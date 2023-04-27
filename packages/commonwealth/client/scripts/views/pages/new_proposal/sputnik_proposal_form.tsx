@@ -1,10 +1,8 @@
-/* @jsx m */
+import React, { useState } from 'react';
 
-import ClassComponent from 'class_component';
 import { notifyError } from 'controllers/app/notifications';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
-import m from 'mithril';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -30,112 +28,99 @@ const sputnikProposalOptions = [
   },
 ];
 
-export class SputnikProposalForm extends ClassComponent {
-  private description: string;
-  private member: string;
-  private payoutAmount: string;
-  private sputnikProposalType: string;
-  private tokenId: string;
+export const SputnikProposalForm = () => {
+  const [description, setDescription] = useState('');
+  const [member, setMember] = useState('');
+  const [payoutAmount, setPayoutAmount] = useState(0);
+  const [sputnikProposalType, setSputnikProposalType] = useState(
+    sputnikProposalOptions[0].value
+  );
+  const [tokenId, setTokenId] = useState('');
 
-  oninit() {
-    this.sputnikProposalType = sputnikProposalOptions[0].value;
-  }
-
-  view() {
-    return (
-      <>
-        <CWDropdown
-          label="Proposal Type"
-          defaultValue={sputnikProposalOptions[0]}
-          options={sputnikProposalOptions}
-          onSelect={(item) => {
-            this.sputnikProposalType = item.value;
-          }}
-        />
-        {this.sputnikProposalType !== 'vote' && (
-          <CWTextInput
-            label="Member"
-            defaultValue="tokenfactory.testnet"
-            oninput={(e) => {
-              this.member = e.target.value;
-            }}
-          />
-        )}
+  return (
+    <>
+      <CWDropdown
+        label="Proposal Type"
+        initialValue={sputnikProposalOptions[0]}
+        options={sputnikProposalOptions}
+        onSelect={(item) => {
+          setSputnikProposalType(item.value);
+        }}
+      />
+      {sputnikProposalType !== 'vote' && (
         <CWTextInput
-          label="Description"
-          defaultValue=""
-          oninput={(e) => {
-            this.description = e.target.value;
+          label="Member"
+          defaultValue="tokenfactory.testnet"
+          onInput={(e) => {
+            setMember(e.target.value);
           }}
         />
-        {this.sputnikProposalType === 'payout' && (
-          <CWTextInput
-            label="Token ID (leave blank for Ⓝ)"
-            defaultValue=""
-            oninput={(e) => {
-              this.tokenId = e.target.value;
-            }}
-          />
-        )}
-        {this.sputnikProposalType === 'payout' && (
-          <CWTextInput
-            label="Amount"
-            defaultValue=""
-            oninput={(e) => {
-              this.payoutAmount = e.target.value;
-            }}
-          />
-        )}
-        <CWButton
-          label="Send transaction"
-          onclick={(e) => {
-            e.preventDefault();
+      )}
+      <CWTextInput
+        label="Description"
+        defaultValue=""
+        onInput={(e) => {
+          setDescription(e.target.value);
+        }}
+      />
+      {sputnikProposalType === 'payout' && (
+        <CWTextInput
+          label="Token ID (leave blank for Ⓝ)"
+          defaultValue=""
+          onInput={(e) => {
+            setTokenId(e.target.value);
+          }}
+        />
+      )}
+      {sputnikProposalType === 'payout' && (
+        <CWTextInput
+          label="Amount"
+          defaultValue=""
+          onInput={(e) => {
+            setPayoutAmount(e.target.value);
+          }}
+        />
+      )}
+      <CWButton
+        label="Send transaction"
+        onClick={(e) => {
+          e.preventDefault();
 
-            // TODO: make type of proposal switchable
-            const member = this.member;
+          let propArgs: NearSputnikProposalKind;
 
-            const description = this.description;
-
-            let propArgs: NearSputnikProposalKind;
-
-            if (this.sputnikProposalType === 'addMember') {
-              propArgs = {
-                AddMemberToRole: { role: 'council', member_id: member },
-              };
-            } else if (this.sputnikProposalType === 'removeMember') {
-              propArgs = {
-                RemoveMemberFromRole: { role: 'council', member_id: member },
-              };
-            } else if (this.sputnikProposalType === 'payout') {
-              // TODO: validate amount / token id
-              const tokenId = this.tokenId || '';
-
-              let amount: string;
-              // treat NEAR as in dollars but tokens as whole #s
-              if (!tokenId) {
-                amount = app.chain.chain
-                  .coins(+this.payoutAmount, true)
-                  .asBN.toString();
-              } else {
-                amount = `${+this.payoutAmount}`;
-              }
-
-              propArgs = {
-                Transfer: { receiver_id: member, token_id: tokenId, amount },
-              };
-            } else if (this.sputnikProposalType === 'vote') {
-              propArgs = 'Vote';
+          if (sputnikProposalType === 'addMember') {
+            propArgs = {
+              AddMemberToRole: { role: 'council', member_id: member },
+            };
+          } else if (sputnikProposalType === 'removeMember') {
+            propArgs = {
+              RemoveMemberFromRole: { role: 'council', member_id: member },
+            };
+          } else if (sputnikProposalType === 'payout') {
+            let amount: string;
+            // treat NEAR as in dollars but tokens as whole #s
+            if (!tokenId) {
+              amount = app.chain.chain
+                .coins(+payoutAmount, true)
+                .asBN.toString();
             } else {
-              throw new Error('unsupported sputnik proposal type');
+              amount = `${+payoutAmount}`;
             }
 
-            (app.chain as NearSputnik).dao
-              .proposeTx(description, propArgs)
-              .then(() => m.redraw())
-              .catch((err) => notifyError(err.message));
-          }}
-        />
-      </>
-    );
-  }
-}
+            propArgs = {
+              Transfer: { receiver_id: member, token_id: tokenId, amount },
+            };
+          } else if (sputnikProposalType === 'vote') {
+            propArgs = 'Vote';
+          } else {
+            throw new Error('unsupported sputnik proposal type');
+          }
+
+          (app.chain as NearSputnik).dao
+            .proposeTx(description, propArgs)
+            .catch((err) => notifyError(err.message));
+        }}
+      />
+    </>
+  );
+};

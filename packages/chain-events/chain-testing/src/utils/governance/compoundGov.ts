@@ -42,7 +42,7 @@ export class compoundGovernor implements IGovernor {
         [
           '0xecb9a875000000000000000000000000c3d688b66703497daa19211eedff47f25384cdc3000000000000000000000000c00e94cb662c3520282e6f5717214004a7f268880000000000000000000000000000000000000000000000000b84c09a3b930000',
         ],
-        'Liquidation ratio proposal'
+        'Liquidation ratio propoasl'
       )
       .send({ from: accounts, gasLimit: 1000000 });
 
@@ -154,23 +154,18 @@ export class compoundGovernor implements IGovernor {
     );
     let txReceipt;
     if (currBalance.lt(tokensNeeded)) {
-      const compoundReservoir = '0x2775b1c75658Be0F640272CCb8c72ac986009e38';
-      const binanceWallet = '0xF977814e90dA44bFA03b6295A0616a897441aceC';
-      const someFund = '0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7';
-
       try {
         txReceipt = await compToken.methods
           .transfer(accounts, tokensNeeded)
           .send({
-            from: binanceWallet,
+            from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
             gasLimit: 100000,
           });
-      } catch (e) {
-        console.error(e);
+      } catch {
         txReceipt = await compToken.methods
           .transfer(accounts, tokensNeeded)
           .send({
-            from: someFund,
+            from: '0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7',
             gasLimit: 100000,
           });
       }

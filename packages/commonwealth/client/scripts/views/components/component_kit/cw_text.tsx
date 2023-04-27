@@ -1,9 +1,6 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_text.scss';
-import m from 'mithril';
 import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
@@ -34,7 +31,7 @@ type FontType =
   | 'buttonLg'
   | 'buttonMini';
 
-type TextStyleAttrs = {
+type TextStyleProps = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;
@@ -42,12 +39,12 @@ type TextStyleAttrs = {
   isCentered?: boolean;
   noWrap?: boolean; // parent must be flex container and have definite width for this to work
   type?: FontType;
+  truncate?: boolean;
 };
 
-type TextAttrs = {
-  onclick?: (e?: MouseEvent) => void;
-  title?: string | number;
-} & TextStyleAttrs;
+type TextProps = TextStyleProps &
+  React.PropsWithChildren &
+  React.HTMLAttributes<HTMLDivElement>;
 
 const getFontWeight = (type: FontType) => {
   if (type === 'buttonSm' || type === 'buttonLg') {
@@ -59,40 +56,42 @@ const getFontWeight = (type: FontType) => {
   }
 };
 
-export class CWText extends ClassComponent<TextAttrs> {
-  view(vnode: m.Vnode<TextAttrs>) {
-    const {
-      className,
-      disabled = false,
-      isCentered,
-      fontStyle,
-      onclick,
-      noWrap = false,
-      title,
-      type = 'b1',
-      fontWeight = getFontWeight(type),
-    } = vnode.attrs;
+export const CWText = (props: TextProps) => {
+  const {
+    className,
+    disabled = false,
+    isCentered,
+    fontStyle,
+    onClick,
+    noWrap = false,
+    title,
+    type = 'b1',
+    fontWeight = getFontWeight(type),
+    truncate = false,
+    ...otherProps
+  } = props;
 
-    return (
-      <div
-        class={getClasses<TextStyleAttrs & { onclick?: boolean }>(
-          {
-            type,
-            fontWeight,
-            disabled,
-            fontStyle,
-            noWrap,
-            onclick: !!onclick,
-            isCentered,
-            className,
-          },
-          ComponentType.Text
-        )}
-        title={title}
-        onclick={onclick}
-      >
-        {vnode.children}
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      className={getClasses<TextStyleProps & { onClick?: boolean }>(
+        {
+          type,
+          fontWeight,
+          disabled,
+          fontStyle,
+          noWrap,
+          onClick: !!onClick,
+          isCentered,
+          className,
+          truncate,
+        },
+        ComponentType.Text
+      )}
+      title={title ? title.toString() : undefined}
+      onClick={onClick}
+      {...otherProps}
+    >
+      {props.children}
+    </div>
+  );
+};

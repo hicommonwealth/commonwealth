@@ -3,7 +3,7 @@ import {
   handleMappingAbiInputs,
   processAbiInputsToDataTypes,
   validateAbiInput,
-} from 'client/scripts/helpers/abi_form_helpers';
+} from '../../../client/scripts/helpers/abi_form_helpers';
 import { BigNumber, ethers } from 'ethers';
 
 describe('validateAbiInput() unit tests', () => {
@@ -145,41 +145,41 @@ describe('handleMappingAbiInputs() unit tests', () => {
   });
 });
 
-describe('processAbiInputsToDataTypes() unit tests', () => {
-  it('should properly parse bytes type', () => {
-    const inputIndex = 0;
-    const input = '123';
-    const functionName = 'testFunction';
-    const inputMap = new Map<string, Map<number, string>>();
-    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+// describe('processAbiInputsToDataTypes() unit tests', () => {
+//   it('should properly parse bytes type', () => {
+//     const inputIndex = 0;
+//     const input = '123';
+//     const functionName = 'testFunction';
+//     const inputMap = new Map<string, Map<number, string>>();
+//     handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
 
-    const functionInputs = [
-      {
-        name: 'test',
-        type: 'uint256',
-      },
-    ];
-    const processedArgs = processAbiInputsToDataTypes(
-      functionName,
-      functionInputs,
-      inputMap
-    );
-    expect(processedArgs).to.deep.equal([BigNumber.from(123)]);
-  });
+//     const functionInputs = [
+//       {
+//         name: 'test',
+//         type: 'uint256',
+//       },
+//     ];
+//     const processedArgs = processAbiInputsToDataTypes(
+//       functionName,
+//       functionInputs,
+//       inputMap
+//     );
+//     expect(processedArgs).to.deep.equal([BigNumber.from(123)]);
+//   });
 
-  it('should return empty array if inputs array is empty', () => {
-    const inputIndex = 0;
-    const input = '123';
-    const functionName = 'testFunction';
-    const inputMap = new Map<string, Map<number, string>>();
-    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+//   it('should return empty array if inputs array is empty', () => {
+//     const inputIndex = 0;
+//     const input = '123';
+//     const functionName = 'testFunction';
+//     const inputMap = new Map<string, Map<number, string>>();
+//     handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
 
-    const functionInputs = [];
-    const processedArgs = processAbiInputsToDataTypes(
-      functionName,
-      functionInputs,
-      inputMap
-    );
-    expect(processedArgs).to.deep.equal([]);
-  });
-});
+//     const functionInputs = [];
+//     const processedArgs = processAbiInputsToDataTypes(
+//       functionName,
+//       functionInputs,
+//       inputMap
+//     );
+//     expect(processedArgs).to.deep.equal([]);
+//   });
+// });

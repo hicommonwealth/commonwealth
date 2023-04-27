@@ -1,9 +1,9 @@
-import m from 'mithril';
 import { notifySuccess } from 'controllers/app/notifications';
+import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
 const handleUpdateEmailConfirmation = () => {
-  if (m.route.param('confirmation')) {
-    if (m.route.param('confirmation') === 'success') {
+  if (_DEPRECATED_getSearchParams('confirmation')) {
+    if (_DEPRECATED_getSearchParams('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
     }
   }

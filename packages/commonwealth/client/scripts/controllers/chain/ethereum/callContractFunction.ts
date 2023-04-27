@@ -7,15 +7,20 @@ import type { AbiItem } from 'web3-utils';
 import type Contract from 'client/scripts/models/Contract';
 import type { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
-import type { Result } from 'ethers/lib/utils';
 
-async function sendFunctionCall(
-  fn: AbiItem,
-  signingWallet: IWebWallet<any>,
-  contract: Contract,
-  functionTx: any,
-  web3: Web3
-) {
+async function sendFunctionCall({
+  fn,
+  signingWallet,
+  contract,
+  functionTx,
+  web3,
+}: {
+  fn: AbiItem;
+  signingWallet: IWebWallet<any>;
+  contract: Contract;
+  functionTx: any;
+  web3: Web3;
+}) {
   let txReceipt: TransactionReceipt | any;
   if (
     fn.stateMutability !== 'view' &&
@@ -28,6 +33,8 @@ async function sendFunctionCall(
       to: contract.address,
       data: functionTx,
     };
+    const estimate = await web3.eth.estimateGas(tx);
+    tx.gas = estimate;
     txReceipt = await web3.eth.sendTransaction(tx);
   } else {
     // send call transaction
@@ -51,12 +58,17 @@ async function sendFunctionCall(
  *
  * @throw Error if the contract is not found, or if the web3 api is not initialized or
  * if there is a web3 api calls are misconfigured or fail.
+ * // TODO: add formInputMap shape for clarity
  */
-export async function callContractFunction(
-  contract: Contract,
-  fn: AbiItem,
-  formInputMap: Map<string, Map<number, string>>
-): Promise<Result> {
+export async function callContractFunction({
+  contract,
+  fn,
+  inputArgs,
+}: {
+  contract: Contract;
+  fn: AbiItem;
+  inputArgs: string[];
+}): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await app.wallets.locateWallet(
@@ -69,19 +81,29 @@ export async function callContractFunction(
   const web3: Web3 = signingWallet.api;
 
   // handle processing the forms inputs into their proper data types
-  const processedArgs = processAbiInputsToDataTypes(
-    fn.name,
-    fn.inputs,
-    formInputMap
-  );
+  const processedArgs = processAbiInputsToDataTypes(fn.inputs, inputArgs);
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
-  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+  const functionConfig: {
+    fn: AbiItem;
+    signingWallet: IWebWallet<any>;
+    contract: Contract;
+    functionTx: any;
+    web3: Web3;
+  } = {
     fn,
     signingWallet,
     contract,
     functionTx,
-    web3
+    web3,
+  };
+  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+    functionConfig
   );
-  return ethersInterface.decodeFunctionResult(fn.name, txReceipt);
+  return txReceipt;
+}
+
+export function encodeParameters(types, values) {
+  const abi = new ethers.utils.AbiCoder();
+  return abi.encode(types, values);
 }

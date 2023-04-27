@@ -1,64 +1,59 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_checkbox.scss';
-import m from 'mithril';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
-import type { StyleAttrs } from './types';
+import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
 
 export type CheckboxType = { label?: string; value?: string };
 
-type CheckboxStyleAttrs = {
+type CheckboxStyleProps = {
   checked?: boolean;
   indeterminate?: boolean;
-} & StyleAttrs;
+} & BaseStyleProps;
 
-type CheckboxAttrs = {
+type CheckboxProps = {
   groupName?: string;
-  onchange?: (e?: any) => void;
+  onChange?: (e?: any) => void;
 } & CheckboxType &
-  CheckboxStyleAttrs;
+  CheckboxStyleProps;
 
-export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
-  view(vnode: m.Vnode<CheckboxAttrs>) {
-    const {
-      className,
-      disabled = false,
-      indeterminate = false,
-      label,
-      onchange,
-      checked,
-      value,
-    } = vnode.attrs;
+export const CWCheckbox = (props: CheckboxProps) => {
+  const {
+    className,
+    disabled = false,
+    indeterminate = false,
+    label,
+    onChange,
+    checked,
+    value,
+  } = props;
 
-    const params = {
-      disabled,
-      onchange,
-      checked,
-      type: 'checkbox',
-      value,
-    };
+  const params = {
+    disabled,
+    onChange,
+    checked,
+    type: 'checkbox',
+    value,
+  };
 
-    return (
-      <label
-        class={getClasses<CheckboxStyleAttrs>(
-          {
-            checked,
-            disabled,
-            indeterminate,
-            className,
-          },
-          ComponentType.Checkbox
-        )}
-      >
-        <input class="checkbox-input" {...params} />
-        <div class="checkbox-control" />
-        <CWText className="checkbox-label">{label || value}</CWText>
-      </label>
-    );
-  }
-}
+  return (
+    <label
+      className={getClasses<CheckboxStyleProps>(
+        {
+          checked,
+          disabled,
+          indeterminate,
+          className,
+        },
+        ComponentType.Checkbox
+      )}
+    >
+      <input className="checkbox-input" {...params} />
+      <div className="checkbox-control" />
+      <CWText className="checkbox-label">{label || value}</CWText>
+    </label>
+  );
+};

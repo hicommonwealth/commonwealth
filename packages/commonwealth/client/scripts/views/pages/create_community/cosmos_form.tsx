@@ -1,155 +1,138 @@
-/* @jsx m */
-
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'state';
-import ClassComponent from 'class_component';
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import React, { useState } from 'react';
 import $ from 'jquery';
-import m from 'mithril';
+
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import 'pages/create_community.scss';
 
+import { initAppState } from 'state';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { IdRow, InputRow } from '../../components/metadata_rows';
-import { defaultChainRows, initChainForm } from './chain_input_rows';
-import type { ChainFormFields, ChainFormState, EthFormFields } from './types';
+import { defaultChainRows } from './chain_input_rows';
+import { useCommonNavigate } from 'navigation/helpers';
+import {
+  useChainFormIdFields,
+  useChainFormDefaultFields,
+  useChainFormState,
+  useEthChainFormFields,
+} from './hooks';
 
-// TODO: populate additional fields
+export const CosmosForm = () => {
+  const [bech32Prefix, setBech32Prefix] = useState('');
+  const [decimals, setDecimals] = useState(6);
 
-type CosmosFormFields = {
-  bech32Prefix: string;
-  decimals: number;
-};
+  const { id, setId, name, setName, symbol, setSymbol } =
+    useChainFormIdFields();
 
-type CreateCosmosForm = ChainFormFields & EthFormFields & CosmosFormFields;
+  const chainFormDefaultFields = useChainFormDefaultFields();
 
-type CreateCosmosState = ChainFormState & { form: CreateCosmosForm };
+  const { message, saving, setMessage, setSaving } = useChainFormState();
 
-export class CosmosForm extends ClassComponent {
-  private state: CreateCosmosState = {
-    message: '',
-    saving: false,
-    form: {
-      altWalletUrl: '',
-      bech32Prefix: '',
-      decimals: 6,
-      id: '',
-      name: '',
-      symbol: 'XYZ',
-      nodeUrl: '',
-      ...initChainForm(),
-    },
-  };
+  const { altWalletUrl, chainString, ethChainId, nodeUrl, setNodeUrl } =
+    useEthChainFormFields();
 
-  view() {
-    return (
-      <div class="CreateCommunityForm">
-        <InputRow
-          title="RPC URL"
-          value={this.state.form.nodeUrl}
-          placeholder="http://my-rpc.cosmos-chain.com:26657/"
-          onChangeHandler={async (v) => {
-            this.state.form.nodeUrl = v;
-          }}
-        />
-        <InputRow
-          title="Name"
-          value={this.state.form.name}
-          onChangeHandler={(v) => {
-            this.state.form.name = v;
-            this.state.form.id = slugifyPreserveDashes(v);
-          }}
-        />
-        <IdRow id={this.state.form.id} />
-        <InputRow
-          title="Symbol"
-          value={this.state.form.symbol}
-          placeholder="XYZ"
-          onChangeHandler={(v) => {
-            this.state.form.symbol = v;
-          }}
-        />
-        <InputRow
-          title="Bech32 Prefix"
-          value={this.state.form.bech32Prefix}
-          placeholder="cosmos"
-          onChangeHandler={async (v) => {
-            this.state.form.bech32Prefix = v;
-          }}
-        />
-        <InputRow
-          title="Decimals"
-          value={`${this.state.form.decimals}`}
-          disabled={true}
-          onChangeHandler={(v) => {
-            this.state.form.decimals = +v;
-          }}
-        />
-        {/* TODO: add alt wallet URL field */}
-        {...defaultChainRows(this.state.form)}
-        <CWButton
-          label="Save changes"
-          disabled={this.state.saving}
-          onclick={async () => {
-            const {
-              altWalletUrl,
-              bech32Prefix,
-              chainString,
-              ethChainId,
-              nodeUrl,
-              symbol,
-              iconUrl,
-            } = this.state.form;
-            this.state.saving = true;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
+  const navigate = useCommonNavigate();
+
+  return (
+    <div className="CreateCommunityForm">
+      <InputRow
+        title="RPC URL"
+        value={nodeUrl}
+        placeholder="http://my-rpc.cosmos-chain.com:26657/"
+        onChangeHandler={async (v) => {
+          setNodeUrl(v);
+        }}
+      />
+      <InputRow
+        title="Name"
+        value={name}
+        onChangeHandler={(v) => {
+          setName(v);
+          setId(slugifyPreserveDashes(v));
+        }}
+      />
+      <IdRow id={id} />
+      <InputRow
+        title="Symbol"
+        value={symbol}
+        placeholder="XYZ"
+        onChangeHandler={(v) => {
+          setSymbol(v);
+        }}
+      />
+      <InputRow
+        title="Bech32 Prefix"
+        value={bech32Prefix}
+        placeholder="cosmos"
+        onChangeHandler={async (v) => {
+          setBech32Prefix(v);
+        }}
+      />
+      <InputRow
+        title="Decimals"
+        value={`${decimals}`}
+        disabled={true}
+        onChangeHandler={(v) => {
+          setDecimals(+v);
+        }}
+      />
+      {defaultChainRows(chainFormDefaultFields)}
+      <CWButton
+        label="Save changes"
+        disabled={saving}
+        onClick={async () => {
+          setSaving(true);
+
+          // mixpanelBrowserTrack({
+          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+          //   chainBase: null,
+          //   isCustomDomain: app.isCustomDomain(),
+          //   communityType: null,
+          // });
+
+          try {
+            const res = await $.post(`${app.serverUrl()}/createChain`, {
+              alt_wallet_url: altWalletUrl,
+              base: ChainBase.CosmosSDK,
+              bech32_prefix: bech32Prefix,
+              chain_string: chainString,
+              eth_chain_id: ethChainId,
+              jwt: app.user.jwt,
+              network: id,
+              node_url: nodeUrl,
+              icon_url: chainFormDefaultFields.iconUrl,
+              type: ChainType.Chain,
+              default_symbol: symbol,
+              // ...form, <-- not typed so I don't know what's needed
             });
-            try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
-                alt_wallet_url: altWalletUrl,
-                base: ChainBase.CosmosSDK,
-                bech32_prefix: bech32Prefix,
-                chain_string: chainString,
-                eth_chain_id: ethChainId,
-                jwt: app.user.jwt,
-                network: this.state.form.id,
-                node_url: nodeUrl,
-                icon_url: iconUrl,
-                type: ChainType.Chain,
-                default_symbol: symbol,
-                ...this.state.form,
-              });
-              if (res.result.admin_address) {
-                await linkExistingAddressToChainOrCommunity(
-                  res.result.admin_address,
-                  res.result.role.chain_id,
-                  res.result.role.chain_id
-                );
-              }
-              await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
-            } catch (err) {
-              this.state.message =
-                err.responseJSON?.error ||
-                'Creating new Cosmos community failed';
-            } finally {
-              this.state.saving = false;
-              m.redraw();
+
+            if (res.result.admin_address) {
+              await linkExistingAddressToChainOrCommunity(
+                res.result.admin_address,
+                res.result.role.chain_id,
+                res.result.role.chain_id
+              );
             }
-          }}
-        />
-        {this.state.message && (
-          <CWValidationText message={this.state.message} status="failure" />
-        )}
-      </div>
-    );
-  }
-}
+
+            await initAppState(false);
+
+            navigate(`/${res.result.chain?.id}`);
+          } catch (err) {
+            setMessage(
+              err.responseJSON?.error || 'Creating new Cosmos community failed'
+            );
+          } finally {
+            setSaving(false);
+          }
+        }}
+      />
+      {message && <CWValidationText message={message} status="failure" />}
+    </div>
+  );
+};

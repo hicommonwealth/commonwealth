@@ -5,19 +5,39 @@
   flex: 1;
   gap: 56px;
   justify-content: space-between;
-  padding: 24px;
+  width: auto;
+  z-index: 0;
+  @media (min-width: $breakpoint-medium-min-px) {
+    /* CommunityPreviewCard 392px width +
+       DashboardCommunitiesPreview 50px right edge */
+    margin-right: 442px;
+  }
+
+  @include contentPadding;
 
   .dashboard-column {
     display: flex;
     flex-direction: column;
-    gap: 16px;
     width: 100%;
+    min-width: 0;
 
     .dashboard-header {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 24px;
       width: 100%;
+      margin-bottom: 16px;
     }
   }
+
+  .Divider {
+    margin-top: 8px;
+    min-width: 100%;
+    max-width: 0;
+  }
+}
+
+.dashboard-filter-items.Card {
+  background: $white;
+  width: 100%;
 }

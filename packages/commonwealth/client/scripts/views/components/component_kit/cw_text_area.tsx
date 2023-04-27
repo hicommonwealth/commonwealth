@@ -1,107 +1,104 @@
-/* @jsx m */
+import React from 'react';
 
-import ClassComponent from 'class_component';
+import { redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_area.scss';
-import m from 'mithril';
-import type { BaseTextInputAttrs } from './cw_text_input';
-import { MessageRow } from './cw_text_input';
-import type { ValidationStatus } from './cw_validation_text';
-import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
+import { getClasses } from './helpers';
+import type { ValidationStatus } from './cw_validation_text';
+import { MessageRow, useTextInputWithValidation } from './cw_text_input';
+import type { BaseTextInputProps } from './cw_text_input';
 
-type TextAreaStyleAttrs = {
+type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
 };
 
-type TextAreaAttrs = BaseTextInputAttrs & TextAreaStyleAttrs;
+type TextAreaProps = BaseTextInputProps & TextAreaStyleProps;
 
-export class CWTextArea extends ClassComponent<TextAreaAttrs> {
-  private inputTimeout: NodeJS.Timeout;
-  private isTyping: boolean;
-  private statusMessage?: string = '';
-  private validationStatus?: ValidationStatus = undefined;
+export const CWTextArea = (props: TextAreaProps) => {
+  const validationProps = useTextInputWithValidation();
 
-  view(vnode: m.Vnode<TextAreaAttrs>) {
-    const {
-      autocomplete,
-      autofocus,
-      value,
-      disabled,
-      inputValidationFn,
-      label,
-      maxlength,
-      name,
-      oninput,
-      placeholder,
-      tabindex,
-    } = vnode.attrs;
+  const {
+    autoComplete,
+    autoFocus,
+    value,
+    disabled,
+    inputValidationFn,
+    label,
+    maxLength,
+    name,
+    onInput,
+    placeholder,
+    tabIndex,
+  } = props;
 
-    return (
-      <div class={ComponentType.TextArea}>
-        {label && (
-          <MessageRow
-            hasFeedback={!!inputValidationFn}
-            label={label}
-            statusMessage={this.statusMessage}
-            validationStatus={this.validationStatus}
-          />
-        )}
-        <textarea
-          autofocus={autofocus}
-          autocomplete={autocomplete}
-          class={getClasses<TextAreaStyleAttrs & { isTyping: boolean }>({
-            validationStatus: this.validationStatus,
-            disabled,
-            isTyping: this.isTyping,
-          })}
-          disabled={disabled}
-          tabindex={tabindex}
-          maxlength={maxlength}
-          name={name}
-          placeholder={placeholder}
-          oninput={(e) => {
-            if (oninput) oninput(e);
-
-            if (e.target.value?.length === 0) {
-              this.isTyping = false;
-              this.validationStatus = undefined;
-              this.statusMessage = undefined;
-              m.redraw();
-            } else {
-              e.stopPropagation();
-              this.isTyping = true;
-              clearTimeout(this.inputTimeout);
-              const timeout = e.target.value?.length > 3 ? 250 : 1000;
-              this.inputTimeout = setTimeout(() => {
-                this.isTyping = false;
-                if (inputValidationFn && e.target.value?.length > 3) {
-                  [this.validationStatus, this.statusMessage] =
-                    inputValidationFn(e.target.value);
-                  m.redraw();
-                }
-              }, timeout);
-            }
-          }}
-          onfocusout={(e) => {
-            if (inputValidationFn) {
-              if (e.target.value?.length === 0) {
-                this.isTyping = false;
-                this.validationStatus = undefined;
-                this.statusMessage = undefined;
-                m.redraw();
-              } else {
-                [this.validationStatus, this.statusMessage] = inputValidationFn(
-                  e.target.value
-                );
-              }
-            }
-          }}
-          value={value}
+  return (
+    <div className={ComponentType.TextArea}>
+      {label && (
+        <MessageRow
+          hasFeedback={!!inputValidationFn}
+          label={label}
+          statusMessage={validationProps.statusMessage}
+          validationStatus={validationProps.validationStatus}
         />
-      </div>
-    );
-  }
-}
+      )}
+      <textarea
+        autoFocus={autoFocus}
+        autoComplete={autoComplete}
+        className={getClasses<TextAreaStyleProps & { isTyping: boolean }>({
+          validationStatus: validationProps.validationStatus,
+          disabled,
+          isTyping: validationProps.isTyping,
+        })}
+        disabled={disabled}
+        tabIndex={tabIndex}
+        maxLength={maxLength}
+        name={name}
+        placeholder={placeholder}
+        onInput={(e) => {
+          if (onInput) onInput(e);
+
+          if (e.currentTarget.value?.length === 0) {
+            validationProps.setIsTyping(false);
+            validationProps.setValidationStatus(undefined);
+            validationProps.setStatusMessage(undefined);
+            redraw();
+          } else {
+            e.stopPropagation();
+            validationProps.setIsTyping(true);
+            clearTimeout(validationProps.inputTimeout);
+            const timeout = e.currentTarget.value?.length > 3 ? 250 : 1000;
+            validationProps.setInputTimeout(
+              setTimeout(() => {
+                validationProps.setIsTyping(false);
+                if (inputValidationFn && e.currentTarget.value.length > 3) {
+                  const result = inputValidationFn(e.currentTarget.value);
+                  validationProps.setValidationStatus(result[0]);
+                  validationProps.setStatusMessage(result[1]);
+                  redraw();
+                }
+              }, timeout)
+            );
+          }
+        }}
+        onBlur={(e) => {
+          if (inputValidationFn) {
+            if (e.target.value?.length === 0) {
+              validationProps.setIsTyping(false);
+              validationProps.setValidationStatus(undefined);
+              validationProps.setStatusMessage(undefined);
+              redraw();
+            } else {
+              const result = inputValidationFn(e.currentTarget.value);
+              validationProps.setValidationStatus(result[0]);
+              validationProps.setStatusMessage(result[1]);
+            }
+          }
+        }}
+        value={value}
+      />
+    </div>
+  );
+};

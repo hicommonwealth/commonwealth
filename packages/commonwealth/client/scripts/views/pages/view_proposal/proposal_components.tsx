@@ -1,10 +1,9 @@
-/* @jsx m */
+import React, { useEffect } from 'react';
 
-import ClassComponent from 'class_component';
+import app from 'state';
+
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-
-import m from 'mithril';
 
 import 'pages/view_proposal/proposal_components.scss';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -19,195 +18,147 @@ import {
   ThreadLink,
   VotingInterfaceLink,
 } from './proposal_header_links';
+import useForceRerender from 'hooks/useForceRerender';
 
-type BaseCancelButtonAttrs = {
+type BaseCancelButtonProps = {
   onModalClose?: () => void;
   toggleVotingModal?: (newModalState: boolean) => void;
   votingModalOpen?: boolean;
 };
 
-type AaveCancelButtonAttrs = {
+type AaveCancelButtonProps = {
   proposal: AaveProposal;
-} & BaseCancelButtonAttrs;
+} & BaseCancelButtonProps;
 
-export class AaveCancelButton extends ClassComponent<AaveCancelButtonAttrs> {
-  view(vnode: m.Vnode<AaveCancelButtonAttrs>) {
-    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
-      vnode.attrs;
+export const AaveCancelButton = (props: AaveCancelButtonProps) => {
+  const { proposal, votingModalOpen, onModalClose, toggleVotingModal } = props;
 
-    return (
-      <CWButton
-        buttonType="primary-red"
-        disabled={!proposal.isCancellable || votingModalOpen}
-        onclick={(e) =>
-          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
-        }
-        label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
-      />
-    );
-  }
-}
+  return (
+    <CWButton
+      buttonType="primary-red"
+      disabled={!proposal.isCancellable || votingModalOpen}
+      onClick={(e) =>
+        cancelProposal(e, toggleVotingModal, proposal, onModalClose)
+      }
+      label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
+    />
+  );
+};
 
-type CompoundCancelButtonAttrs = {
+type CompoundCancelButtonProps = {
   proposal: CompoundProposal;
-} & BaseCancelButtonAttrs;
+} & BaseCancelButtonProps;
 
-export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAttrs> {
-  view(vnode: m.Vnode<CompoundCancelButtonAttrs>) {
-    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
-      vnode.attrs;
+export const CompoundCancelButton = (props: CompoundCancelButtonProps) => {
+  const { proposal, votingModalOpen, onModalClose, toggleVotingModal } = props;
 
-    return (
-      <CWButton
-        buttonType="primary-red"
-        disabled={proposal.completed || votingModalOpen}
-        onclick={(e) =>
-          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
-        }
-        label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
-      />
-    );
-  }
-}
+  return (
+    <CWButton
+      buttonType="primary-red"
+      disabled={proposal.completed || votingModalOpen}
+      onClick={(e) =>
+        cancelProposal(e, toggleVotingModal, proposal, onModalClose)
+      }
+      label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
+    />
+  );
+};
 
 export type SubheaderProposalType = AaveProposal | CompoundProposal;
 
-type ProposalSubheaderAttrs = {
+type ProposalSubheaderProps = {
   proposal: SubheaderProposalType;
-} & BaseCancelButtonAttrs;
+} & BaseCancelButtonProps;
 
-export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
-  view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
-    const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
-      vnode.attrs;
+export const ProposalSubheader = (props: ProposalSubheaderProps) => {
+  const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
+  const forceRerender = useForceRerender();
 
-    return (
-      <div class="ProposalSubheader">
-        <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
-          {getStatusText(proposal)}
-        </CWText>
-        {(proposal['blockExplorerLink'] ||
-          proposal['votingInterfaceLink'] ||
-          proposal.threadId) && (
-          <div class="proposal-links">
-            {proposal.threadId && <ThreadLink proposal={proposal} />}
-            {proposal['blockExplorerLink'] && (
-              <BlockExplorerLink proposal={proposal} />
-            )}
-            {proposal['votingInterfaceLink'] && (
-              <VotingInterfaceLink proposal={proposal} />
-            )}
-          </div>
-        )}
+  useEffect(() => {
+    app.proposalEmitter.on('redraw', forceRerender);
 
-        {proposal instanceof AaveProposal && (
-          <div class="proposal-buttons">
-            {proposal.isQueueable && (
-              <CWButton
-                disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => m.redraw())}
-                label={
-                  proposal.data.queued || proposal.data.executed
-                    ? 'Queued'
-                    : 'Queue'
-                }
-              />
-            )}
-            {proposal.isExecutable && (
-              <CWButton
-                disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => m.redraw())}
-                label={proposal.data.executed ? 'Executed' : 'Execute'}
-              />
-            )}
-            {proposal.isCancellable && (
-              <AaveCancelButton
-                onModalClose={onModalClose}
-                proposal={proposal}
-                toggleVotingModal={toggleVotingModal}
-                votingModalOpen={votingModalOpen}
-              />
-            )}
-          </div>
-        )}
-        {proposal instanceof CompoundProposal && (
-          <div class="proposal-buttons">
-            {proposal.isQueueable && (
-              <CWButton
-                disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => m.redraw())}
-                label={
-                  proposal.data.queued || proposal.data.executed
-                    ? 'Queued'
-                    : 'Queue'
-                }
-              />
-            )}
-            {proposal.isExecutable && (
-              <CWButton
-                disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => m.redraw())}
-                label={proposal.data.executed ? 'Executed' : 'Execute'}
-              />
-            )}
-            <CompoundCancelButton
+    return () => {
+      app.proposalEmitter.removeAllListeners();
+    };
+  }, [forceRerender]);
+
+  return (
+    <div className="ProposalSubheader">
+      <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
+        {getStatusText(proposal)}
+      </CWText>
+      {(proposal['blockExplorerLink'] ||
+        proposal['votingInterfaceLink'] ||
+        proposal.threadId) && (
+        <div className="proposal-links">
+          {proposal.threadId && <ThreadLink proposal={proposal} />}
+          {proposal['blockExplorerLink'] && (
+            <BlockExplorerLink proposal={proposal} />
+          )}
+          {proposal['votingInterfaceLink'] && (
+            <VotingInterfaceLink proposal={proposal} />
+          )}
+        </div>
+      )}
+
+      {proposal instanceof AaveProposal && (
+        <div className="proposal-buttons">
+          {proposal.isQueueable && (
+            <CWButton
+              disabled={votingModalOpen}
+              onClick={() => proposal.queueTx()}
+              label={
+                proposal.data.queued || proposal.data.executed
+                  ? 'Queued'
+                  : 'Queue'
+              }
+            />
+          )}
+          {proposal.isExecutable && (
+            <CWButton
+              disabled={votingModalOpen}
+              onClick={() => proposal.executeTx()}
+              label={proposal.data.executed ? 'Executed' : 'Execute'}
+            />
+          )}
+          {proposal.isCancellable && (
+            <AaveCancelButton
               onModalClose={onModalClose}
               proposal={proposal}
               toggleVotingModal={toggleVotingModal}
               votingModalOpen={votingModalOpen}
             />
-          </div>
-        )}
-      </div>
-    );
-  }
-}
-
-// // needs refactoring
-// export class ProposalBodyLastEdited
-//   extends
-//     ClassComponent<{
-//       item: Thread | Comment<any>;
-//     }>
-// {
-//   view(vnode) {
-//     const { item } = vnode.attrs;
-
-//     const isThread = item instanceof Thread;
-
-//     if (!item.lastEdited) {
-//       return;
-//     }
-
-//     return (
-//       <a
-//         href="#"
-//         onclick={async (e) => {
-//           e.preventDefault();
-
-//           let postWithHistory;
-
-//           const grabHistory = isThread && !item.versionHistory?.length;
-
-//           if (grabHistory) {
-//             try {
-//               postWithHistory = await app.threads.fetchThreadsFromId([item.id]);
-//             } catch (err) {
-//               notifyError('Version history not found.');
-//               return;
-//             }
-//           }
-
-//           app.modals.create({
-//             modal: VersionHistoryModal,
-//             data: {
-//               item: grabHistory && postWithHistory ? postWithHistory : item,
-//             },
-//           });
-//         }}
-//       >
-//         Edited {item.lastEdited.fromNow()}
-//       </a>
-//     );
-//   }
-// }
+          )}
+        </div>
+      )}
+      {proposal instanceof CompoundProposal && (
+        <div className="proposal-buttons">
+          {proposal.isQueueable && (
+            <CWButton
+              disabled={votingModalOpen}
+              onClick={() => proposal.queueTx()}
+              label={
+                proposal.data.queued || proposal.data.executed
+                  ? 'Queued'
+                  : 'Queue'
+              }
+            />
+          )}
+          {proposal.isExecutable && (
+            <CWButton
+              disabled={votingModalOpen}
+              onClick={() => proposal.executeTx()}
+              label={proposal.data.executed ? 'Executed' : 'Execute'}
+            />
+          )}
+          <CompoundCancelButton
+            onModalClose={onModalClose}
+            proposal={proposal}
+            toggleVotingModal={toggleVotingModal}
+            votingModalOpen={votingModalOpen}
+          />
+        </div>
+      )}
+    </div>
+  );
+};

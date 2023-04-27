@@ -1,3 +1,5 @@
+@import '../../shared';
+
 .AddContractAndAbiForm {
   .form {
     display: flex;
@@ -17,5 +19,9 @@
     display: flex;
     justify-content: flex-end;
     gap: 16px;
+  }
+
+  .Label {
+    color: $neutral-600 !important;
   }
 }

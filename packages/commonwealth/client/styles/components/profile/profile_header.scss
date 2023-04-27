@@ -7,7 +7,7 @@
   height: fit-content;
   flex: 1;
   background-color: $white;
-  margin: 0 !important;
+  margin: 0;
 
   @include smallInclusive {
     margin-bottom: 16px;
@@ -29,8 +29,6 @@
       height: 160px;
       width: 160px;
       border-radius: 50%;
-      border: 1px;
-      border-color: $neutral-200;
       object-fit: cover;
     }
   }

@@ -1,7 +1,4 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
@@ -9,24 +6,15 @@ import type { MenuItem } from '../components/component_kit/types';
 
 export const getMainMenuItems = (): Array<MenuItem> => {
   return [
-    // Graham TODO 22.10.05: Reinstate once proper search page built
-    // which can take "empty queries" (i.e. doesn't require active search term)
-    // {
-    //   label: 'Search',
-    //   iconName: 'search',
-    //   mobileCaret: true,
-    //   onclick: () => {
-    //     m.route.set('/search');
-    //   },
-    // },
     ...((app.activeChainId()
       ? [
           {
             label: 'Create',
             iconLeft: 'plusCircle',
             iconRight: 'chevronRight',
-            onclick: () => {
+            onClick: () => {
               app.mobileMenu = 'CreateContentMenu';
+              app.sidebarRedraw.emit('redraw');
             },
           },
         ]
@@ -35,8 +23,9 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       label: 'Help',
       iconLeft: 'help',
       iconRight: 'chevronRight',
-      onclick: () => {
+      onClick: () => {
         app.mobileMenu = 'HelpMenu';
+        app.sidebarRedraw.emit('redraw');
       },
     },
     ...((app.isLoggedIn()
@@ -47,8 +36,9 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             iconRight: 'chevronRight',
             type: 'notification',
             hasUnreads: !!app.user?.notifications.numUnread,
-            onclick: () => {
+            onClick: () => {
               app.mobileMenu = 'NotificationsMenu';
+              app.sidebarRedraw.emit('redraw');
             },
           },
         ]
@@ -56,8 +46,6 @@ export const getMainMenuItems = (): Array<MenuItem> => {
   ];
 };
 
-export class MainMenu extends ClassComponent {
-  view() {
-    return <CWMobileMenu className="MainMenu" menuItems={getMainMenuItems()} />;
-  }
-}
+export const MainMenu = () => {
+  return <CWMobileMenu className="MainMenu" menuItems={getMainMenuItems()} />;
+};

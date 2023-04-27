@@ -1,44 +1,39 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_collapsible.scss';
-import m from 'mithril';
 import { CWIconButton } from './cw_icon_button';
 
 import { ComponentType } from './types';
 
-type CollapsibleAttrs = {
-  collapsibleContent: m.Vnode;
-  headerContent: m.Vnode;
+type CollapsibleProps = {
+  collapsibleContent: React.ReactNode;
+  headerContent: React.ReactNode;
 };
 
-export class CWCollapsible extends ClassComponent<CollapsibleAttrs> {
-  private isExpanded: boolean;
+export const CWCollapsible = (props: CollapsibleProps) => {
+  const { collapsibleContent, headerContent } = props;
 
-  view(vnode: m.Vnode<CollapsibleAttrs>) {
-    const { collapsibleContent, headerContent } = vnode.attrs;
+  const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
 
-    return (
-      <div class={ComponentType.Collapsible}>
-        <div class="header-and-content-container">
-          <div class="collapsible-header">
-            <div class="expand-icon-button">
-              <CWIconButton
-                iconName={this.isExpanded ? 'chevronDown' : 'chevronRight'}
-                iconSize="large"
-                onclick={() => {
-                  this.isExpanded = !this.isExpanded;
-                }}
-              />
-            </div>
-            {headerContent}
+  return (
+    <div className={ComponentType.Collapsible}>
+      <div className="header-and-content-container">
+        <div className="collapsible-header">
+          <div className="expand-icon-button">
+            <CWIconButton
+              iconName={isExpanded ? 'chevronDown' : 'chevronRight'}
+              iconSize="large"
+              onClick={() => {
+                setIsExpanded(!isExpanded);
+              }}
+            />
           </div>
-          <div class="content-container">
-            {this.isExpanded && collapsibleContent}
-          </div>
+          {headerContent}
+        </div>
+        <div className="content-container">
+          {isExpanded && collapsibleContent}
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

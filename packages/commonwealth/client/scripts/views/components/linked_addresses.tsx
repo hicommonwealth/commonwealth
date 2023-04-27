@@ -1,90 +1,94 @@
-/* @jsx m */
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import React, { useState } from 'react';
 
 import 'components/linked_addresses.scss';
 
-import app from 'state';
 import type { AddressInfo, NewProfile as Profile } from 'models';
-import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
+import { Modal } from './component_kit/cw_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 import { CWAddressTooltip } from './component_kit/cw_popover/cw_address_tooltip';
 
-type AddressAttrs = {
+type AddressProps = {
   profile: Profile;
-  addresses: AddressInfo[];
   addressInfo: AddressInfo;
   refreshProfiles: (address: string) => void;
+  toggleRemoveModal: (val: boolean, address: AddressInfo) => void;
 };
 
-type LinkedAddressesAttrs = {
+type LinkedAddressesProps = {
   profile: Profile;
   addresses: AddressInfo[];
   refreshProfiles: (address: string) => void;
 };
 
-class Address extends ClassComponent<AddressAttrs> {
-  view(vnode: m.Vnode<AddressAttrs>) {
-    const { profile, addresses, addressInfo, refreshProfiles } = vnode.attrs;
-    const { address, chain } = addressInfo;
+const Address = (props: AddressProps) => {
+  const { addressInfo, toggleRemoveModal } = props;
+  const { address, chain } = addressInfo;
 
-    return (
-      <div className="AddressContainer">
-        <CWAddressTooltip
-          address={address}
-          trigger={
-            <CWTruncatedAddress address={address} communityInfo={chain} />
-          }
-        />
-        <CWPopoverMenu
-          menuItems={[
-            {
-              label: 'Remove',
-              iconLeft: 'trash',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: DeleteAddressModal,
-                  data: {
-                    profile,
-                    addresses,
-                    address,
-                    chain: chain.id,
-                  },
-                  completeCallback: () => {
-                    refreshProfiles(address);
-                  },
-                });
-              },
-            },
-          ]}
-          trigger={<CWIconButton iconName="dotsVertical" />}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div className="AddressContainer">
+      <CWAddressTooltip
+        address={address}
+        renderTrigger={() => (
+          <CWTruncatedAddress address={address} communityInfo={chain} />
+        )}
+      />
+      <PopoverMenu
+        menuItems={[
+          {
+            label: 'Remove',
+            iconLeft: 'trash',
+            onClick: () => toggleRemoveModal(true, addressInfo),
+          },
+        ]}
+        renderTrigger={(onclick) => (
+          <CWIconButton iconName="dotsVertical" onClick={onclick} />
+        )}
+      />
+    </div>
+  );
+};
 
-export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
-  view(vnode: m.Vnode<LinkedAddressesAttrs>) {
-    const { profile, addresses, refreshProfiles } = vnode.attrs;
+export const LinkedAddresses = (props: LinkedAddressesProps) => {
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState<AddressInfo>();
 
-    return (
-      <div className="LinkedAddresses">
-        {addresses.map((address) => {
-          return (
-            <Address
-              profile={profile}
-              addresses={addresses}
-              addressInfo={address}
-              refreshProfiles={refreshProfiles}
-            />
-          );
-        })}
-      </div>
-    );
-  }
-}
+  const { profile, addresses, refreshProfiles } = props;
+
+  return (
+    <div className="LinkedAddresses">
+      {addresses.map((addr, i) => {
+        return (
+          <Address
+            key={i}
+            profile={profile}
+            addressInfo={addr}
+            refreshProfiles={refreshProfiles}
+            toggleRemoveModal={(val: boolean, address: AddressInfo) => {
+              setIsRemoveModalOpen(val);
+              setCurrentAddress(address);
+            }}
+          />
+        );
+      })}
+      <Modal
+        content={
+          <DeleteAddressModal
+            profile={profile}
+            addresses={addresses}
+            address={currentAddress?.address}
+            chain={currentAddress?.chain.id}
+            closeModal={() => {
+              setIsRemoveModalOpen(false);
+              refreshProfiles(currentAddress.address);
+            }}
+          />
+        }
+        onClose={() => setCurrentAddress(null)}
+        open={isRemoveModalOpen}
+      />
+    </div>
+  );
+};

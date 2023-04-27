@@ -46,6 +46,13 @@ class GqlLazyLoader {
       symbol
       private
       network
+      validation {
+        params
+      }
+      voting {
+        period
+        delay
+      }
       filters {
         minScore
         onlyMembers
@@ -162,6 +169,15 @@ export interface SnapshotSpace {
   symbol: string;
   private: boolean;
   network: string;
+  validation: {
+    params: {
+      minScore: number;
+    };
+  };
+  voting: {
+    period: number;
+    delay: number;
+  };
   filters: {
     minScore: number;
     onlyMembers: boolean;
@@ -279,12 +295,23 @@ export async function getScore(space: SnapshotSpace, address: string) {
   );
 }
 
+export type VoteResultsData = {
+  resultsByVoteBalance: number[][];
+  resultsByStrategyScore: number[];
+  sumOfResultsBalance: number;
+};
+
+export type VoteResults = {
+  votes: SnapshotProposalVote[];
+  results: VoteResultsData;
+};
+
 /* Single Choice Voting */
 
 export async function getResults(
   space: SnapshotSpace,
   proposal: SnapshotProposal
-) {
+): Promise<VoteResults> {
   try {
     let votes = await getVotes(proposal.id);
     const strategies = proposal.strategies ?? space.strategies;
@@ -340,15 +367,20 @@ export async function getResults(
     return { votes, results };
   } catch (e) {
     console.error(e);
-    return e;
+    throw e;
   }
 }
+
+export type Power = {
+  scores: number[];
+  totalScore: number;
+};
 
 export async function getPower(
   space: SnapshotSpace,
   proposal: SnapshotProposal,
   address: string
-) {
+): Promise<Power> {
   const snapshot = await SnapshotLazyLoader.getSnapshot();
   const blockNumber = await snapshot.utils.getBlockNumber(
     snapshot.utils.getProvider(space.network)

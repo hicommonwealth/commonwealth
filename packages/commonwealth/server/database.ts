@@ -46,6 +46,9 @@ import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
+import CommunityContractTemplateFactory from './models/community_contract_template';
+import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
+import TemplateFactory from './models/template';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -88,6 +91,15 @@ const models: Models = {
   Contract: ContractFactory(sequelize, DataTypes),
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
+  CommunityContractTemplate: CommunityContractTemplateFactory(
+    sequelize,
+    DataTypes
+  ),
+  CommunityContractTemplateMetadata: CommunityContractTemplateMetadataFactory(
+    sequelize,
+    DataTypes
+  ),
+  Template: TemplateFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),

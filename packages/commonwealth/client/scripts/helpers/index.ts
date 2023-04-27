@@ -1,15 +1,12 @@
+import type { ClassComponent } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import $ from 'jquery';
-import type { RouteOptions } from 'mithril';
-import m from 'mithril';
-import type { Account, IChainAdapter } from 'models';
 import { ThreadStage } from 'models';
-import type { Coin } from 'adapters/currency';
-import type { ICardListItem } from 'models/interfaces';
+import type { IChainAdapter, Account } from 'models';
 import moment from 'moment';
 import app from 'state';
-import { navigateToSubpage } from 'router';
+import type { Coin } from 'adapters/currency';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -45,29 +42,23 @@ export function parseCustomStages(str) {
     .filter((s) => s) as unknown as ThreadStage[];
 }
 
-export const modalRedirectClick = (e, route) => {
-  e.preventDefault();
-  $(e.target).trigger('modalexit');
-  m.route.set(route);
-};
-
 /*
  * mithril link helper
  */
-export function externalLink(selector, target, children) {
-  return m(
+export function externalLink(selector, target, children, setRouteCb) {
+  return render(
     selector,
     {
       href: target,
       target: '_blank',
       rel: 'noopener noreferrer',
-      onclick: (e) => {
+      onClick: (e) => {
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         if (target.startsWith(`${document.location.origin}/`)) {
           // don't open a new window if the link is on Commonwealth
           e.preventDefault();
           e.stopPropagation();
-          m.route.set(target);
+          setRouteCb?.(target);
         }
       },
     },
@@ -75,10 +66,15 @@ export function externalLink(selector, target, children) {
   );
 }
 
+// This function should not be used anymore for links.
+// Instead, <Link/> component from react-router is advised.
+// It is adjusted, not rewritten, as there are non-jsx components
+// that still use this method.ł
 export function link(
   selector: string,
   target: string,
   children,
+  setRoute: ClassComponent['setRoute'],
   extraAttrs?: object,
   saveScrollPositionAs?: string,
   beforeRouteSet?: () => void,
@@ -86,7 +82,7 @@ export function link(
 ) {
   const attrs = {
     href: target,
-    onclick: (e) => {
+    onClick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       if (e.target.target === '_blank') return;
 
@@ -97,22 +93,22 @@ export function link(
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
       if (beforeRouteSet) beforeRouteSet();
-      const routeArgs: [string, any?, RouteOptions?] =
+      const routeArgs: [string, any?] =
         window.location.href.split('?')[0] === target.split('?')[0]
-          ? [target, {}, { replace: true }]
+          ? [target, { replace: true }]
           : [target];
       if (afterRouteSet) {
         (async () => {
-          await m.route.set(...routeArgs);
+          await setRoute(...routeArgs);
           afterRouteSet();
         })();
       } else {
-        m.route.set(...routeArgs);
+        setRoute(...routeArgs);
       }
     },
   };
   if (extraAttrs) Object.assign(attrs, extraAttrs);
-  return m(selector, attrs, children);
+  return render(selector, attrs, children);
 }
 
 /*
@@ -292,7 +288,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => m('p', p));
+  return paragraphs.map((p, index) => render('p', { key: index }, p));
 }
 
 /*
@@ -307,7 +303,9 @@ export function blocknumToTime(blocknum: number): moment.Moment {
 }
 
 export function blocknumToDuration(blocknum: number) {
-  return moment.duration(blocknumToTime(blocknum).diff(moment()));
+  return moment
+    .duration(blocknumToTime(blocknum).diff(moment()))
+    .asMilliseconds();
 }
 
 export function blockperiodToDuration(blocknum: number) {
@@ -326,25 +324,6 @@ export const loadScript = (scriptURI) => {
       reject();
     };
     document.head.appendChild(script);
-  });
-};
-
-export const removeOrAddClasslistToAllElements = (
-  cardList: ICardListItem[],
-  classlist: string,
-  method: string
-) => {
-  cardList.forEach((chain: ICardListItem) => {
-    const {
-      card: { id },
-    } = chain;
-
-    const METHODS = {
-      add: () => document.getElementById(id).classList.add(classlist),
-      remove: () => document.getElementById(id).classList.remove(classlist),
-    };
-
-    return METHODS[method]();
   });
 };
 
@@ -369,13 +348,16 @@ export const weiToTokens = (input: string, decimals: number) => {
   return valueTokens.toFixed();
 };
 
-export const isCommandClick = (e: MouseEvent) => {
+export const isCommandClick = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>
+) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
-  e: MouseEvent,
+  navigate: any,
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
   callback: () => any
@@ -389,7 +371,7 @@ export const handleRedirectClicks = (
     return;
   }
 
-  navigateToSubpage(redirectLink);
+  navigate(redirectLink);
   if (callback) {
     callback();
   }
@@ -429,3 +411,11 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
 
   return decimals;
 }
+
+export const setDarkMode = (state: boolean) => {
+  const stateStr = state ? 'on' : 'off';
+  localStorage.setItem('dark-mode-state', stateStr);
+  state
+    ? document.getElementsByTagName('html')[0].classList.add('invert')
+    : document.getElementsByTagName('html')[0].classList.remove('invert');
+};

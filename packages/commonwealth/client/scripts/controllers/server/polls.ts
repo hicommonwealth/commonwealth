@@ -3,6 +3,7 @@ import $ from 'jquery';
 import { Poll, Vote } from 'models';
 import moment from 'moment';
 import app from 'state';
+import { redraw } from 'mithrilInterop';
 
 import PollStore from 'stores/PollStore';
 
@@ -125,6 +126,7 @@ class PollsController {
       },
       success: (response) => {
         this._store.remove(this._store.getById(pollId));
+        redraw();
       },
       error: (err) => {
         console.log('Failed to delete poll');

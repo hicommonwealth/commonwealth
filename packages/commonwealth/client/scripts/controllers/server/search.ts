@@ -9,7 +9,7 @@ import type { SearchParams } from '../../models/SearchQuery';
 import { SearchScope } from '../../models/SearchQuery';
 
 const SEARCH_PREVIEW_SIZE = 6;
-const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
+const SEARCH_PAGE_SIZE = 10;
 const SEARCH_HISTORY_KEY = 'COMMONWEALTH_SEARCH_HISTORY';
 const SEARCH_HISTORY_SIZE = 10;
 
@@ -33,7 +33,7 @@ class SearchController {
     }
     const searchCache = this._store.getOrAdd(searchQuery);
     const { searchTerm, chainScope, isSearchPreview, sort } = searchQuery;
-    const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
+    const pageSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
     const scope = searchQuery.getSearchScope();
 
     try {
@@ -42,7 +42,7 @@ class SearchController {
         scope.includes(SearchScope.Proposals)
       ) {
         const discussions = await this.searchDiscussions(searchTerm, {
-          resultSize,
+          pageSize,
           chainScope,
           sort,
         });
@@ -58,8 +58,9 @@ class SearchController {
 
       if (scope.includes(SearchScope.Replies)) {
         const comments = await this.searchComments(searchTerm, {
-          resultSize,
+          pageSize,
           chainScope,
+          sort,
         });
 
         searchCache.results[SearchScope.Replies] = comments.map((comment) => {
@@ -90,7 +91,7 @@ class SearchController {
       if (scope.includes(SearchScope.Members)) {
         const addrs = await this.searchMentionableAddresses(
           searchTerm,
-          { resultSize, chainScope },
+          { pageSize, chainScope },
           ['created_at', 'DESC']
         );
 
@@ -109,20 +110,73 @@ class SearchController {
     return searchCache;
   }
 
+  public async searchPaginated(
+    searchQuery: SearchQuery,
+    tab: SearchScope,
+    page: number,
+    pageSize: number
+  ) {
+    const { searchTerm, chainScope, sort } = searchQuery;
+    const searchParams = {
+      pageSize,
+      chainScope,
+      sort,
+    };
+    switch (tab) {
+      case SearchScope.Threads: {
+        const discussions = await this.searchDiscussions(
+          searchTerm,
+          searchParams,
+          page
+        );
+        return discussions.map((row) => {
+          return {
+            ...row,
+            SearchContentType: SearchContentType.Thread,
+            searchType: SearchScope.Threads,
+          };
+        });
+      }
+      case SearchScope.Replies: {
+        const replies = await this.searchComments(
+          searchTerm,
+          searchParams,
+          page
+        );
+        return replies.map((row) => {
+          return {
+            ...row,
+            SearchContentType: SearchContentType.Comment,
+            searchType: SearchScope.Replies,
+          };
+        });
+      }
+      default:
+        return [];
+    }
+  }
+
   private searchDiscussions = async (
     searchTerm: string,
-    params: SearchParams
+    params: SearchParams,
+    page?: number
   ) => {
-    const { resultSize, chainScope, communityScope, sort } = params;
+    const { pageSize, chainScope, communityScope, sort } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
+      const queryParams = {
         chain: chainScope,
         community: communityScope,
-        cutoff_date: null, // cutoffDate.toISOString(),
         search: searchTerm,
-        results_size: resultSize,
+        page_size: pageSize,
         sort,
-      });
+      };
+      if (page) {
+        queryParams['page'] = page;
+      }
+      const response = await $.get(
+        `${app.serverUrl()}/searchDiscussions`,
+        queryParams
+      );
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
@@ -133,17 +187,27 @@ class SearchController {
     }
   };
 
-  private searchComments = async (searchTerm: string, params: SearchParams) => {
-    const { resultSize, chainScope, communityScope, sort } = params;
+  private searchComments = async (
+    searchTerm: string,
+    params: SearchParams,
+    page?: number
+  ) => {
+    const { pageSize, chainScope, communityScope, sort } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/searchComments`, {
+      const queryParams = {
         chain: chainScope,
         community: communityScope,
-        cutoff_date: null, // cutoffDate.toISOString(),
         search: searchTerm,
-        results_size: resultSize,
+        page_size: pageSize,
         sort,
-      });
+      };
+      if (page) {
+        queryParams['page'] = page;
+      }
+      const response = await $.get(
+        `${app.serverUrl()}/searchComments`,
+        queryParams
+      );
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
@@ -158,13 +222,13 @@ class SearchController {
     searchTerm: string,
     params: SearchParams
   ): Promise<Thread[]> => {
-    const { resultSize, chainScope, communityScope } = params;
+    const { pageSize, chainScope, communityScope } = params;
     try {
       const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
         chain: chainScope,
         community: communityScope,
         search: searchTerm,
-        results_size: resultSize,
+        results_size: pageSize,
         thread_title_only: true,
       });
       if (response.status !== 'Success') {
@@ -184,12 +248,12 @@ class SearchController {
     params: SearchParams,
     order?: string[]
   ) => {
-    const { resultSize, communityScope, chainScope } = params;
+    const { pageSize, communityScope, chainScope } = params;
     try {
       const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
         chain: chainScope,
         community: communityScope,
-        limit: resultSize,
+        limit: pageSize,
         searchTerm,
         order,
       });

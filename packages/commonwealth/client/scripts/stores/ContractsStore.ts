@@ -3,7 +3,7 @@ import IdStore from './IdStore';
 
 // Models a store of all the contracts
 class ContractsStore extends IdStore<Contract> {
-  private _storeAddress: { [address: string]: Contract } = {};
+  public _storeAddress: { [address: string]: Contract } = {};
   private _storeType: { [type: string]: Array<Contract> } = {};
 
   public add(contract: Contract) {

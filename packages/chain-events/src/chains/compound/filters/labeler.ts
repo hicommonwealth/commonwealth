@@ -59,6 +59,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/compoundproposal/${data.id}`
           : null,
+        icon: 'vote',
       };
     }
     default: {

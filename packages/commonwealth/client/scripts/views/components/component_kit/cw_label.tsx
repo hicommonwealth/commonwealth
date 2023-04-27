@@ -1,25 +1,20 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_label.scss';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import m from 'mithril';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
 
-type LabelAttrs = {
-  label: string | m.Vnode;
+type LabelProps = {
+  label: string | React.ReactNode;
 };
 
-export class CWLabel extends ClassComponent<LabelAttrs> {
-  view(vnode: m.Vnode<LabelAttrs>) {
-    const { label } = vnode.attrs;
-    return (
-      <CWText type="caption" className={ComponentType.Label}>
-        {label}
-      </CWText>
-    );
-  }
-}
+export const CWLabel = (props: LabelProps) => {
+  const { label } = props;
+
+  return (
+    <CWText type="caption" className={ComponentType.Label}>
+      {label}
+    </CWText>
+  );
+};

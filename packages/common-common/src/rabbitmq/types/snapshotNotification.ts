@@ -1,5 +1,5 @@
-import type { RmqMsgNamespace } from 'common-common/src/rabbitmq/types';
-import { RmqMsgFormatError } from 'common-common/src/rabbitmq/types';
+import type { RmqMsgNamespace } from 'common-common/src/rabbitmq';
+import { RmqMsgFormatError } from 'common-common/src/rabbitmq';
 import type { ISnapshotNotification } from '../../types';
 
 export const RmqSnapshotNotification: RmqMsgNamespace<ISnapshotNotification> = {

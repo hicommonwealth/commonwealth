@@ -1,51 +1,38 @@
-/* @jsx m */
+import React from 'react';
 
-import ClassComponent from 'class_component';
+import Jdenticon from 'react-jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
-import jdenticon from 'jdenticon';
-import m from 'mithril';
 
 import { ComponentType } from './types';
 
-type BaseAvatarAttrs = {
+type BaseAvatarProps = {
   size: number;
 };
 
-type AvatarAttrs = BaseAvatarAttrs & { avatarUrl: string };
+type AvatarProps = BaseAvatarProps & { avatarUrl: string };
 
-export class CWAvatar extends ClassComponent<AvatarAttrs> {
-  view(vnode: m.Vnode<AvatarAttrs>) {
-    const { avatarUrl, size } = vnode.attrs;
+export const CWAvatar = (props: AvatarProps) => {
+  const { avatarUrl, size } = props;
 
-    return (
-      <div
-        class={ComponentType.Avatar}
-        style={`width: ${size}px; height: ${size}px; background-image: url('${avatarUrl}'); background-position: center;`}
-      />
-    );
-  }
-}
+  return (
+    <div
+      className={ComponentType.Avatar}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundImage: `url("${avatarUrl}")`,
+      }}
+    />
+  );
+};
 
-type JdenticonAttrs = BaseAvatarAttrs & { address?: string };
+type JdenticonProps = BaseAvatarProps & { address?: string };
 
-export class CWJdenticon extends ClassComponent<JdenticonAttrs> {
-  view(vnode: m.Vnode<JdenticonAttrs>) {
-    const { address, size } = vnode.attrs;
-    if (!address) return null;
+export const CWJdenticon = (props: JdenticonProps) => {
+  const { address, size } = props;
 
-    return (
-      <svg
-        width={size}
-        height={size}
-        data-address={address.toString()}
-        oncreate={(vvnode) => {
-          jdenticon.update(vvnode.dom as HTMLElement, address);
-        }}
-        onupdate={(vvnode) => {
-          jdenticon.update(vvnode.dom as HTMLElement, address);
-        }}
-      />
-    );
-  }
-}
+  if (!address) return null;
+
+  return <Jdenticon value={address.toString()} size={size.toString()} />;
+};

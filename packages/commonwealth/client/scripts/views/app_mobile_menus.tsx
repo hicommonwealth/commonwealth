@@ -1,7 +1,4 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
 
 import app from 'state';
 import { CreateContentMenu } from './menus/create_content_menu';
@@ -18,10 +15,8 @@ const mobileMenuLookup = {
 
 export type MobileMenuName = keyof typeof mobileMenuLookup;
 
-export class AppMobileMenus extends ClassComponent {
-  view() {
-    const ActiveMenu = mobileMenuLookup[app.mobileMenu];
+export const AppMobileMenus = () => {
+  const ActiveMenu = mobileMenuLookup[app.mobileMenu];
 
-    return <ActiveMenu />;
-  }
-}
+  return <ActiveMenu />;
+};

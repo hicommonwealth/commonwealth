@@ -1,26 +1,24 @@
-/* @jsx m */
+import React from 'react';
 
-import ClassComponent from 'class_component';
+import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
-import m from 'mithril';
-import moment from 'moment';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
-import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { isWindowMediumSmallInclusive } from './helpers';
-import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
 export type ContentPageSidebarItem = {
   label: string;
-  item: m.Vnode;
+  item: React.ReactNode;
 };
 
 // tuple
@@ -30,185 +28,180 @@ export type SidebarComponents = [
   item?: ContentPageSidebarItem
 ];
 
-type ContentPageAttrs = {
+type ContentPageProps = {
   createdAt: moment.Moment | number;
-  title: string | m.Vnode;
+  title: string | React.ReactNode;
 
   // optional
-  author?: m.Vnode;
-  actions?: Array<MenuItem>;
-  body?: m.Vnode;
-  comments?: m.Vnode;
+  author?: React.ReactNode;
+  actions?: Array<PopoverMenuItem>;
+  body?: React.ReactNode;
+  comments?: React.ReactNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
-  headerComponents?: m.Vnode;
+  headerComponents?: React.ReactNode;
   readOnly?: boolean;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
-  subBody?: m.Vnode;
-  subHeader?: m.Vnode;
+  subBody?: React.ReactNode;
+  subHeader?: React.ReactNode;
   viewCount?: number;
 };
 
-export class CWContentPage extends ClassComponent<ContentPageAttrs> {
-  private viewType: 'sidebarView' | 'tabsView';
-  private tabSelected: number;
+export const CWContentPage = (props: ContentPageProps) => {
+  const {
+    actions,
+    author,
+    body,
+    comments,
+    contentBodyLabel,
+    createdAt,
+    headerComponents,
+    readOnly,
+    showSidebar,
+    sidebarComponents,
+    subBody,
+    subHeader,
+    title,
+    viewCount,
+  } = props;
 
-  onResize(vnode: m.Vnode<ContentPageAttrs>) {
-    this.viewType =
-      isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
-        ? 'tabsView'
-        : 'sidebarView';
+  // @REACT TODO: this needs to be aware of which view to default to
+  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
+    'sidebarView'
+  );
+  const [tabSelected, setTabSelected] = React.useState<number>(0);
 
-    m.redraw();
-  }
+  React.useEffect(() => {
+    const onResize = () => {
+      setViewType(
+        isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+          ? 'tabsView'
+          : 'sidebarView'
+      );
+    };
 
-  oninit(vnode: m.Vnode<ContentPageAttrs>) {
-    this.viewType =
-      isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
-        ? 'tabsView'
-        : 'sidebarView';
+    window.addEventListener('resize', onResize);
 
-    if (vnode.attrs.sidebarComponents?.length > 0) {
-      this.tabSelected = 0;
-    }
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    window.addEventListener('resize', () => {
-      this.onResize(vnode);
-    });
-  }
-
-  onremove(vnode: m.Vnode<ContentPageAttrs>) {
-    window.removeEventListener('resize', () => {
-      this.onResize(vnode);
-    });
-  }
-
-  view(vnode: m.Vnode<ContentPageAttrs>) {
-    const {
-      actions,
-      author,
-      body,
-      comments,
-      contentBodyLabel,
-      createdAt,
-      headerComponents,
-      readOnly,
-      showSidebar,
-      sidebarComponents,
-      subBody,
-      subHeader,
-      title,
-      viewCount,
-    } = vnode.attrs;
-
-    const mainBody = (
-      <div class="main-body-container">
-        <div class="header">
-          {typeof title === 'string' ? (
-            <CWText type="h3" fontWeight="semiBold">
-              {title}
-            </CWText>
-          ) : (
-            title
-          )}
-          <div class="header-info-row">
-            {author}
-            {typeof createdAt === 'number' ||
-              (moment.isMoment(createdAt) && createdAt.isValid() && (
-                <CWText type="caption" className="header-text">
-                  published on {moment(createdAt).format('l')}
-                </CWText>
-              ))}
-            {!!viewCount && (
+  const mainBody = (
+    <div className="main-body-container">
+      <div className="header">
+        {typeof title === 'string' ? (
+          <CWText type="h3" fontWeight="semiBold">
+            {title}
+          </CWText>
+        ) : (
+          title
+        )}
+        <div className="header-info-row">
+          {author}
+          {typeof createdAt === 'number' ||
+            (moment.isMoment(createdAt) && createdAt.isValid() && (
               <CWText type="caption" className="header-text">
-                {pluralize(viewCount, 'view')}
+                published on {moment(createdAt).format('l')}
               </CWText>
-            )}
-            {headerComponents}
-            {readOnly && <CWIcon iconName="lock" iconSize="small" />}
-            {actions && (
-              <CWPopoverMenu
-                trigger={
-                  <CWIconButton iconName="dotsVertical" iconSize="small" />
-                }
-                menuItems={actions}
-              />
-            )}
-            <SharePopover />
-          </div>
-        </div>
-        {subHeader}
-        {body}
-        {subBody}
-        {comments}
-      </div>
-    );
-
-    return (
-      <div class={ComponentType.ContentPage}>
-        {this.viewType === 'sidebarView' && (
-          <div class="sidebar-view">
-            {mainBody}
-            {showSidebar && (
-              <div class="sidebar">{sidebarComponents.map((c) => c.item)}</div>
-            )}
-          </div>
-        )}
-        {this.viewType === 'tabsView' && (
-          <div class="tabs-view">
-            <CWTabBar>
-              <CWTab
-                label={contentBodyLabel}
-                onclick={() => {
-                  this.tabSelected = 0;
-                }}
-                isSelected={this.tabSelected === 0}
-              />
-              {sidebarComponents.map((item, i) => (
-                <CWTab
-                  label={item.label}
-                  onclick={() => {
-                    this.tabSelected = i + 1;
-                  }}
-                  isSelected={this.tabSelected === i + 1}
+            ))}
+          {!!viewCount && (
+            <CWText type="caption" className="header-text">
+              {pluralize(viewCount, 'view')}
+            </CWText>
+          )}
+          {headerComponents}
+          {readOnly && <CWIcon iconName="lock" iconSize="small" />}
+          {actions && (
+            <PopoverMenu
+              renderTrigger={(onclick) => (
+                <CWIconButton
+                  iconName="dotsVertical"
+                  iconSize="small"
+                  onClick={onclick}
                 />
-              ))}
-            </CWTabBar>
-            {this.tabSelected === 0 && mainBody}
-            {sidebarComponents.length >= 1 &&
-              this.tabSelected === 1 &&
-              sidebarComponents[0].item}
-            {sidebarComponents.length >= 2 &&
-              this.tabSelected === 2 &&
-              sidebarComponents[1].item}
-            {sidebarComponents.length === 3 &&
-              this.tabSelected === 3 &&
-              sidebarComponents[2].item}
-          </div>
-        )}
+              )}
+              menuItems={actions}
+            />
+          )}
+          <SharePopover />
+        </div>
       </div>
-    );
-  }
-}
+      {subHeader}
+      {body}
+      {subBody}
+      {comments}
+    </div>
+  );
 
-type ContentPageCardAttrs = {
-  content: m.Vnode;
+  return (
+    <div className={ComponentType.ContentPage}>
+      {viewType === 'sidebarView' && (
+        <div className="sidebar-view">
+          {mainBody}
+          {showSidebar && (
+            <div className="sidebar">
+              {sidebarComponents.map((c) => (
+                <React.Fragment key={c.label}>{c.item}</React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {viewType === 'tabsView' && (
+        <div className="tabs-view">
+          <CWTabBar>
+            <CWTab
+              label={contentBodyLabel}
+              onClick={() => {
+                setTabSelected(0);
+              }}
+              isSelected={tabSelected === 0}
+            />
+            {sidebarComponents.map((item, i) => (
+              <CWTab
+                key={item.label}
+                label={item.label}
+                onClick={() => {
+                  setTabSelected(i + 1);
+                }}
+                isSelected={tabSelected === i + 1}
+              />
+            ))}
+          </CWTabBar>
+          {tabSelected === 0 && mainBody}
+          {sidebarComponents.length >= 1 &&
+            tabSelected === 1 &&
+            sidebarComponents[0].item}
+          {sidebarComponents.length >= 2 &&
+            tabSelected === 2 &&
+            sidebarComponents[1].item}
+          {sidebarComponents.length === 3 &&
+            tabSelected === 3 &&
+            sidebarComponents[2].item}
+        </div>
+      )}
+    </div>
+  );
+};
+
+type ContentPageCardProps = {
+  content: React.ReactNode;
   header: string;
 };
 
-export class CWContentPageCard extends ClassComponent<ContentPageCardAttrs> {
-  view(vnode: m.Vnode<ContentPageCardAttrs>) {
-    const { content, header } = vnode.attrs;
+export const CWContentPageCard = (props: ContentPageCardProps) => {
+  const { content, header } = props;
 
-    return (
-      <CWCard className="ContentPageCard">
-        <div class="header-container">
-          <CWText type="h5" fontWeight="semiBold">
-            {header}
-          </CWText>
-        </div>
-        {content}
-      </CWCard>
-    );
-  }
-}
+  return (
+    <CWCard className="ContentPageCard">
+      <div className="header-container">
+        <CWText type="h5" fontWeight="semiBold">
+          {header}
+        </CWText>
+      </div>
+      {content}
+    </CWCard>
+  );
+};

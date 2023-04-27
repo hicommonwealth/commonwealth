@@ -19,7 +19,7 @@ export interface SearchParams {
   isSearchPreview?: boolean;
   searchScope?: Array<SearchScope>;
   sort?: SearchSort;
-  resultSize?: number;
+  pageSize?: number;
 }
 
 export default class SearchQuery implements SearchParams {
@@ -29,7 +29,7 @@ export default class SearchQuery implements SearchParams {
   public searchScope: Array<SearchScope>;
   public sort: SearchSort;
 
-  constructor(searchTerm: string, params?: SearchParams) {
+  constructor(searchTerm = '', params?: SearchParams) {
     this.searchTerm = <Lowercase<string>>searchTerm.toLowerCase();
     this.searchScope = params?.searchScope || [SearchScope.All];
     this.chainScope = params?.chainScope;
@@ -106,15 +106,11 @@ export default class SearchQuery implements SearchParams {
   }
 
   public getSearchScope() {
-    return this.searchScope[0] === SearchScope.All
-      ? this.chainScope
-        ? [SearchScope.Threads, SearchScope.Replies]
-        : [
-            SearchScope.Threads,
-            SearchScope.Replies,
-            SearchScope.Communities,
-            SearchScope.Members,
-          ]
-      : this.searchScope;
+    return [
+      SearchScope.Threads,
+      SearchScope.Replies,
+      SearchScope.Communities,
+      SearchScope.Members,
+    ];
   }
 }

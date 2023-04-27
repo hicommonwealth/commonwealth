@@ -1,7 +1,12 @@
+import { redraw } from 'mithrilInterop';
+
 import { formatCoin } from 'adapters/currency';
 import { CompoundTypes } from 'chain-events/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
+import {
+  CosmosProposal,
+  CosmosVote,
+} from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
@@ -15,7 +20,6 @@ import {
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import m from 'mithril';
 import type { AnyProposal, IVote } from 'models';
 import { ProposalStatus, VotingUnit } from 'models';
 
@@ -46,16 +50,16 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
       if (vote instanceof AaveProposalVote) {
         balance = vote.power;
         balancesCache[vote.account.address] = vote.format();
-        m.redraw();
+        redraw();
       } else if (vote instanceof CompoundProposalVote) {
         balance = formatCoin(app.chain.chain.coins(vote.power), true);
         balancesCache[vote.account.address] = balance;
-        m.redraw();
+        redraw();
       } else {
         vote.account.balance.then((b) => {
           balance = b;
           balancesCache[vote.account.address] = formatCoin(b, true);
-          m.redraw();
+          redraw();
         });
         balance = '--';
       }
@@ -66,7 +70,7 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
 };
 
 export const cancelProposal = (
-  e: Event,
+  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   toggleVotingModal: (newModalState: boolean) => void,
   proposal: AnyProposal,
   onModalClose?: () => void
@@ -79,7 +83,7 @@ export const cancelProposal = (
       .cancelTx()
       .then(() => {
         onModalClose();
-        m.redraw();
+        redraw();
       })
       .catch((err) => {
         onModalClose();
@@ -90,7 +94,7 @@ export const cancelProposal = (
       .cancelTx()
       .then(() => {
         onModalClose();
-        m.redraw();
+        redraw();
       })
       .catch((err) => {
         onModalClose();

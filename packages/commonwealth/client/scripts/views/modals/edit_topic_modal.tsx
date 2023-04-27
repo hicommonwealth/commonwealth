@@ -1,245 +1,203 @@
-/* @jsx m */
+import React, { useState } from 'react';
 
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import $ from 'jquery';
-import m from 'mithril';
 
 import 'modals/edit_topic_modal.scss';
 import { Topic } from 'models';
 
 import app from 'state';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import type { QuillEditor } from '../components/quill/quill_editor';
-import type { QuillTextContents } from '../components/quill/types';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useCommonNavigate } from 'navigation/helpers';
+import {
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../components/react_quill_editor';
+import type { DeltaStatic } from 'quill';
+import {
+  deserializeDelta,
+  serializeDelta,
+} from '../components/react_quill_editor/utils';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
-type EditTopicModalAttrs = {
-  defaultOffchainTemplate: string;
-  description: string;
-  featuredInNewPost: boolean;
-  featuredInSidebar: boolean;
-  id: number;
-  name: string;
+type EditTopicModalProps = {
+  onModalClose: () => void;
+  topic: Topic;
 };
 
-type EditTopicModalForm = {
-  description: string;
-  featuredInNewPost: boolean;
-  featuredInSidebar: boolean;
-  id: number;
-  name: string;
-};
+export const EditTopicModal = ({
+  topic,
+  onModalClose,
+}: EditTopicModalProps) => {
+  const {
+    defaultOffchainTemplate,
+    description: descriptionProp,
+    featuredInNewPost: featuredInNewPostProp,
+    featuredInSidebar: featuredInSidebarProp,
+    id,
+    name: nameProp,
+  } = topic;
 
-export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
-  private error: string;
-  private form: EditTopicModalForm;
-  private quillEditorState: QuillEditor;
-  private saving: boolean;
-  private _contentsDoc: QuillTextContents;
+  const navigate = useCommonNavigate();
 
-  view(vnode: m.Vnode<EditTopicModalAttrs>) {
-    const {
-      defaultOffchainTemplate,
-      description,
-      featuredInNewPost,
-      featuredInSidebar,
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    deserializeDelta(defaultOffchainTemplate)
+  );
+
+  const [description, setDescription] = useState<string>(descriptionProp);
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
+    featuredInNewPostProp
+  );
+  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
+    featuredInSidebarProp
+  );
+  const [name, setName] = useState<string>(nameProp);
+
+  const editorText = getTextFromDelta(contentDelta);
+
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+
+    if (featuredInNewPost && editorText.length === 0) {
+      setErrorMsg('Must provide template.');
+      return;
+    }
+
+    const topicInfo = {
       id,
-      name,
-    } = vnode.attrs;
-
-    if (defaultOffchainTemplate) {
-      try {
-        this._contentsDoc = JSON.parse(defaultOffchainTemplate);
-      } catch (e) {
-        this._contentsDoc = defaultOffchainTemplate;
-      }
-    }
-
-    if (!this.form) {
-      this.form = {
-        description,
-        featuredInNewPost,
-        featuredInSidebar,
-        id,
-        name,
-      };
-    }
-
-    const updateTopic = async (form) => {
-      if (form.featuredInNewPost) {
-        if (!this.quillEditorState || this.quillEditorState?.isBlank()) {
-          this.error = 'Must provide template.';
-          return false;
-        } else {
-          this.quillEditorState?.disable();
-        }
-      }
-
-      const topicInfo = {
-        id,
-        description: form.description,
-        name: form.name,
-        chain_id: app.activeChainId(),
-        telegram: null,
-        featured_in_sidebar: form.featuredInSidebar,
-        featured_in_new_post: form.featuredInNewPost,
-        default_offchain_template: form.featuredInNewPost
-          ? this.quillEditorState.textContentsAsString
-          : null,
-      };
-
-      try {
-        await app.topics.edit(new Topic(topicInfo));
-        return true;
-      } catch (err) {
-        this.error = err.message || err;
-        m.redraw();
-        return false;
-      }
+      description: description,
+      name: name,
+      chain_id: app.activeChainId(),
+      telegram: null,
+      featured_in_sidebar: featuredInSidebar,
+      featured_in_new_post: featuredInNewPost,
+      default_offchain_template: featuredInNewPost
+        ? serializeDelta(contentDelta)
+        : null,
     };
 
-    const deleteTopic = async (form) => {
-      const topicInfo = {
-        id,
-        name: form.name,
-        chainId: app.activeChainId(),
-      };
+    try {
+      await app.topics.edit(new Topic(topicInfo));
+      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+    } catch (err) {
+      setErrorMsg(err.message || err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-      await app.topics.remove(topicInfo);
+  const handleDeleteTopic = async () => {
+    openConfirmation({
+      title: 'Warning',
+      description: <>Delete this topic?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            const topicInfo = {
+              id,
+              name: name,
+              chainId: app.activeChainId(),
+            };
 
-      navigateToSubpage('/');
-    };
+            await app.topics.remove(topicInfo);
 
-    return (
-      <div class="EditTopicModal">
-        <div class="compact-modal-title">
-          <h3>Edit topic</h3>
-          <ModalExitButton />
-        </div>
-        <div class="compact-modal-body">
-          <CWTextInput
-            label="Name"
-            name="name"
-            value={this?.form?.name}
-            oninput={(e) => {
-              this.form.name = (e.target as HTMLInputElement).value;
-            }}
-            inputValidationFn={(text: string) => {
-              let errorMsg;
+            navigate('/');
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-white',
+        },
+      ],
+    });
+  };
 
-              const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
-              if (disallowedCharMatches) {
-                errorMsg = `The ${pluralizeWithoutNumberPrefix(
-                  disallowedCharMatches.length,
-                  'char'
-                )} 
-                ${disallowedCharMatches.join(', ')} are not permitted`;
-                this.error = errorMsg;
-                m.redraw();
-                return ['failure', errorMsg];
-              }
-
-              if (this.error) delete this.error;
-
-              return ['success', 'Valid topic name'];
-            }}
-            tabindex={1}
-            oncreate={(vvnode) => {
-              // use oncreate to focus because autofocus: true fails when component is recycled in a modal
-              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
-            }}
-          />
-          <CWTextInput
-            label="Description"
-            name="description"
-            tabindex={2}
-            value={this.form.description}
-            oninput={(e) => {
-              this.form.description = (e.target as HTMLInputElement).value;
-            }}
-          />
-          <CWCheckbox
-            label="Featured in Sidebar"
-            checked={this.form.featuredInSidebar}
-            onchange={() => {
-              this.form.featuredInSidebar = !this.form.featuredInSidebar;
-            }}
-            value=""
-          />
-          <CWCheckbox
-            label="Featured in New Post"
-            checked={this.form.featuredInNewPost}
-            onchange={() => {
-              this.form.featuredInNewPost = !this.form.featuredInNewPost;
-            }}
-            value=""
-          />
-          {this.form.featuredInNewPost && (
-            <QuillEditorComponent
-              contentsDoc={this._contentsDoc}
-              oncreateBind={(state: QuillEditor) => {
-                this.quillEditorState = state;
-              }}
-              editorNamespace="new-discussion"
-              tabindex={3}
-            />
-          )}
-          <div class="buttons-row">
-            <CWButton
-              onclick={async (e) => {
-                e.preventDefault();
-                const { form } = this;
-                updateTopic(form)
-                  .then((closeModal) => {
-                    if (closeModal) {
-                      $(e.target).trigger('modalexit');
-                      navigateToSubpage(
-                        `/discussions/${encodeURI(form.name.toString().trim())}`
-                      );
-                    }
-                  })
-                  .catch(() => {
-                    this.saving = false;
-                    m.redraw();
-                  });
-              }}
-              label="Save changes"
-            />
-            <CWButton
-              buttonType="primary-red"
-              disabled={this.saving}
-              onclick={async (e) => {
-                e.preventDefault();
-                const confirmed = await confirmationModalWithText(
-                  'Delete this topic?'
-                )();
-                if (!confirmed) return;
-                deleteTopic(this.form)
-                  .then(() => {
-                    $(e.target).trigger('modalexit');
-                    navigateToSubpage('/');
-                  })
-                  .catch(() => {
-                    this.saving = false;
-                    m.redraw();
-                  });
-              }}
-              label="Delete topic"
-            />
-          </div>
-          {this.error && (
-            <CWValidationText message={this.error} status="failure" />
-          )}
-        </div>
+  return (
+    <div className="EditTopicModal">
+      <div className="compact-modal-title">
+        <h3>Edit topic</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
-    );
-  }
-}
+      <div className="compact-modal-body">
+        <CWTextInput
+          label="Name"
+          value={name}
+          onInput={(e) => {
+            setName(e.target.value);
+          }}
+          inputValidationFn={(text: string) => {
+            let newErrorMsg;
+
+            const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+            if (disallowedCharMatches) {
+              newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
+                disallowedCharMatches.length,
+                'char'
+              )}
+                ${disallowedCharMatches.join(', ')} are not permitted`;
+              setErrorMsg(newErrorMsg);
+              return ['failure', newErrorMsg];
+            }
+
+            if (errorMsg) {
+              setErrorMsg(null);
+            }
+
+            return ['success', 'Valid topic name'];
+          }}
+        />
+        <CWTextInput
+          label="Description"
+          name="description"
+          tabIndex={2}
+          value={description}
+          onInput={(e) => {
+            setDescription(e.target.value);
+          }}
+        />
+        <CWCheckbox
+          label="Featured in Sidebar"
+          checked={featuredInSidebar}
+          onChange={() => {
+            setFeaturedInSidebar(!featuredInSidebar);
+          }}
+          value=""
+        />
+        <CWCheckbox
+          label="Featured in New Post"
+          checked={featuredInNewPost}
+          onChange={() => {
+            setFeaturedInNewPost(!featuredInNewPost);
+          }}
+          value=""
+        />
+        {featuredInNewPost && (
+          <ReactQuillEditor
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+            tabIndex={3}
+          />
+        )}
+        <div className="buttons-row">
+          <CWButton onClick={handleSaveChanges} label="Save changes" />
+          <CWButton
+            buttonType="primary-red"
+            disabled={isSaving}
+            onClick={handleDeleteTopic}
+            label="Delete topic"
+          />
+        </div>
+        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
+      </div>
+    </div>
+  );
+};

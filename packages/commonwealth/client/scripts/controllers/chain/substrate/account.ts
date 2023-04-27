@@ -25,6 +25,8 @@ import SubstrateChain from './shared';
 type Delegation = [AccountId, Conviction] & Codec;
 
 export class SubstrateAccount extends Account {
+  private polkadot;
+
   // GETTERS AND SETTERS
 
   // The total balance
@@ -144,6 +146,8 @@ class SubstrateAccounts
 
   private _Chain: SubstrateChain;
 
+  private polkadot;
+
   public get(address: string, keytype?: string) {
     if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {
       throw new Error(`invalid keytype: ${keytype}`);
@@ -161,13 +165,13 @@ class SubstrateAccounts
   }
 
   public isZero(address: string) {
-    const decoded = decodeAddress(address);
+    const decoded = this.polkadot.decodeAddress(address);
     return decoded.every((v) => v === 0);
   }
 
   public fromAddress(address: string, isEd25519 = false): SubstrateAccount {
     try {
-      decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
+      this.polkadot.decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
       console.error(`Decoded invalid address: ${address}`);
       return;
@@ -204,6 +208,7 @@ class SubstrateAccounts
   }
 
   public async init(ChainInfo: SubstrateChain): Promise<void> {
+    this.polkadot = await import('@polkadot/keyring');
     this._Chain = ChainInfo;
     this._initialized = true;
   }

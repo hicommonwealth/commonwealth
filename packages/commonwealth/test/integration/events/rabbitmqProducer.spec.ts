@@ -4,7 +4,7 @@ import type { CWEvent } from 'chain-events/src';
 import {
   RascalPublications,
   RascalSubscriptions,
-} from 'common-common/src/rabbitmq/types';
+} from 'common-common/src/rabbitmq';
 import { getRabbitMQConfig } from 'common-common/src/rabbitmq/rabbitMQConfig';
 import type { BrokerConfig } from 'rascal';
 

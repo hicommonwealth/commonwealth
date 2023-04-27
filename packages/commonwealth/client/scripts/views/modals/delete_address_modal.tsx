@@ -1,7 +1,4 @@
-/* @jsx m */
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import React from 'react';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
@@ -20,14 +17,15 @@ type DeleteAddressModalAttrs = {
   addresses: AddressInfo[];
   address: string;
   chain: string;
+  closeModal: () => void;
 };
 
-export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> {
-  private onDeleteAddress = async (
-    e: Event,
-    vnode: m.Vnode<DeleteAddressModalAttrs>
+export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
+  const onDeleteAddress = async (
+    e: React.MouseEvent,
+    passedProps: Partial<DeleteAddressModalAttrs>
   ) => {
-    const { addresses, address, chain } = vnode.attrs;
+    const { addresses, address, chain } = passedProps;
 
     e.preventDefault();
 
@@ -48,76 +46,60 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
       });
 
       if (response?.status === 'Success') {
-        setTimeout(() => {
-          notifySuccess('Address has been successfully removed.');
-        }, 1000);
+        notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {
-      setTimeout(() => {
-        notifyError('Address was not successfully deleted, please try again.');
-      }, 1000);
+      notifyError('Address was not successfully deleted, please try again.');
     }
 
-    $(e.target).trigger('modalcomplete');
-    $(e.target).trigger('modalexit');
+    closeModal();
   };
 
-  view(vnode: m.Vnode<DeleteAddressModalAttrs>) {
-    const { profile, address } = vnode.attrs;
-    const { name } = profile;
-    const defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
+  const { profile, address, closeModal } = props;
+  const { name } = profile;
+  const defaultAvatar = jdenticon.toSvg(props.profile.id, 90);
 
-    return (
-      <div class="DeleteAddressModal">
-        <div class="title">
-          <CWText type="h4" fontWeight="semiBold">
-            Delete Address
-          </CWText>
-          <CWIconButton
-            iconName="close"
-            onclick={(e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalexit');
-            }}
+  return (
+    <div className="DeleteAddressModal">
+      <div className="title">
+        <CWText type="h4" fontWeight="semiBold">
+          Delete Address
+        </CWText>
+        <CWIconButton iconName="close" onClick={closeModal} />
+      </div>
+      <div className="body">
+        <CWText>
+          Address will be removed from the following linked profile.
+        </CWText>
+        <div className="profile">
+          {profile.avatarUrl ? (
+            <img src={profile.avatarUrl} />
+          ) : (
+            <img
+              src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                defaultAvatar
+              )}`}
+            />
+          )}
+          <CWText fontWeight="bold">{name || 'Anonymous user'}</CWText>
+        </div>
+        <div className="confirmation">
+          <CWText>Are you sure you want to remove this address?</CWText>
+          <CWTruncatedAddress address={address} />
+        </div>
+        <div className="actions">
+          <CWButton
+            label="Delete"
+            buttonType="secondary-red"
+            onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
+          />
+          <CWButton
+            label="Cancel"
+            buttonType="primary-black"
+            onClick={closeModal}
           />
         </div>
-        <div class="body">
-          <CWText>
-            Address will be removed from the following linked profile.
-          </CWText>
-          <div className="profile">
-            {profile.avatarUrl ? (
-              <img src={profile.avatarUrl} />
-            ) : (
-              <img
-                src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                  defaultAvatar
-                )}`}
-              />
-            )}
-            <CWText fontWeight="bold">{name || 'Anonymous user'}</CWText>
-          </div>
-          <div className="confirmation">
-            <CWText>Are you sure you want to remove this address?</CWText>
-            <CWTruncatedAddress address={address} />
-          </div>
-          <div className="actions">
-            <CWButton
-              label="Delete"
-              buttonType="secondary-red"
-              onclick={(e) => this.onDeleteAddress(e, vnode)}
-            />
-            <CWButton
-              label="Cancel"
-              buttonType="primary-black"
-              onclick={(e) => {
-                e.preventDefault();
-                $(e.target).trigger('modalexit');
-              }}
-            />
-          </div>
-        </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

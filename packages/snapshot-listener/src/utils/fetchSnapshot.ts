@@ -1,8 +1,5 @@
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
-import { factory, formatFilename } from 'common-common/src/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 dotenv.config();
 

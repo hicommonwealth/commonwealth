@@ -1,8 +1,5 @@
-/* @jsx m */
-
-import m from 'mithril';
+import React from 'react';
 import $ from 'jquery';
-import ClassComponent from 'class_component';
 
 import 'components/profile/index.scss';
 
@@ -11,123 +8,119 @@ import type { Thread } from 'models';
 import { AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import { ProfileHeader } from './profile_header';
+import ProfileHeader from './profile_header';
 import type { CommentWithAssociatedThread } from './profile_activity';
-import { ProfileActivity } from './profile_activity';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
+import ProfileActivity from './profile_activity';
+import { CWSpinner } from '../component_kit/cw_spinner';
+import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../../pages/404';
 import Sublayout from '../../sublayout';
 
 enum ProfileError {
   None,
-  NoAddressFound,
   NoProfileFound,
 }
 
-type NewProfileAttrs = {
+type ProfileProps = {
   profileId: string;
 };
 
-export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
-  private addresses: AddressInfo[];
-  private content: m.Vnode;
-  private comments: CommentWithAssociatedThread[];
-  private error: ProfileError;
-  private loading: boolean;
-  private profile: Profile;
-  private threads: Thread[];
-  private isOwner: boolean;
+const NoProfileFoundError = 'No profile found';
 
-  private getProfileData = async (profileId: string) => {
+const ProfileComponent = (props: ProfileProps) => {
+  const [addresses, setAddresses] = React.useState<AddressInfo[]>();
+  const [comments, setComments] = React.useState<CommentWithAssociatedThread[]>(
+    []
+  );
+  const [error, setError] = React.useState<ProfileError>(ProfileError.None);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [profile, setProfile] = React.useState<Profile>();
+  const [threads, setThreads] = React.useState<Thread[]>([]);
+  const [isOwner, setIsOwner] = React.useState<boolean>();
+
+  const getProfileData = async (query: string) => {
+    setLoading(true);
     try {
       const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        profileId,
+        profileId: query,
         jwt: app.user.jwt,
       });
 
-      this.profile = new Profile(result.profile);
-      this.threads = result.threads.map((t) => app.threads.modelFromServer(t));
-      const comments = result.comments.map((c) => modelCommentFromServer(c));
-      const commentsWithAssociatedThread = comments.map((c) => {
+      setProfile(new Profile(result.profile));
+      setThreads(result.threads.map((t) => app.threads.modelFromServer(t)));
+      const responseComments = result.comments.map((c) =>
+        modelCommentFromServer(c)
+      );
+      const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
           (t) => t.id === parseInt(c.threadId, 10)
         );
         return { ...c, thread };
       });
-      this.comments = commentsWithAssociatedThread;
-      this.addresses = result.addresses.map((a) => {
-        try {
-          return new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          );
-        } catch (err) {
-          console.log(a.chain);
-          return null;
-        }
-      });
-      this.isOwner = result.isOwner;
+      setComments(commentsWithAssociatedThread);
+      setAddresses(
+        result.addresses.map((a) => {
+          try {
+            return new AddressInfo(
+              a.id,
+              a.address,
+              a.chain,
+              a.keytype,
+              a.wallet_id,
+              a.ghost_address
+            );
+          } catch (err) {
+            console.error(`Could not return AddressInfo: "${err}"`);
+            return null;
+          }
+        })
+      );
+      setIsOwner(result.isOwner);
     } catch (err) {
-      this.error = ProfileError.NoProfileFound;
+      if (
+        err.status === 500 &&
+        err.responseJSON.error === NoProfileFoundError
+      ) {
+        setError(ProfileError.NoProfileFound);
+      }
     }
-    this.loading = false;
-    m.redraw();
+    setLoading(false);
   };
 
-  private fetchProfile(vnode) {
-    this.loading = true;
-    this.error = ProfileError.None;
-    this.comments = [];
-    this.threads = [];
-    this.getProfileData(vnode.attrs.profileId);
-  }
+  React.useEffect(() => {
+    getProfileData(props.profileId);
+  }, []);
 
-  oninit(vnode) {
-    this.fetchProfile(vnode);
-  }
-
-  view(vnode) {
-    if (
-      this.profile &&
-      this.profile.id.toString() !== vnode.attrs.profileId &&
-      !this.loading
-    ) {
-      this.fetchProfile(vnode);
-    }
-    if (this.loading)
-      this.content = (
-        <div class="NewProfilePage">
-          <div class="loading-spinner">
-            <CWSpinner />
-          </div>
+  if (loading)
+    return (
+      <div className="Profile loading">
+        <div className="loading-spinner">
+          <CWSpinner />
         </div>
-      );
+      </div>
+    );
 
-    if (this.error === ProfileError.NoProfileFound)
-      return <PageNotFound message="We cannot find this profile." />;
+  if (error === ProfileError.NoProfileFound)
+    return <PageNotFound message="We cannot find this profile." />;
 
-    if (this.error === ProfileError.None) {
-      if (!this.profile) return;
+  if (error === ProfileError.None) {
+    if (!profile) return;
 
-      let backgroundUrl;
-      let backgroundImageBehavior;
+    let backgroundUrl;
+    let backgroundImageBehavior;
 
-      if (this.profile.backgroundImage) {
-        const { url, imageBehavior } = this.profile.backgroundImage;
-        backgroundUrl = url;
-        backgroundImageBehavior = imageBehavior;
-      }
+    if (profile.backgroundImage) {
+      const { url, imageBehavior } = profile.backgroundImage;
+      backgroundUrl = url;
+      backgroundImageBehavior = imageBehavior;
+    }
 
-      this.content = (
+    return (
+      <Sublayout>
         <div
           className="Profile"
           style={
-            this.profile.backgroundImage
+            profile.backgroundImage
               ? {
                   backgroundImage: `url(${backgroundUrl})`,
                   backgroundRepeat: `${
@@ -148,31 +141,39 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
               : {}
           }
         >
-          <div className={'ProfilePageContainer'}>
-            <ProfileHeader profile={this.profile} isOwner={this.isOwner} />
+          <div
+            className={
+              profile.backgroundImage
+                ? 'ProfilePageContainer'
+                : 'ProfilePageContainer smaller-margins'
+            }
+          >
+            <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
-              threads={this.threads}
-              comments={this.comments}
-              addresses={this.addresses}
+              threads={threads}
+              comments={comments}
+              addresses={addresses}
             />
           </div>
         </div>
-      );
-    } else {
-      this.content = (
+      </Sublayout>
+    );
+  } else {
+    return (
+      <Sublayout>
         <div className="Profile">
           <div className="ProfilePageContainer">
-            <ProfileHeader profile={this.profile} isOwner={this.isOwner} />
+            <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
-              threads={this.threads}
-              comments={this.comments}
-              addresses={this.addresses}
+              threads={threads}
+              comments={comments}
+              addresses={addresses}
             />
           </div>
         </div>
-      );
-    }
-
-    return <Sublayout hideFooter={true}>{this.content}</Sublayout>;
+      </Sublayout>
+    );
   }
-}
+};
+
+export default ProfileComponent;

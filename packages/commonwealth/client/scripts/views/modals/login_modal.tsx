@@ -1,10 +1,10 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
+import _ from 'lodash';
 import app, { initAppState } from 'state';
-import ClassComponent from 'class_component';
-import $ from 'jquery';
-import _ from 'underscore';
+import { ChainBase } from 'common-common/src/types';
+import { ClassComponent, redraw } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import {
   completeClientLogin,
@@ -13,18 +13,20 @@ import {
 } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithAccount } from 'controllers/server/sessions';
+
+import { notifyError } from 'controllers/app/notifications';
 import type { Account, IWebWallet } from 'models';
-import { ChainBase } from 'common-common/src/types';
-import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
+
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../components/component_kit/helpers';
+import type { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
+import { setDarkMode } from '../../helpers';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -32,13 +34,14 @@ type LoginModalAttrs = {
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
   onSuccess?: () => void;
+  onModalClose: () => void;
 };
 
-export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
+export class LoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;
-  private profiles: Array<ProfileRowAttrs>;
+  private profiles: Array<ProfileRowProps>;
   private sidebarType: LoginSidebarType;
   private username: string;
   private email: string;
@@ -55,7 +58,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private magicLoading: boolean;
   private showMobile: boolean;
 
-  oninit(vnode: m.Vnode<LoginModalAttrs>) {
+  oncreate(vnode: ResultNode<LoginModalAttrs>) {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -127,9 +130,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     );
   }
 
-  view(vnode: m.Vnode<LoginModalAttrs>) {
+  view(vnode: ResultNode<LoginModalAttrs>) {
     const { onSuccess } = vnode.attrs;
-    const wcEnabled = _.any(
+    const wcEnabled = _.some(
       this.wallets,
       (w) =>
         (w instanceof WalletConnectWebWalletController ||
@@ -150,9 +153,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         this.magicLoading = false;
         if (onSuccess) onSuccess();
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
       } catch (e) {
         notifyError("Couldn't send magic link");
@@ -175,16 +178,19 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         completeClientLogin(account);
         if (exitOnComplete) {
           if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            $('.LoginMobile').trigger('modalexit');
+            vnode.attrs.onModalClose();
           } else {
-            $('.LoginDesktop').trigger('modalexit');
+            vnode.attrs.onModalClose();
           }
           if (onSuccess) onSuccess();
         }
-        m.redraw();
+        redraw();
       } else {
         // log in as the new user
         await initAppState(false);
+        if (localStorage.getItem('user-dark-mode-state') === 'on') {
+          setDarkMode(true);
+        }
         if (app.chain) {
           const chain =
             app.user.selectedChain ||
@@ -193,13 +199,13 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         }
         if (exitOnComplete) {
           if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            $('.LoginMobile').trigger('modalexit');
+            vnode.attrs.onModalClose();
           } else {
-            $('.LoginDesktop').trigger('modalexit');
+            vnode.attrs.onModalClose();
           }
           if (onSuccess) onSuccess();
         }
-        m.redraw();
+        redraw();
       }
     };
 
@@ -272,6 +278,8 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
             this.cachedWalletSignature = signature;
             this.cachedTimestamp = timestamp;
             this.cachedChainId = chainId;
+            this.cachedChainId = this.selectedWallet.getChainId();
+            onSuccess?.();
           } catch (e) {
             console.log(e);
           }
@@ -281,7 +289,6 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           this.sidebarType = 'newAddressLinked';
           this.bodyType = 'selectProfile';
         }
-        m.redraw();
       }
     };
 
@@ -296,23 +303,30 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           );
         }
         await logInWithAccount(this.primaryAccount, false);
+        // Important: when we first create an account and verify it, the user id
+        // is initially null from api (reloading the page will update it), to correct
+        // it we need to get the id from api
+        await app.newProfiles.updateProfileForAccount(
+          this.primaryAccount.profile.address,
+          {}
+        );
       } catch (e) {
         console.log(e);
         notifyError('Failed to create account. Please try again.');
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
       }
       this.bodyType = 'welcome';
-      m.redraw();
+      redraw();
     };
 
     // Handle branching logic for linking an account
     const linkExistingAccountCallback = async () => {
       this.bodyType = 'selectPrevious';
-      m.redraw();
+      redraw();
     };
 
     // Handle signature and validation logic for linking an account
@@ -358,19 +372,19 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           );
         }
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
         if (onSuccess) onSuccess();
-        m.redraw();
+        redraw();
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
       }
     };
@@ -400,7 +414,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         handleSetEmail={(e) => {
           this.email = e.target.value;
         }}
-        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
+        setProfiles={(profiles: Array<ProfileRowProps>) => {
           this.profiles = profiles;
         }}
         setSidebarType={(sidebarType: LoginSidebarType) => {
@@ -419,6 +433,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
         showResetWalletConnect={wcEnabled}
+        onModalClose={vnode.attrs.onModalClose}
       />
     ) : (
       <LoginDesktop
@@ -445,7 +460,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         handleSetEmail={(e) => {
           this.email = e.target.value;
         }}
-        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
+        setProfiles={(profiles: Array<ProfileRowProps>) => {
           this.profiles = profiles;
         }}
         setSidebarType={(sidebarType: LoginSidebarType) => {
@@ -464,6 +479,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
         showResetWalletConnect={wcEnabled}
+        onModalClose={vnode.attrs.onModalClose}
       />
     );
   }

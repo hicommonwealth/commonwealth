@@ -1,24 +1,22 @@
-/* @jsx m */
-
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import EditProfileComponent from '../components/edit_profile';
 import { PageNotFound } from '../pages/404';
 
-export default class EditNewProfile extends ClassComponent {
-  view() {
-    if (!app.isLoggedIn())
-      return (
-        <PageNotFound message="You must be logged in to edit your profile." />
-      );
-
+const EditNewProfile = () => {
+  if (!app.isLoggedIn()) {
     return (
-      <Sublayout hideFooter={true}>
-        <EditProfileComponent />
-      </Sublayout>
+      <PageNotFound message="You must be logged in to edit your profile." />
     );
   }
-}
+
+  return (
+    <Sublayout>
+      <EditProfileComponent />
+    </Sublayout>
+  );
+};
+
+export default EditNewProfile;

@@ -3,21 +3,31 @@ import Web3 from 'web3';
 import {
   chainAdvanceTime,
   chainGetEth,
-  erc20Approve,
   erc20BalanceReq,
   erc20Transfer,
-  erc721Approve,
   govCompCreate,
   govCompGetVotes,
   govCompProposalId,
   govCompVote,
 } from '../src/types';
+import { ERC721 } from './nft';
 
 export class ChainTesting {
   host: string;
   header = {
     headers: {
       'Content-Type': 'application/json',
+    },
+  };
+
+  contractAddrs = {
+    compound: {
+      governance: '0xc0Da02939E1441F497fd74F78cE7Decb17B66529',
+      token: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
+    },
+    aave: {
+      governance: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
+      token: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
     },
   };
 
@@ -82,32 +92,6 @@ export class ChainTesting {
   }
 
   /**
-   * Approve a spender to spend an ERC20 token
-   * @param tokenAddress ERC20 token address
-   * @param spender address to approve
-   * @param amount amount to approve
-   * @param accountIndex account index to create approve tx from(erc20.approve)
-   */
-  public async approveErc20(
-    tokenAddress: string,
-    spender: string,
-    amount: string,
-    accountIndex?: number
-  ) {
-    const request: erc20Approve = {
-      tokenAddress,
-      spender,
-      amount,
-      accountIndex,
-    };
-    await axios.post(
-      `${this.host}/erc20/approve`,
-      JSON.stringify(request),
-      this.header
-    );
-  }
-
-  /**
    * Gets ERC20 tokens from a 'Bank Wallet'
    * @param tokenAddress ERC20 token address
    * @param to address to transfer to
@@ -129,11 +113,12 @@ export class ChainTesting {
    * Get voting power via ERC20 token for a given wallet
    * @param accountIndex account index of test chain to get tokens
    * @param numberOfVotes amount of votes/tokens to receive
+   * @param govType type of governor. 'compound' || 'aave
    */
   public async getVotingPower(
     accountIndex: number,
     numberOfVotes: string,
-    govType: string = 'compound'
+    govType = 'compound'
   ) {
     const request: govCompGetVotes = { accountIndex, numberOfVotes };
     const response = await axios.post(
@@ -152,7 +137,7 @@ export class ChainTesting {
    */
   public async createProposal(
     accountIndex: number,
-    govType: string = 'compound'
+    govType = 'compound'
   ): Promise<any> {
     const request: govCompCreate = { accountIndex };
     const response = await axios.post(
@@ -171,7 +156,7 @@ export class ChainTesting {
    */
   public async cancelProposal(
     proposalId: string,
-    govType: string = 'compound'
+    govType = 'compound'
   ): Promise<any> {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
@@ -193,7 +178,7 @@ export class ChainTesting {
     proposalId: string,
     accountIndex: number,
     forAgainst: boolean,
-    govType: string = 'compound'
+    govType = 'compound'
   ) {
     const request: govCompVote = { proposalId, accountIndex, forAgainst };
     const response = await axios.post(
@@ -209,7 +194,7 @@ export class ChainTesting {
    * @param proposalId
    * @param govType type of governor. 'compound' || 'aave
    */
-  public async queueProposal(proposalId: string, govType: string = 'compound') {
+  public async queueProposal(proposalId: string, govType = 'compound') {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/queue`,
@@ -224,10 +209,7 @@ export class ChainTesting {
    * @param proposalId
    * @param govType type of governor. 'compound' || 'aave
    */
-  public async executeProposal(
-    proposalId: string,
-    govType: string = 'compound'
-  ) {
+  public async executeProposal(proposalId: string, govType = 'compound') {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/execute`,
@@ -241,7 +223,7 @@ export class ChainTesting {
    * Runs a full proposal cycle from getting voting power to execution
    * @param govType type of governor. 'compound' || 'aave
    */
-  public async runProposalCycle(govType: string = 'compound') {
+  public async runProposalCycle(govType = 'compound') {
     await axios.get(`${this.host}/gov/${govType}/runFullCylce`);
   }
 
@@ -251,10 +233,7 @@ export class ChainTesting {
    * @param govType type of governor. 'compound' || 'aave
    * @returns JSON data of proposal
    */
-  public async getProposalDetails(
-    proposalId: string,
-    govType: string = 'compound'
-  ) {
+  public async getProposalDetails(proposalId: string, govType = 'compound') {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/proposalDetails`,
@@ -312,96 +291,13 @@ export class ChainTesting {
     );
   }
 
-  // ERC721
   /**
-   * Transfer a specific ERC721 token ID
-   * @param nftAddress ERC721 Contract Address
-   * @param tokenId NFT token ID
-   * @param to transfer to
-   * @param from transfer from: optional if using acct Index
-   * @param accountIndex transfer from: optional if using from
+   * Deploys an ERC721 and produces a reuseable object to interact with it
+   * @returns ERC721 Object
    */
-  public async transferERC721(
-    nftAddress: string,
-    tokenId: string,
-    to: string,
-    from?: string,
-    accountIndex?: number
-  ) {
-    const request: erc721Approve = {
-      nftAddress,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/transfer`,
-      JSON.stringify(request),
-      this.header
-    );
-    return response.data;
-  }
-
-  /**
-   * Approve a single ERC721 for use
-   * @param nftAddress ERC721 Contract Address
-   * @param tokenId NFT token ID
-   * @param to the operator to approve to
-   * @param from from acct(owner): optional if using acct Index
-   * @param accountIndex from acct index(owner): optional if using from
-   */
-  public async approveERC721(
-    nftAddress: string,
-    tokenId: string,
-    to: string,
-    from?: string,
-    accountIndex?: number
-  ) {
-    const request: erc721Approve = {
-      nftAddress,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-      all: false,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/approve`,
-      JSON.stringify(request),
-      this.header
-    );
-    return response.data;
-  }
-  /**
-   * Approve all holdings for use
-   * @param nftAddress ERC721 Contract Address
-   * @param tokenId NFT token ID
-   * @param to the operator to approve to
-   * @param from from acct(owner): optional if using acct Index
-   * @param accountIndex from acct index(owner): optional if using from
-   */
-  public async approveAllERC721(
-    nftAddress: string,
-    tokenId: string,
-    to: string,
-    from?: string,
-    accountIndex?: number
-  ) {
-    const request: erc721Approve = {
-      nftAddress,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-      all: true,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/approve`,
-      JSON.stringify(request),
-      this.header
-    );
-    return response.data;
+  public async deployNFT(): Promise<ERC721> {
+    const response = await axios.get(`${this.host}/erc721/deploy`);
+    return new ERC721(this.host, this.header, response.data['contractAddress']);
   }
 
   //RPC

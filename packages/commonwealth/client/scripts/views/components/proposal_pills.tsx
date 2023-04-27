@@ -1,45 +1,38 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/proposal_pills.scss';
 
 import { formatTimestamp } from 'helpers';
-import m from 'mithril';
 import moment from 'moment';
 import { CWText } from './component_kit/cw_text';
 
-type ActiveProposalPillAttrs = { proposalEnd: number };
+type ActiveProposalPillProps = { proposalEnd: number };
 
-export class ActiveProposalPill extends ClassComponent<ActiveProposalPillAttrs> {
-  view(vnode: m.Vnode<ActiveProposalPillAttrs>) {
-    const { proposalEnd } = vnode.attrs;
+export const ActiveProposalPill = (props: ActiveProposalPillProps) => {
+  const { proposalEnd } = props;
 
-    return (
-      <div class="ActiveProposalPill">
-        <CWText type="caption">
-          Ends in {formatTimestamp(moment(+proposalEnd * 1000))}
-        </CWText>
-        <CWText type="caption" fontWeight="medium" className="active-text">
-          Active
-        </CWText>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="ActiveProposalPill">
+      <CWText type="caption">
+        Ends in {formatTimestamp(moment(+proposalEnd * 1000))}
+      </CWText>
+      <CWText type="caption" fontWeight="medium" className="active-text">
+        Active
+      </CWText>
+    </div>
+  );
+};
 
-type ClosedProposalPillAttrs = { proposalState: string };
+type ClosedProposalPillProps = { proposalState: string };
 
-export class ClosedProposalPill extends ClassComponent<ClosedProposalPillAttrs> {
-  view(vnode: m.Vnode<ClosedProposalPillAttrs>) {
-    const { proposalState } = vnode.attrs;
+export const ClosedProposalPill = (props: ClosedProposalPillProps) => {
+  const { proposalState } = props;
 
-    return (
-      <div class="ClosedProposalPill">
-        <CWText type="caption" fontWeight="semiBold" className="closed-text">
-          {proposalState}
-        </CWText>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="ClosedProposalPill">
+      <CWText type="caption" fontWeight="semiBold" className="closed-text">
+        {proposalState}
+      </CWText>
+    </div>
+  );
+};

@@ -1,29 +1,24 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_divider.scss';
-import m from 'mithril';
 import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
 
-type DividerAttrs = {
+type DividerProps = {
   isVertical?: boolean;
   className?: string;
 };
 
-export class CWDivider extends ClassComponent<DividerAttrs> {
-  view(vnode: m.Vnode<DividerAttrs>) {
-    const { isVertical, className } = vnode.attrs;
+export const CWDivider = (props: DividerProps) => {
+  const { isVertical, className } = props;
 
-    return (
-      <div
-        class={getClasses<DividerAttrs>(
-          { isVertical, className },
-          ComponentType.Divider
-        )}
-      />
-    );
-  }
-}
+  return (
+    <div
+      className={getClasses<DividerProps>(
+        { isVertical, className },
+        ComponentType.Divider
+      )}
+    />
+  );
+};

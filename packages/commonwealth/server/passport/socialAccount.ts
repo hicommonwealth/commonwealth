@@ -193,7 +193,7 @@ async function authenticateSocialAccount(
   }
 }
 
-export function useSocialAccountAuth(models: DB) {
+export function initSocialAccountAuth(models: DB) {
   // allow user to authenticate with Github
   // create stub user without email
   if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET && GITHUB_OAUTH_CALLBACK)

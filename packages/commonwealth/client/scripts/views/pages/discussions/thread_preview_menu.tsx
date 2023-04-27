@@ -1,64 +1,95 @@
-/* @jsx m */
+import { Dispatch, SetStateAction, useState } from 'react';
+import React from 'react';
 
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
-import m from 'mithril';
-import type { Thread, ThreadStage, Topic } from 'models';
-
+import { redraw } from 'mithrilInterop';
+import type { Thread } from 'models';
 import app from 'state';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import { notifySuccess } from '../../../controllers/app/notifications';
+import { ThreadActionType } from '../../../../../shared/types';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
-type ThreadPreviewMenuAttrs = {
+type ThreadPreviewMenuProps = {
   thread: Thread;
+  setIsChangeTopicModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsUpdateProposalStatusModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsLocked: Dispatch<SetStateAction<boolean>>;
 };
 
-export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
-  view(vnode: m.Vnode<ThreadPreviewMenuAttrs>) {
-    if (!app.isLoggedIn()) return;
+export const ThreadPreviewMenu = ({
+  thread,
+  setIsChangeTopicModalOpen,
+  setIsUpdateProposalStatusModalOpen,
+  setIsLocked,
+}: ThreadPreviewMenuProps) => {
+  const [isReadOnly, setIsReadOnly] = useState(thread.readOnly);
 
-    const { thread } = vnode.attrs;
-
-    const hasAdminPermissions =
-      app.user.activeAccount &&
-      (app.roles.isRoleOfCommunity({
-        role: 'admin',
+  const hasAdminPermissions =
+    app.user.activeAccount &&
+    (app.roles.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+    }) ||
+      app.roles.isRoleOfCommunity({
+        role: 'moderator',
         chain: app.activeChainId(),
-      }) ||
-        app.roles.isRoleOfCommunity({
-          role: 'moderator',
-          chain: app.activeChainId(),
-        }));
+      }));
 
-    const isAuthor =
-      app.user.activeAccount &&
-      thread.author === app.user.activeAccount.address;
+  const isAuthor =
+    app.user.activeAccount && thread.author === app.user.activeAccount.address;
 
-    if (!isAuthor && !hasAdminPermissions) return;
+  const handleDeleteThread = () => {
+    openConfirmation({
+      title: 'Delete Thread',
+      description: <>Delete this entire thread?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              app.threads.delete(thread).then(() => {
+                app.threadUpdateEmitter.emit('threadUpdated', {
+                  threadId: thread.id,
+                  action: ThreadActionType.Deletion,
+                });
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+      ],
+    });
+  };
 
-    return (
+  return (
+    <React.Fragment>
       <div
-        class="ThreadPreviewMenu"
-        onclick={(e) => {
+        className="ThreadPreviewMenu"
+        onClick={(e) => {
           // prevent clicks from propagating to discussion row
           e.preventDefault();
           e.stopPropagation();
         }}
       >
-        <CWPopoverMenu
+        <PopoverMenu
           menuItems={[
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
-                      e.preventDefault();
-
+                    onClick: () => {
                       app.threads.pin({ proposal: thread }).then(() => {
-                        navigateToSubpage('/discussions');
-                        m.redraw();
+                        app.threadUpdateEmitter.emit('threadUpdated', {
+                          threadId: thread.id,
+                          action: ThreadActionType.Pinning,
+                        });
+                        redraw();
                       });
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
@@ -69,17 +100,19 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
-                      e.preventDefault();
-
+                    onClick: () => {
                       app.threads
                         .setPrivacy({
                           threadId: thread.id,
-                          readOnly: !thread.readOnly,
+                          readOnly: !isReadOnly,
                         })
-                        .then(() => m.redraw());
+                        .then(() => {
+                          setIsLocked(!isReadOnly);
+                          setIsReadOnly(!isReadOnly);
+                          notifySuccess(isReadOnly ? 'Unlocked!' : 'Locked!');
+                        });
                     },
-                    label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+                    label: isReadOnly ? 'Unlock thread' : 'Lock thread',
                     iconLeft: 'lock' as const,
                   },
                 ]
@@ -87,19 +120,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
-                      e.preventDefault();
-                      app.modals.create({
-                        modal: ChangeTopicModal,
-                        data: {
-                          onChangeHandler: (topic: Topic) => {
-                            thread.topic = topic;
-                            m.redraw();
-                          },
-                          thread,
-                        },
-                      });
-                    },
+                    onClick: () => setIsChangeTopicModalOpen(true),
                     label: 'Change topic',
                     iconLeft: 'filter' as const,
                   },
@@ -108,18 +129,8 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
-                      e.preventDefault();
-                      app.modals.create({
-                        modal: UpdateProposalStatusModal,
-                        data: {
-                          onChangeHandler: (stage: ThreadStage) => {
-                            thread.stage = stage;
-                            m.redraw();
-                          },
-                          thread,
-                        },
-                      });
+                    onClick: () => {
+                      setIsUpdateProposalStatusModalOpen(true);
                     },
                     label: 'Update status',
                     iconLeft: 'democraticProposal' as const,
@@ -129,28 +140,22 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onclick: async (e) => {
-                      e.preventDefault();
-
-                      const confirmed = await confirmationModalWithText(
-                        'Delete this entire thread?'
-                      )();
-
-                      if (!confirmed) return;
-
-                      app.threads.delete(thread).then(() => {
-                        navigateToSubpage('/discussions');
-                      });
-                    },
+                    onClick: handleDeleteThread,
                     label: 'Delete',
                     iconLeft: 'trash' as const,
                   },
                 ]
               : []),
           ]}
-          trigger={<CWIconButton iconName="dotsVertical" iconSize="small" />}
+          renderTrigger={(onclick) => (
+            <CWIconButton
+              iconName="dotsVertical"
+              iconSize="small"
+              onClick={onclick}
+            />
+          )}
         />
       </div>
-    );
-  }
-}
+    </React.Fragment>
+  );
+};

@@ -1,42 +1,35 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_form_section.scss';
-import m from 'mithril';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
 
-type FormSectionAttrs = {
+type FormSectionProps = {
   description: string;
   title: string;
-  topRightElement?: m.Vnode;
-};
+  topRightElement?: React.ReactNode;
+} & React.PropsWithChildren;
 
-export class CWFormSection extends ClassComponent<FormSectionAttrs> {
-  view(vnode: m.Vnode<FormSectionAttrs>) {
-    const { description, title } = vnode.attrs;
+export const CWFormSection = (props: FormSectionProps) => {
+  const { description, title, topRightElement } = props;
 
-    return (
-      <div className={ComponentType.FormSection}>
-        <div className="title">
-          <CWText type="h4">{title}</CWText>
-          {vnode.attrs.topRightElement && (
-            <div className="top-right-element">
-              {vnode.attrs.topRightElement}
-            </div>
-          )}
-        </div>
-        <div className="columns">
-          <div className="left-side">
-            <CWText type="b1">{description}</CWText>
-          </div>
-          <div className="right-side">{vnode.children}</div>
-        </div>
-        <CWDivider />
+  return (
+    <div className={ComponentType.FormSection}>
+      <div className="title">
+        <CWText type="h4">{title}</CWText>
+        {topRightElement && (
+          <div className="top-right-element">{topRightElement}</div>
+        )}
       </div>
-    );
-  }
-}
+      <div className="columns">
+        <div className="left-side">
+          <CWText type="b1">{description}</CWText>
+        </div>
+        <div className="right-side">{props.children}</div>
+      </div>
+      <CWDivider />
+    </div>
+  );
+};

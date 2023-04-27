@@ -1,3 +1,5 @@
+import type React from 'react';
+
 import type { ComponentType } from '../types';
 import type { CustomIconName, IconName } from './cw_icon_lookup';
 
@@ -12,7 +14,7 @@ export type IconSize =
   | 'xl'
   | 'xxl';
 
-export type IconStyleAttrs = {
+export type IconStyleProps = {
   className?: string;
   disabled?: boolean;
   iconButtonTheme?: IconButtonTheme;
@@ -20,18 +22,19 @@ export type IconStyleAttrs = {
   selected?: boolean;
 };
 
-export type IconAttrs = IconStyleAttrs & {
+export type IconProps = IconStyleProps & {
   componentType?: ComponentType;
-  onclick?: (e?: MouseEvent) => void; // should be used by icon button, not by plain icons
-};
+  onClick?: (e?: React.MouseEvent<HTMLElement | SVGSVGElement>) => void;
+} & React.SVGProps<SVGSVGElement>;
 
-export type IconComponentAttrs = IconAttrs & { iconName: IconName };
+export type IconComponentProps = IconProps & { iconName: IconName };
 
-export type CustomIconStyleAttrs = {
+export type CustomIconStyleProps = {
   iconSize?: IconSize;
 };
 
-export type CustomIconAttrs = {
+export type CustomIconProps = {
   componentType?: ComponentType;
   iconName?: CustomIconName;
-} & CustomIconStyleAttrs;
+} & CustomIconStyleProps &
+  React.SVGProps<SVGSVGElement>;

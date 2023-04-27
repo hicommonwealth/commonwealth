@@ -1,101 +1,106 @@
-/* @jsx m */
+import React from 'react';
 
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
-import { notifySuccess } from 'controllers/app/notifications';
-import m from 'mithril';
 import type { Thread } from 'models';
-
 import 'pages/view_thread/edit_body.scss';
-
+import { notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
 import { ContentType } from 'types';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
-import type { QuillEditor } from '../../components/quill/quill_editor';
-import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
+import type { DeltaStatic } from 'quill';
+import { ReactQuillEditor } from '../../components/react_quill_editor';
+import { deserializeDelta } from '../../components/react_quill_editor/utils';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
-type EditBodyAttrs = {
+type EditBodyProps = {
+  title: string;
   savedEdits: string;
-  setIsEditing: (status: boolean) => void;
   shouldRestoreEdits: boolean;
   thread: Thread;
-  title: string;
+  cancelEditing: () => void;
+  threadUpdatedCallback: (title: string, body: string) => void;
 };
 
-export class EditBody extends ClassComponent<EditBodyAttrs> {
-  private quillEditorState: QuillEditor;
-  private saving: boolean;
+export const EditBody = (props: EditBodyProps) => {
+  const {
+    title,
+    shouldRestoreEdits,
+    savedEdits,
+    thread,
+    cancelEditing,
+    threadUpdatedCallback,
+  } = props;
 
-  view(vnode: m.Vnode<EditBodyAttrs>) {
-    const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } =
-      vnode.attrs;
+  const threadBody =
+    shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
+  const body = deserializeDelta(threadBody);
 
-    const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
+  const [saving, setSaving] = React.useState<boolean>(false);
 
-    return (
-      <div class="EditBody">
-        <QuillEditorComponent
-          contentsDoc={body}
-          oncreateBind={(state: QuillEditor) => {
-            this.quillEditorState = state;
-          }}
-          imageUploader
-          theme="snow"
-          editorNamespace={`edit-thread-${thread.id}`}
+  const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    const hasContentChanged =
+      JSON.stringify(body) !== JSON.stringify(contentDelta);
+
+    if (hasContentChanged) {
+      openConfirmation({
+        title: 'Cancel editing?',
+        description: <>Changes will not be saved.</>,
+        buttons: [
+          {
+            label: 'Yes',
+            buttonType: 'mini-black',
+            onClick: () => {
+              clearEditingLocalStorage(thread.id, ContentType.Thread);
+              cancelEditing();
+            },
+          },
+          {
+            label: 'No',
+            buttonType: 'mini-white',
+          },
+        ],
+      });
+    } else {
+      cancelEditing();
+    }
+  };
+
+  const save = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    setSaving(true);
+
+    try {
+      const newBody = JSON.stringify(contentDelta);
+      await app.threads.edit(thread, newBody, title);
+      clearEditingLocalStorage(thread.id, ContentType.Thread);
+      notifySuccess('Thread successfully edited');
+      threadUpdatedCallback(title, newBody);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="EditBody">
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+      />
+      <div className="buttons-row">
+        <CWButton
+          label="Cancel"
+          disabled={saving}
+          buttonType="secondary-blue"
+          onClick={cancel}
         />
-        <div class="buttons-row">
-          <CWButton
-            label="Cancel"
-            disabled={this.saving}
-            buttonType="secondary-blue"
-            onclick={async (e) => {
-              e.preventDefault();
-
-              let confirmed = true;
-
-              const threadText = this.quillEditorState.textContentsAsString;
-
-              if (threadText !== body) {
-                confirmed = await confirmationModalWithText(
-                  'Cancel editing? Changes will not be saved.',
-                  'Delete changes',
-                  'Keep editing'
-                )();
-              }
-
-              if (confirmed) {
-                setIsEditing(false);
-                clearEditingLocalStorage(thread.id, ContentType.Thread);
-                m.redraw();
-              }
-            }}
-          />
-          <CWButton
-            label="Save"
-            disabled={this.saving}
-            onclick={(e) => {
-              e.preventDefault();
-
-              this.saving = true;
-
-              this.quillEditorState.disable();
-
-              const itemText = this.quillEditorState.textContentsAsString;
-
-              app.threads.edit(thread, itemText, title).then(() => {
-                navigateToSubpage(`/discussion/${thread.id}`);
-                this.saving = false;
-                clearEditingLocalStorage(thread.id, ContentType.Thread);
-                setIsEditing(false);
-                m.redraw();
-                notifySuccess('Thread successfully edited');
-              });
-            }}
-          />
-        </div>
+        <CWButton label="Save" disabled={saving} onClick={save} />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

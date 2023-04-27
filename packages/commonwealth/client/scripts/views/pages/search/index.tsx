@@ -1,366 +1,253 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import { notifyError } from 'controllers/app/notifications';
-
-import { pluralize } from 'helpers';
-import _, { capitalize } from 'lodash';
-import m from 'mithril';
-import type { MinimumProfile as Profile } from 'models';
-import { AddressInfo, SearchQuery } from 'models';
-import { SearchScope, SearchSort } from 'models/SearchQuery';
-import moment from 'moment';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { NavigateOptions, useSearchParams } from 'react-router-dom';
+import { capitalize, debounce, uniqBy } from 'lodash';
 
 import 'pages/search/index.scss';
+
+import { SearchScope } from 'models/SearchQuery';
+import { SearchSort } from 'models/SearchQuery';
+
 import app from 'state';
-import { SearchContentType } from 'types';
-import User from 'views/components/widgets/user';
+import { pluralize } from 'helpers';
+import { SearchQuery } from 'models';
+import { notifyError } from 'controllers/app/notifications';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
-import { CommunityLabel } from '../../components/community_label';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import { PageNotFound } from '../404';
-import ErrorPage from '../error';
+import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { useCommonNavigate } from 'navigation/helpers';
+import { getListing } from './helpers';
+import QueryString from 'qs';
 
-const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
+const SearchPage = () => {
+  const navigate = useCommonNavigate();
+  const [searchParams] = useSearchParams();
+  const [searchResults, setSearchResults] = useState({});
+  const [page, setPage] = useState<number>(1);
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
 
-const getDiscussionResult = (thread, searchTerm) => {
-  const proposalId = thread.proposalid;
-  const chain = thread.chain;
-
-  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
-
-  return (
-    <div
-      class="search-result-row"
-      onclick={() => {
-        m.route.set(`/${chain}/discussion/${proposalId}`);
-      }}
-    >
-      <CWIcon iconName="feedback" />
-      <div class="inner-container">
-        <CWText fontStyle="uppercase" type="caption" className="thread-header">
-          {`discussion - ${thread.chain}`}
-        </CWText>
-        <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
-        <div class="search-results-thread-subtitle">
-          {m(User, {
-            user: new AddressInfo(
-              thread.address_id,
-              thread.address,
-              thread.address_chain,
-              null
-            ),
-          })}
-          <CWText className="created-at">
-            {moment(thread.created_at).fromNow()}
-          </CWText>
-        </div>
-        <CWText noWrap>
-          {renderQuillTextBody(thread.body, {
-            hideFormatting: true,
-            collapse: true,
-            searchTerm,
-          })}
-        </CWText>
-      </div>
-    </div>
+  const searchQuery = useMemo(
+    () => SearchQuery.fromUrlParams(Object.fromEntries(searchParams.entries())),
+    [searchParams]
   );
-};
 
-const getCommentResult = (comment, searchTerm) => {
-  const proposalId = comment.proposalid;
-  const chain = comment.chain;
+  const activeTab = useMemo(() => {
+    return (
+      (QueryString.parse(window.location.search.replace('?', ''))[
+        'tab'
+      ] as SearchScope) || SearchScope.Threads
+    );
+  }, []);
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
+  const setActiveTab = (newTab: SearchScope) => {
+    navigate(`/search?${searchQuery.toUrlParams()}&tab=${newTab}`, {
+      replace: true,
+    } as NavigateOptions);
+  };
 
-  return (
-    <div
-      class="search-result-row"
-      onclick={() => {
-        m.route.set(`/${chain}/discussion/${proposalId}`);
-      }}
-    >
-      <CWIcon iconName="feedback" />
-      <div class="inner-container">
-        <CWText fontWeight="medium">{`comment - ${
-          comment.chain || comment.community
-        }`}</CWText>
-        {/* <div class="search-results-thread-title">
-          {decodeURIComponent(comment.title)}
-        </div> */}
-        <div class="search-results-thread-subtitle">
-          {m(User, {
-            user: new AddressInfo(
-              comment.address_id,
-              comment.address,
-              comment.address_chain,
-              null
-            ),
-          })}
-          <CWText className="created-at">
-            {moment(comment.created_at).fromNow()}
-          </CWText>
-        </div>
-        <CWText noWrap>
-          {renderQuillTextBody(comment.text, {
-            hideFormatting: true,
-            collapse: true,
-            searchTerm,
-          })}
-        </CWText>
-      </div>
-    </div>
-  );
-};
+  const debouncedSetPage = useCallback(debounce(setPage, 200), []);
 
-const getCommunityResult = (community) => {
-  const params =
-    community.SearchContentType === SearchContentType.Token
-      ? { community }
-      : community.SearchContentType === SearchContentType.Chain
-      ? { community }
-      : null;
+  const bottomEl = useRef(null);
 
-  const onSelect = () => {
-    if (params.community) {
-      m.route.set(params.community.id ? `/${params.community.id}` : '/');
+  // when tab or query is updated, load first page
+  const handleSearch = useCallback(async () => {
+    try {
+      setPage(1);
+      if (!searchQuery.chainScope) {
+        searchQuery.chainScope = 'all_chains';
+      }
+      const response = await app.search.search(searchQuery);
+      setSearchResults(response.results);
+    } catch (err) {
+      setSearchResults({});
+      notifyError(
+        err.responseJSON?.error || err.responseText || err.toString()
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, searchQuery]);
+
+  useEffect(() => {
+    handleSearch();
+  }, [handleSearch]);
+
+  // when scroll page changes, append new results
+  const handleLoadNextPage = useCallback(async () => {
+    try {
+      if (page <= 1) {
+        return;
+      }
+      setIsLoadingPage(true);
+      const results = await app.search.searchPaginated(
+        searchQuery,
+        activeTab,
+        page,
+        10
+      );
+      setSearchResults((oldSearchResults) => {
+        const newResults = (oldSearchResults[activeTab] || []).concat(results);
+        return {
+          ...oldSearchResults,
+          [activeTab]: uniqBy(
+            newResults,
+            (result: any) => result.id || result.proposalid
+          ),
+        };
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingPage(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, searchQuery]);
+
+  useEffect(() => {
+    handleLoadNextPage();
+  }, [handleLoadNextPage]);
+
+  const tabScopedListing = useMemo(() => {
+    // deduplicate results
+    const dedupedResults = {
+      ...searchResults,
+      [SearchScope.Threads]: uniqBy(
+        (searchResults as any).Threads,
+        (t: any) => t.proposalid
+      ),
+      [SearchScope.Replies]: uniqBy(
+        (searchResults as any).Replies,
+        (r: any) => r.id
+      ),
+    };
+    return getListing(
+      dedupedResults,
+      searchQuery.searchTerm,
+      searchQuery.sort,
+      activeTab as SearchScope,
+      navigate
+    );
+  }, [
+    activeTab,
+    navigate,
+    searchQuery.searchTerm,
+    searchQuery.sort,
+    searchResults,
+  ]);
+
+  const resultCount =
+    tabScopedListing.length >= 10
+      ? `${tabScopedListing.length}+ ${pluralize(
+          2,
+          activeTab.toLowerCase()
+        ).replace('2 ', '')}`
+      : pluralize(tabScopedListing.length, activeTab.toLowerCase());
+
+  const getCaptionScope = () => {
+    if (searchQuery.chainScope) {
+      if (searchQuery.chainScope === 'all_chains') {
+        return 'in all communities.';
+      }
+      return `in ${capitalize(searchQuery.chainScope)}.`;
+    } else if (app.isCustomDomain()) {
+      return '';
     } else {
-      m.route.set(community.id ? `/${community.id}` : '/');
+      return 'across all communities.';
     }
   };
 
-  return (
-    <div class="community-result-row" onclick={onSelect}>
-      <CommunityLabel {...params} />
-    </div>
-  );
-};
-
-const getMemberResult = (addr) => {
-  const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
-  if (addr.name) profile.initialize(addr.name, null, null, null, null, null);
-
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
-
-  return (
-    <div class="member-result-row">
-      {m(User, {
-        user: profile,
-        showRole: true,
-        linkify: true,
-        avatarSize: 32,
-        showAddressWithDisplayName: true,
-      })}
-    </div>
-  );
-};
-
-const getListing = (
-  results: any,
-  searchTerm: string,
-  pageCount: number,
-  sort: SearchSort,
-  searchType?: SearchScope
-) => {
-  if (Object.keys(results).length === 0 || !results[searchType]) return [];
-
-  const tabScopedResults = results[searchType]
-    .map((res) => {
-      return res.searchType === SearchScope.Threads
-        ? getDiscussionResult(res, searchTerm)
-        : res.searchType === SearchScope.Members
-        ? getMemberResult(res)
-        : res.searchType === SearchScope.Communities
-        ? getCommunityResult(res)
-        : res.searchType === SearchScope.Replies
-        ? getCommentResult(res, searchTerm)
-        : null;
-    })
-    .slice(0, pageCount * 50);
-
-  return tabScopedResults;
-};
-
-const search = async (searchQuery: SearchQuery, state) => {
-  try {
-    await app.search.search(searchQuery);
-  } catch (err) {
-    state.results = {};
-    notifyError(err.responseJSON?.error || err.responseText || err.toString());
-  }
-
-  state.results = app.search.getByQuery(searchQuery).results;
-
-  app.search.addToHistory(searchQuery);
-
-  m.redraw();
-};
-
-type SearchPageAttrs = {
-  results: any[];
-};
-
-class SearchPage extends ClassComponent<SearchPageAttrs> {
-  private activeTab: SearchScope;
-  private errorText: string;
-  private pageCount: number;
-  private refreshResults: boolean;
-  private results: any;
-  private searchQuery: SearchQuery;
-
-  view() {
-    const searchQuery = SearchQuery.fromUrlParams(m.route.param());
-
-    const { chainScope, searchTerm } = searchQuery;
-    const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
-
-    if (!app.search.isValidQuery(searchQuery)) {
-      this.errorText =
-        'Must enter query longer than 3 characters to begin searching';
-
-      return (
-        <PageNotFound
-          title="Search"
-          message="Please enter a query longer than 3 characters to begin searching"
-        />
-      );
-    }
-
-    // re-fetch results for new search if search term or URI has changed
-    if (!_.isEqual(searchQuery, this.searchQuery) || this.refreshResults) {
-      this.searchQuery = searchQuery;
-      this.refreshResults = false;
-      this.results = {};
-      search(searchQuery, this);
-      return <PageLoading />;
-    }
-
-    if (!app.search.getByQuery(searchQuery)?.loaded) {
-      return <PageLoading />;
-    }
-
-    if (!this.activeTab) {
-      this.activeTab = searchQuery.getSearchScope()[0];
-    }
-    if (!this.pageCount) {
-      this.pageCount = 1;
-    }
-
-    const { results, pageCount, activeTab } = this;
-
-    const getTab = (searchScope: SearchScope) => {
-      return (
-        <CWTab
-          label={searchScope}
-          isSelected={this.activeTab === searchScope}
-          onclick={() => {
-            this.pageCount = 1;
-            this.activeTab = searchScope;
-          }}
-        />
-      );
-    };
-
-    const tabs = this.searchQuery.getSearchScope().map(getTab);
-
-    const tabScopedListing = getListing(
-      results,
-      searchTerm,
-      pageCount,
-      searchQuery.sort,
-      activeTab
+  const handleSortChange = (option: DropdownItemType) => {
+    const newSearchQuery = SearchQuery.fromUrlParams(
+      Object.fromEntries(searchParams.entries())
     );
+    newSearchQuery.sort = SearchSort[option.value];
+    navigate(`/search?${newSearchQuery.toUrlParams()}&tab=${activeTab}`, {
+      replace: true,
+    } as NavigateOptions);
+  };
 
-    const resultCount =
-      tabScopedListing.length === SEARCH_PAGE_SIZE
-        ? `${tabScopedListing.length}+ ${pluralize(
-            2,
-            activeTab.toLowerCase()
-          ).replace('2 ', '')}`
-        : pluralize(tabScopedListing.length, activeTab.toLowerCase());
+  const handleSearchAllCommunities = () => {
+    const newSearchQuery = SearchQuery.fromUrlParams(
+      Object.fromEntries(searchParams.entries())
+    );
+    newSearchQuery.chainScope = undefined;
+    navigate(`/search?${newSearchQuery.toUrlParams()}&tab=${activeTab}`);
+  };
 
-    const getCaptionScope = () => {
-      if (scope) {
-        return `in ${capitalize(scope)}.`;
-      } else if (app.isCustomDomain()) {
-        return '';
-      } else {
-        return 'across all communities.';
+  const handleScroll = () => {
+    if (!isLoadingPage && bottomEl.current) {
+      const offset = 0;
+      const top = bottomEl.current.getBoundingClientRect().top;
+      const isInViewport =
+        top + offset >= 0 && top - offset <= window.innerHeight;
+      if (isInViewport) {
+        debouncedSetPage(page + 1);
       }
-    };
+    }
+  };
 
-    return this.errorText?.length > 0 ? (
-      <ErrorPage
-        message={this.errorText}
-        title={<BreadcrumbsTitleTag title="Search" />}
-      />
-    ) : (
-      <Sublayout>
-        <div class="SearchPage">
-          <>
-            {!app.search.getByQuery(searchQuery)?.loaded ? (
-              <CWSpinner size="xl" />
-            ) : (
-              <div class="search-results">
-                <CWTabBar>{tabs}</CWTabBar>
-                <CWText isCentered className="search-results-caption">
-                  {resultCount} matching '{this.searchQuery.searchTerm}'{' '}
-                  {getCaptionScope()}
-                  {scope && !app.isCustomDomain() && (
-                    <a
-                      href="#"
-                      class="search-all-communities"
-                      onclick={() => {
-                        searchQuery.chainScope = undefined;
-                        m.route.set(`/search?${searchQuery.toUrlParams()}`);
-                        setTimeout(() => {
-                          this.refreshResults = true;
-                        }, 0);
-                      }}
-                    >
-                      Search all communities?
-                    </a>
-                  )}
-                </CWText>
-                {tabScopedListing.length > 0 && this.activeTab === 'Threads' && (
-                  <div class="search-results-filters">
-                    <CWText type="h5">Sort By:</CWText>
-                    <CWDropdown
-                      label=""
-                      initialValue={{
-                        label: this.searchQuery.sort,
-                        value: this.searchQuery.sort,
-                      }}
-                      options={[
-                        { label: 'Best', value: 'Best' },
-                        { label: 'Newest', value: 'Newest' },
-                        { label: 'Oldest', value: 'Oldest' },
-                      ]}
-                      onSelect={(o) => {
-                        searchQuery.sort = SearchSort[o.value];
-                        m.route.set(`/search?${searchQuery.toUrlParams()}`);
-                        setTimeout(() => {
-                          this.refreshResults = true;
-                        }, 0);
-                      }}
-                    />
-                  </div>
-                )}
-                <div class="search-results-list">{tabScopedListing}</div>
+  return !app.search.getByQuery(searchQuery)?.loaded ? (
+    <PageLoading />
+  ) : (
+    <Sublayout onScroll={handleScroll}>
+      <div className="SearchPage">
+        <div className="search-results">
+          <CWTabBar>
+            {searchQuery.getSearchScope().map((s, i) => (
+              <CWTab
+                key={i}
+                label={s}
+                isSelected={activeTab === s}
+                onClick={() => setActiveTab(s)}
+              />
+            ))}
+          </CWTabBar>
+          <CWText isCentered className="search-results-caption">
+            {resultCount} matching '{searchQuery.searchTerm}'{' '}
+            {getCaptionScope()}
+            {searchQuery.chainScope !== 'all_chains' && !app.isCustomDomain() && (
+              <a
+                href="#"
+                className="search-all-communities"
+                onClick={handleSearchAllCommunities}
+              >
+                Search all communities?
+              </a>
+            )}
+          </CWText>
+          {tabScopedListing.length > 0 &&
+            ['Threads', 'Replies'].includes(activeTab) && (
+              <div className="search-results-filters">
+                <CWText type="h5">Sort By:</CWText>
+                <CWDropdown
+                  label=""
+                  onSelect={handleSortChange}
+                  initialValue={{
+                    label: searchQuery.sort,
+                    value: searchQuery.sort,
+                  }}
+                  options={Object.keys(SearchSort).map((k) => ({
+                    label: k,
+                    value: k,
+                  }))}
+                />
               </div>
             )}
-          </>
+          <div className="search-results-list">
+            {tabScopedListing}
+            <div ref={bottomEl}></div>
+          </div>
         </div>
-      </Sublayout>
-    );
-  }
-}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default SearchPage;

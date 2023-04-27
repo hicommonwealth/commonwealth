@@ -1,9 +1,19 @@
+@import '../../shared';
+
 .NewContractPage {
-  max-width: 688px;
+  width: 688px;
   margin: 16px auto;
+
+  @include mediumSmallInclusive {
+    width: calc(100% - 10%);
+  }
 
   .header {
     margin: 32px 0 8px;
+  }
+
+  .subheader {
+    margin-bottom: 20px;
   }
 
   .divider {

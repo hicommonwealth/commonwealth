@@ -1,33 +1,29 @@
-/* @jsx m */
+import React, { useState, useEffect } from 'react';
 
-import ClassComponent from 'class_component';
-import { isCommandClick, pluralize } from 'helpers';
+import 'pages/discussions/thread_preview.scss';
 import {
   chainEntityTypeToProposalShortName,
   getProposalUrlPath,
 } from 'identifiers';
-import m from 'mithril';
-import type { Thread } from 'models';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
 
 import app from 'state';
 import { slugify } from 'utils';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { isCommandClick, pluralize } from 'helpers';
+import { AddressInfo } from 'models';
+import type { Thread } from 'models';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   getClasses,
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
-import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ThreadPreviewReactionButtonBig } from '../../components/reaction_button/ThreadPreviewReactionButtonBig';
+import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
 import { SharePopover } from '../../components/share_popover';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -35,47 +31,75 @@ import {
   isHot,
 } from './helpers';
 import { ThreadPreviewMenu } from './thread_preview_menu';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { useCommonNavigate } from 'navigation/helpers';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { ChangeTopicModal } from 'views/modals/change_topic_modal';
+import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
-type ThreadPreviewAttrs = {
+type ThreadPreviewProps = {
   thread: Thread;
 };
 
-export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
-  private isWindowSmallInclusive: boolean;
+export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
+  const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
+  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
+    useState(false);
 
-  onResize() {
-    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
-    m.redraw();
-  }
+  const [windowIsSmall, setWindowIsSmall] = useState(
+    isWindowSmallInclusive(window.innerWidth)
+  );
 
-  oninit() {
-    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+  const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
 
-    window.addEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+  useEffect(() => {
+    if (localStorage.getItem('dark-mode-state') === 'on') {
+      document.getElementsByTagName('html')[0].classList.add('invert');
+    }
 
-  onremove() {
-    window.removeEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+    const onResize = () => {
+      setWindowIsSmall(isWindowSmallInclusive(window.innerWidth));
+    };
 
-  view(vnode: m.Vnode<ThreadPreviewAttrs>) {
-    const { thread } = vnode.attrs;
+    window.addEventListener('resize', onResize);
 
-    const isSubscribed =
-      getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive;
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
-    return (
+  const [isSubscribed, setIsSubscribed] = useState(
+    getCommentSubscription(thread)?.isActive &&
+      getReactionSubscription(thread)?.isActive
+  );
+  const [isLocked, setIsLocked] = useState(thread.readOnly);
+
+  const hasAdminPermissions =
+    app.user.activeAccount &&
+    (app.roles.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+    }) ||
+      app.roles.isRoleOfCommunity({
+        role: 'moderator',
+        chain: app.activeChainId(),
+      }));
+
+  const isAuthor =
+    app.user.activeAccount && thread.author === app.user.activeAccount.address;
+
+  return (
+    <>
       <div
-        class={getClasses<{ isPinned?: boolean }>(
+        className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
           'ThreadPreview'
         )}
-        onclick={(e) => {
+        onClick={(e) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`
@@ -93,29 +117,23 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
             scrollEle.scrollTop;
 
-          m.route.set(discussionLink);
+          navigate(discussionLink);
         }}
         key={thread.id}
       >
-        {!this.isWindowSmallInclusive && (
-          <ThreadPreviewReactionButton thread={thread} />
-        )}
-        <div class="main-content">
-          <div class="top-row">
-            <div class="user-and-date">
-              {m(User, {
-                avatarSize: 24,
-                user: new AddressInfo(
-                  null,
-                  thread.author,
-                  thread.authorChain,
-                  null
-                ),
-                linkify: true,
-                popover: false,
-                showAddressWithDisplayName: true,
-              })}
-              {!this.isWindowSmallInclusive && (
+        {!windowIsSmall && <ThreadPreviewReactionButtonBig thread={thread} />}
+        <div className="main-content">
+          <div className="top-row">
+            <div className="user-and-date">
+              <User
+                avatarSize={24}
+                user={
+                  new AddressInfo(null, thread.author, thread.authorChain, null)
+                }
+                linkify
+                showAddressWithDisplayName
+              />
+              {!windowIsSmall && (
                 <CWText className="last-updated-text">•</CWText>
               )}
               <CWText
@@ -125,19 +143,19 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
+              {isLocked && <CWIcon iconName="lock" iconSize="small" />}
             </div>
-            <div class="top-row-icons">
-              {isHot(thread) && <div class="flame" />}
+            <div className="top-row-icons">
+              {isHot(thread) && <div className="flame" />}
               {thread.pinned && (
                 <CWIcon
                   iconName="pin"
-                  iconSize={this.isWindowSmallInclusive ? 'small' : 'medium'}
+                  iconSize={windowIsSmall ? 'small' : 'medium'}
                 />
               )}
             </div>
           </div>
-          <div class="title-row">
+          <div className="title-row">
             <CWText type="h5" fontWeight="semiBold">
               {thread.title}
             </CWText>
@@ -154,7 +172,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
             {thread.plaintext}
           </CWText>
           {thread.chainEntities?.length > 0 && (
-            <div class="tags-row">
+            <div className="tags-row">
               {thread.chainEntities
                 .sort((a, b) => {
                   return +a.typeId - +b.typeId;
@@ -175,19 +193,19 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 })}
             </div>
           )}
-          <div class="row-bottom">
-            <div class="comments-count">
-              {this.isWindowSmallInclusive && (
-                <ThreadReactionButton thread={thread} />
+          <div className="row-bottom">
+            <div className="comments-count">
+              {windowIsSmall && (
+                <ThreadReactionPreviewButtonSmall thread={thread} />
               )}
               <CWIcon iconName="feedback" iconSize="small" />
               <CWText type="caption">
                 {pluralize(thread.numberOfComments, 'comment')}
               </CWText>
             </div>
-            <div class="row-bottom-menu">
+            <div className="row-bottom-menu">
               <div
-                onclick={(e) => {
+                onClick={(e) => {
                   // prevent clicks from propagating to discussion row
                   e.preventDefault();
                   e.stopPropagation();
@@ -196,27 +214,65 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 <SharePopover />
               </div>
               <div
-                onclick={(e) => {
+                onClick={(e) => {
                   // prevent clicks from propagating to discussion row
                   e.preventDefault();
                   e.stopPropagation();
                 }}
               >
-                <CWPopoverMenu
-                  menuItems={[getThreadSubScriptionMenuItem(thread)]}
-                  trigger={
+                <PopoverMenu
+                  menuItems={[
+                    getThreadSubScriptionMenuItem(thread, setIsSubscribed),
+                  ]}
+                  renderTrigger={(onclick) => (
                     <CWIconButton
                       iconName={isSubscribed ? 'unsubscribe' : 'bell'}
                       iconSize="small"
+                      onClick={onclick}
                     />
-                  }
+                  )}
                 />
               </div>
-              {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
+              {isLoggedIn && (isAuthor || hasAdminPermissions) && (
+                <ThreadPreviewMenu
+                  thread={thread}
+                  setIsChangeTopicModalOpen={setIsChangeTopicModalOpen}
+                  setIsUpdateProposalStatusModalOpen={
+                    setIsUpdateProposalStatusModalOpen
+                  }
+                  setIsLocked={setIsLocked}
+                />
+              )}
             </div>
           </div>
         </div>
       </div>
-    );
-  }
-}
+      <Modal
+        content={
+          <ChangeTopicModal
+            onChangeHandler={() => {
+              // TODO update store and rerender
+            }}
+            thread={thread}
+            onModalClose={() => setIsChangeTopicModalOpen(false)}
+          />
+        }
+        onClose={() => setIsChangeTopicModalOpen(false)}
+        open={isChangeTopicModalOpen}
+      />
+      <Modal
+        content={
+          <UpdateProposalStatusModal
+            onChangeHandler={() => {
+              // TODO update store and rerender
+            }}
+            thread={thread}
+            onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}
+          />
+        }
+        onClose={() => setIsUpdateProposalStatusModalOpen(false)}
+        open={isUpdateProposalStatusModalOpen}
+      />
+    </>
+  );
+};

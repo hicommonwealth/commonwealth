@@ -1,10 +1,11 @@
+import { render } from 'mithrilInterop';
 import $ from 'jquery';
-import { RegisteredTypes } from '@polkadot/types/types';
-import m from 'mithril';
+import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, AccessLevel } from 'models';
-import { ChainNetwork, ChainBase } from 'common-common/src/types';
-import NodeInfo from './NodeInfo';
+import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import type NodeInfo from './NodeInfo';
 
 import {
   CWAvatar,
@@ -35,6 +36,8 @@ class ChainInfo {
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultOverview: boolean;
+  public defaultPage: DefaultPage;
+  public hasHomepage: boolean;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -75,6 +78,8 @@ class ChainInfo {
     blockExplorerIds,
     collapsedOnHomepage,
     defaultOverview,
+    defaultPage,
+    hasHomepage,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -111,6 +116,8 @@ class ChainInfo {
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultOverview = defaultOverview;
+    this.defaultPage = defaultPage;
+    this.hasHomepage = hasHomepage;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.defaultAllowPermissions = defaultAllowPermissions;
@@ -148,6 +155,8 @@ class ChainInfo {
     block_explorer_ids,
     collapsed_on_homepage,
     default_summary_view,
+    default_page,
+    has_homepage,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -201,6 +210,8 @@ class ChainInfo {
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       defaultOverview: default_summary_view,
+      defaultPage: default_page,
+      hasHomepage: has_homepage,
       adminsAndMods,
       base,
       ss58_prefix,
@@ -295,6 +306,8 @@ class ChainInfo {
     snapshot,
     iconUrl,
     defaultOverview,
+    defaultPage,
+    hasHomepage,
     default_allow_permissions,
     default_deny_permissions,
   }) {
@@ -317,6 +330,8 @@ class ChainInfo {
       terms,
       icon_url: iconUrl,
       default_summary_view: defaultOverview,
+      default_page: defaultPage,
+      has_homepage: hasHomepage,
       jwt: app.user.jwt,
     });
     const updatedChain = r.result;
@@ -334,6 +349,8 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultOverview = updatedChain.default_summary_view;
+    this.defaultPage = updatedChain.default_page;
+    this.hasHomepage = updatedChain.has_homepage;
     this.defaultAllowPermissions = updatedChain.default_allow_permissions;
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
@@ -341,8 +358,8 @@ class ChainInfo {
 
   public getAvatar(size: number) {
     return this.iconUrl
-      ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: undefined, size });
+      ? render(CWAvatar, { avatarUrl: this.iconUrl, size })
+      : render(CWJdenticon, { address: undefined, size });
   }
 }
 

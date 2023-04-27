@@ -1,52 +1,77 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import type { MenuItem } from '../components/component_kit/types';
+import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { FeedbackModal } from '../modals/feedback_modal';
+import { Modal } from '../components/component_kit/cw_modal';
 
-const gethelpMenuItems = (): Array<MenuItem> => {
-  return [
-    {
-      label: 'Send Feedback',
-      onclick: () => app.modals.create({ modal: FeedbackModal }),
-    },
-    {
-      label: 'Help',
-      onclick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
-    },
-  ];
-};
+export const HelpMenu = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-export class HelpMenu extends ClassComponent {
-  view() {
-    return (
+  return (
+    <React.Fragment>
       <CWMobileMenu
         className="HelpMenu"
         menuHeader={{
           label: 'Help',
-          onclick: () => {
+          onClick: () => {
             app.mobileMenu = 'MainMenu';
+            app.sidebarRedraw.emit('redraw');
           },
         }}
-        menuItems={gethelpMenuItems()}
+        menuItems={[
+          {
+            label: 'Send Feedback',
+            onClick: () => setIsModalOpen(true),
+          },
+          {
+            label: 'Help',
+            onClick: () =>
+              window.open('https://docs.commonwealth.im/commonwealth/'),
+          },
+        ]}
       />
-    );
-  }
-}
+      <Modal
+        content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};
 
-export class HelpMenuPopover extends ClassComponent {
-  view() {
-    return (
-      <CWPopoverMenu
-        trigger={<CWIconButton iconButtonTheme="black" iconName="help" />}
-        menuItems={gethelpMenuItems()}
+export const HelpMenuPopover = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+  return (
+    <React.Fragment>
+      <PopoverMenu
+        renderTrigger={(onclick) => (
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName="help"
+            onClick={onclick}
+          />
+        )}
+        menuItems={[
+          {
+            label: 'Send Feedback',
+            onClick: () => setIsModalOpen(true),
+          },
+          {
+            label: 'Help',
+            onClick: () =>
+              window.open('https://docs.commonwealth.im/commonwealth/'),
+          },
+        ]}
       />
-    );
-  }
-}
+      <Modal
+        content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};

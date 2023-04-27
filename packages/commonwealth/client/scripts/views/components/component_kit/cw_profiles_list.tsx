@@ -1,83 +1,74 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_profiles_list.scss';
-import m from 'mithril';
 import { CWIcon } from './cw_icons/cw_icon';
 
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
-type ProfileRowStyleAttrs = {
+type ProfileRowStyleProps = {
   darkMode?: boolean;
   isSelected?: boolean;
 };
 
-export type ProfileRowAttrs = {
+export type ProfileRowProps = {
   name: string;
-  onclick?: () => void;
-} & ProfileRowStyleAttrs;
+  onClick?: () => void;
+} & ProfileRowStyleProps;
 
-export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
-  view(vnode: m.Vnode<ProfileRowAttrs>) {
-    const { darkMode, isSelected, onclick, name } = vnode.attrs;
+export const CWProfileRow = (props: ProfileRowProps) => {
+  const { darkMode, isSelected, onClick, name } = props;
 
-    return (
-      <div
-        class={getClasses<ProfileRowStyleAttrs>(
-          { darkMode, isSelected },
-          'ProfileRow'
-        )}
-        onclick={onclick}
-      >
-        <div class="avatar-and-name">
-          <div class="avatar" />
-          <CWText
-            type="b1"
-            fontWeight="bold"
-            className="profile-row-text"
-            noWrap
-          >
-            {name ?? 'Your Profile'}
-          </CWText>
-        </div>
-        {isSelected && <CWIcon iconName="check" />}
+  return (
+    <div
+      className={getClasses<ProfileRowStyleProps>(
+        { darkMode, isSelected },
+        'ProfileRow'
+      )}
+      onClick={onClick}
+    >
+      <div className="avatar-and-name">
+        <div className="avatar" />
+        <CWText type="b1" fontWeight="bold" className="profile-row-text" noWrap>
+          {name ?? 'Your Profile'}
+        </CWText>
       </div>
-    );
-  }
-}
-
-type ProfilesListAttrs = {
-  darkMode?: boolean;
-  onclick?: () => void;
-  profiles: Array<ProfileRowAttrs>;
+      {isSelected && <CWIcon iconName="check" />}
+    </div>
+  );
 };
 
-export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
-  view(vnode: m.Vnode<ProfilesListAttrs>) {
-    const { darkMode, onclick, profiles } = vnode.attrs;
+type ProfilesListProps = {
+  darkMode?: boolean;
+  onClick?: () => void;
+  profiles: Array<ProfileRowProps>;
+};
 
-    return (
+export const CWProfilesList = (props: ProfilesListProps) => {
+  const { darkMode, onClick, profiles } = props;
+
+  return (
+    <div
+      className={getClasses<{ darkMode?: boolean }>(
+        { darkMode },
+        'ProfilesList'
+      )}
+    >
       <div
-        class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'ProfilesList')}
+        className={getClasses<{ darkMode?: boolean }>(
+          { darkMode },
+          'ProfilesList'
+        )}
       >
-        <div
-          class={getClasses<{ darkMode?: boolean }>(
-            { darkMode },
-            'profile-rows-container'
-          )}
-        >
-          {profiles.map((profile) => (
-            <CWProfileRow
-              darkMode={darkMode}
-              isSelected={profile.isSelected}
-              name={profile.name}
-              onclick={onclick}
-            />
-          ))}
-        </div>
+        {profiles.map((profile) => (
+          <CWProfileRow
+            darkMode={darkMode}
+            isSelected={profile.isSelected}
+            name={profile.name}
+            onClick={onClick}
+          />
+        ))}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

@@ -1,10 +1,12 @@
+import { Dispatch, SetStateAction } from 'react';
 import { notifySuccess } from 'controllers/app/notifications';
-import m from 'mithril';
+import { redraw } from 'mithrilInterop';
 import type { NotificationSubscription, Thread } from 'models';
 import moment from 'moment';
 
 import app from 'state';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
+import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;
@@ -37,11 +39,12 @@ export const orderDiscussionsbyLastComment = (a, b) => {
   return tsB - tsA;
 };
 
-const handleToggleSubscription = async (
+export const handleToggleSubscription = async (
   thread: Thread,
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
-  isSubscribed: boolean
+  isSubscribed: boolean,
+  setIsSubscribed?: Dispatch<SetStateAction<boolean>>,
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
@@ -68,8 +71,9 @@ const handleToggleSubscription = async (
     ]);
     notifySuccess('Subscribed!');
   }
+  if (setIsSubscribed) setIsSubscribed(!isSubscribed);
 
-  m.redraw();
+  redraw();
 };
 
 export const getCommentSubscription = (thread: Thread) => {
@@ -88,7 +92,10 @@ export const getReactionSubscription = (thread: Thread) => {
   );
 };
 
-export const getThreadSubScriptionMenuItem = (thread: Thread) => {
+export const getThreadSubScriptionMenuItem = (
+  thread: Thread,
+  setIsSubscribed: Dispatch<SetStateAction<boolean>>,
+): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
 
@@ -96,15 +103,15 @@ export const getThreadSubScriptionMenuItem = (thread: Thread) => {
     commentSubscription?.isActive && reactionSubscription?.isActive;
 
   return {
-    onclick: (e) => {
-      e.preventDefault();
+    onClick: () => {
       handleToggleSubscription(
         thread,
         getCommentSubscription(thread),
         getReactionSubscription(thread),
-        isSubscribed
+        isSubscribed,
+        setIsSubscribed,
       );
-      m.redraw();
+      redraw();
     },
     label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
     iconLeft: isSubscribed ? 'unsubscribe' : 'bell',

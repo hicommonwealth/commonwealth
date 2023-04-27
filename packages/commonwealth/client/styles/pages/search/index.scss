@@ -12,6 +12,18 @@
   }
 }
 
+@mixin searchRowStyles {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+}
+
 .SearchPage {
   display: flex;
   flex: 1;
@@ -70,6 +82,10 @@
 
           .thread-header.Text {
             color: $neutral-500;
+          }
+
+          .search-results-thread-title {
+            display: inline; // fix child span/mark spacing
           }
 
           .search-results-thread-subtitle {

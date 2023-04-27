@@ -122,9 +122,6 @@ module.exports = {
               chain: c.chain,
               read_only: true,
               stage: 'discussion',
-              canvas_action: null,
-              canvas_hash: null,
-              canvas_session: null,
               // set the dates to a year back so they dont spam chain's home page
               created_at: new Date(
                 new Date().setFullYear(new Date().getFullYear() - 1)

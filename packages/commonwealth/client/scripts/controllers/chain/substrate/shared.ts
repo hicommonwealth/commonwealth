@@ -1,3 +1,4 @@
+import { redraw } from 'mithrilInterop';
 import type { SubmittableResult } from '@polkadot/api';
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import type {
@@ -32,7 +33,6 @@ import {
   notifySuccess,
 } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
-import m from 'mithril';
 import type {
   ChainInfo,
   IChainModule,
@@ -159,7 +159,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         this.app.chain.networkError = null;
         this._suppressAPIDisconnectErrors = false;
         this._connectTime = 0;
-        m.redraw();
+        redraw();
       }
     };
     const disconnectedCb = () => {
@@ -174,7 +174,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         setTimeout(() => {
           this._suppressAPIDisconnectErrors = false;
         }, CONNECT_TIMEOUT);
-        m.redraw();
+        redraw();
       }
     };
     const errorCb = (err) => {
@@ -198,9 +198,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           console.log('chain connection timed out!');
           provider.disconnect();
           this._timedOut = true;
-          m.redraw();
+          redraw();
         }, CONNECT_TIMEOUT);
-        m.redraw();
+        redraw();
       }
     };
 
@@ -355,7 +355,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._sudoKey = sudokey ? sudokey.toString() : undefined;
 
     // redraw
-    m.redraw();
+    redraw();
     this._metadataInitialized = true;
   }
 
@@ -436,7 +436,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             }
           }
         });
-        m.redraw();
+        redraw();
       }
     );
     this._eventsInitialized = true;
@@ -552,7 +552,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             } else {
               notifyError(err.toString());
             }
-            m.redraw();
+            redraw();
             events.emit(TransactionStatus.Error.toString(), {
               err: err.toString(),
             });

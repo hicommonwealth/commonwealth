@@ -1,83 +1,91 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-
-import 'components/sidebar/index.scss';
-import { Action } from 'commonwealth/shared/permissions';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 import 'components/sidebar/index.scss';
-import { isActiveAddressPermitted } from 'controllers/server/roles';
-import m from 'mithril';
 
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
-import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { DiscussionSection } from './discussion_section';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { featureFlags } from 'helpers/feature-flags';
 
 export type SidebarMenuName =
   | 'default'
   | 'createContent'
   | 'exploreCommunities';
 
-export class Sidebar extends ClassComponent {
-  view() {
-    const activeAddressRoles = app.roles.getAllRolesInCommunity({
+export const Sidebar = () => {
+  const navigate = useCommonNavigate();
+  const { pathname } = useLocation();
+  const { isLoggedIn } = useUserLoggedIn();
+
+  const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
+
+  const isAdmin =
+    app.user.isSiteAdmin ||
+    app.roles.isAdminOfEntity({
       chain: app.activeChainId(),
     });
 
-    const currentChainInfo = app.chain?.meta;
+  const isMod = app.roles.isRoleOfCommunity({
+    role: 'moderator',
+    chain: app.activeChainId(),
+  });
 
-    const hideChat =
-      !currentChainInfo ||
-      !activeAddressRoles ||
-      !isActiveAddressPermitted(
-        activeAddressRoles,
-        currentChainInfo,
-        Action.VIEW_CHAT_CHANNELS
-      );
+  const showAdmin = app.user && (isAdmin || isMod);
 
-    return (
-      <div class="Sidebar">
-        {app.sidebarMenu === 'default' && (
-          <div class="sidebar-default-menu">
-            <SidebarQuickSwitcher />
-            {app.chain && (
-              <div class="community-menu">
-                <AdminSection />
-                <DiscussionSection />
-                <GovernanceSection />
-                {app.socket && !hideChat && <ChatSection />}
-                <ExternalLinksModule />
-                <div class="buttons-container">
-                  {app.isLoggedIn() && app.chain && (
-                    <div class="subscription-button">
-                      <SubscriptionButton />
-                    </div>
-                  )}
-                  {app.isCustomDomain() && (
-                    <div
-                      class="powered-by"
-                      onclick={() => {
-                        window.open('https://commonwealth.im/');
-                      }}
-                    />
-                  )}
+  return (
+    <div className="Sidebar">
+      {app.sidebarMenu === 'default' && (
+        <div className="sidebar-default-menu">
+          <SidebarQuickSwitcher />
+          {app.chain && (
+            <div className="community-menu">
+              {showAdmin && <AdminSection />}
+              {featureFlags.communityHomepage && app.chain.meta.hasHomepage && (
+                <div
+                  className={onHomeRoute ? 'home-button active' : 'home-button'}
+                  onClick={() => navigate('/feed')}
+                >
+                  <CWIcon iconName="home" iconSize="small" />
+                  <CWText>Home</CWText>
                 </div>
+              )}
+              <DiscussionSection />
+              <GovernanceSection />
+              <ExternalLinksModule />
+              <div className="buttons-container">
+                {isLoggedIn && app.chain && (
+                  <div className="subscription-button">
+                    <SubscriptionButton />
+                  </div>
+                )}
+                {app.isCustomDomain() && (
+                  <div
+                    className="powered-by"
+                    onClick={() => {
+                      window.open('https://commonwealth.im/');
+                    }}
+                  />
+                )}
               </div>
-            )}
-          </div>
-        )}
-        {app.sidebarMenu === 'createContent' && <CreateContentSidebar />}
-        {app.sidebarMenu === 'exploreCommunities' && (
-          <ExploreCommunitiesSidebar />
-        )}
-      </div>
-    );
-  }
-}
+            </div>
+          )}
+        </div>
+      )}
+      {app.sidebarMenu === 'createContent' && <CreateContentSidebar />}
+      {app.sidebarMenu === 'exploreCommunities' && (
+        <ExploreCommunitiesSidebar />
+      )}
+    </div>
+  );
+};

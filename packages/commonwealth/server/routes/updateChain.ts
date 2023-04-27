@@ -10,10 +10,12 @@ import type { ChainAttributes } from '../models/chain';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findOneRole } from '../util/roles';
+import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   NoChainId: 'Must provide chain ID',
+  ReservedId: 'The id is reserved and cannot be used',
   CantChangeNetwork: 'Cannot change chain network',
   NotAdmin: 'Not an admin',
   NoChainFound: 'Chain not found',
@@ -27,6 +29,7 @@ export const Errors = {
   SnapshotOnlyOnEthereum:
     'Snapshot data may only be added to chains with Ethereum base',
   InvalidTerms: 'Terms of Service must begin with https://',
+  InvalidDefaultPage: 'Default page does not exist',
 };
 
 type UpdateChainReq = ChainAttributes & {
@@ -45,6 +48,7 @@ const updateChain = async (
 ) => {
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.id) return next(new AppError(Errors.NoChainId));
+  if (req.body.id === ALL_CHAINS) return next(new AppError(Errors.ReservedId));
   if (req.body.network) return next(new AppError(Errors.CantChangeNetwork));
 
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
@@ -83,6 +87,8 @@ const updateChain = async (
     default_allow_permissions,
     default_deny_permissions,
     default_summary_view,
+    default_page,
+    has_homepage,
     terms,
   } = req.body;
 
@@ -181,6 +187,15 @@ const updateChain = async (
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
+  if (has_homepage) chain.has_homepage = has_homepage;
+  if (default_page) {
+    if (!has_homepage) {
+      return next(new AppError(Errors.InvalidDefaultPage));
+    } else {
+      chain.default_page = default_page;
+    }
+  }
+
   // Set default allow/deny permissions
   chain.default_allow_permissions = default_allow_permissions || BigInt(0);
   chain.default_deny_permissions = default_deny_permissions || BigInt(0);

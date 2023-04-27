@@ -1,71 +1,67 @@
-/* @jsx m */
+import React from 'react';
 
-import { MixpanelPageViewEvent } from 'analytics/types';
-import ClassComponent from 'class_component';
 import 'components/sidebar/sidebar_quick_switcher.scss';
-import { link } from 'helpers';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import m from 'mithril';
+
 import { ChainInfo } from 'models';
 
 import app from 'state';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
-export class SidebarQuickSwitcher extends ClassComponent {
-  view() {
-    const allCommunities = app.config.chains
-      .getAll()
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .filter(
-        (item) => !!item.node // only chains with nodes
-      );
+export const SidebarQuickSwitcher = () => {
+  const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
 
-    const starredCommunities = allCommunities.filter((item) => {
-      // filter out non-starred communities
-      if (item instanceof ChainInfo && !app.communities.isStarred(item.id))
-        return false;
-      return true;
-    });
+  const allCommunities = app.config.chains
+    .getAll()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .filter(
+      (item) => !!item.node // only chains with nodes
+    );
 
-    return (
-      <div class="SidebarQuickSwitcher">
-        <div class="community-nav-bar">
-          {app.isLoggedIn() && (
-            <CWIconButton
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onclick={(e) => {
-                e.preventDefault();
-                mixpanelBrowserTrack({
-                  event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
-                  isCustomDomain: app.isCustomDomain(),
-                });
-                app.sidebarMenu = 'createContent';
-              }}
-            />
-          )}
+  const starredCommunities = allCommunities.filter((item) => {
+    // filter out non-starred communities
+    return !(item instanceof ChainInfo && !app.communities.isStarred(item.id));
+  });
+
+  return (
+    <div className="SidebarQuickSwitcher">
+      <div className="community-nav-bar">
+        {isLoggedIn && (
           <CWIconButton
-            iconName="compass"
+            iconName="plusCircle"
             iconButtonTheme="black"
-            onclick={(e) => {
-              e.preventDefault();
-              app.sidebarMenu = 'exploreCommunities';
+            onClick={() => {
+              app.sidebarMenu = 'createContent';
+              app.sidebarRedraw.emit('redraw');
             }}
           />
-        </div>
-        <CWDivider />
-        <div class="scrollable-community-bar">
-          {starredCommunities.map((item) => (
-            <CWCommunityAvatar
-              size="large"
-              community={item}
-              onclick={link ? () => m.route.set(`/${item.id}`) : undefined}
-            />
-          ))}
-        </div>
+        )}
+        <CWIconButton
+          iconName="compass"
+          iconButtonTheme="black"
+          onClick={() => {
+            app.sidebarMenu = 'exploreCommunities';
+            app.sidebarRedraw.emit('redraw');
+          }}
+        />
       </div>
-    );
-  }
-}
+      <CWDivider />
+      <div className="scrollable-community-bar">
+        {starredCommunities.map((item) => (
+          <CWCommunityAvatar
+            key={item.id}
+            size="large"
+            community={item}
+            onClick={() =>
+              navigateToCommunity({ navigate, path: '', chain: item.id })
+            }
+          />
+        ))}
+      </div>
+    </div>
+  );
+};

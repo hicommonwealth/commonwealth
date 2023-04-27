@@ -1,12 +1,10 @@
-/* @jsx m */
+import React from 'react';
 /* eslint-disable max-len */
 
-import ClassComponent from 'class_component';
-
 import { renderMultilineText } from 'helpers';
-import m from 'mithril';
 
 import 'pages/privacy_and_terms.scss';
+
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
 
@@ -117,19 +115,17 @@ CONTACT US
 If you have any questions about this Privacy Statement, please contact us at: hello@commonwealth.im.
 `;
 
-class PrivacyPage extends ClassComponent {
-  view() {
-    return (
-      <Sublayout>
-        <div class="PrivacyPage">
-          <div class="forum-container">
-            <CWText type="h3">Privacy Policy</CWText>
-            {renderMultilineText(PrivacyPolicy)}
-          </div>
+const PrivacyPage = () => {
+  return (
+    <Sublayout>
+      <div className="PrivacyPage">
+        <div className="forum-container">
+          <CWText type="h3">Privacy Policy</CWText>
+          {renderMultilineText(PrivacyPolicy)}
         </div>
-      </Sublayout>
-    );
-  }
-}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default PrivacyPage;

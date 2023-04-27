@@ -1,14 +1,12 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import { notifyError } from 'controllers/app/notifications';
-import m from 'mithril';
-import { SearchQuery } from 'models';
-import { SearchScope } from 'models/SearchQuery';
+import React, { useEffect, useState } from 'react';
+import type { NavigateOptions, To } from 'react-router';
 
 import 'pages/search/search_bar.scss';
 
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
+import { SearchQuery } from 'models';
+import { SearchScope } from 'models/SearchQuery';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -19,246 +17,240 @@ import {
   SearchBarMemberPreviewRow,
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
+import { useCommonNavigate } from 'navigation/helpers';
+import { useDebounce } from 'usehooks-ts';
 
-const goToSearchPage = (query: SearchQuery) => {
+const MIN_SEARCH_TERM_LENGTH = 4;
+const NUM_RESULTS_PER_SECTION = 2;
+
+let resetTimer = null;
+
+const goToSearchPage = (
+  query: SearchQuery,
+  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+) => {
   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
     notifyError('Enter a valid search term');
     return;
   }
 
-  if (query.searchTerm.length < 4) {
-    notifyError('Query must be at least 4 characters');
+  if (query.searchTerm.length < MIN_SEARCH_TERM_LENGTH) {
+    notifyError(`Query must be at least ${MIN_SEARCH_TERM_LENGTH} characters`);
+    return;
   }
 
   app.search.addToHistory(query);
 
-  m.route.set(`/search?${query.toUrlParams()}`);
+  setRoute(`/search?${query.toUrlParams()}`);
 };
 
-const getSearchPreview = async (searchQuery: SearchQuery, state) => {
-  try {
-    await app.search.search(searchQuery);
-  } catch (err) {
-    state.searchResults = {};
+export const SearchBar = () => {
+  const navigate = useCommonNavigate();
 
-    notifyError(err.responseJSON?.error || err.responseText || err.toString());
-  }
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<
+    Record<string, Array<any>>
+  >({});
 
-  state.searchResults = Object.fromEntries(
-    Object.entries(app.search.getByQuery(searchQuery).results).map(([k, v]) => [
-      k,
-      v.slice(0, 2),
-    ])
-  );
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  app.search.addToHistory(searchQuery);
+  const showDropdown =
+    Object.keys(searchResults || {}).length > 0 && searchTerm.length > 0;
 
-  m.redraw();
-};
+  const resetSearchBar = () => {
+    setSearchTerm('');
+    setSearchResults({});
+  };
 
-export class SearchBar extends ClassComponent {
-  private showDropdown: boolean;
-  private searchResults: Record<string, Array<any>>;
-  private searchQuery: SearchQuery;
-  private searchTerm: Lowercase<string>;
+  const handleGoToSearchPage = () => {
+    const searchQuery = new SearchQuery(searchTerm, {
+      isSearchPreview: false,
+      chainScope: app.activeChainId(),
+    });
 
-  oninit() {
-    this.searchTerm = '';
-  }
+    goToSearchPage(searchQuery, navigate);
+  };
 
-  view() {
-    // const historyList = app.search.getHistory().map((previousQuery) => (
-    //   <div
-    //     class="history-row"
-    //     onclick={() => {
-    //       this.searchTerm = previousQuery.searchTerm;
-    //       getSearchPreview(previousQuery, this);
-    //     }}
-    //   >
-    //     {previousQuery.searchTerm}
-    //     <CWIconButton
-    //       iconName="close"
-    //       onclick={(e) => {
-    //         e.stopPropagation();
-    //         app.search.removeFromHistory(previousQuery);
-    //       }}
-    //     />
-    //   </div>
-    // ));
+  const handleInputChange = (e) => {
+    const value = e.target.value?.toLowerCase();
+    setSearchTerm(value);
+  };
 
-    const handleGetSearchPreview = () => {
-      this.searchQuery = new SearchQuery(this.searchTerm, {
-        isSearchPreview: true,
-        chainScope: app.activeChainId(),
-      });
+  const handleGetSearchPreview = async (value: string) => {
+    const searchQuery = new SearchQuery(value, {
+      isSearchPreview: true,
+      chainScope: app.activeChainId() || 'all_chains',
+    });
 
-      getSearchPreview(this.searchQuery, this);
-    };
+    try {
+      await app.search.search(searchQuery);
+      const searchResponse = app.search.getByQuery(searchQuery)?.results;
 
-    const handleGoToSearchPage = () => {
-      if (this.searchTerm.length < 3) {
-        return;
-      } else {
-        this.searchQuery = new SearchQuery(this.searchTerm, {
-          isSearchPreview: false,
-          chainScope: app.activeChainId(),
-        });
-      }
+      const results = searchResponse
+        ? Object.fromEntries(
+            Object.entries(searchResponse).map(([k, v]) => [
+              k,
+              v.slice(0, NUM_RESULTS_PER_SECTION),
+            ])
+          )
+        : {};
 
-      goToSearchPage(this.searchQuery);
-    };
+      setSearchResults(results);
+      app.search.addToHistory(searchQuery);
+    } catch (err) {
+      setSearchResults({});
 
-    return (
-      <div class="SearchBar">
-        <div class="search-and-icon-container">
-          <div class="search-icon">
-            <CWIconButton iconName="search" onclick={handleGoToSearchPage} />
-          </div>
-          <input
-            class={getClasses<{ isClearable: boolean }>({
-              isClearable: this.searchTerm.length > 0,
-            })}
-            placeholder="Search Common"
-            defaultValue={m.route.param('q') || this.searchTerm}
-            value={this.searchTerm}
-            autocomplete="off"
-            onfocus={() => {
-              this.showDropdown = true;
-            }}
-            onblur={() => {
-              setTimeout(() => {
-                this.showDropdown = false;
-                m.redraw();
-              }, 500); // hack to prevent the dropdown closing too quickly on click
-            }}
-            oninput={(e) => {
-              this.searchTerm = e.target.value?.toLowerCase();
+      notifyError(
+        err.responseJSON?.error || err.responseText || err.toString()
+      );
+    }
+  };
 
-              if (this.searchTerm.length > 3) {
-                handleGetSearchPreview();
-              }
-            }}
-            onkeyup={(e) => {
-              if (e.key === 'Enter') {
-                handleGoToSearchPage();
-              }
-            }}
-          />
-          {this.searchTerm.length > 0 && (
-            <div class="clear-icon">
-              <CWIconButton
-                iconName="close"
-                onclick={() => {
-                  this.searchTerm = '';
-                }}
-              />
-            </div>
-          )}
-          {this.searchResults && this.showDropdown && (
-            <div class="search-results-dropdown">
-              {Object.values(this.searchResults).flat(1).length > 0 ? (
-                <div class="previews-section">
-                  {Object.entries(this.searchResults).map(([k, v]) => {
-                    if (k === SearchScope.Threads && v.length > 0) {
-                      return (
-                        <div class="preview-section">
-                          <div class="section-header">
-                            <CWText
-                              type="caption"
-                              className="section-header-text"
-                            >
-                              Threads
-                            </CWText>
-                            <CWDivider />
-                          </div>
-                          {v.map((res) => (
-                            <SearchBarThreadPreviewRow
-                              searchResult={res}
-                              searchTerm={this.searchQuery.searchTerm}
-                            />
-                          ))}
-                        </div>
-                      );
-                    } else if (k === SearchScope.Replies && v.length > 0) {
-                      return (
-                        <div class="preview-section">
-                          <div class="section-header">
-                            <CWText
-                              type="caption"
-                              className="section-header-text"
-                            >
-                              Comments
-                            </CWText>
-                            <CWDivider />
-                          </div>
-                          {v.map((res) => (
-                            <SearchBarCommentPreviewRow
-                              searchResult={res}
-                              searchTerm={this.searchQuery.searchTerm}
-                            />
-                          ))}
-                        </div>
-                      );
-                    } else if (k === SearchScope.Communities && v.length > 0) {
-                      return (
-                        <div class="preview-section">
-                          <div class="section-header">
-                            <CWText
-                              type="caption"
-                              className="section-header-text"
-                            >
-                              Communities
-                            </CWText>
-                            <CWDivider />
-                          </div>
-                          {v.map((res) => (
-                            <SearchBarCommunityPreviewRow searchResult={res} />
-                          ))}
-                        </div>
-                      );
-                    } else if (k === SearchScope.Members && v.length > 0) {
-                      return (
-                        <div class="preview-section">
-                          <div class="section-header">
-                            <CWText
-                              type="caption"
-                              className="section-header-text"
-                            >
-                              Members
-                            </CWText>
-                            <CWDivider />
-                          </div>
-                          {v.map((res) => (
-                            <SearchBarMemberPreviewRow searchResult={res} />
-                          ))}
-                        </div>
-                      );
-                    } else {
-                      return null;
-                    }
-                  })}
-                </div>
-              ) : (
-                <CWText type="caption" className="no-results-text">
-                  No Results
-                </CWText>
-              )}
-              {/* {historyList.length > 0 && (
-                <div class="history-section">
-                  <CWText
-                    type="caption"
-                    fontWeight="medium"
-                    className="search-history-header"
-                  >
-                    Search History
-                  </CWText>
-                  {historyList}
-                </div>
-              )} */}
-            </div>
-          )}
+  // when debounced search term changes, fetch search results
+  useEffect(() => {
+    clearTimeout(resetTimer);
+    if (debouncedSearchTerm?.length >= MIN_SEARCH_TERM_LENGTH) {
+      handleGetSearchPreview(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
+
+  return (
+    <div
+      className="SearchBar"
+      onBlur={() => {
+        // give time for child click events to
+        // fire before resetting the search bar
+        if (!resetTimer) {
+          resetTimer = setTimeout(() => {
+            resetSearchBar();
+            resetTimer = null;
+          }, 300);
+        }
+      }}
+    >
+      <div className="search-and-icon-container">
+        <div className="search-icon">
+          <CWIconButton iconName="search" onClick={handleGoToSearchPage} />
         </div>
+        <input
+          className={getClasses<{ isClearable: boolean }>({
+            isClearable: searchTerm?.length > 0,
+          })}
+          placeholder={'Search Common'}
+          value={searchTerm}
+          autoComplete="off"
+          onChange={handleInputChange}
+          onKeyUp={(e) => {
+            if (e.key === 'Enter') {
+              handleGoToSearchPage();
+            }
+          }}
+        />
+        {searchTerm?.length > 0 && (
+          <div className="clear-icon">
+            <CWIconButton iconName="close" onClick={() => setSearchTerm('')} />
+          </div>
+        )}
+        {showDropdown && (
+          <div className="search-results-dropdown">
+            {Object.values(searchResults).flat(1).length > 0 ? (
+              <div className="previews-section">
+                {Object.entries(searchResults).map(([k, v]) => {
+                  if (k === SearchScope.Threads && v.length > 0) {
+                    return (
+                      <div className="preview-section" key={k}>
+                        <div className="section-header">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
+                            Threads
+                          </CWText>
+                          <CWDivider />
+                        </div>
+                        {v.map((res, i) => (
+                          <SearchBarThreadPreviewRow
+                            searchResult={res}
+                            searchTerm={searchTerm}
+                            key={i}
+                          />
+                        ))}
+                      </div>
+                    );
+                  } else if (k === SearchScope.Replies && v.length > 0) {
+                    return (
+                      <div className="preview-section" key={k}>
+                        <div className="section-header">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
+                            Comments
+                          </CWText>
+                          <CWDivider />
+                        </div>
+                        {v.map((res, i) => (
+                          <SearchBarCommentPreviewRow
+                            key={i}
+                            searchResult={res}
+                            searchTerm={searchTerm}
+                          />
+                        ))}
+                      </div>
+                    );
+                  } else if (k === SearchScope.Communities && v.length > 0) {
+                    return (
+                      <div className="preview-section" key={k}>
+                        <div className="section-header">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
+                            Communities
+                          </CWText>
+                          <CWDivider />
+                        </div>
+                        {v.map((res, i) => (
+                          <SearchBarCommunityPreviewRow
+                            searchResult={res}
+                            key={i}
+                          />
+                        ))}
+                      </div>
+                    );
+                  } else if (k === SearchScope.Members && v.length > 0) {
+                    return (
+                      <div className="preview-section" key={k}>
+                        <div className="section-header">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
+                            Members
+                          </CWText>
+                          <CWDivider />
+                        </div>
+                        {v.map((res, i) => (
+                          <SearchBarMemberPreviewRow
+                            searchResult={res}
+                            key={i}
+                          />
+                        ))}
+                      </div>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
+              </div>
+            ) : (
+              <CWText type="caption" className="no-results-text">
+                No Results
+              </CWText>
+            )}
+          </div>
+        )}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

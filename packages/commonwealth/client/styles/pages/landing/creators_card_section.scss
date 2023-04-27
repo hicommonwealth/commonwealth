@@ -1,28 +1,79 @@
 @import '../../shared';
 
-.TokensCreatorsUseCaseButton.text-center.hidden.mb-20 {
-  a.btn-outline.text-xl.rounded-lg.pb-2.pt-3.px-3 {
-    color: $neutral-800;
-    text-decoration: none;
-    cursor: pointer;
+.GalleryCard {
+  background-color: $neutral-800;
+  border-radius: $border-radius-corners;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  width: 336px;
 
-    &:hover {
-      opacity: 0.6;
+  &.isSelected {
+    background-color: $black;
+  }
+
+  &:hover {
+    background-color: $yellow-800;
+  }
+
+  &:active {
+    background-color: $yellow-600;
+  }
+
+  .gallery-card-title.Text {
+    color: $white;
+  }
+
+  .gallery-card-subtitle.Text {
+    color: $neutral-800;
+
+    &.isSelected {
+      color: $white;
     }
   }
 }
 
-button.TokensCreatorsText {
-  &:hover {
-    background: $yellow-800;
+.CreatorsGallery {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  justify-content: center;
+  padding: 56px;
+  width: 100%;
+
+  .header {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+    max-width: 768px;
   }
-}
 
-img.TokensCreatorsImage {
-  margin-left: 3rem;
-  margin-top: 1rem;
+  .inner-container {
+    display: flex;
+    background-color: $neutral-800;
+    border-radius: $border-radius-corners;
+    height: 568px;
+    padding: 32px;
+    width: 1104px;
 
-  @include mediumSmall {
-    margin-left: 0rem;
+    .cards-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .image-container {
+      display: flex;
+
+      img {
+        height: auto;
+        max-width: 100%;
+      }
+    }
   }
 }

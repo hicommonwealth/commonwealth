@@ -82,7 +82,7 @@
   padding: 0px 24px 0px 24px;
   width: 100%;
 
-  .ModalExitButton {
+  .IconButton {
     position: absolute;
     right: 8px;
     top: 8px;
@@ -102,6 +102,21 @@
       margin-top: 24px;
       width: 100%;
     }
+  }
+
+  .redirectToSign {
+    width: 328px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .CaptionText {
+      margin-top: 32px;
+      color: $neutral-300;
+      text-align: center;
+    }
+
+    @include innerBodyStyles;
   }
 
   .selectAccountType {

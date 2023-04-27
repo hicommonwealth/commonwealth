@@ -1,9 +1,13 @@
 import type { IChainEntityKind } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import type { ChainInfo, ProposalModule } from 'models';
+import type {
+  ChainInfo,
+  NotificationSubscription,
+  ProposalModule,
+} from 'models';
 import type { ProposalStore } from 'stores';
-import { requiresTypeSlug } from 'utils';
+import { requiresTypeSlug, slugify } from 'utils';
 import type ThreadsController from './controllers/server/threads';
 import app from './state';
 
@@ -12,7 +16,7 @@ import app from './state';
 export const getProposalUrlPath = (
   type: ProposalType,
   id: string,
-  omitActiveId = false,
+  omitActiveId = true,
   chainId?: string
 ): string => {
   let basePath: string;
@@ -29,6 +33,18 @@ export const getProposalUrlPath = (
   } else {
     return `/${chainId || app.activeChainId()}${basePath}`;
   }
+};
+
+export const getNotificationUrlPath = (
+  subscription: NotificationSubscription
+): string => {
+  const community = subscription.Chain.id;
+  const type = subscription.Thread.slug;
+  const id = `${subscription.Thread.identifier}-${slugify(
+    subscription.Thread.title
+  )}`;
+
+  return `/${community}/${type}/${id}`;
 };
 
 export const chainToProposalSlug = (c: ChainInfo): ProposalType => {

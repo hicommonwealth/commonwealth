@@ -14,15 +14,6 @@
     height: 100%;
   }
 
-  .actions.top {
-    .buttons-container {
-      @include smallInclusive {
-        margin-top: 32px;
-        justify-content: flex-start;
-      }
-    }
-  }
-
   .buttons-container {
     display: flex;
     justify-content: flex-end;
@@ -68,6 +59,10 @@
         height: 60px;
         align-items: center;
         margin: 16px 0;
+
+        .AvatarUpload {
+          background-color: transparent;
+        }
 
         .TextInput {
           width: 75%;
@@ -155,6 +150,25 @@
 
     .LinkedAddresses {
       margin-bottom: 32px;
+    }
+
+    .connect-address-button {
+      display: flex;
+      align-items: center;
+
+      .caption {
+        color: $neutral-800;
+        margin-left: 4px;
+
+        &:hover {
+          color: $neutral-600;
+        }
+      }
+
+      &:hover {
+        color: $neutral-600;
+        cursor: pointer;
+      }
     }
   }
 }

@@ -24,10 +24,10 @@
 }
 
 @mixin userDashboardRowStyles {
-  border-bottom-width: 2px;
+  border-bottom: 1px solid $neutral-100;
   display: flex;
   gap: 16px;
-  padding: 16px 24px;
+  padding: 16px;
   width: 768px;
 
   @include mediumSmallInclusive {
@@ -36,14 +36,14 @@
 
   &:hover {
     background: $neutral-50;
-    border-radius: $border-radius-corners;
   }
 }
 
 .UserDashboardRow {
   @include userDashboardRowStyles;
-
   flex-direction: column;
+  min-width: 100%;
+  max-width: 0;
 
   &.isLink {
     cursor: pointer;

@@ -1,5 +1,4 @@
 import bodyParser from 'body-parser';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   getRabbitMQConfig,
   RabbitMQController,
@@ -19,7 +18,6 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import * as v8 from 'v8';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -49,6 +47,8 @@ import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
+import * as v8 from 'v8';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -266,8 +266,8 @@ async function main() {
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
-  // TODO: should we await this? it will block server startup -- but not a big deal locally
-  if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
+  // initialize async to avoid blocking startup
+  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
 
   // Declare Validation Middleware Service
   // middleware to use for all requests
@@ -300,8 +300,5 @@ async function main() {
   setupServer(app, rollbar, models, rabbitMQController);
 }
 
-main().catch((e) => {
-  console.log(e);
-  process.exit(0);
-});
+main().catch((e) => console.log(e));
 export default app;

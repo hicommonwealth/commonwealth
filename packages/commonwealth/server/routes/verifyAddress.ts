@@ -1,4 +1,17 @@
 import { Op } from 'sequelize';
+import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+import { configure as configureStableStringify } from 'safe-stable-stringify';
+
+import type { KeyringOptions } from '@polkadot/keyring/types';
+import { hexToU8a, stringToHex } from '@polkadot/util';
+import type { KeypairType } from '@polkadot/util-crypto/types';
+import * as ethUtil from 'ethereumjs-util';
+
+import {
+  recoverTypedSignature,
+  SignTypedDataVersion,
+} from '@metamask/eth-sig-util';
 
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -10,6 +23,8 @@ import {
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 
+import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
@@ -19,8 +34,23 @@ import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySignature from '../util/verifySignature';
+import {
+  chainBaseToCanvasChain,
+  chainBaseToCanvasChainId,
+  constructCanvasMessage,
+} from '../../shared/adapters/shared';
+
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+// can't import from canvas es module, so we reimplement stringify here
+const sortedStringify = configureStableStringify({
+  bigint: false,
+  circularValue: Error,
+  strict: true,
+  deterministic: true,
+});
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -38,7 +68,6 @@ export const Errors = {
   WrongWallet: 'Verified with different wallet than created',
 };
 
-// perform address / user modification logic
 const processAddress = async (
   models: DB,
   chain: ChainInstance,
@@ -74,9 +103,11 @@ const processAddress = async (
   // verify the signature matches the session information = verify ownership
   try {
     const valid = await verifySignature(
+      models,
       chain,
       chain_id,
       addressInstance,
+      user ? user.id : null,
       signature,
       sessionAddress,
       sessionIssued,

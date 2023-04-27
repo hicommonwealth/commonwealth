@@ -3,6 +3,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type Rollbar from 'rollbar';
 
+import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import type { SubstrateEvents } from '../../src';
 import {
   createListener,
@@ -16,18 +17,9 @@ import type { DB } from '../database/database';
 import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
-import { IRabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
+import { handleFatalListenerError } from './chainSubscriber';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-export function handleFatalListenerError(
-  chain_id: string,
-  error: Error,
-  rollbar?: Rollbar
-): void {
-  log.error(`Listener for ${chain_id} threw an error`, error);
-  rollbar?.critical(`Listener for ${chain_id} threw an error`, error);
-}
 
 const generalLogger = new LoggingHandler();
 
@@ -35,7 +27,7 @@ export async function manageErcListeners(
   network: ChainNetwork,
   groupedTokens: { [url: string]: ChainAttributes[] },
   listenerInstances: IListenerInstances,
-  producer: IRabbitMqHandler,
+  producer: RabbitMqHandler,
   rollbar?: Rollbar
 ): Promise<void> {
   // delete any listeners that have no more tokens to listen to
@@ -171,7 +163,7 @@ export async function manageErcListeners(
 export async function manageRegularListeners(
   chains: ChainAttributes[],
   listenerInstances: IListenerInstances,
-  producer: IRabbitMqHandler,
+  producer: RabbitMqHandler,
   rollbar?: Rollbar
 ): Promise<void> {
   // for ease of use create a new object containing all listener instances that are not ERC20 or ERC721
@@ -222,7 +214,7 @@ export async function manageRegularListeners(
 async function setupNewListeners(
   newChains: ChainAttributes[],
   listenerInstances: IListenerInstances,
-  producer: IRabbitMqHandler,
+  producer: RabbitMqHandler,
   rollbar?: Rollbar
 ) {
   for (const chain of newChains) {

@@ -1,56 +1,49 @@
-/* @jsx m */
+import React from 'react';
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
-
-import type { RoleInfo, Webhook } from 'models';
+import type { RoleInfo } from 'models';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
+
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { UpgradeRolesForm } from './upgrade_roles_form';
 import { WebhooksForm } from './webhooks_form';
 
-type AdminPanelTabsAttrs = {
-  defaultTab: number;
+type AdminPanelTabsProps = {
   onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: Array<RoleInfo>;
-  webhooks: Array<Webhook>;
 };
 
-export class AdminPanelTabs extends ClassComponent<AdminPanelTabsAttrs> {
-  private index: number;
+export const AdminPanelTabs = ({
+  onRoleUpgrade,
+  roleData,
+}: AdminPanelTabsProps) => {
+  const [currentTab, setCurrentTab] = React.useState<number>(1);
 
-  oninit(vnode: m.Vnode<AdminPanelTabsAttrs>) {
-    this.index = vnode.attrs.defaultTab;
-  }
-
-  view(vnode: m.Vnode<AdminPanelTabsAttrs>) {
-    return (
-      <div class="AdminPanelTabs">
-        <CWTabBar>
-          <CWTab
-            label="Admins"
-            isSelected={this.index === 1}
-            onclick={() => {
-              this.index = 1;
-            }}
-          />
-          <CWTab
-            label="Webhooks"
-            isSelected={this.index === 2}
-            onclick={() => {
-              this.index = 2;
-            }}
-          />
-        </CWTabBar>
-        {this.index === 1 && (
-          <UpgradeRolesForm
-            roleData={vnode.attrs.roleData}
-            onRoleUpgrade={(x, y) => vnode.attrs.onRoleUpgrade(x, y)}
-          />
-        )}
-        {this.index === 2 && <WebhooksForm webhooks={vnode.attrs.webhooks} />}
-      </div>
-    );
-  }
-}
+  return (
+    <div className="AdminPanelTabs">
+      <CWTabBar>
+        <CWTab
+          label="Admins"
+          isSelected={currentTab === 1}
+          onClick={() => {
+            setCurrentTab(1);
+          }}
+        />
+        <CWTab
+          label="Webhooks"
+          isSelected={currentTab === 2}
+          onClick={() => {
+            setCurrentTab(2);
+          }}
+        />
+      </CWTabBar>
+      {currentTab === 1 && (
+        <UpgradeRolesForm
+          roleData={roleData}
+          onRoleUpgrade={(x, y) => onRoleUpgrade(x, y)}
+        />
+      )}
+      {currentTab === 2 && <WebhooksForm />}
+    </div>
+  );
+};

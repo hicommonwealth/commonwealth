@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import m from 'mithril';
 import _ from 'lodash';
 import { MinimumProfile as Profile } from 'models';
+import { EventEmitter } from 'events';
 
 import app from 'state';
 import { NewProfileStore } from 'stores';
@@ -20,6 +20,8 @@ class NewProfilesController {
   public allLoaded() {
     return this._unfetched.length === 0;
   }
+
+  public isFetched = new EventEmitter();
 
   public constructor() {
     this._unfetched = [];
@@ -58,6 +60,7 @@ class NewProfilesController {
   }
 
   private async _refreshProfiles(profiles: Profile[]): Promise<void> {
+    if (profiles.length === 0) return;
     const chunkedProfiles = _.chunk(profiles, 20);
     await Promise.all(
       chunkedProfiles.map(async (chunk): Promise<Profile | Profile[]> => {
@@ -114,7 +117,7 @@ class NewProfilesController {
         }
       })
     );
-    m.redraw();
+    this.isFetched.emit('redraw');
   }
 }
 

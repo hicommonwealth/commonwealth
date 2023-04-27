@@ -4,6 +4,7 @@ import type { VersionHistory } from '../controllers/server/threads';
 import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
 import type Poll from './Poll';
+import type { ReactionType } from './Reaction';
 import type Topic from './Topic';
 import type { ThreadKind, ThreadStage } from './types';
 
@@ -13,10 +14,16 @@ export interface LinkedThreadRelation {
   linkingThread: string;
 }
 
-interface IThreadCollaborator {
+export interface IThreadCollaborator {
   address: string;
   chain: string;
 }
+
+export type AssociatedReaction = {
+  id: number;
+  type: ReactionType;
+  address: string;
+};
 
 class Thread implements IUniqueId {
   public readonly author: string;
@@ -53,6 +60,7 @@ class Thread implements IUniqueId {
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
   public numberOfComments: number;
+  public associatedReactions: AssociatedReaction[];
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -84,6 +92,9 @@ class Thread implements IUniqueId {
     lastCommentedOn,
     linkedThreads,
     numberOfComments,
+    reactionIds,
+    reactionType,
+    addressesReacted,
     canvasAction,
     canvasSession,
     canvasHash,
@@ -113,6 +124,9 @@ class Thread implements IUniqueId {
     linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
     numberOfComments?: number;
+    reactionIds?: number[];
+    reactionType?: ReactionType[];
+    addressesReacted?: string[];
     canvasAction?: string;
     canvasSession?: string;
     canvasHash?: string;
@@ -153,6 +167,16 @@ class Thread implements IUniqueId {
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
     this.numberOfComments = numberOfComments || 0;
+    this.associatedReactions = [];
+    if (reactionIds) {
+      for (let i = 0; i < reactionIds.length; i++) {
+        this.associatedReactions.push({
+          id: reactionIds[i],
+          type: reactionType[i],
+          address: addressesReacted[i],
+        });
+      }
+    }
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;

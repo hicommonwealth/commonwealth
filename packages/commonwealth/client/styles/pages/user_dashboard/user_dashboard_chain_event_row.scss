@@ -3,24 +3,58 @@
 
 .UserDashboardChainEventRow {
   @include userDashboardRowStyles;
+  gap: 24px;
+  width: 100%;
 
   &.isLink {
     cursor: pointer;
   }
 
+  .chain-event-icon-container {
+    display: flex;
+    align-items: center;
+
+    .delegate {
+      fill: $white;
+    }
+  }
+
   .chain-event-text-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
     word-break: break-word;
+
+    .community-title {
+      display: flex;
+      align-items: center;
+
+      .CommunityAvatar {
+        margin-right: 4px;
+      }
+
+      .dot {
+        width: 24px;
+        height: 16px;
+        color: $neutral-500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        padding-bottom: 8px;
+      }
+
+      .block {
+        color: $neutral-500;
+      }
+    }
 
     .row-top-text.Text {
       @include rowTopTextStyles;
+    }
 
-      .block-number {
-        color: $neutral-500;
-        margin-left: 24px;
-      }
+    .label {
+      color: $neutral-600;
     }
   }
 }

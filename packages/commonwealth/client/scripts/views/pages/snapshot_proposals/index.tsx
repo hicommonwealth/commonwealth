@@ -1,173 +1,119 @@
-/* @jsx m */
-
-import { MixpanelSnapshotEvents } from 'analytics/types';
-import ClassComponent from 'class_component';
-
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import m from 'mithril';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 
 import 'pages/snapshot_proposals.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
-import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { CardsCollection } from '../../components/cards_collection';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { NotificationCategories } from '../../../../../../common-common/src/types';
 
-export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
-
-enum SnapshotProposalFilter {
-  Core = 'Core',
-  Community = 'Community',
-  Active = 'Active',
-  Ended = 'Ended',
-}
-
-type SnapshotProposalStagesBarAttrs = {
-  selected: SnapshotProposalFilter;
-  onChangeFilter: (value: SnapshotProposalFilter) => void;
-};
-
-class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
-  view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
-    return (
-      <div class="SnapshotProposalStagesBar">
-        {Object.values(SnapshotProposalFilter).map(
-          (option: SnapshotProposalFilter) => (
-            <CWButton
-              disabled={
-                option === SnapshotProposalFilter.Core ||
-                option === SnapshotProposalFilter.Community
-              }
-              onclick={(e) => {
-                e.preventDefault();
-                vnode.attrs.onChangeFilter(option);
-              }}
-              label={option}
-            />
-          )
-        )}
-      </div>
-    );
-  }
-}
-
-type SnapshotProposalsPageAttrs = {
+type SnapshotProposalsPageProps = {
   topic?: string;
   snapshotId: string;
 };
 
-class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
-  private selectedFilter: SnapshotProposalFilter;
+const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
+  const [currentTab, setCurrentTab] = useState<number>(1);
+  const [activeProposals, setActiveProposals] = useState<
+    Array<SnapshotProposal>
+  >([]);
+  const [endedProposals, setEndedProposals] = useState<Array<SnapshotProposal>>(
+    []
+  );
 
-  oncreate() {
-    mixpanelBrowserTrack({
-      event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
-      isCustomDomain: app.isCustomDomain(),
-    });
-  }
+  const spaceSubscription = app.user.notifications.subscriptions.find((sub) => {
+    return sub.category === 'snapshot-proposal' && sub.objectId === snapshotId;
+  });
 
-  oninit() {
-    this.selectedFilter = SnapshotProposalFilter.Active;
-  }
+  const [hasSubscription, setHasSubscription] = useState<boolean>(
+    spaceSubscription !== undefined
+  );
 
-  view(vnode: m.Vnode<SnapshotProposalsPageAttrs>) {
-    const { selectedFilter } = this;
-    const { snapshotId } = vnode.attrs;
+  useEffect(() => {
+    const fetch = async () => {
+      await app.snapshot.init(snapshotId);
 
-    if (!app.snapshot.initialized || app.snapshot?.space?.id !== snapshotId) {
-      app.snapshot.init(snapshotId).then(() => {
-        m.redraw();
-      });
-
-      return <PageLoading />;
-    }
-
-    const checkProposalByFilter = (
-      proposal: SnapshotProposal,
-      option: SnapshotProposalFilter
-    ) => {
-      switch (option) {
-        case SnapshotProposalFilter.Core:
-        case SnapshotProposalFilter.Community:
-          return true;
-        case SnapshotProposalFilter.Active:
-          return moment(+proposal.end * 1000) >= moment();
-        case SnapshotProposalFilter.Ended:
-          return moment(+proposal.end * 1000) < moment();
-        default:
-          break;
-      }
-      return true;
-    };
-
-    const proposals = app.snapshot.proposals.filter(
-      (proposal: SnapshotProposal) =>
-        checkProposalByFilter(proposal, selectedFilter)
-    );
-
-    const onChangeFilter = (value: SnapshotProposalFilter) => {
-      this.selectedFilter = value;
-    };
-
-    const spaceSubscription = app.user.notifications.subscriptions.find(
-      (sub) => {
-        return (
-          sub.category === 'snapshot-proposal' && sub.objectId === snapshotId
+      if (app.snapshot.initialized) {
+        setActiveProposals(
+          app.snapshot.proposals.filter(
+            (proposal: SnapshotProposal) =>
+              moment(+proposal.end * 1000) >= moment()
+          )
+        );
+        setEndedProposals(
+          app.snapshot.proposals.filter(
+            (proposal: SnapshotProposal) =>
+              moment(+proposal.end * 1000) < moment()
+          )
         );
       }
-    );
+    };
 
-    return (
-      <Sublayout
-      // title="Proposals"
-      >
-        <div class="SnapshotProposalsPage">
-          <div class="top-bar">
-            <SnapshotProposalStagesBar
-              selected={selectedFilter}
-              onChangeFilter={onChangeFilter}
+    fetch();
+  }, [snapshotId]);
+
+  return (
+    <Sublayout>
+      <div className="SnapshotProposalsPage">
+        <div className="top-bar">
+          <CWTabBar>
+            <CWTab
+              label="Active"
+              isSelected={currentTab === 1}
+              onClick={() => {
+                setCurrentTab(1);
+              }}
             />
-            <div>
-              <CWButton
-                label={
-                  spaceSubscription !== undefined
-                    ? 'Remove Subscription'
-                    : 'Subscribe to Notifications'
+            <CWTab
+              label="Ended"
+              isSelected={currentTab === 2}
+              onClick={() => {
+                setCurrentTab(2);
+              }}
+            />
+          </CWTabBar>
+          <div>
+            <CWButton
+              label={
+                hasSubscription
+                  ? 'Remove Subscription'
+                  : 'Subscribe to Notifications'
+              }
+              iconLeft={hasSubscription ? 'mute' : 'bell'}
+              onClick={() => {
+                if (hasSubscription) {
+                  app.user.notifications
+                    .deleteSubscription(spaceSubscription)
+                    .then(() => {
+                      setHasSubscription(false);
+                    });
+                } else {
+                  app.user.notifications
+                    .subscribe(
+                      NotificationCategories.SnapshotProposal,
+                      snapshotId
+                    )
+                    .then(() => {
+                      setHasSubscription(true);
+                    });
                 }
-                iconLeft={spaceSubscription !== undefined ? 'mute' : 'bell'}
-                onclick={() => {
-                  if (spaceSubscription !== undefined) {
-                    app.user.notifications
-                      .deleteSubscription(spaceSubscription)
-                      .then(() => {
-                        m.redraw();
-                      });
-                  } else {
-                    app.user.notifications
-                      .subscribe(
-                        NotificationCategories.SnapshotProposal,
-                        snapshotId
-                      )
-                      .then(() => {
-                        m.redraw();
-                      });
-                  }
-                }}
-                buttonType="mini-black"
-              />
-            </div>
+              }}
+              buttonType="mini-black"
+            />
           </div>
-
-          {proposals.length > 0 ? (
+        </div>
+        {currentTab === 1 ? (
+          activeProposals.length > 0 ? (
             <CardsCollection
-              content={proposals.map((proposal) => (
+              content={activeProposals.map((proposal, i) => (
                 <SnapshotProposalCard
+                  key={i}
                   snapshotId={snapshotId}
                   proposal={proposal}
                 />
@@ -175,13 +121,30 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
             />
           ) : (
             <CWText className="no-proposals-text">
-              No {this.selectedFilter.toLowerCase()} proposals found.
+              No active proposals found.
             </CWText>
-          )}
-        </div>
-      </Sublayout>
-    );
-  }
-}
+          )
+        ) : null}
+        {currentTab === 2 ? (
+          endedProposals.length > 0 ? (
+            <CardsCollection
+              content={endedProposals.map((proposal, i) => (
+                <SnapshotProposalCard
+                  key={i}
+                  snapshotId={snapshotId}
+                  proposal={proposal}
+                />
+              ))}
+            />
+          ) : (
+            <CWText className="no-proposals-text">
+              No active proposals found.
+            </CWText>
+          )
+        ) : null}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default SnapshotProposalsPage;

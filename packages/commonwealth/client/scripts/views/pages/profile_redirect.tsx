@@ -1,62 +1,56 @@
-/* @jsx m */
+import React, { useState } from 'react';
 
-import ClassComponent from 'class_component';
 import $ from 'jquery';
-import m from 'mithril';
 
 import app from 'state';
+import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from './loading';
 import { PageNotFound } from './404';
 
-class ProfileRedirect extends ClassComponent {
-  private profileId: number;
-  private loading: boolean;
-  private error: boolean;
+type ProfileRedirectProps = {
+  address: string;
+  scope: string;
+};
 
-  private async getProfileId(address, chain) {
-    this.loading = true;
+const ProfileRedirect = (props: ProfileRedirectProps) => {
+  const [profileId, setProfileId] = useState<number>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const navigate = useCommonNavigate();
+
+  const getProfileId = async (address, chain) => {
+    setLoading(true);
     try {
       const res = await $.post(`${app.serverUrl()}/getAddressProfile`, {
         address,
         chain,
       });
       if (res.status === 'Success' && res.result) {
-        this.profileId = res.result.profileId;
+        setProfileId(res.result.profileId);
       }
     } catch (err) {
-      this.error = true;
+      setError(true);
     }
-    this.loading = false;
-    m.redraw();
+    setLoading(false);
+  };
+
+  if (loading) {
+    return <PageLoading />;
   }
 
-  oninit() {
-    this.profileId = null;
-    this.loading = false;
-    this.error = false;
+  if (error) {
+    return <PageNotFound message="There was an error loading this profile." />;
   }
 
-  view(vnode) {
-    if (this.loading) {
-      return <PageLoading />;
-    }
+  let { address, scope } = props;
+  if (!address) address = app.user.activeAccount?.address;
+  if (!scope) scope = app.activeChainId();
 
-    if (this.error) {
-      return (
-        <PageNotFound message="There was an error loading this profile." />
-      );
-    }
+  if (address && scope && !profileId) getProfileId(address, scope);
 
-    let { address, scope } = vnode.attrs;
-    if (!address) address = app.user.activeAccount?.address;
-    if (!scope) scope = app.activeChainId();
-
-    if (address && scope && !this.profileId) this.getProfileId(address, scope);
-
-    if (this.profileId) {
-      m.route.set(`/profile/id/${this.profileId}`);
-    }
+  if (profileId) {
+    navigate(`/profile/id/${profileId}`, {}, null);
   }
-}
+};
 
 export default ProfileRedirect;

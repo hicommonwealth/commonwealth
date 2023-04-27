@@ -1,9 +1,6 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_radio_button.scss';
-import m from 'mithril';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
@@ -15,51 +12,49 @@ export type RadioButtonType = {
   disabled?: boolean;
 };
 
-type RadioButtonStyleAttrs = {
+type RadioButtonStyleProps = {
   disabled?: boolean;
   checked?: boolean;
 };
 
-type RadioButtonAttrs = {
+type RadioButtonProps = {
   groupName?: string;
-  onchange?: (e?: any) => void;
+  onChange?: (e?: any) => void;
 } & Omit<RadioButtonType, 'disabled'> &
-  RadioButtonStyleAttrs;
+  RadioButtonStyleProps;
 
-export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
-  view(vnode: m.Vnode<RadioButtonAttrs>) {
-    const {
-      disabled = false,
-      groupName,
-      label,
-      onchange,
-      checked,
-      value,
-    } = vnode.attrs;
+export const CWRadioButton = (props: RadioButtonProps) => {
+  const {
+    disabled = false,
+    groupName,
+    label,
+    onChange,
+    checked,
+    value,
+  } = props;
 
-    const params = {
-      disabled,
-      name: groupName,
-      onchange,
-      checked,
-      type: 'radio',
-      value,
-    };
+  const params = {
+    disabled,
+    name: groupName,
+    onChange,
+    checked,
+    type: 'radio',
+    value,
+  };
 
-    return (
-      <label
-        class={getClasses<RadioButtonStyleAttrs>(
-          {
-            checked,
-            disabled,
-          },
-          ComponentType.RadioButton
-        )}
-      >
-        <input class="radio-input" {...params} />
-        <div class="radio-control" />
-        <CWText>{label || value}</CWText>
-      </label>
-    );
-  }
-}
+  return (
+    <label
+      className={getClasses<RadioButtonStyleProps>(
+        {
+          checked,
+          disabled,
+        },
+        ComponentType.RadioButton
+      )}
+    >
+      <input className="radio-input" {...params} />
+      <div className="radio-control" />
+      <CWText>{label || value}</CWText>
+    </label>
+  );
+};

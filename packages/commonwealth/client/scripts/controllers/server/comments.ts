@@ -137,6 +137,7 @@ class CommentsController {
   ) {
     let chainEntity;
     try {
+      // TODO: Create a new type for proposal comments?
       const { session, action, hash } = await app.sessions.signComment({
         thread_id: threadId,
         body: unescapedText,

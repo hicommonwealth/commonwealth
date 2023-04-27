@@ -1,79 +1,80 @@
 @import '../../shared';
 
+.MuiModal-root {
+  position: fixed;
+  z-index: 1300;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.MuiModal-backdrop {
+  z-index: -1;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  left: 0;
+}
+
 $modal-padding: 16px;
 
 .Modal {
-  .modal-overlay {
-    align-items: center;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(6px);
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    z-index: 101;
+  background: $white;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-3;
+  overflow: hidden;
+
+  &.isFullScreen {
+    border-radius: 0;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.compact-modal-title {
+  background: $purple-400;
+  color: $white;
+  display: flex;
+  justify-content: space-between;
+  padding: $modal-padding;
+
+  &.ban-user {
+    background: $rorange-500;
   }
 
-  .modal-container {
-    @include popout();
-
-    background: $white;
-    border-radius: $border-radius-corners;
-    overflow: hidden;
-    position: relative;
-    z-index: 20;
-
-    &.isFullScreen {
-      border-radius: 0;
-      height: 100%;
-      width: 100%;
-    }
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
   }
 
-  .compact-modal-title {
-    background: $purple-400;
+  svg {
+    cursor: pointer;
     color: $white;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: $modal-padding;
 
-    &.ban-user {
-      background: $rorange-500;
-    }
-
-    h3 {
-      font-size: 1.1rem;
-      font-weight: 500;
-      margin: 0;
-      padding: 0;
-    }
-
-    svg {
-      cursor: pointer;
+    &:hover {
       color: $white;
-
-      &:hover {
-        color: $white;
-        opacity: 0.6;
-      }
+      opacity: 0.6;
     }
   }
+}
 
-  .compact-modal-body {
-    padding: $modal-padding;
+.compact-modal-body {
+  padding: $modal-padding;
 
-    &:last-child {
-      padding-bottom: 16px;
-    }
+  &:last-child {
+    padding-bottom: 16px;
   }
+}
 
-  .compact-modal-actions {
-    padding: $modal-padding;
-  }
+.compact-modal-actions {
+  padding: $modal-padding;
 }
 
 .ban-modal-content {

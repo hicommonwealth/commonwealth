@@ -1,14 +1,8 @@
-/* @jsx m */
-
-// eslint-disable-next-line max-classes-per-file
-import ClassComponent from 'class_component';
-import app from 'state';
+import React, { useState } from 'react';
 
 import 'components/poll_card.scss';
-import $ from 'jquery';
-import m from 'mithril';
-import { CWButton } from './component_kit/cw_button';
 
+import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
@@ -17,6 +11,7 @@ import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
+import { Modal } from './component_kit/cw_modal';
 
 const LIVE_PREVIEW_MAX = 3;
 const ENDED_PREVIEW_MAX = 1;
@@ -31,165 +26,154 @@ export function buildVoteDirectionString(voteOption: string) {
   return `You voted "${voteOption}"`;
 }
 
-export type PollOptionAttrs = {
+export type PollOptionProps = {
   multiSelect: boolean;
   voteInformation: Array<VoteInformation>;
   selectedOptions?: Array<string>;
   disableVoteOptions?: boolean;
+  setSelectedOptions?: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-export class PollOptions extends ClassComponent<PollOptionAttrs> {
-  view(vnode: m.Vnode<PollOptionAttrs>) {
-    const {
-      multiSelect,
-      voteInformation,
-      selectedOptions,
-      disableVoteOptions,
-    } = vnode.attrs;
+export const PollOptions = ({
+  disableVoteOptions,
+  multiSelect,
+  selectedOptions,
+  voteInformation,
+  setSelectedOptions,
+}: PollOptionProps) => {
+  return (
+    <div className="PollOptions">
+      {multiSelect
+        ? voteInformation.map((option) => (
+            <CWCheckbox
+              checked={false}
+              value=""
+              label={option.label}
+              key={option.value}
+              onChange={() => {
+                // TODO: Build this out when multiple vote options are introduced.
+                // Something like: selectedOptions.push(option.value);
+                console.log('A vote for multiple options');
+              }}
+            />
+          ))
+        : voteInformation.map((option) => (
+            <CWRadioButton
+              key={option.value}
+              checked={
+                selectedOptions.length > 0 &&
+                option.value === selectedOptions[0]
+              }
+              groupName="votes"
+              onChange={() => setSelectedOptions([option.value])}
+              label={option.label}
+              value={option.value}
+              disabled={disableVoteOptions}
+            />
+          ))}
+    </div>
+  );
+};
 
-    return (
-      <div class="PollOptions">
-        {multiSelect
-          ? voteInformation.map((option) => (
-              <CWCheckbox
-                checked={false}
-                value=""
-                label={option.label}
-                onchange={() => {
-                  // TODO: Build this out when multiple vote options are introduced.
-                  // Something like: this.selectedOptions.push(option.value);
-                  console.log('A vote for multiple options');
-                }}
-              />
-            ))
-          : voteInformation.map((option) => (
-              <CWRadioButton
-                checked={
-                  selectedOptions.length > 0 &&
-                  option.value === selectedOptions[0]
-                }
-                groupName="votes"
-                onchange={() => {
-                  selectedOptions[0] = option.value;
-                }}
-                label={option.label}
-                value={option.value}
-                disabled={disableVoteOptions}
-              />
-            ))}
-      </div>
-    );
-  }
-}
-
-export type CastVoteAttrs = {
+export type CastVoteProps = {
   disableVoteButton: boolean;
   timeRemaining: string;
   tooltipErrorMessage: string;
-  onVoteCast: (
-    selectedOption?: string,
-    handleVoteCast?: () => void,
-    isSelected?: boolean
-  ) => void;
+  onVoteCast: (selectedOption?: string, isSelected?: boolean) => void;
 };
 
-export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
-  view(vnode: m.Vnode<CastVoteAttrs>) {
-    const {
-      disableVoteButton,
-      timeRemaining,
-      onVoteCast,
-      tooltipErrorMessage,
-    } = vnode.attrs;
+export const CastVoteSection = ({
+  disableVoteButton,
+  onVoteCast,
+  timeRemaining,
+  tooltipErrorMessage,
+}: CastVoteProps) => {
+  return (
+    <div className="CastVoteSection">
+      {disableVoteButton ? (
+        <CWTooltip
+          content={tooltipErrorMessage ?? 'Select an option to vote.'}
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+              label="Vote"
+              buttonType="mini-black"
+              disabled={disableVoteButton}
+              onClick={() => onVoteCast()}
+            />
+          )}
+        />
+      ) : (
+        <CWButton
+          label="Vote"
+          buttonType="mini-black"
+          disabled={disableVoteButton}
+          onClick={() => onVoteCast()}
+        />
+      )}
+      <CWText className="time-remaining-text" type="caption">
+        {timeRemaining}
+      </CWText>
+    </div>
+  );
+};
 
-    return (
-      <div class="CastVoteSection">
-        {disableVoteButton ? (
-          <CWTooltip
-            interactionType="hover"
-            tooltipContent={tooltipErrorMessage ?? 'Select an option to vote.'}
-            tooltipType="solidNoArrow"
-            hoverCloseDelay={300}
-            trigger={
-              <CWButton
-                label="Vote"
-                buttonType="mini-black"
-                disabled={disableVoteButton}
-                onclick={() => onVoteCast()}
-              />
-            }
-          />
-        ) : (
-          <CWButton
-            label="Vote"
-            buttonType="mini-black"
-            disabled={disableVoteButton}
-            onclick={() => onVoteCast()}
-          />
-        )}
-        <CWText className="time-remaining-text" type="caption">
-          {timeRemaining}
-        </CWText>
-      </div>
-    );
-  }
-}
-
-export type VoteDisplayAttrs = {
+export type VoteDisplayProps = {
   timeRemaining: string;
   voteDirectionString: string;
   pollEnded: boolean;
   voteInformation: Array<VoteInformation>;
 };
 
-export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
-  view(vnode: m.Vnode<VoteDisplayAttrs>) {
-    const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
-      vnode.attrs;
+export const VoteDisplay = ({
+  pollEnded,
+  timeRemaining,
+  voteDirectionString,
+  voteInformation,
+}: VoteDisplayProps) => {
+  const topResponse = voteInformation.sort(
+    (option1, option2) => option2.voteCount - option1.voteCount
+  )[0].label;
 
-    const topResponse = voteInformation.sort(
-      (option1, option2) => option2.voteCount - option1.voteCount
-    )[0].label;
-
-    return (
-      <div class="VoteDisplay">
-        {!pollEnded ? (
-          <>
-            <div class="vote-direction">
-              <CWIcon
-                iconName="check"
-                iconSize="small"
-                className="vote-check-icon"
-              />
-              <CWText type="caption">{voteDirectionString}</CWText>
-            </div>
-            <CWText className="time-remaining-text" type="caption">
-              {timeRemaining}
-            </CWText>
-          </>
-        ) : (
-          <div class="completed-vote-information">
-            <CWText type="caption">This Poll is Complete</CWText>
-            <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
-            {voteDirectionString !== '' && (
-              <CWText
-                type="caption"
-                fontWeight="medium"
-                className="direction-text"
-              >
-                {voteDirectionString}
-              </CWText>
-            )}
+  return (
+    <div className="VoteDisplay">
+      {!pollEnded ? (
+        <>
+          <div className="vote-direction">
+            <CWIcon
+              iconName="check"
+              iconSize="small"
+              className="vote-check-icon"
+            />
+            <CWText type="caption">{voteDirectionString}</CWText>
           </div>
-        )}
-      </div>
-    );
-  }
-}
+          <CWText className="time-remaining-text" type="caption">
+            {timeRemaining}
+          </CWText>
+        </>
+      ) : (
+        <div className="completed-vote-information">
+          <CWText type="caption">This Poll is Complete</CWText>
+          <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
+          {voteDirectionString !== '' && (
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="direction-text"
+            >
+              {voteDirectionString}
+            </CWText>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
-export type ResultsSectionAttrs = {
+export type ResultsSectionProps = {
   resultString?: string;
-  onResultsClick: (e: Event) => any;
+  onResultsClick: (e: React.MouseEvent<HTMLDivElement>) => any;
   tokenSymbol?: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;
@@ -198,145 +182,128 @@ export type ResultsSectionAttrs = {
   isPreview: boolean;
 };
 
-export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
-  view(vnode: m.Vnode<ResultsSectionAttrs>) {
-    const {
-      resultString,
-      onResultsClick,
-      totalVoteCount,
-      tokenSymbol,
-      voteInformation,
-      pollEnded,
-      votedFor,
-      isPreview,
-    } = vnode.attrs;
-
-    const calculateProgressStatus = (
-      option: VoteInformation,
-      index: number
-    ) => {
-      if (!pollEnded) {
-        return 'ongoing';
-      } else if (index === 0) {
-        return 'passed';
-      } else if (option.label === votedFor) {
-        return 'selected';
-      } else {
-        return 'neutral';
-      }
-    };
-
-    const hasVotes =
-      voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
-    let numOptionsBeyondPreview;
+export const ResultsSection = ({
+  isPreview,
+  onResultsClick,
+  pollEnded,
+  resultString,
+  tokenSymbol,
+  totalVoteCount,
+  votedFor,
+  voteInformation,
+}: ResultsSectionProps) => {
+  const calculateProgressStatus = (option: VoteInformation, index: number) => {
     if (!pollEnded) {
-      numOptionsBeyondPreview = voteInformation.length - LIVE_PREVIEW_MAX;
+      return 'ongoing';
+    } else if (index === 0) {
+      return 'passed';
+    } else if (option.label === votedFor) {
+      return 'selected';
     } else {
-      numOptionsBeyondPreview = voteInformation.length - ENDED_PREVIEW_MAX;
+      return 'neutral';
     }
+  };
 
-    return (
-      <div class="ResultsSection">
-        {!isPreview && (
-          <div class="results-header">
-            <CWText type="b1" fontWeight="bold">
-              {resultString}
-            </CWText>
-            <CWText
-              type="caption"
-              className={getClasses<{ clickable?: boolean }>({
-                clickable: onResultsClick && hasVotes,
-              })}
-              onclick={
-                onResultsClick && hasVotes
-                  ? (e) => onResultsClick(e)
-                  : undefined
-              }
-            >
-              {`${Math.floor(totalVoteCount * 100) / 100} ${
-                tokenSymbol ?? 'votes'
-              }`}
-            </CWText>
-          </div>
-        )}
-        <div class="results-content">
-          {voteInformation
-            .sort((option1, option2) => {
-              if (pollEnded) {
-                return option2.voteCount - option1.voteCount;
-              } else {
-                return 0;
-              }
-            })
-            .map((option, index) => {
-              if (
-                isPreview &&
-                (pollEnded
-                  ? index >= ENDED_PREVIEW_MAX
-                  : index >= LIVE_PREVIEW_MAX)
-              ) {
-                return;
-              }
-              return (
-                <CWProgressBar
-                  progress={
-                    option.voteCount
-                      ? (option.voteCount / totalVoteCount) * 100
-                      : 0
-                  }
-                  progressStatus={calculateProgressStatus(option, index)}
-                  label={option.label}
-                  count={option.voteCount}
-                  iconName={option.label === votedFor ? 'check' : undefined}
-                />
-              );
+  const hasVotes =
+    voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
+  let numOptionsBeyondPreview;
+  if (!pollEnded) {
+    numOptionsBeyondPreview = voteInformation.length - LIVE_PREVIEW_MAX;
+  } else {
+    numOptionsBeyondPreview = voteInformation.length - ENDED_PREVIEW_MAX;
+  }
+
+  return (
+    <div className="ResultsSection">
+      {!isPreview && (
+        <div className="results-header">
+          <CWText type="b1" fontWeight="bold">
+            {resultString}
+          </CWText>
+          <CWText
+            type="caption"
+            className={getClasses<{ clickable?: boolean }>({
+              clickable: onResultsClick && hasVotes,
             })}
-        </div>
-        {isPreview && numOptionsBeyondPreview > 0 && (
-          <CWText type="caption" className="more-options">
-            {`+ ${numOptionsBeyondPreview} more option${
-              numOptionsBeyondPreview === 1 ? '' : 's'
+            onClick={
+              onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
+            }
+          >
+            {`${Math.floor(totalVoteCount * 100) / 100} ${
+              tokenSymbol ?? 'votes'
             }`}
           </CWText>
-        )}
+        </div>
+      )}
+      <div className="results-content">
+        {voteInformation
+          .sort((option1, option2) => {
+            if (pollEnded) {
+              return option2.voteCount - option1.voteCount;
+            } else {
+              return 0;
+            }
+          })
+          .map((option, index) => {
+            if (
+              isPreview &&
+              (pollEnded
+                ? index >= ENDED_PREVIEW_MAX
+                : index >= LIVE_PREVIEW_MAX)
+            ) {
+              return;
+            }
+            return (
+              <CWProgressBar
+                progress={
+                  option.voteCount
+                    ? (option.voteCount / totalVoteCount) * 100
+                    : 0
+                }
+                key={option.value}
+                progressStatus={calculateProgressStatus(option, index)}
+                label={option.label}
+                iconName={option.label === votedFor ? 'check' : undefined}
+              />
+            );
+          })}
       </div>
-    );
-  }
-}
-
-type DeletePollModalAttrs = {
-  onClickDelete: () => void;
+      {isPreview && numOptionsBeyondPreview > 0 && (
+        <CWText type="caption" className="more-options">
+          {`+ ${numOptionsBeyondPreview} more option${
+            numOptionsBeyondPreview === 1 ? '' : 's'
+          }`}
+        </CWText>
+      )}
+    </div>
+  );
 };
 
-class DeletePollModal extends ClassComponent<DeletePollModalAttrs> {
-  view(vnode) {
-    const { onClickDelete } = vnode.attrs;
-    return (
-      <div class="DeleteThreadModal">
-        <div class="compact-modal-title">
-          <CWText className="modal-text">Delete this poll?</CWText>
-        </div>
-        <div class="compact-modal-body">
-          <div class="modal-body">
-            <CWText>This action cannot be reversed.</CWText>
-            <CWButton
-              label="confirm"
-              onclick={async (e) => {
-                e.preventDefault();
-                await onClickDelete();
-                $(e.target).trigger('modalexit');
-              }}
-            />
-          </div>
+const DeletePollModal = ({ onClickDelete }) => {
+  const handleDeleteClick = async (e) => {
+    e.preventDefault();
+    await onClickDelete();
+    // Assuming you are using a library like 'react-modal', you can trigger the modal exit using that library's methods.
+  };
+
+  return (
+    <div className="DeleteThreadModal">
+      <div className="compact-modal-title">
+        <CWText className="modal-text">Delete this poll?</CWText>
+      </div>
+      <div className="compact-modal-body">
+        <div className="modal-body">
+          <CWText>This action cannot be reversed.</CWText>
+          <CWButton label="confirm" onClick={handleDeleteClick} />
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-export type PollCardAttrs = PollOptionAttrs &
-  CastVoteAttrs &
-  ResultsSectionAttrs & {
+export type PollCardProps = PollOptionProps &
+  CastVoteProps &
+  ResultsSectionProps & {
     hasVoted?: boolean;
     incrementalVoteCast?: number;
     proposalTitle?: string;
@@ -344,134 +311,116 @@ export type PollCardAttrs = PollOptionAttrs &
     onDeleteClick?: () => void;
   };
 
-export class PollCard extends ClassComponent<PollCardAttrs> {
-  private hasVoted: boolean;
-  private selectedOptions: Array<string>;
-  private totalVoteCount: number;
-  private voteDirectionString: string;
+export const PollCard = ({
+  disableVoteButton = false,
+  isPreview = false,
+  showDeleteButton = false,
+  onDeleteClick,
+  multiSelect,
+  onResultsClick,
+  onVoteCast,
+  pollEnded,
+  proposalTitle,
+  timeRemaining,
+  tokenSymbol,
+  tooltipErrorMessage,
+  votedFor,
+  voteInformation,
+  hasVoted,
+  totalVoteCount,
+}: PollCardProps) => {
+  const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  oninit(vnode: m.Vnode<PollCardAttrs>) {
-    // Initialize state which can change during the lifecycle of the component.
-    this.hasVoted = vnode.attrs.hasVoted;
-    this.voteDirectionString = vnode.attrs.votedFor
-      ? buildVoteDirectionString(vnode.attrs.votedFor)
-      : '';
-    this.totalVoteCount = vnode.attrs.totalVoteCount;
-    this.selectedOptions = [];
-  }
+  const resultString = 'Results';
 
-  view(vnode: m.Vnode<PollCardAttrs>) {
-    const {
-      disableVoteButton = false,
-      incrementalVoteCast,
-      multiSelect,
-      onResultsClick,
-      onVoteCast,
-      pollEnded,
-      proposalTitle,
-      timeRemaining,
-      tokenSymbol,
-      votedFor,
-      voteInformation,
-      tooltipErrorMessage,
-      isPreview = false,
-      showDeleteButton = false,
-      onDeleteClick,
-    } = vnode.attrs;
+  const castVote = async () => {
+    if (
+      multiSelect ||
+      selectedOptions[0] === votedFor ||
+      selectedOptions.length === 0
+    ) {
+      // TODO: Build this out when multiple vote options are introduced.
+      return;
+    }
 
-    const resultString = 'Results';
+    await onVoteCast(selectedOptions[0], selectedOptions.length === 0);
+  };
 
-    const castVote = async () => {
-      if (
-        multiSelect ||
-        this.selectedOptions[0] === votedFor ||
-        this.selectedOptions.length === 0
-      ) {
-        // TODO: Build this out when multiple vote options are introduced.
-        return;
-      }
-
-      await onVoteCast(
-        this.selectedOptions[0],
-        () => {
-          if (!votedFor) {
-            this.totalVoteCount += incrementalVoteCast;
-          }
-          this.voteDirectionString = buildVoteDirectionString(
-            this.selectedOptions[0]
-          );
-          this.hasVoted = true;
-        },
-        this.selectedOptions.length === 0
-      );
-      m.redraw();
-    };
-
-    return (
-      <CWCard className="PollCard">
-        <div className="poll-title-section">
-          <CWText type="b2" className="poll-title-text">
-            {proposalTitle}
-          </CWText>
-          {showDeleteButton && (
-            <CWIcon
-              iconName="close"
-              iconSize="small"
-              className="poll-delete-button"
-              onclick={(e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: DeletePollModal,
-                  data: {
-                    onClickDelete: async () => {
-                      if (onDeleteClick) onDeleteClick();
-                    },
-                  },
-                });
+  return (
+    <CWCard className="PollCard">
+      <div className="poll-title-section">
+        <CWText type="b2" className="poll-title-text">
+          {proposalTitle}
+        </CWText>
+        <Modal
+          content={
+            <DeletePollModal
+              onClickDelete={async () => {
+                if (onDeleteClick) onDeleteClick();
+                setDeleteModalOpen(false);
               }}
             />
-          )}
-        </div>
-
-        <div class="poll-voting-section">
-          {!this.hasVoted && !pollEnded && !isPreview && (
-            <>
-              <PollOptions
-                multiSelect={multiSelect}
-                voteInformation={voteInformation}
-                selectedOptions={this.selectedOptions}
-                disableVoteOptions={disableVoteButton}
-              />
-              <CastVoteSection
-                disableVoteButton={
-                  disableVoteButton || this.selectedOptions.length === 0
-                }
-                timeRemaining={timeRemaining}
-                tooltipErrorMessage={tooltipErrorMessage}
-                onVoteCast={castVote}
-              />
-            </>
-          )}
-          {((this.hasVoted && !isPreview) || pollEnded) && (
-            <VoteDisplay
-              timeRemaining={timeRemaining}
-              voteDirectionString={this.voteDirectionString}
-              pollEnded={pollEnded}
-              voteInformation={voteInformation}
-            />
-          )}
-        </div>
-        <ResultsSection
-          resultString={resultString}
-          onResultsClick={onResultsClick}
-          tokenSymbol={tokenSymbol}
-          voteInformation={voteInformation}
-          pollEnded={pollEnded}
-          totalVoteCount={this.totalVoteCount}
-          votedFor={votedFor}
-          isPreview={isPreview}
+          }
+          onClose={() => setDeleteModalOpen(false)}
+          open={deleteModalOpen}
         />
-      </CWCard>
-    );
-  }
-}
+        {showDeleteButton && (
+          <CWIcon
+            iconName="close"
+            iconSize="small"
+            className="poll-delete-button"
+            onClick={(e) => {
+              console.log('eyo');
+              setDeleteModalOpen(true);
+            }}
+          />
+        )}
+      </div>
+
+      <div className="poll-voting-section">
+        {!hasVoted && !pollEnded && !isPreview && (
+          <>
+            <PollOptions
+              multiSelect={multiSelect}
+              voteInformation={voteInformation}
+              selectedOptions={selectedOptions}
+              setSelectedOptions={setSelectedOptions}
+              disableVoteOptions={disableVoteButton}
+            />
+            <CastVoteSection
+              disableVoteButton={
+                disableVoteButton || selectedOptions.length === 0
+              }
+              timeRemaining={timeRemaining}
+              tooltipErrorMessage={tooltipErrorMessage}
+              onVoteCast={castVote}
+            />
+          </>
+        )}
+        {((hasVoted && !isPreview) || pollEnded) && (
+          <VoteDisplay
+            timeRemaining={timeRemaining}
+            voteDirectionString={
+              votedFor
+                ? buildVoteDirectionString(votedFor)
+                : buildVoteDirectionString(selectedOptions[0])
+            }
+            pollEnded={pollEnded}
+            voteInformation={voteInformation}
+          />
+        )}
+      </div>
+      <ResultsSection
+        resultString={resultString}
+        onResultsClick={onResultsClick}
+        tokenSymbol={tokenSymbol}
+        voteInformation={voteInformation}
+        pollEnded={pollEnded}
+        totalVoteCount={totalVoteCount}
+        votedFor={votedFor}
+        isPreview={isPreview}
+      />
+    </CWCard>
+  );
+};

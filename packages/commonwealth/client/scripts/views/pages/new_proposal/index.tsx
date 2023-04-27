@@ -1,13 +1,11 @@
-/* @jsx m */
+import React, { useEffect, useState } from 'react';
 
-import ClassComponent from 'class_component';
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
 import {
   chainToProposalSlug,
   proposalSlugToClass,
   proposalSlugToFriendlyName,
 } from 'identifiers';
-import m from 'mithril';
 import type { ProposalModule } from 'models';
 
 import 'pages/new_proposal/index.scss';
@@ -21,102 +19,107 @@ import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 import { SputnikProposalForm } from './sputnik_proposal_form';
-import { SubstrateDemocracyProposalForm } from './substrate_democracy_proposal_form';
-import { SubstrateTreasuryProposalForm } from './substrate_treasury_proposal_form';
-import { SubstrateTreasuryTipForm } from './substrate_treasury_tip_form';
+import useForceRerender from 'hooks/useForceRerender';
 
-type NewProposalPageAttrs = {
+type NewProposalPageProps = {
   type: ProposalType;
 };
 
-class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
-  private typeEnum: ProposalType;
+const NewProposalPage = (props: NewProposalPageProps) => {
+  const { type } = props;
+  const forceRerender = useForceRerender();
+  const [internalType, setInternalType] = useState<ProposalType>(type);
+  const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
 
-  view(vnode: m.Vnode<NewProposalPageAttrs>) {
-    this.typeEnum = vnode.attrs.type;
+  useEffect(() => {
+    app.runWhenReady(() => {
+      setIsLoaded(app.chain.loaded);
+    });
+  }, [app.chain?.loaded]);
 
-    // wait for chain
-    if (app.chain?.failed) {
+  useEffect(() => {
+    app.loginStateEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.loginStateEmitter.off('redraw', forceRerender);
+    };
+  }, [app.loginState]);
+
+  // wait for chain
+  if (app.chain?.failed) {
+    return (
+      <PageNotFound
+        title="Wrong Ethereum Provider Network!"
+        message="Change Metamask to point to Ethereum Mainnet"
+      />
+    );
+  }
+
+  if (!app.chain || !isLoaded || !app.chain.meta) {
+    return <PageLoading />;
+  }
+
+  // infer proposal type if possible
+  if (!internalType) {
+    try {
+      setInternalType(chainToProposalSlug(app.chain.meta));
+    } catch (e) {
       return (
         <PageNotFound
-          title="Wrong Ethereum Provider Network!"
-          message="Change Metamask to point to Ethereum Mainnet"
+          title="Invalid Page"
+          message="Cannot determine proposal type."
         />
       );
     }
-
-    if (!app.chain || !app.chain.loaded || !app.chain.meta) {
-      return <PageLoading />;
-    }
-
-    // infer proposal type if possible
-    if (!this.typeEnum) {
-      try {
-        this.typeEnum = chainToProposalSlug(app.chain.meta);
-      } catch (e) {
-        return (
-          <PageNotFound
-            title="Invalid Page"
-            message="Cannot determine proposal type."
-          />
-        );
-      }
-    }
-
-    // check if module is still initializing
-    const c = proposalSlugToClass().get(this.typeEnum) as ProposalModule<
-      any,
-      any,
-      any
-    >;
-
-    if (!c.ready) {
-      app.chain.loadModules([c]);
-      return <PageLoading />;
-    }
-
-    const getForm = (typeEnum) => {
-      switch (typeEnum) {
-        case ProposalType.AaveProposal:
-          return <AaveProposalForm />;
-        case ProposalType.CompoundProposal:
-          return <CompoundProposalForm />;
-        case ProposalType.CosmosProposal:
-          return <CosmosProposalForm />;
-        case ProposalType.SputnikProposal:
-          return <SputnikProposalForm />;
-        case ProposalType.SubstrateDemocracyProposal:
-          return <SubstrateDemocracyProposalForm />;
-        case ProposalType.SubstrateTreasuryProposal:
-          return <SubstrateTreasuryProposalForm />;
-        case ProposalType.SubstrateTreasuryTip:
-          return <SubstrateTreasuryTipForm />;
-        default:
-          return <CWText>Invalid proposal type</CWText>;
-      }
-    };
-
-    const getBody = () => {
-      if (!app.user.activeAccount) {
-        return <CWText>Must be logged in</CWText>;
-      } else if (app.chain?.network === ChainNetwork.Plasm) {
-        return <CWText>Unsupported network</CWText>;
-      } else {
-        return getForm(this.typeEnum);
-      }
-    };
-
-    return (
-      <Sublayout>
-        <div class="NewProposalPage">
-          <CWText type="h3" fontWeight="medium">
-            New {proposalSlugToFriendlyName.get(this.typeEnum)}
-          </CWText>
-          {getBody()}
-        </div>
-      </Sublayout>
-    );
   }
-}
+
+  // check if module is still initializing
+  const c = proposalSlugToClass()?.get(internalType) as ProposalModule<
+    any,
+    any,
+    any
+  >;
+
+  if (!c || !c.ready) {
+    app.chain.loadModules([c]);
+    return <PageLoading />;
+  }
+
+  const getForm = (typeEnum) => {
+    switch (typeEnum) {
+      case ProposalType.AaveProposal:
+        return <AaveProposalForm />;
+      case ProposalType.CompoundProposal:
+        return <CompoundProposalForm />;
+      case ProposalType.CosmosProposal:
+        return <CosmosProposalForm />;
+      case ProposalType.SputnikProposal:
+        return <SputnikProposalForm />;
+      default:
+        return <CWText>Invalid proposal type</CWText>;
+    }
+  };
+
+  const getBody = () => {
+    if (!app.user.activeAccount) {
+      return <CWText>Must be logged in</CWText>;
+    } else if (app.chain?.network === ChainNetwork.Plasm) {
+      return <CWText>Unsupported network</CWText>;
+    } else {
+      return getForm(internalType);
+    }
+  };
+
+  return (
+    <Sublayout>
+      <div className="NewProposalPage">
+        <CWText type="h3" fontWeight="medium">
+          New {proposalSlugToFriendlyName.get(internalType)}
+        </CWText>
+        {getBody()}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default NewProposalPage;

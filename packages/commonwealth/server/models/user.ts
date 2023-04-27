@@ -10,7 +10,7 @@ import type {
 } from './social_account';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type EmailNotificationInterval = 'weekly' | 'never';
+export type EmailNotificationInterval = 'week' | 'never';
 
 export type UserAttributes = {
   email: string;

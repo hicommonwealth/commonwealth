@@ -1,7 +1,8 @@
 import $ from 'jquery';
-import m from 'mithril';
-import { StarredCommunity } from 'models';
 import app from 'state';
+
+import { redraw } from 'mithrilInterop';
+import { StarredCommunity } from 'models';
 
 class CommunitiesController {
   public isStarred(chain: string) {
@@ -42,7 +43,7 @@ class CommunitiesController {
             app.user.removeStarredCommunity(star);
           }
           resolve();
-          m.redraw();
+          redraw();
         })
         .catch(() => {
           reject();

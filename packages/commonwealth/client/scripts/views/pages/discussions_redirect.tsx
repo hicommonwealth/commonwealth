@@ -1,24 +1,45 @@
-/* @jsx m */
-
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React, { useEffect } from 'react';
+import { NavigateOptions } from 'react-router-dom';
 
 import app from 'state';
 import { PageLoading } from './loading';
+import { DefaultPage } from 'common-common/src/types';
+import { useCommonNavigate } from 'navigation/helpers';
+import { featureFlags } from 'helpers/feature-flags';
 
-class DiscussionsRedirect extends ClassComponent {
-  view() {
-    if (app.chain) {
-      if (app.chain.meta.defaultOverview) {
-        navigateToSubpage('/overview');
-      } else {
-        navigateToSubpage('/discussions');
-      }
+export default function DiscussionsRedirect() {
+  const navigate = useCommonNavigate();
+
+  useEffect(() => {
+    if (!app.chain) return;
+
+    const { defaultPage, defaultOverview, hasHomepage } = app.chain.meta;
+    let view;
+
+    if (featureFlags.communityHomepage && hasHomepage) {
+      view = defaultPage;
     } else {
-      return <PageLoading />;
+      view = defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions;
     }
-  }
-}
 
-export default DiscussionsRedirect;
+    // Note that because this is a redirect, we do not add it to the history. If we only keep the original URL
+    // in history, when something like the back button is clicked, it will not come back to this redirect.
+    const dontAddHistory: NavigateOptions = { replace: true };
+
+    switch (view) {
+      case DefaultPage.Overview:
+        navigate('/overview', dontAddHistory);
+        break;
+      case DefaultPage.Discussions:
+        navigate('/discussions', dontAddHistory);
+        break;
+      case DefaultPage.Homepage:
+        navigate('/feed', dontAddHistory);
+        break;
+      default:
+        navigate('/discussions', dontAddHistory);
+    }
+  }, [navigate]);
+
+  return <PageLoading />;
+}

@@ -1,13 +1,13 @@
-/* @jsx m */
+import React from 'react';
 
-import ClassComponent from 'class_component';
-import type { ChainNetwork } from 'common-common/src/types';
+import { redraw } from 'mithrilInterop';
+import app from 'state';
+import $ from 'jquery';
 import { ChainBase } from 'common-common/src/types';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import type { ChainNetwork } from 'common-common/src/types';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
-import { Account, AddressInfo, IWebWallet } from 'models';
 import { signSessionWithAccount } from 'controllers/server/sessions';
 import { createUserWithAddress } from 'controllers/app/login';
 import { notifyInfo } from 'controllers/app/notifications';
@@ -15,151 +15,133 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import $ from 'jquery';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import m from 'mithril';
 
-import app from 'state';
+import { User } from '../user/user';
+import { CWIconButton } from './cw_icon_button';
+import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWText } from './cw_text';
+import type { Account, IWebWallet } from 'models';
+import { AddressInfo } from 'models';
+
 import {
   CWWalletOptionRow,
   CWWalletMissingOptionRow,
 } from './cw_wallet_option_row';
-import { CWTooltip } from './cw_popover/cw_tooltip';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
-import User from '../widgets/user';
-import { CWIconButton } from './cw_icon_button';
-import { CWSpinner } from './cw_spinner';
-import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import { addressSwapper } from 'utils';
+import { Modal } from './cw_modal';
 
-// Copied over from the old wallet selector with modifications
-// TODO: This should eventually be replaced with a component native to the new flow
-const LinkAccountItem: m.Component<
-  {
-    account: { address: string; meta?: { name: string } };
-    walletNetwork: ChainNetwork;
-    walletChain: ChainBase;
-    onSelect: (idx: number) => void;
-    idx: number;
-  },
-  { linking: boolean }
-> = {
-  view: (vnode) => {
-    const { account, walletNetwork, walletChain, onSelect, idx } = vnode.attrs;
+const LinkAccountItem = (props: {
+  account: { address: string; meta?: { name: string } };
+  idx: number;
+  onSelect: (idx: number) => void;
+  walletChain: ChainBase;
+  walletNetwork: ChainNetwork;
+}) => {
+  const { account, walletNetwork, walletChain, onSelect, idx } = props;
 
-    const address = app.chain
-      ? addressSwapper({
-          address: account.address,
-          currentPrefix: parseInt(
-            (app.chain as Substrate)?.meta.ss58Prefix,
-            10
-          ),
-        })
-      : account.address;
+  const address = app.chain
+    ? addressSwapper({
+        address: account.address,
+        currentPrefix: parseInt((app.chain as Substrate)?.meta.ss58Prefix, 10),
+      })
+    : account.address;
 
-    const baseName = app.chain?.meta.base || walletChain;
+  const baseName = app.chain?.meta.base || walletChain;
 
-    const capitalizedBaseName = `${baseName
-      .charAt(0)
-      .toUpperCase()}${baseName.slice(1)}`;
+  const capitalizedBaseName = `${baseName
+    .charAt(0)
+    .toUpperCase()}${baseName.slice(1)}`;
 
-    const name =
-      account.meta?.name ||
-      `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
+  const name =
+    account.meta?.name ||
+    `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
 
-    return m(
-      '.account-item',
-      {
-        class: `account-item-emphasized`,
-        onclick: () => onSelect(idx),
-      },
-      [
-        m('.account-item-avatar', [
-          m(
-            '.account-user',
-            m(User, {
-              user: new AddressInfo(
-                null,
-                address,
-                app.chain?.id || walletNetwork
-              ),
-              avatarOnly: true,
-              avatarSize: 40,
-            })
-          ),
-        ]),
-        m('.account-item-left', [
-          m('.account-item-name', `${name}`),
-          m('.account-item-address', [
-            m(
-              '.account-user',
-              m(User, {
-                user: new AddressInfo(
-                  null,
-                  address,
-                  app.chain?.id || walletNetwork
-                ),
-                hideAvatar: true,
-              })
-            ),
-          ]),
-          vnode.state.linking &&
-            m('p.small-text', 'Check your wallet for a confirmation prompt.'),
-        ]),
-        m('.account-item-right', [
-          vnode.state.linking &&
-            m('.account-waiting', [
-              // TODO: show a (?) icon with a tooltip explaining to check your wallet
-              m(CWSpinner, { size: 'small' }),
-            ]),
-        ]),
-      ]
-    );
-  },
+  return (
+    <div
+      className="account-item account-item-emphasized"
+      onClick={() => onSelect(idx)}
+    >
+      <div className="account-item-avatar">
+        <div className="account-user">
+          <User
+            user={
+              new AddressInfo(null, address, app.chain?.id || walletNetwork)
+            }
+            avatarOnly
+            avatarSize={40}
+          />
+        </div>
+      </div>
+      <div className="account-item-left">
+        <div className="account-item-name">{name}</div>
+        <div className="account-item-address">
+          <div className="account-user">
+            <User
+              user={
+                new AddressInfo(null, address, app.chain?.id || walletNetwork)
+              }
+              hideAvatar
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-type AccountSelectorAttrs = {
-  accounts: Array<{ address: string; meta?: { name: string } }>;
+type AccountSelectorProps = {
+  accounts:
+    | Array<{ address: string; meta?: { name: string } }>
+    | readonly any[];
+  onModalClose: () => void;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
   walletNetwork: ChainNetwork;
 };
 
-export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
-  view(vnode: m.Vnode<AccountSelectorAttrs>) {
-    const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
+export const AccountSelector = (props: AccountSelectorProps) => {
+  const { accounts, onModalClose, walletNetwork, walletChain, onSelect } =
+    props;
 
-    return (
-      <div class="AccountSelector">
-        <div class="close-button-wrapper">
-          <CWIconButton
-            iconButtonTheme="primary"
-            iconName="close"
-            iconSize="small"
-            className="close-icon"
-            onclick={() => $('.AccountSelector').trigger('modalexit')}
-          />
-        </div>
-
-        {accounts.map((account, idx) => {
-          return m(LinkAccountItem, {
-            account,
-            walletChain,
-            walletNetwork,
-            onSelect,
-            idx,
-          });
-        })}
+  return (
+    <div className="AccountSelector">
+      <div className="close-button-wrapper">
+        <CWIconButton
+          iconButtonTheme="primary"
+          iconName="close"
+          iconSize="small"
+          className="close-icon"
+          onClick={() => onModalClose()}
+        />
       </div>
-    );
-  }
-}
 
-type WalletsListAttrs = {
+      {accounts.map((account, idx) => {
+        return (
+          <LinkAccountItem
+            key={`${account.address}-${idx}`}
+            account={account}
+            walletChain={walletChain}
+            walletNetwork={walletNetwork}
+            onSelect={onSelect}
+            idx={idx}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+type WalletsListProps = {
   connectAnotherWayOnclick?: () => void;
   darkMode?: boolean;
   showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
+  isMobile?: boolean;
+  setSignerAccount?: (account: Account) => void;
+  setIsNewlyCreated?: (isNewlyCreated: boolean) => void;
+  setIsLinkingOnMobile?: (isLinkingOnMobile: boolean) => void;
   setBodyType?: (bodyType: string) => void;
   accountVerifiedCallback?: (
     account: Account,
@@ -169,181 +151,178 @@ type WalletsListAttrs = {
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linking?: boolean;
   useSessionKeyLoginFlow?: boolean;
-  hideConnectAnotherWayLink?: boolean;
 };
 
-export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
-  view(vnode: m.Vnode<WalletsListAttrs>) {
-    const {
-      connectAnotherWayOnclick,
-      darkMode,
-      showResetWalletConnect,
-      hasNoWalletsLink = true,
-      wallets,
-      setSelectedWallet,
-      accountVerifiedCallback,
-      linking,
-      useSessionKeyLoginFlow,
-      hideConnectAnotherWayLink,
-    } = vnode.attrs;
+export const CWWalletsList = (props: WalletsListProps) => {
+  const {
+    connectAnotherWayOnclick,
+    darkMode,
+    showResetWalletConnect,
+    hasNoWalletsLink = true,
+    wallets,
+    isMobile = false,
+    setSignerAccount,
+    setIsNewlyCreated,
+    setSelectedWallet,
+    setIsLinkingOnMobile,
+    accountVerifiedCallback,
+    setBodyType,
+    linking,
+    useSessionKeyLoginFlow,
+  } = props;
 
-    // We call handleNormalWalletLogin if we're using connecting a new wallet, and
-    // handleSessionKeyRevalidation if we're regenerating a session key.
-    async function handleSessionKeyRevalidation(
-      wallet: IWebWallet<any>,
-      address: string
-    ) {
-      const timestamp = +new Date();
-      const sessionAddress = await app.sessions.getOrCreateAddress(
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+  // We call handleNormalWalletLogin if we're using connecting a new wallet, and
+  // handleSessionKeyRevalidation if we're regenerating a session key.
+  async function handleSessionKeyRevalidation(
+    wallet: IWebWallet<any>,
+    address: string
+  ) {
+    const timestamp = +new Date();
+    const sessionAddress = await app.sessions.getOrCreateAddress(
+      wallet.chain,
+      wallet.getChainId().toString()
+    );
+    const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
+    const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+
+    // Start the create-user flow, so validationBlockInfo gets saved to the backend
+    // This creates a new `Account` object with fields set up to be validated by verifyAddress.
+    const { account } = await createUserWithAddress(
+      address,
+      wallet.name,
+      chainIdentifier,
+      sessionAddress,
+      validationBlockInfo
+    );
+    account.setValidationBlockInfo(
+      validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
+    );
+
+    const { chainId, sessionPayload, signature } = await signSessionWithAccount(
+      wallet,
+      account,
+      timestamp
+    );
+    await account.validate(signature, timestamp, chainId);
+    await app.sessions.authSession(
+      wallet.chain,
+      chainId,
+      sessionPayload,
+      signature
+    );
+    console.log('Started new session for', wallet.chain, chainId);
+
+    // ensure false for newlyCreated / linking vars on revalidate
+    accountVerifiedCallback(account, false, false);
+    if (isMobile) {
+      if (setSignerAccount) setSignerAccount(account);
+      if (setIsNewlyCreated) setIsNewlyCreated(false);
+      if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
+      setBodyType('redirectToSign');
+      return;
+    } else {
+      accountVerifiedCallback(account, false, false);
+    }
+  }
+
+  async function handleNormalWalletLogin(
+    wallet: IWebWallet<any>,
+    address: string
+  ) {
+    if (app.isLoggedIn()) {
+      const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+        address:
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address,
+                currentPrefix: parseInt(
+                  (app.chain as Substrate)?.meta.ss58Prefix,
+                  10
+                ),
+              })
+            : address,
+        chain: app.activeChainId() ?? wallet.chain,
+        jwt: app.user.jwt,
+      });
+      if (result.exists && result.belongsToUser) {
+        notifyInfo('This address is already linked to your current account.');
+        return;
+      }
+      if (result.exists) {
+        notifyInfo(
+          'This address is already linked to another account. Signing will transfer ownership to your account.'
+        );
+      }
+    }
+
+    try {
+      const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         wallet.chain,
         wallet.getChainId().toString()
       );
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-      const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
-
-      // Start the create-user flow, so validationBlockInfo gets saved to the backend
-      // This creates a new `Account` object with fields set up to be validated by verifyAddress.
-      const { account } = await createUserWithAddress(
-        address,
-        wallet.name,
-        chainIdentifier,
-        sessionAddress,
-        validationBlockInfo
-      );
-      account.setValidationBlockInfo(
-        validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
-      );
-
-      const { chainId, sessionPayload, signature } =
-        await signSessionWithAccount(wallet, account, timestamp);
-      await account.validate(signature, timestamp, chainId);
-      await app.sessions.authSession(
-        wallet.chain,
-        chainId,
-        sessionPayload,
-        signature
-      );
-      console.log('Started new session for', wallet.chain, chainId);
-
-      const newlyCreated = false;
-      const isLinking = false;
-      accountVerifiedCallback(account, newlyCreated, isLinking);
-    }
-    async function handleNormalWalletLogin(
-      wallet: IWebWallet<any>,
-      address: string
-    ) {
-      if (app.isLoggedIn()) {
-        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-          address:
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address,
-                  currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
-                    10
-                  ),
-                })
-              : address,
-          chain: app.activeChainId() ?? wallet.chain,
-          jwt: app.user.jwt,
-        });
-        if (result.exists && result.belongsToUser) {
-          notifyInfo('This address is already linked to your current account.');
-          return;
-        }
-        if (result.exists) {
-          notifyInfo(
-            'This address is already linked to another account. Signing will transfer ownership to your account.'
-          );
-        }
-      }
-
-      try {
-        const sessionAddress = await app.sessions.getOrCreateAddress(
-          wallet.chain,
-          wallet.getChainId().toString()
+      const validationBlockInfo =
+        wallet.getRecentBlock && (await wallet.getRecentBlock(chainIdentifier));
+      const { account: signerAccount, newlyCreated } =
+        await createUserWithAddress(
+          address,
+          wallet.name,
+          chainIdentifier,
+          sessionPublicAddress,
+          validationBlockInfo
         );
-        const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-        const validationBlockInfo =
-          wallet.getRecentBlock &&
-          (await wallet.getRecentBlock(chainIdentifier));
-        const { account: signerAccount, newlyCreated } =
-          await createUserWithAddress(
-            address,
-            wallet.name,
-            chainIdentifier,
-            sessionAddress,
-            validationBlockInfo
-          );
-        accountVerifiedCallback(signerAccount, newlyCreated, linking);
-      } catch (err) {
-        console.log(err);
-      }
-    }
 
-    const resetWalletConnectOnclick = async (
-      webWallets: Array<IWebWallet<any>>
-    ) => {
-      const wallet = webWallets.find(
-        (w) =>
-          w instanceof WalletConnectWebWalletController ||
-          w instanceof TerraWalletConnectWebWalletController
-      );
-
-      await wallet.reset();
-
-      if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        $('.LoginMobile').trigger('modalexit');
+      if (isMobile) {
+        if (setSignerAccount) setSignerAccount(signerAccount);
+        if (setIsNewlyCreated) setIsNewlyCreated(newlyCreated);
+        if (setIsLinkingOnMobile) setIsLinkingOnMobile(linking);
+        setBodyType('redirectToSign');
+        return;
       } else {
-        $('.LoginDesktop').trigger('modalexit');
+        accountVerifiedCallback(signerAccount, newlyCreated, linking);
       }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
-      m.redraw();
-    };
+  const resetWalletConnectOnclick = async (
+    webWallets: Array<IWebWallet<any>>
+  ) => {
+    const wallet = webWallets.find(
+      (w) =>
+        w instanceof WalletConnectWebWalletController ||
+        w instanceof TerraWalletConnectWebWalletController
+    );
 
-    return (
-      <div class="WalletsList">
-        <div class="wallets-and-link-container">
-          <div
-            class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'wallets')}
-          >
-            {wallets.map((wallet: IWebWallet<any>) => (
+    await wallet.reset();
+
+    redraw();
+  };
+
+  return (
+    <div className="WalletsList">
+      <div className="wallets-and-link-container">
+        <div
+          className={getClasses<{ darkMode?: boolean }>(
+            { darkMode },
+            'wallets'
+          )}
+        >
+          {wallets.map((wallet: IWebWallet<any>, index) => (
+            <React.Fragment key={`${wallet.name}-${index}`}>
               <CWWalletOptionRow
                 walletName={wallet.name}
                 walletLabel={wallet.label}
                 darkMode={darkMode}
-                onclick={async () => {
+                onClick={async () => {
                   await wallet.enable();
                   setSelectedWallet(wallet);
 
                   if (wallet.chain === 'substrate') {
-                    app.modals.create({
-                      modal: AccountSelector,
-                      data: {
-                        accounts: wallet.accounts,
-                        walletNetwork: wallet.defaultNetwork,
-                        walletChain: wallet.chain,
-                        onSelect: async (accountIndex) => {
-                          let address;
-                          if (app.chain) {
-                            address = addressSwapper({
-                              address: wallet.accounts[accountIndex].address,
-                              currentPrefix: (app.chain as Substrate).chain
-                                .ss58Format,
-                            });
-                          } else {
-                            address = wallet.accounts[accountIndex].address;
-                          }
-                          $('.AccountSelector').trigger('modalexit');
-                          if (useSessionKeyLoginFlow) {
-                            await handleSessionKeyRevalidation(wallet, address);
-                          } else {
-                            await handleNormalWalletLogin(wallet, address);
-                          }
-                        },
-                      },
-                    });
+                    setIsModalOpen(true);
                   } else {
                     if (wallet.chain === 'near') {
                       // Near Redirect Flow
@@ -418,68 +397,103 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                   }
                 }}
               />
-            ))}
-            {wallets.length === 0 && (
-              <CWWalletMissingOptionRow darkMode={darkMode} />
-            )}
-          </div>
-          <div className="wallet-list-links">
-            {showResetWalletConnect && (
-              <CWText
-                type="caption"
-                className={getClasses<{ darkMode?: boolean }>(
-                  { darkMode },
-                  'reset-wc-link'
-                )}
-              >
-                <a
-                  href="#"
-                  onclick={resetWalletConnectOnclick.bind(this, wallets)}
-                >
-                  Reset WalletConnect
-                </a>
-              </CWText>
-            )}
-            {hasNoWalletsLink && (
-              <CWTooltip
-                interactionType="click"
-                tooltipContent={
-                  <>
-                    <CWText type="caption" className="no-wallets-popover">
-                      If you cannot see your wallet, please ensure that your
-                      wallet Chrome extension is <b>installed</b> and{' '}
-                      <b>activated</b>.
-                    </CWText>
-                  </>
+              <Modal
+                content={
+                  <AccountSelector
+                    accounts={wallet.accounts}
+                    walletNetwork={wallet.defaultNetwork}
+                    walletChain={wallet.chain}
+                    onSelect={async (accountIndex) => {
+                      let address;
+                      if (app.chain) {
+                        address = addressSwapper({
+                          address: wallet.accounts[accountIndex].address,
+                          currentPrefix: (app.chain as Substrate).chain
+                            .ss58Format,
+                        });
+                      } else {
+                        address = wallet.accounts[accountIndex].address;
+                      }
+                      if (useSessionKeyLoginFlow) {
+                        await handleSessionKeyRevalidation(wallet, address);
+                      } else {
+                        await handleNormalWalletLogin(wallet, address);
+                      }
+                      setIsModalOpen(false);
+                    }}
+                    onModalClose={() => setIsModalOpen(false)}
+                  />
                 }
-                tooltipType="solidArrow"
-                trigger={
-                  <CWText
-                    type="caption"
-                    className={getClasses<{ darkMode?: boolean }>(
-                      { darkMode },
-                      'no-wallet-link'
-                    )}
-                  >
-                    Don't see your wallet?
-                  </CWText>
-                }
+                onClose={() => setIsModalOpen(false)}
+                open={isModalOpen}
               />
-            )}
-          </div>
+            </React.Fragment>
+          ))}
+          {wallets.length === 0 && (
+            <CWWalletMissingOptionRow darkMode={darkMode} />
+          )}
         </div>
-        {!hideConnectAnotherWayLink && (
-          <CWText
-            type="b2"
-            className={getClasses<{ darkMode?: boolean }>(
-              { darkMode },
-              'connect-another-way-link'
-            )}
-          >
-            <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
-          </CWText>
-        )}
+        <div className="wallet-list-links">
+          {showResetWalletConnect && (
+            <CWText
+              type="caption"
+              className={getClasses<{ darkMode?: boolean }>(
+                { darkMode },
+                'reset-wc-link'
+              )}
+            >
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  resetWalletConnectOnclick(wallets);
+                }}
+              >
+                Reset WalletConnect
+              </a>
+            </CWText>
+          )}
+          {hasNoWalletsLink && (
+            <CWTooltip
+              content={
+                <>
+                  <CWText type="caption">
+                    If you don’t see your wallet then make sure:
+                  </CWText>
+                  <CWText type="caption">
+                    • Your wallet chrome extension installed?
+                  </CWText>
+                  <CWText type="caption">
+                    • Your wallet chrome extension active?
+                  </CWText>
+                </>
+              }
+              renderTrigger={(handleInteraction) => (
+                <CWText
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                  type="caption"
+                  className={getClasses<{ darkMode?: boolean }>(
+                    { darkMode },
+                    'no-wallet-link'
+                  )}
+                >
+                  Don't see your wallet?
+                </CWText>
+              )}
+            />
+          )}
+        </div>
       </div>
-    );
-  }
-}
+      <CWText
+        type="b2"
+        className={getClasses<{ darkMode?: boolean }>(
+          { darkMode },
+          'connect-another-way-link'
+        )}
+      >
+        <a onClick={connectAnotherWayOnclick}>Connect Another Way</a>
+      </CWText>
+    </div>
+  );
+};

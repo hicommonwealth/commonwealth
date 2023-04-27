@@ -1,12 +1,14 @@
 import type { Coin } from 'adapters/currency';
 import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
-import m from 'mithril';
+
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import type { Account, ProposalModule } from '.';
+import { setDarkMode } from '../helpers';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
@@ -43,8 +45,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
-    const [, response] = await Promise.all([
-      this.app.chainEntities.refresh(this.meta.id),
+    const [response] = await Promise.all([
+      // this.app.chainEntities.refresh(this.meta.id),
       $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
         community: null,
@@ -55,21 +57,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
-    if (
-      this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))
-    ) {
-      return false;
-    }
+    // if (
+    //   this.meta.id !== (this.app.customDomainId() || _DEPRECATED_getSearchParams('scope'))
+    // ) {
+    //   console.log(this.meta.id, _DEPRECATED_getSearchParams('scope'));
+    //   return false;
+    // }
 
+    const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
-      if (localStorage.getItem('user-dark-mode-state') !== 'off') {
-        localStorage.setItem('dark-mode-state', 'on');
-        document.getElementsByTagName('html')[0].classList.add('invert');
-      }
-    } else {
-      if (localStorage.getItem('user-dark-mode-state') !== 'on') {
-        document.getElementsByTagName('html')[0].classList.remove('invert');
-      }
+      darkModePreferenceSet
+        ? setDarkMode(darkModePreferenceSet === 'on')
+        : setDarkMode(true);
     }
 
     const {
@@ -78,9 +77,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       admins,
       activeUsers,
       numVotingThreads,
-      chatChannels,
       communityBanner,
-      contracts,
+      contractsWithTemplatesData,
       communityRoles,
     } = response.result;
     this.app.topics.initialize(topics, true);
@@ -88,15 +86,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
-    this.app.contracts.initialize(contracts, true);
+    this.app.contracts.initialize(contractsWithTemplatesData, true);
 
     // add community roles to the chain's roles
     this.meta.communityRoles = communityRoles;
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
-
-    // parse/save the chat channels
-    await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
 
     if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
       this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
@@ -120,7 +115,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
-    if (this.app.socket) this.app.socket.chatNs.deinit();
     console.log(`${this.meta.name} stopped`);
   }
 
@@ -146,6 +140,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     if (this.app.snapshot) this.app.snapshot.deinit();
     this._loaded = false;
     console.log(`Stopping ${this.meta.id}...`);
+
+    if (
+      this.meta.id === '1inch' &&
+      !localStorage.getItem('user-dark-mode-state')
+    ) {
+      setDarkMode(false);
+    }
   }
 
   public async loadModules(modules: ProposalModule<any, any, any>[]) {
@@ -153,12 +154,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       throw new Error('secondary loading cmd called before chain load');
     }
     // TODO: does this need debouncing?
-    if (modules.some((mod) => !mod.initializing && !mod.ready)) {
+    if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
       await Promise.all(
         modules.map((mod) => mod.init(this.chain, this.accounts))
       );
+      this.app.chainModuleReady.emit('ready');
     }
-    m.redraw();
   }
 
   public abstract base: ChainBase;

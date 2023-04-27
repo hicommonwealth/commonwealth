@@ -60,15 +60,6 @@ class ThreadUniqueAddressesCountController {
     }
   };
 
-  public getUniqueAddressesByRootId(proposal: Thread) {
-    const { id, slug } = proposal;
-    const rootId = `${slug}_${id}`;
-    const { addresses = [] } = this._store.getById(rootId) || {};
-    return addresses.map(
-      ({ address, chain }) => new AddressInfo(null, address, chain, null)
-    );
-  }
-
   public deinit() {
     this._initializedPinned = false;
     this._store.clear();

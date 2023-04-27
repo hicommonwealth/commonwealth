@@ -189,6 +189,7 @@ export interface IEventLabel {
   heading: string;
   label: string;
   linkUrl?: string;
+  icon?: string;
 }
 
 // a function that prepares chain data for user display

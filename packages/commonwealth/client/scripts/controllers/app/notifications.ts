@@ -1,28 +1,25 @@
-import app from 'state';
+import { toast } from 'react-toastify';
 
-export function notifyError(message: string, allowDuplicates?: boolean) {
-  if (
-    !allowDuplicates &&
-    app.toasts.getList().find((toast: any) => toast['_message'] === message)
-  )
-    return;
-  app.toasts.createError(message);
+export function notifySuccess(message: string) {
+  toast(message, {
+    type: 'success',
+    autoClose: 3000,
+    position: toast.POSITION.BOTTOM_RIGHT,
+  });
 }
 
-export function notifySuccess(message: string, allowDuplicates?: boolean) {
-  if (
-    !allowDuplicates &&
-    app.toasts.getList().find((toast: any) => toast['_message'] === message)
-  )
-    return;
-  app.toasts.createSuccess(message);
+export function notifyError(message: string) {
+  toast(message, {
+    type: 'error',
+    autoClose: 3000,
+    position: toast.POSITION.BOTTOM_RIGHT,
+  });
 }
 
-export function notifyInfo(message: string, allowDuplicates?: boolean) {
-  if (
-    !allowDuplicates &&
-    app.toasts.getList().find((toast: any) => toast['_message'] === message)
-  )
-    return;
-  app.toasts.createInfo(message);
+export function notifyInfo(message: string) {
+  toast(message, {
+    type: 'info',
+    autoClose: 3000,
+    position: toast.POSITION.BOTTOM_RIGHT,
+  });
 }

@@ -1,7 +1,4 @@
-/* @jsx m */
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/social_accounts.scss';
 
@@ -9,53 +6,49 @@ import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import type { IconName } from './component_kit/cw_icons/cw_icon_lookup';
 
-type SocialAccountsAttrs = {
-  profile: Profile;
-};
-
-type SocialAccountAttrs = {
+type SocialAccountProps = {
   iconName: IconName;
   link: string;
 };
 
-class SocialAccount extends ClassComponent<SocialAccountAttrs> {
-  view(vnode: m.Vnode<SocialAccountAttrs>) {
-    const { iconName, link } = vnode.attrs;
-    const formattedLink = link.includes('http') ? link : `https://${link}`;
+type SocialAccountsProps = {
+  profile: Profile;
+};
 
-    return (
-      <a href={formattedLink} target="_blank">
-        <CWIcon iconName={iconName} className="social-icon" />
-      </a>
-    );
-  }
-}
+const SocialAccount = (props: SocialAccountProps) => {
+  const { iconName, link } = props;
+  const formattedLink = link.includes('http') ? link : `https://${link}`;
 
-export class SocialAccounts extends ClassComponent<SocialAccountsAttrs> {
-  view(vnode: m.Vnode<SocialAccountsAttrs>) {
-    const { profile } = vnode.attrs;
+  return (
+    <a href={formattedLink} target="_blank">
+      <CWIcon iconName={iconName} className="social-icon" />
+    </a>
+  );
+};
 
-    if (!profile) return;
+export const SocialAccounts = (props: SocialAccountsProps) => {
+  const { profile } = props;
 
-    const { socials } = profile;
+  if (!profile) return;
 
-    return (
-      <div className="SocialAccounts">
-        {/* {email && <SocialAccount email={true} link={`mailto:${email}`} iconName="mail" />} */}
-        {socials?.map((social) => {
-          if (social.includes('twitter')) {
-            return <SocialAccount link={social} iconName="twitter" />;
-          } else if (social.includes('discord')) {
-            return <SocialAccount link={social} iconName="discord" />;
-          } else if (social.includes('telegram')) {
-            return <SocialAccount link={social} iconName="telegram" />;
-          } else if (social.includes('github')) {
-            return <SocialAccount link={social} iconName="github" />;
-          } else {
-            return <SocialAccount link={social} iconName="website" />;
-          }
-        })}
-      </div>
-    );
-  }
-}
+  const { email, socials } = profile;
+
+  return (
+    <div className="SocialAccounts">
+      {email && <SocialAccount link={`mailto:${email}`} iconName="mail" />}
+      {socials?.map((social, i) => {
+        if (social.includes('twitter')) {
+          return <SocialAccount link={social} iconName="twitter" key={i} />;
+        } else if (social.includes('discord')) {
+          return <SocialAccount link={social} iconName="discord" key={i} />;
+        } else if (social.includes('telegram')) {
+          return <SocialAccount link={social} iconName="telegram" key={i} />;
+        } else if (social.includes('github')) {
+          return <SocialAccount link={social} iconName="github" key={i} />;
+        } else {
+          return <SocialAccount link={social} iconName="website" key={i} />;
+        }
+      })}
+    </div>
+  );
+};

@@ -1,18 +1,19 @@
-/* @jsx m */
+/* eslint-disable */
+import React from 'react';
 /* eslint-disable no-useless-escape */
 
-import ClassComponent from 'class_component';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, render, redraw, rootRender } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import { marked } from 'marked';
-import m from 'mithril';
 import smartTruncate from 'smart-truncate';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 import { getClasses } from '../component_kit/helpers';
-import { countLinesMarkdown } from './helpers';
+import { countLinesMarkdown } from '../react_quill_editor/utils';
 
 const renderer = new marked.Renderer();
 
@@ -33,13 +34,14 @@ type MarkdownFormattedTextAttrs = {
   cutoffLines?: number;
 };
 
+// TODO: Replace usages of this component with react_quill_editor/MarkdownFormattedText
 export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextAttrs> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
   truncatedDoc;
   isTruncated: boolean;
 
-  oninit(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
+  oninit(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
@@ -53,7 +55,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
     }
   }
 
-  view(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
+  view(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,
@@ -75,7 +77,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       } else {
         this.truncatedDoc = doc;
       }
-      m.redraw();
+      redraw();
     };
 
     renderer.link = (href, title, text) => {
@@ -97,11 +99,11 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
           ADD_ATTR: ['target'],
         });
 
-        const vnodes = m.trust(sanitized);
+        const vnodes = render.trust(sanitized);
 
         const root = document.createElement('div');
 
-        m.render(root, vnodes);
+        rootRender(root, vnodes);
 
         const textToHighlight = root.innerText
           .replace(/\n/g, ' ')
@@ -147,7 +149,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
 
       return (
         <div
-          class={getClasses<{ collapsed?: boolean }>(
+          className={getClasses<{ collapsed?: boolean }>(
             { collapsed: !!collapse },
             'MarkdownFormattedText'
           )}
@@ -156,11 +158,14 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
         </div>
       );
     } else {
-      if (this.isTruncated)
+      if (!doc) return <></>;
+      if (this.isTruncated) {
         this.truncatedDoc = doc.slice(
           0,
           doc.split('\n', cutoffLines).join('\n').length
         );
+      }
+      if (!this.truncatedDoc) return <></>;
 
       const unsanitized = marked.parse(this.truncatedDoc.toString());
 
@@ -174,12 +179,12 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
             ADD_ATTR: ['target'],
           });
 
-      const results = m.trust(sanitized);
+      const results = render.trust(sanitized);
 
       return (
         <>
           <div
-            class={getClasses<{ collapsed?: boolean }>(
+            className={getClasses<{ collapsed?: boolean }>(
               { collapsed: !!collapse },
               'MarkdownFormattedText'
             )}
@@ -187,10 +192,10 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
             {results}
           </div>
           {this.isTruncated && (
-            <div class="show-more-button-wrapper">
-              <div class="show-more-button" onclick={toggleDisplay}>
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
                 <CWIcon iconName="plus" iconSize="small" />
-                <div class="show-more-text">Show More</div>
+                <div className="show-more-text">Show More</div>
               </div>
             </div>
           )}

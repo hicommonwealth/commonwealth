@@ -1,7 +1,3 @@
-import type { ModalStore } from 'controllers/app/modals';
-import { getModalStore } from 'controllers/app/modals';
-import type { ToastStore } from 'controllers/app/toasts';
-import { getToastStore } from 'controllers/app/toasts';
 import ChainEntityController from 'controllers/server/chain_entities';
 import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
@@ -21,6 +17,7 @@ import PollsController from './controllers/server/polls';
 import NewProfilesController from './controllers/server/newProfiles';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
+import ThreadReactionsController from './controllers/server/reactions/ThreadReactionsController';
 import { RolesController } from './controllers/server/roles';
 import SearchController from './controllers/server/search';
 import SessionsController from './controllers/server/sessions';
@@ -32,7 +29,7 @@ import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
-import m from 'mithril';
+import { redraw } from 'mithrilInterop';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -66,8 +63,13 @@ export interface IApp {
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   comments: CommentsController;
   reactions: ReactionsController;
+  threadReactions: ThreadReactionsController;
   reactionCounts: ReactionCountsController;
   polls: PollsController;
+  threadUpdateEmitter: EventEmitter;
+
+  // Proposals
+  proposalEmitter: EventEmitter;
 
   // Search
   search: SearchController;
@@ -94,14 +96,15 @@ export interface IApp {
   wallets: WebWalletController;
   snapshot: SnapshotController;
 
-  toasts: ToastStore;
-  modals: ModalStore;
-
   mobileMenu: MobileMenuName;
   sidebarMenu: SidebarMenuName;
+  sidebarRedraw: EventEmitter;
+
   sidebarToggled: boolean;
 
   loginState: LoginState;
+  loginStateEmitter: EventEmitter;
+
   // stored on server-side
   config: {
     chains: ChainStore;
@@ -131,13 +134,6 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
-
-  _lastNavigatedBack: boolean;
-  _lastNavigatedFrom: string;
-
-  lastNavigatedBack(): boolean;
-
-  lastNavigatedFrom(): string;
 }
 
 // INJECT DEPENDENCIES
@@ -167,8 +163,13 @@ const app: IApp = {
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
   reactions: new ReactionsController(),
+  threadReactions: new ThreadReactionsController(),
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
+  threadUpdateEmitter: new EventEmitter(),
+
+  // Proposals
+  proposalEmitter: new EventEmitter(),
 
   // Community
   communities: new CommunitiesController(),
@@ -195,14 +196,13 @@ const app: IApp = {
   newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
+  loginStateEmitter: new EventEmitter(),
 
   // Global nav state
   mobileMenu: null,
   sidebarMenu: 'default',
+  sidebarRedraw: new EventEmitter(),
   sidebarToggled: false,
-
-  toasts: getToastStore(),
-  modals: getModalStore(),
 
   config: {
     chains: new ChainStore(),
@@ -212,7 +212,7 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: () => {
+  isNative: (win: Window) => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
   },
@@ -239,11 +239,6 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
-
-  _lastNavigatedFrom: null,
-  _lastNavigatedBack: false,
-  lastNavigatedBack: () => app._lastNavigatedBack,
-  lastNavigatedFrom: () => app._lastNavigatedFrom,
 };
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
@@ -283,10 +278,9 @@ export async function initAppState(
           });
 
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories =
-          data.result.notificationCategories.map((json) =>
-            NotificationCategory.fromJSON(json)
-          );
+        app.config.notificationCategories = data.result.notificationCategories.map(
+          (json) => NotificationCategory.fromJSON(json)
+        );
         app.config.chainCategories = data.result.chainCategories;
         app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 
@@ -306,13 +300,15 @@ export async function initAppState(
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
-          app.user.notifications.refresh().then(() => m.redraw());
+          app.user.notifications.refresh().then(() => redraw());
+          app.loginStateEmitter.emit('redraw');
         } else if (
           app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
           app.socket.disconnect();
+          app.loginStateEmitter.emit('redraw');
         }
 
         app.user.setStarredCommunities(
@@ -333,8 +329,6 @@ export async function initAppState(
         if (customDomain) {
           app.setCustomDomain(customDomain);
         }
-
-        app.user.setHasDisplayName(data.result.user?.hasDisplayName);
 
         resolve();
       })

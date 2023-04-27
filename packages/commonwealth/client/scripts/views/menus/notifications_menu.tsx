@@ -1,240 +1,106 @@
-/* @jsx m */
-
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
+import React, { useState } from 'react';
+import { Virtuoso } from 'react-virtuoso';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/header/notifications_menu.scss';
-import { Button, PopoverMenu } from 'construct-ui';
-import m from 'mithril';
-import Infinite from 'mithril-infinite';
 
 import app from 'state';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
-import NotificationRow from '../components/notification_row';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWButton } from '../components/component_kit/cw_button';
+import {
+  Popover,
+  usePopover,
+} from '../components/component_kit/cw_popover/cw_popover';
+import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWText } from '../components/component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
+import { NotificationRow } from '../pages/notifications/notification_row';
+import { isWindowSmallInclusive } from '../components/component_kit/helpers';
+import { byDescendingCreationDate } from 'helpers';
 
-const MAX_NOTIFS = 40;
+export const NotificationsMenu = () => {
+  const navigate = useCommonNavigate();
+  const [allRead, setAllRead] = useState<boolean>(false);
 
-export class NotificationsMenu extends ClassComponent {
-  private init = false;
-  private minChainEventsNotification = 0;
-  private minDiscussionNotification = 0;
-  private selectedChainEvents: boolean;
-  private showingChainEventNotifications;
-  private showingDiscussionNotifications;
+  const discussionNotifications =
+    app.user.notifications.discussionNotifications;
+  const chainEventNotifications =
+    app.user.notifications.chainEventNotifications;
 
-  private _incrementAndRedraw(type: 'chain-event' | 'discussion') {
-    if (type === 'chain-event') {
-      if (
-        app.user.notifications.chainEventNotifications.length >=
-        this.minChainEventsNotification + MAX_NOTIFS
-      )
-        this.minChainEventsNotification += MAX_NOTIFS;
-    } else if (type === 'discussion') {
-      if (
-        app.user.notifications.discussionNotifications.length >=
-        this.minDiscussionNotification + MAX_NOTIFS
-      )
-        this.minDiscussionNotification += MAX_NOTIFS;
-    }
-    m.redraw();
-  }
+  const mostRecentFirst = [
+    ...discussionNotifications.concat(chainEventNotifications),
+  ].sort(byDescendingCreationDate);
 
-  private _nextPage(showingChainEvents: boolean) {
-    if (showingChainEvents) {
-      const numChainEventNotif =
-        app.user.notifications.chainEventNotifications.length;
-      if (numChainEventNotif < this.minChainEventsNotification + MAX_NOTIFS) {
-        app.user.notifications.getChainEventNotifications().then(() => {
-          this._incrementAndRedraw('chain-event');
-        });
-      } else this._incrementAndRedraw('chain-event');
-    } else {
-      const numDiscussionNotif =
-        app.user.notifications.discussionNotifications.length;
-      if (numDiscussionNotif < this.minDiscussionNotification + MAX_NOTIFS) {
-        app.user.notifications.getDiscussionNotifications().then(() => {
-          this._incrementAndRedraw('discussion');
-        });
-      } else this._incrementAndRedraw('discussion');
-    }
-  }
-
-  private _previousPage(showingChainEvents: boolean) {
-    if (showingChainEvents && this.minChainEventsNotification >= MAX_NOTIFS) {
-      this.minChainEventsNotification -= MAX_NOTIFS;
-    } else if (showingChainEvents && this.minChainEventsNotification !== 0) {
-      this.minChainEventsNotification = 0;
-    } else if (this.minDiscussionNotification >= MAX_NOTIFS) {
-      this.minDiscussionNotification -= MAX_NOTIFS;
-    } else if (this.minDiscussionNotification !== 0) {
-      this.minDiscussionNotification = 0;
-    }
-    m.redraw();
-  }
-
-  view() {
-    this.showingDiscussionNotifications =
-      app.user.notifications.discussionNotifications.slice(
-        this.minDiscussionNotification,
-        this.minDiscussionNotification + MAX_NOTIFS
-      );
-
-    this.showingChainEventNotifications =
-      app.user.notifications.chainEventNotifications.slice(
-        this.minChainEventsNotification,
-        this.minChainEventsNotification + MAX_NOTIFS
-      );
-
-    return (
-      <div class="NotificationsMenu">
-        <div class="NotificationsMenuHeader">
-          {m(Button, {
-            label:
-              // discussionNotificationsCount
-              //   ? `Discussions (${discussionNotificationsCount})`
-              //   : 'Discussions'
-              'Discussions',
-            active: !this.selectedChainEvents,
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              this.selectedChainEvents = false;
-            },
-          })}
-          {m(Button, {
-            label:
-              // chainNotificationsCount
-              //   ? `Chain events (${chainNotificationsCount})`
-              //   : 'Chain events'
-              'Chain events',
-            active: !!this.selectedChainEvents,
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              this.selectedChainEvents = true;
-            },
-          })}
-        </div>
-        <div class="notification-list">
-          {(() => {
-            if (this.selectedChainEvents) {
-              if (this.showingChainEventNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minChainEventsNotification} - ${
-                      this.minChainEventsNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'chain',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
-                });
-              } else if (
-                app.user.notifications.chainEventNotifications.length === 0
-              )
-                return 'No chain notifications';
-              else return 'No more chain notifications';
-            } else {
-              if (this.showingDiscussionNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minDiscussionNotification} - ${
-                      this.minDiscussionNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'discussion',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
-                });
-              } else if (
-                app.user.notifications.discussionNotifications.length === 0
-              )
-                return 'No discussion notifications';
-              else return 'No more discussion notifications';
+  return (
+    <div className="NotificationsMenu">
+      <div className="notification-list">
+        {mostRecentFirst.length > 0 ? (
+          <Virtuoso
+            style={
+              isWindowSmallInclusive(window.innerWidth)
+                ? { height: '100%', width: '100%' }
+                : { height: '480px', width: '294px' }
             }
-          })()}
-        </div>
-        <div class="NotificationsMenuFooter">
-          {m(Button, {
-            label: 'See all',
-            onclick: () =>
-              app.activeChainId()
-                ? navigateToSubpage('/notifications')
-                : m.route.set('/notifications'),
-          })}
-          {m(Button, {
-            label: 'Mark all read',
-            onclick: (e) => {
-              e.preventDefault();
-              // e.stopPropagation();
-              const typeNotif = this.selectedChainEvents
-                ? this.showingChainEventNotifications
-                : this.showingDiscussionNotifications;
-              if (typeNotif.length < 1) return;
-              app.user.notifications
-                .markAsRead(typeNotif)
-                ?.then(() => m.redraw());
-            },
-          })}
-          {m(Button, {
-            label: '<',
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              this._previousPage(this.selectedChainEvents);
-            },
-          })}
-          {m(Button, {
-            label: '>',
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // necessary since page refresh loads the first set of notifications for both but the min may not be set
-              if (!this.init) {
-                this.init = true;
-                this.minDiscussionNotification =
-                  app.user.notifications.discussionNotifications.length;
-                this.minChainEventsNotification =
-                  app.user.notifications.chainEventNotifications.length;
-              }
-              this._nextPage(this.selectedChainEvents);
-            },
-          })}
-        </div>
+            data={mostRecentFirst}
+            itemContent={(i, data) => (
+              <NotificationRow key={i} notification={data} allRead={allRead} />
+            )}
+          />
+        ) : (
+          <div className="no-notifications">
+            <CWText>No Notifications</CWText>
+          </div>
+        )}
       </div>
-    );
-  }
-}
+      <div className="footer">
+        <CWButton
+          label="See all"
+          buttonType="tertiary-black"
+          onClick={() => {
+            navigate('/notifications');
+          }}
+        />
+        <CWDivider isVertical />
+        <CWButton
+          label="Mark all read"
+          buttonType="tertiary-black"
+          onClick={(e) => {
+            e.preventDefault();
 
-export class NotificationsMenuPopover extends ClassComponent {
-  view() {
-    return m(PopoverMenu, {
-      closeOnContentClick: true,
-      closeOnOutsideClick: true,
-      hasArrow: false,
-      hoverCloseDelay: 0,
-      position: 'bottom-end',
-      transitionDuration: 0,
-      trigger:
-        app.user.notifications.numUnread > 0 ? (
-          <div class="unreads-icon">
-            <CWCustomIcon iconName="unreads" />
+            if (mostRecentFirst.length < 1) return;
+
+            app.user.notifications.markAsRead(mostRecentFirst);
+            setAllRead(true);
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const NotificationsMenuPopover = () => {
+  const popoverProps = usePopover();
+
+  return (
+    <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
+      <div>
+        {app.user.notifications.numUnread > 0 ? (
+          <div className="unreads-icon">
+            <CWCustomIcon
+              iconName="unreads"
+              onClick={popoverProps.handleInteraction}
+            />
           </div>
         ) : (
-          <CWIconButton iconButtonTheme="black" iconName="bell" />
-        ),
-      content: <NotificationsMenu />,
-    });
-  }
-}
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName="bell"
+            onClick={popoverProps.handleInteraction}
+          />
+        )}
+        <Popover content={<NotificationsMenu />} {...popoverProps} />
+      </div>
+    </ClickAwayListener>
+  );
+};

@@ -1,6 +1,6 @@
 import type { LoginBodyType } from './types';
 
-export const getText = (bodyType: LoginBodyType) => {
+export const getLoginText = (bodyType: LoginBodyType) => {
   if (bodyType === 'walletList') {
     return {
       headerText: 'Connect Your Wallet',
@@ -47,6 +47,11 @@ export const getText = (bodyType: LoginBodyType) => {
       headerText: 'Connect an ETH Wallet',
       bodyText:
         'An Ethereum based wallet is needed to connect to this community.',
+    };
+  } else if (bodyType === 'redirectToSign') {
+    return {
+      headerText: 'Redirect for Signature',
+      bodyText: 'You must sign with your mobile wallet to continue.',
     };
   }
 };

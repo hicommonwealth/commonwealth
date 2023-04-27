@@ -1,16 +1,13 @@
 import { ChainEventsNamespace } from 'controllers/server/socket/chainEventsNs';
-import { ChatNamespace } from 'controllers/server/socket/chatNs';
 
 export class WebSocketController {
   private _socket;
   private _isConnected = false;
   public readonly chainEventsNs: ChainEventsNamespace;
-  public readonly chatNs: ChatNamespace;
 
   public constructor() {
-    // add all custom namespaces i.e. chain-event notifications, chat, thread notifications
+    // add all custom namespaces i.e. chain-event notifications, thread notifications
     this.chainEventsNs = new ChainEventsNamespace();
-    this.chatNs = new ChatNamespace();
   }
 
   public async init(jwt: string) {
@@ -23,7 +20,6 @@ export class WebSocketController {
     this._socket.on('connect_error', this.onConnectError.bind(this));
     this._socket.on('disconnect', this.onDisconnect.bind(this));
 
-    await this.chatNs.init();
     await this.chainEventsNs.init();
   }
 

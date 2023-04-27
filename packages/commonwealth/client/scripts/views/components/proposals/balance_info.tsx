@@ -1,46 +1,36 @@
-/* @jsx m */
+import React from 'react';
 
 import { formatCoin } from 'adapters/currency';
-import ClassComponent from 'class_component';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import m from 'mithril';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';
 
-type BalanceInfoAttrs = {
+type BalanceInfoProps = {
   account: SubstrateAccount;
 };
 
-export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
-  private balance: any;
-  private freeBalance: any;
-  private lockedBalance: any;
+export const BalanceInfo = (props: BalanceInfoProps) => {
+  const { account } = props;
 
-  oninit(vnode: m.Vnode<BalanceInfoAttrs>) {
-    const { account } = vnode.attrs;
+  const [balance, setBalance] = React.useState<any>();
+  const [freeBalance, setFreeBalance] = React.useState<any>();
+  const [lockedBalance, setLockedBalance] = React.useState<any>();
 
+  React.useEffect(() => {
     app.runWhenReady(async () => {
-      this.freeBalance = await account.freeBalance;
-
-      this.lockedBalance = await account.lockedBalance;
-
-      this.balance = await account.balance;
-
-      m.redraw();
+      setFreeBalance(await account.freeBalance);
+      setLockedBalance(await account.lockedBalance);
+      setBalance(await account.balance);
     });
-  }
+  }, []);
 
-  view() {
-    return (
-      <>
-        <CWText>
-          Free: {this.freeBalance ? formatCoin(this.freeBalance) : '--'}
-        </CWText>
-        <CWText>
-          Locked: {this.lockedBalance ? formatCoin(this.lockedBalance) : '--'}
-        </CWText>
-        <CWText>Total: {this.balance ? formatCoin(this.balance) : '--'}</CWText>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <CWText>Free: {freeBalance ? formatCoin(freeBalance) : '--'}</CWText>
+      <CWText>
+        Locked: {lockedBalance ? formatCoin(lockedBalance) : '--'}
+      </CWText>
+      <CWText>Total: {balance ? formatCoin(balance) : '--'}</CWText>
+    </>
+  );
+};

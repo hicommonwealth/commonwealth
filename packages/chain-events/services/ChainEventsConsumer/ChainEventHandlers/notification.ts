@@ -1,8 +1,6 @@
+import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import type { RmqCENotificationCUD } from 'common-common/src/rabbitmq/types';
-import {
-  AbstractRabbitMQController,
-  RascalPublications,
-} from 'common-common/src/rabbitmq/types';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
 import type { ChainEventInstance } from '../../database/models/chain_event';
@@ -20,7 +18,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models: DB,
-    private readonly _rmqController?: AbstractRabbitMQController,
+    private readonly _rmqController?: RabbitMQController,
     private readonly _excludedEvents: IChainEventKind[] = []
   ) {
     super();
@@ -33,12 +31,12 @@ export default class extends IEventHandler {
     );
 
     if (!dbEvent) {
-      log.warn(`No db event received! Ignoring.`);
+      log.trace(`No db event received! Ignoring.`);
       return;
     }
 
     if (this._excludedEvents.includes(event.data.kind)) {
-      log.warn(`Skipping event!`);
+      log.trace(`Skipping event!`);
       return dbEvent;
     }
 

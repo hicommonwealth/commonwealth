@@ -1,11 +1,9 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'footer.scss';
-import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -27,35 +25,41 @@ const footercontents = [
   },
 ];
 
-export class Footer extends ClassComponent {
-  view() {
-    const redirectClick = (route) => {
-      m.route.set(route);
-    };
+export const Footer = () => {
+  const navigate = useCommonNavigate();
 
-    return (
-      <div class="Footer">
-        <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
-        <div class="footer-links-container">
-          {footercontents.map((item) => {
-            return isNotUndefined(item.redirectTo) ? (
-              <a
-                class="footer-link"
-                onclick={(e) => {
-                  e.preventDefault();
-                  redirectClick(item.redirectTo);
-                }}
-              >
-                {item.text}
-              </a>
-            ) : (
-              <a class="footer-link" href={item.externalLink} target="_blank">
-                {item.text}
-              </a>
-            );
-          })}
-        </div>
+  const redirectClick = (route) => {
+    navigate(route, {}, null);
+  };
+
+  return (
+    <div className="Footer">
+      <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
+      <div className="footer-links-container">
+        {footercontents.map((item) => {
+          return isNotUndefined(item.redirectTo) ? (
+            <a
+              className="footer-link"
+              onClick={(e) => {
+                e.preventDefault();
+                redirectClick(item.redirectTo);
+              }}
+              key={item.text}
+            >
+              {item.text}
+            </a>
+          ) : (
+            <a
+              className="footer-link"
+              key={item.text}
+              href={item.externalLink}
+              target="_blank"
+            >
+              {item.text}
+            </a>
+          );
+        })}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

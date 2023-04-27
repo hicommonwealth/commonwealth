@@ -1,0 +1,27 @@
+@import '../../shared';
+
+.NotificationsPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  width: 100%;
+
+  .notifications-buttons-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .NotificationsList {
+    border-radius: $border-radius-corners;
+    border: 1px solid $neutral-100;
+    height: 100%;
+
+    .no-notifications {
+      padding: 16px;
+    }
+  }
+}

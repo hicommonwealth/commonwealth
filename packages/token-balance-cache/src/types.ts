@@ -91,4 +91,5 @@ export function parseContractType(arg: string): ContractType {
 export type EthBPOpts = {
   tokenAddress?: string;
   contractType?: string;
+  tokenId?: string;
 };

@@ -1,24 +1,23 @@
-/* @jsx m */
+import React from 'react';
 
-import { formatNumberShort } from 'adapters/currency';
-import { MixpanelSnapshotEvents } from 'analytics/types';
-import ClassComponent from 'class_component';
+import { redraw } from 'mithrilInterop';
+
 import { notifyError } from 'controllers/app/notifications';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { castVote } from 'helpers/snapshot_utils';
-import $ from 'jquery';
-import m from 'mithril';
+import { formatNumberShort } from 'adapters/currency';
+// import { MixpanelSnapshotEvents } from 'analytics/types';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
 
 import app from 'state';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-type ConfirmSnapshotVoteModalAttrs = {
+type ConfirmSnapshotVoteModalProps = {
   id: string;
+  onModalClose: () => void;
   proposal: SnapshotProposal;
   scores: any;
   selectedChoice: string;
@@ -28,89 +27,96 @@ type ConfirmSnapshotVoteModalAttrs = {
   successCallback: () => any;
 };
 
-export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVoteModalAttrs> {
-  private saving: boolean;
+export const ConfirmSnapshotVoteModal = (
+  props: ConfirmSnapshotVoteModalProps
+) => {
+  const {
+    id,
+    onModalClose,
+    proposal,
+    selectedChoice,
+    space,
+    successCallback,
+    totalScore,
+  } = props;
 
-  view(vnode: m.Vnode<ConfirmSnapshotVoteModalAttrs>) {
-    const author = app.user.activeAccount;
+  const author = app.user.activeAccount;
 
-    const { proposal, space, id, selectedChoice, totalScore, successCallback } =
-      vnode.attrs;
+  const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
-    return (
-      <div class="ConfirmSnapshotVoteModal">
-        <div class="compact-modal-title">
-          <h3>Confirm vote</h3>
-          <ModalExitButton />
+  return (
+    <div className="ConfirmSnapshotVoteModal">
+      <div className="compact-modal-title">
+        <h3>Confirm vote</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+      </div>
+      <div className="compact-modal-body">
+        <CWText type="h4" fontWeight="semiBold">
+          Are you sure you want to vote {proposal.choices[selectedChoice]}?
+        </CWText>
+        <CWText type="h5">This action cannot be undone.</CWText>
+        <div className="vote-info">
+          <div className="vote-info-row">
+            <CWText>Option</CWText>
+            <CWText>{proposal.choices[selectedChoice]}</CWText>
+          </div>
+          <div className="vote-info-row">
+            <CWText>Your voting power</CWText>
+            <CWText>
+              {`${formatNumberShort(totalScore)} ${space.symbol
+                .slice(0, 6)
+                .trim()}...`}
+            </CWText>
+          </div>
         </div>
-        <div class="compact-modal-body">
-          <CWText type="h4" fontWeight="semiBold">
-            Are you sure you want to vote {proposal.choices[selectedChoice]}?
-          </CWText>
-          <CWText type="h5">This action cannot be undone.</CWText>
-          <div class="vote-info">
-            <div class="vote-info-row">
-              <CWText>Option</CWText>
-              <CWText>{proposal.choices[selectedChoice]}</CWText>
-            </div>
-            <div class="vote-info-row">
-              <CWText>Your voting power</CWText>
-              <CWText>
-                {`${formatNumberShort(totalScore)} ${space.symbol
-                  .slice(0, 6)
-                  .trim()}...`}
-              </CWText>
-            </div>
-          </div>
-          <div class="button-group">
-            <CWButton
-              label="Cancel"
-              buttonType="secondary-blue"
-              disabled={this.saving}
-              onclick={async (e) => {
-                e.preventDefault();
-                $(e.target).trigger('modalexit');
-              }}
-            />
-            <CWButton
-              label="Vote"
-              disabled={this.saving}
-              onclick={async (e) => {
-                e.preventDefault();
+        <div className="button-group">
+          <CWButton
+            label="Cancel"
+            buttonType="secondary-blue"
+            disabled={isSaving}
+            onClick={async (e) => {
+              e.preventDefault();
+              onModalClose();
+            }}
+          />
+          <CWButton
+            label="Vote"
+            disabled={isSaving}
+            onClick={async (e) => {
+              e.preventDefault();
 
-                this.saving = true;
+              setIsSaving(true);
 
-                const votePayload = {
-                  space: space.id,
-                  proposal: id,
-                  type: 'single-choice',
-                  choice: selectedChoice + 1,
-                  metadata: JSON.stringify({}),
-                };
+              const votePayload = {
+                space: space.id,
+                proposal: id,
+                type: 'single-choice',
+                choice: parseInt(selectedChoice) + 1,
+                metadata: JSON.stringify({}),
+              };
 
-                try {
-                  castVote(author.address, votePayload).then(() => {
-                    $(e.target).trigger('modalexit');
-                    successCallback();
-                    m.redraw();
-                  });
-                  mixpanelBrowserTrack({
-                    event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
-                    isCustomDomain: app.isCustomDomain(),
-                    space: app.snapshot.space.id,
-                  });
-                } catch (err) {
-                  console.log(err);
-                  const errorMessage = err.message;
-                  notifyError(errorMessage);
-                }
+              try {
+                castVote(author.address, votePayload).then(async () => {
+                  await app.snapshot.refreshProposals();
+                  onModalClose();
+                  successCallback();
+                });
+                // mixpanelBrowserTrack({
+                //   event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+                //   isCustomDomain: app.isCustomDomain(),
+                //   space: app.snapshot.space.id,
+                // });
+              } catch (err) {
+                console.log(err);
+                const errorMessage = err.message;
+                notifyError(errorMessage);
+              }
 
-                this.saving = false;
-              }}
-            />
-          </div>
+              setIsSaving(false);
+            }}
+          />
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

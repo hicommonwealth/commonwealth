@@ -1,10 +1,10 @@
 import crypto from 'crypto';
 import { addPrefix, factory, formatFilename } from './logging';
 import type {
+  RabbitMQController,
   RascalSubscriptions,
   TRmqMessages,
-  AbstractRabbitMQController,
-} from './rabbitmq/types';
+} from './rabbitmq';
 import type Rollbar from 'rollbar';
 import type { Logger } from 'typescript-logging';
 
@@ -24,7 +24,7 @@ export type RabbitMQSubscription = {
 export class ServiceConsumer {
   public readonly serviceName: string;
   public readonly serviceId: string;
-  public readonly rabbitMQController: AbstractRabbitMQController;
+  public readonly rabbitMQController: RabbitMQController;
   public readonly subscriptions: RabbitMQSubscription[];
   private _initialized = false;
   protected rollbar: Rollbar;
@@ -32,7 +32,7 @@ export class ServiceConsumer {
 
   constructor(
     _serviceName: string,
-    _rabbitmqController: AbstractRabbitMQController,
+    _rabbitmqController: RabbitMQController,
     _subscriptions: RabbitMQSubscription[],
     rollbar?: Rollbar
   ) {
@@ -72,6 +72,7 @@ export class ServiceConsumer {
           sub.subscriptionName,
           sub.msgProcessorContext
         );
+        console.log('subscribed to', sub.subscriptionName);
       } catch (e) {
         this.log.error(
           `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor}' ` +

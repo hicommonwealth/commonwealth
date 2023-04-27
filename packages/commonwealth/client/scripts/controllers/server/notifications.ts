@@ -1,8 +1,10 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import m from 'mithril';
+
+import { redraw } from 'mithrilInterop';
 import { Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
+import { EventEmitter } from 'events';
 
 import app from 'state';
 
@@ -51,6 +53,9 @@ class NotificationsController {
 
   private _numPages = 0;
   private _numUnread = 0;
+
+  public isLoaded = new EventEmitter();
+  public isUpdated = new EventEmitter();
 
   public get chainEventSubscribedChainIds(): string[] {
     return this._chainEventSubscribedChainIds;
@@ -266,10 +271,10 @@ class NotificationsController {
   public update(n: Notification) {
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
-      m.redraw();
+      this.isUpdated.emit('redraw');
     } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
       this._discussionStore.add(n);
-      m.redraw();
+      this.isUpdated.emit('redraw');
     }
   }
 
@@ -389,12 +394,14 @@ class NotificationsController {
   }
 
   public async refresh() {
-    return Promise.all([
+    await Promise.all([
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
       this.getSubscriptions(),
       this.getSubscribedChains(),
     ]);
+    this.isLoaded.emit('redraw');
+    return Promise.resolve();
   }
 }
 

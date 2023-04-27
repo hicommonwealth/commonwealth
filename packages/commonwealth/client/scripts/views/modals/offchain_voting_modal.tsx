@@ -1,71 +1,69 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
 
 import 'modals/offchain_voting_modal.scss';
 
 import type { Vote } from 'models';
 import { AddressInfo } from 'models';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import User from 'views/components/widgets/user';
+import { User } from '../components/user/user';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-type OffchainVotingModalAttrs = {
+type OffchainVotingModalProps = {
+  onModalClose: () => void;
   votes: Array<Vote>;
 };
 
-export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs> {
-  view(vnode: m.Vnode<OffchainVotingModalAttrs>) {
-    const { votes } = vnode.attrs;
+export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
+  const { onModalClose, votes } = props;
 
-    if (!votes || votes.length === 0) return;
+  if (!votes || votes.length === 0) return;
 
-    const csvRows = [];
+  const csvRows = [];
 
-    votes.forEach((vote) => csvRows.push([vote.address, vote.option]));
+  votes.forEach((vote) => csvRows.push([vote.address, vote.option]));
 
-    return (
-      <div class="OffchainVotingModal">
-        <div class="compact-modal-title">
-          <h3>Votes</h3>
-          <ModalExitButton />
+  return (
+    <div className="OffchainVotingModal">
+      <div className="compact-modal-title">
+        <h3>Votes</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+      </div>
+      <div className="compact-modal-body">
+        <div className="download-link">
+          <a
+            onClick={(e) => {
+              e.preventDefault();
+              const csvContent = `data:text/csv;charset=utf-8,${csvRows
+                .map((r) => r.join(','))
+                .join('\n')}`;
+              const encodedUri = encodeURI(csvContent);
+              window.open(encodedUri);
+            }}
+          >
+            Download all votes as CSV
+          </a>
         </div>
-        <div class="compact-modal-body">
-          <div class="download-link">
-            <a
-              onclick={(e) => {
-                e.preventDefault();
-                const csvContent = `data:text/csv;charset=utf-8,${csvRows
-                  .map((r) => r.join(','))
-                  .join('\n')}`;
-                const encodedUri = encodeURI(csvContent);
-                window.open(encodedUri);
-              }}
-            >
-              Download all votes as CSV
-            </a>
-          </div>
-          {votes.map((vote) => (
-            <div class="offchain-poll-voter">
-              <div class="offchain-poll-voter-user">
-                {m(User, {
-                  avatarSize: 16,
-                  popover: true,
-                  linkify: true,
-                  user: new AddressInfo(
+        {votes.map((vote) => (
+          <div className="offchain-poll-voter">
+            <div className="offchain-poll-voter-user">
+              <User
+                avatarSize={16}
+                popover
+                linkify
+                user={
+                  new AddressInfo(
                     null,
                     vote.address,
                     vote.authorChain,
                     null,
                     null
-                  ),
-                })}
-              </div>
-              <div class="offchain-poll-voter-choice">{vote.option}</div>
+                  )
+                }
+              />
             </div>
-          ))}
-        </div>
+            <div className="offchain-poll-voter-choice">{vote.option}</div>
+          </div>
+        ))}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

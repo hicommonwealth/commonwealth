@@ -1,32 +1,27 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
 
 import Sublayout from 'views/sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 
-type PageNotFoundAttrs = { title?: string; message?: string };
+type PageNotFoundProps = { title?: string; message?: string };
 
-export class PageNotFound extends ClassComponent<PageNotFoundAttrs> {
-  view(vnode: m.Vnode<PageNotFoundAttrs>) {
-    const { message } = vnode.attrs;
+export const PageNotFound = (props: PageNotFoundProps) => {
+  const { message } = props;
 
-    return (
-      <Sublayout
-      // title={title}
-      >
-        <CWEmptyState
-          iconName="cautionCircle"
-          content={
-            message ||
-            `
+  return (
+    <Sublayout
+    // title={title}
+    >
+      <CWEmptyState
+        iconName="cautionCircle"
+        content={
+          message ||
+          `
             This page may not be visible to the public.
             If it belongs to a private thread or community, try logging in.
             `
-          }
-        />
-      </Sublayout>
-    );
-  }
-}
+        }
+      />
+    </Sublayout>
+  );
+};

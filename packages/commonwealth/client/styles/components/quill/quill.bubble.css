@@ -200,7 +200,7 @@
 }
 
 .ql-bubble .ql-even {
-  fill-rule: evenodd;
+  fillrule: evenodd;
 }
 
 .ql-bubble .ql-thin,

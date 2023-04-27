@@ -13,7 +13,7 @@ import { stringToHex } from '@polkadot/util';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { addressSwapper } from 'utils';
 
 import type { Account, IWebWallet } from 'models';
 import app from 'state';
@@ -22,6 +22,7 @@ class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>
 {
   // GETTERS/SETTERS
+  private polkadot;
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
   private _enabling = false;
@@ -54,7 +55,7 @@ class PolkadotWebWalletController
       address: who,
       currentPrefix: 42,
     });
-    const injector = await web3FromAddress(reencodedAddress);
+    const injector = await this.polkadot.web3FromAddress(reencodedAddress);
     return injector.signer;
   }
 
@@ -86,6 +87,7 @@ class PolkadotWebWalletController
   }
 
   public async enable() {
+    this.polkadot = await import('@polkadot/extension-dapp');
     console.log('Attempting to enable Substrate web wallet');
     if (!this.available) throw new Error('Web wallet not available');
 
@@ -97,7 +99,7 @@ class PolkadotWebWalletController
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account
-      this._accounts = await web3Accounts();
+      this._accounts = await this.polkadot.web3Accounts();
 
       this._enabled = true;
       this._enabling = false;

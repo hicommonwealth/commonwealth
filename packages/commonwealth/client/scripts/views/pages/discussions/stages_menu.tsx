@@ -1,9 +1,7 @@
-/* @jsx m */
+import React from 'react';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
 import { threadStageToLabel } from 'helpers';
-import m from 'mithril';
 import { ThreadStage } from 'models';
 
 import 'pages/discussions/stages_menu.scss';
@@ -12,88 +10,97 @@ import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import {
+  Popover,
+  usePopover,
+} from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-type ThreadsFilterMenuItemAttrs = {
-  iconRight?: m.Vnode;
+type ThreadsFilterMenuItemProps = {
+  iconRight?: React.ReactNode;
   isSelected: boolean;
   label: string;
-  onclick: (e: any) => void;
+  onClick: (e: any) => void;
 };
 
-export class ThreadsFilterMenuItem extends ClassComponent<ThreadsFilterMenuItemAttrs> {
-  view(vnode: m.Vnode<ThreadsFilterMenuItemAttrs>) {
-    const { iconRight, isSelected, label, onclick } = vnode.attrs;
+export const ThreadsFilterMenuItem = (props: ThreadsFilterMenuItemProps) => {
+  const { iconRight, isSelected, label, onClick } = props;
 
-    return (
-      <div
-        class={getClasses<{ isSelected: boolean }>(
-          { isSelected },
-          'ThreadsFilterMenuItem'
-        )}
-        onclick={onclick}
-      >
-        {isSelected && <CWIcon iconName="check" iconSize="small" />}
-        {label}
-        {iconRight}
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      className={getClasses<{ isSelected: boolean }>(
+        { isSelected },
+        'ThreadsFilterMenuItem'
+      )}
+      onClick={onClick}
+    >
+      {isSelected && <CWIcon iconName="check" iconSize="small" />}
+      {label}
+      {iconRight}
+    </div>
+  );
+};
 
-type StagesMenuAttrs = {
+type StagesMenuProps = {
   selectedStage: ThreadStage;
   stage: string;
   stages: Array<ThreadStage>;
 };
 
-export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
-  view(vnode: m.Vnode<StagesMenuAttrs>) {
-    const { selectedStage, stage, stages } = vnode.attrs;
+export const StagesMenu = (props: StagesMenuProps) => {
+  const { selectedStage, stage, stages } = props;
 
-    return (
-      <CWPopover
-        trigger={
-          <CWButton
-            buttonType="mini-white"
-            label={
-              selectedStage
-                ? `Stage: ${threadStageToLabel(selectedStage)}`
-                : 'All Stages'
-            }
-            iconRight="chevronDown"
-          />
-        }
-        content={
-          <div class="threads-filter-menu-items">
-            <ThreadsFilterMenuItem
-              label="All Stages"
-              isSelected={!stage}
-              onclick={(e) => {
-                e.preventDefault();
-                navigateToSubpage('/discussions');
-              }}
-            />
-            <CWDivider />
-            {stages.map((targetStage) => (
+  const popoverProps = usePopover();
+  const navigate = useCommonNavigate();
+
+  return (
+    <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
+      {/* needs to be div instead of fragment so listener can work */}
+      <div>
+        <CWButton
+          buttonType="mini-white"
+          label={
+            selectedStage
+              ? `Stage: ${threadStageToLabel(selectedStage)}`
+              : 'All Stages'
+          }
+          iconRight="chevronDown"
+          onClick={popoverProps.handleInteraction}
+        />
+        <Popover
+          content={
+            <div className="threads-filter-menu-items">
               <ThreadsFilterMenuItem
-                isSelected={stage === targetStage}
-                onclick={(e) => {
+                label="All Stages"
+                isSelected={!stage}
+                onClick={(e) => {
                   e.preventDefault();
-                  navigateToSubpage(`/discussions?stage=${targetStage}`);
+                  navigate('/discussions');
                 }}
-                label={`
-                    ${threadStageToLabel(targetStage)} ${
-                  targetStage === ThreadStage.Voting
-                    ? app.threads.numVotingThreads
-                    : ''
-                }`}
               />
-            ))}
-          </div>
-        }
-      />
-    );
-  }
-}
+              <CWDivider />
+              {stages.map((targetStage, i) => (
+                <ThreadsFilterMenuItem
+                  key={i}
+                  isSelected={stage === targetStage}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/discussions?stage=${targetStage}`);
+                  }}
+                  label={`
+                    ${threadStageToLabel(targetStage)} ${
+                    targetStage === ThreadStage.Voting
+                      ? app.threads.numVotingThreads
+                      : ''
+                  }`}
+                />
+              ))}
+            </div>
+          }
+          {...popoverProps}
+        />
+      </div>
+    </ClickAwayListener>
+  );
+};

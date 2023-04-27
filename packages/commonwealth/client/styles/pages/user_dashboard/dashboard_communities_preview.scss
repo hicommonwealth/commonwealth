@@ -3,8 +3,8 @@
 .CommunityPreviewCard.Card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 320px;
+  gap: 16px;
+  width: 392px;
 
   .card-top {
     align-items: center;
@@ -16,8 +16,14 @@
     }
   }
 
-  .card-subtext.Text {
-    color: $neutral-500;
+  .card-subtext {
+    &.b2 {
+      color: $neutral-600;
+    }
+
+    &.caption {
+      color: $neutral-500;
+    }
   }
 
   .new-activity-tag.Text {
@@ -29,10 +35,14 @@
 }
 
 .DashboardCommunitiesPreview {
-  align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 32px;
+  position: fixed;
+  right: 50px;
+  float: right;
+  top: 70px;
+  z-index: 1;
 
   @include mediumSmallInclusive {
     display: none;
@@ -42,5 +52,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
   }
 }

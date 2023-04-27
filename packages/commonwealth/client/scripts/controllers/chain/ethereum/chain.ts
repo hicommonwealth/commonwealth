@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import m from 'mithril';
-
 import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
+
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
@@ -102,7 +102,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       }
       this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
       console.log(`Computed block duration: ${this.app.chain.block.duration}`);
-      m.redraw();
+      redraw();
     }
     return this._api;
   }

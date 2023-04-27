@@ -1,9 +1,10 @@
 import app, { ApiStatus } from 'state';
 import { ChainInfo, NodeInfo } from 'models';
-import m from 'mithril';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
+import { redraw } from 'mithrilInterop';
+import type { NavigateFunction } from 'react-router-dom';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;
@@ -51,7 +52,7 @@ export const selectChain = async (
   await deinitChainOrCommunity();
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
-  setTimeout(() => m.redraw()); // redraw to show API status indicator
+  setTimeout(() => redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
@@ -216,7 +217,7 @@ export const selectChain = async (
 
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
-  m.redraw();
+  redraw();
   return true;
 };
 
@@ -244,10 +245,13 @@ export const initChain = async (): Promise<void> => {
   await updateActiveAddresses(chain);
 
   // Finish redraw to remove loading dialog
-  m.redraw();
+  redraw();
 };
 
-export const initNewTokenChain = async (address: string) => {
+export const initNewTokenChain = async (
+  address: string,
+  navigate: NavigateFunction
+) => {
   const chain_network = app.chain.network;
   const response = await $.getJSON('/api/getTokenForum', {
     address,
@@ -257,7 +261,7 @@ export const initNewTokenChain = async (address: string) => {
 
   if (response.status !== 'Success') {
     // TODO: better custom 404
-    m.route.set('/404');
+    navigate('/404');
   }
 
   // TODO: check if this is valid

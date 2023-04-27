@@ -7,13 +7,19 @@ require('dotenv').config();
 
 module.exports = {
   entry: {
-    app: ['app.ts'],
+    app: ['index.tsx'],
   },
   context: __dirname,
   devServer: {
     headers: {
       P3P: 'CP="Commonwealth does not have a P3P compact privacy policy"',
     },
+  },
+  output: {
+    publicPath: '/build/',
+    path: path.join(__dirname, '../build'),
+    filename: 'js/[name].[contenthash:8].js',
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -33,6 +39,16 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.COSMOS_GOV_V1': JSON.stringify(process.env.COSMOS_GOV_V1),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
+        process.env.FLAG_COMMUNITY_HOMEPAGE
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
+          process.env.FLAG_PROPOSAL_TEMPLATES
+      ),
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
@@ -131,6 +147,7 @@ module.exports = {
     fallback: {
       fs: false,
       net: false,
+      zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),
       https: require.resolve('https-browserify'),
@@ -165,7 +182,7 @@ module.exports = {
         loader: 'esbuild-loader',
         options: {
           loader: 'tsx',
-          jsxFragment: 'm.Fragment',
+          jsxFragment: 'React.Fragment',
         },
       },
       {

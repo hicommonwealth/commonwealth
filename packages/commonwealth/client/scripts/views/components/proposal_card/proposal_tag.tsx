@@ -1,22 +1,17 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/proposal_card/proposal_tag.scss';
-import m from 'mithril';
 
 import { CWText } from '../component_kit/cw_text';
 
-type ProposalTagAttrs = { label: string };
+type ProposalTagProps = { label: string };
 
-export class ProposalTag extends ClassComponent<ProposalTagAttrs> {
-  view(vnode: m.Vnode<ProposalTagAttrs>) {
-    const { label } = vnode.attrs;
+export const ProposalTag = (props: ProposalTagProps) => {
+  const { label } = props;
 
-    return (
-      <CWText fontWeight="medium" className="ProposalTag">
-        {label}
-      </CWText>
-    );
-  }
-}
+  return (
+    <CWText fontWeight="medium" className="ProposalTag">
+      {label}
+    </CWText>
+  );
+};

@@ -1,60 +1,56 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_card.scss';
-import m from 'mithril';
 import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
 
 export type CardElevation = 'elevation-1' | 'elevation-2' | 'elevation-3';
 
-type CardStyleAttrs = {
+type CardStyleProps = {
   className?: string;
   elevation?: CardElevation;
   fullWidth?: boolean;
   interactive?: boolean;
 };
 
-type CardAttrs = {
-  onclick?: (e?: MouseEvent) => void;
-  onmouseover?: (e?: MouseEvent) => void;
-  onmouseenter?: (e?: MouseEvent) => void;
-  onmouseleave?: (e?: MouseEvent) => void;
-} & CardStyleAttrs;
+type CardProps = {
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  onmouseover?: (e: React.MouseEvent<HTMLElement>) => void;
+  onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
+  onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
+} & CardStyleProps &
+  React.PropsWithChildren;
 
-export class CWCard extends ClassComponent<CardAttrs> {
-  view(vnode: m.Vnode<CardAttrs>) {
-    const {
-      className,
-      elevation,
-      fullWidth,
-      interactive = false,
-      onclick,
-      onmouseenter,
-      onmouseleave,
-      onmouseover,
-    } = vnode.attrs;
+export const CWCard = (props: CardProps) => {
+  const {
+    className,
+    elevation,
+    fullWidth,
+    interactive = false,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onmouseover,
+  } = props;
 
-    return (
-      <div
-        class={getClasses<CardStyleAttrs>(
-          {
-            elevation,
-            fullWidth,
-            interactive,
-            className,
-          },
-          ComponentType.Card
-        )}
-        onclick={onclick}
-        onmouseover={onmouseover}
-        onmouseenter={onmouseenter}
-        onmouseleave={onmouseleave}
-      >
-        {vnode.children}
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      className={getClasses<CardStyleProps>(
+        {
+          elevation,
+          fullWidth,
+          interactive,
+          className,
+        },
+        ComponentType.Card
+      )}
+      onClick={onClick}
+      onMouseOver={onmouseover}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {props.children}
+    </div>
+  );
+};

@@ -11,16 +11,22 @@ import type { Event } from '@cosmjs/tendermint-rpc';
 import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
+
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import m from 'mithril';
 import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { LCD } from 'chain-events/src/chains/cosmos/types';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
-import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';
+import {
+  getLCDClient,
+  getRPCClient,
+  getSigningClient,
+  getTMClient,
+} from './chain.utils';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -80,21 +86,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     console.log(`Starting Tendermint RPC API at ${url}...`);
     // TODO: configure broadcast mode
 
-    const tm = await import('@cosmjs/tendermint-rpc');
-    this._tmClient = await tm.Tendermint34Client.connect(url);
-    const cosm = await import('@cosmjs/stargate');
-    this._api = cosm.QueryClient.withExtensions(
-      this._tmClient,
-      cosm.setupGovExtension,
-      cosm.setupStakingExtension,
-      cosm.setupBankExtension
-    );
+    this._tmClient = await getTMClient(url);
+    this._api = await getRPCClient(this._tmClient);
 
     if (chain?.cosmosGovernanceVersion === 'v1') {
       const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
-      const lcd = await createLCDClient({
-        restEndpoint: lcdUrl,
-      });
+      const lcd = await getLCDClient(lcdUrl);
       this._lcd = lcd;
     }
 
@@ -124,7 +121,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this.app.chain.block.height = height;
 
     this.app.chain.networkStatus = ApiStatus.Connected;
-    m.redraw();
+    redraw();
   }
 
   public async deinit(): Promise<void> {
@@ -148,7 +145,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       await wallet.enable();
     }
     const cosm = await import('@cosmjs/stargate');
-    const client = await cosm.SigningStargateClient.connectWithSigner(
+    const client = await getSigningClient(
       this._app.chain.meta.node.url,
       wallet.offlineSigner
     );

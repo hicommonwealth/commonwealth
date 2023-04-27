@@ -1,170 +1,175 @@
-/* @jsx m */
+import React, { useState } from 'react';
 
-import ClassComponent from 'class_component';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import $ from 'jquery';
-import m from 'mithril';
 
 import 'modals/update_proposal_status_modal.scss';
 import type { ChainEntity, Thread } from 'models';
 import { ThreadStage } from 'models';
+import { SelectList } from '../components/component_kit/cw_select_list';
 
 import app from 'state';
 import { ChainEntitiesSelector } from '../components/chain_entities_selector';
 import { CWButton } from '../components/component_kit/cw_button';
-import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-type UpdateProposalStatusModalAttrs = {
+type UpdateProposalStatusModalProps = {
   onChangeHandler: (
     stage: ThreadStage,
     chainEntities?: ChainEntity[],
     snapshotProposal?: SnapshotProposal[]
   ) => void;
+  onModalClose: () => void;
   thread: Thread;
 };
 
-export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStatusModalAttrs> {
-  private chainEntitiesToSet: ChainEntity[];
-  private snapshotProposalsToSet: SnapshotProposal[];
-  private stage: ThreadStage;
+export const UpdateProposalStatusModal = ({
+  onChangeHandler,
+  onModalClose,
+  thread,
+}: UpdateProposalStatusModalProps) => {
+  const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
+  const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
+    Array<SnapshotProposal>
+  >(
+    [
+      thread.snapshotProposal &&
+        ({ id: thread.snapshotProposal } as SnapshotProposal),
+    ].filter(Boolean)
+  );
+  const [tempChainEntities, setTempChainEntities] = useState<
+    Array<ChainEntity>
+  >(thread.chainEntities || []);
 
-  oninit(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
-    this.stage = vnode.attrs.thread.stage;
-
-    this.chainEntitiesToSet = [];
-    this.snapshotProposalsToSet = [];
-    vnode.attrs.thread.chainEntities.forEach((ce) =>
-      this.chainEntitiesToSet.push(ce)
-    );
+  if (!app.chain?.meta) {
+    return;
   }
 
-  view(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
-    if (!app.chain?.meta) return;
+  const { customStages } = app.chain.meta;
 
-    const { customStages } = app.chain.meta;
+  const stages = !customStages
+    ? [
+        ThreadStage.Discussion,
+        ThreadStage.ProposalInReview,
+        ThreadStage.Voting,
+        ThreadStage.Passed,
+        ThreadStage.Failed,
+      ]
+    : parseCustomStages(customStages);
+  const showSnapshot = !!app.chain.meta.snapshot?.length;
 
-    const stages = !customStages
-      ? [
-          ThreadStage.Discussion,
-          ThreadStage.ProposalInReview,
-          ThreadStage.Voting,
-          ThreadStage.Passed,
-          ThreadStage.Failed,
-        ]
-      : parseCustomStages(customStages);
-    const showSnapshot = !!app.chain.meta.snapshot?.length;
+  const handleSaveChanges = async () => {
+    // set stage
+    try {
+      await app.threads.setStage({
+        threadId: thread.id,
+        stage: tempStage,
+      });
+    } catch (err) {
+      console.log('Failed to update stage');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? `${err.responseJSON.error}. Make sure one is selected.`
+          : 'Failed to update stage, make sure one is selected'
+      );
+    }
 
-    return (
-      <div class="UpdateProposalStatusModal">
-        <div class="compact-modal-title">
-          <h3>Update proposal status</h3>
-          <ModalExitButton />
-        </div>
-        <div class="compact-modal-body">
-          {stages.length > 0 && (
-            <div class="stage-options">
-              {stages.map((targetStage) => (
-                <CWButton
-                  iconLeft={this.stage === targetStage ? 'check' : undefined}
-                  label={threadStageToLabel(targetStage)}
-                  onclick={() => {
-                    this.stage = targetStage;
-                  }}
-                />
-              ))}
-            </div>
-          )}
-          {showSnapshot && (
-            <SnapshotProposalSelector
-              thread={vnode.attrs.thread}
-              onSelect={(sn) => {
-                if (
-                  this.stage === ThreadStage.Discussion ||
-                  this.stage === ThreadStage.ProposalInReview
-                ) {
-                  this.stage = ThreadStage.Voting;
-                }
-                if (sn.id === vnode.attrs.thread.snapshotProposal) {
-                  this.snapshotProposalsToSet = [];
-                  vnode.attrs.thread.snapshotProposal = '';
-                } else {
-                  this.snapshotProposalsToSet = [sn];
-                  vnode.attrs.thread.snapshotProposal = sn.id;
-                }
-              }}
-              snapshotProposalsToSet={this.snapshotProposalsToSet}
-            />
-          )}
-          {app.chainEntities && (
-            <ChainEntitiesSelector
-              thread={vnode.attrs.thread}
-              onSelect={() => {
-                if (
-                  this.stage === ThreadStage.Discussion ||
-                  this.stage === ThreadStage.ProposalInReview
-                ) {
-                  this.stage = ThreadStage.Voting;
-                }
-              }}
-              chainEntitiesToSet={this.chainEntitiesToSet}
-            />
-          )}
-          <div class="buttons-row">
-            <CWButton
-              label="Cancel"
-              buttonType="secondary-blue"
-              onclick={(e) => {
-                $(e.target).trigger('modalexit');
-              }}
-            />
-            <CWButton
-              label="Save changes"
-              onclick={async (e) => {
-                const { thread } = vnode.attrs;
-                // set stage
-                try {
-                  await app.threads.setStage({
-                    threadId: thread.id,
-                    stage: this.stage,
-                  });
-                } catch (err) {
-                  console.log('Failed to update stage');
-                  throw new Error(
-                    err.responseJSON && err.responseJSON.error
-                      ? `${err.responseJSON.error}. Make sure one is selected.`
-                      : 'Failed to update stage, make sure one is selected'
-                  );
-                }
+    // set linked chain entities
+    try {
+      await app.threads.setLinkedChainEntities({
+        threadId: thread.id,
+        entities: tempChainEntities,
+      });
+      if (tempSnapshotProposals.length > 0 && tempSnapshotProposals[0]?.id) {
+        await app.threads.setLinkedSnapshotProposal({
+          threadId: thread.id,
+          snapshotProposal: tempSnapshotProposals[0]?.id,
+        });
+      }
+    } catch (err) {
+      console.log('Failed to update linked proposals');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update linked proposals'
+      );
+    }
 
-                // set linked chain entities
-                try {
-                  await app.threads.setLinkedChainEntities({
-                    threadId: thread.id,
-                    entities: this.chainEntitiesToSet,
-                  });
-                  await app.threads.setLinkedSnapshotProposal({
-                    threadId: thread.id,
-                    snapshotProposal: this.snapshotProposalsToSet[0]?.id,
-                  });
-                } catch (err) {
-                  console.log('Failed to update linked proposals');
-                  throw new Error(
-                    err.responseJSON && err.responseJSON.error
-                      ? err.responseJSON.error
-                      : 'Failed to update linked proposals'
-                  );
-                }
+    onChangeHandler(tempStage, tempChainEntities, tempSnapshotProposals);
+    onModalClose();
+  };
 
-                // TODO: add set linked snapshot proposals
-                vnode.attrs.onChangeHandler(this.stage);
-                $(e.target).trigger('modalexit');
-              }}
-            />
-          </div>
+  const setVotingStage = () => {
+    if (
+      tempStage === ThreadStage.Discussion ||
+      tempStage === ThreadStage.ProposalInReview
+    ) {
+      setTempStage(ThreadStage.Voting);
+    }
+  };
+
+  const handleSelectProposal = (sn: SnapshotProposal) => {
+    const isSelected = tempSnapshotProposals.find(({ id }) => sn.id === id);
+
+    setTempSnapshotProposals(isSelected ? [] : [sn]);
+    setVotingStage();
+  };
+
+  const handleSelectChainEntity = (ce: ChainEntity) => {
+    const isSelected = tempChainEntities.find(({ id }) => ce.id === id);
+
+    const updatedChainEntities = isSelected
+      ? tempChainEntities.filter(({ id }) => ce.id !== id)
+      : [...tempChainEntities, ce];
+
+    setTempChainEntities(updatedChainEntities);
+    setVotingStage();
+  };
+
+  return (
+    <div className="UpdateProposalStatusModal">
+      <div className="compact-modal-title">
+        <h3>Update proposal status</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+      </div>
+      <div className="compact-modal-body">
+        <SelectList
+          defaultValue={
+            tempStage
+              ? { value: tempStage, label: threadStageToLabel(tempStage) }
+              : null
+          }
+          placeholder="Select the stage"
+          isSearchable={false}
+          options={stages.map((stage) => ({
+            value: stage,
+            label: threadStageToLabel(stage),
+          }))}
+          className="StageSelector"
+          onChange={(option) => setTempStage(option.value)}
+        />
+        {showSnapshot && (
+          <SnapshotProposalSelector
+            onSelect={handleSelectProposal}
+            snapshotProposalsToSet={tempSnapshotProposals}
+          />
+        )}
+        {app.chainEntities && (
+          <ChainEntitiesSelector
+            onSelect={handleSelectChainEntity}
+            chainEntitiesToSet={tempChainEntities}
+          />
+        )}
+        <div className="buttons-row">
+          <CWButton
+            label="Cancel"
+            buttonType="secondary-blue"
+            onClick={onModalClose}
+          />
+          <CWButton label="Save changes" onClick={handleSaveChanges} />
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

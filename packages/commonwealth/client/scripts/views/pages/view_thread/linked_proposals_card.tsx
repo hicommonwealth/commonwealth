@@ -1,6 +1,5 @@
-/* @jsx m */
+import React, { useEffect, useState } from 'react';
 
-import ClassComponent from 'class_component';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
@@ -8,7 +7,6 @@ import {
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import m from 'mithril';
 import type { ChainEntity, Thread, ThreadStage } from 'models';
 
 import 'pages/view_thread/linked_proposals_card.scss';
@@ -19,33 +17,32 @@ import { CWContentPageCard } from '../../components/component_kit/cw_content_pag
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import { Modal } from '../../components/component_kit/cw_modal';
 
-type LinkedProposalAttrs = {
+type LinkedProposalProps = {
   chainEntity: ChainEntity;
   thread: Thread;
 };
 
-class LinkedProposal extends ClassComponent<LinkedProposalAttrs> {
-  view(vnode: m.Vnode<LinkedProposalAttrs>) {
-    const { thread, chainEntity } = vnode.attrs;
+const LinkedProposal = (props: LinkedProposalProps) => {
+  const { thread, chainEntity } = props;
 
-    const slug = chainEntityTypeToProposalSlug(chainEntity.type);
+  const slug = chainEntityTypeToProposalSlug(chainEntity.type);
 
-    const threadLink = `${
-      app.isCustomDomain() ? '' : `/${thread.chain}`
-    }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
+  const threadLink = `${
+    app.isCustomDomain() ? '' : `/${thread.chain}`
+  }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
 
-    return (
-      <a href={threadLink}>
-        {`${chainEntityTypeToProposalName(chainEntity.type)} #${
-          chainEntity.typeId
-        } ${chainEntity.completed ? ' (Completed)' : ''}`}
-      </a>
-    );
-  }
-}
+  return (
+    <a href={threadLink}>
+      {`${chainEntityTypeToProposalName(chainEntity.type)} #${
+        chainEntity.typeId
+      } ${chainEntity.completed ? ' (Completed)' : ''}`}
+    </a>
+  );
+};
 
-type LinkedProposalsCardAttrs = {
+type LinkedProposalsCardProps = {
   onChangeHandler: (
     stage: ThreadStage,
     chainEntities: Array<ChainEntity>,
@@ -55,75 +52,75 @@ type LinkedProposalsCardAttrs = {
   thread: Thread;
 };
 
-export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs> {
-  private initialized: boolean;
-  private snapshot: SnapshotProposal;
-  private snapshotProposalsLoaded: boolean;
-  private space: SnapshotSpace;
+export const LinkedProposalsCard = ({
+  onChangeHandler,
+  thread,
+  showAddProposalButton,
+}: LinkedProposalsCardProps) => {
+  const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
+  const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
+  const [space, setSpace] = useState<SnapshotSpace>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  view(vnode: m.Vnode<LinkedProposalsCardAttrs>) {
-    const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
-
-    if (!this.initialized && thread.snapshotProposal?.length > 0) {
-      this.initialized = true;
-
+  useEffect(() => {
+    if (thread.snapshotProposal?.length > 0) {
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-        for (const { space, proposals } of data) {
+        for (const { space: _space, proposals } of data) {
           const matchingSnapshot = proposals.find(
             (sn) => sn.id === thread.snapshotProposal
           );
 
           if (matchingSnapshot) {
-            this.snapshot = matchingSnapshot;
-            this.space = space;
+            setSnapshot(matchingSnapshot);
+            setSpace(_space);
             break;
           }
         }
 
-        this.snapshotProposalsLoaded = true;
-        this.initialized = false;
-        m.redraw();
+        setSnapshotProposalsLoaded(true);
       });
     }
+  }, [thread.snapshotProposal]);
 
-    let snapshotUrl = '';
+  let snapshotUrl = '';
 
-    if (this.space && this.snapshot) {
-      snapshotUrl = `${
-        app.isCustomDomain() ? '' : `/${thread.chain}`
-      }/snapshot/${this.space.id}/${this.snapshot.id}`;
-    }
+  if (space && snapshot) {
+    snapshotUrl = `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+      space.id
+    }/${snapshot.id}`;
+  }
 
-    const showSnapshot =
-      thread.snapshotProposal?.length > 0 && this.snapshotProposalsLoaded;
+  const showSnapshot =
+    thread.snapshotProposal?.length > 0 && snapshotProposalsLoaded;
 
-    return (
+  return (
+    <>
       <CWContentPageCard
         header="Linked Proposals"
         content={
-          thread.snapshotProposal?.length > 0 &&
-          !this.snapshotProposalsLoaded ? (
-            <div class="spinner-container">
+          thread.snapshotProposal?.length > 0 && !snapshotProposalsLoaded ? (
+            <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>
           ) : (
-            <div class="LinkedProposalsCard">
+            <div className="LinkedProposalsCard">
               {thread.chainEntities.length > 0 || showSnapshot ? (
-                <div class="links-container">
+                <div className="links-container">
                   {thread.chainEntities.length > 0 && (
-                    <div class="linked-proposals">
+                    <div className="linked-proposals">
                       {thread.chainEntities.map((chainEntity) => {
                         return (
                           <LinkedProposal
                             thread={thread}
                             chainEntity={chainEntity}
+                            key={chainEntity.id}
                           />
                         );
                       })}
                     </div>
                   )}
                   {showSnapshot && (
-                    <a href={snapshotUrl}>Snapshot: {this.snapshot?.title}</a>
+                    <a href={snapshotUrl}>Snapshot: {snapshot?.title}</a>
                   )}
                 </div>
               ) : (
@@ -135,15 +132,9 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                 <CWButton
                   buttonType="mini-black"
                   label="Link proposal"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
-                    app.modals.create({
-                      modal: UpdateProposalStatusModal,
-                      data: {
-                        onChangeHandler,
-                        thread,
-                      },
-                    });
+                    setIsModalOpen(true);
                   }}
                 />
               )}
@@ -151,6 +142,18 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
           )
         }
       />
-    );
-  }
-}
+      <Modal
+        className="LinkedProposalsCardModal"
+        content={
+          <UpdateProposalStatusModal
+            onChangeHandler={onChangeHandler}
+            thread={thread}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </>
+  );
+};

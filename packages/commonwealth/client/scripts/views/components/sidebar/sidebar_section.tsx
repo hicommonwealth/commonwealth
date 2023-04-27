@@ -1,10 +1,8 @@
-/* @jsx m */
+import React from 'react';
 
-import ClassComponent from 'class_component';
 import 'components/sidebar/sidebar_section.scss';
-import { isNotUndefined } from 'helpers/typeGuards';
 
-import m from 'mithril';
+import { isNotUndefined } from 'helpers/typeGuards';
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
@@ -14,236 +12,215 @@ import type {
   SubSectionAttrs,
 } from './types';
 
-class SubSection extends ClassComponent<SubSectionAttrs> {
-  view(vnode: m.Vnode<SubSectionAttrs>) {
-    const {
-      isActive,
-      isUpdated,
-      isVisible,
-      onclick,
-      rightIcon,
-      rowIcon,
-      title,
-    } = vnode.attrs;
+const SubSection = (props: SubSectionAttrs) => {
+  const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =
+    props;
 
-    if (!isVisible) {
-      return;
-    }
+  if (!isVisible) {
+    return;
+  }
 
-    const clickHandler = (e) => {
-      onclick(e);
-    };
+  const clickHandler = (e) => {
+    onClick(e);
+  };
 
-    let titleTextClass = '';
+  let titleTextClass = '';
 
-    if (isActive) {
-      titleTextClass = 'title-active';
-    } else if (!isUpdated) {
-      titleTextClass = 'title-stale';
-    }
+  if (isActive) {
+    titleTextClass = 'title-active';
+  } else if (!isUpdated) {
+    titleTextClass = 'title-stale';
+  }
 
-    return (
-      <div
-        class={`SubSection${isActive ? ' active' : ''}`}
-        onclick={(e) => clickHandler(e)}
-      >
-        {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
-        <div class={titleTextClass} title={title}>
-          {title}
-        </div>
-        {isNotUndefined(rightIcon) && <div class="right-icon">{rightIcon}</div>}
+  return (
+    <div
+      className={`SubSection${isActive ? ' active' : ''}`}
+      onClick={(e) => clickHandler(e)}
+    >
+      {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
+      <div className={titleTextClass} title={title}>
+        {title}
       </div>
-    );
+      {isNotUndefined(rightIcon) && (
+        <div className="right-icon">{rightIcon}</div>
+      )}
+    </div>
+  );
+};
+
+const SubSectionGroup = (props: SectionGroupAttrs) => {
+  const {
+    containsChildren,
+    displayData,
+    hasDefaultToggle,
+    isActive,
+    isUpdated,
+    isVisible,
+    onClick,
+    rightIcon,
+    title,
+  } = props;
+
+  const [toggled, setToggled] = React.useState<boolean>(
+    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
+  );
+  const [hoverOn, setHoverOn] = React.useState<boolean>(false);
+
+  if (!isVisible) {
+    return;
   }
-}
 
-class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
-  private toggled: boolean;
-  private hoverOn: boolean;
-
-  oninit(vnode: m.Vnode<SectionGroupAttrs>) {
-    const localStorageToggled =
-      localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
-    this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
-  }
-
-  view(vnode: m.Vnode<SectionGroupAttrs>) {
-    const {
-      containsChildren,
-      displayData,
-      isActive,
-      isUpdated,
-      isVisible,
-      onclick,
-      rightIcon,
-      title,
-    } = vnode.attrs;
-
-    if (!isVisible) {
-      return;
+  const clickHandler = (e) => {
+    if (containsChildren) {
+      setToggled(!toggled);
     }
 
-    const clickHandler = (e) => {
-      if (containsChildren) {
-        this.toggled = !this.toggled;
-      }
+    app.sidebarToggled = !app.sidebarToggled;
+    app.sidebarRedraw.emit('redraw');
 
-      app.sidebarToggled = false;
+    onClick(e, toggled);
+  };
 
-      onclick(e, this.toggled);
-    };
+  const carat = toggled ? (
+    <CWIcon iconName="chevronDown" iconSize="small" />
+  ) : (
+    <CWIcon iconName="chevronRight" iconSize="small" />
+  );
 
-    const carat = this.toggled ? (
-      <CWIcon iconName="chevronDown" iconSize="small" />
-    ) : (
-      <CWIcon iconName="chevronRight" iconSize="small" />
-    );
+  let titleTextClass = '';
 
-    let titleTextClass = '';
+  if (isActive && !containsChildren) {
+    titleTextClass = 'section-title-text-active';
+  } else if (!isUpdated) {
+    titleTextClass = 'section-title-text-stale';
+  }
 
-    if (isActive && !containsChildren) {
-      titleTextClass = 'section-title-text-active';
-    } else if (!isUpdated) {
-      titleTextClass = 'section-title-text-stale';
+  let backgroundColorClass = 'no-background';
+
+  if (isActive && !containsChildren) {
+    backgroundColorClass = 'background';
+  }
+
+  const mouseEnterHandler = (e) => {
+    if (toggled || hoverOn) {
+      e.redraw = false;
+      e.stopPropagation();
     }
-
-    let backgroundColorClass = 'no-background';
-
-    if (isActive && !containsChildren) {
+    if (!toggled) {
       backgroundColorClass = 'background';
+      setHoverOn(true);
+    }
+  };
+
+  const mouseLeaveHandler = () => {
+    backgroundColorClass =
+      isActive && !containsChildren ? 'background' : 'no-background';
+    setHoverOn(false);
+  };
+
+  return (
+    <div
+      className="SubSectionGroup"
+      onMouseEnter={(e) => mouseEnterHandler(e)}
+      onMouseLeave={() => mouseLeaveHandler()}
+    >
+      <div
+        className={`sub-section-group-title ${
+          hoverOn ? 'background' : backgroundColorClass
+        }`}
+        onClick={(e) => clickHandler(e)}
+      >
+        {containsChildren ? (
+          <div className="carat">{carat}</div>
+        ) : (
+          <div className="no-carat" />
+        )}
+        <CWText type="b2" className={`title-text ${titleTextClass}`}>
+          {title}
+        </CWText>
+        {rightIcon && <div className="right-icon">{rightIcon}</div>}
+      </div>
+      {containsChildren && toggled && (
+        <div className="subsections">
+          {displayData.map((subsection, i) => (
+            <SubSection key={i} {...subsection} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
+  const {
+    displayData,
+    extraComponents,
+    hasDefaultToggle,
+    onClick,
+    title,
+    toggleDisabled,
+  } = props;
+
+  const [toggled, setToggled] = React.useState<boolean>(
+    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
+  );
+  const [hoverColor, setHoverColor] = React.useState<string>();
+
+  const clickHandler = (e, sectionName: string) => {
+    if (toggleDisabled) {
+      return;
     }
 
-    const mouseEnterHandler = (e) => {
-      if (this.toggled || this.hoverOn) {
-        e.redraw = false;
-        e.stopPropagation();
-      }
-      if (!this.toggled) {
-        backgroundColorClass = 'background';
-        this.hoverOn = true;
-      }
-    };
+    setToggled(!toggled);
 
-    const mouseLeaveHandler = () => {
-      backgroundColorClass =
-        isActive && !containsChildren ? 'background' : 'no-background';
-      this.hoverOn = false;
-    };
+    localStorage.setItem(`${sectionName}-toggled`, (!toggled).toString());
 
-    return (
+    if (toggled) {
+      setHoverColor('none');
+    }
+
+    onClick(e, toggled);
+  };
+
+  const mouseEnterHandler = (e) => {
+    if (toggled || hoverColor) {
+      e.redraw = false;
+      e.stopPropagation();
+    }
+  };
+
+  const mouseLeaveHandler = () => {
+    setHoverColor('none');
+  };
+
+  const carat = toggled ? (
+    <CWIcon iconName="chevronDown" iconSize="small" />
+  ) : (
+    <CWIcon iconName="chevronRight" iconSize="small" />
+  );
+
+  return (
+    <div
+      className="SidebarSectionGroup"
+      onMouseEnter={(e) => mouseEnterHandler(e)}
+      onMouseLeave={() => mouseLeaveHandler()}
+    >
       <div
-        class="SubSectionGroup"
-        onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={() => mouseLeaveHandler()}
+        className="section-group-title-container"
+        onClick={(e) => clickHandler(e, title)}
       >
-        <div
-          class={`sub-section-group-title ${
-            this.hoverOn ? 'background' : backgroundColorClass
-          }`}
-          onclick={(e) => clickHandler(e)}
-        >
-          {containsChildren ? (
-            <div class="carat">{carat}</div>
-          ) : (
-            <div class="no-carat" />
-          )}
-          <CWText type="b2" className={`title-text ${titleTextClass}`}>
-            {title}
-          </CWText>
-          {rightIcon && <div class="right-icon">{rightIcon}</div>}
-        </div>
-        {containsChildren && this.toggled && (
-          <div class="subsections">
-            {displayData.map((subsection) => (
-              <SubSection {...subsection} />
-            ))}
-          </div>
-        )}
+        {carat}
+        <CWText>{title}</CWText>
+        {/* rightIcon && <div className="right-icon">{rightIcon}</div> */}
       </div>
-    );
-  }
-}
-
-export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
-  private toggled: boolean;
-  private hoverColor: string;
-
-  oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
-    const localStorageToggled =
-      localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
-    this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
-    this.hoverColor = 'none';
-  }
-
-  view(vnode: m.Vnode<SidebarSectionAttrs>) {
-    const {
-      displayData,
-      extraComponents,
-      onclick,
-      rightIcon,
-      title,
-      toggleDisabled,
-    } = vnode.attrs;
-
-    const clickHandler = (e, sectionName: string) => {
-      if (toggleDisabled) {
-        return;
-      }
-
-      this.toggled = !this.toggled;
-
-      localStorage.setItem(
-        `${sectionName}-toggled`,
-        (!!this.toggled).toString()
-      );
-
-      if (this.toggled) {
-        this.hoverColor = 'none';
-      }
-
-      onclick(e, this.toggled);
-    };
-
-    const mouseEnterHandler = (e) => {
-      if (this.toggled || this.hoverColor) {
-        e.redraw = false;
-        e.stopPropagation();
-      }
-    };
-
-    const mouseLeaveHandler = () => {
-      this.hoverColor = 'none';
-    };
-
-    const carat = this.toggled ? (
-      <CWIcon iconName="chevronDown" iconSize="small" />
-    ) : (
-      <CWIcon iconName="chevronRight" iconSize="small" />
-    );
-
-    return (
-      <div
-        class="SidebarSectionGroup"
-        onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={() => mouseLeaveHandler()}
-      >
-        <div
-          class="section-group-title-container"
-          onclick={(e) => clickHandler(e, title)}
-        >
-          {carat}
-          <CWText>{title}</CWText>
-          {rightIcon && <div class="right-icon">{rightIcon}</div>}
+      {toggled && (
+        <div className="sections-container">
+          {displayData.map((sectionGroup, i) => (
+            <SubSectionGroup {...sectionGroup} key={i} />
+          ))}
         </div>
-        {this.toggled && (
-          <div class="sections-container">
-            {displayData.map((sectionGroup) => (
-              <SubSectionGroup {...sectionGroup} />
-            ))}
-          </div>
-        )}
-        {extraComponents}
-      </div>
-    );
-  }
-}
+      )}
+      {extraComponents}
+    </div>
+  );
+};

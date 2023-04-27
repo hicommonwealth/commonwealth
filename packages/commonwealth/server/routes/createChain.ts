@@ -5,12 +5,13 @@ import {
   BalanceType,
   ChainBase,
   ChainType,
+  DefaultPage,
   NotificationCategories,
 } from 'common-common/src/types';
 import type { NextFunction } from 'express';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
-import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+// import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
 
@@ -20,16 +21,18 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { mixpanelTrack } from '../util/mixpanelUtil';
+// import { mixpanelTrack } from '../util/mixpanelUtil';
 
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
+import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
+  ReservedId: 'The id is reserved and cannot be used',
   NoName: 'Must provide name',
   InvalidNameLength: 'Name should not exceed 255',
   NoSymbol: 'Must provide symbol',
@@ -107,6 +110,9 @@ const createChain = async (
   }
   if (!req.body.id || !req.body.id.trim()) {
     return next(new AppError(Errors.NoId));
+  }
+  if (req.body.id === ALL_CHAINS) {
+    return next(new AppError(Errors.ReservedId));
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new AppError(Errors.NoName));
@@ -338,11 +344,19 @@ const createChain = async (
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
+    default_page: DefaultPage.Homepage,
+    has_homepage: true,
   });
 
   await createDefaultCommunityRoles(models, chain.id);
 
   if (req.body.address) {
+    const erc20Abi = await models.ContractAbi.findOne({
+      where: {
+        nickname: 'erc20',
+      },
+    });
+
     const [contract] = await models.Contract.findOrCreate({
       where: {
         address: req.body.address,
@@ -355,6 +369,7 @@ const createChain = async (
         token_name: chain.token_name,
         symbol: chain.default_symbol,
         type: chain.network,
+        abi_id: chain.network === 'erc20' ? erc20Abi?.id : null,
       },
     });
 
@@ -378,6 +393,7 @@ const createChain = async (
   await models.Topic.create({
     chain_id: chain.id,
     name: 'General',
+    featured_in_sidebar: true,
   });
 
   // try to make admin one of the user's addresses
@@ -457,12 +473,12 @@ const createChain = async (
   }
 
   if (process.env.NODE_ENV !== 'test') {
-    mixpanelTrack({
-      chainBase: req.body.base,
-      isCustomDomain: null,
-      communityType: null,
-      event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-    });
+    // mixpanelTrack({
+    //   chainBase: req.body.base,
+    //   isCustomDomain: null,
+    //   communityType: null,
+    //   event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+    // });
   }
 
   return success(res, {

@@ -32,7 +32,7 @@ const getNewProfile = async (
   next: NextFunction
 ) => {
   const { profileId } = req.query;
-  let profile;
+  let profile: ProfileInstance;
 
   if (profileId) {
     profile = await models.Profile.findOne({

@@ -1,67 +1,41 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-
-import { blocknumToTime, formatDuration } from 'helpers';
-import m from 'mithril';
+import React from 'react';
 import moment from 'moment';
+import { useCountdown } from 'usehooks-ts';
 
-type CountdownAttrs = {
-  duration?: moment.Duration;
-  includeSeconds?: boolean;
-  time?: moment.Moment;
+import { blocknumToDuration, formatDuration } from 'helpers';
+
+type CountdownProps = {
+  duration: number;
 };
 
-export class Countdown extends ClassComponent<CountdownAttrs> {
-  private timer;
-  private timerHandle;
+export const Countdown = (props: CountdownProps) => {
+  const { duration } = props;
 
-  view(vnode: m.Vnode<CountdownAttrs>) {
-    const { time, duration, includeSeconds } = vnode.attrs;
-    if (!time && !duration) return;
+  const [count, { startCountdown }] = useCountdown({
+    countStart: duration,
+    intervalMs: 1000,
+  });
 
-    const durationForDisplay = time
-      ? moment.duration(moment(time).diff(moment()))
-      : duration;
+  React.useEffect(() => {
+    startCountdown();
+  }, [startCountdown]);
 
-    return (
-      <span
-        oncreate={() => {
-          this.timerHandle = setInterval(() => {
-            this.timer++;
-            m.redraw();
-          }, 1000);
-        }}
-        onremove={() => {
-          if (this.timerHandle) {
-            clearInterval(this.timerHandle);
-          }
-        }}
-      >
-        {includeSeconds
-          ? formatDuration(durationForDisplay)
-          : formatDuration(durationForDisplay, false)}
-      </span>
-    );
-  }
-}
+  return (
+    <span>
+      {formatDuration(
+        moment.duration(moment().add(duration, 'ms').diff(moment())),
+        false
+      )}
+    </span>
+  );
+};
 
-type CountdownUntilBlockAttrs = {
+type CountdownUntilBlockProps = {
   block: number;
-  includeSeconds?: boolean;
 };
 
-export class CountdownUntilBlock extends ClassComponent<CountdownUntilBlockAttrs> {
-  view(vnode: m.Vnode<CountdownUntilBlockAttrs>) {
-    let { includeSeconds } = vnode.attrs;
-    if (!vnode.attrs.block) return;
-    if (includeSeconds === undefined) includeSeconds = true;
+export const CountdownUntilBlock = (props: CountdownUntilBlockProps) => {
+  const { block } = props;
 
-    return (
-      <Countdown
-        time={blocknumToTime(vnode.attrs.block)}
-        includeSeconds={includeSeconds}
-      />
-    );
-  }
-}
+  return <Countdown duration={blocknumToDuration(block)} />;
+};

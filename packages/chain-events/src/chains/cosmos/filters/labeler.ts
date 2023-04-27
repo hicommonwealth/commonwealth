@@ -38,6 +38,7 @@ export const Label: LabelerFilter = (
         heading: 'Vote',
         label: `${fmtAddr(data.voter)} voted on proposal ${data.id}.`,
         linkUrl: chainId ? `/${chainId}/proposal/${data.id}` : null,
+        icon: 'vote',
       };
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases

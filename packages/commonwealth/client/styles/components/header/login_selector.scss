@@ -9,16 +9,20 @@
     border-bottom: 1px solid $neutral-300;
   }
 
-  .left-button {
-    align-items: center;
-    border-top: 1px solid $neutral-300;
-    border-left: 1px solid $neutral-300;
-    border-bottom: 1px solid $neutral-300;
-    cursor: pointer;
+  .button-container {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 4px 8px;
+
+    .left-button {
+      align-items: center;
+      border-top: 1px solid $neutral-300;
+      border-left: 1px solid $neutral-300;
+      border-bottom: 1px solid $neutral-300;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4px 8px;
+    }
 
     .User {
       display: flex;
@@ -30,14 +34,18 @@
     }
   }
 
-  .right-button {
-    align-items: center;
-    border: 1px solid $neutral-300;
-    cursor: pointer;
+  .button-container {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 4px 8px;
+
+    .right-button {
+      align-items: center;
+      border: 1px solid $neutral-300;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4px 8px;
+    }
   }
 }
 
@@ -70,10 +78,10 @@
   background-color: $white;
   border-radius: $border-radius-corners;
   box-shadow: $elevation-3;
-  position: fixed;
+  position: relative;
 
   &.left {
-    right: 48px;
+    right: 16px;
 
     .UserBlock {
       gap: 24px;
@@ -81,7 +89,7 @@
   }
 
   &.right {
-    right: 8px;
+    right: -8px;
   }
 
   .title {
@@ -111,5 +119,10 @@
     &:hover {
       background-color: $neutral-100;
     }
+  }
+
+  .login-darkmode-label {
+    display: grid;
+    align-items: center;
   }
 }

@@ -1,36 +1,32 @@
-/* @jsx m */
+import React from 'react';
+import type { NavigateOptions, To } from 'react-router';
 
-import ClassComponent from 'class_component';
-import { getProposalUrlPath } from 'identifiers';
-import m from 'mithril';
+import { getNotificationUrlPath } from 'identifiers';
 import type { NotificationSubscription } from 'models';
 import { AddressInfo } from 'models';
 
 import 'pages/notification_settings/helper_components.scss';
 
-import app from 'state';
-import { slugify } from '../../../../../shared/utils';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import User from '../../components/widgets/user';
+import { renderQuillTextBody } from '../../components/react_quill_editor/helpers';
+import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const getTextRows = (subscription: NotificationSubscription) => {
+const getTextRows = (
+  subscription: NotificationSubscription,
+  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+) => {
   if (subscription.Thread) {
-    const threadUrl = getProposalUrlPath(
-      subscription.Thread.slug,
-      `${subscription.Thread.identifier}-${slugify(subscription.Thread.title)}`,
-      undefined,
-      subscription.Chain.id
-    );
+    const threadUrl = getNotificationUrlPath(subscription);
 
     return (
       <>
-        <div class="header-row" onclick={() => m.route.set(threadUrl)}>
+        <div className="header-row" onClick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             className="attribution-text"
@@ -48,10 +44,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
           </CWText>
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
-          {renderQuillTextBody(subscription.Thread.body, {
-            collapse: true,
-            hideFormatting: true,
-          })}
+          {subscription.Thread.plaintext}
         </CWText>
       </>
     );
@@ -59,7 +52,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     // TODO Gabe 9/7/22 - comment headers should link to comments
 
     // const parentThread = app.threads.getById(
-    //   Number(subscription.comment.threadId.slice(-4))
+    //   Number(subscription.comment.threadId)
     // );
 
     // const commentUrl = getProposalUrlPath(
@@ -70,7 +63,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     // );
     return (
       <>
-        <div class="header-row">
+        <div className="header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             className="attribution-text"
@@ -81,15 +74,17 @@ const getTextRows = (subscription: NotificationSubscription) => {
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             fontWeight="bold"
           >
-            {m(User, {
-              hideAvatar: true,
-              user: new AddressInfo(
-                null,
-                subscription.Comment.author,
-                subscription.Comment.chain,
-                null
-              ),
-            })}
+            <User
+              hideAvatar
+              user={
+                new AddressInfo(
+                  null,
+                  subscription.Comment.author,
+                  subscription.Comment.chain,
+                  null
+                )
+              }
+            />
             's
           </CWText>
           <CWText
@@ -101,7 +96,6 @@ const getTextRows = (subscription: NotificationSubscription) => {
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Comment.text, {
-            collapse: true,
             hideFormatting: true,
           })}
         </CWText>
@@ -114,8 +108,8 @@ const getTextRows = (subscription: NotificationSubscription) => {
   ) {
     return (
       <div
-        class="header-row"
-        onclick={() => m.route.set(subscription.Chain.id)}
+        className="header-row"
+        onClick={() => setRoute(`/${subscription.Chain.id}`)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -136,50 +130,56 @@ const getTextRows = (subscription: NotificationSubscription) => {
   }
 };
 
-type SubscriptionRowAttrs = {
+type SubscriptionRowProps = {
   subscription: NotificationSubscription;
 };
 
-export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
-    const { subscription } = vnode.attrs;
+export const SubscriptionRowTextContainer = ({
+  subscription,
+}: SubscriptionRowProps) => {
+  const navigate = useCommonNavigate();
 
-    return (
-      <div class="SubscriptionRowTextContainer">
-        <CWIcon
-          iconName={
-            subscription.category === 'new-reaction'
-              ? 'democraticProposal'
-              : 'feedback'
-          }
-          iconSize="small"
-        />
-        <div class="title-and-body-container">{getTextRows(subscription)}</div>
+  return (
+    <div className="SubscriptionRowTextContainer">
+      <CWIcon
+        iconName={
+          subscription.category === 'new-reaction'
+            ? 'democraticProposal'
+            : 'feedback'
+        }
+        iconSize="small"
+      />
+      <div className="title-and-body-container">
+        {getTextRows(subscription, navigate)}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
-    const { subscription } = vnode.attrs;
-    return (
-      <CWPopoverMenu
-        trigger={<CWIconButton iconName="dotsVertical" />}
+type SubscriptionRowMenuProps = {
+  subscription: NotificationSubscription;
+  onUnsubscribe: (subscription: NotificationSubscription) => void;
+};
+
+export const SubscriptionRowMenu = ({
+  subscription,
+  onUnsubscribe,
+}: SubscriptionRowMenuProps) => {
+  return (
+    <div className="trigger-wrapper">
+      <PopoverMenu
+        renderTrigger={(onclick) => (
+          <CWIconButton iconName="dotsVertical" onClick={onclick} />
+        )}
         menuItems={[
           {
             label: 'Unsubscribe',
             iconLeft: 'close',
             isSecondary: true,
-            onclick: () =>
-              app.user.notifications
-                .deleteSubscription(subscription)
-                .then(() => {
-                  m.redraw();
-                }),
+            onClick: () => onUnsubscribe(subscription),
           },
         ]}
       />
-    );
-  }
-}
+    </div>
+  );
+};

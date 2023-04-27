@@ -1,10 +1,7 @@
-/* @jsx m */
+import React, { useEffect, useState } from 'react';
 
-import ClassComponent from 'class_component';
 import { getProposalUrlPath } from 'identifiers';
-import m from 'mithril';
 import type { Thread } from 'models';
-import type { LinkedThreadRelation } from 'models/Thread';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -14,80 +11,97 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
+import { Modal } from '../../components/component_kit/cw_modal';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 
-type LinkedThreadsCardAttrs = {
+type LinkedThreadsCardProps = {
+  thread: Thread;
   allowLinking: boolean;
-  threadId: number;
+  onChangeHandler: (linkedThreads: Thread[]) => void;
 };
 
-export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
-  private initialized: boolean;
-  private linkedThreads: Thread[] = [];
+export const LinkedThreadsCard = ({
+  thread,
+  allowLinking,
+  onChangeHandler,
+}: LinkedThreadsCardProps) => {
+  const [linkedThreads, setLinkedThreads] = useState<Array<Thread>>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [threadsLoaded, setThreadsLoaded] = useState(false);
 
-  view(vnode: m.Vnode<LinkedThreadsCardAttrs>) {
-    const { allowLinking, threadId } = vnode.attrs;
-
-    const thread = app.threads.getById(threadId);
-
-    if (thread.linkedThreads.length > 0 && !this.initialized) {
-      this.initialized = true;
+  useEffect(() => {
+    if (thread.linkedThreads.length > 0) {
+      const linkedThreadIds = thread.linkedThreads.map(
+        ({ linkedThread }) => linkedThread
+      );
 
       app.threads
-        .fetchThreadsFromId(
-          thread.linkedThreads.map(
-            (relation: LinkedThreadRelation) => relation.linkedThread
-          )
-        )
-        .then((result) => {
-          this.linkedThreads = result;
-          this.initialized = false;
+        .fetchThreadsFromId(linkedThreadIds)
+        .then((data) => {
+          setLinkedThreads(data);
+          setThreadsLoaded(true);
         })
-        .catch((err) => {
-          console.error(err);
-          this.initialized = false;
-        });
+        .catch(console.error);
+    } else {
+      setLinkedThreads([]);
     }
+  }, [thread?.linkedThreads]);
 
-    return (
+  return (
+    <>
       <CWContentPageCard
         header="Linked Discussions"
         content={
-          <div class="LinkedThreadsCard">
-            {thread.linkedThreads.length > 0 ? (
-              <div class="links-container">
-                {this.linkedThreads.map((t) => {
-                  const discussionLink = getProposalUrlPath(
-                    t.slug,
-                    `${t.identifier}-${slugify(t.title)}`
-                  );
+          thread.linkedThreads.length && !threadsLoaded ? (
+            <div className="spinner-container">
+              <CWSpinner size="medium" />
+            </div>
+          ) : (
+            <div className="LinkedThreadsCard">
+              {thread.linkedThreads.length > 0 ? (
+                <div className="links-container">
+                  {linkedThreads.map((t) => {
+                    const discussionLink = getProposalUrlPath(
+                      t.slug,
+                      `${t.identifier}-${slugify(t.title)}`,
+                      false
+                    );
 
-                  return <a href={discussionLink}>{t.title}</a>;
-                })}
-              </div>
-            ) : (
-              <CWText type="b2" className="no-threads-text">
-                There are currently no linked discussions.
-              </CWText>
-            )}
-            {allowLinking && (
-              <CWButton
-                buttonType="mini-black"
-                label="Link discussion"
-                onclick={(e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: LinkedThreadModal,
-                    data: {
-                      linkingThread: thread,
-                      linkedThreads: this.linkedThreads,
-                    },
-                  });
-                }}
-              />
-            )}
-          </div>
+                    return (
+                      <a key={t.id} href={discussionLink}>
+                        {t.title}
+                      </a>
+                    );
+                  })}
+                </div>
+              ) : (
+                <CWText type="b2" className="no-threads-text">
+                  There are currently no linked discussions.
+                </CWText>
+              )}
+              {allowLinking && (
+                <CWButton
+                  buttonType="mini-black"
+                  label="Link discussion"
+                  onClick={() => setIsModalOpen(true)}
+                />
+              )}
+            </div>
+          )
         }
       />
-    );
-  }
-}
+      <Modal
+        content={
+          <LinkedThreadModal
+            thread={thread}
+            linkedThreads={linkedThreads}
+            onSave={onChangeHandler}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </>
+  );
+};

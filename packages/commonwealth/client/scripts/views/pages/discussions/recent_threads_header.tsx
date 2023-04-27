@@ -1,10 +1,8 @@
-/* @jsx m */
+import React, { useEffect, useState } from 'react';
 
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
-import m from 'mithril';
+import type { Topic } from 'models';
 import { ThreadStage } from 'models';
 
 import 'pages/discussions/recent_threads_header.scss';
@@ -16,128 +14,147 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { StagesMenu } from './stages_menu';
 import { TopicsMenu } from './topics_menu';
+import { useCommonNavigate } from 'navigation/helpers';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import useForceRerender from 'hooks/useForceRerender';
 
-type RecentThreadsHeaderAttrs = {
+type RecentThreadsHeaderProps = {
   stage: string;
   topic: string;
   totalThreadCount: number;
 };
 
-export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs> {
-  private isWindowExtraSmall: boolean;
+export const RecentThreadsHeader = ({
+  stage,
+  topic,
+  totalThreadCount,
+}: RecentThreadsHeaderProps) => {
+  const navigate = useCommonNavigate();
+  const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
+  const forceRerender = useForceRerender();
 
-  onResize() {
-    this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
-    m.redraw();
-  }
+  const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
+    isWindowExtraSmall(window.innerWidth)
+  );
 
-  oninit() {
-    this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
+  useEffect(() => {
+    const onResize = () => {
+      setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
+    };
 
-    window.addEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+    window.addEventListener('resize', onResize);
+    app.loginStateEmitter.on('redraw', forceRerender);
 
-  onremove() {
-    window.removeEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+    return () => {
+      window.removeEventListener('resize', onResize);
+      app.loginStateEmitter.off('redraw', forceRerender);
+    };
+  }, [forceRerender]);
 
-  view(vnode: m.Vnode<RecentThreadsHeaderAttrs>) {
-    const { topic, stage, totalThreadCount } = vnode.attrs;
+  const { stagesEnabled, customStages } = app.chain?.meta || {};
 
-    const { stagesEnabled, customStages } = app.chain?.meta;
+  const topics = app.topics.getByCommunity(app.activeChainId());
 
-    const topics = app.topics.getByCommunity(app.activeChainId());
+  const featuredTopics = topics
+    .filter((t) => t.featuredInSidebar)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => a.order - b.order);
 
-    const featuredTopics = topics
-      .filter((t) => t.featuredInSidebar)
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .sort((a, b) => a.order - b.order);
+  const otherTopics = topics
+    .filter((t) => !t.featuredInSidebar)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
-    const otherTopics = topics
-      .filter((t) => !t.featuredInSidebar)
-      .sort((a, b) => a.name.localeCompare(b.name));
+  const selectedTopic = topics.find((t) => topic && topic === t.name);
 
-    const selectedTopic = topics.find((t) => topic && topic === t.name);
+  const stages = !customStages
+    ? [
+        ThreadStage.Discussion,
+        ThreadStage.ProposalInReview,
+        ThreadStage.Voting,
+        ThreadStage.Passed,
+        ThreadStage.Failed,
+      ]
+    : parseCustomStages(customStages);
 
-    const stages = !customStages
-      ? [
-          ThreadStage.Discussion,
-          ThreadStage.ProposalInReview,
-          ThreadStage.Voting,
-          ThreadStage.Passed,
-          ThreadStage.Failed,
-        ]
-      : parseCustomStages(customStages);
+  const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
-    const selectedStage = stages.find((s) => s === (stage as ThreadStage));
-
-    return (
-      <div class="RecentThreadsHeader">
-        {isUndefined(topic) && (
-          <>
-            <div class="header-row">
-              <CWText type="h3" fontWeight="semiBold" className="header-text">
-                All Discussions
-              </CWText>
-              <div class="count-and-button">
-                <CWText
-                  type="caption"
-                  fontWeight="medium"
-                  className="thread-count-text"
-                >
-                  {totalThreadCount} Threads
-                </CWText>
-                {this.isWindowExtraSmall ? (
-                  <CWIconButton
-                    iconName="plusCircle"
-                    iconButtonTheme="black"
-                    onclick={() => {
-                      navigateToSubpage('/new/discussion');
-                    }}
-                  />
-                ) : (
-                  <CWButton
-                    buttonType="mini-black"
-                    label="Create Thread"
-                    iconName="plus"
-                    onclick={() => {
-                      navigateToSubpage('/new/discussion');
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-            <CWText className="subheader-text">
-              This section is for the community to discuss how to manage the
-              community treasury and spending on contributor grants, community
-              initiatives, liquidity mining and other programs.
+  return (
+    <div className="RecentThreadsHeader">
+      {isUndefined(topic) && (
+        <>
+          <div className="header-row">
+            <CWText type="h3" fontWeight="semiBold" className="header-text">
+              All Discussions
             </CWText>
-          </>
-        )}
-        {app.chain?.meta && (
-          <div class="buttons-row">
-            {topics.length > 0 && (
-              <TopicsMenu
-                featuredTopics={featuredTopics}
-                otherTopics={otherTopics}
-                selectedTopic={selectedTopic}
-                topic={topic}
-              />
-            )}
-            {stagesEnabled && (
-              <StagesMenu
-                selectedStage={selectedStage}
-                stage={stage}
-                stages={stages}
-              />
-            )}
+            <div className="count-and-button">
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="thread-count-text"
+              >
+                {totalThreadCount} Threads
+              </CWText>
+              {windowIsExtraSmall ? (
+                <CWIconButton
+                  iconName="plusCircle"
+                  iconButtonTheme="black"
+                  onClick={() => {
+                    navigate('/new/discussion');
+                  }}
+                  disabled={!app.user.activeAccount}
+                />
+              ) : (
+                <CWButton
+                  buttonType="mini-black"
+                  label="Create Thread"
+                  iconLeft="plus"
+                  onClick={() => {
+                    navigate('/new/discussion');
+                  }}
+                  disabled={!app.user.activeAccount}
+                />
+              )}
+            </div>
           </div>
-        )}
-      </div>
-    );
-  }
-}
+          <CWText className="subheader-text">
+            This section is for the community to discuss how to manage the
+            community treasury and spending on contributor grants, community
+            initiatives, liquidity mining and other programs.
+          </CWText>
+        </>
+      )}
+      {app.chain?.meta && (
+        <div className="buttons-row">
+          {topics.length > 0 && (
+            <TopicsMenu
+              featuredTopics={featuredTopics}
+              otherTopics={otherTopics}
+              selectedTopic={selectedTopic}
+              topic={topic}
+              onEditClick={(editTopic) => setTopicSelectedToEdit(editTopic)}
+            />
+          )}
+          {stagesEnabled && (
+            <StagesMenu
+              selectedStage={selectedStage}
+              stage={stage}
+              stages={stages}
+            />
+          )}
+        </div>
+      )}
+
+      <Modal
+        content={
+          <EditTopicModal
+            topic={topicSelectedToEdit}
+            onModalClose={() => setTopicSelectedToEdit(null)}
+          />
+        }
+        onClose={() => setTopicSelectedToEdit(null)}
+        open={!!topicSelectedToEdit}
+      />
+    </div>
+  );
+};

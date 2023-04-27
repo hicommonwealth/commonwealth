@@ -1,7 +1,10 @@
-/* @jsx m */
+import React from 'react';
 
-import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
+
+import app from 'state';
+import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Substrate from 'controllers/chain/substrate/adapter';
@@ -12,26 +15,24 @@ import {
   idToProposal,
   proposalSlugToClass,
 } from 'identifiers';
-import m from 'mithril';
 import type { AnyProposal, ProposalModule } from 'models';
 import { Account } from 'models';
 
-import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
+import withRouter from 'navigation/helpers';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -45,22 +46,22 @@ type ViewProposalPageAttrs = {
   type?: string;
 };
 
-class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
+class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
   private prefetch: ProposalPrefetch;
   private proposal: AnyProposal;
   private tipAmount: number;
   private votingModalOpen: boolean;
 
-  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
+  view(vnode: ResultNode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
-      return (
-        <PageLoading
-        // title="Loading..."
-        />
-      );
+      return <PageLoading message="Loading..." />;
     }
+
+    app.chainAdapterReady.on('ready', () => {
+      this.redraw();
+    });
 
     const type = vnode.attrs.type || chainToProposalSlug(app.chain.meta);
 
@@ -124,7 +125,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           // load sibling modules too
           if (app.chain.base === ChainBase.Substrate) {
             const chain = app.chain as Substrate;
-
             app.chain.loadModules([
               chain.treasury,
               chain.democracyProposals,
@@ -147,14 +147,15 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     }
 
     if (identifier !== `${proposalId}-${slugify(this.proposal.title)}`) {
-      navigateToSubpage(
+      this.setRoute(
         getProposalUrlPath(
           this.proposal.slug,
           `${proposalId}-${slugify(this.proposal.title)}`,
           true
         ),
-        {},
-        { replace: true }
+        {
+          replace: true,
+        }
       );
     }
 
@@ -185,28 +186,18 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     this.prefetch[proposalIdAndType]['profilesFinished'] = true;
 
     if (this.proposal instanceof SubstrateTreasuryTip) {
-      return (
-        <TipDetail
-          tipAmount={this.tipAmount}
-          proposal={this.proposal}
-          headerTitle={headerTitle}
-          setTipAmount={(tip) => {
-            this.tipAmount = tip;
-          }}
-        />
-      );
+      return <TipDetail proposal={this.proposal} />;
     }
 
     const toggleVotingModal = (newModalState: boolean) => {
       this.votingModalOpen = newModalState;
-      m.redraw();
+      this.redraw();
     };
 
     const onModalClose = () => {
       this.votingModalOpen = false;
-      m.redraw();
+      this.redraw();
     };
-
     return (
       <Sublayout
       //  title={headerTitle}
@@ -214,13 +205,14 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         <CWContentPage
           title={this.proposal.title}
           author={
-            !!this.proposal.author &&
-            m(User, {
-              avatarSize: 24,
-              user: this.proposal.author,
-              popover: true,
-              linkify: true,
-            })
+            !!this.proposal.author && (
+              <User
+                avatarSize={24}
+                user={this.proposal.author}
+                popover
+                linkify
+              />
+            )
           }
           createdAt={this.proposal.createdAt}
           subHeader={
@@ -257,5 +249,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     );
   }
 }
+
+const ViewProposalPage = withRouter(ViewProposalPageComponent);
 
 export default ViewProposalPage;

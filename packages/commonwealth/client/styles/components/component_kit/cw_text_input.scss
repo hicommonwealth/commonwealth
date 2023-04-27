@@ -74,13 +74,15 @@
     }
 
     .text-input-right-icon.Icon {
-      color: $primary-300;
-
       @include iconPositionStyles;
     }
 
-    .text-input-right-onclick-icon {
+    .text-input-right-onClick-icon {
       @include iconPositionStyles;
+    }
+
+    ::placeholder {
+      color: $neutral-500;
     }
   }
 }

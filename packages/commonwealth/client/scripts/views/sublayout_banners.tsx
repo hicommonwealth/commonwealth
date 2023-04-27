@@ -1,10 +1,7 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React, { useState } from 'react';
 
 import app from 'state';
-import { isNonEmptyString } from '../helpers/typeGuards';
+import { isNonEmptyString } from 'helpers/typeGuards';
 import type { ChainInfo } from '../models';
 import { ITokenAdapter } from '../models';
 import {
@@ -13,39 +10,41 @@ import {
 } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';
 
-type SublayoutBannersAttrs = {
+type SublayoutBannersProps = {
   banner?: string;
   chain: ChainInfo;
   terms?: string;
-  tosStatus?: string;
-  bannerStatus?: string;
 };
 
-export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
-  view(vnode: m.Vnode<SublayoutBannersAttrs>) {
-    const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
+export const SublayoutBanners = ({
+  banner,
+  chain,
+  terms,
+}: SublayoutBannersProps) => {
+  const bannerLocalStorageId = `${app.activeChainId()}-banner`;
 
-    return (
-      <>
-        {banner && bannerStatus !== 'off' && (
-          <CWMessageBanner
-            bannerContent={banner}
-            onClose={() =>
-              localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
-            }
+  const [bannerStatus, setBannerStatus] = useState(
+    localStorage.getItem(bannerLocalStorageId)
+  );
+
+  const handleDismissBanner = () => {
+    setBannerStatus('off');
+    localStorage.setItem(bannerLocalStorageId, 'off');
+  };
+
+  return (
+    <>
+      {banner && bannerStatus !== 'off' && (
+        <CWMessageBanner bannerContent={banner} onClose={handleDismissBanner} />
+      )}
+      {app.isLoggedIn() &&
+        ITokenAdapter.instanceOf(app.chain) &&
+        !app.user.activeAccount && (
+          <CWBanner
+            bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
           />
         )}
-        {app.isLoggedIn() &&
-          ITokenAdapter.instanceOf(app.chain) &&
-          !app.user.activeAccount && (
-            <CWBanner
-              bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
-            />
-          )}
-        {isNonEmptyString(terms) && tosStatus !== 'off' && (
-          <TermsBanner terms={terms} />
-        )}
-      </>
-    );
-  }
-}
+      {isNonEmptyString(terms) && <TermsBanner terms={terms} />}
+    </>
+  );
+};

@@ -1,22 +1,15 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import 'pages/new_profile.scss';
+
 import ProfileComponent from '../components/profile';
 
-export default class NewProfile extends ClassComponent {
-  private profileId: string;
+type NewProfileAttrs = {
+  profileId: string;
+};
 
-  oninit() {
-    this.profileId = m.route.param('profileId');
-  }
+const NewProfile = (props: NewProfileAttrs) => {
+  return <ProfileComponent profileId={props.profileId} />;
+};
 
-  view() {
-    if (this.profileId !== m.route.param('profileId')) {
-      console.log('hello');
-      this.profileId = m.route.param('profileId');
-      m.redraw();
-    }
-    return <ProfileComponent profileId={this.profileId} />;
-  }
-}
+export default NewProfile;

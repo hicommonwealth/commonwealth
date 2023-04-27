@@ -15,7 +15,7 @@
     white-space: nowrap;
   }
 
-  &.onclick {
+  &.onClick {
     cursor: pointer;
   }
 
@@ -135,5 +135,11 @@
     // at least one of these should apply depending on context
     justify-content: center;
     text-align: center;
+  }
+
+  &.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

@@ -1,6 +1,5 @@
 import sgMail from '@sendgrid/mail';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ChainNetwork,
   ChainType,
@@ -9,6 +8,7 @@ import {
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
+import { factory, formatFilename } from 'common-common/src/logging';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
@@ -323,7 +323,7 @@ const createComment = async (
   emitNotifications(
     models,
     NotificationCategories.NewComment,
-    thread_id,
+    `discussion_${thread_id}`,
     {
       created_at: new Date(),
       thread_id: thread_id,

@@ -1,107 +1,143 @@
-/* @jsx m */
+import React from 'react';
 
-import ClassComponent from 'class_component';
 import { NotificationCategories } from 'common-common/src/types';
-import m from 'mithril';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import app from 'state';
-import { CWButton } from '../../components/component_kit/cw_button';
+import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
+import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
-import { SharePopover } from '../../components/share_popover';
 import { subscribeToThread } from './helpers';
+import { NotificationSubscription } from 'client/scripts/models';
+import useForceRerender from 'hooks/useForceRerender';
 
-type UserDashboardRowBottomAttrs = {
+type UserDashboardRowBottomProps = {
   commentCount: number;
-  likeCount: number;
-  path: string;
   threadId: string;
-  viewCount: number;
+  chainId: string;
+  commentId?: string;
+  commenters: ProfileWithAddress[];
 };
 
-export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBottomAttrs> {
-  view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
-    const { path, threadId, viewCount, likeCount, commentCount } = vnode.attrs;
+export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
+  const { threadId, commentCount, commentId, chainId, commenters } = props;
+  const forceRerender = useForceRerender();
 
-    const adjustedId = `discussion_${threadId}`;
-
-    const commentSubscription = app.user.notifications.subscriptions.find(
-      (v) =>
-        v.objectId === adjustedId &&
-        v.category === NotificationCategories.NewComment
+  const setSubscription = async (
+    subThreadId: string,
+    bothActive: boolean,
+    commentSubscription: NotificationSubscription,
+    reactionSubscription: NotificationSubscription
+  ) => {
+    await subscribeToThread(
+      subThreadId,
+      bothActive,
+      commentSubscription,
+      reactionSubscription
     );
+    forceRerender();
+  };
 
-    const reactionSubscription = app.user.notifications.subscriptions.find(
-      (v) =>
-        v.objectId === adjustedId &&
-        v.category === NotificationCategories.NewReaction
-    );
+  const adjustedId = `discussion_${threadId}`;
 
-    const bothActive =
-      commentSubscription?.isActive && reactionSubscription?.isActive;
+  const commentSubscription = app.user.notifications.subscriptions.find(
+    (v) =>
+      v.objectId === adjustedId &&
+      v.category === NotificationCategories.NewComment
+  );
 
-    return (
-      <div class="UserDashboardRowBottom">
-        <div class="buttons-row">
-          <CWButton
-            label="Discuss"
-            iconLeft="plus"
-            buttonType="secondary-blue"
-          />
-          <CWButton
-            label={bothActive ? 'Unsubscribe' : 'Subscribe'}
-            iconLeft="bell"
-            buttonType="secondary-blue"
-            onclick={(e) => {
-              e.stopPropagation();
+  const reactionSubscription = app.user.notifications.subscriptions.find(
+    (v) =>
+      v.objectId === adjustedId &&
+      v.category === NotificationCategories.NewReaction
+  );
 
-              subscribeToThread(
-                threadId,
-                bothActive,
-                commentSubscription,
-                reactionSubscription
-              );
-            }}
-          />
-          <div
-            onclick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <SharePopover
-              trigger={
-                <CWButton
-                  label="Share"
-                  iconLeft="share"
-                  buttonType="secondary-blue"
-                />
-              }
-            />
-          </div>
+  const bothActive =
+    commentSubscription?.isActive && reactionSubscription?.isActive;
+
+  const domain = document.location.origin;
+
+  return (
+    <div className="UserDashboardRowBottom">
+      <div className="comments">
+        <div className="count">
+          <CWIcon iconName="feedback" iconSize="small" className="icon" />
+          <CWText type="caption" className="text">
+            {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
+          </CWText>
         </div>
-        <div class="interaction-counts">
-          {viewCount && viewCount > 0 && (
-            <div class="icon-and-count">
-              <CWIcon iconName="views" className="count-icon" />
-              <CWText className="count-text">{viewCount}</CWText>
-            </div>
-          )}
-          {likeCount && likeCount > 0 && (
-            <div class="icon-and-count">
-              <CWIcon iconName="heartFilled" className="count-icon" />
-              <CWText className="count-text">{likeCount}</CWText>
-            </div>
-          )}
-          {commentCount && commentCount > 0 && (
-            <div class="icon-and-count">
-              <CWIcon iconName="feedback" className="count-icon" />
-              <CWText className="count-text">{commentCount}</CWText>
-            </div>
-          )}
+        <div>
+          <CWAvatarGroup profiles={commenters} chainId={chainId} />
         </div>
       </div>
-    );
-  }
-}
+      <div className="actions" onClick={(e) => e.stopPropagation()}>
+        <PopoverMenu
+          menuItems={[
+            {
+              onClick: () => {
+                setSubscription(
+                  threadId,
+                  bothActive,
+                  commentSubscription,
+                  reactionSubscription
+                );
+              },
+              label: bothActive ? 'Unsubscribe' : 'Subscribe',
+              iconLeft: bothActive ? 'unsubscribe' : 'bell',
+            },
+          ]}
+          renderTrigger={(onClick) => (
+            <CWIconButton
+              iconName={bothActive ? 'unsubscribe' : 'bell'}
+              iconSize="small"
+              onClick={onClick}
+            />
+          )}
+        />
+        <PopoverMenu
+          menuItems={[
+            {
+              iconLeft: 'copy',
+              label: 'Copy URL',
+              onClick: async () => {
+                if (commentId) {
+                  await navigator.clipboard.writeText(
+                    `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`
+                  );
+                  return;
+                }
+                await navigator.clipboard.writeText(
+                  `${domain}/${chainId}/discussion/${threadId}`
+                );
+              },
+            },
+            {
+              iconLeft: 'twitter',
+              label: 'Share on Twitter',
+              onClick: async () => {
+                if (commentId) {
+                  await window.open(
+                    `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
+                      ?comment=${commentId}`
+                  );
+                  return;
+                }
+                await window.open(
+                  `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}`,
+                  '_blank'
+                );
+              },
+            },
+          ]}
+          renderTrigger={(onClick) => (
+            <CWIconButton iconName="share" iconSize="small" onClick={onClick} />
+          )}
+        />
+      </div>
+    </div>
+  );
+};

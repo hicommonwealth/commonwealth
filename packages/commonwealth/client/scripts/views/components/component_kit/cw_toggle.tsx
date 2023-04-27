@@ -1,46 +1,49 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/component_kit/cw_toggle.scss';
-import m from 'mithril';
+
+import type { BaseStyleProps } from './types';
 import { getClasses } from './helpers';
-import type { StyleAttrs } from './types';
 import { ComponentType } from './types';
+import { setDarkMode } from '../../../helpers';
 
-type ToggleStyleAttrs = {
+export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
+  setDarkMode(on);
+  localStorage.setItem('user-dark-mode-state', on ? 'on' : 'off');
+  stateFn(on);
+};
+
+type ToggleStyleProps = {
   checked?: boolean;
-} & StyleAttrs;
+} & BaseStyleProps;
 
-type ToggleAttrs = {
-  onchange: (e?: any) => void;
-} & ToggleStyleAttrs;
+type ToggleProps = {
+  onChange?: (e?: any) => void;
+} & ToggleStyleProps;
 
-export class CWToggle extends ClassComponent<ToggleAttrs> {
-  view(vnode: m.Vnode<ToggleAttrs>) {
-    const { className, disabled = false, onchange, checked } = vnode.attrs;
+export const CWToggle = (props: ToggleProps) => {
+  const { className, disabled = false, onChange, checked } = props;
 
-    const params = {
-      disabled,
-      onchange,
-      checked,
-      type: 'checkbox',
-    };
+  const params = {
+    disabled,
+    onChange,
+    checked,
+    type: 'checkbox',
+  };
 
-    return (
-      <label
-        class={getClasses<ToggleStyleAttrs>(
-          {
-            checked,
-            disabled,
-            className,
-          },
-          ComponentType.Toggle
-        )}
-      >
-        <input class="toggle-input" {...params} />
-        <div class="slider" />
-      </label>
-    );
-  }
-}
+  return (
+    <label
+      className={getClasses<ToggleStyleProps>(
+        {
+          checked,
+          disabled,
+          className,
+        },
+        ComponentType.Toggle
+      )}
+    >
+      <input className="toggle-input" {...params} />
+      <div className="slider" />
+    </label>
+  );
+};

@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import $ from 'jquery';
+import { EventEmitter } from 'events';
 
 import type {
   Account,
@@ -11,8 +12,8 @@ import type {
   StarredCommunity,
 } from 'models';
 import app from 'state';
-import { notifyError } from '../app/notifications';
 import DraftsController from './drafts';
+import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
@@ -22,6 +23,8 @@ export class UserController {
   public get activeAccount(): Account {
     return this._activeAccount;
   }
+
+  public isFetched = new EventEmitter();
 
   private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
@@ -79,6 +82,7 @@ export class UserController {
 
   private _setActiveAccounts(activeAccounts: Account[]): void {
     this._activeAccounts = activeAccounts;
+    this.isFetched.emit('redraw');
   }
 
   private _socialAccounts: SocialAccount[] = [];
@@ -115,15 +119,6 @@ export class UserController {
 
   private _setDisableRichText(disableRichText: boolean): void {
     this._disableRichText = disableRichText;
-  }
-
-  // Likely remove when unified profiles are in
-  private _hasDisplayName: boolean;
-  public setHasDisplayName(hasDisplayName: boolean): void {
-    this._hasDisplayName = hasDisplayName;
-  }
-  public get hasDisplayName(): boolean {
-    return this._hasDisplayName;
   }
 
   private _notifications: NotificationsController =

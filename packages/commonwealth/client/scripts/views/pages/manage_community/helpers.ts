@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import m from 'mithril';
 
+import { redraw } from 'mithrilInterop';
 import app from 'state';
 import { AccessLevel } from 'models';
 import { ChainCategoryType } from 'common-common/src/types';
@@ -49,7 +49,7 @@ export const setChainCategories = async (
           // else we don't have a response.result, so we don't know what to remove
         }
         resolve();
-        m.redraw();
+        redraw();
       })
       .catch(() => {
         reject();

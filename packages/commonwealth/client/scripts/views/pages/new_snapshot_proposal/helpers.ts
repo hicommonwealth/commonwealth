@@ -2,14 +2,13 @@ import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 import type { Account } from 'models';
 import app from 'state';
-import type { QuillEditor } from '../../components/quill/quill_editor';
 import type { ThreadForm } from './types';
 import { NewThreadErrors } from './types';
+import { getTextFromDelta } from '../../components/react_quill_editor';
 
-// Don't call it a new thread if it ain't a new thread.
-const newThread = async (
+export const createNewProposal = async (
   form: ThreadForm,
-  quillEditorState: QuillEditor,
+  content: string,
   author: Account,
   space: SnapshotSpace
 ) => {
@@ -29,24 +28,22 @@ const newThread = async (
     throw new Error(NewThreadErrors.NoChoices);
   }
 
-  if (quillEditorState.isBlank()) {
+  const bodyText = getTextFromDelta(JSON.parse(content));
+  if (bodyText.length === 0) {
     throw new Error(NewThreadErrors.NoBody);
   }
 
-  quillEditorState.disable();
-
-  const bodyText = quillEditorState.textContentsAsString;
-
-  form.body = bodyText;
-
+  form.body = content; // use content, which is richtext
   form.snapshot = await getSpaceBlockNumber(space.network);
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;
 
   // Format form for proper validation
-  delete form.range;
-  form.start = Math.floor(form.start / 1000);
-  form.end = Math.floor(form.end / 1000);
+  const delay = space.voting.delay ?? 0;
+  const period = space.voting.period ?? 432000; // 5 day default
+  const timestamp = Math.floor(Date.now() / 1e3);
+  form.start = timestamp + delay;
+  form.end = form.start + period;
 
   const proposalPayload = {
     space: space.id,
@@ -58,29 +55,13 @@ const newThread = async (
     end: form.end,
     snapshot: form.snapshot,
     network: '1', // TODO: unclear if this is always 1
-    timestamp: Math.floor(Date.now() / 1e3),
+    timestamp: timestamp,
     strategies: JSON.stringify({}),
     plugins: JSON.stringify({}),
     metadata: JSON.stringify({}),
   };
 
-  try {
-    await createProposal(author.address, proposalPayload);
-    await app.user.notifications.refresh();
-    await app.snapshot.refreshProposals();
-  } catch (e) {
-    console.log(e);
-    throw new Error(e.error);
-  }
-};
-
-export const newLink = async (
-  form: ThreadForm,
-  quillEditorState: QuillEditor,
-  author: Account,
-  space: SnapshotSpace
-) => {
-  const errors = await newThread(form, quillEditorState, author, space);
-  console.log('the rro', errors);
-  return errors;
+  await createProposal(author.address, proposalPayload);
+  await app.user.notifications.refresh();
+  await app.snapshot.refreshProposals();
 };

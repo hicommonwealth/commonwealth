@@ -1,31 +1,35 @@
-/* @jsx m */
+import React, { useState } from 'react';
 
-import ClassComponent from 'class_component';
-import { notifyError } from 'controllers/app/notifications';
-import m from 'mithril';
 import type { Poll, Thread } from 'models';
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
 
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import { getPollTimestamp, handlePollVote } from './helpers';
+import { Modal } from '../../components/component_kit/cw_modal';
 
-type ThreadPollEditorCardAttrs = {
+type ThreadPollEditorCardProps = {
   thread: Thread;
   threadAlreadyHasPolling: boolean;
+  onPollCreate: () => void;
 };
 
-export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAttrs> {
-  view(vnode: m.Vnode<ThreadPollEditorCardAttrs>) {
-    const { thread, threadAlreadyHasPolling } = vnode.attrs;
+export const ThreadPollEditorCard = ({
+  thread,
+  threadAlreadyHasPolling,
+  onPollCreate,
+}: ThreadPollEditorCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    return (
+  return (
+    <>
       <CWContentPageCard
         header={`Add ${
           threadAlreadyHasPolling ? 'an' : 'another'
@@ -36,33 +40,47 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
             <CWButton
               buttonType="mini-black"
               label="Create poll"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
-                app.modals.create({
-                  modal: PollEditorModal,
-                  data: {
-                    thread,
-                  },
-                });
+                setIsModalOpen(true);
               }}
             />
           </div>
         }
       />
-    );
-  }
-}
-
-type ThreadPollCardAttrs = {
-  poll: Poll;
-  showDeleteButton: boolean;
+      <Modal
+        className="PollEditorCardModal"
+        content={
+          <PollEditorModal
+            thread={thread}
+            onModalClose={() => setIsModalOpen(false)}
+            onPollCreate={onPollCreate}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </>
+  );
 };
 
-export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
-  view(vnode: m.Vnode<ThreadPollCardAttrs>) {
-    const { poll, showDeleteButton } = vnode.attrs;
+type ThreadPollCardProps = {
+  poll: Poll;
+  onVote: () => void;
+  showDeleteButton?: boolean;
+  onDelete?: () => void;
+};
 
-    return (
+export const ThreadPollCard = ({
+  poll,
+  onVote,
+  showDeleteButton,
+  onDelete,
+}: ThreadPollCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
       <PollCard
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
@@ -100,16 +118,13 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
             ? null
             : 'You must join this community to vote.'
         }
-        onVoteCast={(option, callback, isSelected) =>
-          handlePollVote(poll, option, isSelected, callback)
-        }
+        onVoteCast={(option, isSelected) => {
+          handlePollVote(poll, option, isSelected, onVote);
+        }}
         onResultsClick={(e) => {
           e.preventDefault();
           if (poll.votes.length > 0) {
-            app.modals.create({
-              modal: OffchainVotingModal,
-              data: { votes: poll.votes },
-            });
+            setIsModalOpen(true);
           }
         }}
         showDeleteButton={showDeleteButton}
@@ -119,13 +134,23 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
               threadId: poll.threadId,
               pollId: poll.id,
             });
-            m.redraw();
+            onDelete();
           } catch (e) {
             console.error(e);
             notifyError('Failed to delete poll');
           }
         }}
       />
-    );
-  }
-}
+      <Modal
+        content={
+          <OffchainVotingModal
+            votes={poll.votes}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </>
+  );
+};

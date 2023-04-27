@@ -147,3 +147,9 @@ export interface ISnapshotNotification {
   start?: string;
   expire?: string;
 }
+
+export enum DefaultPage {
+  Discussions = 'default_all_discussions_view',
+  Overview = 'default_summary_view',
+  Homepage = 'homepage',
+}

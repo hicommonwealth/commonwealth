@@ -9,18 +9,28 @@ $width: 360px;
   padding: 24px;
   width: 100%;
 
-  .progress-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 400px;
-  }
-
   .basic-gallery {
     display: flex;
     flex-direction: column;
     gap: 8px;
     width: $width;
+
+    .item-row {
+      align-items: center;
+      display: flex;
+      gap: 16px;
+
+      .Icon {
+        color: $neutral-400;
+      }
+    }
+  }
+
+  .progress-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 400px;
   }
 
   .tooltip-gallery {
@@ -92,8 +102,7 @@ $width: 360px;
     .icon-row {
       align-items: center;
       display: flex;
-      flex-direction: row;
-      height: 48px;
+      height: 32px;
       justify-content: space-between;
       width: 200px;
     }
@@ -155,5 +164,16 @@ $width: 360px;
     flex-direction: column;
     gap: 8px;
     width: $width;
+  }
+
+  .toggle-gallery {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+
+    .toggle-label {
+      display: grid;
+      align-items: center;
+    }
   }
 }

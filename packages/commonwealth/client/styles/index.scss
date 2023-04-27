@@ -12,6 +12,10 @@ body {
   width: 100%;
 }
 
+#root {
+  height: 100%;
+}
+
 html {
   font-family: $fonts;
   font-size: 16px;
@@ -28,6 +32,14 @@ html {
   transition: 0.2s filter ease-in-out, 0.2s -webkit-filter ease-in-out;
 }
 
+.app-loading {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+}
+
 // dark mode
 html.invert {
   filter: invert(90%);
@@ -36,16 +48,14 @@ html.invert {
   -o-filter: invert(90%);
   -ms-filter: invert(90%);
 
-  .Profile,
-  .profile-image,
   img,
   .user-avatar:not(:has(.Avatar)),
   .Avatar {
-    filter: invert(120%);
-    -webkit-filter: invert(120%);
-    -moz-filter: invert(120%);
-    -o-filter: invert(120%);
-    -ms-filter: invert(120%);
+    filter: invert(90%);
+    -webkit-filter: invert(90%);
+    -moz-filter: invert(90%);
+    -o-filter: invert(90%);
+    -ms-filter: invert(90%);
   }
 }
 
@@ -101,4 +111,9 @@ pre {
 // shared styles
 .clear {
   clear: both;
+}
+
+// makes sure that popovers are above the modals
+[id^='popover-'] {
+  z-index: 10000;
 }

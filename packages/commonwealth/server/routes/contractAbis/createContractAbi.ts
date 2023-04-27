@@ -51,7 +51,7 @@ const createContractAbi = async (
   const abiAsRecord = validateAbi(abi);
 
   const contract_abi = await models.ContractAbi.create({
-    abi: abiAsRecord,
+    abi: JSON.stringify(abiAsRecord),
     nickname,
   });
 

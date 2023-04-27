@@ -1,207 +1,190 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React, { useEffect } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
-import { getDecimals, pluralizeWithoutNumberPrefix } from 'helpers';
-import $ from 'jquery';
-import m from 'mithril';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
 
 import 'modals/new_topic_modal.scss';
 import app from 'state';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import type { QuillEditor } from 'views/components/quill/quill_editor';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useCommonNavigate } from 'navigation/helpers';
+import type { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../components/react_quill_editor';
+import { serializeDelta } from '../components/react_quill_editor/utils';
 
-type NewTopicModalForm = {
-  description: string;
-  featuredInNewPost: boolean;
-  featuredInSidebar: boolean;
-  id: number;
-  name: string;
-  tokenThreshold: string;
+type NewTopicModalProps = {
+  onModalClose: () => void;
 };
 
-export class NewTopicModal extends ClassComponent {
-  private error: string;
-  private form: NewTopicModalForm = {
-    description: '',
-    featuredInNewPost: false,
-    featuredInSidebar: false,
-    id: undefined,
-    name: '',
-    tokenThreshold: '0',
-  };
-  private quillEditorState: QuillEditor;
-  private saving: boolean;
+export const NewTopicModal = (props: NewTopicModalProps) => {
+  const { onModalClose } = props;
 
-  view() {
-    let disabled = false;
+  const navigate = useCommonNavigate();
 
-    if (!this.form.name || !this.form.name.trim()) disabled = true;
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
+  const [isSaving, setIsSaving] = React.useState<boolean>(false);
+  const [description, setDescription] = React.useState<string>('');
+  const [featuredInNewPost, setFeaturedInNewPost] =
+    React.useState<boolean>(false);
+  const [featuredInSidebar, setFeaturedInSidebar] =
+    React.useState<boolean>(false);
+  const [name, setName] = React.useState<string>('');
+  const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
 
-    if (
-      this.form.featuredInNewPost &&
-      this.quillEditorState &&
-      this.quillEditorState.isBlank()
-    ) {
-      disabled = true;
+  const editorText = getTextFromDelta(contentDelta);
+
+  useEffect(() => {
+    if (!name || !name.trim()) {
+      setErrorMsg('Name must be specified.');
+      return;
     }
+    if (featuredInNewPost && editorText.length === 0) {
+      setErrorMsg('Must add template.');
+      return;
+    }
+    setErrorMsg(null);
+  }, [name, featuredInNewPost, editorText]);
 
-    const decimals = getDecimals(app.chain);
+  const decimals = app.chain?.meta?.decimals
+    ? app.chain.meta.decimals
+    : app.chain.network === ChainNetwork.ERC721
+    ? 0
+    : app.chain.base === ChainBase.CosmosSDK
+    ? 6
+    : 18;
 
-    return (
-      <div class="NewTopicModal">
-        <div class="compact-modal-title">
-          <h3>New topic</h3>
-          <ModalExitButton />
-        </div>
-        <div class="compact-modal-body">
-          <CWTextInput
-            label="Name"
-            name="name"
-            value={this.form.name}
-            oninput={(e) => {
-              this.form.name = (e.target as HTMLInputElement).value;
-            }}
-            inputValidationFn={(text: string) => {
-              let errorMsg;
-
-              const currentCommunityTopicNames = app.topics
-                .getByCommunity(app.activeChainId())
-                .map((t) => t.name.toLowerCase());
-
-              if (currentCommunityTopicNames.includes(text.toLowerCase())) {
-                errorMsg = 'Topic name already used within community.';
-                this.error = errorMsg;
-                m.redraw();
-                return ['failure', errorMsg];
-              }
-
-              const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
-
-              if (disallowedCharMatches) {
-                errorMsg = `The ${pluralizeWithoutNumberPrefix(
-                  disallowedCharMatches.length,
-                  'char'
-                )} 
-                ${disallowedCharMatches.join(', ')} are not permitted`;
-                this.error = errorMsg;
-                m.redraw();
-                return ['failure', errorMsg];
-              }
-
-              if (this.error) delete this.error;
-
-              return ['success', 'Valid topic name'];
-            }}
-            autofocus
-            autocomplete="off"
-            tabindex={1}
-            oncreate={(vvnode) => {
-              // use oncreate to focus because autofocus: true fails when component is recycled in a modal
-              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
-            }}
-          />
-          <CWTextInput
-            label="Description"
-            name="description"
-            tabindex={2}
-            value={this.form.description}
-            oninput={(e) => {
-              this.form.description = (e.target as any).value;
-            }}
-          />
-          {app.activeChainId() && (
-            <>
-              <CWLabel
-                label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
-              />
-              <TokenDecimalInput
-                decimals={decimals}
-                defaultValueInWei="0"
-                onInputChange={(newValue: string) => {
-                  this.form.tokenThreshold = newValue;
-                }}
-              />
-            </>
-          )}
-          <div class="checkboxes">
-            <CWCheckbox
-              label="Featured in Sidebar"
-              checked={this.form.featuredInSidebar}
-              onchange={() => {
-                this.form.featuredInSidebar = !this.form.featuredInSidebar;
-              }}
-              value=""
-            />
-            <CWCheckbox
-              label="Featured in New Post"
-              checked={this.form.featuredInNewPost}
-              onchange={() => {
-                this.form.featuredInNewPost = !this.form.featuredInNewPost;
-              }}
-              value=""
-            />
-          </div>
-          {this.form.featuredInNewPost && (
-            <QuillEditorComponent
-              contentsDoc=""
-              oncreateBind={(state: QuillEditor) => {
-                this.quillEditorState = state;
-              }}
-              editorNamespace="new-discussion"
-              tabindex={3}
-            />
-          )}
-          <CWButton
-            label="Create topic"
-            disabled={this.saving || !!this.error || disabled}
-            onclick={async (e: Event) => {
-              e.preventDefault();
-              const { form } = this;
-              try {
-                let defaultOffchainTemplate;
-                if (this.quillEditorState) {
-                  this.quillEditorState.disable();
-                  defaultOffchainTemplate =
-                    this.quillEditorState.textContentsAsString;
-                }
-                await app.topics.add(
-                  form.name,
-                  form.description,
-                  null,
-                  form.featuredInSidebar,
-                  form.featuredInNewPost,
-                  this.form.tokenThreshold || '0',
-                  defaultOffchainTemplate as string
-                );
-
-                this.saving = false;
-                m.redraw();
-                $(e.target).trigger('modalexit');
-              } catch (err) {
-                this.error = 'Error creating topic';
-                this.saving = false;
-                if (this.quillEditorState) {
-                  this.quillEditorState.enable();
-                }
-                m.redraw();
-              }
-            }}
-          />
-          {this.error && (
-            <CWValidationText message={this.error} status="failure" />
-          )}{' '}
-        </div>
+  return (
+    <div className="NewTopicModal">
+      <div className="compact-modal-title">
+        <h3>New topic</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
-    );
-  }
-}
+      <div className="compact-modal-body">
+        <CWTextInput
+          label="Name"
+          value={name}
+          onInput={(e) => {
+            setName(e.target.value);
+          }}
+          inputValidationFn={(text: string) => {
+            const currentCommunityTopicNames = app.topics
+              .getByCommunity(app.activeChainId())
+              .map((t) => t.name.toLowerCase());
+
+            if (currentCommunityTopicNames.includes(text.toLowerCase())) {
+              const err = 'Topic name already used within community.';
+              setErrorMsg(err);
+              return ['failure', err];
+            }
+
+            const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+
+            if (disallowedCharMatches) {
+              const err = `The ${pluralizeWithoutNumberPrefix(
+                disallowedCharMatches.length,
+                'char'
+              )}
+                ${disallowedCharMatches.join(', ')} are not permitted`;
+              setErrorMsg(err);
+              return ['failure', err];
+            }
+
+            if (errorMsg) {
+              setErrorMsg(null);
+            }
+
+            return ['success', 'Valid topic name'];
+          }}
+          autoFocus
+        />
+        <CWTextInput
+          label="Description"
+          name="description"
+          tabIndex={2}
+          value={description}
+          onInput={(e) => {
+            setDescription(e.target.value);
+          }}
+        />
+        {app.activeChainId() && (
+          <React.Fragment>
+            <CWLabel
+              label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
+            />
+            <TokenDecimalInput
+              decimals={decimals}
+              defaultValueInWei="0"
+              onInputChange={(newValue: string) => {
+                setTokenThreshold(newValue);
+              }}
+            />
+          </React.Fragment>
+        )}
+        <div className="checkboxes">
+          <CWCheckbox
+            label="Featured in Sidebar"
+            checked={featuredInSidebar}
+            onChange={() => {
+              setFeaturedInSidebar(!featuredInSidebar);
+            }}
+            value=""
+          />
+          <CWCheckbox
+            label="Featured in New Post"
+            checked={featuredInNewPost}
+            onChange={() => {
+              setFeaturedInNewPost(!featuredInNewPost);
+            }}
+            value=""
+          />
+        </div>
+        {featuredInNewPost && (
+          <ReactQuillEditor
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+          />
+        )}
+        <CWButton
+          label="Create topic"
+          disabled={isSaving || !!errorMsg}
+          onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+
+            try {
+              await app.topics.add(
+                name,
+                description,
+                null,
+                featuredInSidebar,
+                featuredInNewPost,
+                tokenThreshold || '0',
+                serializeDelta(contentDelta)
+              );
+
+              navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+
+              onModalClose();
+            } catch (err) {
+              setErrorMsg('Error creating topic');
+              setIsSaving(false);
+            }
+          }}
+        />
+        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}{' '}
+      </div>
+    </div>
+  );
+};

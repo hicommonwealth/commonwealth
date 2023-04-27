@@ -1,9 +1,7 @@
-/* @jsx m */
-
-import ClassComponent from 'class_component';
+import React from 'react';
 
 import 'components/comments/comments_tree.scss';
-import m from 'mithril'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+
 import type { Comment as CommentType } from 'models';
 import { Thread } from 'models';
 
@@ -22,27 +20,22 @@ type CommentsTreeAttrs = {
   updatedCommentsCallback: () => void;
 };
 
-export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
-  private commentError: any;
-  private dom;
-  private highlightedComment: boolean;
-  private isReplying: boolean;
-  private parentCommentId: number;
+export const CommentsTree = (props: CommentsTreeAttrs) => {
+  const [commentError, setCommentError] = React.useState(null);
+  const [highlightedComment, setHighlightedComment] = React.useState(false);
+  const [isReplying, setIsReplying] = React.useState(false);
+  const [parentCommentId, setParentCommentId] = React.useState(null);
 
-  oncreate(vnode: m.VnodeDOM<CommentsTreeAttrs, this>) {
-    this.dom = vnode.dom;
-  }
+  const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
+    props;
 
-  view(vnode: m.Vnode<CommentsTreeAttrs>) {
-    const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
-      vnode.attrs;
+  // Jump to the comment indicated in the URL upon page load. Avoid
+  // using _DEPRECATED_getSearchParams('comment') because it may return stale
+  // results from a previous page if route transition hasn't finished
 
-    // Jump to the comment indicated in the URL upon page load. Avoid
-    // using m.route.param('comment') because it may return stale
-    // results from a previous page if route transition hasn't finished
-
-    if (this.dom && comments?.length > 0 && !this.highlightedComment) {
-      this.highlightedComment = true;
+  React.useEffect(() => {
+    if (comments?.length > 0 && !highlightedComment) {
+      setHighlightedComment(true);
 
       const commentId = window.location.search.startsWith('?comment=')
         ? window.location.search.replace('?comment=', '')
@@ -50,103 +43,104 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
 
       if (commentId) jumpHighlightComment(Number(commentId));
     }
+  }, [comments?.length, highlightedComment]);
 
-    const handleIsReplying = (isReplying: boolean, id?: number) => {
-      if (isReplying) {
-        this.parentCommentId = id;
-        this.isReplying = true;
-      } else {
-        this.parentCommentId = undefined;
-        this.isReplying = false;
-      }
-    };
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const handleIsReplying = (isReplying: boolean, id?: number) => {
+    if (isReplying) {
+      setParentCommentId(id);
+      setIsReplying(true);
+    } else {
+      setParentCommentId(undefined);
+      setIsReplying(false);
+    }
+  };
 
-    const isLivingCommentTree = (comment, children) => {
-      if (!comment.deleted) {
-        return true;
-      } else if (!children.length) {
-        return false;
-      } else {
-        let survivingDescendents = false;
+  const isLivingCommentTree = (comment, children) => {
+    if (!comment.deleted) {
+      return true;
+    } else if (!children.length) {
+      return false;
+    } else {
+      let survivingDescendents = false;
 
-        for (let i = 0; i < children.length; i++) {
-          const child = children[i];
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
 
-          if (!child.deleted) {
+        if (!child.deleted) {
+          survivingDescendents = true;
+          break;
+        }
+
+        const grandchildren = app.comments
+          .getByThread(thread)
+          .filter((c) => c.parentComment === child.id);
+
+        for (let j = 0; j < grandchildren.length; j++) {
+          const grandchild = grandchildren[j];
+
+          if (!grandchild.deleted) {
             survivingDescendents = true;
             break;
           }
-
-          const grandchildren = app.comments
-            .getByThread(thread)
-            .filter((c) => c.parentComment === child.id);
-
-          for (let j = 0; j < grandchildren.length; j++) {
-            const grandchild = grandchildren[j];
-
-            if (!grandchild.deleted) {
-              survivingDescendents = true;
-              break;
-            }
-          }
-
-          if (survivingDescendents) break;
         }
 
-        return survivingDescendents;
+        if (survivingDescendents) break;
       }
-    };
 
-    const recursivelyGatherComments = (
-      comments_: CommentType<any>[],
-      parentComment: CommentType<any>,
-      threadLevel: number
-    ) => {
-      const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
+      return survivingDescendents;
+    }
+  };
 
-      return comments_.map((comment: CommentType<any>) => {
-        const children = app.comments
-          .getByThread(thread)
-          .filter((c) => c.parentComment === comment.id);
+  const recursivelyGatherComments = (
+    comments_: CommentType<any>[],
+    parentComment: CommentType<any>,
+    threadLevel: number
+  ) => {
+    const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
 
-        if (isLivingCommentTree(comment, children)) {
-          return (
-            <>
-              <Comment
-                comment={comment}
+    return comments_.map((comment: CommentType<any>) => {
+      const children = app.comments
+        .getByThread(thread)
+        .filter((c) => c.parentComment === comment.id);
+
+      if (isLivingCommentTree(comment, children)) {
+        return (
+          <React.Fragment key={comment.id}>
+            <Comment
+              comment={comment}
+              handleIsReplying={handleIsReplying}
+              isLast={threadLevel === 2}
+              isLocked={thread instanceof Thread && thread.readOnly}
+              setIsGloballyEditing={setIsGloballyEditing}
+              threadLevel={threadLevel}
+              updatedCommentsCallback={updatedCommentsCallback}
+            />
+            {!!children.length &&
+              canContinueThreading &&
+              recursivelyGatherComments(children, comment, threadLevel + 1)}
+            {isReplying && parentCommentId === comment.id && (
+              <CreateComment
                 handleIsReplying={handleIsReplying}
-                isLast={threadLevel === 2}
-                isLocked={thread instanceof Thread && thread.readOnly}
-                setIsGloballyEditing={setIsGloballyEditing}
-                threadLevel={threadLevel}
+                parentCommentId={parentCommentId}
+                rootThread={thread}
                 updatedCommentsCallback={updatedCommentsCallback}
               />
-              {!!children.length &&
-                canContinueThreading &&
-                recursivelyGatherComments(children, comment, threadLevel + 1)}
-              {this.isReplying && this.parentCommentId === comment.id && (
-                <CreateComment
-                  handleIsReplying={handleIsReplying}
-                  parentCommentId={this.parentCommentId}
-                  rootThread={thread}
-                  updatedCommentsCallback={updatedCommentsCallback}
-                />
-              )}
-            </>
-          );
-        } else {
-          return null;
-        }
-      });
-    };
+            )}
+          </React.Fragment>
+        );
+      } else {
+        return null;
+      }
+    });
+  };
 
-    return (
-      <div class="ProposalComments">
-        {recursivelyGatherComments(comments, comments[0], 0)}
-        {this.commentError && (
-          <CWValidationText message={this.commentError} status="failure" />
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    <div className="ProposalComments">
+      {comments && recursivelyGatherComments(comments, comments[0], 0)}
+      {commentError && (
+        <CWValidationText message={commentError} status="failure" />
+      )}
+    </div>
+  );
+};

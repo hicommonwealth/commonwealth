@@ -1,5 +1,5 @@
 import type { Account, IWebWallet } from 'models';
-import type { ProfileRowAttrs } from '../../components/component_kit/cw_profiles_list';
+import type { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
 
 export type LoginSidebarType =
   | 'connectWallet'
@@ -10,6 +10,7 @@ export type LoginSidebarType =
 export type LoginBodyType =
   | 'allSet'
   | 'connectWithEmail'
+  | 'redirectToSign'
   | 'ethWalletList'
   | 'selectAccountType'
   | 'selectPrevious'
@@ -17,22 +18,22 @@ export type LoginBodyType =
   | 'walletList'
   | 'welcome';
 
-export type LoginAttrs = {
+export type LoginProps = {
   address: string;
   currentlyInCommunityPage: boolean;
   bodyType: LoginBodyType;
-  profiles: Array<ProfileRowAttrs>;
+  profiles: Array<ProfileRowProps>;
   sidebarType: LoginSidebarType;
   username: string;
   wallets: Array<IWebWallet<any>>;
   magicLoading: boolean;
   setAddress: (address: string) => void;
-  setBodyType: (bodyType: string) => void;
+  setBodyType: (bodyType: LoginBodyType) => void;
   handleEmailLoginCallback: () => void;
-  handleSetAvatar: (url: string) => void;
+  handleSetAvatar: (avatarUrl: string) => void;
   handleSetUsername: (username: string) => void;
   handleSetEmail: (e: any) => void;
-  setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
+  setProfiles: (profiles: Array<ProfileRowProps>) => void;
   setSidebarType: (sidebarType: string) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   setSelectedLinkingWallet: (wallet: IWebWallet<any>) => void;
@@ -47,4 +48,5 @@ export type LoginAttrs = {
   saveProfileInfoCallback: () => void;
   performLinkingCallback: () => void;
   showResetWalletConnect: boolean;
+  onModalClose: () => void;
 };

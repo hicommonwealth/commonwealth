@@ -17,8 +17,6 @@ export enum ComponentType {
   ContentPage = 'ContentPage',
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
-  EngagementButton = 'EngagementButton',
-  ExternalLink = 'ExternalLink',
   Form = 'Form',
   FormSection = 'FormSection',
   FilterMenu = 'FilterMenu',
@@ -46,18 +44,19 @@ export enum ComponentType {
   TextInput = 'TextInput',
   ThreadVoteButton = 'ThreadVoteButton',
   Toggle = 'Toggle',
+  Tooltip = 'Tooltip',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
 }
 
-export type StyleAttrs = {
+export type BaseStyleProps = {
   disabled?: boolean;
   className?: string;
 };
 
-export type DividerMenuItem = { type?: 'divider' };
+export type DividerMenuItem = { type: 'divider' };
 
-type HeaderMenuItem = { type?: 'header'; label?: string };
+export type HeaderMenuItem = { type: 'header'; label?: string };
 
 export type DefaultMenuItem = {
   disabled?: boolean;
@@ -65,7 +64,7 @@ export type DefaultMenuItem = {
   iconRight?: IconName;
   isSecondary?: boolean;
   label?: string;
-  onclick?: (e?: Event) => void;
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'default';
 };
 
@@ -74,7 +73,7 @@ type NotificationMenuItem = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label?: string;
-  onclick?: (e?: MouseEvent) => void;
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'notification';
 };
 

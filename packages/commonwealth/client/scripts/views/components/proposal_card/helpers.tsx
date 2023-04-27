@@ -1,4 +1,4 @@
-/* @jsx m */
+import React from 'react';
 
 import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 
@@ -14,11 +14,10 @@ import {
   chainEntityTypeToProposalShortName,
   proposalSlugToChainEntityType,
 } from 'identifiers';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import m from 'mithril'; // required for getStatusText
 import type { AnyProposal } from 'models';
 import { ProposalStatus } from 'models';
 import moment from 'moment';
+
 import { Countdown } from 'views/components/countdown';
 
 export const getStatusClass = (proposal: AnyProposal) =>
@@ -62,7 +61,9 @@ export const getStatusText = (proposal: AnyProposal) => {
     proposal.endTime.kind === 'fixed'
       ? [
           <Countdown
-            duration={moment.duration(proposal.endTime.time.diff(moment()))}
+            duration={moment
+              .duration(proposal.endTime.time.diff(moment()))
+              .asMilliseconds()}
           />,
           ' left',
         ]

@@ -1,68 +1,60 @@
 @import '../../shared';
 
-@mixin notificationsButton {
-  .cui-button {
-    border-radius: 0;
-    border-right: 1px solid $neutral-300;
-    box-shadow: none;
-    height: 40px;
-    padding: 0 8px;
-    width: 100%;
-
-    .cui-button-label {
-      color: $neutral-900;
-      text-align: center;
-    }
-
-    &:hover {
-      background: $neutral-100;
-    }
-
-    &:active {
-      background: $neutral-200;
-    }
-  }
-}
-
 .unreads-icon svg {
   cursor: pointer;
 }
 
 .NotificationsMenu {
   background-color: $white;
+  border: 1px solid $neutral-300;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-3;
+  display: flex;
+  flex-direction: column;
   width: 296px;
 
-  @include extraSmall {
-    height: calc(100% - 88px);
+  @include smallInclusive {
+    border: none;
+    box-shadow: none;
+    flex: 1;
+    height: 100%;
     width: 100%;
   }
 
-  .NotificationsMenuHeader {
-    @include notificationsButton;
-
+  .header {
     border-bottom: 1px solid $neutral-300;
     display: flex;
+    height: 40px;
+
+    @include smallInclusive {
+      > * {
+        margin: auto;
+      }
+    }
   }
 
   .notification-list {
     align-items: center;
-    border-left: 1px solid $neutral-300;
-    border-right: 1px solid $neutral-300;
     display: flex;
+    flex-direction: column;
     height: 480px;
     justify-content: center;
 
-    @include extraSmall {
-      border: none;
-      height: 100%;
-      width: 100%;
+    @include smallInclusive {
+      height: calc(100% - 40px);
     }
   }
 
-  .NotificationsMenuFooter {
-    @include notificationsButton;
-
+  .footer {
     border-top: 1px solid $neutral-300;
     display: flex;
+    gap: 8px;
+    height: 40px;
+    padding: 0 8px;
+    width: 100%;
+
+    > .Button {
+      flex: 1;
+    }
   }
 }

@@ -1,5 +1,5 @@
+import { render } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
-import m from 'mithril';
 
 import {
   CWAvatar,
@@ -40,6 +40,10 @@ class MinimumProfile {
     return this._chain;
   }
 
+  get initialized() {
+    return this._initialized;
+  }
+
   constructor(address, chain) {
     this._address = address;
     this._chain = chain;
@@ -66,8 +70,8 @@ class MinimumProfile {
 
   public getAvatar(size: number) {
     return this.avatarUrl
-      ? m(CWAvatar, { avatarUrl: this.avatarUrl, size })
-      : m(CWJdenticon, { address: this.address, size });
+      ? render(CWAvatar, { avatarUrl: this.avatarUrl, size })
+      : render(CWJdenticon, { address: this.id, size });
   }
 
   public static getSVGAvatar(address, size) {
