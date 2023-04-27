@@ -13,15 +13,51 @@ import { ChainEntitiesSelector } from '../components/chain_entities_selector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { Link, LinkSource } from 'models/Thread';
 
 type UpdateProposalStatusModalProps = {
   onChangeHandler: (
     stage: ThreadStage,
     chainEntities?: ChainEntity[],
-    snapshotProposal?: SnapshotProposal[]
+    links?: Link[]
   ) => void;
   onModalClose: () => void;
   thread: Thread;
+};
+
+const getAddedAndDeleted = (
+  tempSnapshotProposals: Pick<SnapshotProposal, 'id'>[],
+  initialSnapshotProposals: Pick<SnapshotProposal, 'id'>[]
+) => {
+  const toAdd = tempSnapshotProposals.reduce((acc, curr) => {
+    const wasSelected = initialSnapshotProposals.find(
+      ({ id }) => curr.id === id
+    );
+
+    if (wasSelected) {
+      return acc;
+    }
+
+    return [...acc, curr];
+  }, []);
+
+  const toDelete = initialSnapshotProposals.reduce((acc, curr) => {
+    const isSelected = tempSnapshotProposals.find(({ id }) => curr.id === id);
+
+    if (isSelected) {
+      return acc;
+    }
+
+    return [...acc, curr];
+  }, []);
+
+  return { toAdd, toDelete };
+};
+
+const getInitialSnapshots = (thread: Thread) => {
+  return thread.links
+    .filter((l) => l.source === LinkSource.Snapshot)
+    .map((l) => ({ id: l.identifier }));
 };
 
 export const UpdateProposalStatusModal = ({
@@ -31,13 +67,9 @@ export const UpdateProposalStatusModal = ({
 }: UpdateProposalStatusModalProps) => {
   const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
-    Array<SnapshotProposal>
-  >(
-    [
-      thread.snapshotProposal &&
-        ({ id: thread.snapshotProposal } as SnapshotProposal),
-    ].filter(Boolean)
-  );
+    Array<Pick<SnapshotProposal, 'id'>>
+  >(getInitialSnapshots(thread));
+
   const [tempChainEntities, setTempChainEntities] = useState<
     Array<ChainEntity>
   >(thread.chainEntities || []);
@@ -75,18 +107,48 @@ export const UpdateProposalStatusModal = ({
       );
     }
 
-    // set linked chain entities
+    let links: Link[] = [];
+
     try {
+      const { toAdd, toDelete } = getAddedAndDeleted(
+        tempSnapshotProposals,
+        getInitialSnapshots(thread)
+      );
+
+      if (toAdd.length > 0) {
+        const updatedThread = await app.threads.addLinks({
+          threadId: thread.id,
+          links: toAdd.map((sn) => ({
+            source: LinkSource.Snapshot,
+            identifier: sn.id,
+          })),
+        });
+
+        links = updatedThread.links;
+      }
+
+      if (toDelete.length > 0) {
+        const updatedThread = await app.threads.deleteLinks({
+          threadId: thread.id,
+          links: toDelete.map((sn) => ({
+            source: LinkSource.Snapshot,
+            identifier: sn.id,
+          })),
+        });
+
+        links = updatedThread.links;
+      }
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to update proposal links');
+    }
+
+    try {
+      // set linked chain entities
       await app.threads.setLinkedChainEntities({
         threadId: thread.id,
         entities: tempChainEntities,
       });
-      if (tempSnapshotProposals.length > 0 && tempSnapshotProposals[0]?.id) {
-        await app.threads.setLinkedSnapshotProposal({
-          threadId: thread.id,
-          snapshotProposal: tempSnapshotProposals[0]?.id,
-        });
-      }
     } catch (err) {
       console.log('Failed to update linked proposals');
       throw new Error(
@@ -96,7 +158,7 @@ export const UpdateProposalStatusModal = ({
       );
     }
 
-    onChangeHandler(tempStage, tempChainEntities, tempSnapshotProposals);
+    onChangeHandler(tempStage, tempChainEntities, links);
     onModalClose();
   };
 
@@ -112,7 +174,7 @@ export const UpdateProposalStatusModal = ({
   const handleSelectProposal = (sn: SnapshotProposal) => {
     const isSelected = tempSnapshotProposals.find(({ id }) => sn.id === id);
 
-    setTempSnapshotProposals(isSelected ? [] : [sn]);
+    setTempSnapshotProposals(isSelected ? [] : [{ id: sn.id }]);
     setVotingStage();
   };
 

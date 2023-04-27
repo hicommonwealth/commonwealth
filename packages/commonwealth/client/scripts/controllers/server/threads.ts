@@ -575,14 +575,17 @@ class ThreadsController {
   public async getLinksForThread({
     threadId,
     linkType,
+    link,
   }: {
     threadId: number;
-    linkType?: LinkSource;
+    linkType?: LinkSource[];
+    link?: Link;
   }): Promise<string[]> {
     try {
       const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
         thread_id: threadId,
-        source: linkType,
+        linkType,
+        link,
         jwt: app.user.jwt,
       });
 

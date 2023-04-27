@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
@@ -18,6 +18,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { Link, LinkSource } from 'models/Thread';
 
 type LinkedProposalProps = {
   chainEntity: ChainEntity;
@@ -46,7 +47,7 @@ type LinkedProposalsCardProps = {
   onChangeHandler: (
     stage: ThreadStage,
     chainEntities: Array<ChainEntity>,
-    snapshotProposal: Array<SnapshotProposal>
+    links?: Link[]
   ) => void;
   showAddProposalButton: boolean;
   thread: Thread;
@@ -62,14 +63,17 @@ export const LinkedProposalsCard = ({
   const [space, setSpace] = useState<SnapshotSpace>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log('thread2', thread)
+  const initialSnapshotLinks = useMemo(
+    () => thread.links.filter((l) => l.source === LinkSource.Snapshot),
+    [thread.links]
+  );
 
   useEffect(() => {
-    if (thread.snapshotProposal?.length > 0) {
+    if (initialSnapshotLinks.length > 0) {
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
         for (const { space: _space, proposals } of data) {
           const matchingSnapshot = proposals.find(
-            (sn) => sn.id === thread.snapshotProposal
+            (sn) => sn.id === initialSnapshotLinks[0].identifier
           );
 
           if (matchingSnapshot) {
@@ -82,7 +86,7 @@ export const LinkedProposalsCard = ({
         setSnapshotProposalsLoaded(true);
       });
     }
-  }, [thread.snapshotProposal]);
+  }, [initialSnapshotLinks]);
 
   let snapshotUrl = '';
 
@@ -93,14 +97,14 @@ export const LinkedProposalsCard = ({
   }
 
   const showSnapshot =
-    thread.snapshotProposal?.length > 0 && snapshotProposalsLoaded;
+    initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
 
   return (
     <>
       <CWContentPageCard
         header="Linked Proposals"
         content={
-          thread.snapshotProposal?.length > 0 && !snapshotProposalsLoaded ? (
+          initialSnapshotLinks.length > 0 && !snapshotProposalsLoaded ? (
             <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>
