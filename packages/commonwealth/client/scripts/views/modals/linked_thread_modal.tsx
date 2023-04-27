@@ -8,12 +8,13 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
+import { LinkSource } from 'models/Thread';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
   thread: Thread;
   onModalClose: () => void;
-  onSave?: (linkedThreads: Thread[]) => void;
+  onSave?: (links: Thread['links']) => void;
 };
 
 const getAddedAndDeleted = (
@@ -58,25 +59,38 @@ export const LinkedThreadModal = ({
       initialLinkedThreads
     );
 
+    let links: Thread['links'];
+
     try {
       if (toAdd.length) {
-        await Promise.all(
-          toAdd.map((linkedThread) =>
-            app.threads.addLinkedThread(thread.id, linkedThread.id)
-          )
-        );
+        const updatedThread = await app.threads.addLinks({
+          threadId: thread.id,
+          links: toAdd.map((el) => ({
+            source: LinkSource.Thread,
+            identifier: el.id,
+          })),
+        });
+
+        links = updatedThread.links;
       }
 
       if (toDelete.length) {
-        await Promise.all(
-          toDelete.map((linkedThread) =>
-            app.threads.removeLinkedThread(thread.id, linkedThread.id)
-          )
-        );
+        const updatedThread = await app.threads.deleteLinks({
+          threadId: thread.id,
+          links: toDelete.map((el) => ({
+            source: LinkSource.Thread,
+            identifier: el.id,
+          })),
+        });
+
+        links = updatedThread.links;
       }
 
       onModalClose();
-      onSave(tempLinkedThreads);
+
+      if (links) {
+        onSave(links);
+      }
     } catch (err) {
       console.error(err);
       notifyError('Failed to update linked threads');

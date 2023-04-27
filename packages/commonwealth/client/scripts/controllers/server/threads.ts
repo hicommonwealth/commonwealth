@@ -521,7 +521,7 @@ class ThreadsController {
   }): Promise<Thread> {
     try {
       const response = await axios.post(
-        `${app.serverUrl()}/linking/addThreadLink`,
+        `${app.serverUrl()}/linking/addThreadLinks`,
         {
           thread_id: threadId,
           links,
@@ -529,10 +529,10 @@ class ThreadsController {
         }
       );
 
-      return response.data;
+      return response.data.result;
     } catch (err) {
-      notifyError('Could not add link to the thread');
-      console.log(err);
+      console.log('Could not add links', err);
+      throw new Error(err);
     }
   }
 
@@ -560,10 +560,10 @@ class ThreadsController {
         }
       );
 
-      return response.data;
+      return response.data.result;
     } catch (err) {
-      notifyError('Could not delete link');
-      console.log(err);
+      console.log('Could not delete links', err);
+      throw new Error(err);
     }
   }
 

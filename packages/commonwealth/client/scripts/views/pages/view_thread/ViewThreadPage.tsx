@@ -486,16 +486,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasEditPerms = isAuthor || isEditor;
 
-  const handleLinkedThreadChange = (linkedThreads: Thread[]) => {
-    const linkedThreadsRelations = linkedThreads.map((t) => ({
-      id: '',
-      linkedThread: String(t.id),
-      linkingThread: String(thread.id),
-    }));
-
+  const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({
       ...thread,
-      linkedThreads: linkedThreadsRelations,
+      links,
     });
 
     setThread(updatedThread);

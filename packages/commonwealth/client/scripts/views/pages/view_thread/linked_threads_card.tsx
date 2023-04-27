@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { getProposalUrlPath } from 'identifiers';
 import type { Thread } from 'models';
@@ -13,11 +13,12 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
+import { LinkSource } from 'models/Thread';
 
 type LinkedThreadsCardProps = {
   thread: Thread;
   allowLinking: boolean;
-  onChangeHandler: (linkedThreads: Thread[]) => void;
+  onChangeHandler: (links: Thread['links']) => void;
 };
 
 export const LinkedThreadsCard = ({
@@ -29,12 +30,16 @@ export const LinkedThreadsCard = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [threadsLoaded, setThreadsLoaded] = useState(false);
 
-  useEffect(() => {
-    if (thread.linkedThreads.length > 0) {
-      const linkedThreadIds = thread.linkedThreads.map(
-        ({ linkedThread }) => linkedThread
-      );
+  const linkedThreadIds = useMemo(
+    () =>
+      thread.links
+        .filter(({ source }) => source === LinkSource.Thread)
+        .map(({ identifier }) => identifier),
+    [thread.links]
+  );
 
+  useEffect(() => {
+    if (linkedThreadIds.length > 0) {
       app.threads
         .fetchThreadsFromId(linkedThreadIds)
         .then((data) => {
@@ -45,20 +50,20 @@ export const LinkedThreadsCard = ({
     } else {
       setLinkedThreads([]);
     }
-  }, [thread?.linkedThreads]);
+  }, [linkedThreadIds, thread.links]);
 
   return (
     <>
       <CWContentPageCard
         header="Linked Discussions"
         content={
-          thread.linkedThreads.length && !threadsLoaded ? (
+          linkedThreadIds.length > 0 && !threadsLoaded ? (
             <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>
           ) : (
             <div className="LinkedThreadsCard">
-              {thread.linkedThreads.length > 0 ? (
+              {linkedThreadIds.length > 0 ? (
                 <div className="links-container">
                   {linkedThreads.map((t) => {
                     const discussionLink = getProposalUrlPath(
