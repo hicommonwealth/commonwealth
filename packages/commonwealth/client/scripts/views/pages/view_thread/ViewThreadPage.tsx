@@ -46,6 +46,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { ThreadActionType } from '../../../../../shared/types';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -520,6 +521,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           onClick: async () => {
             try {
               app.threads.delete(thread).then(() => {
+                app.threadUpdateEmitter.emit('threadUpdated', {
+                  threadId: thread.id,
+                  action: ThreadActionType.Deletion,
+                });
                 navigate('/discussions');
               });
             } catch (err) {
