@@ -268,8 +268,6 @@ class ThreadsController {
       canvasHash,
     });
 
-    ThreadsController.Instance.store.add(t);
-
     return t;
   }
 
