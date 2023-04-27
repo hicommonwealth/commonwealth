@@ -5,7 +5,7 @@ import { stringToU8a } from '@polkadot/util';
 import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
-import { BalanceType, ChainNetwork } from 'common-common/src/types';
+import { BalanceType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
@@ -101,7 +101,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
     const sessionPayload = createCanvasSessionPayload(
-      'ethereum',
+      'ethereum' as ChainBase,
       chain_id,
       address,
       sessionWallet.address,
@@ -167,7 +167,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
     const sessionPayload: SessionPayload = createCanvasSessionPayload(
-      'substrate',
+      'substrate' as ChainBase,
       chain_id,
       address,
       sessionWallet.address,
@@ -258,8 +258,7 @@ export const createThread = async (args: ThreadArgs) => {
       link: url || '',
       topic: topicId || '',
     },
-    chain: "ethereum",
-    chainId: "1",
+    chain: "eip155:1",
     from: session.payload.from,
     timestamp: Date.now(),
   };
@@ -320,8 +319,7 @@ export const createComment = async (args: CommentArgs) => {
       thread_id,
       parent_comment_id: parentCommentId
     },
-    chain: "ethereum",
-    chainId: "1",
+    chain: "eip155:1",
     from: session.payload.from,
     timestamp: Date.now(),
   };
@@ -403,8 +401,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
     block: session.payload.block,
     call: "reactComment",
     callArgs: { comment_id, value: reaction },
-    chain: "ethereum",
-    chainId: "1",
+    chain: "eip155:1",
     from: session.payload.from,
     timestamp: Date.now(),
   };

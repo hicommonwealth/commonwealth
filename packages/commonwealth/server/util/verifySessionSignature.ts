@@ -19,10 +19,7 @@ import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { getEIP712SignableSession } from '../../shared/adapters/chain/ethereum/keys';
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
 import { addressSwapper } from '../../shared/utils';
-import {
-  chainBaseToCanvasChainId,
-  createCanvasSessionPayload,
-} from '../../shared/canvas';
+import { createCanvasSessionPayload, chainBaseToCanvasChainId } from '../../shared/canvas';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
@@ -56,8 +53,9 @@ const verifySessionSignature = async (
 
   // Reconstruct the expected canvas message.
   const canvasChainId = chainBaseToCanvasChainId(chain.base, chain_id);
+
   const canvasSessionPayload = createCanvasSessionPayload(
-    canvasChain,
+    chain.base,
     canvasChainId,
     chain.base === ChainBase.Substrate
       ? addressSwapper({
