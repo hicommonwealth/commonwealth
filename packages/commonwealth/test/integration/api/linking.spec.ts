@@ -173,13 +173,23 @@ describe('Linking Tests', () => {
     it('Can get filtered links', async () => {
       const result = await modelUtils.getLinks({
         thread_id: thread1.id,
-        linkType: LinkSource.Snapshot,
+        linkType: [LinkSource.Snapshot],
         jwt: userJWT,
       });
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
       expect(result.result.links[0].source).to.equal(link1.source.toString());
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
+      const result2 = await modelUtils.getLinks({
+        thread_id: thread1.id,
+        linkType: [LinkSource.Snapshot, LinkSource.Proposal],
+        jwt: userJWT,
+      });
+      expect(result2.status).to.equal('Success');
+      expect(result2.result).to.not.be.null;
+      expect(result2.result.links.length).to.equal(2);
+      expect(result2.result.links[0].source).to.equal(link1.source.toString());
+      expect(result2.result.links[1].source).to.equal(link3.source.toString());
     });
     it('Can get all threads linked to a link', async () => {
       const result = await modelUtils.getLinks({ link: link3, jwt: userJWT });

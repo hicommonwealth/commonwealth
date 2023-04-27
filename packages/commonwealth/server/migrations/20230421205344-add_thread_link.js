@@ -11,7 +11,9 @@ module.exports = {
       });
 
       const [threads, metadata] = await queryInterface.sequelize.query(
-        'SELECT id, snapshot_proposal FROM "Threads"'
+        `SELECT t.id as id, t.snapshot_proposal as snapshot_proposal, sp.space as space
+        FROM "Threads" t
+        LEFT JOIN "SnapshotProposals" sp ON t.snapshot_proposal = sp.id`
       );
 
       const linkedThreadsPromises = threads.map((thread) =>
@@ -23,6 +25,7 @@ module.exports = {
           }
         )
       );
+
       const chainEntitiesPromises = threads.map((thread) =>
         queryInterface.sequelize.query(
           'SELECT * FROM "ChainEntityMeta" WHERE "thread_id" = ?',
@@ -43,7 +46,14 @@ module.exports = {
 
         // Add snapshot links
         const snapshotLinks = thread.snapshot_proposal
-          ? [{ source: 'snapshot', identifier: thread.snapshot_proposal }]
+          ? [
+              {
+                source: 'snapshot',
+                identifier: thread.space
+                  ? `${thread.space}/${thread.snapshot_proposal}`
+                  : thread.snapshot_proposal,
+              },
+            ]
           : [];
         links.push(...snapshotLinks);
 

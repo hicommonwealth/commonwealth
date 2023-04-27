@@ -19,6 +19,7 @@ import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type CommentAuthorProps = {
   comment: CommentType<any>;
@@ -215,26 +216,45 @@ export const Comment = (props: CommentProps) => {
                           iconLeft: 'write',
                           onClick: async (e) => {
                             e.preventDefault();
-                            setSavedEdits(
-                              localStorage.getItem(
-                                `${app.activeChainId()}-edit-comment-${
-                                  comment.id
-                                }-storedText`
-                              )
+                            const editsToSave = localStorage.getItem(
+                              `${app.activeChainId()}-edit-comment-${
+                                comment.id
+                              }-storedText`
                             );
-                            if (savedEdits) {
+
+                            if (editsToSave) {
                               clearEditingLocalStorage(
                                 comment.id,
                                 ContentType.Comment
                               );
 
-                              const confirmationResult = window.confirm(
-                                'Previous changes found. Restore edits?'
-                              );
+                              setSavedEdits(editsToSave || '');
 
-                              setShouldRestoreEdits(confirmationResult);
+                              openConfirmation({
+                                title: 'Info',
+                                description: (
+                                  <>Previous changes found. Restore edits?</>
+                                ),
+                                buttons: [
+                                  {
+                                    label: 'Restore',
+                                    buttonType: 'mini-black',
+                                    onClick: () => {
+                                      setShouldRestoreEdits(true);
+                                      handleSetIsEditingComment(true);
+                                    },
+                                  },
+                                  {
+                                    label: 'Cancel',
+                                    buttonType: 'mini-white',
+                                    onClick: () =>
+                                      handleSetIsEditingComment(true),
+                                  },
+                                ],
+                              });
+                            } else {
+                              handleSetIsEditingComment(true);
                             }
-                            handleSetIsEditingComment(true);
                           },
                         },
                         {

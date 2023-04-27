@@ -260,7 +260,7 @@ export const deleteLink = async (args: createDeleteLinkArgs) => {
 
 type getLinksArgs = {
   thread_id?: number;
-  linkType?: LinkSource;
+  linkType?: LinkSource[];
   link?: Link;
   jwt: any;
 };
