@@ -49,7 +49,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
-        unknown,
+        [{ count: string }],
         ChatChannelInstance[],
         RuleInstance[],
         CommunityBannerInstance,
@@ -202,9 +202,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     (t) => t.stage === 'voting'
   ).length;
 
-  const numTotalThreads = parseInt(
-    (totalThreads[0] as { count: string }).count
-  );
+  const numTotalThreads = parseInt(totalThreads[0].count);
 
   return res.json({
     status: 'Success',
