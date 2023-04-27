@@ -159,6 +159,7 @@ const bulkThreads = async (
         pinned: t.pinned,
         chain: t.thread_chain,
         created_at: t.thread_created,
+        links: t.links,
         collaborators,
         linked_threads,
         chain_entity_meta,
