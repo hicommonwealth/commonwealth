@@ -21,7 +21,7 @@ export class ERC721 {
 
   /**
    * mint a new id for this nft
-   * @param tokenId new token id to mint(any number as string)
+   * @param tokenId new token id to mint (any number as a string)
    * @param to Account index to mint to
    * @returns
    */

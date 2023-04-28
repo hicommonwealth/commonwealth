@@ -31,7 +31,8 @@ export function eventMatch(
   kind: string,
   chain_id,
   proposalId?: string,
-  transferAmount?: string
+  transferAmount?: string,
+  from?: string,
 ) {
   expect(event, 'event is undefined').to.not.be.undefined;
   if (proposalId)
@@ -43,6 +44,9 @@ export function eventMatch(
     expect(event.data.value, 'transfer amount does not match').to.equal(
       Web3.utils.toWei(transferAmount)
     );
+
+  if (from)
+    expect(event.data.from, 'from address does not match').to.equal(from);
 
   expect(event.data.kind, 'event kind does not match').to.equal(kind);
   expect(event.chain, 'event chain does not match').to.equal(chain_id);
