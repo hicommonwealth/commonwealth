@@ -292,10 +292,11 @@ export class ChainTesting {
   /**
    * advance the timestamp and block
    * @param seconds amount of seconds to add to timestamp
+   * @param blocks amount of blocks to mine
    * @returns '{PreTime, PostTime}'
    */
-  public async advanceTime(seconds: string) {
-    const request: chainAdvanceTime = { seconds };
+  public async advanceTime(seconds: string, blocks = 1) {
+    const request: chainAdvanceTime = { seconds, blocks };
     const response = await axios.post(
       `${this.host}/chain/advanceTime`,
       JSON.stringify(request),

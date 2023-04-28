@@ -55,3 +55,9 @@ export function findEvent(events: any[], kind: string, chain_id: string, blockNu
     event.blockNumber === blockNumber
   );
 }
+
+export function getEvmSecondsAndBlocks(days: number) {
+  const secs = days * 86400;
+  const blocks = secs / 12 + 500;
+  return { secs, blocks };
+}

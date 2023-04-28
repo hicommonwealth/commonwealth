@@ -87,7 +87,7 @@ export const advanceTimestamp = async (req: Request, res: Response) => {
       preTime: (await getBlockInfo()).timestamp.toString(),
       postTime: '0',
     };
-    await advanceEvmTime(request.seconds, 1);
+    await advanceEvmTime(request.seconds, request.blocks);
     results.postTime = (await getBlockInfo()).timestamp.toString();
     res.status(200).json(results).send();
   } catch (err) {

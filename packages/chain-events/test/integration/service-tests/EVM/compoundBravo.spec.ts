@@ -14,7 +14,7 @@ import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import { eventMatch } from '../../../util';
+import {eventMatch, getEvmSecondsAndBlocks} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
 
 const { expect } = chai;
@@ -46,7 +46,7 @@ describe('Integration tests for Compound Bravo', () => {
     network: ChainNetwork.Compound,
     substrate_spec: null,
     contract_address: contract.contractAddress,
-    verbose_logging: false,
+    verbose_logging: true,
     ChainNode: { id: 1, url: 'http://localhost:8545' },
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
@@ -68,12 +68,13 @@ describe('Integration tests for Compound Bravo', () => {
 
     it('Should capture proposal created events', async () => {
       // get votes before creating the proposal, so we can test voting further down
-      await sdk.getVotingPower(1, '456000');
+      await sdk.getVotingPower(1, '400000');
 
       const result = await sdk.createProposal(1);
       proposalId = result.proposalId;
-      await delay(10000);
+      await delay(12000);
 
+      console.log(rmq.queuedMessages);
       events['proposal-created'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
 
@@ -90,6 +91,8 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks)
       await sdk.castVote(proposalId, 1, true);
 
       await delay(12000);
@@ -110,6 +113,8 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture proposal queued events', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks)
       await sdk.queueProposal(proposalId);
 
       await delay(12000);
@@ -130,6 +135,8 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture proposal executed events', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks)
       await sdk.executeProposal(proposalId);
 
       await delay(10000);
