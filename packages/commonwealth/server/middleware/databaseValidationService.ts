@@ -90,4 +90,5 @@ export default class DatabaseValidationService {
     req.chain = chain;
     next();
   };
+
 }
