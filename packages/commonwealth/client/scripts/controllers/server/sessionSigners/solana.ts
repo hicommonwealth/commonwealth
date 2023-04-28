@@ -126,10 +126,8 @@ export class SolanaSessionController implements ISessionController {
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,
-      appName: 'Commonwealth',
       timestamp: +Date.now(),
-      chain: 'solana',
-      chainId,
+      chain: `solana:${chainId}`,
       block: sessionPayload.block, // will be null
       call,
       callArgs,

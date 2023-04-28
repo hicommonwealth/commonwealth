@@ -1,7 +1,6 @@
-import type { Chain as CanvasChain } from '@canvas-js/interfaces';
 import { ChainBase } from 'common-common/src/types';
 
-export function chainBaseToCanvasChain(chainBase: ChainBase): CanvasChain {
+export function chainBaseToCanvasChain(chainBase: ChainBase): string {
   // Translate Commonwealth ChainBase names to Canvas Chain names.
   if (chainBase === ChainBase.CosmosSDK) {
     return 'cosmos';
@@ -13,6 +12,40 @@ export function chainBaseToCanvasChain(chainBase: ChainBase): CanvasChain {
     return 'solana';
   } else if (chainBase === ChainBase.Substrate) {
     return 'substrate';
+  }
+}
+
+export function chainBaseToCaip2(chainBase: ChainBase): string {
+  // Translate Commonwealth ChainBase names to CAIP-2 Chain names.
+  if (chainBase === ChainBase.CosmosSDK) {
+    return 'cosmos';
+  } else if (chainBase === ChainBase.Ethereum) {
+    return 'eip155';
+  } else if (chainBase === ChainBase.NEAR) {
+    return 'near';
+  } else if (chainBase === ChainBase.Solana) {
+    return 'solana';
+  } else if (chainBase === ChainBase.Substrate) {
+    return 'polkadot';
+  } else {
+    throw new Error(`Unknown chainBase: ${chainBase}`);
+  }
+}
+
+export function caip2ToChainBase(caip2: string): ChainBase {
+  const prefix = caip2.split(':')[0];
+  if (prefix === 'eip155') {
+    return ChainBase.Ethereum;
+  } else if (prefix === 'cosmos') {
+    return ChainBase.CosmosSDK;
+  } else if (prefix === 'near') {
+    return ChainBase.NEAR;
+  } else if (prefix === 'solana') {
+    return ChainBase.Solana;
+  } else if (prefix === 'polkadot') {
+    return ChainBase.Substrate;
+  } else {
+    throw new Error(`Unknown CAIP-2 chain prefix: ${prefix}`);
   }
 }
 

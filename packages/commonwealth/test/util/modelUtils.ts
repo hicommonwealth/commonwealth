@@ -5,7 +5,7 @@ import { stringToU8a } from '@polkadot/util';
 import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
-import { BalanceType, ChainNetwork } from 'common-common/src/types';
+import { BalanceType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
@@ -16,7 +16,7 @@ import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
 import { PermissionManager } from '../../shared/permissions';
 
-import { createCanvasSessionPayload, CANVAS_APPNAME } from 'canvas';
+import { createCanvasSessionPayload } from 'canvas';
 
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
@@ -101,7 +101,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
     const sessionPayload = createCanvasSessionPayload(
-      'ethereum',
+      'ethereum' as ChainBase,
       chain_id,
       address,
       sessionWallet.address,
@@ -167,7 +167,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
     const sessionPayload: SessionPayload = createCanvasSessionPayload(
-      'substrate',
+      'substrate' as ChainBase,
       chain_id,
       address,
       sessionWallet.address,
@@ -249,7 +249,6 @@ export const createThread = async (args: ThreadArgs) => {
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
-    appName: CANVAS_APPNAME,
     block: session.payload.block,
     call: "thread",
     callArgs: {
@@ -259,8 +258,7 @@ export const createThread = async (args: ThreadArgs) => {
       link: url || '',
       topic: topicId || '',
     },
-    chain: "ethereum",
-    chainId: "1",
+    chain: "eip155:1",
     from: session.payload.from,
     timestamp: Date.now(),
   };
@@ -314,7 +312,6 @@ export const createComment = async (args: CommentArgs) => {
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
-    appName: CANVAS_APPNAME,
     block: session.payload.block,
     call: "comment",
     callArgs: {
@@ -322,8 +319,7 @@ export const createComment = async (args: CommentArgs) => {
       thread_id,
       parent_comment_id: parentCommentId
     },
-    chain: "ethereum",
-    chainId: "1",
+    chain: "eip155:1",
     from: session.payload.from,
     timestamp: Date.now(),
   };
@@ -402,12 +398,10 @@ export const createReaction = async (args: CreateReactionArgs) => {
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
-    appName: CANVAS_APPNAME,
     block: session.payload.block,
     call: "reactComment",
     callArgs: { comment_id, value: reaction },
-    chain: "ethereum",
-    chainId: "1",
+    chain: "eip155:1",
     from: session.payload.from,
     timestamp: Date.now(),
   };

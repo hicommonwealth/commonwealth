@@ -7,7 +7,8 @@ import type { Action, Session } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ContentType } from 'types';
-import { ChainType } from '../../../../../../common-common/src/types';
+import { ChainType } from 'common-common/src/types';
+import { notifyError } from '../../../controllers/app/notifications';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
@@ -107,9 +108,30 @@ export const Comment = (props: CommentProps) => {
     !isLocked &&
     (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
-  const deleteComment = async () => {
-    await app.comments.delete(comment);
-    updatedCommentsCallback();
+  const handleDeleteComment = () => {
+    openConfirmation({
+      title: 'Delete Comment',
+      description: <>Delete this comment?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              await app.comments.delete(comment);
+              updatedCommentsCallback();
+            } catch (e) {
+              console.log(e);
+              notifyError('Failed to delete comment.')
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+      ],
+    });
   };
 
   useEffect(() => {
@@ -269,7 +291,7 @@ export const Comment = (props: CommentProps) => {
                         {
                           label: 'Delete',
                           iconLeft: 'trash',
-                          onClick: deleteComment,
+                          onClick: handleDeleteComment,
                         },
                       ]}
                     />
