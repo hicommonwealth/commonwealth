@@ -150,7 +150,7 @@ const addEditors = async (
         },
         {
           user: author.address,
-          url: getThreadUrl('discussion', thread),
+          url: getThreadUrl(thread),
           title: req.body.title,
           bodyUrl: req.body.url,
           chain: thread.chain,
