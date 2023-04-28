@@ -127,7 +127,10 @@ jobs:
         run: cd packages/commonwealth && npx sequelize db:migrate
 
       - name: Init CE Db
-        run: cd packages/chain-events && npx sequelize db:create && yarn --cwd packages/chain-events load-db CE_default.dump && npx sequelize db:migrate
+        run: >
+          cd packages/chain-events && npx sequelize db:create && 
+          psql -h localhost -p 5432 -d commonwealth_chain_events -U commonwealth -W edgeware -f "CE_default.dump" && 
+          npx sequelize db:migrate
 
       - name: Run linter
         run: yarn lint-all
