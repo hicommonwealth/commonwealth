@@ -52,16 +52,16 @@ export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
         <AvatarUpload
           scope="community"
           uploadStartedCallback={() => {
-            state.uploadInProgress = true;
+            state.setUploadInProgress(true);
           }}
           uploadCompleteCallback={(files) => {
             files.forEach((f) => {
               if (!f.uploadURL) return;
               const url = f.uploadURL.replace(/\?.*/, '');
-              state.iconUrl = url;
+              state.setIconUrl(url);
             });
 
-            state.uploadInProgress = false;
+            state.setUploadInProgress(false);
           }}
         />
       </div>
@@ -170,7 +170,7 @@ export const ethChainRows = (
             state.setNodeUrl('');
             state.setAltWalletUrl('');
           }
-          state.loaded = false;
+          state.setLoaded(false);
 
           // mixpanelBrowserTrack({
           //   event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,

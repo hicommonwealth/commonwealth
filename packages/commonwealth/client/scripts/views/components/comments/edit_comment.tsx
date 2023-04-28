@@ -10,6 +10,7 @@ import { clearEditingLocalStorage } from './helpers';
 import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type EditCommentProps = {
   comment: Comment<any>;
@@ -38,17 +39,30 @@ export const EditComment = (props: EditCommentProps) => {
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    let cancelConfirmed = true;
+    const hasContentChanged =
+      JSON.stringify(body) !== JSON.stringify(contentDelta);
 
-    if (JSON.stringify(body) !== JSON.stringify(contentDelta)) {
-      cancelConfirmed = window.confirm(
-        'Cancel editing? Changes will not be saved.'
-      );
-    }
-
-    if (cancelConfirmed) {
+    if (hasContentChanged) {
+      openConfirmation({
+        title: 'Cancel editing?',
+        description: <>Changes will not be saved.</>,
+        buttons: [
+          {
+            label: 'Yes',
+            buttonType: 'mini-black',
+            onClick: () => {
+              setIsEditing(false);
+              clearEditingLocalStorage(comment.id, ContentType.Comment);
+            },
+          },
+          {
+            label: 'No',
+            buttonType: 'mini-white',
+          },
+        ],
+      });
+    } else {
       setIsEditing(false);
-      clearEditingLocalStorage(comment.id, ContentType.Comment);
     }
   };
 

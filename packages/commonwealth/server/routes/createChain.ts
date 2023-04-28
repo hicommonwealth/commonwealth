@@ -393,6 +393,7 @@ const createChain = async (
   await models.Topic.create({
     chain_id: chain.id,
     name: 'General',
+    featured_in_sidebar: true,
   });
 
   // try to make admin one of the user's addresses

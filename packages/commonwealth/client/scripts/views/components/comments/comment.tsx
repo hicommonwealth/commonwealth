@@ -6,7 +6,8 @@ import moment from 'moment';
 
 import app from 'state';
 import { ContentType } from 'types';
-import { ChainType } from '../../../../../../common-common/src/types';
+import { ChainType } from 'common-common/src/types';
+import { notifyError } from '../../../controllers/app/notifications';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
@@ -19,6 +20,7 @@ import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type CommentAuthorProps = {
   comment: CommentType<any>;
@@ -99,9 +101,30 @@ export const Comment = (props: CommentProps) => {
     !isLocked &&
     (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
-  const deleteComment = async () => {
-    await app.comments.delete(comment);
-    updatedCommentsCallback();
+  const handleDeleteComment = () => {
+    openConfirmation({
+      title: 'Delete Comment',
+      description: <>Delete this comment?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              await app.comments.delete(comment);
+              updatedCommentsCallback();
+            } catch (e) {
+              console.log(e);
+              notifyError('Failed to delete comment.')
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+      ],
+    });
   };
 
   // if (!this.verificationChecked) {
@@ -215,32 +238,51 @@ export const Comment = (props: CommentProps) => {
                           iconLeft: 'write',
                           onClick: async (e) => {
                             e.preventDefault();
-                            setSavedEdits(
-                              localStorage.getItem(
-                                `${app.activeChainId()}-edit-comment-${
-                                  comment.id
-                                }-storedText`
-                              )
+                            const editsToSave = localStorage.getItem(
+                              `${app.activeChainId()}-edit-comment-${
+                                comment.id
+                              }-storedText`
                             );
-                            if (savedEdits) {
+
+                            if (editsToSave) {
                               clearEditingLocalStorage(
                                 comment.id,
                                 ContentType.Comment
                               );
 
-                              const confirmationResult = window.confirm(
-                                'Previous changes found. Restore edits?'
-                              );
+                              setSavedEdits(editsToSave || '');
 
-                              setShouldRestoreEdits(confirmationResult);
+                              openConfirmation({
+                                title: 'Info',
+                                description: (
+                                  <>Previous changes found. Restore edits?</>
+                                ),
+                                buttons: [
+                                  {
+                                    label: 'Restore',
+                                    buttonType: 'mini-black',
+                                    onClick: () => {
+                                      setShouldRestoreEdits(true);
+                                      handleSetIsEditingComment(true);
+                                    },
+                                  },
+                                  {
+                                    label: 'Cancel',
+                                    buttonType: 'mini-white',
+                                    onClick: () =>
+                                      handleSetIsEditingComment(true),
+                                  },
+                                ],
+                              });
+                            } else {
+                              handleSetIsEditingComment(true);
                             }
-                            handleSetIsEditingComment(true);
                           },
                         },
                         {
                           label: 'Delete',
                           iconLeft: 'trash',
-                          onClick: deleteComment,
+                          onClick: handleDeleteComment,
                         },
                       ]}
                     />
