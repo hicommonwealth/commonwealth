@@ -59,6 +59,7 @@ module.exports = {
         {
           type: Sequelize.STRING,
           allowNull: true,
+          references: { model: 'Chains', key: 'id' },
         },
         { transaction: t }
       );

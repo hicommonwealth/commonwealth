@@ -51,7 +51,6 @@ export const ViewProposalPage = ({
     ? true
     : power.totalScore > 0;
 
-  console.log({ power });
   const totalScore: number = power?.totalScore || 0;
   const votes: SnapshotProposalVote[] = voteResults?.votes || [];
   const totals: VoteResultsData = voteResults?.results || {
