@@ -511,11 +511,15 @@ export const LoginSelector = () => {
             <CWButton
               buttonType="tertiary-black"
               onClick={async () => {
-                if (hasTermsOfService) {
-                  setIsTOSModalOpen(true);
+                if(sameBaseAddressesRemoveDuplicates.length === 0) {
+                  setIsLoginModalOpen(true)
                 } else {
-                  await performJoinCommunityLinking();
-                  setIsJoined(true);
+                  if (hasTermsOfService) {
+                    setIsTOSModalOpen(true);
+                  } else {
+                    await performJoinCommunityLinking();
+                    setIsJoined(true);
+                  }
                 }
               }}
               label={
@@ -606,6 +610,14 @@ export const LoginSelector = () => {
         }
         onClose={() => setIsTOSModalOpen(false)}
         open={isTOSModalOpen}
+      />
+      <Modal
+        content={
+          <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
+        }
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsLoginModalOpen(false)}
+        open={isLoginModalOpen}
       />
     </>
   );
