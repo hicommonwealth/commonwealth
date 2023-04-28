@@ -1,4 +1,7 @@
 import React, { useMemo, useState } from 'react';
+
+import 'components/quill/markdown_formatted_text.scss';
+
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
