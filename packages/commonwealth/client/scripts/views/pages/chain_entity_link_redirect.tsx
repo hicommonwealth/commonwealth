@@ -25,10 +25,7 @@ export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEnti
           identifier: type === 'proposal' ? `${typeId}` : `${type}/${typeId}}`
         };
 
-        // 3. handoff link to server in background (do not care if fails)
-        // TODO: app.threads dispatch newLink to replace old
-
-        // 4. redirect
+        // 3. redirect
         navigate(`/proposal/${newLink.identifier}`, { replace: true });
       } catch (e) {
         // TODO: show error page

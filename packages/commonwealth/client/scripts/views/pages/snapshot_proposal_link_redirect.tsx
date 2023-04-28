@@ -8,7 +8,7 @@ type SnapshotProposalLinkRedirectProps = {
   scope: string;
 };
 
-export default function SnapshotProposalLinkRedirect({ identifier, scope }: SnapshotProposalLinkRedirectProps) {
+export default function SnapshotProposalLinkRedirect({ identifier }: SnapshotProposalLinkRedirectProps) {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -25,10 +25,7 @@ export default function SnapshotProposalLinkRedirect({ identifier, scope }: Snap
           identifier: `${space}/${identifier}}`
         };
 
-        // 3. handoff link to server in background (do not care if fails)
-        // TODO: app.threads dispatch newLink to replace old
-
-        // 4. redirect
+        // 3. redirect
         navigate(`/proposal/${newLink.identifier}`, { replace: true });
       } catch (e) {
         // TODO: show error page
