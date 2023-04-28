@@ -85,11 +85,11 @@ jobs:
 
     services:
       postgres:
-        image: bitnami/postgresql:latest
+        image: postgres
         env:
-          POSTGRESQL_USERNAME: commonwealth
-          POSTGRESQL_PASSWORD: edgeware
-          POSTGRESQL_MULTIPLE_DATABASES: commonwealth,commonwealth_chain_events
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: commonwealth
+          POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -127,7 +127,7 @@ jobs:
         run: cd packages/commonwealth && npx sequelize db:migrate
 
       - name: Init CE Db
-        run: cd packages/chain-events && npx sequelize db:migrate
+        run: cd packages/chain-events && npx sequelize db:create && npx sequelize db:migrate
 
       - name: Run linter
         run: yarn lint-all
