@@ -22,7 +22,6 @@ markdownRenderer.link = (href, title, text) => {
   } href="${href}">${text}</a>`;
 };
 markdownRenderer.image = (href, title, text) => {
-  console.log({ href, title, text });
   if (href?.startsWith('ipfs://')) {
     const hash = href.split('ipfs://')[1];
     if (hash) {
