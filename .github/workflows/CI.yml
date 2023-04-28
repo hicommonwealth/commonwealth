@@ -129,7 +129,7 @@ jobs:
       - name: Init CE Db
         run: >
           cd packages/chain-events && npx sequelize db:create && 
-          psql -h localhost -p 5432 -d commonwealth_chain_events -U commonwealth -W edgeware -f "CE_default.dump" && 
+          PGPASSWORD=edgeware psql -h localhost -p 5432 -d commonwealth_chain_events -U commonwealth -f "CE_default.dump" && 
           npx sequelize db:migrate
 
       - name: Run linter
