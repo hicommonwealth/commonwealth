@@ -19,10 +19,12 @@ const processLinks = async (thread, models) => {
               [Op.in]: ces.map((ce) => parseInt(ce.identifier)),
             },
           },
-          attributes: ['ce_id', 'title'],
+          attributes: ['ce_id', 'title', 'chain'],
         })
       ).map((entity) => {
-        return { ce_id: entity.ce_id, title: ces.title };
+        if (thread.thread_chain === entity.chain) {
+          return { ce_id: entity.ce_id, title: ces.title };
+        }
       });
     }
     linked_threads = thread.links
@@ -159,6 +161,7 @@ const bulkThreads = async (
         pinned: t.pinned,
         chain: t.thread_chain,
         created_at: t.thread_created,
+        links: t.links,
         collaborators,
         linked_threads,
         chain_entity_meta,

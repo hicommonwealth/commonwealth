@@ -18,6 +18,7 @@ export enum LinkSource {
 export type Link = {
   source: LinkSource;
   identifier: string;
+  title?: string; 
 };
 
 export type ThreadAttributes = {
