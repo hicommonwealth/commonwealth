@@ -26,33 +26,6 @@ describe('Cache Decorator', () => {
     await redisCache.closeClient();
   });
 
-  it('should call the /api/status route', async () => {
-    const res = await chai
-      .request(app)
-      .get('/api/status')
-      .set('Accept', 'application/json');
-    expect(res.body).to.not.be.null;
-    expect(res).to.have.status(200);
-    expect(res.body).to.have.property('status', 'Success');
-    expect(res).to.not.have.header('X-Cache', 'HIT');
-
-    const res2 = await chai
-      .request(app)
-      .get('/api/status')
-      .set('Accept', 'application/json');
-
-    expect(res2).to.have.status(200);
-    expect(res2).to.have.header('X-Cache', 'HIT');
-    const valFromRedis = await redisCache.getKey(
-      route_namespace,
-      '/api/status'
-    );
-    expect(valFromRedis).to.not.be.null;
-    expect(JSON.parse(valFromRedis)).to.be.deep.equal(res2.body);
-    expect(res2.body).to.have.property('status', 'Success');
-    expect(res2.body).to.be.deep.equal(res.body);
-  });
-
   it('dont cache broken route /api/statusBroken route', async () => {
     const res = await chai
       .request(app)
