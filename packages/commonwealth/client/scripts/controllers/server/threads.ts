@@ -494,6 +494,10 @@ class ThreadsController {
     });
   }
 
+  public async updateThreadInStore(thread: Thread) {
+    this._store.update(thread);
+  }
+
   public async pin(args: { proposal: Thread }) {
     return $.ajax({
       url: `${app.serverUrl()}/updateThreadPinned`,
