@@ -21,7 +21,7 @@ import {
   getTextFromDelta,
   ReactQuillEditor,
 } from '../react_quill_editor';
-import { serializeDelta } from '../react_quill_editor/utils';
+import { clearDraft, serializeDelta } from '../react_quill_editor/utils';
 
 type CreateCommmentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -45,6 +45,10 @@ export const CreateComment = (props: CreateCommmentProps) => {
     rootThread,
     updatedCommentsCallback,
   } = props;
+
+  const draftKey = !parentCommentId
+    ? `new-thread-comment-${rootThread.id}`
+    : null;
 
   const author = app.user.activeAccount;
 
@@ -73,6 +77,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
       await app.user.notifications.refresh();
 
       setContentDelta(createDeltaFromText(''));
+      clearDraft(draftKey);
 
       jumpHighlightComment(res.id);
 
@@ -92,8 +97,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
     rootThread instanceof Thread ? rootThread?.topic?.name : null;
 
   // token balance check if needed
-  const tokenPostingThreshold: BN =
-    TopicGateCheck.getTopicThreshold(activeTopicName);
+  const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(
+    activeTopicName
+  );
 
   const userBalance: BN = TopicGateCheck.getUserBalance();
   const userFailsThreshold =
@@ -131,6 +137,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
         className="editor"
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
+        draftKey={draftKey}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
