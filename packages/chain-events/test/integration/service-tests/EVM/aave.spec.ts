@@ -14,7 +14,7 @@ import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import {eventMatch, findEvent} from '../../../util';
+import {eventMatch, findEvent, getEvmSecondsAndBlocks} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
 import {EventKind} from "../../../../src/chains/aave/types";
 
@@ -70,13 +70,14 @@ describe('Integration tests for Aave', () => {
 
     it('Should capture proposal created events', async () => {
       // get votes before creating the proposal, so we can test voting further down
-      await sdk.getVotingPower(1, '456000', 'aave');
+      await sdk.getVotingPower(1, '400000', 'aave');
 
       const result = await sdk.createProposal(1, 'aave');
       proposalId = result.proposalId;
       proposalCreatedBlockNum = result.block;
-      await delay(13000);
+      await delay(15000);
 
+      console.log(JSON.stringify(rmq.queuedMessages, null, 2))
       events[EventKind.ProposalCreated] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         EventKind.ProposalCreated,
@@ -93,6 +94,8 @@ describe('Integration tests for Aave', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
       await delay(20000);
@@ -114,6 +117,8 @@ describe('Integration tests for Aave', () => {
     });
 
     it('Should capture proposal queued events', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.queueProposal(proposalId, 'aave');
 
       await delay(12000);
@@ -134,6 +139,8 @@ describe('Integration tests for Aave', () => {
     });
 
     it('Should capture proposal executed events', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.executeProposal(proposalId, 'aave');
 
       await delay(10000);
