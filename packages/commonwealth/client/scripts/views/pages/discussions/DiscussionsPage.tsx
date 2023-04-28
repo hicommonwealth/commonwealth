@@ -116,7 +116,21 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       return;
     }
 
-    return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
+    return setThreads((oldThreads) => {
+      const finalThreads = [...oldThreads];
+      newThreads.map((x) => {
+        const foundIndex = finalThreads.findIndex(
+          (y) => y.identifier === x.identifier
+        );
+        if (foundIndex === -1) {
+          finalThreads.push(x);
+        } else {
+          finalThreads[foundIndex] = x;
+        }
+        return null;
+      });
+      return finalThreads;
+    });
   }, [stageName, topicName]);
 
   if (initializing) {

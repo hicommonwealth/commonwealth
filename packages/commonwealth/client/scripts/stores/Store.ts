@@ -1,8 +1,10 @@
 abstract class Store<T> {
   protected _store: T[] = [];
 
-  public add(item: T): Store<T> {
-    const index = this._store.indexOf(item);
+  public add(item: T, eqFn?: (a: T) => boolean): Store<T> {
+    const index = eqFn
+      ? this._store.findIndex(eqFn)
+      : this._store.indexOf(item);
 
     // Only add unique elements to store
     if (index === -1) {

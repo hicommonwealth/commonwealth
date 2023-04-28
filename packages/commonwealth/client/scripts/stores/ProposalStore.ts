@@ -5,7 +5,7 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
   private _storeId: { [hash: string]: ProposalT } = {};
 
   public add(proposal: ProposalT) {
-    super.add(proposal);
+    super.add(proposal, (x) => x.identifier === proposal.identifier);
     this._storeId[proposal.identifier] = proposal;
     return this;
   }
