@@ -11,6 +11,7 @@ import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
 import { ThreadActionType } from '../../../../../shared/types';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { ThreadStage } from 'models';
 
 type DiscussionsPageProps = {
   topicName?: string;
