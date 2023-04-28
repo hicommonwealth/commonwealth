@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 
@@ -7,8 +7,6 @@ import 'pages/tip_detail.scss';
 import app from 'state';
 import { User } from '../components/user/user';
 import Sublayout from '../sublayout';
-import { QuillFormattedText } from '../components/react_quill_editor/quill_formatted_text';
-import { createDeltaFromText } from '../components/react_quill_editor';
 import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 
 type TipDetailProps = {
