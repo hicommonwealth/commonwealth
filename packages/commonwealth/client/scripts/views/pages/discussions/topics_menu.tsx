@@ -14,7 +14,6 @@ import {
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { ThreadsFilterMenuItem } from './stages_menu';
-import { useCommonNavigate } from 'navigation/helpers';
 import type { Topic } from 'models';
 
 type TopicsMenuProps = {
@@ -23,6 +22,7 @@ type TopicsMenuProps = {
   selectedTopic: Topic;
   topic: string;
   onEditClick: (topic: Topic) => void;
+  onTopicChange: (topic: string) => void;
 };
 
 export const TopicsMenu = ({
@@ -31,8 +31,8 @@ export const TopicsMenu = ({
   selectedTopic,
   topic,
   onEditClick,
+  onTopicChange,
 }: TopicsMenuProps) => {
-  const navigate = useCommonNavigate();
   const popoverProps = usePopover();
 
   return (
@@ -54,7 +54,7 @@ export const TopicsMenu = ({
                   _DEPRECATED_getRoute() === `/${app.activeChainId()}` || !topic
                 }
                 onClick={() => {
-                  navigate('/discussions');
+                  onTopicChange('');
                 }}
               />
               <CWDivider />
@@ -73,7 +73,7 @@ export const TopicsMenu = ({
                     isSelected={active}
                     onClick={(e) => {
                       e.preventDefault();
-                      navigate(`/discussions/${t.name}`);
+                      onTopicChange(t.name);
                     }}
                     iconRight={
                       app.roles?.isAdminOfEntity({
