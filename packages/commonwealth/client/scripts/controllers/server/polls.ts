@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import $ from 'jquery';
-import { Poll, Vote } from 'models';
+import { Poll, Thread, Vote } from 'models';
 import moment from 'moment';
 import app from 'state';
 import { redraw } from 'mithrilInterop';
@@ -100,6 +100,9 @@ class PollsController {
       },
       success: (response) => {
         const modeledPoll = modelFromServer(response.result);
+        const thread = app.threads.getById(threadId);
+        const updatedThread = new Thread({ ...thread, hasPoll: true });
+        app.threads.updateThreadInStore(updatedThread);
         this._store.add(modeledPoll);
       },
       error: (err) => {
