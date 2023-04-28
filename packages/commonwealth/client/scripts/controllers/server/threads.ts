@@ -24,6 +24,7 @@ import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
+import { ThreadActionType } from '../../../../shared/types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -456,7 +457,11 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
-        app.threadUpdateEmitter.emit('threadUpdated', {});
+        app.threadUpdateEmitter.emit('threadUpdated', {
+          action: ThreadActionType.StageChange,
+          stage: args.stage,
+          threadId: args.threadId,
+        });
         return result;
       },
       error: (err) => {

@@ -25,8 +25,23 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;
+    stage: ThreadStage;
   }) => {
-    const { threadId, action } = data;
+    const { threadId, action, stage } = data;
+
+    if (action === ThreadActionType.StageChange) {
+      setThreads((oldThreads) => {
+        const updatedThreads = [...oldThreads].filter(
+          // make sure that if we have an active stage filter (from the dropdown)
+          // then we also filter the current list for the current stage only
+          (x) => x.stage === stageName
+        );
+        const foundThread = updatedThreads.find((x) => x.id === threadId);
+        if (foundThread) foundThread.stage = stage;
+        return updatedThreads;
+      });
+      return;
+    }
 
     if (
       action === ThreadActionType.TopicChange ||
@@ -152,7 +167,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           style={{ height: '100%', width: '100%' }}
           data={threads}
           itemContent={(i, thread) => {
-            return <ThreadPreview thread={thread} key={thread.id} />;
+            return (
+              <ThreadPreview thread={thread} key={thread.id + thread.stage} />
+            );
           }}
           endReached={loadMore}
           overscan={200}
