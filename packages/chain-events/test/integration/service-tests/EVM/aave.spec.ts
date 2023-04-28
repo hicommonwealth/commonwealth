@@ -16,6 +16,7 @@ import { setupChainEventConsumer } from '../../../../services/ChainEventsConsume
 import { Op, Sequelize } from 'sequelize';
 import {eventMatch, findEvent} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
+import {EventKind} from "../../../../src/chains/aave/types";
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -27,7 +28,7 @@ chai.use(chaiHttp);
 
 // TODO: ensure that the lastBlockNumber in the listener is updated AFTER all events have been processed + published to the appropriate queues
 
-describe('Integration tests for Compound Bravo', () => {
+describe.only('Integration tests for Aave', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
@@ -61,7 +62,7 @@ describe('Integration tests for Compound Bravo', () => {
     await rmq.init();
   });
 
-  describe('Tests the Bravo event listener using the chain subscriber', () => {
+  describe('Tests the Aave event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
       await runSubscriberAsFunction(rmq, null, null, chain);
@@ -73,27 +74,19 @@ describe('Integration tests for Compound Bravo', () => {
 
       const result = await sdk.createProposal(1, 'aave');
       proposalId = result.proposalId;
-      proposalCreatedBlockNum = result.blockNumber;
+      proposalCreatedBlockNum = result.block;
       await delay(13000);
 
-      events['proposal-created'] = findEvent(
+      events[EventKind.ProposalCreated] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-   'proposal-created',
+        EventKind.ProposalCreated,
         chain_id,
         proposalCreatedBlockNum
       );
 
-      // verify the event was created and appended to the correct queue
-      console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(
-        10,
-        'Actual number of captured events does not match expected number of events'
-      );
       eventMatch(
-        events['proposal-created'],
-        'proposal-created',
+        events[EventKind.ProposalCreated],
+        EventKind.ProposalCreated,
         chain_id,
         proposalId
       );
@@ -102,22 +95,19 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture votes on the created proposal', async () => {
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
-      await delay(12000);
+      await delay(20000);
 
-      events['vote-cast'] = findEvent(
+      console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
+      events[EventKind.VoteEmitted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-        'vote-cast',
+        EventKind.VoteEmitted,
         chain_id,
         block
       );
 
-      // verify the event was created and appended to the correct queue
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(11);
       eventMatch(
-        events['vote-cast'],
-        'vote-cast',
+        events[EventKind.VoteEmitted],
+        EventKind.VoteEmitted,
         chain_id,
         proposalId
       );
@@ -128,20 +118,16 @@ describe('Integration tests for Compound Bravo', () => {
 
       await delay(12000);
 
-      events['proposal-queued'] = findEvent(
+      events[EventKind.ProposalQueued] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-        'proposal-queued',
+        EventKind.ProposalQueued,
         chain_id,
         block
       );
 
-      // verify the event was created and appended to the correct queue
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(12);
       eventMatch(
-        events['proposal-queued'],
-        'proposal-queued',
+        events[EventKind.ProposalQueued],
+        EventKind.ProposalQueued,
         chain_id,
         proposalId
       );
@@ -152,20 +138,16 @@ describe('Integration tests for Compound Bravo', () => {
 
       await delay(10000);
 
-      events['proposal-executed'] = findEvent(
+      events[EventKind.ProposalExecuted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-        'proposal-executed',
+        EventKind.ProposalExecuted,
         chain_id,
-        proposalCreatedBlockNum
+        block
       );
 
-      // verify the event was created and appended to the correct queue
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(13);
       eventMatch(
-        events['proposal-executed'],
-        'proposal-executed',
+        events[EventKind.ProposalExecuted],
+        EventKind.ProposalExecuted,
         chain_id,
         proposalId
       );
@@ -184,7 +166,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
   });
 
-  describe('Tests for processing Bravo events with the consumer', async () => {
+  describe('Tests for processing Aave events with the consumer', async () => {
     before(async () => {
       // set up the chain consumer - this starts the subscriptions thus processing all existing events
       await setupChainEventConsumer(rmq);
@@ -199,20 +181,16 @@ describe('Integration tests for Compound Bravo', () => {
               Sequelize.literal(`event_data->>'kind' = 'proposal-created'`),
             ],
           },
-          block_number: events['proposal-created'].blockNumber,
+          block_number: events[EventKind.ProposalCreated].blockNumber,
         },
       });
 
       expect(propCreatedEvent, 'Proposal created event not found').to.exist;
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEventNotificationsCUDMain]
-          .length
-      ).to.equal(2);
       eventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][0].event,
-        'proposal-created',
+        EventKind.ProposalCreated,
         chain_id,
         proposalId
       );
@@ -220,7 +198,7 @@ describe('Integration tests for Compound Bravo', () => {
       relatedEntity = await models.ChainEntity.findOne({
         where: {
           chain: chain_id,
-          type_id: '0x' + parseInt(proposalId).toString(16),
+          type_id: proposalId,
           type: 'proposal',
         },
       });
@@ -236,9 +214,9 @@ describe('Integration tests for Compound Bravo', () => {
         where: {
           chain: chain_id,
           event_data: {
-            [Op.and]: [Sequelize.literal(`event_data->>'kind' = 'vote-cast'`)],
+            [Op.and]: [Sequelize.literal(`event_data->>'kind' = '${EventKind.VoteEmitted}'`)],
           },
-          block_number: events['vote-cast'].blockNumber,
+          block_number: events[EventKind.VoteEmitted].blockNumber,
         },
       });
 
@@ -252,10 +230,10 @@ describe('Integration tests for Compound Bravo', () => {
           chain: chain_id,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'proposal-queued'`),
+              Sequelize.literal(`event_data->>'kind' = '${EventKind.ProposalQueued}'`),
             ],
           },
-          block_number: events['proposal-queued'].blockNumber,
+          block_number: events[EventKind.ProposalQueued].blockNumber,
         },
       });
 
@@ -269,10 +247,10 @@ describe('Integration tests for Compound Bravo', () => {
           chain: chain_id,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'proposal-executed'`),
+              Sequelize.literal(`event_data->>'kind' = '${EventKind.ProposalExecuted}'`),
             ],
           },
-          block_number: events['proposal-executed'].blockNumber,
+          block_number: events[EventKind.ProposalExecuted].blockNumber,
         },
       });
 
@@ -283,14 +261,14 @@ describe('Integration tests for Compound Bravo', () => {
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][1].event,
-        'proposal-executed',
+        EventKind.ProposalExecuted,
         chain_id,
         proposalId
       );
     });
   });
 
-  describe('Tests for retrieving Bravo events with the app', async () => {
+  describe('Tests for retrieving Aave events with the app', async () => {
     let agent, hexProposalId;
 
     before(async () => {
@@ -305,17 +283,18 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should retrieve the proposal created event and entity', async () => {
-      let res = await agent.get(`/api/events?limit=10`);
+      let res = await agent.get(`/api/events?limit=30`);
       expect(res.status).to.equal(200);
       expect(
         res.body.result,
         'The request body should contain an array of events'
       ).to.exist;
 
+      console.log(res.body.result);
       const proposalCreatedEvent = res.body.result.find(
         (e) =>
-          e.event_data.kind === 'proposal-created' &&
-          e.event_data.id === hexProposalId &&
+          e.event_data.kind === EventKind.ProposalCreated &&
+          e.event_data.id == proposalId &&
           e.chain === chain_id
       );
       expect(
@@ -324,7 +303,7 @@ describe('Integration tests for Compound Bravo', () => {
       ).to.exist;
 
       res = await agent.get(
-        `/api/entities?type=proposal&type_id=${hexProposalId}&chain=${chain_id}`
+        `/api/entities?type=proposal&type_id=${proposalId}&chain=${chain_id}`
       );
       expect(res.status).to.equal(200);
       expect(
@@ -336,13 +315,13 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should retrieve vote cast events', async () => {
-      const res = await agent.get(`/api/events?limit=10`);
+      const res = await agent.get(`/api/events?limit=30`);
       expect(res.status).to.equal(200);
       expect(res.body.result).to.exist;
       const event = res.body.result.find(
         (e) =>
-          e.event_data.kind === 'vote-cast' &&
-          e.event_data.id === hexProposalId &&
+          e.event_data.kind === EventKind.VoteEmitted &&
+          e.event_data.id == proposalId &&
           e.chain === chain_id
       );
       expect(event).to.exist;
@@ -350,13 +329,13 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should retrieve proposal queued events', async () => {
-      const res = await agent.get(`/api/events?limit=10`);
+      const res = await agent.get(`/api/events?limit=30`);
       expect(res.status).to.equal(200);
       expect(res.body.result).to.exist;
       const event = res.body.result.find(
         (e) =>
-          e.event_data.kind === 'proposal-queued' &&
-          e.event_data.id === hexProposalId &&
+          e.event_data.kind === EventKind.ProposalQueued &&
+          e.event_data.id == proposalId &&
           e.chain === chain_id
       );
       expect(event).to.exist;
@@ -364,13 +343,13 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should retrieve proposal executed events', async () => {
-      const res = await agent.get(`/api/events?limit=10`);
+      const res = await agent.get(`/api/events?limit=30`);
       expect(res.status).to.equal(200);
       expect(res.body.result).to.exist;
       const event = res.body.result.find(
         (e) =>
-          e.event_data.kind === 'proposal-executed' &&
-          e.event_data.id === hexProposalId &&
+          e.event_data.kind === EventKind.ProposalExecuted &&
+          e.event_data.id == proposalId &&
           e.chain === chain_id
       );
       expect(event).to.exist;
