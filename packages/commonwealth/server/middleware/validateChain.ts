@@ -13,24 +13,38 @@ export type ValidateChainParams = {
   chain_id?: string;
 };
 
-// sequelize 5.0 does not accept undefined key in where clause
+const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => ({
+  where: {
+    id: chain_id,
+  },
+  include: [
+    ...(includeTopics
+      ? [
+          {
+            model: models.Topic,
+            as: 'topics',
+            required: false,
+            attributes: ['id', 'name', 'chain_id'],
+          },
+        ]
+      : []),
+    {
+      model: models.ChainNode,
+      required: true,
+    },
+  ],
+});
+
 export const validateChain = async (
   models: DB,
-  params: ValidateChainParams
+  params: ValidateChainParams,
+  includeTopics = false
 ): Promise<[ChainInstance, string]> => {
   const chain_id = params.chain || params.chain_id;
   if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
-  const chain = await models.Chain.findOne({
-    where: {
-      id: chain_id,
-    },
-    include: [
-      {
-        model: models.ChainNode,
-        required: true,
-      },
-    ],
-  });
+  const chain = await models.Chain.findOne(
+    getChainQuery(chain_id, models, includeTopics)
+  );
   // searching for chain that doesn't exist
   if (chain_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
   return [chain, null];
@@ -40,26 +54,5 @@ export const validateChainWithTopics = async (
   models: DB,
   params: ValidateChainParams
 ): Promise<[ChainInstance, string]> => {
-  const chain_id = params.chain || params.chain_id;
-  if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
-  const chain = await models.Chain.findOne({
-    where: {
-      id: chain_id,
-    },
-    include: [
-      {
-        model: models.Topic,
-        as: 'topics',
-        required: false,
-        attributes: ['id', 'name', 'chain_id'],
-      },
-      {
-        model: models.ChainNode,
-        required: true,
-      },
-    ],
-  });
-  // searching for chain that doesn't exist
-  if (chain_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
-  return [chain, null];
+  return validateChain(models, params, true);
 };
