@@ -313,7 +313,7 @@ function setupRouter(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateChainWithTopics,
+    databaseValidationService.validateChain,
     createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.put(
