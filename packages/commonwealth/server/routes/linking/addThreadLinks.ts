@@ -54,6 +54,22 @@ const addThreadLink = async (
 
   const finalThread = await models.Thread.findOne({
     where: { id: thread_id },
+    include: [
+      {
+        model: models.Address,
+        as: 'Address',
+      },
+      {
+        model: models.Address,
+        // through: models.Collaboration,
+        as: 'collaborators',
+      },
+      models.Attachment,
+      {
+        model: models.Topic,
+        as: 'topic',
+      },
+    ],
   });
 
   return success(res, finalThread.toJSON());

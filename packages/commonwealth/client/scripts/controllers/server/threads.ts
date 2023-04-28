@@ -529,6 +529,9 @@ class ThreadsController {
         }
       );
 
+      const updatedThread = this.modelFromServer(response.data.result);
+      this._listingStore.update(updatedThread);
+
       return response.data.result;
     } catch (err) {
       console.log('Could not add links', err);
@@ -559,6 +562,9 @@ class ThreadsController {
           },
         }
       );
+
+      const updatedThread = this.modelFromServer(response.data.result);
+      this._listingStore.update(updatedThread);
 
       return response.data.result;
     } catch (err) {
