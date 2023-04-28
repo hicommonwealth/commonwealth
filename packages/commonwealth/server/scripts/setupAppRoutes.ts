@@ -23,6 +23,10 @@ const decodeTitle = (title: string) => {
   }
 };
 
+const getUrl = (req) => {
+  return req.protocol + '://' + req.get('host') + req.originalUrl;
+}
+
 const setupAppRoutes = (
   app,
   models: DB,
@@ -51,7 +55,7 @@ const setupAppRoutes = (
     throw new Error('Template not found, cannot start production server');
   }
 
-  const renderWithMetaTags = (res, title, description, author, image) => {
+  const renderWithMetaTags = (res, title, description, author, image, url) => {
     description =
       description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
@@ -72,6 +76,7 @@ const setupAppRoutes = (
     $tmpl('meta[property="og:site_name"]').attr('content', 'Commonwealth');
     $tmpl('meta[property="og:title"]').attr('content', title);
     $tmpl('meta[property="og:description"]').attr('content', description);
+    $tmpl('meta[property="og:url"]').attr('content', url);
     if (image) {
       $tmpl('meta[property="og:image"]').attr('content', image);
     }
@@ -97,7 +102,9 @@ const setupAppRoutes = (
         : `https://commonwealth.im${chain.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
-    renderWithMetaTags(res, title, description, author, image);
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
   });
 
   app.get('/:scope/account/:address', async (req, res) => {
@@ -126,12 +133,15 @@ const setupAppRoutes = (
       image = '';
       author = '';
     }
-    renderWithMetaTags(res, title, description, author, image);
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
   });
 
   const renderThread = async (
     scope: string,
     threadId: string,
+    req,
     res
   ) => {
     // Retrieve discussions
@@ -165,12 +175,14 @@ const setupAppRoutes = (
     const author = thread?.Address?.Profile?.profile_name ?
       thread.Address.Profile.profile_name :
       '';
+    const url = getUrl(req);
 
-    renderWithMetaTags(res, title, description, author, image);
+    renderWithMetaTags(res, title, description, author, image, url);
   };
 
   const renderProposal = async (
     scope: string,
+    req,
     res,
     chain?: ChainInstance
   ) => {
@@ -185,13 +197,14 @@ const setupAppRoutes = (
         : `https://commonwealth.im${chain.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
+    const url = getUrl(req);
 
-    renderWithMetaTags(res, title, description, author, image);
+    renderWithMetaTags(res, title, description, author, image, url);
   };
 
   app.get('/:scope/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    await renderProposal(scope, res);
+    await renderProposal(scope, req, res);
   });
 
   app.get('/:scope/discussion/:identifier', async (req, res) => {
@@ -200,7 +213,7 @@ const setupAppRoutes = (
     if (isNaN(threadId)) {
       return; // don't render because thread ID needs to be a number
     }
-    await renderThread(scope, threadId, res);
+    await renderThread(scope, threadId, req, res);
   });
 
   app.get('/:scope/proposal/:identifier', async (req, res) => {
@@ -214,11 +227,11 @@ const setupAppRoutes = (
     ]);
 
     if (!proposalTypes.has(chain?.network) && chain?.base !== ChainBase.CosmosSDK) {
-      renderWithMetaTags(res, '', '', '', null);
+      renderWithMetaTags(res, '', '', '', null, null);
       return;
     }
 
-    await renderProposal(scope, res, chain);
+    await renderProposal(scope, req, res, chain);
   });
 
   app.get('*', (req, res) => {
