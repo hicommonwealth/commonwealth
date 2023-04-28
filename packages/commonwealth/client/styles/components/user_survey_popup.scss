@@ -1,15 +1,16 @@
 @import '../shared';
 
-.ProfileGrowlPopup {
+.UserSurveyPopup {
   display: flex;
   flex-direction: column;
-  width: fit-content;
+  gap: 8px;
+  width: 100%;
 
   .survey-svg-header {
-    background-image: url('/static/img/email_growl.png');
+    background-image: url('/static/img/survey_header.svg');
     background-repeat: no-repeat;
     background-size: contain;
-    height: 177px;
+    height: 156px;
   }
 
   .header-text {
@@ -20,7 +21,6 @@
   .body-text {
     text-align: center;
     padding: 0 16px 0 16px;
-    margin-top: 8px;
   }
 
   .button-wrapper {
@@ -28,7 +28,6 @@
     gap: 8px;
     justify-content: center;
     margin-top: 16px;
-    margin-bottom: 8px;
   }
 
   .checkbox.Checkbox {
@@ -47,24 +46,6 @@
   .close-icon {
     position: fixed;
     right: 34px; // not on grid system due to fixed positioning
-    color: $neutral-800;
-  }
-
-  .learn-more {
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-    align-items: center;
-    justify-content: center;
-    margin: 16px;
-
-    .blue-text {
-      color: $primary-500;
-      cursor: pointer;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+    color: $primary-300;
   }
 }

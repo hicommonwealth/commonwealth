@@ -52,7 +52,6 @@ type StatusResp = {
     starredCommunities: StarredCommunityAttributes[];
     discussionDrafts: DiscussionDraftAttributes[];
     unseenPosts: { [chain: string]: number };
-    hasDisplayName: boolean;
   };
   evmTestEnv?: string;
 };
@@ -142,12 +141,6 @@ const status = async (
         evmTestEnv: ETH_RPC,
       });
     }
-
-    const profile = await models.Profile.findOne({
-      where: { user_id: user.id },
-    });
-
-    const hasDisplayName = !!profile?.profile_name;
 
     const unfilteredAddresses = await user.getAddresses();
     // TODO: fetch all this data with a single query
@@ -372,7 +365,6 @@ const status = async (
         starredCommunities,
         discussionDrafts,
         unseenPosts,
-        hasDisplayName,
       },
       evmTestEnv: ETH_RPC,
     });

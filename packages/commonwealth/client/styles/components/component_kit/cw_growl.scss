@@ -17,23 +17,9 @@ $growl-outside-right-padding: 32px; // accounts for scrollbar width
     right: $growl-outside-right-padding;
   }
 
-  &.top-left {
-    left: $growl-outside-left-padding;
-    top: $growl-outside-bottom-padding;
-    bottom: unset;
-  }
-
-  &.top-right {
-    right: $growl-outside-right-padding;
-    top: $growl-outside-bottom-padding;
-    bottom: unset;
-  }
-
   .growl-card.Card {
     padding: 0;
     width: 300px;
-    overflow: hidden;
-    border: 0px;
   }
 
   z-index: 1001;

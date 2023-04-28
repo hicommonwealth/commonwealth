@@ -44,9 +44,4 @@ module.exports = merge(module.exports, {
   plugins: [
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
   ],
-  optimization: {
-    minimizer: [
-      new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
-    ],
-  },
 });

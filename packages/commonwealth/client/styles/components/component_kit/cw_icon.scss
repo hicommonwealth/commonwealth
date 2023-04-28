@@ -7,14 +7,6 @@
     color: $neutral-200;
     pointer-events: none;
   }
-
-  &.hasBackground {
-    padding: 4px;
-    background-color: $neutral-25;
-    border-radius: $border-radius-corners;
-    border-color: $neutral-200;
-    cursor: pointer;
-  }
 }
 
 .CustomIcon {
