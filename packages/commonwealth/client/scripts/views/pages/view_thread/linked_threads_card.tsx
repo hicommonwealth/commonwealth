@@ -14,6 +14,7 @@ import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { LinkSource } from 'models/Thread';
+import { filterLinks } from 'helpers/threads';
 
 type LinkedThreadsCardProps = {
   thread: Thread;
@@ -32,9 +33,9 @@ export const LinkedThreadsCard = ({
 
   const linkedThreadIds = useMemo(
     () =>
-      thread.links
-        .filter(({ source }) => source === LinkSource.Thread)
-        .map(({ identifier }) => identifier),
+      filterLinks(thread.links, LinkSource.Thread).map(
+        ({ identifier }) => identifier
+      ),
     [thread.links]
   );
 
@@ -50,7 +51,7 @@ export const LinkedThreadsCard = ({
     } else {
       setLinkedThreads([]);
     }
-  }, [linkedThreadIds, thread.links]);
+  }, [linkedThreadIds]);
 
   return (
     <>

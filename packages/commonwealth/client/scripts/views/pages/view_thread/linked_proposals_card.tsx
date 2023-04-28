@@ -20,6 +20,7 @@ import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_m
 import { Modal } from '../../components/component_kit/cw_modal';
 import { Link, LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
+import { filterLinks } from 'helpers/threads';
 
 type LinkedProposalProps = {
   thread: Thread;
@@ -66,12 +67,12 @@ export const LinkedProposalsCard = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const initialSnapshotLinks = useMemo(
-    () => thread.links.filter((l) => l.source === LinkSource.Snapshot),
+    () => filterLinks(thread.links, LinkSource.Snapshot),
     [thread.links]
   );
 
   const initialProposalLinks = useMemo(
-    () => thread.links.filter((l) => l.source === LinkSource.Proposal),
+    () => filterLinks(thread.links, LinkSource.Proposal),
     [thread.links]
   );
 

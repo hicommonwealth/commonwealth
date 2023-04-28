@@ -67,7 +67,7 @@ export const LinkedThreadModal = ({
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Thread,
-            identifier: el.id,
+            identifier: String(el.id),
           })),
         });
 
@@ -79,7 +79,7 @@ export const LinkedThreadModal = ({
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Thread,
-            identifier: el.id,
+            identifier: String(el.id),
           })),
         });
 

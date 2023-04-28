@@ -46,6 +46,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { filterLinks } from 'helpers/threads';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -461,16 +462,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     getCommentSubscription(thread)?.isActive &&
     getReactionSubscription(thread)?.isActive;
 
+  const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+
   const showLinkedProposalOptions =
-    thread.links.filter((l) => l.source === LinkSource.Snapshot)?.length > 0 ||
-    thread.links.filter((l) => l.source === LinkSource.Proposal)?.length > 0 ||
+    linkedSnapshots.length > 0 ||
+    linkedProposals.length > 0 ||
     isAuthor ||
     isAdminOrMod;
 
   const showLinkedThreadOptions =
-    thread.links.filter((l) => l.source === LinkSource.Thread)?.length > 0 ||
-    isAuthor ||
-    isAdminOrMod;
+    linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
   const canComment =
     app.user.activeAccount ||
@@ -677,6 +680,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     ];
   };
 
+  console.log('thread', thread);
   return (
     <Sublayout>
       <CWContentPage

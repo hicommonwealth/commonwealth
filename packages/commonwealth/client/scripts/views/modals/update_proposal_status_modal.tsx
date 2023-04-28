@@ -14,6 +14,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { Link, LinkSource } from 'models/Thread';
+import { filterLinks } from 'helpers/threads';
 
 const getAddedAndDeleted = (
   tempSnapshotProposals: Pick<SnapshotProposal, 'id'>[],
@@ -75,17 +76,15 @@ const getAddedAndDeletedProposals = (
   return { toAdd, toDelete };
 };
 
-const getInitialSnapshots = (thread: Thread) => {
-  return thread.links
-    .filter((l) => l.source === LinkSource.Snapshot)
-    .map((l) => ({ id: l.identifier }));
-};
+const getInitialSnapshots = (thread: Thread) =>
+  filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
+    id: l.identifier,
+  }));
 
-const getInitialProposals = (thread: Thread) => {
-  return thread.links
-    .filter((l) => l.source === LinkSource.Proposal)
-    .map((l) => ({ typeId: l.identifier }));
-};
+const getInitialProposals = (thread: Thread) =>
+  filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
+    typeId: l.identifier,
+  }));
 
 type UpdateProposalStatusModalProps = {
   onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
@@ -152,7 +151,7 @@ export const UpdateProposalStatusModal = ({
           threadId: thread.id,
           links: toAdd.map((sn) => ({
             source: LinkSource.Snapshot,
-            identifier: sn.id,
+            identifier: String(sn.id),
           })),
         });
 
@@ -164,7 +163,7 @@ export const UpdateProposalStatusModal = ({
           threadId: thread.id,
           links: toDelete.map((sn) => ({
             source: LinkSource.Snapshot,
-            identifier: sn.id,
+            identifier: String(sn.id),
           })),
         });
 
@@ -186,7 +185,7 @@ export const UpdateProposalStatusModal = ({
           threadId: thread.id,
           links: toAdd.map(({ typeId }) => ({
             source: LinkSource.Proposal,
-            identifier: typeId,
+            identifier: String(typeId),
           })),
         });
 
@@ -198,7 +197,7 @@ export const UpdateProposalStatusModal = ({
           threadId: thread.id,
           links: toDelete.map(({ typeId }) => ({
             source: LinkSource.Proposal,
-            identifier: typeId,
+            identifier: String(typeId),
           })),
         });
 
