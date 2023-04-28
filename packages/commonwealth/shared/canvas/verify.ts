@@ -76,7 +76,7 @@ export const verify = async ({
       });
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
-  } else if (chainBase == ChainBase.CosmosSDK) {
+  } else if (chainBase === ChainBase.CosmosSDK) {
     // verify terra sessions (actions are verified like other cosmos chains)
     const [bech32, cosmAmino, cosmEncoding, cosmCrypto] = await Promise.all([
       import('bech32'),
@@ -201,7 +201,7 @@ export const verify = async ({
       );
       return valid;
     }
-  } else if (chainBase == ChainBase.Solana) {
+  } else if (chainBase === ChainBase.Solana) {
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
     const canvas = await importCanvas();
@@ -220,7 +220,7 @@ export const verify = async ({
       signerPublicKeyBytes
     );
     return valid;
-  } else if (chainBase == ChainBase.NEAR) {
+  } else if (chainBase === ChainBase.NEAR) {
     const nearlib = await import('near-api-js/lib/utils');
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
@@ -259,7 +259,7 @@ export const verify = async ({
       );
       return valid;
     }
-  } else if (chainBase == ChainBase.Substrate) {
+  } else if (chainBase === ChainBase.Substrate) {
     // verify substrate signature
     const polkadotUtil = await import('@polkadot/util-crypto');
     const canvas = await importCanvas();

@@ -76,11 +76,11 @@ class SessionsController {
   }
 
   getSessionController(chainBase: ChainBase): ISessionController {
-    if (chainBase == 'ethereum') return this.ethereum;
-    else if (chainBase == 'substrate') return this.substrate;
-    else if (chainBase == 'cosmos') return this.cosmos;
-    else if (chainBase == 'solana') return this.solana;
-    else if (chainBase == 'near') return this.near;
+    if (chainBase === 'ethereum') return this.ethereum;
+    else if (chainBase === 'substrate') return this.substrate;
+    else if (chainBase === 'cosmos') return this.cosmos;
+    else if (chainBase === 'solana') return this.solana;
+    else if (chainBase === 'near') return this.near;
   }
 
   // Get a session address. Generate one and cache in localStorage if none exists.
@@ -124,7 +124,7 @@ class SessionsController {
     // `chainBaseToCanvasChainId` replaces idOrPrefix with the appropriate
     // chainID for non-eth, non-cosmos chains.
     const idOrPrefix =
-      chainBase == ChainBase.CosmosSDK
+      chainBase === ChainBase.CosmosSDK
         ? app.chain?.meta.bech32Prefix
         : app.chain?.meta.node?.ethChainId;
     const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix)
