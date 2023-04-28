@@ -1,8 +1,14 @@
 @import '../../shared';
 
 .QuillEditorWrapper {
+  .ql-container {
+    min-height: 212px;
+    max-height: 512px;
+    overflow-y: scroll;
+  }
+
   .ql-editor {
-    min-height: 180px;
+    min-height: 212px;
   }
 
   .custom-buttons {
