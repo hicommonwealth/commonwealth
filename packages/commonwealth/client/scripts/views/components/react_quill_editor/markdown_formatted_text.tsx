@@ -30,6 +30,7 @@ type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
 };
 
+// NOTE: Do NOT use this directly. Use QuillRenderer instead.
 export const MarkdownFormattedText = ({
   doc,
   hideFormatting,

@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 
 import 'pages/tip_detail.scss';
 
 import app from 'state';
-import { MarkdownFormattedText } from '../components/quill/markdown_formatted_text';
 import { User } from '../components/user/user';
 import Sublayout from '../sublayout';
+import { QuillFormattedText } from '../components/react_quill_editor/quill_formatted_text';
+import { createDeltaFromText } from '../components/react_quill_editor';
+import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 
 type TipDetailProps = {
   proposal: SubstrateTreasuryTip;
@@ -45,7 +47,7 @@ export const TipDetail = (props: TipDetailProps) => {
           <div className="proposal-page-row">
             <div className="label">Reason</div>
             <div className="tip-reason">
-              {reason && <MarkdownFormattedText doc={reason} />}
+              {reason && <QuillRenderer doc={reason} />}
             </div>
           </div>
           <div className="proposal-page-row">
