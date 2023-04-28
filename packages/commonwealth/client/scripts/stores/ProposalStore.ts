@@ -23,7 +23,7 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
   }
 
   public remove(proposal: ProposalT) {
-    super.remove(proposal);
+    super.remove(proposal, (x) => x.identifier === proposal.identifier);
     delete this._storeId[proposal.identifier];
     return this;
   }
