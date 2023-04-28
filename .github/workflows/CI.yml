@@ -123,8 +123,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Init Db
+      - name: Init CW Db
         run: cd packages/commonwealth && npx sequelize db:migrate
+
+      - name: Init CE Db
+        run: cd packages/chain-events && npx sequelize db:migrate
 
       - name: Run linter
         run: yarn lint-all
