@@ -1,6 +1,10 @@
 import React from 'react';
 
-import 'components/component_kit/cw_button.scss';
+import '../../../../styles/components/component_kit/cw_button.scss';
+// C:\dev\common\commonwealth\packages\commonwealth\.storybook
+// client\scripts\views\components\component_kit\components\component_kit\cw_button.scss
+
+// client/styles/components/component_kit/cw_button.scss
 
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
