@@ -488,6 +488,7 @@ class ThreadsController {
       success: (response) => {
         const result = this.modelFromServer(response.result);
         // Post edits propagate to all thread stores
+        this._store.update(result);
         this._listingStore.add(result);
         this._overviewStore.update(result);
         return result;
