@@ -290,8 +290,8 @@ export const getBatchNotificationFields = (
   };
 
   const args = comment_id
-    ? [root_type, pseudoProposal, { id: comment_id }]
-    : [root_type, pseudoProposal];
+    ? [pseudoProposal, { id: comment_id }]
+    : [pseudoProposal, undefined];
 
   const path =
     category === NotificationCategories.NewThread
