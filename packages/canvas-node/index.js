@@ -24,33 +24,8 @@ import { EthereumChainImplementation } from "@canvas-js/chain-ethereum"
 import { getReasonPhrase, StatusCodes } from "http-status-codes"
 
 yargs(hideBin(process.argv))
-  .command("run [sync-uri]", "running canvas-node", (yargs) => {
+  .command(["start", "*"], "Runs a Canvas node", (yargs) => {
 	  yargs
-		  .positional("app", {
-			  describe: "Path to app file, or IPFS hash of app",
-			  type: "string",
-			  demandOption: true,
-		  })
-		  .option("port", {
-			  type: "number",
-			  desc: "Port to bind the Core API",
-			  default: 8000,
-		  })
-		  .option("offline", {
-			  type: "boolean",
-			  desc: "Disable libp2p",
-			  default: false,
-		  })
-		  .option("disable-ping", {
-			  type: "boolean",
-			  desc: "Disable peer health check pings",
-			  default: false,
-		  })
-		  .option("install", {
-			  type: "boolean",
-			  desc: "Install a local app and run it in production mode",
-			  default: false,
-		  })
 		  .option("listen", {
 			  type: "array",
 			  desc: "Internal libp2p /ws multiaddr, e.g. /ip4/0.0.0.0/tcp/4444/ws",
@@ -92,10 +67,6 @@ yargs(hideBin(process.argv))
 			  type: "array",
 			  desc: "Declare chain implementations and provide RPC endpoints for reading on-chain data (format: {chain} or {chain}={URL})",
 		  })
-		  .option("static", {
-			  type: "string",
-			  desc: "Serve a static directory from /, and API routes from /api",
-		  })
   }, async (args) => {
 	  // validate options
 	  if (args.replay && args.reset) {
@@ -105,11 +76,9 @@ yargs(hideBin(process.argv))
 
 	  // eslint-disable-next-line
 	  let { directory, uri, spec } = parseSpecArgument("spec.js")
-	  if (directory === null && args.install) {
-		  const cid = await installSpec(spec)
-		  directory = path.resolve(CANVAS_HOME, cid)
-		  uri = `ipfs://${cid}`
-	  }
+		const cid = await installSpec(spec)
+		directory = path.resolve(CANVAS_HOME, cid)
+		uri = `ipfs://${cid}`
 
 	  if (directory === null) {
 		  if (args.replay || args.reset) {
@@ -180,8 +149,6 @@ yargs(hideBin(process.argv))
 		  )
 
 		  console.log(chalk.yellow(`✦ ${chalk.bold("Using in-memory database.")} Data will be lost on restart.`))
-		  console.log(chalk.yellow(`✦ ${chalk.bold("To persist data, install the app:")} canvas install ${args.app}`))
-		  console.log("")
 	  }
 
 	  const { listen, announce } = args
@@ -200,10 +167,10 @@ yargs(hideBin(process.argv))
 
 	  const options = {
 		  replay: args.replay,
-		  offline: directory === null || args.offline,
+		  offline: args.offline,
 		  unchecked: args.unchecked,
 		  verbose: args.verbose,
-		  disablePingService: args["disable-ping"],
+		  // disablePingService: args["disable-ping"],
 	  }
 
 	  const core = await Core.initialize({ chains, directory, uri, spec, listen, announce, ...options })
@@ -211,24 +178,12 @@ yargs(hideBin(process.argv))
 	  const app = express()
 	  app.use(cors())
 
-	  if (args.static) {
-		  if (!/^(.\/)?\w[\w/]*$/.test(args.static)) {
-			  throw new Error("Invalid directory for static files")
-		  } else if (!fs.existsSync(args.static)) {
-			  throw new Error("Invalid directory for static files (path not found)")
-		  }
-
-		  app.use("/api", getAPI(core, { exposeMetrics: args.metrics, exposeP2P: args.p2p }))
-		  app.use(express.static(args.static))
-	  } else {
-		  app.use(getAPI(core, { exposeMetrics: args.metrics, exposeP2P: args.p2p }))
-	  }
-
-	  const origin = `http://localhost:${args.port}`
+    const PORT = 6000
+	  const origin = `http://localhost:${PORT}`
 	  const apiURL = args.static ? `${origin}/api` : origin
 
 	  const server = stoppable(
-		  http.createServer(app).listen(args.port, () => {
+		  http.createServer(app).listen(PORT, () => {
 			  if (args.static) {
 				  console.log(`Serving static bundle: ${chalk.bold(origin)}`)
 			  }
@@ -256,7 +211,12 @@ yargs(hideBin(process.argv))
 			  wss.handleUpgrade(req, socket, head, (socket) => handleWebsocketConnection(core, socket))
 		  } else {
 			  console.log(chalk.red("[canvas-cli] rejecting incoming WS connection at unexpected path"), url.pathname)
-			  rejectRequest(socket, StatusCodes.NOT_FOUND)
+	      const date = new Date()
+        const code = StatusCodes.NOT_FOUND
+	      socket.write(`HTTP/1.1 ${code} ${getReasonPhrase(code)}\r\n`)
+	      socket.write(`Date: ${date.toUTCString()}\r\n`)
+	      socket.write(`\r\n`)
+	      socket.end()
 		  }
 	  })
 
@@ -279,13 +239,5 @@ yargs(hideBin(process.argv))
 			  console.log("[canvas-cli] Core closed, press Ctrl+C to terminate immediately.")
 		  }
 	  })
-  })
-  .parse()
-
-function rejectRequest(reqSocket, code) {
-	const date = new Date()
-	reqSocket.write(`HTTP/1.1 ${code} ${getReasonPhrase(code)}\r\n`)
-	reqSocket.write(`Date: ${date.toUTCString()}\r\n`)
-	reqSocket.write(`\r\n`)
-	reqSocket.end()
-}
+	}
+,).parse()
