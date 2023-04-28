@@ -3,7 +3,7 @@ import { ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
-import type { ThreadInstance } from '../models/thread';
+import type { Link, ThreadInstance } from '../models/thread';
 import { getLastEdited } from '../util/getLastEdited';
 
 const processLinks = async (thread, models) => {
@@ -12,19 +12,8 @@ const processLinks = async (thread, models) => {
   if (thread.links) {
     const ces = thread.links.filter((item) => item.source === 'proposal');
     if (ces.length > 0) {
-      chain_entity_meta = (
-        await models.ChainEntityMeta.findAll({
-          where: {
-            ce_id: {
-              [Op.in]: ces.map((ce) => parseInt(ce.identifier)),
-            },
-          },
-          attributes: ['ce_id', 'title', 'chain'],
-        })
-      ).map((entity) => {
-        if (thread.thread_chain === entity.chain) {
-          return { ce_id: entity.ce_id, title: ces.title };
-        }
+      chain_entity_meta = ces.map((ce: Link) => {
+        return { ce_id: parseInt(ce.identifier), title: ce.title };
       });
     }
     linked_threads = thread.links
