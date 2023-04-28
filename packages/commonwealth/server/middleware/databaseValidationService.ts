@@ -65,4 +65,5 @@ export default class DatabaseValidationService {
     if (!chain) return next(new AppError(Errors.InvalidCommunity));
     next();
   };
+
 }
