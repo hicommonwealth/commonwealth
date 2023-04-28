@@ -52,10 +52,6 @@ const setupAppRoutes = (
   }
 
   const renderWithMetaTags = (res, title, description, author, image) => {
-    if (image) {
-      image = cleanMalformedUrl(image);
-    }
-
     description =
       description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
@@ -163,7 +159,7 @@ const setupAppRoutes = (
     const title = thread ? decodeTitle(thread.title) : '';
     const description = thread ? thread.plaintext : '';
     const image = thread?.Chain?.icon_url
-      ? `https://commonwealth.im${thread.Chain.icon_url}`
+      ? `${thread.Chain.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
 
     const author = thread?.Address?.Profile?.profile_name ?
@@ -183,8 +179,10 @@ const setupAppRoutes = (
 
     const title = chain ? chain.name : 'Commonwealth';
     const description = '';
-    const image = chain
-      ? `https://commonwealth.im${chain.icon_url}`
+    const image = chain?.icon_url
+      ? chain.icon_url.match(`^(http|https)://`)
+        ? chain.icon_url
+        : `https://commonwealth.im${chain.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
 
