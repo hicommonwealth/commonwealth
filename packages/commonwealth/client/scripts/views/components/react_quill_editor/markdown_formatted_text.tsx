@@ -21,6 +21,16 @@ markdownRenderer.link = (href, title, text) => {
     OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
   } href="${href}">${text}</a>`;
 };
+markdownRenderer.image = (href, title, text) => {
+  console.log({ href, title, text });
+  if (href?.startsWith('ipfs://')) {
+    const hash = href.split('ipfs://')[1];
+    if (hash) {
+      href = `https://ipfs.io/ipfs/${hash}`;
+    }
+  }
+  return `<img alt="${text}" src="${href}"/>`;
+};
 marked.setOptions({
   renderer: markdownRenderer,
   gfm: true, // use github flavored markdown
