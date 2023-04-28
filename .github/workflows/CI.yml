@@ -85,11 +85,11 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: bitnami/postgresql:latest
         env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
-          POSTGRES_PASSWORD: edgeware
+          POSTGRESQL_USERNAME: commonwealth
+          POSTGRESQL_PASSWORD: edgeware
+          POSTGRESQL_MULTIPLE_DATABASES: commonwealth,commonwealth_chain_events
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
