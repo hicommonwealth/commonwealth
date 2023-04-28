@@ -2,13 +2,13 @@ import { ProposalType } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
 
-import type { ChainEntity, Comment, Poll, Topic } from 'models';
+import type { Comment, Poll, Topic } from 'models';
 import { Thread, ThreadStage as ThreadStageType } from 'models';
 import type { IThreadCollaborator } from 'models/Thread';
+import { Link, LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
@@ -46,6 +46,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { filterLinks } from 'helpers/threads';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -461,14 +462,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     getCommentSubscription(thread)?.isActive &&
     getReactionSubscription(thread)?.isActive;
 
+  const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+
   const showLinkedProposalOptions =
-    thread.snapshotProposal?.length > 0 ||
-    thread.chainEntities?.length > 0 ||
+    linkedSnapshots.length > 0 ||
+    linkedProposals.length > 0 ||
     isAuthor ||
     isAdminOrMod;
 
   const showLinkedThreadOptions =
-    thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
+    linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
   const canComment =
     app.user.activeAccount ||
@@ -486,16 +491,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasEditPerms = isAuthor || isEditor;
 
-  const handleLinkedThreadChange = (linkedThreads: Thread[]) => {
-    const linkedThreadsRelations = linkedThreads.map((t) => ({
-      id: '',
-      linkedThread: String(t.id),
-      linkingThread: String(thread.id),
-    }));
-
+  const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({
       ...thread,
-      linkedThreads: linkedThreadsRelations,
+      links,
     });
 
     setThread(updatedThread);
@@ -503,14 +502,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const handleLinkedProposalChange = (
     stage: ThreadStageType,
-    chainEntities: ChainEntity[] = [],
-    snapshotProposal: SnapshotProposal[] = []
+    links: Link[] = []
   ) => {
     const newThread = {
       ...thread,
       stage,
-      chainEntities,
-      snapshotProposal: snapshotProposal[0]?.id,
+      links,
     } as Thread;
 
     setThread(newThread);
@@ -683,6 +680,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     ];
   };
 
+  console.log('thread', thread);
   return (
     <Sublayout>
       <CWContentPage

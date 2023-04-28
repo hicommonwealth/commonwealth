@@ -1,6 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
 import type moment from 'moment';
-import { Link } from 'server/models/thread';
 import type { VersionHistory } from '../controllers/server/threads';
 import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
@@ -24,6 +23,18 @@ export type AssociatedReaction = {
   id: number;
   type: ReactionType;
   address: string;
+};
+
+export enum LinkSource {
+  Snapshot = 'snapshot',
+  Proposal = 'proposal',
+  Thread = 'thread',
+  Web = 'web',
+}
+
+export type Link = {
+  source: LinkSource;
+  identifier: string;
 };
 
 class Thread implements IUniqueId {
@@ -100,6 +111,7 @@ class Thread implements IUniqueId {
     canvasAction,
     canvasSession,
     canvasHash,
+    links,
   }: {
     author: string;
     title: string;
@@ -132,6 +144,7 @@ class Thread implements IUniqueId {
     canvasAction?: string;
     canvasSession?: string;
     canvasHash?: string;
+    links?: Link[];
   }) {
     this.author = author;
     this.title = title;
@@ -182,6 +195,7 @@ class Thread implements IUniqueId {
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
+    this.links = links || [];
   }
 }
 
