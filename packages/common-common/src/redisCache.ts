@@ -35,6 +35,11 @@ export class RedisCache {
     this.rollbar = rollbar_;
   }
 
+  // get namespace key for redis
+  static getNamespaceKey(namespace: RedisNamespaces, key: string) {
+    return `${namespace}_${key}`;
+  }
+
   /**
    * Initializes the Redis client. Must be run before any Redis command can be executed.
    */
@@ -120,7 +125,8 @@ export class RedisCache {
   public async setKey(
     namespace: RedisNamespaces,
     key: string,
-    value: string
+    value: string,
+    duration = 0 // no ttl   
   ): Promise<boolean> {
     if (!this.initialized) {
       log.error(
@@ -128,10 +134,16 @@ export class RedisCache {
       );
       return false;
     }
-    const finalKey = namespace + '_' + key;
+    const finalKey = RedisCache.getNamespaceKey(namespace, key);
 
     try {
-      await this.client.set(finalKey, value);
+      if (duration > 0) {
+        await this.client.set(finalKey, value, {
+          EX: duration
+        });
+      } else {
+        await this.client.set(finalKey, value);
+      }
     } catch (e) {
       log.error(
         `An error occurred while setting the following key value pair '${finalKey}: ${value}'`,
@@ -154,7 +166,7 @@ export class RedisCache {
       return;
     }
 
-    const finalKey = namespace + '_' + key;
+    const finalKey = RedisCache.getNamespaceKey(namespace, key);
     return await this.client.get(finalKey);
   }
 
@@ -195,7 +207,7 @@ export class RedisCache {
    */
   public async getNamespaceKeys(
     namespace: RedisNamespaces,
-    maxResults?: number
+    maxResults = 1000
   ): Promise<{ [key: string]: string } | boolean> {
     if (!this.initialized) {
       log.error(
@@ -204,16 +216,23 @@ export class RedisCache {
       return false;
     }
 
+    const keys = [];
     const data = {};
     try {
-      for await (const { field, value } of this.client.scanIterator({
+      for await (const key of this.client.scanIterator({
         MATCH: `${namespace}*`,
         COUNT: maxResults,
       })) {
-        data[field] = value;
+        keys.push(key);
       }
+
+      for (const key of keys) {
+        data[key] = await this.client.get(key);
+      }
+
       return data;
     } catch (e) {
+      console.log(e);
       return false;
     }
   }
@@ -228,5 +247,42 @@ export class RedisCache {
     await this.client.quit();
     this.initialized = false;
     return true;
+  }
+
+  /**
+   * Check if redis is initialized
+   * @returns boolean
+   */
+  public isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  /**
+   * delete redis key by namespace and key
+   * @returns boolean
+   */
+  public async deleteNamespaceKeys(
+    namespace: RedisNamespaces
+  ): Promise<number | boolean> {
+    try {
+      let count = 0;
+      const data = await this.getNamespaceKeys(namespace);
+      if (data) {
+        for (const key of Object.keys(data)) {
+          try {
+            const resp = await this.client.del(key);
+            count += resp;
+            console.log(`deleted key ${key} ${resp} ${count}`)
+          } catch (err) {
+            console.log(`error deleting key ${key}`)
+            console.log(err);
+          }
+        }
+      }
+      return count;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
   }
 }
