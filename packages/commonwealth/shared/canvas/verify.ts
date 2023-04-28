@@ -1,9 +1,10 @@
-import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
 import { import_ } from "@brillout/import"
 
 import { getEIP712SignableAction, getEIP712SignableSession } from '../adapters/chain/ethereum/keys';
 import { getADR036SignableSession, getADR036SignableAction } from '../adapters/chain/cosmos/keys';
+import { caip2ToChainBase } from './chainMappings';
+import { ChainBase } from '../../../common-common/src/types';
 
 // Direct import works on the client but fails on the server because of ESM incompatibility
 // If it fails, fall back to a patched async `import` call in @brillout/import
@@ -48,7 +49,9 @@ export const verify = async ({
   const payload = action?.payload ?? session?.payload;
   if (!payload || !signature) return false;
 
-  if (payload.chain === 'ethereum') {
+  const chainBase = caip2ToChainBase(payload.chain);
+
+  if (chainBase === ChainBase.Ethereum) {
     // verify ethereum signature
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
@@ -73,7 +76,7 @@ export const verify = async ({
       });
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
-  } else if (payload.chain === 'cosmos') {
+  } else if (chainBase == ChainBase.CosmosSDK) {
     // verify terra sessions (actions are verified like other cosmos chains)
     const [bech32, cosmAmino, cosmEncoding, cosmCrypto] = await Promise.all([
       import('bech32'),
@@ -198,7 +201,7 @@ export const verify = async ({
       );
       return valid;
     }
-  } else if (payload.chain === 'solana') {
+  } else if (chainBase == ChainBase.Solana) {
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
     const canvas = await importCanvas();
@@ -217,7 +220,7 @@ export const verify = async ({
       signerPublicKeyBytes
     );
     return valid;
-  } else if (payload.chain === 'near') {
+  } else if (chainBase == ChainBase.NEAR) {
     const nearlib = await import('near-api-js/lib/utils');
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
@@ -256,7 +259,7 @@ export const verify = async ({
       );
       return valid;
     }
-  } else if (payload.chain === 'substrate') {
+  } else if (chainBase == ChainBase.Substrate) {
     // verify substrate signature
     const polkadotUtil = await import('@polkadot/util-crypto');
     const canvas = await importCanvas();

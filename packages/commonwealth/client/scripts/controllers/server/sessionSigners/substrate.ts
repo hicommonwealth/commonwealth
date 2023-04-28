@@ -137,11 +137,9 @@ export class SubstrateSessionController implements ISessionController {
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,
-      appName: 'Commonwealth',
       from: sessionPayload.from,
       timestamp: +Date.now(),
-      chain: 'substrate',
-      chainId,
+      chain: `polkadot:${chainId}`,
       block: sessionPayload.block, // will be null
       call,
       callArgs,

@@ -1,6 +1,5 @@
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import type { Chain } from '@canvas-js/interfaces';
 import { createCanvasSessionPayload } from 'canvas';
 import { initAppState } from 'state';
 import BN from 'bn.js';
@@ -103,7 +102,7 @@ const FinishNearLogin = () => {
       );
 
       const canvasSessionPayload = createCanvasSessionPayload(
-        'near' as Chain,
+        'near' as ChainBase,
         chainId,
         acct.address,
         sessionPublicAddress,

@@ -13,6 +13,7 @@ import {
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../../shared/adapters/chain/ethereum/keys';
 import * as modelUtils from '../../util/modelUtils';
+import { ChainBase } from '../../../../common-common/src/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -73,7 +74,7 @@ describe('API Tests', () => {
       const sessionWallet = ethers.Wallet.createRandom();
       const timestamp = 1665083987891;
       const message = createCanvasSessionPayload(
-        'ethereum',
+        'ethereum' as ChainBase,
         chain_id,
         address,
         sessionWallet.address,

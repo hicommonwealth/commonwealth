@@ -1,10 +1,9 @@
-import type {
-  Chain as CanvasChain,
-  SessionPayload,
-} from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
+import { ChainBase } from '../../../common-common/src/types';
+import { chainBaseToCaip2 } from './chainMappings';
 
 export const createCanvasSessionPayload = (
-  canvasChain: CanvasChain, // Canvas chain network, e.g. "ethereum"
+  chainBase: ChainBase, // Canvas chain network, e.g. "ethereum"
   canvasChainId: string, // Canvas chain id, e.g. "1" or "osmo-1" (CW chainId is 1 or "osmo-1")
   from: string,
   sessionAddress: string,
@@ -17,12 +16,12 @@ export const createCanvasSessionPayload = (
   // The blockhash is optional, but must be explicitly so
   if (block === undefined) throw new Error('Invalid Canvas signing message');
 
+  const caip2Prefix = chainBaseToCaip2(chainBase)
+
   const payload: SessionPayload = {
     app: placeholderMultihash,
-    appName: 'Commonwealth',
     block: block === null ? null : block,
-    chain: canvasChain,
-    chainId: canvasChainId,
+    chain: `${caip2Prefix}:${canvasChainId}`,
     from,
     sessionAddress,
     sessionDuration: 86400 * 1000,

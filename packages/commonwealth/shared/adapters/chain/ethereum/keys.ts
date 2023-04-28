@@ -28,10 +28,8 @@ export const getEIP712SignableSession = (
     EIP712Domain: [{ name: 'name', type: 'string' }],
     Message: [
       { name: 'app', type: 'string' },
-      { name: 'appName', type: 'string' },
       { name: 'block', type: 'string' },
       { name: 'chain', type: 'string' },
-      { name: 'chainId', type: 'string' },
       { name: 'from', type: 'string' },
       { name: 'sessionAddress', type: 'string' },
       { name: 'sessionDuration', type: 'uint256' },
@@ -57,12 +55,10 @@ export const getEIP712SignableAction = (
     EIP712Domain: [{ name: 'name', type: 'string' }],
     Message: [
       { name: 'app', type: 'string' },
-      { name: 'appName', type: 'string' },
       { name: 'from', type: 'string' },
       { name: 'call', type: 'string' },
       { name: 'callArgs', type: 'string' },
       { name: 'chain', type: 'string' },
-      { name: 'chainId', type: 'string' },
       { name: 'block', type: 'string' },
       { name: 'timestamp', type: 'uint64' },
     ],

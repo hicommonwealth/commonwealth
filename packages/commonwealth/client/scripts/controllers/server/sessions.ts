@@ -4,7 +4,6 @@ import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
   createCanvasSessionPayload,
-  chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
 } from 'canvas';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
@@ -34,7 +33,6 @@ export async function signSessionWithAccount<T extends { address: string }>(
     wallet.chain === ChainBase.CosmosSDK
       ? app.chain?.meta.bech32Prefix || 'cosmos'
       : app.chain?.meta.node?.ethChainId || 1;
-  const canvasChain = chainBaseToCanvasChain(wallet.chain);
   const canvasChainId = chainBaseToCanvasChainId(wallet.chain, idOrPrefix);
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(
     wallet.chain,
@@ -43,7 +41,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   );
 
   const canvasSessionPayload = createCanvasSessionPayload(
-    canvasChain,
+    wallet.chain,
     canvasChainId,
     wallet.chain === ChainBase.Substrate
       ? addressSwapper({
@@ -129,14 +127,14 @@ class SessionsController {
       chainBase == ChainBase.CosmosSDK
         ? app.chain?.meta.bech32Prefix
         : app.chain?.meta.node?.ethChainId;
-    const chainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
+    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix)
 
     // Try to request a new session from the user, if one was not found.
     const controller = this.getSessionController(chainBase);
 
     // Load any past session
     const hasAuthenticatedSession = await controller.hasAuthenticatedSession(
-      chainId,
+      canvasChainId,
       address,
     );
 
@@ -148,7 +146,7 @@ class SessionsController {
       });
 
       // The user may have signed using a different account
-      const sessionReauthed = await controller.hasAuthenticatedSession(chainId, address);
+      const sessionReauthed = await controller.hasAuthenticatedSession(canvasChainId, address);
       if (!sessionReauthed) {
         const err = new Error();
         (err as any).responseJSON = { error: `Message signed with ${account.address}. Switch to this account to continue` };
@@ -157,7 +155,7 @@ class SessionsController {
     }
 
     const { session, action, hash } = await controller.sign(
-      chainId,
+      canvasChainId,
       address,
       call,
       args
