@@ -9,3 +9,31 @@ export function detectURL(str: string) {
 export const filterLinks = (links: Link[] = [], source: LinkSource) => {
   return links.filter((l) => l?.source === source);
 };
+
+export const getAddedAndDeleted = <T>(
+  finalArr: T[],
+  initialArr: T[],
+  key: keyof T = 'id' as keyof T
+) => {
+  const toAdd = finalArr.reduce((acc, curr) => {
+    const wasSelected = initialArr.find((obj) => obj[key] === curr[key]);
+
+    if (wasSelected) {
+      return acc;
+    }
+
+    return [...acc, curr];
+  }, []);
+
+  const toDelete = initialArr.reduce((acc, curr) => {
+    const isSelected = finalArr.find((obj) => obj[key] === curr[key]);
+
+    if (isSelected) {
+      return acc;
+    }
+
+    return [...acc, curr];
+  }, []);
+
+  return { toAdd, toDelete };
+};

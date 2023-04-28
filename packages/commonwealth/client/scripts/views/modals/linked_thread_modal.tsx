@@ -9,39 +9,13 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { LinkSource } from 'models/Thread';
+import { getAddedAndDeleted } from 'helpers/threads';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
   thread: Thread;
   onModalClose: () => void;
   onSave?: (links: Thread['links']) => void;
-};
-
-const getAddedAndDeleted = (
-  tempLinkedThreads: Thread[],
-  initialLinkedThreads: Thread[]
-) => {
-  const toAdd = tempLinkedThreads.reduce((acc, curr) => {
-    const wasSelected = initialLinkedThreads.find(({ id }) => curr.id === id);
-
-    if (wasSelected) {
-      return acc;
-    }
-
-    return [...acc, curr];
-  }, []);
-
-  const toDelete = initialLinkedThreads.reduce((acc, curr) => {
-    const isSelected = tempLinkedThreads.find(({ id }) => curr.id === id);
-
-    if (isSelected) {
-      return acc;
-    }
-
-    return [...acc, curr];
-  }, []);
-
-  return { toAdd, toDelete };
 };
 
 export const LinkedThreadModal = ({

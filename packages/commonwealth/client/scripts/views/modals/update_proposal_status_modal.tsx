@@ -14,67 +14,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { Link, LinkSource } from 'models/Thread';
-import { filterLinks } from 'helpers/threads';
-
-const getAddedAndDeleted = (
-  tempSnapshotProposals: Pick<SnapshotProposal, 'id'>[],
-  initialSnapshotProposals: Pick<SnapshotProposal, 'id'>[]
-) => {
-  const toAdd = tempSnapshotProposals.reduce((acc, curr) => {
-    const wasSelected = initialSnapshotProposals.find(
-      ({ id }) => curr.id === id
-    );
-
-    if (wasSelected) {
-      return acc;
-    }
-
-    return [...acc, curr];
-  }, []);
-
-  const toDelete = initialSnapshotProposals.reduce((acc, curr) => {
-    const isSelected = tempSnapshotProposals.find(({ id }) => curr.id === id);
-
-    if (isSelected) {
-      return acc;
-    }
-
-    return [...acc, curr];
-  }, []);
-
-  return { toAdd, toDelete };
-};
-
-const getAddedAndDeletedProposals = (
-  tempProposals: Pick<ChainEntity, 'typeId'>[],
-  initialProposals: Pick<ChainEntity, 'typeId'>[]
-) => {
-  const toAdd = tempProposals.reduce((acc, curr) => {
-    const wasSelected = initialProposals.find(
-      ({ typeId }) => String(curr.typeId) === String(typeId)
-    );
-
-    if (wasSelected) {
-      return acc;
-    }
-
-    return [...acc, curr];
-  }, []);
-
-  const toDelete = initialProposals.reduce((acc, curr) => {
-    const isSelected = tempProposals.find(
-      ({ typeId }) => String(curr.typeId) === String(typeId)
-    );
-
-    if (isSelected) {
-      return acc;
-    }
-
-    return [...acc, curr];
-  }, []);
-
-  return { toAdd, toDelete };
-};
+import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -175,9 +115,10 @@ export const UpdateProposalStatusModal = ({
     }
 
     try {
-      const { toAdd, toDelete } = getAddedAndDeletedProposals(
+      const { toAdd, toDelete } = getAddedAndDeleted(
         tempProposals,
-        getInitialProposals(thread)
+        getInitialProposals(thread),
+        'typeId'
       );
 
       if (toAdd.length > 0) {
