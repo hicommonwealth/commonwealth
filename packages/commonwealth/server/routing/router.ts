@@ -8,7 +8,7 @@ import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import { defaultUserKeyGenerator } from 'common-common/src/cacheKeyUtils';
 
 import domain from '../routes/domain';
-import { status, statusBroken } from '../routes/status';
+import { status } from '../routes/status';
 import createAddress from '../routes/createAddress';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
@@ -216,11 +216,7 @@ function setupRouter(
     updateAddress.bind(this, models)
   );
   router.get('/domain', domain.bind(this, models));
-  router.get(
-    '/statusBroken',
-    cacheDecorator.cacheMiddleware(100),
-    statusBroken.bind(this, models)
-  );
+  router.get('/status', status.bind(this, models));
   router.post(
     '/ipfsPin',
     passport.authenticate('jwt', { session: false }),
