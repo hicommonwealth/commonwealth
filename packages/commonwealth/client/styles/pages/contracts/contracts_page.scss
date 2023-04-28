@@ -4,6 +4,10 @@
   width: 864px;
   margin: 16px auto;
 
+  .Tabs {
+    margin-top: 40px;
+  }
+
   @include mediumSmallInclusive {
     width: calc(100% - 10%);
   }
@@ -37,6 +41,54 @@
     .no-contracts-info {
       text-align: center;
       color: $neutral-600;
+    }
+  }
+
+  .Table {
+    margin-top: 40px;
+    display: flex;
+    flex: 1;
+
+    .table-row {
+      border: 1px solid $neutral-100;
+      border-top: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 12px;
+      width: 100%;
+
+      .ColumnText {
+        color: $neutral-600 !important;
+      }
+
+      .Text:first-of-type {
+        justify-content: start;
+      }
+
+      .Text {
+        justify-content: right;
+        margin-right: 8px;
+      }
+    }
+
+    .dark {
+      background-color: $neutral-50;
+      color: $neutral-500;
+    }
+
+    .bottom {
+      border-bottom-right-radius: $border-radius-corners;
+      border-bottom-left-radius: $border-radius-corners;
+    }
+
+    .top {
+      border-top: 1px solid $neutral-100;
+      border-top-right-radius: $border-radius-corners;
+      border-top-left-radius: $border-radius-corners;
+
+      .Text {
+        color: $neutral-500;
+      }
     }
   }
 }
