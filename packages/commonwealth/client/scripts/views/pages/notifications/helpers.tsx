@@ -188,7 +188,7 @@ export const getBatchNotificationFields = (
   const decodedTitle = decodeURIComponent(root_title).trim();
 
   if (comment_text) {
-    notificationBody = getCommentPreview(comment_text);
+    notificationBody = <QuillRenderer doc={comment_text} />;
   } else if (root_type === ProposalType.Thread) {
     notificationBody = null;
   }
