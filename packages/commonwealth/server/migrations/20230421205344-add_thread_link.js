@@ -11,14 +11,16 @@ module.exports = {
       });
 
       const [threads, metadata] = await queryInterface.sequelize.query(
-        `SELECT t.id as id, t.snapshot_proposal as snapshot_proposal, sp.space as space
+        `SELECT t.id as id, t.snapshot_proposal as snapshot_proposal, sp.space as space, sp.title as title
         FROM "Threads" t
         LEFT JOIN "SnapshotProposals" sp ON t.snapshot_proposal = sp.id`
       );
 
       const linkedThreadsPromises = threads.map((thread) =>
         queryInterface.sequelize.query(
-          'SELECT * FROM "LinkedThreads" WHERE "linking_thread" = ?',
+          `Select lt.linked_thread, t.title from "LinkedThreads" lt
+          JOIN "Threads" t ON t.id=lt.linked_thread
+          WHERE lt.linking_thread = ?`,
           {
             replacements: [thread.id],
             type: Sequelize.QueryTypes.SELECT,
@@ -52,6 +54,7 @@ module.exports = {
                 identifier: thread.space
                   ? `${thread.space}/${thread.snapshot_proposal}`
                   : thread.snapshot_proposal,
+                title: thread.title,
               },
             ]
           : [];
@@ -61,6 +64,7 @@ module.exports = {
         const threadLinks = linkedThreadsData.map((linkedThread) => ({
           source: 'thread',
           identifier: linkedThread.linked_thread.toString(),
+          title: linkedThread.title,
         }));
         links.push(...threadLinks);
 
@@ -68,6 +72,7 @@ module.exports = {
         const ceLinks = chainEntitiesData.map((ce) => ({
           source: 'proposal',
           identifier: ce.ce_id.toString(),
+          title: ce.title,
         }));
         links.push(...ceLinks);
 
