@@ -76,14 +76,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         .getAll()
         .filter((x) => x.chain === chain);
       if (foundThreadsForChain.length >= 20) {
-        // if topic was selected then find threads for this topic
+        if (topicName || stageName) {
+          let finalThreads = foundThreadsForChain;
+
+          // get threads for current topic
         const topicId = app.topics.getByName(topicName, chain)?.id;
         if (topicId) {
-          const threadsForTopic = foundThreadsForChain.filter(
-            (x) => x.topic.id === topicId
-          );
-          if (threadsForTopic.length >= 20) {
-            setThreads(threadsForTopic);
+            finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
+          }
+
+          // get threads for current stage
+          if (stageName) {
+            finalThreads = finalThreads.filter((x) => x.stage === stageName);
+          }
+
+          if (finalThreads.length >= 20) {
+            setThreads(finalThreads);
             setInitializing(false);
             return;
           }
