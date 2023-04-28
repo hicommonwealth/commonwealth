@@ -161,6 +161,10 @@ export default (
       constraints: false,
       as: 'chain_entity_meta',
     });
+    models.Thread.hasMany(models.Comment, {
+      foreignKey: 'thread_id',
+      constraints: false
+    });
     models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linking_threads',
