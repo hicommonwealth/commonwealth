@@ -274,10 +274,13 @@ const customDomainRoutes = () => {
     // TREASURY END
 
     // ADMIN
-    <Route path="/manage" element={withLayout(ManageCommunityPage, {
-      scoped: true,
-      deferChain: true,
-    })} />,
+    <Route
+      path="/manage"
+      element={withLayout(ManageCommunityPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />,
     <Route
       path="/analytics"
       element={withLayout(AnalyticsPage, {
@@ -385,15 +388,25 @@ const customDomainRoutes = () => {
     <Route path="/:scope/proposals" element={<Navigate to="/proposals" />} />,
     <Route
       path="/:scope/proposal/:type/:identifier"
-      element={<Navigate to="/proposal/:type/:identifier" />}
+      element={
+        <Navigate
+          to={(parameters) =>
+            `/proposal/${parameters.type}/${parameters.identifier}`
+          }
+        />
+      }
     />,
     <Route
       path="/:scope/proposal/:identifier"
-      element={<Navigate to="/proposal/:identifier" />}
+      element={
+        <Navigate to={(parameters) => `/proposal/${parameters.identifier}`} />
+      }
     />,
     <Route
       path="/:scope/new/proposal/:type"
-      element={<Navigate to="/new/proposal/:type" />}
+      element={
+        <Navigate to={(parameters) => `/new/proposal/${parameters.type}`} />
+      }
     />,
     <Route
       path="/:scope/new/proposal"
@@ -408,11 +421,15 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/discussions/:topicName"
-      element={<Navigate to="/discussions/:topicName" />}
+      element={
+        <Navigate to={(parameters) => `/discussions/${parameters.topicName}`} />
+      }
     />,
     <Route
       path="/:scope/discussion/:identifier"
-      element={<Navigate to="/discussion/:identifier" />}
+      element={
+        <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
+      }
     />,
     <Route
       path="/:scope/new/discussion"
@@ -420,7 +437,11 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/proposal/discussion/:identifier"
-      element={<Navigate to="/proposal/discussion/:identifier" />}
+      element={
+        <Navigate
+          to={(parameters) => `/proposal/discussion/${parameters.identifier}`}
+        />
+      }
     />,
     // DISCUSSIONS END
 
@@ -431,7 +452,11 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/contract/:contractAddress"
-      element={<Navigate to="/contract/:contractAddress" />}
+      element={
+        <Navigate
+          to={(parameters) => `/contract/${parameters.contractAddress}`}
+        />
+      }
     />,
     // CONTRACTS END
 
@@ -445,7 +470,9 @@ const customDomainRoutes = () => {
     <Route path="/:scope/analytics" element={<Navigate to="/analytics" />} />,
     <Route
       path="/:scope/snapshot/:snapshotId"
-      element={<Navigate to="/snapshot/:snapshotId" />}
+      element={
+        <Navigate to={(parameters) => `/snapshot/${parameters.snapshotId}`} />
+      }
     />,
     <Route
       path="/:scope/multiple-snapshots"
@@ -453,11 +480,21 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/snapshot/:snapshotId/:identifier"
-      element={<Navigate to="/snapshot/:snapshotId/:identifier" />}
+      element={
+        <Navigate
+          to={(parameters) =>
+            `/snapshot/${parameters.snapshotId}/${parameters.identifier}`
+          }
+        />
+      }
     />,
     <Route
       path="/:scope/new/snapshot/:snapshotId"
-      element={<Navigate to="/new/snapshot/:snapshotId" />}
+      element={
+        <Navigate
+          to={(parameters) => `/new/snapshot/${parameters.snapshotId}`}
+        />
+      }
     />,
     // ADMIN END
 
@@ -469,7 +506,9 @@ const customDomainRoutes = () => {
     <Route path="/:scope/account" element={<Navigate to="/account" />} />,
     <Route
       path="/:scope/profile/id/:profileId"
-      element={<Navigate to="/profile/id/:profileId" />}
+      element={
+        <Navigate to={(parameters) => `/profile/id/${parameters.profileId}`} />
+      }
     />,
     <Route
       path="/:scope/profile/edit"
