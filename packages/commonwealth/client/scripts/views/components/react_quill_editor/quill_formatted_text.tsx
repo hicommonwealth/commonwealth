@@ -15,6 +15,7 @@ type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
 };
 
+// NOTE: Do NOT use this directly. Use QuillRenderer instead.
 export const QuillFormattedText = ({
   doc,
   hideFormatting,
