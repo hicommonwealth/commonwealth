@@ -143,6 +143,7 @@ module.exports = {
         __dirname,
         '../../token-balance-cache'
       ),
+      'bn.js': path.resolve(__dirname, '../node_modules/bn.js'), // Add this line to alias bn.js
     },
     fallback: {
       fs: false,
