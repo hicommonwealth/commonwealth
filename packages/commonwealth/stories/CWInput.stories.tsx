@@ -1,27 +1,25 @@
 import React from "react";
-// import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { Input } from "./CWInput";
+// import { Input } from "./CWInput";
+import { CWTextInput } from '../client/scripts/views/components/component_kit/cw_text_input';
+import type {
+  ValidationStatus
+} from '../client/scripts/views/components/component_kit/cw_validation_text';
 
 const input = {
   title: "Example/CWInput",
-  component: Input,
-};
-// } satisfies Meta<typeof Input>;
+  component: CWTextInput,
+} satisfies Meta<typeof CWTextInput>;
 
 export default input;
-// type Story = StoryObj<typeof Input>;
+type Story = StoryObj<typeof CWTextInput>;
 
 /** Large */
 // export const Large: Story = {
 export const Large = {
   render: () => (
-    <Input
-      name="Text field"
-      label="Large"
-      placeholder="Type here"
-      size="large"
-    />
+    <CWTextInput name="Text field" label="Large" placeholder="Type here" />
   ),
 };
 
@@ -29,7 +27,7 @@ export const Large = {
 // export const Small: Story = {
 export const Small = {
   render: () => (
-    <Input
+    <CWTextInput
       name="Text field"
       label="Small"
       placeholder="Type here"
@@ -42,11 +40,17 @@ export const Small = {
 // export const OnlyLetters: Story = {
 export const OnlyLetters = {
   render: () => (
-    <Input
+    <CWTextInput
       name="Form field"
+      inputValidationFn={(val: string): [ValidationStatus, string] => {
+        if (val.match(/[^A-Za-z]/)) {
+          return ['failure', 'Must enter characters A-Z'];
+        } else {
+          return ['success', 'Input validated'];
+        }
+      }}
       label="This input only accepts A-Z"
       placeholder="Type here"
-      size="large"
     />
   ),
 };
@@ -55,12 +59,11 @@ export const OnlyLetters = {
 // export const WithIcons: Story = {
 export const WithIcons = {
   render: () => (
-    <Input
+    <CWTextInput
       label="Text field with icons"
       name="Text field with icons"
       placeholder="Type here"
       iconRight="write"
-      size="large"
     />
   ),
 };
@@ -69,13 +72,11 @@ export const WithIcons = {
 // export const Disabled: Story = {
 export const Disabled = {
   render: () => (
-    <Input
+    <CWTextInput
       name="Text field"
-      placeholder="Some disabled text"
       label="Disabled"
       disabled
       value="Some disabled text"
-      size="large"
     />
   ),
 };
@@ -84,12 +85,11 @@ export const Disabled = {
 // export const DarkMode: Story = {
 export const DarkMode = {
   render: () => (
-    <Input
+    <CWTextInput
       name="Text field dark mode"
       label="Dark mode"
       darkMode
       placeholder="Type here"
-      size="large"
     />
   ),
 };

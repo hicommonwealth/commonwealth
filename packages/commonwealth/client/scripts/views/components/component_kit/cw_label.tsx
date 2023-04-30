@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_label.scss';
+// import 'components/component_kit/cw_label.scss';
+import '../../../../styles/components/component_kit/cw_label.scss';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
