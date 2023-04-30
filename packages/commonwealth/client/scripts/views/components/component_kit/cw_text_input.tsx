@@ -1,7 +1,7 @@
 import React from 'react';
 
 // The import below is breaking Storybook
-// import { redraw } from 'mithrilInterop';
+// import { redraw } from '../../../mithrilInterop';
 
 // import 'components/component_kit/cw_text_input.scss';
 import '../../../../styles/components/component_kit/cw_text_input.scss';
@@ -193,7 +193,7 @@ export const CWTextInput = (props: TextInputProps) => {
               validationProps.setIsTyping(false);
               validationProps.setValidationStatus(undefined);
               validationProps.setStatusMessage(undefined);
-              // redraw();
+              redraw();
             } else {
               e.stopPropagation();
               validationProps.setIsTyping(true);
@@ -206,7 +206,7 @@ export const CWTextInput = (props: TextInputProps) => {
                     const result = inputValidationFn(e.currentTarget.value);
                     validationProps.setValidationStatus(result[0]);
                     validationProps.setStatusMessage(result[1]);
-                    // redraw();
+                    redraw();
                   }
                 }, timeout)
               );
@@ -218,7 +218,7 @@ export const CWTextInput = (props: TextInputProps) => {
                 validationProps.setIsTyping(false);
                 validationProps.setValidationStatus(undefined);
                 validationProps.setStatusMessage(undefined);
-                // redraw();
+                redraw();
               } else {
                 const result = inputValidationFn(e.currentTarget.value);
                 validationProps.setValidationStatus(result[0]);

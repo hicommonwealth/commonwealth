@@ -1,19 +1,21 @@
 import React from 'react';
-import type { Meta, StoryObj } from "@storybook/react";
+// import type { Meta, StoryObj } from "@storybook/react";
 
 import { CWButton } from '../client/scripts/views/components/component_kit/cw_button';
 import { notifySuccess } from '../client/scripts/controllers/app/notifications';
 
 const button = {
-  title: 'Example/CWButton',
+  title: 'Atoms/Button',
   component: CWButton,
-} satisfies Meta<typeof CWButton>;
+};
+// } satisfies Meta<typeof CWButton>;
 
 export default button;
-type Story = StoryObj<typeof CWButton>;
+// type Story = StoryObj<typeof CWButton>;
 
 /** Primary buttons */
-export const PrimaryRed: Story = {
+// export const PrimaryRed: Story = {
+export const PrimaryRed = {
   name: 'Primary red with icon',
   render: () => (
     <CWButton
@@ -25,8 +27,9 @@ export const PrimaryRed: Story = {
   ),
 };
 
-export const PrimaryBlue: Story = {
-  name: "Primary blue with icon",
+// export const PrimaryBlue: Story = {
+export const PrimaryBlue = {
+  name: 'Primary blue with icon',
   render: () => (
     <CWButton
       buttonType="primary-blue"
@@ -36,8 +39,9 @@ export const PrimaryBlue: Story = {
   ),
 };
 
-export const PrimaryBlack: Story = {
-  name: "Primary black",
+// export const PrimaryBlack: Story = {
+export const PrimaryBlack = {
+  name: 'Primary black',
   render: () => (
     <CWButton
       buttonType="primary-black"
@@ -47,8 +51,9 @@ export const PrimaryBlack: Story = {
   ),
 };
 
-export const PrimaryDisabled: Story = {
-  name: "Primary disabled",
+// export const PrimaryDisabled: Story = {
+export const PrimaryDisabled = {
+  name: 'Primary disabled',
   render: () => (
     <CWButton
       label="Primary disabled"
@@ -59,8 +64,9 @@ export const PrimaryDisabled: Story = {
 };
 
 // /** Secondary buttons */
-export const SecondaryRed: Story = {
-  name: "Secondary red with icon",
+// export const SecondaryRed: Story = {
+export const SecondaryRed = {
+  name: 'Secondary red with icon',
   render: () => (
     <CWButton
       iconLeft="person"
@@ -71,8 +77,9 @@ export const SecondaryRed: Story = {
   ),
 };
 
-export const SecondaryBlue: Story = {
-  name: "Secondary blue",
+// export const SecondaryBlue: Story = {
+export const SecondaryBlue = {
+  name: 'Secondary blue',
   render: () => (
     <CWButton
       label="Secondary blue"
@@ -82,8 +89,9 @@ export const SecondaryBlue: Story = {
   ),
 };
 
-export const SecondaryBlack: Story = {
-  name: "Secondary black",
+// export const SecondaryBlack: Story = {
+export const SecondaryBlack = {
+  name: 'Secondary black',
   render: () => (
     <CWButton
       label="Secondary black"
@@ -93,8 +101,9 @@ export const SecondaryBlack: Story = {
   ),
 };
 
-export const SecondaryDisabled: Story = {
-  name: "Secondary disabled",
+// export const SecondaryDisabled: Story = {
+export const SecondaryDisabled = {
+  name: 'Secondary disabled',
   render: () => (
     <CWButton
       label="Secondary disabled"
@@ -106,8 +115,9 @@ export const SecondaryDisabled: Story = {
 };
 
 // /** Tertiary buttons */
-export const TertiaryBlue: Story = {
-  name: "Tertiary blue with icon",
+// export const TertiaryBlue: Story = {
+export const TertiaryBlue = {
+  name: 'Tertiary blue with icon',
   render: () => (
     <CWButton
       iconLeft="person"
@@ -118,8 +128,9 @@ export const TertiaryBlue: Story = {
   ),
 };
 
-export const TertiaryBlack: Story = {
-  name: "Tertiary black",
+// export const TertiaryBlack: Story = {
+export const TertiaryBlack = {
+  name: 'Tertiary black',
   render: () => (
     <CWButton
       label="Tertiary black"
@@ -129,8 +140,9 @@ export const TertiaryBlack: Story = {
   ),
 };
 
-export const TertiaryDisabled: Story = {
-  name: "Tertiary disabled",
+// export const TertiaryDisabled: Story = {
+export const TertiaryDisabled = {
+  name: 'Tertiary disabled',
   render: () => (
     <CWButton
       label="Tertiary disabled"
@@ -142,8 +154,9 @@ export const TertiaryDisabled: Story = {
 };
 
 // /** Large primary buttons */
-export const LargePrimaryRed: Story = {
-  name: "Large primary red with icon",
+// export const LargePrimaryRed: Story = {
+export const LargePrimaryRed = {
+  name: 'Large primary red with icon',
   render: () => (
     <CWButton
       iconLeft="person"
@@ -154,8 +167,9 @@ export const LargePrimaryRed: Story = {
   ),
 };
 
-export const LargePrimaryBlue: Story = {
-  name: "Large primary blue",
+// export const LargePrimaryBlue: Story = {
+export const LargePrimaryBlue = {
+  name: 'Large primary blue',
   render: () => (
     <CWButton
       label="Large primary blue"
@@ -165,8 +179,9 @@ export const LargePrimaryBlue: Story = {
   ),
 };
 
-export const LargePrimaryBlueDisabled: Story = {
-  name: "Large primary blue disabled",
+// export const LargePrimaryBlueDisabled: Story = {
+export const LargePrimaryBlueDisabled = {
+  name: 'Large primary blue disabled',
   render: () => (
     <CWButton
       label="Large primary blue"
@@ -178,8 +193,9 @@ export const LargePrimaryBlueDisabled: Story = {
 };
 
 // /** Large secondary buttons */
-export const LargeSecondaryRed: Story = {
-  name: "Large secondary red with icon",
+// export const LargeSecondaryRed: Story = {
+export const LargeSecondaryRed = {
+  name: 'Large secondary red with icon',
   render: () => (
     <CWButton
       iconLeft="person"
@@ -190,8 +206,9 @@ export const LargeSecondaryRed: Story = {
   ),
 };
 
-export const LargeSecondaryBlue: Story = {
-  name: "Large secondary blue",
+// export const LargeSecondaryBlue: Story = {
+export const LargeSecondaryBlue = {
+  name: 'Large secondary blue',
   render: () => (
     <CWButton
       label="Large secondary blue"
@@ -201,8 +218,9 @@ export const LargeSecondaryBlue: Story = {
   ),
 };
 
-export const LargeSecondaryBlueDisabled: Story = {
-  name: "Large secondary blue disabled",
+// export const LargeSecondaryBlueDisabled: Story = {
+export const LargeSecondaryBlueDisabled = {
+  name: 'Large secondary blue disabled',
   render: () => (
     <CWButton
       label="Large secondary disabled"
@@ -214,8 +232,9 @@ export const LargeSecondaryBlueDisabled: Story = {
 };
 
 // /** Large tertiary buttons */
-export const LargeTertiaryRed: Story = {
-  name: "Large tertiary red with icon",
+// export const LargeTertiaryRed: Story = {
+export const LargeTertiaryRed = {
+  name: 'Large tertiary red with icon',
   render: () => (
     <CWButton
       iconLeft="person"
@@ -226,8 +245,9 @@ export const LargeTertiaryRed: Story = {
   ),
 };
 
-export const LargeTertiaryBlue: Story = {
-  name: "Large tertiary blue",
+// export const LargeTertiaryBlue: Story = {
+export const LargeTertiaryBlue = {
+  name: 'Large tertiary blue',
   render: () => (
     <CWButton
       label="Large tertiary blue"
@@ -237,8 +257,9 @@ export const LargeTertiaryBlue: Story = {
   ),
 };
 
-export const LargeTertiaryBlueDisabled: Story = {
-  name: "Large tertiary blue disabled",
+// export const LargeTertiaryBlueDisabled: Story = {
+export const LargeTertiaryBlueDisabled = {
+  name: 'Large tertiary blue disabled',
   render: () => (
     <CWButton
       label="Large tertiary disabled"
@@ -250,8 +271,9 @@ export const LargeTertiaryBlueDisabled: Story = {
 };
 
 // /** Blue dark disabled buttons */
-export const PrimaryBlueDarkDisabled: Story = {
-  name: "Primary blue dark disabled",
+// export const PrimaryBlueDarkDisabled: Story = {
+export const PrimaryBlueDarkDisabled = {
+  name: 'Primary blue dark disabled',
   render: () => (
     <CWButton
       label="Primary blue dark disabled"
@@ -262,8 +284,9 @@ export const PrimaryBlueDarkDisabled: Story = {
   ),
 };
 
-export const SecondaryBlueDarkDisabled: Story = {
-  name: "Secondary blue dark disabled",
+// export const SecondaryBlueDarkDisabled: Story = {
+export const SecondaryBlueDarkDisabled = {
+  name: 'Secondary blue dark disabled',
   render: () => (
     <CWButton
       label="Secondary blue dark disabled"
@@ -275,8 +298,9 @@ export const SecondaryBlueDarkDisabled: Story = {
 };
 
 // /** Mini buttons */
-export const MiniWithIcon: Story = {
-  name: "Mini with icon",
+// export const MiniWithIcon: Story = {
+export const MiniWithIcon = {
+  name: 'Mini with icon',
   render: () => (
     <CWButton
       iconLeft="person"
@@ -287,8 +311,9 @@ export const MiniWithIcon: Story = {
   ),
 };
 
-export const Mini: Story = {
-  name: "Mini",
+// export const Mini: Story = {
+export const Mini = {
+  name: 'Mini',
   render: () => (
     <CWButton
       label="Mini"
@@ -298,8 +323,9 @@ export const Mini: Story = {
   ),
 };
 
-export const MiniDisabled: Story = {
-  name: "Mini disabled",
+// export const MiniDisabled: Story = {
+export const MiniDisabled = {
+  name: 'Mini disabled',
   render: () => (
     <CWButton
       label="Mini Disabled"
@@ -311,8 +337,9 @@ export const MiniDisabled: Story = {
 };
 
 // /** Mini white buttons */
-export const MiniWhiteWithIcon: Story = {
-  name: "Mini white with icon",
+// export const MiniWhiteWithIcon: Story = {
+export const MiniWhiteWithIcon = {
+  name: 'Mini white with icon',
   render: () => (
     <CWButton
       iconLeft="person"
@@ -323,8 +350,9 @@ export const MiniWhiteWithIcon: Story = {
   ),
 };
 
-export const MiniWhite: Story = {
-  name: "Mini",
+// export const MiniWhite: Story = {
+export const MiniWhite = {
+  name: 'Mini',
   render: () => (
     <CWButton
       label="Mini white"
@@ -334,8 +362,9 @@ export const MiniWhite: Story = {
   ),
 };
 
-export const MiniWhiteDisabled: Story = {
-  name: "Mini disabled",
+// export const MiniWhiteDisabled: Story = {
+export const MiniWhiteDisabled = {
+  name: 'Mini disabled',
   render: () => (
     <CWButton
       label="Mini white disabled"
