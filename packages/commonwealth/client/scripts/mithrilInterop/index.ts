@@ -16,7 +16,8 @@ import type {
   NavigateOptions,
 } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
-import { getScopePrefix } from 'navigation/helpers';
+// import { getScopePrefix } from 'navigation/helpers';
+import { getScopePrefix } from '../navigation/helpers';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];

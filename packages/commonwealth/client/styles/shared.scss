@@ -1,13 +1,23 @@
-@import 'mixins/buttons';
-@import 'mixins/media_queries';
-@import 'mixins/breakpoints';
-@import 'mixins/elevation';
-@import 'mixins/colors';
-@import 'mixins/border_radius';
-@import 'mixins/choice';
-@import 'mixins/inputs';
-@import 'mixins/icons';
-@import 'mixins/text';
+// @import 'mixins/buttons';
+// @import 'mixins/media_queries';
+// @import 'mixins/breakpoints';
+// @import 'mixins/elevation';
+// @import 'mixins/colors';
+// @import 'mixins/border_radius';
+// @import 'mixins/choice';
+// @import 'mixins/inputs';
+// @import 'mixins/icons';
+// @import 'mixins/text';
+@import './mixins/buttons.scss';
+@import './mixins/media_queries';
+@import './mixins/breakpoints';
+@import './mixins/elevation';
+@import './mixins/colors';
+@import './mixins/border_radius';
+@import './mixins/choice';
+@import './mixins/inputs';
+@import './mixins/icons';
+@import './mixins/text';
 
 // layout & global nav parameters
 

@@ -1,4 +1,5 @@
-// import { redraw } from 'mithrilInterop';
+// The import below is breaking Storybook
+// import { redraw } from '../../../mithrilInterop';
 // import { isBoolean, isNotNil } from 'helpers/typeGuards';
 import { isBoolean, isNotNil } from '../../../helpers/typeGuards';
 

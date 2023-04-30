@@ -1,4 +1,5 @@
-import type { ChainInfo } from 'models';
+// import type { ChainInfo } from 'models';
+import type { ChainInfo } from '../../../models';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {

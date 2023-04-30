@@ -6,7 +6,8 @@ import {
   useLocation,
   Navigate as ReactNavigate,
 } from 'react-router-dom';
-import app from 'state';
+// import app from 'state';
+import app from '../state';
 
 const PROD_URL = 'https://commonwealth.im';
 
