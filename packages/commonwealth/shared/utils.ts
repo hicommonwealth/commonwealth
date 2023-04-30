@@ -71,7 +71,7 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getThreadUrl = (type, thread, comment?) => {
+export const getThreadUrl = (thread, comment?) => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';

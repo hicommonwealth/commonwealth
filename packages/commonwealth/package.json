@@ -228,6 +228,7 @@
     "quill": "^2.0.0-dev.4",
     "quill-image-drop-and-paste": "^1.0.4",
     "quill-image-uploader": "^1.0.2",
+    "quill-magic-url": "^4.2.0",
     "quill-mention": "^2.2.7",
     "rascal": "^13.1.0",
     "react": "^18.2.0",
