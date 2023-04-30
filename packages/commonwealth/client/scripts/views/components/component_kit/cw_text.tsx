@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_text.scss';
+// import 'components/component_kit/cw_text.scss';
+import '../../../../styles/components/component_kit/cw_text.scss';
 import { getClasses } from './helpers';
 
 import { ComponentType } from './types';

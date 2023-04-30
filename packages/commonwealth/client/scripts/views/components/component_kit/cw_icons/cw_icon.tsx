@@ -1,9 +1,14 @@
 import React from 'react';
 
-import 'components/component_kit/cw_icon.scss';
+// import 'components/component_kit/cw_icon.scss';
+// import '../../../../../styles/components/component_kit/cw_icon.scss';
+import '../../../../../styles/components/component_kit/cw_icon.scss';
 import { ComponentType } from '../types';
 import { iconLookup } from './cw_icon_lookup';
 import type { IconComponentProps } from './types';
+
+// client\scripts\views\components\component_kit\cw_icons\cw_icon.tsx
+// client\styles\components\component_kit\cw_icon.scss
 
 export const CWIcon = (props: IconComponentProps) => {
   const {

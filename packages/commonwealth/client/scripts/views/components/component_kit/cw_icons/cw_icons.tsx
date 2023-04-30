@@ -1,8 +1,10 @@
 /* eslint-disable max-len */
 import React from 'react';
 
-import 'components/component_kit/cw_icon.scss';
-import 'components/component_kit/cw_icon_button.scss';
+// import 'components/component_kit/cw_icon.scss';
+import '../../../../../styles/components/component_kit/cw_icon.scss';
+// import 'components/component_kit/cw_icon_button.scss';
+import '../../../../../styles/components/component_kit/cw_icon_button.scss';
 
 import { getClasses } from '../helpers';
 import type { IconProps, IconStyleProps } from './types';

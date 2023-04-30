@@ -1,7 +1,9 @@
-import { redraw } from 'mithrilInterop';
-import { isBoolean, isNotNil } from 'helpers/typeGuards';
+// import { redraw } from 'mithrilInterop';
+// import { isBoolean, isNotNil } from 'helpers/typeGuards';
+import { isBoolean, isNotNil } from '../../../helpers/typeGuards';
 
-import breakpoints from 'mixins/breakpoints.scss';
+// import breakpoints from 'mixins/breakpoints.scss';
+import breakpoints from '../../../../styles/mixins/breakpoints.scss';
 
 export const getClasses = <T>(
   styleAttrs: T,
@@ -56,6 +58,6 @@ export const breakpointFnValidator = (
 
   if (widthState !== breakPointState) {
     setWidthState(breakPointState);
-    redraw();
+    // redraw();
   }
 };

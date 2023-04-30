@@ -2,7 +2,8 @@ import React from 'react';
 
 /* eslint-disable max-len */
 
-import 'components/component_kit/cw_icon.scss';
+// import 'components/component_kit/cw_icon.scss';
+import '../../../../../styles/components/component_kit/cw_icon.scss';
 
 import { getClasses } from '../helpers';
 import type { CustomIconProps, CustomIconStyleProps } from './types';
