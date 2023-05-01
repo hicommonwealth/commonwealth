@@ -700,6 +700,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }
         author={<ThreadAuthor thread={thread} />}
         createdAt={thread.createdAt}
+        lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
         headerComponents={

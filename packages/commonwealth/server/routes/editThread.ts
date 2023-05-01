@@ -33,12 +33,14 @@ const editThread = async (
     title,
     kind,
     stage,
+    last_edited,
     thread_id,
     url,
     canvas_action,
     canvas_session,
     canvas_hash,
   } = req.body;
+
   if (!thread_id) {
     return next(new AppError(Errors.NoThreadId));
   }
@@ -147,6 +149,7 @@ const editThread = async (
     }
     thread.body = body;
     thread.stage = stage;
+    thread.last_edited = last_edited;
     thread.canvas_action = canvas_action;
     thread.canvas_session = canvas_session;
     thread.canvas_hash = canvas_hash;

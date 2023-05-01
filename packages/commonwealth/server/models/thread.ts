@@ -34,6 +34,7 @@ export type ThreadAttributes = {
 
   created_at?: Date;
   updated_at?: Date;
+  last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
 
@@ -105,6 +106,7 @@ export default (
       // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
     },
