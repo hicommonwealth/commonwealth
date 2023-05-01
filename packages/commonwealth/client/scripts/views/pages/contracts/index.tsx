@@ -70,6 +70,7 @@ const ContractsPage = () => {
   const onUpdateSuccess = () => {
     const updatedContracts = app.contracts.store.getCommunityContracts();
     setContracts([...updatedContracts]);
+    fetchTemplates();
   };
 
   const handleDeleteTemplate = (template) => {
@@ -314,7 +315,7 @@ const ContractsPage = () => {
                 })
               ) : (
                 <div className="empty-state">
-                  <CWText type="b1">
+                  <CWText type="b1" className="EmptyTemplate">
                     You currently have no action templates in your library.
                   </CWText>
                 </div>

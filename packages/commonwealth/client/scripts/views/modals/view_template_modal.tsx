@@ -114,12 +114,12 @@ const ViewTemplateModal = ({
             JSON Blob
           </CWText>
           <pre className="Blob">
-            <CWText>
+            <CWText type="b2">
               {JSON.stringify(JSON.parse(template.template), null, 2)}
             </CWText>
           </pre>
+          <CWDivider className="BlobDivider" />
         </div>
-        <CWDivider />
         <div className="TemplateDisplay">
           <CWText type="caption" fontWeight="medium" className="labelText">
             Template form
