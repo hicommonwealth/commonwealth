@@ -22,6 +22,7 @@ import {
 } from './helpers';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { clearDraft, createDeltaFromText } from '../react_quill_editor/utils';
+import { parseCustomStages } from 'helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -86,7 +87,9 @@ export const NewThreadForm = () => {
       const result = await app.threads.create(
         author.address,
         threadKind,
-        ThreadStage.Discussion,
+        app.chain.meta.customStages
+          ? parseCustomStages(app.chain.meta.customStages)[0]
+          : ThreadStage.Discussion,
         app.activeChainId(),
         threadTitle,
         threadTopic,

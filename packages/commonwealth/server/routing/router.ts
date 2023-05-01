@@ -82,7 +82,6 @@ import updateThreadPinned from '../routes/updateThreadPinned';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
 import fetchEntityTitle from '../routes/fetchEntityTitle';
-import fetchThreadForSnapshot from '../routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import deleteThread from '../routes/deleteThread';
 import addEditors from '../routes/addEditors';
@@ -366,10 +365,6 @@ function setupRouter(
   );
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
-  router.get(
-    '/fetchThreadForSnapshot',
-    fetchThreadForSnapshot.bind(this, models)
-  );
 
   router.post(
     '/contractAbi',
@@ -784,8 +779,8 @@ function setupRouter(
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
   router.post(
-    '/viewGlobalActivity'
-    ,viewGlobalActivity.bind(this, models, globalActivityCache)
+    '/viewGlobalActivity',
+    viewGlobalActivity.bind(this, models, globalActivityCache)
   );
   router.post(
     '/markNotificationsRead',
