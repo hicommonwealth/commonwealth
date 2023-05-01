@@ -74,11 +74,7 @@ export const cosmosCacheLCD = (duration: number): RequestHandler => {
       duration = 60 * 60 * 24;
     }
 
-    return cacheDecorator.cacheMiddleware(duration, cosmosLCDKeyGenerator)(
-      req,
-      res,
-      next
-    );
+    return cacheDecorator.cacheMiddleware(duration)(req, res, next);
   };
 };
 
@@ -90,10 +86,6 @@ const cosmosRPCKeyGenerator = (req: Request) => {
   }
 
   return `${req.originalUrl}_${identifier}`;
-};
-
-const cosmosLCDKeyGenerator = (req: Request) => {
-  return req.originalUrl;
 };
 
 const parseReqBody = (req: Request) => {
