@@ -27,8 +27,8 @@ export const cosmosCacheRPC = (duration: number): RequestHandler => {
       // BLOCK CHECK: short cache
       duration = oneBlock;
     } else if (/^Query\/(Votes|TallyResult|Deposits)/.test(params)) {
-      // LIVE DATA: short cache
-      duration = oneBlock;
+      // LIVE DATA: 5 minutes
+      duration = 60 * 5;
     } else if (/^Query\/(Params|Pool)/.test(params)) {
       // chain PARAMS: cache long-term (1 day)
       duration = 60 * 60 * 24;
@@ -67,8 +67,8 @@ export const cosmosCacheLCD = (duration: number): RequestHandler => {
       }
       // specific proposal request:
     } else if (url.includes('/proposals/')) {
-      // LIVE VOTES/TALLY/DEPOSITS: short cache
-      duration = oneBlock;
+      // LIVE VOTES/TALLY/DEPOSITS: 5 minutes
+      duration = 60 * 5;
     } else if (url.includes('/params/')) {
       // PARAMS: cache long term (1 day)
       duration = 60 * 60 * 24;
