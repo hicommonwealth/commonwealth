@@ -70,7 +70,6 @@ class Thread implements IUniqueId {
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
   public readonly linkedThreads: LinkedThreadRelation[];
-  public snapshotProposal: string;
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
@@ -100,7 +99,6 @@ class Thread implements IUniqueId {
     collaborators,
     chainEntities,
     lastEdited,
-    snapshotProposal,
     hasPoll,
     lastCommentedOn,
     linkedThreads,
@@ -133,7 +131,6 @@ class Thread implements IUniqueId {
     collaborators?: any[];
     chainEntities?: any[];
     lastEdited?: moment.Moment;
-    snapshotProposal: string;
     hasPoll: boolean;
     linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
@@ -178,7 +175,6 @@ class Thread implements IUniqueId {
         })
       : [];
     this.hasPoll = hasPoll;
-    this.snapshotProposal = snapshotProposal;
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
     this.numberOfComments = numberOfComments || 0;

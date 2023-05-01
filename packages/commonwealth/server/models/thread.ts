@@ -38,7 +38,6 @@ export type ThreadAttributes = {
 
   read_only?: boolean;
   version_history?: string[];
-  snapshot_proposal?: string;
 
   has_poll?: boolean;
 
@@ -108,7 +107,6 @@ export default (
         defaultValue: [],
         allowNull: false,
       },
-      snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
       links: { type: dataTypes.JSONB, allowNull: true },
 
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
