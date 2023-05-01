@@ -54,7 +54,7 @@ describe('Cosmos Cache', () => {
       return chai.request(app).post(path).set(headers).send(body);
     }
 
-    async function rpcTestBody(body, key) {
+    async function rpcTestIsCached(body, key) {
       const res1 = await makeRPCRequest(body);
       verifyNoCacheResponse(res1);
       const res2 = await makeRPCRequest(body);
@@ -65,7 +65,7 @@ describe('Cosmos Cache', () => {
       const params = `{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
       const body = `{"jsonrpc":"2.0","id":382288611593,"method":"abci_query","params":${params}}`;
       const key = `/cosmosAPI/juno_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
-      await rpcTestBody(body, key);
+      await rpcTestIsCached(body, key);
     };
 
     it('should cache passed proposals', async () => {
@@ -105,16 +105,21 @@ describe('Cosmos Cache', () => {
     it('should cache params requests', async () => {
       const body =
         '{"jsonrpc":"2.0","id":533311223528,"method":"abci_query","params":{"path":"/cosmos.staking.v1beta1.Query/Params","data":"","prove":false}}';
-      const key =
-        '/cosmosAPI/juno_{"path":"/cosmos.staking.v1beta1.Query/Params","data":"","prove":false}';
-      await rpcTestBody(body, key);
+      const key = '/cosmosAPI/juno_/cosmos.staking.v1beta1.Query/Params';
+      await rpcTestIsCached(body, key);
+    });
+    it('should cache pool requests', async () => {
+      const body =
+        '{"jsonrpc":"2.0","id":411681968672,"method":"abci_query","params":{"path":"/cosmos.staking.v1beta1.Query/Pool","data":"","prove":false}}';
+      const key = '/cosmosAPI/juno_/cosmos.staking.v1beta1.Query/Pool';
+      await rpcTestIsCached(body, key);
     });
     it('should cache status requests', async () => {
       const body =
         '{"jsonrpc":"2.0","id":599352122315,"method":"status","params":{}}';
       const key =
         '/cosmosAPI/juno_{"jsonrpc":"2.0","id":599352122315,"method":"status","params":{}}';
-      await rpcTestBody(body, key);
+      await rpcTestIsCached(body, key);
     });
   });
   describe('cosmosLCD', () => {

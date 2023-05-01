@@ -23,13 +23,13 @@ export const cosmosCacheRPC = (duration: number): RequestHandler => {
     if (/^(tx)/.test(method)) {
       // TX Response: do not cache
       return next();
-    } else if (/^(block|status)/.test(method)) {
+    } else if (/(block|status)/.test(method)) {
       // BLOCK CHECK: short cache
       duration = oneBlock;
-    } else if (/^Query\/(Votes|TallyResult|Deposits)/.test(params)) {
+    } else if (/Query\/(Votes|TallyResult|Deposits)/.test(params)) {
       // LIVE DATA: 5 minutes
       duration = 60 * 5;
-    } else if (/^Query\/(Params|Pool)/.test(params)) {
+    } else if (/Query\/(Params|Pool)/.test(params)) {
       // chain PARAMS: cache long-term (1 day)
       duration = 60 * 60 * 24;
     } else if (activeCodes.some((c) => c === body?.params?.data)) {
@@ -80,8 +80,15 @@ export const cosmosCacheLCD = (duration: number): RequestHandler => {
 
 const cosmosRPCKeyGenerator = (req: Request) => {
   const body = parseReqBody(req);
-  let identifier = JSON.stringify(body?.params);
-  if (identifier === '{}') {
+  const params = body?.params;
+  let identifier = JSON.stringify(params);
+
+  if (/Query\/(Params|Pool)/.test(identifier)) {
+    // chain PARAMS: need to leave off ID to cache long-term
+    identifier = params.path;
+  }
+
+  if (!identifier || identifier === '{}') {
     identifier = JSON.stringify(body);
   }
 
