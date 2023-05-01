@@ -681,11 +681,25 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.result.map((rawThread) => {
+      /**
+       * rawThread has a different DS than the threads in store
+       * here we will find if thread is in store and if so use most keys
+       * of that data else if there is a valid key rawThread then it will
+       * replace existing key from foundThread
+       */
       const thread = this.modelFromServer(rawThread);
-      this._store.update(thread);
+      const foundThread = this._store.getByIdentifier(thread.identifier);
+      const finalThread = new Thread({
+        ...((foundThread || {}) as any),
+        ...((thread || {}) as any),
+      });
+      finalThread.numberOfComments =
+        rawThread?.comments?.length || foundThread.numberOfComments || 0;
+      this._store.update(finalThread);
+
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
-      this.fetchReactionsCount([thread]);
-      return thread;
+      this.fetchReactionsCount([finalThread]);
+      return finalThread;
     });
   }
 
