@@ -36,8 +36,8 @@ export const cosmosCacheRPC = (duration: number): RequestHandler => {
       // ACTIVE PROPOSALS: short cache
       duration = oneBlock;
     } else if (completedCodes.some((c) => c === body?.params?.data)) {
-      // COMPLETED PROPOSALS: cache 60 minutes
-      duration = 60 * 60;
+      // COMPLETED PROPOSALS: cache 15 minutes
+      duration = 60 * 15;
     }
 
     return cacheDecorator.cacheMiddleware(duration, cosmosRPCKeyGenerator)(
@@ -62,8 +62,8 @@ export const cosmosCacheLCD = (duration: number): RequestHandler => {
         // ACTIVE PROPOSALS: short cache
         duration = oneBlock;
       } else if (completedProposalCodes.some((c) => c === +proposalStatus)) {
-        // COMPLETED PROPOSALS: cache 60 minutes
-        duration = 60 * 60;
+        // COMPLETED PROPOSALS: cache 15 minutes
+        duration = 60 * 15;
       }
       // specific proposal request:
     } else if (url.includes('/proposals/')) {
