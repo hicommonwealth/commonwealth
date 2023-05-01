@@ -170,8 +170,8 @@ export const renderQuillDelta = (
               },
               [
                 render('iframe', {
-                  frameborder: 0,
-                  allowfullscreen: true,
+                  frameBorder: 0,
+                  allowFullscreen: true,
                   src: child.insert?.video,
                   key: 1,
                 }),

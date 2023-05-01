@@ -4,9 +4,11 @@ import type { Express } from 'express';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
+import { cacheDecorator } from 'common-common/src/cacheDecorator';
+import { defaultUserKeyGenerator } from 'common-common/src/cacheKeyUtils';
 
 import domain from '../routes/domain';
-import status from '../routes/status';
+import { status } from '../routes/status';
 import createAddress from '../routes/createAddress';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
@@ -307,7 +309,7 @@ function setupRouter(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
+    databaseValidationService.validateChainWithTopics,
     createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.put(
@@ -801,8 +803,8 @@ function setupRouter(
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
   router.post(
-    '/viewGlobalActivity',
-    viewGlobalActivity.bind(this, models, globalActivityCache)
+    '/viewGlobalActivity'
+    ,viewGlobalActivity.bind(this, models, globalActivityCache)
   );
   router.post(
     '/markNotificationsRead',

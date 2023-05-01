@@ -245,9 +245,9 @@ const ProposalsPage = () => {
     (inactiveDemocracyProposals || [])
       .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
       .concat(
-        inactiveCosmosProposals.map((proposal, i) => (
+        inactiveCosmosProposals?.length ? inactiveCosmosProposals.map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
-        ))
+        )) : []
       )
       .concat(
         (inactiveCompoundProposals || []).map((proposal, i) => (
