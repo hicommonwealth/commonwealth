@@ -8,11 +8,13 @@ import type { PopoverTriggerProps } from './component_kit/cw_popover/cw_popover'
 
 type SharePopoverProps = {
   commentId?: number;
+  discussionLink?: string;
 } & Partial<PopoverTriggerProps>;
 
 export const SharePopover = (props: SharePopoverProps) => {
   const {
     commentId,
+    discussionLink,
     renderTrigger = (onclick) => (
       <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
     ),
@@ -29,13 +31,17 @@ export const SharePopover = (props: SharePopoverProps) => {
           onClick: async () => {
             const currentRouteSansCommentParam =
               _DEPRECATED_getRoute().split('?comment=')[0];
-            if (!commentId) {
+            if (commentId) {
               await navigator.clipboard.writeText(
-                `${domain}${currentRouteSansCommentParam}`
+                `${domain}${currentRouteSansCommentParam}?comment=${commentId}`
+              );
+            } else if (discussionLink) {
+              await navigator.clipboard.writeText(
+                `${domain}${currentRouteSansCommentParam.replace('/discussions', discussionLink)}`
               );
             } else {
               await navigator.clipboard.writeText(
-                `${domain}${currentRouteSansCommentParam}?comment=${commentId}`
+                `${domain}${currentRouteSansCommentParam}`
               );
             }
           },
