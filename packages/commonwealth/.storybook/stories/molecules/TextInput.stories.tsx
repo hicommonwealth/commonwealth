@@ -1,7 +1,6 @@
 import React from 'react';
 // import type { Meta, StoryObj } from "@storybook/react";
 
-// import { Input } from "./CWInput";
 import { CWTextInput } from '../../../client/scripts/views/components/component_kit/cw_text_input';
 import type { ValidationStatus } from '../../../client/scripts/views/components/component_kit/cw_validation_text';
 
