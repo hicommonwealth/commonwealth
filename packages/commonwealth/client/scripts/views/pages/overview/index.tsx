@@ -50,6 +50,7 @@ const OverviewPage = () => {
   const allPinnedThreads = app.threads.listingStore.getThreads({
     pinned: true,
   });
+  const allThreads = app.threads.store.getAll();
 
   const topics = app.topics.getByCommunity(app.activeChainId());
 
@@ -66,6 +67,7 @@ const OverviewPage = () => {
   const topicSummaryRows: Array<{
     monthlyThreads: Array<Thread>;
     pinnedThreads: Array<Thread>;
+    allThreadsCount: number;
     topic: Topic;
   }> = topicsSorted.map((topic) => {
     const monthlyThreads = allMonthlyThreads.filter(
@@ -74,8 +76,16 @@ const OverviewPage = () => {
     const pinnedThreads = allPinnedThreads.filter(
       (thread) => topic.id === thread.topic.id
     );
+    const allThreadsCount = allThreads.filter(
+      (thread) => topic.id === thread.topic.id
+    ).length;
 
-    return { monthlyThreads, pinnedThreads, topic };
+    return {
+      monthlyThreads,
+      pinnedThreads,
+      topic,
+      allThreadsCount: allThreadsCount,
+    };
   });
 
   return !topicSummaryRows.length && !app.threads.initialized ? (
