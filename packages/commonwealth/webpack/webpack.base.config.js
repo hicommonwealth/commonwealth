@@ -143,6 +143,14 @@ module.exports = {
         }
       }
     ),
+    new webpack.NormalModuleReplacementPlugin(
+      createDependencyRegex(bnJsV4Dependencies),
+      resource => {
+        if (resource.request.includes('bn.js')) {
+          resource.request = resource.request.replace('bn.js', 'bn.js-v4');
+        }
+      }
+    ),
   ],
   optimization: {
     splitChunks: {
@@ -221,7 +229,7 @@ module.exports = {
         '../../token-balance-cache'
       ),
       'bn.js-v5': path.resolve(__dirname, '../node_modules/@ethersproject/bignumber/node_modules/bn.js'),
-      'bn.js': path.resolve(__dirname, '../../../node_modules/bn.js'), // Alias for version 4.x.x
+      'bn.js-v4': path.resolve(__dirname, '../../../node_modules/bn.js'), // Alias for version 4.x.x
       // 'bn.js': path.resolve(__dirname, '../node_modules/bn.js'), // Add this line to alias bn.js
     },
     fallback: {
