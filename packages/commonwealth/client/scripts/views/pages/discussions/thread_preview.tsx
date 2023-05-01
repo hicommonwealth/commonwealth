@@ -183,6 +183,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 .sort((a, b) => +a.identifier - +b.identifier)
                 .map((link) => (
                   <CWTag
+                    key={`${link.source}-${link.identifier}`}
                     type="proposal"
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind

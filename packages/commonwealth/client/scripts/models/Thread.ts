@@ -8,12 +8,6 @@ import type { ReactionType } from './Reaction';
 import type Topic from './Topic';
 import type { ThreadKind, ThreadStage } from './types';
 
-export interface LinkedThreadRelation {
-  id: string;
-  linkedThread: string;
-  linkingThread: string;
-}
-
 export interface IThreadCollaborator {
   address: string;
   chain: string;
@@ -69,8 +63,6 @@ class Thread implements IUniqueId {
   public readonly lastEdited: moment.Moment;
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
-  public readonly linkedThreads: LinkedThreadRelation[];
-  public snapshotProposal: string;
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
@@ -100,10 +92,8 @@ class Thread implements IUniqueId {
     collaborators,
     chainEntities,
     lastEdited,
-    snapshotProposal,
     hasPoll,
     lastCommentedOn,
-    linkedThreads,
     numberOfComments,
     reactionIds,
     reactionType,
@@ -133,9 +123,7 @@ class Thread implements IUniqueId {
     collaborators?: any[];
     chainEntities?: any[];
     lastEdited?: moment.Moment;
-    snapshotProposal: string;
     hasPoll: boolean;
-    linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
     numberOfComments?: number;
     reactionIds?: number[];
@@ -178,9 +166,7 @@ class Thread implements IUniqueId {
         })
       : [];
     this.hasPoll = hasPoll;
-    this.snapshotProposal = snapshotProposal;
     this.lastEdited = lastEdited;
-    this.linkedThreads = linkedThreads || [];
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];
     if (reactionIds) {
