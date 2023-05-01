@@ -6,7 +6,7 @@ import { CWTextInput } from '../../../client/scripts/views/components/component_
 import type { ValidationStatus } from '../../../client/scripts/views/components/component_kit/cw_validation_text';
 
 const input = {
-  title: 'Atoms/TextInput',
+  title: 'Molecules/TextInput',
   component: CWTextInput,
 };
 // } satisfies Meta<typeof CWTextInput>;
