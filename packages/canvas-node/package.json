@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node ./node_modules/@canvas-js/cli/dist/index.js run contract.js --syncModule $PWD/syncModule.js",
+    "dev": "$(which -a canvas | tail -1) run contract.js --syncModule $PWD/syncModule.js",
+    "wh": ""
   },
   "engines": {
     "node": "18.x"
@@ -16,6 +18,7 @@
   "dependencies": {
     "@canvas-js/chain-ethereum": "^0.4.7",
     "@canvas-js/core": "^0.4.7",
+    "@canvas-js/cli": "^0.4.7",
     "chalk": "^5.2.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
