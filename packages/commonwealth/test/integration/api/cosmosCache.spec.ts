@@ -72,6 +72,15 @@ describe('Cosmos Cache', () => {
       it('should cache passed proposals', async () => {
         await rpcProposalsCacheExpectedTest('0803');
       });
+      it('should cache passed proposals (0803220a0a080000000000000087)', async () => {
+        await rpcProposalsCacheExpectedTest('0803220a0a080000000000000087');
+      });
+      it('should cache passed proposals (0803220a0a080000000000000100)', async () => {
+        await rpcProposalsCacheExpectedTest('0803220a0a080000000000000100');
+      });
+      it('should cache passed proposals (0803220a0a080000000000000189)', async () => {
+        await rpcProposalsCacheExpectedTest('0803220a0a080000000000000189');
+      });
       it('should cache rejected proposals', async () => {
         await rpcProposalsCacheExpectedTest('0804');
       });

@@ -10,9 +10,9 @@ export const cosmosCacheRPC = (duration: number): RequestHandler => {
     '0803', // 'Passed'
     '0804', // 'Rejected'
     '0805', // 'Failed'
-    '0803220a0a080000000000000087', // 'Passed'
-    '0803220a0a080000000000000100', // 'Passed'
-    '0803220a0a080000000000000189', // 'Passed'
+    '0803220a0a080000000000000087', // 'Passed - Osmosis'
+    '0803220a0a080000000000000100', // 'Passed - Osmosis'
+    '0803220a0a080000000000000189', // 'Passed - Osmosis'
   ];
 
   return async function cacheIfCacheworthyRPC(req, res, next) {
