@@ -73,8 +73,6 @@ const ViewTemplateModal = ({
 }) => {
   const creator = app.chain.accounts.get(template.createdBy);
 
-  console.log({ template });
-
   return (
     <div className="ViewTemplateModal">
       <div className="TopSection">

@@ -50,6 +50,15 @@
     gap: 40px;
     margin-top: 40px;
 
+    .add-template-btn {
+      padding-inline: 0;
+      margin-top: 16px;
+
+      .Text {
+        font-size: 12px;
+      }
+    }
+
     .no-contract-alert {
       display: flex;
       padding: 16px 24px;

@@ -320,6 +320,13 @@ const ContractsPage = () => {
                 </div>
               )}
             </div>
+            <CWButton
+              className="add-template-btn"
+              buttonType="tertiary-black"
+              label="Create Template"
+              iconLeft="plus"
+              onClick={() => navigate('/new/contract_template/blank')}
+            />
           </div>
         )}
       </div>
