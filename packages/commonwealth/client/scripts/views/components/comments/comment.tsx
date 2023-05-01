@@ -57,6 +57,7 @@ type CommentProps = {
   isLocked: boolean;
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
+  threadId: number;
   updatedCommentsCallback?: () => void;
 };
 
@@ -69,6 +70,7 @@ export const Comment = (props: CommentProps) => {
     setIsGloballyEditing,
     threadLevel,
     updatedCommentsCallback,
+    threadId,
   } = props;
 
   const [isEditingComment, setIsEditingComment] =
@@ -111,11 +113,11 @@ export const Comment = (props: CommentProps) => {
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              await app.comments.delete(comment);
+              await app.comments.delete(comment, threadId);
               updatedCommentsCallback();
             } catch (e) {
               console.log(e);
-              notifyError('Failed to delete comment.')
+              notifyError('Failed to delete comment.');
             }
           },
         },
