@@ -617,7 +617,12 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this.modelFromServer(response.result);
+    const result = this.modelFromServer(response.result);
+    // Post edits propagate to all thread stores
+    this._store.update(result);
+    this._listingStore.add(result);
+    this._overviewStore.update(result);
+    return result;
   }
 
   public async removeLinkedThread(
@@ -638,7 +643,12 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this.modelFromServer(response.result);
+    const result = this.modelFromServer(response.result);
+    // Post edits propagate to all thread stores
+    this._store.update(result);
+    this._listingStore.add(result);
+    this._overviewStore.update(result);
+    return result;
   }
 
   public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
