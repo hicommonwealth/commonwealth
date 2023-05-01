@@ -64,7 +64,7 @@ describe('Cosmos Cache', () => {
     const rpcProposalsCacheExpectedTest = async (proposalStatus: string) => {
       const params = `{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
       const body = `{"jsonrpc":"2.0","id":382288611593,"method":"abci_query","params":${params}}`;
-      const key = `/cosmosAPI/juno_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
+      const key = `/cosmosAPI/juno_${params}`;
       await rpcTestIsCached(body, key);
     };
 
