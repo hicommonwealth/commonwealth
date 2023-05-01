@@ -729,7 +729,7 @@ class ThreadsController {
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/bulkThreads`, params),
-      app.chainEntities.getRawEntities(chain),
+      // app.chainEntities.getRawEntities(chain),
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);

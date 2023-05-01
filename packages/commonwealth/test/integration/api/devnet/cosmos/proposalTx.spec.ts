@@ -1,22 +1,35 @@
 import chai from 'chai';
-
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { StdFee } from '@cosmjs/amino';
-import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
+
 import { ProposalStatus } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { VoteOption } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import {
   encodeMsgVote,
   encodeMsgSubmitProposal,
+  encodeTextProposal,
+  getCompletedProposalsV1Beta1,
+  getActiveProposalsV1Beta1,
+} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import {
+  getLCDClient,
+  getRPCClient,
   getSigningClient,
-} from 'client/scripts/controllers/chain/cosmos/helpers';
-import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';
+  getTMClient,
+} from 'controllers/chain/cosmos/chain.utils';
+import {
+  getActiveProposalsV1,
+  getCompletedProposalsV1,
+} from 'controllers/chain/cosmos/gov/v1/utils-v1';
+import { CosmosApiType } from 'controllers/chain/cosmos/chain';
+import { LCD } from 'chain-events/src/chains/cosmos/types';
+
+const { expect, assert } = chai;
 
 const mnemonic =
   'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';
 const rpcUrl = `http://localhost:8080/cosmosAPI/csdk`;
-const lcdUrl = `http://localhost:8080/cosmosLCD/csdk`;
 const DEFAULT_FEE: StdFee = {
   gas: '180000',
   amount: [{ amount: '0', denom: 'ustake' }],
@@ -24,24 +37,7 @@ const DEFAULT_FEE: StdFee = {
 const DEFAULT_MEMO = '';
 const deposit = new CosmosToken('stake', 100000, false);
 
-const setupTM = async () => {
-  const tm = await import('@cosmjs/tendermint-rpc');
-  const tmClient = await tm.Tendermint34Client.connect(rpcUrl);
-  return tmClient;
-};
-
-const setupLCD = async () => {
-  const { createLCDClient } = await import(
-    'common-common/src/cosmos-ts/src/codegen/cosmos/lcd'
-  );
-
-  const lcd = await createLCDClient({
-    restEndpoint: lcdUrl,
-  });
-  return lcd;
-};
-
-const setupSigner = async () => {
+const setupTestSigner = async () => {
   const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
     prefix: 'cosmos',
   });
@@ -52,7 +48,7 @@ const setupSigner = async () => {
 };
 
 const sendTx = async (tx) => {
-  const { client, signerAddress } = await setupSigner();
+  const { client, signerAddress } = await setupTestSigner();
   const result = await client.signAndBroadcast(
     signerAddress,
     [tx],
@@ -62,16 +58,8 @@ const sendTx = async (tx) => {
   return result;
 };
 
-const encodeTextProposalAny = (title: string, description: string): Any => {
-  const tProp = TextProposal.fromPartial({ title, description });
-  return Any.fromPartial({
-    typeUrl: '/cosmos.gov.v1beta1.TextProposal',
-    value: Uint8Array.from(TextProposal.encode(tProp).finish()),
-  });
-};
-
 const waitOneBlock = async (): Promise<void> => {
-  const tm = await setupTM();
+  const tm = await getTMClient(rpcUrl);
   // Get the current block height
   const block = await tm.block();
   const currentHeight = block.block.header.height;
@@ -90,10 +78,16 @@ const waitOneBlock = async (): Promise<void> => {
 
 describe('Proposal Tests', () => {
   describe('gov v1 chain using v1beta1 signer', () => {
-    it('creates a proposal', async () => {
-      const lcd = await setupLCD();
-      const { signerAddress } = await setupSigner();
+    let lcd: LCD;
+    let signer: string;
+    const id = 'csdk';
+    beforeEach(async () => {
+      lcd = await getLCDClient(`http://localhost:8080/cosmosLCD/${id}`);
+      const { signerAddress } = await setupTestSigner();
+      signer = signerAddress;
+    });
 
+    it('creates a proposal', async () => {
       const { proposals } = await lcd.cosmos.gov.v1.proposals({
         proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
         voter: '',
@@ -102,16 +96,16 @@ describe('Proposal Tests', () => {
 
       const beforeCount = proposals.length;
 
-      const content = encodeTextProposalAny(
+      const content = encodeTextProposal(
         `title ${beforeCount + 1}`,
         `description ${beforeCount + 1}`
       );
-      const msg = encodeMsgSubmitProposal(signerAddress, deposit, content);
+      const msg = encodeMsgSubmitProposal(signer, deposit, content);
 
       const resp = await sendTx(msg);
 
-      chai.assert.isDefined(resp.transactionHash);
-      chai.assert.isDefined(resp.rawLog);
+      expect(resp.transactionHash).to.not.be.undefined;
+      expect(resp.rawLog).to.not.be.undefined;
 
       await waitOneBlock();
 
@@ -121,11 +115,9 @@ describe('Proposal Tests', () => {
         depositor: '',
       });
 
-      chai.assert.equal(proposalsAfter.length, beforeCount + 1);
+      assert.equal(proposalsAfter.length, beforeCount + 1);
     });
     it('votes NO on an active proposal', async () => {
-      const lcd = await setupLCD();
-      const { signerAddress } = await setupSigner();
       await waitOneBlock();
 
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
@@ -134,24 +126,18 @@ describe('Proposal Tests', () => {
         depositor: '',
       });
 
-      chai.assert.isAtLeast(activeProposals.length, 1);
+      assert.isAtLeast(activeProposals.length, 1);
       const proposal = activeProposals[0];
 
-      const msg = encodeMsgVote(
-        signerAddress,
-        proposal.id,
-        VoteOption.VOTE_OPTION_NO
-      );
+      const msg = encodeMsgVote(signer, proposal.id, VoteOption.VOTE_OPTION_NO);
       const resp = await sendTx(msg);
 
-      chai.assert.isDefined(resp.transactionHash);
-      chai.assert.isDefined(resp.rawLog);
-      chai.assert.isTrue(resp.rawLog.includes('VOTE_OPTION_NO'));
-      chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_YES'));
+      expect(resp.transactionHash).to.not.be.undefined;
+      expect(resp.rawLog).to.not.be.undefined;
+      expect(resp.rawLog).to.include('VOTE_OPTION_NO');
+      expect(resp.rawLog).to.not.include('VOTE_OPTION_YES');
     });
     it('votes NO WITH VETO on an active proposal', async () => {
-      const lcd = await setupLCD();
-      const { signerAddress } = await setupSigner();
       await waitOneBlock();
 
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
@@ -160,24 +146,22 @@ describe('Proposal Tests', () => {
         depositor: '',
       });
 
-      chai.assert.isAtLeast(activeProposals.length, 1);
+      assert.isAtLeast(activeProposals.length, 1);
       const proposal = activeProposals[0];
 
       const msg = encodeMsgVote(
-        signerAddress,
+        signer,
         proposal.id,
         VoteOption.VOTE_OPTION_NO_WITH_VETO
       );
       const resp = await sendTx(msg);
 
-      chai.assert.isDefined(resp.transactionHash);
-      chai.assert.isDefined(resp.rawLog);
-      chai.assert.isTrue(resp.rawLog.includes('VOTE_OPTION_NO_WITH_VETO'));
-      chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_YES'));
+      expect(resp.transactionHash).to.not.be.undefined;
+      expect(resp.rawLog).to.not.be.undefined;
+      expect(resp.rawLog).to.include('VOTE_OPTION_NO_WITH_VETO');
+      expect(resp.rawLog).to.not.include('VOTE_OPTION_YES');
     });
     it('votes ABSTAIN on an active proposal', async () => {
-      const lcd = await setupLCD();
-      const { signerAddress } = await setupSigner();
       await waitOneBlock();
 
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
@@ -186,25 +170,23 @@ describe('Proposal Tests', () => {
         depositor: '',
       });
 
-      chai.assert.isAtLeast(activeProposals.length, 1);
+      assert.isAtLeast(activeProposals.length, 1);
       const proposal = activeProposals[0];
 
       const msg = encodeMsgVote(
-        signerAddress,
+        signer,
         proposal.id,
         VoteOption.VOTE_OPTION_ABSTAIN
       );
       const resp = await sendTx(msg);
 
-      chai.assert.isDefined(resp.transactionHash);
-      chai.assert.isDefined(resp.rawLog);
-      chai.assert.isTrue(resp.rawLog.includes('VOTE_OPTION_ABSTAIN'));
-      chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_YES'));
+      expect(resp.transactionHash).to.not.be.undefined;
+      expect(resp.rawLog).to.not.be.undefined;
+      expect(resp.rawLog).to.include('VOTE_OPTION_ABSTAIN');
+      expect(resp.rawLog).to.not.include('VOTE_OPTION_YES');
     });
     it('votes YES on an active proposal', async () => {
       await waitOneBlock();
-      const lcd = await setupLCD();
-      const { signerAddress } = await setupSigner();
 
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
         proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
@@ -212,21 +194,111 @@ describe('Proposal Tests', () => {
         depositor: '',
       });
 
-      chai.assert.isDefined(activeProposals);
-      chai.assert.isAtLeast(activeProposals.length, 1);
+      expect(activeProposals).to.not.be.undefined;
+      expect(activeProposals.length).to.be.greaterThan(0);
+
       const proposal = activeProposals[0];
 
       const msg = encodeMsgVote(
-        signerAddress,
+        signer,
         proposal.id,
         VoteOption.VOTE_OPTION_YES
       );
       const resp = await sendTx(msg);
 
-      chai.assert.isDefined(resp.transactionHash);
-      chai.assert.isDefined(resp.rawLog);
-      chai.assert.isTrue(resp.rawLog.includes('VOTE_OPTION_YES'));
-      chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_NO'));
+      expect(resp.transactionHash).to.not.be.undefined;
+      expect(resp.rawLog).to.not.be.undefined;
+      expect(resp.rawLog).to.include('VOTE_OPTION_YES');
+      expect(resp.rawLog).to.not.include('VOTE_OPTION_NO');
+    });
+  });
+
+  // Cosmos gov v1beta1 query tests
+  describe('Cosmos Governance v1 util Tests', () => {
+    describe('csdk', () => {
+      let lcd: LCD;
+      const id = 'csdk';
+      beforeEach(async () => {
+        lcd = await getLCDClient(`http://localhost:8080/cosmosLCD/${id}`);
+      });
+
+      describe('getActiveProposals', () => {
+        it('should fetch active proposals', async () => {
+          const proposals = await getActiveProposalsV1(lcd);
+          expect(proposals.length).to.be.greaterThan(0);
+
+          proposals.forEach((proposal) => {
+            expect(proposal.state.completed).to.eq(false);
+            expect(proposal.state.status).to.be.oneOf([
+              'VotingPeriod',
+              'DepositPeriod',
+            ]);
+            expect(proposal.state.tally).to.not.be.null;
+          });
+        });
+      });
+      describe('getCompletedProposals', () => {
+        it('should fetch completed proposals', async () => {
+          const proposals = await getCompletedProposalsV1(lcd);
+
+          proposals.forEach((proposal) => {
+            expect(proposal.state.completed).to.eq(true);
+            expect(proposal.state.status).to.be.oneOf([
+              'Passed',
+              'Rejected',
+              'Failed',
+            ]);
+          });
+        });
+      });
+    });
+  });
+});
+
+// TODO: use a v1beta1 devnet for CI testing. See: https://github.com/hicommonwealth/commonwealth/issues/3563
+// skipping for CI until then
+
+// Cosmos gov v1beta1 tests
+xdescribe('Cosmos Governance v1beta1 util Tests', () => {
+  describe('osmosis', () => {
+    let rpc: CosmosApiType;
+    const id = 'osmosis';
+    beforeEach(async () => {
+      const tmClient = await getTMClient(
+        `http://localhost:8080/cosmosAPI/${id}`
+      );
+      rpc = await getRPCClient(tmClient);
+    });
+
+    describe('getActiveProposals', () => {
+      it('should fetch active proposals', async () => {
+        const proposals = await getActiveProposalsV1Beta1(rpc);
+        expect(proposals.length).to.be.greaterThan(0); // TODO: use better expectation in #3563 (noted above)
+
+        proposals.forEach((proposal) => {
+          expect(proposal.state.completed).to.eq(false);
+          expect(proposal.state.status).to.be.oneOf([
+            'VotingPeriod',
+            'DepositPeriod',
+          ]);
+          expect(proposal.state.tally).to.not.be.null;
+        });
+      });
+    });
+    describe('getCompletedProposals', () => {
+      it('should fetch completed proposals', async () => {
+        const proposals = await getCompletedProposalsV1Beta1(rpc);
+        expect(proposals.length).to.be.greaterThan(100);
+
+        proposals.forEach((proposal) => {
+          expect(proposal.state.completed).to.eq(true);
+          expect(proposal.state.status).to.be.oneOf([
+            'Passed',
+            'Rejected',
+            'Failed',
+          ]);
+        });
+      });
     });
   });
 });

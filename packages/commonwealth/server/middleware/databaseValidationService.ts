@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
-import validateChain from './validateChain';
+import { validateChain, validateChainWithTopics } from './validateChain';
 
 export const ALL_CHAINS = 'all_chains';
 
@@ -16,6 +16,31 @@ export default class DatabaseValidationService {
 
   constructor(models: DB) {
     this.models = models;
+  }
+
+  private async validateChainByRequestMethod(
+    req: Request,
+    validator: (models: DB, query: any) => Promise<[any, any]>
+  ) {
+    let chain = null;
+    let error = null;
+    if (req.query.chain === ALL_CHAINS) {
+      // If chain is all, don't set anything on request object
+      return [null, null];
+    }
+
+    if (
+      req.method === 'GET' ||
+      req.method === 'POST' ||
+      req.method === 'PUT' ||
+      req.method === 'DELETE' ||
+      req.method === 'PATCH'
+    ) {
+      const source = req.method === 'GET' ? req.query : req.body;
+      [chain, error] = await validator(this.models, source);
+    }
+
+    return [chain, error];
   }
 
   public validateAuthor = async (
@@ -39,30 +64,31 @@ export default class DatabaseValidationService {
     res: Response,
     next: NextFunction
   ) => {
-    let chain = null;
-    let error = null;
-    if (req.query.chain === ALL_CHAINS) {
-      // If chain is all, don't set anything on request object
-      next();
-      return;
-    }
-    if (req.method === 'GET') {
-      [chain, error] = await validateChain(this.models, req.query);
-      if (error) return next(new AppError(error));
-      // If the chain is valid, add it to the request object
-      req.chain = chain;
-    } else if (
-      req.method === 'POST' ||
-      req.method === 'PUT' ||
-      req.method === 'DELETE' ||
-      req.method === 'PATCH'
-    ) {
-      [chain, error] = await validateChain(this.models, req.body);
-      if (error) return next(new AppError(error));
-      // If the chain is valid, add it to the request object
-      req.chain = chain;
-    }
+    const [chain, error] = await this.validateChainByRequestMethod(
+      req,
+      validateChain
+    );
+    if (error) return next(new AppError(error));
     if (!chain) return next(new AppError(Errors.InvalidCommunity));
+    // If the chain is valid, add it to the request object
+    req.chain = chain;
     next();
   };
+
+  public validateChainWithTopics = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const [chain, error] = await this.validateChainByRequestMethod(
+      req,
+      validateChainWithTopics
+    );
+    if (error) return next(new AppError(error));
+    if (!chain) return next(new AppError(Errors.InvalidCommunity));
+    // If the chain is valid, add it to the request object
+    req.chain = chain;
+    next();
+  };
+
 }
