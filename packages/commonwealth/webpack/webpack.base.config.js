@@ -5,75 +5,6 @@ const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attribute
 
 require('dotenv').config();
 
-function createDependencyRegex(dependencies) {
-  const escapedDependencies = dependencies.map(dep => dep.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
-  return new RegExp(`^(${escapedDependencies.join('|')})$`);
-}
-
-const bnJsV4Dependencies = [
-  '@walletconnect/utils',
-  'rlp',
-  'eth-lib',
-  'ethjs-unit',
-  'number-to-bn',
-  'ethereumjs-tx',
-  'merkle-patricia-tree',
-  'eth-sig-util',
-  'ethereumjs-abi#ethereumjs-util',
-  'ethereumjs-util#rlp',
-  '@terra-money/wallet-controller',
-  'create-ecdh',
-  'diffie-hellman',
-  'public-encrypt',
-  'browserify-sign',
-  'ganache-cli',
-  '@metamask/eth-sig-util',
-  'ethereumjs-abi#rlp',
-  'commonwealth#rlp',
-  'web3-utils#rlp',
-  'ethereumjs-tx#elliptic',
-  'merkle-patricia-tree#elliptic',
-  'eth-sig-util#elliptic',
-  'web3-provider-engine',
-  'passport-magic',
-  'ethereumjs-abi#ethereumjs-util#rlp',
-  'commonwealth#ethereumjs-abi#rlp',
-  'web3-utils#ethereumjs-abi#rlp',
-  'ethjson-rpc-middleware',
-  '@metamask/eth-sig-util',
-  'ethereumjs-abi#ethereumjs-util#elliptic',
-  'commonwealth#ethereumjs-abi#elliptic',
-  'web3-utils#ethereumjs-abi#elliptic',
-  'passport-magic#ethereumjs-abi#ethereumjs-util#elliptic',
-  'eth-json-rpc-middleware#elliptic',
-  '@metamask/eth-sig-util#ethereumjs-util#elliptic',
-  'ethereumjs-account#elliptic',
-  'ethereumjs-vm#elliptic',
-  '@magic-sdk/provider#rlp',
-  'commonwealth',
-];
-
-const bnJsV5Dependencies = [
-  '@solana/web3.js',
-  'ethereumjs-util',
-  'chain-events',
-  '@ethersproject/bignumber',
-  '@ethersproject/signing-key',
-  'web3-eth-iban',
-  'web3-utils',
-  'near-api-js',
-  'borsh',
-  'commonwealth#ethereumjs-util',
-  'web3-utils#ethereumjs-util',
-  'ethereumjs-wallet',
-  'web3-core-method',
-  '@walletconnect/core',
-  '@walletconnect/iso-crypto',
-  'miller-rabin',
-  'browserify-rsa',
-  '@magic-sdk/provider#ethereumjs-util',
-];
-
 module.exports = {
   entry: {
     app: ['index.tsx'],
@@ -135,22 +66,6 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
-    new webpack.NormalModuleReplacementPlugin(
-      createDependencyRegex(bnJsV5Dependencies),
-      resource => {
-        if (resource.request.includes('bn.js')) {
-          resource.request = resource.request.replace('bn.js', 'bn.js-v5');
-        }
-      }
-    ),
-    new webpack.NormalModuleReplacementPlugin(
-      createDependencyRegex(bnJsV4Dependencies),
-      resource => {
-        if (resource.request.includes('bn.js')) {
-          resource.request = resource.request.replace('bn.js', 'bn.js-v4');
-        }
-      }
-    ),
   ],
   optimization: {
     splitChunks: {
@@ -228,9 +143,7 @@ module.exports = {
         __dirname,
         '../../token-balance-cache'
       ),
-      'bn.js-v5': path.resolve(__dirname, '../node_modules/@ethersproject/bignumber/node_modules/bn.js'),
-      'bn.js-v4': path.resolve(__dirname, '../../../node_modules/bn.js'), // Alias for version 4.x.x
-      // 'bn.js': path.resolve(__dirname, '../node_modules/bn.js'), // Add this line to alias bn.js
+      'bn.js': path.resolve(__dirname, '../../../node_modules/bn.js'), // Alias for version 4.x.x
     },
     fallback: {
       fs: false,
