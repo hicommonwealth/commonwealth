@@ -611,34 +611,22 @@ class ThreadsController {
    * @param args
    * @returns A list of resolved thread objects
    */
-  public async getThreadsForLink({ link }: { link: Link }): Promise<Thread[]> {
+  public async getThreadsForLink({
+    link,
+  }: {
+    link: Link;
+  }): Promise<{ title: string; id: string }[]> {
     try {
       const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
         link,
         jwt: app.user.jwt,
       });
 
-      return response.data;
+      return response.data.result.threads;
     } catch (err) {
       notifyError('Could not get threads');
       console.log(err);
     }
-  }
-
-  //PROPOSAL LINKING TODO: Remove this + reimplement in above fns
-  public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
-    const response = await $.ajax({
-      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
-      type: 'GET',
-      data: {
-        snapshot: args.snapshot,
-        chain: app.activeChainId(),
-      },
-    });
-    if (response.status === 'Failure') {
-      return null;
-    }
-    return response.result;
   }
 
   public async fetchThreadsFromId(

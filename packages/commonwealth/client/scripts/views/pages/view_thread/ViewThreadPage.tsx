@@ -673,7 +673,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     ];
   };
 
-  console.log('thread', thread);
   return (
     <Sublayout>
       <CWContentPage
