@@ -27,7 +27,7 @@ const getInitialProposals = (thread: Thread) =>
   }));
 
 type UpdateProposalStatusModalProps = {
-  onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
+  onChangeHandler?: (stage: ThreadStage, links?: Link[]) => void;
   onModalClose: () => void;
   thread: Thread;
 };
@@ -149,7 +149,7 @@ export const UpdateProposalStatusModal = ({
       throw new Error('Failed to update linked proposals');
     }
 
-    onChangeHandler(tempStage, links);
+    onChangeHandler?.(tempStage, links);
     onModalClose();
   };
 

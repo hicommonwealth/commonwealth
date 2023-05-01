@@ -530,7 +530,9 @@ class ThreadsController {
       );
 
       const updatedThread = this.modelFromServer(response.data.result);
-      this._listingStore.update(updatedThread);
+      this._listingStore.remove(updatedThread);
+      this._listingStore.add(updatedThread);
+      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
@@ -564,7 +566,9 @@ class ThreadsController {
       );
 
       const updatedThread = this.modelFromServer(response.data.result);
-      this._listingStore.update(updatedThread);
+      this._listingStore.remove(updatedThread);
+      this._listingStore.add(updatedThread);
+      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {

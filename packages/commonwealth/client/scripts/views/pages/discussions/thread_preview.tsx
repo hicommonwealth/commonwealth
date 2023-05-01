@@ -266,9 +266,6 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
       <Modal
         content={
           <UpdateProposalStatusModal
-            onChangeHandler={() => {
-              // TODO update store and rerender
-            }}
             thread={thread}
             onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}
           />
