@@ -1,9 +1,9 @@
 import cheerio from 'cheerio';
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -22,6 +22,10 @@ const decodeTitle = (title: string) => {
     return title;
   }
 };
+
+const getUrl = (req) => {
+  return req.protocol + '://' + req.get('host') + req.originalUrl;
+}
 
 const setupAppRoutes = (
   app,
@@ -51,15 +55,17 @@ const setupAppRoutes = (
     throw new Error('Template not found, cannot start production server');
   }
 
-  const renderWithMetaTags = (res, title, description, author, image) => {
-    if (image) {
-      image = cleanMalformedUrl(image);
-    }
-
+  const renderWithMetaTags = (res, title, description, author, image, url) => {
     description =
       description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
     $tmpl('meta[name="title"]').attr('content', title);
+
+    // Cut post body down to 160 characters if too long.
+    if (description.length > 160) {
+      description = description.substring(0, 160) + '...';
+    }
+
     $tmpl('meta[name="description"]').attr('content', description);
     if (author) {
       $tmpl('meta[name="author"]').attr('content', author);
@@ -76,6 +82,7 @@ const setupAppRoutes = (
     $tmpl('meta[property="og:site_name"]').attr('content', 'Commonwealth');
     $tmpl('meta[property="og:title"]').attr('content', title);
     $tmpl('meta[property="og:description"]').attr('content', description);
+    $tmpl('meta[property="og:url"]').attr('content', url);
     if (image) {
       $tmpl('meta[property="og:image"]').attr('content', image);
     }
@@ -101,7 +108,9 @@ const setupAppRoutes = (
         : `https://commonwealth.im${chain.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
-    renderWithMetaTags(res, title, description, author, image);
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
   });
 
   app.get('/:scope/account/:address', async (req, res) => {
@@ -130,95 +139,105 @@ const setupAppRoutes = (
       image = '';
       author = '';
     }
-    renderWithMetaTags(res, title, description, author, image);
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
   });
+
+  const renderThread = async (
+    scope: string,
+    threadId: string,
+    req,
+    res
+  ) => {
+    // Retrieve discussions
+    const thread = await models.Thread.findOne({
+      where: { id: threadId },
+      include: [
+        {
+          model: models.Chain,
+          attributes: ['icon_url']
+        },
+        {
+          model: models.Address,
+          as: 'Address',
+          attributes: ['profile_id'],
+          include: [
+            {
+              model: models.Profile,
+              attributes: ['profile_name']
+            }
+          ]
+        },
+      ],
+    });
+
+    const title = thread ? decodeTitle(thread.title) : '';
+    const description = thread ? thread.plaintext : '';
+    const image = thread?.Chain?.icon_url
+      ? `${thread.Chain.icon_url}`
+      : DEFAULT_COMMONWEALTH_LOGO;
+
+    const author = thread?.Address?.Profile?.profile_name ?
+      thread.Address.Profile.profile_name :
+      '';
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
+  };
 
   const renderProposal = async (
     scope: string,
-    proposalType: string,
-    proposalId: string,
+    req,
     res,
     chain?: ChainInstance
   ) => {
     // Retrieve title, description, and author from the database
-    let title, description, author, image;
     chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
 
-    if (proposalType === 'discussion' && proposalId !== null) {
-      // Retrieve discussions
-      const proposal = await models.Thread.findOne({
-        where: { id: proposalId },
-        include: [
-          {
-            model: models.Chain,
-          },
-          {
-            model: models.Address,
-            as: 'Address',
-          },
-        ],
-      });
+    const title = chain ? chain.name : 'Commonwealth';
+    const description = '';
+    const image = chain?.icon_url
+      ? chain.icon_url.match(`^(http|https)://`)
+        ? chain.icon_url
+        : `https://commonwealth.im${chain.icon_url}`
+      : DEFAULT_COMMONWEALTH_LOGO;
+    const author = '';
+    const url = getUrl(req);
 
-      title = proposal ? decodeTitle(proposal.title) : '';
-
-      description = proposal ? proposal.plaintext : '';
-      image = chain
-        ? `https://commonwealth.im${chain.icon_url}`
-        : DEFAULT_COMMONWEALTH_LOGO;
-      try {
-        const profile = await models.Profile.findOne({
-          where: { id: proposal.Address.id },
-        });
-        author = profile.profile_name;
-      } catch (e) {
-        author = '';
-      }
-    } else {
-      title = chain ? chain.name : 'Commonwealth';
-      description = '';
-      image = chain
-        ? `https://commonwealth.im${chain.icon_url}`
-        : DEFAULT_COMMONWEALTH_LOGO;
-      author = '';
-    }
-    renderWithMetaTags(res, title, description, author, image);
+    renderWithMetaTags(res, title, description, author, image, url);
   };
 
   app.get('/:scope/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const proposalType = req.params.type;
-    const proposalId = req.params.identifier.split('-')[0];
-    await renderProposal(scope, proposalType, proposalId, res);
+    await renderProposal(scope, req, res);
   });
 
   app.get('/:scope/discussion/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const proposalType = ProposalType.Thread;
-    const proposalId = req.params.identifier.split('-')[0];
-    await renderProposal(scope, proposalType, proposalId, res);
+    const threadId = req.params.identifier.split('-')[0];
+    if (isNaN(threadId)) {
+      return; // don't render because thread ID needs to be a number
+    }
+    await renderThread(scope, threadId, req, res);
   });
 
   app.get('/:scope/proposal/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const proposalId = req.params.identifier.split('-')[0];
     const chain = await models.Chain.findOne({ where: { id: scope } });
 
-    // derive proposal type from scope if possible
-    let proposalType;
-    if (chain?.base === ChainBase.CosmosSDK) {
-      proposalType = ProposalType.CosmosProposal;
-    } else if (chain?.network === ChainNetwork.Sputnik) {
-      proposalType = ProposalType.SputnikProposal;
-    } else if (chain?.network === ChainNetwork.Compound) {
-      proposalType = ProposalType.CompoundProposal;
-    } else if (chain?.network === ChainNetwork.Aave) {
-      proposalType = ProposalType.AaveProposal;
-    } else {
-      renderWithMetaTags(res, '', '', '', null);
+    const proposalTypes = new Set([
+      ChainNetwork.Sputnik,
+      ChainNetwork.Compound,
+      ChainNetwork.Aave
+    ]);
+
+    if (!proposalTypes.has(chain?.network) && chain?.base !== ChainBase.CosmosSDK) {
+      renderWithMetaTags(res, '', '', '', null, null);
       return;
     }
 
-    await renderProposal(scope, proposalType, proposalId, res, chain);
+    await renderProposal(scope, req, res, chain);
   });
 
   app.get('*', (req, res) => {
