@@ -29,6 +29,7 @@ export enum LinkSource {
 export type Link = {
   source: LinkSource;
   identifier: string;
+  title?: string;
 };
 
 class Thread implements IUniqueId {

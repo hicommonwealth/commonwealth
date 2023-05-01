@@ -19,11 +19,13 @@ import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
     id: l.identifier,
+    title: l.title,
   }));
 
 const getInitialProposals = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
     typeId: l.identifier,
+    title: l.title,
   }));
 
 type UpdateProposalStatusModalProps = {
@@ -39,10 +41,10 @@ export const UpdateProposalStatusModal = ({
 }: UpdateProposalStatusModalProps) => {
   const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
-    Array<Pick<SnapshotProposal, 'id'>>
+    Array<Pick<SnapshotProposal, 'id' | 'title'>>
   >(getInitialSnapshots(thread));
   const [tempProposals, setTempProposals] = useState<
-    Array<Pick<ChainEntity, 'typeId'>>
+    Array<Pick<ChainEntity, 'typeId' | 'title'>>
   >(getInitialProposals(thread));
 
   if (!app.chain?.meta) {
@@ -92,6 +94,7 @@ export const UpdateProposalStatusModal = ({
           links: toAdd.map((sn) => ({
             source: LinkSource.Snapshot,
             identifier: String(sn.id),
+            title: sn.title,
           })),
         });
 
@@ -165,7 +168,9 @@ export const UpdateProposalStatusModal = ({
   const handleSelectProposal = (sn: SnapshotProposal) => {
     const isSelected = tempSnapshotProposals.find(({ id }) => sn.id === id);
 
-    setTempSnapshotProposals(isSelected ? [] : [{ id: sn.id }]);
+    setTempSnapshotProposals(
+      isSelected ? [] : [{ id: sn.id, title: sn.title }]
+    );
     setVotingStage();
   };
 

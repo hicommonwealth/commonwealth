@@ -42,6 +42,7 @@ export const LinkedThreadModal = ({
           links: toAdd.map((el) => ({
             source: LinkSource.Thread,
             identifier: String(el.id),
+            title: el.title,
           })),
         });
 
