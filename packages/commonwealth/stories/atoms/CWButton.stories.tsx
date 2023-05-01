@@ -1,8 +1,8 @@
 import React from 'react';
 // import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWButton } from '../client/scripts/views/components/component_kit/cw_button';
-import { notifySuccess } from '../client/scripts/controllers/app/notifications';
+import { CWButton } from '../../client/scripts/views/components/component_kit/cw_button';
+import { notifySuccess } from '../../client/scripts/controllers/app/notifications';
 
 const button = {
   title: 'Atoms/Button',

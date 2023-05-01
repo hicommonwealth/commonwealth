@@ -18,7 +18,6 @@ module.exports = {
     autodocs: 'tag',
   },
   webpackFinal: async (config) => {
-    console.log('...custom.resolve', { ...custom.resolve });
     return {
       ...config,
       resolve: { ...config.resolve, ...custom.resolve },
