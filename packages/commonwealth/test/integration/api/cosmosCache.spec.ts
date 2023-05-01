@@ -62,8 +62,8 @@ describe('Cosmos Cache', () => {
     }
 
     const rpcProposalsCacheExpectedTest = async (proposalStatus: string) => {
-      const pathParam = `{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
-      const body = `{"jsonrpc":"2.0","id":382288611593,"method":"abci_query","params":${pathParam}}`;
+      const params = `{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
+      const body = `{"jsonrpc":"2.0","id":382288611593,"method":"abci_query","params":${params}}`;
       const key = `/cosmosAPI/juno_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
       await rpcTestBody(body, key);
     };
@@ -71,19 +71,19 @@ describe('Cosmos Cache', () => {
     it('should cache passed proposals', async () => {
       await rpcProposalsCacheExpectedTest('0803');
     });
-    it('should cache passed proposals (0803220a0a080000000000000087)', async () => {
+    it('should cache passed proposals (Osmosis case - 0803220a0a080000000000000087)', async () => {
       await rpcProposalsCacheExpectedTest('0803220a0a080000000000000087');
     });
-    it('should cache passed proposals (0803220a0a080000000000000100)', async () => {
+    it('should cache passed proposals (Osmosis case - 0803220a0a080000000000000100)', async () => {
       await rpcProposalsCacheExpectedTest('0803220a0a080000000000000100');
     });
-    it('should cache passed proposals (0803220a0a080000000000000189)', async () => {
+    it('should cache passed proposals (Osmosis case - 0803220a0a080000000000000189)', async () => {
       await rpcProposalsCacheExpectedTest('0803220a0a080000000000000189');
     });
     it('should cache rejected proposals', async () => {
       await rpcProposalsCacheExpectedTest('0804');
     });
-    it('should cache rejected proposals', async () => {
+    it('should cache failed proposals', async () => {
       await rpcProposalsCacheExpectedTest('0805');
     });
     it('should cache deposit period proposals', async () => {
