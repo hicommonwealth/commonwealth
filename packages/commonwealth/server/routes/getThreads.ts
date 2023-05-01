@@ -46,6 +46,10 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
           model: models.LinkedThread,
           as: 'linked_threads',
         },
+        {
+          model: models.Comment,
+          as: 'comments',
+        },
       ],
     });
   } catch (e) {
