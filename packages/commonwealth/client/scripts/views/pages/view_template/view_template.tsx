@@ -90,8 +90,6 @@ const ViewTemplatePage = () => {
           console.log('err', err);
         }
 
-        console.log('parsedJSON', parsedJSON);
-
         for (const field of parsedJSON.form_fields) {
           switch (Object.keys(field)[0]) {
             case TemplateComponents.INPUT:

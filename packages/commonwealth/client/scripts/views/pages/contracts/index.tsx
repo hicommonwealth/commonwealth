@@ -17,6 +17,10 @@ import { CWCommunityAvatar } from '../../components/component_kit/cw_community_a
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { Modal } from '../../components/component_kit/cw_modal';
 import ViewTemplateModal from '../../modals/view_template_modal';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { openConfirmation } from '../../modals/confirmation_modal';
+import { notifyError } from 'controllers/app/notifications';
 
 const ContractsPage = () => {
   const navigate = useCommonNavigate();
@@ -31,29 +35,29 @@ const ContractsPage = () => {
   const [viewTemplateModalOpen, setViewTemplateModalOpen] = useState(false);
   const [mountedTemplate, setMountedTemplate] = useState<Template>(null);
 
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      if (contracts.length > 0) {
-        const fetchedTemplates = [];
-        for (const contract of contracts) {
-          const templatesForContract =
-            await app.contracts.getTemplatesForContract(contract.id);
+  const fetchTemplates = async () => {
+    if (contracts.length > 0) {
+      const fetchedTemplates = [];
+      for (const contract of contracts) {
+        const templatesForContract =
+          await app.contracts.getTemplatesForContract(contract.id);
 
-          fetchedTemplates.push(...templatesForContract);
-        }
-
-        setTemplates(
-          fetchedTemplates.map((template) => {
-            return Template.fromJSON(template);
-          })
-        );
+        fetchedTemplates.push(...templatesForContract);
       }
-    };
 
+      setTemplates(
+        fetchedTemplates.map((template) => {
+          return Template.fromJSON(template);
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
     fetchTemplates();
   }, [contracts, setTemplates]);
 
-  const [tabOn, setTabOn] = useState<'contracts' | 'templates'>('templates');
+  const [tabOn, setTabOn] = useState<'contracts' | 'templates'>('contracts');
 
   const handleAddContract = () => {
     navigate(`/new/contract`);
@@ -66,6 +70,57 @@ const ContractsPage = () => {
   const onUpdateSuccess = () => {
     const updatedContracts = app.contracts.store.getCommunityContracts();
     setContracts([...updatedContracts]);
+  };
+
+  const handleDeleteTemplate = (template) => {
+    if (template.inUse) {
+      openConfirmation({
+        title: 'Action template cannot be deleted',
+        description: (
+          <>
+            Action template <b>{template.name}</b> cannot be deleted at this
+            time because it is currently being used by a community.
+          </>
+        ),
+        buttons: [
+          {
+            label: 'Close',
+            buttonType: 'secondary-black',
+          },
+        ],
+      });
+    } else {
+      openConfirmation({
+        title: 'Delete Template',
+        description: (
+          <>
+            Deleting this template <b>{template.name}</b> is permanent and
+            deletes all associated data. Are you sure you want to proceed?
+          </>
+        ),
+        buttons: [
+          {
+            label: 'Delete',
+            buttonType: 'mini-red',
+            onClick: async () => {
+              try {
+                await app.contracts.deleteTemplate({
+                  templateId: template.id,
+                });
+                await fetchTemplates();
+              } catch (e) {
+                console.error(e);
+                notifyError('Failed to delete template!');
+              }
+            },
+          },
+          {
+            label: 'Cancel',
+            buttonType: 'mini-black',
+          },
+        ],
+      });
+    }
   };
 
   return (
@@ -225,8 +280,25 @@ const ContractsPage = () => {
                       </div>
                       <div className="table-column">
                         <div className="IconGroup">
-                          <CWIcon iconName="dots" iconSize="small" />
-                          <CWIcon
+                          <PopoverMenu
+                            renderTrigger={(onclick) => (
+                              <CWIconButton
+                                iconName="dots"
+                                iconSize="small"
+                                onClick={onclick}
+                              />
+                            )}
+                            menuItems={[
+                              {
+                                label: 'Delete',
+                                iconLeft: 'trash',
+                                onClick: () => {
+                                  handleDeleteTemplate(template);
+                                },
+                              },
+                            ]}
+                          />
+                          <CWIconButton
                             iconName="views"
                             iconSize="small"
                             className="ViewIcon"

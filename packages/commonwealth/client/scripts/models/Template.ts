@@ -10,6 +10,7 @@ class Template {
   public readonly createdForCommunity?: string;
   public readonly createdAt?: moment.Moment;
   public readonly updatedAt?: moment.Moment;
+  public readonly inUse: boolean = false;
 
   constructor({
     id,
@@ -21,6 +22,7 @@ class Template {
     createdForCommunity,
     createdAt,
     updatedAt,
+    inUse,
   }: {
     id: number;
     abiId: number;
@@ -31,6 +33,7 @@ class Template {
     createdForCommunity?: string;
     createdAt?: moment.Moment;
     updatedAt?: moment.Moment;
+    inUse?: boolean;
   }) {
     this.id = id;
     this.abiId = abiId;
@@ -41,6 +44,7 @@ class Template {
     this.createdForCommunity = createdForCommunity;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.inUse = inUse;
   }
 
   public static fromJSON({
@@ -53,6 +57,7 @@ class Template {
     created_for_community,
     created_at,
     updated_at,
+    inUse,
   }) {
     return new Template({
       id,
@@ -64,6 +69,7 @@ class Template {
       createdForCommunity: created_for_community,
       createdAt: created_at,
       updatedAt: updated_at,
+      inUse,
     });
   }
 }

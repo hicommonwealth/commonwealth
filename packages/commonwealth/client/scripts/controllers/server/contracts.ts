@@ -355,6 +355,22 @@ class ContractsController {
     }
   }
 
+  public async deleteTemplate({ templateId }: { templateId: string }) {
+    try {
+      await $.ajax({
+        url: `${app.serverUrl()}/contract/template`,
+        data: {
+          jwt: app.user.jwt,
+          template_id: templateId,
+        },
+        type: 'DELETE',
+      });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to delete template');
+    }
+  }
+
   public async getTemplatesForContract(contractId: number) {
     try {
       const res = await $.get(`${app.serverUrl()}/contract/template`, {

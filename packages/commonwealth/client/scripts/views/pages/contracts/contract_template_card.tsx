@@ -68,11 +68,10 @@ export const ContractTemplateCard = ({
 
   const handleDeleteTemplate = () => {
     openConfirmation({
-      title: 'Delete Template',
+      title: 'Delete Action',
       description: (
         <>
-          Deleting this template <b>{templateInfo.displayName}</b> is permanent
-          and deletes all associated data. Are you sure you want to proceed?
+          Deleting this action is permanent. Are you sure you want to proceed?
         </>
       ),
       buttons: [

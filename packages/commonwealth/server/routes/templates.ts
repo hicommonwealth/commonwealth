@@ -23,6 +23,10 @@ type CreateTemplateAndMetadataResp = {
   template_id: number;
 };
 
+type DeleteTemplateAndMetadataReq = {
+  template_id: string;
+};
+
 export async function createTemplate(
   models: DB,
   req: TypedRequestBody<CreateTemplateAndMetadataReq>,
@@ -130,8 +134,49 @@ export async function getTemplates(
         abi_id,
       },
     });
-    return success(res, { templates });
+
+    const templatePromises = templates.map(async (template) => {
+      const inUse = await models.CommunityContractTemplate.findOne({
+        where: {
+          template_id: template.id,
+        },
+      });
+
+      return {
+        ...template.toJSON(),
+        inUse: !!inUse,
+      };
+    });
+
+    const templatesWithInUse = await Promise.all(templatePromises);
+    return success(res, { templates: templatesWithInUse });
   } catch (e) {
     throw new AppError('Error getting templates');
+  }
+}
+
+export async function deleteTemplate(
+  models: DB,
+  req: TypedRequestBody<DeleteTemplateAndMetadataReq>,
+  res: TypedResponse<{ message: string }>
+) {
+  const { template_id } = req.body;
+
+  const template = await models.Template.findOne({
+    where: {
+      id: template_id,
+    },
+  });
+
+  if (!template) {
+    throw new AppError('Template does not exist');
+  }
+
+  try {
+    await template.destroy();
+    return success(res, { message: 'Template deleted' });
+  } catch (e) {
+    console.log(e);
+    throw new AppError('Error deleting template');
   }
 }
