@@ -4,7 +4,7 @@ class Template {
   public readonly id: number;
   public readonly abiId: number;
   public readonly name: string;
-  public readonly template: Record<string, unknown>;
+  public readonly template: string;
   public readonly createdBy?: string;
   public readonly description?: string;
   public readonly createdForCommunity?: string;
@@ -25,7 +25,7 @@ class Template {
     id: number;
     abiId: number;
     name: string;
-    template: Record<string, unknown>;
+    template: string;
     createdBy?: string;
     description?: string;
     createdForCommunity?: string;

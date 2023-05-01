@@ -15,6 +15,8 @@ import Template from 'models/Template';
 import { User } from '../../components/user/user';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { Modal } from '../../components/component_kit/cw_modal';
+import ViewTemplateModal from '../../modals/view_template_modal';
 
 const ContractsPage = () => {
   const navigate = useCommonNavigate();
@@ -26,6 +28,8 @@ const ContractsPage = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [noContractsAlertDisplayed, setNoContractsAlertDisplayed] =
     useState(true);
+  const [viewTemplateModalOpen, setViewTemplateModalOpen] = useState(false);
+  const [mountedTemplate, setMountedTemplate] = useState<Template>(null);
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -125,6 +129,22 @@ const ContractsPage = () => {
           </>
         ) : (
           <div className="template-display-section">
+            <Modal
+              content={
+                <ViewTemplateModal
+                  template={mountedTemplate}
+                  onClose={() => {
+                    setViewTemplateModalOpen(false);
+                    setMountedTemplate(null);
+                  }}
+                />
+              }
+              open={viewTemplateModalOpen}
+              onClose={() => {
+                setViewTemplateModalOpen(false);
+                setMountedTemplate(null);
+              }}
+            />
             {contracts.length === 0 && noContractsAlertDisplayed && (
               <div className="no-contract-alert">
                 <div className="information">
@@ -206,7 +226,15 @@ const ContractsPage = () => {
                       <div className="table-column">
                         <div className="IconGroup">
                           <CWIcon iconName="dots" iconSize="small" />
-                          <CWIcon iconName="views" iconSize="small" />
+                          <CWIcon
+                            iconName="views"
+                            iconSize="small"
+                            className="ViewIcon"
+                            onClick={() => {
+                              setMountedTemplate(template);
+                              setViewTemplateModalOpen(true);
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
