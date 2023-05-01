@@ -60,6 +60,12 @@ const setupAppRoutes = (
       description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
     $tmpl('meta[name="title"]').attr('content', title);
+
+    // Cut post body down to 160 characters if too long.
+    if (description.length > 160) {
+      description = description.substring(0, 160) + '...';
+    }
+
     $tmpl('meta[name="description"]').attr('content', description);
     if (author) {
       $tmpl('meta[name="author"]').attr('content', author);
