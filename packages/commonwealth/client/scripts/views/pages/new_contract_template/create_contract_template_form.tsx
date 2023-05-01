@@ -33,6 +33,7 @@ const CreateContractTemplateForm = () => {
         template: form.template,
         description: form.description,
         contract_id,
+        community: app.activeChainId(),
       });
 
       navigate(`/contracts`);

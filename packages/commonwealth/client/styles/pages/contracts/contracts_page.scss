@@ -44,18 +44,67 @@
     }
   }
 
-  .Table {
-    margin-top: 40px;
+  .template-display-section {
     display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 40px;
+
+    .no-contract-alert {
+      display: flex;
+      padding: 16px 24px;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-direction: row;
+      background: $primary-50;
+      border: 1px solid $primary-500;
+      border-radius: 6px;
+
+      .information {
+        display: flex;
+        flex-direction: row;
+        gap: 16px;
+        align-items: flex-start;
+
+        .info-text {
+          color: $neutral-600;
+          max-width: 70%;
+        }
+      }
+
+      .closeIcon {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .Table {
     flex: 1;
+
+    .empty-state {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid $neutral-100;
+      border-top: none;
+    }
 
     .table-row {
       border: 1px solid $neutral-100;
       border-top: none;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 0.2fr;
       padding: 12px;
       width: 100%;
+
+      .table-column {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+      }
 
       .ColumnText {
         color: $neutral-600 !important;
@@ -68,6 +117,11 @@
       .Text {
         justify-content: right;
         margin-right: 8px;
+      }
+
+      .IconGroup {
+        display: flex;
+        gap: 8px;
       }
     }
 

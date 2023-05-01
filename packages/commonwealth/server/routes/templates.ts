@@ -15,6 +15,8 @@ type CreateTemplateAndMetadataReq = {
   template: string;
   description: string;
   chain_id: string;
+  created_by: string;
+  created_for_community: string;
 };
 
 type CreateTemplateAndMetadataResp = {
@@ -26,7 +28,15 @@ export async function createTemplate(
   req: TypedRequestBody<CreateTemplateAndMetadataReq>,
   res: TypedResponse<CreateTemplateAndMetadataResp>
 ) {
-  const { contract_id, name, template, chain_id, description } = req.body;
+  const {
+    contract_id,
+    name,
+    template,
+    chain_id,
+    description,
+    created_by,
+    created_for_community,
+  } = req.body;
 
   const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
   if (!isAdmin) throw new AppError('Must be admin');
@@ -63,6 +73,8 @@ export async function createTemplate(
       name,
       template,
       description,
+      created_by,
+      created_for_community,
     });
     return success(res, { template_id: newTemplate.id });
   } catch (e) {
