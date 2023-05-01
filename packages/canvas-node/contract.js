@@ -75,4 +75,8 @@ export const actions = {
 	},
 }
 
+const sources = {
+  '/Commonwealth': { ...actions }
+}
+
 export const routes = {}
