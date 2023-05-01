@@ -8,7 +8,6 @@ import { getLastEdited } from '../util/getLastEdited';
 
 const processLinks = async (thread) => {
   let chain_entity_meta = [];
-  let linked_threads = [];
   if (thread.links) {
     const ces = thread.links.filter((item) => item.source === 'proposal');
     if (ces.length > 0) {
@@ -16,16 +15,8 @@ const processLinks = async (thread) => {
         return { ce_id: parseInt(ce.identifier), title: ce.title };
       });
     }
-    linked_threads = thread.links
-      .filter((item) => item.source === 'thread')
-      .map((thread_link) => {
-        return {
-          linking_thread: thread.thread_id,
-          linked_thread: parseInt(thread_link.identifier),
-        };
-      });
   }
-  return { chain_entity_meta, linked_threads };
+  return { chain_entity_meta };
 };
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -131,7 +122,7 @@ const bulkThreads = async (
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
-      const { chain_entity_meta, linked_threads } = await processLinks(t);
+      const { chain_entity_meta } = await processLinks(t);
 
       const last_edited = getLastEdited(t);
 
@@ -149,7 +140,6 @@ const bulkThreads = async (
         created_at: t.thread_created,
         links: t.links,
         collaborators,
-        linked_threads,
         chain_entity_meta,
         has_poll: t.has_poll,
         last_commented_on: t.last_commented_on,
@@ -203,9 +193,8 @@ const bulkThreads = async (
       ).map(async (t) => {
         const row = t.toJSON();
         const last_edited = getLastEdited(row);
-        const { chain_entity_meta, linked_threads } = await processLinks(t);
+        const { chain_entity_meta } = await processLinks(t);
         row['chain_entity_meta'] = chain_entity_meta;
-        row['linked_threads'] = linked_threads;
         row['last_edited'] = last_edited;
         return row;
       });
