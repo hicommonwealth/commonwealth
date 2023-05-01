@@ -18,7 +18,6 @@ import {
   ThreadStage,
 } from 'models';
 import moment from 'moment';
-import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
@@ -116,7 +115,6 @@ class ThreadsController {
       body,
       last_edited,
       version_history,
-      snapshot_proposal,
       Attachments,
       created_at,
       topic,
@@ -133,7 +131,6 @@ class ThreadsController {
       polls = [], // associated Polls
       reactions,
       last_commented_on,
-      linked_threads,
       numberOfComments,
       canvasAction,
       canvasSession,
@@ -217,13 +214,6 @@ class ThreadsController {
       decodedBody = body;
     }
 
-    const linkedThreads = (linked_threads || []).map(
-      (lT: LinkedThreadAttributes) => ({
-        linkedThread: lT.linked_thread,
-        linkingThread: lT.linking_thread,
-      })
-    );
-
     const t = new Thread({
       id,
       author: thread.Address.address,
@@ -232,7 +222,6 @@ class ThreadsController {
       body: decodedBody,
       createdAt: moment(created_at),
       attachments,
-      snapshotProposal: snapshot_proposal,
       topic: topicFromStore,
       kind,
       stage,
@@ -248,7 +237,6 @@ class ThreadsController {
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
-      linkedThreads,
       numberOfComments,
       reactionIds,
       reactionType,
