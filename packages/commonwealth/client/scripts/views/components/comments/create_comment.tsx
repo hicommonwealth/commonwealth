@@ -42,6 +42,9 @@ export const CreateComment = ({
   );
 
   const restoredDraft = useMemo(() => {
+    if (handleIsReplying) {
+      return createDeltaFromText('');
+    }
     return restoreDraft() || createDeltaFromText('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -128,11 +131,14 @@ export const CreateComment = ({
 
   // on content updated, save draft
   useEffect(() => {
+    if (handleIsReplying) {
+      return;
+    }
     if (!contentDelta || getTextFromDelta(contentDelta).length === 0) {
       return;
     }
     saveDraft(contentDelta);
-  }, [saveDraft, contentDelta]);
+  }, [handleIsReplying, saveDraft, contentDelta]);
 
   return (
     <div className="CreateComment">
