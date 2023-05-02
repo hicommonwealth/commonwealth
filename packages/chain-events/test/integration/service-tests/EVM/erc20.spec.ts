@@ -11,12 +11,16 @@ import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
 import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/chainSubscriber';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { eventMatch } from '../../../util';
+import {eventMatch, waitUntilBlock} from '../../../util';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
 import { createChainEventsApp } from '../../../../services/app/Server';
 import Web3 from 'web3';
+import {EventKind, IErc20Contracts} from "../../../../src/chains/erc20/types";
+import {Processor, Subscriber} from "../../../../src/chains/erc20";
+import { Listener } from "../../../../src";
+import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -31,6 +35,14 @@ describe('Integration tests for ERC20', () => {
   const events = {};
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
+
+  let listener: Listener<
+    IErc20Contracts,
+    never,
+    Processor,
+    Subscriber,
+    EventKind
+  >
 
   const contract = new compoundGovernor();
   const chain_id = 'ganache-fork-busd';
@@ -48,9 +60,6 @@ describe('Integration tests for ERC20', () => {
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   const transferAmount = '100';
 
-  // This function delays the execution of the test for the specified number of milliseconds
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
   before(async () => {
     // initialize the mock rabbitmq controller
     await rmq.init();
@@ -59,13 +68,19 @@ describe('Integration tests for ERC20', () => {
   describe('Tests the ERC20 event listener using the chain subscriber', async () => {
     before(async () => {
       // set up the chain subscriber
-      await runSubscriberAsFunction(rmq, null, null, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, null, null, chain);
+      listener = listeners[`erc20_${chain.ChainNode.url}`] as Listener<
+        IErc20Contracts,
+        never,
+        Processor,
+        Subscriber,
+        EventKind
+      >
     });
 
     it('Should capture transfer events', async () => {
-      // await sdk.getEth(randomWallet, transferAmount);
-      await sdk.getErc20(BUSDAddress, randomWallet, transferAmount);
-      await delay(10000);
+      const { block } = await sdk.getErc20(BUSDAddress, randomWallet, transferAmount);
+      await waitUntilBlock(block, listener, 10);
 
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
       events['transfer'] = msg;
@@ -76,12 +91,12 @@ describe('Integration tests for ERC20', () => {
     });
 
     it('Should capture approval events', async () => {
-      await sdk.approveErc20(
+      const { block } = await sdk.approveErc20(
         BUSDAddress,
         randomWallet,
         Web3.utils.toWei(transferAmount)
       );
-      await delay(10000);
+      await waitUntilBlock(block, listener, 10);
 
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
       events['approval'] = msg;
@@ -96,10 +111,6 @@ describe('Integration tests for ERC20', () => {
     before(async () => {
       // set up the chain consumer - this starts the subscriptions thus processing all existing events
       await setupChainEventConsumer(rmq);
-    });
-
-    after(async () => {
-      await delay(30000);
     });
 
     it('Should process transfer events', async () => {

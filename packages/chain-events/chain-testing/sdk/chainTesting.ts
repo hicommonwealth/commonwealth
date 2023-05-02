@@ -104,18 +104,19 @@ export class ChainTesting {
     spender: string,
     amount: string,
     accountIndex?: number
-  ) {
+  ): Promise<{block: number}> {
     const request: erc20Approve = {
       tokenAddress,
       spender,
       amount,
       accountIndex,
     };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/erc20/approve`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   /**
@@ -124,7 +125,7 @@ export class ChainTesting {
    * @param to address to transfer to
    * @param amount amount in ether to receive
    */
-  public async getErc20(tokenAddress: string, to: string, amount: string) {
+  public async getErc20(tokenAddress: string, to: string, amount: string): Promise<{block: number}> {
     const fromBank = true;
     const request: erc20Transfer = { tokenAddress, to, amount, fromBank };
     const response = await axios.post(

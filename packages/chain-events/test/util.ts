@@ -1,7 +1,7 @@
 import type events from 'events';
 
 import type { CWEvent, IChainEventData, IEventHandler } from '../src';
-import { ChainEventKinds } from '../src';
+import {ChainEventKinds, Listener} from '../src';
 import { expect } from 'chai';
 import Web3 from 'web3';
 
@@ -64,4 +64,16 @@ export function getEvmSecondsAndBlocks(days: number) {
   const secs = days * 86400;
   const blocks = secs / 12 + 500;
   return { secs, blocks };
+}
+
+// sleeps until the listener reaches the desired block or until the maxWaitTime is reached
+export async function waitUntilBlock(blockNum: number, listener: Listener<any, any, any, any, any>, maxWaitTime = 30): Promise<void> {
+  let waitTime = 0;
+  while (true) {
+    console.log(`Wait time: ${waitTime}, lastCachedBlockNumber: ${listener.lastCachedBlockNumber}`);
+    if (waitTime > maxWaitTime) break;
+    if (listener.lastCachedBlockNumber >= blockNum) break;
+    await new Promise<void>(resolve => setTimeout(resolve, 1000));
+    waitTime += 1;
+  }
 }
