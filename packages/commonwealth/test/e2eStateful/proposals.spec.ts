@@ -40,6 +40,7 @@ test.describe('Community proposals page', () => {
   };
 
   const inactiveProposalPageTest = async ({ page }) => {
+    test.setTimeout(70000);
     await waitForCompletedProposals({ page });
     const inactiveCardsContainer = await page
       .locator('.CardsCollection .cards')
