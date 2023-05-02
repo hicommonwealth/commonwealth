@@ -40,7 +40,7 @@ export const models = {
 
 export const actions = {
   thread({ community, title, body, link, topic }, { db, from, hash }) {
-    db.threads.set({
+    db.threads.set(hash, {
       id: hash,
       creator: from,
       community,
@@ -52,14 +52,14 @@ export const actions = {
   },
   updateThread({ thread_id, title, body }, { db, from, hash }) {
     const t = db.threads.find({ id: thread_id, creator: from });
-    db.threads.set({ id: t.id, title, body });
+    db.threads.set(hash, { id: t.id, title, body });
   },
-  deleteThread({ thread_id }, { db, from }) {
+  deleteThread({ thread_id }, { db, from, hash }) {
     const c = db.threads.find({ id: thread_id, creator: from });
     db.threads.delete({ id: c.id });
   },
   comment({ thread_id, body, parent_comment_id }, { db, from, hash }) {
-    db.comments.set({
+    db.comments.set(hash, {
       id: hash,
       creator: from,
       thread_id,
@@ -67,42 +67,46 @@ export const actions = {
       parent_comment_id,
     });
   },
-  updateComment({ comment_id, body }, { db, from }) {
+  updateComment({ comment_id, body }, { db, from, hash }) {
     const c = db.comments.find({ id: comment_id, creator: from });
-    db.comments.set({ id: c.id, body });
+    db.comments.set(hash, { id: c.id, body });
   },
-  deleteComment({ comment_id }, { db, from }) {
+  deleteComment({ comment_id }, { db, from, hash }) {
     const c = db.comments.find({ id: comment_id, creator: from });
     db.comments.delete({ id: c.id });
   },
-  reactThread({ thread_id, value }, { db, from }) {
-    if (value !== 'like' && value !== 'dislike') return false;
-    db.thread_reactions.set({
+  reactThread({ thread_id, value }, { db, from, hash }) {
+    if (value !== 'like' && value !== 'dislike') {
+      throw new Error('Invalid reaction');
+    }
+    db.thread_reactions.set(hash, {
       id: `${thread_id}/${from}`,
       creator: from,
       thread_id,
       value,
     });
   },
-  unreactThread({ thread_id, value }, { db, from }) {
-    db.thread_reactions.set({
+  unreactThread({ thread_id, value }, { db, from, hash }) {
+    db.thread_reactions.set(hash, {
       id: `${thread_id}/${from}`,
       creator: from,
       thread_id,
       value: null,
     });
   },
-  reactComment({ comment_id, value }, { db, from }) {
-    if (value !== 'like' && value !== 'dislike') return false;
-    db.comment_reactions.set({
+  reactComment({ comment_id, value }, { db, from, hash }) {
+    if (value !== 'like' && value !== 'dislike') {
+      throw new Error('Invalid reaction');
+    }
+    db.comment_reactions.set(hash, {
       id: `${comment_id}/${from}`,
       creator: from,
       comment_id,
       value,
     });
   },
-  unreactComment({ comment_id, value }, { db, from }) {
-    db.comment_reactions.set({
+  unreactComment({ comment_id, value }, { db, from, hash }) {
+    db.comment_reactions.set(hash, {
       id: `${comment_id}/${from}`,
       creator: from,
       comment_id,
