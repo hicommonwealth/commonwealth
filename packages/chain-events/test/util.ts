@@ -67,7 +67,7 @@ export function getEvmSecondsAndBlocks(days: number) {
 }
 
 // sleeps until the listener reaches the desired block or until the maxWaitTime is reached
-export async function waitUntilBlock(blockNum: number, listener: Listener<any, any, any, any, any>, maxWaitTime = 30): Promise<void> {
+export async function waitUntilBlock(blockNum: number, listener: Listener<any, any, any, any, any>, maxWaitTime = 60): Promise<void> {
   let waitTime = 0;
   while (true) {
     console.log(`Wait time: ${waitTime}, lastCachedBlockNumber: ${listener.lastCachedBlockNumber}`);
