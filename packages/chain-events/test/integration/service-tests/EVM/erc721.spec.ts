@@ -201,6 +201,5 @@ describe('Integration tests for ERC721', () => {
     await models.ChainEntity.destroy({
       where: { chain: chain_id }
     });
-    await models.sequelize.close();
   });
 });

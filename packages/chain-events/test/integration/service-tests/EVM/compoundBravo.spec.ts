@@ -370,6 +370,5 @@ describe('Integration tests for Compound Bravo', () => {
     await models.ChainEntity.destroy({
       where: { chain: chain_id }
     });
-    await models.sequelize.close();
   });
 });
