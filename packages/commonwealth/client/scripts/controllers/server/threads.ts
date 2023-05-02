@@ -700,6 +700,10 @@ class ThreadsController {
         ...((foundThread || {}) as any),
         ...((thread || {}) as any),
       });
+      finalThread.associatedReactions =
+        thread.associatedReactions.length > 0
+          ? thread.associatedReactions
+          : foundThread.associatedReactions;
       finalThread.numberOfComments =
         rawThread?.comments?.length || foundThread.numberOfComments || 0;
       this._store.update(finalThread);
