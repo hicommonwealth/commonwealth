@@ -89,7 +89,7 @@ export const CreateComment = ({
 
       jumpHighlightComment(res.id);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       notifyError(err.message || 'Comment submission failed.');
       setErrorMsg(err.message);
     } finally {

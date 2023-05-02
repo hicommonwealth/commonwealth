@@ -117,7 +117,7 @@ export const NewThreadForm = () => {
       navigate(`/discussion/${result.id}`);
       updateTopicList(result.topic, app.chain);
     } catch (err) {
-      console.log('err', err);
+      console.error(err);
     } finally {
       setIsSaving(false);
     }
