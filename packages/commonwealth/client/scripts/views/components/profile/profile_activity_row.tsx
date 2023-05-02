@@ -12,10 +12,10 @@ import withRouter, {
 } from 'navigation/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/cw_tag';
-import { renderQuillTextBody } from '../react_quill_editor/helpers';
 import type { CommentWithAssociatedThread } from './profile_activity';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
@@ -119,9 +119,7 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
       </div>
       <div className="content">
         <CWText type="b2" className="gray-text">
-          {isThread
-            ? renderQuillTextBody(body)
-            : renderQuillTextBody(comment.text)}
+          <QuillRenderer doc={isThread ? body : comment.text} />
         </CWText>
         <div className="actions">
           <PopoverMenu
