@@ -136,6 +136,10 @@ export class RedisCache {
     }
     const finalKey = RedisCache.getNamespaceKey(namespace, key);
 
+    if (typeof value !== 'string') {
+      value = JSON.stringify(value);
+    }
+
     try {
       if (duration > 0) {
         await this.client.set(finalKey, value, {
