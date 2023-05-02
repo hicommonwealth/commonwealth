@@ -54,14 +54,12 @@ export const useGetCompletedCosmosProposals = ({
       await getProposals();
     };
 
-    if (
-      app.chain?.apiInitialized &&
-      app.chain?.base === ChainBase.CosmosSDK &&
-      !isLoading
-    ) {
-      getProposals();
-    } else {
-      initApiThenFetch();
+    if (app.chain?.base === ChainBase.CosmosSDK && !isLoading) {
+      if (app.chain?.apiInitialized) {
+        getProposals();
+      } else {
+        initApiThenFetch();
+      }
     }
   }, [app.chain?.apiInitialized]);
 
