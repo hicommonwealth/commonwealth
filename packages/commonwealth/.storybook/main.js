@@ -12,6 +12,15 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
+    {
+      name: '@storybook/addon-styling',
+      options: {
+        sass: {
+          // Require your Sass preprocessor here
+          implementation: require('sass'),
+        },
+      },
+    },
   ],
   framework: {
     name: '@storybook/react-webpack5',
@@ -30,11 +39,14 @@ module.exports = {
 
     const configObj = {
       ...config,
+      output: { ...config.output, pathinfo: true },
       mode: 'development',
       context: __dirname,
       module: {
         ...config.module,
-        rules: [...config.module.rules, ...custom.module.rules],
+        rules: [...config.module.rules, ...custom.module.rules].filter((rule) => {
+          return !rule.use || !rule.use.includes('fast-sass-loader');
+        }),
       },
       resolve: {
         ...config.resolve,
@@ -49,11 +61,25 @@ module.exports = {
         // ],
         modules: [...custom.resolve.modules],
         alias: { ...custom.resolve.alias },
+        fallback: {
+          fs: false,
+          net: false,
+          zlib: require.resolve('browserify-zlib'),
+          crypto: require.resolve('crypto-browserify'),
+          http: require.resolve('stream-http'),
+          https: require.resolve('https-browserify'),
+          os: require.resolve('os-browserify/browser'),
+          vm: require.resolve('vm-browserify'),
+          path: require.resolve('path-browserify'),
+          stream: require.resolve('stream-browserify'),
+        }
         // alias: {
         //   components: path.resolve(__dirname, '..', 'client', 'styles'),
         // },
       },
     };
+
+
 
     // console.log('configObj:', configObj.resolve);
 
@@ -75,33 +101,5 @@ module.exports = {
     // Return the altered config
     return config;
   },
-  babel: async (options) => ({
-    ...options,
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          useBuiltIns: 'usage',
-          corejs: '3.22',
-        },
-      ],
-      '@babel/preset-typescript',
-      '@babel/preset-react',
-    ],
-    plugins: [
-      ...options.plugins,
-      [
-        '@babel/plugin-transform-react-jsx',
-        {
-          pragma: 'jsx',
-          pragmaFrag: 'React.Fragment',
-        },
-      ],
-      '@babel/plugin-syntax-dynamic-import',
-      '@babel/plugin-proposal-class-properties',
-      '@babel/plugin-proposal-async-generator-functions',
-      'babel-plugin-transform-scss',
-    ],
-  }),
 };
 // export default config;

@@ -155,7 +155,6 @@ module.exports = {
       vm: require.resolve('vm-browserify'),
       path: require.resolve('path-browserify'),
       stream: require.resolve('stream-browserify'),
-      zlib: require.resolve('browserify-zlib'),
     },
   },
   module: {
