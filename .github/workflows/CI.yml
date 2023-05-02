@@ -227,12 +227,12 @@ jobs:
       - name: Start ganache
         run: |
           yarn --cwd packages/chain-events/chain-testing
-          yarn --cwd packages/chain-events/chain-testing ganache > ganacheLog.log 2>&1
+          yarn --cwd packages/chain-events/chain-testing ganache > ganacheLog.log 2>&1 &
           sleep 5
 
       - name: Start chain-testing SDK
         run: |
-          yarn --cwd packages/chain-events/chain-testing start > sdkLog.log 2>&1
+          yarn --cwd packages/chain-events/chain-testing start > sdkLog.log 2>&1 &
           sleep 5
 
       - name: Run Chain Events Integration Tests
