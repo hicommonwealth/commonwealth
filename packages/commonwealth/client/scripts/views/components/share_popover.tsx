@@ -1,10 +1,9 @@
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import React from 'react';
 
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
-
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import type { PopoverTriggerProps } from './component_kit/cw_popover/cw_popover';
+import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
 type SharePopoverProps = {
   commentId?: number;
@@ -29,22 +28,20 @@ export const SharePopover = (props: SharePopoverProps) => {
           iconLeft: 'copy',
           label: 'Copy URL',
           onClick: async () => {
-            const currentRouteSansCommentParam =
-              _DEPRECATED_getRoute().split('?comment=')[0];
+            const currentRoute = _DEPRECATED_getRoute();
+            let urlToCopy = `${domain}${currentRoute}`; // If we copy the thread on discussion page
+
             if (commentId) {
-              await navigator.clipboard.writeText(
-                `${domain}${currentRouteSansCommentParam}?comment=${commentId}`
-              );
+              // If we copy a comment on discussion page
+              const currentRouteSansCommentParam = currentRoute.split('?comment=')[0];
+              urlToCopy = `${domain}${currentRouteSansCommentParam}?comment=${commentId}`;
             } else if (discussionLink) {
-              const chainId = `${currentRouteSansCommentParam.split('/')[1]}`;
-              await navigator.clipboard.writeText(
-                `${domain}/${chainId}${discussionLink}`
-              );
-            } else {
-              await navigator.clipboard.writeText(
-                `${domain}${currentRouteSansCommentParam}`
-              );
+              // If we copy a discussion on discussions page
+              const chainId = currentRoute.split('/')[1];
+              urlToCopy = `${domain}/${chainId}${discussionLink}`;
             }
+
+            await navigator.clipboard.writeText(urlToCopy);
           },
         },
         {
