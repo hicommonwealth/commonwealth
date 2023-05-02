@@ -67,8 +67,6 @@ describe('Integration tests for ERC721', () => {
       await nft.transferERC721('137', 2, accounts[1]);
       await delay(12000);
 
-      console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
-      console.log('transfer', chain_id, accounts[1]);
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents].find(
         (e) =>
           e.data.kind === 'transfer' &&
@@ -83,7 +81,6 @@ describe('Integration tests for ERC721', () => {
       await nft.approveERC721('137', 3, accounts[2]);
       await delay(10000);
 
-      console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents].find(
         (e) =>
           e.data.kind === 'approval' &&
@@ -199,12 +196,10 @@ describe('Integration tests for ERC721', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.sequelize.close();
   });

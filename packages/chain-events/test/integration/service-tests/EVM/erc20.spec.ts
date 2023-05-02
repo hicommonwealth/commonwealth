@@ -185,12 +185,10 @@ describe('Integration tests for ERC20', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.sequelize.close();
   });

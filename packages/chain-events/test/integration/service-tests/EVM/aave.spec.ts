@@ -77,7 +77,6 @@ describe('Integration tests for Aave', () => {
       proposalCreatedBlockNum = result.block;
       await delay(15000);
 
-      console.log(JSON.stringify(rmq.queuedMessages, null, 2))
       events[EventKind.ProposalCreated] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         EventKind.ProposalCreated,
@@ -100,7 +99,6 @@ describe('Integration tests for Aave', () => {
 
       await delay(20000);
 
-      console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
       events[EventKind.VoteEmitted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         EventKind.VoteEmitted,
@@ -297,7 +295,6 @@ describe('Integration tests for Aave', () => {
         'The request body should contain an array of events'
       ).to.exist;
 
-      console.log(res.body.result);
       const proposalCreatedEvent = res.body.result.find(
         (e) =>
           e.event_data.kind === EventKind.ProposalCreated &&
@@ -367,12 +364,10 @@ describe('Integration tests for Aave', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.sequelize.close();
   });

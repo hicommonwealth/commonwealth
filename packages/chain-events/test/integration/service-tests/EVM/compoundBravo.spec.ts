@@ -74,7 +74,6 @@ describe('Integration tests for Compound Bravo', () => {
       proposalId = result.proposalId;
       await delay(12000);
 
-      console.log(rmq.queuedMessages);
       events['proposal-created'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
 
@@ -366,12 +365,10 @@ describe('Integration tests for Compound Bravo', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id },
-      logging: console.log,
+      where: { chain: chain_id }
     });
     await models.sequelize.close();
   });
