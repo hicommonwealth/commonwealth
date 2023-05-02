@@ -16,6 +16,7 @@ type MarkdownDocInfo = { format: 'markdown'; content: string };
 type UnknownDocInfo = { format: 'unknown'; content: null };
 type DocInfo = RichTextDocInfo | MarkdownDocInfo | UnknownDocInfo;
 
+// QuillRenderer is the way to render both richtext and markdown quill content
 export const QuillRenderer = ({
   doc,
   searchTerm,
