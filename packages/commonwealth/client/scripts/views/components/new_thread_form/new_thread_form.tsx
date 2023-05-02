@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { capitalize } from 'lodash';
 
 import 'components/new_thread_form.scss';
@@ -14,6 +14,12 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
 import { useCommonNavigate } from 'navigation/helpers';
 
+type NewThreadDraft = {
+  topicId: number;
+  title: string;
+  body: DeltaStatic;
+};
+
 import {
   useNewThreadForm,
   useAuthorName,
@@ -21,7 +27,12 @@ import {
   updateTopicList,
 } from './helpers';
 import { ReactQuillEditor } from '../react_quill_editor';
-import { clearDraft, createDeltaFromText } from '../react_quill_editor/utils';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+} from '../react_quill_editor/utils';
+import { useDraft } from 'hooks/useDraft';
+import { DeltaStatic } from 'quill';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -47,8 +58,6 @@ export const NewThreadForm = () => {
     isDisabled,
   } = useNewThreadForm(authorName, hasTopics);
 
-  const draftKey = `new-thread-${app.activeChainId()}`;
-
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
   const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
@@ -58,6 +67,14 @@ export const NewThreadForm = () => {
       !TopicGateCheck.isGatedTopic(t.name)
     );
   });
+
+  const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
+    `new-thread-${chainId}-info`
+  );
+
+  const isPopulated = useMemo(() => {
+    return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
+  }, [threadContentDelta, threadTitle]);
 
   const handleNewThreadCreation = async () => {
     if (!isDiscussion && !detectURL(threadUrl)) {
@@ -95,16 +112,63 @@ export const NewThreadForm = () => {
       );
 
       setThreadContentDelta(createDeltaFromText(''));
-      clearDraft(draftKey);
+      clearDraft();
 
       navigate(`/discussion/${result.id}`);
       updateTopicList(result.topic, app.chain);
     } catch (err) {
-      console.log('err');
+      console.log('err', err);
     } finally {
       setIsSaving(false);
     }
   };
+
+  const handleCancel = () => {
+    setThreadTitle('');
+    setThreadTopic(
+      topicsForSelector.find((t) => t.name.includes('General')) || null
+    );
+    setThreadContentDelta(createDeltaFromText(''));
+  };
+
+  // on content updated, save draft
+  useEffect(() => {
+    const draft = {
+      topicId: threadTopic?.id || 0,
+      title: threadTitle,
+      body: threadContentDelta,
+    };
+    if (!draft.topicId && !draft.title && !draft.body) {
+      return;
+    }
+    saveDraft(draft);
+  }, [saveDraft, threadTopic, threadTitle, threadContentDelta]);
+
+  // on init, restore draft
+  useEffect(() => {
+    if (!topicsForSelector.length) {
+      return;
+    }
+    const draft = restoreDraft();
+
+    // select General topic by default
+    if (!draft) {
+      const topic =
+        topicsForSelector.find((t) => t.name.includes('General')) || null;
+      setThreadTopic(topic);
+      return;
+    }
+
+    const { topicId, title, body } = draft;
+    const topic =
+      topicsForSelector.find((t) => t.id === topicId) ||
+      topicsForSelector.find((t) => t.name.includes('General')) ||
+      null;
+    setThreadTopic(topic);
+    setThreadTitle(title);
+    setThreadContentDelta(body);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -128,8 +192,8 @@ export const NewThreadForm = () => {
             <div className="topics-and-title-row">
               {hasTopics && (
                 <TopicSelector
-                  defaultTopic={threadTopic}
                   topics={topicsForSelector}
+                  value={threadTopic}
                   onChange={setThreadTopic}
                 />
               )}
@@ -137,7 +201,7 @@ export const NewThreadForm = () => {
                 autoFocus
                 placeholder="Title"
                 value={threadTitle}
-                tabIndex={2}
+                tabIndex={1}
                 onInput={(e) => setThreadTitle(e.target.value)}
               />
             </div>
@@ -146,7 +210,7 @@ export const NewThreadForm = () => {
               <CWTextInput
                 placeholder="https://"
                 value={threadUrl}
-                tabIndex={3}
+                tabIndex={2}
                 onInput={(e) => setThreadUrl(e.target.value)}
               />
             )}
@@ -154,10 +218,17 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
-              draftKey={draftKey}
             />
 
             <div className="buttons-row">
+              {isPopulated && (
+                <CWButton
+                  label={'Cancel'}
+                  onClick={handleCancel}
+                  tabIndex={3}
+                  buttonType="secondary-blue"
+                />
+              )}
               <CWButton
                 label={
                   app.user.activeAccount
