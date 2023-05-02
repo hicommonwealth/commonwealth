@@ -36,9 +36,19 @@ export const SharePopover = (props: SharePopoverProps) => {
               const currentRouteSansCommentParam = currentRoute.split('?comment=')[0];
               urlToCopy = `${domain}${currentRouteSansCommentParam}?comment=${commentId}`;
             } else if (discussionLink) {
-              // If we copy a discussion on discussions page
-              const chainId = currentRoute.split('/')[1];
-              urlToCopy = `${domain}/${chainId}${discussionLink}`;
+              const urlParts = currentRoute.split('/');
+
+              const isCustomDomain =
+                !domain.includes('//commonwealth.im') &&
+                !domain.includes('//localhost')
+
+              // If we copy from a custom domain page, exclude the chain
+              if (isCustomDomain){
+                urlToCopy = `${domain}${discussionLink}`;
+              } else {
+                const chainId = urlParts[1];
+                urlToCopy = `${domain}/${chainId}${discussionLink}`;
+              }
             }
 
             await navigator.clipboard.writeText(urlToCopy);
