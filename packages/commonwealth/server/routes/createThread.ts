@@ -154,7 +154,7 @@ const dispatchHooks = async (
     {
       user: finalThread.Address.address,
       author_chain: finalThread.Address.chain,
-      url: getThreadUrl('discussion', finalThread),
+      url: getThreadUrl(finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
