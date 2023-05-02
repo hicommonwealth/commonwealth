@@ -80,7 +80,7 @@ describe('Integration tests for ERC20', () => {
 
     it('Should capture transfer events', async () => {
       const { block } = await sdk.getErc20(BUSDAddress, randomWallet, transferAmount);
-      await waitUntilBlock(block, listener, 10);
+      await waitUntilBlock(block, listener);
 
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
       events['transfer'] = msg;
@@ -96,7 +96,7 @@ describe('Integration tests for ERC20', () => {
         randomWallet,
         Web3.utils.toWei(transferAmount)
       );
-      await waitUntilBlock(block, listener, 10);
+      await waitUntilBlock(block, listener);
 
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
       events['approval'] = msg;

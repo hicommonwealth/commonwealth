@@ -89,7 +89,7 @@ describe('Integration tests for Aave', () => {
       const result = await sdk.createProposal(1, 'aave');
       proposalId = result.proposalId;
       proposalCreatedBlockNum = result.block;
-      await waitUntilBlock(proposalCreatedBlockNum, listener, 20);
+      await waitUntilBlock(proposalCreatedBlockNum, listener);
 
       events[EventKind.ProposalCreated] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
@@ -111,7 +111,7 @@ describe('Integration tests for Aave', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
-      await waitUntilBlock(block, listener, 15);
+      await waitUntilBlock(block, listener);
 
       events[EventKind.VoteEmitted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
@@ -133,7 +133,7 @@ describe('Integration tests for Aave', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.queueProposal(proposalId, 'aave');
 
-      await waitUntilBlock(block, listener, 12);
+      await waitUntilBlock(block, listener);
       // await delay(12000);
 
       events[EventKind.ProposalQueued] = findEvent(
@@ -155,7 +155,7 @@ describe('Integration tests for Aave', () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.executeProposal(proposalId, 'aave');
-      await waitUntilBlock(block, listener, 20);
+      await waitUntilBlock(block, listener);
 
       events[EventKind.ProposalExecuted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],

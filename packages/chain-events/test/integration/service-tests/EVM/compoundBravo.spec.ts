@@ -89,7 +89,7 @@ describe('Integration tests for Compound Bravo', () => {
       const result = await sdk.createProposal(1);
       proposalId = result.proposalId;
       proposalCreatedBlockNum = result.block;
-      await waitUntilBlock(proposalCreatedBlockNum, listener, 20);
+      await waitUntilBlock(proposalCreatedBlockNum, listener);
 
       events['proposal-created'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
@@ -111,7 +111,7 @@ describe('Integration tests for Compound Bravo', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.castVote(proposalId, 1, true);
 
-      await waitUntilBlock(block, listener, 15);
+      await waitUntilBlock(block, listener);
 
       events['vote-cast'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
@@ -133,7 +133,7 @@ describe('Integration tests for Compound Bravo', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.queueProposal(proposalId);
 
-      await waitUntilBlock(block, listener, 12);
+      await waitUntilBlock(block, listener);
 
       events['proposal-queued'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][2];
@@ -155,7 +155,7 @@ describe('Integration tests for Compound Bravo', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.executeProposal(proposalId);
 
-      await waitUntilBlock(block, listener, 20);
+      await waitUntilBlock(block, listener);
 
       events['proposal-executed'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][3];
