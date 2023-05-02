@@ -125,16 +125,14 @@ export const CreateComment = ({
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
       handleIsReplying(false);
+    } else {
+      clearDraft();
     }
-    clearDraft();
   };
 
   // on content updated, save draft
   useEffect(() => {
     if (handleIsReplying) {
-      return;
-    }
-    if (!contentDelta || getTextFromDelta(contentDelta).length === 0) {
       return;
     }
     saveDraft(contentDelta);
