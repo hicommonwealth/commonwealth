@@ -48,11 +48,6 @@ export const UpdateProposalStatusModal = ({
   const [tempProposals, setTempProposals] = useState<
     Array<Pick<ChainEntity, 'typeId' | 'title'>>
   >(getInitialProposals(thread));
-
-  if (!app.chain?.meta) {
-    return;
-  }
-
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
     setIsLoading: setIsCosmosLoading,
@@ -60,6 +55,10 @@ export const UpdateProposalStatusModal = ({
   });
 
   console.log('completedCosmosProposals', completedCosmosProposals);
+
+  if (!app.chain?.meta) {
+    return;
+  }
 
   const { customStages } = app.chain.meta;
 
