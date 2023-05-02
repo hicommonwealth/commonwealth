@@ -2,7 +2,6 @@ import 'chai/register-should';
 import models from 'server/database';
 import chai from 'chai';
 import 'chai/register-should';
-import { req, res } from 'test/unit/unitHelpers';
 import type { GetThreadsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import 'test/integration/api/external/dbEntityHooks.spec';
@@ -133,5 +132,31 @@ describe('getThreads Tests', () => {
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'count_only');
+  });
+
+  it('Should return sensible default for thread with no associated comment', async () => {
+    let resp = await get(
+        '/api/threads',
+        { community_id: testThreads[0].chain, include_comments: true, topic_id: -1 }
+      );
+
+    chai.assert.lengthOf(resp.result.threads, 2);
+    if (resp.result.threads[0].Comments.length === 2){
+      chai.assert.equal(resp.result.threads[0].Comments.length, 2);
+      chai.assert.equal(resp.result.threads[1].Comments.length, 3);
+    } else {
+      chai.assert.equal(resp.result.threads[0].Comments.length, 3);
+      chai.assert.equal(resp.result.threads[1].Comments.length, 2);
+    }
+
+    resp = await get(
+      '/api/threads',
+      { community_id: testThreads[0].chain, include_comments: true, topic_id: -2 }
+    );
+
+    chai.assert.lengthOf(resp.result.threads, 3);
+    chai.assert.equal(resp.result.threads[0].Comments.length, 0);
+    chai.assert.equal(resp.result.threads[1].Comments.length, 0);
+    chai.assert.equal(resp.result.threads[2].Comments.length, 0);
   });
 });
