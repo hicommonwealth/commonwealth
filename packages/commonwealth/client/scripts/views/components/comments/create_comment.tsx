@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import BN from 'bn.js';
 
@@ -21,7 +21,8 @@ import {
   getTextFromDelta,
   ReactQuillEditor,
 } from '../react_quill_editor';
-import { clearDraft, serializeDelta } from '../react_quill_editor/utils';
+import { serializeDelta } from '../react_quill_editor/utils';
+import { useDraft } from 'hooks/useDraft';
 
 type CreateCommmentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -30,25 +31,33 @@ type CreateCommmentProps = {
   updatedCommentsCallback: () => void;
 };
 
-export const CreateComment = (props: CreateCommmentProps) => {
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    createDeltaFromText('')
+export const CreateComment = ({
+  handleIsReplying,
+  parentCommentId,
+  rootThread,
+  updatedCommentsCallback,
+}: CreateCommmentProps) => {
+  const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
+    `new-thread-comment-${rootThread.id}`
   );
+
+  // get restored draft on init
+  const restoredDraft = useMemo(() => {
+    if (handleIsReplying) {
+      return createDeltaFromText('');
+    }
+    return restoreDraft() || createDeltaFromText('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    restoredDraft
+  );
+
   const [sendingComment, setSendingComment] = React.useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   const editorValue = getTextFromDelta(contentDelta);
-
-  const {
-    handleIsReplying,
-    parentCommentId,
-    rootThread,
-    updatedCommentsCallback,
-  } = props;
-
-  const draftKey = !parentCommentId
-    ? `new-thread-comment-${rootThread.id}`
-    : null;
 
   const author = app.user.activeAccount;
 
@@ -77,19 +86,19 @@ export const CreateComment = (props: CreateCommmentProps) => {
       await app.user.notifications.refresh();
 
       setContentDelta(createDeltaFromText(''));
-      clearDraft(draftKey);
+      clearDraft();
 
       jumpHighlightComment(res.id);
-
+    } catch (err) {
+      console.error(err);
+      notifyError(err.message || 'Comment submission failed.');
+      setErrorMsg(err.message);
+    } finally {
       setSendingComment(false);
+
       if (handleIsReplying) {
         handleIsReplying(false);
       }
-    } catch (err) {
-      console.log(err);
-      notifyError(err.message || 'Comment submission failed.');
-      setSendingComment(false);
-      setErrorMsg(err.message);
     }
   };
 
@@ -117,8 +126,18 @@ export const CreateComment = (props: CreateCommmentProps) => {
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
       handleIsReplying(false);
+    } else {
+      clearDraft();
     }
   };
+
+  // on content updated, save draft
+  useEffect(() => {
+    if (handleIsReplying) {
+      return;
+    }
+    saveDraft(contentDelta);
+  }, [handleIsReplying, saveDraft, contentDelta]);
 
   return (
     <div className="CreateComment">
@@ -137,7 +156,6 @@ export const CreateComment = (props: CreateCommmentProps) => {
         className="editor"
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
-        draftKey={draftKey}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
