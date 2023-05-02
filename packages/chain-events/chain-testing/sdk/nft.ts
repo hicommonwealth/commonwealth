@@ -53,7 +53,7 @@ export class ERC721 {
     to: number,
     from?: string,
     accountIndex?: number
-  ) {
+  ): Promise<{block: number}> {
     const request: erc721Approve = {
       nftAddress: this.address,
       tokenId,
@@ -81,7 +81,7 @@ export class ERC721 {
     to: number,
     from?: string,
     accountIndex?: number
-  ) {
+  ): Promise<{ block: number }> {
     const request: erc721Approve = {
       nftAddress: this.address,
       tokenId,

@@ -5,19 +5,21 @@ import {
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
-import { compoundGovernor } from '../../../../chain-testing/src/utils/governance/compoundGov';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
 import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/chainSubscriber';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { eventMatch } from '../../../util';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
 import { createChainEventsApp } from '../../../../services/app/Server';
-import Web3 from 'web3';
 import { ERC721 } from '../../../../chain-testing/sdk/nft';
+import {EventKind, IErc721Contracts} from "../../../../src/chains/erc721/types";
+import {Processor, Subscriber} from "../../../../src/chains/erc721";
+import { Listener } from "../../../../src";
+import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
+import {waitUntilBlock} from "../../../util";
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -30,20 +32,27 @@ describe('Integration tests for ERC721', () => {
 
   // holds event data, so we can verify the integrity of the events across all services
   const events = {};
+
+  let listener: Listener<
+    IErc721Contracts,
+    never,
+    Processor,
+    Subscriber,
+    EventKind
+  >;
+
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let nft: ERC721, chain, accounts;
+  const token_id = '123';
   const chain_id = 'ganache-fork-erc721';
   const randomWallet = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
 
   const sdk = new ChainTesting('http://127.0.0.1:3000');
 
-  // This function delays the execution of the test for the specified number of milliseconds
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
   before(async () => {
     accounts = await sdk.getAccounts();
     nft = await sdk.deployNFT();
-    await nft.mint('137', 1);
+    await nft.mint(token_id, 1);
     chain = {
       id: chain_id,
       base: ChainBase.Ethereum,
@@ -60,12 +69,19 @@ describe('Integration tests for ERC721', () => {
   describe('Tests the ERC721 event listener using the chain subscriber', async () => {
     before(async () => {
       // set up the chain subscriber
-      await runSubscriberAsFunction(rmq, null, null, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, null, null, chain);
+      listener = listeners[`erc721_${chain.ChainNode.url}`] as Listener<
+        IErc721Contracts,
+        never,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
     });
 
     it('Should capture transfer events', async () => {
-      await nft.transferERC721('137', 2, accounts[1]);
-      await delay(12000);
+      const { block } = await nft.transferERC721(token_id, 2, accounts[1]);
+      await waitUntilBlock(block, listener);
 
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents].find(
         (e) =>
@@ -78,8 +94,8 @@ describe('Integration tests for ERC721', () => {
     });
 
     it('Should capture approval events', async () => {
-      await nft.approveERC721('137', 3, accounts[2]);
-      await delay(10000);
+      const { block } = await nft.approveERC721(token_id, 3, accounts[2]);
+      await waitUntilBlock(block, listener);
 
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents].find(
         (e) =>
@@ -97,10 +113,6 @@ describe('Integration tests for ERC721', () => {
     before(async () => {
       // set up the chain consumer - this starts the subscriptions thus processing all existing events
       await setupChainEventConsumer(rmq);
-    });
-
-    after(async () => {
-      await delay(30000);
     });
 
     it('Should process transfer events', async () => {
@@ -145,7 +157,7 @@ describe('Integration tests for ERC721', () => {
     });
   });
 
-  describe('Tests for retrieving ERC20 events with the app', () => {
+  describe('Tests for retrieving ERC721 events with the app', () => {
     let agent;
 
     before(async () => {
