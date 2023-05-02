@@ -229,7 +229,7 @@ jobs:
         run: yarn --cwd packages/chain-events test-services
 
       - name: Typecheck
-        run: yarn --cwd packages/chain-event check-types
+        run: yarn --cwd packages/chain-events check-types
 
       - name: Stop EVM Chain
         run: docker stop chain
