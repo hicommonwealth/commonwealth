@@ -14,7 +14,7 @@ import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import {eventMatch, findEvent, getEvmSecondsAndBlocks} from '../../../util';
+import {eventMatch, findEvent, getEvmSecondsAndBlocks, waitUntilBlock} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
 import {Api, EventKind} from "../../../../src/chains/aave/types";
 import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
@@ -64,23 +64,6 @@ describe('Integration tests for Aave', () => {
   let proposalId: string;
   let proposalCreatedBlockNum: number;
 
-  // This function delays the execution of the test for the specified number of milliseconds
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-  // sleeps until the listener reaches the desired block or until the maxWaitTime is reached
-  async function waitUntilBlock(blockNum: number, listener: Listener<any, any, any, any, any>, maxWaitTime = 30): Promise<void> {
-    let waitTime = 0;
-    while (true) {
-      console.log(waitTime);
-      // limit wait time to ~30 seconds
-      if (waitTime > maxWaitTime) break;
-      console.log(listener.lastCachedBlockNumber);
-      if (listener.lastCachedBlockNumber >= blockNum) break;
-      await new Promise<void>(resolve => setTimeout(resolve, 1000));
-      waitTime += 1;
-    }
-  }
-
   before(async () => {
     // initialize the mock rabbitmq controller
     await rmq.init();
@@ -128,8 +111,7 @@ describe('Integration tests for Aave', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
-      await waitUntilBlock(block, listener, 15)
-      // await delay(20000);
+      await waitUntilBlock(block, listener, 15);
 
       events[EventKind.VoteEmitted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
@@ -194,7 +176,7 @@ describe('Integration tests for Aave', () => {
       const proposalIdToCancel = await sdk.createProposal(1, 'aave');
       await sdk.cancelProposal(proposalIdToCancel, 'aave');
 
-      await delay(10000);
+      // await delay(10000);
 
       // verify the event was created and appended to the correct queue
       expect(

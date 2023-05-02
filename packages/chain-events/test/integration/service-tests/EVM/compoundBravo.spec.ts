@@ -14,8 +14,12 @@ import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import {eventMatch, getEvmSecondsAndBlocks} from '../../../util';
+import {eventMatch, getEvmSecondsAndBlocks, waitUntilBlock} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
+import {Api, EventKind} from "../../../../src/chains/compound/types";
+import {Processor, StorageFetcher, Subscriber} from "../../../../src/chains/compound";
+import { Listener } from "../../../../src";
+import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -38,6 +42,13 @@ describe('Integration tests for Compound Bravo', () => {
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
+  let listener: Listener<
+    Api,
+    StorageFetcher,
+    Processor,
+    Subscriber,
+    EventKind
+  >
   const contract = new compoundGovernor();
   const chain_id = 'ganache-fork-bravo';
   const chain = {
@@ -46,14 +57,12 @@ describe('Integration tests for Compound Bravo', () => {
     network: ChainNetwork.Compound,
     substrate_spec: null,
     contract_address: contract.contractAddress,
-    verbose_logging: true,
+    verbose_logging: false,
     ChainNode: { id: 1, url: 'http://localhost:8545' },
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;
-
-  // This function delays the execution of the test for the specified number of milliseconds
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+  let proposalCreatedBlockNum: number;
 
   before(async () => {
     // initialize the mock rabbitmq controller
@@ -63,7 +72,14 @@ describe('Integration tests for Compound Bravo', () => {
   describe('Tests the Bravo event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
-      await runSubscriberAsFunction(rmq, null, null, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, null, null, chain);
+      listener = listeners[chain_id] as Listener<
+        Api,
+        StorageFetcher,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
     });
 
     it('Should capture proposal created events', async () => {
@@ -72,7 +88,8 @@ describe('Integration tests for Compound Bravo', () => {
 
       const result = await sdk.createProposal(1);
       proposalId = result.proposalId;
-      await delay(12000);
+      proposalCreatedBlockNum = result.block;
+      await waitUntilBlock(proposalCreatedBlockNum, listener, 20);
 
       events['proposal-created'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
@@ -92,9 +109,9 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture votes on the created proposal', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks)
-      await sdk.castVote(proposalId, 1, true);
+      const { block } = await sdk.castVote(proposalId, 1, true);
 
-      await delay(12000);
+      await waitUntilBlock(block, listener, 15);
 
       events['vote-cast'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
@@ -114,9 +131,9 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture proposal queued events', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks)
-      await sdk.queueProposal(proposalId);
+      const { block } = await sdk.queueProposal(proposalId);
 
-      await delay(12000);
+      await waitUntilBlock(block, listener, 12);
 
       events['proposal-queued'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][2];
@@ -136,9 +153,9 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture proposal executed events', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks)
-      await sdk.executeProposal(proposalId);
+      const { block } = await sdk.executeProposal(proposalId);
 
-      await delay(10000);
+      await waitUntilBlock(block, listener, 20);
 
       events['proposal-executed'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][3];
@@ -159,7 +176,7 @@ describe('Integration tests for Compound Bravo', () => {
       const proposalIdToCancel = await sdk.createProposal(1);
       await sdk.cancelProposal(proposalIdToCancel);
 
-      await delay(10000);
+      // await delay(10000);
 
       // verify the event was created and appended to the correct queue
       expect(
