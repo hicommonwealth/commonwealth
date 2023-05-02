@@ -1,4 +1,4 @@
-const KEY_VERSION = 'v2';
+const KEY_VERSION = 'v2'; // update this for breaking changes
 const PREFIX = `cw-draft-${KEY_VERSION}`;
 
 export function useDraft<T>(key: string) {
