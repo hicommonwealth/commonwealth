@@ -36,9 +36,9 @@ export const SharePopover = (props: SharePopoverProps) => {
                 `${domain}${currentRouteSansCommentParam}?comment=${commentId}`
               );
             } else if (discussionLink) {
-              const communityName = `${currentRouteSansCommentParam.split('/')[1]}`;
+              const chainId = `${currentRouteSansCommentParam.split('/')[1]}`;
               await navigator.clipboard.writeText(
-                `${domain}/${communityName}${discussionLink}`
+                `${domain}/${chainId}${discussionLink}`
               );
             } else {
               await navigator.clipboard.writeText(
