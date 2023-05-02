@@ -35,13 +35,13 @@ const ProfileActivityContent = (props: ProfileActivityContentProps) => {
       );
     }
     return (
-      <>
+      <div>
         {threads
           .sort((a, b) => +b.createdAt - +a.createdAt)
           .map((thread, i) => (
             <NewProfileActivityRow key={i} activity={thread} />
           ))}
-      </>
+      </div>
     );
   }
 
@@ -64,11 +64,11 @@ const ProfileActivityContent = (props: ProfileActivityContentProps) => {
   }
 
   return (
-    <>
+    <div>
       {allActivities.map((activity, i) => {
         return <NewProfileActivityRow key={i} activity={activity} />;
       })}
-    </>
+    </div>
   );
 };
 
