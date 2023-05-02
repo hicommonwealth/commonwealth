@@ -58,7 +58,7 @@ describe.only('Integration tests for Aave', () => {
     substrate_spec: null,
     contract_address: contract.contractAddress,
     verbose_logging: false,
-    ChainNode: { id: 1, url: 'http://localhost:8545' },
+    ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;
