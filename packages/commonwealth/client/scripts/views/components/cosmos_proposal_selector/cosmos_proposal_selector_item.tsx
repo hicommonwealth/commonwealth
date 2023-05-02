@@ -19,7 +19,7 @@ interface ProposalSelectorItemProps {
         <div className="selected">{isSelected && <CWCheck />}</div>
         <div className="text">
           <CWText fontWeight="medium" truncate noWrap>
-            `${proposal.title} #${proposal.identifier}`
+            '`${proposal.title} #${proposal.identifier}`'
           </CWText>
           <CWText type="caption" truncate>
             {proposal.threadTitle !== 'undefined'
