@@ -232,6 +232,7 @@ jobs:
 
       - name: Start chain-testing SDK
         run: |
+          sudo fuser -k 3000/tcp || true
           RPC_HOST=ganache CHAIN_PORT=3000 yarn --cwd packages/chain-events/chain-testing start > sdkLog.log 2>&1 &
           sleep 15
 
