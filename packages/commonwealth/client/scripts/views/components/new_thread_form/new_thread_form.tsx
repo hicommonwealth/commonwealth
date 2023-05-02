@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { capitalize } from 'lodash';
 
 import 'components/new_thread_form.scss';
@@ -14,12 +14,6 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
 import { useCommonNavigate } from 'navigation/helpers';
 
-type NewThreadDraft = {
-  topicId: number;
-  title: string;
-  body: DeltaStatic;
-};
-
 import {
   useNewThreadForm,
   useAuthorName,
@@ -31,8 +25,6 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from '../react_quill_editor/utils';
-import { useDraft } from 'hooks/useDraft';
-import { DeltaStatic } from 'quill';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -42,6 +34,14 @@ export const NewThreadForm = () => {
   const author = app.user.activeAccount;
   const { authorName } = useAuthorName();
   const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
+
+  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
+    return (
+      isAdmin ||
+      t.tokenThreshold.isZero() ||
+      !TopicGateCheck.isGatedTopic(t.name)
+    );
+  });
 
   const {
     threadTitle,
@@ -56,21 +56,10 @@ export const NewThreadForm = () => {
     setThreadContentDelta,
     setIsSaving,
     isDisabled,
-  } = useNewThreadForm(authorName, hasTopics);
+    clearDraft,
+  } = useNewThreadForm(chainId, authorName, topicsForSelector);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
-
-  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
-    return (
-      isAdmin ||
-      t.tokenThreshold.isZero() ||
-      !TopicGateCheck.isGatedTopic(t.name)
-    );
-  });
-
-  const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
-    `new-thread-${chainId}-info`
-  );
 
   const isPopulated = useMemo(() => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
@@ -130,45 +119,6 @@ export const NewThreadForm = () => {
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
-
-  // on content updated, save draft
-  useEffect(() => {
-    const draft = {
-      topicId: threadTopic?.id || 0,
-      title: threadTitle,
-      body: threadContentDelta,
-    };
-    if (!draft.topicId && !draft.title && !draft.body) {
-      return;
-    }
-    saveDraft(draft);
-  }, [saveDraft, threadTopic, threadTitle, threadContentDelta]);
-
-  // on init, restore draft
-  useEffect(() => {
-    if (!topicsForSelector.length) {
-      return;
-    }
-    const draft = restoreDraft();
-
-    // select General topic by default
-    if (!draft) {
-      const topic =
-        topicsForSelector.find((t) => t.name.includes('General')) || null;
-      setThreadTopic(topic);
-      return;
-    }
-
-    const { topicId, title, body } = draft;
-    const topic =
-      topicsForSelector.find((t) => t.id === topicId) ||
-      topicsForSelector.find((t) => t.name.includes('General')) ||
-      null;
-    setThreadTopic(topic);
-    setThreadTitle(title);
-    setThreadContentDelta(body);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <>

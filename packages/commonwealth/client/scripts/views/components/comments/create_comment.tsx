@@ -41,6 +41,7 @@ export const CreateComment = ({
     `new-thread-comment-${rootThread.id}`
   );
 
+  // get restored draft on init
   const restoredDraft = useMemo(() => {
     if (handleIsReplying) {
       return createDeltaFromText('');
