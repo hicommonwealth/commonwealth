@@ -226,6 +226,7 @@ jobs:
 #          /usr/bin/docker run -d --name chain --network $network_name --network-alias chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
       - name: Start ganache
         run: |
+          yarn --cwd packages/chain-events/chain-testing
           yarn --cwd packages/chain-events/chain-testing ganache > ganacheLog.log 2>&1
           sleep 5
 
