@@ -28,6 +28,7 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
+import setupCosmosProxy from 'server/util/cosmosProxy';
 
 require('express-async-errors');
 
@@ -87,7 +88,7 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       const nodes = [
-        ['mainnet1.edgewa.re', 'Edgeware Mainnet'],
+        ['mainnet1.edgewa.re', 'Edgeware Mainnet', null, BalanceType.Substrate],
         [
           'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           'Ethereum Mainnet',
@@ -98,20 +99,31 @@ const resetServer = (debug = false): Promise<void> => {
           'Ropsten Testnet',
           '3',
         ],
+        ['https://rpc-juno.itastakers.com', 'Juno', null, BalanceType.Cosmos],
+        [
+          'https://cosmos-devnet.herokuapp.com/rpc',
+          'Cosmos SDK v0.46.11 devnet',
+          null,
+          BalanceType.Cosmos,
+          'https://cosmos-devnet.herokuapp.com/lcd/',
+        ],
       ];
 
-      const [edgewareNode, mainnetNode, testnetNode] = await Promise.all(
-        nodes.map(([url, name, eth_chain_id]) =>
-          models.ChainNode.create({
-            url,
-            name,
-            eth_chain_id: eth_chain_id ? +eth_chain_id : null,
-            balance_type: eth_chain_id
-              ? BalanceType.Ethereum
-              : BalanceType.Substrate,
-          })
-        )
-      );
+      const [edgewareNode, mainnetNode, testnetNode, junoNode, csdkNode] =
+        await Promise.all(
+          nodes.map(([url, name, eth_chain_id, balance_type, alt_wallet_url]) =>
+            models.ChainNode.create({
+              url,
+              name,
+              eth_chain_id: eth_chain_id ? +eth_chain_id : null,
+              balance_type:
+                balance_type || eth_chain_id
+                  ? BalanceType.Ethereum
+                  : BalanceType.Substrate,
+              alt_wallet_url,
+            })
+          )
+        );
 
       // Initialize different chain + node URLs
       await models.Chain.create({
@@ -150,6 +162,30 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: testnetNode.id,
+      });
+      await models.Chain.create({
+        id: 'juno',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'JUNO',
+        name: 'Juno',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: false,
+        chain_node_id: junoNode.id,
+      });
+      await models.Chain.create({
+        id: 'csdk',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'Cosmos SDK v0.46.11 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: false,
+        chain_node_id: csdkNode.id,
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',
@@ -385,6 +421,7 @@ setupAPI(
   globalActivityCache,
   databaseValidationService
 );
+setupCosmosProxy(app, models);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
