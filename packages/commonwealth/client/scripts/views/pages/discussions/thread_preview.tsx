@@ -92,6 +92,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const isAuthor =
     app.user.activeAccount && thread.author === app.user.activeAccount.address;
 
+  const diffInMs = moment().diff(thread.createdAt);
+  const isNew = moment.duration(diffInMs).asHours() < 48;
+
   return (
     <>
       <div
@@ -143,6 +146,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
+              {isNew && <CWTag label={'NEW'} type={'new'} />}
               {isLocked && <CWIcon iconName="lock" iconSize="small" />}
             </div>
             <div className="top-row-icons">

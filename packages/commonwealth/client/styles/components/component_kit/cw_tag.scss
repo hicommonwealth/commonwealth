@@ -73,4 +73,15 @@
       color: $neutral-600;
     }
   }
+
+  &.new {
+    background-color: $primary-50;
+    border-radius: 6px;
+    padding: 4px 8px;
+
+    .tag-text.Text,
+    .tag-icon.Icon {
+      color: $primary-600;
+    }
+  }
 }
