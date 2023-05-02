@@ -15,6 +15,9 @@ import { SnapshotProposalSelector } from '../components/snapshot_proposal_select
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { Link, LinkSource } from 'models/Thread';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
+import { ProposalSelector } from '../components/cosmos_proposal_selector';
+import { CosmosProposal } from '/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import Cosmos from 'client/scripts/controllers/chain/cosmos/adapter';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -25,6 +28,12 @@ const getInitialSnapshots = (thread: Thread) =>
 const getInitialProposals = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
     typeId: l.identifier,
+    title: l.title,
+  }));
+
+const getInitialCosmosProposals = (thread: Thread) => 
+  filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
+    identifier: l.identifier.split('/')[1],
     title: l.title,
   }));
 
@@ -46,6 +55,9 @@ export const UpdateProposalStatusModal = ({
   const [tempProposals, setTempProposals] = useState<
     Array<Pick<ChainEntity, 'typeId' | 'title'>>
   >(getInitialProposals(thread));
+  const [tempCosmosProposals, setTempCosmosProposals] = useState<
+    Array<Pick<CosmosProposal, 'identifier'>>
+  >((app.chain as Cosmos).governance.store.getAll() as CosmosProposal[]);
 
   if (!app.chain?.meta) {
     return;
@@ -152,6 +164,42 @@ export const UpdateProposalStatusModal = ({
       throw new Error('Failed to update linked proposals');
     }
 
+    try {
+      const { toAdd, toDelete } = getAddedAndDeleted(
+        tempCosmosProposals,
+        getInitialCosmosProposals(thread),
+        'identifier'
+      );
+
+      if (toAdd.length > 0) {
+        const updatedThread = await app.threads.addLinks({
+          threadId: thread.id,
+          links: toAdd.map(({ identifier }) => ({
+            source: LinkSource.Proposal,
+            identifier: String("proposal/" + identifier),
+          })),
+        });
+
+        links = updatedThread.links;
+      }
+
+      if (toDelete.length > 0) {
+        const updatedThread = await app.threads.deleteLinks({
+          threadId: thread.id,
+          links: toDelete.map(({ identifier }) => ({
+            source: LinkSource.Proposal,
+            identifier: String("proposal/" + identifier),
+          })),
+        });
+
+        links = updatedThread.links;
+      }
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to update linked proposals');
+    }
+
+
     onChangeHandler?.(tempStage, links);
     onModalClose();
   };
@@ -187,6 +235,17 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
+  const handleSelectCosmosProposal = (proposal: {identifier: string}) => {
+    const isSelected = tempCosmosProposals.find(
+      ({ identifier }) => proposal.identifier === String(identifier)
+    );
+    const updatedProposals = isSelected
+      ? tempCosmosProposals.filter(({ identifier }) => proposal.identifier !== String(identifier))
+      : [...tempCosmosProposals, proposal];
+    setTempCosmosProposals(updatedProposals)
+    setVotingStage();  
+  }
+  
   return (
     <div className="UpdateProposalStatusModal">
       <div className="compact-modal-title">
@@ -219,6 +278,12 @@ export const UpdateProposalStatusModal = ({
           <ChainEntitiesSelector
             onSelect={handleSelectChainEntity}
             proposalsToSet={tempProposals}
+          />
+        )}
+        {true && (
+          <ProposalSelector
+            onSelect={handleSelectCosmosProposal}
+            proposalsToSet={tempCosmosProposals}
           />
         )}
         <div className="buttons-row">
