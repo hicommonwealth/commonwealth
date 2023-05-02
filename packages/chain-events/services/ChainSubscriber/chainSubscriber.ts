@@ -50,7 +50,7 @@ export async function processChains(
   producer: IRabbitMqHandler,
   chainsAndTokens: ChainAttributes[],
   rollbar?: Rollbar
-) {
+): Promise<IListenerInstances> {
   log.info('Starting scheduled process...');
   const activeListeners = getListenerNames(listenerInstances);
   if (activeListeners.length > 0) {
@@ -116,6 +116,8 @@ export async function processChains(
   }
 
   log.info('Finished scheduled process.');
+
+  return listenerInstances
 }
 
 /**
@@ -274,7 +276,7 @@ export async function runSubscriberAsFunction(
   chain?: ChainAttributes
 ) {
   const chains = await getSubscriberChainData(pool, rollbar, chain);
-  await processChains(producer, chains, rollbar);
+  return await processChains(producer, chains, rollbar);
 }
 
 /**

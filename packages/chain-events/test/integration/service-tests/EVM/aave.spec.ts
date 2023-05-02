@@ -16,7 +16,10 @@ import { setupChainEventConsumer } from '../../../../services/ChainEventsConsume
 import { Op, Sequelize } from 'sequelize';
 import {eventMatch, findEvent, getEvmSecondsAndBlocks} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
-import {EventKind} from "../../../../src/chains/aave/types";
+import {Api, EventKind} from "../../../../src/chains/aave/types";
+import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
+import { Listener } from "../../../../src";
+import {Processor, StorageFetcher, Subscriber} from "../../../../src/chains/aave";
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -39,6 +42,13 @@ describe('Integration tests for Aave', () => {
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
+  let listener: Listener<
+    Api,
+    StorageFetcher,
+    Processor,
+    Subscriber,
+    EventKind
+  >
   const contract = new aaveGovernor();
   const chain_id = 'ganache-fork-aave';
   const chain = {
@@ -57,6 +67,20 @@ describe('Integration tests for Aave', () => {
   // This function delays the execution of the test for the specified number of milliseconds
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+  // sleeps until the listener reaches the desired block or until the maxWaitTime is reached
+  async function waitUntilBlock(blockNum: number, listener: Listener<any, any, any, any, any>, maxWaitTime = 30): Promise<void> {
+    let waitTime = 0;
+    while (true) {
+      console.log(waitTime);
+      // limit wait time to ~30 seconds
+      if (waitTime > maxWaitTime) break;
+      console.log(listener.lastCachedBlockNumber);
+      if (listener.lastCachedBlockNumber >= blockNum) break;
+      await new Promise<void>(resolve => setTimeout(resolve, 1000));
+      waitTime += 1;
+    }
+  }
+
   before(async () => {
     // initialize the mock rabbitmq controller
     await rmq.init();
@@ -65,7 +89,14 @@ describe('Integration tests for Aave', () => {
   describe('Tests the Aave event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
-      await runSubscriberAsFunction(rmq, null, null, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, null, null, chain);
+      listener = listeners[chain_id] as Listener<
+        Api,
+        StorageFetcher,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
     });
 
     it('Should capture proposal created events', async () => {
@@ -75,7 +106,7 @@ describe('Integration tests for Aave', () => {
       const result = await sdk.createProposal(1, 'aave');
       proposalId = result.proposalId;
       proposalCreatedBlockNum = result.block;
-      await delay(15000);
+      await waitUntilBlock(proposalCreatedBlockNum, listener, 20);
 
       events[EventKind.ProposalCreated] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
@@ -97,7 +128,8 @@ describe('Integration tests for Aave', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
-      await delay(20000);
+      await waitUntilBlock(block, listener, 15)
+      // await delay(20000);
 
       events[EventKind.VoteEmitted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
@@ -119,7 +151,8 @@ describe('Integration tests for Aave', () => {
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.queueProposal(proposalId, 'aave');
 
-      await delay(12000);
+      await waitUntilBlock(block, listener, 12);
+      // await delay(12000);
 
       events[EventKind.ProposalQueued] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
@@ -140,8 +173,7 @@ describe('Integration tests for Aave', () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks)
       const { block } = await sdk.executeProposal(proposalId, 'aave');
-
-      await delay(10000);
+      await waitUntilBlock(block, listener, 20);
 
       events[EventKind.ProposalExecuted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
