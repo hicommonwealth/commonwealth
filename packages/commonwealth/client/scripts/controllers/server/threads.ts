@@ -486,12 +486,19 @@ class ThreadsController {
         read_only: args.readOnly,
       },
       success: (response) => {
-        const result = this.modelFromServer(response.result);
-        // Post edits propagate to all thread stores
-        this._store.update(result);
-        this._listingStore.add(result);
-        this._overviewStore.update(result);
-        return result;
+        const thread = this.modelFromServer(response.result);
+
+        // update thread in store
+        const foundThread = this._store.getByIdentifier(thread.identifier);
+        const finalThread = new Thread({
+          ...((foundThread || {}) as any),
+          readOnly: args.readOnly,
+        });
+        this._store.update(finalThread);
+        this._listingStore.add(finalThread);
+        this._overviewStore.update(finalThread);
+
+        return thread;
       },
       error: (err) => {
         notifyError('Could not update thread read_only');
