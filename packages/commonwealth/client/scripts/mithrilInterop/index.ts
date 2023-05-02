@@ -55,8 +55,8 @@ export const render = (
   // ensure vnode.className exists
   attrs.className = className;
 
-  // react forbids <img> tags to have children
-  if (tag === 'img') {
+  // react forbids <img> and <br> tags to have children
+  if (tag === 'img' || tag == 'br') {
     return createElement(tag, attrs);
   }
 
