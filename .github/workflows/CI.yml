@@ -169,7 +169,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: All Chain-Events Long-running Integration Tests
+    name: All Chain-Events Integration Tests
     runs-on: ubuntu-latest
 
     services:
