@@ -89,16 +89,16 @@ export const CreateComment = ({
       clearDraft();
 
       jumpHighlightComment(res.id);
-
+    } catch (err) {
+      console.error(err);
+      notifyError(err.message || 'Comment submission failed.');
+      setErrorMsg(err.message);
+    } finally {
       setSendingComment(false);
+
       if (handleIsReplying) {
         handleIsReplying(false);
       }
-    } catch (err) {
-      console.log(err);
-      notifyError(err.message || 'Comment submission failed.');
-      setSendingComment(false);
-      setErrorMsg(err.message);
     }
   };
 
