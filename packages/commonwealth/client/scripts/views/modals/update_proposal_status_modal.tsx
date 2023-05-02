@@ -15,6 +15,7 @@ import { SnapshotProposalSelector } from '../components/snapshot_proposal_select
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { Link, LinkSource } from 'models/Thread';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
+import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -40,6 +41,7 @@ export const UpdateProposalStatusModal = ({
   thread,
 }: UpdateProposalStatusModalProps) => {
   const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
+  const [isCosmosLoading, setIsCosmosLoading] = useState(false);
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
   >(getInitialSnapshots(thread));
@@ -50,6 +52,14 @@ export const UpdateProposalStatusModal = ({
   if (!app.chain?.meta) {
     return;
   }
+
+  const { completedCosmosProposals } = useGetCompletedCosmosProposals({
+    app,
+    setIsLoading: setIsCosmosLoading,
+    isLoading: isCosmosLoading,
+  });
+
+  console.log('completedCosmosProposals', completedCosmosProposals);
 
   const { customStages } = app.chain.meta;
 
