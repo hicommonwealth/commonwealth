@@ -228,12 +228,12 @@ jobs:
         run: |
           yarn --cwd packages/chain-events/chain-testing
           yarn --cwd packages/chain-events/chain-testing ganache > ganacheLog.log 2>&1 &
-          sleep 5
+          sleep 20
 
       - name: Start chain-testing SDK
         run: |
-          yarn --cwd packages/chain-events/chain-testing start > sdkLog.log 2>&1 &
-          sleep 5
+          RPC_HOST=ganache CHAIN_PORT=3000 yarn --cwd packages/chain-events/chain-testing start > sdkLog.log 2>&1 &
+          sleep 15
 
       - name: Run Chain Events Integration Tests
         run: yarn --cwd packages/chain-events test-services
