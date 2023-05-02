@@ -86,7 +86,7 @@ export const useImageDropAndPaste = ({
         setIsUploading(false);
       }
     },
-    [editorRef, isMarkdownEnabled, setContentDelta]
+    [editorRef, isMarkdownEnabled, setContentDelta, setIsUploading]
   );
 
   return { handleImageDropAndPaste };
