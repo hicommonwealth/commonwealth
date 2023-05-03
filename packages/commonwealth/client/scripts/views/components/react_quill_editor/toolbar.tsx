@@ -150,7 +150,6 @@ export const useMarkdownToolbarHandlers = ({
         throw new Error(`could not get prefix for value: ${value}`);
       }
       const text = editor.getText(selection.index, selection.length);
-      console.log(text);
       const newText = text.split('\n').reduce((acc, line) => {
         // remove empty lines
         if (line.trim().length === 0) {
