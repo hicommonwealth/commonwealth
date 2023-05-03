@@ -232,6 +232,15 @@ describe('Integration tests for Compound Bravo', () => {
       expect(relatedEntity.id, 'Incorrect entity id').to.equal(
         propCreatedEvent.entity_id
       );
+
+      expect(rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length).to.equal(1);
+      expect(rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]).to.deep.equal({
+        author: relatedEntity.author,
+        ce_id: relatedEntity.id,
+        chain_id,
+        entity_type_id: relatedEntity.type_id,
+        cud: 'create'
+      });
     });
 
     it('Should process vote cast events', async () => {
