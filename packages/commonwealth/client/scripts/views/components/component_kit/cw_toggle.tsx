@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_toggle.scss';
+// import 'components/component_kit/cw_toggle.scss';
+import '../../../../styles/components/component_kit/cw_toggle.scss';
 
 import type { BaseStyleProps } from './types';
 import { getClasses } from './helpers';

@@ -1,5 +1,5 @@
 import React from 'react';
-// import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import { CWTextInput } from '../../../client/scripts/views/components/component_kit/cw_text_input';
 import type { ValidationStatus } from '../../../client/scripts/views/components/component_kit/cw_validation_text';
@@ -7,23 +7,20 @@ import type { ValidationStatus } from '../../../client/scripts/views/components/
 const input = {
   title: 'Molecules/TextInput',
   component: CWTextInput,
-};
-// } satisfies Meta<typeof CWTextInput>;
+} satisfies Meta<typeof CWTextInput>;
 
 export default input;
-// type Story = StoryObj<typeof CWTextInput>;
+type Story = StoryObj<typeof input>;
 
 /** Large */
-// export const Large: Story = {
-export const Large = {
+export const Large: Story = {
   render: () => (
     <CWTextInput name="Text field" label="Large" placeholder="Type here" />
   ),
 };
 
 /** Small */
-// export const Small: Story = {
-export const Small = {
+export const Small: Story = {
   render: () => (
     <CWTextInput
       name="Text field"
@@ -35,8 +32,7 @@ export const Small = {
 };
 
 /** This input only accepts A-Z */
-// export const OnlyLetters: Story = {
-export const OnlyLetters = {
+export const OnlyLetters: Story = {
   render: () => (
     <CWTextInput
       name="Form field"
@@ -54,8 +50,7 @@ export const OnlyLetters = {
 };
 
 /** Text field with icons */
-// export const WithIcons: Story = {
-export const WithIcons = {
+export const WithIcons: Story = {
   render: () => (
     <CWTextInput
       label="Text field with icons"
@@ -67,8 +62,7 @@ export const WithIcons = {
 };
 
 /** Disabled */
-// export const Disabled: Story = {
-export const Disabled = {
+export const Disabled: Story = {
   render: () => (
     <CWTextInput
       name="Text field"
@@ -80,8 +74,7 @@ export const Disabled = {
 };
 
 /** Dark mode */
-// export const DarkMode: Story = {
-export const DarkMode = {
+export const DarkMode: Story = {
   render: () => (
     <CWTextInput
       name="Text field dark mode"

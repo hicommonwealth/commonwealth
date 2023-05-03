@@ -1,19 +1,21 @@
 import React from 'react';
-import type { Meta, StoryObj } from "@storybook/react";
+// import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
-import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
+import { CWText } from '../client/scripts/views/components/component_kit/cw_text';
+import '../client/styles/components/component_kit/cw_component_showcase.scss';
 
 const text = {
   title: 'Atoms/Text',
   component: CWText,
-} satisfies Meta<typeof CWText>;
+};
+// } satisfies Meta<typeof CWButton>;
 
 export default text;
-type Story = StoryObj<typeof text>;
+// type Story = StoryObj<typeof CWButton>;
 
 /** Display1 */
-export const Display1SemiBold: Story = {
+// export const Display1SemiBold: Story = {
+export const Display1SemiBold = {
   name: 'Display1 semi bold',
   render: () => (
     <CWText fontWeight="semiBold" type="d1">
@@ -22,7 +24,8 @@ export const Display1SemiBold: Story = {
   ),
 };
 
-export const Display1bold: Story = {
+// export const Display1SemiBold: Story = {
+export const Display1bold = {
   name: 'Display1 bold',
   render: () => (
     <CWText type="d1" fontWeight="bold">
@@ -31,7 +34,8 @@ export const Display1bold: Story = {
   ),
 };
 
-export const Display1black: Story = {
+// export const Display1SemiBold: Story = {
+export const Display1black = {
   name: 'Display1 black',
   render: () => (
     <CWText type="d1" fontWeight="black">
@@ -41,7 +45,8 @@ export const Display1black: Story = {
 };
 
 /** Display2 */
-export const Display2SemiBold: Story = {
+// export const Display1SemiBold: Story = {
+export const Display2SemiBold = {
   name: 'Display2 semi bold',
   render: () => (
     <CWText type="d2" fontWeight="semiBold">
@@ -50,7 +55,7 @@ export const Display2SemiBold: Story = {
   ),
 };
 
-export const Display2Bold: Story = {
+export const Display2Bold = {
   name: 'Display2 bold',
   render: () => (
     <CWText type="d2" fontWeight="bold">
@@ -59,7 +64,7 @@ export const Display2Bold: Story = {
   ),
 };
 
-export const Display2Black: Story = {
+export const Display2Black = {
   name: 'Display2 black',
   render: () => (
     <CWText type="d2" fontWeight="black">
@@ -69,7 +74,7 @@ export const Display2Black: Story = {
 };
 
 /** Heading1 */
-export const Heading1Medium: Story = {
+export const Heading1Medium = {
   name: 'Heading1 medium',
   render: () => (
     <CWText type="h1" fontWeight="medium">
@@ -78,7 +83,7 @@ export const Heading1Medium: Story = {
   ),
 };
 
-export const Heading1SemiBold: Story = {
+export const Heading1SemiBold = {
   name: 'Heading1 semi bold',
   render: () => (
     <CWText type="h1" fontWeight="semiBold">
@@ -87,7 +92,7 @@ export const Heading1SemiBold: Story = {
   ),
 };
 
-export const Heading1Bold: Story = {
+export const Heading1Bold = {
   name: 'Heading1 bold',
   render: () => (
     <CWText type="h1" fontWeight="bold">
@@ -97,7 +102,7 @@ export const Heading1Bold: Story = {
 };
 
 /** Heading2 */
-export const Heading2Medium: Story = {
+export const Heading2Medium = {
   name: 'Heading2 medium',
   render: () => (
     <CWText type="h2" fontWeight="medium">
@@ -106,7 +111,7 @@ export const Heading2Medium: Story = {
   ),
 };
 
-export const Heading2SemiBold: Story = {
+export const Heading2SemiBold = {
   name: 'Heading2 semi bold',
   render: () => (
     <CWText type="h2" fontWeight="semiBold">
@@ -115,7 +120,7 @@ export const Heading2SemiBold: Story = {
   ),
 };
 
-export const Heading2Bold: Story = {
+export const Heading2Bold = {
   name: 'Heading2 bold',
   render: () => (
     <CWText type="h2" fontWeight="bold">
@@ -125,7 +130,7 @@ export const Heading2Bold: Story = {
 };
 
 /** Heading3 */
-export const Heading3Medium: Story = {
+export const Heading3Medium = {
   name: 'Heading3 medium',
   render: () => (
     <CWText type="h3" fontWeight="medium">
@@ -134,7 +139,7 @@ export const Heading3Medium: Story = {
   ),
 };
 
-export const Heading3SemiBold: Story = {
+export const Heading3SemiBold = {
   name: 'Heading3 semi bold',
   render: () => (
     <CWText type="h3" fontWeight="semiBold">
@@ -143,7 +148,7 @@ export const Heading3SemiBold: Story = {
   ),
 };
 
-export const Heading3Bold: Story = {
+export const Heading3Bold = {
   name: 'Heading3 bold',
   render: () => (
     <CWText type="h3" fontWeight="bold">
@@ -152,7 +157,7 @@ export const Heading3Bold: Story = {
   ),
 };
 
-export const Heading4Medium: Story = {
+export const Heading4Medium = {
   name: 'Heading4 medium',
   render: () => (
     <CWText fontWeight="medium" type="h4">
@@ -161,7 +166,7 @@ export const Heading4Medium: Story = {
   ),
 };
 
-export const Heading4SemiBold: Story = {
+export const Heading4SemiBold = {
   name: 'Heading4 semi bold',
   render: () => (
     <CWText type="h4" fontWeight="semiBold">
@@ -170,7 +175,7 @@ export const Heading4SemiBold: Story = {
   ),
 };
 
-export const Heading4Bold: Story = {
+export const Heading4Bold = {
   name: 'Heading4 bold',
   render: () => (
     <CWText type="h4" fontWeight="bold">
@@ -179,7 +184,7 @@ export const Heading4Bold: Story = {
   ),
 };
 
-export const Heading5Medium: Story = {
+export const Heading5Medium = {
   name: 'Heading5 medium',
   render: () => (
     <CWText fontWeight="medium" type="h5">
@@ -188,7 +193,7 @@ export const Heading5Medium: Story = {
   ),
 };
 
-export const Heading5SemiBold: Story = {
+export const Heading5SemiBold = {
   name: 'Heading5 semi bold',
   render: () => (
     <CWText type="h5" fontWeight="semiBold">
@@ -197,7 +202,7 @@ export const Heading5SemiBold: Story = {
   ),
 };
 
-export const Heading5Bold: Story = {
+export const Heading5Bold = {
   name: 'Heading5 bold',
   render: () => (
     <CWText type="h5" fontWeight="bold">
@@ -206,12 +211,12 @@ export const Heading5Bold: Story = {
   ),
 };
 
-export const Body1Regular: Story = {
+export const Body1Regular = {
   name: 'Body1 regular',
   render: () => <CWText type="b1">Body1 regular</CWText>,
 };
 
-export const Body1Bold: Story = {
+export const Body1Bold = {
   name: 'Body1 bold',
   render: () => (
     <CWText type="b1" fontWeight="bold">
@@ -220,7 +225,7 @@ export const Body1Bold: Story = {
   ),
 };
 
-export const Body1Italic: Story = {
+export const Body1Italic = {
   name: 'Body1 italic',
   render: () => (
     <CWText type="b1" fontWeight="italic">
@@ -229,12 +234,12 @@ export const Body1Italic: Story = {
   ),
 };
 
-export const Body2Regular: Story = {
+export const Body2Regular = {
   name: 'Body2 regular',
   render: () => <CWText type="b2">Body2 regular</CWText>,
 };
 
-export const Body2Bold: Story = {
+export const Body2Bold = {
   name: 'Body2 bold',
   render: () => (
     <CWText type="b2" fontWeight="bold">
@@ -243,7 +248,7 @@ export const Body2Bold: Story = {
   ),
 };
 
-export const Body2Italic: Story = {
+export const Body2Italic = {
   name: 'Body2 italic',
   render: () => (
     <CWText type="b2" fontWeight="italic">
@@ -252,12 +257,12 @@ export const Body2Italic: Story = {
   ),
 };
 
-export const CaptionRegular: Story = {
+export const CaptionRegular = {
   name: 'Caption regular',
   render: () => <CWText type="caption">Caption regular</CWText>,
 };
 
-export const CaptionMedium: Story = {
+export const CaptionMedium = {
   name: 'Caption medium',
   render: () => (
     <CWText type="caption" fontWeight="medium">
@@ -266,7 +271,7 @@ export const CaptionMedium: Story = {
   ),
 };
 
-export const CaptionUppercase: Story = {
+export const CaptionUppercase = {
   name: 'Caption uppercase',
   render: () => (
     <CWText type="caption" fontWeight="uppercase">
@@ -275,27 +280,27 @@ export const CaptionUppercase: Story = {
   ),
 };
 
-export const ButtonMini: Story = {
+export const ButtonMini = {
   name: 'Button mini',
   render: () => <CWText type="buttonMini">Button mini</CWText>,
 };
 
-export const ButtonSmall: Story = {
+export const ButtonSmall = {
   name: 'Button small',
   render: () => <CWText type="buttonSm">Button small</CWText>,
 };
 
-export const ButtonLarge: Story = {
+export const ButtonLarge = {
   name: 'Button large',
   render: () => <CWText type="buttonLg">Button large</CWText>,
 };
 
-export const Disabled: Story = {
+export const Disabled = {
   name: 'Disabled',
   render: () => <CWText type="h3">Disabled</CWText>,
 };
 
-export const Body1Disabled: Story = {
+export const Body1Disabled = {
   name: 'Body1 disabled',
   render: () => (
     <div className="text-row">
@@ -307,7 +312,7 @@ export const Body1Disabled: Story = {
   ),
 };
 
-export const Body1NoWrap: Story = {
+export const Body1NoWrap = {
   name: 'Body1 noWrap',
   render: () => (
     <div className="text-row">

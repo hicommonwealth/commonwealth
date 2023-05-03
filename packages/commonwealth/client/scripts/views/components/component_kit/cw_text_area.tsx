@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
+// import { redraw } from 'mithrilInterop';
 
-import 'components/component_kit/cw_text_area.scss';
+// import 'components/component_kit/cw_text_area.scss';
+import '../../../../styles/components/component_kit/cw_text_area.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
@@ -64,7 +65,7 @@ export const CWTextArea = (props: TextAreaProps) => {
             validationProps.setIsTyping(false);
             validationProps.setValidationStatus(undefined);
             validationProps.setStatusMessage(undefined);
-            redraw();
+            // redraw();
           } else {
             e.stopPropagation();
             validationProps.setIsTyping(true);
@@ -77,7 +78,7 @@ export const CWTextArea = (props: TextAreaProps) => {
                   const result = inputValidationFn(e.currentTarget.value);
                   validationProps.setValidationStatus(result[0]);
                   validationProps.setStatusMessage(result[1]);
-                  redraw();
+                  // redraw();
                 }
               }, timeout)
             );
@@ -89,7 +90,7 @@ export const CWTextArea = (props: TextAreaProps) => {
               validationProps.setIsTyping(false);
               validationProps.setValidationStatus(undefined);
               validationProps.setStatusMessage(undefined);
-              redraw();
+              // redraw();
             } else {
               const result = inputValidationFn(e.currentTarget.value);
               validationProps.setValidationStatus(result[0]);
