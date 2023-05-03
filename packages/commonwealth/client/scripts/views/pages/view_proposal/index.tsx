@@ -33,6 +33,7 @@ import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import withRouter from 'navigation/helpers';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -61,6 +62,10 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
 
     app.chainAdapterReady.on('ready', () => {
       this.redraw();
+    });
+
+    app.chainModuleReady.on('ready', () => {
+      if (!this.proposal) this.redraw();
     });
 
     const type = vnode.attrs.type || chainToProposalSlug(app.chain.meta);
@@ -133,13 +138,20 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
             ]);
           } else {
             app.chain.loadModules([c]);
-          }
 
-          return (
-            <PageLoading
-            // title={headerTitle}
-            />
-          );
+            return (
+              <PageLoading
+              // title={headerTitle}
+              />
+            );
+          }
+        } else if (
+          c?.ready &&
+          !this.proposal &&
+          app.chain.base === ChainBase.CosmosSDK
+        ) {
+          (app.chain as Cosmos).initData(+proposalId);
+          return <PageLoading />;
         }
         // proposal does not exist, 404
         return <PageNotFound message="Proposal not found" />;

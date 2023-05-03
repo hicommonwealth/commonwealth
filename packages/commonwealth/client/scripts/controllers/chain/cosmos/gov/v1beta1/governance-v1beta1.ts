@@ -44,7 +44,8 @@ class CosmosGovernance extends ProposalModule<
 
   public async init(
     ChainInfo: CosmosChain,
-    Accounts: CosmosAccounts
+    Accounts: CosmosAccounts,
+    proposalId?: number
   ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -76,7 +77,7 @@ class CosmosGovernance extends ProposalModule<
     console.log(this._minDeposit);
 
     // query existing proposals
-    await this._initProposals();
+    await this._initProposals(proposalId);
     this._initialized = true;
   }
 
