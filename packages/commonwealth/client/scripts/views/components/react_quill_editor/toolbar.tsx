@@ -91,10 +91,11 @@ export const useMarkdownToolbarHandlers = ({
       if (!selection) {
         return;
       }
-      let linkUrl =
+      const linkText =
         selection.length === 0
-          ? prompt('Enter link URL:')
+          ? prompt('Enter link text:')
           : editor.getText(selection.index, selection.length);
+      let linkUrl = prompt('Enter link URL:');
       if (!linkUrl.startsWith('https://')) {
         if (linkUrl.startsWith('http://')) {
           // convert HTTP to HTTPS
@@ -103,7 +104,6 @@ export const useMarkdownToolbarHandlers = ({
           linkUrl = `https://${linkUrl}`;
         }
       }
-      const linkText = prompt('Enter link text:');
       const linkMarkdown = `[${linkText}](${linkUrl})`;
       editor.deleteText(selection.index, selection.length);
       editor.insertText(selection.index, linkMarkdown);
