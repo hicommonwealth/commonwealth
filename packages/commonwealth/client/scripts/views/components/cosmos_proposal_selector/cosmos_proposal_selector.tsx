@@ -7,8 +7,8 @@ import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
-import {ProposalSelectorItem} from 'views/components/cosmos_proposal_selector/cosmos_proposal_selector_item'
-import { CWText } from '../component_kit/cw_text';
+import {ProposalSelectorItem} from 'views/components/cosmos_proposal_selector/cosmos_proposal_selector_item';
+
 
 const filterProposals = (ce: CosmosProposal, searchTerm: string) => {
     return (
@@ -56,6 +56,7 @@ export const ProposalSelector = ({
     const entities = useMemo(
     () =>
         completedCosmosProposals
+        .sort((a, b) => parseInt(b.identifier) - parseInt(a.identifier))
         .filter((el) => filterProposals(el, searchTerm)),
     [completedCosmosProposals, searchTerm]
     );
@@ -80,15 +81,14 @@ export const ProposalSelector = ({
       if (!app.chain || !app.activeChainId()) {
         return;
       }
-      console.log(entities)
-      console.log(renderItem)
+
 
       const EmptyComponent = () => (
         <div className="empty-component">{getEmptyContentMessage()}</div>
       );
 
       return (
-        <div className="ProposalSelector">
+        <div className="ChainEntitiesSelector">
           <CWTextInput
             placeholder="Search for an existing proposal..."
             iconRightonClick={handleClearButtonClick}
@@ -97,7 +97,7 @@ export const ProposalSelector = ({
             onInput={handleInputChange}
           />
 
-          <QueryList loading={loading} options={entities} components={{ EmptyPlaceholder: EmptyComponent }} renderItem={renderItem} />
+          <QueryList loading={loading} options={entities} renderItem={renderItem} />
         </div>
     );
   }

@@ -19,11 +19,11 @@ interface ProposalSelectorItemProps {
         <div className="selected">{isSelected && <CWCheck />}</div>
         <div className="text">
           <CWText fontWeight="medium" truncate noWrap>
-            '`${proposal.title} #${proposal.identifier}`'
+             #{proposal.identifier} {proposal.title}
           </CWText>
           <CWText type="caption" truncate>
-            {proposal.threadTitle !== 'undefined'
-              ? decodeURIComponent(proposal.threadTitle)
+            {proposal.status.toString() !== 'undefined'
+              ? proposal.status.toString()
               : 'No thread title'}
           </CWText>
         </div>

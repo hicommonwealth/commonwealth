@@ -33,7 +33,7 @@ const getInitialProposals = (thread: Thread) =>
 
 const getInitialCosmosProposals = (thread: Thread) => 
   filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
-    identifier: l.identifier.split('/')[1],
+    identifier: l.identifier,
     title: l.title,
   }));
 
@@ -57,7 +57,7 @@ export const UpdateProposalStatusModal = ({
   >(getInitialProposals(thread));
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier'>>
-  >((app.chain as Cosmos).governance.store.getAll() as CosmosProposal[]);
+  >(getInitialCosmosProposals(thread));
 
   if (!app.chain?.meta) {
     return;
@@ -176,7 +176,7 @@ export const UpdateProposalStatusModal = ({
           threadId: thread.id,
           links: toAdd.map(({ identifier }) => ({
             source: LinkSource.Proposal,
-            identifier: String("proposal/" + identifier),
+            identifier: identifier,
           })),
         });
 
@@ -188,7 +188,7 @@ export const UpdateProposalStatusModal = ({
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
-            identifier: String("proposal/" + identifier),
+            identifier: String(identifier),
           })),
         });
 
@@ -245,7 +245,6 @@ export const UpdateProposalStatusModal = ({
     setTempCosmosProposals(updatedProposals)
     setVotingStage();  
   }
-  
   return (
     <div className="UpdateProposalStatusModal">
       <div className="compact-modal-title">
@@ -274,7 +273,7 @@ export const UpdateProposalStatusModal = ({
             snapshotProposalsToSet={tempSnapshotProposals}
           />
         )}
-        {app.chainEntities && (
+        {app.chainEntities.store.get(thread.chain).length > 0 && (
           <ChainEntitiesSelector
             onSelect={handleSelectChainEntity}
             proposalsToSet={tempProposals}
