@@ -152,11 +152,12 @@ export const useMarkdownToolbarHandlers = ({
       const text = editor.getText(selection.index, selection.length);
       console.log(text);
       const newText = text.split('\n').reduce((acc, line) => {
-        if (line.length === 0) {
+        // remove empty lines
+        if (line.trim().length === 0) {
           return acc;
         }
+        // don't add prefix if already has it
         if (line.startsWith(prefix)) {
-          // already has prefix
           return acc + `${line.trim()}\n`;
         }
         return acc + `${prefix} ${line}\n`;
