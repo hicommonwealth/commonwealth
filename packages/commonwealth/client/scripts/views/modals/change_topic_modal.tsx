@@ -51,8 +51,8 @@ export const ChangeTopicModal = ({
       </div>
       <div className="compact-modal-body">
         <TopicSelector
-          defaultTopic={activeTopic}
           topics={topics}
+          value={activeTopic}
           onChange={setActiveTopic}
         />
         <div className="buttons-row">
