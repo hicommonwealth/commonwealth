@@ -1,6 +1,7 @@
 import { DeltaStatic } from 'quill';
 import { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
+import { SerializableDeltaStatic } from './utils';
 
 type UseMarkdownShortcutsProps = {
   editorRef: MutableRefObject<ReactQuill>;

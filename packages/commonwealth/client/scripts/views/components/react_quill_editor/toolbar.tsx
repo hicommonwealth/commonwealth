@@ -1,6 +1,7 @@
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
 import { SerializableDeltaStatic } from './utils';
+import { DeltaStatic } from 'quill';
 
 const LIST_ITEM_PREFIX = {
   ordered: '1.',
