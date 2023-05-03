@@ -81,8 +81,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
-  const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
-    useState(false);
+  const [
+    isEditCollaboratorsModalOpen,
+    setIsEditCollaboratorsModalOpen,
+  ] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =

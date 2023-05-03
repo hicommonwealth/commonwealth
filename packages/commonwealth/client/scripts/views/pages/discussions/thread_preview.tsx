@@ -92,6 +92,11 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const isAuthor =
     app.user.activeAccount && thread.author === app.user.activeAccount.address;
 
+  const discussionLink = getProposalUrlPath(
+    thread.slug,
+    `${thread.identifier}-${slugify(thread.title)}`
+  );
+
   const diffInMs = moment().diff(thread.createdAt);
   const isNew = moment.duration(diffInMs).asHours() < 48;
 
@@ -103,11 +108,6 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           'ThreadPreview'
         )}
         onClick={(e) => {
-          const discussionLink = getProposalUrlPath(
-            thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
-          );
-
           if (isCommandClick(e)) {
             window.open(discussionLink, '_blank');
             return;
@@ -215,7 +215,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   e.stopPropagation();
                 }}
               >
-                <SharePopover />
+                <SharePopover discussionLink={discussionLink}/>
               </div>
               <div
                 onClick={(e) => {
