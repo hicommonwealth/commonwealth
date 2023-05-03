@@ -28,10 +28,11 @@ export const ProposalSelector = ({
 }: ProposalSelectorProps) => {
   const [loadingCompleted, setCompletedLoading] = useState(false);
   const [loadingActive, setActiveLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const { activeCosmosProposals } = useGetActiveCosmosProposals({
     app,
-    setIsLoading: setActiveLoading,
+    setIsLoading: setLoading,
     isLoading: loadingActive,
   });
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
@@ -103,11 +104,7 @@ export const ProposalSelector = ({
         iconRight="close"
         onInput={handleInputChange}
       />
-      <QueryList
-        loading={loadingActive}
-        options={entities}
-        renderItem={renderItem}
-      />
+      <QueryList loading={loading} options={entities} renderItem={renderItem} />
     </div>
   );
 };
