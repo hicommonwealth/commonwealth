@@ -6,12 +6,11 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
 
   public add(proposal: ProposalT) {
     const existingProposal = this.getByIdentifier(proposal.identifier);
-    if (existingProposal) {
-      this.remove(existingProposal);
+    // console.log('existingProposal', existingProposal);
+    if (!existingProposal) {
+      super.add(proposal);
+      this._storeId[proposal.identifier] = proposal;
     }
-
-    super.add(proposal);
-    this._storeId[proposal.identifier] = proposal;
     return this;
   }
 

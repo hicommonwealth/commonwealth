@@ -54,6 +54,10 @@ const ProposalsPage = () => {
     isCosmosCompletedProposalsLoading,
     setIsCosmosCompletedProposalsLoading,
   ] = useState(false);
+  const [
+    isCosmosCompletedProposalsLoadingMore,
+    setIsCosmosCompletedProposalsLoadingMore,
+  ] = useState(false);
   const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
@@ -87,6 +91,7 @@ const ProposalsPage = () => {
     app,
     setIsLoading: setIsCosmosCompletedProposalsLoading,
     isLoading: isCosmosCompletedProposalsLoading,
+    setIsLoadingMore: setIsCosmosCompletedProposalsLoadingMore,
   });
 
   if (isLoading) {
@@ -246,9 +251,11 @@ const ProposalsPage = () => {
       .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
       .concat(
         inactiveCosmosProposals?.length
-          ? inactiveCosmosProposals.map((proposal) => (
-              <ProposalCard key={proposal.identifier} proposal={proposal} />
-            ))
+          ? inactiveCosmosProposals
+              .map((proposal) => (
+                <ProposalCard key={proposal.identifier} proposal={proposal} />
+              ))
+              .concat(isCosmosCompletedProposalsLoadingMore && <CWSpinner />)
           : []
       )
       .concat(

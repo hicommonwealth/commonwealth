@@ -16,12 +16,14 @@ interface Props {
   app: IApp;
   setIsLoading: UseStateSetter<boolean>;
   isLoading: boolean;
+  setIsLoadingMore?: UseStateSetter<boolean>;
 }
 
 export const useGetCompletedCosmosProposals = ({
   app,
   setIsLoading,
   isLoading,
+  setIsLoadingMore,
 }: Props): Response => {
   const [completedCosmosProposals, setCompletedCosmosProposals] = useState<
     CosmosProposal[]
@@ -45,8 +47,11 @@ export const useGetCompletedCosmosProposals = ({
         const completedProposals = storedProposals.filter((p) => p.completed);
 
         if (completedProposals?.length) {
+          if (setIsLoadingMore) setIsLoadingMore(true);
           setCompletedCosmosProposals(completedProposals); // show whatever we have stored
           await getAndSetProposals(); // update if there are more from the API
+          if (setIsLoadingMore) setIsLoadingMore(false);
+          setIsLoading(false);
         } else {
           setIsLoading(true);
           await getAndSetProposals();
