@@ -24,6 +24,7 @@ import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
+  serializeDelta,
 } from '../react_quill_editor/utils';
 
 export const NewThreadForm = () => {
@@ -96,7 +97,7 @@ export const NewThreadForm = () => {
         app.activeChainId(),
         threadTitle,
         threadTopic,
-        deltaString,
+        serializeDelta(threadContentDelta),
         threadUrl
       );
 

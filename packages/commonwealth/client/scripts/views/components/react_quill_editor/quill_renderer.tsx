@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { QuillFormattedText } from './quill_formatted_text';
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import { DeltaStatic } from 'quill';
+import { SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 export type QuillRendererProps = {
   doc: string;
@@ -40,6 +41,13 @@ export const QuillRenderer = ({
           format: 'unknown',
           content: null,
         } as UnknownDocInfo;
+      }
+      // if it's markdown but not properly serialized...
+      if ((delta as SerializableDeltaStatic).___isMarkdown) {
+        return {
+          format: 'markdown',
+          content: getTextFromDelta(delta),
+        } as MarkdownDocInfo;
       }
       return {
         format: 'richtext',
