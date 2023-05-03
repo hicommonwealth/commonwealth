@@ -60,7 +60,7 @@ describe('Integration tests for ERC721', () => {
       substrate_spec: null,
       contract_address: nft.address,
       verbose_logging: true,
-      ChainNode: { id: 1, url: 'http://localhost:8545' },
+      ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
     };
     // initialize the mock rabbitmq controller
     await rmq.init();

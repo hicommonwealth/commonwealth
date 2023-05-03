@@ -55,7 +55,7 @@ describe('Integration tests for ERC20', () => {
     substrate_spec: null,
     contract_address: BUSDAddress,
     verbose_logging: false,
-    ChainNode: { id: 1, url: 'http://localhost:8545' },
+    ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   const transferAmount = '100';
