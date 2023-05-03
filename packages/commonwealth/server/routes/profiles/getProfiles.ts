@@ -60,7 +60,7 @@ const getProfiles = async (
       required: true,
       include: [
         { model: models.Chain, required: true, where: { active: true } },
-        { model: models.Thread, as: 'threadsCreated' },
+        { model: models.Thread },
         { model: models.Comment, include: [{ model: models.Thread, as: 'commentThread' }] },
       ],
     },

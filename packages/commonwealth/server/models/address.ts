@@ -131,7 +131,6 @@ export default (
     models.Address.hasMany(models.Comment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Thread, {
       foreignKey: 'address_id',
-      as: 'threadsCreated',
     });
     models.Address.belongsToMany(models.Thread, {
       through: models.Collaboration,
