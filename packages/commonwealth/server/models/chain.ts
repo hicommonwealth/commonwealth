@@ -66,6 +66,10 @@ export type ChainAttributes = {
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
   Contract?: ContractInstance;
+
+  created_at?: Date;
+  updated_at?: Date;
+  deleted_at?: Date;
 };
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
@@ -147,10 +151,15 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      created_at: { type: dataTypes.DATE, allowNull: true },
+      updated_at: { type: dataTypes.DATE, allowNull: true },
+      deleted_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       tableName: 'Chains',
-      timestamps: false,
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       underscored: false,
     }
   );
