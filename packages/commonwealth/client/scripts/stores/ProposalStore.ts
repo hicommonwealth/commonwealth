@@ -5,6 +5,11 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
   private _storeId: { [hash: string]: ProposalT } = {};
 
   public add(proposal: ProposalT) {
+    const existingProposal = this.getByIdentifier(proposal.identifier);
+    if (existingProposal) {
+      this.remove(existingProposal);
+    }
+
     super.add(proposal);
     this._storeId[proposal.identifier] = proposal;
     return this;

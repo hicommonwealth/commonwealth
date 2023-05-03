@@ -169,8 +169,8 @@ const ProposalsPage = () => {
       : (activeDemocracyProposals || [])
           .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
           .concat(
-            (activeCosmosProposals || []).map((proposal, i) => (
-              <ProposalCard key={i} proposal={proposal} />
+            (activeCosmosProposals || []).map((proposal) => (
+              <ProposalCard key={proposal.identifier} proposal={proposal} />
             ))
           )
           .concat(
@@ -245,9 +245,11 @@ const ProposalsPage = () => {
     (inactiveDemocracyProposals || [])
       .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
       .concat(
-        inactiveCosmosProposals?.length ? inactiveCosmosProposals.map((proposal, i) => (
-          <ProposalCard key={i} proposal={proposal} />
-        )) : []
+        inactiveCosmosProposals?.length
+          ? inactiveCosmosProposals.map((proposal) => (
+              <ProposalCard key={proposal.identifier} proposal={proposal} />
+            ))
+          : []
       )
       .concat(
         (inactiveCompoundProposals || []).map((proposal, i) => (
