@@ -55,8 +55,6 @@ type LayoutAttrs = {
 class LayoutComponent extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
-  private surveyDelayTriggered = false;
-  private surveyReadyForDisplay = false;
 
   view(vnode: ResultNode<LayoutAttrs>) {
     const { scope, deferChain, router } = vnode.attrs;
@@ -64,14 +62,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
-
-    // Put the survey on a timer so it doesn't immediately appear
-    if (!this.surveyDelayTriggered && !this.surveyReadyForDisplay) {
-      this.surveyDelayTriggered = true;
-      setTimeout(() => {
-        this.surveyReadyForDisplay = true;
-      }, 4000);
-    }
 
     if (app.loadingError) {
       return (
@@ -151,12 +141,7 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
 
-    return (
-      <div className="Layout">
-        {vnode.children}
-        {/*<UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />*/}
-      </div>
-    );
+    return <div className="Layout">{vnode.children}</div>;
   }
 }
 
