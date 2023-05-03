@@ -118,24 +118,24 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     //   );
     // }
 
-    if (scope && scope !== app.activeChainId() && scope !== this.loadingScope) {
-      // If we are supposed to load a new chain or community, we do so now
-      // This happens only once, and then loadingScope should be set
-      this.loadingScope = scope;
-      if (scopeMatchesChain) {
-        this.deferred = deferChain;
-        selectChain(scopeMatchesChain, deferChain).then((response) => {
-          if (!deferChain && response) {
-            initChain().then(() => {
-              this.redraw();
-            });
-          } else {
-            this.redraw();
-          }
-        });
-        return <LoadingLayout />;
-      }
-    }
+    // if (scope && scope !== app.activeChainId() && scope !== this.loadingScope) {
+    //   // If we are supposed to load a new chain or community, we do so now
+    //   // This happens only once, and then loadingScope should be set
+    //   this.loadingScope = scope;
+    //   if (scopeMatchesChain) {
+    //     this.deferred = deferChain;
+    //     selectChain(scopeMatchesChain, deferChain).then((response) => {
+    //       if (!deferChain && response) {
+    //         initChain().then(() => {
+    //           this.redraw();
+    //         });
+    //       } else {
+    //         this.redraw();
+    //       }
+    //     });
+    //     return <LoadingLayout />;
+    //   }
+    // }
 
     if (scope && this.deferred && !deferChain) {
       this.deferred = false;
@@ -182,6 +182,7 @@ const LayoutComponentReact = ({
     selectedScope.length === 42;
 
   const [scopeToLoad, setScopeToLoad] = useState<string>();
+  const [isChainDeferred, setIsChainDeferred] = useState<boolean>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   useNecessaryEffect(() => {
@@ -195,8 +196,34 @@ const LayoutComponentReact = ({
           setIsLoading(false);
         });
       }
+      // IFB 5: If scope is different from app.activeChainId() at render
+      // time (and we are not loading another community at the same time,
+      // via this.loadingScope), set this.loadingScope to the provided scope,
+      // and then call selectChain, passing deferChain through. If deferChain
+      // is false once selectChain returns, call initChain. Render a LoadingLayout
+      // immediately (before selectChain resolves).
+      else if (selectedScope !== app.activeChainId() && scopeMatchesChain) {
+        setIsLoading(true);
+        setScopeToLoad(selectedScope);
+        setIsChainDeferred(true);
+        selectChain(scopeMatchesChain, shouldDeferChain).then((response) => {
+          if (!shouldDeferChain && response) {
+            initChain().finally(() => {
+              setIsLoading(false);
+            });
+          } else {
+            setIsLoading(false);
+          }
+        });
+      }
     }
-  }, [selectedScope, scopeToLoad, scopeIsEthereumAddress]);
+  }, [
+    selectedScope,
+    scopeToLoad,
+    scopeIsEthereumAddress,
+    scopeMatchesChain,
+    shouldDeferChain,
+  ]);
 
   // IFB 1: If initApp() threw an error, show application error.
   if (app.loadingError) {
@@ -209,7 +236,22 @@ const LayoutComponentReact = ({
   // -
   // IFB 3: If the user has navigated to an ethereum address directly,
   // init a new token chain immediately and show loading state
-  if (isLoading || !app.loginStatusLoaded()) {
+  // -
+  // IFB 5: If scope is different from app.activeChainId() at render
+  // time (and we are not loading another community at the same time,
+  // via this.loadingScope), set this.loadingScope to the provided scope,
+  // and then call selectChain, passing deferChain through. If deferChain
+  // is false once selectChain returns, call initChain. Render a LoadingLayout
+  // immediately (before selectChain resolves).
+  if (
+    isLoading ||
+    !app.loginStatusLoaded() ||
+    // Important: render loading state immediately for IFB 5
+    // For IFB 5
+    (selectedScope &&
+      selectedScope !== app.activeChainId() &&
+      selectedScope !== scopeToLoad)
+  ) {
     return <LoadingLayout />;
   }
 
