@@ -17,7 +17,7 @@ import { Link, LinkSource } from 'models/Thread';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
 import { ProposalSelector } from '../components/cosmos_proposal_selector';
 import { CosmosProposal } from '/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import Cosmos from 'client/scripts/controllers/chain/cosmos/adapter';
+import CosmosChain from 'controllers/chain/cosmos/chain';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -31,7 +31,7 @@ const getInitialProposals = (thread: Thread) =>
     title: l.title,
   }));
 
-const getInitialCosmosProposals = (thread: Thread) => 
+const getInitialCosmosProposals = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
     identifier: l.identifier,
     title: l.title,
@@ -199,7 +199,6 @@ export const UpdateProposalStatusModal = ({
       throw new Error('Failed to update linked proposals');
     }
 
-
     onChangeHandler?.(tempStage, links);
     onModalClose();
   };
@@ -235,16 +234,20 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
-  const handleSelectCosmosProposal = (proposal: {identifier: string}) => {
+  const handleSelectCosmosProposal = (proposal: { identifier: string }) => {
     const isSelected = tempCosmosProposals.find(
       ({ identifier }) => proposal.identifier === String(identifier)
     );
     const updatedProposals = isSelected
-      ? tempCosmosProposals.filter(({ identifier }) => proposal.identifier !== String(identifier))
+      ? tempCosmosProposals.filter(
+          ({ identifier }) => proposal.identifier !== String(identifier)
+        )
       : [...tempCosmosProposals, proposal];
-    setTempCosmosProposals(updatedProposals)
-    setVotingStage();  
-  }
+    setTempCosmosProposals(updatedProposals);
+    setVotingStage();
+  };
+
+  console.log('app.chain', app.chain);
   return (
     <div className="UpdateProposalStatusModal">
       <div className="compact-modal-title">
@@ -279,7 +282,7 @@ export const UpdateProposalStatusModal = ({
             proposalsToSet={tempProposals}
           />
         )}
-        {true && (
+        {app.chain.chain instanceof CosmosChain && (
           <ProposalSelector
             onSelect={handleSelectCosmosProposal}
             proposalsToSet={tempCosmosProposals}
