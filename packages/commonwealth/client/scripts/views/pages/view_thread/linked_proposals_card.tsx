@@ -24,6 +24,7 @@ import { filterLinks } from 'helpers/threads';
 
 type LinkedProposalProps = {
   thread: Thread;
+  title: string;
   ceType: ChainEntity['type'];
   ceTypeId: ChainEntity['typeId'];
   ceCompleted?: ChainEntity['completed'];
@@ -31,6 +32,7 @@ type LinkedProposalProps = {
 
 const LinkedProposal = ({
   thread,
+  title,
   ceType,
   ceTypeId,
   ceCompleted,
@@ -43,7 +45,7 @@ const LinkedProposal = ({
 
   return (
     <a href={threadLink}>
-      {`${chainEntityTypeToProposalName(ceType)} #${ceTypeId} ${
+      {`${title ?? chainEntityTypeToProposalName(ceType)} #${ceTypeId} ${
         ceCompleted ? ' (Completed)' : ''
       }`}
     </a>
@@ -127,6 +129,7 @@ export const LinkedProposalsCard = ({
                           <LinkedProposal
                             key={l.identifier}
                             thread={thread}
+                            title={l.title}
                             ceType={'proposal' as IChainEntityKind}
                             ceTypeId={l.identifier}
                           />
