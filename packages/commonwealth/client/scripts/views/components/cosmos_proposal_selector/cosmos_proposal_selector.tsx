@@ -9,6 +9,7 @@ import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
 import { useGetActiveCosmosProposals } from 'hooks/cosmos/useGetActiveCosmosProposals';
 import { ProposalSelectorItem } from 'views/components/cosmos_proposal_selector/cosmos_proposal_selector_item';
+import { CWText } from '../component_kit/cw_text';
 
 const filterProposals = (ce: CosmosProposal, searchTerm: string) => {
   return (
@@ -111,6 +112,9 @@ export const ProposalSelector = ({
         onInput={handleInputChange}
       />
       <QueryList loading={loading} options={entities} renderItem={renderItem} />
+      {loadingCompleted && (
+        <p style={{ color: 'grey' }}>Loading completed proposals...</p>
+      )}
     </div>
   );
 };
