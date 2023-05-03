@@ -145,19 +145,19 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     //   return <LoadingLayout />;
     // }
 
-    if (!scope && app.chain && app.chain.network) {
-      // Handle the case where we unload the network or community, if we're
-      // going to a page that doesn't have one
-      // Include this in if for isCustomDomain, scope gets unset on redirect
-      // We don't need this to happen
-      if (!app.isCustomDomain()) {
-        deinitChainOrCommunity().then(() => {
-          this.loadingScope = null;
-          redraw();
-        });
-      }
-      return <LoadingLayout />;
-    }
+    // if (!scope && app.chain && app.chain.network) {
+    //   // Handle the case where we unload the network or community, if we're
+    //   // going to a page that doesn't have one
+    //   // Include this in if for isCustomDomain, scope gets unset on redirect
+    //   // We don't need this to happen
+    //   if (!app.isCustomDomain()) {
+    //     deinitChainOrCommunity().then(() => {
+    //       this.loadingScope = null;
+    //       redraw();
+    //     });
+    //   }
+    //   return <LoadingLayout />;
+    // }
 
     // return <div className="Layout">{vnode.children}</div>;
   }
@@ -238,6 +238,24 @@ const LayoutComponentReact = ({
     }
   }, [selectedScope, isChainDeferred, shouldDeferChain]);
 
+  useNecessaryEffect(() => {
+    // IFB 7: If scope is not defined (and we are not on a custom domain),
+    // deinitialize whatever chain is loaded by calling deinitChainOrCommunity,
+    // then set loadingScope to null. Render a LoadingLayout immediately.
+    if (
+      !selectedScope &&
+      !app.isCustomDomain() &&
+      app.chain &&
+      app.chain.network
+    ) {
+      setIsLoading(true);
+      deinitChainOrCommunity().finally(() => {
+        setScopeToLoad(null);
+        setIsLoading(false);
+      });
+    }
+  }, [selectedScope]);
+
   // IFB 1: If initApp() threw an error, show application error.
   if (app.loadingError) {
     return <ApplicationError />;
@@ -260,16 +278,22 @@ const LayoutComponentReact = ({
   // IFB 6: If deferChain is false on the page we’re routing to, but we
   // have loaded with isChainDeferred=true (previously from step 5),
   // then call initChain and render a LoadingLayout immediately.
+  // -
+  // IFB 7: If scope is not defined (and we are not on a custom domain),
+  // deinitialize whatever chain is loaded by calling deinitChainOrCommunity,
+  // then set loadingScope to null. Render a LoadingLayout immediately.
   if (
     isLoading ||
     !app.loginStatusLoaded() ||
-    // Important: render loading state immediately for IFB 5, 6
+    // Important: render loading state immediately for IFB 5, 6 and 7
     // For IFB 5
     (selectedScope &&
       selectedScope !== app.activeChainId() &&
       selectedScope !== scopeToLoad) ||
     // For IFB 6
-    (selectedScope && isChainDeferred && !shouldDeferChain)
+    (selectedScope && isChainDeferred && !shouldDeferChain) ||
+    // For IFB 7
+    (!selectedScope && !app.isCustomDomain() && app.chain && app.chain.network)
   ) {
     return <LoadingLayout />;
   }
