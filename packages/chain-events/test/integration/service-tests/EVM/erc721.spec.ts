@@ -43,7 +43,7 @@ describe('Integration tests for ERC721', () => {
 
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let nft: ERC721, chain, accounts;
-  const token_id = '137';
+  const token_id = '138';
   const chain_id = 'ganache-fork-erc721';
   const randomWallet = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
 
