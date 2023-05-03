@@ -1,18 +1,20 @@
-import React from 'react';
-
 import { _DEPRECATED_getRoute } from 'mithrilInterop';
+import React from 'react';
+import app from '../../state';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import type { PopoverTriggerProps } from './component_kit/cw_popover/cw_popover';
+import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
 type SharePopoverProps = {
   commentId?: number;
+  discussionLink?: string;
 } & Partial<PopoverTriggerProps>;
 
 export const SharePopover = (props: SharePopoverProps) => {
   const {
     commentId,
+    discussionLink,
     renderTrigger = (onclick) => (
       <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
     ),
@@ -27,17 +29,26 @@ export const SharePopover = (props: SharePopoverProps) => {
           iconLeft: 'copy',
           label: 'Copy URL',
           onClick: async () => {
-            const currentRouteSansCommentParam =
-              _DEPRECATED_getRoute().split('?comment=')[0];
-            if (!commentId) {
-              await navigator.clipboard.writeText(
-                `${domain}${currentRouteSansCommentParam}`
-              );
-            } else {
-              await navigator.clipboard.writeText(
-                `${domain}${currentRouteSansCommentParam}?comment=${commentId}`
-              );
+            const currentRoute = _DEPRECATED_getRoute();
+            let urlToCopy = `${domain}${currentRoute}`; // If we copy the thread on discussion page
+
+            if (commentId) {
+              // If we copy a comment on discussion page
+              const currentRouteSansCommentParam = currentRoute.split('?comment=')[0];
+              urlToCopy = `${domain}${currentRouteSansCommentParam}?comment=${commentId}`;
+            } else if (discussionLink) {
+              const urlParts = currentRoute.split('/');
+
+              // If we copy from a custom domain page, exclude the chain
+              if (app.isCustomDomain()){
+                urlToCopy = `${domain}${discussionLink}`;
+              } else {
+                const chainId = urlParts[1];
+                urlToCopy = `${domain}/${chainId}${discussionLink}`;
+              }
             }
+
+            await navigator.clipboard.writeText(urlToCopy);
           },
         },
         {
