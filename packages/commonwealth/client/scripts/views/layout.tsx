@@ -1,7 +1,6 @@
 import React, { Suspense, useState } from 'react';
 
-import type { ClassComponentRouter } from 'mithrilInterop';
-
+// import type { ClassComponentRouter } from 'mithrilInterop';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 
 import 'layout.scss';
@@ -65,7 +64,7 @@ const shouldDeferChain = ({ deferChain }: ShouldDeferChainAttrs) => {
 type LayoutAttrs = {
   deferChain?: boolean;
   scope?: string;
-  router?: ClassComponentRouter;
+  // router?: ClassComponentRouter;
   children: React.ReactNode;
 };
 
@@ -74,9 +73,11 @@ type LayoutAttrs = {
  * --
  * Each logic block is marked with a IFS=Init-Flow-Step comment
  * with a number indicating the order in which they occur
+ * Important:
+ * - IBS 3 is omitted
  */
 const LayoutComponent = ({
-  router,
+  // router,
   children,
   scope: selectedScope,
   deferChain: shouldDeferChain,
@@ -93,22 +94,23 @@ const LayoutComponent = ({
 
   useNecessaryEffect(() => {
     if (selectedScope && selectedScope !== scopeToLoad) {
-      // IFB 3: If the user has navigated to an ethereum address directly,
-      // init a new token chain immediately
-      if (scopeIsEthereumAddress) {
-        setIsLoading(true);
-        setScopeToLoad(selectedScope);
-        initNewTokenChain(selectedScope, router.navigate).finally(() => {
-          setIsLoading(false);
-        });
-      }
+      // // IFB 3: If the user has navigated to an ethereum address directly,
+      // // init a new token chain immediately
+      // if (scopeIsEthereumAddress) {
+      //   setIsLoading(true);
+      //   setScopeToLoad(selectedScope);
+      //   initNewTokenChain(selectedScope, router.navigate).finally(() => {
+      //     setIsLoading(false);
+      //   });
+      // } else
+
       // IFB 5: If scope is different from app.activeChainId() at render
       // time (and we are not loading another community at the same time,
       // via this.loadingScope), set this.loadingScope to the provided scope,
       // and then call selectChain, passing deferChain through. If deferChain
       // is false once selectChain returns, call initChain. Render a LoadingLayout
       // immediately (before selectChain resolves).
-      else if (selectedScope !== app.activeChainId() && scopeMatchesChain) {
+      if (selectedScope !== app.activeChainId() && scopeMatchesChain) {
         setIsLoading(true);
         setScopeToLoad(selectedScope);
         setIsChainDeferred(true);
