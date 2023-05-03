@@ -242,8 +242,8 @@ jobs:
       - name: Typecheck
         run: yarn --cwd packages/chain-events check-types
 
-      - name: Stop EVM Chain
-        run: docker stop chain
+#      - name: Stop EVM Chain
+#        run: docker stop chain
 
       - name: Display server logs
         if: always() # Ensure this step runs even if previous steps failed
