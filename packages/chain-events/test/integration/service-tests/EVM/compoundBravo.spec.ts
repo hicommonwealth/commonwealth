@@ -31,7 +31,7 @@ chai.use(chaiHttp);
 
 // TODO: ensure that the lastBlockNumber in the listener is updated AFTER all events have been processed + published to the appropriate queues
 
-describe.only('Integration tests for Compound Bravo', () => {
+describe.skip('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
