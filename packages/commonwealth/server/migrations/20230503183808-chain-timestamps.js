@@ -35,15 +35,14 @@ module.exports = {
       );
 
       const updateQuery = `
-      UPDATE "Chains" AS c
-      SET created_at = a.created_at
-      FROM (
-        SELECT chain, MIN(created_at) AS created_at
-        FROM "Addresses"
-        GROUP BY chain
-      ) AS a
-      WHERE c.created_at IS NULL AND c.id = a.chain;
-      
+        UPDATE "Chains" AS c
+        SET created_at = a.created_at
+        FROM (
+          SELECT chain, MIN(created_at) AS created_at
+          FROM "Addresses"
+          GROUP BY chain
+        ) AS a
+        WHERE c.created_at IS NULL AND c.id = a.chain;
       `;
 
       await queryInterface.sequelize.query(updateQuery, { transaction });
