@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { capitalize } from 'lodash';
 
 import 'components/new_thread_form.scss';
@@ -21,8 +21,11 @@ import {
   updateTopicList,
 } from './helpers';
 import { ReactQuillEditor } from '../react_quill_editor';
-import { clearDraft, createDeltaFromText } from '../react_quill_editor/utils';
-import { parseCustomStages } from 'helpers';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  serializeDelta,
+} from '../react_quill_editor/utils';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -32,6 +35,14 @@ export const NewThreadForm = () => {
   const author = app.user.activeAccount;
   const { authorName } = useAuthorName();
   const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
+
+  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
+    return (
+      isAdmin ||
+      t.tokenThreshold.isZero() ||
+      !TopicGateCheck.isGatedTopic(t.name)
+    );
+  });
 
   const {
     threadTitle,
@@ -46,19 +57,14 @@ export const NewThreadForm = () => {
     setThreadContentDelta,
     setIsSaving,
     isDisabled,
-  } = useNewThreadForm(authorName, hasTopics);
-
-  const draftKey = `new-thread-${app.activeChainId()}`;
+    clearDraft,
+  } = useNewThreadForm(chainId, authorName, topicsForSelector);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
-  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
-    return (
-      isAdmin ||
-      t.tokenThreshold.isZero() ||
-      !TopicGateCheck.isGatedTopic(t.name)
-    );
-  });
+  const isPopulated = useMemo(() => {
+    return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
+  }, [threadContentDelta, threadTitle]);
 
   const handleNewThreadCreation = async () => {
     if (!isDiscussion && !detectURL(threadUrl)) {
@@ -93,20 +99,28 @@ export const NewThreadForm = () => {
         app.activeChainId(),
         threadTitle,
         threadTopic,
-        deltaString,
+        serializeDelta(threadContentDelta),
         threadUrl
       );
 
       setThreadContentDelta(createDeltaFromText(''));
-      clearDraft(draftKey);
+      clearDraft();
 
       navigate(`/discussion/${result.id}`);
       updateTopicList(result.topic, app.chain);
     } catch (err) {
-      console.log('err');
+      console.error(err);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    setThreadTitle('');
+    setThreadTopic(
+      topicsForSelector.find((t) => t.name.includes('General')) || null
+    );
+    setThreadContentDelta(createDeltaFromText(''));
   };
 
   return (
@@ -131,8 +145,8 @@ export const NewThreadForm = () => {
             <div className="topics-and-title-row">
               {hasTopics && (
                 <TopicSelector
-                  defaultTopic={threadTopic}
                   topics={topicsForSelector}
+                  value={threadTopic}
                   onChange={setThreadTopic}
                 />
               )}
@@ -140,7 +154,7 @@ export const NewThreadForm = () => {
                 autoFocus
                 placeholder="Title"
                 value={threadTitle}
-                tabIndex={2}
+                tabIndex={1}
                 onInput={(e) => setThreadTitle(e.target.value)}
               />
             </div>
@@ -149,7 +163,7 @@ export const NewThreadForm = () => {
               <CWTextInput
                 placeholder="https://"
                 value={threadUrl}
-                tabIndex={3}
+                tabIndex={2}
                 onInput={(e) => setThreadUrl(e.target.value)}
               />
             )}
@@ -157,10 +171,17 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
-              draftKey={draftKey}
             />
 
             <div className="buttons-row">
+              {isPopulated && (
+                <CWButton
+                  label={'Cancel'}
+                  onClick={handleCancel}
+                  tabIndex={3}
+                  buttonType="secondary-blue"
+                />
+              )}
               <CWButton
                 label={
                   app.user.activeAccount
