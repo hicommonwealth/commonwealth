@@ -137,13 +137,13 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     //   }
     // }
 
-    if (scope && this.deferred && !deferChain) {
-      this.deferred = false;
-      initChain().then(() => {
-        this.redraw();
-      });
-      return <LoadingLayout />;
-    }
+    // if (scope && this.deferred && !deferChain) {
+    //   this.deferred = false;
+    //   initChain().then(() => {
+    //     this.redraw();
+    //   });
+    //   return <LoadingLayout />;
+    // }
 
     if (!scope && app.chain && app.chain.network) {
       // Handle the case where we unload the network or community, if we're
@@ -225,6 +225,19 @@ const LayoutComponentReact = ({
     shouldDeferChain,
   ]);
 
+  useNecessaryEffect(() => {
+    // IFB 6: If deferChain is false on the page we’re routing to, but we
+    // have loaded with isChainDeferred=true (previously from step 5),
+    // then call initChain and render a LoadingLayout immediately.
+    if (selectedScope && isChainDeferred && !shouldDeferChain) {
+      setIsLoading(true);
+      setIsChainDeferred(false);
+      initChain().finally(() => {
+        setIsLoading(false);
+      });
+    }
+  }, [selectedScope, isChainDeferred, shouldDeferChain]);
+
   // IFB 1: If initApp() threw an error, show application error.
   if (app.loadingError) {
     return <ApplicationError />;
@@ -243,14 +256,20 @@ const LayoutComponentReact = ({
   // and then call selectChain, passing deferChain through. If deferChain
   // is false once selectChain returns, call initChain. Render a LoadingLayout
   // immediately (before selectChain resolves).
+  // -
+  // IFB 6: If deferChain is false on the page we’re routing to, but we
+  // have loaded with isChainDeferred=true (previously from step 5),
+  // then call initChain and render a LoadingLayout immediately.
   if (
     isLoading ||
     !app.loginStatusLoaded() ||
-    // Important: render loading state immediately for IFB 5
+    // Important: render loading state immediately for IFB 5, 6
     // For IFB 5
     (selectedScope &&
       selectedScope !== app.activeChainId() &&
-      selectedScope !== scopeToLoad)
+      selectedScope !== scopeToLoad) ||
+    // For IFB 6
+    (selectedScope && isChainDeferred && !shouldDeferChain)
   ) {
     return <LoadingLayout />;
   }
