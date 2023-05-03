@@ -1,5 +1,6 @@
 import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import React from 'react';
+import app from '../../state';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
 import type { PopoverTriggerProps } from './component_kit/cw_popover/cw_popover';
@@ -38,12 +39,8 @@ export const SharePopover = (props: SharePopoverProps) => {
             } else if (discussionLink) {
               const urlParts = currentRoute.split('/');
 
-              const isCustomDomain =
-                !domain.includes('//commonwealth.im') &&
-                !domain.includes('//localhost')
-
               // If we copy from a custom domain page, exclude the chain
-              if (isCustomDomain){
+              if (app.isCustomDomain()){
                 urlToCopy = `${domain}${discussionLink}`;
               } else {
                 const chainId = urlParts[1];
