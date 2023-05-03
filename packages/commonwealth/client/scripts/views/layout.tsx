@@ -106,15 +106,15 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
 
-    if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
-      // If /api/status has returned, then app.config.nodes and app.config.communities
-      // should both be loaded. If we match neither of them, then we can safely 404
-      return (
-        <div className="Layout">
-          <PageNotFound />
-        </div>
-      );
-    }
+    // if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
+    //   // If /api/status has returned, then app.config.nodes and app.config.communities
+    //   // should both be loaded. If we match neither of them, then we can safely 404
+    //   return (
+    //     <div className="Layout">
+    //       <PageNotFound />
+    //     </div>
+    //   );
+    // }
 
     if (scope && scope !== app.activeChainId() && scope !== this.loadingScope) {
       // If we are supposed to load a new chain or community, we do so now
@@ -173,9 +173,25 @@ const LayoutComponentReact = ({
   scope: selectedScope,
   deferChain: shouldDeferChain,
 }: LayoutAttrs) => {
+  const scopeMatchesChain = app.config.chains.getById(selectedScope);
+  const scopeIsEthereumAddress =
+    selectedScope &&
+    selectedScope.startsWith('0x') &&
+    selectedScope.length === 42;
+
   // IFB 1: If initApp() threw an error, show application error.
   if (app.loadingError) {
     return <ApplicationError />;
+  }
+
+  // IFB 4: If the user has attempted to a community page that was not
+  // found on the list of communities from /status, show a 404 page.
+  if (selectedScope && !scopeMatchesChain && !scopeIsEthereumAddress) {
+    return (
+      <div className="Layout">
+        <PageNotFound />
+      </div>
+    );
   }
 
   // IFB 8: No pending branch case - Render the inner page as passed by router
