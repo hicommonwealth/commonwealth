@@ -173,7 +173,6 @@ export const UpdateProposalStatusModal = ({
         getInitialCosmosProposals(thread),
         'identifier'
       );
-      console.log(toAdd[0]);
       if (toAdd.length > 0) {
         const updatedThread = await app.threads.addLinks({
           threadId: thread.id,
