@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, Dispatch, SetStateAction } from 'react';
-import _ from 'lodash';
 import { IApp } from 'state';
 
 import { ChainBase } from 'common-common/src/types';
