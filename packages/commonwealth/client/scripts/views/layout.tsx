@@ -1,7 +1,9 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode, ClassComponentRouter } from 'mithrilInterop';
+
+import useNecessaryEffect from '../hooks/useNecessaryEffect';
 
 import 'layout.scss';
 
@@ -75,8 +77,8 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
   view(vnode: ResultNode<LayoutAttrs>) {
     const { scope, deferChain, router } = vnode.attrs;
 
-    const scopeIsEthereumAddress =
-      scope && scope.startsWith('0x') && scope.length === 42;
+    // const scopeIsEthereumAddress =
+    //   scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
 
     // if (app.loadingError) {
@@ -100,11 +102,11 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     //   return <LoadingLayout />;
     // }
 
-    if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
-      this.loadingScope = scope;
-      initNewTokenChain(scope, router.navigate);
-      return <LoadingLayout />;
-    }
+    // if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
+    //   this.loadingScope = scope;
+    //   initNewTokenChain(scope, router.navigate);
+    //   return <LoadingLayout />;
+    // }
 
     // if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
     //   // If /api/status has returned, then app.config.nodes and app.config.communities
@@ -179,6 +181,23 @@ const LayoutComponentReact = ({
     selectedScope.startsWith('0x') &&
     selectedScope.length === 42;
 
+  const [scopeToLoad, setScopeToLoad] = useState<string>();
+  const [isLoading, setIsLoading] = useState<boolean>();
+
+  useNecessaryEffect(() => {
+    if (selectedScope && selectedScope !== scopeToLoad) {
+      // IFB 3: If the user has navigated to an ethereum address directly,
+      // init a new token chain immediately
+      if (scopeIsEthereumAddress) {
+        setIsLoading(true);
+        setScopeToLoad(selectedScope);
+        initNewTokenChain(selectedScope, router.navigate).finally(() => {
+          setIsLoading(false);
+        });
+      }
+    }
+  }, [selectedScope, scopeToLoad, scopeIsEthereumAddress]);
+
   // IFB 1: If initApp() threw an error, show application error.
   if (app.loadingError) {
     return <ApplicationError />;
@@ -187,7 +206,10 @@ const LayoutComponentReact = ({
   // Show loading state for these cases
   // -
   // IFB 2: If initApp() hasn’t finished loading yet
-  if (!app.loginStatusLoaded()) {
+  // -
+  // IFB 3: If the user has navigated to an ethereum address directly,
+  // init a new token chain immediately and show loading state
+  if (isLoading || !app.loginStatusLoaded()) {
     return <LoadingLayout />;
   }
 
