@@ -123,29 +123,26 @@ const LayoutComponent = ({
     !selectedScope && !app.isCustomDomain() && app.chain && app.chain.network;
 
   useNecessaryEffect(() => {
-    // if (shouldInitNewTokenChain) {
-    //   // IFB 3
-    //   setIsLoading(true);
-    //   setScopeToLoad(selectedScope);
-    //   initNewTokenChain(selectedScope, router.navigate).finally(() => {
-    //     setIsLoading(false);
-    //   });
-    // } else
-    if (shouldSelectChain) {
-      // IFB 5
-      setIsLoading(true);
-      setScopeToLoad(selectedScope);
-      setIsChainDeferred(true);
-      selectChain(scopeMatchesChain, shouldDeferChain).then((response) => {
+    (async () => {
+      // if (shouldInitNewTokenChain) {
+      //   // IFB 3
+      //   setIsLoading(true);
+      //   setScopeToLoad(selectedScope);
+      //   await initNewTokenChain(selectedScope, router.navigate);
+      //   setIsLoading(false);
+      // } else
+      if (shouldSelectChain) {
+        // IFB 5
+        setIsLoading(true);
+        setScopeToLoad(selectedScope);
+        setIsChainDeferred(true);
+        const response = await selectChain(scopeMatchesChain, shouldDeferChain);
         if (!shouldDeferChain && response) {
-          initChain().finally(() => {
-            setIsLoading(false);
-          });
-        } else {
-          setIsLoading(false);
+          await initChain();
         }
-      });
-    }
+        setIsLoading(false);
+      }
+    })();
   }, [
     // shouldInitNewTokenChain,
     shouldSelectChain,
@@ -153,25 +150,27 @@ const LayoutComponent = ({
   ]);
 
   useNecessaryEffect(() => {
-    // IFB 6
-    if (shouldLoadDeferredChain) {
-      setIsLoading(true);
-      setIsChainDeferred(false);
-      initChain().finally(() => {
+    (async () => {
+      // IFB 6
+      if (shouldLoadDeferredChain) {
+        setIsLoading(true);
+        setIsChainDeferred(false);
+        await initChain();
         setIsLoading(false);
-      });
-    }
+      }
+    })();
   }, [shouldLoadDeferredChain]);
 
   useNecessaryEffect(() => {
-    // IFB 7
-    if (shouldDeInitChain) {
-      setIsLoading(true);
-      deinitChainOrCommunity().finally(() => {
+    (async () => {
+      // IFB 7
+      if (shouldDeInitChain) {
+        setIsLoading(true);
+        await deinitChainOrCommunity();
         setScopeToLoad(null);
         setIsLoading(false);
-      });
-    }
+      }
+    })();
   }, [shouldDeInitChain]);
 
   // IFB 1: If initApp() threw an error, show application error.
