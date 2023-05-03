@@ -31,7 +31,7 @@ chai.use(chaiHttp);
 
 // TODO: ensure that the lastBlockNumber in the listener is updated AFTER all events have been processed + published to the appropriate queues
 
-describe.skip('Integration tests for Compound Bravo', () => {
+describe('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
@@ -107,8 +107,10 @@ describe.skip('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
-      const { secs, blocks } = getEvmSecondsAndBlocks(4);
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks)
+      const currentBlock = await sdk.getBlock();
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Vote Period Check', currentBlock.number - proposalCreatedBlockNum)
       const { block } = await sdk.castVote(proposalId, 1, true);
 
       await waitUntilBlock(block, listener);
