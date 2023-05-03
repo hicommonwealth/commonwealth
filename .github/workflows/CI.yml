@@ -26,6 +26,11 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
 
     steps:
       - name: Checkout
@@ -103,6 +108,10 @@ jobs:
         image: irowan/common_chain_tests
         ports:
          - 3000:3000
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
 
     steps:
       - name: Checkout

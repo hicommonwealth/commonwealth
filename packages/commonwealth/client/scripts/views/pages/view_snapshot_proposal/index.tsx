@@ -19,12 +19,12 @@ import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
-import { renderQuillTextBody } from '../../components/react_quill_editor/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -141,7 +141,7 @@ export const ViewProposalPage = ({
             <ClosedProposalPill proposalState={proposal.state} />
           )
         }
-        body={renderQuillTextBody(proposal.body)}
+        body={<QuillRenderer doc={proposal.body} />}
         subBody={
           votes.length > 0 && (
             <SnapshotVotesTable

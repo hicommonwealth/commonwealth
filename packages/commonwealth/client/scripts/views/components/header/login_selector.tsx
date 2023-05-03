@@ -613,7 +613,10 @@ export const LoginSelector = () => {
       />
       <Modal
         content={
-          <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
+          <LoginModal
+            onSuccess={() => setIsJoined(true)}
+            onModalClose={() => setIsLoginModalOpen(false)}
+          />
         }
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}

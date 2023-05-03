@@ -12,8 +12,7 @@ import { AddressInfo } from 'models';
 import { pluralize } from 'helpers';
 import { User } from 'views/components/user/user';
 import { getThreadUrl, getCommunityUrl } from 'utils';
-import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
-import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 const jumpHighlightNotification = (
   commentId,
@@ -52,35 +51,6 @@ const jumpHighlightNotification = (
   }
 };
 
-const getCommentPreview = (commentText) => {
-  let decodedCommentText;
-
-  try {
-    const doc = JSON.parse(decodeURIComponent(commentText));
-
-    if (!doc.ops) throw new Error();
-
-    decodedCommentText = <QuillFormattedText doc={doc} hideFormatting />;
-  } catch (e) {
-    // TODO Graham 22-6-5: What does this do? How can we simplify to use helper?
-    let doc = decodeURIComponent(commentText);
-
-    const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
-
-    const matches = doc['matchAll'](regexp);
-
-    Array.from(matches).forEach((match) => {
-      doc = doc.replace(match[0], match[1]);
-    });
-
-    decodedCommentText = (
-      <MarkdownFormattedText doc={doc.slice(0, 140)} hideFormatting collapse />
-    );
-  }
-
-  return decodedCommentText;
-};
-
 const getNotificationFields = (category, data: IPostNotificationData) => {
   const {
     created_at,
@@ -104,7 +74,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const decodedTitle = decodeURIComponent(root_title).trim();
 
   if (comment_text) {
-    notificationBody = getCommentPreview(comment_text);
+    notificationBody = <QuillRenderer doc={comment_text} />;
   } else if (root_type === ProposalType.Thread) {
     notificationBody = null;
   }
@@ -218,7 +188,7 @@ export const getBatchNotificationFields = (
   const decodedTitle = decodeURIComponent(root_title).trim();
 
   if (comment_text) {
-    notificationBody = getCommentPreview(comment_text);
+    notificationBody = <QuillRenderer doc={comment_text} />;
   } else if (root_type === ProposalType.Thread) {
     notificationBody = null;
   }
