@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { RangeStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
 import MagicUrl from 'quill-magic-url';
@@ -26,6 +20,8 @@ import { LoadingIndicator } from './loading_indicator';
 import { useMention } from './use_mention';
 import { useClipboardMatchers } from './use_clipboard_matchers';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
+import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
+import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 
 Quill.register('modules/magicUrl', MagicUrl);
 
@@ -45,6 +41,10 @@ const ReactQuillEditor = ({
   contentDelta,
   setContentDelta,
 }: ReactQuillEditorProps) => {
+  const toolbarId = useMemo(() => {
+    return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+  }, []);
+
   const editorRef = useRef<ReactQuill>();
 
   const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -60,12 +60,26 @@ const ReactQuillEditor = ({
     lastSelectionRef,
   });
 
+  // handle clipboard behavior
   const { clipboardMatchers } = useClipboardMatchers();
 
+  // handle image upload
   const { handleImageDropAndPaste } = useImageDropAndPaste({
     editorRef,
     setIsUploading,
     isMarkdownEnabled,
+    setContentDelta,
+  });
+
+  // handle custom toolbar behavior for markdown
+  const markdownToolbarHandlers = useMarkdownToolbarHandlers({
+    editorRef,
+    setContentDelta,
+  });
+
+  // handle keyboard shortcuts for markdown
+  const markdownKeyboardShortcuts = useMarkdownShortcuts({
+    editorRef,
     setContentDelta,
   });
 
@@ -134,19 +148,6 @@ const ReactQuillEditor = ({
   const handlePreviewModalClose = () => {
     setIsPreviewVisible(false);
   };
-
-  // if markdown is disabled, hide toolbar buttons
-  const toolbar = useMemo(() => {
-    if (isMarkdownEnabled) {
-      return [];
-    }
-    // ref: https://quilljs.com/docs/modules/toolbar/
-    return ([[{ header: 1 }, { header: 2 }]] as any).concat([
-      ['bold', 'italic', 'strike'],
-      ['link', 'code-block', 'blockquote'],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-    ]);
-  }, [isMarkdownEnabled]);
 
   // when markdown state is changed, add markdown metadata to delta ops
   // and refresh quill component
@@ -225,32 +226,44 @@ const ReactQuillEditor = ({
         />
       </div>
       {isVisible && (
-        <ReactQuill
-          ref={editorRef}
-          className={`QuillEditor ${className}`}
-          placeholder={placeholder}
-          tabIndex={tabIndex}
-          theme="snow"
-          value={contentDelta}
-          onChange={handleChange}
-          onChangeSelection={(selection: RangeStatic) => {
-            if (!selection) {
-              return;
-            }
-            lastSelectionRef.current = selection;
-          }}
-          modules={{
-            toolbar,
-            imageDropAndPaste: {
-              handler: handleImageDropAndPaste,
-            },
-            clipboard: {
-              matchers: clipboardMatchers,
-            },
-            mention,
-            magicUrl: !isMarkdownEnabled,
-          }}
-        />
+        <>
+          <CustomQuillToolbar toolbarId={toolbarId} />
+          <ReactQuill
+            ref={editorRef}
+            className={`QuillEditor ${className}`}
+            placeholder={placeholder}
+            tabIndex={tabIndex}
+            theme="snow"
+            value={contentDelta}
+            onChange={handleChange}
+            onChangeSelection={(selection: RangeStatic) => {
+              if (!selection) {
+                return;
+              }
+              lastSelectionRef.current = selection;
+            }}
+            formats={isMarkdownEnabled ? [] : undefined}
+            modules={{
+              toolbar: {
+                container: `#${toolbarId}`,
+                handlers: isMarkdownEnabled
+                  ? markdownToolbarHandlers
+                  : undefined,
+              },
+              imageDropAndPaste: {
+                handler: handleImageDropAndPaste,
+              },
+              clipboard: {
+                matchers: clipboardMatchers,
+              },
+              mention,
+              magicUrl: !isMarkdownEnabled,
+              keyboard: isMarkdownEnabled
+                ? markdownKeyboardShortcuts
+                : undefined,
+            }}
+          />
+        </>
       )}
     </div>
   );
