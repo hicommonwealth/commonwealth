@@ -33,6 +33,22 @@ const LoadingLayout = () => {
   );
 };
 
+const ApplicationError = () => {
+  return (
+    <div className="Layout">
+      <CWEmptyState
+        iconName="cautionTriangle"
+        content={
+          <div className="loading-error">
+            <CWText>Application error: {app.loadingError}</CWText>
+            <CWText>Please try again later</CWText>
+          </div>
+        }
+      />
+    </div>
+  );
+};
+
 interface ShouldDeferChainAttrs {
   deferChain: boolean;
 }
@@ -63,21 +79,21 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
 
-    if (app.loadingError) {
-      return (
-        <div className="Layout">
-          <CWEmptyState
-            iconName="cautionTriangle"
-            content={
-              <div className="loading-error">
-                <CWText>Application error: {app.loadingError}</CWText>
-                <CWText>Please try again later</CWText>
-              </div>
-            }
-          />
-        </div>
-      );
-    }
+    // if (app.loadingError) {
+    //   return (
+    //     <div className="Layout">
+    //       <CWEmptyState
+    //         iconName="cautionTriangle"
+    //         content={
+    //           <div className="loading-error">
+    //             <CWText>Application error: {app.loadingError}</CWText>
+    //             <CWText>Please try again later</CWText>
+    //           </div>
+    //         }
+    //       />
+    //     </div>
+    //   );
+    // }
 
     if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
@@ -157,6 +173,11 @@ const LayoutComponentReact = ({
   scope: selectedScope,
   deferChain: shouldDeferChain,
 }: LayoutAttrs) => {
+  // IFB 1: If initApp() threw an error, show application error.
+  if (app.loadingError) {
+    return <ApplicationError />;
+  }
+
   // IFB 8: No pending branch case - Render the inner page as passed by router
   return <div className="Layout">{children}</div>;
 };
