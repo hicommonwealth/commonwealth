@@ -159,7 +159,7 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                         e.stopPropagation();
                       }}
                     >
-                      <SharePopover />
+                      <SharePopover discussionLink={discussionLink}/>
                     </div>
                     {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
                     {/* {isAdminOrMod && (
