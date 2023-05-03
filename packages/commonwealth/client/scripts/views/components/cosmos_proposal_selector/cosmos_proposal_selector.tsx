@@ -103,7 +103,6 @@ export const ProposalSelector = ({
         iconRight="close"
         onInput={handleInputChange}
       />
-
       <QueryList
         loading={loadingActive}
         options={entities}

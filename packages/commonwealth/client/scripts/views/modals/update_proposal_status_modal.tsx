@@ -75,6 +75,9 @@ export const UpdateProposalStatusModal = ({
       ]
     : parseCustomStages(customStages);
   const showSnapshot = !!app.chain.meta.snapshot?.length;
+  const isCosmos = app.chain?.chain instanceof CosmosChain;
+  const showChainEvents =
+    !isCosmos && app.chainEntities.store.get(thread.chain).length > 0;
 
   const handleSaveChanges = async () => {
     // set stage
@@ -247,7 +250,6 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
-  console.log('app.chain', app.chain);
   return (
     <div className="UpdateProposalStatusModal">
       <div className="compact-modal-title">
@@ -276,13 +278,13 @@ export const UpdateProposalStatusModal = ({
             snapshotProposalsToSet={tempSnapshotProposals}
           />
         )}
-        {app.chainEntities.store.get(thread.chain).length > 0 && (
+        {showChainEvents && (
           <ChainEntitiesSelector
             onSelect={handleSelectChainEntity}
             proposalsToSet={tempProposals}
           />
         )}
-        {app.chain.chain instanceof CosmosChain && (
+        {isCosmos && (
           <ProposalSelector
             onSelect={handleSelectCosmosProposal}
             proposalsToSet={tempCosmosProposals}
