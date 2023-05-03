@@ -1,7 +1,6 @@
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useState } from 'react';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode, ClassComponentRouter } from 'mithrilInterop';
+import type { ClassComponentRouter } from 'mithrilInterop';
 
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 
@@ -70,106 +69,13 @@ type LayoutAttrs = {
   children: React.ReactNode;
 };
 
-class LayoutComponent extends ClassComponent<LayoutAttrs> {
-  private loadingScope: string;
-  private deferred: boolean;
-
-  view(vnode: ResultNode<LayoutAttrs>) {
-    const { scope, deferChain, router } = vnode.attrs;
-
-    // const scopeIsEthereumAddress =
-    //   scope && scope.startsWith('0x') && scope.length === 42;
-    const scopeMatchesChain = app.config.chains.getById(scope);
-
-    // if (app.loadingError) {
-    //   return (
-    //     <div className="Layout">
-    //       <CWEmptyState
-    //         iconName="cautionTriangle"
-    //         content={
-    //           <div className="loading-error">
-    //             <CWText>Application error: {app.loadingError}</CWText>
-    //             <CWText>Please try again later</CWText>
-    //           </div>
-    //         }
-    //       />
-    //     </div>
-    //   );
-    // }
-
-    // if (!app.loginStatusLoaded()) {
-    //   // Wait for /api/status to return with the user's login status
-    //   return <LoadingLayout />;
-    // }
-
-    // if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
-    //   this.loadingScope = scope;
-    //   initNewTokenChain(scope, router.navigate);
-    //   return <LoadingLayout />;
-    // }
-
-    // if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
-    //   // If /api/status has returned, then app.config.nodes and app.config.communities
-    //   // should both be loaded. If we match neither of them, then we can safely 404
-    //   return (
-    //     <div className="Layout">
-    //       <PageNotFound />
-    //     </div>
-    //   );
-    // }
-
-    // if (scope && scope !== app.activeChainId() && scope !== this.loadingScope) {
-    //   // If we are supposed to load a new chain or community, we do so now
-    //   // This happens only once, and then loadingScope should be set
-    //   this.loadingScope = scope;
-    //   if (scopeMatchesChain) {
-    //     this.deferred = deferChain;
-    //     selectChain(scopeMatchesChain, deferChain).then((response) => {
-    //       if (!deferChain && response) {
-    //         initChain().then(() => {
-    //           this.redraw();
-    //         });
-    //       } else {
-    //         this.redraw();
-    //       }
-    //     });
-    //     return <LoadingLayout />;
-    //   }
-    // }
-
-    // if (scope && this.deferred && !deferChain) {
-    //   this.deferred = false;
-    //   initChain().then(() => {
-    //     this.redraw();
-    //   });
-    //   return <LoadingLayout />;
-    // }
-
-    // if (!scope && app.chain && app.chain.network) {
-    //   // Handle the case where we unload the network or community, if we're
-    //   // going to a page that doesn't have one
-    //   // Include this in if for isCustomDomain, scope gets unset on redirect
-    //   // We don't need this to happen
-    //   if (!app.isCustomDomain()) {
-    //     deinitChainOrCommunity().then(() => {
-    //       this.loadingScope = null;
-    //       redraw();
-    //     });
-    //   }
-    //   return <LoadingLayout />;
-    // }
-
-    // return <div className="Layout">{vnode.children}</div>;
-  }
-}
-
 /**
  * Handles the app init flow and branch cases
  * --
  * Each logic block is marked with a IFS=Init-Flow-Step comment
  * with a number indicating the order in which they occur
  */
-const LayoutComponentReact = ({
+const LayoutComponent = ({
   router,
   children,
   scope: selectedScope,
