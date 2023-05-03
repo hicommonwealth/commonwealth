@@ -53,7 +53,7 @@ interface ShouldDeferChainAttrs {
   deferChain: boolean;
 }
 
-const shouldDeferChain = ({ deferChain }: ShouldDeferChainAttrs) => {
+const shouldDeferChainLoading = ({ deferChain }: ShouldDeferChainAttrs) => {
   if (app.chain?.meta.type === ChainType.Token) {
     return false;
   }
@@ -226,7 +226,7 @@ export const LayoutWrapper = ({ Component, params }) => {
 
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
   const scope = params.scoped ? pathScope : null;
-  const deferChain = shouldDeferChain({
+  const deferChain = shouldDeferChainLoading({
     deferChain: params.deferChain,
   });
 
