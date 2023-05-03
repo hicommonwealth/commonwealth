@@ -30,7 +30,10 @@ export const useMarkdownShortcuts = ({
           const end = start + selection.length;
           editor.insertText(end, markdownChars);
           editor.insertText(start, markdownChars);
-          setContentDelta(editor.getContents());
+          setContentDelta({
+            ...editor.getContents(),
+            ___isMarkdown: true,
+          } as SerializableDeltaStatic);
         },
       };
     };
