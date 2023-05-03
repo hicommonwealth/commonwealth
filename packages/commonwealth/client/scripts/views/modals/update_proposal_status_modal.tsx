@@ -17,7 +17,7 @@ import { Link, LinkSource } from 'models/Thread';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
 import { ProposalSelector } from '../components/cosmos_proposal_selector';
 import { CosmosProposal } from '/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import CosmosChain from 'controllers/chain/cosmos/chain';
+import { ChainBase } from 'common-common/src/types';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -75,7 +75,7 @@ export const UpdateProposalStatusModal = ({
       ]
     : parseCustomStages(customStages);
   const showSnapshot = !!app.chain.meta.snapshot?.length;
-  const isCosmos = app.chain?.chain instanceof CosmosChain;
+  const isCosmos = app.chain.base === ChainBase.CosmosSDK;
   const showChainEvents =
     !isCosmos && app.chainEntities.store.get(thread.chain).length > 0;
 
