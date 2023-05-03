@@ -52,7 +52,6 @@ describe('Integration tests for ERC721', () => {
   before(async () => {
     accounts = await sdk.getAccounts();
     nft = await sdk.deployNFT();
-    await nft.mint(token_id, 1);
     chain = {
       id: chain_id,
       base: ChainBase.Ethereum,
@@ -80,6 +79,7 @@ describe('Integration tests for ERC721', () => {
     });
 
     it('Should capture transfer events', async () => {
+      await nft.mint(token_id, 1);
       const { block } = await nft.transferERC721(token_id, 2, accounts[1]);
       await waitUntilBlock(block, listener);
 

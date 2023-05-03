@@ -19,7 +19,7 @@
     "unit-test": "ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "integration-test": "cd eth && hardhat test ../test/integration/*.spec.ts",
     "test": "ts-mocha --bail --project test/integration/service-tests/tsconfig.json test/integration/service-tests/EVM/erc721.spec.ts --timeout 80000",
-    "test-services": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/**/*.spec.ts --timeout 240000",
+    "test-services": "ts-mocha --bail --project test/integration/service-tests/tsconfig.json test/integration/service-tests/**/*.spec.ts --timeout 240000",
     "test-app": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/chainEventsApp.test.ts",
     "lint-all": "eslint './**/*.ts'",
     "listen": "ts-node -T ./scripts/listener.ts",
