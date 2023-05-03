@@ -95,10 +95,10 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     //   );
     // }
 
-    if (!app.loginStatusLoaded()) {
-      // Wait for /api/status to return with the user's login status
-      return <LoadingLayout />;
-    }
+    // if (!app.loginStatusLoaded()) {
+    //   // Wait for /api/status to return with the user's login status
+    //   return <LoadingLayout />;
+    // }
 
     if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
       this.loadingScope = scope;
@@ -182,6 +182,13 @@ const LayoutComponentReact = ({
   // IFB 1: If initApp() threw an error, show application error.
   if (app.loadingError) {
     return <ApplicationError />;
+  }
+
+  // Show loading state for these cases
+  // -
+  // IFB 2: If initApp() hasn’t finished loading yet
+  if (!app.loginStatusLoaded()) {
+    return <LoadingLayout />;
   }
 
   // IFB 4: If the user has attempted to a community page that was not
