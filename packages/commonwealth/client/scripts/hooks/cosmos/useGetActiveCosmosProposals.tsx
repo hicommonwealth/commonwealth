@@ -3,13 +3,13 @@ import { IApp } from 'state';
 
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
-import { getCompletedProposals } from 'controllers/chain/cosmos/gov/utils';
+import { getActiveProposals } from 'controllers/chain/cosmos/gov/utils';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 
 type UseStateSetter<T> = Dispatch<SetStateAction<T>>;
 
 interface Response {
-  completedCosmosProposals: CosmosProposal[];
+  activeCosmosProposals: CosmosProposal[];
 }
 
 interface Props {
@@ -18,12 +18,12 @@ interface Props {
   isLoading: boolean;
 }
 
-export const useGetCompletedCosmosProposals = ({
+export const useGetActiveCosmosProposals = ({
   app,
   setIsLoading,
   isLoading,
 }: Props): Response => {
-  const [completedCosmosProposals, setCompletedCosmosProposals] = useState<
+  const [activeCosmosProposals, setActiveCosmosProposals] = useState<
     CosmosProposal[]
   >([]);
 
@@ -36,13 +36,13 @@ export const useGetCompletedCosmosProposals = ({
         const cosmos = app.chain as Cosmos;
         const storedProposals =
           cosmos.governance.store.getAll() as CosmosProposal[];
-        const completedProposals = storedProposals.filter((p) => p.completed);
-        if (completedProposals?.length) {
-          setCompletedCosmosProposals(completedProposals);
+        const activeProposals = storedProposals.filter((p) => !p.completed);
+        if (activeProposals?.length) {
+          setActiveCosmosProposals(activeProposals);
         } else {
           setIsLoading(true);
-          const proposals = await getCompletedProposals(cosmos);
-          setCompletedCosmosProposals(proposals);
+          const proposals = await getActiveProposals(cosmos);
+          setActiveCosmosProposals(proposals);
           setIsLoading(false);
         }
       }
@@ -63,6 +63,6 @@ export const useGetCompletedCosmosProposals = ({
   }, [app.chain?.apiInitialized]);
 
   return {
-    completedCosmosProposals,
+    activeCosmosProposals,
   };
 };
