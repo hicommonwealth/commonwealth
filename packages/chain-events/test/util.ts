@@ -62,7 +62,7 @@ export function findEvent(events: any[], kind: string, chain_id: string, blockNu
 
 export function getEvmSecondsAndBlocks(days: number) {
   const secs = days * 86400;
-  const blocks = secs / 12 + 500;
+  const blocks = Math.round(secs / 12 + 500);
   return { secs, blocks };
 }
 

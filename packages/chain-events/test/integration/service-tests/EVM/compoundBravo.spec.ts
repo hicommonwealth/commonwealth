@@ -109,8 +109,8 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture votes on the created proposal', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks)
-      const currentBlock = await sdk.getBlock();
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Vote Period Check', currentBlock.number - proposalCreatedBlockNum)
+      // const currentBlock = await sdk.getBlock();
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Vote Period Check', currentBlock.number - proposalCreatedBlockNum)
       const { block } = await sdk.castVote(proposalId, 1, true);
 
       await waitUntilBlock(block, listener);
