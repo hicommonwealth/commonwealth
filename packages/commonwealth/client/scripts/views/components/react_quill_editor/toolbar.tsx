@@ -47,7 +47,6 @@ export const useMarkdownToolbarHandlers = ({
       if (!selection) {
         return;
       }
-      // TODO: remove leading/trailing spaces from selection?
       const text = editor.getText(selection.index, selection.length);
       editor.deleteText(selection.index, selection.length);
       editor.insertText(

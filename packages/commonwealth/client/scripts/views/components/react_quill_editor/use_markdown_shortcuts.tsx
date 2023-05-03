@@ -25,11 +25,12 @@ export const useMarkdownShortcuts = ({
           if (!selection) {
             return;
           }
-          // TODO: remove leading/trailing spaces from selection?
-          const start = selection.index;
-          const end = start + selection.length;
-          editor.insertText(end, markdownChars);
-          editor.insertText(start, markdownChars);
+          const text = editor.getText(selection.index, selection.length);
+          editor.deleteText(selection.index, selection.length);
+          editor.insertText(
+            selection.index,
+            `${markdownChars}${text.trim()}${markdownChars}`
+          );
           setContentDelta({
             ...editor.getContents(),
             ___isMarkdown: true,
