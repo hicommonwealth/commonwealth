@@ -12,7 +12,7 @@ import QuillMention from 'quill-mention';
 import MagicUrl from 'quill-magic-url';
 import moment from 'moment';
 
-import { SerializableDeltaStatic, restoreDraft, saveDraft } from './utils';
+import { SerializableDeltaStatic } from './utils';
 import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
 
 import app from 'state';
@@ -28,7 +28,6 @@ import { nextTick } from 'process';
 import { MinimumProfile } from 'models';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { LoadingIndicator } from './loading_indicator';
-import { debounce } from 'lodash';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
@@ -43,7 +42,6 @@ type ReactQuillEditorProps = {
   tabIndex?: number;
   contentDelta: SerializableDeltaStatic;
   setContentDelta: (d: SerializableDeltaStatic) => void;
-  draftKey?: string;
 };
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -53,7 +51,6 @@ const ReactQuillEditor = ({
   tabIndex,
   contentDelta,
   setContentDelta,
-  draftKey,
 }: ReactQuillEditorProps) => {
   const editorRef = useRef<ReactQuill>();
 
@@ -382,26 +379,6 @@ const ReactQuillEditor = ({
     setTimeout(() => {
       refreshQuillComponent();
     }, 100);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editorRef]);
-
-  const debouncedSaveDraft = useCallback(debounce(saveDraft, 300), []);
-
-  // when content updated, save draft
-  useEffect(() => {
-    debouncedSaveDraft(draftKey, contentDelta);
-  }, [debouncedSaveDraft, draftKey, contentDelta]);
-
-  // when initialized, restore draft
-  useEffect(() => {
-    if (!editorRef.current || !draftKey) {
-      return;
-    }
-    const restoredDelta = restoreDraft(draftKey);
-    if (restoredDelta) {
-      setContentDelta(restoredDelta.contentDelta);
-      setIsMarkdownEnabled(!!restoredDelta.contentDelta?.___isMarkdown);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
