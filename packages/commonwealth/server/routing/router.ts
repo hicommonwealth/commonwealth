@@ -182,6 +182,7 @@ import { createTemplate, getTemplates } from '../routes/templates';
 
 import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
+import bulkProfiles from 'server/routes/bulkProfiles';
 
 function setupRouter(
   endpoint: string,
@@ -673,6 +674,13 @@ function setupRouter(
     bulkAddresses.bind(this, models)
   );
 
+  // fetch profiles (e.g. for mentions)
+  router.get(
+    '/bulkProfiles',
+    databaseValidationService.validateChain,
+    bulkProfiles.bind(this, models)
+  );
+
   // projects related routes
   router.get(
     '/setProjectChain',
@@ -803,8 +811,8 @@ function setupRouter(
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
   router.post(
-    '/viewGlobalActivity'
-    ,viewGlobalActivity.bind(this, models, globalActivityCache)
+    '/viewGlobalActivity',
+    viewGlobalActivity.bind(this, models, globalActivityCache)
   );
   router.post(
     '/markNotificationsRead',
