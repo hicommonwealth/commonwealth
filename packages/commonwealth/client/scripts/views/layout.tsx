@@ -141,9 +141,25 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
 
-    return <div className="Layout">{vnode.children}</div>;
+    // return <div className="Layout">{vnode.children}</div>;
   }
 }
+
+/**
+ * Handles the app init flow and branch cases
+ * --
+ * Each logic block is marked with a IFS=Init-Flow-Step comment
+ * with a number indicating the order in which they occur
+ */
+const LayoutComponentReact = ({
+  router,
+  children,
+  scope: selectedScope,
+  deferChain: shouldDeferChain,
+}: LayoutAttrs) => {
+  // IFB 8: No pending branch case - Render the inner page as passed by router
+  return <div className="Layout">{children}</div>;
+};
 
 export const LayoutWrapper = ({ Component, params }) => {
   const routerParams = useParams();
