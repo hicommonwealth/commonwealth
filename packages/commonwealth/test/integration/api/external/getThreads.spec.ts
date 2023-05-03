@@ -1,16 +1,11 @@
-import 'chai/register-should';
-import models from 'server/database';
 import chai from 'chai';
 import 'chai/register-should';
 import type { GetThreadsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
-import 'test/integration/api/external/dbEntityHooks.spec';
-import {
-  testComments,
-  testThreads,
-} from 'test/integration/api/external/dbEntityHooks.spec';
 import type { ThreadAttributes } from 'server/models/thread';
 import { get } from 'test/integration/api/external/appHook.spec';
+import 'test/integration/api/external/dbEntityHooks.spec';
+import { testComments, testThreads, } from 'test/integration/api/external/dbEntityHooks.spec';
 
 describe('getThreads Tests', () => {
   it('should return threads with specified community_id correctly', async () => {
@@ -136,18 +131,14 @@ describe('getThreads Tests', () => {
 
   it('Should return sensible default for thread with no associated comment', async () => {
     let resp = await get(
-        '/api/threads',
-        { community_id: testThreads[0].chain, include_comments: true, topic_id: -1 }
-      );
+      '/api/threads',
+      { community_id: testThreads[0].chain, include_comments: true, topic_id: -1 }
+    );
 
     chai.assert.lengthOf(resp.result.threads, 2);
-    if (resp.result.threads[0].Comments.length === 2){
-      chai.assert.equal(resp.result.threads[0].Comments.length, 2);
-      chai.assert.equal(resp.result.threads[1].Comments.length, 3);
-    } else {
-      chai.assert.equal(resp.result.threads[0].Comments.length, 3);
-      chai.assert.equal(resp.result.threads[1].Comments.length, 2);
-    }
+    const sortedByLength = resp.result.threads.sort((a, b) => a.Comments.length - b.Comments.length);
+    chai.assert.equal(sortedByLength[0].Comments.length, 2);
+    chai.assert.equal(sortedByLength[1].Comments.length, 3);
 
     resp = await get(
       '/api/threads',
@@ -158,5 +149,16 @@ describe('getThreads Tests', () => {
     chai.assert.equal(resp.result.threads[0].Comments.length, 0);
     chai.assert.equal(resp.result.threads[1].Comments.length, 0);
     chai.assert.equal(resp.result.threads[2].Comments.length, 0);
+
+
+    resp = await get(
+      '/api/threads',
+      { community_id: testThreads[0].chain, include_comments: false, topic_id: -2 }
+    );
+
+    chai.assert.lengthOf(resp.result.threads, 3);
+    chai.assert.equal(resp.result.threads[0].Comments, undefined);
+    chai.assert.equal(resp.result.threads[1].Comments, undefined);
+    chai.assert.equal(resp.result.threads[2].Comments, undefined);
   });
 });
