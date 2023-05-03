@@ -82,7 +82,6 @@ const LayoutComponent = ({
   scope: selectedScope,
   deferChain: shouldDeferChain,
 }: LayoutAttrs) => {
-  const scopeMatchesChain = app.config.chains.getById(selectedScope);
   // const scopeIsEthereumAddress =
   //   selectedScope &&
   //   selectedScope.startsWith('0x') &&
@@ -92,77 +91,88 @@ const LayoutComponent = ({
   const [isChainDeferred, setIsChainDeferred] = useState<boolean>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
-  useNecessaryEffect(() => {
-    if (selectedScope && selectedScope !== scopeToLoad) {
-      // // IFB 3: If the user has navigated to an ethereum address directly,
-      // // init a new token chain immediately
-      // if (scopeIsEthereumAddress) {
-      //   setIsLoading(true);
-      //   setScopeToLoad(selectedScope);
-      //   initNewTokenChain(selectedScope, router.navigate).finally(() => {
-      //     setIsLoading(false);
-      //   });
-      // } else
+  const scopeMatchesChain = app.config.chains.getById(selectedScope);
 
-      // IFB 5: If scope is different from app.activeChainId() at render
-      // time (and we are not loading another community at the same time,
-      // via this.loadingScope), set this.loadingScope to the provided scope,
-      // and then call selectChain, passing deferChain through. If deferChain
-      // is false once selectChain returns, call initChain. Render a LoadingLayout
-      // immediately (before selectChain resolves).
-      if (selectedScope !== app.activeChainId() && scopeMatchesChain) {
-        setIsLoading(true);
-        setScopeToLoad(selectedScope);
-        setIsChainDeferred(true);
-        selectChain(scopeMatchesChain, shouldDeferChain).then((response) => {
-          if (!shouldDeferChain && response) {
-            initChain().finally(() => {
-              setIsLoading(false);
-            });
-          } else {
+  // IFB 3: If the user has navigated to an ethereum address directly,
+  // init a new token chain immediately
+  // const shouldInitNewTokenChain =
+  //   selectedScope && selectedScope !== scopeToLoad && scopeIsEthereumAddress;
+
+  // IFB 5: If scope is different from app.activeChainId() at render
+  // time (and we are not loading another community at the same time,
+  // via this.loadingScope), set this.loadingScope to the provided scope,
+  // and then call selectChain, passing deferChain through. If deferChain
+  // is false once selectChain returns, call initChain. Render a LoadingLayout
+  // immediately (before selectChain resolves).
+  const shouldSelectChain =
+    selectedScope &&
+    selectedScope !== app.activeChainId() &&
+    selectedScope !== scopeToLoad &&
+    scopeMatchesChain;
+
+  // IFB 6: If deferChain is false on the page we’re routing to, but we
+  // have loaded with isChainDeferred=true (previously from step 5),
+  // then call initChain and render a LoadingLayout immediately.
+  const shouldLoadDeferredChain =
+    selectedScope && isChainDeferred && !shouldDeferChain;
+
+  // IFB 7: If scope is not defined (and we are not on a custom domain),
+  // deinitialize whatever chain is loaded by calling deinitChainOrCommunity,
+  // then set loadingScope to null. Render a LoadingLayout immediately.
+  const shouldDeInitChain =
+    !selectedScope && !app.isCustomDomain() && app.chain && app.chain.network;
+
+  useNecessaryEffect(() => {
+    // if (shouldInitNewTokenChain) {
+    //   // IFB 3
+    //   setIsLoading(true);
+    //   setScopeToLoad(selectedScope);
+    //   initNewTokenChain(selectedScope, router.navigate).finally(() => {
+    //     setIsLoading(false);
+    //   });
+    // } else
+    if (shouldSelectChain) {
+      // IFB 5
+      setIsLoading(true);
+      setScopeToLoad(selectedScope);
+      setIsChainDeferred(true);
+      selectChain(scopeMatchesChain, shouldDeferChain).then((response) => {
+        if (!shouldDeferChain && response) {
+          initChain().finally(() => {
             setIsLoading(false);
-          }
-        });
-      }
+          });
+        } else {
+          setIsLoading(false);
+        }
+      });
     }
   }, [
-    selectedScope,
-    scopeToLoad,
-    // scopeIsEthereumAddress,
-    scopeMatchesChain,
+    // shouldInitNewTokenChain,
+    shouldSelectChain,
     shouldDeferChain,
   ]);
 
   useNecessaryEffect(() => {
-    // IFB 6: If deferChain is false on the page we’re routing to, but we
-    // have loaded with isChainDeferred=true (previously from step 5),
-    // then call initChain and render a LoadingLayout immediately.
-    if (selectedScope && isChainDeferred && !shouldDeferChain) {
+    // IFB 6
+    if (shouldLoadDeferredChain) {
       setIsLoading(true);
       setIsChainDeferred(false);
       initChain().finally(() => {
         setIsLoading(false);
       });
     }
-  }, [selectedScope, isChainDeferred, shouldDeferChain]);
+  }, [shouldLoadDeferredChain]);
 
   useNecessaryEffect(() => {
-    // IFB 7: If scope is not defined (and we are not on a custom domain),
-    // deinitialize whatever chain is loaded by calling deinitChainOrCommunity,
-    // then set loadingScope to null. Render a LoadingLayout immediately.
-    if (
-      !selectedScope &&
-      !app.isCustomDomain() &&
-      app.chain &&
-      app.chain.network
-    ) {
+    // IFB 7
+    if (shouldDeInitChain) {
       setIsLoading(true);
       deinitChainOrCommunity().finally(() => {
         setScopeToLoad(null);
         setIsLoading(false);
       });
     }
-  }, [selectedScope]);
+  }, [shouldDeInitChain]);
 
   // IFB 1: If initApp() threw an error, show application error.
   if (app.loadingError) {
@@ -176,32 +186,19 @@ const LayoutComponent = ({
   // IFB 3: If the user has navigated to an ethereum address directly,
   // init a new token chain immediately and show loading state
   // -
-  // IFB 5: If scope is different from app.activeChainId() at render
-  // time (and we are not loading another community at the same time,
-  // via this.loadingScope), set this.loadingScope to the provided scope,
-  // and then call selectChain, passing deferChain through. If deferChain
-  // is false once selectChain returns, call initChain. Render a LoadingLayout
-  // immediately (before selectChain resolves).
+  // IFB 5
   // -
-  // IFB 6: If deferChain is false on the page we’re routing to, but we
-  // have loaded with isChainDeferred=true (previously from step 5),
-  // then call initChain and render a LoadingLayout immediately.
+  // IFB 6
   // -
-  // IFB 7: If scope is not defined (and we are not on a custom domain),
-  // deinitialize whatever chain is loaded by calling deinitChainOrCommunity,
-  // then set loadingScope to null. Render a LoadingLayout immediately.
+  // IFB 7
   if (
-    isLoading ||
-    !app.loginStatusLoaded() ||
-    // Important: render loading state immediately for IFB 5, 6 and 7
-    // For IFB 5
-    (selectedScope &&
-      selectedScope !== app.activeChainId() &&
-      selectedScope !== scopeToLoad) ||
-    // For IFB 6
-    (selectedScope && isChainDeferred && !shouldDeferChain) ||
-    // For IFB 7
-    (!selectedScope && !app.isCustomDomain() && app.chain && app.chain.network)
+    isLoading || // general loading
+    !app.loginStatusLoaded() || // IFB 2
+    // Important: render loading state immediately for IFB 5, 6 and 7, general
+    // loading will take over later
+    shouldSelectChain || // IFB 5
+    shouldLoadDeferredChain || // IFB 6
+    shouldDeInitChain // IFB 7
   ) {
     return <LoadingLayout />;
   }
