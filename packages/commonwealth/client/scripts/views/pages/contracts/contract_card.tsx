@@ -164,7 +164,7 @@ export const ContractCard = ({
                 className="cta"
                 onClick={handleCreateNewTemplate}
               >
-                Create a New Template
+                Create a new template
               </CWText>
             </CWText>
           )}

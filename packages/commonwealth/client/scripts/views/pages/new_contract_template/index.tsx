@@ -10,6 +10,7 @@ import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 
 const NewContractTemplatePage = () => {
   if (!app.contracts || !app.chain) {
@@ -28,15 +29,24 @@ const NewContractTemplatePage = () => {
         <CWBreadcrumbs
           breadcrumbs={[
             { label: 'Contracts', path: `/contracts` },
-            { label: 'Create a New Template', path: '' },
+            { label: 'Create a new action template', path: '' },
           ]}
         />
+        <CWText type="caption" fontWeight="medium" className="step">
+          Step 1 of 2
+        </CWText>
         <CWText type="h3" className="header">
-          Create a New Template
+          Create a new action template
         </CWText>
-        <CWText className="subheader" type="b1">
-          Create a new template for your community to use.
-        </CWText>
+        <div className="CommunityInfo">
+          <CWText className="label" type="b2">
+            {'Created in'}
+          </CWText>
+          <CWCommunityAvatar community={app.chain.meta} size="small" />
+          <CWText type="b2" fontWeight="medium">
+            {app.chain.meta.name}
+          </CWText>
+        </div>
         <CWDivider className="divider" />
         <CreateContractTemplateForm />
       </div>

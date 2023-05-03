@@ -66,17 +66,18 @@ const CreateContractTemplateForm = () => {
       <div className="form">
         <div className="ContractDropdown">
           <CWText type="caption" fontWeight="medium" className="input-label">
-            Contract Address
+            Contract
           </CWText>
           <CWDropdown
             containerClassName="DropdownInput"
+            label="Select the contract you want your template to built on"
             initialValue={
               contract_id !== 'blank'
                 ? {
                     label: app.contracts.getByIdentifier(contract_id).address,
                     value: contract_id,
                   }
-                : { label: 'Select a contract', value: 'lol' }
+                : { label: 'Select contract address', value: '' }
             }
             options={contracts.map((contract) => {
               return { label: contract.address, value: contract.id.toString() };
@@ -89,7 +90,7 @@ const CreateContractTemplateForm = () => {
         </div>
 
         <CWText type="caption" fontWeight="medium" className="input-label">
-          Template Name
+          Template name
         </CWText>
         <CWTextInput
           value={form.displayName}
@@ -102,11 +103,12 @@ const CreateContractTemplateForm = () => {
           }}
         />
         <CWText type="caption" fontWeight="medium" className="input-label">
-          Action details
+          Template action details
         </CWText>
         <CWTextInput
+          label="Describe the action this template enables your community to execute"
           value={form.description}
-          placeholder="Briefly describe the action your template enables"
+          placeholder="Enter action details"
           onInput={(e) => {
             setForm((prevState) => ({
               ...prevState,
@@ -119,7 +121,7 @@ const CreateContractTemplateForm = () => {
         </CWText>
         <CWTextArea
           value={form.template}
-          placeholder="Enter relevant JSON Blob"
+          placeholder="Enter code"
           onInput={(e) => {
             setForm((prevState) => ({
               ...prevState,
