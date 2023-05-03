@@ -24,7 +24,7 @@ import {waitUntilBlock} from "../../../util";
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe.only('Integration tests for ERC721', () => {
+describe('Integration tests for ERC721', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
