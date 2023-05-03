@@ -56,7 +56,7 @@ export const UpdateProposalStatusModal = ({
     Array<Pick<ChainEntity, 'typeId' | 'title'>>
   >(getInitialProposals(thread));
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
-    Array<Pick<CosmosProposal, 'identifier'>>
+    Array<Pick<CosmosProposal, 'identifier' | 'title'>>
   >(getInitialCosmosProposals(thread));
 
   if (!app.chain?.meta) {
@@ -173,13 +173,14 @@ export const UpdateProposalStatusModal = ({
         getInitialCosmosProposals(thread),
         'identifier'
       );
-
+      console.log(toAdd[0]);
       if (toAdd.length > 0) {
         const updatedThread = await app.threads.addLinks({
           threadId: thread.id,
-          links: toAdd.map(({ identifier }) => ({
+          links: toAdd.map(({ identifier, title }) => ({
             source: LinkSource.Proposal,
             identifier: identifier,
+            title: title,
           })),
         });
 
@@ -237,7 +238,10 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
-  const handleSelectCosmosProposal = (proposal: { identifier: string }) => {
+  const handleSelectCosmosProposal = (proposal: {
+    identifier: string;
+    title: string;
+  }) => {
     const isSelected = tempCosmosProposals.find(
       ({ identifier }) => proposal.identifier === String(identifier)
     );

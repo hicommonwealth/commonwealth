@@ -18,8 +18,8 @@ const filterProposals = (ce: CosmosProposal, searchTerm: string) => {
 };
 
 type ProposalSelectorProps = {
-  proposalsToSet: Array<Pick<CosmosProposal, 'identifier'>>;
-  onSelect: ({ identifier }: { identifier: string }) => void;
+  proposalsToSet: Array<Pick<CosmosProposal, 'identifier' | 'title'>>;
+  onSelect: ({ identifier }: { identifier: string; title: string }) => void;
 };
 
 export const ProposalSelector = ({
@@ -28,7 +28,7 @@ export const ProposalSelector = ({
 }: ProposalSelectorProps) => {
   const [loadingCompleted, setCompletedLoading] = useState(false);
   const [loadingActive, setActiveLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { activeCosmosProposals } = useGetActiveCosmosProposals({
     app,
@@ -40,6 +40,10 @@ export const ProposalSelector = ({
     setIsLoading: setCompletedLoading,
     isLoading: loadingCompleted,
   });
+
+  useEffect(() => {
+    setLoading(!(activeCosmosProposals.length > 0));
+  }, [activeCosmosProposals]);
 
   const queryLength = searchTerm?.trim()?.length;
   const getEmptyContentMessage = () => {
@@ -80,7 +84,9 @@ export const ProposalSelector = ({
         <ProposalSelectorItem
           proposal={proposal}
           isSelected={isSelected}
-          onClick={(ce) => onSelect({ identifier: ce.identifier })}
+          onClick={(ce) =>
+            onSelect({ identifier: ce.identifier, title: ce.title })
+          }
         />
       );
     },
