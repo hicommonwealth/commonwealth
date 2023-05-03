@@ -83,10 +83,10 @@ const LayoutComponent = ({
   deferChain: shouldDeferChain,
 }: LayoutAttrs) => {
   const scopeMatchesChain = app.config.chains.getById(selectedScope);
-  const scopeIsEthereumAddress =
-    selectedScope &&
-    selectedScope.startsWith('0x') &&
-    selectedScope.length === 42;
+  // const scopeIsEthereumAddress =
+  //   selectedScope &&
+  //   selectedScope.startsWith('0x') &&
+  //   selectedScope.length === 42;
 
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isChainDeferred, setIsChainDeferred] = useState<boolean>();
@@ -128,7 +128,7 @@ const LayoutComponent = ({
   }, [
     selectedScope,
     scopeToLoad,
-    scopeIsEthereumAddress,
+    // scopeIsEthereumAddress,
     scopeMatchesChain,
     shouldDeferChain,
   ]);
@@ -208,7 +208,11 @@ const LayoutComponent = ({
 
   // IFB 4: If the user has attempted to a community page that was not
   // found on the list of communities from /status, show a 404 page.
-  if (selectedScope && !scopeMatchesChain && !scopeIsEthereumAddress) {
+  if (
+    selectedScope &&
+    !scopeMatchesChain
+    // && !scopeIsEthereumAddress
+  ) {
     return (
       <div className="Layout">
         <PageNotFound />
