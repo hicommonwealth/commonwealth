@@ -11,7 +11,7 @@ import { SnapshotProposalSelectorItem } from 'views/components/snapshot_proposal
 
 type SnapshotProposalSelectorProps = {
   onSelect: (sn: SnapshotProposal) => void;
-  snapshotProposalsToSet: SnapshotProposal[];
+  snapshotProposalsToSet: Pick<SnapshotProposal, 'id'>[];
 };
 
 export const SnapshotProposalSelector = ({
