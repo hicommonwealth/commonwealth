@@ -1,7 +1,4 @@
-import React from 'react';
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
+import React, { useState, useEffect } from 'react';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -14,9 +11,9 @@ import {
   getProposalUrlPath,
   idToProposal,
   proposalSlugToClass,
+  proposalSlugToStore,
 } from 'identifiers';
-import type { AnyProposal, ProposalModule } from 'models';
-import { Account } from 'models';
+import { AnyProposal, ProposalModule } from 'models';
 
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
@@ -31,225 +28,142 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import withRouter from 'navigation/helpers';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-
-type ProposalPrefetch = {
-  [identifier: string]: {
-    profilesFinished: boolean;
-    profilesStarted: boolean;
-  };
-};
+import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 
 type ViewProposalPageAttrs = {
   identifier: string;
   type?: string;
 };
 
-class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
-  private prefetch: ProposalPrefetch;
-  private proposal: AnyProposal;
-  private tipAmount: number;
-  private votingModalOpen: boolean;
+const ViewProposalPage = ({ identifier, type: typeProp }: ViewProposalPageAttrs) => {
+  const proposalId = identifier.split('-')[0];
+  const forceRender = useForceRerender();
+  const navigate = useCommonNavigate();
 
-  view(vnode: ResultNode<ViewProposalPageAttrs>) {
-    const { identifier } = vnode.attrs;
+  const [proposal, setProposal] = useState<AnyProposal>(undefined);
+  const [type, setType] = useState(typeProp);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
+  const [error, setError] = useState(null);
 
-    if (!app.chain?.meta) {
-      return <PageLoading message="Loading..." />;
-    }
+  useEffect(() => {
+    const afterAdapterLoaded = async () => {
+      if (!type) {
+        setType(chainToProposalSlug(app.chain.meta));
+      }
 
-    app.chainAdapterReady.on('ready', () => {
-      this.redraw();
-    });
-
-    const type = vnode.attrs.type || chainToProposalSlug(app.chain.meta);
-
-    const headerTitle = 'Proposals';
-
-    if (typeof identifier !== 'string')
-      return (
-        <PageNotFound
-        // title={headerTitle}
-        />
-      );
-
-    const proposalId = identifier.split('-')[0];
-    const proposalType = type;
-    const proposalIdAndType = `${proposalId}-${proposalType}`;
-
-    // we will want to prefetch profiles, and viewCount on the page before rendering anything
-    if (!this.prefetch || !this.prefetch[proposalIdAndType]) {
-      this.prefetch = {};
-
-      this.prefetch[proposalIdAndType] = {
-        profilesFinished: false,
-        profilesStarted: false,
-      };
-    }
-
-    if (
-      this.proposal &&
-      (+this.proposal.identifier !== +proposalId ||
-        this.proposal.slug !== proposalType)
-    ) {
-      this.proposal = undefined;
-    }
-
-    // load proposal, and return <PageLoading />
-    if (!this.proposal) {
       try {
-        this.proposal = idToProposal(proposalType, proposalId);
+        const proposalFromStore = idToProposal(type, proposalId);
+        setProposal(proposalFromStore);
+        setError(null);
       } catch (e) {
-        if (!app.chain.loaded) {
-          return (
-            <PageLoading
-            //  title={headerTitle}
-            />
-          );
-        }
-
-        // check if module is still initializing
-        const c = proposalSlugToClass().get(proposalType) as ProposalModule<
-          any,
-          any,
-          any
-        >;
-
-        if (!c) {
-          return <PageNotFound message="Invalid proposal type" />;
-        }
-
-        if (!c.ready) {
-          // TODO: perhaps we should be able to load here without fetching ALL proposal data
-          // load sibling modules too
-          if (app.chain.base === ChainBase.Substrate) {
-            const chain = app.chain as Substrate;
-            app.chain.loadModules([
-              chain.treasury,
-              chain.democracyProposals,
-              chain.democracy,
-              chain.tips,
-            ]);
-          } else {
-            app.chain.loadModules([c]);
+        // special case handling for completed cosmos proposals
+        if (app.chain.base === ChainBase.CosmosSDK) {
+          try {
+            const cosmosProposal = await (app.chain as Cosmos).governance.getProposal(+proposalId);
+            setProposal(cosmosProposal);
+            setError(null);
+          } catch (err) {
+            setError('Proposal not found');
           }
-
-          return (
-            <PageLoading
-            // title={headerTitle}
-            />
-          );
+        } else {
+          setError('Proposal not found');
         }
-        // proposal does not exist, 404
-        return <PageNotFound message="Proposal not found" />;
       }
     }
 
-    if (identifier !== `${proposalId}-${slugify(this.proposal.title)}`) {
-      this.setRoute(
-        getProposalUrlPath(
-          this.proposal.slug,
-          `${proposalId}-${slugify(this.proposal.title)}`,
-          true
-        ),
-        {
-          replace: true,
-        }
-      );
+    if (!isAdapterLoaded) {
+      app.chainAdapterReady.on('ready', () => {
+        setIsAdapterLoaded(true);
+        afterAdapterLoaded();
+      });
+    } else {
+      afterAdapterLoaded();
     }
+  }, [type, isAdapterLoaded, proposalId]);
 
-    // load profiles
-    if (this.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
-      if (this.proposal.author instanceof Account) {
-        // AnyProposal
-        app.newProfiles.getProfile(
-          this.proposal.author.chain.id,
-          this.proposal.author.address
-        );
-      }
-
-      this.prefetch[proposalIdAndType]['profilesStarted'] = true;
-    }
-
-    if (
-      !app.newProfiles.allLoaded() &&
-      !this.prefetch[proposalIdAndType]['profilesFinished']
-    ) {
-      return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
-    }
-
-    this.prefetch[proposalIdAndType]['profilesFinished'] = true;
-
-    if (this.proposal instanceof SubstrateTreasuryTip) {
-      return <TipDetail proposal={this.proposal} />;
-    }
-
-    const toggleVotingModal = (newModalState: boolean) => {
-      this.votingModalOpen = newModalState;
-      this.redraw();
-    };
-
-    const onModalClose = () => {
-      this.votingModalOpen = false;
-      this.redraw();
-    };
-    return (
-      <Sublayout
-      //  title={headerTitle}
-      >
-        <CWContentPage
-          title={this.proposal.title}
-          author={
-            !!this.proposal.author && (
-              <User
-                avatarSize={24}
-                user={this.proposal.author}
-                popover
-                linkify
-              />
-            )
-          }
-          createdAt={this.proposal.createdAt}
-          subHeader={
-            <ProposalSubheader
-              proposal={this.proposal as SubheaderProposalType}
-              toggleVotingModal={toggleVotingModal}
-              votingModalOpen={this.votingModalOpen}
-            />
-          }
-          body={
-            !!this.proposal.description && (
-              <CollapsibleProposalBody proposal={this.proposal} />
-            )
-          }
-          subBody={
-            <>
-              <LinkedProposalsEmbed
-                proposal={this.proposal as LinkedSubstrateProposal}
-              />
-              {this.proposal instanceof AaveProposal && (
-                <AaveViewProposalDetail proposal={this.proposal} />
-              )}
-              <VotingResults proposal={this.proposal} />
-              <VotingActions
-                onModalClose={onModalClose}
-                proposal={this.proposal}
-                toggleVotingModal={toggleVotingModal}
-                votingModalOpen={this.votingModalOpen}
-              />
-            </>
-          }
-        />
-      </Sublayout>
-    );
+  if (!isAdapterLoaded || !proposal) {
+    return <PageLoading message="Loading..." />;
   }
-}
 
-const ViewProposalPage = withRouter(ViewProposalPageComponent);
+  if (error) {
+    return <PageNotFound message={error} />;
+  }
+
+  // replace path with correct slug
+  if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
+    const newPath = getProposalUrlPath(
+      proposal.slug,
+      `${proposalId}-${slugify(proposal.title)}`,
+      true
+    );
+    navigate(newPath, { replace: true });
+  }
+
+  // special case loading for tips
+  if (proposal instanceof SubstrateTreasuryTip) {
+    return <TipDetail proposal={proposal} />;
+  }
+
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
+  return (
+    <Sublayout
+    //  title={headerTitle}
+    >
+      <CWContentPage
+        title={proposal.title}
+        author={
+          !!proposal.author && (
+            <User
+              avatarSize={24}
+              user={proposal.author}
+              popover
+              linkify
+            />
+          )
+        }
+        createdAt={proposal.createdAt}
+        subHeader={
+          <ProposalSubheader
+            proposal={proposal as SubheaderProposalType}
+            toggleVotingModal={toggleVotingModal}
+            votingModalOpen={votingModalOpen}
+          />
+        }
+        body={
+          !!proposal.description && (
+            <CollapsibleProposalBody proposal={proposal} />
+          )
+        }
+        subBody={
+          <>
+            <LinkedProposalsEmbed
+              proposal={proposal as LinkedSubstrateProposal}
+            />
+            {proposal instanceof AaveProposal && (
+              <AaveViewProposalDetail proposal={proposal} />
+            )}
+            <VotingResults proposal={proposal} />
+            <VotingActions
+              onModalClose={onModalClose}
+              proposal={proposal}
+              toggleVotingModal={toggleVotingModal}
+              votingModalOpen={votingModalOpen}
+            />
+          </>
+        }
+      />
+    </Sublayout>
+  );
+};
 
 export default ViewProposalPage;
