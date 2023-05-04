@@ -109,259 +109,6 @@ class LoginModal extends ClassComponent<LoginModalAttrs> {
       )
     );
   }
-
-  view(vnode: ResultNode<LoginModalAttrs>) {
-    const { onSuccess } = vnode.attrs;
-
-    // Handles Magic Link Login
-    const handleEmailLoginCallback = async () => {
-      this.magicLoading = true;
-      if (!this.email) {
-        notifyError('Please enter a valid email address.');
-        this.magicLoading = false;
-        return;
-      }
-      try {
-        await loginWithMagicLink(this.email);
-        this.magicLoading = false;
-        if (onSuccess) onSuccess();
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          vnode.attrs.onModalClose();
-        } else {
-          vnode.attrs.onModalClose();
-        }
-      } catch (e) {
-        notifyError("Couldn't send magic link");
-        this.magicLoading = false;
-        console.error(e);
-      }
-    };
-
-    // Performs Login on the client
-    const logInWithAccount = async (
-      account: Account,
-      exitOnComplete: boolean
-    ) => {
-      const profile = account.profile;
-      this.address = account.address;
-      if (profile.name) {
-        this.username = profile.name;
-      }
-      if (app.isLoggedIn()) {
-        completeClientLogin(account);
-        if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            vnode.attrs.onModalClose();
-          } else {
-            vnode.attrs.onModalClose();
-          }
-          if (onSuccess) onSuccess();
-        }
-        redraw();
-      } else {
-        // log in as the new user
-        await initAppState(false);
-        if (localStorage.getItem('user-dark-mode-state') === 'on') {
-          setDarkMode(true);
-        }
-        if (app.chain) {
-          const chain =
-            app.user.selectedChain ||
-            app.config.chains.getById(app.activeChainId());
-          await updateActiveAddresses(chain);
-        }
-        if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            vnode.attrs.onModalClose();
-          } else {
-            vnode.attrs.onModalClose();
-          }
-          if (onSuccess) onSuccess();
-        }
-        redraw();
-      }
-    };
-
-    // Handle branching logic after wallet is selected
-    const accountVerifiedCallback = async (
-      account: Account,
-      newlyCreated: boolean,
-      linking: boolean
-    ) => {
-      // Handle Logged in and joining community of different chain base
-      if (this.currentlyInCommunityPage && app.isLoggedIn()) {
-        const timestamp = +new Date();
-        const { signature, chainId, sessionPayload } =
-          await signSessionWithAccount(this.selectedWallet, account, timestamp);
-        await account.validate(signature, timestamp, chainId);
-        app.sessions.authSession(
-          app.chain.base,
-          chainId,
-          sessionPayload,
-          signature
-        );
-        await logInWithAccount(account, true);
-        return;
-      }
-
-      // Handle Linking vs New Account cases
-      if (!linking) {
-        this.primaryAccount = account;
-        this.address = account.address;
-        this.profiles = [account.profile];
-      } else {
-        if (newlyCreated) {
-          notifyError("This account doesn't exist");
-          return;
-        }
-        if (account.address === this.primaryAccount.address) {
-          notifyError("You can't link to the same account");
-          return;
-        }
-        this.secondaryLinkAccount = account;
-        this.profiles = [account.profile]; // TODO: Update when User -> Many Profiles goes in
-      }
-
-      // Handle receiving and caching wallet signature strings
-      if (!newlyCreated && !linking) {
-        try {
-          const timestamp = +new Date();
-          const { signature, sessionPayload, chainId } =
-            await signSessionWithAccount(
-              this.selectedWallet,
-              account,
-              timestamp
-            );
-          await account.validate(signature, timestamp, chainId);
-          // Can't call authSession now, since chain.base is unknown, so we wait till action
-          await logInWithAccount(account, true);
-        } catch (e) {
-          console.log(e);
-        }
-      } else {
-        if (!linking) {
-          try {
-            const timestamp = +new Date();
-            const { signature, chainId } = await signSessionWithAccount(
-              this.selectedWallet,
-              account,
-              timestamp
-            );
-            // Can't call authSession now, since chain.base is unknown, so we wait till action
-            this.cachedWalletSignature = signature;
-            this.cachedTimestamp = timestamp;
-            this.cachedChainId = chainId;
-            this.cachedChainId = this.selectedWallet.getChainId();
-            onSuccess?.();
-          } catch (e) {
-            console.log(e);
-          }
-          this.sidebarType = 'newOrReturning';
-          this.bodyType = 'selectAccountType';
-        } else {
-          this.sidebarType = 'newAddressLinked';
-          this.bodyType = 'selectProfile';
-        }
-      }
-    };
-
-    // Handle Logic for creating a new account, including validating signature
-    const createNewAccountCallback = async () => {
-      try {
-        if (this.selectedWallet.chain !== 'near') {
-          await this.primaryAccount.validate(
-            this.cachedWalletSignature,
-            this.cachedTimestamp,
-            this.cachedChainId
-          );
-        }
-        await logInWithAccount(this.primaryAccount, false);
-        // Important: when we first create an account and verify it, the user id
-        // is initially null from api (reloading the page will update it), to correct
-        // it we need to get the id from api
-        await app.newProfiles.updateProfileForAccount(
-          this.primaryAccount.profile.address,
-          {}
-        );
-      } catch (e) {
-        console.log(e);
-        notifyError('Failed to create account. Please try again.');
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          vnode.attrs.onModalClose();
-        } else {
-          vnode.attrs.onModalClose();
-        }
-      }
-      this.bodyType = 'welcome';
-      redraw();
-    };
-
-    // Handle branching logic for linking an account
-    const linkExistingAccountCallback = async () => {
-      this.bodyType = 'selectPrevious';
-      redraw();
-    };
-
-    // Handle signature and validation logic for linking an account
-    // Validates both linking (secondary) and primary accounts
-    const performLinkingCallback = async () => {
-      try {
-        const secondaryTimestamp = +new Date();
-        const { signature: secondarySignature, chainId: secondaryChainId } =
-          await signSessionWithAccount(
-            this.selectedLinkingWallet,
-            this.secondaryLinkAccount,
-            secondaryTimestamp
-          );
-        await this.secondaryLinkAccount.validate(
-          secondarySignature,
-          secondaryTimestamp,
-          secondaryChainId
-        );
-        await this.primaryAccount.validate(
-          this.cachedWalletSignature,
-          this.cachedTimestamp,
-          this.cachedChainId
-        );
-        // Can't call authSession now, since chain.base is unknown, so we wait till action
-        await logInWithAccount(this.primaryAccount, true);
-      } catch (e) {
-        console.log(e);
-        notifyError('Unable to link account');
-      }
-    };
-
-    // Handle saving profile information
-    const saveProfileInfoCallback = async () => {
-      const data = {
-        name: this.username,
-        avatarUrl: this.avatarUrl,
-      };
-      try {
-        if (this.username || this.avatarUrl) {
-          await app.newProfiles.updateProfileForAccount(
-            this.primaryAccount.profile.address,
-            data
-          );
-        }
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          vnode.attrs.onModalClose();
-        } else {
-          vnode.attrs.onModalClose();
-        }
-        if (onSuccess) onSuccess();
-        redraw();
-      } catch (e) {
-        console.log(e);
-        notifyError('Failed to save profile info');
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          vnode.attrs.onModalClose();
-        } else {
-          vnode.attrs.onModalClose();
-        }
-      }
-    };
-  }
 }
 
 const LoginModalReact = (props: LoginModalAttrs) => {
@@ -396,16 +143,203 @@ const LoginModalReact = (props: LoginModalAttrs) => {
   );
 
   // Handles Magic Link Login
-  const handleEmailLoginCallback = useCallback(async () => {}, []);
+  const handleEmailLoginCallback = useCallback(async () => {
+    setMagicLoading(true);
+
+    if (!email) {
+      notifyError('Please enter a valid email address.');
+      setMagicLoading(false);
+      return;
+    }
+
+    try {
+      await loginWithMagicLink(email);
+      setMagicLoading(false);
+
+      if (props.onSuccess) props.onSuccess();
+
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
+      }
+    } catch (e) {
+      notifyError("Couldn't send magic link");
+      setMagicLoading(false);
+      console.error(e);
+    }
+  }, [email, props.onSuccess, props.onModalClose]);
 
   // Performs Login on the client
-  const logInWithAccount = useCallback(async () => {}, []);
+  const logInWithAccount = useCallback(
+    async (account: Account, exitOnComplete: boolean) => {
+      const profile = account.profile;
+      setAddress(account.address);
+
+      if (profile.name) {
+        setUsername(profile.name);
+      }
+
+      if (app.isLoggedIn()) {
+        completeClientLogin(account);
+        if (exitOnComplete) {
+          if (isWindowMediumSmallInclusive(window.innerWidth)) {
+            props.onModalClose();
+          } else {
+            props.onModalClose();
+          }
+          if (props.onSuccess) props.onSuccess();
+        }
+        // redraw();
+      } else {
+        // log in as the new user
+        await initAppState(false);
+        if (localStorage.getItem('user-dark-mode-state') === 'on') {
+          setDarkMode(true);
+        }
+        if (app.chain) {
+          const chain =
+            app.user.selectedChain ||
+            app.config.chains.getById(app.activeChainId());
+          await updateActiveAddresses(chain);
+        }
+        if (exitOnComplete) {
+          if (isWindowMediumSmallInclusive(window.innerWidth)) {
+            props.onModalClose();
+          } else {
+            props.onModalClose();
+          }
+          if (props.onSuccess) props.onSuccess();
+        }
+        // redraw();
+      }
+    },
+    [props.onModalClose, props.onSuccess]
+  );
 
   // Handle branching logic after wallet is selected
-  const accountVerifiedCallback = useCallback(async () => {}, []);
+  const accountVerifiedCallback = useCallback(
+    async (account: Account, newlyCreated: boolean, linking: boolean) => {
+      // Handle Logged in and joining community of different chain base
+      if (currentlyInCommunityPage && app.isLoggedIn()) {
+        const timestamp = +new Date();
+        const { signature, chainId, sessionPayload } =
+          await signSessionWithAccount(selectedWallet, account, timestamp);
+        await account.validate(signature, timestamp, chainId);
+        app.sessions.authSession(
+          app.chain.base,
+          chainId,
+          sessionPayload,
+          signature
+        );
+        await logInWithAccount(account, true);
+        return;
+      }
+
+      // Handle Linking vs New Account cases
+      if (!linking) {
+        setPrimaryAccount(account);
+        setAddress(account.address);
+        setProfiles([account.profile]);
+      } else {
+        if (newlyCreated) {
+          notifyError("This account doesn't exist");
+          return;
+        }
+        if (account.address === primaryAccount.address) {
+          notifyError("You can't link to the same account");
+          return;
+        }
+        setSecondaryLinkAccount(account);
+        setProfiles(
+          [account.profile] // TODO: Update when User -> Many Profiles goes in
+        );
+      }
+
+      // Handle receiving and caching wallet signature strings
+      if (!newlyCreated && !linking) {
+        try {
+          const timestamp = +new Date();
+          const { signature, sessionPayload, chainId } =
+            await signSessionWithAccount(selectedWallet, account, timestamp);
+          await account.validate(signature, timestamp, chainId);
+          // Can't call authSession now, since chain.base is unknown, so we wait till action
+          await logInWithAccount(account, true);
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        if (!linking) {
+          try {
+            const timestamp = +new Date();
+            const { signature, chainId } = await signSessionWithAccount(
+              selectedWallet,
+              account,
+              timestamp
+            );
+            // Can't call authSession now, since chain.base is unknown, so we wait till action
+            setCachedWalletSignature(signature);
+            setCachedTimestamp(timestamp);
+            setCachedChainId(selectedWallet.getChainId());
+            props.onSuccess?.();
+          } catch (e) {
+            console.log(e);
+          }
+          setSidebarType('newOrReturning');
+          setBodyType('selectAccountType');
+        } else {
+          setSidebarType('newAddressLinked');
+          setBodyType('selectProfile');
+        }
+      }
+    },
+    [
+      currentlyInCommunityPage,
+      selectedWallet,
+      logInWithAccount,
+      primaryAccount,
+      props.onSuccess,
+    ]
+  );
 
   // Handle Logic for creating a new account, including validating signature
-  const createNewAccountCallback = useCallback(async () => {}, []);
+  const createNewAccountCallback = useCallback(async () => {
+    try {
+      if (selectedWallet.chain !== 'near') {
+        await primaryAccount.validate(
+          cachedWalletSignature,
+          cachedTimestamp,
+          cachedChainId
+        );
+      }
+      await logInWithAccount(primaryAccount, false);
+      // Important: when we first create an account and verify it, the user id
+      // is initially null from api (reloading the page will update it), to correct
+      // it we need to get the id from api
+      await app.newProfiles.updateProfileForAccount(
+        primaryAccount.profile.address,
+        {}
+      );
+    } catch (e) {
+      console.log(e);
+      notifyError('Failed to create account. Please try again.');
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
+      }
+    }
+    setBodyType('welcome');
+    // redraw();
+  }, [
+    props.onModalClose,
+    primaryAccount,
+    logInWithAccount,
+    cachedWalletSignature,
+    cachedTimestamp,
+    cachedChainId,
+    selectedWallet,
+  ]);
 
   // Handle branching logic for linking an account
   const linkExistingAccountCallback = async () => {
@@ -414,10 +348,77 @@ const LoginModalReact = (props: LoginModalAttrs) => {
 
   // Handle signature and validation logic for linking an account
   // Validates both linking (secondary) and primary accounts
-  const performLinkingCallback = useCallback(async () => {}, []);
+  const performLinkingCallback = useCallback(async () => {
+    try {
+      const secondaryTimestamp = +new Date();
+      const { signature: secondarySignature, chainId: secondaryChainId } =
+        await signSessionWithAccount(
+          selectedLinkingWallet,
+          secondaryLinkAccount,
+          secondaryTimestamp
+        );
+      await secondaryLinkAccount.validate(
+        secondarySignature,
+        secondaryTimestamp,
+        secondaryChainId
+      );
+      await primaryAccount.validate(
+        cachedWalletSignature,
+        cachedTimestamp,
+        cachedChainId
+      );
+      // Can't call authSession now, since chain.base is unknown, so we wait till action
+      await logInWithAccount(primaryAccount, true);
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to link account');
+    }
+  }, [
+    selectedLinkingWallet,
+    secondaryLinkAccount,
+    primaryAccount,
+    cachedWalletSignature,
+    cachedTimestamp,
+    cachedChainId,
+    logInWithAccount,
+  ]);
 
   // Handle saving profile information
-  const saveProfileInfoCallback = useCallback(async () => {}, []);
+  const saveProfileInfoCallback = useCallback(async () => {
+    const data = {
+      name: username,
+      avatarUrl: avatarUrl,
+    };
+    try {
+      if (username || avatarUrl) {
+        await app.newProfiles.updateProfileForAccount(
+          primaryAccount.profile.address,
+          data
+        );
+      }
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
+      }
+      if (props.onSuccess) props.onSuccess();
+      // redraw();
+    } catch (e) {
+      console.log(e);
+      notifyError('Failed to save profile info');
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
+      }
+    }
+  }, [
+    props.onModalClose,
+    props.onSuccess,
+    primaryAccount,
+    username,
+    avatarUrl,
+  ]);
 
   const LoginModule = showMobile ? LoginMobile : LoginDesktop;
 
