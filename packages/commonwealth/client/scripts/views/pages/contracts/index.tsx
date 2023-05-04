@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import 'pages/contracts/contracts_page.scss';
 import app from 'state';
-
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -12,15 +11,10 @@ import { useCommonNavigate } from 'navigation/helpers';
 import Contract from 'models/Contract';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import Template from 'models/Template';
-import { User } from '../../components/user/user';
-import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { Modal } from '../../components/component_kit/cw_modal';
-import ViewTemplateModal from '../../modals/view_template_modal';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { openConfirmation } from '../../modals/confirmation_modal';
+
 import { notifyError } from 'controllers/app/notifications';
+import { TemplateDisplayTab } from './template_display_tab';
+import { openConfirmation } from '../../modals/confirmation_modal';
 
 const ContractsPage = () => {
   const navigate = useCommonNavigate();
@@ -32,8 +26,8 @@ const ContractsPage = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [noContractsAlertDisplayed, setNoContractsAlertDisplayed] =
     useState(true);
-  const [viewTemplateModalOpen, setViewTemplateModalOpen] = useState(false);
-  const [mountedTemplate, setMountedTemplate] = useState<Template>(null);
+
+  const [tabOn, setTabOn] = useState<'contracts' | 'templates'>('contracts');
 
   const fetchTemplates = async () => {
     if (contracts.length > 0) {
@@ -56,8 +50,6 @@ const ContractsPage = () => {
   useEffect(() => {
     fetchTemplates();
   }, [contracts, setTemplates]);
-
-  const [tabOn, setTabOn] = useState<'contracts' | 'templates'>('contracts');
 
   const handleAddContract = () => {
     navigate(`/new/contract`);
@@ -184,151 +176,13 @@ const ContractsPage = () => {
             )}
           </>
         ) : (
-          <div className="template-display-section">
-            <Modal
-              content={
-                <ViewTemplateModal
-                  template={mountedTemplate}
-                  onClose={() => {
-                    setViewTemplateModalOpen(false);
-                    setMountedTemplate(null);
-                  }}
-                />
-              }
-              open={viewTemplateModalOpen}
-              onClose={() => {
-                setViewTemplateModalOpen(false);
-                setMountedTemplate(null);
-              }}
-            />
-            {contracts.length === 0 && noContractsAlertDisplayed && (
-              <div className="no-contract-alert">
-                <div className="information">
-                  <CWIcon iconName="infoEmpty" />
-                  <CWText className="info-text">
-                    Make sure you have connected a contract in order to see
-                    compatible action templates and to create your own action
-                    templates.
-                  </CWText>
-                </div>
-                <CWIcon
-                  iconName="close"
-                  iconSize="small"
-                  className="closeIcon"
-                  onClick={() => {
-                    setNoContractsAlertDisplayed(false);
-                  }}
-                />
-              </div>
-            )}
-            <div className="Table">
-              <div className="table-row dark top">
-                <div className="table-column">
-                  <CWText
-                    fontWeight="medium"
-                    type="caption"
-                    className="ColumnText"
-                  >
-                    TEMPLATE NAME
-                  </CWText>
-                </div>
-                <div className="table-column">
-                  <CWText
-                    fontWeight="medium"
-                    type="caption"
-                    className="ColumnText"
-                  >
-                    CREATED BY
-                  </CWText>
-                </div>
-                <div className="table-column">
-                  <CWText
-                    fontWeight="medium"
-                    type="caption"
-                    className="ColumnText"
-                  >
-                    CREATED IN
-                  </CWText>
-                </div>
-              </div>
-              {templates.length > 0 ? (
-                templates.map((template) => {
-                  const creator = app.chain.accounts.get(template.createdBy);
-                  return (
-                    <div className="table-row">
-                      <div className="table-column">
-                        <CWText>{template.name}</CWText>
-                      </div>
-                      <div className="table-column">
-                        <User user={creator} showAddressWithDisplayName />
-                      </div>
-                      <div className="table-column">
-                        <div className="IconGroup">
-                          <CWCommunityAvatar
-                            community={app.config.chains.getById(
-                              template.createdForCommunity
-                            )}
-                            size="small"
-                          />
-                          <CWText type="caption" fontWeight="bold">
-                            {
-                              app.config.chains.getById(
-                                template.createdForCommunity
-                              ).name
-                            }
-                          </CWText>
-                        </div>
-                      </div>
-                      <div className="table-column">
-                        <div className="IconGroup">
-                          <PopoverMenu
-                            renderTrigger={(onclick) => (
-                              <CWIconButton
-                                iconName="dots"
-                                iconSize="small"
-                                onClick={onclick}
-                              />
-                            )}
-                            menuItems={[
-                              {
-                                label: 'Delete',
-                                iconLeft: 'trash',
-                                onClick: () => {
-                                  handleDeleteTemplate(template);
-                                },
-                              },
-                            ]}
-                          />
-                          <CWIconButton
-                            iconName="views"
-                            iconSize="small"
-                            className="ViewIcon"
-                            onClick={() => {
-                              setMountedTemplate(template);
-                              setViewTemplateModalOpen(true);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="empty-state">
-                  <CWText type="b1" className="EmptyTemplate">
-                    You currently have no action templates in your library.
-                  </CWText>
-                </div>
-              )}
-            </div>
-            <CWButton
-              className="add-template-btn"
-              buttonType="tertiary-black"
-              label="Create Template"
-              iconLeft="plus"
-              onClick={() => navigate('/new/contract_template/blank')}
-            />
-          </div>
+          <TemplateDisplayTab
+            templates={templates}
+            handleDeleteTemplate={handleDeleteTemplate}
+            contracts={contracts}
+            setNoContractsAlertDisplayed={setNoContractsAlertDisplayed}
+            noContractsAlertDisplayed={noContractsAlertDisplayed}
+          />
         )}
       </div>
     </Sublayout>
