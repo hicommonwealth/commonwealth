@@ -225,7 +225,7 @@ const ViewTemplatePage = () => {
 
   const formatTransactionParams = () => {
     const { tx_template } = json;
-    let txObject = {};
+    const txObject = {};
     Object.keys(tx_template.tx_params).map((key) => {
       const arg = tx_template.tx_params[key];
       if (arg.startsWith('$')) {
