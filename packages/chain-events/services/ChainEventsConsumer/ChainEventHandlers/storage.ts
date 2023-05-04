@@ -62,16 +62,10 @@ export default class extends IEventHandler {
 
   private async _shouldSkip(event: CWEvent): Promise<boolean> {
     if (!event) return true;
-    const entity = eventToEntity(event.network, event.data?.kind);
-    if (!entity) return true;
 
     // filter out all events that won't have an associated entity in the db
-    const [_, kind] = entity
-    if (![EntityEventKind.Create,
-    EntityEventKind.Update,
-    EntityEventKind.Vote,
-    EntityEventKind.Complete].includes(kind)
-    ) return true;
+    const entity = eventToEntity(event.network, event.data?.kind);
+    if (!entity) return true;
 
     return !!this._filterConfig.excludedEvents?.includes(event.data?.kind);
   }
