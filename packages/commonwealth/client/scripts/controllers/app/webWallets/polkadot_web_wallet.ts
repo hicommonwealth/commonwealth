@@ -32,6 +32,12 @@ class PolkadotWebWalletController
   public readonly defaultNetwork = ChainNetwork.Edgeware;
   public readonly chain = ChainBase.Substrate;
 
+  constructor() {
+    // isWeb3Injected doesn't always return as "available" even when it's been
+    // injected into the browser, unless we call web3Enable() preemptively.
+    web3Enable('commonwealth');
+  }
+
   public get available() {
     return isWeb3Injected;
   }
@@ -89,7 +95,6 @@ class PolkadotWebWalletController
   public async enable() {
     this.polkadot = await import('@polkadot/extension-dapp');
     console.log('Attempting to enable Substrate web wallet');
-    if (!this.available) throw new Error('Web wallet not available');
 
     // returns an array of all the injected sources
     // (this needs to be called first, before other requests)
