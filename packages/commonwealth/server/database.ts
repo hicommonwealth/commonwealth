@@ -22,7 +22,6 @@ import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
 import DiscussionDraftFactory from './models/discussion_draft';
-import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
@@ -105,7 +104,6 @@ const models: Models = {
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
-  LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
