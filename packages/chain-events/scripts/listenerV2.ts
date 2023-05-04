@@ -70,12 +70,6 @@ const shortcuts = {
     url: networkUrls.dydx,
     address: contracts.dydx,
   },
-  commonwealth: {
-    chain: 'commonwealth',
-    network: SupportedNetwork.Commonwealth,
-    url: networkUrls['eth-local'],
-    address: contracts['commonwealth-local'],
-  },
   cosmos: {
     chain: 'osmosis',
     network: SupportedNetwork.Cosmos,
