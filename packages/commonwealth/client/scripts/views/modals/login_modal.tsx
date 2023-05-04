@@ -1,32 +1,26 @@
-import React, { useState, useCallback } from 'react';
-
-import _ from 'lodash';
-import app, { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
-
 import {
   completeClientLogin,
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { signSessionWithAccount } from 'controllers/server/sessions';
-
-import { notifyError } from 'controllers/app/notifications';
+import _ from 'lodash';
 import type { Account, IWebWallet } from 'models';
-
+import React, { useCallback, useEffect, useState } from 'react';
+import app, { initAppState } from 'state';
+import { setDarkMode } from '../../helpers';
+import type { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../components/component_kit/helpers';
-import type { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import { setDarkMode } from '../../helpers';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -37,81 +31,7 @@ type LoginModalAttrs = {
   onModalClose: () => void;
 };
 
-class LoginModal extends ClassComponent<LoginModalAttrs> {
-  oncreate(vnode: ResultNode<LoginModalAttrs>) {
-    // Determine if in a community
-    this.currentlyInCommunityPage = app.activeChainId() !== undefined;
-
-    if (this.currentlyInCommunityPage) {
-      const chainbase = app.chain?.meta?.base;
-      this.wallets = app.wallets.availableWallets(chainbase);
-      this.sidebarType = 'communityWalletOptions';
-      this.bodyType = 'walletList';
-    } else {
-      const allChains = app.config.chains.getAll();
-      const sortedChainBases = [
-        ChainBase.CosmosSDK,
-        ChainBase.Ethereum,
-        // ChainBase.NEAR,
-        ChainBase.Substrate,
-        ChainBase.Solana,
-      ].filter((base) => allChains.find((chain) => chain.base === base));
-      this.wallets = _.flatten(
-        sortedChainBases.map((base) => {
-          return app.wallets.availableWallets(base);
-        })
-      );
-      this.sidebarType = 'connectWallet';
-      this.bodyType = 'walletList';
-    }
-
-    this.showMobile = isWindowMediumSmallInclusive(window.innerWidth);
-
-    // Override if initial data is provided (needed for redirecting wallets + CommonBot)
-    if (vnode.attrs.initialBody) {
-      this.bodyType = vnode.attrs.initialBody;
-    }
-    if (vnode.attrs.initialSidebar) {
-      this.sidebarType = vnode.attrs.initialSidebar;
-    }
-    if (vnode.attrs.initialAccount) {
-      this.primaryAccount = vnode.attrs.initialAccount;
-      this.address = vnode.attrs.initialAccount.address;
-    }
-    // if (vnode.attrs.initialWebWallet) {
-    //   this.selectedWallet = vnode.attrs.initialWebWallet;
-    // }
-    if (vnode.attrs.initialWallets) {
-      this.wallets = vnode.attrs.initialWallets;
-    }
-
-    // eslint-disable-next-line no-restricted-globals
-    addEventListener('resize', () =>
-      breakpointFnValidator(
-        this.showMobile,
-        (state: boolean) => {
-          this.showMobile = state;
-        },
-        isWindowMediumSmallInclusive
-      )
-    );
-  }
-
-  onremove() {
-    // eslint-disable-next-line no-restricted-globals
-    removeEventListener('resize', () =>
-      breakpointFnValidator(
-        this.showMobile,
-        (state: boolean) => {
-          this.showMobile = state;
-        },
-        isWindowMediumSmallInclusive
-      )
-    );
-  }
-}
-
-const LoginModalReact = (props: LoginModalAttrs) => {
+const LoginModal = (props: LoginModalAttrs) => {
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [bodyType, setBodyType] = useState<LoginBodyType>();
@@ -141,6 +61,83 @@ const LoginModalReact = (props: LoginModalAttrs) => {
         w instanceof TerraWalletConnectWebWalletController) &&
       w.enabled
   );
+
+  useEffect(() => {
+    // Determine if in a community
+    const tempCurrentlyInCommunityPage = app.activeChainId() !== undefined;
+    setCurrentlyInCommunityPage(tempCurrentlyInCommunityPage);
+
+    if (tempCurrentlyInCommunityPage) {
+      const chainbase = app.chain?.meta?.base;
+      setWallets(app.wallets.availableWallets(chainbase));
+      setSidebarType('communityWalletOptions');
+      setBodyType('walletList');
+    } else {
+      const allChains = app.config.chains.getAll();
+      const sortedChainBases = [
+        ChainBase.CosmosSDK,
+        ChainBase.Ethereum,
+        // ChainBase.NEAR,
+        ChainBase.Substrate,
+        ChainBase.Solana,
+      ].filter((base) => allChains.find((chain) => chain.base === base));
+      setWallets(
+        _.flatten(
+          sortedChainBases.map((base) => {
+            return app.wallets.availableWallets(base);
+          })
+        )
+      );
+      setSidebarType('connectWallet');
+      setBodyType('walletList');
+    }
+
+    setShowMobile(isWindowMediumSmallInclusive(window.innerWidth));
+
+    // Override if initial data is provided (needed for redirecting wallets + CommonBot)
+    if (props.initialBody) {
+      setBodyType(props.initialBody);
+    }
+    if (props.initialSidebar) {
+      setSidebarType(props.initialSidebar);
+    }
+    if (props.initialAccount) {
+      setPrimaryAccount(props.initialAccount);
+      setAddress(props.initialAccount.address);
+    }
+    // if (props.initialWebWallet) {
+    //   this.selectedWallet = props.initialWebWallet;
+    // }
+    if (props.initialWallets) {
+      setWallets(props.initialWallets);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line no-restricted-globals
+    addEventListener('resize', () =>
+      breakpointFnValidator(
+        showMobile,
+        (state: boolean) => {
+          setShowMobile(state);
+        },
+        isWindowMediumSmallInclusive
+      )
+    );
+
+    return () => {
+      // eslint-disable-next-line no-restricted-globals
+      removeEventListener('resize', () =>
+        breakpointFnValidator(
+          showMobile,
+          (state: boolean) => {
+            setShowMobile(state);
+          },
+          isWindowMediumSmallInclusive
+        )
+      );
+    };
+  }, [showMobile]);
 
   // Handles Magic Link Login
   const handleEmailLoginCallback = useCallback(async () => {
@@ -471,4 +468,4 @@ const LoginModalReact = (props: LoginModalAttrs) => {
   );
 };
 
-export default LoginModal;
+export { LoginModal };
