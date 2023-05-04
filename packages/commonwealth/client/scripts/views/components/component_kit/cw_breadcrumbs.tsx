@@ -1,10 +1,11 @@
 import React from 'react';
 
-import 'components/component_kit/cw_breadcrumbs.scss';
+// import 'components/component_kit/cw_breadcrumbs.scss';
+import '../../../../styles/components/component_kit/cw_breadcrumbs.scss';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from '../../../navigation/helpers';
 
 type BreadcrumbsType = {
   label: string;

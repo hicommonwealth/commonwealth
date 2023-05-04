@@ -12,7 +12,7 @@ const icons = {
 } satisfies Meta<typeof CWIcon>;
 
 export default icons;
-// type Story = StoryObj<typeof allIcons>;
+// type Story = StoryObj<typeof icons>;
 
 const IconButton = (theme, number, selected, selectedFn) => {
   return (
