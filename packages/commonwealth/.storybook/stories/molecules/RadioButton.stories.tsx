@@ -17,7 +17,7 @@ interface RadiobuttonProps {
   disabled?: boolean,
 }
 
-const Radiobutton = ({value, checked, disabled}: RadiobuttonProps) => {
+const Radiobutton: FC<RadiobuttonProps> = ({value, checked, disabled}) => {
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
     useState<boolean>(false);
 
