@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 
 import _ from 'lodash';
 import app, { initAppState } from 'state';
@@ -37,27 +37,7 @@ type LoginModalAttrs = {
   onModalClose: () => void;
 };
 
-export class LoginModal extends ClassComponent<LoginModalAttrs> {
-  private avatarUrl: string;
-  private address: string;
-  private bodyType: LoginBodyType;
-  private profiles: Array<ProfileRowProps>;
-  private sidebarType: LoginSidebarType;
-  private username: string;
-  private email: string;
-  private wallets: Array<IWebWallet<any>>;
-  private selectedWallet: IWebWallet<any>;
-  private selectedLinkingWallet: IWebWallet<any>;
-  private cachedWalletSignature: string;
-  private cachedTimestamp: number;
-  private cachedChainId: string | number;
-  private primaryAccount: Account;
-  private secondaryLinkAccount: Account;
-  private secondaryChainId: string | number;
-  private currentlyInCommunityPage: boolean;
-  private magicLoading: boolean;
-  private showMobile: boolean;
-
+class LoginModal extends ClassComponent<LoginModalAttrs> {
   oncreate(vnode: ResultNode<LoginModalAttrs>) {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
@@ -132,13 +112,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
 
   view(vnode: ResultNode<LoginModalAttrs>) {
     const { onSuccess } = vnode.attrs;
-    const wcEnabled = _.some(
-      this.wallets,
-      (w) =>
-        (w instanceof WalletConnectWebWalletController ||
-          w instanceof TerraWalletConnectWebWalletController) &&
-        w.enabled
-    );
 
     // Handles Magic Link Login
     const handleEmailLoginCallback = async () => {
@@ -388,99 +361,113 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         }
       }
     };
-
-    return this.showMobile ? (
-      <LoginMobile
-        address={this.address}
-        currentlyInCommunityPage={this.currentlyInCommunityPage}
-        bodyType={this.bodyType}
-        profiles={this.profiles}
-        sidebarType={this.sidebarType}
-        username={this.username}
-        wallets={this.wallets}
-        magicLoading={this.magicLoading}
-        setAddress={(address: string) => {
-          this.address = address;
-        }}
-        setBodyType={(bodyType: LoginBodyType) => {
-          this.bodyType = bodyType;
-        }}
-        handleSetAvatar={(a) => {
-          this.avatarUrl = a;
-        }}
-        handleSetUsername={(u) => {
-          this.username = u;
-        }}
-        handleSetEmail={(e) => {
-          this.email = e.target.value;
-        }}
-        setProfiles={(profiles: Array<ProfileRowProps>) => {
-          this.profiles = profiles;
-        }}
-        setSidebarType={(sidebarType: LoginSidebarType) => {
-          this.sidebarType = sidebarType;
-        }}
-        setSelectedWallet={(wallet: IWebWallet<any>) => {
-          this.selectedWallet = wallet;
-        }}
-        setSelectedLinkingWallet={(wallet: IWebWallet<any>) => {
-          this.selectedLinkingWallet = wallet;
-        }}
-        createNewAccountCallback={createNewAccountCallback}
-        linkExistingAccountCallback={linkExistingAccountCallback}
-        accountVerifiedCallback={accountVerifiedCallback}
-        handleEmailLoginCallback={handleEmailLoginCallback}
-        saveProfileInfoCallback={saveProfileInfoCallback}
-        performLinkingCallback={performLinkingCallback}
-        showResetWalletConnect={wcEnabled}
-        onModalClose={vnode.attrs.onModalClose}
-      />
-    ) : (
-      <LoginDesktop
-        address={this.address}
-        currentlyInCommunityPage={this.currentlyInCommunityPage}
-        bodyType={this.bodyType}
-        profiles={this.profiles}
-        sidebarType={this.sidebarType}
-        username={this.username}
-        wallets={this.wallets}
-        magicLoading={this.magicLoading}
-        setAddress={(address: string) => {
-          this.address = address;
-        }}
-        setBodyType={(bodyType: LoginBodyType) => {
-          this.bodyType = bodyType;
-        }}
-        handleSetAvatar={(a) => {
-          this.avatarUrl = a;
-        }}
-        handleSetUsername={(u) => {
-          this.username = u;
-        }}
-        handleSetEmail={(e) => {
-          this.email = e.target.value;
-        }}
-        setProfiles={(profiles: Array<ProfileRowProps>) => {
-          this.profiles = profiles;
-        }}
-        setSidebarType={(sidebarType: LoginSidebarType) => {
-          this.sidebarType = sidebarType;
-        }}
-        setSelectedWallet={(wallet: IWebWallet<any>) => {
-          this.selectedWallet = wallet;
-        }}
-        setSelectedLinkingWallet={(wallet: IWebWallet<any>) => {
-          this.selectedLinkingWallet = wallet;
-        }}
-        createNewAccountCallback={createNewAccountCallback}
-        linkExistingAccountCallback={linkExistingAccountCallback}
-        accountVerifiedCallback={accountVerifiedCallback}
-        handleEmailLoginCallback={handleEmailLoginCallback}
-        saveProfileInfoCallback={saveProfileInfoCallback}
-        performLinkingCallback={performLinkingCallback}
-        showResetWalletConnect={wcEnabled}
-        onModalClose={vnode.attrs.onModalClose}
-      />
-    );
   }
 }
+
+const LoginModalReact = (props: LoginModalAttrs) => {
+  const [avatarUrl, setAvatarUrl] = useState<string>();
+  const [address, setAddress] = useState<string>();
+  const [bodyType, setBodyType] = useState<LoginBodyType>();
+  const [profiles, setProfiles] = useState<Array<ProfileRowProps>>();
+  const [sidebarType, setSidebarType] = useState<LoginSidebarType>();
+  const [username, setUsername] = useState<string>();
+  const [email, setEmail] = useState<string>();
+  const [wallets, setWallets] = useState<Array<IWebWallet<any>>>();
+  const [selectedWallet, setSelectedWallet] = useState<IWebWallet<any>>();
+  const [selectedLinkingWallet, setSelectedLinkingWallet] =
+    useState<IWebWallet<any>>();
+  const [cachedWalletSignature, setCachedWalletSignature] = useState<string>();
+  const [cachedTimestamp, setCachedTimestamp] = useState<number>();
+  const [cachedChainId, setCachedChainId] = useState<string | number>();
+  const [primaryAccount, setPrimaryAccount] = useState<Account>();
+  const [secondaryLinkAccount, setSecondaryLinkAccount] = useState<Account>();
+  const [secondaryChainId, setSecondaryChainId] = useState<string | number>();
+  const [currentlyInCommunityPage, setCurrentlyInCommunityPage] =
+    useState<boolean>();
+  const [magicLoading, setMagicLoading] = useState<boolean>();
+  const [showMobile, setShowMobile] = useState<boolean>();
+
+  const wcEnabled = _.some(
+    wallets,
+    (w) =>
+      (w instanceof WalletConnectWebWalletController ||
+        w instanceof TerraWalletConnectWebWalletController) &&
+      w.enabled
+  );
+
+  // Handles Magic Link Login
+  const handleEmailLoginCallback = useCallback(async () => {}, []);
+
+  // Performs Login on the client
+  const logInWithAccount = useCallback(async () => {}, []);
+
+  // Handle branching logic after wallet is selected
+  const accountVerifiedCallback = useCallback(async () => {}, []);
+
+  // Handle Logic for creating a new account, including validating signature
+  const createNewAccountCallback = useCallback(async () => {}, []);
+
+  // Handle branching logic for linking an account
+  const linkExistingAccountCallback = async () => {
+    setBodyType('selectPrevious');
+  };
+
+  // Handle signature and validation logic for linking an account
+  // Validates both linking (secondary) and primary accounts
+  const performLinkingCallback = useCallback(async () => {}, []);
+
+  // Handle saving profile information
+  const saveProfileInfoCallback = useCallback(async () => {}, []);
+
+  const LoginModule = showMobile ? LoginMobile : LoginDesktop;
+
+  return (
+    <LoginModule
+      address={address}
+      currentlyInCommunityPage={currentlyInCommunityPage}
+      bodyType={bodyType}
+      profiles={profiles}
+      sidebarType={sidebarType}
+      username={username}
+      wallets={wallets}
+      magicLoading={magicLoading}
+      setAddress={(a: string) => {
+        setAddress(a);
+      }}
+      setBodyType={(bT: LoginBodyType) => {
+        setBodyType(bT);
+      }}
+      handleSetAvatar={(a) => {
+        setAvatarUrl(a);
+      }}
+      handleSetUsername={(u) => {
+        setUsername(u);
+      }}
+      handleSetEmail={(e) => {
+        setEmail(e.target.value);
+      }}
+      setProfiles={(p: Array<ProfileRowProps>) => {
+        setProfiles(p);
+      }}
+      setSidebarType={(sT: LoginSidebarType) => {
+        setSidebarType(sT);
+      }}
+      setSelectedWallet={(w: IWebWallet<any>) => {
+        setSelectedWallet(w);
+      }}
+      setSelectedLinkingWallet={(w: IWebWallet<any>) => {
+        setSelectedLinkingWallet(w);
+      }}
+      createNewAccountCallback={createNewAccountCallback}
+      linkExistingAccountCallback={linkExistingAccountCallback}
+      accountVerifiedCallback={accountVerifiedCallback}
+      handleEmailLoginCallback={handleEmailLoginCallback}
+      saveProfileInfoCallback={saveProfileInfoCallback}
+      performLinkingCallback={performLinkingCallback}
+      showResetWalletConnect={wcEnabled}
+      onModalClose={props.onModalClose}
+    />
+  );
+};
+
+export default LoginModal;
