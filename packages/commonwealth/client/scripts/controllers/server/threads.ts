@@ -388,7 +388,6 @@ class ThreadsController {
         stage: proposal.stage,
         body: encodeURIComponent(newBody),
         title: encodeURIComponent(newTitle),
-        last_edited: new Date().toISOString(),
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
