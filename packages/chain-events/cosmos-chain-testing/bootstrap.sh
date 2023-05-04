@@ -55,6 +55,6 @@ simd start --api.enable true &
 CSDK_PID=$!
 # Sleep for node to full boot up
 sleep 3
-# wait again on the regen node process so it can be terminated with ctrl+C
-echo "Node started & state inialized!"
+# wait again on the node process so it can be terminated with ctrl+C
+echo "Node started & state initialized!"
 wait $CSDK_PID
