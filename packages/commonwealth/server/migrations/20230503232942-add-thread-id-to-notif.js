@@ -9,7 +9,6 @@ module.exports = {
         {
           type: Sequelize.INTEGER,
           allowNull: true,
-          references: { model: 'Threads', key: 'id' },
         },
         { transaction: t }
       );
