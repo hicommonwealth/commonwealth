@@ -18,6 +18,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import useForceRerender from 'hooks/useForceRerender';
+import useAppStore from 'stores/zustand';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -38,6 +39,8 @@ export const RecentThreadsHeader = ({
     isWindowExtraSmall(window.innerWidth)
   );
 
+  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
+
   useEffect(() => {
     const onResize = () => {
       setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
@@ -54,7 +57,7 @@ export const RecentThreadsHeader = ({
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const topics = getByCommunity(app.activeChainId());
 
   const featuredTopics = topics
     .filter((t) => t.featuredInSidebar)

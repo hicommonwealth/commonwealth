@@ -10,14 +10,14 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import DraggableTopicsList from './draggable_topics_list';
 import { CWText } from '../../components/component_kit/cw_text';
+import useAppStore from 'stores/zustand';
 
 type OrderTopicsModalProps = {
   onModalClose: () => void;
 };
 
-const getSortedTopics = (): Topic[] => {
-  const topics = app.topics.store
-    .getByCommunity(app.chain.id)
+const getSortedTopics = (topics: Topic[]): Topic[] => {
+  topics
     .filter((topic) => topic.featuredInSidebar)
     .map((topic) => ({ ...topic } as Topic));
 
@@ -35,7 +35,11 @@ const getSortedTopics = (): Topic[] => {
 };
 
 export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
-  const [topics, setTopics] = useState<Topic[]>(() => getSortedTopics());
+  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
+
+  const [topics, setTopics] = useState<Topic[]>(() =>
+    getSortedTopics(getByCommunity(app.activeChainId()))
+  );
 
   const handleSave = async () => {
     try {

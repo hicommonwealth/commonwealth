@@ -16,6 +16,7 @@ import type {
   ToggleTree,
 } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
+import useAppStore from 'stores/zustand';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -37,6 +38,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 
 export const DiscussionSection = () => {
   const navigate = useCommonNavigate();
+  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
 
   // Conditional Render Details +
   const onAllDiscussionPage = (p) => {
@@ -86,8 +88,7 @@ export const DiscussionSection = () => {
   const onSputnikDaosPage = (p) =>
     p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
-  const topics = app.topics.store
-    .getByCommunity(app.activeChainId())
+  const topics = getByCommunity(app.activeChainId())
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     .sort((a, b) => a.order - b.order);

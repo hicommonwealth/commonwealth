@@ -15,6 +15,7 @@ import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import useAppStore from 'stores/zustand';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
@@ -23,6 +24,8 @@ const OverviewPage = () => {
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
     isWindowExtraSmall(window.innerWidth)
   );
+
+  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
 
   useEffect(() => {
     const onResize = () => {
@@ -51,7 +54,7 @@ const OverviewPage = () => {
     pinned: true,
   });
 
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const topics = getByCommunity(app.activeChainId());
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
 

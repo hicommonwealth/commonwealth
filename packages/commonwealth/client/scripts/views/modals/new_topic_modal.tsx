@@ -21,6 +21,7 @@ import {
   ReactQuillEditor,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
+import useAppStore from 'stores/zustand';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -45,6 +46,8 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
 
   const editorText = getTextFromDelta(contentDelta);
+
+  const [addTopic] = useAppStore((s) => [s.addTopic]);
 
   useEffect(() => {
     if (!name || !name.trim()) {
@@ -164,7 +167,17 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             e.preventDefault();
 
             try {
-              await app.topics.add(
+              // await app.topics.add(
+              //   name,
+              //   description,
+              //   null,
+              //   featuredInSidebar,
+              //   featuredInNewPost,
+              //   tokenThreshold || '0',
+              //   serializeDelta(contentDelta)
+              // );
+
+              await addTopic(
                 name,
                 description,
                 null,

@@ -14,12 +14,14 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { vanillaStore } from 'stores/zustand';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
-  const topics = app.topics
+  const topics = vanillaStore
+    .getState()
     .getByCommunity(app.activeChainId())
     .reduce(
       (acc, current) => (current.featuredInNewPost ? [...acc, current] : acc),

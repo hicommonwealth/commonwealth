@@ -27,17 +27,20 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import useAppStore from 'stores/zustand';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
+  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
 
   const chainId = app.chain.id;
-  const hasTopics = !!app.topics.getByCommunity(chainId).length;
+  // const hasTopics = !!app.topics.getByCommunity(chainId).length;
+  const hasTopics = getByCommunity(chainId).length;
   const author = app.user.activeAccount;
   const { authorName } = useAuthorName();
   const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
-  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
+  const topicsForSelector = getByCommunity(chainId)?.filter((t) => {
     return (
       isAdmin ||
       t.tokenThreshold.isZero() ||

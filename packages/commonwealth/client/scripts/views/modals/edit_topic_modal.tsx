@@ -23,6 +23,7 @@ import {
   serializeDelta,
 } from '../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import useAppStore from 'stores/zustand';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -41,6 +42,10 @@ export const EditTopicModal = ({
     id,
     name: nameProp,
   } = topic;
+  const [editTopic, removeTopic] = useAppStore((s) => [
+    s.editTopic,
+    s.removeTopic,
+  ]);
 
   const navigate = useCommonNavigate();
 
@@ -84,7 +89,8 @@ export const EditTopicModal = ({
     };
 
     try {
-      await app.topics.edit(new Topic(topicInfo));
+      // await app.topics.edit(new Topic(topicInfo));
+      await editTopic(new Topic(topicInfo));
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
       setErrorMsg(err.message || err);
@@ -108,9 +114,9 @@ export const EditTopicModal = ({
               chainId: app.activeChainId(),
             };
 
-            await app.topics.remove(topicInfo);
-
-            navigate('/');
+            // await app.topics.remove(topicInfo);
+            await removeTopic(topicInfo as Topic);
+            await navigate('/');
           },
         },
         {

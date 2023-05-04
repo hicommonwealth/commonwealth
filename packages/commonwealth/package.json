@@ -274,7 +274,8 @@
     "webpack-dev-middleware": "^5.3.3",
     "webpack-hot-middleware": "^2.25.2",
     "webpack-merge": "^5.8.0",
-    "ws": "^7.4.6"
+    "ws": "^7.4.6",
+    "zustand": "^4.3.7"
   },
   "devDependencies": {
     "@aave/aave-token": "^1.0.4",

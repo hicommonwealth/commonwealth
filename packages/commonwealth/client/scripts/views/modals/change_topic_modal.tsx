@@ -7,6 +7,7 @@ import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { TopicSelector } from '../components/topic_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import useAppStore from 'stores/zustand';
 
 type ChangeTopicModalProps = {
   onChangeHandler: (topic: Topic) => void;
@@ -20,7 +21,8 @@ export const ChangeTopicModal = ({
   thread,
 }: ChangeTopicModalProps) => {
   const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
+  const topics = getByCommunity(app.activeChainId());
 
   const handleSaveChanges = async () => {
     try {

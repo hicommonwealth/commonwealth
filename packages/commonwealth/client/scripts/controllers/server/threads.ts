@@ -25,6 +25,7 @@ import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
 import { Link, LinkSource } from 'server/models/thread';
 import axios from 'axios';
+import { vanillaStore } from 'stores/zustand';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -195,7 +196,8 @@ class ThreadsController {
 
     let topicFromStore = null;
     if (topic?.id) {
-      topicFromStore = app.topics.store.getById(topic.id);
+      topicFromStore = vanillaStore.getState().getByIdentifier(topic.id);
+      // topicFromStore = app.topics.store.getById(topic.id);
     }
 
     let decodedTitle;
@@ -700,7 +702,8 @@ class ThreadsController {
         ? this.listingStore.getCutoffDate(options).toISOString()
         : moment().toISOString(),
     };
-    const topicId = app.topics.getByName(topicName, chain)?.id;
+    // const topicId = app.topics.getByName(topicName, chain)?.id;
+    const topicId = vanillaStore.getState().getByName(topicName, chain)?.id;
 
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;
