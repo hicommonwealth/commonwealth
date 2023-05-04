@@ -704,10 +704,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         readOnly={thread.readOnly}
         headerComponents={
           <>
+            <NewThreadTag thread={thread}/>
             {thread.stage !== ThreadStageType.Discussion && (
               <ThreadStage thread={thread}/>
             )}
-            <NewThreadTag thread={thread}/>
           </>
         }
         subHeader={!!thread.url && <ExternalLink thread={thread} />}

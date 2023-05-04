@@ -1,4 +1,5 @@
 import * as CustomIcons from './cw_custom_icons';
+import { CWNewStar } from './cw_icons';
 import * as Icons from './cw_icons';
 
 export const iconLookup = {
@@ -55,6 +56,7 @@ export const iconLookup = {
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
   mute: Icons.CWMute,
+  newStar: Icons.CWNewStar,
   people: Icons.CWPeople,
   person: Icons.CWPerson,
   pin: Icons.CWPin,

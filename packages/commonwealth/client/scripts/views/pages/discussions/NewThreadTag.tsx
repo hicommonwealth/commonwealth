@@ -10,7 +10,7 @@ export function isNewThread(thread: Thread){
 
 export const NewThreadTag = ({ thread }: {thread: Thread}) => {
   if (isNewThread(thread)) {
-    return <CWTag label={'NEW'} type={'new'} />
+    return <CWTag label={'NEW'} type={'new'} iconName={'newStar'} iconSize={'large'}/>
   }
 
   return null;

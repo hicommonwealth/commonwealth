@@ -75,13 +75,18 @@
   }
 
   &.new {
-    background-color: $primary-50;
+    background-color: $yellow-50;
     border-radius: 6px;
     padding: 4px 8px;
 
-    .tag-text.Text,
+    .tag-text.Text {
+      color: $yellow-600;
+    }
     .tag-icon.Icon {
-      color: $primary-600;
+      color: $yellow-600;
+      padding: 0;
+      margin: -6px -4px -13px -9px;
+      fill: none;
     }
   }
 }

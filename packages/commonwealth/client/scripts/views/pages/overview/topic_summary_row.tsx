@@ -118,10 +118,10 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
+                    <NewThreadTag thread={thread}/>
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}
-                    <NewThreadTag thread={thread}/>
                   </div>
                   <div className="row-top-icons">
                     {isHot(thread) && <div className="flame" />}
