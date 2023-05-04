@@ -28,6 +28,7 @@ import {
   getThreadSubScriptionMenuItem,
   isHot,
 } from './helpers';
+import { NewThreadTag } from './NewThreadTag';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -101,9 +102,6 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
     `${thread.identifier}-${slugify(thread.title)}`
   );
 
-  const diffInMs = moment().diff(thread.createdAt);
-  const isNew = moment.duration(diffInMs).asHours() < 48;
-
   return (
     <>
       <div
@@ -150,8 +148,8 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              {isNew && <CWTag label={'NEW'} type={'new'} />}
               {isLocked && <CWIcon iconName="lock" iconSize="small" />}
+              <NewThreadTag thread={thread}/>
             </div>
             <div className="top-row-icons">
               {isHot(thread) && <div className="flame" />}

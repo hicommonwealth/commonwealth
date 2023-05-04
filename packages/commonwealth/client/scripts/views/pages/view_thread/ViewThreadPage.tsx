@@ -37,6 +37,7 @@ import {
   getReactionSubscription,
   handleToggleSubscription,
 } from '../discussions/helpers';
+import { NewThreadTag } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -702,9 +703,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         viewCount={viewCount}
         readOnly={thread.readOnly}
         headerComponents={
-          thread.stage !== ThreadStageType.Discussion && (
-            <ThreadStage thread={thread} />
-          )
+          <>
+            {thread.stage !== ThreadStageType.Discussion && (
+              <ThreadStage thread={thread}/>
+            )}
+            <NewThreadTag thread={thread}/>
+          </>
         }
         subHeader={!!thread.url && <ExternalLink thread={thread} />}
         actions={

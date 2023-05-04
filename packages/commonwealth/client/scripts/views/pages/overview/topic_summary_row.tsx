@@ -20,6 +20,7 @@ import { User } from '../../components/user/user';
 // import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { useCommonNavigate } from 'navigation/helpers';
+import { NewThreadTag } from '../discussions/NewThreadTag';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
@@ -120,6 +121,7 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}
+                    <NewThreadTag thread={thread}/>
                   </div>
                   <div className="row-top-icons">
                     {isHot(thread) && <div className="flame" />}
