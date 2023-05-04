@@ -32,7 +32,7 @@ import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
+import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
@@ -110,7 +110,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
         )}
         onClick={(e) => {
           if (isCommandClick(e)) {
-            window.open(discussionLink, '_blank');
+            window.open(`${getScopePrefix()}${discussionLink}`, '_blank');
             return;
           }
 
