@@ -49,6 +49,7 @@ const ProposalsPage = () => {
   const [isLoading, setLoading] = useState(
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized
   );
+
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   const [
     isCosmosCompletedProposalsLoading,
@@ -61,14 +62,14 @@ const ProposalsPage = () => {
   const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
-    const initApi = async () => {
+    const chainInit = async () => {
       if (!hasFetchedApiRef.current) {
         hasFetchedApiRef.current = true;
         await initChain();
       }
     };
 
-    if (!app.chain?.apiInitialized) initApi();
+    if (!app.chain?.apiInitialized || !app.chain?.loaded) chainInit();
   }, [app.chain, initChain]);
 
   useEffect(() => {
