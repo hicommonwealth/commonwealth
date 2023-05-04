@@ -9,7 +9,6 @@ import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
 import { useGetActiveCosmosProposals } from 'hooks/cosmos/useGetActiveCosmosProposals';
 import { ProposalSelectorItem } from 'views/components/cosmos_proposal_selector/cosmos_proposal_selector_item';
-import { CWText } from '../component_kit/cw_text';
 
 const filterProposals = (ce: CosmosProposal, searchTerm: string) => {
   return (
@@ -27,24 +26,20 @@ export const ProposalSelector = ({
   onSelect,
   proposalsToSet,
 }: ProposalSelectorProps) => {
-  const [loadingCompleted, setCompletedLoading] = useState(false);
+  const [loadingCompletedProposals, setCompletedProposalsLoading] =
+    useState(false);
   const [loadingActive, setActiveLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { activeCosmosProposals } = useGetActiveCosmosProposals({
     app,
-    setIsLoading: setLoading,
+    setIsLoading: setActiveLoading,
     isLoading: loadingActive,
   });
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
-    setIsLoading: setCompletedLoading,
-    isLoading: loadingCompleted,
+    setIsLoading: setCompletedProposalsLoading,
+    isLoading: loadingCompletedProposals,
   });
-
-  useEffect(() => {
-    setLoading(!(activeCosmosProposals.length > 0));
-  }, [activeCosmosProposals]);
 
   const queryLength = searchTerm?.trim()?.length;
   const getEmptyContentMessage = () => {
@@ -111,8 +106,12 @@ export const ProposalSelector = ({
         iconRight="close"
         onInput={handleInputChange}
       />
-      <QueryList loading={loading} options={entities} renderItem={renderItem} />
-      {loadingCompleted && (
+      <QueryList
+        loading={loadingActive}
+        options={entities}
+        renderItem={renderItem}
+      />
+      {loadingCompletedProposals && (
         <p style={{ color: 'grey' }}>Loading completed proposals...</p>
       )}
     </div>

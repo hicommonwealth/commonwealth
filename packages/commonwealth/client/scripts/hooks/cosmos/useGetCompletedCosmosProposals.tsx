@@ -16,12 +16,14 @@ interface Props {
   app: IApp;
   setIsLoading: UseStateSetter<boolean>;
   isLoading: boolean;
+  setIsLoadingMore?: UseStateSetter<boolean>;
 }
 
 export const useGetCompletedCosmosProposals = ({
   app,
   setIsLoading,
   isLoading,
+  setIsLoadingMore,
 }: Props): Response => {
   const [completedCosmosProposals, setCompletedCosmosProposals] = useState<
     CosmosProposal[]
@@ -30,19 +32,28 @@ export const useGetCompletedCosmosProposals = ({
   const hasFetchedDataRef = useRef(false);
 
   useEffect(() => {
+    const cosmos = app.chain as Cosmos;
+
+    const getAndSetProposals = async () => {
+      const proposals = await getCompletedProposals(cosmos);
+      setCompletedCosmosProposals(proposals);
+    };
+
     const getProposals = async () => {
       if (!hasFetchedDataRef.current) {
         hasFetchedDataRef.current = true;
-        const cosmos = app.chain as Cosmos;
         const storedProposals =
           cosmos.governance.store.getAll() as CosmosProposal[];
         const completedProposals = storedProposals.filter((p) => p.completed);
+
         if (completedProposals?.length) {
-          setCompletedCosmosProposals(completedProposals);
+          if (setIsLoadingMore) setIsLoadingMore(true);
+          setCompletedCosmosProposals(completedProposals); // show whatever we have stored
+          await getAndSetProposals(); // update if there are more from the API
+          if (setIsLoadingMore) setIsLoadingMore(false);
         } else {
           setIsLoading(true);
-          const proposals = await getCompletedProposals(cosmos);
-          setCompletedCosmosProposals(proposals);
+          await getAndSetProposals();
           setIsLoading(false);
         }
       }
