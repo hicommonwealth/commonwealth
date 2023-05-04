@@ -81,6 +81,22 @@ class CosmosGovernance extends ProposalModule<
     this._initialized = true;
   }
 
+  public async getProposal(proposalId: number): Promise<CosmosProposal> {
+    const existingProposal = this.store.getByIdentifier(proposalId);
+    if (existingProposal) {
+      return existingProposal;
+    }
+    const { proposal } = await this._Chain.api.gov.proposal(proposalId);
+    const cosmosProp = new CosmosProposal(
+      this._Chain,
+      this._Accounts,
+      this,
+      msgToIProposal(proposal)
+    );
+    await cosmosProp.init();
+    return cosmosProp;
+  }
+
   private async _initProposals(proposalId?: number): Promise<void> {
     let cosmosProposals: CosmosProposal[];
     if (!proposalId) {

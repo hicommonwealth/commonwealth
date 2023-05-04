@@ -333,9 +333,8 @@ export class SubstrateDemocracyReferendum extends Proposal<
     }
 
     console.log(
-      'could not find:',
-      this.hash,
-      chain.democracyProposals?.store.getAll().map((c) => c.hash)
+      'could not find matching proposal or motion for referendum: ',
+      this.identifier
     );
     return undefined;
   }
