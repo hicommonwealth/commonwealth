@@ -35,7 +35,7 @@ export const isAuthorOrAdmin = async (
     const role = roles.find((r) => {
       return r.chain_id === chain;
     });
-    if (!role) return false;
+    return !!role;
   } else {
     return true;
   }
