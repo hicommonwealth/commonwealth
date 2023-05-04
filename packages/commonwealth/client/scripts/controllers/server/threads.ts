@@ -18,12 +18,13 @@ import {
   ThreadStage,
 } from 'models';
 import moment from 'moment';
-import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
+import { Link, LinkSource } from 'server/models/thread';
+import axios from 'axios';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -103,19 +104,6 @@ class ThreadsController {
     this._resetPagination = true;
   }
 
-  public getType(primary: string, secondary?: string, tertiary?: string) {
-    const result = this._store.getAll().filter((thread) => {
-      return tertiary
-        ? thread.kind === primary ||
-            thread.kind === secondary ||
-            thread.kind === tertiary
-        : secondary
-        ? thread.kind === primary || thread.kind === secondary
-        : thread.kind === primary;
-    });
-    return result;
-  }
-
   public getById(id: number) {
     return this._store.getByIdentifier(id);
   }
@@ -127,7 +115,6 @@ class ThreadsController {
       body,
       last_edited,
       version_history,
-      snapshot_proposal,
       Attachments,
       created_at,
       topic,
@@ -144,11 +131,11 @@ class ThreadsController {
       polls = [], // associated Polls
       reactions,
       last_commented_on,
-      linked_threads,
       numberOfComments,
       canvasAction,
       canvasSession,
       canvasHash,
+      links,
     } = thread;
 
     let { reactionIds, reactionType, addressesReacted } = thread;
@@ -227,13 +214,6 @@ class ThreadsController {
       decodedBody = body;
     }
 
-    const linkedThreads = (linked_threads || []).map(
-      (lT: LinkedThreadAttributes) => ({
-        linkedThread: lT.linked_thread,
-        linkingThread: lT.linking_thread,
-      })
-    );
-
     const t = new Thread({
       id,
       author: thread.Address.address,
@@ -242,7 +222,6 @@ class ThreadsController {
       body: decodedBody,
       createdAt: moment(created_at),
       attachments,
-      snapshotProposal: snapshot_proposal,
       topic: topicFromStore,
       kind,
       stage,
@@ -258,7 +237,6 @@ class ThreadsController {
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
-      linkedThreads,
       numberOfComments,
       reactionIds,
       reactionType,
@@ -266,6 +244,7 @@ class ThreadsController {
       canvasAction,
       canvasSession,
       canvasHash,
+      links,
     });
 
     ThreadsController.Instance.store.add(t);
@@ -516,136 +495,126 @@ class ThreadsController {
       },
     });
   }
-
-  public async setLinkedSnapshotProposal(args: {
+  /**
+   * Add a set of links to a Thread
+   * @param args
+   * @returns updated Thread
+   */
+  public async addLinks({
+    threadId,
+    links,
+  }: {
     threadId: number;
-    snapshotProposal: string;
-  }) {
-    await $.ajax({
-      url: `${app.serverUrl()}/updateThreadLinkedSnapshotProposal`,
-      type: 'POST',
-      data: {
-        chain: app.activeChainId(),
-        thread_id: args.threadId,
-        snapshot_proposal: args.snapshotProposal,
-        jwt: app.user.jwt,
-      },
-      success: () => {
-        const thread = this._store.getByIdentifier(args.threadId);
-        if (!thread) return;
-        thread.snapshotProposal = args.snapshotProposal;
-        return thread;
-      },
-      error: (err) => {
-        notifyError(
-          `Could not update Snapshot Linked Proposal: ${err.responseJSON.error}`
-        );
-        console.error('Failed to update linked snapshot proposal');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to update linked proposals'
-        );
-      },
-    });
+    links: Link[];
+  }): Promise<Thread> {
+    try {
+      const response = await axios.post(
+        `${app.serverUrl()}/linking/addThreadLinks`,
+        {
+          thread_id: threadId,
+          links,
+          jwt: app.user.jwt,
+        }
+      );
+
+      const updatedThread = this.modelFromServer(response.data.result);
+      this._listingStore.remove(updatedThread);
+      this._listingStore.add(updatedThread);
+      app.threadUpdateEmitter.emit('threadUpdated', {});
+
+      return response.data.result;
+    } catch (err) {
+      console.log('Could not add links', err);
+      throw new Error(err);
+    }
   }
 
-  public async setLinkedChainEntities(args: {
+  /**
+   * Deletes a set of Links
+   * @param args
+   * @returns updated Thread
+   */
+  public async deleteLinks({
+    threadId,
+    links,
+  }: {
     threadId: number;
-    entities: ChainEntity[];
-  }) {
-    const { threadId, entities } = args;
-    await $.ajax({
-      url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
-      type: 'POST',
-      data: {
-        chain: app.activeChainId(),
+    links: Link[];
+  }): Promise<Thread> {
+    try {
+      const response = await axios.delete(
+        `${app.serverUrl()}/linking/deleteLinks`,
+        {
+          data: {
+            thread_id: threadId,
+            links,
+            jwt: app.user.jwt,
+          },
+        }
+      );
+
+      const updatedThread = this.modelFromServer(response.data.result);
+      this._listingStore.remove(updatedThread);
+      this._listingStore.add(updatedThread);
+      app.threadUpdateEmitter.emit('threadUpdated', {});
+
+      return response.data.result;
+    } catch (err) {
+      console.log('Could not delete links', err);
+      throw new Error(err);
+    }
+  }
+
+  /**
+   * Gets all links or filtered by linkType for a thread id
+   * @param args
+   * @returns list of resolved links using adapters + link object
+   */
+  public async getLinksForThread({
+    threadId,
+    linkType,
+    link,
+  }: {
+    threadId: number;
+    linkType?: LinkSource[];
+    link?: Link;
+  }): Promise<string[]> {
+    try {
+      const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
         thread_id: threadId,
-        chain_entity_id: entities.map((ce) => ce.id),
+        linkType,
+        link,
         jwt: app.user.jwt,
-      },
-      success: () => {
-        const thread = this._store.getByIdentifier(threadId);
-        if (!thread) return;
-        thread.chainEntities.splice(0);
-        entities.forEach((ce) =>
-          thread.chainEntities.push({
-            id: ce.id,
-            type: ce.type,
-            typeId: ce.typeId,
-            chain: thread.chain,
-          })
-        );
-        return thread;
-      },
-      error: (err) => {
-        console.log('Failed to update linked proposals');
-        notifyError(
-          `Failed to update linked proposals: ${err.responseJSON.error}`
-        );
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to update linked proposals'
-        );
-      },
-    });
+      });
+
+      return response.data;
+    } catch (err) {
+      notifyError('Could not get links');
+      console.log(err);
+    }
   }
 
-  public async addLinkedThread(
-    linkingThreadId: number,
-    linkedThreadId: number
-  ) {
-    const [response] = await Promise.all([
-      $.post(`${app.serverUrl()}/updateLinkedThreads`, {
-        chain: app.activeChainId(),
-        linking_thread_id: linkingThreadId,
-        linked_thread_id: linkedThreadId,
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
+  /**
+   * Gets all threads associated with a link(ie all threads linked to 1 proposal)
+   * @param args
+   * @returns A list of resolved thread objects
+   */
+  public async getThreadsForLink({
+    link,
+  }: {
+    link: Link;
+  }): Promise<{ title: string; id: string }[]> {
+    try {
+      const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
+        link,
         jwt: app.user.jwt,
-      }),
-    ]);
-    if (response.status !== 'Success') {
-      throw new Error();
-    }
-    this.modelFromServer(response.result);
-  }
+      });
 
-  public async removeLinkedThread(
-    linkingThreadId: number,
-    linkedThreadId: number
-  ) {
-    const [response] = await Promise.all([
-      $.post(`${app.serverUrl()}/updateLinkedThreads`, {
-        chain: app.activeChainId(),
-        linking_thread_id: linkingThreadId,
-        linked_thread_id: linkedThreadId,
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
-        remove_link: true,
-        jwt: app.user.jwt,
-      }),
-    ]);
-    if (response.status !== 'Success') {
-      throw new Error();
+      return response.data.result.threads;
+    } catch (err) {
+      notifyError('Could not get threads');
+      console.log(err);
     }
-    this.modelFromServer(response.result);
-  }
-
-  public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
-    const response = await $.ajax({
-      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
-      type: 'GET',
-      data: {
-        snapshot: args.snapshot,
-        chain: app.activeChainId(),
-      },
-    });
-    if (response.status === 'Failure') {
-      return null;
-    }
-    return response.result;
   }
 
   public async fetchThreadsFromId(

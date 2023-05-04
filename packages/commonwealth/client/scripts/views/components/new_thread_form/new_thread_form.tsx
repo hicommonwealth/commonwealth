@@ -7,6 +7,7 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { notifyError } from 'controllers/app/notifications';
 import { ThreadKind, ThreadStage } from 'models';
 import app from 'state';
+import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
@@ -93,7 +94,9 @@ export const NewThreadForm = () => {
       const result = await app.threads.create(
         author.address,
         threadKind,
-        ThreadStage.Discussion,
+        app.chain.meta.customStages
+          ? parseCustomStages(app.chain.meta.customStages)[0]
+          : ThreadStage.Discussion,
         app.activeChainId(),
         threadTitle,
         threadTopic,
