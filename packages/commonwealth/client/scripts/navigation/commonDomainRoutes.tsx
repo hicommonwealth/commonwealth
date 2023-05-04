@@ -38,6 +38,12 @@ const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')
 );
+const ChainEntityLinkRedirectPage = lazy(
+  () => import('views/pages/chain_entity_link_redirect')
+);
+const SnapshotProposalLinkRedirectPage = lazy(
+  () => import('views/pages/snapshot_proposal_link_redirect')
+);
 const FeedPage = lazy(() => import('views/pages/feed'));
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
@@ -476,6 +482,28 @@ const commonDomainsRoutes = () => [
     })}
   />,
   // PROFILES END
+
+  // LEGACY LINKING REDIRECTS
+  // These redirects exist so we can land on a properly identified page
+  // without loading additional metadata on the view thread page to construct
+  // a proper link. Each of these routes will:
+  // (a) load external data as needed (from snapshot, chain events, etc) to
+  // (b) produce a correct link to the entity (whether /snapshot/space/id or /proposal/id), and
+  // (c) update the link objects associated with the identifer to point at the correct page.
+  <Route
+    path="/:scope/link/chain-entity/:identifier"
+    element={withLayout(ChainEntityLinkRedirectPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/link/snapshot-proposal/:identifier"
+    element={withLayout(SnapshotProposalLinkRedirectPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
 
   // LEGACY REDIRECTS
   //here for compatibility only
