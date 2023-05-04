@@ -2,7 +2,10 @@ import { RequestHandler, Request, Response } from 'express';
 import { RedisNamespaces } from './types';
 import { RedisCache } from './redisCache';
 import { ServerError } from 'common-common/src/errors';
-import { defaultKeyGenerator } from './cacheKeyUtils';
+import { defaultKeyGenerator, CacheKeyDuration, isCacheKeyDuration } from './cacheKeyUtils';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class CacheDecorator {
   private redisCache: RedisCache;
@@ -18,7 +21,7 @@ export class CacheDecorator {
   // namespace: namespace for the cache key, default is Route_Response
   public cacheMiddleware(
     duration: number,
-    keyGenerator: (req: Request) => string = defaultKeyGenerator,
+    keyGenerator: (req: Request) => string | CacheKeyDuration = defaultKeyGenerator,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): RequestHandler {
     const initInterceptor = this.initInterceptor.bind(this);
@@ -27,17 +30,23 @@ export class CacheDecorator {
     return async function cache(req, res, next) {
       // If cache is not set, skip caching
       if (!this.redisCache) {
-        console.log(`cache undefined`);
-        next();
-        return;
+        log.trace(`cacheMiddleware: cache undefined`);
+        return next();
       }
 
       // if you like to skip caching based on some condition, return null from keyGenerator
-      const cacheKey = keyGenerator(req);
+      let cacheKey = keyGenerator(req);
+      let cacheDuration = duration;
+      // check if cacheKey is object with cacheKey and cacheDuration
+      // if yes, override duration and cacheKey
+      if (cacheKey && isCacheKeyDuration(cacheKey)) {
+        cacheDuration = cacheKey.cacheDuration;
+        cacheKey = cacheKey.cacheKey;
+      }
+
       if (!cacheKey) {
-        console.log(`Cache key not found for ${req.originalUrl}`);
-        next();
-        return;
+        log.trace(`Cache key not found for ${req.originalUrl}`);
+        return next();
       }
 
       try {
@@ -56,15 +65,15 @@ export class CacheDecorator {
         res.send = initInterceptor(
           cacheKey,
           namespace,
-          duration,
+          cacheDuration,
           originalSend,
           res
         );
-        next();
-      } catch (error) {
-        console.log(`Error fetching cache ${cacheKey}`);
-        console.error(error);
-        next();
+        return next();
+      } catch (err) {
+        log.error(`Error fetching cache ${cacheKey}`);
+        log.error(err);
+        return next();
       }
     }.bind(this);
   }
@@ -78,16 +87,23 @@ export class CacheDecorator {
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): Promise<boolean> {
     if (!cacheKey) {
-      console.log(`Cache key not found for ${res.req.originalUrl}`);
+      log.trace(`Cache key not found for ${res.req.originalUrl}`);
       return false;
     }
 
     const cachedResponse = await this.redisCache.getKey(namespace, cacheKey);
     if (cachedResponse) {
       // Response found in cache, send it
-      console.log(`Response ${cacheKey} FOUND in cache, sending it`);
+      log.trace(`Response ${cacheKey} FOUND in cache, sending it`);
       res.set('X-Cache', 'HIT');
-      res.status(200).send(JSON.parse(cachedResponse));
+      // If the response is a JSON, parse it and send it
+      try {
+        const parsedResponse = JSON.parse(cachedResponse);
+        res.status(200).send(parsedResponse);
+      } catch (error) {
+        // If the response is not a JSON, send it as it is
+        res.status(200).send(cachedResponse);
+      }
       return true;
     }
     return false;
@@ -126,20 +142,20 @@ export class CacheDecorator {
   ) {
     return function resSendInterceptor(body: any) {
       try {
-        console.log(`Response ${cacheKey} not found in cache, sending it`);
+        log.trace(`Response ${cacheKey} not found in cache, sending it`);
         const response = originalSend.call(res, body);
         try {
           if (res.statusCode == 200) {
             this.redisCache.setKey(namespace, cacheKey, body, duration);
           }
         } catch (error) {
-          console.log(`Error writing cache ${cacheKey} skip writing cache`);
+          log.warn(`Error writing cache ${cacheKey} skip writing cache`);
         }
         return response;
-      } catch (error) {
-        console.log(`Error catch all res.send ${cacheKey}`);
-        console.log(error);
-        throw new ServerError('something broke', error);
+      } catch (err) {
+        log.error(`Error catch all res.send ${cacheKey}`);
+        log.error(err);
+        throw new ServerError('something broke', err);
       }
     }.bind(this);
   }

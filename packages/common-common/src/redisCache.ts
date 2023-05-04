@@ -236,7 +236,7 @@ export class RedisCache {
 
       return data;
     } catch (e) {
-      console.log(e);
+      log.error(e);
       return false;
     }
   }
@@ -276,16 +276,16 @@ export class RedisCache {
           try {
             const resp = await this.client.del(key);
             count += resp;
-            console.log(`deleted key ${key} ${resp} ${count}`)
+            log.trace(`deleted key ${key} ${resp} ${count}`)
           } catch (err) {
-            console.log(`error deleting key ${key}`)
-            console.log(err);
+            log.trace(`error deleting key ${key}`)
+            log.trace(err);
           }
         }
       }
       return count;
     } catch (e) {
-      console.log(e);
+      log.error(e);
       return false;
     }
   }
