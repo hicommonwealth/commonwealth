@@ -46,7 +46,7 @@ type Json = {
       value: string;
       gas: string;
       gasPrice: string;
-    }
+    };
   };
 };
 
@@ -225,16 +225,17 @@ const ViewTemplatePage = () => {
 
   const formatTransactionParams = () => {
     const { tx_template } = json;
-    let txObject = {}
-    Object.keys(tx_template.tx_params).map((key)=> {
-      const arg = tx_template.args[key];
+    let txObject = {};
+    Object.keys(tx_template.tx_params).map((key) => {
+      const arg = tx_template.tx_params[key];
       if (arg.startsWith('$')) {
-        txObject[key] = formState[arg.slice(1)]
-      }else{
-        txObject[key] = arg
+        txObject[key] = formState[arg.slice(1)];
+      } else {
+        txObject[key] = arg;
       }
-    })
-  }
+    });
+    return txObject;
+  };
 
   const constructTxPreview = () => {
     const functionArgs = formatFunctionArgs();
@@ -243,7 +244,7 @@ const ViewTemplatePage = () => {
 
     preview['method'] = json.tx_template?.method;
     preview['args'] = functionArgs;
-    preview['tx_params'] = txParams
+    preview['tx_params'] = txParams;
 
     return JSON.stringify(preview, null, 4);
   };
@@ -348,7 +349,7 @@ const ViewTemplatePage = () => {
                 contract: currentContract,
                 fn: functionAbi,
                 inputArgs: functionArgs,
-                tx_options: txParams
+                tx_options: txParams,
               });
 
               if (res.status) {

@@ -14,14 +14,14 @@ async function sendFunctionCall({
   contract,
   functionTx,
   web3,
-  tx_options
+  tx_options,
 }: {
   fn: AbiItem;
   signingWallet: IWebWallet<any>;
   contract: Contract;
   functionTx: any;
   web3: Web3;
-  tx_options?: any
+  tx_options?: any;
 }) {
   let txReceipt: TransactionReceipt | any;
   if (
@@ -37,7 +37,7 @@ async function sendFunctionCall({
     };
 
     tx = tx_options ? Object.assign(tx, tx_options) : tx;
-    
+
     const estimate = await web3.eth.estimateGas(tx);
     tx.gas = estimate;
     txReceipt = await web3.eth.sendTransaction(tx);
@@ -69,7 +69,7 @@ export async function callContractFunction({
   contract,
   fn,
   inputArgs,
-  tx_options
+  tx_options,
 }: {
   contract: Contract;
   fn: AbiItem;
@@ -97,14 +97,14 @@ export async function callContractFunction({
     contract: Contract;
     functionTx: any;
     web3: Web3;
-    tx_options?: any
+    tx_options?: any;
   } = {
     fn,
     signingWallet,
     contract,
     functionTx,
     web3,
-    tx_options
+    tx_options,
   };
   const txReceipt: TransactionReceipt | any = await sendFunctionCall(
     functionConfig
