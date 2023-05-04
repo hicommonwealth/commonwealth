@@ -95,10 +95,40 @@ class SearchController {
         );
 
         searchCache.results[SearchScope.Members] = profiles
-          .map((addr) => {
-            addr.SearchContentType = SearchContentType.Member;
-            addr.searchType = SearchScope.Members;
-            return addr;
+          .map((profile) => {
+            const profileAsMember: any = {
+              id: profile.id,
+              profile_id: profile.id,
+              address: profile.addresses[0],
+              chain: profile.chains[0],
+              name: profile.profile_name,
+              user_id: profile.user_id,
+              UserId: profile.user_id,
+            };
+            console.log('profile: ', profile);
+            /*
+            Expected Model: {
+                "id": 10000,
+                "address": "0x0000…",
+                "chain": "ethereum",
+                "verified": "2020-02-28T10:12:19.767Z",
+                "keytype": null,
+                "name": "Dope",
+                "last_active": "2023-02-28T10:12:21.079Z",
+                "user_id": 500,
+                "is_councillor": false,
+                "is_validator": false,
+                "ghost_address": false,
+                "profile_id": 200,
+                "wallet_id": "metamask",
+                "UserId": 500,
+                "SearchContentType": "member",
+                "searchType": "Members"
+            }
+            */
+            profileAsMember.SearchContentType = SearchContentType.Member;
+            profileAsMember.searchType = SearchScope.Members;
+            return profileAsMember;
           })
           .sort(this.sortResults);
       }

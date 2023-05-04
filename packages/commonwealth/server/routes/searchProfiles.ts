@@ -50,8 +50,9 @@ const searchProfiles = async (models: DB, req, res) => {
       "Profiles".id,
       "Profiles".user_id,
       "Profiles".profile_name,
-      array_agg(DISTINCT "Addresses".chain) as chains,
-      array_agg(DISTINCT "Addresses".address) as addresses
+      array_agg("Addresses".id) as address_ids,
+      array_agg("Addresses".chain) as chains,
+      array_agg("Addresses".address) as addresses
     FROM
       "Profiles"
     JOIN
@@ -71,7 +72,18 @@ const searchProfiles = async (models: DB, req, res) => {
 
   return res.json({
     status: 'Success',
-    result: profiles,
+    result: profiles.map((profile: any) => {
+      return {
+        id: profile.id,
+        user_id: profile.user_id,
+        profile_name: profile.profile_name,
+        addresses: profile.address_ids.map((_, i) => ({
+          id: profile.address_ids[i],
+          chain: profile.chains[i],
+          address: profile.addresses[i],
+        })),
+      };
+    }),
   });
 };
 
