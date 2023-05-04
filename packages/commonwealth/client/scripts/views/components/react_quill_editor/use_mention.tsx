@@ -6,6 +6,11 @@ import moment from 'moment';
 import QuillMention from 'quill-mention';
 
 import app from 'state';
+import { debounce } from 'lodash';
+import { MentionCache } from './mention_cache';
+
+// local storage cache for mention search results
+const mentionCache = new MentionCache(1_000 * 60);
 
 const Delta = Quill.import('delta');
 Quill.register('modules/mention', QuillMention);
@@ -59,91 +64,104 @@ export const useMention = ({
       dataAttributes: ['name', 'link', 'component'],
       renderItem: (item) => item.component,
       onSelect: selectMention,
-      source: async (
-        searchTerm: string,
-        renderList: (
-          formattedMatches: QuillMention,
-          searchTerm: string
-        ) => null,
-        mentionChar: string
-      ) => {
-        if (mentionChar !== '@') return;
+      source: debounce(
+        async (
+          searchTerm: string,
+          renderList: (
+            formattedMatches: QuillMention,
+            searchTerm: string
+          ) => null,
+          mentionChar: string
+        ) => {
+          if (mentionChar !== '@') return;
 
-        let formattedMatches = [];
-        if (searchTerm.length === 0) {
-          const node = document.createElement('div');
-          const tip = document.createElement('span');
-          tip.innerText = 'Type to tag a member';
-          node.appendChild(tip);
-          formattedMatches = [
-            {
-              link: '#',
-              name: '',
-              component: node.outerHTML,
-            },
-          ];
-        } else if (searchTerm.length > 0) {
-          const members = await app.search.searchMentionableAddresses(
-            searchTerm,
-            {
-              pageSize: 10,
-              chainScope: app.activeChainId(),
-            }
-          );
-          formattedMatches = members.map((addr) => {
-            const profile = app.newProfiles.getProfile(
-              addr.chain,
-              addr.address
-            );
+          let formattedMatches = [];
+          if (searchTerm.length === 0) {
             const node = document.createElement('div');
-
-            let avatar;
-            if (profile.avatarUrl) {
-              avatar = document.createElement('img');
-              (avatar as HTMLImageElement).src = profile.avatarUrl;
-              avatar.className = 'ql-mention-avatar';
-              node.appendChild(avatar);
-            } else {
-              avatar = document.createElement('div');
-              avatar.className = 'ql-mention-avatar';
-              avatar.innerHTML = MinimumProfile.getSVGAvatar(addr.address, 20);
+            const tip = document.createElement('span');
+            tip.innerText = 'Type to tag a member';
+            node.appendChild(tip);
+            formattedMatches = [
+              {
+                link: '#',
+                name: '',
+                component: node.outerHTML,
+              },
+            ];
+          } else if (searchTerm.length > 2) {
+            // try to get results from cache
+            let profiles = mentionCache.get(searchTerm);
+            if (!profiles) {
+              profiles = await app.search.searchMentionableProfiles(
+                searchTerm,
+                app.activeChainId()
+              );
+              if (!profiles?.length) {
+                return;
+              }
+              mentionCache.set(searchTerm, profiles);
             }
+            formattedMatches = profiles.map((p: any) => {
+              const profileId = p.id;
+              const profileAddress = p.addresses[0];
+              const profileName = p.profile_name;
+              const profileChain = p.chains[0];
 
-            const nameSpan = document.createElement('span');
-            nameSpan.innerText = addr.name;
-            nameSpan.className = 'ql-mention-name';
+              const profile = new MinimumProfile(profileAddress, profileChain);
+              const node = document.createElement('div');
 
-            const addrSpan = document.createElement('span');
-            addrSpan.innerText =
-              addr.chain === 'near'
-                ? addr.address
-                : `${addr.address.slice(0, 6)}...`;
-            addrSpan.className = 'ql-mention-addr';
+              let avatar;
+              if (profile.avatarUrl) {
+                avatar = document.createElement('img');
+                (avatar as HTMLImageElement).src = profile.avatarUrl;
+                avatar.className = 'ql-mention-avatar';
+                node.appendChild(avatar);
+              } else {
+                avatar = document.createElement('div');
+                avatar.className = 'ql-mention-avatar';
+                avatar.innerHTML = MinimumProfile.getSVGAvatar(
+                  profileAddress,
+                  20
+                );
+              }
 
-            const lastActiveSpan = document.createElement('span');
-            lastActiveSpan.innerText = profile.lastActive
-              ? `Last active ${moment(profile.lastActive).fromNow()}`
-              : null;
-            lastActiveSpan.className = 'ql-mention-la';
+              const nameSpan = document.createElement('span');
+              nameSpan.innerText = p.profile_name;
+              nameSpan.className = 'ql-mention-name';
 
-            const textWrap = document.createElement('div');
-            textWrap.className = 'ql-mention-text-wrap';
+              const addrSpan = document.createElement('span');
+              addrSpan.innerText =
+                profileChain === 'near'
+                  ? profileAddress
+                  : `${profileAddress.slice(0, 6)}...`;
+              addrSpan.className = 'ql-mention-addr';
 
-            node.appendChild(avatar);
-            textWrap.appendChild(nameSpan);
-            textWrap.appendChild(addrSpan);
-            textWrap.appendChild(lastActiveSpan);
-            node.appendChild(textWrap);
+              const lastActiveSpan = document.createElement('span');
+              lastActiveSpan.innerText = profile.lastActive
+                ? `Last active ${moment(profile.lastActive).fromNow()}`
+                : null;
+              lastActiveSpan.className = 'ql-mention-la';
 
-            return {
-              link: `/profile/id/${addr.profile_id}`,
-              name: addr.name,
-              component: node.outerHTML,
-            };
-          });
-        }
-        renderList(formattedMatches, searchTerm);
-      },
+              const textWrap = document.createElement('div');
+              textWrap.className = 'ql-mention-text-wrap';
+
+              node.appendChild(avatar);
+              textWrap.appendChild(nameSpan);
+              textWrap.appendChild(addrSpan);
+              textWrap.appendChild(lastActiveSpan);
+              node.appendChild(textWrap);
+
+              return {
+                link: `/profile/id/${profileId}`,
+                name: profileName,
+                component: node.outerHTML,
+              };
+            });
+          }
+          renderList(formattedMatches, searchTerm);
+        },
+        500
+      ),
       isolateChar: true,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

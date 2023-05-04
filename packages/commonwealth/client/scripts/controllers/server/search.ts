@@ -89,7 +89,7 @@ class SearchController {
       }
 
       if (scope.includes(SearchScope.Members)) {
-        const addrs = await this.searchMentionableAddresses(
+        const addrs = await this.searchMentionableProfiles(
           searchTerm,
           { pageSize, chainScope },
           ['created_at', 'DESC']
@@ -243,19 +243,14 @@ class SearchController {
     }
   };
 
-  public searchMentionableAddresses = async (
+  public searchMentionableProfiles = async (
     searchTerm: string,
-    params: SearchParams,
-    order?: string[]
+    chainScope: string
   ) => {
-    const { pageSize, communityScope, chainScope } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      const response = await $.get(`${app.serverUrl()}/searchProfiles`, {
         chain: chainScope,
-        community: communityScope,
-        limit: pageSize,
-        searchTerm,
-        order,
+        search: searchTerm,
       });
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
