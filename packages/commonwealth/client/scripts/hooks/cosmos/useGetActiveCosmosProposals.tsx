@@ -30,19 +30,26 @@ export const useGetActiveCosmosProposals = ({
   const hasFetchedDataRef = useRef(false);
 
   useEffect(() => {
+    const cosmos = app.chain as Cosmos;
+
+    const getAndSetProposals = async () => {
+      const proposals = await getActiveProposals(cosmos);
+      setActiveCosmosProposals(proposals);
+    };
+
     const getProposals = async () => {
       if (!hasFetchedDataRef.current) {
         hasFetchedDataRef.current = true;
-        const cosmos = app.chain as Cosmos;
         const storedProposals =
           cosmos.governance.store.getAll() as CosmosProposal[];
         const activeProposals = storedProposals.filter((p) => !p.completed);
+
         if (activeProposals?.length) {
-          setActiveCosmosProposals(activeProposals);
+          setActiveCosmosProposals(activeProposals); // show whatever we have stored
+          await getAndSetProposals(); // update if there are more from the API
         } else {
           setIsLoading(true);
-          const proposals = await getActiveProposals(cosmos);
-          setActiveCosmosProposals(proposals);
+          await getAndSetProposals();
           setIsLoading(false);
         }
       }
