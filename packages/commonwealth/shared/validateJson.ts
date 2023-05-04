@@ -20,6 +20,15 @@ const schema = {
       properties: {
         method: { type: 'string' },
         args: { type: 'object' },
+        tx_params: { 
+          type: 'object',
+          properties: {
+            value: { type: 'string'},
+            gas: {type: 'string'},
+            gasPrice: {type: 'string'}
+          },
+          additionalProperties: false,
+        }
       },
       required: ['method'],
       additionalProperties: false,

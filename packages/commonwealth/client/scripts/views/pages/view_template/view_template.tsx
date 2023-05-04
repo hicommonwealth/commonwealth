@@ -42,6 +42,11 @@ type Json = {
       values: string[][];
       description: string;
     };
+    tx_params: {
+      value: string;
+      gas: string;
+      gasPrice: string;
+    }
   };
 };
 
@@ -218,12 +223,27 @@ const ViewTemplatePage = () => {
     });
   };
 
+  const formatTransactionParams = () => {
+    const { tx_template } = json;
+    let txObject = {}
+    Object.keys(tx_template.tx_params).map((key)=> {
+      const arg = tx_template.args[key];
+      if (arg.startsWith('$')) {
+        txObject[key] = formState[arg.slice(1)]
+      }else{
+        txObject[key] = arg
+      }
+    })
+  }
+
   const constructTxPreview = () => {
     const functionArgs = formatFunctionArgs();
+    const txParams = formatTransactionParams();
     const preview = {};
 
     preview['method'] = json.tx_template?.method;
     preview['args'] = functionArgs;
+    preview['tx_params'] = txParams
 
     return JSON.stringify(preview, null, 4);
   };
@@ -323,11 +343,12 @@ const ViewTemplatePage = () => {
               );
 
               const functionArgs = formatFunctionArgs();
-
+              const txParams = formatFunctionArgs();
               const res = await callContractFunction({
                 contract: currentContract,
                 fn: functionAbi,
                 inputArgs: functionArgs,
+                tx_options: txParams
               });
 
               if (res.status) {
