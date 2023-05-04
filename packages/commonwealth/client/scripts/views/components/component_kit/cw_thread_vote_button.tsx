@@ -1,11 +1,13 @@
 import React from 'react';
 
-import 'components/component_kit/cw_thread_vote_button.scss';
+// import 'components/component_kit/cw_thread_vote_button.scss';
+import '../../../../styles/components/component_kit/cw_thread_vote_button.scss';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
-import { formatNumberShort } from 'adapters/currency';
+// import { formatNumberShort } from 'adapters/currency';
+import { formatNumberShort } from '../../../../../shared/adapters/currency';
 
 type ThreadVoteButtonProps = {
   updateVoteCount: (newCount: number) => void;
