@@ -89,13 +89,12 @@ class SearchController {
       }
 
       if (scope.includes(SearchScope.Members)) {
-        const addrs = await this.searchMentionableProfiles(
+        const profiles = await this.searchMentionableProfiles(
           searchTerm,
-          { pageSize, chainScope },
-          ['created_at', 'DESC']
+          chainScope
         );
 
-        searchCache.results[SearchScope.Members] = addrs
+        searchCache.results[SearchScope.Members] = profiles
           .map((addr) => {
             addr.SearchContentType = SearchContentType.Member;
             addr.searchType = SearchScope.Members;

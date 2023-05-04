@@ -41,6 +41,8 @@ const searchProfiles = async (models: DB, req, res) => {
     bind.chain = req.chain.id;
   }
 
+  const chainWhere = bind.chain ? `"Addresses".chain = $chain AND` : '';
+
   // get profiles and aggregate all addresses for each profile
   const profiles = await models.sequelize.query(
     `
@@ -55,7 +57,7 @@ const searchProfiles = async (models: DB, req, res) => {
     JOIN
       "Addresses" on "Profiles".user_id = "Addresses".user_id
     WHERE
-      "Addresses".chain = $chain AND
+      ${chainWhere}
       "Profiles".profile_name LIKE $searchTerm
     GROUP BY
       "Profiles".id
