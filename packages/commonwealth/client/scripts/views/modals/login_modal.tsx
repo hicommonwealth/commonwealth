@@ -31,7 +31,7 @@ type LoginModalAttrs = {
   onModalClose: () => void;
 };
 
-const LoginModal = (props: LoginModalAttrs) => {
+export const LoginModal = (props: LoginModalAttrs) => {
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [bodyType, setBodyType] = useState<LoginBodyType>();
@@ -467,5 +467,3 @@ const LoginModal = (props: LoginModalAttrs) => {
     />
   );
 };
-
-export { LoginModal };
