@@ -69,7 +69,6 @@ export type ChainAttributes = {
 
   created_at?: Date;
   updated_at?: Date;
-  deleted_at?: Date;
 };
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
@@ -153,7 +152,6 @@ export default (
       },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       tableName: 'Chains',

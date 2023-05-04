@@ -24,16 +24,6 @@ module.exports = {
         { transaction }
       );
 
-      await queryInterface.addColumn(
-        'Chains',
-        'deleted_at',
-        {
-          type: Sequelize.DATE,
-          allowNull: true,
-        },
-        { transaction }
-      );
-
       const updateQuery = `
         UPDATE "Chains" AS c
         SET created_at = a.created_at
@@ -56,9 +46,6 @@ module.exports = {
         transaction,
       });
       await queryInterface.removeColumn('Chains', 'updated_at', {
-        transaction,
-      });
-      await queryInterface.removeColumn('Chains', 'deleted_at', {
         transaction,
       });
     });
