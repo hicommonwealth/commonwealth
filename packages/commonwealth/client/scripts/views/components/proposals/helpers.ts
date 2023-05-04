@@ -3,7 +3,10 @@ import { redraw } from 'mithrilInterop';
 import { formatCoin } from 'adapters/currency';
 import { CompoundTypes } from 'chain-events/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
+import {
+  CosmosProposal,
+  CosmosVote,
+} from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';

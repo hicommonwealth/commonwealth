@@ -10,7 +10,7 @@ import {
 import { DynamicTemplate } from '../../shared/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
-import validateChain from '../middleware/validateChain';
+import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import sgMail from '@sendgrid/mail';
