@@ -49,7 +49,6 @@ const ProposalsPage = () => {
   const [isLoading, setLoading] = useState(
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized
   );
-
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   const [
     isCosmosCompletedProposalsLoading,

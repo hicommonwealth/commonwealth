@@ -51,7 +51,6 @@ export const useGetCompletedCosmosProposals = ({
           setCompletedCosmosProposals(completedProposals); // show whatever we have stored
           await getAndSetProposals(); // update if there are more from the API
           if (setIsLoadingMore) setIsLoadingMore(false);
-          setIsLoading(false);
         } else {
           setIsLoading(true);
           await getAndSetProposals();

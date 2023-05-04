@@ -37,8 +37,8 @@ class Cosmos
     await super.initApi();
   }
 
-  public async initData(proposalId?: number) {
-    await this.governance.init(this.chain, this.accounts, proposalId);
+  public async initData() {
+    await this.governance.init(this.chain, this.accounts);
     await super.initData();
     await this.activeAddressHasToken(this.app.user?.activeAccount?.address);
   }
