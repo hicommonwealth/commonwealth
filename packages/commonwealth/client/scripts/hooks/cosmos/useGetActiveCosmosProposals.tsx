@@ -42,10 +42,10 @@ export const useGetActiveCosmosProposals = ({
         hasFetchedDataRef.current = true;
         const storedProposals =
           cosmos.governance.store.getAll() as CosmosProposal[];
-        const completedProposals = storedProposals.filter((p) => p.completed);
+        const activeProposals = storedProposals.filter((p) => !p.completed);
 
-        if (completedProposals?.length) {
-          setActiveCosmosProposals(completedProposals); // show whatever we have stored
+        if (activeProposals?.length) {
+          setActiveCosmosProposals(activeProposals); // show whatever we have stored
           await getAndSetProposals(); // update if there are more from the API
         } else {
           setIsLoading(true);
