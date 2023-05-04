@@ -78,14 +78,10 @@ import deletePoll from '../routes/deletePoll';
 import updateThreadStage from '../routes/updateThreadStage';
 import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
-import updateThreadLinkedChainEntities from '../routes/updateThreadLinkedChainEntities';
-import updateThreadLinkedSnapshotProposal from '../routes/updateThreadLinkedSnapshotProposal';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
 import fetchEntityTitle from '../routes/fetchEntityTitle';
-import fetchThreadForSnapshot from '../routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
-import updateLinkedThreads from '../routes/updateLinkedThreads';
 import deleteThread from '../routes/deleteThread';
 import addEditors from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
@@ -179,6 +175,9 @@ import {
 import { createTemplate, getTemplates } from '../routes/templates';
 
 import * as controllers from '../controller';
+import addThreadLink from '../routes/linking/addThreadLinks';
+import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
+import getLinks from '../routes/linking/getLinks';
 
 function setupRouter(
   endpoint: string,
@@ -348,18 +347,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateThreadPinned.bind(this, models)
   );
-  router.post(
-    '/updateThreadLinkedChainEntities',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateThreadLinkedChainEntities.bind(this, models)
-  );
-  router.post(
-    '/updateThreadLinkedSnapshotProposal',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateThreadLinkedSnapshotProposal.bind(this, models)
-  );
 
   router.post(
     '/updateVote',
@@ -375,10 +362,6 @@ function setupRouter(
   );
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
-  router.get(
-    '/fetchThreadForSnapshot',
-    fetchThreadForSnapshot.bind(this, models)
-  );
 
   router.post(
     '/contractAbi',
@@ -445,13 +428,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     updateChainEntityTitle.bind(this, models)
-  );
-  router.post(
-    '/updateLinkedThreads',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    updateLinkedThreads.bind(this, models)
   );
   router.post(
     '/addEditors',
@@ -954,6 +930,25 @@ function setupRouter(
     '/generateImage',
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models)
+  );
+
+  //linking
+  router.post(
+    '/linking/addThreadLinks',
+    passport.authenticate('jwt', { session: false }),
+    addThreadLink.bind(this, models)
+  );
+
+  router.delete(
+    '/linking/deleteLinks',
+    passport.authenticate('jwt', { session: false }),
+    deleteThreadLinks.bind(this, models)
+  );
+
+  router.post(
+    '/linking/getLinks',
+    passport.authenticate('jwt', { session: false }),
+    getLinks.bind(this, models)
   );
 
   // login
