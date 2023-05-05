@@ -12,7 +12,7 @@ export default dropdown;
 // type Story = StoryObj<typeof dropdown>;
 
 // export const DropdownStory: Story = {
-export const MinhasBolas = {
+export const DropdownStory = {
   name: 'Dropdown',
   render: () => (
     <CWDropdown
