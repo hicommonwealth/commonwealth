@@ -642,13 +642,6 @@ function setupRouter(
     updateBanner.bind(this, models)
   );
 
-  // fetch addresses (e.g. for mentions)
-  router.get(
-    '/bulkAddresses',
-    databaseValidationService.validateChain,
-    bulkAddresses.bind(this, models)
-  );
-
   // third-party webhooks
   router.post(
     '/createWebhook',
