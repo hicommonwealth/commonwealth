@@ -28,7 +28,7 @@ const ViewTemplateModal = ({
     <div className="ViewTemplateModal">
       <div className="TopSection">
         <CWText type="h4" fontWeight="bold">
-          View Template
+          View template
         </CWText>
         <CWIcon
           iconName="close"
@@ -56,13 +56,13 @@ const ViewTemplateModal = ({
         </div>
         <div className="LabelRow">
           <CWText type="caption" fontWeight="medium" className="labelText">
-            Template Action Detail
+            Template action detail
           </CWText>
           <CWText>{template.description}</CWText>
         </div>
         <div className="BlobContainer">
           <CWText type="caption" fontWeight="medium" className="labelText">
-            JSON Blob
+            JSON blob
           </CWText>
           <pre className="Blob">
             <CWText type="b2">

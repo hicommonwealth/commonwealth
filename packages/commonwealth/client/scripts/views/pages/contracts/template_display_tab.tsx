@@ -136,7 +136,6 @@ export const TemplateDisplayTab = ({
                     <CWIconButton
                       iconName="views"
                       iconSize="small"
-                      className="ViewIcon"
                       onClick={() => {
                         setMountedTemplate(template);
                         setViewTemplateModalOpen(true);
@@ -158,7 +157,7 @@ export const TemplateDisplayTab = ({
       <CWButton
         className="add-template-btn"
         buttonType="tertiary-black"
-        label="Create Template"
+        label="Create template"
         iconLeft="plus"
         onClick={() => navigate('/new/contract_template/blank')}
       />

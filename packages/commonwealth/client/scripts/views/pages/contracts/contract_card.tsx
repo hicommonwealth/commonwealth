@@ -101,11 +101,7 @@ export const ContractCard = ({
             CONTRACT
           </CWText>
 
-          <CWIconButton
-            className="delete-icon"
-            iconName="trash"
-            onClick={handleDeleteContract}
-          />
+          <CWIconButton iconName="trash" onClick={handleDeleteContract} />
         </div>
         <div className="label-group">
           <CWText className="group-title" type="b2">
