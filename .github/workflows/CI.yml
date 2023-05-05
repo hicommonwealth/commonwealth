@@ -85,7 +85,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Commonwealth Code Quality checks
+    name: Code Quality checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -117,7 +117,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: All Commonwealth Unit And Integration Tests
+    name: Unit And Integration Tests
     runs-on: ubuntu-latest
 
     services:
@@ -172,11 +172,11 @@ jobs:
           NO_CLIENT: true
 
   # These tests run slowly, so run them in a separate job
-  commonwealth-testnet-tests:
+  commonwealth-devnet-tests:
     strategy:
       matrix:
         node: [ 18 ]
-    name: All Commonwealth Testnet Tests
+    name: Devnet Tests
     runs-on: ubuntu-latest
 
     services:
