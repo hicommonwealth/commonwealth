@@ -5,7 +5,7 @@ import app from 'state';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';
 import { notifyError } from 'controllers/app/notifications';
-import { vanillaStore } from 'stores/zustand';
+import { appStore } from 'stores/zustand';
 
 export const checkNewThreadErrors = (
   { threadTitle, threadKind, threadTopic, threadUrl }: NewThreadFormType,
@@ -31,7 +31,7 @@ export const updateTopicList = (
   chain: IChainAdapter<any, any>
 ) => {
   try {
-    const topicNames = vanillaStore
+    const topicNames = appStore
       .getState()
       .getByCommunity(chain.id)
       .map((t) => t.name);

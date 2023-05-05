@@ -3,10 +3,12 @@ import { createStore } from 'zustand/vanilla';
 
 import createTopicsSlice, { TopicsSlice } from './topics';
 
-export const vanillaStore = createStore<TopicsSlice>((...args) => ({
+// appStore can be imported and used outside the React context
+export const appStore = createStore<TopicsSlice>((...args) => ({
   ...createTopicsSlice(...args),
 }));
 
-const useAppStore = create(vanillaStore);
+// useAppStore can be imported and used only inside the React functional components
+const useAppStore = create(appStore);
 
 export default useAppStore;

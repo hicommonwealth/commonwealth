@@ -10,7 +10,7 @@ import type { Account, ProposalModule } from '.';
 import { setDarkMode } from '../helpers';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
-import { vanillaStore } from 'stores/zustand';
+import { appStore } from 'stores/zustand';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -81,7 +81,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       contractsWithTemplatesData,
       communityRoles,
     } = response.result;
-    vanillaStore.getState().initialize(topics);
+    appStore.getState().initialize(topics);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);

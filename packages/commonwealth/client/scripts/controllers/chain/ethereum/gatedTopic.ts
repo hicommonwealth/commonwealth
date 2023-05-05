@@ -1,12 +1,12 @@
 import BN from 'bn.js';
 import { ITokenAdapter } from 'models';
 import app from 'state';
-import { vanillaStore } from 'stores/zustand';
+import { appStore } from 'stores/zustand';
 
 export default class TopicGateCheck {
   public static isGatedTopic(topicName: string): boolean {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
-      const tokenPostingThreshold: BN = vanillaStore
+      const tokenPostingThreshold: BN = appStore
         .getState()
         .getByName(topicName, app.activeChainId())?.tokenThreshold;
       return (
@@ -19,7 +19,7 @@ export default class TopicGateCheck {
 
   public static getTopicThreshold(topicName: string): BN {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
-      return vanillaStore.getState().getByName(topicName, app.activeChainId())
+      return appStore.getState().getByName(topicName, app.activeChainId())
         ?.tokenThreshold;
     }
     return new BN('0', 10);

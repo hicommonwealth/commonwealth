@@ -33,10 +33,6 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
   get
 ) => ({
   topics: [],
-  initialize: (initialTopics) => {
-    const initializedTopics = initialTopics.map((t) => new Topic(t));
-    set({ topics: initializedTopics });
-  },
   getByIdentifier: (identifier: number) =>
     get().topics.find((t) => t.id === identifier),
   getByCommunity: (communityId: string) =>
@@ -45,6 +41,10 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
     get()
       .getByCommunity(communityId)
       .find((t) => t.name === name),
+  initialize: (initialTopics) => {
+    const initializedTopics = initialTopics.map((t) => new Topic(t));
+    set({ topics: initializedTopics });
+  },
   addTopic: async (
     name: string,
     description: string,
@@ -65,6 +65,7 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
       jwt: app.user.jwt,
       token_threshold: tokenThreshold,
     });
+
     const result = new Topic(response.result);
 
     set((prev) => ({ topics: [...prev.topics, result] }));
@@ -84,12 +85,14 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
       jwt: app.user.jwt,
     });
     const result = new Topic(response.result);
+
     const updatedTopics = get().topics.map((t) => {
       if (t.id === result.id) {
         return result;
       }
       return t;
     });
+
     set({ topics: updatedTopics });
   },
   removeTopic: async (topic: Partial<Topic>) => {
@@ -98,7 +101,9 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
       chain: topic.chainId,
       jwt: app.user.jwt,
     });
+
     const updatedTopics = get().topics.filter((t) => t.id !== topic.id);
+
     set({ topics: updatedTopics });
   },
   updateTopic: async (
@@ -113,14 +118,18 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
       topic_name: topicName,
       address: app.user.activeAccount.address,
     });
+
     const result = new Topic(response.result);
+
     const updatedTopics = get().topics.map((t) => {
       if (t.id === result.id) {
         return result;
       }
       return t;
     });
+
     set({ topics: updatedTopics });
+
     return result;
   },
   updateFeaturedOrder: async (featuredTopics: Topic[]) => {
@@ -141,6 +150,7 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
       }
       return topic;
     });
+
     set({ topics: updatedTopics });
   },
 });
