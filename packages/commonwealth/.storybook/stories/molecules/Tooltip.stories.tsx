@@ -17,6 +17,8 @@ const tooltip = {
 export default tooltip;
 // type Story = StoryObj<typeof tooltip>;
 
+type InteractionType = (e: any) => void;
+
 // export const Default: Story = {
 export const Default = {
   name: 'Default',
@@ -72,7 +74,7 @@ export const AddressTooltip = {
       <CWText>Address tooltip</CWText>
       <CWAddressTooltip
         address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
-        renderTrigger={(handleInteraction: any) => (
+        renderTrigger={(handleInteraction: InteractionType) => (
           <CWIconButton
             iconName="infoEmpty"
             onClick={handleInteraction}
