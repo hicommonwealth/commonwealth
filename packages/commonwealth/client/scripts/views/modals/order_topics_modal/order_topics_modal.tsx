@@ -35,7 +35,10 @@ const getSortedTopics = (topics: Topic[]): Topic[] => {
 };
 
 export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
-  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
+  const [getByCommunity, updateFeaturedOrder] = useAppStore((s) => [
+    s.getByCommunity,
+    s.updateFeaturedOrder,
+  ]);
 
   const [topics, setTopics] = useState<Topic[]>(() =>
     getSortedTopics(getByCommunity(app.activeChainId()))
@@ -43,9 +46,8 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
 
   const handleSave = async () => {
     try {
-      await app.topics.updateFeaturedOrder(topics);
+      await updateFeaturedOrder(topics);
       onModalClose();
-      app.sidebarRedraw.emit('redraw');
       app.threads.isFetched.emit('redraw');
     } catch (err) {
       notifyError('Failed to update order');

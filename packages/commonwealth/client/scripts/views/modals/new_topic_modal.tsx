@@ -38,10 +38,12 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   );
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
-  const [featuredInNewPost, setFeaturedInNewPost] =
-    React.useState<boolean>(false);
-  const [featuredInSidebar, setFeaturedInSidebar] =
-    React.useState<boolean>(false);
+  const [featuredInNewPost, setFeaturedInNewPost] = React.useState<boolean>(
+    false
+  );
+  const [featuredInSidebar, setFeaturedInSidebar] = React.useState<boolean>(
+    false
+  );
   const [name, setName] = React.useState<string>('');
   const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
 
@@ -167,16 +169,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             e.preventDefault();
 
             try {
-              // await app.topics.add(
-              //   name,
-              //   description,
-              //   null,
-              //   featuredInSidebar,
-              //   featuredInNewPost,
-              //   tokenThreshold || '0',
-              //   serializeDelta(contentDelta)
-              // );
-
               await addTopic(
                 name,
                 description,

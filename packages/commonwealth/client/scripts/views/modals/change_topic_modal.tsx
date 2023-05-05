@@ -21,12 +21,15 @@ export const ChangeTopicModal = ({
   thread,
 }: ChangeTopicModalProps) => {
   const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
-  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
+  const [getByCommunity, updateTopic] = useAppStore((s) => [
+    s.getByCommunity,
+    s.updateTopic,
+  ]);
   const topics = getByCommunity(app.activeChainId());
 
   const handleSaveChanges = async () => {
     try {
-      const topic: Topic = await app.topics.update(
+      const topic = await updateTopic(
         thread.id,
         activeTopic.name,
         activeTopic.id

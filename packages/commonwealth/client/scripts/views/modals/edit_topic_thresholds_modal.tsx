@@ -11,14 +11,16 @@ import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import useAppStore from 'stores/zustand';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
 };
 
 const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
-  const [newTokenThresholdInWei, setNewTokenThresholdInWei] =
-    React.useState<string>();
+  const [newTokenThresholdInWei, setNewTokenThresholdInWei] = React.useState<
+    string
+  >();
 
   const { topic } = props;
 
@@ -73,6 +75,8 @@ type EditTopicThresholdsModalProps = {
 export const EditTopicThresholdsModal = (
   props: EditTopicThresholdsModalProps
 ) => {
+  const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
+
   if (
     !app.user.isSiteAdmin &&
     !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
@@ -80,7 +84,7 @@ export const EditTopicThresholdsModal = (
     return null;
   }
 
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const topics = getByCommunity(app.activeChainId());
 
   return (
     <div className="EditTopicThresholdsModal">

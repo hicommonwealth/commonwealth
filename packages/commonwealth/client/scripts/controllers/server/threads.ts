@@ -197,7 +197,6 @@ class ThreadsController {
     let topicFromStore = null;
     if (topic?.id) {
       topicFromStore = vanillaStore.getState().getByIdentifier(topic.id);
-      // topicFromStore = app.topics.store.getById(topic.id);
     }
 
     let decodedTitle;
@@ -702,7 +701,6 @@ class ThreadsController {
         ? this.listingStore.getCutoffDate(options).toISOString()
         : moment().toISOString(),
     };
-    // const topicId = app.topics.getByName(topicName, chain)?.id;
     const topicId = vanillaStore.getState().getByName(topicName, chain)?.id;
 
     if (topicId) params['topic_id'] = topicId;

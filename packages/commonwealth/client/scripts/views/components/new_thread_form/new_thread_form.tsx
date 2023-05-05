@@ -34,7 +34,6 @@ export const NewThreadForm = () => {
   const [getByCommunity] = useAppStore((s) => [s.getByCommunity]);
 
   const chainId = app.chain.id;
-  // const hasTopics = !!app.topics.getByCommunity(chainId).length;
   const hasTopics = getByCommunity(chainId).length;
   const author = app.user.activeAccount;
   const { authorName } = useAuthorName();

@@ -89,7 +89,6 @@ export const EditTopicModal = ({
     };
 
     try {
-      // await app.topics.edit(new Topic(topicInfo));
       await editTopic(new Topic(topicInfo));
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
@@ -114,7 +113,6 @@ export const EditTopicModal = ({
               chainId: app.activeChainId(),
             };
 
-            // await app.topics.remove(topicInfo);
             await removeTopic(topicInfo as Topic);
             await navigate('/');
           },

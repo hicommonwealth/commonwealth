@@ -81,7 +81,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       contractsWithTemplatesData,
       communityRoles,
     } = response.result;
-    // this.app.topics.initialize(topics, true);
     vanillaStore.getState().initialize(topics);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.setAdmins(admins);

@@ -20,6 +20,12 @@ export interface TopicsSlice {
   ) => void;
   editTopic: (topic: Topic, featuredOrder?: number) => void;
   removeTopic: (topic: Topic) => void;
+  updateTopic: (
+    threadId: number,
+    topicName: string,
+    topicId?: number
+  ) => Promise<Topic>;
+  updateFeaturedOrder: (featuredTopics: Topic[]) => void;
 }
 
 const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
@@ -93,6 +99,48 @@ const createTopicsSlice: StateCreator<TopicsSlice, [], [], TopicsSlice> = (
       jwt: app.user.jwt,
     });
     const updatedTopics = get().topics.filter((t) => t.id !== topic.id);
+    set({ topics: updatedTopics });
+  },
+  updateTopic: async (
+    threadId: number,
+    topicName: string,
+    topicId?: number
+  ) => {
+    const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+      jwt: app.user.jwt,
+      thread_id: threadId,
+      topic_id: topicId,
+      topic_name: topicName,
+      address: app.user.activeAccount.address,
+    });
+    const result = new Topic(response.result);
+    const updatedTopics = get().topics.map((t) => {
+      if (t.id === result.id) {
+        return result;
+      }
+      return t;
+    });
+    set({ topics: updatedTopics });
+    return result;
+  },
+  updateFeaturedOrder: async (featuredTopics: Topic[]) => {
+    const orderedIds = featuredTopics
+      .sort((a, b) => a.order - b.order)
+      .map((t) => t.id);
+
+    const response = await $.post(`${app.serverUrl()}/orderTopics`, {
+      chain: app.activeChainId(),
+      'order[]': orderedIds,
+      jwt: app.user.jwt,
+    });
+
+    const updatedTopics = get().topics.map((topic) => {
+      const found = response.result.find((t) => t.id === topic.id);
+      if (found) {
+        return new Topic(found);
+      }
+      return topic;
+    });
     set({ topics: updatedTopics });
   },
 });
