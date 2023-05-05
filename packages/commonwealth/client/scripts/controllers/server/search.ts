@@ -105,6 +105,8 @@ class SearchController {
               user_id: profile.user_id,
               UserId: profile.user_id,
             };
+            profileAsMember.SearchContentType = SearchContentType.Member;
+            profileAsMember.searchType = SearchScope.Members;
             /*
             Expected Model: {
                 "id": 10000,
@@ -125,8 +127,6 @@ class SearchController {
                 "searchType": "Members"
             }
             */
-            profileAsMember.SearchContentType = SearchContentType.Member;
-            profileAsMember.searchType = SearchScope.Members;
             return profileAsMember;
           })
           .sort(this.sortResults);
