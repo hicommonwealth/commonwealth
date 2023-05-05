@@ -58,7 +58,6 @@ import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
-import bulkAddresses from '../routes/bulkAddresses';
 import searchProfiles from '../routes/searchProfiles';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
@@ -642,13 +641,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     updateBanner.bind(this, models)
-  );
-
-  // fetch addresses (e.g. for mentions)
-  router.get(
-    '/bulkAddresses',
-    databaseValidationService.validateChain,
-    bulkAddresses.bind(this, models)
   );
 
   // projects related routes
