@@ -9,7 +9,7 @@ const tabs = {
 } satisfies Meta<typeof CWTab>;
 
 export default tabs;
-type Story = StoryObj<typeof tabs>;
+// type Story = StoryObj<typeof tabs>;
 
 const Tabs: FC = () => {
   const [selectedTab, setSelectedTab] = useState<number>(1);

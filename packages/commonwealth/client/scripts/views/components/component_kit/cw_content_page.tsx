@@ -2,7 +2,8 @@ import React from 'react';
 
 import moment from 'moment';
 
-import 'components/component_kit/cw_content_page.scss';
+// import 'components/component_kit/cw_content_page.scss';
+import '../../../../styles/components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
