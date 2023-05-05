@@ -774,7 +774,6 @@ class ThreadsController {
       });
 
       const thread = response['data']['result'][0];
-      console.log({ thread });
       return thread;
     } catch (e) {
       return null;

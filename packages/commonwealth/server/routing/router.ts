@@ -86,7 +86,6 @@ import addEditors from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
 import getThreadsOld from '../routes/getThreads';
-import getThreadCommunity from '../routes/getThreadCommunity';
 import searchDiscussions from '../routes/searchDiscussions';
 import searchComments from '../routes/searchComments';
 import createDraft from '../routes/drafts/createDraft';
@@ -463,7 +462,6 @@ function setupRouter(
     // databaseValidationService.validateChain,
     getThreadsOld.bind(this, models)
   );
-  router.get('/getThreadCommunity', getThreadCommunity.bind(this, models));
   router.get(
     '/searchDiscussions',
     databaseValidationService.validateChain,
