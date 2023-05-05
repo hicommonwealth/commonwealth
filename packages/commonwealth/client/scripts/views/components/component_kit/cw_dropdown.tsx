@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
-import 'components/component_kit/cw_dropdown.scss';
-import { CWText } from './cw_text';
+// import 'components/component_kit/cw_dropdown.scss';
+import '../../../../styles/components/component_kit/cw_dropdown.scss';
 
+import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 
 export type DropdownItemType = {
