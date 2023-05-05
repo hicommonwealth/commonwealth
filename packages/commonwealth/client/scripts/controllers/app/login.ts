@@ -208,6 +208,7 @@ export function updateActiveUser(data) {
     app.user.setEmailInterval(data.emailInterval);
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
+    localStorage.setItem('jwt', data.jwt);
 
     app.user.setAddresses(
       data.addresses.map(
