@@ -27,7 +27,7 @@ import { LCD } from 'chain-events/src/chains/cosmos/types';
 
 const { expect, assert } = chai;
 
-const idV1 = 'csdk'; // devnet
+const idV1 = 'csdk-v1'; // CI devnet
 const mnemonic =
   'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';
 const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
@@ -110,6 +110,10 @@ describe('Proposal Transaction Tests', () => {
 
       expect(resp.transactionHash).to.not.be.undefined;
       expect(resp.rawLog).to.not.be.undefined;
+
+      await waitOneBlock();
+      const activeProposals = await getActiveVotingProposals();
+      expect(activeProposals.length).to.be.greaterThan(0);
     });
     it('votes NO on an active proposal', async () => {
       await waitOneBlock();
