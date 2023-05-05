@@ -1,7 +1,8 @@
 import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
+import * as siwe from "siwe"
 
-import { getEIP712SignableAction, getEIP712SignableSession } from '../../../shared/adapters/chain/ethereum/keys';
+import { createSiweMessage, getEIP712SignableAction } from '../../../shared/adapters/chain/ethereum/keys';
 import { getADR036SignableAction, getADR036SignableSession } from '../../../shared/adapters/chain/cosmos/keys';
 
 // TODO: verify payload is not expired
@@ -42,13 +43,15 @@ export const verify = async ({
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
       const ethSigUtil = await import('@metamask/eth-sig-util');
-      const { types, domain, message } =
-        getEIP712SignableSession(sessionPayload);
-      const recoveredAddr = ethSigUtil.recoverTypedSignature({
-        data: { types, domain, message, primaryType: 'Message' as const },
-        signature,
-        version: ethSigUtil.SignTypedDataVersion.V4,
-      });
+      const nonce = siwe.generateNonce();
+      const domain = "Commonwealth"
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce)
+
+      const recoveredAddr = ethSigUtil.recoverPersonalSignature({
+        data: siweMessage,
+        signature
+      })
+
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (payload.chain === 'cosmos') {

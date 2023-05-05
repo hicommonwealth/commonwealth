@@ -2,8 +2,8 @@ import type { Action, Session } from '@canvas-js/interfaces';
 import { import_ } from '@brillout/import';
 
 import {
+  createSiweMessage,
   getEIP712SignableAction,
-  getEIP712SignableSession,
 } from '../adapters/chain/ethereum/keys';
 import {
   getADR036SignableSession,
@@ -73,13 +73,22 @@ export const verify = async ({
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
       const ethSigUtil = await import('@metamask/eth-sig-util');
-      const { types, domain, message } =
-        getEIP712SignableSession(sessionPayload);
-      const recoveredAddr = ethSigUtil.recoverTypedSignature({
-        data: { types, domain, message, primaryType: 'Message' as const },
-        signature,
-        version: ethSigUtil.SignTypedDataVersion.V4,
-      });
+      const siwe = await import("siwe")
+      const nonce = siwe.generateNonce();
+      const domain = "Commonwealth"
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce)
+      const recoveredAddr = ethSigUtil.recoverPersonalSignature({
+        data: siweMessage,
+        signature
+      })
+
+      // const { types, domain, message } =
+        // getEIP712SignableSession(sessionPayload);
+      // const recoveredAddr = ethSigUtil.recoverTypedSignature({
+        // data: { types, domain, message, primaryType: 'Message' as const },
+        // signature,
+        // version: ethSigUtil.SignTypedDataVersion.V4,
+      // });
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (chainBase === ChainBase.CosmosSDK) {
