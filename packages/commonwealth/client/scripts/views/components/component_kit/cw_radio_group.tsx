@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_radio_group.scss';
+// import 'components/component_kit/cw_radio_group.scss';
+import '../../../../styles/components/component_kit/cw_radio_group.scss';
 
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';

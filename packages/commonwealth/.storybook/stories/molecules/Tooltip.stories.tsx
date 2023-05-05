@@ -14,24 +14,7 @@ const tooltip = {
 } satisfies Meta<typeof CWTooltip>;
 
 export default tooltip;
-type Story = StoryObj<typeof tooltip>;
-
-// const Radiobutton: FC = ({value, checked, disabled}) => {
-//   const [isRadioButtonChecked, setIsRadioButtonChecked] =
-//     useState<boolean>(false);
-
-//   return (
-//     <CWRadioButton
-//       value={value}
-//       label={value}
-//       disabled={disabled}
-//       checked={isRadioButtonChecked === true || checked}
-//       onChange={() => {
-//         setIsRadioButtonChecked(true);
-//       }}
-//     />
-//   )
-// }
+// type Story = StoryObj<typeof tooltip>;
 
 // export const Default: Story = {
 export const Default = {
