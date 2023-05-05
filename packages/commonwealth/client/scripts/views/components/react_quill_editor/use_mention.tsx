@@ -103,9 +103,9 @@ export const useMention = ({
             }
             formattedMatches = profiles.map((p: any) => {
               const profileId = p.id;
-              const profileAddress = p.addresses[0];
+              const profileAddress = p.addresses[0]?.address;
               const profileName = p.profile_name;
-              const profileChain = p.chains[0];
+              const profileChain = p.addresses[0]?.chain;
 
               const profile = new MinimumProfile(profileAddress, profileChain);
               const node = document.createElement('div');

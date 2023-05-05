@@ -99,13 +99,12 @@ class SearchController {
             const profileAsMember: any = {
               id: profile.id,
               profile_id: profile.id,
-              address: profile.addresses[0],
-              chain: profile.chains[0],
+              address: profile.addresses[0]?.address,
+              chain: profile.addresses[0]?.chain,
               name: profile.profile_name,
               user_id: profile.user_id,
               UserId: profile.user_id,
             };
-            console.log('profile: ', profile);
             /*
             Expected Model: {
                 "id": 10000,
