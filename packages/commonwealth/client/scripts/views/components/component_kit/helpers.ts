@@ -1,7 +1,4 @@
-// The import below is breaking Storybook
-// import { redraw } from '../../../mithrilInterop';
-// import { isBoolean, isNotNil } from 'helpers/typeGuards';
-import { isBoolean, isNotNil } from '../../../helpers/typeGuards';
+import { isBoolean, isNotNil } from 'helpers/typeGuards';
 
 // import breakpoints from 'mixins/breakpoints.scss';
 import breakpoints from '../../../../styles/mixins/breakpoints.scss';
@@ -59,6 +56,5 @@ export const breakpointFnValidator = (
 
   if (widthState !== breakPointState) {
     setWidthState(breakPointState);
-    redraw();
   }
 };

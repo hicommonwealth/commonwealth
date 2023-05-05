@@ -16,10 +16,10 @@ export const Breadcrumbs = {
   render: () => (
     <CWBreadcrumbs
       breadcrumbs={[
-        { label: 'Page', path: '' },
-        { label: 'Page', path: '' },
-        { label: 'Page', path: '' },
-        { label: 'Current', path: '' },
+        { label: 'Page' },
+        { label: 'Page' },
+        { label: 'Page' },
+        { label: 'Current' },
       ]}
     />
   )
