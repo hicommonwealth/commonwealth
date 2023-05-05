@@ -10,6 +10,7 @@ import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { SublayoutHeader } from './sublayout_header';
 import useForceRerender from 'hooks/useForceRerender';
+import useSidebarStore from 'stores/zustand/sidebar';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -23,6 +24,7 @@ const Sublayout = ({
   hideSearch,
   onScroll,
 }: SublayoutProps) => {
+  const [sidebarToggled] = useSidebarStore((s) => [s.toggled]);
   const forceRerender = useForceRerender();
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
@@ -58,7 +60,7 @@ const Sublayout = ({
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = app.sidebarToggled || !isWindowSmall;
+  const showSidebar = sidebarToggled || !isWindowSmall;
 
   return (
     <div className="Sublayout">

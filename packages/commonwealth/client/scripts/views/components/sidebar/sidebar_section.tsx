@@ -3,7 +3,6 @@ import React from 'react';
 import 'components/sidebar/sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
-import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import type {
@@ -11,6 +10,7 @@ import type {
   SidebarSectionAttrs,
   SubSectionAttrs,
 } from './types';
+import useSidebarStore from 'stores/zustand/sidebar';
 
 const SubSection = (props: SubSectionAttrs) => {
   const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =
@@ -61,6 +61,11 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     title,
   } = props;
 
+  const [toggleSidebar, sidebarToggled] = useSidebarStore((s) => [
+    s.toggle,
+    s.toggled,
+  ]);
+
   const [toggled, setToggled] = React.useState<boolean>(
     hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
   );
@@ -74,10 +79,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     if (containsChildren) {
       setToggled(!toggled);
     }
-
-    app.sidebarToggled = !app.sidebarToggled;
-    app.sidebarRedraw.emit('redraw');
-
+    toggleSidebar(!sidebarToggled);
     onClick(e, toggled);
   };
 

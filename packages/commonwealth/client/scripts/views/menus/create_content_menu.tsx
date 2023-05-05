@@ -15,6 +15,7 @@ import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { appStore } from 'stores/zustand';
+import useSidebarStore, { sidebarStore } from 'stores/zustand/sidebar';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
@@ -182,9 +183,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         //   isCustomDomain: app.isCustomDomain(),
         //   communityType: null,
         // });
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
-        app.sidebarRedraw.emit('redraw');
+
+        sidebarStore.getState().setMenu('default');
+        sidebarStore.getState().toggle(false);
         navigate('/createCommunity', {}, null);
       },
     },
@@ -199,9 +200,8 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         //   isCustomDomain: app.isCustomDomain(),
         //   communityType: null,
         // });
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
-        app.sidebarRedraw.emit('redraw');
+        sidebarStore.getState().setMenu('default');
+        sidebarStore.getState().toggle(false);
 
         window.open(
           `https://discord.com/oauth2/authorize?client_id=${
@@ -246,6 +246,10 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
 export const CreateContentSidebar = () => {
   const navigate = useCommonNavigate();
+  const [toggleSidebar, setMenuName] = useSidebarStore((s) => [
+    s.toggle,
+    s.setMenu,
+  ]);
 
   return (
     <CWSidebarMenu
@@ -258,9 +262,8 @@ export const CreateContentSidebar = () => {
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            app.sidebarToggled = false;
-            app.sidebarMenu = 'default';
-            app.sidebarRedraw.emit('redraw');
+            setMenuName('default');
+            toggleSidebar(false);
             redraw();
           }, 200);
         },

@@ -10,11 +10,12 @@ import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useSidebarStore from 'stores/zustand/sidebar';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-
+  const [setMenuName] = useSidebarStore((s) => [s.setMenu]);
   const allCommunities = app.config.chains
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -35,8 +36,7 @@ export const SidebarQuickSwitcher = () => {
             iconName="plusCircle"
             iconButtonTheme="black"
             onClick={() => {
-              app.sidebarMenu = 'createContent';
-              app.sidebarRedraw.emit('redraw');
+              setMenuName('createContent');
             }}
           />
         )}
@@ -44,8 +44,7 @@ export const SidebarQuickSwitcher = () => {
           iconName="compass"
           iconButtonTheme="black"
           onClick={() => {
-            app.sidebarMenu = 'exploreCommunities';
-            app.sidebarRedraw.emit('redraw');
+            setMenuName('exploreCommunities');
           }}
         />
       </div>

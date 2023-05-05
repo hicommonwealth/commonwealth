@@ -14,6 +14,7 @@ import { SearchBar } from './pages/search/search_bar';
 import { useCommonNavigate } from 'navigation/helpers';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useSidebarStore from 'stores/zustand/sidebar';
 
 type SublayoutHeaderProps = {
   hideSearch?: boolean;
@@ -26,6 +27,10 @@ export const SublayoutHeader = ({
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const [sidebarToggled, toggleSidebar] = useSidebarStore((s) => [
+    s.toggled,
+    s.toggle,
+  ]);
 
   return (
     <div className="SublayoutHeader">
@@ -43,7 +48,7 @@ export const SublayoutHeader = ({
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) && app.activeChainId() && (
+        {(!isWindowSmallInclusive(window.innerWidth) || !sidebarToggled) && app.activeChainId() && (
           <CWCommunityAvatar
             size="large"
             community={app.chain.meta}
@@ -53,10 +58,9 @@ export const SublayoutHeader = ({
         {onMobile && app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"
-            iconName={app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
+            iconName={sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
-              app.sidebarToggled = !app.sidebarToggled;
-              app.sidebarRedraw.emit('redraw');
+              toggleSidebar(!sidebarToggled);
             }}
           />
         )}
@@ -68,9 +72,8 @@ export const SublayoutHeader = ({
             iconName="dotsVertical"
             iconButtonTheme="black"
             onClick={() => {
-              app.sidebarToggled = false;
+              toggleSidebar(false);
               app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-              app.sidebarRedraw.emit('redraw');
             }}
           />
         </div>
