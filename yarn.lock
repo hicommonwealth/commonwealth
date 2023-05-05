@@ -1469,24 +1469,24 @@
   resolved "https://registry.yarnpkg.com/@brillout/import/-/import-0.2.2.tgz#1b2d3012830d397ecd3eddef3ad4a23984cd0dd8"
   integrity sha512-JatRCkrFxss1iwRrFlnY3yPFyD2yGWIeFprMH++TmZ+wqnRlwfN0ECDJea0EyagSGXlb2CUxFIH3dBMBiV05sw==
 
-"@canvas-js/chain-ethereum@0.4.8", "@canvas-js/chain-ethereum@^0.4.8":
-  version "0.4.8"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.4.8.tgz#55d439e9e0c5a80b8737ee832c58bf09ecf71b8d"
-  integrity sha512-lqXcGBYuhIqU3sc6u/VKtUdgi/HJb1Uz2TQcpqykEqFyFq2s5/aw2sB5vNIOzW90Ud4/nTljz1vAONsroc9IHQ==
+"@canvas-js/chain-ethereum@0.4.11", "@canvas-js/chain-ethereum@^0.4.11":
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.4.11.tgz#54b64f2f222c7a70b5d50b13ea7aaaf55cb980c2"
+  integrity sha512-2GfmrYs2BhClS6rkN9BVblSgLZcDkB0BqQzCGFlT9TuOAYwaxWRVS26QIUAZMGIFqHrZo36DAKlJr8lEtjhrUw==
   dependencies:
-    "@canvas-js/interfaces" "0.4.8"
+    "@canvas-js/interfaces" "0.4.11"
     "@ethersproject/wallet" "^5.7.0"
     ethers "^5.7.2"
     safe-stable-stringify "^2.4.3"
     siwe "^2.1.3"
 
-"@canvas-js/core@^0.4.8":
-  version "0.4.8"
-  resolved "https://registry.yarnpkg.com/@canvas-js/core/-/core-0.4.8.tgz#9146f660cd013c0b640bd8dd1772961a1ed3f2cc"
-  integrity sha512-ApcOfbBWwmv3eKwSaMppi4N/FICqpP9h6xJSpWGsx4F7XjdteIGmqEME0FNy1zufwP6UHdW4F9dR6fwKPmrNxw==
+"@canvas-js/core@^0.4.11":
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@canvas-js/core/-/core-0.4.11.tgz#93c3eed43600a19b99ce8d48aec6edb9848d27a5"
+  integrity sha512-ce6cU8xv23G4PxPYD8/BavvNcj4IECs1Lfe4Nq+NHvc/nlt/Z3qDasQe9ksVyqiUOVR9+7FBdPfYBAzx7Nhxqw==
   dependencies:
-    "@canvas-js/chain-ethereum" "0.4.8"
-    "@canvas-js/interfaces" "0.4.8"
+    "@canvas-js/chain-ethereum" "0.4.11"
+    "@canvas-js/interfaces" "0.4.11"
     "@canvas-js/okra-browser" "^0.2.0"
     "@canvas-js/okra-node" "^0.2.1"
     "@chainsafe/libp2p-gossipsub" "^7.0.0"
@@ -1538,10 +1538,10 @@
     uuid "^9.0.0"
     ws "^8.13.0"
 
-"@canvas-js/interfaces@0.4.8", "@canvas-js/interfaces@^0.4.8":
-  version "0.4.8"
-  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.4.8.tgz#9c53125e58839b5a6ad556b89bffb2bce5eeb090"
-  integrity sha512-zMdX1EejoUFdf86YAUmrbDJ5NxA69UobdQFCvlaHD0ulD3oICiFhLcmlXPZM7joAcC6jCfR0PD25gNJje9TrJA==
+"@canvas-js/interfaces@0.4.11", "@canvas-js/interfaces@^0.4.11":
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.4.11.tgz#0cff9c551cc2ee6e27008a2e530d7dbbed4e711b"
+  integrity sha512-KpjNaFBzT4+qtuftY9KSvq2XEWT+DZAK6O55s2NmztXxCz9Wba02KjYdOOhYGocJl3oB1CyEBkSLfkGaaN8kLw==
   dependencies:
     "@libp2p/interfaces" "^3.3.1"
     "@noble/hashes" "^1.3.0"
