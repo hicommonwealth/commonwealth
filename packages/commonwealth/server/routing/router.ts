@@ -4,8 +4,6 @@ import type { Express } from 'express';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { defaultUserKeyGenerator } from 'common-common/src/cacheKeyUtils';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -60,7 +58,7 @@ import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
-import bulkAddresses from '../routes/bulkAddresses';
+import searchProfiles from '../routes/searchProfiles';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
@@ -150,7 +148,6 @@ import type BanCache from '../util/banCheckCache';
 import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
-import { addExternalRoutes } from './external';
 import generateImage from '../routes/generateImage';
 import { getChainEventServiceData } from '../routes/getChainEventServiceData';
 import { getChain } from '../routes/getChain';
@@ -175,7 +172,6 @@ import {
 } from '../routes/proposalTemplate';
 import { createTemplate, getTemplates } from '../routes/templates';
 
-import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
@@ -474,6 +470,11 @@ function setupRouter(
     '/searchComments',
     databaseValidationService.validateChain,
     searchComments.bind(this, models)
+  );
+  router.get(
+    '/searchProfiles',
+    databaseValidationService.validateChain,
+    searchProfiles.bind(this, models)
   );
 
   router.get('/profile/v2', getProfileNew.bind(this, models));
