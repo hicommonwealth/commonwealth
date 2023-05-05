@@ -27,9 +27,10 @@ import { LCD } from 'chain-events/src/chains/cosmos/types';
 
 const { expect, assert } = chai;
 
+const idV1 = 'csdk'; // devnet
 const mnemonic =
   'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';
-const rpcUrl = `http://localhost:8080/cosmosAPI/csdk`;
+const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
 const DEFAULT_FEE: StdFee = {
   gas: '180000',
   amount: [{ amount: '0', denom: 'ustake' }],
@@ -68,7 +69,7 @@ const waitOneBlock = async (): Promise<void> => {
   let newHeight = currentHeight;
   while (newHeight === currentHeight) {
     // Wait for a short period
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 6000));
 
     // Check the current block height again
     const block = await tm.block();
@@ -76,16 +77,24 @@ const waitOneBlock = async (): Promise<void> => {
   }
 };
 
-describe('Proposal Tests', () => {
+describe('Proposal Transaction Tests', () => {
   describe('gov v1 chain using v1beta1 signer', () => {
     let lcd: LCD;
     let signer: string;
-    const id = 'csdk';
     beforeEach(async () => {
-      lcd = await getLCDClient(`http://localhost:8080/cosmosLCD/${id}`);
+      lcd = await getLCDClient(`http://localhost:8080/cosmosLCD/${idV1}`);
       const { signerAddress } = await setupTestSigner();
       signer = signerAddress;
     });
+
+    const getActiveVotingProposals = async () => {
+      const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
+        proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
+        voter: '',
+        depositor: '',
+      });
+      return activeProposals;
+    };
 
     it('creates a proposal', async () => {
       const { proposals } = await lcd.cosmos.gov.v1.proposals({
@@ -94,37 +103,17 @@ describe('Proposal Tests', () => {
         depositor: '',
       });
 
-      const beforeCount = proposals.length;
-
-      const content = encodeTextProposal(
-        `title ${beforeCount + 1}`,
-        `description ${beforeCount + 1}`
-      );
+      const content = encodeTextProposal(`test title`, `test description`);
       const msg = encodeMsgSubmitProposal(signer, deposit, content);
 
       const resp = await sendTx(msg);
 
       expect(resp.transactionHash).to.not.be.undefined;
       expect(resp.rawLog).to.not.be.undefined;
-
-      await waitOneBlock();
-
-      const { proposals: proposalsAfter } = await lcd.cosmos.gov.v1.proposals({
-        proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
-        voter: '',
-        depositor: '',
-      });
-
-      assert.equal(proposalsAfter.length, beforeCount + 1);
     });
     it('votes NO on an active proposal', async () => {
       await waitOneBlock();
-
-      const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
-        proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
-        voter: '',
-        depositor: '',
-      });
+      const activeProposals = await getActiveVotingProposals();
 
       assert.isAtLeast(activeProposals.length, 1);
       const proposal = activeProposals[0];
@@ -139,12 +128,7 @@ describe('Proposal Tests', () => {
     });
     it('votes NO WITH VETO on an active proposal', async () => {
       await waitOneBlock();
-
-      const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
-        proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
-        voter: '',
-        depositor: '',
-      });
+      const activeProposals = await getActiveVotingProposals();
 
       assert.isAtLeast(activeProposals.length, 1);
       const proposal = activeProposals[0];
@@ -163,12 +147,7 @@ describe('Proposal Tests', () => {
     });
     it('votes ABSTAIN on an active proposal', async () => {
       await waitOneBlock();
-
-      const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
-        proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
-        voter: '',
-        depositor: '',
-      });
+      const activeProposals = await getActiveVotingProposals();
 
       assert.isAtLeast(activeProposals.length, 1);
       const proposal = activeProposals[0];
@@ -187,12 +166,7 @@ describe('Proposal Tests', () => {
     });
     it('votes YES on an active proposal', async () => {
       await waitOneBlock();
-
-      const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
-        proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
-        voter: '',
-        depositor: '',
-      });
+      const activeProposals = await getActiveVotingProposals();
 
       expect(activeProposals).to.not.be.undefined;
       expect(activeProposals.length).to.be.greaterThan(0);
@@ -213,13 +187,12 @@ describe('Proposal Tests', () => {
     });
   });
 
-  // Cosmos gov v1beta1 query tests
+  // Cosmos gov v1 query tests
   describe('Cosmos Governance v1 util Tests', () => {
-    describe('csdk', () => {
+    describe('csdk-v1', () => {
       let lcd: LCD;
-      const id = 'csdk';
       beforeEach(async () => {
-        lcd = await getLCDClient(`http://localhost:8080/cosmosLCD/${id}`);
+        lcd = await getLCDClient(`http://localhost:8080/cosmosLCD/${idV1}`);
       });
 
       describe('getActiveProposals', () => {

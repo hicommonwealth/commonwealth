@@ -82,16 +82,14 @@ type SnapshotThreadLinkProps = {
   thread: { id: string; title: string };
 };
 
-export const SnapshotThreadLink = (props: SnapshotThreadLinkProps) => {
-  const { id, title } = props.thread;
-
+export const SnapshotThreadLink = ({ thread }: SnapshotThreadLinkProps) => {
   const navigate = useCommonNavigate();
 
-  const proposalLink = getProposalUrlPath(ProposalType.Thread, id, true);
+  const proposalLink = getProposalUrlPath(ProposalType.Thread, thread.id, true);
 
   return (
     <div className="HeaderLink">
-      {link('a', proposalLink, [decodeURIComponent(title)], navigate)}
+      {link('a', proposalLink, [decodeURIComponent(thread.title)], navigate)}
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );

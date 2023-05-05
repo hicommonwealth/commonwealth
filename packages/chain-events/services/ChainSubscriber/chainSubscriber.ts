@@ -20,7 +20,7 @@ import {
   RABBITMQ_URI,
   REPEAT_TIME,
   ROLLBAR_SERVER_TOKEN,
-  CHAIN_SUBSCRIBER_INDEX,
+  CHAIN_SUBSCRIBER_INDEX, ROLLBAR_ENV,
 } from '../config';
 
 import {
@@ -229,7 +229,7 @@ export async function chainEventsSubscriberInitializer(): Promise<{
   if (ROLLBAR_SERVER_TOKEN) {
     rollbar = new Rollbar({
       accessToken: ROLLBAR_SERVER_TOKEN,
-      environment: process.env.NODE_ENV,
+      environment: ROLLBAR_ENV,
       captureUncaught: true,
       captureUnhandledRejections: true,
     });
