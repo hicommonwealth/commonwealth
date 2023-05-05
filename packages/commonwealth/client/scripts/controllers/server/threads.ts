@@ -765,6 +765,21 @@ class ThreadsController {
     return modeledThreads;
   }
 
+  public async getThreadCommunityId(threadId: string) {
+    try {
+      const response = await axios.get(`${app.serverUrl()}/getThreads`, {
+        params: {
+          ids: [threadId],
+        },
+      });
+
+      const thread = response['data']['result'][0];
+      return thread;
+    } catch (e) {
+      return null;
+    }
+  }
+
   public initialize(initialThreads = [], numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
