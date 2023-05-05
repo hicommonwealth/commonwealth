@@ -15,7 +15,8 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
-import { isSameAccount, pluralize, setDarkMode } from 'helpers';
+import { isSameAccount, pluralize } from 'helpers';
+import { setDarkMode } from 'helpers/darkMode';
 import type { Account } from 'models';
 import { AddressInfo, ITokenAdapter } from 'models';
 
