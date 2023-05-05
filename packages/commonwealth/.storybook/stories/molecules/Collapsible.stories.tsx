@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWCollapsible } from '../../../client/scripts/views/components/component_kit/cw_collapsible';

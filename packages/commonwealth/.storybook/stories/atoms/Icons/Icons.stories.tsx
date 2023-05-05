@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWIcon } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';

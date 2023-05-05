@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWCard, CardElevation } from '../../../client/scripts/views/components/component_kit/cw_card';
