@@ -19,7 +19,7 @@ import favicon from 'serve-favicon';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
-import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
+import {ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
@@ -425,7 +425,7 @@ setupCosmosProxy(app, models);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
-  environment: process.env.NODE_ENV,
+  environment: ROLLBAR_ENV,
   captureUncaught: true,
   captureUnhandledRejections: true,
 });
