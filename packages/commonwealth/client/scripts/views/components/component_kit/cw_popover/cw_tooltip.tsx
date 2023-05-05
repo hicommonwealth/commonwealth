@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_popover/cw_tooltip.scss';
+// import 'components/component_kit/cw_popover/cw_tooltip.scss';
+import '../../../../../styles/components/component_kit/cw_popover/cw_tooltip.scss';
 
 import { Popover, usePopover } from './cw_popover';
 import type { PopoverTriggerProps } from './cw_popover';

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
+// import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
+import '../../../../../styles/components/component_kit/cw_popover/cw_address_tooltip.scss';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWIconButton } from '../cw_icon_button';
