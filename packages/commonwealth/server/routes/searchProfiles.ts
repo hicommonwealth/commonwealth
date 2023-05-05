@@ -19,7 +19,6 @@ type SearchProfilesQuery = {
 
 const searchProfiles = async (models: DB, req, res) => {
   const options = req.query as SearchProfilesQuery;
-  console.log('OPTIONS: ', options);
   if (!options.search) {
     throw new AppError(Errors.QueryMissing);
   }
