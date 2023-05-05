@@ -5,7 +5,7 @@ import { CWCoverImageUploader } from '../../../client/scripts/views/components/c
 import { notifySuccess } from '../../../client/scripts/controllers/app/notifications';
 
 const coverImageUploader = {
-  title: 'Organisms/CoverImageUploader',
+  title: 'Organisms/Image Upload',
   component: CWCoverImageUploader,
 } satisfies Meta<typeof CWCoverImageUploader>;
 

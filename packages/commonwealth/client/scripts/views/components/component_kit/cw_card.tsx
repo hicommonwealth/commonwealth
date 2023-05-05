@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_card.scss';
+// import 'components/component_kit/cw_card.scss';
+import '../../../../styles/components/component_kit/cw_card.scss';
 import { getClasses } from './helpers';
 
 import { ComponentType } from './types';

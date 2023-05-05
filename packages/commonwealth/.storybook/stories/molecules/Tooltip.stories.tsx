@@ -6,6 +6,7 @@ import { CWAddressTooltip } from '../../../client/scripts/views/components/compo
 import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
 import { CWIcon } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../../../client/scripts/views/components/component_kit/cw_icon_button';
+
 import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
 const tooltip = {
