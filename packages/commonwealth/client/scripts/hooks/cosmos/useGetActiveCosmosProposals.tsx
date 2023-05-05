@@ -3,29 +3,27 @@ import { IApp } from 'state';
 
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
-import { getCompletedProposals } from 'controllers/chain/cosmos/gov/utils';
+import { getActiveProposals } from 'controllers/chain/cosmos/gov/utils';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 
 type UseStateSetter<T> = Dispatch<SetStateAction<T>>;
 
 interface Response {
-  completedCosmosProposals: CosmosProposal[];
+  activeCosmosProposals: CosmosProposal[];
 }
 
 interface Props {
   app: IApp;
   setIsLoading: UseStateSetter<boolean>;
   isLoading: boolean;
-  setIsLoadingMore?: UseStateSetter<boolean>;
 }
 
-export const useGetCompletedCosmosProposals = ({
+export const useGetActiveCosmosProposals = ({
   app,
   setIsLoading,
   isLoading,
-  setIsLoadingMore,
 }: Props): Response => {
-  const [completedCosmosProposals, setCompletedCosmosProposals] = useState<
+  const [activeCosmosProposals, setActiveCosmosProposals] = useState<
     CosmosProposal[]
   >([]);
 
@@ -35,8 +33,8 @@ export const useGetCompletedCosmosProposals = ({
     const cosmos = app.chain as Cosmos;
 
     const getAndSetProposals = async () => {
-      const proposals = await getCompletedProposals(cosmos);
-      setCompletedCosmosProposals(proposals);
+      const proposals = await getActiveProposals(cosmos);
+      setActiveCosmosProposals(proposals);
     };
 
     const getProposals = async () => {
@@ -44,13 +42,11 @@ export const useGetCompletedCosmosProposals = ({
         hasFetchedDataRef.current = true;
         const storedProposals =
           cosmos.governance.store.getAll() as CosmosProposal[];
-        const completedProposals = storedProposals.filter((p) => p.completed);
+        const activeProposals = storedProposals.filter((p) => !p.completed);
 
-        if (completedProposals?.length) {
-          if (setIsLoadingMore) setIsLoadingMore(true);
-          setCompletedCosmosProposals(completedProposals); // show whatever we have stored
+        if (activeProposals?.length) {
+          setActiveCosmosProposals(activeProposals); // show whatever we have stored
           await getAndSetProposals(); // update if there are more from the API
-          if (setIsLoadingMore) setIsLoadingMore(false);
         } else {
           setIsLoading(true);
           await getAndSetProposals();
@@ -74,6 +70,6 @@ export const useGetCompletedCosmosProposals = ({
   }, [app.chain?.apiInitialized]);
 
   return {
-    completedCosmosProposals,
+    activeCosmosProposals,
   };
 };
