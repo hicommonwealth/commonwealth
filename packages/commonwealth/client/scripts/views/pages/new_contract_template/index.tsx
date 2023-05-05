@@ -28,13 +28,10 @@ const NewContractTemplatePage = () => {
       <div className="NewContractTemplatePage">
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Contracts', path: `/contracts` },
+            { label: 'Contract action templates', path: `/contracts` },
             { label: 'Create a new action template', path: '' },
           ]}
         />
-        <CWText type="caption" fontWeight="medium" className="step">
-          Step 1 of 2
-        </CWText>
         <CWText type="h3" className="header">
           Create a new action template
         </CWText>

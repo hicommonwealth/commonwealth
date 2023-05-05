@@ -29,12 +29,12 @@ const NewContractPage = () => {
       <div className="NewContractPage">
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Contracts', path: `/contracts` },
-            { label: 'Add Contract and ABI', path: '' },
+            { label: 'Contract action templates', path: `/contracts` },
+            { label: 'Add contract and ABI', path: '' },
           ]}
         />
         <CWText type="h3" className="header">
-          Add Contract and ABI
+          Add contract and ABI
         </CWText>
         <CWText className="subheader" type="b1">
           Add contracts and their corresponding ABI files to your community.

@@ -53,9 +53,18 @@
     .add-template-btn {
       padding-inline: 0;
       margin-top: 16px;
+      padding: 0px 8px;
+      gap: 4px;
+      border-radius: 24px;
+
+      &:hover {
+        background: $neutral-50;
+      }
 
       .Text {
         font-size: 12px;
+        color: $neutral-600;
+        font-weight: 500;
       }
     }
 

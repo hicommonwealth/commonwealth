@@ -152,7 +152,7 @@ export const ContractCard = ({
             <CWButton
               className="add-template-btn"
               buttonType="tertiary-black"
-              label="Enable Action"
+              label="Enable action"
               iconLeft="plus"
               onClick={() => handleOpenManageContractTemplateModal()}
             />

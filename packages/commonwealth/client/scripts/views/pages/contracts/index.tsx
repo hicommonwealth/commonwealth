@@ -119,12 +119,14 @@ const ContractsPage = () => {
   return (
     <Sublayout>
       <div className="ContractsPage">
-        <CWBreadcrumbs breadcrumbs={[{ label: 'Contracts', path: '' }]} />
+        <CWBreadcrumbs
+          breadcrumbs={[{ label: 'Contract action templates', path: '' }]}
+        />
         <div className="header-container">
-          <CWText type="h3">Contract Action Templates</CWText>
+          <CWText type="h3">Contract action templates</CWText>
           <CWButton
             buttonType="mini-white"
-            label="Add Contract"
+            label="Add contract"
             iconLeft="plus"
             onClick={handleAddContract}
           />

@@ -1,7 +1,7 @@
 @import '../../shared';
 
 .ContractCard {
-  padding: 28px 32px;
+  padding: 24px 32px;
 
   .label {
     color: $neutral-800;
@@ -39,7 +39,7 @@
 
   .templates {
     width: 100%;
-    margin-top: 24px;
+    margin-top: 44px;
 
     .no-templates-container {
       min-height: 56px;
@@ -64,9 +64,18 @@
     .add-template-btn {
       padding-inline: 0;
       margin-top: 16px;
+      padding: 0px 8px;
+      gap: 4px;
+      border-radius: 24px;
+
+      &:hover {
+        background: $neutral-50;
+      }
 
       .Text {
         font-size: 12px;
+        color: $neutral-600;
+        font-weight: 500;
       }
     }
 

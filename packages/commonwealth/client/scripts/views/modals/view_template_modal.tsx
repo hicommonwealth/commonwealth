@@ -73,7 +73,7 @@ const ViewTemplateModal = ({
         </div>
         <div className="TemplateDisplay">
           <CWText type="caption" fontWeight="medium" className="labelText">
-            Template form
+            Template form preview
           </CWText>
           <div className="Template">
             {renderDisabledTemplate(JSON.parse(template.template).form_fields)}
