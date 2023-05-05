@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 
-import 'components/avatar_upload.scss';
+// import 'components/avatar_upload.scss';
+import '../../../styles/components/avatar_upload.scss';
 
 import app from 'state';
 import { CWIconButton } from './component_kit/cw_icon_button';

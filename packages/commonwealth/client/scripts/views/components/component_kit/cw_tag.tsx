@@ -1,6 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_tag.scss';
+// import 'components/component_kit/cw_tag.scss';
+import '../../../../styles/components/component_kit/cw_tag.scss';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
