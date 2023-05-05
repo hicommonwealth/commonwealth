@@ -2,6 +2,7 @@ import { QueryTypes } from 'sequelize';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { AppError } from '../../../common-common/src/errors';
 import type { DB } from '../models';
+import { TypedRequestQuery, TypedResponse } from 'server/types';
 
 const MIN_SEARCH_QUERY_LENGTH = 3;
 
@@ -16,9 +17,23 @@ type SearchProfilesQuery = {
   search?: string;
   chain?: string;
 };
+type SearchProfilesResponse = {
+  id: number;
+  user_id: string;
+  profile_name: string;
+  addresses: {
+    id: number;
+    chain: string;
+    address: string;
+  }[];
+}[];
 
-const searchProfiles = async (models: DB, req, res) => {
-  const options = req.query as SearchProfilesQuery;
+const searchProfiles = async (
+  models: DB,
+  req: TypedRequestQuery<SearchProfilesQuery>,
+  res: TypedResponse<SearchProfilesResponse>
+) => {
+  const options = req.query;
   if (!options.search) {
     throw new AppError(Errors.QueryMissing);
   }
@@ -58,7 +73,7 @@ const searchProfiles = async (models: DB, req, res) => {
       "Addresses" on "Profiles".user_id = "Addresses".user_id
     WHERE
       ${chainWhere}
-      "Profiles".profile_name LIKE $searchTerm
+      "Profiles".profile_name ILIKE $searchTerm
     GROUP BY
       "Profiles".id
     LIMIT 100
