@@ -55,6 +55,5 @@ export const breakpointFnValidator = (
 
   if (widthState !== breakPointState) {
     setWidthState(breakPointState);
-    // redraw()
   }
 };
