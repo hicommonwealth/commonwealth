@@ -89,17 +89,45 @@ class SearchController {
       }
 
       if (scope.includes(SearchScope.Members)) {
-        const addrs = await this.searchMentionableAddresses(
+        const profiles = await this.searchMentionableProfiles(
           searchTerm,
-          { pageSize, chainScope },
-          ['created_at', 'DESC']
+          chainScope
         );
 
-        searchCache.results[SearchScope.Members] = addrs
-          .map((addr) => {
-            addr.SearchContentType = SearchContentType.Member;
-            addr.searchType = SearchScope.Members;
-            return addr;
+        searchCache.results[SearchScope.Members] = profiles
+          .map((profile) => {
+            const profileAsMember: any = {
+              id: profile.id,
+              profile_id: profile.id,
+              address: profile.addresses[0]?.address,
+              chain: profile.addresses[0]?.chain,
+              name: profile.profile_name,
+              user_id: profile.user_id,
+              UserId: profile.user_id,
+            };
+            profileAsMember.SearchContentType = SearchContentType.Member;
+            profileAsMember.searchType = SearchScope.Members;
+            /*
+            Expected Model: {
+                "id": 10000,
+                "address": "0x0000…",
+                "chain": "ethereum",
+                "verified": "2020-02-28T10:12:19.767Z",
+                "keytype": null,
+                "name": "Dope",
+                "last_active": "2023-02-28T10:12:21.079Z",
+                "user_id": 500,
+                "is_councillor": false,
+                "is_validator": false,
+                "ghost_address": false,
+                "profile_id": 200,
+                "wallet_id": "metamask",
+                "UserId": 500,
+                "SearchContentType": "member",
+                "searchType": "Members"
+            }
+            */
+            return profileAsMember;
           })
           .sort(this.sortResults);
       }
@@ -243,19 +271,14 @@ class SearchController {
     }
   };
 
-  public searchMentionableAddresses = async (
+  public searchMentionableProfiles = async (
     searchTerm: string,
-    params: SearchParams,
-    order?: string[]
+    chainScope: string
   ) => {
-    const { pageSize, communityScope, chainScope } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      const response = await $.get(`${app.serverUrl()}/searchProfiles`, {
         chain: chainScope,
-        community: communityScope,
-        limit: pageSize,
-        searchTerm,
-        order,
+        search: searchTerm,
       });
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);

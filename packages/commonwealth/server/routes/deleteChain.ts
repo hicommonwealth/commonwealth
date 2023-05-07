@@ -134,13 +134,6 @@ const deleteChain = async (
         transaction: t,
       });
 
-      await models.LinkedThread.destroy({
-        where: {
-          linked_thread: { [Op.in]: threads.map((thread) => thread.id) },
-        },
-        transaction: t,
-      });
-
       await models.Vote.destroy({
         where: { chain_id: chain.id },
         transaction: t,
