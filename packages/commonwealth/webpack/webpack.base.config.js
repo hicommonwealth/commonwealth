@@ -105,7 +105,7 @@ module.exports = {
           chunks: 'all',
         },
         snapshot: {
-          test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
+          test: /[\\/]node_modules[\\/](@apollo)[\\/]/,
           name: 'snapshot',
           chunks: 'all',
         },
