@@ -99,7 +99,7 @@ export class CacheDecorator {
       // If the response is a JSON, parse it and send it
       try {
         const parsedResponse = JSON.parse(cachedResponse);
-        res.status(200).send(parsedResponse);
+        res.status(200).json(parsedResponse);
       } catch (error) {
         // If the response is not a JSON, send it as it is
         res.status(200).send(cachedResponse);
@@ -143,7 +143,7 @@ export class CacheDecorator {
     return function resSendInterceptor(body: any) {
       try {
         log.trace(`Response ${cacheKey} not found in cache, sending it`);
-        const response = originalSend.call(res, body);
+        originalSend.call(res, body);
         try {
           if (res.statusCode == 200) {
             this.redisCache.setKey(namespace, cacheKey, body, duration);
@@ -151,7 +151,6 @@ export class CacheDecorator {
         } catch (error) {
           log.warn(`Error writing cache ${cacheKey} skip writing cache`);
         }
-        return response;
       } catch (err) {
         log.error(`Error catch all res.send ${cacheKey}`);
         log.error(err);
