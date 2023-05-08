@@ -3,8 +3,21 @@ import { ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
-import type { ThreadInstance } from '../models/thread';
+import type { Link, ThreadInstance } from '../models/thread';
 import { getLastEdited } from '../util/getLastEdited';
+
+const processLinks = async (thread) => {
+  let chain_entity_meta = [];
+  if (thread.links) {
+    const ces = thread.links.filter((item) => item.source === 'proposal');
+    if (ces.length > 0) {
+      chain_entity_meta = ces.map((ce: Link) => {
+        return { ce_id: parseInt(ce.identifier), title: ce.title };
+      });
+    }
+  }
+  return { chain_entity_meta };
+};
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (
@@ -32,6 +45,68 @@ const bulkThreads = async (
 
   let threads;
   if (cutoff_date) {
+    const query = `
+      SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
+        addr.chain AS addr_chain, threads.thread_id, thread_title,
+        thread_chain, thread_created, threads.kind,
+        threads.read_only, threads.body, threads.stage,
+        threads.has_poll, threads.plaintext,
+        threads.url, threads.pinned, threads.number_of_comments,
+        threads.reaction_ids, threads.reaction_type, threads.addresses_reacted,
+        threads.links as links,
+        topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
+        topics.chain_id AS topic_chain,
+        topics.telegram AS topic_telegram,
+        collaborators
+      FROM "Addresses" AS addr
+      RIGHT JOIN (
+        SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
+          t.created_at AS thread_created,
+          t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted,
+          t.has_poll,
+          t.plaintext,
+          t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
+            CONCAT(
+              '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
+              )
+            ) AS collaborators
+        FROM "Threads" t
+        LEFT JOIN "Collaborations" AS collaborations
+        ON t.id = collaborations.thread_id
+        LEFT JOIN "Addresses" editors
+        ON collaborations.address_id = editors.id
+        LEFT JOIN (
+            SELECT thread_id, COUNT(*) AS number_of_comments
+            FROM "Comments"
+            WHERE deleted_at IS NULL
+            GROUP BY thread_id
+        ) comments
+        ON t.id = comments.thread_id
+        LEFT JOIN (
+            SELECT thread_id,
+            STRING_AGG(ad.address::text, ',') AS addresses_reacted,
+            STRING_AGG(r.reaction::text, ',') AS reaction_type,
+            STRING_AGG(r.id::text, ',') AS reaction_ids
+            FROM "Reactions" as r
+            LEFT JOIN "Addresses" ad
+            ON r.address_id = ad.id
+            GROUP BY thread_id
+        ) reactions
+        ON t.id = reactions.thread_id
+        WHERE t.deleted_at IS NULL
+          AND t.chain = $chain
+          ${topicOptions}
+          AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
+          (COALESCE(t.last_commented_on, t.created_at) < $created_at AND t.pinned = false))
+          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
+           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
+          ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
+        ) threads
+      ON threads.address_id = addr.id
+      LEFT JOIN "Topics" topics
+      ON threads.topic_id = topics.id
+      ${includePinnedThreads ? 'ORDER BY threads.pinned DESC' : ''}`;
     let preprocessedThreads;
     try {
       const query = `
@@ -183,15 +258,12 @@ const bulkThreads = async (
       return next(new ServerError('Could not fetch threads'));
     }
 
-    threads = preprocessedThreads.map((t) => {
+    threads = preprocessedThreads.map(async (t) => {
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
-      let chain_entity_meta = [];
-      if (t.chain_entity_meta[0].ce_id) chain_entity_meta = t.chain_entity_meta;
-      const linked_threads = JSON.parse(t.linked_threads[0]).id
-        ? t.linked_threads.map((c) => JSON.parse(c))
-        : [];
+      const { chain_entity_meta } = await processLinks(t);
+
       const last_edited = getLastEdited(t);
 
       const data = {
@@ -206,10 +278,9 @@ const bulkThreads = async (
         pinned: t.pinned,
         chain: t.thread_chain,
         created_at: t.thread_created,
+        links: t.links,
         collaborators,
-        linked_threads,
         chain_entity_meta,
-        snapshot_proposal: t.snapshot_proposal,
         has_poll: t.has_poll,
         last_commented_on: t.last_commented_on,
         plaintext: t.plaintext,
@@ -255,21 +326,15 @@ const bulkThreads = async (
               model: models.Topic,
               as: 'topic',
             },
-            {
-              model: models.ChainEntityMeta,
-              as: 'chain_entity_meta',
-            },
-            {
-              model: models.LinkedThread,
-              as: 'linked_threads',
-            },
           ],
           attributes: { exclude: ['version_history'] },
           order: [['created_at', 'DESC']],
         })
-      ).map((t) => {
+      ).map(async (t) => {
         const row = t.toJSON();
         const last_edited = getLastEdited(row);
+        const { chain_entity_meta } = await processLinks(t);
+        row['chain_entity_meta'] = chain_entity_meta;
         row['last_edited'] = last_edited;
         return row;
       });
@@ -290,6 +355,8 @@ const bulkThreads = async (
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
   ).length;
+
+  threads = await Promise.all(threads);
 
   return res.json({
     status: 'Success',

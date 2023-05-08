@@ -369,6 +369,18 @@ const send = async (models, content: WebhookContent) => {
                   ],
                 },
               };
+        } else if (url.indexOf('zapier') !== -1 && !isChainEvent) {
+          webhookData = JSON.stringify({
+            event: notificationCategory,
+            author: {
+              name: actor,
+              url: actorAccountLink,
+              icon_url: actorAvatarUrl,
+            },
+            title: notificationTitlePrefix + actedOn,
+            url: actedOnLink,
+            content: notificationExcerpt,
+          });
         } else {
           // TODO: other formats unimplemented
         }

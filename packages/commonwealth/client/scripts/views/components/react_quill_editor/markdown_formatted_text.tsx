@@ -1,4 +1,7 @@
 import React, { useMemo, useState } from 'react';
+
+import 'components/quill/markdown_formatted_text.scss';
+
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -18,6 +21,15 @@ markdownRenderer.link = (href, title, text) => {
     OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
   } href="${href}">${text}</a>`;
 };
+markdownRenderer.image = (href, title, text) => {
+  if (href?.startsWith('ipfs://')) {
+    const hash = href.split('ipfs://')[1];
+    if (hash) {
+      href = `https://ipfs.io/ipfs/${hash}`;
+    }
+  }
+  return `<img alt="${text}" src="${href}"/>`;
+};
 marked.setOptions({
   renderer: markdownRenderer,
   gfm: true, // use github flavored markdown
@@ -30,6 +42,7 @@ type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
 };
 
+// NOTE: Do NOT use this directly. Use QuillRenderer instead.
 export const MarkdownFormattedText = ({
   doc,
   hideFormatting,

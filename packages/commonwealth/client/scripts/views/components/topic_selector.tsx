@@ -5,8 +5,8 @@ import { SelectList } from 'views/components/component_kit/cw_select_list';
 import 'components/topic_selector.scss';
 
 interface TopicSelectorProps {
-  defaultTopic: Topic;
   topics: Topic[];
+  value: Topic;
   onChange: (topic: Topic) => void;
 }
 
@@ -16,27 +16,24 @@ const topicToOption = (topic: Topic) => ({
 });
 
 export const TopicSelector = ({
-  defaultTopic,
   topics,
+  value,
   onChange,
 }: TopicSelectorProps) => {
-  const options = topics
-    .filter((topic) => topic.featuredInSidebar)
-    .sort((a, b) => a.order - b.order)
-    .map(topicToOption);
+  const options = topics.sort((a, b) => a.order - b.order).map(topicToOption);
 
-  const handleOnChange = ({ value }) => {
-    const selectedTopic = topics.find(({ id }) => id === value);
+  const handleOnChange = ({ value: newValue }) => {
+    const selectedTopic = topics.find(({ id }) => id === newValue);
     onChange(selectedTopic);
   };
 
   return (
     <SelectList
-      defaultValue={defaultTopic ? topicToOption(defaultTopic) : null}
       placeholder="Select the topic"
       isSearchable={false}
       options={options}
       className="TopicSelector"
+      value={topicToOption(value)}
       onChange={handleOnChange}
     />
   );
