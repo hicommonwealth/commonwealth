@@ -40,29 +40,28 @@ export class CacheDecorator {
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): RequestHandler {
     return async function cache(req, res, next) {
-
-      // If cache is disabled, skip caching
-      if (!this.isEnabled()) {
-        log.trace(`Cache disabled, skipping cache`);
-        res.set(XCACHE_HEADER, XCACHE_VALUES.UNDEF);
-        return next();
-      }
-
-      // cache control header is set to no-cache, skip caching
-      if (CacheDecorator.skipCache(req)) {
-        res.set(XCACHE_HEADER, XCACHE_VALUES.SKIP);
-        return next();
-      }
-
-      // If cache key is not found, skip caching
-      const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(req, keyGenerator, duration);
-      if (!cacheKey) {
-        log.trace(`Cache key not found for ${req.originalUrl}`);
-        res.set(XCACHE_HEADER, XCACHE_VALUES.NOKEY);
-        return next();
-      }
-
       try {
+        // If cache is disabled, skip caching
+        if (!this.isEnabled()) {
+          log.trace(`Cache disabled, skipping cache`);
+          res.set(XCACHE_HEADER, XCACHE_VALUES.UNDEF);
+          return next();
+        }
+
+        // cache control header is set to no-cache, skip caching
+        if (CacheDecorator.skipCache(req)) {
+          res.set(XCACHE_HEADER, XCACHE_VALUES.SKIP);
+          return next();
+        }
+
+        // If cache key is not found, skip caching
+        const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(req, keyGenerator, duration);
+        if (!cacheKey) {
+          log.trace(`Cache key not found for ${req.originalUrl}`);
+          res.set(XCACHE_HEADER, XCACHE_VALUES.NOKEY);
+          return next();
+        }
+
         // Try to fetch the response from Redis cache
         const found = await this.checkCacheAndSendResponseIfFound(
           res,
@@ -83,12 +82,12 @@ export class CacheDecorator {
           originalSend,
           res
         );
-        return next();
       } catch (err) {
-        log.error(`Error fetching cache ${cacheKey}`);
-        log.error(err);
+        log.warn(`calling next from cacheMiddleware catch ${req.originalUrl}`)
+        log.warn(err);
         return next();
       }
+      return next();
     }.bind(this);
   }
 

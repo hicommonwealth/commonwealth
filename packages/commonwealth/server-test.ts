@@ -32,7 +32,7 @@ import { MockTokenBalanceProvider } from './test/util/modelUtils';
 import setupCosmosProxy from 'server/util/cosmosProxy';
 
 import { cacheDecorator } from '../common-common/src/cacheDecorator';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { ServerError } from 'common-common/src/errors';
 import { lookupKeyDurationInReq, CustomRequest } from '../common-common/src/cacheKeyUtils';
 
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -462,7 +462,7 @@ export const setupCacheTestEndpoints = (appAttach:Express) => {
   appAttach.get(CACHE_ENDPOINTS.BROKEN_5XX, cacheDecorator.cacheMiddleware(3), async (req, res, next) => {
     log.info(`${CACHE_ENDPOINTS.BROKEN_5XX} called`);
     const err = new Error('route error');
-    return next(new ServerError('broken route', `${err}`));
+    return next(new ServerError('broken route',err));
   });
 };
 
