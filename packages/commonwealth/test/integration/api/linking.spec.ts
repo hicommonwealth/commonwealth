@@ -24,10 +24,12 @@ describe('Linking Tests', () => {
   let adminJWT;
   let adminAddress;
   let adminAddressId;
+  let adminSession;
   let userJWT;
   let userId;
   let userAddress;
   let userAddressId;
+  let userSession;
   let thread1: ThreadInstance;
   let thread2: ThreadInstance;
   const link1 = {
