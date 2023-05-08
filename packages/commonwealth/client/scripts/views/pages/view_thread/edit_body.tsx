@@ -10,6 +10,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type EditBodyProps = {
   title: string;
@@ -40,16 +41,29 @@ export const EditBody = (props: EditBodyProps) => {
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    let cancelConfirmed = true;
+    const hasContentChanged =
+      JSON.stringify(body) !== JSON.stringify(contentDelta);
 
-    if (JSON.stringify(body) !== JSON.stringify(contentDelta)) {
-      cancelConfirmed = window.confirm(
-        'Cancel editing? Changes will not be saved.'
-      );
-    }
-
-    if (cancelConfirmed) {
-      clearEditingLocalStorage(thread.id, ContentType.Thread);
+    if (hasContentChanged) {
+      openConfirmation({
+        title: 'Cancel editing?',
+        description: <>Changes will not be saved.</>,
+        buttons: [
+          {
+            label: 'Yes',
+            buttonType: 'mini-black',
+            onClick: () => {
+              clearEditingLocalStorage(thread.id, ContentType.Thread);
+              cancelEditing();
+            },
+          },
+          {
+            label: 'No',
+            buttonType: 'mini-white',
+          },
+        ],
+      });
+    } else {
       cancelEditing();
     }
   };

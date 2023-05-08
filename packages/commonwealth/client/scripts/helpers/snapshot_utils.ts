@@ -46,6 +46,13 @@ class GqlLazyLoader {
       symbol
       private
       network
+      validation {
+        params
+      }
+      voting {
+        period
+        delay
+      }
       filters {
         minScore
         onlyMembers
@@ -56,6 +63,25 @@ class GqlLazyLoader {
         params
       }
       members
+    }
+  }
+`;
+  }
+
+  public static async PROPOSAL_QUERY() {
+    await this.init();
+    return this.gql`
+  query Proposals(
+    $id: Int!
+  ) {
+    proposals(
+      where: {
+        id: $id
+      }
+    ) {
+      id
+      title
+      space
     }
   }
 `;
@@ -162,6 +188,15 @@ export interface SnapshotSpace {
   symbol: string;
   private: boolean;
   network: string;
+  validation: {
+    params: {
+      minScore: number;
+    };
+  };
+  voting: {
+    period: number;
+    delay: number;
+  };
   filters: {
     minScore: number;
     onlyMembers: boolean;
@@ -217,6 +252,17 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
     },
   });
   return spaceObj.data.space;
+}
+
+export async function getProposal(id: string): Promise<{ title: string, space: string }> {
+  await getApolloClient();
+  const proposalObj = await apolloClient.query({
+    query: await GqlLazyLoader.PROPOSAL_QUERY(),
+    variables: {
+      id: +id,
+    }
+  });
+  return proposalObj.data?.proposals[0];
 }
 
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {

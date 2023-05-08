@@ -128,6 +128,7 @@ const linkExistingAddressToChain = async (
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
       existingAddress.name = originalAddress.name;
+      existingAddress.verified = originalAddress.verified;
       const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {

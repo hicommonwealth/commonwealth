@@ -1,18 +1,11 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import type { DeltaOperation } from 'quill';
-import imageDropAndPaste from 'quill-image-drop-and-paste';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type { RangeStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
+import MagicUrl from 'quill-magic-url';
 
-import type { SerializableDeltaStatic } from './utils';
-import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
+import { SerializableDeltaStatic } from './utils';
+import { getTextFromDelta } from './utils';
 
-import app from 'state';
 import { CWText } from '../component_kit/cw_text';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { PreviewModal } from '../../modals/preview_modal';
@@ -22,20 +15,15 @@ import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
 import { nextTick } from 'process';
 
-const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import { LoadingIndicator } from './loading_indicator';
+import { useMention } from './use_mention';
+import { useClipboardMatchers } from './use_clipboard_matchers';
+import { useImageDropAndPaste } from './use_image_drop_and_paste';
+import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
+import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 
-const LoadingIndicator = () => {
-  return (
-    <div className="LoadingIndicator">
-      <div className="outer-circle">
-        <div className="inner-circle"></div>
-      </div>
-    </div>
-  );
-};
-
-const Delta = Quill.import('delta');
-Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
+Quill.register('modules/magicUrl', MagicUrl);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -53,12 +41,47 @@ const ReactQuillEditor = ({
   contentDelta,
   setContentDelta,
 }: ReactQuillEditorProps) => {
+  const toolbarId = useMemo(() => {
+    return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+  }, []);
+
   const editorRef = useRef<ReactQuill>();
 
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isMarkdownEnabled, setIsMarkdownEnabled] = useState<boolean>(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
+
+  // ref is used to prevent rerenders when selection
+  // is changed, since rerenders bug out the editor
+  const lastSelectionRef = useRef<RangeStatic | null>(null);
+  const { mention } = useMention({
+    editorRef,
+    lastSelectionRef,
+  });
+
+  // handle clipboard behavior
+  const { clipboardMatchers } = useClipboardMatchers();
+
+  // handle image upload
+  const { handleImageDropAndPaste } = useImageDropAndPaste({
+    editorRef,
+    setIsUploading,
+    isMarkdownEnabled,
+    setContentDelta,
+  });
+
+  // handle custom toolbar behavior for markdown
+  const markdownToolbarHandlers = useMarkdownToolbarHandlers({
+    editorRef,
+    setContentDelta,
+  });
+
+  // handle keyboard shortcuts for markdown
+  const markdownKeyboardShortcuts = useMarkdownShortcuts({
+    editorRef,
+    setContentDelta,
+  });
 
   // refreshQuillComponent unmounts and remounts the
   // React Quill component, as this is the only way
@@ -78,93 +101,44 @@ const ReactQuillEditor = ({
     } as SerializableDeltaStatic);
   };
 
-  // must be memoized or else infinite loop
-  const handleImageDropAndPaste = useCallback(
-    async (imageDataUrl, imageType) => {
-      const editor = editorRef.current?.editor;
-
-      try {
-        if (!editor) {
-          throw new Error('editor is not set');
-        }
-
-        setIsUploading(true);
-
-        editor.disable();
-
-        if (!imageType) {
-          imageType = 'image/png';
-        }
-
-        const selectedIndex =
-          editor.getSelection()?.index || editor.getLength() || 0;
-
-        // filter out ops that contain a base64 image
-        const opsWithoutBase64Images: DeltaOperation[] = (
-          editor.getContents() || []
-        ).filter((op) => {
-          for (const opImageType of VALID_IMAGE_TYPES) {
-            const base64Prefix = `data:image/${opImageType};base64`;
-            if (op.insert?.image?.startsWith(base64Prefix)) {
-              return false;
-            }
-          }
-          return true;
-        });
-        setContentDelta({
-          ops: opsWithoutBase64Images,
-          ___isMarkdown: isMarkdownEnabled,
-        } as SerializableDeltaStatic);
-
-        const file = base64ToFile(imageDataUrl, imageType);
-
-        const uploadedFileUrl = await uploadFileToS3(
-          file,
-          app.serverUrl(),
-          app.user.jwt
-        );
-
-        // insert image op at the selected index
-        if (isMarkdownEnabled) {
-          editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
-        } else {
-          editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
-        }
-        setContentDelta({
-          ...editor.getContents(),
-          ___isMarkdown: isMarkdownEnabled,
-        } as SerializableDeltaStatic); // sync state with editor content
-      } catch (err) {
-        console.error(err);
-      } finally {
-        editor.enable();
-        setIsUploading(false);
-      }
-    },
-    [editorRef, isMarkdownEnabled, setContentDelta]
-  );
-
   const handleToggleMarkdown = () => {
     const editor = editorRef.current?.getEditor();
+
     if (!editor) {
       throw new Error('editor not set');
     }
     // if enabling markdown, confirm and remove formatting
     const newMarkdownEnabled = !isMarkdownEnabled;
+
     if (newMarkdownEnabled) {
-      let confirmed = true;
-      if (getTextFromDelta(editor.getContents()).length > 0) {
-        confirmed = window.confirm(
-          'All formatting and images will be lost. Continue?'
-        );
-      }
-      if (confirmed) {
-        editor.removeFormat(0, editor.getLength());
-        setIsMarkdownEnabled(newMarkdownEnabled);
-        setContentDelta({
-          ...editor.getContents(),
-          ___isMarkdown: newMarkdownEnabled,
+      const isContentAvailable =
+        getTextFromDelta(editor.getContents()).length > 0;
+
+      if (isContentAvailable) {
+        openConfirmation({
+          title: 'Warning',
+          description: <>All formatting and images will be lost. Continue?</>,
+          buttons: [
+            {
+              label: 'Yes',
+              buttonType: 'mini-red',
+              onClick: () => {
+                editor.removeFormat(0, editor.getLength());
+                setIsMarkdownEnabled(newMarkdownEnabled);
+                setContentDelta({
+                  ...editor.getContents(),
+                  ___isMarkdown: newMarkdownEnabled,
+                });
+              },
+            },
+            {
+              label: 'No',
+              buttonType: 'mini-white',
+            },
+          ],
         });
+      } else {
+        setIsMarkdownEnabled(newMarkdownEnabled);
       }
     } else {
       setIsMarkdownEnabled(newMarkdownEnabled);
@@ -174,25 +148,6 @@ const ReactQuillEditor = ({
   const handlePreviewModalClose = () => {
     setIsPreviewVisible(false);
   };
-
-  // must be memoized or else infinite loop
-  const clipboardMatchers = useMemo(() => {
-    return [
-      [
-        Node.ELEMENT_NODE,
-        (node, delta) => {
-          return delta.compose(
-            new Delta().retain(delta.length(), {
-              header: false,
-              align: false,
-              color: false,
-              background: false,
-            })
-          );
-        },
-      ],
-    ];
-  }, []);
 
   // when markdown state is changed, add markdown metadata to delta ops
   // and refresh quill component
@@ -219,18 +174,6 @@ const ReactQuillEditor = ({
     }, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
-
-  // if markdown is disabled, hide toolbar buttons
-  const toolbar = useMemo(() => {
-    if (isMarkdownEnabled) {
-      return [];
-    }
-    return ([[{ header: 1 }, { header: 2 }]] as any).concat([
-      ['bold', 'italic', 'strike'],
-      ['link', 'code-block', 'blockquote'],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-    ]);
-  }, [isMarkdownEnabled]);
 
   return (
     <div className="QuillEditorWrapper">
@@ -283,24 +226,44 @@ const ReactQuillEditor = ({
         />
       </div>
       {isVisible && (
-        <ReactQuill
-          ref={editorRef}
-          className={`QuillEditor ${className}`}
-          placeholder={placeholder}
-          tabIndex={tabIndex}
-          theme="snow"
-          value={contentDelta}
-          onChange={handleChange}
-          modules={{
-            toolbar,
-            imageDropAndPaste: {
-              handler: handleImageDropAndPaste,
-            },
-            clipboard: {
-              matchers: clipboardMatchers,
-            },
-          }}
-        />
+        <>
+          <CustomQuillToolbar toolbarId={toolbarId} />
+          <ReactQuill
+            ref={editorRef}
+            className={`QuillEditor ${className}`}
+            placeholder={placeholder}
+            tabIndex={tabIndex}
+            theme="snow"
+            value={contentDelta}
+            onChange={handleChange}
+            onChangeSelection={(selection: RangeStatic) => {
+              if (!selection) {
+                return;
+              }
+              lastSelectionRef.current = selection;
+            }}
+            formats={isMarkdownEnabled ? [] : undefined}
+            modules={{
+              toolbar: {
+                container: `#${toolbarId}`,
+                handlers: isMarkdownEnabled
+                  ? markdownToolbarHandlers
+                  : undefined,
+              },
+              imageDropAndPaste: {
+                handler: handleImageDropAndPaste,
+              },
+              clipboard: {
+                matchers: clipboardMatchers,
+              },
+              mention,
+              magicUrl: !isMarkdownEnabled,
+              keyboard: isMarkdownEnabled
+                ? markdownKeyboardShortcuts
+                : undefined,
+            }}
+          />
+        </>
       )}
     </div>
   );

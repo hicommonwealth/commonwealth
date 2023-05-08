@@ -34,6 +34,12 @@ const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')
 );
+const ChainEntityLinkRedirectPage = lazy(
+  () => import('views/pages/chain_entity_link_redirect')
+);
+const SnapshotProposalLinkRedirectPage = lazy(
+  () => import('views/pages/snapshot_proposal_link_redirect')
+);
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
@@ -71,7 +77,10 @@ const customDomainRoutes = () => {
   return [
     <Route
       path="/"
-      element={withLayout(DiscussionsRedirectPage, { scoped: true })}
+      element={withLayout(DiscussionsRedirectPage, {
+        scoped: true,
+        deferChain: true,
+      })}
     />,
     <Route
       path="/createCommunity"
@@ -192,6 +201,7 @@ const customDomainRoutes = () => {
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
+        deferChain: true,
       })}
     />,
     <Route
@@ -265,7 +275,13 @@ const customDomainRoutes = () => {
     // TREASURY END
 
     // ADMIN
-    <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,
+    <Route
+      path="/manage"
+      element={withLayout(ManageCommunityPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />,
     <Route
       path="/analytics"
       element={withLayout(AnalyticsPage, {
@@ -369,15 +385,25 @@ const customDomainRoutes = () => {
     <Route path="/:scope/proposals" element={<Navigate to="/proposals" />} />,
     <Route
       path="/:scope/proposal/:type/:identifier"
-      element={<Navigate to="/proposal/:type/:identifier" />}
+      element={
+        <Navigate
+          to={(parameters) =>
+            `/proposal/${parameters.type}/${parameters.identifier}`
+          }
+        />
+      }
     />,
     <Route
       path="/:scope/proposal/:identifier"
-      element={<Navigate to="/proposal/:identifier" />}
+      element={
+        <Navigate to={(parameters) => `/proposal/${parameters.identifier}`} />
+      }
     />,
     <Route
       path="/:scope/new/proposal/:type"
-      element={<Navigate to="/new/proposal/:type" />}
+      element={
+        <Navigate to={(parameters) => `/new/proposal/${parameters.type}`} />
+      }
     />,
     <Route
       path="/:scope/new/proposal"
@@ -392,11 +418,15 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/discussions/:topicName"
-      element={<Navigate to="/discussions/:topicName" />}
+      element={
+        <Navigate to={(parameters) => `/discussions/${parameters.topicName}`} />
+      }
     />,
     <Route
       path="/:scope/discussion/:identifier"
-      element={<Navigate to="/discussion/:identifier" />}
+      element={
+        <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
+      }
     />,
     <Route
       path="/:scope/new/discussion"
@@ -404,7 +434,11 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/proposal/discussion/:identifier"
-      element={<Navigate to="/proposal/discussion/:identifier" />}
+      element={
+        <Navigate
+          to={(parameters) => `/proposal/discussion/${parameters.identifier}`}
+        />
+      }
     />,
     // DISCUSSIONS END
 
@@ -415,7 +449,11 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/contract/:contractAddress"
-      element={<Navigate to="/contract/:contractAddress" />}
+      element={
+        <Navigate
+          to={(parameters) => `/contract/${parameters.contractAddress}`}
+        />
+      }
     />,
     // CONTRACTS END
 
@@ -429,7 +467,9 @@ const customDomainRoutes = () => {
     <Route path="/:scope/analytics" element={<Navigate to="/analytics" />} />,
     <Route
       path="/:scope/snapshot/:snapshotId"
-      element={<Navigate to="/snapshot/:snapshotId" />}
+      element={
+        <Navigate to={(parameters) => `/snapshot/${parameters.snapshotId}`} />
+      }
     />,
     <Route
       path="/:scope/multiple-snapshots"
@@ -437,11 +477,21 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/snapshot/:snapshotId/:identifier"
-      element={<Navigate to="/snapshot/:snapshotId/:identifier" />}
+      element={
+        <Navigate
+          to={(parameters) =>
+            `/snapshot/${parameters.snapshotId}/${parameters.identifier}`
+          }
+        />
+      }
     />,
     <Route
       path="/:scope/new/snapshot/:snapshotId"
-      element={<Navigate to="/new/snapshot/:snapshotId" />}
+      element={
+        <Navigate
+          to={(parameters) => `/new/snapshot/${parameters.snapshotId}`}
+        />
+      }
     />,
     // ADMIN END
 
@@ -453,11 +503,35 @@ const customDomainRoutes = () => {
     <Route path="/:scope/account" element={<Navigate to="/account" />} />,
     <Route
       path="/:scope/profile/id/:profileId"
-      element={<Navigate to="/profile/id/:profileId" />}
+      element={
+        <Navigate to={(parameters) => `/profile/id/${parameters.profileId}`} />
+      }
     />,
     <Route
       path="/:scope/profile/edit"
       element={<Navigate to="/profile/edit" />}
+    />,
+
+    // LEGACY LINKING REDIRECTS
+    // These redirects exist so we can land on a properly identified page
+    // without loading additional metadata on the view thread page to construct
+    // a proper link. Each of these routes will:
+    // (a) load external data as needed (from snapshot, chain events, etc) to
+    // (b) produce a correct link to the entity (whether /snapshot/space/id or /proposal/id), and
+    // (c) update the link objects associated with the identifer to point at the correct page.
+    <Route
+      path="/link/chain-entity/:identifier"
+      element={withLayout(ChainEntityLinkRedirectPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />,
+    <Route
+      path="/link/snapshot-proposal/:identifier"
+      element={withLayout(SnapshotProposalLinkRedirectPage, {
+        scoped: true,
+        deferChain: true,
+      })}
     />,
   ];
 };
