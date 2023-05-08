@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, MutableRefObject } from 'react';
 import { SerializableDeltaStatic, uploadFileToS3 } from './utils';
 import { DeltaStatic } from 'quill';
+import ReactQuill from 'react-quill';
 
 import app from 'state';
 
