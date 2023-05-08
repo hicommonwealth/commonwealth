@@ -10,7 +10,7 @@ export function calcCosmosRPCCacheKeyDuration(req, res, next) {
 
   // cosmosRPCDuration and cosmosRPCKey are defined below
   // TX Response: do not cache and call next()
-  req.cacheDuration = cosmosRPCDuration(body, method, params, next);
+  req.cacheDuration = cosmosRPCDuration(body, method, params);
   if(req.cacheDuration === null) return next();
   req.cacheKey = cosmosRPCKey(req, body);
 
@@ -48,7 +48,7 @@ export function calcCosmosLCDCacheKeyDuration(req, res, next) {
   return next();
 };
 
-const cosmosRPCDuration = (body, method, params, next) => {
+const cosmosRPCDuration = (body, method, params) => {
   let duration = defaultCacheDuration;
   // RPC specific codes from cosmJS requests
   const activeCodes = ['0801', '0802']; // ['DepositPerion', 'VotingPeriod']
