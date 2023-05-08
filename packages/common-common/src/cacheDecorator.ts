@@ -7,6 +7,19 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+const XCACHE_HEADER = 'X-Cache';
+enum XCACHE_VALUES {
+  UNDEF = 'UNDEF', // cache is undefined
+  SKIP = 'SKIP', // cache is disabled
+  HIT = 'HIT', // cache hit
+  MISS = 'MISS', // cache miss
+  NOKEY = 'NOKEY', // cache key not found
+  SET = 'SET', // cache key found, set successful
+  NOSET = 'NOSET', // cache key found, but not set response status is not 200
+  SETERR = 'SETERR', // cache key found, but set failed
+  ORIGSENDERR = 'ORIGSENDERR' // cache key found, but original send failed
+};
+
 export class CacheDecorator {
   private redisCache: RedisCache;
 
@@ -32,11 +45,13 @@ export class CacheDecorator {
       // If cache is not set, skip caching
       if (!this.redisCache) {
         log.trace(`cacheMiddleware: cache undefined`);
+        res.set(XCACHE_HEADER, XCACHE_VALUES.UNDEF);
         return next();
       }
 
-      // If cache is disabled, and cache control header is set to no-cache, skip caching
+      // cache control header is set to no-cache, skip caching
       if (CacheDecorator.skipCache(req)) {
+        res.set(XCACHE_HEADER, XCACHE_VALUES.SKIP);
         return next();
       }
 
@@ -44,6 +59,7 @@ export class CacheDecorator {
       const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(req, keyGenerator, duration);
       if (!cacheKey) {
         log.trace(`Cache key not found for ${req.originalUrl}`);
+        res.set(XCACHE_HEADER, XCACHE_VALUES.NOKEY);
         return next();
       }
 
@@ -57,6 +73,7 @@ export class CacheDecorator {
         if (found) {
           return;
         }
+        res.set(XCACHE_HEADER, XCACHE_VALUES.MISS);
 
         // Response not found in cache, generate it and cache it
         const originalSend = res.send;
@@ -93,7 +110,7 @@ export class CacheDecorator {
     if (cachedResponse) {
       // Response found in cache, send it
       log.trace(`Response ${cacheKey} FOUND in cache, sending it`);
-      res.set('X-Cache', 'HIT');
+      res.set(XCACHE_HEADER, XCACHE_VALUES.HIT);
       // If the response is a JSON, parse it and send it
       try {
         const parsedResponse = JSON.parse(cachedResponse);
@@ -145,11 +162,17 @@ export class CacheDecorator {
         try {
           if (res.statusCode == 200) {
             this.redisCache.setKey(namespace, cacheKey, body, duration);
+            res.set(XCACHE_HEADER, XCACHE_VALUES.SET);
+          } else {
+            res.set(XCACHE_HEADER, XCACHE_VALUES.NOSET);
+            log.warn(`Response status code is not 200 ${cacheKey}, skip writing cache`);
           }
         } catch (error) {
+          res.set(XCACHE_HEADER, XCACHE_VALUES.SETERR);
           log.warn(`Error writing cache ${cacheKey} skip writing cache`);
         }
       } catch (err) {
+        res.set(XCACHE_HEADER, XCACHE_VALUES.ORIGSENDERR);
         log.error(`Error catch all res.send ${cacheKey}`);
         log.error(err);
         throw new ServerError('something broke', err);
