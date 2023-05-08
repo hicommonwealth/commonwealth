@@ -51,6 +51,7 @@ describe('Linking Tests', () => {
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
+    adminSession = { session: res.session, sign: res.sign };
     expect(adminAddress).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
@@ -60,6 +61,7 @@ describe('Linking Tests', () => {
     userId = res.user_id;
     userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
@@ -74,6 +76,8 @@ describe('Linking Tests', () => {
         topicId,
         body,
         jwt: userJWT,
+        session: userSession.session,
+        sign: userSession.sign,
       })
     ).result;
 
@@ -88,6 +92,8 @@ describe('Linking Tests', () => {
         topicId,
         body,
         jwt: adminJWT,
+        session: adminSession.session,
+        sign: adminSession.sign,
       })
     ).result;
   });
