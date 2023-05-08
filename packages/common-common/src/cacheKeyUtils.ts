@@ -6,7 +6,7 @@ export type CacheKeyDuration = {
 };
 
 // Extend the Request type with your custom properties
-interface CustomRequest extends Request, CacheKeyDuration {}
+export interface CustomRequest extends Request, CacheKeyDuration {}
 
 export function isCacheKeyDuration(obj: any): obj is CacheKeyDuration {
   return (

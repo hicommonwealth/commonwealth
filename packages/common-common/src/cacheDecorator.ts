@@ -8,7 +8,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const XCACHE_HEADER = 'X-Cache';
-enum XCACHE_VALUES {
+export enum XCACHE_VALUES {
   UNDEF = 'UNDEF', // cache is undefined
   SKIP = 'SKIP', // cache is disabled
   HIT = 'HIT', // cache hit
