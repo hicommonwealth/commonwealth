@@ -3,7 +3,7 @@ const expect = chai.expect;
 import { RedisCache } from 'common-common/src/redisCache';
 import { RedisNamespaces } from 'common-common/src/types';
 import { connectToRedis } from '../../util/redisUtils';
-import { sleep } from '../../util/delayUtils';
+import { delay } from '../../util/delayUtils';
 
 async function addRandomKeys(redisCache: RedisCache, test_namespace: RedisNamespaces) {
   const random = Math.random();
@@ -34,7 +34,7 @@ export async function testExpiry(
   await redisCache.setKey(test_namespace, key, value, ttl);
   let result = await redisCache.getKey(test_namespace, key);
   expect(result).to.equal(value);
-  await sleep((ttl + 1) * 1000);
+  await delay((ttl + 1) * 1000);
   result = await redisCache.getKey(test_namespace, key);
   expect(result).to.equal(null);
 }

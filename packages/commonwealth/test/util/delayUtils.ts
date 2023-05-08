@@ -6,6 +6,6 @@ export function timeoutPromise(timeout: number) {
     });
 }
 
-export function sleep(ms: number): Promise<void> {
+export function delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -13,11 +13,7 @@ enum XCACHE_VALUES {
   SKIP = 'SKIP', // cache is disabled
   HIT = 'HIT', // cache hit
   MISS = 'MISS', // cache miss
-  NOKEY = 'NOKEY', // cache key not found
-  SET = 'SET', // cache key found, set successful
-  NOSET = 'NOSET', // cache key found, but not set response status is not 200
-  SETERR = 'SETERR', // cache key found, but set failed
-  ORIGSENDERR = 'ORIGSENDERR' // cache key found, but original send failed
+  NOKEY = 'NOKEY' // cache no key
 };
 
 export class CacheDecorator {
@@ -157,25 +153,20 @@ export class CacheDecorator {
   ) {
     return function resSendInterceptor(body: any) {
       try {
-        log.trace(`Response ${cacheKey} not found in cache, sending it`);
         originalSend.call(res, body);
         try {
           if (res.statusCode == 200) {
             this.redisCache.setKey(namespace, cacheKey, body, duration);
-            res.set(XCACHE_HEADER, XCACHE_VALUES.SET);
+            log.trace(`SET: ${cacheKey}`);
           } else {
-            res.set(XCACHE_HEADER, XCACHE_VALUES.NOSET);
-            log.warn(`Response status code is not 200 ${cacheKey}, skip writing cache`);
+            log.warn(`NOSET: Response status code is not 200 ${cacheKey}, skip writing cache`);
           }
         } catch (error) {
-          res.set(XCACHE_HEADER, XCACHE_VALUES.SETERR);
-          log.warn(`Error writing cache ${cacheKey} skip writing cache`);
+          log.warn(`SETERR: Error writing cache ${cacheKey} skip writing cache`);
         }
       } catch (err) {
-        res.set(XCACHE_HEADER, XCACHE_VALUES.ORIGSENDERR);
         log.error(`Error catch all res.send ${cacheKey}`);
-        log.error(err);
-        throw new ServerError('something broke', err);
+        throw new ServerError('something broke');
       }
     }.bind(this);
   }
