@@ -21,9 +21,11 @@ export class CacheDecorator {
 
   // Set redis cache instance
   public setCache(redisCache: RedisCache) {
+    log.info(`setCache: DISABLE_CACHE ${process.env.DISABLE_CACHE}`);
     // If cache is disabled, skip caching
-    if (process.env.DISABLE_CACHE) {
-      log.trace(`cacheMiddleware: cache disabled`);
+    if (process.env.DISABLE_CACHE === 'true') {
+      log.info(`cacheMiddleware: cache disabled`);
+      return;
     }
     this.redisCache = redisCache;
   }
@@ -38,9 +40,10 @@ export class CacheDecorator {
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): RequestHandler {
     return async function cache(req, res, next) {
-      // If cache is not set, skip caching
-      if (!this.redisCache) {
-        log.trace(`cacheMiddleware: cache undefined`);
+
+      // If cache is disabled, skip caching
+      if (!this.isEnabled()) {
+        log.trace(`Cache disabled, skipping cache`);
         res.set(XCACHE_HEADER, XCACHE_VALUES.UNDEF);
         return next();
       }
@@ -102,7 +105,7 @@ export class CacheDecorator {
       return false;
     }
 
-    const cachedResponse = await this.redisCache.getKey(namespace, cacheKey);
+    const cachedResponse = await this.checkCache(cacheKey, namespace);
     if (cachedResponse) {
       // Response found in cache, send it
       log.trace(`Response ${cacheKey} FOUND in cache, sending it`);
@@ -127,6 +130,8 @@ export class CacheDecorator {
     duration: number,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ) {
+    if(!this.isEnabled()) return false;
+
     return await this.redisCache.setKey(
       namespace,
       cacheKey,
@@ -140,7 +145,10 @@ export class CacheDecorator {
     cacheKey: string,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): Promise<string> {
-    return await this.redisCache.getKey(namespace, cacheKey);
+    const ret = await this.redisCache.getKey(namespace, cacheKey);
+    if (ret) {
+      return ret;
+    }
   }
 
   // response interceptor to cache the response and send it
@@ -151,13 +159,17 @@ export class CacheDecorator {
     originalSend,
     res
   ) {
-    return function resSendInterceptor(body: any) {
+    return async function resSendInterceptor(body: any) {
       try {
         originalSend.call(res, body);
         try {
           if (res.statusCode == 200) {
-            this.redisCache.setKey(namespace, cacheKey, body, duration);
-            log.trace(`SET: ${cacheKey}`);
+            const ret = await this.cacheResponse(cacheKey, body, duration, namespace);
+            if(ret) {
+              log.trace(`SET: ${cacheKey}`);
+            }  else {
+              log.warn(`NOSET: Unable to set redis key returned false ${cacheKey} ${ret}`);
+            }
           } else {
             log.warn(`NOSET: Response status code is not 200 ${cacheKey}, skip writing cache`);
           }
@@ -196,6 +208,9 @@ export class CacheDecorator {
     return { cacheKey, cacheDuration };
   }
 
+  private isEnabled(): boolean {
+    return this.redisCache && this.redisCache.isInitialized();
+  }
 }
 
 export const cacheDecorator = new CacheDecorator();

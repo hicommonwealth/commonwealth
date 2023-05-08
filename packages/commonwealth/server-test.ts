@@ -427,14 +427,17 @@ export const setupCacheTestEndpoints = (appAttach:Express) => {
 
   // /cachedummy endpoint for testing
   appAttach.get(CACHE_ENDPOINTS.BROKEN_4XX, cacheDecorator.cacheMiddleware(3), async (req, res) => {
+    log.info(`${CACHE_ENDPOINTS.BROKEN_4XX} called`);
     res.status(400).json({ 'message': 'cachedummy 400 response' });
   });
 
   appAttach.get(CACHE_ENDPOINTS.JSON, cacheDecorator.cacheMiddleware(3), async (req, res) => {
+    log.info(`${CACHE_ENDPOINTS.JSON} called`);
     res.json({ 'message': 'cachedummy response' });
   });
 
   appAttach.post(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, (req: CustomRequest, res, next) => {
+    log.info(`${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} called`);
     const body = req.body;
     if (!body || !body.duration || !body.key) {
       return next();
