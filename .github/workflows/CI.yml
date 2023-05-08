@@ -3,7 +3,7 @@ name: CI
 env:
   ROLLBAR_ENV: 'GitHubCI'
 
-on: [push]
+on: [pull_request]
 
 jobs:
   # These tests run slowly, so run them in a separate job
@@ -173,12 +173,11 @@ jobs:
 
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
+    name: Devnet Tests
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node: [ 18 ]
-    name: Devnet Tests
-    runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres
@@ -203,10 +202,14 @@ jobs:
         image: irowan/heroku-csdk
         ports:
          - 5050:5050
+      cosmos_beta_test_app:
+        image: mhagel1/csdk-beta
+        ports:
+         - 5051:5051
       redis:
         image: redis:latest
         ports:
-          - 6379:6379
+         - 6379:6379
 
     steps:
       - name: Checkout
@@ -227,15 +230,7 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
-          
-      - name: Run Devnet tests
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
-        env:
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-        
+      ## EVM Section:
       - name: Start EVM Testnet
         run: |
           /usr/bin/docker pull trufflesuite/ganache;
@@ -251,3 +246,32 @@ jobs:
 
       - name: Stop EVM Chain
         run: docker stop chain
+
+      ## Cosmos Section:
+      # We only run Cosmos devnet tests if any files in the following folders changes
+      - name: Get changed Cosmos devnet-related files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            packages/commonwealth/test/devnet/cosmos/**/*
+            packages/commonwealth/server/util/cosmosProxy.ts
+            packages/chain-events/cosmos-chain-testing/**/*
+            packages/common-common/src/cosmos-ts/**/*
+
+      - name: Run following steps if any file(s) in the Cosmos folders change
+        if: steps.changed-files-specific.outputs.all_changed_files
+        run: |
+          echo "One or more files in the docs folder has changed."
+          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
+
+      - name: Init Db
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: cd packages/commonwealth && npx sequelize db:migrate
+          
+      - name: Run Devnet tests
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
+        env:
+          PORT: 8080
+          USES_DOCKER_PGSQL: true
