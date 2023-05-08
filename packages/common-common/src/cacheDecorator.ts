@@ -12,6 +12,10 @@ export class CacheDecorator {
 
   // Set redis cache instance
   public setCache(redisCache: RedisCache) {
+    // If cache is disabled, skip caching
+    if (process.env.DISABLE_CACHE) {
+      log.trace(`cacheMiddleware: cache disabled`);
+    }
     this.redisCache = redisCache;
   }
 
@@ -24,9 +28,6 @@ export class CacheDecorator {
     keyGenerator: (req: Request) => string | CacheKeyDuration = defaultKeyGenerator,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): RequestHandler {
-    const initInterceptor = this.initInterceptor.bind(this);
-    const checkCacheAndSendResponseIfFound =
-      this.checkCacheAndSendResponseIfFound.bind(this);
     return async function cache(req, res, next) {
       // If cache is not set, skip caching
       if (!this.redisCache) {
@@ -34,16 +35,13 @@ export class CacheDecorator {
         return next();
       }
 
-      // if you like to skip caching based on some condition, return null from keyGenerator
-      let cacheKey = keyGenerator(req);
-      let cacheDuration = duration;
-      // check if cacheKey is object with cacheKey and cacheDuration
-      // if yes, override duration and cacheKey
-      if (cacheKey && isCacheKeyDuration(cacheKey)) {
-        cacheDuration = cacheKey.cacheDuration;
-        cacheKey = cacheKey.cacheKey;
+      // If cache is disabled, and cache control header is set to no-cache, skip caching
+      if (CacheDecorator.skipCache(req)) {
+        return next();
       }
 
+      // If cache key is not found, skip caching
+      const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(req, keyGenerator, duration);
       if (!cacheKey) {
         log.trace(`Cache key not found for ${req.originalUrl}`);
         return next();
@@ -51,7 +49,7 @@ export class CacheDecorator {
 
       try {
         // Try to fetch the response from Redis cache
-        const found = await checkCacheAndSendResponseIfFound(
+        const found = await this.checkCacheAndSendResponseIfFound(
           res,
           cacheKey,
           namespace
@@ -62,7 +60,7 @@ export class CacheDecorator {
 
         // Response not found in cache, generate it and cache it
         const originalSend = res.send;
-        res.send = initInterceptor(
+        res.send = this.initInterceptor(
           cacheKey,
           namespace,
           cacheDuration,
@@ -158,6 +156,32 @@ export class CacheDecorator {
       }
     }.bind(this);
   }
+
+  private static skipCache(req: Request): boolean {
+    // check for Cache-Control: no-cache header
+    const cacheControl = req.header('Cache-Control');
+    if (cacheControl && cacheControl.includes('no-cache')) {
+      log.trace(`Cache-Control: no-cache header found, skipping cache`);
+      return true
+    }
+    return false;
+  }
+
+  private static calcCacheKeyDuration(req, keyGenerator, duration) {
+    // if you like to skip caching based on some condition, return null from keyGenerator
+    let cacheKey = keyGenerator(req);
+    let cacheDuration = duration;
+    // check if cacheKey is object with cacheKey and cacheDuration
+    // if yes, override duration and cacheKey
+    if (cacheKey && isCacheKeyDuration(cacheKey)) {
+      cacheDuration = cacheKey.cacheDuration;
+      cacheKey = cacheKey.cacheKey;
+    }
+
+    log.trace(`req: ${req.originalUrl}, cacheKey: ${cacheKey}, cacheDuration: ${cacheDuration}`);
+    return { cacheKey, cacheDuration };
+  }
+
 }
 
 export const cacheDecorator = new CacheDecorator();
