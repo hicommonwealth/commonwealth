@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { RangeStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
 import MagicUrl from 'quill-magic-url';
+import ImageUploader from 'quill-image-uploader';
 
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
@@ -22,8 +23,10 @@ import { useClipboardMatchers } from './use_clipboard_matchers';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
+import { useImageUploader } from './use_image_uploader';
 
 Quill.register('modules/magicUrl', MagicUrl);
+Quill.register('modules/imageUploader', ImageUploader);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -63,12 +66,20 @@ const ReactQuillEditor = ({
   // handle clipboard behavior
   const { clipboardMatchers } = useClipboardMatchers();
 
-  // handle image upload
+  // handle image upload for drag and drop
   const { handleImageDropAndPaste } = useImageDropAndPaste({
     editorRef,
+    setContentDelta,
     setIsUploading,
     isMarkdownEnabled,
+  });
+
+  // handle image upload for image toolbar button
+  const { handleImageUploader } = useImageUploader({
+    editorRef,
     setContentDelta,
+    setIsUploading,
+    isMarkdownEnabled,
   });
 
   // handle custom toolbar behavior for markdown
@@ -261,6 +272,9 @@ const ReactQuillEditor = ({
               keyboard: isMarkdownEnabled
                 ? markdownKeyboardShortcuts
                 : undefined,
+              imageUploader: {
+                upload: handleImageUploader,
+              },
             }}
           />
         </>
