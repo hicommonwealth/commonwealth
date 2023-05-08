@@ -137,51 +137,49 @@ export const CWContentPage = (props: ContentPageProps) => {
 
   return (
     <div className={ComponentType.ContentPage}>
-      {viewType === 'sidebarView' && (
-        <div className="sidebar-view">
-          {mainBody}
-          {showSidebar && (
-            <div className="sidebar">
-              {sidebarComponents.map((c) => (
-                <React.Fragment key={c.label}>{c.item}</React.Fragment>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {viewType === 'tabsView' && (
-        <div className="tabs-view">
-          <CWTabBar>
-            <CWTab
-              label={contentBodyLabel}
-              onClick={() => {
-                setTabSelected(0);
-              }}
-              isSelected={tabSelected === 0}
-            />
-            {sidebarComponents.map((item, i) => (
-              <CWTab
-                key={item.label}
-                label={item.label}
-                onClick={() => {
-                  setTabSelected(i + 1);
-                }}
-                isSelected={tabSelected === i + 1}
-              />
+      <div
+        className={`sidebar-view ${viewType !== 'sidebarView' ? 'hidden' : ''}`}
+      >
+        {mainBody}
+        {showSidebar && (
+          <div className="sidebar">
+            {sidebarComponents.map((c) => (
+              <React.Fragment key={c.label}>{c.item}</React.Fragment>
             ))}
-          </CWTabBar>
-          {tabSelected === 0 && mainBody}
-          {sidebarComponents.length >= 1 &&
-            tabSelected === 1 &&
-            sidebarComponents[0].item}
-          {sidebarComponents.length >= 2 &&
-            tabSelected === 2 &&
-            sidebarComponents[1].item}
-          {sidebarComponents.length === 3 &&
-            tabSelected === 3 &&
-            sidebarComponents[2].item}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
+      <div className={`tabs-view ${viewType !== 'tabsView' ? 'hidden' : ''}`}>
+        <CWTabBar>
+          <CWTab
+            label={contentBodyLabel}
+            onClick={() => {
+              setTabSelected(0);
+            }}
+            isSelected={tabSelected === 0}
+          />
+          {sidebarComponents.map((item, i) => (
+            <CWTab
+              key={item.label}
+              label={item.label}
+              onClick={() => {
+                setTabSelected(i + 1);
+              }}
+              isSelected={tabSelected === i + 1}
+            />
+          ))}
+        </CWTabBar>
+        {tabSelected === 0 && mainBody}
+        {sidebarComponents.length >= 1 &&
+          tabSelected === 1 &&
+          sidebarComponents[0].item}
+        {sidebarComponents.length >= 2 &&
+          tabSelected === 2 &&
+          sidebarComponents[1].item}
+        {sidebarComponents.length === 3 &&
+          tabSelected === 3 &&
+          sidebarComponents[2].item}
+      </div>
     </div>
   );
 };
