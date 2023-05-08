@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node ./node_modules/@canvas-js/cli/dist/index.js run contract.js --syncModule $PWD/syncModule.js",
+    "start": "node ./node_modules/@canvas-js/cli/dist/index.js run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js",
     "dev": "$(which -a canvas | tail -1) run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js"
   },
   "engines": {
