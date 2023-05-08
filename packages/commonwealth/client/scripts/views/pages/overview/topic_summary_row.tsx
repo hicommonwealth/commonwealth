@@ -24,11 +24,12 @@ import { useCommonNavigate } from 'navigation/helpers';
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
   pinnedThreads: Array<Thread>;
+  allThreadsCount: number;
   topic: Topic;
 };
 
 export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
-  const { monthlyThreads, pinnedThreads, topic } = props;
+  const { monthlyThreads, pinnedThreads, topic, allThreadsCount } = props;
   const navigate = useCommonNavigate();
 
   const topSortedThreads = monthlyThreads
@@ -74,7 +75,7 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
             fontWeight="medium"
             className="threads-count-text"
           >
-            {monthlyThreads.length} Threads
+            {allThreadsCount} Threads
           </CWText>
         </div>
         {topic.description && <CWText type="b2">{topic.description}</CWText>}
@@ -159,7 +160,7 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                         e.stopPropagation();
                       }}
                     >
-                      <SharePopover />
+                      <SharePopover discussionLink={discussionLink}/>
                     </div>
                     {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
                     {/* {isAdminOrMod && (

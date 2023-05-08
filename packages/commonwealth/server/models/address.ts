@@ -2,7 +2,7 @@ import type { WalletId } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes, ChainInstance } from './chain';
-import type { ProfileInstance } from './profile';
+import type { ProfileAttributes, ProfileInstance } from './profile';
 import type {
   RoleAssignmentAttributes,
   RoleAssignmentInstance,
@@ -32,6 +32,7 @@ export type AddressAttributes = {
   wallet_id?: WalletId;
   // associations
   Chain?: ChainAttributes;
+  Profile?: ProfileAttributes;
   User?: UserAttributes;
   RoleAssignments?: RoleAssignmentAttributes[];
   SsoToken?: SsoTokenAttributes;

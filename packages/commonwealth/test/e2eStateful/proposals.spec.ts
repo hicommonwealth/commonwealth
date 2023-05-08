@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { PORT } from '../../server/config';
 
 test.describe('Community proposals page', () => {
-  test.beforeEach(async ({ page }) => {
-    test.setTimeout(60000);
+  test.beforeEach(async () => {
+    test.setTimeout(30000);
   });
 
   // Using same tests for both gov modules, so extracted first:
@@ -17,20 +17,31 @@ test.describe('Community proposals page', () => {
   };
 
   const inactiveProposalCardsTest = async ({ page }, expectedMinimumCount) => {
+    await waitForCompletedProposals({ page });
     const inactiveCardsContainer = await page
       .locator('.CardsCollection .cards')
       .nth(1);
-    await page.waitForSelector('.ProposalCard', {
-      timeout: 60000,
-      strict: false,
-    });
+
     const cardCount = await inactiveCardsContainer
       .locator('.ProposalCard')
       .count();
     await expect(cardCount).toBeGreaterThanOrEqual(expectedMinimumCount);
   };
 
+  const waitForCompletedProposals = async ({ page }) => {
+    // these are lazy-loaded after page init
+    await page.waitForSelector(
+      '.CardsCollection:nth-of-type(2) .ProposalCard .proposal-card-metadata',
+      {
+        timeout: 60000,
+        strict: false,
+      }
+    );
+  };
+
   const inactiveProposalPageTest = async ({ page }) => {
+    test.setTimeout(70000);
+    await waitForCompletedProposals({ page });
     const inactiveCardsContainer = await page
       .locator('.CardsCollection .cards')
       .nth(1);
@@ -84,7 +95,7 @@ test.describe('Community proposals page', () => {
     });
     test('Active header loads', headerTest);
     test('Inactive proposal cards load', ({ page }) =>
-      inactiveProposalCardsTest({ page }, 412)); // as of commit, should never be less than 412
+      inactiveProposalCardsTest({ page }, 431)); // as of commit, should never be less than 431
     test('Inactive proposal page loads', inactiveProposalPageTest);
   });
 });
