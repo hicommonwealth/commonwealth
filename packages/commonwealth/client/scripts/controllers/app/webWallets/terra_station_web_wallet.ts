@@ -1,5 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
+import type Account from '../../../models/Account';
+import type IWebWallet from '../../../models/IWebWallet';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 

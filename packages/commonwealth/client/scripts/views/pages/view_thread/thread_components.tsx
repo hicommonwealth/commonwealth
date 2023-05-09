@@ -4,17 +4,11 @@ import 'pages/view_proposal/proposal_header_links.scss';
 import 'pages/view_thread/thread_components.scss';
 
 import app from 'state';
-import {
-  externalLink,
-  extractDomain,
-  pluralize,
-  threadStageToLabel,
-} from 'helpers';
+import { externalLink, extractDomain, pluralize, threadStageToLabel } from '../../../helpers/index';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import type Thread from '../../../models/Thread';
-import { ThreadStage as ThreadStageType } from '../../../models/types';
-
+import { ThreadStage } from '../../../models/types';
 import {
   Popover,
   usePopover,
@@ -72,7 +66,7 @@ export const ThreadAuthor = (props: ThreadComponentProps) => {
   );
 };
 
-export const ThreadStage = (props: ThreadComponentProps) => {
+export const ThreadStageComponent = (props: ThreadComponentProps) => {
   const { thread } = props;
   const navigate = useCommonNavigate();
 
@@ -82,13 +76,13 @@ export const ThreadStage = (props: ThreadComponentProps) => {
       className={getClasses<{ stage: 'negative' | 'positive' }>(
         {
           stage:
-            thread.stage === ThreadStageType.ProposalInReview
+            thread.stage === ThreadStage.ProposalInReview
               ? 'positive'
-              : thread.stage === ThreadStageType.Voting
+              : thread.stage === ThreadStage.Voting
               ? 'positive'
-              : thread.stage === ThreadStageType.Passed
+              : thread.stage === ThreadStage.Passed
               ? 'positive'
-              : thread.stage === ThreadStageType.Failed
+              : thread.stage === ThreadStage.Failed
               ? 'negative'
               : 'positive',
         },
