@@ -7,13 +7,14 @@ import type Web3 from 'web3';
 
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
+import * as siwe from "siwe"
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import { getEIP712SignableSession } from 'adapters/chain/ethereum/keys';
+import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -76,14 +77,17 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     account: Account,
     sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = await getEIP712SignableSession(
-      sessionPayload
-    );
+    const nonce = siwe.generateNonce();
+    // TODO: what is the actual value for this?
+    const domain = "Commonwealth";
+    const message = createSiweMessage(sessionPayload, domain, nonce);
+
     const signature = await this._web3.givenProvider.request({
-      method: 'eth_signTypedData_v4',
-      params: [account.address, JSON.stringify(typedCanvasMessage)],
+      method: 'personal_sign',
+      params: [account.address, message]
     });
-    return signature;
+
+    return `${domain}/${nonce}/${signature}`;
   }
 
   // ACTIONS

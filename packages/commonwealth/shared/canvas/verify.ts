@@ -2,8 +2,8 @@ import type { Action, Session } from '@canvas-js/interfaces';
 import { import_ } from '@brillout/import';
 
 import {
+  createSiweMessage,
   getEIP712SignableAction,
-  getEIP712SignableSession,
 } from '../adapters/chain/ethereum/keys';
 import {
   getADR036SignableSession,
@@ -72,14 +72,18 @@ export const verify = async ({
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
-      const ethSigUtil = await import('@metamask/eth-sig-util');
-      const { types, domain, message } =
-        getEIP712SignableSession(sessionPayload);
-      const recoveredAddr = ethSigUtil.recoverTypedSignature({
-        data: { types, domain, message, primaryType: 'Message' as const },
-        signature,
-        version: ethSigUtil.SignTypedDataVersion.V4,
-      });
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
+      const signaturePatternMatch = signaturePattern.exec(signature)
+      if (signaturePatternMatch === null) {
+        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch
+
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce)
+
+      const ethersUtils = (await import('ethers')).utils;
+      const recoveredAddr = ethersUtils.verifyMessage(siweMessage, signatureData)
+
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (chainBase === ChainBase.CosmosSDK) {

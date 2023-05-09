@@ -1,12 +1,9 @@
-import {
-  recoverTypedSignature,
-  SignTypedDataVersion,
-} from '@metamask/eth-sig-util';
 import type { KeyringOptions } from '@polkadot/keyring/types';
 import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
+import { verifyMessage } from 'ethers/lib/utils';
 
 import {
   ChainBase,
@@ -16,7 +13,7 @@ import {
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 
-import { getEIP712SignableSession } from '../../shared/adapters/chain/ethereum/keys';
+import { createSiweMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
 import { addressSwapper } from '../../shared/utils';
 import { createCanvasSessionPayload, chainBaseToCanvasChainId } from '../../shared/canvas';
@@ -249,18 +246,23 @@ const verifySessionSignature = async (
     // ethereum address handling
     //
     try {
-      const typedCanvasMessage = getEIP712SignableSession(canvasSessionPayload);
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
+      const signaturePatternMatch = signaturePattern.exec(signatureString)
+      if (signaturePatternMatch === null) {
+        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch
+
+      const siweMessage = createSiweMessage(canvasSessionPayload, domain, nonce)
 
       if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(
           `Eth verification failed for ${addressModel.address}: signed a different block than expected`
         );
       }
-      const address = recoverTypedSignature({
-        data: typedCanvasMessage,
-        signature: signatureString.trim(),
-        version: SignTypedDataVersion.V4,
-      });
+
+      const address = verifyMessage(siweMessage, signatureData)
+
       isValid = addressModel.address.toLowerCase() === address.toLowerCase();
       if (!isValid) {
         log.info(

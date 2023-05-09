@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
+import { personalSign, signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import type BN from 'bn.js';
@@ -8,6 +8,7 @@ import 'chai/register-should';
 import { BalanceType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
+import * as siwe from "siwe";
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from 'server/util/roles';
 import type { Action, Session, ActionPayload, SessionPayload } from '@canvas-js/interfaces';
@@ -27,9 +28,9 @@ import type { Permission } from '../../server/models/role';
 
 import {
   getEIP712SignableAction,
-  getEIP712SignableSession,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
+  createSiweMessage,
 } from '../../shared/adapters/chain/ethereum/keys';
 import { Link, LinkSource } from 'server/models/thread';
 
@@ -109,11 +110,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
-    const signature = signTypedData({
+    const nonce = siwe.generateNonce();
+    const domain = "Commonwealth";
+    const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
+    const signatureData = personalSign({
       privateKey: keypair.getPrivateKey(),
-      data: getEIP712SignableSession(sessionPayload),
-      version: SignTypedDataVersion.V4,
+      data: siweMessage
     });
+    const signature = `${domain}/${nonce}/${signatureData}`
     const session: Session = {
       type: 'session',
       payload: sessionPayload,
