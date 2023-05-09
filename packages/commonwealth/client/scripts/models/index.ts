@@ -1,6 +1,3 @@
-export { default as ChainInfo } from './ChainInfo';
-export { default as DiscussionDraft } from './DiscussionDraft';
-export { default as IChainAdapter } from './IChainAdapter';
 export { default as ITokenAdapter } from './ITokenAdapter';
 export { default as IWebWallet } from './IWebWallet';
 export { default as NodeInfo } from './NodeInfo';
