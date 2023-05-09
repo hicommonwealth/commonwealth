@@ -69,8 +69,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     sessionPayload: SessionPayload
   ): Promise<string> {
     const nonce = siwe.generateNonce();
-    // TODO: what is the actual value for this?
-    const domain = "Commonwealth";
+    // this must be open-ended, because of custom domains
+    const domain = document.location.origin;
     const message = createSiweMessage(sessionPayload, domain, nonce);
 
     const signature = await this._provider.wc.signMessage([

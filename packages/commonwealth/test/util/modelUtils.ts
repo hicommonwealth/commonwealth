@@ -111,7 +111,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       TEST_BLOCK_INFO_BLOCKHASH
     );
     const nonce = siwe.generateNonce();
-    const domain = "Commonwealth";
+    const domain = "https://commonwealth.test";
     const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
     const signatureData = personalSign({
       privateKey: keypair.getPrivateKey(),

@@ -85,7 +85,7 @@ describe('API Tests', () => {
       createSiweMessage
       // const data = getEIP712SignableSession(message);
       const nonce = siwe.generateNonce();
-      const domain = "Commonwealth"
+      const domain = "https://commonwealth.test"
       const siweMessage = createSiweMessage(message, domain, nonce)
       const privateKey = keypair.getPrivateKey();
       const signatureData = personalSign({privateKey, data: siweMessage})
