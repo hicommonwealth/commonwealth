@@ -24,16 +24,23 @@ describe('Linking Tests', () => {
   let adminJWT;
   let adminAddress;
   let adminAddressId;
+  let adminSession;
   let userJWT;
   let userId;
   let userAddress;
   let userAddressId;
+  let userSession;
   let thread1: ThreadInstance;
   let thread2: ThreadInstance;
-  const link1 = { source: LinkSource.Snapshot, identifier: '0x1234567', title: 'my snapshot' };
+  const link1 = {
+    source: LinkSource.Snapshot,
+    identifier: '0x1234567',
+    title: 'my snapshot',
+  };
   const link2 = { source: LinkSource.Thread, identifier: '2' };
   const link3 = { source: LinkSource.Proposal, identifier: '123' };
   const link4 = { source: LinkSource.Thread, identifier: '3' };
+  const link5 = { source: LinkSource.Proposal, identifier: '4' };
 
   before(async () => {
     await resetDatabase();
@@ -46,6 +53,7 @@ describe('Linking Tests', () => {
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
+    adminSession = { session: res.session, sign: res.sign };
     expect(adminAddress).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
@@ -55,6 +63,7 @@ describe('Linking Tests', () => {
     userId = res.user_id;
     userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
@@ -69,6 +78,8 @@ describe('Linking Tests', () => {
         topicId,
         body,
         jwt: userJWT,
+        session: userSession.session,
+        sign: userSession.sign,
       })
     ).result;
 
@@ -83,6 +94,8 @@ describe('Linking Tests', () => {
         topicId,
         body,
         jwt: adminJWT,
+        session: adminSession.session,
+        sign: adminSession.sign,
       })
     ).result;
   });
@@ -98,7 +111,7 @@ describe('Linking Tests', () => {
       expect(result.result).to.not.be.null;
       expect(result.result.links[0].source).to.equal(link1.source.toString());
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
-      expect(result.result.links[0].title).to.equal('my snapshot')
+      expect(result.result.links[0].title).to.equal('my snapshot');
     });
     it('should add multiple links to existing links', async () => {
       const result = await modelUtils.createLink({
@@ -153,6 +166,24 @@ describe('Linking Tests', () => {
       expect(result.result.links.length).to.equal(4);
       expect(result.result.links[3].source).to.equal(link4.source.toString());
       expect(result.result.links[3].identifier).to.equal(link4.identifier);
+    });
+    it('should allow admin to link any Thread', async () => {
+      const result = await modelUtils.createLink({
+        jwt: adminJWT,
+        thread_id: thread1.id,
+        links: [link5],
+      });
+      expect(result.status).to.equal('Success');
+      expect(result.result).to.not.be.null;
+      expect(result.result.links.length).to.equal(5);
+      const result2 = await modelUtils.deleteLink({
+        jwt: adminJWT,
+        thread_id: thread1.id,
+        links: [link5],
+      });
+      expect(result2.status).to.equal('Success');
+      expect(result2.result).to.not.be.null;
+      expect(result2.result.links.length).to.equal(4);
     });
   });
 

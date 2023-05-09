@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node ./node_modules/@canvas-js/cli/dist/index.js run contract.js --syncModule $PWD/syncModule.js",
+    "start": "node ./node_modules/@canvas-js/cli/dist/index.js run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js",
     "dev": "$(which -a canvas | tail -1) run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js"
   },
   "engines": {
@@ -15,9 +15,9 @@
     "url": "git+https://github.com/hicommonwealth/canvas-node.git"
   },
   "dependencies": {
-    "@canvas-js/chain-ethereum": "^0.4.11",
-    "@canvas-js/core": "^0.4.11",
-    "@canvas-js/cli": "^0.4.11",
+    "@canvas-js/chain-ethereum": "^0.5.0-alpha",
+    "@canvas-js/core": "^0.5.0-alpha",
+    "@canvas-js/cli": "^0.5.0-alpha",
     "chalk": "^5.2.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
