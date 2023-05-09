@@ -16,6 +16,7 @@ import type { RuleAttributes } from '../../../../server/models/rule';
 
 const Op = Sequelize.Op;
 
+/* eslint-disable import/no-mutable-exports */
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];

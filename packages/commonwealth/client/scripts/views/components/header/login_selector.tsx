@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events';
 import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
@@ -16,7 +15,8 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
-import { isSameAccount, pluralize, setDarkMode } from 'helpers';
+import { isSameAccount, pluralize } from 'helpers';
+import { setDarkMode } from 'helpers/darkMode';
 import type { Account } from 'models';
 import { AddressInfo, ITokenAdapter } from 'models';
 
@@ -302,7 +302,7 @@ export const LoginSelector = () => {
 
   useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
-  }, [])
+  }, [app.user.activeAccount]);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
@@ -504,37 +504,37 @@ export const LoginSelector = () => {
     }
   }
 
-  console.log(isJoined);
   return (
     <>
       <div className="LoginSelector">
-        {app.chain &&
-          !app.chainPreloading &&
-          profileLoadComplete &&
-          !isJoined && (
-            <div className="join-button-container">
-              <CWButton
-                buttonType="tertiary-black"
-                onClick={async () => {
+        {app.chain && !app.chainPreloading && profileLoadComplete && !isJoined && (
+          <div className="join-button-container">
+            <CWButton
+              buttonType="tertiary-black"
+              onClick={async () => {
+                if (sameBaseAddressesRemoveDuplicates.length === 0) {
+                  setIsLoginModalOpen(true);
+                } else {
                   if (hasTermsOfService) {
                     setIsTOSModalOpen(true);
                   } else {
                     await performJoinCommunityLinking();
                     setIsJoined(true);
                   }
-                }}
-                label={
-                  sameBaseAddressesRemoveDuplicates.length === 0
-                    ? `No ${
-                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                        ''
-                      } address`
-                    : 'Join'
                 }
-              />
-            </div>
-          )}
+              }}
+              label={
+                sameBaseAddressesRemoveDuplicates.length === 0
+                  ? `No ${
+                      CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                      CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                      ''
+                    } address`
+                  : 'Join'
+              }
+            />
+          </div>
+        )}
         {profileLoadComplete && (
           <ClickAwayListener
             onClickAway={() => {
@@ -611,6 +611,17 @@ export const LoginSelector = () => {
         }
         onClose={() => setIsTOSModalOpen(false)}
         open={isTOSModalOpen}
+      />
+      <Modal
+        content={
+          <LoginModal
+            onSuccess={() => setIsJoined(true)}
+            onModalClose={() => setIsLoginModalOpen(false)}
+          />
+        }
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsLoginModalOpen(false)}
+        open={isLoginModalOpen}
       />
     </>
   );

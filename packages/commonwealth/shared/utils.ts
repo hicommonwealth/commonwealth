@@ -71,10 +71,10 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getThreadUrl = (proposal, comment?) => {
-  const aId = proposal.chain;
-  const tId = proposal.type_id || proposal.id;
-  const tTitle = proposal.title ? `-${slugify(proposal.title)}` : '';
+export const getThreadUrl = (thread, comment?) => {
+  const aId = thread.chain;
+  const tId = thread.type_id || thread.id;
+  const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
   const cId = comment ? `?comment=${comment.id}` : '';
 
   return process.env.NODE_ENV === 'production'

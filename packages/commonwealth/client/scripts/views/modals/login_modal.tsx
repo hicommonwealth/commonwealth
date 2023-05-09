@@ -26,7 +26,7 @@ import type { ProfileRowProps } from '../components/component_kit/cw_profiles_li
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import { setDarkMode } from '../../helpers';
+import { setDarkMode } from '../../helpers/darkMode';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -303,6 +303,13 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           );
         }
         await logInWithAccount(this.primaryAccount, false);
+        // Important: when we first create an account and verify it, the user id
+        // is initially null from api (reloading the page will update it), to correct
+        // it we need to get the id from api
+        await app.newProfiles.updateProfileForAccount(
+          this.primaryAccount.profile.address,
+          {}
+        );
       } catch (e) {
         console.log(e);
         notifyError('Failed to create account. Please try again.');

@@ -2,17 +2,17 @@ import { ProposalType } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
 
-import type { ChainEntity, Comment, Poll, Topic } from 'models';
+import type { Comment, Poll, Topic } from 'models';
 import { Thread, ThreadStage as ThreadStageType } from 'models';
 import type { IThreadCollaborator } from 'models/Thread';
+import { Link, LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
@@ -45,6 +45,8 @@ import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import { filterLinks } from 'helpers/threads';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -80,8 +82,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
-  const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
-    useState(false);
+  const [
+    isEditCollaboratorsModalOpen,
+    setIsEditCollaboratorsModalOpen,
+  ] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -414,13 +418,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageNotFound />;
   }
 
-  if (
-    !app.newProfiles.allLoaded() &&
-    !prefetch[threadId]?.['profilesFinished']
-  ) {
-    return <PageLoading />;
-  }
-
   if (!thread) {
     return <PageLoading />;
   }
@@ -460,14 +457,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     getCommentSubscription(thread)?.isActive &&
     getReactionSubscription(thread)?.isActive;
 
+  const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+
   const showLinkedProposalOptions =
-    thread.snapshotProposal?.length > 0 ||
-    thread.chainEntities?.length > 0 ||
+    linkedSnapshots.length > 0 ||
+    linkedProposals.length > 0 ||
     isAuthor ||
     isAdminOrMod;
 
   const showLinkedThreadOptions =
-    thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
+    linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
   const canComment =
     app.user.activeAccount ||
@@ -485,16 +486,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasEditPerms = isAuthor || isEditor;
 
-  const handleLinkedThreadChange = (linkedThreads: Thread[]) => {
-    const linkedThreadsRelations = linkedThreads.map((t) => ({
-      id: '',
-      linkedThread: String(t.id),
-      linkingThread: String(thread.id),
-    }));
-
+  const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({
       ...thread,
-      linkedThreads: linkedThreadsRelations,
+      links,
     });
 
     setThread(updatedThread);
@@ -502,17 +497,81 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const handleLinkedProposalChange = (
     stage: ThreadStageType,
-    chainEntities: ChainEntity[] = [],
-    snapshotProposal: SnapshotProposal[] = []
+    links: Link[] = []
   ) => {
     const newThread = {
       ...thread,
       stage,
-      chainEntities,
-      snapshotProposal: snapshotProposal[0]?.id,
+      links,
     } as Thread;
 
     setThread(newThread);
+  };
+
+  const handleDeleteThread = () => {
+    openConfirmation({
+      title: 'Delete Thread',
+      description: <>Delete this entire thread?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              app.threads.delete(thread).then(() => {
+                navigate('/discussions');
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+      ],
+    });
+  };
+
+  const handleEditThread = async (e) => {
+    e.preventDefault();
+    const editsToSave = localStorage.getItem(
+      `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+    );
+
+    if (editsToSave) {
+      clearEditingLocalStorage(thread.id, ContentType.Thread);
+
+      setSavedEdits(editsToSave || '');
+
+      openConfirmation({
+        title: 'Info',
+        description: <>Previous changes found. Restore edits?</>,
+        buttons: [
+          {
+            label: 'Restore',
+            buttonType: 'mini-black',
+            onClick: () => {
+              setShouldRestoreEdits(true);
+              setIsGloballyEditing(true);
+              setIsEditingBody(true);
+            },
+          },
+          {
+            label: 'Cancel',
+            buttonType: 'mini-white',
+            onClick: () => {
+              setIsGloballyEditing(true);
+              setIsEditingBody(true);
+            },
+          },
+        ],
+      });
+    } else {
+      setIsGloballyEditing(true);
+      setIsEditingBody(true);
+    }
   };
 
   const getActionMenuItems = (): PopoverMenuItem[] => {
@@ -522,25 +581,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Edit',
               iconLeft: 'write' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-                setSavedEdits(
-                  localStorage.getItem(
-                    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
-                  )
-                );
-
-                if (savedEdits) {
-                  clearEditingLocalStorage(thread.id, ContentType.Thread);
-                  const confirmation = window.confirm(
-                    'Previous changes found. Restore edits?'
-                  );
-                  setShouldRestoreEdits(confirmation);
-                }
-
-                setIsGloballyEditing(true);
-                setIsEditingBody(true);
-              },
+              onClick: handleEditThread,
             },
           ]
         : []),
@@ -571,15 +612,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Delete',
               iconLeft: 'trash' as const,
-              onClick: async () => {
-                const confirmed = window.confirm('Delete this entire thread?');
-
-                if (!confirmed) return;
-
-                app.threads.delete(thread).then(() => {
-                  navigate('/discussions');
-                });
-              },
+              onClick: handleDeleteThread,
             },
           ]
         : []),
@@ -600,6 +633,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     setRecentlyEdited(true);
                     notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
                   });
+                setThread(
+                  new Thread({ ...thread, readOnly: !thread.readOnly })
+                );
               },
             },
           ]

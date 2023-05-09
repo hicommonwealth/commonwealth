@@ -34,9 +34,9 @@ const ContractsPage = () => {
   return (
     <Sublayout>
       <div className="ContractsPage">
-        <CWBreadcrumbs breadcrumbs={[{ label: 'Contracts', path: '' }]} />
+        <CWBreadcrumbs breadcrumbs={[{ label: 'Contracts' }]} />
         <div className="header-container">
-          <CWText type="h3">Contracts</CWText>
+          <CWText type="h3">Contract Action Templates</CWText>
           <CWButton
             buttonType="mini-white"
             label="Add Contract"

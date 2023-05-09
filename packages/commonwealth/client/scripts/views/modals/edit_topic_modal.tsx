@@ -22,6 +22,7 @@ import {
   deserializeDelta,
   serializeDelta,
 } from '../components/react_quill_editor/utils';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -93,21 +94,31 @@ export const EditTopicModal = ({
   };
 
   const handleDeleteTopic = async () => {
-    const confirmed = window.confirm('Delete this topic?');
+    openConfirmation({
+      title: 'Warning',
+      description: <>Delete this topic?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            const topicInfo = {
+              id,
+              name: name,
+              chainId: app.activeChainId(),
+            };
 
-    if (!confirmed) {
-      return;
-    }
+            await app.topics.remove(topicInfo);
 
-    const topicInfo = {
-      id,
-      name: name,
-      chainId: app.activeChainId(),
-    };
-
-    await app.topics.remove(topicInfo);
-
-    navigate('/');
+            navigate('/');
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-white',
+        },
+      ],
+    });
   };
 
   return (

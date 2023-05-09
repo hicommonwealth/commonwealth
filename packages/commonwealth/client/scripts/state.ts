@@ -29,7 +29,6 @@ import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
-import { redraw } from 'mithrilInterop';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -67,6 +66,9 @@ export interface IApp {
   reactionCounts: ReactionCountsController;
   polls: PollsController;
   threadUpdateEmitter: EventEmitter;
+
+  // Proposals
+  proposalEmitter: EventEmitter;
 
   // Search
   search: SearchController;
@@ -164,6 +166,9 @@ const app: IApp = {
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
   threadUpdateEmitter: new EventEmitter(),
+
+  // Proposals
+  proposalEmitter: new EventEmitter(),
 
   // Community
   communities: new CommunitiesController(),
@@ -272,10 +277,9 @@ export async function initAppState(
           });
 
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories =
-          data.result.notificationCategories.map((json) =>
-            NotificationCategory.fromJSON(json)
-          );
+        app.config.notificationCategories = data.result.notificationCategories.map(
+          (json) => NotificationCategory.fromJSON(json)
+        );
         app.config.chainCategories = data.result.chainCategories;
         app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 
@@ -295,7 +299,7 @@ export async function initAppState(
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
-          app.user.notifications.refresh().then(() => redraw());
+          app.user.notifications.refresh(); // TODO: redraw if needed
           app.loginStateEmitter.emit('redraw');
         } else if (
           app.loginState === LoginState.LoggedOut &&

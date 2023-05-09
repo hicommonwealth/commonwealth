@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import moment from 'moment';
 
 import 'pages/search/index.scss';
@@ -17,6 +17,13 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 
 const getDiscussionResult = (thread, searchTerm, setRoute) => {
+  let title = '';
+  try {
+    title = decodeURIComponent(thread.title);
+  } catch (err) {
+    title = thread.title;
+  }
+
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
@@ -36,10 +43,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
           {`discussion - ${thread.chain}`}
         </CWText>
         <CWText className="search-results-thread-title" fontWeight="medium">
-          {renderTruncatedHighlights(
-            searchTerm,
-            decodeURIComponent(thread.title)
-          )}
+          {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
@@ -56,7 +60,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
             {moment(thread.created_at).fromNow()}
           </CWText>
         </div>
-        <CWText noWrap>
+        <CWText>
           <QuillRenderer
             hideFormatting={true}
             doc={thread.body}
@@ -106,7 +110,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
             {moment(comment.created_at).fromNow()}
           </CWText>
         </div>
-        <CWText noWrap>
+        <CWText>
           <QuillRenderer
             hideFormatting={true}
             doc={comment.text}
@@ -118,6 +122,12 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
   );
 };
 
+/**
+ *  This function sets the route to go to the search result (i.e. a community).
+ *  At this point the route is /:scope/search where :scope is the current community id.
+ *  The route should be set to /<community-id>, so null should be passed instead of a prefix,
+ *  as defined in the useCommonNavigate hook and the getScopePrefix helper function.
+ */
 const getCommunityResult = (community, setRoute) => {
   const params =
     community.SearchContentType === SearchContentType.Token
@@ -178,19 +188,19 @@ export const getListing = (
 ) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
 
-  const tabScopedResults = results[searchType]
-    .map((res) => {
-      return res.searchType === SearchScope.Threads
-        ? getDiscussionResult(res, searchTerm, setRoute)
-        : res.searchType === SearchScope.Members
-        ? getMemberResult(res, setRoute)
-        : res.searchType === SearchScope.Communities
-        ? getCommunityResult(res, setRoute)
-        : res.searchType === SearchScope.Replies
-        ? getCommentResult(res, searchTerm, setRoute)
-        : null;
-    })
-    .slice(0, 50);
+  const tabScopedResults = results[searchType].map((res) => {
+    return res.searchType === SearchScope.Threads ? (
+      getDiscussionResult(res, searchTerm, setRoute)
+    ) : res.searchType === SearchScope.Members ? (
+      getMemberResult(res, setRoute)
+    ) : res.searchType === SearchScope.Communities ? (
+      getCommunityResult(res, setRoute)
+    ) : res.searchType === SearchScope.Replies ? (
+      getCommentResult(res, searchTerm, setRoute)
+    ) : (
+      <>ERROR</>
+    );
+  });
 
   return tabScopedResults;
 };

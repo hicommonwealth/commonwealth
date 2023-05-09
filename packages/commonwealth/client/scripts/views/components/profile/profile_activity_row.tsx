@@ -6,19 +6,20 @@ import 'components/profile/profile_activity_row.scss';
 
 import app from 'state';
 import type Thread from 'client/scripts/models/Thread';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import withRouter, {
+  navigateToCommunity,
+  useCommonNavigate,
+} from 'navigation/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/cw_tag';
-import { renderQuillTextBody } from '../react_quill_editor/helpers';
 import type { CommentWithAssociatedThread } from './profile_activity';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
 };
-
-const PROD_URL = 'https://commonwealth.im';
 
 const ProfileActivityRow = (props: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
@@ -37,38 +38,34 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
       decodedTitle = decodeURIComponent(comment.thread?.title);
     }
   } catch (err) {
-    console.error(`Could not decode title: "${title}"`);
-    decodedTitle = title;
+    // If we get an error trying to decode URI component, see if it passes when we first encode it.
+    // (Maybe it has % Sign in the title)
+    try {
+      if (isThread) {
+        decodedTitle = decodeURIComponent(encodeURIComponent(title));
+      } else {
+        decodedTitle = decodeURIComponent(encodeURIComponent(comment.thread?.title));
+      }
+    } catch (e) {
+      console.error(`Could not decode title: "${title ? title : comment.thread?.title}"`);
+      decodedTitle = title;
+    }
   }
 
   const renderTrigger = (onclick) => (
     <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
   );
 
-  const handleClickLink = (path) => {
-    const isExternalLink = chain !== app.customDomainId();
-
-    if (!app.isCustomDomain()) {
-      navigate(path, {}, chain);
-    } else {
-      if (isExternalLink) {
-        window.open(`${PROD_URL}/${chain}${path}`);
-      } else {
-        navigate(path);
-      }
-    }
-  };
-
   return (
     <div className="ProfileActivityRow">
       <div className="chain-info">
-        <img src={iconUrl} />
+        <img src={iconUrl} alt="chain-logo" />
         <CWText fontWeight="semiBold" className="link">
           <a
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleClickLink(`/discussions`);
+              navigateToCommunity({ navigate, path: `/discussions`, chain });
             }}
           >
             {chain}
@@ -94,7 +91,11 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleClickLink(`/discussion/${id}`);
+                navigateToCommunity({
+                  navigate,
+                  path: `/discussion/${id}`,
+                  chain,
+                });
               }}
             >
               {title}
@@ -104,9 +105,11 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleClickLink(
-                  `/discussion/${comment.thread?.id}?comment=${comment.id}`
-                );
+                navigateToCommunity({
+                  navigate,
+                  path: `/discussion/${comment.thread?.id}?comment=${comment.id}`,
+                  chain,
+                });
               }}
             >
               {decodedTitle}
@@ -116,9 +119,7 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
       </div>
       <div className="content">
         <CWText type="b2" className="gray-text">
-          {isThread
-            ? renderQuillTextBody(body)
-            : renderQuillTextBody(comment.text)}
+          <QuillRenderer doc={isThread ? body : comment.text} />
         </CWText>
         <div className="actions">
           <PopoverMenu

@@ -5,14 +5,17 @@ import { AppError } from 'common-common/src/errors';
 import type { Express } from 'express';
 import type { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { cosmosCacheLCD, cosmosCacheRPC } from './cosmosCache';
 
 const log = factory.getLogger(formatFilename(__filename));
+const defaultCacheDuration = 60 * 10; // 10 minutes
 
 function setupCosmosProxy(app: Express, models: DB) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:chain',
     bodyParser.text(),
+    cosmosCacheRPC(defaultCacheDuration),
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
@@ -48,6 +51,7 @@ function setupCosmosProxy(app: Express, models: DB) {
   app.use(
     '/cosmosLCD/:chain',
     bodyParser.text(),
+    cosmosCacheLCD(defaultCacheDuration),
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {

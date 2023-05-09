@@ -4,7 +4,11 @@ import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
-import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
+import {
+  CosmosProposal,
+  CosmosVote,
+} from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
@@ -23,7 +27,7 @@ import {
 import type { AnyProposal } from 'models';
 import { VotingType } from 'models';
 
-import app, { LoginState } from 'state';
+import app from 'state';
 
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
@@ -87,7 +91,10 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   let user;
 
-  if (proposal instanceof CosmosProposal) {
+  if (
+    proposal instanceof CosmosProposal ||
+    proposal instanceof CosmosProposalV1
+  ) {
     user = app.user.activeAccount as CosmosAccount;
   } else if (
     proposal instanceof CompoundProposal ||
@@ -100,34 +107,46 @@ export const VotingActions = (props: VotingActionsProps) => {
     return <CannotVote label="Unrecognized proposal type" />;
   }
 
+  const emitRedraw = () => {
+    app.proposalEmitter.emit('redraw');
+  };
+
   const voteYes = async (e) => {
     e.preventDefault();
     toggleVotingModal(true);
 
-    if (proposal instanceof CosmosProposal) {
+    if (
+      proposal instanceof CosmosProposal ||
+      proposal instanceof CosmosProposalV1
+    ) {
       if (proposal.status === 'DepositPeriod') {
         // TODO: configure deposit amount
         proposal
           .submitDepositTx(user, (app.chain as Cosmos).chain.coins(amount))
+          .then(emitRedraw)
           .catch((err) => notifyError(err.toString()));
       } else {
         proposal
           .voteTx(new CosmosVote(user, 'Yes'))
+          .then(emitRedraw)
           .catch((err) => notifyError(err.toString()));
       }
     } else if (proposal instanceof CompoundProposal) {
       proposal
         .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else if (proposal instanceof AaveProposal) {
       proposal
         .submitVoteWebTx(new AaveProposalVote(user, true))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
           new NearSputnikVote(user, NearSputnikVoteString.Approve)
         )
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else {
       toggleVotingModal(false);
@@ -139,23 +158,30 @@ export const VotingActions = (props: VotingActionsProps) => {
     e.preventDefault();
     toggleVotingModal(true);
 
-    if (proposal instanceof CosmosProposal) {
+    if (
+      proposal instanceof CosmosProposal ||
+      proposal instanceof CosmosProposalV1
+    ) {
       proposal
         .voteTx(new CosmosVote(user, 'No'))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else if (proposal instanceof CompoundProposal) {
       proposal
         .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else if (proposal instanceof AaveProposal) {
       proposal
         .submitVoteWebTx(new AaveProposalVote(user, false))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
           new NearSputnikVote(user, NearSputnikVoteString.Reject)
         )
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else {
       toggleVotingModal(false);
@@ -167,9 +193,13 @@ export const VotingActions = (props: VotingActionsProps) => {
     e.preventDefault();
     toggleVotingModal(true);
 
-    if (proposal instanceof CosmosProposal) {
+    if (
+      proposal instanceof CosmosProposal ||
+      proposal instanceof CosmosProposalV1
+    ) {
       proposal
         .voteTx(new CosmosVote(user, 'Abstain'))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else if (
       proposal instanceof CompoundProposal &&
@@ -177,6 +207,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     ) {
       proposal
         .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.ABSTAIN))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else {
       toggleVotingModal(false);
@@ -188,9 +219,13 @@ export const VotingActions = (props: VotingActionsProps) => {
     e.preventDefault();
     toggleVotingModal(true);
 
-    if (proposal instanceof CosmosProposal) {
+    if (
+      proposal instanceof CosmosProposal ||
+      proposal instanceof CosmosProposalV1
+    ) {
       proposal
         .voteTx(new CosmosVote(user, 'NoWithVeto'))
+        .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
     } else {
       toggleVotingModal(false);
