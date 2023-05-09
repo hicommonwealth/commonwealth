@@ -17,13 +17,14 @@ import {
 import { notifySuccess } from 'controllers/app/notifications';
 import { isSameAccount, pluralize } from 'helpers';
 import { setDarkMode } from 'helpers/darkMode';
-import type { Account } from 'models';
-import { AddressInfo, ITokenAdapter } from 'models';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';

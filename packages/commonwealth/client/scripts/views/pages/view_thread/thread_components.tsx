@@ -10,8 +10,10 @@ import {
   pluralize,
   threadStageToLabel,
 } from 'helpers';
-import { ThreadStage as ThreadStageType, AddressInfo } from 'models';
-import type { Account, Thread } from 'models';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import type Thread from '../../../models/Thread';
+import { ThreadStage as ThreadStageType } from '../../../models/types';
 
 import {
   Popover,

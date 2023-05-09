@@ -1,4 +1,3 @@
-export { default as AddressInfo } from './AddressInfo';
 export { default as BlockInfo } from './BlockInfo';
 export { default as ChainInfo } from './ChainInfo';
 export { default as DiscussionDraft } from './DiscussionDraft';

@@ -20,8 +20,9 @@ import { User } from '../user/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
-import type { Account, IWebWallet } from 'models';
-import { AddressInfo } from 'models';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import type IWebWallet from '../../../models/IWebWallet';
 
 import {
   CWWalletOptionRow,
