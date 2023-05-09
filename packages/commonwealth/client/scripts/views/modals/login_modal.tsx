@@ -27,7 +27,7 @@ import type { ProfileRowProps } from '../components/component_kit/cw_profiles_li
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import { setDarkMode } from '../../helpers';
+import { setDarkMode } from '../../helpers/darkMode';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
