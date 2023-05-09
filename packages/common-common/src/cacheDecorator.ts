@@ -1,7 +1,6 @@
 import { RequestHandler, Request, Response } from 'express';
 import { RedisNamespaces } from './types';
 import { RedisCache } from './redisCache';
-import { ServerError } from 'common-common/src/errors';
 import { defaultKeyGenerator, CacheKeyDuration, isCacheKeyDuration } from './cacheKeyUtils';
 import { factory, formatFilename } from 'common-common/src/logging';
 
@@ -167,7 +166,8 @@ export class CacheDecorator {
   ) {
     return async function resSendInterceptor(body: any) {
       try {
-        originalSend.call(res, body);
+        res.send = originalSend;
+        res.send(body);
         try {
           if (res.statusCode == 200) {
             const ret = await this.cacheResponse(cacheKey, body, duration, namespace);
@@ -184,7 +184,6 @@ export class CacheDecorator {
         }
       } catch (err) {
         log.error(`Error catch all res.send ${cacheKey}`);
-        throw new ServerError('something broke');
       }
     }.bind(this);
   }
