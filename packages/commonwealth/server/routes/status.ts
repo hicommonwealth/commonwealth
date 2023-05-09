@@ -3,8 +3,6 @@ import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
-import type { ChainCategoryInstance } from 'server/models/chain_category';
-import type { ChainCategoryTypeInstance } from 'server/models/chain_category_type';
 import type { ChainNodeInstance } from 'server/models/chain_node';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import type { DiscussionDraftAttributes } from 'server/models/discussion_draft';
@@ -20,6 +18,7 @@ import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 import { ETH_RPC } from '../config';
+import type { ChainCategoryType } from 'common-common/src/types';
 
 type ThreadCountQueryData = {
   concat: string;
@@ -33,8 +32,6 @@ type StatusResp = {
   }[];
   nodes: ChainNodeInstance[];
   notificationCategories: NotificationCategoryInstance[];
-  chainCategories: ChainCategoryInstance[];
-  chainCategoryTypes: ChainCategoryTypeInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
@@ -54,6 +51,7 @@ type StatusResp = {
     unseenPosts: { [chain: string]: number };
   };
   evmTestEnv?: string;
+  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
 };
 
 export const status = async (
@@ -62,13 +60,7 @@ export const status = async (
   res: TypedResponse<StatusResp>
 ) => {
   try {
-    const [
-      chains,
-      nodes,
-      notificationCategories,
-      chainCategories,
-      chainCategoryTypes,
-    ] = await Promise.all([
+    const [chains, nodes, notificationCategories] = await Promise.all([
       models.Chain.findAll({
         where: { active: true },
         include: [
@@ -84,9 +76,16 @@ export const status = async (
       }),
       models.ChainNode.findAll(),
       models.NotificationCategory.findAll(),
-      models.ChainCategory.findAll(),
-      models.ChainCategoryType.findAll(),
     ]);
+
+    const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
+    for (const chain of chains) {
+      if (chain.category !== null) {
+        chainCategories[chain.id] = chain.category
+          .slice(1, -1)
+          .split(',') as ChainCategoryType[];
+      }
+    }
 
     const chainsWithSnapshots = await Promise.all(
       chains.map(async (chain) => {
@@ -135,10 +134,9 @@ export const status = async (
         chainsWithSnapshots,
         nodes,
         notificationCategories,
-        chainCategories,
-        chainCategoryTypes,
         recentThreads: threadCountQueryData,
         evmTestEnv: ETH_RPC,
+        chainCategoryMap: chainCategories,
       });
     }
 
@@ -346,8 +344,6 @@ export const status = async (
       chainsWithSnapshots,
       nodes,
       notificationCategories,
-      chainCategories,
-      chainCategoryTypes,
       recentThreads: threadCountQueryData,
       roles,
       loggedIn: true,
@@ -367,6 +363,7 @@ export const status = async (
         unseenPosts,
       },
       evmTestEnv: ETH_RPC,
+      chainCategoryMap: chainCategories,
     });
   } catch (error) {
     console.log(error);

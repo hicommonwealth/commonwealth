@@ -3,11 +3,9 @@ import numeral from 'numeral';
 
 import 'pages/communities.scss';
 
-import type { ChainCategoryType } from 'common-common/src/types';
+import { ChainCategoryType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type { ChainInfo } from 'models';
-import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
-import type { ChainCategoryAttributes } from 'server/models/chain_category';
 
 import app from 'state';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
@@ -20,42 +18,9 @@ const buildCommunityString = (numCommunities: number) =>
     ? `${numeral(numCommunities).format('0.0a')} Communities`
     : `${numCommunities} Communities`;
 
-export const buildChainToCategoriesMap = (
-  categoryTypes: Array<ChainCategoryTypeAttributes>,
-  chainsAndCategories: Array<ChainCategoryAttributes>
-) => {
-  // Handle mapping provided by ChainCategories table
-  const categoryMap = {};
-
-  for (const data of categoryTypes) {
-    categoryMap[data.id] = data.category_name;
-  }
-
-  const chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } = {};
-
-  for (const data of chainsAndCategories) {
-    if (chainToCategoriesMap[data.chain_id]) {
-      chainToCategoriesMap[data.chain_id].push(
-        categoryMap[data.category_type_id]
-      );
-    } else {
-      chainToCategoriesMap[data.chain_id] = [
-        categoryMap[data.category_type_id],
-      ];
-    }
-  }
-
-  return chainToCategoriesMap;
-};
-
-const chainsAndCategories = app.config.chainCategories;
-const categoryTypes = app.config.chainCategoryTypes;
-const chainToCategoriesMap = buildChainToCategoriesMap(
-  categoryTypes,
-  chainsAndCategories
-);
+const chainToCategoriesMap = app.config.chainCategoryMap;
 // Handle mapping provided by ChainCategories table
-const chainCategories = categoryTypes.map((category) => category.category_name);
+const chainCategories = Object.values(ChainCategoryType);
 const chainNetworks = Object.keys(ChainNetwork).filter(
   (val) => val === 'ERC20'
 ); // We only are allowing ERC20 for now

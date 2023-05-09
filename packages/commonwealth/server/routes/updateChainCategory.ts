@@ -1,53 +1,51 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
-import type { ChainCategoryInstance } from 'server/models/chain_category';
 import type { DB } from '../models';
-import type { TypedRequestBody } from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { ChainCategoryType } from 'common-common/src/types';
 
-type UpdateChainCategoryReq = Omit<ChainCategoryInstance, 'id'> & {
-  create: string;
+type UpdateChainCategoryReq = {
+  category: string;
+  chain_id: string;
   auth: string;
   jwt: string;
+};
+
+type UpdateChainCategoryRes = {
+  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
 };
 
 const updateChainCategory = async (
   models: DB,
   req: TypedRequestBody<UpdateChainCategoryReq>,
-  res: Response,
+  res: TypedResponse<UpdateChainCategoryRes>,
   next: NextFunction
 ) => {
-  if (req.body.create === 'true') {
-    const categoryEntry = await models.ChainCategory.findOne({
+  if (Object.keys(ChainCategoryType).includes(req.body.category)) {
+    const chain = await models.Chain.findOne({
       where: {
-        chain_id: req.body.chain_id,
-        category_type_id: req.body.category_type_id,
+        id: req.body.chain_id,
       },
     });
-    if (!categoryEntry) {
-      const category = await models.ChainCategory.create({
-        chain_id: req.body.chain_id,
-        category_type_id: req.body.category_type_id,
-      });
-      return success(res, category.toJSON());
-    }
+    if (!chain) return next(new AppError('Invalid Chain Id'));
 
-    return res.json({ status: 'Success' });
-  } else if (req.body.create === 'false') {
-    const categoryEntry = await models.ChainCategory.findOne({
-      where: {
-        chain_id: req.body.chain_id,
-        category_type_id: req.body.category_type_id,
-      },
-    });
+    const existingCategories = chain.category
+      ? chain.category.slice(1, -1).split(',')
+      : [];
+    if (existingCategories.includes(req.body.category))
+      return next(new AppError('Chain already include this category'));
 
-    if (categoryEntry) {
-      await categoryEntry.destroy();
-      return success(res, categoryEntry.toJSON());
-    }
-    return res.json({ status: 'Success' });
+    existingCategories.push(req.body.category);
+
+    chain.category = existingCategories.toString();
+    await chain.save();
+    const updatedCategory = {
+      [req.body.chain_id]: existingCategories as ChainCategoryType[],
+    };
+    return success(res, { chainCategoryMap: updatedCategory });
   } else {
-    return next(new AppError('No update action specified.'));
+    return next(new AppError('Not a valid category'));
   }
 };
 

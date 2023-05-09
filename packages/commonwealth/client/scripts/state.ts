@@ -4,8 +4,6 @@ import { WebSocketController } from 'controllers/server/socket';
 import { EventEmitter } from 'events';
 import type { IChainAdapter } from 'models';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
-import type { ChainCategoryAttributes } from 'server/models/chain_category';
-import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 import { ChainStore, NodeStore } from 'stores';
 import RecentActivityController from './controllers/app/recent_activity';
 import WebWalletController from './controllers/app/web_wallets';
@@ -29,6 +27,7 @@ import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
+import { ChainCategoryType } from '../../../common-common/src/types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -110,9 +109,8 @@ export interface IApp {
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    chainCategories?: ChainCategoryAttributes[];
-    chainCategoryTypes?: ChainCategoryTypeAttributes[];
     evmTestEnv?: string;
+    chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
@@ -277,12 +275,11 @@ export async function initAppState(
           });
 
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories = data.result.notificationCategories.map(
-          (json) => NotificationCategory.fromJSON(json)
-        );
-        app.config.chainCategories = data.result.chainCategories;
-        app.config.chainCategoryTypes = data.result.chainCategoryTypes;
-
+        app.config.notificationCategories =
+          data.result.notificationCategories.map((json) =>
+            NotificationCategory.fromJSON(json)
+          );
+        app.config.chainCategoryMap = data.result.chainCategoryMap;
         // add recentActivity
         const { recentThreads } = data.result;
         recentThreads.forEach(({ chain, count }) => {
