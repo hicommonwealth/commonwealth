@@ -1,7 +1,7 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { ContractType } from 'common-common/src/types';
-import type { ChainInfo } from 'models';
+import type ChainInfo from '../../../../models/ChainInfo';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import AaveApi from './api';
