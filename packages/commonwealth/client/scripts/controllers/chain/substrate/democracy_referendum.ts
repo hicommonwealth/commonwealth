@@ -262,7 +262,6 @@ export class SubstrateDemocracyReferendum extends Proposal<
     this._threshold = this.data.threshold;
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
-    this.threadId = entity.threadId;
     this.threadTitle = entity.threadTitle;
 
     // see if associated entity title exists, otherwise try to populate title with preimage
