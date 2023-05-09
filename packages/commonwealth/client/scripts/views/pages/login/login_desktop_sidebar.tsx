@@ -39,15 +39,15 @@ const generateText = (wallets: Array<IWebWallet<any>>) => {
 
 type LoginDesktopSidebarProps = {
   sidebarType: LoginSidebarType;
-  createNewAccountCallback: () => void;
-  linkExistingAccountCallback: () => void;
+  onCreateNewAccount: () => void;
+  onLinkExistingAccount: () => void;
   wallets: Array<IWebWallet<any>>;
 };
 
 export const LoginDesktopSidebar = ({
   sidebarType,
-  createNewAccountCallback,
-  linkExistingAccountCallback,
+  onCreateNewAccount,
+  onLinkExistingAccount,
   wallets,
 }: LoginDesktopSidebarProps) => {
   return (
@@ -73,10 +73,10 @@ export const LoginDesktopSidebar = ({
           <CWText type="h4" fontWeight="semiBold" className="header-text">
             New or Returning?
           </CWText>
-          <CWAccountCreationButton onClick={createNewAccountCallback} />
+          <CWAccountCreationButton onClick={onCreateNewAccount} />
           <CWAccountCreationButton
             creationType="linkAccount"
-            onClick={linkExistingAccountCallback}
+            onClick={onLinkExistingAccount}
           />
         </div>
       )}

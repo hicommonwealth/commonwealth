@@ -50,16 +50,20 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
       <div className="compact-modal-actions">
         <div>
           <CWWalletsList
-            useSessionKeyLoginFlow={true}
+            onResetWalletConnect={() => {}}
+            onWalletAddressSelect={async () => {}}
+            onWalletSelect={async () => {}}
+            onConnectAnotherWay={() => {}}
+            // useSessionKeyLoginFlow={true}
             wallets={wallets}
             darkMode={false}
-            setSelectedWallet={(wallet) => {
-              /* do nothing */
-            }}
-            accountVerifiedCallback={() => onModalClose()}
-            linking={false}
+            // setSelectedWallet={(wallet) => {
+            //   /* do nothing */
+            // }}
+            // onAccountVerified={() => onModalClose()}
+            // linking={false}
             hasNoWalletsLink={false}
-            showResetWalletConnect={wcEnabled}
+            canResetWalletConnect={wcEnabled}
           />
         </div>
       </div>
