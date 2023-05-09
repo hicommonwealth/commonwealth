@@ -1,13 +1,14 @@
 import React from 'react';
 
 import 'components/comments/comment.scss';
-import type { Account, Comment as CommentType } from 'models';
 import moment from 'moment';
 
 import app from 'state';
 import { ContentType } from 'types';
 import { ChainType } from 'common-common/src/types';
 import { notifyError } from '../../../controllers/app/notifications';
+import type Account from '../../../models/Account';
+import type Comment from '../../../models/Comment';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
@@ -23,7 +24,7 @@ import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type CommentAuthorProps = {
-  comment: CommentType<any>;
+  comment: Comment<any>;
 };
 
 const CommentAuthor = (props: CommentAuthorProps) => {
@@ -50,7 +51,7 @@ const CommentAuthor = (props: CommentAuthorProps) => {
 };
 
 type CommentProps = {
-  comment: CommentType<any>;
+  comment: Comment<any>;
   handleIsReplying: (isReplying: boolean, id?: number) => void;
   isGloballyEditing?: boolean;
   isLast: boolean;
@@ -60,7 +61,7 @@ type CommentProps = {
   updatedCommentsCallback?: () => void;
 };
 
-export const Comment = (props: CommentProps) => {
+export const CommentComponent = (props: CommentProps) => {
   const {
     comment,
     handleIsReplying,

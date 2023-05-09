@@ -10,7 +10,7 @@ import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type { Contract } from 'ethers';
 import { ethers } from 'ethers';
-import type { Account } from 'models';
+import Account from '../../../models/Account';
 
 export type ContractFactoryT<ContractT> = (
   address: string,

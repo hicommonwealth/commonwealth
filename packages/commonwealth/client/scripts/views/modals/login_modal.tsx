@@ -16,7 +16,8 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { signSessionWithAccount } from 'controllers/server/sessions';
 
 import { notifyError } from 'controllers/app/notifications';
-import type { Account, IWebWallet } from 'models';
+import Account from '../../models/Account';
+import IWebWallet from '../../models/IWebWallet';
 
 import {
   breakpointFnValidator,
