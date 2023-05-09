@@ -88,7 +88,8 @@ describe('API Tests', () => {
       const domain = "Commonwealth"
       const siweMessage = createSiweMessage(message, domain, nonce)
       const privateKey = keypair.getPrivateKey();
-      const signature = personalSign({privateKey, data: siweMessage})
+      const signatureData = personalSign({privateKey, data: siweMessage})
+      const signature = `${domain}/${nonce}/${signatureData}`
       res = await chai
         .request(app)
         .post('/api/verifyAddress')

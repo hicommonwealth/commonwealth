@@ -113,10 +113,11 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const nonce = siwe.generateNonce();
     const domain = "Commonwealth";
     const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
-    const signature = personalSign({
+    const signatureData = personalSign({
       privateKey: keypair.getPrivateKey(),
       data: siweMessage
     });
+    const signature = `${domain}/${nonce}/${signatureData}`
     const session: Session = {
       type: 'session',
       payload: sessionPayload,
