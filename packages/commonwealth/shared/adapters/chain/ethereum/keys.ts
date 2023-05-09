@@ -69,7 +69,7 @@ export function createSiweMessage(payload: SessionPayload, domain: string, nonce
 		chainId: parseInt(chainId),
 		issuedAt: new Date(payload.sessionIssued).toISOString(),
 		expirationTime: new Date(payload.sessionIssued + payload.sessionDuration).toISOString(),
-		resources: [`ethereum:${payload.sessionAddress}`],
+		resources: [`ethereum:${payload.sessionAddress}:${payload.app}`],
 	})
 
 	return message.prepareMessage()
