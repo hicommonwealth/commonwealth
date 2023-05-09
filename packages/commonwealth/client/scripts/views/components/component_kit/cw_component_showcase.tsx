@@ -663,10 +663,10 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Breadcrumbs</CWText>
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Page', path: '' },
-            { label: 'Page', path: '' },
-            { label: 'Page', path: '' },
-            { label: 'Current', path: '' },
+            { label: 'Page' },
+            { label: 'Page' },
+            { label: 'Page' },
+            { label: 'Current' },
           ]}
         />
       </div>
