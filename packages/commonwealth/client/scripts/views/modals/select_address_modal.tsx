@@ -7,11 +7,12 @@ import 'modals/select_address_modal.scss';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, RoleInfo } from 'models';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { formatAddressShort } from '../../../../shared/utils';
+import Account from '../../models/Account';
+import RoleInfo from '../../models/RoleInfo';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';

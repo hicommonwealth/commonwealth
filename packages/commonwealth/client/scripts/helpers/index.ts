@@ -2,11 +2,12 @@ import type { ClassComponent } from 'mithrilInterop';
 import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ThreadStage } from 'models';
-import type { IChainAdapter, Account } from 'models';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
+import Account from '../models/Account';
+import IChainAdapter from '../models/IChainAdapter';
+import { ThreadStage } from '../models/types';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
