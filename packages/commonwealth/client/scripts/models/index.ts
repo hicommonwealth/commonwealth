@@ -1,4 +1,3 @@
-export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
 export { default as BlockInfo } from './BlockInfo';
 export { default as ChainInfo } from './ChainInfo';
@@ -49,7 +48,6 @@ export type { AnyProposal, ProposalEndTime } from './types';
 export {
   IBlockInfo,
   IChainModule,
-  IAccountsModule,
   IOffchainAccountsModule,
   ITransactionResult,
   ITXData,
