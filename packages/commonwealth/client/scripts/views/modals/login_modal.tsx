@@ -19,7 +19,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { addressSwapper } from 'utils';
-import { setDarkMode } from '../../helpers';
+import { setDarkMode } from '../../helpers/darkMode';
 import type { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,

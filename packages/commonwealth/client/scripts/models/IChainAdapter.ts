@@ -8,7 +8,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import type { Account, ProposalModule } from '.';
-import { setDarkMode } from '../helpers';
+import { setDarkMode } from '../helpers/darkMode';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
@@ -77,12 +77,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       admins,
       activeUsers,
       numVotingThreads,
+      numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
       communityRoles,
     } = response.result;
     this.app.topics.initialize(topics, true);
-    this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
+    this.app.threads.initialize(
+      pinnedThreads,
+      numVotingThreads,
+      numTotalThreads,
+      true
+    );
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);

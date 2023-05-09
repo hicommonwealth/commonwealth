@@ -98,6 +98,7 @@ class ThreadsController {
   }
 
   public numVotingThreads: number;
+  public numTotalThreads: number;
   private _resetPagination: boolean;
 
   public resetPagination() {
@@ -302,6 +303,8 @@ class ThreadsController {
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
+      this.store.add(result);
+      this.numTotalThreads += 1;
       this._listingStore.add(result);
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
@@ -408,6 +411,7 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
+          this.numTotalThreads -= 1;
           redraw();
           resolve(result);
         })
@@ -635,7 +639,10 @@ class ThreadsController {
       const thread = this.modelFromServer(rawThread);
       const existing = this._store.getByIdentifier(thread.id);
       if (existing) this._store.remove(existing);
-      this._store.update(thread);
+      else {
+        this._store.update(thread);
+        this.numTotalThreads += 1;
+      }
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
       this.fetchReactionsCount([thread]);
       return thread;
@@ -765,7 +772,27 @@ class ThreadsController {
     return modeledThreads;
   }
 
-  public initialize(initialThreads = [], numVotingThreads, reset) {
+  public async getThreadCommunityId(threadId: string) {
+    try {
+      const response = await axios.get(`${app.serverUrl()}/getThreads`, {
+        params: {
+          ids: [threadId],
+        },
+      });
+
+      const thread = response['data']['result'][0];
+      return thread;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public initialize(
+    initialThreads = [],
+    numVotingThreads,
+    numTotalThreads,
+    reset
+  ) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -782,6 +809,7 @@ class ThreadsController {
       }
     }
     this.numVotingThreads = numVotingThreads;
+    this.numTotalThreads = numTotalThreads;
     this._initialized = true;
     this._resetPagination = true;
   }
@@ -791,6 +819,7 @@ class ThreadsController {
     this._resetPagination = true;
     this._store.clear();
     this._listingStore.clear();
+    this.numTotalThreads = 0;
   }
 }
 

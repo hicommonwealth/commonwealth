@@ -211,9 +211,8 @@ const bulkThreads = async (
       type: QueryTypes.SELECT,
     }
   );
-  const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
-  ).length;
+  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
+    .length;
 
   threads = await Promise.all(threads);
 
