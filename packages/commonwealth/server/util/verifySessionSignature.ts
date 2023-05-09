@@ -3,8 +3,7 @@ import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-import * as siwe from "siwe"
-import * as ethSigUtil from '@metamask/eth-sig-util';
+import { verifyMessage } from 'ethers/lib/utils';
 
 import {
   ChainBase,
@@ -247,8 +246,13 @@ const verifySessionSignature = async (
     // ethereum address handling
     //
     try {
-      const nonce = siwe.generateNonce();
-      const domain = "Commonwealth"
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
+      const signaturePatternMatch = signaturePattern.exec(signatureString)
+      if (signaturePatternMatch === null) {
+        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch
+
       const siweMessage = createSiweMessage(canvasSessionPayload, domain, nonce)
 
       if (addressModel.block_info !== sessionBlockInfo) {
@@ -257,10 +261,7 @@ const verifySessionSignature = async (
         );
       }
 
-      const address = ethSigUtil.recoverPersonalSignature({
-        data: siweMessage,
-        signature: signatureString.trim()
-      })
+      const address = verifyMessage(siweMessage, signatureData)
 
       isValid = addressModel.address.toLowerCase() === address.toLowerCase();
       if (!isValid) {

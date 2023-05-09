@@ -52,7 +52,7 @@ export const SiweMessageVersion = "1"
 
 const chainPattern = /^eip155:(\d+)$/
 
-export function createSiweMessage(payload: SessionPayload, domain: string, nonce: string): string {
+export function createSiweMessage(payload: SessionPayload, domain: string, nonce: string) {
 	const chainPatternMatch = chainPattern.exec(payload.chain)
 	if (chainPatternMatch === null) {
 		throw new Error(`invalid chain: ${payload.chain} did not match ${chainPattern}`)

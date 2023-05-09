@@ -42,17 +42,14 @@ export const verify = async ({
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
-      const ethSigUtil = await import('@metamask/eth-sig-util');
+      const ethersUtils = (await import('ethers')).utils;
+
       const nonce = siwe.generateNonce();
-      const domain = "Commonwealth"
-      const siweMessage = createSiweMessage(sessionPayload, domain, nonce)
+      const domain = "Commonwealth";
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
 
-      const recoveredAddr = ethSigUtil.recoverPersonalSignature({
-        data: siweMessage,
-        signature
-      })
-
-      return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
+      const recoveredAddress = ethersUtils.verifyMessage(siweMessage, signature)
+      return recoveredAddress.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (payload.chain === 'cosmos') {
     // verify terra sessions (actions are verified like other cosmos chains)

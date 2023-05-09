@@ -72,15 +72,17 @@ export const verify = async ({
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
-      const ethSigUtil = await import('@metamask/eth-sig-util');
-      const siwe = await import("siwe")
-      const nonce = siwe.generateNonce();
-      const domain = "Commonwealth"
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
+      const signaturePatternMatch = signaturePattern.exec(signature)
+      if (signaturePatternMatch === null) {
+        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch
+
       const siweMessage = createSiweMessage(sessionPayload, domain, nonce)
-      const recoveredAddr = ethSigUtil.recoverPersonalSignature({
-        data: siweMessage,
-        signature
-      })
+
+      const ethersUtils = (await import('ethers')).utils;
+      const recoveredAddr = ethersUtils.verifyMessage(siweMessage, signatureData)
 
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
