@@ -24,17 +24,17 @@ export const getEIP712SignableAction = (
   // user to provide a valid EIP712Domain
   //
   // see: https://github.com/ethers-io/ethers.js/issues/687#issuecomment-714069471
-  const domain = { name: 'Commonwealth' };
+  const domain = { name: '/commonwealth' };
 
   const types = {
     EIP712Domain: [{ name: 'name', type: 'string' }],
     Message: [
       { name: 'app', type: 'string' },
-      { name: 'from', type: 'string' },
+      { name: 'block', type: 'string' },
       { name: 'call', type: 'string' },
       { name: 'callArgs', type: 'string' },
       { name: 'chain', type: 'string' },
-      { name: 'block', type: 'string' },
+      { name: 'from', type: 'string' },
       { name: 'timestamp', type: 'uint64' },
     ],
   };
