@@ -83,7 +83,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     const message = createSiweMessage(sessionPayload, domain, nonce);
 
     const signature = await this._web3.givenProvider.request({
-      method: 'eth_sign',
+      method: 'personal_sign',
       params: [account.address, message]
     });
 
