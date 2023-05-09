@@ -48,6 +48,7 @@ export type { AnyProposal, ProposalEndTime } from './types';
 export {
   IBlockInfo,
   IChainModule,
+  IAccountsModule,
   IOffchainAccountsModule,
   ITransactionResult,
   ITXData,
