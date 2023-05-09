@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import moment from 'moment';
 
 import 'pages/search/index.scss';
@@ -8,7 +8,7 @@ import type { MinimumProfile as Profile } from 'models';
 import app from 'state';
 import { SearchContentType } from 'types';
 import { SearchScope } from 'models/SearchQuery';
-import { AddressInfo } from 'models';
+import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
