@@ -44,11 +44,15 @@ export const verify = async ({
     } else {
       const ethersUtils = (await import('ethers')).utils;
 
-      const nonce = siwe.generateNonce();
-      const domain = "Commonwealth";
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
+      const signaturePatternMatch = signaturePattern.exec(signature)
+      if (signaturePatternMatch === null) {
+        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch
       const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
 
-      const recoveredAddress = ethersUtils.verifyMessage(siweMessage, signature)
+      const recoveredAddress = ethersUtils.verifyMessage(siweMessage, signatureData)
       return recoveredAddress.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (payload.chain === 'cosmos') {
