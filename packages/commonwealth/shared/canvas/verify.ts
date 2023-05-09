@@ -82,13 +82,6 @@ export const verify = async ({
         signature
       })
 
-      // const { types, domain, message } =
-        // getEIP712SignableSession(sessionPayload);
-      // const recoveredAddr = ethSigUtil.recoverTypedSignature({
-        // data: { types, domain, message, primaryType: 'Message' as const },
-        // signature,
-        // version: ethSigUtil.SignTypedDataVersion.V4,
-      // });
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (chainBase === ChainBase.CosmosSDK) {
