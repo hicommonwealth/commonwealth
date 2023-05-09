@@ -9,20 +9,24 @@ export const api = `${DOMAIN}/api/oplog`;
 export const apiToPeerHandler = async ({ status, result }, apply) => {
   const applied = [];
   for (const res of result) {
-    if (await apply(res.hash, res.action, res.session)) applied.push(res);
+    const result = await apply(res.hash, res.action, res.session);
+    if (result) applied.push(res);
   }
 
   if (applied.length === 0) {
-    return null;
+    return { applied: 0, count: result.length };
   } else {
     return {
       applied: applied.length,
-      next: `${DOMAIN}/api/oplog?updated_at=${applied[applied.length - 1].updated_at}`,
+      count: result.length,
+      next: `${DOMAIN}/api/oplog?updated_at=${
+        applied[applied.length - 1].updated_at
+      }`,
     };
   }
 };
 
 export const peerToApiHandler = async ({ action, session }) => {
-  console.log("peerToApiHandler: pushing action to CW", action, session)
+  console.log('peerToApiHandler: pushing action to CW', action, session);
   // TODO
 };
