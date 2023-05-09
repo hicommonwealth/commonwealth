@@ -1,6 +1,4 @@
 import $ from 'jquery';
-import type { Thread } from 'models';
-import { AddressInfo } from 'models';
 import ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
 import app from 'state';
 
