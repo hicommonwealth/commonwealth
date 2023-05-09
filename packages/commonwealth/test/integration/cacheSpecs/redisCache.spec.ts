@@ -5,22 +5,25 @@ import { RedisNamespaces } from 'common-common/src/types';
 import { connectToRedis } from '../../util/redisUtils';
 import { delay } from '../../util/delayUtils';
 
-async function addRandomKeys(redisCache: RedisCache, test_namespace: RedisNamespaces) {
+async function addRandomKeys(
+  redisCache: RedisCache,
+  test_namespace: RedisNamespaces
+) {
   const random = Math.random();
-    const key1 = `testKey${random}`;
-    const value1 = `testValue${random}`;
-    const key2 = `testKey${random + 1}`;
-    const value2 = `testValue${random + 1}`;
-    const key3 = `testKey${random + 2}`;
-    const value3 = `testValue${random + 2}`;
-    await redisCache.setKey(test_namespace, key1, value1);
-    await redisCache.setKey(test_namespace, key2, value2);
-    await redisCache.setKey(test_namespace, key3, value3);
-    return {
-      [`${RedisCache.getNamespaceKey(test_namespace, key1)}`]: value1,
-      [`${RedisCache.getNamespaceKey(test_namespace, key2)}`]: value2,
-      [`${RedisCache.getNamespaceKey(test_namespace, key3)}`]: value3,
-    }
+  const key1 = `testKey${random}`;
+  const value1 = `testValue${random}`;
+  const key2 = `testKey${random + 1}`;
+  const value2 = `testValue${random + 1}`;
+  const key3 = `testKey${random + 2}`;
+  const value3 = `testValue${random + 2}`;
+  await redisCache.setKey(test_namespace, key1, value1);
+  await redisCache.setKey(test_namespace, key2, value2);
+  await redisCache.setKey(test_namespace, key3, value3);
+  return {
+    [`${RedisCache.getNamespaceKey(test_namespace, key1)}`]: value1,
+    [`${RedisCache.getNamespaceKey(test_namespace, key2)}`]: value2,
+    [`${RedisCache.getNamespaceKey(test_namespace, key3)}`]: value3,
+  };
 }
 
 export async function testExpiry(
@@ -83,5 +86,4 @@ describe('RedisCache', () => {
     const result = await redisCache.getNamespaceKeys(test_namespace);
     expect(result).to.deep.equal({});
   });
-
 });

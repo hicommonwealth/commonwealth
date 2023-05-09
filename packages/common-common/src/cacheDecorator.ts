@@ -1,7 +1,11 @@
 import { RequestHandler, Request, Response } from 'express';
 import { RedisNamespaces } from './types';
 import { RedisCache } from './redisCache';
-import { defaultKeyGenerator, CacheKeyDuration, isCacheKeyDuration } from './cacheKeyUtils';
+import {
+  defaultKeyGenerator,
+  CacheKeyDuration,
+  isCacheKeyDuration,
+} from './cacheKeyUtils';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -12,8 +16,8 @@ export enum XCACHE_VALUES {
   SKIP = 'SKIP', // cache is disabled
   HIT = 'HIT', // cache hit
   MISS = 'MISS', // cache miss
-  NOKEY = 'NOKEY' // cache no key
-};
+  NOKEY = 'NOKEY', // cache no key
+}
 
 export class CacheDecorator {
   private redisCache: RedisCache;
@@ -35,7 +39,9 @@ export class CacheDecorator {
   // namespace: namespace for the cache key, default is Route_Response
   public cacheMiddleware(
     duration: number,
-    keyGenerator: (req: Request) => string | CacheKeyDuration = defaultKeyGenerator,
+    keyGenerator: (
+      req: Request
+    ) => string | CacheKeyDuration = defaultKeyGenerator,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): RequestHandler {
     return async function cache(req, res, next) {
@@ -57,7 +63,11 @@ export class CacheDecorator {
         }
 
         // If cache key is not found, skip caching
-        const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(req, keyGenerator, duration);
+        const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(
+          req,
+          keyGenerator,
+          duration
+        );
         if (!cacheKey) {
           log.trace(`Cache key not found for ${req.originalUrl}`);
           res.set(XCACHE_HEADER, XCACHE_VALUES.NOKEY);
@@ -88,7 +98,7 @@ export class CacheDecorator {
         isNextCalled = true;
         return next();
       } catch (err) {
-        log.warn(`calling next from cacheMiddleware catch ${req.originalUrl}`)
+        log.warn(`calling next from cacheMiddleware catch ${req.originalUrl}`);
         log.warn(err);
         if (!isNextCalled) {
           return next();
@@ -135,7 +145,7 @@ export class CacheDecorator {
     duration: number,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ) {
-    if(!this.isEnabled()) return false;
+    if (!this.isEnabled()) return false;
 
     return await this.redisCache.setKey(
       namespace,
@@ -170,17 +180,28 @@ export class CacheDecorator {
         res.send(body);
         try {
           if (res.statusCode == 200) {
-            const ret = await this.cacheResponse(cacheKey, body, duration, namespace);
-            if(ret) {
+            const ret = await this.cacheResponse(
+              cacheKey,
+              body,
+              duration,
+              namespace
+            );
+            if (ret) {
               log.trace(`SET: ${cacheKey}`);
-            }  else {
-              log.warn(`NOSET: Unable to set redis key returned false ${cacheKey} ${ret}`);
+            } else {
+              log.warn(
+                `NOSET: Unable to set redis key returned false ${cacheKey} ${ret}`
+              );
             }
           } else {
-            log.warn(`NOSET: Response status code is not 200 ${cacheKey}, skip writing cache`);
+            log.warn(
+              `NOSET: Response status code is not 200 ${cacheKey}, skip writing cache`
+            );
           }
         } catch (error) {
-          log.warn(`SETERR: Error writing cache ${cacheKey} skip writing cache`);
+          log.warn(
+            `SETERR: Error writing cache ${cacheKey} skip writing cache`
+          );
         }
       } catch (err) {
         log.error(`Error catch all res.send ${cacheKey}`);
@@ -193,7 +214,7 @@ export class CacheDecorator {
     const cacheControl = req.header('Cache-Control');
     if (cacheControl && cacheControl.includes('no-cache')) {
       log.trace(`Cache-Control: no-cache header found, skipping cache`);
-      return true
+      return true;
     }
     return false;
   }
@@ -209,7 +230,9 @@ export class CacheDecorator {
       cacheKey = cacheKey.cacheKey;
     }
 
-    log.trace(`req: ${req.originalUrl}, cacheKey: ${cacheKey}, cacheDuration: ${cacheDuration}`);
+    log.trace(
+      `req: ${req.originalUrl}, cacheKey: ${cacheKey}, cacheDuration: ${cacheDuration}`
+    );
     return { cacheKey, cacheDuration };
   }
 

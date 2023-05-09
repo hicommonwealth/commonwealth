@@ -129,7 +129,7 @@ export class RedisCache {
     namespace: RedisNamespaces,
     key: string,
     value: string,
-    duration = 0 // no ttl   
+    duration = 0 // no ttl
   ): Promise<boolean> {
     try {
       if (!this.initialized) {
@@ -144,7 +144,7 @@ export class RedisCache {
       }
       if (duration > 0) {
         await this.client.set(finalKey, value, {
-          EX: duration
+          EX: duration,
         });
       } else {
         await this.client.set(finalKey, value);
@@ -284,9 +284,9 @@ export class RedisCache {
           try {
             const resp = await this.client.del(key);
             count += resp;
-            log.trace(`deleted key ${key} ${resp} ${count}`)
+            log.trace(`deleted key ${key} ${resp} ${count}`);
           } catch (err) {
-            log.trace(`error deleting key ${key}`)
+            log.trace(`error deleting key ${key}`);
             log.trace(err);
           }
         }

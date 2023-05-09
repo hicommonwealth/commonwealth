@@ -18,25 +18,27 @@ export function isCacheKeyDuration(obj: any): obj is CacheKeyDuration {
 
 export const defaultKeyGenerator = (req: Request) => {
   return req.originalUrl;
-}
+};
 
 export const defaultUserKeyGenerator = (req: Request) => {
-    const user = req.user;
-    if(user && user.id) {
-        return `user:${user.id}_${req.originalUrl}`;
-    }
-    return req.originalUrl;
-}
+  const user = req.user;
+  if (user && user.id) {
+    return `user:${user.id}_${req.originalUrl}`;
+  }
+  return req.originalUrl;
+};
 
-export function lookupKeyDurationInReq(req: CustomRequest): CacheKeyDuration | null {
+export function lookupKeyDurationInReq(
+  req: CustomRequest
+): CacheKeyDuration | null {
   let cacheKey = null;
   let cacheDuration = null;
 
-  if(req.cacheKey && typeof req.cacheKey === 'string') {
+  if (req.cacheKey && typeof req.cacheKey === 'string') {
     cacheKey = req.cacheKey;
   }
 
-  if(typeof req.cacheDuration === 'number') {
+  if (typeof req.cacheDuration === 'number') {
     cacheDuration = req.cacheDuration;
   }
 

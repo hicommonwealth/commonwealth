@@ -11,11 +11,11 @@ export function calcCosmosRPCCacheKeyDuration(req, res, next) {
   // cosmosRPCDuration and cosmosRPCKey are defined below
   // TX Response: do not cache and call next()
   req.cacheDuration = cosmosRPCDuration(body, method, params);
-  if(req.cacheDuration === null) return next();
+  if (req.cacheDuration === null) return next();
   req.cacheKey = cosmosRPCKey(req, body);
 
   return next();
-};
+}
 
 export function calcCosmosLCDCacheKeyDuration(req, res, next) {
   // Matches ProposalStatus from common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov.ts
@@ -46,7 +46,7 @@ export function calcCosmosLCDCacheKeyDuration(req, res, next) {
   req.cacheKey = req.originalUrl;
 
   return next();
-};
+}
 
 const cosmosRPCDuration = (body, method, params) => {
   let duration = defaultCacheDuration;
@@ -82,7 +82,7 @@ const cosmosRPCDuration = (body, method, params) => {
   }
 
   return duration;
-}
+};
 
 const cosmosRPCKey = (req, body) => {
   const params = body?.params;

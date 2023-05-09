@@ -7,40 +7,40 @@ const expect = chai.expect;
 
 import { RedisCache } from 'common-common/src/redisCache';
 import { RedisNamespaces } from 'common-common/src/types';
-import { cacheDecorator, XCACHE_VALUES } from 'common-common/src/cacheDecorator';
+import {
+  cacheDecorator,
+  XCACHE_VALUES,
+} from 'common-common/src/cacheDecorator';
 import app, { CACHE_ENDPOINTS } from '../../../server-test';
 import { connectToRedis } from '../../util/redisUtils';
 
 const content_type = {
   json: 'application/json; charset=utf-8',
-  html: 'text/html; charset=utf-8'
-}
+  html: 'text/html; charset=utf-8',
+};
 
-function verifyNoCacheResponse(res, status = 200, cacheHeader = XCACHE_VALUES.MISS) {
+function verifyNoCacheResponse(
+  res,
+  status = 200,
+  cacheHeader = XCACHE_VALUES.MISS
+) {
   expect(res.body).to.not.be.null;
   expect(res).to.have.status(status);
   expect(res).to.not.have.header('X-Cache', XCACHE_VALUES.HIT);
   expect(res).to.have.header('X-Cache', cacheHeader);
 }
 
-async function makeGetRequest(endpoint, headers={}) {
-  headers = {...headers, 'Accept': 'application/json'}
-  const res = await chai
-      .request(app)
-      .get(endpoint)
-      .set(headers);
-  
+async function makeGetRequest(endpoint, headers = {}) {
+  headers = { ...headers, Accept: 'application/json' };
+  const res = await chai.request(app).get(endpoint).set(headers);
+
   return res;
 }
 
-async function makePostRequest(endpoint, body, headers={}) {
-  headers = {...headers, 'Accept': 'application/json'}
-  const res = await chai
-      .request(app)
-      .post(endpoint)
-      .set(headers)
-      .send(body);
-    
+async function makePostRequest(endpoint, body, headers = {}) {
+  headers = { ...headers, Accept: 'application/json' };
+  const res = await chai.request(app).post(endpoint).set(headers).send(body);
+
   return res;
 }
 
@@ -51,7 +51,9 @@ describe('Cache Disable Tests', () => {
   before(async () => {
     await connectToRedis(redisCache);
     process.env.DISABLE_CACHE = 'true';
-    console.log(`Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`);
+    console.log(
+      `Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`
+    );
     cacheDecorator.setCache(redisCache);
     process.env.DISABLE_CACHE = 'false';
   });
@@ -74,30 +76,42 @@ describe('Cache Disable Tests', () => {
 
   it(`verify cache control skip ${CACHE_ENDPOINTS.JSON} route and expire`, async () => {
     // make request to /cachedummy/json twice, verify undef cache
-    const res = await makeGetRequest(CACHE_ENDPOINTS.JSON, {'Cache-Control': 'no-cache'});
+    const res = await makeGetRequest(CACHE_ENDPOINTS.JSON, {
+      'Cache-Control': 'no-cache',
+    });
     verifyNoCacheResponse(res, 200, XCACHE_VALUES.UNDEF);
     expect(res).to.have.header('content-type', content_type.json);
   });
 
   it(`verify no key or duration ${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} route and expire`, async () => {
     // make request to /cachedummy/customkeyduration twice, verify undef cache with no key or duration
-    const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {duration: 3});
+    const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
+      duration: 3,
+    });
     verifyNoCacheResponse(res, 200, XCACHE_VALUES.UNDEF);
 
-    const res2 = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {key: 'test'});
+    const res2 = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
+      key: 'test',
+    });
     verifyNoCacheResponse(res2, 200, XCACHE_VALUES.UNDEF);
   });
 
   it(`verify key ${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} route and expire`, async () => {
     // make request to /cachedummy/customkeyduration twice, verify undef cache with both key and duration both times
-    const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {key: 'test', duration: 3});
+    const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
+      key: 'test',
+      duration: 3,
+    });
     verifyNoCacheResponse(res, 200, XCACHE_VALUES.UNDEF);
     expect(res).to.have.header('content-type', content_type.json);
-    expect(res.body).to.be.deep.equal({key: 'test', duration: 3});
+    expect(res.body).to.be.deep.equal({ key: 'test', duration: 3 });
 
-    const res2 = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {key: 'test', duration: 3});
+    const res2 = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
+      key: 'test',
+      duration: 3,
+    });
     verifyNoCacheResponse(res2, 200, XCACHE_VALUES.UNDEF);
     expect(res2).to.have.header('content-type', content_type.json);
-    expect(res2.body).to.be.deep.equal({key: 'test', duration: 3});
+    expect(res2.body).to.be.deep.equal({ key: 'test', duration: 3 });
   });
 });
