@@ -77,12 +77,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       admins,
       activeUsers,
       numVotingThreads,
+      numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
       communityRoles,
     } = response.result;
     this.app.topics.initialize(topics, true);
-    this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
+    this.app.threads.initialize(
+      pinnedThreads,
+      numVotingThreads,
+      numTotalThreads,
+      true
+    );
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);

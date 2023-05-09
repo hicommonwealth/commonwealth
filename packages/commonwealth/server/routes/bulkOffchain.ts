@@ -35,6 +35,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     admins,
     mostActiveUsers,
     threadsInVoting,
+    totalThreads,
     chatChannels,
     rules,
     communityBanner,
@@ -47,6 +48,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
+        [{ count: string }],
         ChatChannelInstance[],
         RuleInstance[],
         CommunityBannerInstance,
@@ -117,6 +119,39 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
       {
         replacements,
+        type: QueryTypes.SELECT,
+      }
+    ),
+    await models.sequelize.query(
+      `
+      SELECT 
+        COUNT(*) 
+      FROM 
+        "Addresses" AS addr 
+        RIGHT JOIN (
+          SELECT 
+            t.id AS thread_id, 
+            t.address_id, 
+            t.topic_id 
+          FROM 
+            "Threads" t 
+          WHERE 
+            t.deleted_at IS NULL 
+            AND t.chain = $chain 
+            AND (
+              t.pinned = true 
+              OR (
+                COALESCE(
+                  t.last_commented_on, t.created_at
+                ) < $created_at 
+                AND t.pinned = false
+              )
+            )
+        ) threads ON threads.address_id = addr.id 
+        LEFT JOIN "Topics" topics ON threads.topic_id = topics.id
+      `,
+      {
+        bind: { chain: chain.id, created_at: new Date().toISOString() },
         type: QueryTypes.SELECT,
       }
     ),
@@ -195,11 +230,14 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     (t) => t.stage === 'voting'
   ).length;
 
+  const numTotalThreads = parseInt(totalThreads[0].count);
+
   return res.json({
     status: 'Success',
     result: {
       topics: topics.map((t) => t.toJSON()),
       numVotingThreads,
+      numTotalThreads,
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels),

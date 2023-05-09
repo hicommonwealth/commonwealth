@@ -23,6 +23,7 @@ export const CustomQuillToolbar = ({ toolbarId }: CustomQuillToolbarProps) => (
     <button className="ql-link"></button>
     <button className="ql-code-block"></button>
     <button className="ql-blockquote"></button>
+    <button className="ql-image"></button>
     <button className="ql-list" value="ordered" />
     <button className="ql-list" value="bullet" />
     <button className="ql-list" value="check" />

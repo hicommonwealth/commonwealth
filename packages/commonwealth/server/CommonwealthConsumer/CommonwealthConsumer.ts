@@ -8,7 +8,7 @@ import type { BrokerConfig } from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import Rollbar from 'rollbar';
-import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
+import {RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN} from '../config';
 import models from '../database';
 import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
@@ -19,7 +19,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
   const rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: process.env.NODE_ENV,
+    environment: ROLLBAR_ENV,
     captureUncaught: true,
     captureUnhandledRejections: true,
   });

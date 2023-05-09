@@ -11,7 +11,7 @@ import Rollbar from 'rollbar';
 import { SubstrateTypes } from 'chain-events/src/types';
 
 import models from '../database/database';
-import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
+import {RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN} from '../config';
 
 import EventStorageHandler from './ChainEventHandlers/storage';
 import NotificationsHandler from './ChainEventHandlers/notification';
@@ -39,7 +39,7 @@ export async function setupChainEventConsumer(): Promise<ServiceConsumer> {
   if (ROLLBAR_SERVER_TOKEN) {
     rollbar = new Rollbar({
       accessToken: ROLLBAR_SERVER_TOKEN,
-      environment: process.env.NODE_ENV,
+      environment: ROLLBAR_ENV,
       captureUncaught: true,
       captureUnhandledRejections: true,
     });
