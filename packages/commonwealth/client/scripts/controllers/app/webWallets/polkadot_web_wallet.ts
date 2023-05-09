@@ -1,11 +1,6 @@
 import type { Signer } from '@polkadot/api/types';
 
-import {
-  isWeb3Injected,
-  web3Accounts,
-  web3Enable,
-  web3FromAddress,
-} from '@polkadot/extension-dapp';
+import { web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
@@ -18,9 +13,10 @@ import { addressSwapper } from 'utils';
 import type { Account, IWebWallet } from 'models';
 import app from 'state';
 
+declare let window: any;
+
 class PolkadotWebWalletController
-  implements IWebWallet<InjectedAccountWithMeta>
-{
+  implements IWebWallet<InjectedAccountWithMeta> {
   // GETTERS/SETTERS
   private polkadot;
   private _enabled: boolean;
@@ -33,7 +29,7 @@ class PolkadotWebWalletController
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
-    return isWeb3Injected;
+    return window?.injectedWeb3?.['polkadot-js'];
   }
 
   public get enabled() {
