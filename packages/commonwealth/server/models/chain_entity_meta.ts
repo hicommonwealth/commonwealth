@@ -12,7 +12,6 @@ export type ChainEntityMetaAttributes = {
   title?: string;
   chain: string;
   author?: string;
-  thread_id?: number;
   type_id?: string;
   project_chain?: string;
 
@@ -40,7 +39,6 @@ export default (
       title: { type: dataTypes.STRING, allowNull: true },
       chain: { type: dataTypes.STRING, allowNull: false },
       author: { type: dataTypes.STRING, allowNull: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: true },
       type_id: { type: dataTypes.STRING, allowNull: true },
       project_chain: { type: dataTypes.STRING, allowNull: true },
     },
@@ -56,10 +54,6 @@ export default (
   ChainEntityMeta.associate = (models) => {
     models.ChainEntityMeta.belongsTo(models.Chain, {
       foreignKey: 'chain',
-      targetKey: 'id',
-    });
-    models.ChainEntityMeta.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
       targetKey: 'id',
     });
     models.ChainEntityMeta.belongsTo(models.Chain, {
