@@ -1,7 +1,8 @@
 import topics from 'controllers/server/topics';
-import type { IChainAdapter, Topic } from 'models';
-import { ThreadKind } from 'models';
 import app from 'state';
+import type IChainAdapter from '../../../../models/IChainAdapter';
+import type Topic from '../../../../models/Topic';
+import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';
 import { notifyError } from 'controllers/app/notifications';
