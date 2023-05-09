@@ -33,11 +33,11 @@ test.describe('Community proposals page', () => {
     // these are lazy-loaded after page init
     await page.waitForSelector('.CardsCollection:nth-of-type(2)');
     const collection = await page.locator('.CardsCollection:nth-of-type(2)');
-    const spinner = await collection.locator('.cards .Spinner');
+    await collection.locator('.cards .Spinner');
     const p = await collection
       .locator('.cards .ProposalCard .proposal-card-metadata')
       .first();
-    await p.waitFor({ state: 'visible', timeout: 90000 });
+    await p.waitFor({ state: 'visible', timeout: 60000 });
   };
 
   const inactiveProposalPageTest = async ({ page }) => {
@@ -95,13 +95,13 @@ test.describe('Community proposals page', () => {
       inactiveProposalCardsTest({ page }, 2)); // as of commit, should never be less than 2
     test('Inactive proposal page loads', inactiveProposalPageTest);
   });
-  test.describe('osmosis (gov v1beta1)', () => {
+  test.describe('juno (gov v1beta1)', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`http://localhost:8080/osmosis/proposals`);
+      await page.goto(`http://localhost:8080/juno/proposals`);
     });
     test('Active header loads', headerTest);
     test('Inactive proposal cards load', ({ page }) =>
-      inactiveProposalCardsTest({ page }, 431)); // as of commit, should never be less than 431
+      inactiveProposalCardsTest({ page }, 79)); // as of commit, should never be less than 79
     test('Inactive proposal page loads', inactiveProposalPageTest);
   });
 });
