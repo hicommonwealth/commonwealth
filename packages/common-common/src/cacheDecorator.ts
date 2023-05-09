@@ -40,17 +40,20 @@ export class CacheDecorator {
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
   ): RequestHandler {
     return async function cache(req, res, next) {
+      let isNextCalled = false;
       try {
         // If cache is disabled, skip caching
         if (!this.isEnabled()) {
           log.trace(`Cache disabled, skipping cache`);
           res.set(XCACHE_HEADER, XCACHE_VALUES.UNDEF);
+          isNextCalled = true;
           return next();
         }
 
         // cache control header is set to no-cache, skip caching
         if (CacheDecorator.skipCache(req)) {
           res.set(XCACHE_HEADER, XCACHE_VALUES.SKIP);
+          isNextCalled = true;
           return next();
         }
 
@@ -59,6 +62,7 @@ export class CacheDecorator {
         if (!cacheKey) {
           log.trace(`Cache key not found for ${req.originalUrl}`);
           res.set(XCACHE_HEADER, XCACHE_VALUES.NOKEY);
+          isNextCalled = true;
           return next();
         }
 
@@ -82,12 +86,15 @@ export class CacheDecorator {
           originalSend,
           res
         );
+        isNextCalled = true;
+        return next();
       } catch (err) {
         log.warn(`calling next from cacheMiddleware catch ${req.originalUrl}`)
         log.warn(err);
-        return next();
+        if (!isNextCalled) {
+          return next();
+        }
       }
-      return next();
     }.bind(this);
   }
 
