@@ -1,4 +1,3 @@
-export { default as BlockInfo } from './BlockInfo';
 export { default as ChainInfo } from './ChainInfo';
 export { default as DiscussionDraft } from './DiscussionDraft';
 export { default as IChainAdapter } from './IChainAdapter';
