@@ -1,8 +1,14 @@
 import type { Action, Session } from '@canvas-js/interfaces';
-import { import_ } from "@brillout/import"
+import { import_ } from '@brillout/import';
 
-import { getEIP712SignableAction, getEIP712SignableSession } from '../adapters/chain/ethereum/keys';
-import { getADR036SignableSession, getADR036SignableAction } from '../adapters/chain/cosmos/keys';
+import {
+  createSiweMessage,
+  getEIP712SignableAction,
+} from '../adapters/chain/ethereum/keys';
+import {
+  getADR036SignableSession,
+  getADR036SignableAction,
+} from '../adapters/chain/cosmos/keys';
 import { caip2ToChainBase } from './chainMappings';
 import { ChainBase } from '../../../common-common/src/types';
 
@@ -16,7 +22,7 @@ const importCanvas = async () => {
     const canvas = await import_('@canvas-js/interfaces');
     return canvas;
   }
-}
+};
 
 const importChainEthereum = async () => {
   try {
@@ -26,7 +32,7 @@ const importChainEthereum = async () => {
     const canvas = await import_('@canvas-js/chain-ethereum');
     return canvas;
   }
-}
+};
 
 // TODO: verify payload is not expired
 export const verify = async ({
@@ -66,14 +72,18 @@ export const verify = async ({
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
-      const ethSigUtil = await import('@metamask/eth-sig-util');
-      const { types, domain, message } =
-        getEIP712SignableSession(sessionPayload);
-      const recoveredAddr = ethSigUtil.recoverTypedSignature({
-        data: { types, domain, message, primaryType: 'Message' as const },
-        signature,
-        version: ethSigUtil.SignTypedDataVersion.V4,
-      });
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
+      const signaturePatternMatch = signaturePattern.exec(signature)
+      if (signaturePatternMatch === null) {
+        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch
+
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce)
+
+      const ethersUtils = (await import('ethers')).utils;
+      const recoveredAddr = ethersUtils.verifyMessage(siweMessage, signatureData)
+
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (chainBase === ChainBase.CosmosSDK) {
@@ -143,7 +153,7 @@ export const verify = async ({
       const valid = payload.from === bech32Address;
       return valid;
     }
-    // verify cosmos signature (base64)
+    // verify cosmos actions (base64)
     if (action) {
       const signDocPayload = await getADR036SignableAction(
         actionPayload,
@@ -171,6 +181,7 @@ export const verify = async ({
         )
       );
     } else {
+      // verify cosmos sessions
       const canvas = await importCanvas();
       const signDocPayload = await getADR036SignableSession(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
@@ -205,7 +216,7 @@ export const verify = async ({
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
     const canvas = await importCanvas();
-    // verify solana signature
+    // verify solana signature (action, session)
     const stringPayload = action
       ? canvas.serializeActionPayload(actionPayload)
       : canvas.serializeSessionPayload(sessionPayload);
@@ -224,7 +235,7 @@ export const verify = async ({
     const nearlib = await import('near-api-js/lib/utils');
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
-    // verify near signature
+    // verify near signature (action, session)
     if (action) {
       const canvas = await importCanvas();
       const stringPayload = canvas.serializeActionPayload(actionPayload);
@@ -260,7 +271,7 @@ export const verify = async ({
       return valid;
     }
   } else if (chainBase === ChainBase.Substrate) {
-    // verify substrate signature
+    // verify substrate signature (action, session)
     const polkadotUtil = await import('@polkadot/util-crypto');
     const canvas = await importCanvas();
     const stringPayload = action

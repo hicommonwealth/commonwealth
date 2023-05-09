@@ -1,14 +1,15 @@
 /* eslint-disable no-unused-expressions */
-import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
+import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
+import * as siwe from "siwe";
 import { createCanvasSessionPayload } from 'canvas';
 import app, { resetDatabase } from '../../../server-test';
 import {
-  getEIP712SignableSession,
+  createSiweMessage,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../../shared/adapters/chain/ethereum/keys';
@@ -81,13 +82,14 @@ describe('API Tests', () => {
         timestamp,
         TEST_BLOCK_INFO_BLOCKHASH
       );
-      const data = getEIP712SignableSession(message);
+      createSiweMessage
+      // const data = getEIP712SignableSession(message);
+      const nonce = siwe.generateNonce();
+      const domain = "https://commonwealth.test"
+      const siweMessage = createSiweMessage(message, domain, nonce)
       const privateKey = keypair.getPrivateKey();
-      const signature = signTypedData({
-        privateKey,
-        data,
-        version: SignTypedDataVersion.V4,
-      });
+      const signatureData = personalSign({privateKey, data: siweMessage})
+      const signature = `${domain}/${nonce}/${signatureData}`
       res = await chai
         .request(app)
         .post('/api/verifyAddress')

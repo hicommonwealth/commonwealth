@@ -1,7 +1,8 @@
 import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
+import * as siwe from "siwe"
 
-import { getEIP712SignableAction, getEIP712SignableSession } from '../../../shared/adapters/chain/ethereum/keys';
+import { createSiweMessage, getEIP712SignableAction } from '../../../shared/adapters/chain/ethereum/keys';
 import { getADR036SignableAction, getADR036SignableSession } from '../../../shared/adapters/chain/cosmos/keys';
 
 // TODO: verify payload is not expired
@@ -41,15 +42,18 @@ export const verify = async ({
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
-      const ethSigUtil = await import('@metamask/eth-sig-util');
-      const { types, domain, message } =
-        getEIP712SignableSession(sessionPayload);
-      const recoveredAddr = ethSigUtil.recoverTypedSignature({
-        data: { types, domain, message, primaryType: 'Message' as const },
-        signature,
-        version: ethSigUtil.SignTypedDataVersion.V4,
-      });
-      return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
+      const ethersUtils = (await import('ethers')).utils;
+
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
+      const signaturePatternMatch = signaturePattern.exec(signature)
+      if (signaturePatternMatch === null) {
+        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
+
+      const recoveredAddress = ethersUtils.verifyMessage(siweMessage, signatureData)
+      return recoveredAddress.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (payload.chain === 'cosmos') {
     // verify terra sessions (actions are verified like other cosmos chains)

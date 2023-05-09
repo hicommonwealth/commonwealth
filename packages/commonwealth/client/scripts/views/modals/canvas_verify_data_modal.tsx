@@ -72,18 +72,6 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
           <pre>{sessionSignature}</pre>
         </div>
       </div>
-      <div className="compact-modal-actions">
-        <CWButton
-          onClick={(e) => {
-            e.preventDefault();
-            $(e.target).trigger('modalcomplete');
-            setTimeout(() => {
-              $(e.target).trigger('modalexit');
-            }, 0);
-          }}
-          label="Okay"
-        />
-      </div>
     </div>
   );
 };

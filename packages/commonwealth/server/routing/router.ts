@@ -118,6 +118,8 @@ import createRule from '../routes/rules/createRule';
 import deleteRule from '../routes/rules/deleteRule';
 import getRuleTypes from '../routes/rules/getRuleTypes';
 
+import { getCanvasData, postCanvasData } from '../routes/canvas';
+
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
@@ -857,6 +859,10 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     editChatCategory.bind(this, models)
   );
+
+  // signed data
+  router.get('/oplog', getCanvasData.bind(this, models));
+  router.post('/oplog', postCanvasData.bind(this, models));
 
   // rules
   router.post(

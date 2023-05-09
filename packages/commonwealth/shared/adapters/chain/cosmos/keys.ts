@@ -2,9 +2,15 @@
 // we insert our account registration token into a proposal message, and then verify against the
 // generated signature. But first we need the message to insert.
 import type { AminoMsg, StdFee, StdSignDoc } from '@cosmjs/amino';
-import type {
-  ActionPayload,
-} from '@canvas-js/interfaces';
+import type { ActionPayload } from '@canvas-js/interfaces';
+import { configure as configureStableStringify } from 'safe-stable-stringify';
+
+const sortedStringify = configureStableStringify({
+  bigint: false,
+  circularValue: Error,
+  strict: true,
+  deterministic: true,
+});
 
 export const getADR036SignableAction = async (
   actionPayload: ActionPayload,
@@ -23,7 +29,7 @@ export const getADR036SignableAction = async (
     type: 'sign/MsgSignData',
     value: {
       signer: address,
-      data: JSON.stringify(actionPayload),
+      data: sortedStringify(actionPayload),
     },
   };
   const cosm = await import('@cosmjs/amino');
