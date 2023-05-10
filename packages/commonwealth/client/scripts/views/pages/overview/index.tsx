@@ -71,13 +71,13 @@ const OverviewPage = () => {
     topic: Topic;
   }> = topicsSorted.map((topic) => {
     const monthlyThreads = allMonthlyThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic.id === thread.topic?.id
     );
     const pinnedThreads = allPinnedThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic.id === thread.topic?.id
     );
     const allThreadsCount = allThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic.id === thread.topic?.id
     ).length;
 
     return {
