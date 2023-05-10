@@ -13,6 +13,7 @@ type AddCommunityContractTemplateAttributes = {
   contract_id: number;
   community_id: string;
   template_id: number;
+  enabled_by: string;
 };
 
 type EditCommunityContractTemplateAttributes = {
@@ -155,6 +156,8 @@ class ContractsController {
       nickname: string;
       display_name: string;
       display_options: string;
+      enabled_by: string;
+      created_at: Date;
     };
     isNewCCT: boolean;
     template_id?: number;
@@ -322,10 +325,12 @@ class ContractsController {
     name,
     template,
     contract_id,
+    description,
   }: {
     name: string;
     template: string;
     contract_id: string;
+    description: string;
   }) {
     try {
       await $.post(`${app.serverUrl()}/contract/template`, {
@@ -334,6 +339,7 @@ class ContractsController {
         name,
         template,
         contract_id,
+        description,
       });
 
       const contract = this._store.getById(contract_id);
@@ -483,6 +489,7 @@ class ContractsController {
             nickname: string;
             display_name: string;
             display_options: string;
+            enabled_by: string;
           };
         }>;
         if (contractWithTemplate.contract.ContractAbi) {

@@ -97,23 +97,29 @@ export const ContractCard = ({
     <>
       <CWCard fullWidth className="ContractCard">
         <div className="header">
-          <div>
-            <CWText type="caption" className="label">
-              Contract
-            </CWText>
-            <CWText className="address">{address}</CWText>
-          </div>
+          <CWText type="caption" className="label" fontStyle="uppercase">
+            CONTRACT
+          </CWText>
+
           <CWIconButton
             className="delete-icon"
             iconName="trash"
             onClick={handleDeleteContract}
           />
         </div>
+        <div className="label-group">
+          <CWText className="group-title" type="b2">
+            Address
+          </CWText>
+          <CWText className="address" type="b2">
+            {address}
+          </CWText>
+        </div>
         <div className="templates">
           {templates?.length ? (
             <>
-              <CWText type="caption" className="label">
-                Actions
+              <CWText type="caption" className="label" fontStyle="uppercase">
+                ACTIONS
               </CWText>
               <div className="templates-container">
                 {templates.map((template) => (
@@ -125,6 +131,8 @@ export const ContractCard = ({
                     nickname={template.cctmd.nickname}
                     slug={template.cctmd.slug}
                     display={template.cctmd.display_options}
+                    enabledBy={template.cctmd.enabled_by}
+                    enabledAt={template.cctmd.created_at}
                     cctmd_id={template.cctmd.id}
                     cct_id={template.id}
                     handleShowModal={handleOpenManageContractTemplateModal}
