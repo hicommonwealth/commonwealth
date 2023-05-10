@@ -8,23 +8,21 @@ import 'components/edit_profile.scss';
 
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  NewProfile as Profile,
-  Account,
-  AddressInfo,
-  MinimumProfile,
-} from '../../models';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { AvatarUpload } from '../components/avatar_upload';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWDivider } from '../components/component_kit/cw_divider';
-import { CWForm } from '../components/component_kit/cw_form';
-import { CWFormSection } from '../components/component_kit/cw_form_section';
-import { CWSocials } from '../components/component_kit/cw_socials';
-import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
-import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
+import Account from '../../models/Account';
+import AddressInfo from '../../models/AddressInfo';
+import MinimumProfile from '../../models/MinimumProfile';
+import NewProfile from '../../models/NewProfile';
+import { CWButton } from './component_kit/cw_button';
+import { CWTextInput } from './component_kit/cw_text_input';
+import { AvatarUpload } from './avatar_upload';
+import { CWSpinner } from './component_kit/cw_spinner';
+import { CWText } from './component_kit/cw_text';
+import { CWDivider } from './component_kit/cw_divider';
+import { CWForm } from './component_kit/cw_form';
+import { CWFormSection } from './component_kit/cw_form_section';
+import { CWSocials } from './component_kit/cw_socials';
+import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
+import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../pages/404';
 import { LinkedAddresses } from './linked_addresses';
 import { createDeltaFromText, ReactQuillEditor } from './react_quill_editor';
@@ -48,7 +46,7 @@ const EditProfileComponent = () => {
   const [error, setError] = useState<EditProfileError>(EditProfileError.None);
   const [loading, setLoading] = useState(true);
   const [socials, setSocials] = useState<string[]>();
-  const [profile, setProfile] = useState<Profile>();
+  const [profile, setProfile] = useState<NewProfile>();
   const [name, setName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState();
   const [bio, setBio] = React.useState<DeltaStatic>(createDeltaFromText(''));
@@ -65,7 +63,7 @@ const EditProfileComponent = () => {
         },
       });
 
-      setProfile(new Profile(response.data.result.profile));
+      setProfile(new NewProfile(response.data.result.profile));
       setName(response.data.result.profile.profile_name || '');
       setEmail(response.data.result.profile.email || '');
       setSocials(response.data.result.profile.socials);

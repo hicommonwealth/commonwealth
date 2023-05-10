@@ -3,7 +3,7 @@ import React from 'react';
 import 'components/community_card.scss';
 
 import { isCommandClick } from 'helpers';
-import type { ChainInfo } from 'models';
+import type ChainInfo from '../../models/ChainInfo';
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';

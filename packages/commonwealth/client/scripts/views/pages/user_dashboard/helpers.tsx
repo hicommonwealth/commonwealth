@@ -4,7 +4,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
 import $ from 'jquery';
-import type { NotificationSubscription } from 'models';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 import app from 'state';
 import { DashboardViews } from '.';

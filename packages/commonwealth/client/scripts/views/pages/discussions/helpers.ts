@@ -1,11 +1,12 @@
 import { Dispatch, SetStateAction } from 'react';
 import { notifySuccess } from 'controllers/app/notifications';
 import { redraw } from 'mithrilInterop';
-import type { NotificationSubscription, Thread } from 'models';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
+import type Thread from '../../../models/Thread';
 import moment from 'moment';
 
 import app from 'state';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {

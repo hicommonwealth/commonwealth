@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { EventEmitter } from 'events';
 import _ from 'lodash';
-import { MinimumProfile as Profile } from 'models';
+import MinimumProfile from '../../models/MinimumProfile';
 
 import app from 'state';
 import { NewProfileStore } from 'stores';
@@ -35,7 +35,7 @@ class NewProfilesController {
     if (existingProfile !== undefined) {
       return existingProfile;
     }
-    const profile = new Profile(address, chain);
+    const profile = new MinimumProfile(address, chain);
     this._store.add(profile);
     this._unfetched.set(profile.address, profile);
     this._fetchNewProfiles();
@@ -58,7 +58,7 @@ class NewProfilesController {
     }
   }
 
-  private async _refreshProfiles(profiles: Profile[]): Promise<void> {
+  private async _refreshProfiles(profiles: MinimumProfile[]): Promise<void> {
     if (profiles.length === 0) {
       return;
     }

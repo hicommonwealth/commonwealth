@@ -4,16 +4,14 @@
 import $ from 'jquery';
 import { EventEmitter } from 'events';
 
-import type {
-  Account,
-  AddressInfo,
-  ChainInfo,
-  SocialAccount,
-  StarredCommunity,
-} from 'models';
 import app from 'state';
-import DraftsController from './drafts';
+import Account from '../../models/Account';
+import AddressInfo from '../../models/AddressInfo';
+import ChainInfo from '../../models/ChainInfo';
+import SocialAccount from '../../models/SocialAccount';
+import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
+import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
