@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
-
 import 'components/sidebar/index.scss';
 import app from 'state';
 import { handleRedirectClicks } from '../../../helpers';
@@ -49,9 +47,10 @@ export const DiscussionSection = () => {
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
     location
   );
-
-  const onSputnikDaosPage = (p) =>
-    p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
+  const matchesSputnikDaosRoute = matchRoutes(
+    [{ path: '/sputnik-daos' }, { path: ':scope/sputnik-daos' }],
+    location
+  );
 
   const topics = app.topics.store
     .getByCommunity(app.activeChainId())
@@ -153,7 +152,7 @@ export const DiscussionSection = () => {
       isVisible: true,
       isUpdated: true,
       isActive:
-        onSputnikDaosPage(_DEPRECATED_getRoute()) &&
+        !!matchesSputnikDaosRoute &&
         (app.chain ? app.chain.serverLoaded : true),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();

@@ -219,12 +219,6 @@ export function rootRender(el: Element, vnodes: Children) {
   return rootMount(el, render('div', {}, vnodes));
 }
 
-// m.route.get() shim
-// Do not use for new features. Instead, take a look on react-router hook => "useLocation"
-export function _DEPRECATED_getRoute() {
-  return window.location.pathname;
-}
-
 // This should not be used for setting the route, because it does not use react-router.
 // Instead, it uses native history API, and because react router does not recognize the
 // path change, the page has to be reloaded programmatically.
