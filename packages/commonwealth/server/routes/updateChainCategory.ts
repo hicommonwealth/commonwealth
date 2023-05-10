@@ -6,7 +6,7 @@ import { success } from '../types';
 import { ChainCategoryType } from 'common-common/src/types';
 
 type UpdateChainCategoryReq = {
-  selected_tags: any;
+  selected_tags: { [tag: string]: boolean };
   chain_id: string;
   auth: string;
   jwt: string;
@@ -36,7 +36,14 @@ const updateChainCategory = async (
       Object.keys(ChainCategoryType).includes(tag)
     );
   });
-  if (updateCategories != existingCategories) {
+
+  if (
+    existingCategories.length !== updateCategories.length ||
+    !updateCategories.every(
+      (element, index) => element === existingCategories[index]
+    )
+  ) {
+    console.log('updating');
     chain.category = updateCategories;
     await chain.save();
   }
