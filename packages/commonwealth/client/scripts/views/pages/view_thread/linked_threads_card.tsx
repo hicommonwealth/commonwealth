@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { getProposalUrlPath } from 'identifiers';
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -13,7 +13,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
-import { LinkSource } from 'models/Thread';
+import { LinkSource } from '../../../models/Thread';
 import { filterLinks } from 'helpers/threads';
 
 type LinkedThreadsCardProps = {
