@@ -6,7 +6,7 @@ import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import type { AnyProposal } from 'models';
+import type { AnyProposal } from '../../../models/types';
 
 import app from 'state';
 import { BalanceInfo } from 'views/components/proposals/balance_info';

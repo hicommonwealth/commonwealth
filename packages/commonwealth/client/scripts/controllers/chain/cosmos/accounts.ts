@@ -1,6 +1,6 @@
 import type CosmosChain from 'controllers/chain/cosmos/chain';
 import type { CosmosToken } from 'controllers/chain/cosmos/types';
-import type { IAccountsModule } from 'models';
+import type { IAccountsModule } from '../../../models/interfaces';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import CosmosAccount from './account';
