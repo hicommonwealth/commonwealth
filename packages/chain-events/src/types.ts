@@ -1,4 +1,3 @@
-export * as CommonwealthTypes from './chains/commonwealth/types';
 export * as CosmosTypes from './chains/cosmos/types';
 export * as AaveTypes from './chains/aave/types';
 export * as Erc721Types from './chains/erc721/types';
