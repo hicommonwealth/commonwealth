@@ -34,7 +34,7 @@ const updateChainCategory = async (
       ? (chain.category as string[])
       : [];
     if (existingCategories.includes(req.body.category))
-      return next(new AppError('Chain already include this category'));
+      throw new AppError('Chain already include this category');
 
     existingCategories.push(req.body.category);
 
