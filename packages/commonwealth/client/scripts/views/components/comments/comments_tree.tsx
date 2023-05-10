@@ -21,17 +21,17 @@ type CommentsTreeAttrs = {
 };
 
 export const CommentsTree = (props: CommentsTreeAttrs) => {
-  const [commentError, setCommentError] = React.useState(null);
+  const [commentError] = React.useState(null);
   const [highlightedComment, setHighlightedComment] = React.useState(false);
   const [isReplying, setIsReplying] = React.useState(false);
   const [parentCommentId, setParentCommentId] = React.useState(null);
 
-  const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
-    props;
-
-  // Jump to the comment indicated in the URL upon page load. Avoid
-  // using _DEPRECATED_getSearchParams('comment') because it may return stale
-  // results from a previous page if route transition hasn't finished
+  const {
+    comments,
+    thread,
+    setIsGloballyEditing,
+    updatedCommentsCallback,
+  } = props;
 
   React.useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {

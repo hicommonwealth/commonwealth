@@ -1,9 +1,6 @@
 import React from 'react';
 
-import {
-  _DEPRECATED_getRoute,
-  _DEPRECATED_getSearchParams,
-} from 'mithrilInterop';
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import app from 'state';
@@ -16,6 +13,7 @@ import type {
   ToggleTree,
 } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useLocation, matchRoutes } from 'react-router-dom';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -31,57 +29,26 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = !toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
-    JSON.stringify(newTree);
+  localStorage[
+    `${app.activeChainId()}-discussions-toggle-tree`
+  ] = JSON.stringify(newTree);
 }
 
 export const DiscussionSection = () => {
   const navigate = useCommonNavigate();
-
-  // Conditional Render Details +
-  const onAllDiscussionPage = (p) => {
-    const identifier = _DEPRECATED_getSearchParams('§');
-    if (identifier) {
-      const thread = app.threads.store.getByIdentifier(
-        identifier.slice(0, identifier.indexOf('-'))
-      );
-      if (thread && !thread.topic) {
-        return true;
-      }
-    }
-
-    return (
-      p === `/${app.activeChainId()}/discussions` ||
-      p === `/${app.activeChainId()}/discussions/`
-    );
-  };
-
-  const onOverviewDiscussionPage = (p) => {
-    const identifier = _DEPRECATED_getSearchParams('identifier');
-    if (identifier) {
-      const thread = app.threads.store.getByIdentifier(
-        identifier.slice(0, identifier.indexOf('-'))
-      );
-      if (thread && !thread.topic) {
-        return true;
-      }
-    }
-
-    return p === `/${app.activeChainId()}/overview`;
-  };
-
-  const onFeaturedDiscussionPage = (p, topic) => {
-    const identifier = _DEPRECATED_getSearchParams('identifier');
-    if (identifier) {
-      const thread = app.threads.store.getByIdentifier(
-        identifier.slice(0, identifier.indexOf('-'))
-      );
-      if (thread?.topic && thread.topic.name === topic) {
-        return true;
-      }
-    }
-    return decodeURI(p).endsWith(`/discussions/${topic}`);
-  };
+  const location = useLocation();
+  const matchesDiscussionsRoute = matchRoutes(
+    [{ path: '/discussions' }, { path: ':scope/discussions' }],
+    location
+  );
+  const matchesOverviewRoute = matchRoutes(
+    [{ path: '/overview' }, { path: ':scope/overview' }],
+    location
+  );
+  const matchesDiscussionsTopicRoute = matchRoutes(
+    [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
+    location
+  );
 
   const onSputnikDaosPage = (p) =>
     p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
@@ -122,13 +89,15 @@ export const DiscussionSection = () => {
 
   // Check if an existing toggle tree is stored
   if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
-    localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
-      JSON.stringify(discussionsDefaultToggleTree);
+    localStorage[
+      `${app.activeChainId()}-discussions-toggle-tree`
+    ] = JSON.stringify(discussionsDefaultToggleTree);
   } else if (
     !verifyCachedToggleTree('discussions', discussionsDefaultToggleTree)
   ) {
-    localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
-      JSON.stringify(discussionsDefaultToggleTree);
+    localStorage[
+      `${app.activeChainId()}-discussions-toggle-tree`
+    ] = JSON.stringify(discussionsDefaultToggleTree);
   }
   const toggleTreeState = JSON.parse(
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
@@ -141,7 +110,7 @@ export const DiscussionSection = () => {
       hasDefaultToggle: false,
       isVisible: true,
       isUpdated: true,
-      isActive: onAllDiscussionPage(_DEPRECATED_getRoute()),
+      isActive: !!matchesDiscussionsRoute,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(
@@ -162,7 +131,7 @@ export const DiscussionSection = () => {
       hasDefaultToggle: false,
       isVisible: true,
       isUpdated: true,
-      isActive: onOverviewDiscussionPage(_DEPRECATED_getRoute()),
+      isActive: !!matchesOverviewRoute,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(
@@ -213,7 +182,8 @@ export const DiscussionSection = () => {
         hasDefaultToggle: false,
         isVisible: true,
         isUpdated: true,
-        isActive: onFeaturedDiscussionPage(_DEPRECATED_getRoute(), topic.name),
+        isActive:
+          matchesDiscussionsTopicRoute?.[0]?.params?.topic === topic.name,
         // eslint-disable-next-line no-loop-func
         onClick: (e, toggle: boolean) => {
           e.preventDefault();

@@ -219,13 +219,6 @@ export function rootRender(el: Element, vnodes: Children) {
   return rootMount(el, render('div', {}, vnodes));
 }
 
-// ROUTING FUNCTIONS
-// Do not use for new features. Instead, take a look on react-router hook => "useSearchParams"
-export function _DEPRECATED_getSearchParams(name?: string) {
-  const search = new URLSearchParams(window.location.search);
-  return search.get(name);
-}
-
 // m.route.get() shim
 // Do not use for new features. Instead, take a look on react-router hook => "useLocation"
 export function _DEPRECATED_getRoute() {

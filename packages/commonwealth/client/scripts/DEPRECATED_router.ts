@@ -1,5 +1,3 @@
-import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
-
 /**
   TODO THIS FILE IS DEPRECATED BUT NOT ALL FUNCTIONALITIES HAVE BEEN REWRITTEN TO THE REACT APPROACH
   SO THIS SHOULD STAY HERE TILL EVERYTHING WILL BE TRANSFERRED.
@@ -10,7 +8,7 @@ import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 // TODO this function used to be in the app.ts but now
 // should be incorporated in new react flow
 const handleLoginRedirects = () => {
-  const routeParam = _DEPRECATED_getSearchParams();
+  const routeParam = {};
   if (
     routeParam['loggedin'] &&
     routeParam['loggedin'].toString() === 'true' &&
@@ -19,17 +17,15 @@ const handleLoginRedirects = () => {
   ) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
-
     /* If we are creating a new account, then we alias to create a new mixpanel user
      else we identify to associate mixpanel events
     */
-    if (
-      _DEPRECATED_getSearchParams()['new'] &&
-      _DEPRECATED_getSearchParams()['new'].toString() === 'true'
-    ) {
-      console.log('creating account');
-    }
-
+    // if (
+    //   _DEPRECATED_getSearchParams()['new'] &&
+    //   _DEPRECATED_getSearchParams()['new'].toString() === 'true'
+    // ) {
+    //   console.log('creating account');
+    // }
     // TODO setRoute outside of react router, might not work properly
     // setRoute(_DEPRECATED_getSearchParams['path'], {}, { replace: true });
   } else if (
