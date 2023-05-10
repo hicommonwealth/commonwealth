@@ -97,6 +97,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
           hideFormatting={true}
           doc={content}
           searchTerm={searchTerm}
+          containerClass="SearchQuillRenderer"
         />
       </CWText>
     </div>
@@ -129,6 +130,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
           hideFormatting={true}
           doc={content}
           searchTerm={searchTerm}
+          containerClass="SearchQuillRenderer"
         />
       </CWText>
     </div>
