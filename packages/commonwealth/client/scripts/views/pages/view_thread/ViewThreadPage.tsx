@@ -4,11 +4,14 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
+import { Link, LinkSource } from '../../../../../server/models/thread';
 
-import type { Comment, Poll, Topic } from 'models';
-import { Thread, ThreadStage as ThreadStageType } from 'models';
+import type Comment from '../../../models/Comment';
+import type Poll from '../../../models/Poll';
+import type Topic from '../../../models/Topic';
+import { ThreadStage as ThreadStageType } from '../../../models/types';
 import type { IThreadCollaborator } from 'models/Thread';
-import { Link, LinkSource } from 'models/Thread';
+import Thread from '../../../models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';

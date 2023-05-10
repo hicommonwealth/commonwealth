@@ -1,12 +1,7 @@
-export { default as NotificationSubscription } from './NotificationSubscription';
-export { default as Attachment } from './Attachment';
-export { default as Comment } from './Comment';
 export { default as Contract } from './Contract';
 export { default as Topic } from './Topic';
 export { default as Thread } from './Thread';
 export { default as Poll } from './Poll';
-export { default as Vote } from './Vote';
-export { default as NewProfile } from './NewProfile';
 export { default as MinimumProfile } from './MinimumProfile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
@@ -16,7 +11,6 @@ export { default as SearchQuery } from './SearchQuery';
 export { default as SearchResult } from './SearchResult';
 export { default as ChainEvent } from './ChainEvent';
 export { default as ChainEntity } from './ChainEntity';
-export { default as StarredCommunity } from './StarredCommunity';
 export { default as Webhook } from './Webhook';
 
 export { DepositVote, BinaryVote } from './votes';
