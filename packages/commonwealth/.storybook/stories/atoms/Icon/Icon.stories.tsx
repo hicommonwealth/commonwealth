@@ -7,7 +7,7 @@ import type { IconName } from '../../../../client/scripts/views/components/compo
 import { iconLookup } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 const icons = {
-  title: 'Atoms/Icons',
+  title: 'Atoms/Icon/Overview',
   component: CWIcon,
 } satisfies Meta<typeof CWIcon>;
 
@@ -33,6 +33,6 @@ const Icons = () => {
 
 // export const AllIcons: Story = {
 export const AllIcons = {
-  name: 'Icons',
+  name: 'Overview',
   render: () => <Icons />
 }

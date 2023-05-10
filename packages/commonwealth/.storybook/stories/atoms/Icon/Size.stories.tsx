@@ -6,7 +6,7 @@ import { CWText } from '../../../../client/scripts/views/components/component_ki
 // import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
 const icons = {
-  title: 'Atoms/Icons with different sizes',
+  title: 'Atoms/Icon/Size',
   component: CWIcon,
 } satisfies Meta<typeof CWIcon>;
 
