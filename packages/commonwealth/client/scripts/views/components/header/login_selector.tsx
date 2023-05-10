@@ -24,7 +24,7 @@ import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
-import { ITokenAdapter } from '../../../models/index';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
