@@ -1,8 +1,10 @@
 import $ from 'jquery';
-import type { Thread, Topic } from 'models';
-import { AbridgedThread, MinimumProfile as Profile } from 'models';
+import MinimumProfile from '../../models/MinimumProfile';
+import type Thread from '../../models/Thread';
+import type Topic from '../../models/Topic';
 import moment from 'moment';
 import app from 'state';
+import AbridgedThread from '../../models/AbridgedThread';
 
 export interface IAbridgedThreadFromServer {
   id: number;
@@ -60,7 +62,7 @@ class RecentActivityController {
     this._activeUsers = users.map((user) => {
       const { count } = user;
       const { chain, address, name, id, avatarUrl, lastActive } = user.info;
-      const info = new Profile(address, chain);
+      const info = new MinimumProfile(address, chain);
       info.initialize(name, address, avatarUrl, id, chain, lastActive);
       return { info, count };
     });

@@ -1,5 +1,5 @@
 import { pluralize } from 'helpers';
-import type { ChainInfo } from 'models';
+import ChainInfo from '../../../models/ChainInfo';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 import React from 'react';

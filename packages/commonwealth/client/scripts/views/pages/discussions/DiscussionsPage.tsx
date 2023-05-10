@@ -18,6 +18,7 @@ type DiscussionsPageProps = {
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
+  const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
@@ -63,6 +64,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     };
   }, [threads]);
 
+  useEffect(() => {
+    setTotalThreads(app.threads.numTotalThreads);
+  }, [app.threads.numTotalThreads]);
+
   // setup initial threads
   useEffect(() => {
     app.threads.resetPagination();
@@ -71,6 +76,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       .then((t) => {
         // Fetch first 20 + unpinned threads
         setThreads(t);
+        // !totalThreads && setTotalThreads(totalResults);
         setInitializing(false);
       });
   }, [stageName, topicName]);
@@ -82,8 +88,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       return;
     }
 
+    // !totalThreads && setTotalThreads(response.totalResults);
     return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
-  }, [stageName, topicName]);
+  }, [stageName, topicName, totalThreads]);
 
   if (initializing) {
     return <PageLoading />;
@@ -110,7 +117,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 <RecentThreadsHeader
                   topic={topicName}
                   stage={stageName}
-                  totalThreadCount={threads ? threads.length : 0}
+                  totalThreadCount={threads ? totalThreads : 0}
                 />
               );
             },

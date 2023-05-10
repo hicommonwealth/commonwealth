@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import { MinimumProfile as Profile } from 'models';
+import MinimumProfile from '../../models/MinimumProfile';
 import { EventEmitter } from 'events';
 
 import app from 'state';
@@ -13,7 +13,7 @@ class NewProfilesController {
     return this._store;
   }
 
-  private _unfetched: Profile[];
+  private _unfetched: MinimumProfile[];
 
   private _fetchNewProfiles;
 
@@ -36,7 +36,7 @@ class NewProfilesController {
     if (existingProfile !== undefined) {
       return existingProfile;
     }
-    const profile = new Profile(address, chain);
+    const profile = new MinimumProfile(address, chain);
     this._store.add(profile);
     this._unfetched.push(profile);
     this._fetchNewProfiles();
@@ -59,11 +59,11 @@ class NewProfilesController {
     }
   }
 
-  private async _refreshProfiles(profiles: Profile[]): Promise<void> {
+  private async _refreshProfiles(profiles: MinimumProfile[]): Promise<void> {
     if (profiles.length === 0) return;
     const chunkedProfiles = _.chunk(profiles, 20);
     await Promise.all(
-      chunkedProfiles.map(async (chunk): Promise<Profile | Profile[]> => {
+      chunkedProfiles.map(async (chunk): Promise<MinimumProfile | MinimumProfile[]> => {
         const requestData =
           chunk.length === 1
             ? {

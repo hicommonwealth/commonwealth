@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import 'components/chain_entities_selector.scss';
-import type { ChainEntity } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
 
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
@@ -36,13 +36,13 @@ const filterChainEntities = (ce: ChainEntity, searchTerm: string) => {
 };
 
 type ChainEntitiesSelectorProps = {
-  chainEntitiesToSet: Array<ChainEntity>;
-  onSelect: (ce: ChainEntity) => void;
+  proposalsToSet: Array<Pick<ChainEntity, 'typeId'>>;
+  onSelect: ({ typeId }: { typeId: string }) => void;
 };
 
 export const ChainEntitiesSelector = ({
   onSelect,
-  chainEntitiesToSet,
+  proposalsToSet,
 }: ChainEntitiesSelectorProps) => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,19 +79,19 @@ export const ChainEntitiesSelector = ({
 
   const renderItem = useCallback(
     (i: number, chainEntity: ChainEntity) => {
-      const isSelected = !!chainEntitiesToSet.find(
-        (el) => el.id === chainEntity.id
+      const isSelected = !!proposalsToSet.find(
+        (el) => String(el.typeId) === chainEntity.typeId
       );
 
       return (
         <ChainEntitiesSelectorItem
           chainEntity={chainEntity}
           isSelected={isSelected}
-          onClick={(ce) => onSelect(ce)}
+          onClick={(ce) => onSelect({ typeId: ce.typeId })}
         />
       );
     },
-    [chainEntitiesToSet, onSelect]
+    [onSelect, proposalsToSet]
   );
 
   if (!app.chain || !app.activeChainId()) {

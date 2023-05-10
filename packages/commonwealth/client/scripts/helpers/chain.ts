@@ -1,10 +1,11 @@
 import app, { ApiStatus } from 'state';
-import { ChainInfo, NodeInfo } from 'models';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import { redraw } from 'mithrilInterop';
 import type { NavigateFunction } from 'react-router-dom';
+import ChainInfo from '../models/ChainInfo';
+import NodeInfo from '../models/NodeInfo';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;

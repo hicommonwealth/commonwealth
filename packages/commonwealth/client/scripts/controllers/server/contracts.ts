@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import type { Response } from 'express';
 import { ContractsStore } from 'stores';
-import { Contract } from 'models';
+import Contract from '../../models/Contract';
 import app from 'state';
 import type { BalanceType, ContractType } from 'common-common/src/types';
 

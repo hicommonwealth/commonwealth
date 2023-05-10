@@ -1,6 +1,6 @@
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
-import type { Account } from 'models';
+import type Account from 'models/Account';
 import app from 'state';
 import type { ThreadForm } from './types';
 import { NewThreadErrors } from './types';

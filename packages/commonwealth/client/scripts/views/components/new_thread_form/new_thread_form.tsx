@@ -5,8 +5,9 @@ import 'components/new_thread_form.scss';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { notifyError } from 'controllers/app/notifications';
-import { ThreadKind, ThreadStage } from 'models';
+import { ThreadKind, ThreadStage } from '../../../models/types';
 import app from 'state';
+import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
@@ -24,6 +25,7 @@ import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
+  serializeDelta,
 } from '../react_quill_editor/utils';
 
 export const NewThreadForm = () => {
@@ -92,11 +94,13 @@ export const NewThreadForm = () => {
       const result = await app.threads.create(
         author.address,
         threadKind,
-        ThreadStage.Discussion,
+        app.chain.meta.customStages
+          ? parseCustomStages(app.chain.meta.customStages)[0]
+          : ThreadStage.Discussion,
         app.activeChainId(),
         threadTitle,
         threadTopic,
-        deltaString,
+        serializeDelta(threadContentDelta),
         threadUrl
       );
 

@@ -15,14 +15,16 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
-import { isSameAccount, pluralize, setDarkMode } from 'helpers';
-import type { Account } from 'models';
-import { AddressInfo, ITokenAdapter } from 'models';
+import { isSameAccount, pluralize } from 'helpers';
+import { setDarkMode } from 'helpers/darkMode';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
+import Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -511,8 +513,8 @@ export const LoginSelector = () => {
             <CWButton
               buttonType="tertiary-black"
               onClick={async () => {
-                if(sameBaseAddressesRemoveDuplicates.length === 0) {
-                  setIsLoginModalOpen(true)
+                if (sameBaseAddressesRemoveDuplicates.length === 0) {
+                  setIsLoginModalOpen(true);
                 } else {
                   if (hasTermsOfService) {
                     setIsTOSModalOpen(true);

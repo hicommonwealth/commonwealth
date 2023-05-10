@@ -4,7 +4,8 @@ import axios from 'axios';
 import 'pages/manage_community/index.scss';
 
 import app from 'state';
-import { AccessLevel, RoleInfo } from 'models';
+import { AccessLevel } from '../../../../../shared/permissions';
+import RoleInfo from '../../../models/RoleInfo';
 import Sublayout from '../../sublayout';
 import ErrorPage from '../error';
 import { PageLoading } from '../loading';

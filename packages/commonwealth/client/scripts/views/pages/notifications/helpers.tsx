@@ -8,10 +8,10 @@ import type { IPostNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 
 import app from 'state';
-import { AddressInfo } from 'models';
 import { pluralize } from 'helpers';
 import { User } from 'views/components/user/user';
 import { getThreadUrl, getCommunityUrl } from 'utils';
+import AddressInfo from '../../../models/AddressInfo';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 const jumpHighlightNotification = (

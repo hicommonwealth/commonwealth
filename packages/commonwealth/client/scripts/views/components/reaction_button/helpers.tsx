@@ -1,11 +1,12 @@
 import React from 'react';
 import $ from 'jquery';
 
-import type { ChainInfo, Comment } from 'models';
-
 import app from 'state';
-import { AddressInfo, Thread } from 'models';
 import { User } from 'views/components/user/user';
+import AddressInfo from '../../../models/AddressInfo';
+import ChainInfo from '../../../models/ChainInfo';
+import Comment from '../../../models/Comment';
+import Thread from '../../../models/Thread';
 import { CWText } from '../component_kit/cw_text';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;

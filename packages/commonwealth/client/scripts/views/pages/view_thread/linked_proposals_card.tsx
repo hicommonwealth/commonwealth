@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
@@ -7,7 +7,9 @@ import {
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import type { ChainEntity, Thread, ThreadStage } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
+import type Thread from '../../../models/Thread';
+import type { ThreadStage } from '../../../models/types';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -18,36 +20,42 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { Link, LinkSource } from 'models/Thread';
+import { IChainEntityKind } from 'chain-events/src';
+import { filterLinks } from 'helpers/threads';
 
 type LinkedProposalProps = {
-  chainEntity: ChainEntity;
   thread: Thread;
+  title: string;
+  ceType: ChainEntity['type'];
+  ceTypeId: ChainEntity['typeId'];
+  ceCompleted?: ChainEntity['completed'];
 };
 
-const LinkedProposal = (props: LinkedProposalProps) => {
-  const { thread, chainEntity } = props;
-
-  const slug = chainEntityTypeToProposalSlug(chainEntity.type);
+const LinkedProposal = ({
+  thread,
+  title,
+  ceType,
+  ceTypeId,
+  ceCompleted,
+}: LinkedProposalProps) => {
+  const slug = chainEntityTypeToProposalSlug(ceType);
 
   const threadLink = `${
     app.isCustomDomain() ? '' : `/${thread.chain}`
-  }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
+  }${getProposalUrlPath(slug, ceTypeId, true)}`;
 
   return (
     <a href={threadLink}>
-      {`${chainEntityTypeToProposalName(chainEntity.type)} #${
-        chainEntity.typeId
-      } ${chainEntity.completed ? ' (Completed)' : ''}`}
+      {`${title ?? chainEntityTypeToProposalName(ceType)} #${ceTypeId} ${
+        ceCompleted ? ' (Completed)' : ''
+      }`}
     </a>
   );
 };
 
 type LinkedProposalsCardProps = {
-  onChangeHandler: (
-    stage: ThreadStage,
-    chainEntities: Array<ChainEntity>,
-    snapshotProposal: Array<SnapshotProposal>
-  ) => void;
+  onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
   showAddProposalButton: boolean;
   thread: Thread;
 };
@@ -59,15 +67,27 @@ export const LinkedProposalsCard = ({
 }: LinkedProposalsCardProps) => {
   const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
+  const [snapshotUrl, setSnapshotUrl] = useState('');
   const [space, setSpace] = useState<SnapshotSpace>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const initialSnapshotLinks = useMemo(
+    () => filterLinks(thread.links, LinkSource.Snapshot),
+    [thread.links]
+  );
+
+  const initialProposalLinks = useMemo(
+    () => filterLinks(thread.links, LinkSource.Proposal),
+    [thread.links]
+  );
+
   useEffect(() => {
-    if (thread.snapshotProposal?.length > 0) {
+    if (initialSnapshotLinks.length > 0) {
+      const proposal = initialSnapshotLinks[0];
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
         for (const { space: _space, proposals } of data) {
           const matchingSnapshot = proposals.find(
-            (sn) => sn.id === thread.snapshotProposal
+            (sn) => sn.id === proposal.identifier
           );
 
           if (matchingSnapshot) {
@@ -76,51 +96,60 @@ export const LinkedProposalsCard = ({
             break;
           }
         }
-
+        if (proposal.identifier.includes('/')) {
+          setSnapshotUrl(
+            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+              proposal.identifier
+            }`
+          );
+        } else if (space && snapshot) {
+          setSnapshotUrl(
+            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+              space.id
+            }/${snapshot.id}`
+          );
+        }
         setSnapshotProposalsLoaded(true);
       });
     }
-  }, [thread.snapshotProposal]);
-
-  let snapshotUrl = '';
-
-  if (space && snapshot) {
-    snapshotUrl = `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-      space.id
-    }/${snapshot.id}`;
-  }
+  }, [initialSnapshotLinks]);
 
   const showSnapshot =
-    thread.snapshotProposal?.length > 0 && snapshotProposalsLoaded;
+    initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
 
   return (
     <>
       <CWContentPageCard
         header="Linked Proposals"
         content={
-          thread.snapshotProposal?.length > 0 && !snapshotProposalsLoaded ? (
+          initialSnapshotLinks.length > 0 && !snapshotProposalsLoaded ? (
             <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>
           ) : (
             <div className="LinkedProposalsCard">
-              {thread.chainEntities.length > 0 || showSnapshot ? (
+              {initialProposalLinks.length > 0 || showSnapshot ? (
                 <div className="links-container">
-                  {thread.chainEntities.length > 0 && (
+                  {initialProposalLinks.length > 0 && (
                     <div className="linked-proposals">
-                      {thread.chainEntities.map((chainEntity) => {
+                      {initialProposalLinks.map((l) => {
                         return (
                           <LinkedProposal
+                            key={l.identifier}
                             thread={thread}
-                            chainEntity={chainEntity}
-                            key={chainEntity.id}
+                            title={l.title}
+                            ceType={'proposal' as IChainEntityKind}
+                            ceTypeId={l.identifier}
                           />
                         );
                       })}
                     </div>
                   )}
                   {showSnapshot && (
-                    <a href={snapshotUrl}>Snapshot: {snapshot?.title}</a>
+                    <a href={snapshotUrl}>
+                      Snapshot:{' '}
+                      {initialSnapshotLinks[0].title ?? snapshot.title}
+                    </a>
                   )}
                 </div>
               ) : (

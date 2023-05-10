@@ -11,7 +11,7 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
     threads = await models.Thread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
-        chain: chain.id,
+        // chain: req.chain ? req.chain.id : undefined,
       },
       include: [
         {
@@ -41,10 +41,6 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
               required: true,
             },
           ],
-        },
-        {
-          model: models.LinkedThread,
-          as: 'linked_threads',
         },
       ],
     });
