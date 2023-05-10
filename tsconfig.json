@@ -17,7 +17,6 @@
       "chain-testing/*": ["./packages/chain-events/chain-testing/*"],
       "token-balance-cache": ["./packages/token-balance-cache"],
       "token-balance-cache/*": ["./packages/token-balance-cache/*"],
-      "react": ["./node_modules/@types/react"]
     }
   }
 }
