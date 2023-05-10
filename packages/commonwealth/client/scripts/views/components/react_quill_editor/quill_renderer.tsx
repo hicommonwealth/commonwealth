@@ -4,8 +4,6 @@ import { MarkdownFormattedText } from './markdown_formatted_text';
 import { DeltaStatic } from 'quill';
 import { SerializableDeltaStatic, getTextFromDelta } from './utils';
 
-export const SEARCH_PREVIEW_HEIGHT = 70;
-
 export type QuillRendererProps = {
   doc: string;
   hideFormatting?: boolean;
