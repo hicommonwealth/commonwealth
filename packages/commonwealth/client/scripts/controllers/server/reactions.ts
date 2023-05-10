@@ -1,7 +1,7 @@
 import { ReactionStore } from 'stores';
 import AbridgedThread from '../../models/AbridgedThread';
-import Comment from '../../models/Comment';
-import { AnyProposal } from '../../models/index';
+import type Comment from '../../models/Comment';
+import type { AnyProposal } from '../../models/types';
 import Reaction from '../../models/Reaction';
 import Thread from '../../models/Thread';
 

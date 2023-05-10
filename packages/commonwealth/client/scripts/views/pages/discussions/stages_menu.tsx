@@ -2,7 +2,7 @@ import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { threadStageToLabel } from 'helpers';
-import { ThreadStage } from 'models';
+import { ThreadStage } from '../../../models/types';
 
 import 'pages/discussions/stages_menu.scss';
 
