@@ -32,16 +32,17 @@ import type {
   LoginSidebarType,
 } from '../views/pages/login/types';
 
-type LoginModalAttrs = {
+type IuseWalletProps = {
   initialBody?: LoginActiveStep;
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
   onSuccess?: () => void;
   onModalClose: () => void;
+  useSessionKeyLoginFlow?: boolean;
 };
 
-const useWallets = (props: LoginModalAttrs) => {
+const useWallets = (walletProps: IuseWalletProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [activeStep, setActiveStep] = useState<LoginActiveStep>();
@@ -110,21 +111,21 @@ const useWallets = (props: LoginModalAttrs) => {
     setShowMobile(isWindowMediumSmallInclusive(window.innerWidth));
 
     // Override if initial data is provided (needed for redirecting wallets + CommonBot)
-    if (props.initialBody) {
-      setActiveStep(props.initialBody);
+    if (walletProps.initialBody) {
+      setActiveStep(walletProps.initialBody);
     }
-    if (props.initialSidebar) {
-      setSidebarType(props.initialSidebar);
+    if (walletProps.initialSidebar) {
+      setSidebarType(walletProps.initialSidebar);
     }
-    if (props.initialAccount) {
-      setPrimaryAccount(props.initialAccount);
-      setAddress(props.initialAccount.address);
+    if (walletProps.initialAccount) {
+      setPrimaryAccount(walletProps.initialAccount);
+      setAddress(walletProps.initialAccount.address);
     }
-    // if (props.initialWebWallet) {
-    //   this.selectedWallet = props.initialWebWallet;
+    // if (walletProps.initialWebWallet) {
+    //   this.selectedWallet = walletProps.initialWebWallet;
     // }
-    if (props.initialWallets) {
-      setWallets(props.initialWallets);
+    if (walletProps.initialWallets) {
+      setWallets(walletProps.initialWallets);
     }
   }, []);
 
@@ -168,12 +169,12 @@ const useWallets = (props: LoginModalAttrs) => {
       await loginWithMagicLink(email);
       setIsMagicLoading(false);
 
-      if (props.onSuccess) props.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess();
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        props.onModalClose();
+        walletProps.onModalClose();
       } else {
-        props.onModalClose();
+        walletProps.onModalClose();
       }
     } catch (e) {
       notifyError("Couldn't send magic link");
@@ -198,11 +199,11 @@ const useWallets = (props: LoginModalAttrs) => {
       completeClientLogin(account);
       if (exitOnComplete) {
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          props.onModalClose();
+          walletProps.onModalClose();
         } else {
-          props.onModalClose();
+          walletProps.onModalClose();
         }
-        if (props.onSuccess) props.onSuccess();
+        if (walletProps.onSuccess) walletProps.onSuccess();
       }
       // redraw();
     } else {
@@ -219,11 +220,11 @@ const useWallets = (props: LoginModalAttrs) => {
       }
       if (exitOnComplete) {
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          props.onModalClose();
+          walletProps.onModalClose();
         } else {
-          props.onModalClose();
+          walletProps.onModalClose();
         }
-        if (props.onSuccess) props.onSuccess();
+        if (walletProps.onSuccess) walletProps.onSuccess();
       }
       // redraw();
     }
@@ -236,6 +237,11 @@ const useWallets = (props: LoginModalAttrs) => {
     linking: boolean,
     currentWallet?: IWebWallet<any>
   ) => {
+    if (walletProps.useSessionKeyLoginFlow) {
+      walletProps.onModalClose();
+      return;
+    }
+
     const walletToUse = currentWallet || selectedWallet;
 
     // Handle Logged in and joining community of different chain base
@@ -305,7 +311,7 @@ const useWallets = (props: LoginModalAttrs) => {
           setCachedWalletSignature(signature);
           setCachedTimestamp(timestamp);
           setCachedChainId(walletToUse.getChainId());
-          props.onSuccess?.();
+          walletProps.onSuccess?.();
         } catch (e) {
           console.log(e);
         }
@@ -340,9 +346,9 @@ const useWallets = (props: LoginModalAttrs) => {
       console.log(e);
       notifyError('Failed to create account. Please try again.');
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        props.onModalClose();
+        walletProps.onModalClose();
       } else {
-        props.onModalClose();
+        walletProps.onModalClose();
       }
     }
     setActiveStep('welcome');
@@ -399,19 +405,19 @@ const useWallets = (props: LoginModalAttrs) => {
         );
       }
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        props.onModalClose();
+        walletProps.onModalClose();
       } else {
-        props.onModalClose();
+        walletProps.onModalClose();
       }
-      if (props.onSuccess) props.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess();
       // redraw();
     } catch (e) {
       console.log(e);
       notifyError('Failed to save profile info');
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        props.onModalClose();
+        walletProps.onModalClose();
       } else {
-        props.onModalClose();
+        walletProps.onModalClose();
       }
     }
   };
@@ -487,7 +493,11 @@ const useWallets = (props: LoginModalAttrs) => {
         }
       }
 
-      await onNormalWalletLogin(wallet, selectedAddress);
+      if (walletProps.useSessionKeyLoginFlow) {
+        await onSessionKeyRevalidation(wallet, selectedAddress);
+      } else {
+        await onNormalWalletLogin(wallet, selectedAddress);
+      }
     }
   };
 
@@ -496,10 +506,17 @@ const useWallets = (props: LoginModalAttrs) => {
     address: string
   ) => {
     setSelectedWallet(wallet);
-    await onNormalWalletLogin(wallet, address);
+    if (walletProps.useSessionKeyLoginFlow) {
+      await onSessionKeyRevalidation(wallet, address);
+    } else {
+      await onNormalWalletLogin(wallet, address);
+    }
   };
 
-  async function onNormalWalletLogin(wallet: IWebWallet<any>, address: string) {
+  const onNormalWalletLogin = async (
+    wallet: IWebWallet<any>,
+    address: string
+  ) => {
     setSelectedWallet(wallet);
 
     if (app.isLoggedIn()) {
@@ -564,7 +581,59 @@ const useWallets = (props: LoginModalAttrs) => {
     } catch (err) {
       console.log(err);
     }
-  }
+  };
+
+  const onSessionKeyRevalidation = async (
+    wallet: IWebWallet<any>,
+    address: string
+  ) => {
+    const timestamp = +new Date();
+    const sessionAddress = await app.sessions.getOrCreateAddress(
+      wallet.chain,
+      wallet.getChainId().toString()
+    );
+    const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
+    const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+
+    // Start the create-user flow, so validationBlockInfo gets saved to the backend
+    // This creates a new `Account` object with fields set up to be validated by verifyAddress.
+    const { account } = await createUserWithAddress(
+      address,
+      wallet.name,
+      chainIdentifier,
+      sessionAddress,
+      validationBlockInfo
+    );
+    account.setValidationBlockInfo(
+      validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
+    );
+
+    const { chainId, sessionPayload, signature } = await signSessionWithAccount(
+      wallet,
+      account,
+      timestamp
+    );
+    await account.validate(signature, timestamp, chainId);
+    await app.sessions.authSession(
+      wallet.chain,
+      chainId,
+      sessionPayload,
+      signature
+    );
+    console.log('Started new session for', wallet.chain, chainId);
+
+    // ensure false for newlyCreated / linking vars on revalidate
+    onAccountVerified(account, false, false);
+    if (isMobile) {
+      if (setSignerAccount) setSignerAccount(account);
+      if (setIsNewlyCreated) setIsNewlyCreated(false);
+      if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
+      setActiveStep('redirectToSign');
+      return;
+    } else {
+      onAccountVerified(account, false, false);
+    }
+  };
 
   return {
     showMobile,
@@ -595,6 +664,7 @@ const useWallets = (props: LoginModalAttrs) => {
     setActiveStep,
     setUsername,
     setSidebarType,
+    onSessionKeyRevalidation,
   };
 };
 
