@@ -14,8 +14,8 @@ import {
   chainEntityTypeToProposalShortName,
   proposalSlugToChainEntityType,
 } from 'identifiers';
-import type { AnyProposal } from 'models';
-import { ProposalStatus } from 'models';
+import type { AnyProposal } from '../../../models/types';
+import { ProposalStatus } from '../../../models/types';
 import moment from 'moment';
 
 import { Countdown } from 'views/components/countdown';

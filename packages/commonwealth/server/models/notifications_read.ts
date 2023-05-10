@@ -41,6 +41,7 @@ export default (
       tableName: 'NotificationsRead',
       underscored: true,
       timestamps: false,
+      indexes: [{ fields: ['subscription_id'] }],
     }
   );
 

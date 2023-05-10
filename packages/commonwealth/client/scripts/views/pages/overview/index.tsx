@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import type { Thread, Topic } from 'models';
+import type Thread from '../../../models/Thread';
+import type Topic from '../../../models/Topic';
 
 import 'pages/overview/index.scss';
 
@@ -71,13 +72,13 @@ const OverviewPage = () => {
     topic: Topic;
   }> = topicsSorted.map((topic) => {
     const monthlyThreads = allMonthlyThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
     const pinnedThreads = allPinnedThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
     const allThreadsCount = allThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     ).length;
 
     return {
