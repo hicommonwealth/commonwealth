@@ -541,7 +541,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const onSessionKeyRevalidation = async (
     wallet: IWebWallet<any>,
-    address: string
+    selectedAddress: string
   ) => {
     const timestamp = +new Date();
     const sessionAddress = await app.sessions.getOrCreateAddress(
@@ -554,7 +554,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
     // This creates a new `Account` object with fields set up to be validated by verifyAddress.
     const { account } = await createUserWithAddress(
-      address,
+      selectedAddress,
       wallet.name,
       chainIdentifier,
       sessionAddress,
