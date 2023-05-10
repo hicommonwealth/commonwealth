@@ -16,6 +16,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { signSessionWithAccount } from 'controllers/server/sessions';
 
 import { notifyError } from 'controllers/app/notifications';
+import WebWalletController from '../../controllers/app/web_wallets';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 
@@ -65,7 +66,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
 
     if (this.currentlyInCommunityPage) {
       const chainbase = app.chain?.meta?.base;
-      this.wallets = app.wallets.availableWallets(chainbase);
+      this.wallets = WebWalletController.Instance.availableWallets(chainbase);
       this.sidebarType = 'communityWalletOptions';
       this.bodyType = 'walletList';
     } else {
@@ -79,7 +80,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
       ].filter((base) => allChains.find((chain) => chain.base === base));
       this.wallets = _.flatten(
         sortedChainBases.map((base) => {
-          return app.wallets.availableWallets(base);
+          return WebWalletController.Instance.availableWallets(base);
         })
       );
       this.sidebarType = 'connectWallet';
