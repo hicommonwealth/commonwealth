@@ -1,4 +1,3 @@
-import type ChainInfo from '../../../models/ChainInfo';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
@@ -77,15 +76,8 @@ type NotificationMenuItem = {
   type?: 'notification';
 };
 
-export type CommunityMenuItem = {
-  community?: ChainInfo;
-  label?: string;
-  type?: 'community';
-};
-
 export type MenuItem =
   | DividerMenuItem
   | HeaderMenuItem
   | DefaultMenuItem
-  | NotificationMenuItem
-  | CommunityMenuItem;
+  | NotificationMenuItem;
