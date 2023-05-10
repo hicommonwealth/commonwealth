@@ -2,15 +2,15 @@ import type { Coin } from 'adapters/currency';
 import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
-import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
-import type { Account, ProposalModule } from '.';
-import { setDarkMode } from '../helpers';
+import { setDarkMode } from '../helpers/darkMode';
+import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
+import ProposalModule from './ProposalModule';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -77,12 +77,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       admins,
       activeUsers,
       numVotingThreads,
+      numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
       communityRoles,
     } = response.result;
     this.app.topics.initialize(topics, true);
-    this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
+    this.app.threads.initialize(
+      pinnedThreads,
+      numVotingThreads,
+      numTotalThreads,
+      true
+    );
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 import app from 'state';
 import { isNonEmptyString } from 'helpers/typeGuards';
-import type { ChainInfo } from '../models';
-import { ITokenAdapter } from '../models';
+import ITokenAdapter from '../models/ITokenAdapter';
+import ChainInfo from '../models/ChainInfo';
 import {
   CWBanner,
   CWMessageBanner,

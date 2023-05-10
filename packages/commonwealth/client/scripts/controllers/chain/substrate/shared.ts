@@ -25,7 +25,6 @@ import { formatCoin } from 'adapters/currency';
 import BN from 'bn.js';
 
 import { SubstrateEvents } from 'chain-events/src';
-import { ChainNetwork } from 'common-common/src/types';
 
 import {
   notifyError,
@@ -33,19 +32,15 @@ import {
   notifySuccess,
 } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
-import type {
-  ChainInfo,
-  IChainModule,
-  ITXData,
-  ITXModalData,
-  NodeInfo,
-} from 'models';
-import { TransactionStatus } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
+import type ChainInfo from '../../../models/ChainInfo';
+import type { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
+import type NodeInfo from '../../../models/NodeInfo';
+import { TransactionStatus } from '../../../models/types';
 import { chainToEventNetwork } from '../../server/chain_entities';
 import type { SubstrateAccount } from './account';
 

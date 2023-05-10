@@ -10,8 +10,7 @@ import moment from 'moment';
 import app from 'state';
 import { slugify } from 'utils';
 import { isCommandClick, pluralize } from 'helpers';
-import type { Thread } from 'models';
-import { AddressInfo } from 'models';
+import AddressInfo from '../../../models/AddressInfo';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import {
@@ -37,7 +36,7 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { LinkSource } from 'models/Thread';
+import Thread, { LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
 import { filterLinks } from 'helpers/threads';
 
