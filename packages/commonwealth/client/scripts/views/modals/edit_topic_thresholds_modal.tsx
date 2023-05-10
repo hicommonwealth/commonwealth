@@ -4,7 +4,7 @@ import { getDecimals } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import 'modals/edit_topic_thresholds_modal.scss';
-import type { Topic } from 'models';
+import type Topic from '../../models/Topic';
 
 import app from 'state';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';

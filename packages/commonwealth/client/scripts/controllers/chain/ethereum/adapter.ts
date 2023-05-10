@@ -3,9 +3,9 @@ import { ChainBase } from 'common-common/src/types';
 import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-import type { ChainInfo } from 'models';
-import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
+import IChainAdapter from '../../../models/IChainAdapter';
 
 // TODO: hook up underlyung functionality of this boilerplate
 //       (e.g., EthereumChain and EthereumAccount methods, etc.)

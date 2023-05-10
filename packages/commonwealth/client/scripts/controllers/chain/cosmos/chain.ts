@@ -13,12 +13,14 @@ import BN from 'bn.js';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
 import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { LCD } from 'chain-events/src/chains/cosmos/types';
+import ChainInfo from '../../../models/ChainInfo';
+import { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
+import WebWalletController from '../../app/web_wallets';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 import {
@@ -137,7 +139,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (this._app.chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
-    const wallet = this.app.wallets.getByName(
+    const wallet = WebWalletController.Instance.getByName(
       WalletId.Keplr
     ) as KeplrWebWalletController;
     if (!wallet) throw new Error('Keplr wallet not found');

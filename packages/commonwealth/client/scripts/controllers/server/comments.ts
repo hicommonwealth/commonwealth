@@ -9,7 +9,7 @@ import { CommentsStore } from 'stores';
 import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
-import { IUniqueId } from '../../models/index';
+import type { IUniqueId } from '../../models/interfaces';
 import type Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
 

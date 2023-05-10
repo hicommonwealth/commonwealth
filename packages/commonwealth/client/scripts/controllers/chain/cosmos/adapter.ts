@@ -1,9 +1,10 @@
 import BN from 'bn.js';
 import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
-import type { ChainInfo, ITokenAdapter } from 'models';
-import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
+import IChainAdapter from '../../../models/IChainAdapter';
+import type ITokenAdapter from '../../../models/ITokenAdapter';
 import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';

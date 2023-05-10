@@ -2,8 +2,8 @@ import React from 'react';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
 import { formatAddressShort } from 'helpers';
+import Account from '../../../models/Account';
 
-import type { Account } from 'models';
 import { AvatarUpload } from '../avatar_upload';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';

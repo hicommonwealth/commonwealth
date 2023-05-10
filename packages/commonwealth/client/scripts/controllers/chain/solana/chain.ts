@@ -2,10 +2,11 @@ import type * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 
 import { redraw } from 'mithrilInterop';
-import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
+import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type SolanaAccount from './account';
 
 import { SolanaToken } from './types';
