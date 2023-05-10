@@ -50,6 +50,7 @@ export const ViewProposalPage = ({
   const validatedAgainstStrategies: boolean = !power
     ? true
     : power.totalScore > 0;
+
   const totalScore: number = power?.totalScore || 0;
   const votes: SnapshotProposalVote[] = voteResults?.votes || [];
   const totals: VoteResultsData = voteResults?.results || {
