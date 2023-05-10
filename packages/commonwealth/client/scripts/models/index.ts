@@ -1,5 +1,3 @@
-export { default as Thread } from './Thread';
-export { default as MinimumProfile } from './MinimumProfile';
 export { default as ProposalModule } from './ProposalModule';
 export { default as RoleInfo } from './RoleInfo';
 export { AccessLevel } from 'permissions';
