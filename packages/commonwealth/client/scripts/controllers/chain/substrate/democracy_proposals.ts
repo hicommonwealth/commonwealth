@@ -11,7 +11,7 @@ import type {
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ProposalModule } from 'models';
+import ProposalModule from '../../../models/ProposalModule';
 import type { IApp } from 'state';
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';

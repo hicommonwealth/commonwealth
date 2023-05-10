@@ -1,10 +1,3 @@
-export { default as ProposalModule } from './ProposalModule';
-export { default as RoleInfo } from './RoleInfo';
-export { AccessLevel } from 'permissions';
-export { default as SearchQuery } from './SearchQuery';
-export { default as ChainEvent } from './ChainEvent';
-export { default as ChainEntity } from './ChainEntity';
-
 export { DepositVote, BinaryVote } from './votes';
 
 export {
