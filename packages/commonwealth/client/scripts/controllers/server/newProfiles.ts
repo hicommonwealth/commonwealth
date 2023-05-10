@@ -13,7 +13,7 @@ class NewProfilesController {
     return this._store;
   }
 
-  private _unfetched: Map<string, Profile>;
+  private _unfetched: Map<string, MinimumProfile>;
 
   private _fetchNewProfiles;
 

@@ -1,10 +1,4 @@
-import { render } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
-
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
 
 class MinimumProfile {
   private _name: string;
@@ -66,12 +60,6 @@ class MinimumProfile {
 
   public static fromJSON(json) {
     return new MinimumProfile(json.address, json.chain);
-  }
-
-  public getAvatar(size: number) {
-    return this.avatarUrl
-      ? render(CWAvatar, { avatarUrl: this.avatarUrl, size })
-      : render(CWJdenticon, { address: this.id, size });
   }
 
   public static getSVGAvatar(address, size) {

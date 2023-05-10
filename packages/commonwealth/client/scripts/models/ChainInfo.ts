@@ -356,12 +356,6 @@ class ChainInfo {
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
   }
-
-  public getAvatar(size: number) {
-    return this.iconUrl
-      ? render(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : render(CWJdenticon, { address: undefined, size });
-  }
 }
 
 export default ChainInfo;

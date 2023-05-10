@@ -11,6 +11,7 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
+import { getAvatarFromProfile } from '../component_kit/cw_avatar';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
@@ -177,8 +178,8 @@ export const User = (props: UserAttrs) => {
       {!profile
         ? null
         : profile.avatarUrl
-        ? profile.getAvatar(avatarSize)
-        : profile.getAvatar(avatarSize - 4)}
+        ? getAvatarFromProfile(profile, avatarSize)
+        : getAvatarFromProfile(profile, avatarSize - 4)}
     </div>
   ) : (
     <div
@@ -190,7 +191,7 @@ export const User = (props: UserAttrs) => {
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
-          {profile && profile.getAvatar(avatarSize)}
+          {profile && getAvatarFromProfile(profile, avatarSize)}
         </div>
       )}
       {
@@ -268,8 +269,8 @@ export const User = (props: UserAttrs) => {
           {!profile
             ? null
             : profile.avatarUrl
-            ? profile.getAvatar(36)
-            : profile.getAvatar(32)}
+            ? getAvatarFromProfile(profile, 36)
+            : getAvatarFromProfile(profile, 32)}
         </div>
         <div className="user-name">
           {app.chain &&

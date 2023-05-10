@@ -6,6 +6,7 @@ import 'components/avatar_upload.scss';
 
 import app from 'state';
 import Account from '../../models/Account';
+import { getAvatarFromChainInfo, getAvatarFromProfile } from './component_kit/cw_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
@@ -103,9 +104,9 @@ export const AvatarUpload = ({
   const forCommunity = scope === 'community';
 
   const avatar = forUser
-    ? account?.profile?.getAvatar(avatarSize)
+    ? getAvatarFromProfile(account?.profile, avatarSize)
     : forCommunity
-    ? app.chain?.meta.getAvatar(avatarSize)
+    ? getAvatarFromChainInfo(app.chain?.meta, avatarSize)
     : undefined;
 
   return (
