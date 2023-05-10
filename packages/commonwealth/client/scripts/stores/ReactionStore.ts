@@ -1,5 +1,5 @@
 import { byAscendingCreationDate } from '../helpers';
-import type { AnyProposal } from '../models';
+import type { AnyProposal } from '../models/types';
 import AbridgedThread from '../models/AbridgedThread';
 import Comment from '../models/Comment';
 import Proposal from '../models/Proposal';
