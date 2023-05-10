@@ -5,7 +5,7 @@ import 'pages/communities.scss';
 
 import { ChainCategoryType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import type { ChainInfo } from 'models';
+import ChainInfo from '../../models/ChainInfo';
 
 import app from 'state';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';

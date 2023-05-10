@@ -1,10 +1,3 @@
-export { default as AbridgedThread } from './AbridgedThread';
-export { default as Account } from './Account';
-export { default as AddressInfo } from './AddressInfo';
-export { default as BlockInfo } from './BlockInfo';
-export { default as ChainInfo } from './ChainInfo';
-export { default as DiscussionDraft } from './DiscussionDraft';
-export { default as IChainAdapter } from './IChainAdapter';
 export { default as ITokenAdapter } from './ITokenAdapter';
 export { default as IWebWallet } from './IWebWallet';
 export { default as NodeInfo } from './NodeInfo';
@@ -29,7 +22,6 @@ export { AccessLevel } from 'permissions';
 export { default as SearchQuery } from './SearchQuery';
 export { default as SearchResult } from './SearchResult';
 export { default as SocialAccount } from './SocialAccount';
-export { default as StorageModule } from './StorageModule';
 export { default as ChainEvent } from './ChainEvent';
 export { default as ChainEntity } from './ChainEntity';
 export { default as StarredCommunity } from './StarredCommunity';

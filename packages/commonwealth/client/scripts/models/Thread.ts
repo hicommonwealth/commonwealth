@@ -32,7 +32,7 @@ export type Link = {
   title?: string;
 };
 
-class Thread implements IUniqueId {
+export class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
   public chainEntities?: any[];
