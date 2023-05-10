@@ -5,7 +5,7 @@ import type {
   Web3Provider,
 } from '@ethersproject/providers';
 import { ChainBase } from 'common-common/src/types';
-import type WebWalletController from 'controllers/app/web_wallets';
+import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type { Contract } from 'ethers';
@@ -18,11 +18,10 @@ export type ContractFactoryT<ContractT> = (
 ) => ContractT;
 
 export async function attachSigner<CT extends Contract>(
-  wallets: WebWalletController,
   sender: Account,
   contract: CT
 ): Promise<CT> {
-  const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
+  const signingWallet = await WebWalletController.Instance.locateWallet(sender, ChainBase.Ethereum);
   let signer: JsonRpcSigner;
   if (
     signingWallet instanceof MetamaskWebWalletController ||
