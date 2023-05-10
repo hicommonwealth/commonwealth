@@ -10,6 +10,7 @@ export type QuillRendererProps = {
   openLinksInNewTab?: boolean;
   searchTerm?: string;
   cutoffLines?: number;
+  containerClass?: string;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -23,6 +24,7 @@ export const QuillRenderer = ({
   searchTerm,
   hideFormatting,
   cutoffLines,
+  containerClass,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -62,26 +64,40 @@ export const QuillRenderer = ({
     }
   }, [doc]);
 
-  switch (docInfo.format) {
-    case 'richtext':
-      return (
-        <QuillFormattedText
-          hideFormatting={hideFormatting}
-          doc={docInfo.content}
-          searchTerm={searchTerm}
-          cutoffLines={cutoffLines}
-        />
-      );
-    case 'markdown':
-      return (
-        <MarkdownFormattedText
-          hideFormatting={hideFormatting}
-          doc={docInfo.content}
-          searchTerm={searchTerm}
-          cutoffLines={cutoffLines}
-        />
-      );
-    default:
-      return <>N/A</>;
+  const renderedDoc = useMemo(() => {
+    switch (docInfo.format) {
+      case 'richtext':
+        return (
+          <QuillFormattedText
+            hideFormatting={hideFormatting}
+            doc={docInfo.content}
+            searchTerm={searchTerm}
+            cutoffLines={cutoffLines}
+          />
+        );
+      case 'markdown':
+        return (
+          <MarkdownFormattedText
+            hideFormatting={hideFormatting}
+            doc={docInfo.content}
+            searchTerm={searchTerm}
+            cutoffLines={cutoffLines}
+          />
+        );
+      default:
+        return <>N/A</>;
+    }
+  }, [
+    cutoffLines,
+    hideFormatting,
+    searchTerm,
+    docInfo.content,
+    docInfo.format,
+  ]);
+
+  if (containerClass) {
+    return <div className={containerClass}>{renderedDoc}</div>;
   }
+
+  return renderedDoc;
 };
