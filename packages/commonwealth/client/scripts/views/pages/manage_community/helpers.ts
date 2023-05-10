@@ -4,6 +4,7 @@ import { redraw } from 'mithrilInterop';
 import app from 'state';
 import { AccessLevel } from 'models';
 import { ChainCategoryType } from 'common-common/src/types';
+import axios from 'axios';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -16,21 +17,22 @@ export const sortAdminsAndModsFirst = (a, b) => {
 };
 
 export const setChainCategories = async (
-  category_type_id: string,
+  selected_tags: { [tag: string]: boolean },
   chain_id: string
 ) => {
   return new Promise<void>((resolve, reject) => {
     const params = {
       chain_id,
-      category_type_id,
+      selected_tags: selected_tags,
       auth: true,
       jwt: app.user.jwt,
     };
-    $.post(`${app.serverUrl()}/updateChainCategory`, params)
+    axios
+      .post(`${app.serverUrl()}/updateChainCategory`, params)
       .then((response) => {
-        if (response?.result) {
+        if (response?.data) {
           app.config.chainCategoryMap[chain_id] =
-            response.result.chainCategoryMap.chain_id;
+            response.data.chainCategoryMap.chain_id;
         }
         resolve();
         redraw();

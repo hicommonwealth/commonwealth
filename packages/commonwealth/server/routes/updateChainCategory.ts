@@ -6,7 +6,7 @@ import { success } from '../types';
 import { ChainCategoryType } from 'common-common/src/types';
 
 type UpdateChainCategoryReq = {
-  category: string;
+  selected_tags: any;
   chain_id: string;
   auth: string;
   jwt: string;
@@ -22,31 +22,28 @@ const updateChainCategory = async (
   res: TypedResponse<UpdateChainCategoryRes>,
   next: NextFunction
 ) => {
-  if (Object.keys(ChainCategoryType).includes(req.body.category)) {
-    const chain = await models.Chain.findOne({
-      where: {
-        id: req.body.chain_id,
-      },
-    });
-    if (!chain) throw new AppError('Invalid Chain Id');
+  const chain = await models.Chain.findOne({
+    where: {
+      id: req.body.chain_id,
+    },
+  });
+  if (!chain) throw new AppError('Invalid Chain Id');
 
-    const existingCategories = chain.category
-      ? (chain.category as string[])
-      : [];
-    if (existingCategories.includes(req.body.category))
-      throw new AppError('Chain already include this category');
-
-    existingCategories.push(req.body.category);
-
-    chain.category = existingCategories.toString();
+  const existingCategories = chain.category ? (chain.category as string[]) : [];
+  const updateCategories = Object.keys(req.body.selected_tags).filter((tag) => {
+    return (
+      req.body.selected_tags[tag] &&
+      Object.keys(ChainCategoryType).includes(tag)
+    );
+  });
+  if (updateCategories != existingCategories) {
+    chain.category = updateCategories;
     await chain.save();
-    const updatedCategory = {
-      [req.body.chain_id]: existingCategories as ChainCategoryType[],
-    };
-    return success(res, { chainCategoryMap: updatedCategory });
-  } else {
-    throw new AppError('Not a valid category');
   }
+  const updatedCategory = {
+    [req.body.chain_id]: updateCategories as ChainCategoryType[],
+  };
+  return success(res, { chainCategoryMap: updatedCategory });
 };
 
 export default updateChainCategory;

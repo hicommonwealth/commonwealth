@@ -113,9 +113,7 @@ export const ChainMetadataRows = ({
 
     // Update ChainCategories
     try {
-      for (const category of Object.keys(selectedTags2)) {
-        await setChainCategories(category, chain.id);
-      }
+      await setChainCategories(selectedTags2, chain.id);
     } catch (err) {
       console.log(err);
     }

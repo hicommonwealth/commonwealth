@@ -34,6 +34,22 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.createTable(
+        'ChainCategoryTypes',
+        {
+          id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+          },
+          category_name: {
+            type: Sequelize.STRING,
+            allowNull: false,
+          },
+        },
+        { transaction }
+      );
+
+      await queryInterface.createTable(
         'ChainCategories',
         {
           id: {
@@ -56,22 +72,6 @@ module.exports = {
               model: 'ChainCategoryTypes',
               key: 'id',
             },
-          },
-        },
-        { transaction }
-      );
-
-      await queryInterface.createTable(
-        'ChainCategoryTypes',
-        {
-          id: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-          },
-          category_name: {
-            type: Sequelize.STRING,
-            allowNull: false,
           },
         },
         { transaction }
