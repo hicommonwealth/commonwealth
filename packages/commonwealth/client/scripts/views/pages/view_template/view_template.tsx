@@ -13,7 +13,7 @@ import {
 } from 'views/components/component_kit/cw_text_input';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
-import type Contract from 'client/scripts/models/Contract';
+import type Contract from 'models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'helpers/validateTypes';
