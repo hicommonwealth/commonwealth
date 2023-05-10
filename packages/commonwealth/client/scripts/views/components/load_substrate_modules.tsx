@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { ChainBase } from 'common-common/src/types';
-import type { ProposalModule } from 'models';
+import type ProposalModule from '../../models/ProposalModule';
 
 import app from 'state';
 import ErrorPage from 'views/pages/error';
