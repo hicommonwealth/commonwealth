@@ -471,7 +471,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const onNormalWalletLogin = async (
     wallet: IWebWallet<any>,
-    address: string
+    selectedAddress: string
   ) => {
     setSelectedWallet(wallet);
 
@@ -480,13 +480,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
         address:
           wallet.chain === ChainBase.Substrate
             ? addressSwapper({
-                address,
+                address: selectedAddress,
                 currentPrefix: parseInt(
                   (app.chain as Substrate)?.meta.ss58Prefix,
                   10
                 ),
               })
-            : address,
+            : selectedAddress,
         chain: app.activeChainId() ?? wallet.chain,
         jwt: app.user.jwt,
       });
@@ -513,7 +513,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         account: signingAccount,
         newlyCreated,
       } = await createUserWithAddress(
-        address,
+        selectedAddress,
         wallet.name,
         chainIdentifier,
         sessionPublicAddress,
