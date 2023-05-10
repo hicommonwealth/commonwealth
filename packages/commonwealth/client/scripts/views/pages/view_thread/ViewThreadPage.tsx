@@ -6,7 +6,7 @@ import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
 
 import type { Comment, Poll, Topic } from 'models';
-import { Thread, ThreadStage as ThreadStageType } from 'models';
+import { Thread, ThreadStage, ThreadStage as ThreadStageType } from 'models';
 import type { IThreadCollaborator } from 'models/Thread';
 import { Link, LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -41,12 +41,17 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import { ExternalLink, ThreadAuthor, ThreadStageComponent } from './thread_components';
+import {
+  ExternalLink,
+  ThreadAuthor,
+  ThreadStageComponent,
+} from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { filterLinks } from 'helpers/threads';
+import { parseCustomStages } from 'helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -675,6 +680,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     ];
   };
 
+  const isDefaultStage =
+    thread.stage === ThreadStage.Discussion ||
+    thread.stage === parseCustomStages(app.chain.meta.customStages)[0];
+
   return (
     <Sublayout>
       <CWContentPage
@@ -697,16 +706,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             thread.title
           )
         }
-        author={<ThreadAuthor thread={thread} />}
+        author={
+          <ThreadAuthor
+            author={thread.author}
+            collaborators={thread.collaborators}
+          />
+        }
         createdAt={thread.createdAt}
         viewCount={viewCount}
         readOnly={thread.readOnly}
         headerComponents={
-          thread.stage !== ThreadStageType.Discussion && (
-            <ThreadStageComponent thread={thread} />
-          )
+          !isDefaultStage && <ThreadStageComponent stage={thread.stage} />
         }
-        subHeader={!!thread.url && <ExternalLink thread={thread} />}
+        subHeader={!!thread.url && <ExternalLink url={thread.url} />}
         actions={
           app.user.activeAccount && !isGloballyEditing && getActionMenuItems()
         }
