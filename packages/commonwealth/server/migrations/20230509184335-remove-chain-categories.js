@@ -3,7 +3,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      // Add a new column called "category_names" to the "Chains" table
       try {
         await queryInterface.addColumn(
           'Chains',
@@ -31,7 +30,6 @@ module.exports = {
         await queryInterface.dropTable('ChainCategories', { transaction });
         await queryInterface.dropTable('ChainCategoryTypes', { transaction });
       } catch (error) {
-        // Rollback the transaction if there is an error
         await transaction.rollback();
         throw error;
       }
@@ -41,7 +39,6 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
       try {
-        // Create the "ChainCategories" table
         await queryInterface.createTable(
           'ChainCategories',
           {
@@ -70,7 +67,6 @@ module.exports = {
           { transaction }
         );
 
-        // Create the "ChainCategoryTypes" table
         await queryInterface.createTable(
           'ChainCategoryTypes',
           {
@@ -87,7 +83,6 @@ module.exports = {
           { transaction }
         );
 
-        // Remove the "category_names" column from the "Chains" table
         await queryInterface.removeColumn('Chains', 'category', {
           transaction,
         });
@@ -95,7 +90,6 @@ module.exports = {
         // Commit the transaction
         await transaction.commit();
       } catch (error) {
-        // Rollback the transaction if there is an error
         await transaction.rollback();
         throw error;
       }
