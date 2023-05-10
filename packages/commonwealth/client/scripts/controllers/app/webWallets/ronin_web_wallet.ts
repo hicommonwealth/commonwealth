@@ -3,7 +3,8 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
+import Account from '../../../models/Account';
+import IWebWallet from '../../../models/IWebWallet';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of Ronin login
 // is handled through redirects involving the `/finishAxieLogin` page.

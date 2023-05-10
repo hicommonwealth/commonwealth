@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 import 'pages/view_thread/edit_body.scss';
 import { notifySuccess } from 'controllers/app/notifications';
 import app from 'state';

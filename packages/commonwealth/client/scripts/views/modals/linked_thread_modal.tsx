@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import 'modals/linked_thread_modal.scss';
 
-import type { Thread } from 'models';
+import type Thread from '../../models/Thread';
 import { ThreadSelector } from 'views/components/thread_selector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';

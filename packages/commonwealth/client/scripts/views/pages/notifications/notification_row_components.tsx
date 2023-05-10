@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import moment from 'moment';
 
 import 'pages/notifications/notification_row.scss';
+import AddressInfo from '../../../models/AddressInfo';
 
 import type { NotificationRowProps } from './notification_row';
 import { Label as ChainEventLabel } from 'chain-events/src';
 import type { CWEvent } from 'chain-events/src';
-import { AddressInfo } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
 
 import app from 'state';

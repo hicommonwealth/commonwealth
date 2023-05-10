@@ -5,7 +5,7 @@ import 'pages/communities.scss';
 
 import type { ChainCategoryType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import type { ChainInfo } from 'models';
+import ChainInfo from '../../models/ChainInfo';
 import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 import type { ChainCategoryAttributes } from 'server/models/chain_category';
 
