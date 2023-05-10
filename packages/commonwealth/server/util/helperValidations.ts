@@ -83,8 +83,17 @@ export const getThreadsValidation = [
   query('ids')
     .toArray()
     .custom((value) => {
-      if (!value.every(Number.isInteger)) {
-        throw new Error('Ids must be integers');
+      // make sure the value is either a string or a number
+      let hasInvalidValue = false;
+      for (let i = 0; i < value.length; i++) {
+        if (!['number', 'string'].includes(typeof value[i])) {
+          hasInvalidValue = true;
+          break;
+        }
+      }
+
+      if (hasInvalidValue) {
+        throw new Error('ids must be integers');
       }
 
       return true;
