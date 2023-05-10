@@ -57,7 +57,7 @@ export const LoginModal = (props: LoginModalAttrs) => {
   const [cachedChainId, setCachedChainId] = useState<string | number>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [secondaryLinkAccount, setSecondaryLinkAccount] = useState<Account>();
-  const [secondaryChainId, setSecondaryChainId] = useState<string | number>();
+  // const [secondaryChainId, setSecondaryChainId] = useState<string | number>();
   const [isInCommunityPage, setIsInCommunityPage] = useState<boolean>();
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
   const [showMobile, setShowMobile] = useState<boolean>();
@@ -73,7 +73,7 @@ export const LoginModal = (props: LoginModalAttrs) => {
       w.enabled
   );
 
-  const linking = activeStep === 'selectPrevious';
+  const isLinkingWallet = activeStep === 'selectPrevious';
 
   useEffect(() => {
     // Determine if in a community
@@ -472,20 +472,20 @@ export const LoginModal = (props: LoginModalAttrs) => {
       }
     } else {
       // Normal Wallet Flow
-      let address;
+      let selectedAddress;
       if (wallet.chain === 'ethereum' || wallet.chain === 'solana') {
-        address = wallet.accounts[0];
+        selectedAddress = wallet.accounts[0];
       } else if (wallet.defaultNetwork === 'terra') {
-        address = wallet.accounts[0].address;
+        selectedAddress = wallet.accounts[0].address;
       } else if (wallet.chain === 'cosmos') {
         if (wallet.defaultNetwork === 'injective') {
-          address = wallet.accounts[0];
+          selectedAddress = wallet.accounts[0];
         } else {
-          address = wallet.accounts[0].address;
+          selectedAddress = wallet.accounts[0].address;
         }
       }
 
-      await onNormalWalletLogin(wallet, address);
+      await onNormalWalletLogin(wallet, selectedAddress);
     }
   };
 
@@ -535,7 +535,7 @@ export const LoginModal = (props: LoginModalAttrs) => {
       const validationBlockInfo =
         wallet.getRecentBlock && (await wallet.getRecentBlock(chainIdentifier));
       const {
-        account: signerAccount,
+        account: signingAccount,
         newlyCreated,
       } = await createUserWithAddress(
         address,
@@ -546,13 +546,13 @@ export const LoginModal = (props: LoginModalAttrs) => {
       );
 
       if (isMobile) {
-        setSignerAccount(signerAccount);
+        setSignerAccount(signingAccount);
         setIsNewlyCreated(newlyCreated);
-        setIsLinkingOnMobile(linking);
+        setIsLinkingOnMobile(isLinkingWallet);
         setActiveStep('redirectToSign');
         return;
       } else {
-        onAccountVerified(signerAccount, newlyCreated, linking, wallet);
+        onAccountVerified(signerAccount, newlyCreated, isLinkingWallet, wallet);
       }
     } catch (err) {
       console.log(err);
