@@ -43,7 +43,6 @@ const updateChainCategory = async (
       (element, index) => element === existingCategories[index]
     )
   ) {
-    console.log('updating');
     chain.category = updateCategories;
     await chain.save();
   }
