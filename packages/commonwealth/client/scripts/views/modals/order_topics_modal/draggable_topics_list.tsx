@@ -4,7 +4,7 @@ import type { DraggableProvided } from 'react-beautiful-dnd';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from 'lib/react-beautiful-dnd';
 
-import type { Topic } from 'models';
+import type Topic from '../../../models/Topic';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 

@@ -1,6 +1,6 @@
 import { Store } from '.';
-import type { SearchQuery } from '../models';
-import { SearchResult } from '../models';
+import type SearchQuery from '../models/SearchQuery';
+import SearchResult from '../models/SearchResult';
 
 class SearchStore extends Store<SearchResult> {
   private _storeSearch: { [encodedQueryString: string]: SearchResult } = {};
