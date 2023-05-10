@@ -1,7 +1,5 @@
-import type { ITXModalData } from 'models';
-import { ProposalModule } from 'models';
-// import { ICommonwealthProposalResponse } from 'adapters/chain/moloch/types';
-// import { CommonwealthEvents } from 'chain-events/src';
+import type { ITXModalData } from '../../../../models/interfaces';
+import ProposalModule from '../../../../models/ProposalModule';
 import type { IApp } from 'state';
 
 // import CommonwealthProposal from './proposal';
