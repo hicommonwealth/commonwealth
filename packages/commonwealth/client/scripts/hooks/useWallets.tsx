@@ -459,13 +459,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const onWalletAddressSelect = async (
     wallet: IWebWallet<any>,
-    address: string
+    selectedAddress: string
   ) => {
     setSelectedWallet(wallet);
     if (walletProps.useSessionKeyLoginFlow) {
-      await onSessionKeyRevalidation(wallet, address);
+      await onSessionKeyRevalidation(wallet, selectedAddress);
     } else {
-      await onNormalWalletLogin(wallet, address);
+      await onNormalWalletLogin(wallet, selectedAddress);
     }
   };
 

@@ -59,6 +59,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             onResetWalletConnect={onResetWalletConnect}
             onWalletAddressSelect={onWalletAddressSelect}
             onWalletSelect={onWalletSelect}
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             onConnectAnotherWay={() => {}}
             darkMode={false}
             wallets={wallets}
