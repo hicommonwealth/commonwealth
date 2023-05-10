@@ -8,7 +8,7 @@ import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
-import type { ProposalModule } from 'models';
+import type ProposalModule from '../../models/ProposalModule';
 import { initChain } from 'helpers/chain';
 import 'pages/proposals.scss';
 

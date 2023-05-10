@@ -2,7 +2,7 @@ import type ReactionCount from 'models/ReactionCount';
 import IdStore from 'stores/IdStore';
 import AbridgedThread from '../models/AbridgedThread';
 import Comment from '../models/Comment';
-import { AnyProposal } from '../models/index';
+import type { AnyProposal } from '../models/types';
 import Proposal from '../models/Proposal';
 import Reaction from '../models/Reaction';
 import Thread from '../models/Thread';

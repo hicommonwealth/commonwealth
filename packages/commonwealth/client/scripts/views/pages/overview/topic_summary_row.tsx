@@ -2,7 +2,8 @@ import React from 'react';
 
 import { pluralize } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import type { Thread, Topic } from 'models';
+import type Thread from '../../../models/Thread';
+import type Topic from '../../../models/Topic';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
