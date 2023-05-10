@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 import { redraw } from 'mithrilInterop';
 import app from 'state';
-import { AccessLevel } from 'models';
+import { AccessLevel } from '../../../../../shared/permissions';
 import { ChainCategoryType } from 'common-common/src/types';
 import axios from 'axios';
 

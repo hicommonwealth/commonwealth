@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { chainEntityTypeToProposalName } from 'identifiers';
-import type { ChainEntity } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
 import { CWText } from '../component_kit/cw_text';
 
 interface ChainEntitiesSelectorItemProps {

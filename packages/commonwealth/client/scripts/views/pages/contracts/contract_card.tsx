@@ -4,7 +4,7 @@ import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { ContractTemplateCard } from './contract_template_card';
-import type { Contract } from '../../../models';
+import type Contract from '../../../models/Contract';
 
 import app from 'state';
 

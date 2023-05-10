@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 

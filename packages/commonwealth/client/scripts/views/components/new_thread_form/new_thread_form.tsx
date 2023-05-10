@@ -5,7 +5,7 @@ import 'components/new_thread_form.scss';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { notifyError } from 'controllers/app/notifications';
-import { ThreadKind, ThreadStage } from 'models';
+import { ThreadKind, ThreadStage } from '../../../models/types';
 import app from 'state';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
