@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import $ from 'jquery';
-import { Topic } from 'models';
+import Topic from '../../models/Topic';
 import app from 'state';
 
 import { TopicStore } from 'stores';

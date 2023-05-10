@@ -14,16 +14,11 @@ import type {
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
 
-import type { ITXModalData } from 'models/interfaces';
-import type { ProposalEndTime } from 'models/types';
-import {
-  DepositVote,
-  Proposal,
-  ProposalStatus,
-  VotingType,
-  VotingUnit,
-} from 'models';
 import moment from 'moment';
+import { ITXModalData } from '../../../../../models/interfaces';
+import { ProposalEndTime, ProposalStatus, VotingType, VotingUnit } from '../../../../../models/types';
+import { DepositVote } from '../../../../../models/votes';
+import Proposal from '../../../../../models/Proposal';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
