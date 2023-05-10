@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 
 import 'pages/snapshot/snapshot_space_card.scss';
 import app from 'state';
