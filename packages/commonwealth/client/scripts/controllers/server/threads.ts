@@ -9,14 +9,14 @@ import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
 import { redraw } from 'mithrilInterop';
-import type { ChainEntity, MinimumProfile as Profile, Topic } from 'models';
-import {
-  Attachment,
-  NotificationSubscription,
-  Poll,
-  Thread,
-  ThreadStage,
-} from 'models';
+import Attachment from '../../models/Attachment';
+import type ChainEntity from '../../models/ChainEntity';
+import type MinimumProfile from '../../models/MinimumProfile';
+import NotificationSubscription from '../../models/NotificationSubscription';
+import Poll from '../../models/Poll';
+import Thread from '../../models/Thread';
+import type Topic from '../../models/Topic';
+import { ThreadStage } from '../../models/types';
 import moment from 'moment';
 
 import app from 'state';
@@ -57,7 +57,7 @@ would break the listingStore's careful chronology.
 */
 
 export interface VersionHistory {
-  author?: Profile;
+  author?: MinimumProfile;
   timestamp: moment.Moment;
   body: string;
 }
