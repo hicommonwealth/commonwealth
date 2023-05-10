@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import type { Thread, Topic } from 'models';
+import type Thread from '../../../models/Thread';
+import type Topic from '../../../models/Topic';
 
 import 'pages/overview/index.scss';
 

@@ -9,14 +9,12 @@ import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
 import { EventEmitter } from 'events';
 
-import type {
-  ChainEntity,
-  ChainEvent,
-  ITXModalData,
-  IVote,
-  ProposalEndTime,
-} from 'models';
-import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import type ChainEntity from '../../../../models/ChainEntity';
+import type ChainEvent from '../../../../models/ChainEvent';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
+import Proposal from '../../../../models/Proposal';
+import type { ProposalEndTime } from '../../../../models/types';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
 import moment from 'moment';
 import Web3 from 'web3-utils';
 import type EthereumAccount from '../account';
