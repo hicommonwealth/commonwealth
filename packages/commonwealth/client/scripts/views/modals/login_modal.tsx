@@ -14,8 +14,9 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import { signSessionWithAccount } from 'controllers/server/sessions';
 import $ from 'jquery';
 import _ from 'lodash';
-import type { Account, IWebWallet } from 'models';
-import React, { useCallback, useEffect, useState } from 'react';
+import IWebWallet from '../../models/IWebWallet';
+import Account from '../../models/Account';
+import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { addressSwapper } from 'utils';
@@ -152,227 +153,199 @@ export const LoginModal = (props: LoginModalAttrs) => {
   }, [showMobile]);
 
   // Handles Magic Link Login
-  const onEmailLogin =
-    //  useCallback(
-    async () => {
-      setIsMagicLoading(true);
+  const onEmailLogin = async () => {
+    setIsMagicLoading(true);
 
-      if (!email) {
-        notifyError('Please enter a valid email address.');
-        setIsMagicLoading(false);
-        return;
+    if (!email) {
+      notifyError('Please enter a valid email address.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      await loginWithMagicLink(email);
+      setIsMagicLoading(false);
+
+      if (props.onSuccess) props.onSuccess();
+
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
       }
+    } catch (e) {
+      notifyError("Couldn't send magic link");
+      setIsMagicLoading(false);
+      console.error(e);
+    }
+  };
 
-      try {
-        await loginWithMagicLink(email);
-        setIsMagicLoading(false);
+  // Performs Login on the client
+  const onLogInWithAccount = async (
+    account: Account,
+    exitOnComplete: boolean
+  ) => {
+    const profile = account.profile;
+    setAddress(account.address);
 
-        if (props.onSuccess) props.onSuccess();
+    if (profile.name) {
+      setUsername(profile.name);
+    }
 
+    if (app.isLoggedIn()) {
+      completeClientLogin(account);
+      if (exitOnComplete) {
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
           props.onModalClose();
         } else {
           props.onModalClose();
         }
-      } catch (e) {
-        notifyError("Couldn't send magic link");
-        setIsMagicLoading(false);
-        console.error(e);
+        if (props.onSuccess) props.onSuccess();
       }
-    };
-  // , [email, props.onSuccess, props.onModalClose]);
-
-  // Performs Login on the client
-  const onLogInWithAccount =
-    // useCallback(
-    async (account: Account, exitOnComplete: boolean) => {
-      const profile = account.profile;
-      setAddress(account.address);
-
-      if (profile.name) {
-        setUsername(profile.name);
+      // redraw();
+    } else {
+      // log in as the new user
+      await initAppState(false);
+      if (localStorage.getItem('user-dark-mode-state') === 'on') {
+        setDarkMode(true);
       }
-
-      if (app.isLoggedIn()) {
-        completeClientLogin(account);
-        if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            props.onModalClose();
-          } else {
-            props.onModalClose();
-          }
-          if (props.onSuccess) props.onSuccess();
-        }
-        // redraw();
-      } else {
-        // log in as the new user
-        await initAppState(false);
-        if (localStorage.getItem('user-dark-mode-state') === 'on') {
-          setDarkMode(true);
-        }
-        if (app.chain) {
-          const chain =
-            app.user.selectedChain ||
-            app.config.chains.getById(app.activeChainId());
-          await updateActiveAddresses(chain);
-        }
-        if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            props.onModalClose();
-          } else {
-            props.onModalClose();
-          }
-          if (props.onSuccess) props.onSuccess();
-        }
-        // redraw();
+      if (app.chain) {
+        const chain =
+          app.user.selectedChain ||
+          app.config.chains.getById(app.activeChainId());
+        await updateActiveAddresses(chain);
       }
-    };
-  //   ,
-  //   [props.onModalClose, props.onSuccess]
-  // );
+      if (exitOnComplete) {
+        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          props.onModalClose();
+        } else {
+          props.onModalClose();
+        }
+        if (props.onSuccess) props.onSuccess();
+      }
+      // redraw();
+    }
+  };
 
   // Handle branching logic after wallet is selected
+  const onAccountVerified = async (
+    account: Account,
+    newlyCreated: boolean,
+    linking: boolean,
+    currentWallet?: IWebWallet<any>
+  ) => {
+    const walletToUse = currentWallet || selectedWallet;
 
-  const onAccountVerified =
-    // useCallback(
-    async (
-      account: Account,
-      newlyCreated: boolean,
-      linking: boolean,
-      currentWallet?: IWebWallet<any>
-    ) => {
-      const walletToUse = currentWallet || selectedWallet;
+    // Handle Logged in and joining community of different chain base
+    if (isInCommunityPage && app.isLoggedIn()) {
+      const timestamp = +new Date();
+      const {
+        signature,
+        chainId,
+        sessionPayload,
+      } = await signSessionWithAccount(walletToUse, account, timestamp);
+      await account.validate(signature, timestamp, chainId);
+      app.sessions.authSession(
+        app.chain.base,
+        chainId,
+        sessionPayload,
+        signature
+      );
+      await onLogInWithAccount(account, true);
+      return;
+    }
 
-      // Handle Logged in and joining community of different chain base
-      if (isInCommunityPage && app.isLoggedIn()) {
+    // Handle Linking vs New Account cases
+    if (!linking) {
+      setPrimaryAccount(account);
+      setAddress(account.address);
+      setProfiles([account.profile]);
+    } else {
+      if (newlyCreated) {
+        notifyError("This account doesn't exist");
+        return;
+      }
+      if (account.address === primaryAccount.address) {
+        notifyError("You can't link to the same account");
+        return;
+      }
+      setSecondaryLinkAccount(account);
+      setProfiles(
+        [account.profile] // TODO: Update when User -> Many Profiles goes in
+      );
+    }
+
+    // Handle receiving and caching wallet signature strings
+    if (!newlyCreated && !linking) {
+      try {
         const timestamp = +new Date();
         const {
           signature,
-          chainId,
           sessionPayload,
+          chainId,
         } = await signSessionWithAccount(walletToUse, account, timestamp);
         await account.validate(signature, timestamp, chainId);
-        app.sessions.authSession(
-          app.chain.base,
-          chainId,
-          sessionPayload,
-          signature
-        );
+        // Can't call authSession now, since chain.base is unknown, so we wait till action
         await onLogInWithAccount(account, true);
-        return;
+      } catch (e) {
+        console.log(e);
       }
-
-      // Handle Linking vs New Account cases
+    } else {
       if (!linking) {
-        setPrimaryAccount(account);
-        setAddress(account.address);
-        setProfiles([account.profile]);
-      } else {
-        if (newlyCreated) {
-          notifyError("This account doesn't exist");
-          return;
-        }
-        if (account.address === primaryAccount.address) {
-          notifyError("You can't link to the same account");
-          return;
-        }
-        setSecondaryLinkAccount(account);
-        setProfiles(
-          [account.profile] // TODO: Update when User -> Many Profiles goes in
-        );
-      }
-
-      // Handle receiving and caching wallet signature strings
-      if (!newlyCreated && !linking) {
         try {
           const timestamp = +new Date();
-          const {
-            signature,
-            sessionPayload,
-            chainId,
-          } = await signSessionWithAccount(walletToUse, account, timestamp);
-          await account.validate(signature, timestamp, chainId);
+          const { signature, chainId } = await signSessionWithAccount(
+            walletToUse,
+            account,
+            timestamp
+          );
           // Can't call authSession now, since chain.base is unknown, so we wait till action
-          await onLogInWithAccount(account, true);
+          setCachedWalletSignature(signature);
+          setCachedTimestamp(timestamp);
+          setCachedChainId(walletToUse.getChainId());
+          props.onSuccess?.();
         } catch (e) {
           console.log(e);
         }
+        setSidebarType('newOrReturning');
+        setActiveStep('selectAccountType');
       } else {
-        if (!linking) {
-          try {
-            const timestamp = +new Date();
-            const { signature, chainId } = await signSessionWithAccount(
-              walletToUse,
-              account,
-              timestamp
-            );
-            // Can't call authSession now, since chain.base is unknown, so we wait till action
-            setCachedWalletSignature(signature);
-            setCachedTimestamp(timestamp);
-            setCachedChainId(walletToUse.getChainId());
-            props.onSuccess?.();
-          } catch (e) {
-            console.log(e);
-          }
-          setSidebarType('newOrReturning');
-          setActiveStep('selectAccountType');
-        } else {
-          setSidebarType('newAddressLinked');
-          setActiveStep('selectProfile');
-        }
+        setSidebarType('newAddressLinked');
+        setActiveStep('selectProfile');
       }
-    };
-  //   ,
-  //   [
-  //     isInCommunityPage,
-  //     selectedWallet,
-  //     onLogInWithAccount,
-  //     primaryAccount,
-  //     props.onSuccess,
-  //   ]
-  // );
+    }
+  };
 
   // Handle Logic for creating a new account, including validating signature
-  const onCreateNewAccount =
-    // useCallback(
-    async () => {
-      try {
-        if (selectedWallet.chain !== 'near') {
-          await primaryAccount.validate(
-            cachedWalletSignature,
-            cachedTimestamp,
-            cachedChainId
-          );
-        }
-        await onLogInWithAccount(primaryAccount, false);
-        // Important: when we first create an account and verify it, the user id
-        // is initially null from api (reloading the page will update it), to correct
-        // it we need to get the id from api
-        await app.newProfiles.updateProfileForAccount(
-          primaryAccount.profile.address,
-          {}
+  const onCreateNewAccount = async () => {
+    try {
+      if (selectedWallet.chain !== 'near') {
+        await primaryAccount.validate(
+          cachedWalletSignature,
+          cachedTimestamp,
+          cachedChainId
         );
-      } catch (e) {
-        console.log(e);
-        notifyError('Failed to create account. Please try again.');
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          props.onModalClose();
-        } else {
-          props.onModalClose();
-        }
       }
-      setActiveStep('welcome');
-      // redraw();
-    };
-  // , [
-  //   props.onModalClose,
-  //   primaryAccount,
-  //   onLogInWithAccount,
-  //   cachedWalletSignature,
-  //   cachedTimestamp,
-  //   cachedChainId,
-  //   selectedWallet,
-  // ]);
+      await onLogInWithAccount(primaryAccount, false);
+      // Important: when we first create an account and verify it, the user id
+      // is initially null from api (reloading the page will update it), to correct
+      // it we need to get the id from api
+      await app.newProfiles.updateProfileForAccount(
+        primaryAccount.profile.address,
+        {}
+      );
+    } catch (e) {
+      console.log(e);
+      notifyError('Failed to create account. Please try again.');
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
+      }
+    }
+    setActiveStep('welcome');
+    // redraw();
+  };
 
   // Handle branching logic for linking an account
   const onLinkExistingAccount = async () => {
@@ -381,85 +354,65 @@ export const LoginModal = (props: LoginModalAttrs) => {
 
   // Handle signature and validation logic for linking an account
   // Validates both linking (secondary) and primary accounts
-  const onPerformLinking =
-    // useCallback(
-    async () => {
-      try {
-        const secondaryTimestamp = +new Date();
-        const {
-          signature: secondarySignature,
-          chainId: secondaryChainId,
-        } = await signSessionWithAccount(
-          selectedLinkingWallet,
-          secondaryLinkAccount,
-          secondaryTimestamp
-        );
-        await secondaryLinkAccount.validate(
-          secondarySignature,
-          secondaryTimestamp,
-          secondaryChainId
-        );
-        await primaryAccount.validate(
-          cachedWalletSignature,
-          cachedTimestamp,
-          cachedChainId
-        );
-        // Can't call authSession now, since chain.base is unknown, so we wait till action
-        await onLogInWithAccount(primaryAccount, true);
-      } catch (e) {
-        console.log(e);
-        notifyError('Unable to link account');
-      }
-    };
-  // , [
-  //   selectedLinkingWallet,
-  //   secondaryLinkAccount,
-  //   primaryAccount,
-  //   cachedWalletSignature,
-  //   cachedTimestamp,
-  //   cachedChainId,
-  //   onLogInWithAccount,
-  // ]);
+  const onPerformLinking = async () => {
+    try {
+      const secondaryTimestamp = +new Date();
+      const {
+        signature: secondarySignature,
+        chainId: secondaryChainId,
+      } = await signSessionWithAccount(
+        selectedLinkingWallet,
+        secondaryLinkAccount,
+        secondaryTimestamp
+      );
+      await secondaryLinkAccount.validate(
+        secondarySignature,
+        secondaryTimestamp,
+        secondaryChainId
+      );
+      await primaryAccount.validate(
+        cachedWalletSignature,
+        cachedTimestamp,
+        cachedChainId
+      );
+      // Can't call authSession now, since chain.base is unknown, so we wait till action
+      await onLogInWithAccount(primaryAccount, true);
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to link account');
+    }
+  };
 
   // Handle saving profile information
-  const onSaveProfileInfo =
-    // useCallback(
-    async () => {
-      const data = {
-        name: username,
-        avatarUrl: avatarUrl,
-      };
-      try {
-        if (username || avatarUrl) {
-          await app.newProfiles.updateProfileForAccount(
-            primaryAccount.profile.address,
-            data
-          );
-        }
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          props.onModalClose();
-        } else {
-          props.onModalClose();
-        }
-        if (props.onSuccess) props.onSuccess();
-        // redraw();
-      } catch (e) {
-        console.log(e);
-        notifyError('Failed to save profile info');
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          props.onModalClose();
-        } else {
-          props.onModalClose();
-        }
-      }
+  const onSaveProfileInfo = async () => {
+    const data = {
+      name: username,
+      avatarUrl: avatarUrl,
     };
-  // , [
-  //   props.onModalClose,
-  //   props.onSuccess,
-  //   primaryAccount,
-  //   username,
-  //   avatarUrl,
-  // ]);
+    try {
+      if (username || avatarUrl) {
+        await app.newProfiles.updateProfileForAccount(
+          primaryAccount.profile.address,
+          data
+        );
+      }
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
+      }
+      if (props.onSuccess) props.onSuccess();
+      // redraw();
+    } catch (e) {
+      console.log(e);
+      notifyError('Failed to save profile info');
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        props.onModalClose();
+      } else {
+        props.onModalClose();
+      }
+    }
+  };
 
   const onResetWalletConnect = async () => {
     const wallet = wallets.find(
