@@ -4,8 +4,8 @@ import { isEqual } from 'lodash';
 
 import 'modals/edit_collaborators_modal.scss';
 
-import type { Thread } from 'models';
-import type { IThreadCollaborator } from 'models/Thread';
+import type { IThreadCollaborator } from '../../models/Thread';
+import type Thread from '../../models/Thread';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 
 import app from 'state';
