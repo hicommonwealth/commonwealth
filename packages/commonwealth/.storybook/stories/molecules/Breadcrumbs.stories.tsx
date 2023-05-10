@@ -9,18 +9,19 @@ const breadcrumbs = {
 } satisfies Meta<typeof CWBreadcrumbs>;
 
 export default breadcrumbs;
-// type Story = StoryObj<typeof breadcrumbs>;
+type Story = StoryObj<typeof breadcrumbs>;
 
-// export const Breadcrumbs: Story = {
-export const Breadcrumbs = {
-  render: () => (
-    <CWBreadcrumbs
-      breadcrumbs={[
-        { label: 'Page' },
-        { label: 'Page' },
-        { label: 'Page' },
-        { label: 'Current' },
-      ]}
-    />
+export const Breadcrumbs: Story = {
+  args: {
+    breadcrumbs: [
+      { label: "Page" },
+      { label: "Page" },
+      { label: "Page" },
+      { label: "Current" },
+    ],
+  },
+  argTypes: {},
+  render: ({...args}) => (
+    <CWBreadcrumbs {...args} />
   )
 }
