@@ -260,7 +260,11 @@ const ReactQuillEditor = ({
               }
               lastSelectionRef.current = selection;
             }}
-            formats={isMarkdownEnabled ? [] : undefined}
+            formats={
+              isMarkdownEnabled
+                ? []
+                : ['header', 'bold', 'italic', 'underline', 'list', 'emoji']
+            }
             modules={{
               toolbar: {
                 container: `#${toolbarId}`,
