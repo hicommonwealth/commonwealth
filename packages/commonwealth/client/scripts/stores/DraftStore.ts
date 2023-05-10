@@ -1,5 +1,5 @@
 import { byAscendingCreationDate } from '../helpers';
-import type { DiscussionDraft } from '../models';
+import type DiscussionDraft from '../models/DiscussionDraft';
 import IdStore from './IdStore';
 
 class DraftStore extends IdStore<DiscussionDraft> {

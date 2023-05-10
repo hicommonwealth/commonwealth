@@ -6,8 +6,9 @@ import { capitalize } from 'lodash';
 import 'components/user/user.scss';
 
 import app from 'state';
-import type { Account } from 'models';
-import { AddressInfo, MinimumProfile as Profile } from 'models';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import MinimumProfile from '../../../models/MinimumProfile';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
@@ -23,7 +24,7 @@ export const UserBlock = (props: {
   showAddressWithDisplayName?: boolean;
   showChainName?: boolean;
   showRole?: boolean;
-  user: Account | AddressInfo | Profile;
+  user: Account | AddressInfo | MinimumProfile;
   hideAvatar?: boolean;
 }) => {
   const { compact, searchTerm, showChainName, user } = props;
@@ -33,7 +34,7 @@ export const UserBlock = (props: {
   if (user instanceof AddressInfo) {
     if (!user.chain || !user.address) return;
     profile = app.newProfiles.getProfile(user.chain.id, user.address);
-  } else if (user instanceof Profile) {
+  } else if (user instanceof MinimumProfile) {
     profile = user;
   } else {
     profile = app.newProfiles.getProfile(user.chain.id, user.address);

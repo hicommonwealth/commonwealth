@@ -4,8 +4,8 @@ import app from 'state';
 import type Web3 from 'web3';
 import type { TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import type { AbiItem } from 'web3-utils';
-import type Contract from 'client/scripts/models/Contract';
-import type { IWebWallet } from 'client/scripts/models';
+import type Contract from 'models/Contract';
+import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
 
 async function sendFunctionCall({

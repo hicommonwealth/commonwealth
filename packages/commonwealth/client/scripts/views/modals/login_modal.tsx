@@ -16,7 +16,8 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { signSessionWithAccount } from 'controllers/server/sessions';
 
 import { notifyError } from 'controllers/app/notifications';
-import type { Account, IWebWallet } from 'models';
+import Account from '../../models/Account';
+import IWebWallet from '../../models/IWebWallet';
 
 import {
   breakpointFnValidator,
@@ -26,7 +27,7 @@ import type { ProfileRowProps } from '../components/component_kit/cw_profiles_li
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import { setDarkMode } from '../../helpers';
+import { setDarkMode } from '../../helpers/darkMode';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;

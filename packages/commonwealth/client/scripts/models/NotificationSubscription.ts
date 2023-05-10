@@ -2,9 +2,11 @@ import { modelFromServer as modelCommentFromServer } from 'controllers/server/co
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
-import type { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
 import app from '../state';
+import type ChainInfo from './ChainInfo';
+import type { Comment as CommentT } from './Comment';
 import type { IUniqueId } from './interfaces';
+import { Thread as ThreadT } from './Thread';
 
 class NotificationSubscription {
   public readonly category: string;
