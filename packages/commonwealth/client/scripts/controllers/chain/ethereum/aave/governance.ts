@@ -97,11 +97,7 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // send transaction
-    const contract = await attachSigner(
-      this.app.wallets,
-      this.app.user.activeAccount,
-      this._api.Governance
-    );
+    const contract = await attachSigner(this.app.user.activeAccount, this._api.Governance);
     const tx = await contract.create(
       executorContract.address,
       targets,

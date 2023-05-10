@@ -94,7 +94,6 @@ export interface IApp {
   sessions: SessionsController;
 
   // Web3
-  wallets: WebWalletController;
   snapshot: SnapshotController;
 
   mobileMenu: MobileMenuName;
@@ -188,7 +187,6 @@ const app: IApp = {
 
   // Web3
   snapshot: new SnapshotController(),
-  wallets: new WebWalletController(),
 
   // User
   user,
