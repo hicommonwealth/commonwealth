@@ -16,7 +16,6 @@ export default button;
 type Story = StoryObj<typeof CWButton>;
 
 const argTypesObj = (options: string[]) => {
-  // By default, Storybook chooses a control for each arg based on initial value
   return {
     iconLeft: {
       control: { type: "select" },
@@ -37,7 +36,6 @@ const argTypesObj = (options: string[]) => {
 
 /** Primary buttons */
 export const Primary: Story = {
-  // args: default values set to story
   args: {
     label: "Primary",
     iconLeft: "person",
@@ -45,8 +43,8 @@ export const Primary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "primary-red", "primary-blue", "primary-blue-dark", "primary-black" ]),
-  render: ({...common}) => (
-    <CWButton {...common} onClick={() => notifySuccess('Button clicked!')} />
+  render: ({...args}) => (
+    <CWButton {...args} onClick={() => notifySuccess('Button clicked!')} />
   ),
 };
 

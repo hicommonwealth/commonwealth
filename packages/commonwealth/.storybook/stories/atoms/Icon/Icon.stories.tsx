@@ -2,9 +2,12 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWIcon } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import '../../../../client/styles/components/component_kit/cw_component_showcase.scss';
 import type { IconName } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import { iconLookup } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+
+import '../../../../client/styles/components/component_kit/cw_component_showcase.scss';
+
+const iconOptions = [ ...Object.keys(iconLookup) ];
 
 const icons = {
   title: 'Atoms/Icon/Overview',
@@ -12,27 +15,23 @@ const icons = {
 } satisfies Meta<typeof CWIcon>;
 
 export default icons;
-// type Story = StoryObj<typeof allIcons>;
+type Story = StoryObj<typeof icons>;
 
-const displayIcons = (icons) => {
-  return Object.entries(icons).map(([k], i) => {
-    return (
-      <div className="icon-container" key={i}>
-        <div className="icon-name">{k}</div>
-        <CWIcon iconName={k as IconName} />
-      </div>
-    );
-  });
-};
-
-const Icons = () => {
-  return (
-    <div className="all-icons-container">{displayIcons(iconLookup)}</div>
-  )
-}
-
-// export const AllIcons: Story = {
-export const AllIcons = {
-  name: 'Overview',
-  render: () => <Icons />
+export const Icon: Story = {
+  name: "Overview",
+  args: {
+    iconName: "arrowLeft",
+  },
+  argTypes: {
+    iconName: {
+      control: { type: "select" },
+      options: iconOptions,
+    },
+  },
+  render: ({...args}) => (
+    <div className="icon-container">
+      <div className="icon-name">{args.iconName}</div>
+      <CWIcon iconName={args.iconName as IconName} />
+    </div>
+  ),
 }
