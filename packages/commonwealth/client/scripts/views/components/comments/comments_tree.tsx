@@ -7,7 +7,7 @@ import { Thread } from 'models';
 
 import app from 'state';
 import { CWValidationText } from '../component_kit/cw_validation_text';
-import { Comment } from './comment';
+import { CommentComponent } from './commentComponent';
 import { CreateComment } from './create_comment';
 import { jumpHighlightComment } from './helpers';
 
@@ -107,7 +107,7 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
       if (isLivingCommentTree(comment, children)) {
         return (
           <React.Fragment key={comment.id}>
-            <Comment
+            <CommentComponent
               comment={comment}
               handleIsReplying={handleIsReplying}
               isLast={threadLevel === 2}

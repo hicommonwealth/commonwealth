@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { formatNumberLong } from 'helpers';
-import { AddressInfo } from 'models';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
 import app from 'state';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
 

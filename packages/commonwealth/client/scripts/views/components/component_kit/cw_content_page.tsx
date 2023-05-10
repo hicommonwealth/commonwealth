@@ -147,7 +147,7 @@ export const CWContentPage = (props: ContentPageProps) => {
         {mainBody}
         {showSidebar && (
           <div className="sidebar">
-            {sidebarComponents.map((c) => (
+            {sidebarComponents?.map((c) => (
               <React.Fragment key={c.label}>{c.item}</React.Fragment>
             ))}
           </div>
@@ -162,7 +162,7 @@ export const CWContentPage = (props: ContentPageProps) => {
             }}
             isSelected={tabSelected === 0}
           />
-          {sidebarComponents.map((item, i) => (
+          {sidebarComponents?.map((item, i) => (
             <CWTab
               key={item.label}
               label={item.label}
@@ -174,13 +174,13 @@ export const CWContentPage = (props: ContentPageProps) => {
           ))}
         </CWTabBar>
         {tabSelected === 0 && mainBody}
-        {sidebarComponents.length >= 1 &&
+        {sidebarComponents?.length >= 1 &&
           tabSelected === 1 &&
           sidebarComponents[0].item}
-        {sidebarComponents.length >= 2 &&
+        {sidebarComponents?.length >= 2 &&
           tabSelected === 2 &&
           sidebarComponents[1].item}
-        {sidebarComponents.length === 3 &&
+        {sidebarComponents?.length === 3 &&
           tabSelected === 3 &&
           sidebarComponents[2].item}
       </div>

@@ -360,8 +360,8 @@ const ViewTemplatePage = () => {
       <div className="ViewTemplatePage">
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Contracts', path: `/contracts` },
-            { label: templateNickname, path: '' },
+            { label: 'Contracts', path: `/contracts`, navigate },
+            { label: templateNickname },
           ]}
         />
         <CWText type="h3" className="header">

@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
-import { AddressInfo } from 'models';
 
 import app from 'state';
+import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';

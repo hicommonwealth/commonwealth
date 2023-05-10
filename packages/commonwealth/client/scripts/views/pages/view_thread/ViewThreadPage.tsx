@@ -42,7 +42,7 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
+import { ExternalLink, ThreadAuthor, ThreadStageComponent } from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
@@ -705,7 +705,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         displayNewTag={true}
         headerComponents={
           thread.stage !== ThreadStageType.Discussion && (
-            <ThreadStage thread={thread} />
+            <ThreadStageComponent thread={thread} />
           )
         }
         subHeader={!!thread.url && <ExternalLink thread={thread} />}
