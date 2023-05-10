@@ -3,7 +3,6 @@ import type { RangeStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
 
 import MagicUrl from 'quill-magic-url';
-import * as Emoji from 'quill-emoji/dist/quill-emoji';
 
 import { nextTick } from 'process';
 
@@ -30,7 +29,6 @@ import 'react-quill/dist/quill.snow.css';
 import 'quill-emoji/dist/quill-emoji.css';
 
 Quill.register('modules/magicUrl', MagicUrl);
-Quill.register('modules/emoji', Emoji);
 
 type ReactQuillEditorProps = {
   className?: string;
