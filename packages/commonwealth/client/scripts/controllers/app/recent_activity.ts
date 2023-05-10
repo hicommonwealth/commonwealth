@@ -1,9 +1,10 @@
 import $ from 'jquery';
-import type { Thread, Topic } from 'models';
+import MinimumProfile from '../../models/MinimumProfile';
+import type Thread from '../../models/Thread';
+import type Topic from '../../models/Topic';
 import moment from 'moment';
 import app from 'state';
 import AbridgedThread from '../../models/AbridgedThread';
-import { MinimumProfile } from '../../models/index';
 
 export interface IAbridgedThreadFromServer {
   id: number;

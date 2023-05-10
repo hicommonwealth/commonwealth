@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 import 'modals/change_topic_modal.scss';
-import type { Thread, Topic } from 'models';
+import type Thread from '../../models/Thread';
+import type Topic from '../../models/Topic';
 
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
