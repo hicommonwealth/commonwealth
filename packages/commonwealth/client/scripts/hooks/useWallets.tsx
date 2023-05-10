@@ -31,6 +31,7 @@ import type {
   LoginActiveStep,
   LoginSidebarType,
 } from '../views/pages/login/types';
+import { getAddressFromWallet, loginToAxie, loginToNear } from '../lib/wallet';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -442,56 +443,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     if (wallet.chain === 'near') {
-      // Near Redirect Flow
-      const WalletAccount = (await import('near-api-js')).WalletAccount;
-      if (!app.chain.apiInitialized) {
-        await app.chain.initApi();
-      }
-      const nearWallet = new WalletAccount(
-        (app.chain as Near).chain.api,
-        'commonwealth_near'
-      );
-      if (nearWallet.isSignedIn()) {
-        nearWallet.signOut();
-      }
-      const redirectUrl = !app.isCustomDomain()
-        ? `${window.location.origin}/${app.activeChainId()}/finishNearLogin`
-        : `${window.location.origin}/finishNearLogin`;
-      nearWallet.requestSignIn({
-        contractId: (app.chain as Near).chain.isMainnet
-          ? 'commonwealth-login.near'
-          : 'commonwealth-login.testnet',
-        successUrl: redirectUrl,
-        failureUrl: redirectUrl,
-      });
+      await loginToNear(app.chain as Near, app.isCustomDomain());
     } else if (wallet.defaultNetwork === 'axie-infinity') {
-      // Axie Redirect Flow
-      const result = await $.post(`${app.serverUrl()}/auth/sso`, {
-        issuer: 'AxieInfinity',
-      });
-      if (result.status === 'Success' && result.result.stateId) {
-        const stateId = result.result.stateId;
-
-        // redirect to axie page for login
-        // eslint-disable-next-line max-len
-        window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
-      } else {
-        console.log(result.error || 'Could not login');
-      }
+      await loginToAxie(`${app.serverUrl()}/auth/sso`);
     } else {
-      // Normal Wallet Flow
-      let selectedAddress;
-      if (wallet.chain === 'ethereum' || wallet.chain === 'solana') {
-        selectedAddress = wallet.accounts[0];
-      } else if (wallet.defaultNetwork === 'terra') {
-        selectedAddress = wallet.accounts[0].address;
-      } else if (wallet.chain === 'cosmos') {
-        if (wallet.defaultNetwork === 'injective') {
-          selectedAddress = wallet.accounts[0];
-        } else {
-          selectedAddress = wallet.accounts[0].address;
-        }
-      }
+      const selectedAddress = getAddressFromWallet(wallet);
 
       if (walletProps.useSessionKeyLoginFlow) {
         await onSessionKeyRevalidation(wallet, selectedAddress);
