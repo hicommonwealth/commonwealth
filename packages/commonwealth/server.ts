@@ -41,7 +41,7 @@ import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupCEProxy from './server/util/entitiesProxy';
-import GlobalActivityCache from './server/util/globalActivityCache';
+import { globalActivityInstance } from './server/util/queryGlobalActivity';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
@@ -264,11 +264,8 @@ async function main() {
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   if (!NO_RULE_CACHE) await ruleCache.start();
   const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
 
-  // initialize async to avoid blocking startup
-  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
-
+  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityInstance.startTask(models);
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
@@ -282,7 +279,6 @@ async function main() {
     tokenBalanceCache,
     ruleCache,
     banCache,
-    globalActivityCache,
     dbValidationService
   );
 

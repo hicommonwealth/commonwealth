@@ -1,6 +1,9 @@
 import type { MinimumProfile as Profile } from 'models';
 import type { DB } from '../models';
 
+import { RedisNamespaces } from 'common-common/src/types';
+import { Activity  } from 'common-common/src/daemons/activity';
+
 export type GlobalActivity = Array<{
   category_id: string;
   comment_count: string;
@@ -12,7 +15,7 @@ export type GlobalActivity = Array<{
   commenters: Profile[];
 }>;
 
-export default async function queryGlobalActivity(
+export async function queryGlobalActivity(
   models: DB
 ): Promise<GlobalActivity> {
   const query = `
@@ -91,3 +94,13 @@ export default async function queryGlobalActivity(
   // TODO: verify output type
   return notificationsWithProfiles as GlobalActivity;
 }
+
+export const globalActivityInstance = new Activity(
+  'GlobalActivity',
+  queryGlobalActivity,
+  'globalactivity',
+  60*5, // 5 minutes
+  RedisNamespaces.Global_Response
+);
+
+export default globalActivityInstance.queryWithCache;

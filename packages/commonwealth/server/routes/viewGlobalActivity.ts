@@ -1,16 +1,14 @@
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import type GlobalActivityCache from '../util/globalActivityCache';
-import type { GlobalActivity } from '../util/queryGlobalActivity';
+import { default as queryGlobalActivity, GlobalActivity } from '../util/queryGlobalActivity';
 
 const viewGlobalActivity = async (
   models: DB,
-  globalActivityCache: GlobalActivityCache,
   req: TypedRequestBody<Record<string, never>>,
   res: TypedResponse<GlobalActivity>
 ) => {
-  const activity = await globalActivityCache.globalActivity();
+  const activity = await queryGlobalActivity(models);
   return success(res, activity);
 };
 

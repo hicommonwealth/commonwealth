@@ -155,7 +155,6 @@ import { getChain } from '../routes/getChain';
 import { getChainNode } from '../routes/getChainNode';
 import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
-import type GlobalActivityCache from '../util/globalActivityCache';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
@@ -186,7 +185,6 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
   banCache: BanCache,
-  globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService
 ) {
   const router = express.Router();
@@ -774,7 +772,7 @@ function setupRouter(
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
   router.post(
     '/viewGlobalActivity',
-    viewGlobalActivity.bind(this, models, globalActivityCache)
+    viewGlobalActivity.bind(this, models)
   );
   router.post(
     '/markNotificationsRead',

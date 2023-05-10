@@ -29,7 +29,7 @@ import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
-import GlobalActivityCache from './server/util/globalActivityCache';
+import { globalActivityInstance } from './server/util/queryGlobalActivity';
 import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
@@ -495,8 +495,7 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
 };
 
 const banCache = new BanCache(models);
-const globalActivityCache = new GlobalActivityCache(models);
-globalActivityCache.start();
+globalActivityInstance.startTask(models);
 setupPassport(models);
 // TODO: mock RabbitMQController
 setupAPI(
@@ -507,7 +506,6 @@ setupAPI(
   tokenBalanceCache,
   ruleCache,
   banCache,
-  globalActivityCache,
   databaseValidationService
 );
 setupCosmosProxy(app, models);

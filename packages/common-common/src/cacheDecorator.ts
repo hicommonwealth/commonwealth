@@ -33,6 +33,76 @@ export class CacheDecorator {
     this.redisCache = redisCache;
   }
 
+  /**
+  * Method to wrap a function with caching mechanism
+  * The keyGenerator should be a function returning a unique key for each unique combination of arguments
+  * The ttl is the time to live for the cache in seconds
+  */
+  public cacheWrap<T extends (...args: any[]) => any>(
+    override: boolean,
+    fn: T,
+    key: string, // keyGenerator: (...args: Parameters<T>) => string | CacheKeyDuration = defaultKeyGenerator,
+    duration: number,
+    namespace: RedisNamespaces = RedisNamespaces.Function_Response
+  ) {
+    return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+      let isFunctionCalled = false;
+      try {
+        // If cache is disabled, skip caching
+        if (!this.isEnabled()) {
+          log.trace(`Cache disabled, skipping cache`);
+          // call the function
+          isFunctionCalled = true;
+          return await fn(...args);
+        }
+
+        // If cache key is null 
+        if (!key || duration === undefined || duration === null) {
+          log.trace(`Cache key not found for ${fn.name}`);
+          // call the function
+          isFunctionCalled = true;
+          return await fn(...args);
+        }
+
+        // If cache is disabled, skip caching
+        if(!override) {
+          const cachedValue = await this.checkCache(key, namespace);
+          if (cachedValue) {
+            try {
+              // Try to parse and return the cached value as JSON
+              return JSON.parse(cachedValue);
+            } catch (error) {
+              // If parsing fails, return the raw cached value
+              log.warn(`Failed to parse cached value for ${key} as JSON, returning raw value. Error: ${error}`);
+              return cachedValue as ReturnType<T>;
+            }
+          }
+        }
+
+        // call the function and cache the response
+        isFunctionCalled = true;
+        const result = await fn(...args);
+        if(result === undefined) {
+          log.warn(`Function ${fn.name} returned undefined, skipping cache`);
+          return result;
+        }
+        try {
+          this.cacheResponse(key, JSON.stringify(result), duration, namespace);
+        } catch (error) {
+          log.error(`Error caching value for ${key}: ${error}`);
+        }
+        return result;
+      } catch (error) {
+        log.error(`Error in cacheWrap for ${fn.name}: ${error}`);
+        if (!isFunctionCalled) {
+          return await fn(...args);
+        } else {
+          throw error;
+        };
+      }
+    };
+  }
+
   // Cache decorator for express routes
   // duration: cache duration in seconds, 0 means no expiry
   // keyGenerator: function to generate cache key, default is the route path

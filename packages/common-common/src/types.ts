@@ -136,6 +136,8 @@ export enum BalanceType {
 export enum RedisNamespaces {
   Chat_Socket = 'chat_socket',
   Route_Response = 'route_response',
+  Function_Response = 'function_response',
+  Global_Response = 'global_response',
   Test_Redis = 'test_redis',
 }
 
