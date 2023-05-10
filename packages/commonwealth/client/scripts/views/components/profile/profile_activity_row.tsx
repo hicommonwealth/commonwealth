@@ -5,7 +5,7 @@ import moment from 'moment';
 import 'components/profile/profile_activity_row.scss';
 
 import app from 'state';
-import type Thread from 'client/scripts/models/Thread';
+import type Thread from 'models/Thread';
 import withRouter, {
   navigateToCommunity,
   useCommonNavigate,
