@@ -81,9 +81,7 @@ export const status = async (
     const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
     for (const chain of chains) {
       if (chain.category !== null) {
-        chainCategories[chain.id] = chain.category
-          .slice(1, -1)
-          .split(',') as ChainCategoryType[];
+        chainCategories[chain.id] = chain.category as ChainCategoryType[];
       }
     }
 

@@ -28,10 +28,10 @@ const updateChainCategory = async (
         id: req.body.chain_id,
       },
     });
-    if (!chain) return next(new AppError('Invalid Chain Id'));
+    if (!chain) throw new AppError('Invalid Chain Id');
 
     const existingCategories = chain.category
-      ? chain.category.slice(1, -1).split(',')
+      ? (chain.category as string[])
       : [];
     if (existingCategories.includes(req.body.category))
       return next(new AppError('Chain already include this category'));
@@ -45,7 +45,7 @@ const updateChainCategory = async (
     };
     return success(res, { chainCategoryMap: updatedCategory });
   } else {
-    return next(new AppError('Not a valid category'));
+    throw new AppError('Not a valid category');
   }
 };
 
