@@ -8,8 +8,9 @@ import app from 'state';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
-import { AvatarUpload } from 'views/components/avatar_upload';
-import type { ChainInfo, RoleInfo } from 'models';
+import type ChainInfo from '../../../models/ChainInfo';
+import type RoleInfo from '../../../models/RoleInfo';
+import { AvatarUpload } from '../../components/avatar_upload';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';

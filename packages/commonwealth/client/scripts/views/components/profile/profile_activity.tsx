@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 
 import 'components/profile/profile_activity.scss';
 
-import type Thread from 'client/scripts/models/Thread';
-import type Comment from 'client/scripts/models/Comment';
-import type AddressInfo from 'client/scripts/models/AddressInfo';
-import type { IUniqueId } from 'client/scripts/models/interfaces';
+import type Thread from 'models/Thread';
+import type Comment from 'models/Comment';
+import type AddressInfo from 'models/AddressInfo';
+import type { IUniqueId } from 'models/interfaces';
 import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
 import ProfileActivityContent from './profile_activity_content';
 

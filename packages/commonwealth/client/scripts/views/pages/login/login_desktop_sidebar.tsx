@@ -4,7 +4,7 @@ import 'pages/login/login_desktop_sidebar.scss';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
-import type { IWebWallet } from 'models';
+import type IWebWallet from '../../../models/IWebWallet';
 import app from 'state';
 import { CWAccountCreationButton } from 'views/components/component_kit/cw_account_creation_button';
 import { CWButton } from 'views/components/component_kit/cw_button';

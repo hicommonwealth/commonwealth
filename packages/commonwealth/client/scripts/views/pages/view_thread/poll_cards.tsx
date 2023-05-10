@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import type { Poll, Thread } from 'models';
+import type Poll from '../../../models/Poll';
+import type Thread from '../../../models/Thread';
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
