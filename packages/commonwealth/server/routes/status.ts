@@ -56,7 +56,7 @@ type StatusResp = {
   evmTestEnv?: string;
 };
 
-const status = async (
+export const status = async (
   models: DB,
   req: TypedRequestQuery,
   res: TypedResponse<StatusResp>
@@ -373,5 +373,3 @@ const status = async (
     throw new ServerError('something broke', error);
   }
 };
-
-export default status;

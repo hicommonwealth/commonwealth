@@ -111,8 +111,8 @@ export const getForumNotificationCopy = async (
     chain: chain_id,
   };
   const proposalUrlArgs = comment_id
-    ? [root_type, pseudoProposal, { id: comment_id }]
-    : [root_type, pseudoProposal];
+    ? [pseudoProposal, { id: comment_id }]
+    : [pseudoProposal];
   const proposalPath = (getThreadUrl as any)(...proposalUrlArgs);
   return [
     emailSubjectLine,
