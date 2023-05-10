@@ -1,32 +1,36 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { RangeStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
-import MagicUrl from 'quill-magic-url';
-import ImageUploader from 'quill-image-uploader';
 
-import { SerializableDeltaStatic } from './utils';
-import { getTextFromDelta } from './utils';
+import MagicUrl from 'quill-magic-url';
+import * as Emoji from 'quill-emoji/dist/quill-emoji';
+
+import { nextTick } from 'process';
+
+import { SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import { CWText } from '../component_kit/cw_text';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { PreviewModal } from '../../modals/preview_modal';
 import { Modal } from '../component_kit/cw_modal';
-
-import 'components/react_quill/react_quill_editor.scss';
-import 'react-quill/dist/quill.snow.css';
-import { nextTick } from 'process';
-
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { LoadingIndicator } from './loading_indicator';
+
+import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
+
 import { useMention } from './use_mention';
 import { useClipboardMatchers } from './use_clipboard_matchers';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
-import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useImageUploader } from './use_image_uploader';
+import { useEmoji } from './use_emoji';
+
+import 'components/react_quill/react_quill_editor.scss';
+import 'react-quill/dist/quill.snow.css';
+import 'quill-emoji/dist/quill-emoji.css';
 
 Quill.register('modules/magicUrl', MagicUrl);
-Quill.register('modules/imageUploader', ImageUploader);
+Quill.register('modules/emoji', Emoji);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -93,6 +97,11 @@ const ReactQuillEditor = ({
     editorRef,
     setContentDelta,
   });
+
+  // handle emoji selector and shortcuts
+  const { emojiModules } = useEmoji({ editorRef });
+
+  console.log('emojiModules: ', emojiModules);
 
   // refreshQuillComponent unmounts and remounts the
   // React Quill component, as this is the only way
@@ -275,6 +284,7 @@ const ReactQuillEditor = ({
               imageUploader: {
                 upload: handleImageUploader,
               },
+              ...emojiModules,
             }}
           />
         </>

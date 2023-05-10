@@ -226,6 +226,7 @@
     "prerender-node": "^3.2.5",
     "process": "^0.11.10",
     "quill": "^2.0.0-dev.4",
+    "quill-emoji": "^0.2.0",
     "quill-image-drop-and-paste": "^1.0.4",
     "quill-image-uploader": "^1.0.2",
     "quill-magic-url": "^4.2.0",

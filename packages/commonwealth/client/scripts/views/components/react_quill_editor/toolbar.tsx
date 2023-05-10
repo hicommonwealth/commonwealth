@@ -24,6 +24,7 @@ export const CustomQuillToolbar = ({ toolbarId }: CustomQuillToolbarProps) => (
     <button className="ql-code-block"></button>
     <button className="ql-blockquote"></button>
     <button className="ql-image"></button>
+    <button className="ql-emoji"></button>
     <button className="ql-list" value="ordered" />
     <button className="ql-list" value="bullet" />
     <button className="ql-list" value="check" />
@@ -171,6 +172,12 @@ export const useMarkdownToolbarHandlers = ({
     };
   };
 
+  const createEmojiHandler = () => {
+    return () => {
+      console.log('EMOJI');
+    };
+  };
+
   const handlers = useMemo(() => {
     return {
       bold: createHandler('**'),
@@ -182,6 +189,7 @@ export const useMarkdownToolbarHandlers = ({
       link: createLinkHandler(),
       blockquote: createBlockquoteHandler(),
       list: createListHandler(),
+      emoji: createEmojiHandler(),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
