@@ -1,16 +1,3 @@
-export { DepositVote, BinaryVote } from './votes';
-
-export {
-  ThreadStage,
-  ThreadKind,
-  TransactionStatus,
-  ProposalStatus,
-  VotingType,
-  VotingUnit,
-} from './types';
-
-export type { AnyProposal, ProposalEndTime } from './types';
-
 export {
   IBlockInfo,
   IChainModule,

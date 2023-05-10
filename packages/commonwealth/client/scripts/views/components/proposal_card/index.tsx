@@ -8,7 +8,7 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { isNotNil } from 'helpers/typeGuards';
 import { getProposalUrlPath } from 'identifiers';
-import type { AnyProposal } from 'models';
+import type { AnyProposal } from '../../../models/types';
 
 import app from 'state';
 import { slugify } from 'utils';
