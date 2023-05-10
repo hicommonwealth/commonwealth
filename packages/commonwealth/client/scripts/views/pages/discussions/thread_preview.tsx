@@ -148,7 +148,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              <NewThreadTag thread={thread}/>
+              <NewThreadTag threadCreatedAt={thread.createdAt}/>
               {isLocked && <CWIcon iconName="lock" iconSize="small" />}
             </div>
             <div className="top-row-icons">

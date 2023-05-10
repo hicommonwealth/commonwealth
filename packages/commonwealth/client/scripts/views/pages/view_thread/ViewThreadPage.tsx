@@ -702,13 +702,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         createdAt={thread.createdAt}
         viewCount={viewCount}
         readOnly={thread.readOnly}
+        displayNewTag={true}
         headerComponents={
-          <>
-            <NewThreadTag thread={thread}/>
-            {thread.stage !== ThreadStageType.Discussion && (
-              <ThreadStage thread={thread}/>
-            )}
-          </>
+          thread.stage !== ThreadStageType.Discussion && (
+            <ThreadStage thread={thread} />
+          )
         }
         subHeader={!!thread.url && <ExternalLink thread={thread} />}
         actions={

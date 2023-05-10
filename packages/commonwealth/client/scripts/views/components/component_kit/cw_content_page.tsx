@@ -5,6 +5,7 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
+import { NewThreadTag } from '../../pages/discussions/NewThreadTag';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
@@ -45,6 +46,7 @@ type ContentPageProps = {
   subBody?: React.ReactNode;
   subHeader?: React.ReactNode;
   viewCount?: number;
+  displayNewTag?: boolean;
 };
 
 export const CWContentPage = (props: ContentPageProps) => {
@@ -63,6 +65,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     subHeader,
     title,
     viewCount,
+    displayNewTag,
   } = props;
 
   // @REACT TODO: this needs to be aware of which view to default to
@@ -106,6 +109,7 @@ export const CWContentPage = (props: ContentPageProps) => {
                 published on {moment(createdAt).format('l')}
               </CWText>
             ))}
+          {!!displayNewTag && <NewThreadTag threadCreatedAt={moment(createdAt)}/>}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
               {pluralize(viewCount, 'view')}

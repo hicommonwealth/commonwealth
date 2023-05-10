@@ -119,7 +119,7 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
-                    <NewThreadTag thread={thread}/>
+                    <NewThreadTag threadCreatedAt={thread.createdAt}/>
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}
