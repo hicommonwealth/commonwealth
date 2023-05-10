@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { parseCustomStages, pluralize, threadStageToLabel } from 'helpers';
+import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import type { Thread, Topic } from 'models';
 import moment from 'moment';
@@ -17,7 +17,6 @@ import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { useCommonNavigate } from 'navigation/helpers';
-import { ThreadStage } from 'models';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 
 type TopicSummaryRowProps = {
@@ -79,10 +78,8 @@ export const TopicSummaryRow = ({
 
           const user = app.chain.accounts.get(thread.author);
 
-          const isDefaultStage =
-            thread.stage === ThreadStage.Discussion ||
-            thread.stage === parseCustomStages(app.chain.meta.customStages)[0];
-          const isTagsRowVisible = thread.stage && !isDefaultStage;
+          const isStageDefault = isDefaultStage(thread.stage);
+          const isTagsRowVisible = thread.stage && !isStageDefault;
 
           return (
             <div key={idx}>

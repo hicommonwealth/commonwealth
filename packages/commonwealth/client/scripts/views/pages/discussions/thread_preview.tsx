@@ -11,7 +11,7 @@ import app from 'state';
 import { slugify } from 'utils';
 import {
   isCommandClick,
-  parseCustomStages,
+  isDefaultStage,
   pluralize,
   threadStageToLabel,
 } from 'helpers';
@@ -44,7 +44,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Thread, { LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
 import { filterLinks } from 'helpers/threads';
-import { ThreadStage } from 'models';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -108,11 +107,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
     `${thread.identifier}-${slugify(thread.title)}`
   );
 
-  const isDefaultStage =
-    thread.stage === ThreadStage.Discussion ||
-    thread.stage === parseCustomStages(app.chain.meta.customStages)[0];
+  const isStageDefault = isDefaultStage(thread.stage);
   const isTagsRowVisible =
-    (thread.stage && !isDefaultStage) || linkedProposals.length > 0;
+    (thread.stage && !isStageDefault) || linkedProposals.length > 0;
 
   const handleStageTagClick = (e) => {
     e.stopPropagation();
@@ -197,7 +194,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           </CWText>
           {isTagsRowVisible && (
             <div className="tags-row">
-              {thread.stage && !isDefaultStage && (
+              {thread.stage && !isStageDefault && (
                 <CWTag
                   label={threadStageToLabel(thread.stage)}
                   trimAt={20}
