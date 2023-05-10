@@ -21,6 +21,10 @@ const argTypesObj = (options: string[]) => {
       control: { type: "select" },
       options: iconOptions,
     },
+    iconRight: {
+      control: { type: "select" },
+      options: iconOptions,
+    },
     label: {
       control: { type: "text" },
     },
@@ -39,6 +43,7 @@ export const Primary: Story = {
   args: {
     label: "Primary",
     iconLeft: "person",
+    iconRight: undefined,
     buttonType: "primary-red",
     disabled: false,
   },

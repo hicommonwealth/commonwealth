@@ -13,7 +13,6 @@ const text = {
 export default text;
 type Story = StoryObj<typeof text>;
 
-/** Overview */
 export const Text: Story = {
   name: 'Overview',
   args: {
@@ -35,7 +34,7 @@ export const Text: Story = {
     },
     fontWeight: {
       control: { type: "select" },
-      options: [ "bold", "medium", "italic", "uppercase", "regular", "semiBold", "black" ],
+      options: [ "regular", "medium", "semiBold", "bold", "black", "italic", "uppercase" ],
     },
     isCentered: {
       options: [ true, false ],
