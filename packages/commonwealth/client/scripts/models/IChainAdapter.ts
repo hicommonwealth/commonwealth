@@ -54,16 +54,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       }),
     ]);
 
-    // If user is no longer on the initializing chain, abort initialization
-    // and return false, so that the invoking selectChain fn can similarly
-    // break, rather than complete.
-    // if (
-    //   this.meta.id !== (this.app.customDomainId() || _DEPRECATED_getSearchParams('scope'))
-    // ) {
-    //   console.log(this.meta.id, _DEPRECATED_getSearchParams('scope'));
-    //   return false;
-    // }
-
     const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
       darkModePreferenceSet
