@@ -16,6 +16,8 @@ import { detectURL } from 'helpers/threads';
 import { rpc } from '@polkadot/types/interfaces/definitions';
 import NodeInfo from 'models/NodeInfo';
 import ChainInfo from 'models/ChainInfo';
+import { CWDropdown } from '../components/component_kit/cw_dropdown';
+import { BalanceType } from '../../../../../common-common/src/types';
 
 // Allows admins to create/update RPC endpoints for chains
 const RPCEndpointTask = () => {
@@ -30,98 +32,160 @@ const RPCEndpointTask = () => {
     React.useState<NodeInfo>(null);
   const [rpcEndpointChainNodeValidated, setRpcEndpointChainNodeValidated] =
     React.useState<boolean>(false);
+  const [rpcName, setRpcName] = React.useState<string>('');
+  const [bech32, setBech32] = React.useState<string>('');
+  const [balanceType, setBalanceType] = React.useState<BalanceType>(
+    BalanceType.Ethereum
+  );
+  const [chainNodeNotCreated, setChainNodeNotCreated] =
+    React.useState<boolean>(false);
 
+  const buttonEnabled =
+    (rpcEndpointChainNodeValidated &&
+      rpcEndpointChainNode &&
+      rpcEndpointChainValueValidated) ||
+    (rpcName !== '' && bech32 !== '' && rpcEndpoint !== '');
   return (
     <div className="TaskGroup">
       <CWText type="h4">Switch/Add RPC Endpoint</CWText>
       <CWText type="caption">
         Changes the RPC endpoint for a specific chain.
       </CWText>
-      <div className="TaskRow">
-        <CWTextInput
-          label="Community Id"
-          value={rpcEndpointChainValue}
-          onInput={(e) => {
-            setRpcEndpointChainValue(e.target.value);
-            if (e.target.value.length === 0)
-              setRpcEndpointChainValueValidated(false);
-          }}
-          inputValidationFn={(value: string) => {
-            const chainInfo = app.config.chains.getById(value);
-            if (!chainInfo) {
-              setRpcEndpointChainValueValidated(false);
-              return ['failure', 'Community not found'];
-            }
-            setRpcEndpointChain(chainInfo);
-            setRpcEndpointChainValueValidated(true);
-            return [];
-          }}
-          placeholder="Enter a community id"
-        />
-        <CWTextInput
-          label="RPC Endpoint"
-          value={rpcEndpoint}
-          onInput={(e) => {
-            setRpcEndpoint(e.target.value);
-          }}
-          inputValidationFn={(value: string) => {
-            if (!detectURL(value)) {
-              setRpcEndpointChainNodeValidated(false);
-              return ['failure', 'Not a valid URL'];
-            }
+      <div className="MultiRow">
+        <div className="TaskRow">
+          <CWTextInput
+            label="Community Id"
+            value={rpcEndpointChainValue}
+            onInput={(e) => {
+              setRpcEndpointChainValue(e.target.value);
+              if (e.target.value.length === 0)
+                setRpcEndpointChainValueValidated(false);
+            }}
+            inputValidationFn={(value: string) => {
+              const chainInfo = app.config.chains.getById(value);
+              if (!chainInfo) {
+                setRpcEndpointChainValueValidated(false);
+                return ['failure', 'Community not found'];
+              }
+              setRpcEndpointChain(chainInfo);
+              setRpcEndpointChainValueValidated(true);
+              return [];
+            }}
+            placeholder="Enter a community id"
+          />
+          <CWTextInput
+            label="RPC Endpoint"
+            value={rpcEndpoint}
+            onInput={(e) => {
+              setRpcEndpoint(e.target.value);
+            }}
+            inputValidationFn={(value: string) => {
+              if (!detectURL(value)) {
+                setRpcEndpointChainNodeValidated(false);
+                return ['failure', 'Not a valid URL'];
+              }
 
-            const nodeInfo = app.config.nodes.getByUrl(value);
+              const nodeInfo = app.config.nodes.getByUrl(value);
 
-            if (nodeInfo) {
-              setRpcEndpointChainNode(nodeInfo);
-              setRpcEndpointChainNodeValidated(true);
-            }
+              if (nodeInfo) {
+                setRpcEndpointChainNode(nodeInfo);
+                setRpcEndpointChainNodeValidated(true);
+              } else {
+                setChainNodeNotCreated(true);
+              }
 
-            return [];
-          }}
-          placeholder="Enter an RPC endpoint"
-        />
-        <CWButton
-          label="Update"
-          className="TaskButton"
-          disabled={
-            !rpcEndpointChainNodeValidated ||
-            !rpcEndpointChainNode ||
-            !rpcEndpointChainValueValidated
-          }
-          onClick={() => {
-            openConfirmation({
-              title: 'Update RPC Endpoint',
-              description: `Are you sure you want to update the rpc endpoint on ${rpcEndpointChainValue}?`,
-              buttons: [
-                {
-                  label: 'Upodate',
-                  buttonType: 'mini-black',
-                  onClick: async () => {
-                    try {
-                      await rpcEndpointChain.updateChainData({
-                        chain_node_id: rpcEndpointChainNode.id.toString(),
-                      });
-                      setRpcEndpointChainValue('');
-                      setRpcEndpoint('');
-                      setRpcEndpointChain(null);
-                      setRpcEndpointChainNode(null);
-                      notifySuccess('RPC Endpoint Updated');
-                    } catch (e) {
-                      notifyError('Error updating RPC Endpoint');
+              return [];
+            }}
+            placeholder="Enter an RPC endpoint"
+          />
+          <CWButton
+            label="Update"
+            className="TaskButton"
+            disabled={!buttonEnabled}
+            onClick={() => {
+              openConfirmation({
+                title: 'Update RPC Endpoint',
+                description: `Are you sure you want to update the rpc endpoint on ${rpcEndpointChainValue}?`,
+                buttons: [
+                  {
+                    label: 'Upodate',
+                    buttonType: 'mini-black',
+                    onClick: async () => {
+                      try {
+                        let nodeId = null;
+                        if (chainNodeNotCreated) {
+                          // Create Chain Node if not yet created
+                          const res = await axios.post(
+                            `${app.serverUrl()}/createChainNode`,
+                            {
+                              url: rpcEndpoint,
+                              name: rpcName,
+                              bech32,
+                              balance_type: balanceType,
+                              jwt: app.user.jwt,
+                            }
+                          );
+                          nodeId = res.data.id;
+                        }
 
-                      console.error(e);
-                    }
+                        await rpcEndpointChain.updateChainData({
+                          chain_node_id:
+                            nodeId ?? rpcEndpointChainNode.id.toString(),
+                        });
+                        setRpcEndpointChainValue('');
+                        setRpcEndpoint('');
+                        setRpcEndpointChain(null);
+                        setRpcEndpointChainNode(null);
+                        notifySuccess('RPC Endpoint Updated');
+                      } catch (e) {
+                        notifyError('Error updating RPC Endpoint');
+
+                        console.error(e);
+                      }
+                    },
                   },
-                },
-                {
-                  label: 'Cancel',
-                  buttonType: 'mini-white',
-                },
-              ],
-            });
-          }}
-        />
+                  {
+                    label: 'Cancel',
+                    buttonType: 'mini-white',
+                  },
+                ],
+              });
+            }}
+          />
+        </div>
+        {chainNodeNotCreated && (
+          <div className="TaskRow">
+            <CWTextInput
+              label="name"
+              value={rpcName}
+              onInput={(e) => {
+                setRpcName(e.target.value);
+              }}
+              placeholder="Enter chain node name (optional)"
+            />
+            <CWTextInput
+              label="bech32"
+              value={bech32}
+              onInput={(e) => {
+                setBech32(e.target.value);
+              }}
+              placeholder="Enter bech32 name"
+            />
+            <CWDropdown
+              label="balance type"
+              options={[
+                { label: 'ethereum', value: BalanceType.Ethereum },
+                { label: 'solana', value: BalanceType.Solana },
+                { label: 'cosmos', value: BalanceType.Cosmos },
+                { label: 'NEAR', value: BalanceType.NEAR },
+                { label: 'substrate', value: BalanceType.Substrate },
+              ]}
+              onSelect={(item) => {
+                setBalanceType(item.value as BalanceType);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

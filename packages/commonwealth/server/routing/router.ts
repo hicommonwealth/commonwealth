@@ -160,6 +160,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import createChainNode from '../routes/createChainNode';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -296,6 +297,12 @@ function setupRouter(
   router.get(
     '/getSupportedEthChains',
     getSupportedEthChains.bind(this, models)
+  );
+
+  router.post(
+    '/createChainNode',
+    passport.authenticate('jwt', { session: false }),
+    createChainNode.bind(this, models)
   );
 
   // threads

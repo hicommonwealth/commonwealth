@@ -10,6 +10,7 @@ export type ChainNodeAttributes = {
   alt_wallet_url?: string;
   private_url?: string;
   balance_type: BalanceType;
+  bech32?: string;
   name: string;
   description?: string;
 };
