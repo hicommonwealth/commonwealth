@@ -9,7 +9,7 @@ import generalRoutes from './generalRoutes';
 import commonDomainRoutes from './commonDomainRoutes';
 import customDomainRoutes from 'navigation/customDomainRoutes';
 import { PageNotFound } from 'views/pages/404';
-import { withLayout } from 'views/layout';
+import { withLayout } from 'views/Layout';
 
 const router = (customDomain: string) =>
   createBrowserRouter(

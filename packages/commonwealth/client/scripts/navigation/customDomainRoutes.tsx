@@ -1,7 +1,7 @@
 import { Route } from 'react-router-dom';
 import React, { lazy } from 'react';
 
-import { withLayout } from 'views/layout';
+import { withLayout } from 'views/Layout';
 import { Navigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
 
