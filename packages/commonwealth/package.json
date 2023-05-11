@@ -25,7 +25,7 @@
     "test-devnet": "nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts",
     "test-query": "ts-node server/scripts/testQuery.ts",
     "test": "nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts",
-    "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json /Users/kurtis/commonwealth/packages/commonwealth/test/integration/controllers/newProfiles.spec.ts",
+    "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json ./test/unit/**/*.spec.ts",
     "unit-test:watch": "NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts ./test/unit/**/*.spec.ts -w --watch-files '**/*.ts'",
     "test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
     "test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/api/*.spec.ts",
