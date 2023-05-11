@@ -3,10 +3,11 @@ name: CI
 env:
   ROLLBAR_ENV: 'GitHubCI'
 
-on: 
+on:
   pull_request:
   push:
-    branches: master
+    branches:
+      - master
 
 jobs:
   # These tests run slowly, so run them in a separate job
