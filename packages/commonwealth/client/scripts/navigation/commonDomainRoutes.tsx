@@ -74,6 +74,7 @@ const ViewSnapshotsProposalPage = lazy(
 const NewSnapshotProposalPage = lazy(
   () => import('views/pages/new_snapshot_proposal')
 );
+const AdminPanelPage = lazy(() => import('views/pages/admin_panel'));
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
@@ -356,6 +357,14 @@ const commonDomainsRoutes = () => [
     })}
   />,
   // TREASURY END
+
+  // SITE ADMIN
+  <Route
+    path="/admin_panel"
+    element={withLayout(AdminPanelPage, {
+      deferChain: true,
+    })}
+  />,
 
   // ADMIN
   <Route

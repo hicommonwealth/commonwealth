@@ -1,0 +1,27 @@
+@import '../shared';
+
+.AdminPanel {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+  padding: 24px;
+  padding-left: 36px;
+  gap: 32px;
+
+  .TaskGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .TaskRow {
+      display: flex;
+      flex-direction: row;
+      gap: 44px;
+      align-items: flex-end;
+
+      .TaskButton {
+        margin-bottom: 3px;
+      }
+    }
+  }
+}
