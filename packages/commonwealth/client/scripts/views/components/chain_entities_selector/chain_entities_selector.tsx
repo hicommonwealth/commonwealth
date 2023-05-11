@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import 'components/chain_entities_selector.scss';
-import type { ChainEntity } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
 
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';

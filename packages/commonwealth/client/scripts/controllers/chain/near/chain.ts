@@ -1,7 +1,6 @@
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { uuidv4 } from 'lib/util';
-import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';
 import type { ConnectConfig, Near as NearApi } from 'near-api-js';
 import {
@@ -17,10 +16,12 @@ import type {
 import type { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
+import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import { redraw, _DEPRECATED_dangerouslySetRoute } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;
@@ -115,8 +116,10 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
       // handle chain-related updates
       this._chainId = this._nodeStatus.chain_id;
-      const { latest_block_time, latest_block_height } =
-        this._nodeStatus.sync_info;
+      const {
+        latest_block_time,
+        latest_block_height,
+      } = this._nodeStatus.sync_info;
 
       // update block heights and times
       this.app.chain.block.lastTime = moment(latest_block_time);
@@ -279,7 +282,8 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         failureUrl,
       });
     } else {
-      _DEPRECATED_dangerouslySetRoute(successUrl);
+      window.history.pushState('', '', successUrl);
+      window.location.reload();
     }
   }
 

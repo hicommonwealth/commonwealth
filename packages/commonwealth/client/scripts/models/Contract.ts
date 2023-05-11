@@ -27,6 +27,8 @@ class Contract {
       nickname: string;
       display_name: string;
       display_options: string;
+      enabled_by: string;
+      created_at: Date;
     };
   }>;
   public readonly hasGlobalTemplate: boolean;
@@ -70,6 +72,8 @@ class Contract {
         nickname: string;
         display_name: string;
         display_options: string;
+        enabled_by: string;
+        created_at: Date;
       };
     }>;
     hasGlobalTemplate?: boolean;

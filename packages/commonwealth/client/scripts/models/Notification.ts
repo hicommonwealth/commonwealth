@@ -2,7 +2,7 @@ import moment from 'moment';
 import ChainEvent from './ChainEvent';
 import type NotificationSubscription from './NotificationSubscription';
 
-class Notification {
+export class Notification {
   public readonly id: number;
   public readonly data: string;
   public readonly createdAt: moment.Moment;

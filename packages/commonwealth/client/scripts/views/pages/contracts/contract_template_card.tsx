@@ -1,6 +1,7 @@
 import React from 'react';
 
 import app from 'state';
+import moment from 'moment';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -12,6 +13,8 @@ import {
 
 import 'pages/contracts/contract_template_card.scss';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { User } from '../../components/user/user';
+import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 
 type ContractTemplateCardProps = {
   contractId: number;
@@ -23,6 +26,8 @@ type ContractTemplateCardProps = {
   display: string;
   cctmd_id: number;
   cct_id: number;
+  enabledBy: string;
+  enabledAt: Date;
   onUpdateSuccess: () => void;
   handleShowModal: (
     templateId: number,
@@ -37,10 +42,10 @@ interface InfoOrder {
 }
 
 const infosOrder: InfoOrder[] = [
-  { key: 'displayName', label: 'Display Name' },
-  { key: 'nickname', label: 'Enable action' },
+  { key: 'nickname', label: 'Action details' },
   { key: 'slug', label: 'Slug' },
   { key: 'display', label: 'Display' },
+  { key: 'enabledBy', label: 'Enabled by' },
 ];
 
 const parseDisplayOption = (displayOption: string) => {
@@ -91,6 +96,9 @@ export const ContractTemplateCard = ({
     });
   };
 
+  const enabler = app.chain.accounts.get(templateInfo.enabledBy);
+  const enabledOn = moment(templateInfo.enabledAt).format('MM/DD/YY');
+
   return (
     <CWCard fullWidth className="ContractTemplateCard">
       <div className="header">
@@ -120,6 +128,34 @@ export const ContractTemplateCard = ({
           if (!templateInfo[info.key]) {
             return null;
           }
+
+          if (info.key === 'enabledBy')
+            return (
+              <div className="info-row" key={info.label}>
+                <CWText type="b2" className="row-label">
+                  {info.label}
+                </CWText>
+                <div className="enabledby-row">
+                  <User user={enabler} showAddressWithDisplayName />
+                  <div className="text-group">
+                    <CWText type="caption">on</CWText>
+                    <CWText type="caption" fontWeight="medium">
+                      {enabledOn}
+                    </CWText>
+                  </div>
+                  <div className="text-group">
+                    <CWText type="caption">for</CWText>
+                    <CWCommunityAvatar
+                      community={app.chain.meta}
+                      size="small"
+                    />
+                    <CWText type="caption" fontWeight="medium">
+                      {app.chain.meta.name}
+                    </CWText>
+                  </div>
+                </div>
+              </div>
+            );
 
           return (
             <div className="info-row" key={info.label}>

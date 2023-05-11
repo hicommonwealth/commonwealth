@@ -11,7 +11,8 @@ import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { NearSputnikVote } from 'controllers/chain/near/sputnik/types';
 import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 
-import type { AnyProposal, IVote } from 'models';
+import type { IVote } from '../../../models/interfaces';
+import type { AnyProposal } from '../../../models/types';
 import { CWText } from '../component_kit/cw_text';
 import { VoteListing } from './vote_listing';
 

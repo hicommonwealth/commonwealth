@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { ITokenAdapter } from 'models';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import app from 'state';
 
 export default class TopicGateCheck {

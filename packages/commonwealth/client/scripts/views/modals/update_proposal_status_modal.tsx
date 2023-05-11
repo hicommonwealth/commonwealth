@@ -4,8 +4,9 @@ import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
-import type { ChainEntity, Thread } from 'models';
-import { ThreadStage } from 'models';
+import type ChainEntity from '../../models/ChainEntity';
+import type Thread from '../../models/Thread';
+import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
 import app from 'state';

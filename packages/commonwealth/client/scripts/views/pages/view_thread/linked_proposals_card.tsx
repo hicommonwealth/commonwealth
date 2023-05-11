@@ -7,7 +7,9 @@ import {
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import type { ChainEntity, Thread, ThreadStage } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
+import type Thread from '../../../models/Thread';
+import type { ThreadStage } from '../../../models/types';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 

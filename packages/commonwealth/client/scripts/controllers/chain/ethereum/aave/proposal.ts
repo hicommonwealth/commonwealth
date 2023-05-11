@@ -9,14 +9,12 @@ import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
 import { EventEmitter } from 'events';
 
-import type {
-  ChainEntity,
-  ChainEvent,
-  ITXModalData,
-  IVote,
-  ProposalEndTime,
-} from 'models';
-import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import type ChainEntity from '../../../../models/ChainEntity';
+import type ChainEvent from '../../../../models/ChainEvent';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
+import Proposal from '../../../../models/Proposal';
+import type { ProposalEndTime } from '../../../../models/types';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
 import moment from 'moment';
 import Web3 from 'web3-utils';
 import type EthereumAccount from '../account';
@@ -444,11 +442,7 @@ export default class AaveProposal extends Proposal<
       }
     }
 
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
-    );
+    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
     const tx = await contract.cancel(this.data.identifier, {
       gasLimit: this._Gov.api.gasLimit,
     });
@@ -466,11 +460,7 @@ export default class AaveProposal extends Proposal<
     }
 
     // no user validation needed
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
-    );
+    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
     const tx = await contract.queue(this.data.id);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -493,11 +483,7 @@ export default class AaveProposal extends Proposal<
     }
 
     // no user validation needed
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
-    );
+    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
     const tx = await contract.execute(this.data.id);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -523,11 +509,7 @@ export default class AaveProposal extends Proposal<
       throw new Error('user has already voted on this proposal');
     }
 
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
-    );
+    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
     const tx = await contract.submitVote(this.data.id, vote.choice);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
