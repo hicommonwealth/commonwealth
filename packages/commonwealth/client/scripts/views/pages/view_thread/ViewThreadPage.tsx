@@ -4,11 +4,10 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
+import { ThreadStage } from '../../../models/types';
 
-import type { Comment, Poll, Topic } from 'models';
-import { Thread, ThreadStage as ThreadStageType } from 'models';
+import { Link, LinkSource, Thread } from '../../../models/Thread';
 import type { IThreadCollaborator } from 'models/Thread';
-import { Link, LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
@@ -20,6 +19,9 @@ import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
+import Comment from '../../../models/Comment';
+import Poll from '../../../models/Poll';
+import Topic from '../../../models/Topic';
 import { CommentsTree } from '../../components/comments/comments_tree';
 import { CreateComment } from '../../components/comments/create_comment';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
@@ -501,7 +503,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const handleLinkedProposalChange = (
-    stage: ThreadStageType,
+    stage: ThreadStage,
     links: Link[] = []
   ) => {
     const newThread = {
@@ -583,84 +585,84 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return [
       ...(hasEditPerms && !thread.readOnly
         ? [
-            {
-              label: 'Edit',
-              iconLeft: 'write' as const,
-              onClick: handleEditThread,
-            },
-          ]
+          {
+            label: 'Edit',
+            iconLeft: 'write' as const,
+            onClick: handleEditThread,
+          },
+        ]
         : []),
       ...(hasEditPerms
         ? [
-            {
-              label: 'Edit collaborators',
-              iconLeft: 'write' as const,
-              onClick: () => {
-                setIsEditCollaboratorsModalOpen(true);
-              },
+          {
+            label: 'Edit collaborators',
+            iconLeft: 'write' as const,
+            onClick: () => {
+              setIsEditCollaboratorsModalOpen(true);
             },
-          ]
+          },
+        ]
         : []),
       ...(isAdminOrMod || isAuthor
         ? [
-            {
-              label: 'Change topic',
-              iconLeft: 'write' as const,
-              onClick: () => {
-                setIsChangeTopicModalOpen(true);
-              },
+          {
+            label: 'Change topic',
+            iconLeft: 'write' as const,
+            onClick: () => {
+              setIsChangeTopicModalOpen(true);
             },
-          ]
+          },
+        ]
         : []),
       ...(isAuthor || isAdminOrMod
         ? [
-            {
-              label: 'Delete',
-              iconLeft: 'trash' as const,
-              onClick: handleDeleteThread,
-            },
-          ]
+          {
+            label: 'Delete',
+            iconLeft: 'trash' as const,
+            onClick: handleDeleteThread,
+          },
+        ]
         : []),
       ...(isAuthor || isAdminOrMod
         ? [
-            {
-              label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
-              iconLeft: 'lock' as const,
-              onClick: () => {
-                app.threads
-                  .setPrivacy({
-                    threadId: thread.id,
-                    readOnly: !thread.readOnly,
-                  })
-                  .then(() => {
-                    setIsGloballyEditing(false);
-                    setIsEditingBody(false);
-                    setRecentlyEdited(true);
-                    notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
-                  });
-                setThread(
-                  new Thread({ ...thread, readOnly: !thread.readOnly })
-                );
-              },
+          {
+            label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+            iconLeft: 'lock' as const,
+            onClick: () => {
+              app.threads
+                .setPrivacy({
+                  threadId: thread.id,
+                  readOnly: !thread.readOnly,
+                })
+                .then(() => {
+                  setIsGloballyEditing(false);
+                  setIsEditingBody(false);
+                  setRecentlyEdited(true);
+                  notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
+                });
+              setThread(
+                new Thread({ ...thread, readOnly: !thread.readOnly })
+              );
             },
-          ]
+          },
+        ]
         : []),
       ...((isAuthor || isAdminOrMod) && !!app.chain?.meta.snapshot.length
         ? [
-            {
-              label: 'Snapshot proposal from thread',
-              iconLeft: 'democraticProposal' as const,
-              onClick: () => {
-                const snapshotSpaces = app.chain.meta.snapshot;
+          {
+            label: 'Snapshot proposal from thread',
+            iconLeft: 'democraticProposal' as const,
+            onClick: () => {
+              const snapshotSpaces = app.chain.meta.snapshot;
 
-                if (snapshotSpaces.length > 1) {
-                  navigate('/multiple-snapshots');
-                } else {
-                  navigate(`/snapshot/${snapshotSpaces}`);
-                }
-              },
+              if (snapshotSpaces.length > 1) {
+                navigate('/multiple-snapshots');
+              } else {
+                navigate(`/snapshot/${snapshotSpaces}`);
+              }
             },
-          ]
+          },
+        ]
         : []),
       { type: 'divider' as const },
       {
@@ -766,61 +768,61 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div className="cards-column">
-                        {showLinkedProposalOptions && (
-                          <LinkedProposalsCard
-                            onChangeHandler={handleLinkedProposalChange}
-                            thread={thread}
-                            showAddProposalButton={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                        {showLinkedThreadOptions && (
-                          <LinkedThreadsCard
-                            thread={thread}
-                            allowLinking={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleLinkedThreadChange}
-                          />
-                        )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Links',
+                  item: (
+                    <div className="cards-column">
+                      {showLinkedProposalOptions && (
+                        <LinkedProposalsCard
+                          onChangeHandler={handleLinkedProposalChange}
+                          thread={thread}
+                          showAddProposalButton={isAuthor || isAdminOrMod}
+                        />
+                      )}
+                      {showLinkedThreadOptions && (
+                        <LinkedThreadsCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleLinkedThreadChange}
+                        />
+                      )}
+                    </div>
+                  ),
+                },
+              ]
               : []),
             ...(polls?.length > 0 ||
             (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                  {
-                    label: 'Polls',
-                    item: (
-                      <div className="cards-column">
-                        {[
-                          ...new Map(
-                            polls?.map((poll) => [poll.id, poll])
-                          ).values(),
-                        ].map((poll: Poll) => {
-                          return (
-                            <ThreadPollCard
-                              poll={poll}
-                              key={poll.id}
-                              onVote={() => setInitializedPolls(false)}
-                            />
-                          );
-                        })}
-                        {isAuthor &&
-                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                            <ThreadPollEditorCard
-                              thread={thread}
-                              threadAlreadyHasPolling={!polls?.length}
-                              onPollCreate={() => setInitializedPolls(false)}
-                            />
-                          )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Polls',
+                  item: (
+                    <div className="cards-column">
+                      {[
+                        ...new Map(
+                          polls?.map((poll) => [poll.id, poll])
+                        ).values(),
+                      ].map((poll: Poll) => {
+                        return (
+                          <ThreadPollCard
+                            poll={poll}
+                            key={poll.id}
+                            onVote={() => setInitializedPolls(false)}
+                          />
+                        );
+                      })}
+                      {isAuthor &&
+                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                          <ThreadPollEditorCard
+                            thread={thread}
+                            threadAlreadyHasPolling={!polls?.length}
+                            onPollCreate={() => setInitializedPolls(false)}
+                          />
+                        )}
+                    </div>
+                  ),
+                },
+              ]
               : []),
           ] as SidebarComponents
         }

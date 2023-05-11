@@ -2,7 +2,7 @@ import type { NearToken } from 'adapters/chain/near/types';
 import type { IIdentifiable } from 'adapters/shared';
 import BN from 'bn.js';
 import type { NearAccount } from 'controllers/chain/near/account';
-import type { IVote } from 'models';
+import type { IVote } from '../../../../models/interfaces';
 
 export interface NearSputnikConfig {
   metadata: string;

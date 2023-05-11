@@ -21,6 +21,7 @@ const CreateContractTemplateForm = () => {
   const [form, setForm] = useState({
     displayName: '',
     template: '',
+    description: '',
   });
 
   const createContractTemplate = async () => {
@@ -30,6 +31,7 @@ const CreateContractTemplateForm = () => {
       await app.contracts.addTemplate({
         name: form.displayName,
         template: form.template,
+        description: form.description,
         contract_id,
       });
 
@@ -52,16 +54,28 @@ const CreateContractTemplateForm = () => {
     <div className="CreateContractTemplateForm">
       <div className="form">
         <CWText type="caption" fontWeight="medium" className="input-label">
-          Display Name
+          Template Name
         </CWText>
         <CWTextInput
-          label="An official name to identify this kind of template"
           value={form.displayName}
           placeholder="Enter display name"
           onInput={(e) => {
             setForm((prevState) => ({
               ...prevState,
               displayName: e.target.value,
+            }));
+          }}
+        />
+        <CWText type="caption" fontWeight="medium" className="input-label">
+          Action details
+        </CWText>
+        <CWTextInput
+          value={form.description}
+          placeholder="Briefly describe the action your template enables"
+          onInput={(e) => {
+            setForm((prevState) => ({
+              ...prevState,
+              description: e.target.value,
             }));
           }}
         />
