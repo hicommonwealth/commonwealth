@@ -4,7 +4,7 @@ import type { IEventHandler, CWEvent } from 'chain-events/src';
 import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type { ChainInstance } from 'commonwealth/server/models/chain';
+import type { CommunityInstance } from 'commonwealth/server/models/communities';
 import { SubstrateTypes } from '../src/types';
 import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
@@ -40,7 +40,7 @@ const handleEventFn = async (
 };
 
 export const generateHandlers = (
-  chain: ChainInstance,
+  chain: CommunityInstance,
   storageConfig: StorageFilterConfig = {}
 ): IEventHandler[] => {
   // writes events into the db as ChainEvents rows
@@ -107,7 +107,7 @@ async function main(chain: string, eventsPath: string) {
   let handlers: IEventHandler[];
   try {
     await sequelize.authenticate();
-    const chainInstance = await cwModels.Chain.findOne({
+    const chainInstance = await cwModels.Community.findOne({
       where: { id: chain, active: true },
       include: [
         {

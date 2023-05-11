@@ -47,7 +47,7 @@ const bulkThreads = async (
   if (cutoff_date) {
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.chain AS addr_chain, threads.thread_id, thread_title,
+        addr.community_id AS addr_chain, threads.thread_id, thread_title,
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage,
         threads.has_poll, threads.plaintext,
@@ -55,20 +55,20 @@ const bulkThreads = async (
         threads.reaction_ids, threads.reaction_type, threads.addresses_reacted,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
-        topics.chain_id AS topic_chain,
+        topics.community_id AS topic_chain,
         topics.telegram AS topic_telegram,
         collaborators
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
-          t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
+          t.community_id AS thread_chain, t.read_only, t.body, comments.number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted,
           t.has_poll,
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
             CONCAT(
-              '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
+              '{ "address": "', editors.address, '", "chain": "', editors.community_id, '" }'
               )
             ) AS collaborators
         FROM "Threads" t
@@ -95,7 +95,7 @@ const bulkThreads = async (
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          AND t.chain = $chain
+          AND t.community_id = $chain
           ${topicOptions}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $created_at AND t.pinned = false))
@@ -202,7 +202,7 @@ const bulkThreads = async (
 
   const countsQuery = `
      SELECT id, title, stage FROM "Threads"
-     WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
+     WHERE community_id = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: ThreadInstance[] = await models.sequelize.query(
     countsQuery,

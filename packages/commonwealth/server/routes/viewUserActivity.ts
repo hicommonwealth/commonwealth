@@ -31,7 +31,7 @@ export default async (
                   MAX(n.id) OVER (PARTITION BY (n.notification_data::jsonb->>'thread_id')) AS mx_not_id
                 FROM "Notifications" n
                 WHERE n.category_id IN('new-thread-creation','new-comment-creation')
-                  AND n.chain_id IN(SELECT a."chain" FROM "Addresses" a WHERE a.user_id = ?)
+                  AND n.community_id IN(SELECT a."community_id" FROM "Addresses" a WHERE a.user_id = ?)
                 ORDER BY id DESC
                 FETCH FIRST 500 ROWS ONLY
                 ) nn

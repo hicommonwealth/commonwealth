@@ -118,12 +118,12 @@ export const status = async (
       const threadCountQueryData: ThreadCountQueryData[] =
         await models.sequelize.query(
           `
-        SELECT "Threads".chain, COUNT("Threads".id) 
+        SELECT "Threads".community_id, COUNT("Threads".id) 
         FROM "Threads"
         WHERE "Threads".created_at > :thirtyDaysAgo
         AND "Threads".deleted_at IS NULL
-        AND "Threads".chain IS NOT NULL
-        GROUP BY "Threads".chain;
+        AND "Threads".community_id IS NOT NULL
+        GROUP BY "Threads".community_id;
         `,
           { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
         );
@@ -179,12 +179,12 @@ export const status = async (
     const threadCountQueryData: ThreadCountQueryData[] =
       await models.sequelize.query(
         `
-      SELECT "Threads".chain, COUNT("Threads".id) 
+      SELECT "Threads".community_id, COUNT("Threads".id) 
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
       AND "Threads".deleted_at IS NULL
-      AND "Threads".chain IS NOT NULL
-      GROUP BY "Threads".chain;
+      AND "Threads".community_id IS NOT NULL
+      GROUP BY "Threads".community_id;
       `,
         {
           replacements: {
@@ -228,8 +228,8 @@ export const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT id, chain FROM "Threads" WHERE
- (kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
+      query += `SELECT id, community_id FROM "Threads" WHERE
+ (kind IN ('discussion', 'link') OR community_id = ?) AND created_at > TO_TIMESTAMP(?)`;
       if (i === commsAndChains.length - 1) query += ';';
     }
 
@@ -277,7 +277,7 @@ export const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
+      query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > TO_TIMESTAMP(?)`;
       if (i === commsAndChains.length - 1) query += ';';
     }
 

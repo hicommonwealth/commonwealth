@@ -25,7 +25,7 @@ export const Errors = {};
 const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
   // globally shared SQL replacements
-  const communityOptions = 'chain = :chain';
+  const communityOptions = 'community_id = :chain';
   const replacements = { chain: chain.id };
 
   // parallelized queries
@@ -136,7 +136,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
             "Threads" t 
           WHERE 
             t.deleted_at IS NULL 
-            AND t.chain = $chain 
+            AND t.community_id = $chain 
             AND (
               t.pinned = true 
               OR (

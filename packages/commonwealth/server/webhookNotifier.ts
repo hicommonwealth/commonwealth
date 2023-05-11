@@ -194,7 +194,7 @@ const send = async (models, content: WebhookContent) => {
   if (!previewImageUrl) {
     if (content.chain) {
       // if the chain has a logo, show it as preview image
-      const chain = await models.Chain.findOne({
+      const chain = await models.Community.findOne({
         where: { id: content.chain },
       });
       if (chain) {

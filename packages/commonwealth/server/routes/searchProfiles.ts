@@ -65,7 +65,7 @@ const searchProfiles = async (
       "Profiles".user_id,
       "Profiles".profile_name,
       array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".chain) as chains,
+      array_agg("Addresses".community_id) as chains,
       array_agg("Addresses".address) as addresses
     FROM
       "Profiles"

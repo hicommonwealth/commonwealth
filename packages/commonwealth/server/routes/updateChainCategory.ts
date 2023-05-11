@@ -23,7 +23,7 @@ const updateChainCategory = async (
   res: TypedResponse<UpdateChainCategoryRes>,
   next: NextFunction
 ) => {
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id: req.body.chain_id,
     },

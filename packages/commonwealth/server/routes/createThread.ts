@@ -73,12 +73,12 @@ const dispatchHooks = async (
       FROM "Subscriptions"
       WHERE subscriber_id IN (
         SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
-      ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
+      ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND community_id = ? AND is_active = true
     )
     INSERT INTO "Subscriptions"
-    (subscriber_id, category_id, object_id, offchain_thread_id, chain_id, is_active, created_at, updated_at)
+    (subscriber_id, category_id, object_id, offchain_thread_id, community_id, is_active, created_at, updated_at)
     SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as
-     chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
+     community_id true as is_active, NOW() as created_at, NOW() as updated_at
     FROM "Subscriptions"
     WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
   `,

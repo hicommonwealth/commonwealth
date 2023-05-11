@@ -85,7 +85,7 @@ const bulkBalances = async (
   // THIS WILL BE REMOVED EVENTUALLY WHEN RULES-API GOES LIVE
   const baseQuery = `
     SELECT DISTINCT(c.base) FROM "Addresses" addr 
-      LEFT JOIN "Chains" c ON addr.chain = c.id 
+      LEFT JOIN "Communities" c ON addr.community_id = c.id 
       WHERE addr.profile_id = ${profileId};`;
   const basesRaw: string[] = <any>await sequelize.query(baseQuery, {
     raw: true,

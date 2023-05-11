@@ -95,7 +95,7 @@ export default (
   dataTypes: typeof DataTypes
 ): CommunityModelStatic => {
   const Community = <CommunityModelStatic>sequelize.define(
-    'Chain',
+    'Community',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
       chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community

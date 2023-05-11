@@ -20,11 +20,11 @@ const fetchUniqueAddressesByThreadIds = async (
 ) => {
   return sequelize.query<UniqueAddresses>(
     `
-    SELECT distinct cts.address_id, address, thread_id, cts.chain
+    SELECT distinct cts.address_id, address, thread_id, cts.community_id
     FROM "Comments" cts INNER JOIN "Addresses" adr
     ON adr.id = cts.address_id
     WHERE thread_id = ANY($thread_ids)
-    AND cts.chain = $chain
+    AND cts.community_id = $chain
     AND deleted_at IS NULL
     ORDER BY thread_id
   `,

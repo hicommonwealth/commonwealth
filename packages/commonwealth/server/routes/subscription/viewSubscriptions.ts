@@ -33,8 +33,8 @@ export default async (
       include: [models.Address],
     },
     {
-      model: models.Chain,
-      as: 'Chain',
+      model: models.Community,
+      as: 'Community',
       required: false,
       where: { active: true },
     },

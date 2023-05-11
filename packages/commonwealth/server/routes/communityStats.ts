@@ -47,9 +47,9 @@ ORDER BY seq.date DESC;`,
       }
     );
   };
-  const roles = await newObjectsQuery('"Roles"', 'chain_id');
-  const threads = await newObjectsQuery('"Threads"', 'chain');
-  const comments = await newObjectsQuery('"Comments"', 'chain');
+  const roles = await newObjectsQuery('"Roles"', 'community_id');
+  const threads = await newObjectsQuery('"Threads"', 'community_id');
+  const comments = await newObjectsQuery('"Comments"', 'community_id');
 
   // get total number of roles, threads, and comments
   const totalObjectsQuery = async (table, chainName) => {
@@ -61,9 +61,9 @@ ORDER BY seq.date DESC;`,
       }
     );
   };
-  const totalRoles = await totalObjectsQuery('"Roles"', 'chain_id');
-  const totalThreads = await totalObjectsQuery('"Threads"', 'chain');
-  const totalComments = await totalObjectsQuery('"Comments"', 'chain');
+  const totalRoles = await totalObjectsQuery('"Roles"', 'community_id');
+  const totalThreads = await totalObjectsQuery('"Threads"', 'community_id');
+  const totalComments = await totalObjectsQuery('"Comments"', 'community_id');
 
   // get number of active accounts by day
   const activeAccounts = await models.sequelize.query(

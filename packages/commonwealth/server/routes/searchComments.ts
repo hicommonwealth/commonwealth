@@ -81,9 +81,9 @@ const search = async (
         'comment' as type,
         "Addresses".id as address_id,
         "Addresses".address,
-        "Addresses".chain as address_chain,
+        "Addresses".community_id as address_chain,
         "Comments".created_at,
-        "Threads".chain,
+        "Threads".community_id,
         ts_rank_cd("Comments"._search, query) as rank
       FROM "Comments"
       JOIN "Threads" ON "Comments".thread_id = "Threads".id

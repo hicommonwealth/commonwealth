@@ -86,7 +86,7 @@ export const getForumNotificationCopy = async (
     ? 'created a new thread'
     : null;
   const objectCopy = decodeURIComponent(root_title).trim();
-  const communityObject = await models.Chain.findOne({
+  const communityObject = await models.Community.findOne({
     where: { id: chain_id },
   });
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
