@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-import 'components/comments/comments_tree.scss';
+import 'components/Comments/CommentsTree.scss';
 
 import type { Comment as CommentType } from '../../../models/Comment';
 import Thread from '../../../models/Thread';
 
 import app from 'state';
 import { CWValidationText } from '../component_kit/cw_validation_text';
-import { CommentComponent } from './commentComponent';
-import { CreateComment } from './create_comment';
+import { CommentComponent } from './CommentComponent';
+import { CreateComment } from './CreateComment';
 import { jumpHighlightComment } from './helpers';
 
 const MAX_THREAD_LEVEL = 2;
@@ -20,20 +20,22 @@ type CommentsTreeAttrs = {
   updatedCommentsCallback: () => void;
 };
 
-export const CommentsTree = (props: CommentsTreeAttrs) => {
-  const [commentError, setCommentError] = React.useState(null);
-  const [highlightedComment, setHighlightedComment] = React.useState(false);
-  const [isReplying, setIsReplying] = React.useState(false);
-  const [parentCommentId, setParentCommentId] = React.useState(null);
-
-  const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
-    props;
+export const CommentsTree = ({
+  comments,
+  thread,
+  setIsGloballyEditing,
+  updatedCommentsCallback,
+}: CommentsTreeAttrs) => {
+  const [commentError] = useState(null);
+  const [highlightedComment, setHighlightedComment] = useState(false);
+  const [isReplying, setIsReplying] = useState(false);
+  const [parentCommentId, setParentCommentId] = useState(null);
 
   // Jump to the comment indicated in the URL upon page load. Avoid
   // using _DEPRECATED_getSearchParams('comment') because it may return stale
   // results from a previous page if route transition hasn't finished
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
       setHighlightedComment(true);
 

@@ -1,39 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import 'components/chain_entities_selector.scss';
+import 'components/ChainEntitiesSelector.scss';
 import type ChainEntity from '../../../models/ChainEntity';
 
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
-import { ChainEntitiesSelectorItem } from 'views/components/chain_entities_selector/chain_entities_selector_item';
-import { chainEntityTypeToProposalName } from 'identifiers';
-
-const sortChainEntities = (a: ChainEntity, b: ChainEntity) => {
-  if (!a.threadId && b.threadId) {
-    return -1;
-  }
-
-  if (a.threadId && !b.threadId) {
-    return 1;
-  }
-
-  return 0;
-};
-
-const filterChainEntities = (ce: ChainEntity, searchTerm: string) => {
-  if (ce.typeId.startsWith('0x')) {
-    return false;
-  }
-
-  return (
-    ce.typeId.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ce.title?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-    chainEntityTypeToProposalName(ce.type)
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
-};
+import { ChainEntitiesSelectorItem } from 'views/components/ChainEntitiesSelector';
+import {
+  filterChainEntities,
+  sortChainEntities,
+} from 'views/components/ChainEntitiesSelector/utils';
 
 type ChainEntitiesSelectorProps = {
   proposalsToSet: Array<Pick<ChainEntity, 'typeId'>>;
