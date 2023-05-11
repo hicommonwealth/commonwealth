@@ -76,7 +76,7 @@ export type GetCommunitiesReq = {
 };
 
 export type PutCommunitiesReq = {
-  community: CommentAttributes;
+  community: CommunityAttributes;
   contract: { token_type: string; address: string };
   admin_addresses: string[];
 };
@@ -84,7 +84,7 @@ export type PutCommunitiesReq = {
 export type PutCommunitiesResp = { url: string; error?: string };
 
 export type GetCommunitiesResp = {
-  communities?: CommentAttributes[];
+  communities?: CommunityAttributes[];
   count: number;
 };
 
