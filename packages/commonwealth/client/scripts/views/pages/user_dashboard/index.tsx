@@ -5,7 +5,7 @@ import 'pages/user_dashboard/index.scss';
 import app, { LoginState } from 'state';
 import { notifyInfo } from 'controllers/app/notifications';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';

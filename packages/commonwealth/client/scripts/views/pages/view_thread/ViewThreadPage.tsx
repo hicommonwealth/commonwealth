@@ -18,7 +18,7 @@ import { ContentType } from 'types';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import Topic from '../../../models/Topic';
