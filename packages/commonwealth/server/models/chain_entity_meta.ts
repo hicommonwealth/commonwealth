@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
-import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ChainEntityMetaAttributes = {
@@ -17,7 +16,6 @@ export type ChainEntityMetaAttributes = {
 
   Chain?: ChainAttributes;
   ProjectChain?: ChainAttributes;
-  Thread?: ThreadAttributes;
 };
 
 export type ChainEntityMetaInstance = ModelInstance<ChainEntityMetaAttributes>;
