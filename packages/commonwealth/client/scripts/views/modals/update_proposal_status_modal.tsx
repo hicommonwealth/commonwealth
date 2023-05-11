@@ -262,7 +262,7 @@ export const UpdateProposalStatusModal = ({
               ? { value: tempStage, label: threadStageToLabel(tempStage) }
               : null
           }
-          placeholder="Select the stage"
+          placeholder="Select a stage"
           isSearchable={false}
           options={stages.map((stage) => ({
             value: stage,
