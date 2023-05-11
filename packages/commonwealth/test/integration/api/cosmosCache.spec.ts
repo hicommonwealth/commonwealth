@@ -10,7 +10,7 @@ import { RedisNamespaces } from 'common-common/src/types';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import app, { resetDatabase } from '../../../server-test';
 import { connectToRedis } from '../../util/redisUtils';
-import { sleep } from '../../util/delayUtils';
+import { delay } from '../../util/delayUtils';
 
 function verifyNoCacheResponse(res) {
   expect(res.body).to.not.be.null;
@@ -96,7 +96,7 @@ describe('Cosmos Cache', () => {
 
       console.log('waiting 7 seconds');
       // wait 7 seconds then expect cached request to be expired
-      await sleep(7000);
+      await delay(7000);
       const res3 = await makeRPCRequest(body);
 
       expect(res3).to.have.status(200);
@@ -148,7 +148,7 @@ describe('Cosmos Cache', () => {
 
       console.log('waiting 7 seconds');
       // wait 7 seconds then expect cached request to be expired
-      await sleep(7000);
+      await delay(7000);
 
       const res3 = await chai
         .request(app)

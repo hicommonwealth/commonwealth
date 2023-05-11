@@ -21,7 +21,7 @@ import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import { redraw, _DEPRECATED_dangerouslySetRoute } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;
@@ -116,8 +116,10 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
       // handle chain-related updates
       this._chainId = this._nodeStatus.chain_id;
-      const { latest_block_time, latest_block_height } =
-        this._nodeStatus.sync_info;
+      const {
+        latest_block_time,
+        latest_block_height,
+      } = this._nodeStatus.sync_info;
 
       // update block heights and times
       this.app.chain.block.lastTime = moment(latest_block_time);
@@ -280,7 +282,8 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         failureUrl,
       });
     } else {
-      _DEPRECATED_dangerouslySetRoute(successUrl);
+      window.history.pushState('', '', successUrl);
+      window.location.reload();
     }
   }
 

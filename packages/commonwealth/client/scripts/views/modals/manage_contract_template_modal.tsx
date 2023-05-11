@@ -93,6 +93,7 @@ const ManageContractTemplateModal = ({
       community_id: communityId,
       template_id: templateIdForm,
       contract_id: contractId,
+      enabled_by: app.user.activeAccount.address,
     };
 
     try {
