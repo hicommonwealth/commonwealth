@@ -3,7 +3,7 @@ import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
 
-import type { DashboardActivityNotification } from 'models';
+import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
 
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 import { PageNotFound } from '../pages/404';

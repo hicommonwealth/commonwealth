@@ -10,8 +10,10 @@ import AaveProposal, {
 } from 'controllers/chain/ethereum/aave/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
-import type { AnyProposal, IVote } from 'models';
-import { BinaryVote, DepositVote, VotingUnit } from 'models';
+import type { IVote } from '../../../models/interfaces';
+import type { AnyProposal } from '../../../models/types';
+import { VotingUnit } from '../../../models/types';
+import { BinaryVote, DepositVote } from '../../../models/votes';
 
 import app from 'state';
 import { User } from '../../components/user/user';

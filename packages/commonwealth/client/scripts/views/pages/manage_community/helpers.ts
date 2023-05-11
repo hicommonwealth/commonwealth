@@ -2,9 +2,9 @@ import $ from 'jquery';
 
 import { redraw } from 'mithrilInterop';
 import app from 'state';
-import { AccessLevel } from 'models';
+import { AccessLevel } from '../../../../../shared/permissions';
 import { ChainCategoryType } from 'common-common/src/types';
-import { buildChainToCategoriesMap } from '../communities';
+import axios from 'axios';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -17,36 +17,22 @@ export const sortAdminsAndModsFirst = (a, b) => {
 };
 
 export const setChainCategories = async (
-  category_type_id: number,
-  chain_id: string,
-  create: boolean
+  selected_tags: { [tag: string]: boolean },
+  chain_id: string
 ) => {
   return new Promise<void>((resolve, reject) => {
     const params = {
       chain_id,
-      category_type_id,
-      create,
+      selected_tags: selected_tags,
       auth: true,
       jwt: app.user.jwt,
     };
-    $.post(`${app.serverUrl()}/updateChainCategory`, params)
+    axios
+      .post(`${app.serverUrl()}/updateChainCategory`, params)
       .then((response) => {
-        if (create && response?.result) {
-          app.config.chainCategories = app.config.chainCategories.concat([
-            {
-              id: response.result.id,
-              chain_id: response.result.chain_id,
-              category_type_id: response.result.category_type_id,
-            },
-          ]);
-        } else if (!create) {
-          // TODO: this is a hack, we should be able to just remove the category from the list
-          if (response?.result) {
-            app.config.chainCategories = app.config.chainCategories.filter(
-              (c) => c.id !== response.result.id
-            );
-          }
-          // else we don't have a response.result, so we don't know what to remove
+        if (response?.data.result) {
+          const newMap = response.data.result;
+          app.config.chainCategoryMap[newMap.chain] = newMap.tags;
         }
         resolve();
         redraw();
@@ -58,11 +44,9 @@ export const setChainCategories = async (
 };
 
 export const setSelectedTags = (chain: string) => {
-  const categoryTypes = app.config.chainCategoryTypes;
-  const chainsAndCategories = app.config.chainCategories;
   const chainToCategoriesMap: {
     [chain: string]: ChainCategoryType[];
-  } = buildChainToCategoriesMap(categoryTypes, chainsAndCategories);
+  } = app.config.chainCategoryMap;
 
   const types = Object.keys(ChainCategoryType);
   const selectedTags = {};
@@ -78,14 +62,4 @@ export const setSelectedTags = (chain: string) => {
   }
 
   return selectedTags;
-};
-
-export const buildCategoryMap = () => {
-  const categoryTypes = app.config.chainCategoryTypes;
-  const categoryMap = {};
-
-  for (const data of categoryTypes) {
-    categoryMap[data.category_name] = data.id;
-  }
-  return categoryMap;
 };

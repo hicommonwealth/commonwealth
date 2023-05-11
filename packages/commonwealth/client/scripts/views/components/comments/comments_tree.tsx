@@ -2,12 +2,12 @@ import React from 'react';
 
 import 'components/comments/comments_tree.scss';
 
-import type { Comment as CommentType } from 'models';
-import { Thread } from 'models';
+import type { Comment as CommentType } from '../../../models/Comment';
+import Thread from '../../../models/Thread';
 
 import app from 'state';
 import { CWValidationText } from '../component_kit/cw_validation_text';
-import { Comment } from './comment';
+import { CommentComponent } from './commentComponent';
 import { CreateComment } from './create_comment';
 import { jumpHighlightComment } from './helpers';
 
@@ -21,17 +21,17 @@ type CommentsTreeAttrs = {
 };
 
 export const CommentsTree = (props: CommentsTreeAttrs) => {
-  const [commentError, setCommentError] = React.useState(null);
+  const [commentError] = React.useState(null);
   const [highlightedComment, setHighlightedComment] = React.useState(false);
   const [isReplying, setIsReplying] = React.useState(false);
   const [parentCommentId, setParentCommentId] = React.useState(null);
 
-  const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
-    props;
-
-  // Jump to the comment indicated in the URL upon page load. Avoid
-  // using _DEPRECATED_getSearchParams('comment') because it may return stale
-  // results from a previous page if route transition hasn't finished
+  const {
+    comments,
+    thread,
+    setIsGloballyEditing,
+    updatedCommentsCallback,
+  } = props;
 
   React.useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
@@ -107,7 +107,7 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
       if (isLivingCommentTree(comment, children)) {
         return (
           <React.Fragment key={comment.id}>
-            <Comment
+            <CommentComponent
               comment={comment}
               handleIsReplying={handleIsReplying}
               isLast={threadLevel === 2}

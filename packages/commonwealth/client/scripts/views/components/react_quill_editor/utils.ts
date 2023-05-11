@@ -1,6 +1,8 @@
 import axios from 'axios';
 import type { DeltaStatic } from 'quill';
 
+export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
+
 // createDeltaFromText returns a new DeltaStatic object from a string
 export const createDeltaFromText = (
   str: string,
