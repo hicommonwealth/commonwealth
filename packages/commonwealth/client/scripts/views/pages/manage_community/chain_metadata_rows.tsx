@@ -168,6 +168,7 @@ export const ChainMetadataRows = ({
         hasHomepage,
         default_allow_permissions: chain.defaultAllowPermissions,
         default_deny_permissions: chain.defaultDenyPermissions,
+        chain_node_id: null,
       });
       onSave();
       notifySuccess('Chain updated');

@@ -311,10 +311,31 @@ class ChainInfo {
     hasHomepage,
     default_allow_permissions,
     default_deny_permissions,
+    chain_node_id,
+  }: {
+    name?: string;
+    description?: string;
+    website?: string;
+    discord?: string;
+    element?: string;
+    telegram?: string;
+    github?: string;
+    stagesEnabled?: boolean;
+    customStages?: string;
+    customDomain?: string;
+    terms?: string;
+    snapshot?: string[];
+    iconUrl?: string;
+    defaultOverview?: boolean;
+    defaultPage?: DefaultPage;
+    hasHomepage?: boolean;
+    default_allow_permissions?: bigint;
+    default_deny_permissions?: bigint;
+    chain_node_id?: string;
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
-      id: app.activeChainId(),
+      id: app.activeChainId() ?? this.id,
       name,
       description,
       website,
@@ -333,6 +354,7 @@ class ChainInfo {
       default_summary_view: defaultOverview,
       default_page: defaultPage,
       has_homepage: hasHomepage,
+      chain_node_id,
       jwt: app.user.jwt,
     });
     const updatedChain = r.result;
