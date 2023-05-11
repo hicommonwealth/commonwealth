@@ -15,7 +15,7 @@ import type MinimumProfile from '../../models/MinimumProfile';
 import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
-import type Topic from '../../models/Topic';
+import Topic from '../../models/Topic';
 import { ThreadStage } from '../../models/types';
 import moment from 'moment';
 
