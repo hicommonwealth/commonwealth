@@ -3,6 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { CWTextInput } from '../../../client/scripts/views/components/component_kit/cw_text_input';
 import type { ValidationStatus } from '../../../client/scripts/views/components/component_kit/cw_validation_text';
+import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+
+const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
 const input = {
   title: 'Molecules/TextInput',
@@ -12,24 +15,43 @@ const input = {
 export default input;
 type Story = StoryObj<typeof input>;
 
-/** Large */
-export const Large: Story = {
-  render: () => (
-    <CWTextInput name="Text field" label="Large" placeholder="Type here" />
-  ),
-};
-
-/** Small */
-export const Small: Story = {
-  render: () => (
-    <CWTextInput
-      name="Text field"
-      label="Small"
-      placeholder="Type here"
-      size="small"
-    />
-  ),
-};
+export const TextInput: Story = {
+  args: {
+    label: "Large",
+    placeholder: "Type here",
+    disabled: false,
+    size: "large",
+    iconRight: undefined,
+    darkMode: false,
+  },
+  argTypes: {
+    label: {
+      control: { type: "text" },
+    },
+    placeholder: {
+      control: { type: "text" },
+    },
+    disabled: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    size: {
+      control: { type: "select" },
+      options: [ "small", "large" ],
+    },
+    iconRight: {
+      control: { type: "select" },
+      options: iconOptions,
+    },
+    darkMode: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+  },
+  render: ({...args}) => (
+    <CWTextInput name="Text field" {...args} />
+  )
+}
 
 /** This input only accepts A-Z */
 export const OnlyLetters: Story = {
@@ -44,42 +66,6 @@ export const OnlyLetters: Story = {
         }
       }}
       label="This input only accepts A-Z"
-      placeholder="Type here"
-    />
-  ),
-};
-
-/** Text field with icons */
-export const WithIcons: Story = {
-  render: () => (
-    <CWTextInput
-      label="Text field with icons"
-      name="Text field with icons"
-      placeholder="Type here"
-      iconRight="write"
-    />
-  ),
-};
-
-/** Disabled */
-export const Disabled: Story = {
-  render: () => (
-    <CWTextInput
-      name="Text field"
-      label="Disabled"
-      disabled
-      value="Some disabled text"
-    />
-  ),
-};
-
-/** Dark mode */
-export const DarkMode: Story = {
-  render: () => (
-    <CWTextInput
-      name="Text field dark mode"
-      label="Dark mode"
-      darkMode
       placeholder="Type here"
     />
   ),
