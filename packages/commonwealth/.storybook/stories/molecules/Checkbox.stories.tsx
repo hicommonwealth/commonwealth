@@ -11,7 +11,7 @@ const checkbox = {
 export default checkbox;
 type Story = StoryObj<typeof checkbox>;
 
-export const CheckBox: Story = {
+export const Checkbox: Story = {
   args: {
     label: "Click me",
     disabled: false,
