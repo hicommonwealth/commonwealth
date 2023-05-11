@@ -269,7 +269,7 @@ jobs:
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: cd packages/commonwealth && npx sequelize db:migrate
           
-      - name: Run Devnet tests
+      - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
         env:
