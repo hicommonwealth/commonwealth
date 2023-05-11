@@ -30,9 +30,9 @@ export const setChainCategories = async (
     axios
       .post(`${app.serverUrl()}/updateChainCategory`, params)
       .then((response) => {
-        if (response?.data) {
-          app.config.chainCategoryMap[chain_id] =
-            response.data.chainCategoryMap.chain_id;
+        if (response?.data.result) {
+          const newMap = response.data.result;
+          app.config.chainCategoryMap[newMap.chain] = newMap.tags;
         }
         resolve();
         redraw();

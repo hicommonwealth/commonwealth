@@ -13,7 +13,8 @@ type UpdateChainCategoryReq = {
 };
 
 type UpdateChainCategoryRes = {
-  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
+  chain: string;
+  tags: ChainCategoryType[];
 };
 
 const updateChainCategory = async (
@@ -49,7 +50,10 @@ const updateChainCategory = async (
   const updatedCategory = {
     [req.body.chain_id]: updateCategories as ChainCategoryType[],
   };
-  return success(res, { chainCategoryMap: updatedCategory });
+  return success(res, {
+    chain: req.body.chain_id,
+    tags: updateCategories as ChainCategoryType[],
+  });
 };
 
 export default updateChainCategory;
