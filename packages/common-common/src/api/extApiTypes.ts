@@ -3,7 +3,7 @@
 import type { ThreadAttributes } from 'commonwealth/server/models/thread';
 import type { CommentAttributes } from 'commonwealth/server/models/comment';
 import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
-import type { ChainAttributes } from 'commonwealth/server/models/chain';
+import type { CommunityAttributes } from 'commonwealth/server/models/communities';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
 import type {
   BalanceProviderResp,
@@ -76,7 +76,7 @@ export type GetCommunitiesReq = {
 };
 
 export type PutCommunitiesReq = {
-  community: ChainAttributes;
+  community: CommentAttributes;
   contract: { token_type: string; address: string };
   admin_addresses: string[];
 };
@@ -84,7 +84,7 @@ export type PutCommunitiesReq = {
 export type PutCommunitiesResp = { url: string; error?: string };
 
 export type GetCommunitiesResp = {
-  communities?: ChainAttributes[];
+  communities?: CommentAttributes[];
   count: number;
 };
 
