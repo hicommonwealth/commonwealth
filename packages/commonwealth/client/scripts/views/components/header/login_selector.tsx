@@ -204,7 +204,9 @@ export const LoginSelectorMenuRight = ({
     /**
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
-    const walletConnectWallet = WebWalletController.Instance.getByName(WalletId.WalletConnect);
+    const walletConnectWallet = WebWalletController.Instance.getByName(
+      WalletId.WalletConnect
+    );
     await walletConnectWallet.reset();
   };
 
@@ -293,7 +295,11 @@ const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
   );
 };
 
-export const LoginSelector = () => {
+type LoginSelectorProps = {
+  onJoinSuccess: () => void;
+};
+
+export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -481,7 +487,7 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
+        onJoinSuccess(); // this triggers a state update from the parent to update the sibling component
       } catch (err) {
         console.error(err);
       }

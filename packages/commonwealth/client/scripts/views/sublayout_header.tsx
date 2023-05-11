@@ -26,6 +26,7 @@ export const SublayoutHeader = ({
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const [contentKey, setContentKey] = React.useState('');
 
   return (
     <div className="SublayoutHeader">
@@ -43,13 +44,16 @@ export const SublayoutHeader = ({
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) && app.activeChainId() && (
-          <CWCommunityAvatar
-            size="large"
-            community={app.chain.meta}
-            onClick={() => { navigate('/discussions'); }}
-          />
-        )}
+        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) &&
+          app.activeChainId() && (
+            <CWCommunityAvatar
+              size="large"
+              community={app.chain.meta}
+              onClick={() => {
+                navigate('/discussions');
+              }}
+            />
+          )}
         {onMobile && app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"
@@ -75,11 +79,11 @@ export const SublayoutHeader = ({
           />
         </div>
         <div className="DesktopMenuContainer">
-          <CreateContentPopover />
+          <CreateContentPopover key={contentKey} />
           <HelpMenuPopover />
           {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>
-        <LoginSelector />
+        <LoginSelector onJoinSuccess={() => setContentKey('joined')} />
       </div>
     </div>
   );
