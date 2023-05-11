@@ -18,7 +18,6 @@ class ChainEntity {
 
   // these values cannot be readonly because they are updated when the chain-entity metadata is added to the instance
   public title?: string;
-  public threadId?: number;
 
   private _updatedAt?: moment.Moment;
   public get updatedAt() {
@@ -48,7 +47,6 @@ class ChainEntity {
     createdAt,
     updatedAt,
     id,
-    threadId,
     threadTitle,
     title,
     author,
@@ -60,7 +58,6 @@ class ChainEntity {
     chainEvents: any[];
     createdAt: moment.MomentInput;
     updatedAt: moment.MomentInput;
-    threadId: number;
     threadTitle: string;
     author: string;
     id?: number;
@@ -71,7 +68,6 @@ class ChainEntity {
     this.chain = chain;
     this.type = type;
     this.typeId = typeId;
-    this.threadId = threadId;
     this.threadTitle = decodeURIComponent(threadTitle);
     this.title = title;
     this.author = author;
@@ -97,7 +93,6 @@ class ChainEntity {
       created_at,
       updated_at,
       id,
-      thread_id,
       Thread,
       title,
       author,
@@ -112,7 +107,6 @@ class ChainEntity {
       createdAt: created_at,
       updatedAt: updated_at,
       id,
-      threadId: thread_id,
       threadTitle: Thread?.title,
       title,
       author,

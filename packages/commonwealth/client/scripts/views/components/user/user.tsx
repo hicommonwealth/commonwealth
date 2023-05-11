@@ -63,7 +63,7 @@ export const User = (props: UserAttrs) => {
     app.newProfiles.isFetched.off('redraw', () => {
       forceRerender();
     });
-  }, []);
+  }, [forceRerender]);
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
@@ -153,7 +153,7 @@ export const User = (props: UserAttrs) => {
     );
   }
 
-  const getRoleTags = (long?: boolean) => (
+  const getRoleTags = () => (
     <>
       {/* role in commonwealth forum */}
       {showRole && role && (
@@ -213,7 +213,7 @@ export const User = (props: UserAttrs) => {
                     </div>
                   </>
                 )}
-                {getRoleTags(false)}
+                {getRoleTags()}
               </>,
               handleClick
             )
@@ -237,7 +237,7 @@ export const User = (props: UserAttrs) => {
                   </div>
                 </>
               )}
-              {getRoleTags(false)}
+              {getRoleTags()}
             </a>
           )}
           {account &&
@@ -246,6 +246,7 @@ export const User = (props: UserAttrs) => {
                 account.address === address && ghostAddress
             ) && (
               <img
+                alt="ghost"
                 src="/static/img/ghost.svg"
                 width="20px"
                 style={{ display: 'inline-block' }}
@@ -312,7 +313,7 @@ export const User = (props: UserAttrs) => {
           <div className="user-chain">{friendlyChainName}</div>
         )}
         {/* always show roleTags in UserPopover */}
-        {getRoleTags(true)}
+        {getRoleTags()}
         {/* If Admin Allow Banning */}
         {loggedInUserIsAdmin && (
           <div className="ban-wrapper">
