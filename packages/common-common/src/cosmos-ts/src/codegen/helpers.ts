@@ -13,6 +13,7 @@ if (_m0.util.Long !== Long) {
 
   _m0.configure();
 }
+// non-cosmos diff
 
 export { Long };
 

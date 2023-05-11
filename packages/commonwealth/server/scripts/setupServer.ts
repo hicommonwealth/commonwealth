@@ -24,6 +24,8 @@ const setupServer = (
     if (error.syscall !== 'listen') {
       throw error;
     }
+    // non-cosmos diff
+
     switch (error.code) {
       case 'EACCES':
         log.error('Port requires elevated privileges');

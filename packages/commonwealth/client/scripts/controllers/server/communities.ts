@@ -20,6 +20,7 @@ class CommunitiesController {
     if (!chain) throw new Error('Must provide a chain community');
     if (!app.isLoggedIn()) throw new Error('Must be logged in');
     const isAlreadyStarred = this.isStarred(chain);
+    // non-cosmos diff
 
     return new Promise<void>((resolve, reject) => {
       const params = {

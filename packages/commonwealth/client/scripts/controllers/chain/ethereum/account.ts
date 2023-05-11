@@ -41,6 +41,8 @@ export default class EthereumAccount extends Account {
     } else {
       this._Chain = ChainInfo;
     }
+    // non-cosmos diff
+
     this._Accounts = Accounts;
     this._Accounts.store.add(this);
   }

@@ -21,6 +21,7 @@ export function parseAbiItemsFromABI(
       };
       return abiItem;
     });
+    // non-cosmos diff
   } catch (e) {
     console.error(e);
     return [];
