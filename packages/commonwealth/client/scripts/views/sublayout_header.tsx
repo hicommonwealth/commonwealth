@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import 'sublayout_header.scss';
 
@@ -26,7 +26,7 @@ export const SublayoutHeader = ({
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const [contentKey, setContentKey] = React.useState('');
+  const [contentKey, setContentKey] = useState('');
 
   return (
     <div className="SublayoutHeader">
