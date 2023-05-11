@@ -12,7 +12,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 
-describe.only('User Dashboard API', () => {
+describe('User Dashboard API', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
@@ -227,4 +227,6 @@ describe.only('User Dashboard API', () => {
       expect(chains.includes(threadOne.chainId)).to.be.false;
     });
   });
+
+  describe('/viewGlobalActivity', () => {});
 });
