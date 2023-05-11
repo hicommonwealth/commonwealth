@@ -2,6 +2,9 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWTag } from '../../../client/scripts/views/components/component_kit/cw_tag';
+import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+
+const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
 const tag = {
   title: 'Molecules/Tag',
@@ -9,52 +12,25 @@ const tag = {
 } satisfies Meta<typeof CWTag>;
 
 export default tag;
-// type Story = StoryObj<typeof tag>;
+type Story = StoryObj<typeof tag>;
 
-// export const Regular: Story = {
-export const Regular = {
-  name: 'Regular',
-  render: () => <CWTag label="Ref #90" />
-}
-
-// export const Passed: Story = {
-export const Passed = {
-  name: 'Passed',
-  render: () => <CWTag label="Passed" type="passed" />
-}
-
-// export const Failed: Story = {
-export const Failed = {
-  name: 'Failed',
-  render: () => <CWTag label="Failed" type="failed" />
-}
-
-// export const Active: Story = {
-export const Active = {
-  name: 'Active',
-  render: () => <CWTag label="Active" type="active" />
-}
-
-// export const Poll: Story = {
-export const Poll = {
-  name: 'Poll',
-  render: () => <CWTag label="Poll" type="poll" />
-}
-
-// export const Proposal: Story = {
-export const Proposal = {
-  name: 'Proposal',
-  render: () => <CWTag label="Prop #52" type="proposal" />
-}
-
-// export const Referendum: Story = {
-export const Referendum = {
-  name: 'Referendum',
-  render: () => <CWTag label="Ref #90" type="referendum" />
-}
-
-// export const Referendum: Story = {
-export const WithIcon = {
-  name: 'With Icon',
-  render: () => <CWTag label="12 days" iconName="clock" />
+export const Tag: Story = {
+  args: {
+    label: "Ref #90",
+    type: "active",
+    iconName: undefined,
+  },
+  argTypes: {
+    label: {
+      control: { type: "text" },
+    },
+    type: {
+      control: { type: "select" },
+    },
+    iconName: {
+      control: { type: "select" },
+      options: iconOptions,
+    },
+  },
+  render: ({...args}) => <CWTag {...args} />
 }
