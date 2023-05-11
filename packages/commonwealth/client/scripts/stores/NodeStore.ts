@@ -1,6 +1,19 @@
 import type NodeInfo from '../models/NodeInfo';
 import IdStore from './IdStore';
 
-class NodeStore extends IdStore<NodeInfo> {}
+class NodeStore extends IdStore<NodeInfo> {
+  public getByUrl(url: string) {
+    if (!url) return undefined;
+    // replace the 'https://' with '' as a variant
+    const urlVariants = [
+      url,
+      url.replace(/\/$/, ''),
+      url.replace(/^https?:\/\//, ''),
+      url.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+    ];
+
+    return this._store.find((node) => urlVariants.includes(node.url));
+  }
+}
 
 export default NodeStore;

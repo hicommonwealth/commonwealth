@@ -8,13 +8,13 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { valueContainerCSS } from 'react-select/dist/declarations/src/components/containers';
 import { CWButton } from '../components/component_kit/cw_button';
-import {
-  ConfirmationModal,
-  openConfirmation,
-} from '../modals/confirmation_modal';
+import { openConfirmation } from '../modals/confirmation_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import axios from 'axios';
 import 'pages/admin_panel.scss';
+import { detectURL } from 'helpers/threads';
+import { rpc } from '@polkadot/types/interfaces/definitions';
+import NodeInfo from 'models/NodeInfo';
 
 const AdminPanel = () => {
   const navigate = useCommonNavigate();
@@ -24,11 +24,21 @@ const AdminPanel = () => {
       // redirect to 404
       navigate('/404');
     }
-  }, []);
+  }, [navigate]);
 
   // State
   const [deleteChainValue, setDeleteChainValue] = React.useState<string>('');
   const [deleteChainValueValidated, setDeleteChainValueValidated] =
+    React.useState<boolean>(false);
+
+  const [rpcEndpointChainValue, setRpcEndpointChainValue] =
+    React.useState<string>('');
+  const [rpcEndpoint, setRpcEndpoint] = React.useState<string>('');
+  const [rpcEndpointChainValueValidated, setRpcEndpointChainValueValidated] =
+    React.useState<boolean>(false);
+  const [rpcEndpointChainNode, setRpcEndpointChainNode] =
+    React.useState<NodeInfo>(null);
+  const [rpcEndpointChainNodeValidated, setRpcEndpointChainNodeValidated] =
     React.useState<boolean>(false);
 
   return (
@@ -36,7 +46,7 @@ const AdminPanel = () => {
     // title={title}
     >
       <div className="AdminPanel">
-        <CWText type="h2">Admin Tasks</CWText>
+        <CWText type="h2">Site Admin Tasks</CWText>
         <div className="TaskGroup">
           <CWText type="h4">Delete Community</CWText>
           <CWText type="caption">
@@ -60,9 +70,94 @@ const AdminPanel = () => {
                 setDeleteChainValueValidated(true);
                 return [];
               }}
+              placeholder="Enter a community id"
             />
             <CWButton
               label="Delete"
+              className="TaskButton"
+              disabled={!deleteChainValueValidated}
+              onClick={() => {
+                openConfirmation({
+                  title: 'Delete Community',
+                  description: `Are you sure you want to delete ${deleteChainValue}? This action cannot be reversed. Note that this will NOT work if there is an admin in the community.`,
+                  buttons: [
+                    {
+                      label: 'Delete',
+                      buttonType: 'mini-red',
+                      onClick: async () => {
+                        try {
+                          await axios.post(`${app.serverUrl()}/deleteChain`, {
+                            id: deleteChainValue,
+                            jwt: app.user.jwt,
+                          });
+                          setDeleteChainValue('');
+                          notifySuccess('Community deleted');
+                        } catch (e) {
+                          notifyError('Error deleting community');
+
+                          console.error(e);
+                        }
+                      },
+                    },
+                    {
+                      label: 'Cancel',
+                      buttonType: 'mini-white',
+                    },
+                  ],
+                });
+              }}
+            />
+          </div>
+        </div>
+        <div className="TaskGroup">
+          <CWText type="h4">Switch RPC Endpoint</CWText>
+          <CWText type="caption">
+            Changes the RPC endpoint for a specific chain.
+          </CWText>
+          <div className="TaskRow">
+            <CWTextInput
+              label="Community Id"
+              value={rpcEndpointChainValue}
+              onInput={(e) => {
+                setRpcEndpointChainValue(e.target.value);
+                if (e.target.value.length === 0)
+                  setRpcEndpointChainValueValidated(false);
+              }}
+              inputValidationFn={(value: string) => {
+                if (!app.config.chains.getById(value)) {
+                  setRpcEndpointChainValueValidated(false);
+                  return ['failure', 'Community not found'];
+                }
+                setRpcEndpointChainValueValidated(true);
+                return [];
+              }}
+              placeholder="Enter a community id"
+            />
+            <CWTextInput
+              label="RPC Endpoint"
+              value={rpcEndpoint}
+              onInput={(e) => {
+                setRpcEndpoint(e.target.value);
+              }}
+              inputValidationFn={(value: string) => {
+                if (!detectURL(value)) {
+                  setRpcEndpointChainNodeValidated(false);
+                  return ['failure', 'Not a valid URL'];
+                }
+
+                const nodeInfo = app.config.nodes.getByUrl(value);
+
+                if (nodeInfo) {
+                  setRpcEndpointChainNode(nodeInfo);
+                  setRpcEndpointChainNodeValidated(true);
+                }
+
+                return [];
+              }}
+              placeholder="Enter an RPC endpoint"
+            />
+            <CWButton
+              label="Save"
               className="TaskButton"
               disabled={!deleteChainValueValidated}
               onClick={() => {
