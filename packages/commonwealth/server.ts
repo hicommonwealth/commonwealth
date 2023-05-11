@@ -49,6 +49,8 @@ import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { getChainStatusWithCache, getChainStatusWithCacheOverride } from './server/routes/status';
+import daemon from 'common-common/src/daemons';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -265,7 +267,14 @@ async function main() {
   if (!NO_RULE_CACHE) await ruleCache.start();
   const banCache = new BanCache(models);
 
-  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityInstance.startTask(models);
+  // Start Global Activity Daemon
+  if (!NO_GLOBAL_ACTIVITY_CACHE) {
+    globalActivityInstance.startTask(models);
+    globalActivityInstance.queryWithCache(models);
+    getChainStatusWithCache(models);
+    daemon.startTask('getChainStatus', () => getChainStatusWithCacheOverride(models), 60);
+  }
+
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
