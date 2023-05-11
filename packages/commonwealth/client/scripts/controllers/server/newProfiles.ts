@@ -44,12 +44,12 @@ class NewProfilesController {
 
   public async updateProfileForAccount(address, data) {
     try {
-      const response = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
+      const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
         ...data,
         jwt: app.user.jwt,
       });
 
-      if (response?.result?.status === 'Success') {
+      if (response?.data.result?.status === 'Success') {
         const profile = this._store.getByAddress(address);
         this._refreshProfiles([profile]);
       }
