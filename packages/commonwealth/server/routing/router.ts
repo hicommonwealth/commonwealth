@@ -141,7 +141,6 @@ import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
-import setProjectChain from '../routes/setProjectChain';
 import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
@@ -641,14 +640,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     updateBanner.bind(this, models)
-  );
-
-  // projects related routes
-  router.get(
-    '/setProjectChain',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    setProjectChain.bind(this, models)
   );
 
   // third-party webhooks
