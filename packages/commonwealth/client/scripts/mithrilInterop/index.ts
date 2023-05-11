@@ -218,18 +218,3 @@ export function rootMount(element: Element, component?: any | null) {
 export function rootRender(el: Element, vnodes: Children) {
   return rootMount(el, render('div', {}, vnodes));
 }
-
-// This should not be used for setting the route, because it does not use react-router.
-// Instead, it uses native history API, and because react router does not recognize the
-// path change, the page has to be reloaded programmatically.
-// This is only for legacy code, where react router is not accessible (eg in controllers or JS classes).
-// Always use "withRouter" for react class components or "useNavigate" for functional components.
-export function _DEPRECATED_dangerouslySetRoute(route: string) {
-  window.history.pushState('', '', route);
-  window.location.reload();
-
-  const html = document.getElementsByTagName('html')[0];
-  if (html) html.scrollTo(0, 0);
-  const body = document.getElementsByTagName('body')[0];
-  if (body) body.scrollTo(0, 0);
-}
