@@ -50,7 +50,7 @@ const getAddressProfile = async (
     const reqChain = (req.body as GetAddressProfileReq).chain;
     const reqAddr = (req.body as GetAddressProfileReq).address;
 
-    const chain = await models.Chain.findOne({
+    const chain = await models.Community.findOne({
       where: { id: reqChain },
     });
     if (!chain) {

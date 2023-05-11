@@ -16,7 +16,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
 
 import type { AddressInstance } from '../models/address';
-import type { ChainAttributes } from '../models/chain';
+import type { CommunityAttributes } from '../models/communities';
 import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -64,7 +64,7 @@ export const Errors = {
   ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
 };
 
-export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
+export type CreateChainReq = Omit<CommunityAttributes, 'substrate_spec'> &
   Omit<ChainNodeAttributes, 'id'> & {
     id: string;
     node_url: string;
@@ -74,7 +74,7 @@ export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
   };
 
 type CreateChainResp = {
-  chain: ChainAttributes;
+  chain: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;
@@ -137,7 +137,7 @@ const createChain = async (
     throw new AppError(Errors.ImageTooLarge);
   }
 
-  const existingBaseChain = await models.Chain.findOne({
+  const existingBaseChain = await models.Community.findOne({
     where: { base: req.body.base },
   });
   if (!existingBaseChain) {
@@ -290,7 +290,7 @@ const createChain = async (
     return next(new AppError(Errors.InvalidIconUrl));
   }
 
-  const oldChain = await models.Chain.findOne({
+  const oldChain = await models.Community.findOne({
     where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
@@ -324,7 +324,7 @@ const createChain = async (
     },
   });
 
-  const chain = await models.Chain.create({
+  const chain = await models.Community.create({
     id,
     name,
     default_symbol,
@@ -411,7 +411,7 @@ const createChain = async (
       },
       include: [
         {
-          model: models.Chain,
+          model: models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -427,7 +427,7 @@ const createChain = async (
       },
       include: [
         {
-          model: models.Chain,
+          model: models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -444,7 +444,7 @@ const createChain = async (
       },
       include: [
         {
-          model: models.Chain,
+          model: models.Community,
           where: { base: chain.base },
           required: true,
         },

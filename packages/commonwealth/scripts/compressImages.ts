@@ -52,7 +52,7 @@ async function compressImage(
 }
 
 async function main() {
-  const chains = await models.Chain.findAll({
+  const chains = await models.Community.findAll({
     where: { icon_url: { [Op.ne]: null } },
   });
   const transaction = await sequelize.transaction();
@@ -89,7 +89,7 @@ async function main() {
       console.log(
         `Success for community ${chain.id} with new url ${data.Location}`
       );
-      await models.Chain.update(
+      await models.Community.update(
         { icon_url: data.Location },
         { where: { id: chain.id }, transaction }
       );

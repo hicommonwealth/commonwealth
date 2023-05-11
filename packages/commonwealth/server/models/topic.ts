@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { RuleAttributes } from './rule';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
@@ -22,7 +22,7 @@ export type TopicAttributes = {
   rule_id?: number;
 
   // associations
-  chain?: ChainAttributes;
+  chain?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
   Rule?: RuleAttributes;
 };
@@ -46,7 +46,7 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
       telegram: { type: dataTypes.STRING, allowNull: true },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -86,9 +86,9 @@ export default (
   );
 
   Topic.associate = (models) => {
-    models.Topic.belongsTo(models.Chain, {
+    models.Topic.belongsTo(models.Community, {
       as: 'chain',
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Topic.hasMany(models.Thread, {

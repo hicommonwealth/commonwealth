@@ -28,7 +28,7 @@ import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereu
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
+import type { CommunityInstance } from '../models/communities';
 import type { ProfileAttributes } from '../models/profile';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
@@ -70,7 +70,7 @@ export const Errors = {
 
 const processAddress = async (
   models: DB,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,
@@ -229,7 +229,7 @@ const verifyAddress = async (
   if (!req.body.chain || !req.body.chain_id) {
     throw new AppError(Errors.NoChain);
   }
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
   const chain_id = req.body.chain_id;

@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { AttachmentAttributes } from './attachment';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { ChainEntityMetaAttributes } from './chain_entity_meta';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
@@ -50,7 +50,7 @@ export type ThreadAttributes = {
   last_commented_on?: Date;
 
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Address?: AddressAttributes;
   Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
   ChainEntityMeta?: ChainEntityMetaAttributes;
@@ -89,7 +89,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       view_count: {
         type: dataTypes.INTEGER,
         allowNull: false,
@@ -129,19 +129,19 @@ export default (
       paranoid: true,
       indexes: [
         { fields: ['address_id'] },
-        { fields: ['chain'] },
-        { fields: ['chain', 'created_at'] },
-        { fields: ['chain', 'updated_at'] },
-        { fields: ['chain', 'pinned'] },
-        { fields: ['chain', 'has_poll'] },
+        { fields: ['community_id'] },
+        { fields: ['community_id', 'created_at'] },
+        { fields: ['community_id', 'updated_at'] },
+        { fields: ['community_id', 'pinned'] },
+        { fields: ['community_id', 'has_poll'] },
         { fields: ['canvas_hash'] },
       ],
     }
   );
 
   Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.Thread.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Thread.belongsTo(models.Address, {

@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
@@ -13,7 +13,7 @@ export type StarredCommunityAttributes = {
 
   // associations
   User?: UserAttributes | UserAttributes['id'];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };
 
 export type StarredCommunityInstance =
@@ -30,7 +30,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       user_id: { type: dataTypes.INTEGER, allowNull: false },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -39,14 +39,14 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['user_id'] }, { fields: ['chain'] }],
+      indexes: [{ fields: ['user_id'] }, { fields: ['community_id'] }],
     }
   );
 
   StarredCommunity.associate = (models) => {
     models.StarredCommunity.belongsTo(models.User);
-    models.StarredCommunity.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.StarredCommunity.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
   };

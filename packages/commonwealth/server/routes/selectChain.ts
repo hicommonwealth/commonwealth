@@ -21,7 +21,7 @@ const selectChain = async (
     return next(new AppError(Errors.NoChain));
   }
 
-  const chain = await models.Chain.findOne({ where: { id: req.body.chain } });
+  const chain = await models.Community.findOne({ where: { id: req.body.chain } });
   if (!chain) {
     return next(new AppError(Errors.ChainNF));
   }

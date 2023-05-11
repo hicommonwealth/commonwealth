@@ -50,7 +50,7 @@ const updateThreadStage = async (
 
     // fetch available stages
     let custom_stages = [];
-    const entity = await models.Chain.findOne({ where: { id: thread.chain } });
+    const entity = await models.Community.findOne({ where: { id: thread.chain } });
     try {
       custom_stages = Array.from(JSON.parse(entity.custom_stages))
         .map((s) => s.toString())

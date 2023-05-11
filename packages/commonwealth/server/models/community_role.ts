@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { Permission } from './role';
 import type {
   RoleAssignmentAttributes,
@@ -19,7 +19,7 @@ export type CommunityRoleAttributes = {
 
   // associations
   RoleAssignments?: RoleAssignmentAttributes[];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };
 
 export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
@@ -36,7 +36,7 @@ export default (
     'CommunityRole',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       name: {
         type: dataTypes.ENUM,
         values: ['admin', 'moderator', 'member'],
@@ -62,7 +62,7 @@ export default (
       updatedAt: 'updated_at',
       tableName: 'CommunityRoles',
       underscored: true,
-      indexes: [{ fields: ['chain_id'] }],
+      indexes: [{ fields: ['community_id'] }],
     }
   );
 
@@ -70,8 +70,8 @@ export default (
     models.CommunityRole.hasMany(models.RoleAssignment, {
       foreignKey: 'community_role_id',
     });
-    models.CommunityRole.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+    models.CommunityRole.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
   };

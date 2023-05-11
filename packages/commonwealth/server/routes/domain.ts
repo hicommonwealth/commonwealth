@@ -6,7 +6,7 @@ const domain = async (models: DB, req: Request, res: Response) => {
 
   // return the community id matching the hostname's custom domain
   try {
-    const chain = await models.Chain.findOne({
+    const chain = await models.Community.findOne({
       where: { custom_domain: hostname },
     });
     if (chain) {

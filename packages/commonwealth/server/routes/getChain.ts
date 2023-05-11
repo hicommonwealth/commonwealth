@@ -28,7 +28,7 @@ export const getChain = async (
     return next(new AppError(Errors.NeedChainId));
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain_id },
   });
 

@@ -59,7 +59,7 @@ const deleteChain = async (
   //   return next(new AppError(Errors.CannotDeleteChain));
   // }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id,
       has_chain_events_listener: false, // make sure no chain events
@@ -200,7 +200,7 @@ const deleteChain = async (
         communityRoles.map((r) => r.destroy({ transaction: t }))
       );
 
-      await models.Chain.destroy({
+      await models.Community.destroy({
         where: { id: chain.id },
         transaction: t,
       });

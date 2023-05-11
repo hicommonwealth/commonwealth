@@ -29,7 +29,7 @@ export default (
       title: { type: DataTypes.TEXT, allowNull: true },
       topic: { type: DataTypes.STRING, allowNull: true },
       body: { type: DataTypes.TEXT, allowNull: true },
-      chain: { type: DataTypes.STRING, allowNull: false },
+      chain: { type: DataTypes.STRING, allowNull: false, field: 'community_id' },
       attachment: { type: DataTypes.INTEGER, allowNull: true },
     },
     {
@@ -43,8 +43,8 @@ export default (
   );
 
   DiscussionDraft.associate = (models) => {
-    models.DiscussionDraft.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.DiscussionDraft.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.DiscussionDraft.belongsTo(models.Address, {

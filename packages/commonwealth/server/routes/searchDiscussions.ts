@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 
 import type { DB } from '../models';
-import { ChainInstance } from '../models/chain';
+import { CommunityInstance } from '../models/communities';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import {
   PaginationSqlBind,
@@ -36,7 +36,7 @@ type SearchDiscussionsBindOptions = PaginationSqlBind & {
 
 const search = async (
   models: DB,
-  chain: ChainInstance | null,
+  chain: CommunityInstance | null,
   options: SearchDiscussionsQuery
 ) => {
   if (options.thread_title_only === 'true') {

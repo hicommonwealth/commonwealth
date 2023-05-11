@@ -3,7 +3,7 @@ import type { DataTypes } from 'sequelize';
 
 import type { AddressAttributes } from './address';
 import type { AttachmentAttributes } from './attachment';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommentAttributes = {
@@ -25,7 +25,7 @@ export type CommentAttributes = {
   deleted_at?: Date;
 
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Address?: AddressAttributes;
   Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
 };
@@ -42,7 +42,7 @@ export default (
     'Comment',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
       parent_id: { type: dataTypes.STRING, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -72,10 +72,10 @@ export default (
       paranoid: true,
       indexes: [
         { fields: ['id'] },
-        { fields: ['chain', 'thread_id'] },
+        { fields: ['community_id', 'thread_id'] },
         { fields: ['address_id'] },
-        { fields: ['chain', 'created_at'] },
-        { fields: ['chain', 'updated_at'] },
+        { fields: ['community_id', 'created_at'] },
+        { fields: ['community_id', 'updated_at'] },
         { fields: ['thread_id'] },
         { fields: ['canvas_hash'] },
       ],
@@ -83,8 +83,8 @@ export default (
   );
 
   Comment.associate = (models) => {
-    models.Comment.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.Comment.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Comment.belongsTo(models.Address, {

@@ -31,7 +31,7 @@ export default async (
 
   switch (category.name) {
     case 'new-thread-creation': {
-      chain = await models.Chain.findOne({
+      chain = await models.Community.findOne({
         where: {
           id: p_entity,
         },
@@ -73,7 +73,7 @@ export default async (
     case 'new-mention':
       return next(new AppError(Errors.NoMentions));
     case 'chain-event': {
-      chain = await models.Chain.findOne({
+      chain = await models.Community.findOne({
         where: {
           id: p_entity,
         },

@@ -23,7 +23,7 @@ const viewCount = async (
   if (!req.body.chain) {
     return next(new AppError(Errors.NoChainOrComm));
   }
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain || null },
   });
   if (!chain) {

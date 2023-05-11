@@ -22,7 +22,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       address: { type: dataTypes.STRING, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -32,12 +32,12 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       timestamps: true,
-      indexes: [{ fields: ['chain_id'] }],
+      indexes: [{ fields: ['community_id'] }],
     }
   );
 
   Ban.associate = (models) => {
-    models.Ban.belongsTo(models.Chain);
+    models.Ban.belongsTo(models.Community);
   };
 
   return Ban;

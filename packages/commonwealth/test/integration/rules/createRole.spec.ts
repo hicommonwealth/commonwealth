@@ -86,7 +86,7 @@ describe('createRole tests', () => {
 
   it('create default community roles should properly create all permission roles for a new chain', async () => {
     const newChain = `newtestChain${Math.random()}`;
-    const chainObj = await models.Chain.create({
+    const chainObj = await models.Community.create({
       id: newChain,
       name: newChain,
       chain_node_id: 1,

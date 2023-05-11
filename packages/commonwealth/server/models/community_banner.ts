@@ -23,7 +23,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       banner_text: { type: dataTypes.TEXT, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -37,7 +37,7 @@ export default (
   );
 
   CommunityBanner.associate = (models) => {
-    models.CommunityBanner.belongsTo(models.Chain);
+    models.CommunityBanner.belongsTo(models.Community);
   };
 
   return CommunityBanner;

@@ -3,7 +3,7 @@ import type { Sequelize } from 'sequelize';
 import type { AddressModelStatic } from './models/address';
 import type { AttachmentModelStatic } from './models/attachment';
 import type { BanModelStatic } from './models/ban';
-import type { ChainModelStatic } from './models/chain';
+import type { CommunityModelStatic } from './models/communities';
 import type { ChainCategoryModelStatic } from './models/chain_category';
 import type { ChainCategoryTypeModelStatic } from './models/chain_category_type';
 import type { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
@@ -50,7 +50,7 @@ import type { TemplateModelStatic } from './models/template';
 export type Models = {
   Address: AddressModelStatic;
   Ban: BanModelStatic;
-  Chain: ChainModelStatic;
+  Community: CommunityModelStatic;
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntityMeta: ChainEntityMetaModelStatic;

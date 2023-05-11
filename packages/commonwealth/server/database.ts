@@ -5,7 +5,7 @@ import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import AttachmentFactory from './models/attachment';
 import BanFactory from './models/ban';
-import ChainFactory from './models/chain';
+import ChainFactory from './models/communities';
 import ChainCategoryFactory from './models/chain_category';
 import ChainCategoryTypeFactory from './models/chain_category_type';
 import ChainEntityMetaFactory from './models/chain_entity_meta';
@@ -79,7 +79,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
-  Chain: ChainFactory(sequelize, DataTypes),
+  Community: ChainFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),

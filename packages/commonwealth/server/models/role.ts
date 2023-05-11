@@ -1,7 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type Permission = 'admin' | 'moderator' | 'member';
@@ -17,7 +17,7 @@ export type RoleAttributes = {
 
   // associations
   Address?: AddressAttributes;
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };
 
 export type RoleInstance = ModelInstance<RoleAttributes>;
@@ -33,7 +33,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       is_user_default: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -56,8 +56,8 @@ export default (
       underscored: true,
       indexes: [
         { fields: ['address_id'] },
-        { fields: ['chain_id'] },
-        { fields: ['address_id', 'chain_id'], unique: true },
+        { fields: ['community_id'] },
+        { fields: ['address_id', 'community_id'], unique: true },
       ],
     }
   );
@@ -67,8 +67,8 @@ export default (
       foreignKey: 'address_id',
       targetKey: 'id',
     });
-    models.Role.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+    models.Role.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
   };

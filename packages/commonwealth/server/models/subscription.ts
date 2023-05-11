@@ -9,7 +9,7 @@ import type {
 } from '../../shared/types';
 import type { DB } from '../models';
 import type { WebhookContent } from '../webhookNotifier';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { CommentAttributes } from './comment';
 import type { NotificationInstance } from './notification';
 import type { NotificationCategoryAttributes } from './notification_category';
@@ -38,7 +38,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
@@ -86,7 +86,7 @@ export default (
         allowNull: false,
       },
       // TODO: change allowNull to false once subscription refactor is implemented
-      chain_id: { type: dataTypes.STRING, allowNull: true },
+      chain_id: { type: dataTypes.STRING, allowNull: true, field: 'community_id' },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
       snapshot_id: {
@@ -120,8 +120,8 @@ export default (
       foreignKey: 'subscription_id',
       onDelete: 'cascade',
     });
-    models.Subscription.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+    models.Subscription.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Subscription.belongsTo(models.Thread, {

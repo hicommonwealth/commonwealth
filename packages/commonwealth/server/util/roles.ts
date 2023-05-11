@@ -306,7 +306,7 @@ export async function isAddressPermitted(
 
   const permissionsManager = new PermissionManager();
 
-  const chain = await models.Chain.findOne({ where: { id: chain_id } });
+  const chain = await models.Community.findOne({ where: { id: chain_id } });
   if (!chain) {
     throw new Error('Chain not found');
   }
@@ -374,7 +374,7 @@ export async function isAnyonePermitted(
   chain_id: string,
   action: Action
 ): Promise<PermissionError | boolean> {
-  const chain = await models.Chain.findOne({ where: { id: chain_id } });
+  const chain = await models.Community.findOne({ where: { id: chain_id } });
   if (!chain) {
     throw new Error('Chain not found');
   }

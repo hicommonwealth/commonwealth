@@ -1,7 +1,7 @@
 import type { WalletId } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './communities';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type {
   RoleAssignmentAttributes,
@@ -31,7 +31,7 @@ export type AddressAttributes = {
   profile_id?: number;
   wallet_id?: WalletId;
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   RoleAssignments?: RoleAssignmentAttributes[];
@@ -39,7 +39,7 @@ export type AddressAttributes = {
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
-  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
@@ -57,7 +57,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       verification_token: { type: dataTypes.STRING, allowNull: false },
       verification_token_expires: { type: dataTypes.DATE, allowNull: true },
       verified: { type: dataTypes.DATE, allowNull: true },
@@ -93,7 +93,7 @@ export default (
       underscored: true,
       tableName: 'Addresses',
       indexes: [
-        { fields: ['address', 'chain'], unique: true },
+        { fields: ['address', 'community_id'], unique: true },
         { fields: ['user_id'] },
         { fields: ['name'] },
       ],
@@ -115,8 +115,8 @@ export default (
   );
 
   Address.associate = (models) => {
-    models.Address.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.Address.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Address.belongsTo(models.Profile, {

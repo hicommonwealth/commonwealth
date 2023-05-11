@@ -3,7 +3,7 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
-import { ChainInstance } from '../models/chain';
+import { CommunityInstance } from '../models/communities';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { buildPaginationSql } from '../../server/util/queries';
 
@@ -33,7 +33,7 @@ type SearchCommentsBindOptions = {
 
 const search = async (
   models: DB,
-  chain: ChainInstance | null,
+  chain: CommunityInstance | null,
   options: SearchCommentsQuery
 ) => {
   // sort by rank by default

@@ -1,7 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ReactionAttributes = {
@@ -20,7 +20,7 @@ export type ReactionAttributes = {
   created_at?: Date;
   updated_at?: Date;
 
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Address?: AddressAttributes;
 };
 
@@ -36,7 +36,7 @@ export default (
     'Reaction',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
       proposal_id: { type: dataTypes.STRING, allowNull: true },
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -54,11 +54,11 @@ export default (
       updatedAt: 'updated_at',
       indexes: [
         { fields: ['id'] },
-        { fields: ['chain', 'thread_id', 'proposal_id', 'comment_id'] },
+        { fields: ['community_id', 'thread_id', 'proposal_id', 'comment_id'] },
         { fields: ['address_id'] },
         {
           fields: [
-            'chain',
+            'community_id',
             'address_id',
             'thread_id',
             'proposal_id',
@@ -67,16 +67,16 @@ export default (
           ],
           unique: true,
         },
-        { fields: ['chain', 'thread_id'] },
-        { fields: ['chain', 'comment_id'] },
+        { fields: ['community_id', 'thread_id'] },
+        { fields: ['community_id', 'comment_id'] },
         { fields: ['canvas_hash'] },
       ],
     }
   );
 
   Reaction.associate = (models) => {
-    models.Reaction.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.Reaction.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Reaction.belongsTo(models.Address, {

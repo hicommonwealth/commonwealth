@@ -42,12 +42,12 @@ const getCommunities = async (
 
   let communities, count;
   if (!count_only) {
-    ({ rows: communities, count } = await models.Chain.findAndCountAll({
+    ({ rows: communities, count } = await models.Community.findAndCountAll({
       where,
       ...formatPaginationNoSort(req.query),
     }));
   } else {
-    count = await models.Chain.count({
+    count = await models.Community.count({
       where,
       ...formatPaginationNoSort(req.query),
     });

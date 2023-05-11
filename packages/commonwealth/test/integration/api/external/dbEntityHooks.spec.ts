@@ -5,7 +5,7 @@ import type { ThreadInstance } from 'server/models/thread';
 import type { CommentInstance } from 'server/models/comment';
 import type { UserInstance } from 'server/models/user';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
+import type { CommunityInstance } from 'server/models/communities';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { ReactionAttributes } from 'server/models/reaction';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
@@ -21,7 +21,7 @@ export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
 export let testAddresses: AddressInstance[];
-export let testChains: ChainInstance[];
+export let testChains: CommunityInstance[];
 export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
@@ -42,7 +42,7 @@ async function clearTestEntities() {
   await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Rule.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Chain.destroy({
+  await models.Community.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,
   });
@@ -114,7 +114,7 @@ beforeEach(async () => {
 
   testChains = [
     (
-      await models.Chain.findOrCreate({
+      await models.Community.findOrCreate({
         where: {
           id: 'cmntest',
           chain_node_id: -1,
@@ -126,7 +126,7 @@ beforeEach(async () => {
       })
     )[0],
     (
-      await models.Chain.findOrCreate({
+      await models.Community.findOrCreate({
         where: {
           id: 'cmntest2',
           chain_node_id: -2,

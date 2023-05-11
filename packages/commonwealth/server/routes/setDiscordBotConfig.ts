@@ -73,7 +73,7 @@ const setDiscordBotConfig = async (
   const existingCommunityWithGuildConnected =
     await models.DiscordBotConfig.findAll({ where: { guild_id } });
 
-  const chainInstance = await models.Chain.findOne({
+  const chainInstance = await models.Community.findOne({
     where: { id: chain_id },
   });
 

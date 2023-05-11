@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './communities';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type {
   SocialAccountAttributes,
@@ -25,19 +25,19 @@ export type UserAttributes = {
   updated_at?: Date;
 
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
-  selectedChain?: ChainAttributes | ChainAttributes['id'];
+  selectedChain?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
-  Chains?: ChainAttributes[] | ChainAttributes['id'][];
+  Chains?: CommunityAttributes[] | CommunityAttributes['id'][];
 };
 
 // eslint-disable-next-line no-use-before-define
 export type UserInstance = ModelInstance<UserAttributes> & {
-  getSelectedChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getSelectedChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   setSelectedChain: Sequelize.BelongsToSetAssociationMixin<
-    ChainInstance,
-    ChainInstance['id']
+    CommunityInstance,
+    CommunityInstance['id']
   >;
 
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<
@@ -143,7 +143,7 @@ export default (
   };
 
   User.associate = (models) => {
-    models.User.belongsTo(models.Chain, {
+    models.User.belongsTo(models.Community, {
       as: 'selectedChain',
       foreignKey: 'selected_chain_id',
       constraints: false,

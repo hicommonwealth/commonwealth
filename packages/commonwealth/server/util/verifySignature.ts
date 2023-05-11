@@ -24,7 +24,7 @@ import {
 } from '../../shared/adapters/shared';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
-import type { ChainInstance } from '../models/chain';
+import type { CommunityInstance } from '../models/communities';
 import type { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -39,7 +39,7 @@ const sortedStringify = configureStableStringify({
 
 const verifySignature = async (
   models: DB,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   chain_id: string | number,
   addressModel: AddressInstance,
   user_id: number,

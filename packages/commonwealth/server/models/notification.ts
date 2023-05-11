@@ -35,7 +35,7 @@ export default (
       notification_data: { type: dataTypes.TEXT, allowNull: false },
       chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
-      chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
+      chain_id: { type: dataTypes.STRING, allowNull: true, field: 'community_id' }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
       category_id: { type: dataTypes.STRING, allowNull: false },
     },
     {
@@ -57,8 +57,8 @@ export default (
       foreignKey: 'category_id',
       targetKey: 'name',
     });
-    models.Notification.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+    models.Notification.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
   };

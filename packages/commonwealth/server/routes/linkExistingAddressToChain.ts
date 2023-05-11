@@ -43,7 +43,7 @@ const linkExistingAddressToChain = async (
   }
   const userId = req.user.id;
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
 
@@ -73,7 +73,7 @@ const linkExistingAddressToChain = async (
     verificationTokenExpires && +verificationTokenExpires <= +new Date();
 
   if (!isOriginalTokenValid) {
-    const chains = await models.Chain.findAll({
+    const chains = await models.Community.findAll({
       where: { base: chain.base },
     });
 

@@ -72,7 +72,7 @@ export default (
   );
 
   Contract.associate = (models) => {
-    models.Contract.belongsToMany(models.Chain, {
+    models.Contract.belongsToMany(models.Community, {
       through: models.CommunityContract,
     });
     models.Contract.belongsTo(models.ChainNode, {

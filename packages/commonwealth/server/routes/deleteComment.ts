@@ -53,7 +53,7 @@ const deleteComment = async (
         where: {
           id: req.body.comment_id,
         },
-        include: [models.Chain],
+        include: [models.Community],
       });
       const requesterIsAdminOrMod = await findOneRole(
         models,

@@ -20,7 +20,7 @@ function setupCosmosProxy(app: Express, models: DB) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
         log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
-        const chain = await models.Chain.findOne({
+        const chain = await models.Community.findOne({
           where: { id: req.params.chain },
           include: models.ChainNode,
         });
@@ -56,7 +56,7 @@ function setupCosmosProxy(app: Express, models: DB) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
         log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
-        const chain = await models.Chain.findOne({
+        const chain = await models.Community.findOne({
           where: { id: req.params.chain },
           include: models.ChainNode,
         });

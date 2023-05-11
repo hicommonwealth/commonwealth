@@ -55,7 +55,7 @@ export async function putCommunities(
   const transaction = await sequelize.transaction();
   let error = '';
   try {
-    await models.Chain.create(community);
+    await models.Community.create(community);
     // if optionalValidation route is used, check for positive balance in address provided
     if (contract) {
       if (!contract.token_type || !contract.address || !admin_addresses) {

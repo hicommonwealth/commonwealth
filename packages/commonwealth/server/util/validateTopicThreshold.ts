@@ -19,7 +19,7 @@ const validateTopicThreshold = async (
       where: { id: topicId },
       include: [
         {
-          model: models.Chain,
+          model: models.Community,
           required: true,
           as: 'chain',
           include: [

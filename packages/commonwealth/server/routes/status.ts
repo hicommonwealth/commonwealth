@@ -2,7 +2,7 @@ import { ServerError } from 'common-common/src/errors';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
+import type { CommunityInstance } from 'server/models/communities';
 import type { ChainCategoryInstance } from 'server/models/chain_category';
 import type { ChainCategoryTypeInstance } from 'server/models/chain_category_type';
 import type { ChainNodeInstance } from 'server/models/chain_node';
@@ -28,7 +28,7 @@ type ThreadCountQueryData = {
 
 type StatusResp = {
   chainsWithSnapshots: {
-    chain: ChainInstance;
+    chain: CommunityInstance;
     snapshot: string[];
   }[];
   nodes: ChainNodeInstance[];
@@ -45,7 +45,7 @@ type StatusResp = {
     jwt: string;
     addresses: AddressInstance[];
     socialAccounts: SocialAccountInstance[];
-    selectedChain: ChainInstance;
+    selectedChain: CommunityInstance;
     isAdmin: boolean;
     disableRichText: boolean;
     lastVisited: string;
@@ -69,7 +69,7 @@ export const status = async (
       chainCategories,
       chainCategoryTypes,
     ] = await Promise.all([
-      models.Chain.findAll({
+      models.Community.findAll({
         where: { active: true },
         include: [
           {

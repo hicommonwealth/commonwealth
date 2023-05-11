@@ -19,7 +19,7 @@ const getEntityMeta = async (
     return next(new AppError(Errors.NeedChain));
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.query.chain },
   });
 

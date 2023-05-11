@@ -49,7 +49,7 @@ export default (
       foreignKey: 'abi_id',
       targetKey: 'id',
     });
-    models.Template.belongsTo(models.Chain, {
+    models.Template.belongsTo(models.Community, {
       foreignKey: 'created_for_community',
       targetKey: 'id',
     });

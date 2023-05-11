@@ -65,7 +65,7 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
           message: 'Cannot autocreate custom node',
         });
       }
-      const [chain, success] = await models.Chain.findOrCreate({
+      const [chain, success] = await models.Community.findOrCreate({
         where: { id: token.id },
         defaults: {
           active: true,

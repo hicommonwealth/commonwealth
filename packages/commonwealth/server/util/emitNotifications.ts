@@ -211,7 +211,7 @@ export default async function emitNotifications(
   }
 
   const erc20Tokens = (
-    await models.Chain.findAll({
+    await models.Community.findAll({
       where: {
         base: ChainBase.Ethereum,
         type: ChainType.Token,

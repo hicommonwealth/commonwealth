@@ -34,6 +34,7 @@ export default (
       chain_id: {
         type: dataTypes.STRING,
         allowNull: false,
+        field: 'community_id'
       },
       guild_id: { type: dataTypes.STRING, allowNull: true },
       snapshot_channel_id: { type: dataTypes.STRING, allowNull: true },
@@ -55,8 +56,8 @@ export default (
   );
 
   DiscordBotConfig.associate = (models) => {
-    models.DiscordBotConfig.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+    models.DiscordBotConfig.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
   };

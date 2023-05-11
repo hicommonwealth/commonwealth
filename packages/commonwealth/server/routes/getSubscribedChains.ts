@@ -12,7 +12,7 @@ export const getSubscribedChains = async (
   res: Response,
   next: NextFunction
 ) => {
-  const chains = await models.Chain.findAll({
+  const chains = await models.Community.findAll({
     where: { has_chain_events_listener: true },
   });
 

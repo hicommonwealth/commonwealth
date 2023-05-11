@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import models from 'server/database';
-import type { ChainInstance } from 'server/models/chain';
+import type { CommunityInstance } from 'server/models/communities';
 import {
   createDefaultCommunityRoles,
   createRole,
@@ -15,8 +15,8 @@ describe('findAllRoles and findOneRole tests', () => {
   let loggedInAddr, loggedInAddr2: string;
   let loggedInAddrId, loggedInAddrId2: number;
   const chain = 'ethereum';
-  let newChain: ChainInstance;
-  let newChain2: ChainInstance;
+  let newChain: CommunityInstance;
+  let newChain2: CommunityInstance;
 
   beforeEach(
     'reset server and create new address, user, and community roles ',
@@ -61,7 +61,7 @@ describe('findAllRoles and findOneRole tests', () => {
       const chainName = `newtestChain${Math.random()}`;
       const chainName2 = `newtestChain${Math.random()}`;
 
-      newChain = await models.Chain.create({
+      newChain = await models.Community.create({
         id: chainName,
         name: chainName,
         chain_node_id: 1,
@@ -75,7 +75,7 @@ describe('findAllRoles and findOneRole tests', () => {
         default_deny_permissions: BigInt(2048),
       });
 
-      newChain2 = await models.Chain.create({
+      newChain2 = await models.Community.create({
         id: chainName2,
         name: chainName2,
         chain_node_id: 1,

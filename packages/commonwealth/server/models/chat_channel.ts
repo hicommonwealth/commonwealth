@@ -54,6 +54,7 @@ export default (
           model: 'Chains',
           key: 'id',
         },
+        field:'community_id'
       },
       category: {
         type: Sequelize.STRING(255),
@@ -85,7 +86,7 @@ export default (
     models.ChatChannel.hasMany(models.ChatMessage, {
       foreignKey: 'chat_channel_id',
     });
-    models.ChatChannel.belongsTo(models.Chain, {
+    models.ChatChannel.belongsTo(models.Community, {
       onDelete: 'CASCADE',
     });
     models.ChatChannel.belongsTo(models.Rule, {

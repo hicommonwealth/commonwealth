@@ -41,7 +41,7 @@ export async function createAddressHelper(
     return next(new AppError(Errors.NeedWallet));
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.chain },
   });
 

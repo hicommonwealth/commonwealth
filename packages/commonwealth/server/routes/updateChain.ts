@@ -6,7 +6,7 @@ import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainAttributes } from '../models/chain';
+import type { CommunityAttributes } from '../models/communities';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findOneRole } from '../util/roles';
@@ -32,13 +32,13 @@ export const Errors = {
   InvalidDefaultPage: 'Default page does not exist',
 };
 
-type UpdateChainReq = ChainAttributes & {
+type UpdateChainReq = CommunityAttributes & {
   id: string;
   'featured_topics[]'?: string[];
   'snapshot[]'?: string[];
 };
 
-type UpdateChainResp = ChainAttributes & { snapshot: string[] };
+type UpdateChainResp = CommunityAttributes & { snapshot: string[] };
 
 const updateChain = async (
   models: DB,
@@ -51,7 +51,7 @@ const updateChain = async (
   if (req.body.id === ALL_CHAINS) return next(new AppError(Errors.ReservedId));
   if (req.body.network) return next(new AppError(Errors.CantChangeNetwork));
 
-  const chain = await models.Chain.findOne({ where: { id: req.body.id } });
+  const chain = await models.Community.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new AppError(Errors.NoChainFound));
   else {
     const userAddressIds = (await req.user.getAddresses())

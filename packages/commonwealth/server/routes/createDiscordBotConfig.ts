@@ -58,7 +58,7 @@ const createDiscordBotConfig = async (
         }
       );
 
-      await models.Chain.update(
+      await models.Community.update(
         { discord_config_id: existingConfig.id },
         { where: { id: chain_id } }
       );

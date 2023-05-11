@@ -3,7 +3,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
+import type { CommunityInstance } from '../models/communities';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -99,7 +99,7 @@ const setupAppRoutes = (
   app.get('/:scope', async (req, res) => {
     // Retrieve chain
     const scope = req.params.scope;
-    const chain = await models.Chain.findOne({ where: { id: scope } });
+    const chain = await models.Community.findOne({ where: { id: scope } });
     const title = chain ? chain.name : 'Commonwealth';
     const description = chain ? chain.description : '';
     const image = chain?.icon_url
@@ -155,7 +155,7 @@ const setupAppRoutes = (
       where: { id: threadId },
       include: [
         {
-          model: models.Chain,
+          model: models.Community,
           attributes: ['icon_url']
         },
         {
@@ -190,10 +190,10 @@ const setupAppRoutes = (
     scope: string,
     req,
     res,
-    chain?: ChainInstance
+    chain?: CommunityInstance
   ) => {
     // Retrieve title, description, and author from the database
-    chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
+    chain = chain || (await models.Community.findOne({ where: { id: scope } }));
 
     const title = chain ? chain.name : 'Commonwealth';
     const description = '';
@@ -224,7 +224,7 @@ const setupAppRoutes = (
 
   app.get('/:scope/proposal/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const chain = await models.Chain.findOne({ where: { id: scope } });
+    const chain = await models.Community.findOne({ where: { id: scope } });
 
     const proposalTypes = new Set([
       ChainNetwork.Sputnik,

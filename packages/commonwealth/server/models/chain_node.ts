@@ -56,7 +56,7 @@ export default (
   );
 
   ChainNode.associate = (models) => {
-    models.ChainNode.hasMany(models.Chain, { foreignKey: 'chain_node_id' });
+    models.ChainNode.hasMany(models.Community, { foreignKey: 'chain_node_id' });
   };
 
   return ChainNode;

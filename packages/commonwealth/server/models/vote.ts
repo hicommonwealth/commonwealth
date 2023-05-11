@@ -33,7 +33,7 @@ export default (
       option: { type: dataTypes.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
       author_chain: { type: Sequelize.STRING, allowNull: true },
-      chain_id: { type: Sequelize.STRING, allowNull: true },
+      chain_id: { type: Sequelize.STRING, allowNull: true, field: 'community_id' },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

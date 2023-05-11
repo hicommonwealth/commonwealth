@@ -10,7 +10,7 @@ AWS.config.update({
 
 // This should only be run once. Delete it as soon as you run it on prod.
 const staticFileToBucketMigrator = async () => {
-  const chainsWithStaticImages = await models.Chain.findAll({
+  const chainsWithStaticImages = await models.Community.findAll({
     where: {
       icon_url: {
         [Op.like]: '/static/img%',

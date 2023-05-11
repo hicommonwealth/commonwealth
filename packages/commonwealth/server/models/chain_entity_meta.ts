@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './communities';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -16,8 +16,8 @@ export type ChainEntityMetaAttributes = {
   type_id?: string;
   project_chain?: string;
 
-  Chain?: ChainAttributes;
-  ProjectChain?: ChainAttributes;
+  Chain?: CommunityAttributes;
+  ProjectChain?: CommunityAttributes;
   Thread?: ThreadAttributes;
 };
 
@@ -38,7 +38,7 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       ce_id: { type: dataTypes.INTEGER, allowNull: false, unique: true },
       title: { type: dataTypes.STRING, allowNull: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id'},
       author: { type: dataTypes.STRING, allowNull: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
       type_id: { type: dataTypes.STRING, allowNull: true },
@@ -54,15 +54,15 @@ export default (
   );
 
   ChainEntityMeta.associate = (models) => {
-    models.ChainEntityMeta.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.ChainEntityMeta.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.ChainEntityMeta.belongsTo(models.Thread, {
       foreignKey: 'thread_id',
       targetKey: 'id',
     });
-    models.ChainEntityMeta.belongsTo(models.Chain, {
+    models.ChainEntityMeta.belongsTo(models.Community, {
       foreignKey: 'project_chain',
       targetKey: 'id',
       as: 'ProjectChain',

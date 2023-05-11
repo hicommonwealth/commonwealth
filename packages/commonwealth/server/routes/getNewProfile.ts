@@ -53,7 +53,7 @@ const getNewProfile = async (
   const addresses = await profile.getAddresses({
     include: [
       {
-        model: models.Chain,
+        model: models.Community,
         required: true,
         where: { active: true },
       },
@@ -69,7 +69,7 @@ const getNewProfile = async (
     },
     include: [
       { model: models.Address, as: 'Address' },
-      { model: models.Chain, required: true, where: { active: true } },
+      { model: models.Community, required: true, where: { active: true } },
     ],
   });
 
@@ -81,7 +81,7 @@ const getNewProfile = async (
     },
     include: [
       { model: models.Address, as: 'Address' },
-      { model: models.Chain, required: true, where: { active: true } },
+      { model: models.Community, required: true, where: { active: true } },
     ],
   });
 
@@ -96,7 +96,7 @@ const getNewProfile = async (
     },
     include: [
       {
-        model: models.Chain,
+        model: models.Community,
         required: true,
         where: { active: true },
       },

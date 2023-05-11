@@ -8,7 +8,7 @@ export const getTokensFromLists = async (
 ) => {
   try {
     const tokens = await models.Token.findAll();
-    const chains = await models.Chain.findAll();
+    const chains = await models.Community.findAll();
     const chainNames = chains.map((chain) => chain.name.toLowerCase());
     const filteredTokens = tokens.filter(
       (token) => !chainNames.includes(token.name.toLowerCase())

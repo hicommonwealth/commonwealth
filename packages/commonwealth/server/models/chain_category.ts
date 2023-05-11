@@ -25,7 +25,8 @@ export default (
       chain_id: {
         type: dataTypes.STRING,
         allowNull: false,
-        references: { model: 'Chains', key: 'id' },
+        field: 'community_id',
+        references: { model: 'Communities', key: 'id' }
       },
       category_type_id: {
         type: dataTypes.INTEGER,
@@ -40,7 +41,7 @@ export default (
   );
 
   ChainCategory.associate = (models) => {
-    models.ChainCategory.belongsTo(models.Chain);
+    models.ChainCategory.belongsTo(models.Community);
     models.ChainCategory.belongsTo(models.ChainCategoryType, {
       foreignKey: 'category_type_id',
     });
