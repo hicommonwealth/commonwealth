@@ -18,6 +18,7 @@ import NodeInfo from 'models/NodeInfo';
 import ChainInfo from 'models/ChainInfo';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import { BalanceType } from '../../../../../common-common/src/types';
+import { set } from 'lodash';
 
 // Allows admins to create/update RPC endpoints for chains
 const RPCEndpointTask = () => {
@@ -80,7 +81,11 @@ const RPCEndpointTask = () => {
               setRpcEndpoint(e.target.value);
             }}
             inputValidationFn={(value: string) => {
-              if (!detectURL(value)) {
+              if (
+                !detectURL(value) &&
+                value.startsWith('wss://') === false &&
+                value.startsWith('ws://') === false
+              ) {
                 setRpcEndpointChainNodeValidated(false);
                 return ['failure', 'Not a valid URL'];
               }
@@ -125,7 +130,7 @@ const RPCEndpointTask = () => {
                               jwt: app.user.jwt,
                             }
                           );
-                          nodeId = res.data.id;
+                          nodeId = res.data.result.node_id;
                         }
 
                         await rpcEndpointChain.updateChainData({
@@ -136,10 +141,12 @@ const RPCEndpointTask = () => {
                         setRpcEndpoint('');
                         setRpcEndpointChain(null);
                         setRpcEndpointChainNode(null);
+                        setRpcEndpointChainNodeValidated(false);
+                        setBech32('');
+                        setRpcName('');
                         notifySuccess('RPC Endpoint Updated');
                       } catch (e) {
                         notifyError('Error updating RPC Endpoint');
-
                         console.error(e);
                       }
                     },
