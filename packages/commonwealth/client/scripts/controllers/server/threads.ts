@@ -665,9 +665,9 @@ class ThreadsController {
       finalThread.associatedReactions =
         thread.associatedReactions.length > 0
           ? thread.associatedReactions
-          : foundThread.associatedReactions;
+          : foundThread?.associatedReactions || [];
       finalThread.numberOfComments =
-        rawThread?.comments?.length || foundThread.numberOfComments || 0;
+        rawThread?.comments?.length || foundThread?.numberOfComments || 0;
       this._store.update(finalThread);
       if (foundThread) {
         this.numTotalThreads += 1;

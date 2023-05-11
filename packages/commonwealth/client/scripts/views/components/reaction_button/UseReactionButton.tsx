@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import TopicGateCheck from '../../../controllers/chain/ethereum/gatedTopic';
 import type ChainInfo from '../../../models/ChainInfo';
-import type Thread from '../../../models/Thread';
+import Thread from '../../../models/Thread';
 import app from '../../../state';
 
 export const useReactionButton = (thread: Thread, setReactors) => {
@@ -64,6 +64,15 @@ export const useReactionButton = (thread: Thread, setReactors) => {
         setReactedId(-1);
         setHasReacted(false);
         setIsLoading(false);
+
+        // update in store
+        const foundThread = app.threads.getById(thread.id);
+        if (foundThread) {
+          foundThread.associatedReactions = [
+            ...foundThread.associatedReactions,
+          ].filter((x) => x.address !== activeAddress);
+          app.threads.updateThreadInStore(foundThread);
+        }
       })
       .catch((e) => {
         console.log(e);
@@ -84,6 +93,21 @@ export const useReactionButton = (thread: Thread, setReactors) => {
         setReactors((oldReactors) => [...oldReactors, activeAddress]);
         setHasReacted(true);
         setIsLoading(false);
+
+        // update in store
+        const tempReaction = {
+          id: (reaction.id + '') as any,
+          type: reaction.reaction,
+          address: activeAddress,
+        };
+        const foundThread = app.threads.getById(thread.id);
+        if (foundThread) {
+          foundThread.associatedReactions = [
+            ...foundThread.associatedReactions,
+            tempReaction,
+          ];
+          app.threads.updateThreadInStore(foundThread);
+        }
       })
       .catch((e) => {
         console.log(e);
