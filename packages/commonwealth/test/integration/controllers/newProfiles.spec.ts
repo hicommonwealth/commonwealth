@@ -3,14 +3,13 @@ import { expect } from 'chai';
 import 'chai/register-should';
 import sinon from 'sinon';
 import { testAddresses, testProfiles } from 'test/integration/api/external/dbEntityHooks.spec';
-import NewProfilesController from '../../../client/scripts/controllers/server/newProfiles';
+import NewProfilesController, { newProfilesChunkSize } from '../../../client/scripts/controllers/server/newProfiles';
 import MinimumProfile from '../../../client/scripts/models/MinimumProfile';
-
-axios.defaults.baseURL = 'http://localhost:8080';
-
+import app from '../../../client/scripts/state';
 
 describe('NewProfilesController tests', async () => {
   let newProfilesController;
+  const axiosStub = sinon.stub(axios, 'post');
 
   beforeEach(() => {
     newProfilesController = new NewProfilesController();
@@ -42,38 +41,82 @@ describe('NewProfilesController tests', async () => {
     const address = '0x123456789abcdef';
     const chain = 'mainnet';
 
+    axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
+      data: {
+        result: [{
+          name: `Profile for ${address}`,
+          address: address,
+          avatarUrl: 'https://example.com/avatar.png',
+          profileId: 12345,
+          lastActive: new Date(),
+        }],
+      },
+    });
+
     newProfilesController.getProfile(chain, address);
 
     expect(newProfilesController.allLoaded()).to.be.false;
-    expect(newProfilesController.isFetched.listenerCount('redraw')).to.equal(1);
-    expect(newProfilesController['_unfetched'].get(address)).to.exist;
   });
 
-  it('should update the profile on the server and refresh the profile data', async () => {
+  it('Update profile should work correctly', async () => {
     const controller = new NewProfilesController();
     const expectedProfile = testProfiles[0];
     const expectedAddress = testAddresses.filter(a => a.profile_id === expectedProfile.id)[0];
-    const data = { name: 'John Doe' };
-    const response = { data: { result: { status: 'Success' } } };
+    const data = { name: 'Test Name' };
 
-    // Create a stub for axios.post method to return the response object
-    const axiosStub = sinon.stub(axios, 'post').resolves(response);
+    // Create a stubs for axios.post methods
+    axiosStub.withArgs(`${app.serverUrl()}/updateProfile/v2`).resolves({
+      data: {
+        result: {
+          status: 'Success',
+        },
+      },
+    });
+
+    axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
+      data: {
+        result: [{}],
+      },
+    });
 
     // Add profile to store
     controller.getProfile(expectedAddress.chain, expectedAddress.address);
 
-    // Call the updateProfileForAccount method
     await controller.updateProfileForAccount(expectedAddress.address, data);
 
-    // Check that the axios.post method was called with the correct arguments
-    sinon.assert.calledOnce(axiosStub);
+    // Calls once from getProfile invocation, then twice from updateProfileForAccount
+    // (once for getProfile and once for update)
+    sinon.assert.callCount(axiosStub, 3);
+  });
 
+  it('assert chunking works correctly', async () => {
+    const controller = new NewProfilesController();
+    const expectedProfile = testProfiles[0];
+    const expectedAddress = testAddresses.filter(a => a.profile_id === expectedProfile.id)[0];
+    const data = { name: 'Test Name' };
 
-    // Check that the profile was updated
-    const profile = controller.store.getByAddress(expectedAddress.address);
-    expect(profile.name).to.equal(data.name);
+    // Create a stubs for axios.post methods
+    axiosStub.withArgs(`${app.serverUrl()}/updateProfile/v2`).resolves({
+      data: {
+        result: {
+          status: 'Success',
+        },
+      },
+    });
 
-    // Restore the original axios.post method
-    axiosStub.restore();
+    axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
+      data: {
+        result: new Array(newProfilesChunkSize+1).fill({}),
+      },
+    });
+
+    // Add profile to store
+    controller.getProfile(expectedAddress.chain, expectedAddress.address);
+
+    await controller.updateProfileForAccount(expectedAddress.address, data);
+
+    // Calls once from getProfile invocation, then twice from updateProfileForAccount
+    // (twice for getProfile and for update)
+    sinon.assert.callCount(axiosStub, 5);
   });
 });

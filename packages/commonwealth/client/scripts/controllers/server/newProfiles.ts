@@ -6,6 +6,8 @@ import MinimumProfile from '../../models/MinimumProfile';
 import app from 'state';
 import { NewProfileStore } from 'stores';
 
+export const newProfilesChunkSize = 20000;
+
 class NewProfilesController {
   private _store: NewProfileStore = new NewProfileStore();
 
@@ -65,7 +67,7 @@ class NewProfilesController {
 
     // we can safely fit 20000 addresses in a call before we hit the 1mb limit
     // addresses*addressSize = 20000*42 = 840000bytes = 0.84mb. As a result chunk in groups of 20000
-    const profileChunks = _.chunk(profiles, 20000);
+    const profileChunks = _.chunk(profiles, newProfilesChunkSize);
 
     try {
       const responses = await Promise.all(profileChunks.map(async profileChunk => {
