@@ -6,7 +6,7 @@ const TermsPage = lazy(() => import('views/pages/terms'));
 const PrivacyPage = lazy(() => import('views/pages/privacy'));
 const ComponentsPage = lazy(() => import('views/pages/components'));
 
-const generalRoutes = () => [
+const GeneralRoutes = () => [
   <Route path="/terms" element={withLayout(TermsPage, {})} />,
   <Route path="/privacy" element={withLayout(PrivacyPage, {})} />,
   <Route
@@ -15,4 +15,4 @@ const generalRoutes = () => [
   />,
 ];
 
-export default generalRoutes;
+export default GeneralRoutes;

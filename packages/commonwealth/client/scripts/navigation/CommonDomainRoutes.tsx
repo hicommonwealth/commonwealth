@@ -79,7 +79,7 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const commonDomainsRoutes = () => [
+const CommonDomainRoutes = () => [
   <Route
     path="/"
     element={withLayout(LandingPage, {
@@ -523,4 +523,4 @@ const commonDomainsRoutes = () => [
   // LEGACY REDIRECTS END
 ];
 
-export default commonDomainsRoutes;
+export default CommonDomainRoutes;

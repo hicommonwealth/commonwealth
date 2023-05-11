@@ -5,18 +5,18 @@ import {
 } from 'react-router-dom';
 import React from 'react';
 
-import generalRoutes from './generalRoutes';
-import commonDomainRoutes from './commonDomainRoutes';
-import customDomainRoutes from 'navigation/customDomainRoutes';
+import GeneralRoutes from './GeneralRoutes';
+import CommonDomainRoutes from './CommonDomainRoutes';
+import CustomDomainRoutes from 'navigation/CustomDomainRoutes';
 import { PageNotFound } from 'views/pages/404';
 import { withLayout } from 'views/Layout';
 
-const router = (customDomain: string) =>
+const Router = (customDomain: string) =>
   createBrowserRouter(
     createRoutesFromElements([
-      ...generalRoutes(),
-      ...(customDomain ? customDomainRoutes() : commonDomainRoutes()),
+      ...GeneralRoutes(),
+      ...(customDomain ? CustomDomainRoutes() : CommonDomainRoutes()),
       <Route path="*" element={withLayout(PageNotFound, {})} />,
     ])
   );
-export default router;
+export default Router;
