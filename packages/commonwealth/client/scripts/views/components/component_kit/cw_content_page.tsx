@@ -74,7 +74,7 @@ export const CWContentPage = (props: ContentPageProps) => {
   const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
-  const createdOrEditedText = lastEdited ? 'edited' : 'published'
+  const createdOrEditedText = lastEdited ? 'Edited' : 'Published'
 
   React.useEffect(() => {
     const onResize = () => {
@@ -108,12 +108,12 @@ export const CWContentPage = (props: ContentPageProps) => {
           {typeof createdOrEditedDate === 'number' ||
             (moment.isMoment(createdOrEditedDate) && createdOrEditedDate.isValid() && (
               <CWText type="caption" className="header-text">
-                {createdOrEditedText} on {moment(createdOrEditedDate).format('l')}
+                • &nbsp; {createdOrEditedText} on {moment(createdOrEditedDate).format('l')} &nbsp; •
               </CWText>
             ))}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
-              {pluralize(viewCount, 'view')}
+            {pluralize(viewCount, 'view')}
             </CWText>
           )}
           {headerComponents}
