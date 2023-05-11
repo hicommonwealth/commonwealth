@@ -85,6 +85,14 @@ export const useReactionButton = (thread: Thread, setReactors) => {
     chainId: string,
     userAddress: string
   ) => {
+    const foundThread = app.threads.getById(thread.id);
+    if (
+      foundThread &&
+      foundThread.associatedReactions.find((x) => x.address === activeAddress)
+    ) {
+      return;
+    }
+
     setIsLoading(true);
     app.threadReactions
       .createOnThread(userAddress, thread, 'like')
@@ -100,7 +108,6 @@ export const useReactionButton = (thread: Thread, setReactors) => {
           type: reaction.reaction,
           address: activeAddress,
         };
-        const foundThread = app.threads.getById(thread.id);
         if (foundThread) {
           foundThread.associatedReactions = [
             ...foundThread.associatedReactions,
