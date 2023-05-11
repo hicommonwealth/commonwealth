@@ -31,7 +31,11 @@ import type {
   LoginActiveStep,
   LoginSidebarType,
 } from '../views/pages/login/types';
-import { getAddressFromWallet, loginToAxie, loginToNear } from '../lib/wallet';
+import {
+  getAddressFromWallet,
+  loginToAxie,
+  loginToNear,
+} from '../helpers/wallet';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
