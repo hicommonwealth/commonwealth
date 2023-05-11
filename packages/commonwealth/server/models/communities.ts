@@ -53,6 +53,7 @@ export type CommunityAttributes = {
   discord_config_id?: number;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
+  category?: any;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -150,6 +151,7 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      category: { type: dataTypes.JSONB, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },

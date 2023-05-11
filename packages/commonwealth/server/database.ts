@@ -6,8 +6,6 @@ import AddressFactory from './models/address';
 import AttachmentFactory from './models/attachment';
 import BanFactory from './models/ban';
 import ChainFactory from './models/communities';
-import ChainCategoryFactory from './models/chain_category';
-import ChainCategoryTypeFactory from './models/chain_category_type';
 import ChainEntityMetaFactory from './models/chain_entity_meta';
 import ChainNodeFactory from './models/chain_node';
 import ChatChannelFactory from './models/chat_channel';
@@ -80,8 +78,6 @@ const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
   Community: ChainFactory(sequelize, DataTypes),
-  ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
-  ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),

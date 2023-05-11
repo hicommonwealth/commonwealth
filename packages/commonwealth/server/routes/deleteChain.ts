@@ -158,11 +158,6 @@ const deleteChain = async (
         where: { chain: chain.id },
       });
 
-      await models.ChainCategory.destroy({
-        where: { chain_id: chain.id },
-        transaction: t,
-      });
-
       await models.CommunityBanner.destroy({
         where: { chain_id: chain.id },
         transaction: t,

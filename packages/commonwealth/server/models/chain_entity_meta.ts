@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './communities';
-import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ChainEntityMetaAttributes = {
@@ -12,13 +11,11 @@ export type ChainEntityMetaAttributes = {
   title?: string;
   chain: string;
   author?: string;
-  thread_id?: number;
   type_id?: string;
   project_chain?: string;
 
   Chain?: CommunityAttributes;
   ProjectChain?: CommunityAttributes;
-  Thread?: ThreadAttributes;
 };
 
 export type ChainEntityMetaInstance = ModelInstance<ChainEntityMetaAttributes>;
@@ -40,7 +37,6 @@ export default (
       title: { type: dataTypes.STRING, allowNull: true },
       chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id'},
       author: { type: dataTypes.STRING, allowNull: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: true },
       type_id: { type: dataTypes.STRING, allowNull: true },
       project_chain: { type: dataTypes.STRING, allowNull: true },
     },
@@ -58,10 +54,7 @@ export default (
       foreignKey: 'community_id',
       targetKey: 'id',
     });
-    models.ChainEntityMeta.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
+
     models.ChainEntityMeta.belongsTo(models.Community, {
       foreignKey: 'project_chain',
       targetKey: 'id',
