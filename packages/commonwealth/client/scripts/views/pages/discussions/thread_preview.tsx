@@ -46,8 +46,10 @@ type ThreadPreviewProps = {
 
 export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
-  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
-    useState(false);
+  const [
+    isUpdateProposalStatusModalOpen,
+    setIsUpdateProposalStatusModalOpen,
+  ] = useState(false);
 
   const [windowIsSmall, setWindowIsSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
@@ -214,7 +216,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   e.stopPropagation();
                 }}
               >
-                <SharePopover discussionLink={discussionLink}/>
+                <SharePopover discussionLink={discussionLink} />
               </div>
               <div
                 onClick={(e) => {
