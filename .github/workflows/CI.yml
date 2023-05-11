@@ -262,7 +262,7 @@ jobs:
       - name: Run following steps if any file(s) in the Cosmos folders change
         if: steps.changed-files-specific.outputs.all_changed_files
         run: |
-          echo "One or more files in the docs folder has changed."
+          echo "One or more Cosmos Devnet-related files has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
 
       - name: Init Db
