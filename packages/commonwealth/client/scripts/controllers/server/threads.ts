@@ -9,14 +9,14 @@ import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
 import { redraw } from 'mithrilInterop';
-import type { ChainEntity, MinimumProfile as Profile, Topic } from 'models';
-import {
-  Attachment,
-  NotificationSubscription,
-  Poll,
-  Thread,
-  ThreadStage,
-} from 'models';
+import Attachment from '../../models/Attachment';
+import type ChainEntity from '../../models/ChainEntity';
+import type MinimumProfile from '../../models/MinimumProfile';
+import NotificationSubscription from '../../models/NotificationSubscription';
+import Poll from '../../models/Poll';
+import Thread from '../../models/Thread';
+import type Topic from '../../models/Topic';
+import { ThreadStage } from '../../models/types';
 import moment from 'moment';
 
 import app from 'state';
@@ -58,7 +58,7 @@ would break the listingStore's careful chronology.
 */
 
 export interface VersionHistory {
-  author?: Profile;
+  author?: MinimumProfile;
   timestamp: moment.Moment;
   body: string;
 }
@@ -99,6 +99,7 @@ class ThreadsController {
   }
 
   public numVotingThreads: number;
+  public numTotalThreads: number;
   private _resetPagination: boolean;
 
   public resetPagination() {
@@ -301,6 +302,8 @@ class ThreadsController {
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
+      this.store.add(result);
+      this.numTotalThreads += 1;
       this._listingStore.add(result);
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
@@ -407,6 +410,7 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
+          this.numTotalThreads -= 1;
           redraw();
           resolve(result);
         })
@@ -445,7 +449,6 @@ class ThreadsController {
       },
       error: (err) => {
         console.log('Failed to update stage');
-        notifyError(`Failed to update stage: ${err.responseJSON.error}`);
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
@@ -666,6 +669,9 @@ class ThreadsController {
       finalThread.numberOfComments =
         rawThread?.comments?.length || foundThread.numberOfComments || 0;
       this._store.update(finalThread);
+      if (foundThread) {
+        this.numTotalThreads += 1;
+      }
 
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
       this.fetchReactionsCount([finalThread]);
@@ -796,7 +802,27 @@ class ThreadsController {
     return modeledThreads;
   }
 
-  public initialize(initialThreads = [], numVotingThreads, reset) {
+  public async getThreadCommunityId(threadId: string) {
+    try {
+      const response = await axios.get(`${app.serverUrl()}/getThreads`, {
+        params: {
+          ids: [threadId],
+        },
+      });
+
+      const thread = response['data']['result'][0];
+      return thread;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public initialize(
+    initialThreads = [],
+    numVotingThreads,
+    numTotalThreads,
+    reset
+  ) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -813,6 +839,7 @@ class ThreadsController {
       }
     }
     this.numVotingThreads = numVotingThreads;
+    this.numTotalThreads = numTotalThreads;
     this._initialized = true;
     this._resetPagination = true;
   }
@@ -822,6 +849,7 @@ class ThreadsController {
     this._resetPagination = true;
     this._store.clear();
     this._listingStore.clear();
+    this.numTotalThreads = 0;
   }
 }
 

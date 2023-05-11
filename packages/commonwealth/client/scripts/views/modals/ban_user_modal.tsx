@@ -3,14 +3,14 @@ import React from 'react';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
 
-import type { MinimumProfile as Profile } from 'models';
+import type MinimumProfile from '../../models/MinimumProfile';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
-  profile: Profile;
+  profile: MinimumProfile;
 };
 
 export const BanUserModal = (props: BanUserModalAttrs) => {

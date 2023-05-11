@@ -37,6 +37,8 @@ export const RABBITMQ_API_URI = (() => {
 
 export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
 
+export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
+
 // ----------------- ChainSubscriber specific var ------------------------
 export const CHAIN_SUBSCRIBER_INDEX = process.env.CHAIN_SUBSCRIBER_INDEX
   ? Number(process.env.CHAIN_SUBSCRIBER_INDEX)

@@ -2,7 +2,7 @@ import React from 'react';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
-import { ChainInfo } from 'models';
+import ChainInfo from '../../../models/ChainInfo';
 
 import app from 'state';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';

@@ -1,8 +1,6 @@
 import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
-
 import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';
@@ -14,7 +12,8 @@ import {
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { ThreadsFilterMenuItem } from './stages_menu';
-import type { Topic } from 'models';
+import type Topic from '../../../models/Topic';
+import { matchRoutes } from 'react-router-dom';
 
 type TopicsMenuProps = {
   featuredTopics: Array<Topic>;
@@ -35,6 +34,11 @@ export const TopicsMenu = ({
 }: TopicsMenuProps) => {
   const popoverProps = usePopover();
 
+  const matchesDiscussionsTopicRoute = matchRoutes(
+    [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
+    location
+  );
+
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
       {/* needs to be div instead of fragment so listener can work */}
@@ -50,9 +54,7 @@ export const TopicsMenu = ({
             <div className="threads-filter-menu-items">
               <ThreadsFilterMenuItem
                 label="All Topics"
-                isSelected={
-                  _DEPRECATED_getRoute() === `/${app.activeChainId()}` || !topic
-                }
+                isSelected={!topic}
                 onClick={() => {
                   onTopicChange('');
                 }}
@@ -60,11 +62,7 @@ export const TopicsMenu = ({
               <CWDivider />
               {featuredTopics.concat(otherTopics).map((t) => {
                 const active =
-                  _DEPRECATED_getRoute() ===
-                    `/${app.activeChainId()}/discussions/${encodeURI(
-                      t.name.toString().trim()
-                    )}` ||
-                  (topic && topic === t.name);
+                  matchesDiscussionsTopicRoute?.[0]?.params?.topic === t.name;
 
                 return (
                   <ThreadsFilterMenuItem

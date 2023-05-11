@@ -5,8 +5,8 @@ import { CompoundTypes } from 'chain-events/src/types';
 import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import type { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
-import type { ITXModalData } from 'models';
-import { ProposalModule } from 'models';
+import type { ITXModalData } from '../../../../models/interfaces';
+import ProposalModule from '../../../../models/ProposalModule';
 import type { IApp } from 'state';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
@@ -80,11 +80,7 @@ export default class CompoundGovernance extends ProposalModule<
 
   public async propose(args: CompoundProposalArgs): Promise<string> {
     const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(
-      this.app.wallets,
-      this.app.user.activeAccount,
-      this._api.Contract
-    );
+    const contract = await attachSigner(this.app.user.activeAccount, this._api.Contract);
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !calldatas || !description)

@@ -11,8 +11,10 @@ import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const NewContractPage = () => {
+  const navigate = useCommonNavigate();
   // Payable functions are not supported in this implementation
   if (!app.contracts || !app.chain) {
     return <PageLoading message="General Contract" />;
@@ -29,8 +31,8 @@ const NewContractPage = () => {
       <div className="NewContractPage">
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Contracts', path: `/contracts` },
-            { label: 'Add Contract and ABI', path: '' },
+            { label: 'Contracts', path: `/contracts`, navigate },
+            { label: 'Add Contract and ABI' },
           ]}
         />
         <CWText type="h3" className="header">

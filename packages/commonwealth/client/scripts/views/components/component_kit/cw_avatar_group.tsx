@@ -1,12 +1,12 @@
 import React from 'react';
 
-import type { MinimumProfile as Profile } from 'models';
+import type MinimumProfile from '../../../models/MinimumProfile';
 
 import 'components/component_kit/cw_avatar_group.scss';
 import { CWAvatar, CWJdenticon } from './cw_avatar';
 import { CWText } from './cw_text';
 
-export type ProfileWithAddress = Profile & {
+export type ProfileWithAddress = MinimumProfile & {
   Addresses: any;
 };
 

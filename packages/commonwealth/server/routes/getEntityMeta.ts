@@ -38,12 +38,6 @@ const getEntityMeta = async (
   }
   const entityMeta = await models.ChainEntityMeta.findAll({
     where: entityMetaWhereOptions,
-    include: [
-      {
-        model: models.Thread,
-        attributes: ['title'],
-      },
-    ],
   });
   return res.json({
     status: 'Success',

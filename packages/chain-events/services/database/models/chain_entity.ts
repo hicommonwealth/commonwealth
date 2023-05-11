@@ -57,7 +57,6 @@ export default (
       paranoid: false,
       indexes: [
         { fields: ['id'] },
-        { fields: ['thread_id'] },
         { fields: ['chain', 'type', 'id'], unique: true },
       ],
     }

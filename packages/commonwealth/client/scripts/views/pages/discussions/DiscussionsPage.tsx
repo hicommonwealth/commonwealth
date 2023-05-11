@@ -11,7 +11,7 @@ import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
 import { ThreadActionType } from '../../../../../shared/types';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ThreadStage } from 'models';
+import { ThreadStage } from 'models/types';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -19,6 +19,7 @@ type DiscussionsPageProps = {
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
+  const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
@@ -79,6 +80,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     };
   }, [threads]);
 
+  useEffect(() => {
+    setTotalThreads(app.threads.numTotalThreads);
+  }, [app.threads.numTotalThreads]);
+
   // setup initial threads
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -96,8 +101,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           let finalThreads = foundThreadsForChain;
 
           // get threads for current topic
-        const topicId = app.topics.getByName(topicName, chain)?.id;
-        if (topicId) {
+          const topicId = app.topics.getByName(topicName, chain)?.id;
+          if (topicId) {
             finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
           }
 
@@ -185,7 +190,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 <RecentThreadsHeader
                   topic={topicName}
                   stage={stageName}
-                  totalThreadCount={threads ? threads.length : 0}
+                  totalThreadCount={threads ? totalThreads : 0}
                 />
               );
             },

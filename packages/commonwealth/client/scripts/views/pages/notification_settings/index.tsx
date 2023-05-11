@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { AddressInfo, NotificationSubscription } from 'models';
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
+import AddressInfo from '../../../models/AddressInfo';
+import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';

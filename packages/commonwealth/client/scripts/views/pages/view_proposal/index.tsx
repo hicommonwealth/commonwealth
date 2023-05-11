@@ -10,7 +10,7 @@ import {
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
-import { AnyProposal } from 'models';
+import type { AnyProposal } from '../../../models/types';
 
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';

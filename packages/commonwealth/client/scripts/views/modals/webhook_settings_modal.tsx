@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import 'modals/webhook_settings_modal.scss';
 
-import type { Webhook } from 'models';
+import type Webhook from '../../models/Webhook';
 
 import { NotificationCategories } from 'common-common/src/types';
 import {

@@ -6,7 +6,7 @@ import {
   proposalSlugToClass,
   proposalSlugToFriendlyName,
 } from 'identifiers';
-import type { ProposalModule } from 'models';
+import type ProposalModule from '../../../models/ProposalModule';
 
 import 'pages/new_proposal/index.scss';
 

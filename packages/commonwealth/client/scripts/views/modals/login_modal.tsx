@@ -16,7 +16,9 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { signSessionWithAccount } from 'controllers/server/sessions';
 
 import { notifyError } from 'controllers/app/notifications';
-import type { Account, IWebWallet } from 'models';
+import WebWalletController from '../../controllers/app/web_wallets';
+import Account from '../../models/Account';
+import IWebWallet from '../../models/IWebWallet';
 
 import {
   breakpointFnValidator,
@@ -26,7 +28,7 @@ import type { ProfileRowProps } from '../components/component_kit/cw_profiles_li
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import { setDarkMode } from '../../helpers';
+import { setDarkMode } from '../../helpers/darkMode';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -64,7 +66,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
 
     if (this.currentlyInCommunityPage) {
       const chainbase = app.chain?.meta?.base;
-      this.wallets = app.wallets.availableWallets(chainbase);
+      this.wallets = WebWalletController.Instance.availableWallets(chainbase);
       this.sidebarType = 'communityWalletOptions';
       this.bodyType = 'walletList';
     } else {
@@ -78,7 +80,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
       ].filter((base) => allChains.find((chain) => chain.base === base));
       this.wallets = _.flatten(
         sortedChainBases.map((base) => {
-          return app.wallets.availableWallets(base);
+          return WebWalletController.Instance.availableWallets(base);
         })
       );
       this.sidebarType = 'connectWallet';

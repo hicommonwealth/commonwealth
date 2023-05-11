@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-globals */
 import $ from 'jquery';
-import { Poll, Thread, Vote } from 'models';
+import Poll from '../../models/Poll';
+import Vote from '../../models/Vote';
+import Thread from '../../models/Thread';
 import moment from 'moment';
 import app from 'state';
 import { redraw } from 'mithrilInterop';

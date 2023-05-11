@@ -4,9 +4,10 @@ import $ from 'jquery';
 import 'components/profile/index.scss';
 
 import app from 'state';
-import type { Thread } from 'models';
-import { AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import AddressInfo from '../../../models/AddressInfo';
+import NewProfile from '../../../models/NewProfile';
+import Thread from '../../../models/Thread';
 
 import ProfileHeader from './profile_header';
 import type { CommentWithAssociatedThread } from './profile_activity';
@@ -34,7 +35,7 @@ const ProfileComponent = (props: ProfileProps) => {
   );
   const [error, setError] = React.useState<ProfileError>(ProfileError.None);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [profile, setProfile] = React.useState<Profile>();
+  const [profile, setProfile] = React.useState<NewProfile>();
   const [threads, setThreads] = React.useState<Thread[]>([]);
   const [isOwner, setIsOwner] = React.useState<boolean>();
 
@@ -46,7 +47,7 @@ const ProfileComponent = (props: ProfileProps) => {
         jwt: app.user.jwt,
       });
 
-      setProfile(new Profile(result.profile));
+      setProfile(new NewProfile(result.profile));
       setThreads(result.threads.map((t) => app.threads.modelFromServer(t)));
       const responseComments = result.comments.map((c) =>
         modelCommentFromServer(c)
