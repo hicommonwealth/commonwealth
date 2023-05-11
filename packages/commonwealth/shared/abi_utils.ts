@@ -27,6 +27,8 @@ export function parseAbiItemsFromABI(
   }
 }
 
+// just to make a non-cosmos diff
+
 export function parseFunctionsFromABI(
   abi: Array<Record<string, unknown>>
 ): AbiItem[] {

@@ -38,6 +38,7 @@ export default class EthereumAccount extends Account {
           console.error('Did not successfully initialize account with chain');
         }
       });
+      // just to make a non-cosmos diff
     } else {
       this._Chain = ChainInfo;
     }
