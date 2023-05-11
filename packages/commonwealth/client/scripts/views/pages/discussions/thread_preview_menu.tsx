@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import React from 'react';
 
 import { redraw } from 'mithrilInterop';
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 import app from 'state';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';

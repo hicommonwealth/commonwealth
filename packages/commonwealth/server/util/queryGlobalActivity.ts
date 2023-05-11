@@ -1,4 +1,4 @@
-import type { MinimumProfile as Profile } from 'models';
+import type MinimumProfile from '../../client/scripts/models/MinimumProfile';
 import type { DB } from '../models';
 
 export type GlobalActivity = Array<{
@@ -9,7 +9,7 @@ export type GlobalActivity = Array<{
   reaction_count: string;
   thread_id: string;
   view_count: number;
-  commenters: Profile[];
+  commenters: MinimumProfile[];
 }>;
 
 export default async function queryGlobalActivity(

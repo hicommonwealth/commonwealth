@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { AddressInfo, ChainInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
 
 import app from 'state';
+import AddressInfo from '../../../models/AddressInfo';
+import ChainInfo from '../../../models/ChainInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
@@ -96,6 +97,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
           hideFormatting={true}
           doc={content}
           searchTerm={searchTerm}
+          containerClass="SearchQuillRenderer"
         />
       </CWText>
     </div>
@@ -128,6 +130,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
           hideFormatting={true}
           doc={content}
           searchTerm={searchTerm}
+          containerClass="SearchQuillRenderer"
         />
       </CWText>
     </div>

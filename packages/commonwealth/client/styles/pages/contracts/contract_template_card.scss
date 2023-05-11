@@ -29,4 +29,20 @@
       }
     }
   }
+
+  .enabledby-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .text-group {
+      display: flex;
+      gap: 4px;
+    }
+  }
+}
+
+.user-display-name {
+  @include caption;
+  font-weight: 500;
 }

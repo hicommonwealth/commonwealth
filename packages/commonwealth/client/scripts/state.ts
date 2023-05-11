@@ -2,10 +2,6 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
 import { EventEmitter } from 'events';
-import type { IChainAdapter } from 'models';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
-import type { ChainCategoryAttributes } from 'server/models/chain_category';
-import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 import { ChainStore, NodeStore } from 'stores';
 import RecentActivityController from './controllers/app/recent_activity';
 import WebWalletController from './controllers/app/web_wallets';
@@ -13,8 +9,8 @@ import SnapshotController from './controllers/chain/snapshot';
 import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
-import PollsController from './controllers/server/polls';
 import NewProfilesController from './controllers/server/newProfiles';
+import PollsController from './controllers/server/polls';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
 import ThreadReactionsController from './controllers/server/reactions/ThreadReactionsController';
@@ -25,10 +21,15 @@ import ThreadsController from './controllers/server/threads';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
 import TopicsController from './controllers/server/topics';
 import { UserController } from './controllers/server/user';
+import ChainInfo from './models/ChainInfo';
+import type IChainAdapter from './models/IChainAdapter';
+import NodeInfo from './models/NodeInfo';
+import NotificationCategory from './models/NotificationCategory';
 import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
+import { ChainCategoryType } from 'common-common/src/types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -92,7 +93,6 @@ export interface IApp {
   sessions: SessionsController;
 
   // Web3
-  wallets: WebWalletController;
   snapshot: SnapshotController;
 
   mobileMenu: MobileMenuName;
@@ -110,9 +110,8 @@ export interface IApp {
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    chainCategories?: ChainCategoryAttributes[];
-    chainCategoryTypes?: ChainCategoryTypeAttributes[];
     evmTestEnv?: string;
+    chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
@@ -186,7 +185,6 @@ const app: IApp = {
 
   // Web3
   snapshot: new SnapshotController(),
-  wallets: new WebWalletController(),
 
   // User
   user,
@@ -277,12 +275,11 @@ export async function initAppState(
           });
 
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories = data.result.notificationCategories.map(
-          (json) => NotificationCategory.fromJSON(json)
-        );
-        app.config.chainCategories = data.result.chainCategories;
-        app.config.chainCategoryTypes = data.result.chainCategoryTypes;
-
+        app.config.notificationCategories =
+          data.result.notificationCategories.map((json) =>
+            NotificationCategory.fromJSON(json)
+          );
+        app.config.chainCategoryMap = data.result.chainCategoryMap;
         // add recentActivity
         const { recentThreads } = data.result;
         recentThreads.forEach(({ chain, count }) => {

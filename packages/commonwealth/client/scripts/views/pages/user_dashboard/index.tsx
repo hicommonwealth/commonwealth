@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 
 import 'pages/user_dashboard/index.scss';
 
 import app, { LoginState } from 'state';
 import { notifyInfo } from 'controllers/app/notifications';
-import { DashboardActivityNotification } from 'models';
-import { useIsomorphicLayoutEffect } from 'usehooks-ts';
+import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import Sublayout from 'views/sublayout';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';

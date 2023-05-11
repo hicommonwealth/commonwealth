@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 import app from 'state';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { CWText } from 'views/components/component_kit/cw_text';

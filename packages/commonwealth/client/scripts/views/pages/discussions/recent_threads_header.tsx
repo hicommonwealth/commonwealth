@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
-import type { Topic } from 'models';
-import { ThreadStage } from 'models';
+import type Topic from '../../../models/Topic';
+import { ThreadStage } from '../../../models/types';
 
 import 'pages/discussions/recent_threads_header.scss';
 
