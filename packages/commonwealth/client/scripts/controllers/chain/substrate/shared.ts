@@ -38,7 +38,7 @@ import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import type ChainInfo from '../../../models/ChainInfo';
-import type { IChainModule, ITXData, ITXModalData } from '../../../models/index';
+import type { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
 import type NodeInfo from '../../../models/NodeInfo';
 import { TransactionStatus } from '../../../models/types';
 import { chainToEventNetwork } from '../../server/chain_entities';

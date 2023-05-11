@@ -2,8 +2,8 @@ import React from 'react';
 
 import 'components/comments/comments_tree.scss';
 
-import type { Comment as CommentType } from 'models';
-import { Thread } from 'models';
+import type { Comment as CommentType } from '../../../models/Comment';
+import Thread from '../../../models/Thread';
 
 import app from 'state';
 import { CWValidationText } from '../component_kit/cw_validation_text';

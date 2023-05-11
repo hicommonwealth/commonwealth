@@ -1,7 +1,7 @@
 import React from 'react';
 
 import 'components/comments/edit_comment.scss';
-import type { Comment } from 'models';
+import type Comment from '../../../models/Comment';
 
 import app from 'state';
 import { ContentType } from 'types';

@@ -13,7 +13,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { ThreadsFilterMenuItem } from './stages_menu';
 import { useCommonNavigate } from 'navigation/helpers';
-import type { Topic } from 'models';
+import type Topic from '../../../models/Topic';
 import { matchRoutes } from 'react-router-dom';
 
 type TopicsMenuProps = {

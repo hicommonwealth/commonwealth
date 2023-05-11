@@ -17,6 +17,12 @@ import WalletConnectWebWalletController from './webWallets/walletconnect_web_wal
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
+  private static _instance: WebWalletController;
+
+  public static get Instance(): WebWalletController{
+    return this._instance || (this._instance = new this());
+  }
+
   public get wallets() {
     return this._wallets;
   }

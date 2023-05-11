@@ -7,7 +7,7 @@ import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { weiToTokens, getDecimals } from 'helpers';
 import type { DeltaStatic } from 'quill';
-import { Thread } from 'models';
+import Thread from '../../../models/Thread';
 
 import app from 'state';
 import { ContentType } from 'types';
