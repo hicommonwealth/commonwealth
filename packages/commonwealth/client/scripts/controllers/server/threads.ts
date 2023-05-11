@@ -446,7 +446,6 @@ class ThreadsController {
       },
       error: (err) => {
         console.log('Failed to update stage');
-        notifyError(`Failed to update stage: ${err.responseJSON.error}`);
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
