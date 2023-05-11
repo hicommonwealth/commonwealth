@@ -31,10 +31,6 @@ export const CommentsTree = ({
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState(null);
 
-  // Jump to the comment indicated in the URL upon page load. Avoid
-  // using _DEPRECATED_getSearchParams('comment') because it may return stale
-  // results from a previous page if route transition hasn't finished
-
   useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
       setHighlightedComment(true);

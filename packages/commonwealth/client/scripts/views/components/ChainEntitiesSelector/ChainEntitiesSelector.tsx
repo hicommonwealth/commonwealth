@@ -7,10 +7,7 @@ import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { ChainEntitiesSelectorItem } from 'views/components/ChainEntitiesSelector';
-import {
-  filterChainEntities,
-  sortChainEntities,
-} from 'views/components/ChainEntitiesSelector/utils';
+import { filterChainEntities } from 'views/components/ChainEntitiesSelector/utils';
 
 type ChainEntitiesSelectorProps = {
   proposalsToSet: Array<Pick<ChainEntity, 'typeId'>>;
@@ -49,7 +46,7 @@ export const ChainEntitiesSelector = ({
   const entities = useMemo(
     () =>
       chainEntities
-        .sort(sortChainEntities)
+        .sort((a, b) => b.id - a.id)
         .filter((el) => filterChainEntities(el, searchTerm)),
     [chainEntities, searchTerm]
   );
