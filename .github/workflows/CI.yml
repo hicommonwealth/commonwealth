@@ -284,6 +284,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
       - name: Get changed chain-events files
         id: changed-files-chain-events
         uses: tj-actions/changed-files@v5
@@ -299,24 +314,6 @@ jobs:
         run: |
           echo "One or more chain-events-related files has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-chain-events.outputs.all_changed_files }}"
-
-      - name: Setup Node
-        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Cache dependencies
-        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependencies
-        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
-        run: yarn --ignore-engines
 
       - name: Init CE Db
         if: steps.changed-files-chain-events.outputs.any_changed == 'true'
