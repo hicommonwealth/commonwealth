@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'sublayout_header.scss';
+import 'SublayoutHeader.scss';
 
 import app from '../state';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';

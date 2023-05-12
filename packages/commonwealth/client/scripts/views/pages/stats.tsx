@@ -6,7 +6,7 @@ import 'pages/stats.scss';
 import app from 'state';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 
 type Batchable = {
