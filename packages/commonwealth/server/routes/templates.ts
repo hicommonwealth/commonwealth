@@ -15,10 +15,16 @@ type CreateTemplateAndMetadataReq = {
   template: string;
   description: string;
   chain_id: string;
+  created_by: string;
+  created_for_community: string;
 };
 
 type CreateTemplateAndMetadataResp = {
   template_id: number;
+};
+
+type DeleteTemplateAndMetadataReq = {
+  template_id: string;
 };
 
 export async function createTemplate(
@@ -26,7 +32,15 @@ export async function createTemplate(
   req: TypedRequestBody<CreateTemplateAndMetadataReq>,
   res: TypedResponse<CreateTemplateAndMetadataResp>
 ) {
-  const { contract_id, name, template, chain_id, description } = req.body;
+  const {
+    contract_id,
+    name,
+    template,
+    chain_id,
+    description,
+    created_by,
+    created_for_community,
+  } = req.body;
 
   const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
   if (!isAdmin) throw new AppError('Must be admin');
@@ -63,6 +77,8 @@ export async function createTemplate(
       name,
       template,
       description,
+      created_by,
+      created_for_community,
     });
     return success(res, { template_id: newTemplate.id });
   } catch (e) {
@@ -118,8 +134,49 @@ export async function getTemplates(
         abi_id,
       },
     });
-    return success(res, { templates });
+
+    const templatePromises = templates.map(async (template) => {
+      const inUse = await models.CommunityContractTemplate.findOne({
+        where: {
+          template_id: template.id,
+        },
+      });
+
+      return {
+        ...template.toJSON(),
+        inUse: !!inUse,
+      };
+    });
+
+    const templatesWithInUse = await Promise.all(templatePromises);
+    return success(res, { templates: templatesWithInUse });
   } catch (e) {
     throw new AppError('Error getting templates');
+  }
+}
+
+export async function deleteTemplate(
+  models: DB,
+  req: TypedRequestBody<DeleteTemplateAndMetadataReq>,
+  res: TypedResponse<{ message: string }>
+) {
+  const { template_id } = req.body;
+
+  const template = await models.Template.findOne({
+    where: {
+      id: template_id,
+    },
+  });
+
+  if (!template) {
+    throw new AppError('Template does not exist');
+  }
+
+  try {
+    await template.destroy();
+    return success(res, { message: 'Template deleted' });
+  } catch (e) {
+    console.log(e);
+    throw new AppError('Error deleting template');
   }
 }
