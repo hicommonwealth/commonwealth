@@ -153,6 +153,11 @@ class SubstrateAccounts
 
   constructor(app: IApp) {
     this._app = app;
+
+    import('@polkadot/keyring')
+    .then((polkadot) => {
+      this.polkadot = polkadot;
+    })
   }
 
   public isZero(address: string) {
@@ -199,7 +204,6 @@ class SubstrateAccounts
   }
 
   public async init(ChainInfo: SubstrateChain): Promise<void> {
-    this.polkadot = await import('@polkadot/keyring');
     this._Chain = ChainInfo;
     this._initialized = true;
   }
