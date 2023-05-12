@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import 'pages/discussions/index.scss';
 
 import app from '../../../state';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';

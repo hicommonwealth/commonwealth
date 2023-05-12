@@ -270,7 +270,7 @@ const createComment = async (
   const cwUrl =
     typeof thread === 'string'
       ? getThreadUrlWithoutObject(finalComment.chain, thread, finalComment)
-      : getThreadUrl(thread, finalComment);
+      : getThreadUrl(thread, finalComment?.id);
   const root_title = typeof thread === 'string' ? '' : thread.title || '';
 
   // auto-subscribe comment author to reactions & child comments
