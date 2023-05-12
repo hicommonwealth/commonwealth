@@ -133,11 +133,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     chain: chain_id,
   };
 
-  const args = comment_id
-    ? [root_type, pseudoProposal, { id: comment_id }]
-    : [root_type, pseudoProposal];
-
-  const path = (getThreadUrl as any)(...args);
+  const path = getThreadUrl(pseudoProposal, comment_id);
 
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)
@@ -259,14 +255,10 @@ export const getBatchNotificationFields = (
     chain: chain_id,
   };
 
-  const args = comment_id
-    ? [pseudoProposal, { id: comment_id }]
-    : [pseudoProposal, undefined];
-
   const path =
     category === NotificationCategories.NewThread
-      ? (getCommunityUrl as any)(chain_id)
-      : (getThreadUrl as any)(...args);
+      ? getCommunityUrl(chain_id)
+      : getThreadUrl(pseudoProposal, comment_id);
 
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)
