@@ -1,4 +1,3 @@
-import type { ClassComponent } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
@@ -8,6 +7,7 @@ import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
 import { render } from 'helpers/DEPRECATED_ReactRender';
+import { NavigateOptions, To } from 'react-router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -83,7 +83,11 @@ export function link(
   selector: string,
   target: string,
   children,
-  setRoute: ClassComponent['setRoute'],
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string
+  ) => void,
   extraAttrs?: object,
   saveScrollPositionAs?: string,
   beforeRouteSet?: () => void,
