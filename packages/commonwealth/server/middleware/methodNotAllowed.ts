@@ -20,7 +20,7 @@ export const methodNotAllowedMiddleware = () => {
       res.set('Allow', methods ? methods.join(', ') : '');
       return res.status(405).json({ result: 'Method Not Allowed', status: 405 });
     } else {
-      next();
+      return res.status(404).json({ result: 'Not Found', status: 404 });
     }
   };
 }
