@@ -304,10 +304,10 @@ jobs:
         uses: tj-actions/changed-files@v5
         with:
           files: |
-            'packages/chain-events/**/*'
-            'packages/common-common/src/eth/**/*'
-            'packages/common-common/src/rabbitmq/**/*'
-            'packages/common-common/src/serviceConsumer.ts'
+            packages/chain-events/**/*
+            packages/common-common/src/eth/**/*
+            packages/common-common/src/rabbitmq/**/*
+            packages/common-common/src/serviceConsumer.ts
 
       - name: Run following steps if any file(s) in the chain-events folders change
         if: steps.changed-files-chain-events.outputs.all_changed_files
@@ -347,9 +347,17 @@ jobs:
       - name: Display Ganache logs
         if: always() # Ensure this step runs even if previous steps failed
         run: |
-          cat ganacheLog.log
+          if [ -f ganacheLog.log ]; then
+            cat ganacheLog.log
+          else
+            echo "ganacheLog.log does not exist."
+          fi
 
       - name: Display SDK logs
         if: always() # Ensure this step runs even if previous steps failed
         run: |
-          cat sdkLog.log
+          if [ -f sdkLog.log ]; then
+            cat sdkLog.log
+          else
+            echo "sdkLog.log does not exist."
+          fi
