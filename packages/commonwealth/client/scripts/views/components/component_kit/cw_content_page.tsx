@@ -65,7 +65,6 @@ export const CWContentPage = (props: ContentPageProps) => {
     viewCount,
   } = props;
 
-  // @REACT TODO: this needs to be aware of which view to default to
   const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
     isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
       ? 'tabsView'
