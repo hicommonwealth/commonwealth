@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MagicUrl from 'quill-magic-url';
 import ImageUploader from 'quill-image-uploader';
-import './twitter_embed';
 
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
