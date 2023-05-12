@@ -19,6 +19,7 @@ import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
 import { ProposalSelector } from '../components/cosmos_proposal_selector';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { ChainBase } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -49,7 +50,20 @@ export const UpdateProposalStatusModal = ({
   onModalClose,
   thread,
 }: UpdateProposalStatusModalProps) => {
-  const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
+  const { customStages } = app.chain.meta;
+  const stages = !customStages
+    ? [
+        ThreadStage.Discussion,
+        ThreadStage.ProposalInReview,
+        ThreadStage.Voting,
+        ThreadStage.Passed,
+        ThreadStage.Failed,
+      ]
+    : parseCustomStages(customStages);
+
+  const [tempStage, setTempStage] = useState(
+    stages.includes(thread.stage) ? thread.stage : null
+  );
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
   >(getInitialSnapshots(thread));
@@ -60,21 +74,6 @@ export const UpdateProposalStatusModal = ({
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
   >(getInitialCosmosProposals(thread));
 
-  if (!app.chain?.meta) {
-    return;
-  }
-
-  const { customStages } = app.chain.meta;
-
-  const stages = !customStages
-    ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
-      ]
-    : parseCustomStages(customStages);
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
   const showChainEvents =
@@ -88,12 +87,8 @@ export const UpdateProposalStatusModal = ({
         stage: tempStage,
       });
     } catch (err) {
-      console.log('Failed to update stage');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? `${err.responseJSON.error}. Make sure one is selected.`
-          : 'Failed to update stage, make sure one is selected'
-      );
+      notifyError(`Failed to update stage. Make sure one is selected.`);
+      throw new Error('Failed to update stage');
     }
 
     let links: Link[] = thread.links;
@@ -267,7 +262,7 @@ export const UpdateProposalStatusModal = ({
               ? { value: tempStage, label: threadStageToLabel(tempStage) }
               : null
           }
-          placeholder="Select the stage"
+          placeholder="Select a stage"
           isSearchable={false}
           options={stages.map((stage) => ({
             value: stage,
