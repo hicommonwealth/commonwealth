@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import 'components/comments/comment.scss';
+import 'components/Comments/Comment.scss';
 import moment from 'moment';
 
 import app from 'state';
 import { ContentType } from 'types';
-import { ChainType } from 'common-common/src/types';
 import { notifyError } from '../../../controllers/app/notifications';
-import type Account from '../../../models/Account';
 import type Comment from '../../../models/Comment';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -15,40 +13,12 @@ import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
 import { SharePopover } from '../share_popover';
-import { User } from '../user/user';
-import { EditComment } from './edit_comment';
+import { EditComment } from './EditComment';
 import { clearEditingLocalStorage } from './helpers';
-import { AnonymousUser } from '../user/anonymous_user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-
-type CommentAuthorProps = {
-  comment: Comment<any>;
-};
-
-const CommentAuthor = (props: CommentAuthorProps) => {
-  const { comment } = props;
-
-  // Check for accounts on forums that originally signed up on a different base chain,
-  // Render them as anonymous as the forum is unable to support them.
-  if (app.chain.meta.type === ChainType.Offchain) {
-    if (
-      comment.authorChain !== app.chain.id &&
-      comment.authorChain !== app.chain.base
-    ) {
-      return <AnonymousUser distinguishingKey={comment.author} />;
-    }
-  }
-
-  const author: Account = app.chain.accounts.get(comment.author);
-
-  return comment.deleted ? (
-    <span>[deleted]</span>
-  ) : (
-    <User avatarSize={24} user={author} popover linkify />
-  );
-};
+import CommentAuthor from 'views/components/Comments/CommentAuthor';
 
 type CommentProps = {
   comment: Comment<any>;
@@ -61,22 +31,18 @@ type CommentProps = {
   updatedCommentsCallback?: () => void;
 };
 
-export const CommentComponent = (props: CommentProps) => {
-  const {
-    comment,
-    handleIsReplying,
-    isLast,
-    isLocked,
-    setIsGloballyEditing,
-    threadLevel,
-    updatedCommentsCallback,
-  } = props;
-
-  const [isEditingComment, setIsEditingComment] =
-    React.useState<boolean>(false);
-  const [shouldRestoreEdits, setShouldRestoreEdits] =
-    React.useState<boolean>(false);
-  const [savedEdits, setSavedEdits] = React.useState<string>('');
+export const CommentComponent = ({
+  comment,
+  handleIsReplying,
+  isLast,
+  isLocked,
+  setIsGloballyEditing,
+  threadLevel,
+  updatedCommentsCallback,
+}: CommentProps) => {
+  const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
+  const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>(false);
+  const [savedEdits, setSavedEdits] = useState<string>('');
 
   const { isLoggedIn } = useUserLoggedIn();
 
@@ -116,7 +82,7 @@ export const CommentComponent = (props: CommentProps) => {
               updatedCommentsCallback();
             } catch (e) {
               console.log(e);
-              notifyError('Failed to delete comment.')
+              notifyError('Failed to delete comment.');
             }
           },
         },
@@ -127,32 +93,6 @@ export const CommentComponent = (props: CommentProps) => {
       ],
     });
   };
-
-  // if (!this.verificationChecked) {
-  //   this.verificationChecked = true;
-  //   try {
-  //     const session = JSON.parse(comment.canvasSession);
-  //     const action = JSON.parse(comment.canvasAction);
-  //     const actionSignerAddress = session?.payload?.sessionAddress;
-  //     if (
-  //       !comment.canvasSession ||
-  //       !comment.canvasAction ||
-  //       !actionSignerAddress
-  //     )
-  //       return;
-  //     verify({ session })
-  //       .then((result) => (this.verifiedSession = true))
-  //       .catch((err) => console.log('Could not verify session'))
-  //       .finally(() => m.redraw());
-  //     verify({ action, actionSignerAddress })
-  //       .then((result) => (this.verifiedAction = true))
-  //       .catch((err) => console.log('Could not verify action'))
-  //       .finally(() => m.redraw());
-  //   } catch (err) {
-  //     console.log('Unexpected error while verifying action/session');
-  //     return;
-  //   }
-  // }
 
   return (
     <div className={`Comment comment-${comment.id}`}>
@@ -168,10 +108,6 @@ export const CommentComponent = (props: CommentProps) => {
       <div className="comment-body">
         <div className="comment-header">
           <CommentAuthor comment={comment} />
-          {/* don't need this distinction yet since we aren't showing "edited at" */}
-          {/* <CWText type="caption" className="published-text">
-              published on
-            </CWText> */}
           <CWText
             key={comment.id}
             type="caption"
@@ -211,16 +147,6 @@ export const CommentComponent = (props: CommentProps) => {
                       </CWText>
                     </div>
                   )}
-                  {/* this.verifiedAction && this.verifiedSession && (
-              <CWText
-                type="caption"
-                fontWeight="medium"
-                className="verification-icon"
-                onclick={() => showCanvasVerifyDataModal(comment)}
-              >
-                <CWIcon iconName="checkCircle" iconSize="xs" />
-              </CWText>
-            ) */}
                 </div>
                 <div className="menu-buttons-right">
                   <SharePopover commentId={comment.id} />
