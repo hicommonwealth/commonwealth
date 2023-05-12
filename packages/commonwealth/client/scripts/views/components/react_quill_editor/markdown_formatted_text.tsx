@@ -19,7 +19,6 @@ import removeMarkdown from 'markdown-to-text';
 import { QuillRendererProps } from './quill_renderer';
 import axios from 'axios';
 import { loadScript } from 'helpers';
-import { memoize } from 'underscore';
 import { debounce } from 'lodash';
 
 const fetchTwitterEmbedInfo = async (url: string) => {
