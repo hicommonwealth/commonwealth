@@ -1,6 +1,6 @@
 import 'components/reaction_button/comment_reaction_button.scss';
 
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 import React, { useState } from 'react';
 
 import app from 'state';

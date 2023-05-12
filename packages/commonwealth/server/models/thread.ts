@@ -3,7 +3,6 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
-import type { ChainEntityMetaAttributes } from './chain_entity_meta';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -53,7 +52,6 @@ export type ThreadAttributes = {
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
   Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
-  ChainEntityMeta?: ChainEntityMetaAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
 };
@@ -167,11 +165,6 @@ export default (
       as: 'reactions',
     });
     models.Thread.hasMany(models.Collaboration);
-    models.Thread.hasMany(models.ChainEntityMeta, {
-      foreignKey: 'thread_id',
-      constraints: false,
-      as: 'chain_entity_meta',
-    });
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });

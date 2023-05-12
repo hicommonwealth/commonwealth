@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-
-import type { Notification } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
+import type Notification from '../../../models/Notification';
 
 import {
   ChainEventNotificationRow,

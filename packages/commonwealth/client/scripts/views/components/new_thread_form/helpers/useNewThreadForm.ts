@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { DeltaStatic } from 'quill';
 
-import type { Topic } from 'models';
-import { ThreadKind } from 'models';
+import type Topic from '../../../../models/Topic';
+import { ThreadKind } from '../../../../models/types';
 import { getTextFromDelta } from '../../react_quill_editor';
 import { useDraft } from 'hooks/useDraft';
 

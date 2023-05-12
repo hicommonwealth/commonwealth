@@ -6,13 +6,15 @@ import { ChainBase } from 'common-common/src/types';
 import CreateContractTemplateForm from './create_contract_template_form';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const NewContractTemplatePage = () => {
+  const navigate = useCommonNavigate();
   if (!app.contracts || !app.chain) {
     return <PageLoading message="Contract Template" />;
   }

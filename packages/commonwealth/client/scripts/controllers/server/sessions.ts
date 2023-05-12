@@ -1,5 +1,3 @@
-import { IWebWallet, Account } from 'models';
-// import { sessionSigninModal } from 'views/modals/session_signin_modal';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
@@ -11,6 +9,8 @@ import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase } from '../../../../../common-common/src/types';
+import Account from '../../models/Account';
+import IWebWallet from '../../models/IWebWallet';
 import {
   ISessionController,
   EthereumSessionController,

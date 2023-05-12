@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { ChainBase } from 'common-common/src/types';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
@@ -10,7 +10,7 @@ import {
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
-import { AnyProposal } from 'models';
+import type { AnyProposal } from '../../../models/types';
 
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';

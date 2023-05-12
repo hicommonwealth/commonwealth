@@ -4,7 +4,7 @@ import smartTruncate from 'smart-truncate';
 
 import 'pages/manage_community/webhooks_form.scss';
 
-import type { Webhook } from 'models';
+import type Webhook from '../../../models/Webhook';
 
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';

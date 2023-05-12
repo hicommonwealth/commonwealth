@@ -9,10 +9,11 @@ import {
   extractDomain,
   pluralize,
   threadStageToLabel,
-} from 'helpers';
-import { ThreadStage as ThreadStageType, AddressInfo } from 'models';
-import type { Account, Thread } from 'models';
-
+} from '../../../helpers/index';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import type Thread from '../../../models/Thread';
+import { ThreadStage } from '../../../models/types';
 import {
   Popover,
   usePopover,
@@ -23,21 +24,20 @@ import { getClasses } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
 import { useCommonNavigate } from 'navigation/helpers';
 
-type ThreadComponentProps = {
-  thread: Thread;
+type ThreadAuthorProps = {
+  author: Thread['author'];
+  collaborators: Thread['collaborators'];
 };
 
-export const ThreadAuthor = (props: ThreadComponentProps) => {
-  const { thread } = props;
-
+export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
   const popoverProps = usePopover();
 
-  const author: Account = app.chain.accounts.get(thread.author);
+  const user: Account = app.chain.accounts.get(author);
 
   return (
     <div className="ThreadAuthor">
-      <User avatarSize={24} user={author} popover linkify />
-      {thread.collaborators?.length > 0 && (
+      <User avatarSize={24} user={user} popover linkify />
+      {collaborators?.length > 0 && (
         <>
           <CWText type="caption">and</CWText>
           <CWText
@@ -46,11 +46,11 @@ export const ThreadAuthor = (props: ThreadComponentProps) => {
             onMouseEnter={popoverProps.handleInteraction}
             onMouseLeave={popoverProps.handleInteraction}
           >
-            {pluralize(thread.collaborators?.length, 'other')}
+            {pluralize(collaborators?.length, 'other')}
             <Popover
               content={
                 <div className="collaborators">
-                  {thread.collaborators.map(({ address, chain }) => {
+                  {collaborators.map(({ address, chain }) => {
                     return (
                       <User
                         linkify
@@ -70,8 +70,11 @@ export const ThreadAuthor = (props: ThreadComponentProps) => {
   );
 };
 
-export const ThreadStage = (props: ThreadComponentProps) => {
-  const { thread } = props;
+interface ThreadStageComponentProps {
+  stage: Thread['stage'];
+}
+
+export const ThreadStageComponent = ({ stage }: ThreadStageComponentProps) => {
   const navigate = useCommonNavigate();
 
   return (
@@ -80,13 +83,13 @@ export const ThreadStage = (props: ThreadComponentProps) => {
       className={getClasses<{ stage: 'negative' | 'positive' }>(
         {
           stage:
-            thread.stage === ThreadStageType.ProposalInReview
+            stage === ThreadStage.ProposalInReview
               ? 'positive'
-              : thread.stage === ThreadStageType.Voting
+              : stage === ThreadStage.Voting
               ? 'positive'
-              : thread.stage === ThreadStageType.Passed
+              : stage === ThreadStage.Passed
               ? 'positive'
-              : thread.stage === ThreadStageType.Failed
+              : stage === ThreadStage.Failed
               ? 'negative'
               : 'positive',
         },
@@ -94,22 +97,24 @@ export const ThreadStage = (props: ThreadComponentProps) => {
       )}
       onClick={(e) => {
         e.preventDefault();
-        navigate(`/discussions?stage=${thread.stage}`);
+        navigate(`/discussions?stage=${stage}`);
       }}
     >
-      {threadStageToLabel(thread.stage)}
+      {threadStageToLabel(stage)}
     </CWText>
   );
 };
 
-export const ExternalLink = (props: ThreadComponentProps) => {
-  const { thread } = props;
+interface ExternalLinkProps {
+  url: Thread['url'];
+}
 
+export const ExternalLink = ({ url }: ExternalLinkProps) => {
   const navigate = useCommonNavigate();
 
   return (
     <div className="HeaderLink">
-      {externalLink('a', thread.url, [extractDomain(thread.url)], navigate)}
+      {externalLink('a', url, [extractDomain(url)], navigate)}
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );

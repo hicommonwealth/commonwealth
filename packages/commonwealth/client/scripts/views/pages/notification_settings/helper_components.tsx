@@ -2,10 +2,10 @@ import React from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
 import { getNotificationUrlPath } from 'identifiers';
-import type { NotificationSubscription } from 'models';
-import { AddressInfo } from 'models';
 
 import 'pages/notification_settings/helper_components.scss';
+import AddressInfo from '../../../models/AddressInfo';
+import NotificationSubscription from '../../../models/NotificationSubscription';
 
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';

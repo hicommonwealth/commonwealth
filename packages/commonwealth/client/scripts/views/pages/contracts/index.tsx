@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import 'pages/contracts/contracts_page.scss';
 import app from 'state';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
