@@ -68,14 +68,14 @@ const AddContractAndAbiForm = () => {
             }
             return ['failure', 'Invalid Input'];
           }}
-          label="Contract Address"
+          label="Contract address"
           value={form.address}
           placeholder="Enter contract address"
           onInput={handleContractInput}
         />
 
         <CWTextArea
-          label="Contract ABI File"
+          label="Contract ABI file"
           value={form.abi}
           placeholder="Enter contract's ABI file"
           onInput={(e) =>
