@@ -176,6 +176,10 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from '../middleware/methodNotAllowed';
 
 function setupRouter(
   endpoint: string,
@@ -204,298 +208,411 @@ function setupRouter(
     next();
   });
 
-  router.post(
+  // Updating the address
+  registerRoute(
+    router,
+    'post',
     '/updateAddress',
     passport.authenticate('jwt', { session: false }),
     updateAddress.bind(this, models)
   );
-  router.get('/domain', domain.bind(this, models));
-  router.get('/status', status.bind(this, models));
-  router.post(
+  registerRoute(router, 'get', '/domain', domain.bind(this, models));
+  registerRoute(router, 'get', '/status', status.bind(this, models));
+  registerRoute(
+    router,
+    'post',
     '/ipfsPin',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     ipfsPin.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/editSubstrateSpec',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     editSubstrateSpec.bind(this, models)
   );
 
-  router.post('/createAddress', createAddress.bind(this, models));
-  router.post('/verifyAddress', verifyAddress.bind(this, models));
-  router.post(
+  // Creating and Managing Addresses
+  registerRoute(
+    router,
+    'post',
+    '/createAddress',
+    createAddress.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/verifyAddress',
+    verifyAddress.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
     '/deleteAddress',
     passport.authenticate('jwt', { session: false }),
     deleteAddress.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/linkExistingAddressToChain',
     passport.authenticate('jwt', { session: false }),
     linkExistingAddressToChain.bind(this, models)
   );
-  router.post('/getAddressStatus', getAddressStatus.bind(this, models));
-  router.post('/getAddressProfile', getAddressProfile.bind(this, models));
-  router.post(
+  registerRoute(
+    router,
+    'post',
+    '/getAddressStatus',
+    getAddressStatus.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/getAddressProfile',
+    getAddressProfile.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
     selectChain.bind(this, models)
   );
 
   // chains
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createChain',
     passport.authenticate('jwt', { session: false }),
     createChain.bind(this, models)
   );
-  router.post('/deleteChain', deleteChain.bind(this, models));
-  router.post(
+  registerRoute(router, 'post', '/deleteChain', deleteChain.bind(this, models));
+  registerRoute(
+    router,
+    'post',
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/etherscanAPI/fetchEtherscanContract',
     passport.authenticate('jwt', { session: false }),
     fetchEtherscanContract.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/etherscanAPI/fetchEtherscanContractAbi',
     passport.authenticate('jwt', { session: false }),
     fetchEtherscanContractAbi.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/starCommunity',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     starCommunity.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/tokenBalance',
     databaseValidationService.validateChain,
     tokenBalance.bind(this, models, tokenBalanceCache)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/bulkBalances',
     bulkBalances.bind(this, models, tokenBalanceCache)
   );
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
-  router.get('/getTokenForum', getTokenForum.bind(this, models));
-  router.get(
+  registerRoute(
+    router,
+    'get',
+    '/getTokensFromLists',
+    getTokensFromLists.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/getTokenForum',
+    getTokenForum.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'get',
     '/getSupportedEthChains',
     getSupportedEthChains.bind(this, models)
   );
 
   // threads
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createThread',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
     createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
-  router.put(
+  registerRoute(
+    router,
+    'put',
     '/editThread',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     editThread.bind(this, models, banCache)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createPoll',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createPoll.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/getPolls',
     databaseValidationService.validateChain,
     getPolls.bind(this, models)
   );
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/deletePoll',
     passport.authenticate('jwt', { session: false }),
     deletePoll.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
     updateThreadStage.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateThreadPrivacy',
     passport.authenticate('jwt', { session: false }),
     updateThreadPrivacy.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateThreadPinned',
     passport.authenticate('jwt', { session: false }),
     updateThreadPinned.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     updateVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/viewVotes',
     databaseValidationService.validateChain,
     viewVotes.bind(this, models)
   );
-
-  router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
-
-  router.post(
+  registerRoute(
+    router,
+    'get',
+    '/fetchEntityTitle',
+    fetchEntityTitle.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
     '/contractAbi',
     passport.authenticate('jwt', { session: false }),
     createContractAbi.bind(this, models)
   );
 
   // Templates
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/contract/template',
     passport.authenticate('jwt', { session: false }),
     createTemplate.bind(this, models)
   );
-
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/contract/template',
     passport.authenticate('jwt', { session: false }),
     getTemplates.bind(this, models)
   );
 
   // community contract
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/contract/community_template_and_metadata',
     passport.authenticate('jwt', { session: false }),
     createCommunityContractTemplateAndMetadata.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/contract/community_template',
     getCommunityContractTemplate.bind(this, models)
   );
-
-  router.put(
+  registerRoute(
+    router,
+    'put',
     '/contract/community_template',
     passport.authenticate('jwt', { session: false }),
     updateCommunityContractTemplate.bind(this, models)
   );
-
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/contract/community_template',
     passport.authenticate('jwt', { session: false }),
     deleteCommunityContractTemplate.bind(this, models)
   );
 
   // community contract metadata
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/contract/community_template/metadata',
     getCommunityContractTemplateMetadata.bind(this, models)
   );
-
-  router.put(
+  registerRoute(
+    router,
+    'put',
     '/contract/community_template/metadata',
     passport.authenticate('jwt', { session: false }),
     updateCommunityContractTemplateMetadata.bind(this, models)
   );
-
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/contract/community_template/metadata',
     passport.authenticate('jwt', { session: false }),
     deleteCommunityContractTemplateMetadata.bind(this, models)
   );
 
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     updateChainEntityTitle.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/addEditors',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     addEditors.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteEditors',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     deleteEditors.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteThread',
     passport.authenticate('jwt', { session: false }),
     deleteThread.bind(this, models, banCache)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/bulkThreads',
     databaseValidationService.validateChain,
     bulkThreads.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/activeThreads',
     databaseValidationService.validateChain,
     activeThreads.bind(this, models)
   );
-  router.get(
-    '/getThreads',
-    // databaseValidationService.validateChain,
-    getThreadsOld.bind(this, models)
-  );
-  router.get(
+  registerRoute(router, 'get', '/getThreads', getThreadsOld.bind(this, models));
+  registerRoute(
+    router,
+    'get',
     '/searchDiscussions',
     databaseValidationService.validateChain,
     searchDiscussions.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/searchComments',
     databaseValidationService.validateChain,
     searchComments.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/searchProfiles',
     databaseValidationService.validateChain,
     searchProfiles.bind(this, models)
   );
-
-  router.get('/profile/v2', getProfileNew.bind(this, models));
+  registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
 
   // discussion drafts
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/drafts',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createDraft.bind(this, models)
   );
-  router.get('/drafts', getDrafts.bind(this, models));
-  router.delete(
+  registerRoute(router, 'get', '/drafts', getDrafts.bind(this, models));
+  registerRoute(
+    router,
+    'delete',
     '/drafts',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     deleteDraft.bind(this, models)
   );
-  router.patch(
+  registerRoute(
+    router,
+    'patch',
     '/drafts',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -503,124 +620,203 @@ function setupRouter(
     editDraft.bind(this, models)
   );
 
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/bulkOffchain',
     databaseValidationService.validateChain,
     bulkOffchain.bind(this, models)
   );
 
   // comments
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createComment',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/editComment',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     editComment.bind(this, models, banCache)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteComment',
     passport.authenticate('jwt', { session: false }),
     deleteComment.bind(this, models, banCache)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/viewComments',
     databaseValidationService.validateChain,
     viewComments.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/bulkComments',
     databaseValidationService.validateChain,
     bulkComments.bind(this, models)
   );
 
   // topics
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createTopic',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     createTopic.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateTopic',
     passport.authenticate('jwt', { session: false }),
     updateTopic.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/orderTopics',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     orderTopics.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/editTopic',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     editTopic.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteTopic',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     deleteTopic.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/bulkTopics',
     databaseValidationService.validateChain,
     bulkTopics.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/setTopicThreshold',
     passport.authenticate('jwt', { session: false }),
     setTopicThreshold.bind(this, models)
   );
 
   // reactions
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteReaction',
     passport.authenticate('jwt', { session: false }),
     deleteReaction.bind(this, models, banCache)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/viewReactions',
     databaseValidationService.validateChain,
     viewReactions.bind(this, models)
   );
-  router.get('/bulkReactions', bulkReactions.bind(this, models));
-  router.post('/reactionsCounts', reactionsCounts.bind(this, models));
-  router.post(
+  registerRoute(
+    router,
+    'get',
+    '/bulkReactions',
+    bulkReactions.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/reactionsCounts',
+    reactionsCounts.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
   // roles
-  router.get('/roles', controllers.getRoles.bind(this, models));
-  router.post('/roles', controllers.createRole.bind(this, models));
-  router.patch('/roles', controllers.updateRole.bind(this, models));
-  // permissions
-  router.get('/permissions', controllers.getPermissions.bind(this, models));
-  router.post('/permissions', controllers.createPermission.bind(this, models));
-  router.patch('/permissions', controllers.updatePermission.bind(this, models));
+  registerRoute(
+    router,
+    'get',
+    '/roles',
+    controllers.getRoles.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/roles',
+    controllers.createRole.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'patch',
+    '/roles',
+    controllers.updateRole.bind(this, models)
+  );
 
-  router.get(
+  // permissions
+  registerRoute(
+    router,
+    'get',
+    '/permissions',
+    controllers.getPermissions.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/permissions',
+    controllers.createPermission.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'patch',
+    '/permissions',
+    controllers.updatePermission.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'get',
     '/bulkMembers',
     databaseValidationService.validateChain,
     bulkMembers.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
@@ -628,14 +824,18 @@ function setupRouter(
   );
 
   // user model update
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateEmail',
     passport.authenticate('jwt', { session: false }),
     updateEmail.bind(this, models)
   );
 
   // community banners (update or create)
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateBanner',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
@@ -643,25 +843,33 @@ function setupRouter(
   );
 
   // third-party webhooks
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createWebhook',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     createWebhook.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateWebhook',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     updateWebhook.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteWebhook',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     deleteWebhook.bind(this, models)
   );
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/getWebhooks',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
@@ -669,19 +877,25 @@ function setupRouter(
   );
 
   // roles
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createRole',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     createRole.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteRole',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     deleteRole.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/setDefaultRole',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
@@ -689,110 +903,156 @@ function setupRouter(
   );
 
   // new profile
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateProfile/v2',
     passport.authenticate('jwt', { session: false }),
     updateProfileNew.bind(this, models)
   );
 
   // social accounts
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/githubAccount',
     passport.authenticate('jwt', { session: false }),
     deleteSocialAccount.bind(this, models, 'github')
   );
-
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/discordAccount',
     passport.authenticate('jwt', { session: false }),
     deleteSocialAccount.bind(this, models, 'discord')
   );
 
   // viewCount
-  router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
+  registerRoute(
+    router,
+    'post',
+    '/viewCount',
+    viewCount.bind(this, models, viewCountCache)
+  );
 
   // attachments
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/getUploadSignature',
     passport.authenticate('jwt', { session: false }),
     getUploadSignature.bind(this, models)
   );
 
   // notifications
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/viewSubscriptions',
     passport.authenticate('jwt', { session: false }),
     viewSubscriptions.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createSubscription',
     passport.authenticate('jwt', { session: false }),
     createSubscription.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteSubscription',
     passport.authenticate('jwt', { session: false }),
     deleteSubscription.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/enableSubscriptions',
     passport.authenticate('jwt', { session: false }),
     enableSubscriptions.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/disableSubscriptions',
     passport.authenticate('jwt', { session: false }),
     disableSubscriptions.bind(this, models)
   );
 
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/viewDiscussionNotifications',
     passport.authenticate('jwt', { session: false }),
     viewNotifications.bind(this, models, NotificationCategories.Discussion)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/viewChainEventNotifications',
     passport.authenticate('jwt', { session: false }),
     viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
   );
 
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/viewUserActivity',
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models)
   );
-  router.post('/viewChainIcons', viewChainIcons.bind(this, models));
-  router.post(
+  registerRoute(
+    router,
+    'post',
+    '/viewChainIcons',
+    viewChainIcons.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
     '/viewGlobalActivity',
     viewGlobalActivity.bind(this, models, globalActivityCache)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/markNotificationsRead',
     passport.authenticate('jwt', { session: false }),
     markNotificationsRead.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/clearReadNotifications',
     passport.authenticate('jwt', { session: false }),
     clearReadNotifications.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/clearNotifications',
     passport.authenticate('jwt', { session: false }),
     clearNotifications.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/enableImmediateEmails',
     passport.authenticate('jwt', { session: false }),
     enableImmediateEmails.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/disableImmediateEmails',
     passport.authenticate('jwt', { session: false }),
     disableImmediateEmails.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -800,88 +1060,117 @@ function setupRouter(
   );
 
   // chain categories
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateChainCategory',
     passport.authenticate('jwt', { session: false }),
     updateChainCategory.bind(this, models)
   );
 
   // chat
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/getChatMessages',
     passport.authenticate('jwt', { session: false }),
     getChatMessages.bind(this, models)
   );
-
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/getChatChannel',
     passport.authenticate('jwt', { session: false }),
     getChatChannel.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createChatChannel',
     passport.authenticate('jwt', { session: false }),
     createChatChannel.bind(this, models)
   );
-
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/deleteChatChannel',
     passport.authenticate('jwt', { session: false }),
     deleteChatChannel.bind(this, models)
   );
-
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/deleteChatCategory',
     passport.authenticate('jwt', { session: false }),
     deleteChatCategory.bind(this, models)
   );
-
-  router.put(
+  registerRoute(
+    router,
+    'put',
     '/editChatChannel',
     passport.authenticate('jwt', { session: false }),
     editChatChannel.bind(this, models)
   );
-
-  router.put(
+  registerRoute(
+    router,
+    'put',
     '/editChatCategory',
     passport.authenticate('jwt', { session: false }),
     editChatCategory.bind(this, models)
   );
 
   // rules
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createRule',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     createRule.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/deleteRule',
     passport.authenticate('jwt', { session: false }),
     deleteRule.bind(this, models)
   );
-  router.get('/getRuleTypes', getRuleTypes.bind(this, models));
+  registerRoute(
+    router,
+    'get',
+    '/getRuleTypes',
+    getRuleTypes.bind(this, models)
+  );
 
   // settings
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models)
   );
 
   // send feedback button
-  router.post('/sendFeedback', sendFeedback.bind(this, models));
+  registerRoute(
+    router,
+    'post',
+    '/sendFeedback',
+    sendFeedback.bind(this, models)
+  );
 
   // bans
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/banAddress',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     banAddress.bind(this, models)
   );
-
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/getBannedAddresses',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
@@ -889,55 +1178,87 @@ function setupRouter(
   );
 
   // Custom domain update route
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/updateChainCustomDomain',
     updateChainCustomDomain.bind(this, models)
   );
 
   // Discord Bot
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createDiscordBotConfig',
     passport.authenticate('jwt', { session: false }),
     createDiscordBotConfig.bind(this, models)
   );
-  router.post('/setDiscordBotConfig', setDiscordBotConfig.bind(this, models));
-  router.post(
+  registerRoute(
+    router,
+    'post',
+    '/setDiscordBotConfig',
+    setDiscordBotConfig.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
     '/getDiscordChannels',
     passport.authenticate('jwt', { session: false }),
     getDiscordChannels.bind(this, models)
   );
 
-  router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+  registerRoute(
+    router,
+    'post',
+    '/updateChainPriority',
+    updateChainPriority.bind(this, models)
+  );
 
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/generateImage',
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models)
   );
 
-  //linking
-  router.post(
+  // linking
+  registerRoute(
+    router,
+    'post',
     '/linking/addThreadLinks',
     passport.authenticate('jwt', { session: false }),
     addThreadLink.bind(this, models)
   );
-
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/linking/deleteLinks',
     passport.authenticate('jwt', { session: false }),
     deleteThreadLinks.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/linking/getLinks',
     passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models)
   );
 
   // login
-  router.post('/login', startEmailLogin.bind(this, models));
-  router.get('/finishLogin', finishEmailLogin.bind(this, models));
-  router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
+  registerRoute(router, 'post', '/login', startEmailLogin.bind(this, models));
+  registerRoute(
+    router,
+    'get',
+    '/finishLogin',
+    finishEmailLogin.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/finishOAuthLogin',
+    finishOAuthLogin.bind(this, models)
+  );
 
   // OAuth2.0 for Discord and GitHub:
   // The way this works is first the /auth.discord route is hit and passport.authenticate triggers for the first time
@@ -952,14 +1273,16 @@ function setupRouter(
   // ONLY in the req.authInfo.state object in the callback i.e. startOAuthLogin.ts.
   // NOTE: if a successfulRedirect url is used in the options then there is no way to access that data.
 
-  router.get('/auth/github', (req, res, next) => {
+  registerRoute(router, 'get', '/auth/github', (req, res, next) => {
     passport.authenticate('github', <any>{ state: { hostname: req.hostname } })(
       req,
       res,
       next
     );
   });
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/auth/github/callback',
     passport.authenticate('github', {
       failureRedirect: '/',
@@ -967,13 +1290,15 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'github')
   );
 
-  router.get('/auth/discord', (req, res, next) => {
+  registerRoute(router, 'get', '/auth/discord', (req, res, next) => {
     passport.authenticate('discord', <any>{
       state: { hostname: req.hostname },
     })(req, res, next);
   });
 
-  router.get(
+  registerRoute(
+    router,
+    'get',
     '/auth/discord/callback',
     passport.authenticate('discord', {
       failureRedirect: '/',
@@ -981,51 +1306,105 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
-    return res.json({ status: 'Success', result: req.user.toJSON() });
-  });
+  registerRoute(
+    router,
+    'post',
+    '/auth/magic',
+    passport.authenticate('magic'),
+    (req, res) => {
+      return res.json({ status: 'Success', result: req.user.toJSON() });
+    }
+  );
 
-  router.post('/auth/sso', startSsoLogin.bind(this, models));
-  router.post(
+  registerRoute(router, 'post', '/auth/sso', startSsoLogin.bind(this, models));
+  registerRoute(
+    router,
+    'post',
     '/auth/sso/callback',
     // passport.authenticate('jwt', { session: false }),
     finishSsoLogin.bind(this, models)
   );
 
-  router.get(
+  registerRoute(
+    router,
+    'get',
+    '/auth/callback',
+    passport.authenticate('jwt', { session: false }),
+    authCallback.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'get',
     '/auth/callback',
     passport.authenticate('jwt', { session: false }),
     authCallback.bind(this, models)
   );
 
   // logout
-  router.get('/logout', logout.bind(this, models));
+  registerRoute(router, 'get', '/logout', logout.bind(this, models));
 
-  router.get('/getEntityMeta', getEntityMeta.bind(this, models));
+  registerRoute(
+    router,
+    'get',
+    '/getEntityMeta',
+    getEntityMeta.bind(this, models)
+  );
 
   // snapshotAPI
-  router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
-  router.get(
+  registerRoute(
+    router,
+    'post',
+    '/snapshotAPI/sendMessage',
+    sendMessage.bind(this)
+  );
+
+  registerRoute(
+    router,
+    'get',
     '/communityStats',
     databaseValidationService.validateChain,
     communityStats.bind(this, models)
   );
 
   // snapshot-commonwealth
-  router.get('/snapshot', getSnapshotProposal.bind(this, models));
+  registerRoute(
+    router,
+    'get',
+    '/snapshot',
+    getSnapshotProposal.bind(this, models)
+  );
 
   // These routes behave like get (fetch data) but use POST because a secret
   // is passed in the request body -> passing the secret via query parameters is not safe
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/getChainEventServiceData',
     getChainEventServiceData.bind(this, models)
   );
-  router.post('/getChain', getChain.bind(this, models));
-  router.post('/getChainNode', getChainNode.bind(this, models));
-  router.post('/getChainContracts', getChainContracts.bind(this, models));
-  router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
+  registerRoute(router, 'post', '/getChain', getChain.bind(this, models));
+  registerRoute(
+    router,
+    'post',
+    '/getChainNode',
+    getChainNode.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/getChainContracts',
+    getChainContracts.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/getSubscribedChains',
+    getSubscribedChains.bind(this, models)
+  );
 
   app.use(endpoint, router);
+  app.use(methodNotAllowedMiddleware());
 }
 
 export default setupRouter;
