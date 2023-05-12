@@ -301,7 +301,7 @@ jobs:
 
       - name: Get changed chain-events files
         id: changed-files-chain-events
-        uses: tj-actions/changed-files@v5
+        uses: tj-actions/changed-files@v35
         with:
           files: |
             packages/chain-events/**/*
