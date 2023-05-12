@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { capitalize } from 'lodash';
 
-import 'components/new_thread_form.scss';
+import 'components/NewThreadForm.scss';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { notifyError } from 'controllers/app/notifications';

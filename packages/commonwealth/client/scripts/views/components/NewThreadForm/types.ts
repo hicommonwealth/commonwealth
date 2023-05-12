@@ -14,7 +14,3 @@ export enum NewThreadErrors {
   NoTitle = 'Title cannot be blank',
   NoUrl = 'URL cannot be blank',
 }
-
-export enum NewDraftErrors {
-  InsufficientData = 'Draft must have a text body.',
-}
