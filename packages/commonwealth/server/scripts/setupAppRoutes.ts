@@ -145,17 +145,14 @@ const setupAppRoutes = (
   });
 
   const renderThread = async (scope: string, threadId: string, req, res) => {
-    const where = scope
-      ? { id: threadId, chain: scope }
-      : { id: threadId, hostname: req.hostname };
-
     // Retrieve discussions
     const thread = await models.Thread.findOne({
-      where,
+      where: scope ? { id: threadId, chain: scope } : { id: threadId },
       include: [
         {
           model: models.Chain,
-          attributes: ['icon_url'],
+          where: scope ? null : { custom_domain: req.hostname },
+          attributes: ['custom_domain', 'icon_url'],
         },
         {
           model: models.Address,
