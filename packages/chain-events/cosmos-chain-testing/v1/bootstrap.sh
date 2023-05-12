@@ -50,11 +50,11 @@ dasel put bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.swagger'
 dasel put bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.enabled-unsafe-cors'
 
 ### Start chain
-echo "Starting up csdk node..."
+echo "Starting up csdk v1 node..."
 simd start --api.enable true &
 CSDK_PID=$!
 # Sleep for node to full boot up
 sleep 3
-# wait again on the regen node process so it can be terminated with ctrl+C
-echo "Node started & state inialized!"
+# wait again on the node process so it can be terminated with ctrl+C
+echo "CSDK V1 node started & state initialized!"
 wait $CSDK_PID

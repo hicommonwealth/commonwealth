@@ -101,11 +101,15 @@ export const ContractCard = ({
             CONTRACT
           </CWText>
 
-          <CWIconButton
-            className="delete-icon"
-            iconName="trash"
-            onClick={handleDeleteContract}
-          />
+          <CWIconButton iconName="trash" onClick={handleDeleteContract} />
+        </div>
+        <div className="label-group">
+          <CWText className="group-title" type="b2">
+            Address
+          </CWText>
+          <CWText className="address" type="b2">
+            {address}
+          </CWText>
         </div>
         <div className="label-group">
           <CWText className="group-title" type="b2">
@@ -152,7 +156,7 @@ export const ContractCard = ({
             <CWButton
               className="add-template-btn"
               buttonType="tertiary-black"
-              label="Enable Action"
+              label="Enable action"
               iconLeft="plus"
               onClick={() => handleOpenManageContractTemplateModal()}
             />
@@ -164,7 +168,7 @@ export const ContractCard = ({
                 className="cta"
                 onClick={handleCreateNewTemplate}
               >
-                Create a New Template
+                Create a new template
               </CWText>
             </CWText>
           )}
