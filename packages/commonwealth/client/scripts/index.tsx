@@ -7,7 +7,7 @@ import 'index.scss';
 import '../../static/fonts/fonts.css';
 import 'react-toastify/dist/ReactToastify.css';
 
-import App from './app';
+import App from './App';
 
 function cordovaReady() {
   (window as any).plugins.safearea.get(successCallback, errorCallback);

@@ -21,7 +21,7 @@ import {
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 type GeneralContractPageProps = {
   contractAddress?: string;
 };

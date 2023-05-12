@@ -6,7 +6,7 @@ import { renderMultilineText } from 'helpers';
 import 'pages/privacy_and_terms.scss';
 
 import { CWText } from '../components/component_kit/cw_text';
-import Sublayout from '../sublayout';
+import Sublayout from '../Sublayout';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019

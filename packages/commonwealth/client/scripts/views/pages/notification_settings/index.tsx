@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import AddressInfo from '../../../models/AddressInfo';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
