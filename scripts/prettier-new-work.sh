@@ -8,7 +8,6 @@ export PRE_COMMIT_RUNNING=1
 # Run Prettier on changed JavaScript/TypeScript files
 files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$')
 
-echo "$files"
 for file in $files
 do
   npx prettier --write "$file"
@@ -16,7 +15,7 @@ do
 done
 
 if [[ $files ]]; then
-  git commit --amend --no-edit 2>/dev/null
+  git commit
 fi
 
 unset PRE_COMMIT_RUNNING
