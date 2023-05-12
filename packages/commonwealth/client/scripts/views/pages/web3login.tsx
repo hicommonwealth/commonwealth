@@ -2,12 +2,11 @@ import React from 'react';
 
 import { link } from 'helpers';
 
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
@@ -64,8 +63,6 @@ const Web3LoginPage = () => {
       }
     } catch (e) {
       setErrorMsg(e.responseJSON.error);
-
-      redraw();
     }
   };
 

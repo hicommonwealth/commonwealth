@@ -6,7 +6,7 @@ import 'pages/tip_detail.scss';
 
 import app from 'state';
 import { User } from '../components/user/user';
-import Sublayout from '../sublayout';
+import Sublayout from '../Sublayout';
 import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 
 type TipDetailProps = {

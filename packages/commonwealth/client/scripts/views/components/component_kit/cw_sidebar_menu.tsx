@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/component_kit/cw_sidebar_menu.scss';
 
 import app from 'state';
@@ -93,7 +91,6 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
                 e.stopPropagation();
                 await app.communities.setStarred(item.id);
                 setIsStarred((prevState) => !prevState);
-                redraw();
               }}
             />
           </div>
