@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
@@ -68,8 +66,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
         );
 
         setIsLoading(false);
-
-        redraw();
       });
   };
 
@@ -87,8 +83,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
         ]);
 
         setIsLoading(false);
-
-        redraw();
       });
   };
 
@@ -126,7 +120,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
             content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
-                  reactors: reactors.map(r => r.Address.address),
+                  reactors: reactors.map((r) => r.Address.address),
                 })}
               </div>
             }

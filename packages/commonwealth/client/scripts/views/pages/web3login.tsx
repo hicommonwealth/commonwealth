@@ -2,7 +2,6 @@ import React from 'react';
 
 import { link } from 'helpers';
 
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';
@@ -64,8 +63,6 @@ const Web3LoginPage = () => {
       }
     } catch (e) {
       setErrorMsg(e.responseJSON.error);
-
-      redraw();
     }
   };
 
