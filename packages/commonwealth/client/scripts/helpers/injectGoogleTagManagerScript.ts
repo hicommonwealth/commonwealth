@@ -1,4 +1,4 @@
-import { render } from 'mithrilInterop';
+import { render } from 'helpers/DEPRECATED_ReactRender';
 
 const injectGoogleTagManagerScript = () => {
   const script = document.createElement('noscript');

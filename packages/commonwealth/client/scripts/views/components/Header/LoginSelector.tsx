@@ -3,7 +3,6 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
-import { redraw } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -224,7 +223,6 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
       } catch (err) {
         console.error(err);
       }

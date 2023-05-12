@@ -3,7 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 import app, { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import {
@@ -186,7 +186,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           }
           if (onSuccess) onSuccess();
         }
-        redraw();
       } else {
         // log in as the new user
         await initAppState(false);
@@ -207,7 +206,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           }
           if (onSuccess) onSuccess();
         }
-        redraw();
       }
     };
 
@@ -322,13 +320,11 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         }
       }
       this.bodyType = 'welcome';
-      redraw();
     };
 
     // Handle branching logic for linking an account
     const linkExistingAccountCallback = async () => {
       this.bodyType = 'selectPrevious';
-      redraw();
     };
 
     // Handle signature and validation logic for linking an account
@@ -379,7 +375,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           vnode.attrs.onModalClose();
         }
         if (onSuccess) onSuccess();
-        redraw();
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');

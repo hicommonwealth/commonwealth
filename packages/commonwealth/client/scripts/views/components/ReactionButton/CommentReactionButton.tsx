@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
@@ -69,8 +67,6 @@ export const CommentReactionButton = ({
         );
 
         setIsLoading(false);
-
-        redraw();
       });
   };
 
@@ -88,8 +84,6 @@ export const CommentReactionButton = ({
         ]);
 
         setIsLoading(false);
-
-        redraw();
       });
   };
 
