@@ -1,4 +1,4 @@
-import 'components/reaction_button/comment_reaction_button.scss';
+import 'components/ReactionButton/CommentReactionButton.scss';
 
 import type Thread from '../../../models/Thread';
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
-import { useReactionButton } from './UseReactionButton';
+import { useReactionButton } from './useReactionButton';
 
 type ThreadReactionButtonProps = {
   thread: Thread;

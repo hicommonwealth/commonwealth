@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { redraw } from 'mithrilInterop';
 
-import 'components/reaction_button/comment_reaction_button.scss';
+import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 import app from 'state';
@@ -27,12 +27,13 @@ type CommentReactionButtonProps = {
   comment: Comment<any>;
 };
 
-export const CommentReactionButton = (props: CommentReactionButtonProps) => {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [reactors, setReactors] = React.useState<Array<any>>([]);
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const CommentReactionButton = ({
+  comment,
+}: CommentReactionButtonProps) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [reactors, setReactors] = useState<Array<any>>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { comment } = props;
   const reactionCounts = app.reactionCounts.store.getByPost(comment);
   const { likes = 0, hasReacted } = reactionCounts || {};
 
@@ -126,7 +127,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
             content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
-                  reactors: reactors.map(r => r.Address.address),
+                  reactors: reactors.map((r) => r.Address.address),
                 })}
               </div>
             }
