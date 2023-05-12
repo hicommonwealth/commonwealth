@@ -14,9 +14,10 @@ import { SubstrateTypes } from 'chain-events/src/types';
 import type { ProposalType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import getFetch from 'helpers/getFetch';
-import type { ChainInfo } from 'models';
-import { ChainEntity, ChainEvent } from 'models';
 import { proposalSlugToChainEntityType } from '../../identifiers';
+import ChainEntity from '../../models/ChainEntity';
+import ChainEvent from '../../models/ChainEvent';
+import type ChainInfo from '../../models/ChainInfo';
 import app from 'state';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
@@ -82,14 +83,14 @@ class ChainEntityController {
       .filter((e) => e.type === type);
   }
 
-  private static _formatEntitiesWithMeta(entities: any[], entityMetas: any[]): ChainEntity[] {
+  private static _formatEntitiesWithMeta(
+    entities: any[],
+    entityMetas: any[]
+  ): ChainEntity[] {
     const data: ChainEntity[] = [];
     // save chain-entity metadata to the appropriate chain-entity
-    const metaMap: Map<string, { title: string; threadId: number }> = new Map(
-      entityMetas.map((e) => [
-        e.ce_id,
-        { title: e.title, threadId: e.thread_id },
-      ])
+    const metaMap: Map<string, { title: string }> = new Map(
+      entityMetas.map((e) => [e.ce_id, { title: e.title }])
     );
 
     if (Array.isArray(entities)) {
@@ -98,7 +99,6 @@ class ChainEntityController {
         const metaData = metaMap.get(entityJSON.id);
         if (metaData) {
           entityJSON.title = metaData.title;
-          entityJSON.threadId = metaData.threadId;
         }
 
         const entity = ChainEntity.fromJSON(entityJSON);
@@ -118,7 +118,10 @@ class ChainEntityController {
       getFetch(`${app.serverUrl()}/ce/entities`, { chain, id }),
       getFetch(`${app.serverUrl()}/getEntityMeta`, { chain, ce_id: id }),
     ]);
-    const data = ChainEntityController._formatEntitiesWithMeta(entities, entityMetas);
+    const data = ChainEntityController._formatEntitiesWithMeta(
+      entities,
+      entityMetas
+    );
     if (data?.length > 1) {
       throw new Error('Found multiple entities with same id!');
     }
@@ -142,7 +145,10 @@ class ChainEntityController {
       getFetch(`${app.serverUrl()}/ce/entities`, options),
       getFetch(`${app.serverUrl()}/getEntityMeta`, options),
     ]);
-    const data = ChainEntityController._formatEntitiesWithMeta(entities, entityMetas);
+    const data = ChainEntityController._formatEntitiesWithMeta(
+      entities,
+      entityMetas
+    );
     this._store.set(chain, data);
     return data;
   }

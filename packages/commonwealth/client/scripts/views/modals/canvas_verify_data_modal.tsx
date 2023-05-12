@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
 import type { Action, Session } from '@canvas-js/interfaces';
 
-import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { verify } from 'canvas';
 
@@ -35,15 +33,13 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
 
       verify({ session })
         .then((result) => setVerifiedSession(result))
-        .catch((err) => console.error('Could not verify session:', err))
-        .finally(() => redraw());
+        .catch((err) => console.error('Could not verify session:', err));
       verify({
         action,
         actionSignerAddress: session.payload.sessionAddress,
       })
         .then((result) => setVerifiedAction(result))
-        .catch((err) => console.error('Could not verify action:', err))
-        .finally(() => redraw());
+        .catch((err) => console.error('Could not verify action:', err));
     });
   }, []);
 

@@ -9,9 +9,13 @@ import moment from 'moment';
 
 import app from 'state';
 import { slugify } from 'utils';
-import { isCommandClick, pluralize } from 'helpers';
-import type { Thread } from 'models';
-import { AddressInfo } from 'models';
+import {
+  isCommandClick,
+  isDefaultStage,
+  pluralize,
+  threadStageToLabel,
+} from 'helpers';
+import AddressInfo from '../../../models/AddressInfo';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import {
@@ -37,7 +41,7 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { LinkSource } from 'models/Thread';
+import Thread, { LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
 import { filterLinks } from 'helpers/threads';
 
@@ -47,8 +51,10 @@ type ThreadPreviewProps = {
 
 export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
-  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
-    useState(false);
+  const [
+    isUpdateProposalStatusModalOpen,
+    setIsUpdateProposalStatusModalOpen,
+  ] = useState(false);
 
   const [windowIsSmall, setWindowIsSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
@@ -100,6 +106,15 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
     thread.slug,
     `${thread.identifier}-${slugify(thread.title)}`
   );
+
+  const isStageDefault = isDefaultStage(thread.stage);
+  const isTagsRowVisible =
+    (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+
+  const handleStageTagClick = (e) => {
+    e.stopPropagation();
+    navigate(`/discussions?stage=${thread.stage}`);
+  };
 
   return (
     <>
@@ -177,8 +192,16 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           <CWText type="caption" className="thread-preview">
             {thread.plaintext}
           </CWText>
-          {linkedProposals.length > 0 && (
+          {isTagsRowVisible && (
             <div className="tags-row">
+              {thread.stage && !isStageDefault && (
+                <CWTag
+                  label={threadStageToLabel(thread.stage)}
+                  trimAt={20}
+                  type="stage"
+                  onClick={handleStageTagClick}
+                />
+              )}
               {linkedProposals
                 .sort((a, b) => +a.identifier - +b.identifier)
                 .map((link) => (
@@ -215,7 +238,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   e.stopPropagation();
                 }}
               >
-                <SharePopover discussionLink={discussionLink}/>
+                <SharePopover discussionLink={discussionLink} />
               </div>
               <div
                 onClick={(e) => {

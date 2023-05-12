@@ -13,6 +13,7 @@ import 'modals/session_signin_modal.scss';
 
 import type { Account } from 'models';
 import app from 'state';
+import WebWalletController from '../../controllers/app/web_wallets';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
@@ -27,7 +28,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
   const { onVerified, onClose } = props;
 
   const chainbase = app.chain?.meta?.base;
-  const wallets = app.wallets.availableWallets(chainbase);
+  const wallets = WebWalletController.Instance.availableWallets(chainbase);
 
   const wcEnabled = _.any(
     wallets,

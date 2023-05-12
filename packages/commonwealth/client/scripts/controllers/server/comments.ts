@@ -2,12 +2,14 @@ import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import $ from 'jquery';
 import _ from 'lodash';
-import type { IUniqueId, AbridgedThread } from 'models';
-import { Attachment, Comment } from 'models';
 import moment from 'moment';
 
 import app from 'state';
 import { CommentsStore } from 'stores';
+import AbridgedThread from '../../models/AbridgedThread';
+import Attachment from '../../models/Attachment';
+import Comment from '../../models/Comment';
+import type { IUniqueId } from '../../models/interfaces';
 import type Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
 

@@ -10,6 +10,7 @@ import {
 } from 'common-common/src/types';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
+import type { Express } from 'express';
 import express from 'express';
 import session from 'express-session';
 import http from 'http';
@@ -19,7 +20,11 @@ import favicon from 'serve-favicon';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
-import {ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
+import {
+  ROLLBAR_ENV,
+  ROLLBAR_SERVER_TOKEN,
+  SESSION_SECRET,
+} from './server/config';
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
@@ -29,6 +34,17 @@ import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
 import setupCosmosProxy from 'server/util/cosmosProxy';
+
+import { cacheDecorator } from '../common-common/src/cacheDecorator';
+import { ServerError } from 'common-common/src/errors';
+import {
+  lookupKeyDurationInReq,
+  CustomRequest,
+} from '../common-common/src/cacheKeyUtils';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 require('express-async-errors');
 
@@ -74,12 +90,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const resetServer = (debug = false): Promise<void> => {
-  if (debug) console.log('Resetting database...');
+  if (debug) log.info('Resetting database...');
   return new Promise(async (resolve) => {
     try {
       await models.sequelize.sync({ force: true });
-      console.log('done syncing.');
-      if (debug) console.log('Initializing default models...');
+      log.info('done syncing.');
+      if (debug) log.info('Initializing default models...');
       const drew = await models.User.create({
         email: 'drewstone329@gmail.com',
         emailVerified: true,
@@ -361,9 +377,9 @@ const resetServer = (debug = false): Promise<void> => {
         ).toString(),
       });
 
-      if (debug) console.log('Database reset!');
+      if (debug) log.info('Database reset!');
     } catch (error) {
-      console.log('error', error);
+      log.info('error', error);
     }
     resolve();
   });
@@ -394,15 +410,88 @@ const setupServer = () => {
   const onListen = () => {
     const addr = server.address();
     if (typeof addr === 'string') {
-      console.log(`Listening on ${addr}`);
+      log.info(`Listening on ${addr}`);
     } else {
-      console.log(`Listening on port ${addr.port}`);
+      log.info(`Listening on port ${addr.port}`);
     }
   };
 
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListen);
+};
+
+export enum CACHE_ENDPOINTS {
+  BROKEN_5XX = '/cachedummy/broken5xx',
+  BROKEN_4XX = '/cachedummy/broken4xx',
+  JSON = '/cachedummy/json',
+  TEXT = '/cachedummy/text',
+  CUSTOM_KEY_DURATION = '/cachedummy/customKeyDuration',
+}
+
+export const setupCacheTestEndpoints = (appAttach: Express) => {
+  log.info('setupCacheTestEndpoints');
+
+  // /cachedummy endpoint for testing
+  appAttach.get(
+    CACHE_ENDPOINTS.BROKEN_4XX,
+    cacheDecorator.cacheMiddleware(3),
+    async (req, res) => {
+      log.info(`${CACHE_ENDPOINTS.BROKEN_4XX} called`);
+      res.status(400).json({ message: 'cachedummy 400 response' });
+    }
+  );
+
+  appAttach.get(
+    CACHE_ENDPOINTS.JSON,
+    cacheDecorator.cacheMiddleware(3),
+    async (req, res) => {
+      log.info(`${CACHE_ENDPOINTS.JSON} called`);
+      res.json({ message: 'cachedummy response' });
+    }
+  );
+
+  appAttach.post(
+    CACHE_ENDPOINTS.CUSTOM_KEY_DURATION,
+    (req: CustomRequest, res, next) => {
+      log.info(`${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} called`);
+      const body = req.body;
+      if (!body || !body.duration || !body.key) {
+        return next();
+      }
+      req.cacheKey = body.key;
+      req.cacheDuration = body.duration;
+      return next();
+    },
+    cacheDecorator.cacheMiddleware(3, lookupKeyDurationInReq),
+    async (req, res) => {
+      res.json(req.body);
+    }
+  );
+
+  // Uncomment the following lines if you want to use the /cachedummy/json route
+  // app.post('/cachedummy/json', cacheDecorator.cacheInvalidMiddleware(3), async (req, res) => {
+  //   res.json({ 'message': 'cachedummy response' });
+  // });
+
+  appAttach.get(
+    CACHE_ENDPOINTS.TEXT,
+    cacheDecorator.cacheMiddleware(3),
+    async function cacheTextEndpoint(req, res) {
+      log.info(`${CACHE_ENDPOINTS.TEXT} called`);
+      res.send('cachedummy response');
+    }
+  );
+
+  appAttach.get(
+    CACHE_ENDPOINTS.BROKEN_5XX,
+    cacheDecorator.cacheMiddleware(3),
+    async (req, res, next) => {
+      log.info(`${CACHE_ENDPOINTS.BROKEN_5XX} called`);
+      const err = new Error('route error');
+      return next(new ServerError('broken route', err));
+    }
+  );
 };
 
 const banCache = new BanCache(models);
@@ -422,6 +511,7 @@ setupAPI(
   databaseValidationService
 );
 setupCosmosProxy(app, models);
+setupCacheTestEndpoints(app);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -431,8 +521,20 @@ const rollbar = new Rollbar({
 });
 
 setupErrorHandlers(app, rollbar);
-
 setupServer();
+
+function availableRoutes() {
+  return app._router.stack
+    .filter((r) => r.route)
+    .map((r) => {
+      return {
+        method: Object.keys(r.route.methods)[0].toUpperCase(),
+        path: r.route.path,
+      };
+    });
+}
+
+console.log(JSON.stringify(availableRoutes(), null, 2));
 
 export const resetDatabase = () => resetServer();
 export const getTokenBalanceCache = () => tokenBalanceCache;

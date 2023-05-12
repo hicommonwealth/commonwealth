@@ -1,9 +1,9 @@
 import React from 'react';
 
 import 'modals/offchain_voting_modal.scss';
+import AddressInfo from '../../models/AddressInfo';
+import Vote from '../../models/Vote';
 
-import type { Vote } from 'models';
-import { AddressInfo } from 'models';
 import { User } from '../components/user/user';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 

@@ -35,11 +35,6 @@ import {
   Label as AaveLabel,
 } from './chains/aave';
 import {
-  Listener as CommonwealthListener,
-  Title as CommonwealthTitle,
-  Label as CommonwealthLabel,
-} from './chains/commonwealth';
-import {
   Listener as CosmosListener,
   Title as CosmosTitle,
   Label as CosmosLabel,
@@ -62,8 +57,6 @@ export function Title(
       return Erc20Title(kind);
     case SupportedNetwork.ERC721:
       return Erc721Title(kind);
-    case SupportedNetwork.Commonwealth:
-      return CommonwealthTitle(kind);
     case SupportedNetwork.Cosmos:
       return CosmosTitle(kind);
     default:
@@ -83,8 +76,6 @@ export function Label(chain: string, event: CWEvent): IEventLabel {
       return Erc20Label(event.blockNumber, chain, event.data);
     case SupportedNetwork.ERC721:
       return Erc721Label(event.blockNumber, chain, event.data);
-    case SupportedNetwork.Commonwealth:
-      return CommonwealthLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.Cosmos:
       return CosmosLabel(event.blockNumber, chain, event.data);
     default:
@@ -174,15 +165,6 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.Aave) {
     listener = new AaveListener(
-      chain,
-      options.address,
-      options.url,
-      !!options.skipCatchup,
-      !!options.verbose,
-      options.discoverReconnectRange
-    );
-  } else if (network === SupportedNetwork.Commonwealth) {
-    listener = new CommonwealthListener(
       chain,
       options.address,
       options.url,

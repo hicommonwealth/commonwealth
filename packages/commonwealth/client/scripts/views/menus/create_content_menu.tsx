@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
@@ -259,7 +258,6 @@ export const CreateContentSidebar = () => {
             app.sidebarToggled = false;
             app.sidebarMenu = 'default';
             app.sidebarRedraw.emit('redraw');
-            redraw();
           }, 200);
         },
       }}

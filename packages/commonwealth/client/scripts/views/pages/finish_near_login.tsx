@@ -1,9 +1,9 @@
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
+import type { Chain } from '@canvas-js/interfaces';
 import { createCanvasSessionPayload } from 'canvas';
 import { initAppState } from 'state';
 import BN from 'bn.js';
-import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -21,13 +21,14 @@ import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
 import { Modal } from '../components/component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useSearchParams } from 'react-router-dom';
 
 // TODO:
 //  - figure out how account switching will work
@@ -66,6 +67,7 @@ const redirectToNextPage = (navigate) => {
 
 const FinishNearLogin = () => {
   const navigate = useCommonNavigate();
+  const [searchParams] = useSearchParams();
   const [validating, setValidating] = React.useState<boolean>(false);
   const [validationCompleted, setValidationCompleted] =
     React.useState<boolean>(false);
@@ -145,7 +147,7 @@ const FinishNearLogin = () => {
     }
 
     // tx error handling
-    const failedTx = _DEPRECATED_getSearchParams('tx_failure');
+    const failedTx = searchParams.get('tx_failure');
 
     if (failedTx) {
       console.log(`Login failed: deleting storage key ${failedTx}`);
@@ -160,7 +162,7 @@ const FinishNearLogin = () => {
 
     // tx success handling
     // TODO: ensure that create() calls redirect correctly
-    const savedTx = _DEPRECATED_getSearchParams('saved_tx');
+    const savedTx = searchParams.get('saved_tx');
 
     if (savedTx && localStorage[savedTx]) {
       try {
@@ -189,7 +191,7 @@ const FinishNearLogin = () => {
     // create new chain handling
     // TODO: we need to figure out how to clean this localStorage entry up
     //   in the case of transaction failure!!
-    const chainName = _DEPRECATED_getSearchParams('chain_name');
+    const chainName = searchParams.get('chain_name');
 
     if (chainName && localStorage[chainName]) {
       try {
@@ -285,13 +287,11 @@ const FinishNearLogin = () => {
       validate(wallet).then(() => {
         setValidationCompleted(true);
         setValidating(false);
-        redraw();
       });
     } else {
       setValidationError('Sign-in failed.');
       setValidating(false);
       setValidationCompleted(true);
-      redraw();
     }
   } else {
     // validation in progress

@@ -4,9 +4,12 @@ import { DeltaOperation, DeltaStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 
 import app from 'state';
-import { SerializableDeltaStatic, base64ToFile, uploadFileToS3 } from './utils';
-
-const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
+import {
+  SerializableDeltaStatic,
+  VALID_IMAGE_TYPES,
+  base64ToFile,
+  uploadFileToS3,
+} from './utils';
 
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 

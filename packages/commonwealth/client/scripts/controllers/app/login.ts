@@ -7,11 +7,14 @@ import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
-import { redraw } from 'mithrilInterop';
-import type { BlockInfo, ChainInfo } from 'models';
-import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
 import moment from 'moment';
 import app from 'state';
+import Account from '../../models/Account';
+import AddressInfo from '../../models/AddressInfo';
+import type BlockInfo from '../../models/BlockInfo';
+import type ChainInfo from '../../models/ChainInfo';
+import ITokenAdapter from '../../models/ITokenAdapter';
+import SocialAccount from '../../models/SocialAccount';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -31,7 +34,7 @@ export async function setActiveAccount(account: Account): Promise<void> {
   const role = app.roles.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-    app.chain.activeAddressHasToken(account.address).then(() => redraw());
+    await app.chain.activeAddressHasToken(account.address);
   }
 
   if (!role || role.is_user_default) {
@@ -119,7 +122,6 @@ export async function completeClientLogin(account: Account) {
     ) {
       app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
-    redraw();
   } catch (e) {
     console.trace(e);
   }

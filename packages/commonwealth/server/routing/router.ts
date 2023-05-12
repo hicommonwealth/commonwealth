@@ -143,7 +143,6 @@ import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
-import setProjectChain from '../routes/setProjectChain';
 import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
@@ -173,7 +172,11 @@ import {
   updateCommunityContractTemplateMetadata,
   deleteCommunityContractTemplateMetadata,
 } from '../routes/proposalTemplate';
-import { createTemplate, getTemplates } from '../routes/templates';
+import {
+  createTemplate,
+  deleteTemplate,
+  getTemplates,
+} from '../routes/templates';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -381,6 +384,12 @@ function setupRouter(
     '/contract/template',
     passport.authenticate('jwt', { session: false }),
     getTemplates.bind(this, models)
+  );
+
+  router.delete(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    deleteTemplate.bind(this, models)
   );
 
   // community contract
@@ -643,14 +652,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     updateBanner.bind(this, models)
-  );
-
-  // projects related routes
-  router.get(
-    '/setProjectChain',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    setProjectChain.bind(this, models)
   );
 
   // third-party webhooks

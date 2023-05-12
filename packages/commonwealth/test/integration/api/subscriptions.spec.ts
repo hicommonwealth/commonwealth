@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { NotificationCategories } from 'common-common/src/types';
 import jwt from 'jsonwebtoken';
-import type { NotificationSubscription } from 'models';
+import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';

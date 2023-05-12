@@ -10,6 +10,8 @@ import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase } from '../../../../../common-common/src/types';
+import Account from '../../models/Account';
+import IWebWallet from '../../models/IWebWallet';
 import {
   ISessionController,
   EthereumSessionController,

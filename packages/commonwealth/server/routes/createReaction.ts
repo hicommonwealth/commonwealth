@@ -203,11 +203,11 @@ const createReaction = async (
     proposal = await models.Thread.findOne({
       where: { id },
     });
-    cwUrl = getThreadUrl(proposal, comment);
+    cwUrl = getThreadUrl(proposal, comment?.id);
   } else if (thread_id) {
     proposal = await models.Thread.findByPk(Number(thread_id));
     if (!proposal) return next(new AppError(Errors.NoProposalMatch));
-    cwUrl = getThreadUrl(proposal, comment);
+    cwUrl = getThreadUrl(proposal, comment?.id);
     root_type = 'discussion';
   }
 

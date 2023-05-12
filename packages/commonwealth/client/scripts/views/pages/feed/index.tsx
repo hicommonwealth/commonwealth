@@ -3,8 +3,8 @@ import React from 'react';
 import 'pages/feed/index.scss';
 
 import app from 'state';
-import { DashboardActivityNotification } from 'models';
-import Sublayout from '../../sublayout';
+import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
+import Sublayout from '../../Sublayout';
 import { fetchActivity } from '../user_dashboard/helpers';
 import { DashboardViews } from '../user_dashboard';
 import { CWText } from '../../components/component_kit/cw_text';

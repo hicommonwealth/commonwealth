@@ -2,7 +2,9 @@ declare let window: any;
 
 import $ from 'jquery';
 
-import type { Account, BlockInfo, IWebWallet } from 'models';
+import type Account from '../../../models/Account';
+import type BlockInfo from '../../../models/BlockInfo';
+import type IWebWallet from '../../../models/IWebWallet';
 import type Web3 from 'web3';
 
 import type { provider } from 'web3-core';
