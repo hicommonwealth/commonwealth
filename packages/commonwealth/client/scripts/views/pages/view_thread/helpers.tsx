@@ -1,4 +1,4 @@
-import type { Poll } from 'models';
+import type Poll from '../../../models/Poll';
 import moment from 'moment';
 
 import app from 'state';

@@ -1,7 +1,9 @@
-import type { AbridgedThread, AnyProposal } from 'models';
-import { Comment, Reaction, Thread } from 'models';
-
 import { ReactionStore } from 'stores';
+import AbridgedThread from '../../models/AbridgedThread';
+import type Comment from '../../models/Comment';
+import type { AnyProposal } from '../../models/types';
+import Reaction from '../../models/Reaction';
+import Thread from '../../models/Thread';
 
 export const modelFromServer = (reaction) => {
   return new Reaction({

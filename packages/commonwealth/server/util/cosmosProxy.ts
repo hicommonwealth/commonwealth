@@ -5,7 +5,12 @@ import { AppError } from 'common-common/src/errors';
 import type { Express } from 'express';
 import type { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { cosmosCacheLCD, cosmosCacheRPC } from './cosmosCache';
+import {
+  calcCosmosLCDCacheKeyDuration,
+  calcCosmosRPCCacheKeyDuration,
+} from './cosmosCache';
+import { lookupKeyDurationInReq } from 'common-common/src/cacheKeyUtils';
+import { cacheDecorator } from 'common-common/src/cacheDecorator';
 
 const log = factory.getLogger(formatFilename(__filename));
 const defaultCacheDuration = 60 * 10; // 10 minutes
@@ -15,7 +20,11 @@ function setupCosmosProxy(app: Express, models: DB) {
   app.post(
     '/cosmosAPI/:chain',
     bodyParser.text(),
-    cosmosCacheRPC(defaultCacheDuration),
+    calcCosmosRPCCacheKeyDuration,
+    cacheDecorator.cacheMiddleware(
+      defaultCacheDuration,
+      lookupKeyDurationInReq
+    ),
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
@@ -51,7 +60,11 @@ function setupCosmosProxy(app: Express, models: DB) {
   app.use(
     '/cosmosLCD/:chain',
     bodyParser.text(),
-    cosmosCacheLCD(defaultCacheDuration),
+    calcCosmosLCDCacheKeyDuration,
+    cacheDecorator.cacheMiddleware(
+      defaultCacheDuration,
+      lookupKeyDurationInReq
+    ),
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {

@@ -14,14 +14,13 @@ import BN from 'bn.js';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import { formatProposalHashShort } from 'helpers';
-import type { Account, ChainEntity, ChainEvent, ProposalEndTime } from 'models';
-import {
-  DepositVote,
-  Proposal,
-  ProposalStatus,
-  VotingType,
-  VotingUnit,
-} from 'models';
+import type Account from '../../../models/Account';
+import type ChainEntity from '../../../models/ChainEntity';
+import type ChainEvent from '../../../models/ChainEvent';
+import Proposal from '../../../models/Proposal';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../models/types';
+import type { ProposalEndTime } from '../../../models/types';
+import { DepositVote } from '../../../models/votes';
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';
 import type Substrate from './adapter';
@@ -169,7 +168,6 @@ class SubstrateDemocracyProposal extends Proposal<
     );
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
-    this.threadId = entity.threadId;
     this.threadTitle = entity.threadTitle;
 
     // see if preimage exists and populate data if it does

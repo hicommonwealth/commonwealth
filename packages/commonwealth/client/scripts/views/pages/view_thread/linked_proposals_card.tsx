@@ -7,7 +7,9 @@ import {
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import type { ChainEntity, Thread, ThreadStage } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
+import type Thread from '../../../models/Thread';
+import type { ThreadStage } from '../../../models/types';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -65,6 +67,7 @@ export const LinkedProposalsCard = ({
 }: LinkedProposalsCardProps) => {
   const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
+  const [snapshotUrl, setSnapshotUrl] = useState('');
   const [space, setSpace] = useState<SnapshotSpace>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -80,10 +83,11 @@ export const LinkedProposalsCard = ({
 
   useEffect(() => {
     if (initialSnapshotLinks.length > 0) {
+      const proposal = initialSnapshotLinks[0];
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
         for (const { space: _space, proposals } of data) {
           const matchingSnapshot = proposals.find(
-            (sn) => sn.id === initialSnapshotLinks[0].identifier
+            (sn) => sn.id === proposal.identifier
           );
 
           if (matchingSnapshot) {
@@ -92,19 +96,23 @@ export const LinkedProposalsCard = ({
             break;
           }
         }
-
+        if (proposal.identifier.includes('/')) {
+          setSnapshotUrl(
+            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+              proposal.identifier
+            }`
+          );
+        } else if (space && snapshot) {
+          setSnapshotUrl(
+            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+              space.id
+            }/${snapshot.id}`
+          );
+        }
         setSnapshotProposalsLoaded(true);
       });
     }
   }, [initialSnapshotLinks]);
-
-  let snapshotUrl = '';
-
-  if (space && snapshot) {
-    snapshotUrl = `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-      space.id
-    }/${snapshot.id}`;
-  }
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
@@ -138,7 +146,10 @@ export const LinkedProposalsCard = ({
                     </div>
                   )}
                   {showSnapshot && (
-                    <a href={snapshotUrl}>Snapshot: {snapshot?.title}</a>
+                    <a href={snapshotUrl}>
+                      Snapshot:{' '}
+                      {initialSnapshotLinks[0].title ?? snapshot.title}
+                    </a>
                   )}
                 </div>
               ) : (

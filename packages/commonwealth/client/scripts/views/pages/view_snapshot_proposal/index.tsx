@@ -9,10 +9,10 @@ import {
   VoteResultsData,
 } from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
-import { AddressInfo } from 'models';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -50,6 +50,7 @@ export const ViewProposalPage = ({
   const validatedAgainstStrategies: boolean = !power
     ? true
     : power.totalScore > 0;
+
   const totalScore: number = power?.totalScore || 0;
   const votes: SnapshotProposalVote[] = voteResults?.votes || [];
   const totals: VoteResultsData = voteResults?.results || {

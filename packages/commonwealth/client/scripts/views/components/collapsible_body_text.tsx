@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { AnyProposal } from 'models';
+import type { AnyProposal } from '../../models/types';
 
 import { QuillRenderer } from './react_quill_editor/quill_renderer';
 

@@ -2,11 +2,12 @@ import type { ClassComponent } from 'mithrilInterop';
 import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ThreadStage } from 'models';
-import type { IChainAdapter, Account } from 'models';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
+import Account from '../models/Account';
+import IChainAdapter from '../models/IChainAdapter';
+import { ThreadStage } from '../models/types';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -32,10 +33,18 @@ export function parseCustomStages(str) {
   // Parse customStages into a `string[]` and then cast to ThreadStage[]
   // If parsing fails, return an empty array.
   let arr;
+  const default_stages = [
+    ThreadStage.Discussion,
+    ThreadStage.ProposalInReview,
+    ThreadStage.Voting,
+    ThreadStage.Passed,
+    ThreadStage.Failed,
+  ];
   try {
-    arr = Array.from(JSON.parse(str));
+    const stages = JSON.parse(str);
+    arr = Array.isArray(stages) ? Array.from(stages) : default_stages;
   } catch (e) {
-    return [];
+    return default_stages;
   }
   return arr
     .map((s) => s?.toString())
@@ -411,11 +420,3 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
 
   return decimals;
 }
-
-export const setDarkMode = (state: boolean) => {
-  const stateStr = state ? 'on' : 'off';
-  localStorage.setItem('dark-mode-state', stateStr);
-  state
-    ? document.getElementsByTagName('html')[0].classList.add('invert')
-    : document.getElementsByTagName('html')[0].classList.remove('invert');
-};

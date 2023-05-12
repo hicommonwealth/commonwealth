@@ -2,7 +2,7 @@ import React from 'react';
 
 import 'pages/landing/index.scss';
 
-import type { ChainInfo } from 'models';
+import ChainInfo from '../../../models/ChainInfo';
 
 import app, { LoginState } from 'state';
 import { Header } from './header';
