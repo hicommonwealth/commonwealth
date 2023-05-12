@@ -26,7 +26,6 @@ import {
 import { bundleSubs } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
-import { redraw } from 'mithrilInterop';
 import { NotificationCategories } from 'common-common/src/types';
 
 const emailIntervalFrequencyMap = {
