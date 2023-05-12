@@ -1,8 +1,7 @@
 import React from 'react';
 
 import moment from 'moment';
-
-import 'components/profile/profile_activity_row.scss';
+import 'components/Profile/ProfileActivityRow.scss';
 
 import app from 'state';
 import type Thread from 'models/Thread';
@@ -12,7 +11,7 @@ import withRouter, {
 } from 'navigation/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/cw_tag';
-import type { CommentWithAssociatedThread } from './profile_activity';
+import type { CommentWithAssociatedThread } from './ProfileActivity';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
@@ -21,9 +20,8 @@ type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
 };
 
-const ProfileActivityRow = (props: ProfileActivityRowProps) => {
+const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
-  const { activity } = props;
   const { chain, createdAt, author, title, id, body } = activity;
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;
@@ -44,10 +42,14 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
       if (isThread) {
         decodedTitle = decodeURIComponent(encodeURIComponent(title));
       } else {
-        decodedTitle = decodeURIComponent(encodeURIComponent(comment.thread?.title));
+        decodedTitle = decodeURIComponent(
+          encodeURIComponent(comment.thread?.title)
+        );
       }
     } catch (e) {
-      console.error(`Could not decode title: "${title ? title : comment.thread?.title}"`);
+      console.error(
+        `Could not decode title: "${title ? title : comment.thread?.title}"`
+      );
       decodedTitle = title;
     }
   }

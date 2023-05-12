@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
 
-import 'components/profile/index.scss';
+import 'components/Profile/Profile.scss';
 
 import app from 'state';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
@@ -9,9 +9,9 @@ import AddressInfo from '../../../models/AddressInfo';
 import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
 
-import ProfileHeader from './profile_header';
-import type { CommentWithAssociatedThread } from './profile_activity';
-import ProfileActivity from './profile_activity';
+import ProfileHeader from './ProfileHeader';
+import type { CommentWithAssociatedThread } from './ProfileActivity';
+import ProfileActivity from './ProfileActivity';
 import { CWSpinner } from '../component_kit/cw_spinner';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../../pages/404';
@@ -28,16 +28,14 @@ type ProfileProps = {
 
 const NoProfileFoundError = 'No profile found';
 
-const ProfileComponent = (props: ProfileProps) => {
-  const [addresses, setAddresses] = React.useState<AddressInfo[]>();
-  const [comments, setComments] = React.useState<CommentWithAssociatedThread[]>(
-    []
-  );
-  const [error, setError] = React.useState<ProfileError>(ProfileError.None);
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [profile, setProfile] = React.useState<NewProfile>();
-  const [threads, setThreads] = React.useState<Thread[]>([]);
-  const [isOwner, setIsOwner] = React.useState<boolean>();
+const Profile = ({ profileId }: ProfileProps) => {
+  const [addresses, setAddresses] = useState<AddressInfo[]>();
+  const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
+  const [error, setError] = useState<ProfileError>(ProfileError.None);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [profile, setProfile] = useState<NewProfile>();
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [isOwner, setIsOwner] = useState<boolean>();
 
   const getProfileData = async (query: string) => {
     setLoading(true);
@@ -88,8 +86,8 @@ const ProfileComponent = (props: ProfileProps) => {
     setLoading(false);
   };
 
-  React.useEffect(() => {
-    getProfileData(props.profileId);
+  useEffect(() => {
+    getProfileData(profileId);
   }, []);
 
   if (loading)
@@ -177,4 +175,4 @@ const ProfileComponent = (props: ProfileProps) => {
   }
 };
 
-export default ProfileComponent;
+export default Profile;
