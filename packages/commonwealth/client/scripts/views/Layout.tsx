@@ -16,7 +16,7 @@ import { useParams } from 'react-router-dom';
 import { ChainType } from 'common-common/src/types';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorPage from 'views/pages/error';
-import { LayoutContext, LayoutContextProvider } from './Layout.context';
+import { LayoutContext } from './Layout.context';
 
 const LoadingLayout = () => {
   return (
