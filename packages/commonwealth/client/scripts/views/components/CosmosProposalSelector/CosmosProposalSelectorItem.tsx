@@ -3,17 +3,17 @@ import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { CWText } from '../component_kit/cw_text';
 
-interface ProposalSelectorItemProps {
+interface CosmosProposalSelectorItemProps {
   proposal: CosmosProposal;
   isSelected: boolean;
   onClick: (proposal: CosmosProposal) => void;
 }
 
-const ProposalSelectorItem = ({
+const CosmosProposalSelectorItem = ({
   onClick,
   proposal,
   isSelected,
-}: ProposalSelectorItemProps) => {
+}: CosmosProposalSelectorItemProps) => {
   return (
     <div className="chain-entity" onClick={() => onClick(proposal)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
@@ -34,4 +34,4 @@ const ProposalSelectorItem = ({
   );
 };
 
-export { ProposalSelectorItem };
+export { CosmosProposalSelectorItem };

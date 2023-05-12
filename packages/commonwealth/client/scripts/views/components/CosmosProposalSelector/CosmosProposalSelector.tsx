@@ -8,7 +8,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
 import { useGetActiveCosmosProposals } from 'hooks/cosmos/useGetActiveCosmosProposals';
-import { ProposalSelectorItem } from 'views/components/cosmos_proposal_selector/cosmos_proposal_selector_item';
+import { CosmosProposalSelectorItem } from 'views/components/CosmosProposalSelector';
 
 const filterProposals = (ce: CosmosProposal, searchTerm: string) => {
   return (
@@ -22,7 +22,7 @@ type ProposalSelectorProps = {
   onSelect: ({ identifier }: { identifier: string; title: string }) => void;
 };
 
-export const ProposalSelector = ({
+export const CosmosProposalSelector = ({
   onSelect,
   proposalsToSet,
 }: ProposalSelectorProps) => {
@@ -40,17 +40,6 @@ export const ProposalSelector = ({
     setIsLoading: setCompletedProposalsLoading,
     isLoading: loadingCompletedProposals,
   });
-
-  const queryLength = searchTerm?.trim()?.length;
-  const getEmptyContentMessage = () => {
-    if (queryLength > 0 && queryLength < 5) {
-      return 'Query too short';
-    } else if (queryLength >= 5 && !searchTerm.length) {
-      return 'No proposals found';
-    } else if (!completedCosmosProposals?.length) {
-      return 'No currently linked proposals';
-    }
-  };
 
   const handleClearButtonClick = () => {
     setSearchTerm('');
@@ -77,7 +66,7 @@ export const ProposalSelector = ({
       );
 
       return (
-        <ProposalSelectorItem
+        <CosmosProposalSelectorItem
           proposal={proposal}
           isSelected={isSelected}
           onClick={(ce) =>
@@ -92,10 +81,6 @@ export const ProposalSelector = ({
   if (!app.chain || !app.activeChainId()) {
     return;
   }
-
-  const EmptyComponent = () => (
-    <div className="empty-component">{getEmptyContentMessage()}</div>
-  );
 
   return (
     <div className="ChainEntitiesSelector">
