@@ -96,9 +96,6 @@ const ReactQuillEditor = ({
     setContentDelta,
   });
 
-  // handle twitter embed
-  // useTwitter({ editorRef, contentDelta, setContentDelta });
-
   // refreshQuillComponent unmounts and remounts the
   // React Quill component, as this is the only way
   // to refresh the component if the 'modules'
@@ -192,22 +189,6 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
-  const allFormats = useMemo(() => {
-    return [
-      'bold',
-      'italic',
-      'strike',
-      'code',
-      'link',
-      'blockquote',
-      'code-block',
-      'header',
-      'list',
-      'twitter',
-      'mention',
-    ];
-  }, []);
-
   return (
     <div className="QuillEditorWrapper">
       {isUploading && <LoadingIndicator />}
@@ -275,7 +256,7 @@ const ReactQuillEditor = ({
               }
               lastSelectionRef.current = selection;
             }}
-            formats={isMarkdownEnabled ? [] : allFormats}
+            formats={isMarkdownEnabled ? [] : undefined}
             modules={{
               toolbar: {
                 container: `#${toolbarId}`,

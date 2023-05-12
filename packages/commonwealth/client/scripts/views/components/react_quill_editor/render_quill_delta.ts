@@ -200,7 +200,7 @@ export const renderQuillDelta = (
               'blockquote',
               {
                 key: ii,
-                class: 'twitter-tweet',
+                className: 'twitter-tweet',
               },
               render('a', {
                 tabIndex: -1,

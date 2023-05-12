@@ -55,8 +55,6 @@ export const convertTwitterLinksToEmbeds = (
       if (embeddableTweet) {
         const id = link.match(twitterRe)[1];
         if (typeof id === 'string' && id) {
-          console.log('id: ', id, typeof id);
-          // test link: https://twitter.com/sketch/status/1017789080871030784
           newContent.ops[i] = {
             insert: {
               twitter: {

@@ -113,6 +113,7 @@ import deleteChatChannel from '../routes/chat/deleteChatChannel';
 import deleteChatCategory from '../routes/chat/deleteChatCategory';
 import editChatChannel from '../routes/chat/editChatChannel';
 import editChatCategory from '../routes/chat/editChatCategory';
+import { twitterEmbed } from '../routes/twitterEmbed';
 
 import createRule from '../routes/rules/createRule';
 import deleteRule from '../routes/rules/deleteRule';
@@ -933,6 +934,9 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models)
   );
+
+  // twitter embed
+  router.get('/twitterEmbed', twitterEmbed.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
