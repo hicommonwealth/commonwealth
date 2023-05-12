@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { ProposalType } from 'common-common/src/types';
 
-import 'components/proposal_card/index.scss';
+import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
@@ -21,7 +21,7 @@ import {
   getStatusClass,
   getStatusText,
 } from './helpers';
-import { ProposalTag } from './proposal_tag';
+import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
 
 type ProposalCardProps = {
@@ -29,8 +29,10 @@ type ProposalCardProps = {
   proposal: AnyProposal;
 };
 
-export const ProposalCard = (props: ProposalCardProps) => {
-  const { proposal, injectedContent } = props;
+export const ProposalCard = ({
+  proposal,
+  injectedContent,
+}: ProposalCardProps) => {
   const navigate = useCommonNavigate();
   const [title, setTitle] = useState(proposal.title);
 
@@ -125,8 +127,6 @@ export const ProposalCard = (props: ProposalCardProps) => {
                   true
                 )
               );
-
-              // avoid resetting scroll point
             }}
           >
             {proposal.threadTitle ? proposal.threadTitle : 'Go to thread'}
