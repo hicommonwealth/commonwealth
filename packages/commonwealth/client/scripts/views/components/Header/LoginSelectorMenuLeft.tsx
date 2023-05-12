@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { setActiveAccount } from 'controllers/app/login';
-import { redraw } from 'mithrilInterop';
 import { UserBlock } from 'views/components/user/user_block';
 import { isSameAccount, pluralize } from 'helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -80,7 +79,6 @@ export const LoginSelectorMenuLeft = ({
                 onClick={async () => {
                   await setActiveAccount(account);
                   setSelectedAddress(account.address);
-                  redraw();
                 }}
               >
                 <UserBlock

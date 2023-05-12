@@ -3,7 +3,6 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
-import { redraw } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -43,7 +42,11 @@ const CHAINNETWORK_SHORT = {
   [ChainNetwork.Terra]: 'Terra',
 };
 
-export const LoginSelector = () => {
+type LoginSelectorProps = {
+  onJoinSuccess: () => void;
+};
+
+export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -224,7 +227,7 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
+        onJoinSuccess(); // this triggers a state update from the parent to update the sibling component
       } catch (err) {
         console.error(err);
       }

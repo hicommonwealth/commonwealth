@@ -7,7 +7,6 @@ import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-import { redraw } from 'mithrilInterop';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import $ from 'jquery';
 import app, { initAppState } from 'state';
@@ -58,7 +57,6 @@ export const LoginSelectorMenuRight = ({
                 ? toggleDarkMode(false, setIsDarkModeOn)
                 : toggleDarkMode(true, setIsDarkModeOn);
               e.stopPropagation();
-              redraw();
             }}
           />
           <div className="login-darkmode-label">
