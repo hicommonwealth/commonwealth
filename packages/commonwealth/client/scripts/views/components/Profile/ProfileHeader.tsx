@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import jdenticon from 'jdenticon';
 
-import 'components/profile/profile_header.scss';
+import 'components/Profile/ProfileHeader.scss';
 
 import type NewProfile from '../../../models/NewProfile';
 import { CWButton } from '../component_kit/cw_button';
@@ -16,11 +16,9 @@ type ProfileHeaderProps = {
   isOwner: boolean;
 };
 
-const ProfileHeader = (props: ProfileHeaderProps) => {
+const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-
-  const { profile, isOwner } = props;
 
   if (!profile) return;
   const { bio, name } = profile;
@@ -54,11 +52,6 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
         <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
           {name || 'Anonymous user'}
         </CWText>
-        <div className="buttons">
-          {/* TODO: Add delegate and follow buttons */}
-          {/* <CWButton label="Delegate" buttonType="mini-black" onClick={() => {}} />
-          <CWButton label="Follow" buttonType="mini-black" onClick={() => {}} /> */}
-        </div>
         <SocialAccounts profile={profile} />
         {bio && (
           <div>

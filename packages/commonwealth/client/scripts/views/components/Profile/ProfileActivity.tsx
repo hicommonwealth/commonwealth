@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-import 'components/profile/profile_activity.scss';
+import 'components/Profile/ProfileActivity.scss';
 
 import type Thread from 'models/Thread';
 import type Comment from 'models/Comment';
 import type AddressInfo from 'models/AddressInfo';
 import type { IUniqueId } from 'models/interfaces';
 import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
-import ProfileActivityContent from './profile_activity_content';
+import ProfileActivityContent from './ProfileActivityContent';
 
 enum ProfileActivityType {
   Addresses,
@@ -26,11 +26,10 @@ type ProfileActivityProps = {
   threads: Thread[];
 };
 
-const ProfileActivity = (props: ProfileActivityProps) => {
+const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments
   );
-  const { comments, threads } = props;
 
   return (
     <div className="ProfileActivity">
@@ -55,22 +54,6 @@ const ProfileActivity = (props: ProfileActivityProps) => {
             }}
             isSelected={selectedActivity === ProfileActivityType.Threads}
           />
-          {/* TODO: uncomment when communities are ready */}
-          {/* <div className="divider" />
-          <CWTab
-            label="Communities"
-            onclick={() => {
-              this.selectedActivity = ProfileActivity.Communities;
-            }}
-            isSelected={this.selectedActivity === ProfileActivity.Communities}
-          />
-          <CWTab
-            label="Addresses"
-            onclick={() => {
-              this.selectedActivity = ProfileActivity.Addresses;
-            }}
-            isSelected={this.selectedActivity === ProfileActivity.Addresses}
-          /> */}
         </CWTabBar>
       </div>
       <div className="activity-content">
