@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'components/reaction_button/thread_preview_reaction_button.scss';
+import 'components/ReactionButton/ThreadPreviewReactionButton.scss';
 
 import type Thread from '../../../models/Thread';
 import { LoginModal } from '../../modals/login_modal';
@@ -11,7 +11,7 @@ import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { Modal } from '../component_kit/cw_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import { useReactionButton } from './UseReactionButton';
+import { useReactionButton } from './useReactionButton';
 
 type ThreadPreviewReactionButtonProps = {
   thread: Thread;
