@@ -13,9 +13,6 @@ export const registerRoute = (router, method: HttpMethod, path: string, ...handl
 export const methodNotAllowedMiddleware = () => {
   return (req: Request, res: Response, next: NextFunction) => {
     const methods = routesMethods[req.path];
-    console.log(methods);
-    console.log(routesMethods);
-    console.log(req.path);
     if (methods && !methods.includes(req.method)) {
       res.set('Allow', methods ? methods.join(', ') : '');
       return res.status(405).json({ result: 'Method Not Allowed', status: 405 });
