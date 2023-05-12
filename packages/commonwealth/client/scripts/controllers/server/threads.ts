@@ -8,7 +8,6 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
-import { redraw } from 'mithrilInterop';
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
@@ -412,7 +411,6 @@ class ThreadsController {
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
           this.numTotalThreads -= 1;
-          redraw();
           resolve(result);
         })
         .catch((e) => {
@@ -446,7 +444,6 @@ class ThreadsController {
       },
       error: (err) => {
         console.log('Failed to update stage');
-        notifyError(`Failed to update stage: ${err.responseJSON.error}`);
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
