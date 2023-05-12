@@ -25,7 +25,7 @@ const decodeTitle = (title: string) => {
 
 const getUrl = (req) => {
   return req.protocol + '://' + req.get('host') + req.originalUrl;
-}
+};
 
 const setupAppRoutes = (
   app,
@@ -96,10 +96,10 @@ const setupAppRoutes = (
     res.send(twitterSafeHtml);
   };
 
-  app.get('/:scope', async (req, res) => {
+  app.get('/:scope?', async (req, res) => {
     // Retrieve chain
     const scope = req.params.scope;
-    const chain = await models.Chain.findOne({ where: { id: scope } });
+    const chain = await getChain(req, scope);
     const title = chain ? chain.name : 'Commonwealth';
     const description = chain ? chain.description : '';
     const image = chain?.icon_url
@@ -113,7 +113,7 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image, url);
   });
 
-  app.get('/:scope/account/:address', async (req, res) => {
+  app.get('/:scope?/account/:address', async (req, res) => {
     // Retrieve title, description, and author from the database
     let title, description, author, profileData, image;
     const address = await models.Address.findOne({
@@ -144,19 +144,18 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image, url);
   });
 
-  const renderThread = async (
-    scope: string,
-    threadId: string,
-    req,
-    res
-  ) => {
+  const renderThread = async (scope: string, threadId: string, req, res) => {
+    const where = scope
+      ? { id: threadId, chain: scope }
+      : { id: threadId, hostname: req.hostname };
+
     // Retrieve discussions
     const thread = await models.Thread.findOne({
-      where: { id: threadId },
+      where,
       include: [
         {
           model: models.Chain,
-          attributes: ['icon_url']
+          attributes: ['icon_url'],
         },
         {
           model: models.Address,
@@ -165,9 +164,9 @@ const setupAppRoutes = (
           include: [
             {
               model: models.Profile,
-              attributes: ['profile_name']
-            }
-          ]
+              attributes: ['profile_name'],
+            },
+          ],
         },
       ],
     });
@@ -178,9 +177,9 @@ const setupAppRoutes = (
       ? `${thread.Chain.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
 
-    const author = thread?.Address?.Profile?.profile_name ?
-      thread.Address.Profile.profile_name :
-      '';
+    const author = thread?.Address?.Profile?.profile_name
+      ? thread.Address.Profile.profile_name
+      : '';
     const url = getUrl(req);
 
     renderWithMetaTags(res, title, description, author, image, url);
@@ -193,7 +192,7 @@ const setupAppRoutes = (
     chain?: ChainInstance
   ) => {
     // Retrieve title, description, and author from the database
-    chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
+    chain = chain || (await getChain(req, scope));
 
     const title = chain ? chain.name : 'Commonwealth';
     const description = '';
@@ -208,12 +207,12 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image, url);
   };
 
-  app.get('/:scope/proposal/:type/:identifier', async (req, res) => {
+  app.get('/:scope?/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
     await renderProposal(scope, req, res);
   });
 
-  app.get('/:scope/discussion/:identifier', async (req, res) => {
+  app.get('/:scope?/discussion/:identifier', async (req, res) => {
     const scope = req.params.scope;
     const threadId = req.params.identifier.split('-')[0];
     if (isNaN(threadId)) {
@@ -222,23 +221,32 @@ const setupAppRoutes = (
     await renderThread(scope, threadId, req, res);
   });
 
-  app.get('/:scope/proposal/:identifier', async (req, res) => {
+  app.get('/:scope?/proposal/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const chain = await models.Chain.findOne({ where: { id: scope } });
+    const chain = await getChain(req, scope);
 
     const proposalTypes = new Set([
       ChainNetwork.Sputnik,
       ChainNetwork.Compound,
-      ChainNetwork.Aave
+      ChainNetwork.Aave,
     ]);
 
-    if (!proposalTypes.has(chain?.network) && chain?.base !== ChainBase.CosmosSDK) {
+    if (
+      !proposalTypes.has(chain?.network) &&
+      chain?.base !== ChainBase.CosmosSDK
+    ) {
       renderWithMetaTags(res, '', '', '', null, null);
       return;
     }
 
     await renderProposal(scope, req, res, chain);
   });
+
+  async function getChain(req, scope: string) {
+    return scope
+      ? await models.Chain.findOne({ where: { id: scope } })
+      : await models.Chain.findOne({ where: { custom_domain: req.hostname } });
+  }
 
   app.get('*', (req, res) => {
     log.info(`setupAppRoutes sendFiles ${req.path}`);
