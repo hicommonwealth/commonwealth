@@ -4,7 +4,6 @@ import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
 import moment from 'moment';
 import app from 'state';
-import { redraw } from 'mithrilInterop';
 
 import PollStore from 'stores/PollStore';
 
@@ -125,9 +124,8 @@ class PollsController {
         chain_id: app.activeChainId(),
         jwt: app.user.jwt,
       },
-      success: (response) => {
+      success: () => {
         this._store.remove(this._store.getById(pollId));
-        redraw();
       },
       error: (err) => {
         console.log('Failed to delete poll');

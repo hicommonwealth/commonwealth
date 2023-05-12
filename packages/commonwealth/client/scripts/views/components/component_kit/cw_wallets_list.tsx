@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase } from 'common-common/src/types';
@@ -299,8 +298,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
     );
 
     await wallet.reset();
-
-    redraw();
   };
 
   return (
