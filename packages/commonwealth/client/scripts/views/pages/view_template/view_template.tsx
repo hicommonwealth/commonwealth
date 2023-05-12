@@ -2,7 +2,7 @@ import React from 'react';
 import 'view_template/view_template.scss';
 import app from 'state';
 
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';

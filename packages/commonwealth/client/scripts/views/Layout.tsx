@@ -2,7 +2,7 @@ import React, { Suspense, useState } from 'react';
 
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 
-import 'layout.scss';
+import 'Layout.scss';
 
 import { deinitChainOrCommunity, initChain, selectChain } from 'helpers/chain';
 
