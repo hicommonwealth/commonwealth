@@ -4,20 +4,26 @@ import app, {resetDatabase} from "../../server-test";
 import * as modelUtils from "../util/modelUtils";
 import jwt from "jsonwebtoken";
 import {JWT_SECRET} from "../../server/config";
-import {JoinCommunityArgs} from "../util/modelUtils";
+import {JoinCommunityArgs, ThreadArgs} from "../util/modelUtils";
+import emitNotifications from "../../server/util/emitNotifications";
+import models from '../../server/database';
+import {NotificationCategories, ProposalType} from "common-common/src/types";
+import {IPostNotificationData} from "types";
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('emitNotifications tests', () => {
+describe.only('emitNotifications tests', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
   // author_chain, which is required for authorship lookup.
   // Therefore, a valid chain MUST be included alongside
   // communityId, unlike in non-test thread creation
+  let thread, comment, reaction;
   const title = 'test title';
   const body = 'test body';
+  const commentBody = 'test';
   const topicName = 'test topic';
   const kind = 'discussion';
 
@@ -29,7 +35,6 @@ describe('emitNotifications tests', () => {
   let userId2;
   let userAddress2;
   let userAddressId2;
-  let threadOne;
 
   before('Reset database', async () => {
     await resetDatabase();
@@ -48,7 +53,7 @@ describe('emitNotifications tests', () => {
     expect(userAddressId).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
-    const secondUser = await modelUtils.createAndVerifyAddress({ chain: chain2 });
+    const secondUser = await modelUtils.createAndVerifyAddress({ chain: chain });
     userId2 = secondUser.user_id;
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
@@ -63,8 +68,8 @@ describe('emitNotifications tests', () => {
       jwt: userJWT2,
       address_id: userAddressId2,
       address: userAddress2,
-      chain,
-      originChain: chain2
+      chain: chain2,
+      originChain: chain
     }
     const res = await modelUtils.joinCommunity(communityArgs);
     expect(res).to.equal(true);
@@ -76,11 +81,173 @@ describe('emitNotifications tests', () => {
       role: 'admin',
     });
     expect(isAdmin).to.not.be.null;
+
+    // create a thread manually to bypass emitNotifications in-route
+    thread = await models.Thread.create({
+      chain: chain,
+      address_id: userAddressId2,
+      title,
+      plaintext: '',
+      kind,
+    });
+
+    comment = await models.Comment.create({
+      thread_id: thread.id,
+      address_id: userAddressId2,
+      text: commentBody,
+      chain
+    });
+
+    reaction = await models.Reaction.create({
+      chain,
+      thread_id: thread.id,
+      address_id: userAddressId,
+      reaction: 'like'
+    });
   });
 
   describe('PostNotificationData', () => {
-    it('should generate a notification for a post', () => {
+    it('should generate a notification and notification reads for a new thread', async () => {
+      const subscription = await models.Subscription.create({
+        subscriber_id: userId,
+        category_id: NotificationCategories.NewThread,
+        object_id: chain,
+        chain_id: chain,
+      });
 
+      const notification_data: IPostNotificationData = {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_type: ProposalType.Thread,
+        root_title: title,
+        chain_id: chain,
+        author_address: userAddress2,
+        author_chain: chain
+      }
+
+      await emitNotifications(
+        models,
+        NotificationCategories.NewThread,
+        chain,
+        notification_data
+      );
+
+      const notif = await models.Notification.findOne({
+        where: {
+          chain_id: chain,
+          category_id: NotificationCategories.NewThread,
+          thread_id: thread.id
+        }
+      });
+      expect(notif).to.not.be.null;
+      expect(notif.thread_id).to.equal(thread.id);
+      expect((notif.toJSON()).notification_data).to.deep.equal(JSON.stringify(notification_data));
+
+      const notifRead = await models.NotificationsRead.findOne({
+        where: {
+          subscription_id: subscription.id,
+          notification_id: notif.id,
+          user_id: userId,
+          is_read: false
+        }
+      });
+      expect(notifRead).to.not.be.null;
+    });
+
+    it('should generate a notification and notification reads for a thread comment', async () => {
+      const subscription = await models.Subscription.create({
+        subscriber_id: userId,
+        category_id: NotificationCategories.NewComment,
+        object_id: `discussion_${thread.id}`,
+        chain_id: chain,
+        offchain_thread_id: thread.id
+      });
+
+      const notification_data: IPostNotificationData = {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_type: ProposalType.Thread,
+        root_title: title,
+        comment_text: commentBody,
+        chain_id: chain,
+        author_address: userAddress2,
+        author_chain: chain
+      }
+
+      const object_id = `discussion_${thread.id}`;
+      await emitNotifications(
+        models,
+        NotificationCategories.NewComment,
+        `discussion_${thread.id}`,
+        notification_data
+      );
+
+      const notif = await models.Notification.findOne({
+        where: {
+          chain_id: chain,
+          category_id: NotificationCategories.NewComment,
+        }
+      });
+      expect(notif).to.not.be.null;
+      expect(notif.thread_id).to.equal(thread.id);
+      expect((notif.toJSON()).notification_data).to.deep.equal(JSON.stringify(notification_data));
+
+      const notifRead = await models.NotificationsRead.findOne({
+        where: {
+          subscription_id: subscription.id,
+          notification_id: notif.id,
+          user_id: userId,
+          is_read: false
+        }
+      });
+      expect(notifRead).to.not.be.null;
+    });
+
+    it('should generate a notification and notification reads for a new thread reaction', async () => {
+      const subscription = await models.Subscription.create({
+        subscriber_id: userId,
+        category_id: NotificationCategories.NewReaction,
+        object_id: `discussion_${thread.id}`,
+        chain_id: chain,
+        offchain_thread_id: thread.id
+      });
+
+      const notification_data: IPostNotificationData = {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_type: ProposalType.Thread,
+        root_title: title,
+        chain_id: chain,
+        author_address: userAddress,
+        author_chain: chain
+      }
+      await emitNotifications(
+        models,
+        NotificationCategories.NewReaction,
+        `discussion_${thread.id}`,
+        notification_data
+      );
+
+      const notif = await models.Notification.findOne({
+        where: {
+          chain_id: chain,
+          category_id: NotificationCategories.NewReaction,
+          thread_id: thread.id
+        }
+      });
+      expect(notif).to.not.be.null;
+      expect(notif.thread_id).to.equal(thread.id);
+      expect((notif.toJSON()).notification_data).to.deep.equal(JSON.stringify(notification_data));
+
+      const notifRead = await models.NotificationsRead.findOne({
+        where: {
+          subscription_id: subscription.id,
+          notification_id: notif.id,
+          user_id: userId,
+          is_read: false
+        }
+      });
+      expect(notifRead).to.not.be.null;
     });
   });
 });

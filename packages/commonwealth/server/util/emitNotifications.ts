@@ -163,7 +163,7 @@ export default async function emitNotifications(
     console.trace(e);
   }
 
-  let query = `INSERT INTO "NotificationsRead" VALUES `;
+  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id, id) VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {

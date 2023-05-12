@@ -44,7 +44,6 @@ export async function addAllowDenyPermissionsForCommunityRole(
   deny_permission: number | undefined
 ) {
   try {
-    console.log('addAllowDenyPermissionsForCommunityRole');
     const permissionsManager = new PermissionManager();
     // get community role object from the database
     const communityRole = await models.CommunityRole.findOne({
@@ -71,7 +70,6 @@ export async function addAllowDenyPermissionsForCommunityRole(
     }
     // save community role object to the database
     const updatedRole = await communityRole.save();
-    console.log('updatedRole', updatedRole);
   } catch (err) {
     throw new Error(err);
   }
@@ -86,7 +84,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
-    console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
