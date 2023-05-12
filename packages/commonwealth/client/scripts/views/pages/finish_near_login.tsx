@@ -3,7 +3,6 @@ import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import BN from 'bn.js';
-import { redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -69,13 +68,10 @@ const FinishNearLogin = () => {
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
   const [validating, setValidating] = React.useState<boolean>(false);
-  const [validationCompleted, setValidationCompleted] = React.useState<boolean>(
-    false
-  );
-  const [
-    validatedAccount,
-    setValidatedAccount,
-  ] = React.useState<NearAccount | null>(null);
+  const [validationCompleted, setValidationCompleted] =
+    React.useState<boolean>(false);
+  const [validatedAccount, setValidatedAccount] =
+    React.useState<NearAccount | null>(null);
   const [validationError, setValidationError] = React.useState<string>('');
   const [isNewAccount, setIsNewAccount] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -289,13 +285,11 @@ const FinishNearLogin = () => {
       validate(wallet).then(() => {
         setValidationCompleted(true);
         setValidating(false);
-        redraw();
       });
     } else {
       setValidationError('Sign-in failed.');
       setValidating(false);
       setValidationCompleted(true);
-      redraw();
     }
   } else {
     // validation in progress
