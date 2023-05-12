@@ -1,13 +1,11 @@
 import { createContext } from 'react';
 
 type LayoutContextProps = {
-  onRerender: () => void;
-  renderKey?: string;
+  reRenderLayout: () => void;
 };
 
 const initialValues = {
-  onRerender: () => {},
-  renderKey: '',
+  reRenderLayout: () => {},
 };
 
 export const LayoutContext = createContext<LayoutContextProps>(initialValues);

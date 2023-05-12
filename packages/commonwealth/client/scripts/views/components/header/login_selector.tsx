@@ -301,16 +301,15 @@ export const LoginSelector = () => {
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
-  const { onRerender } = useContext(LayoutContext);
+  const { reRenderLayout } = useContext(LayoutContext);
 
   useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
   }, [app.user.activeAccount]);
 
   const onJoinSuccess = () => {
-    console.log('onJoinSuccess');
     setIsJoined(true);
-    onRerender();
+    reRenderLayout();
   };
 
   const leftMenuProps = usePopover();
@@ -337,7 +336,7 @@ export const LoginSelector = () => {
             <LoginModal
               onModalClose={() => {
                 setIsLoginModalOpen(false);
-                onRerender();
+                reRenderLayout();
               }}
             />
           }

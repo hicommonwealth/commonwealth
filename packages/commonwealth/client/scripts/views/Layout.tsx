@@ -218,6 +218,7 @@ const LayoutComponent = ({
 export const LayoutWrapper = ({ Component, params }) => {
   const routerParams = useParams();
   const LayoutComp = withRouter(LayoutComponent);
+  const [, setRenderKey] = useState({});
 
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
   const scope = params.scoped ? pathScope : null;
@@ -225,18 +226,14 @@ export const LayoutWrapper = ({ Component, params }) => {
     deferChain: params.deferChain,
   });
 
-  const [renderKey, setRenderKey] = useState('');
-
-  const onRerender = () => {
-    console.log('onRerender');
-    setRenderKey(Date.now().toString());
+  const reRenderLayout = () => {
+    // a simple state update to trigger children to re-render
+    setRenderKey({});
   };
-
-  console.log('renderKey', renderKey);
 
   return (
     <LayoutComp scope={scope} deferChain={deferChain}>
-      <LayoutContext.Provider value={{ renderKey, onRerender }}>
+      <LayoutContext.Provider value={{ reRenderLayout }}>
         <Component {...routerParams} />
       </LayoutContext.Provider>
     </LayoutComp>
