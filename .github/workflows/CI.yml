@@ -171,6 +171,11 @@ jobs:
         env:
           NO_CLIENT: true
 
+      - name: Run emitNotification tests
+        run: yarn --cwd packages/commonwealth test-emit-notif
+        env:
+          NO_CLIENT: true
+
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
     strategy:
@@ -229,13 +234,13 @@ jobs:
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
-          
+
       - name: Run Devnet tests
         run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
-        
+
       - name: Start EVM Testnet
         run: |
           /usr/bin/docker pull trufflesuite/ganache;
