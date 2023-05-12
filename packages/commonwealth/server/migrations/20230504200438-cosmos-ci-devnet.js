@@ -5,14 +5,12 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
-        INSERT INTO "ChainNodes" (name, url, alt_wallet_url, balance_type, bech32, created_at, updated_at) VALUES (
+        INSERT INTO "ChainNodes" (name, url, alt_wallet_url, balance_type, bech32) VALUES (
           'cosmos sdk v0.46.11',
           'http://localhost:5050/rpc',
           'http://localhost:5050/lcd/',
           'cosmos',
-          'cosmos',
-          NOW(),
-          NOW()
+          'cosmos'
         );
         
         INSERT INTO "Chains" (id, name, default_symbol, active, network, type, base, bech32_prefix, chain_node_id) VALUES (

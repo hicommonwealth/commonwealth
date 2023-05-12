@@ -37,7 +37,6 @@ module.exports = {
             NOW(),
             NOW()
         );
-
         INSERT INTO "ChainNodes" (name, url, alt_wallet_url, balance_type, bech32, created_at, updated_at) VALUES (
           'cosmos sdk v0.45.0',
           'https://cosmos-devnet-beta.herokuapp.com/rpc',
