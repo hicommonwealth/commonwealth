@@ -307,6 +307,12 @@ export const LoginSelector = () => {
     setIsJoined(!!app.user.activeAccount);
   }, [app.user.activeAccount]);
 
+  const onJoinSuccess = () => {
+    console.log('onJoinSuccess');
+    setIsJoined(true);
+    onRerender();
+  };
+
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
 
@@ -328,7 +334,12 @@ export const LoginSelector = () => {
         </div>
         <Modal
           content={
-            <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
+            <LoginModal
+              onModalClose={() => {
+                setIsLoginModalOpen(false);
+                onRerender();
+              }}
+            />
           }
           isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
           onClose={() => setIsLoginModalOpen(false)}
@@ -482,7 +493,7 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        onRerender();
+        onJoinSuccess();
       } catch (err) {
         console.error(err);
       }
@@ -522,7 +533,6 @@ export const LoginSelector = () => {
                     setIsTOSModalOpen(true);
                   } else {
                     await performJoinCommunityLinking();
-                    setIsJoined(true);
                   }
                 }
               }}
@@ -607,7 +617,7 @@ export const LoginSelector = () => {
             onAccept={async () => {
               await performJoinCommunityLinking();
               setIsTOSModalOpen(false);
-              setIsJoined(true);
+              onJoinSuccess();
             }}
             onModalClose={() => setIsTOSModalOpen(false)}
           />
@@ -618,7 +628,7 @@ export const LoginSelector = () => {
       <Modal
         content={
           <LoginModal
-            onSuccess={() => setIsJoined(true)}
+            onSuccess={onJoinSuccess}
             onModalClose={() => setIsLoginModalOpen(false)}
           />
         }
