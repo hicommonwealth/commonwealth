@@ -186,7 +186,12 @@ export const CWWalletsList = (props: WalletsListProps) => {
       address
     );
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-    const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+    let validationBlockInfo
+    try {
+      validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+    } catch (err) {
+      // if getRecentBlock fails, continue with null blockhash
+    }
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
     // This creates a new `Account` object with fields set up to be validated by verifyAddress.
@@ -266,8 +271,13 @@ export const CWWalletsList = (props: WalletsListProps) => {
         address
       );
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-      const validationBlockInfo =
-        wallet.getRecentBlock && (await wallet.getRecentBlock(chainIdentifier));
+      let validationBlockInfo
+      try {
+        validationBlockInfo =
+          wallet.getRecentBlock && (await wallet.getRecentBlock(chainIdentifier));
+      } catch (err) {
+        // if getRecentBlock fails, continue with null blockhash
+      }
       const { account: signerAccount, newlyCreated } =
         await createUserWithAddress(
           address,

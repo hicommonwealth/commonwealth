@@ -115,9 +115,6 @@ class Account {
     timestamp: number,
     chainId: string | number
   ) {
-    if (!this._validationToken && !this._validationBlockInfo) {
-      throw new Error('no validation token found');
-    }
     if (!signature) {
       throw new Error('signature required for validation');
     }
