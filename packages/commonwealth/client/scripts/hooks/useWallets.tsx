@@ -191,7 +191,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const onLogInWithAccount = async (
     account: Account,
     exitOnComplete: boolean,
-    shouldRedrawApp: boolean = true
+    shouldRedrawApp = true
   ) => {
     const profile = account.profile;
     setAddress(account.address);
