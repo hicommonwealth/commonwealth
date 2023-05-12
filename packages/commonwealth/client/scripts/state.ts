@@ -4,7 +4,6 @@ import { WebSocketController } from 'controllers/server/socket';
 import { EventEmitter } from 'events';
 import { ChainStore, NodeStore } from 'stores';
 import RecentActivityController from './controllers/app/recent_activity';
-import WebWalletController from './controllers/app/web_wallets';
 import SnapshotController from './controllers/chain/snapshot';
 import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
@@ -25,7 +24,7 @@ import ChainInfo from './models/ChainInfo';
 import type IChainAdapter from './models/IChainAdapter';
 import NodeInfo from './models/NodeInfo';
 import NotificationCategory from './models/NotificationCategory';
-import type { MobileMenuName } from './views/app_mobile_menus';
+import type { MobileMenuName } from './views/AppMobileMenus';
 import type { SidebarMenuName } from './views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
@@ -209,7 +208,7 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: (win: Window) => {
+  isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
   },

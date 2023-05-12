@@ -1,7 +1,7 @@
 import { Route } from 'react-router-dom';
 import React, { lazy } from 'react';
 
-import { withLayout } from 'views/layout';
+import { withLayout } from 'views/Layout';
 import { Navigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
 
@@ -73,7 +73,7 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const customDomainRoutes = () => {
+const CustomDomainRoutes = () => {
   return [
     <Route
       path="/"
@@ -536,4 +536,4 @@ const customDomainRoutes = () => {
   ];
 };
 
-export default customDomainRoutes;
+export default CustomDomainRoutes;

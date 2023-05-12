@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';

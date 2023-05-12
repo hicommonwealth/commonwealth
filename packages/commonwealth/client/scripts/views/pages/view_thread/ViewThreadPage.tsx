@@ -18,13 +18,13 @@ import { ContentType } from 'types';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import Topic from '../../../models/Topic';
-import { CommentsTree } from '../../components/comments/comments_tree';
-import { CreateComment } from '../../components/comments/create_comment';
-import { clearEditingLocalStorage } from '../../components/comments/helpers';
+import { CommentsTree } from '../../components/Comments/CommentsTree';
+import { CreateComment } from '../../components/Comments/CreateComment';
+import { clearEditingLocalStorage } from '../../components/Comments/helpers';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -43,12 +43,17 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import { ExternalLink, ThreadAuthor, ThreadStageComponent } from './thread_components';
+import {
+  ExternalLink,
+  ThreadAuthor,
+  ThreadStageComponent,
+} from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { filterLinks } from 'helpers/threads';
+import { isDefaultStage } from 'helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -677,6 +682,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     ];
   };
 
+  const isStageDefault = isDefaultStage(thread.stage);
+
   return (
     <Sublayout>
       <CWContentPage
@@ -699,16 +706,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             thread.title
           )
         }
-        author={<ThreadAuthor thread={thread} />}
+        author={
+          <ThreadAuthor
+            author={thread.author}
+            collaborators={thread.collaborators}
+          />
+        }
         createdAt={thread.createdAt}
         viewCount={viewCount}
         readOnly={thread.readOnly}
         headerComponents={
-          thread.stage !== ThreadStage.Discussion && (
-            <ThreadStageComponent thread={thread} />
-          )
+          !isStageDefault && <ThreadStageComponent stage={thread.stage} />
         }
-        subHeader={!!thread.url && <ExternalLink thread={thread} />}
+        subHeader={!!thread.url && <ExternalLink url={thread.url} />}
         actions={
           app.user.activeAccount && !isGloballyEditing && getActionMenuItems()
         }

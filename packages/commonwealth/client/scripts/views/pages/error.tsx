@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 

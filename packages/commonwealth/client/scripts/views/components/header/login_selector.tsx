@@ -5,7 +5,6 @@ import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -120,7 +119,6 @@ export const LoginSelectorMenuLeft = ({
                 onClick={async () => {
                   await setActiveAccount(account);
                   setSelectedAddress(account.address);
-                  redraw();
                 }}
               >
                 <UserBlock
@@ -204,7 +202,9 @@ export const LoginSelectorMenuRight = ({
     /**
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
-    const walletConnectWallet = WebWalletController.Instance.getByName(WalletId.WalletConnect);
+    const walletConnectWallet = WebWalletController.Instance.getByName(
+      WalletId.WalletConnect
+    );
     await walletConnectWallet.reset();
   };
 
@@ -225,7 +225,6 @@ export const LoginSelectorMenuRight = ({
                 ? toggleDarkMode(false, setIsDarkModeOn)
                 : toggleDarkMode(true, setIsDarkModeOn);
               e.stopPropagation();
-              redraw();
             }}
           />
           <div className="login-darkmode-label">
@@ -293,7 +292,11 @@ const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
   );
 };
 
-export const LoginSelector = () => {
+type LoginSelectorProps = {
+  onJoinSuccess: () => void;
+};
+
+export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -481,7 +484,7 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
+        onJoinSuccess(); // this triggers a state update from the parent to update the sibling component
       } catch (err) {
         console.error(err);
       }
