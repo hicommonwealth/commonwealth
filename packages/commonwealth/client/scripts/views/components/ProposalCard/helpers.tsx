@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 
-import 'components/proposal_card/index.scss';
+import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
