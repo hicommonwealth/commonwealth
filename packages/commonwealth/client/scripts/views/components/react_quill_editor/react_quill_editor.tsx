@@ -25,8 +25,7 @@ import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useImageUploader } from './use_image_uploader';
 import { RangeStatic } from 'quill';
-import { useTwitter } from './use_twitter';
-import { cloneDeep } from 'lodash';
+import { convertTwitterLinksToEmbeds } from './twitter_embed';
 
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register('modules/imageUploader', ImageUploader);
@@ -112,38 +111,9 @@ const ReactQuillEditor = ({
   };
 
   const handleChange = (value, delta, source, editor) => {
-    // convert twitter links to embeds
-    const twitterRe =
-      /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
-
-    const content = cloneDeep(editor.getContents());
-
-    for (let i = 0; i < (content.ops?.length || 0); i++) {
-      const op = content.ops[i];
-      const link = op.attributes?.link || '';
-      if (link) {
-        const embeddableTweet = twitterRe.test(link);
-        if (embeddableTweet) {
-          const id = link.match(twitterRe)[1];
-          if (typeof id === 'string' && id) {
-            console.log('id: ', id, typeof id);
-            // test link: https://twitter.com/sketch/status/1017789080871030784
-            content.ops[i] = {
-              insert: {
-                twitter: {
-                  id,
-                },
-              },
-            };
-          }
-        }
-      }
-    }
-
-    console.log('new content: ', content);
-
+    const newContent = convertTwitterLinksToEmbeds(editor.getContents());
     setContentDelta({
-      ...content,
+      ...newContent,
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
   };

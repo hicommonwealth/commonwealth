@@ -1,4 +1,6 @@
 import { loadScript } from 'helpers';
+import { cloneDeep } from 'lodash';
+import { DeltaStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
 
 const BlockEmbed = Quill.import('blots/block/embed');
@@ -36,3 +38,36 @@ class TwitterBlot extends BlockEmbed {
 }
 
 Quill.register('formats/twitter', TwitterBlot);
+
+export const convertTwitterLinksToEmbeds = (
+  content: DeltaStatic
+): DeltaStatic => {
+  const twitterRe =
+    /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
+
+  const newContent = cloneDeep(content);
+
+  for (let i = 0; i < (newContent.ops?.length || 0); i++) {
+    const op = newContent.ops[i];
+    const link = op.attributes?.link || '';
+    if (link) {
+      const embeddableTweet = twitterRe.test(link);
+      if (embeddableTweet) {
+        const id = link.match(twitterRe)[1];
+        if (typeof id === 'string' && id) {
+          console.log('id: ', id, typeof id);
+          // test link: https://twitter.com/sketch/status/1017789080871030784
+          newContent.ops[i] = {
+            insert: {
+              twitter: {
+                id,
+              },
+            },
+          };
+        }
+      }
+    }
+  }
+
+  return newContent;
+};
