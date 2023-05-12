@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import type { RangeStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
 import MagicUrl from 'quill-magic-url';
 import ImageUploader from 'quill-image-uploader';
+import './twitter_embed';
 
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
@@ -24,6 +24,9 @@ import { useImageDropAndPaste } from './use_image_drop_and_paste';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useImageUploader } from './use_image_uploader';
+import { RangeStatic } from 'quill';
+import { useTwitter } from './use_twitter';
+import { cloneDeep } from 'lodash';
 
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register('modules/imageUploader', ImageUploader);
@@ -94,6 +97,9 @@ const ReactQuillEditor = ({
     setContentDelta,
   });
 
+  // handle twitter embed
+  // useTwitter({ editorRef, contentDelta, setContentDelta });
+
   // refreshQuillComponent unmounts and remounts the
   // React Quill component, as this is the only way
   // to refresh the component if the 'modules'
@@ -106,8 +112,38 @@ const ReactQuillEditor = ({
   };
 
   const handleChange = (value, delta, source, editor) => {
+    // convert twitter links to embeds
+    const twitterRe =
+      /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
+
+    const content = cloneDeep(editor.getContents());
+
+    for (let i = 0; i < (content.ops?.length || 0); i++) {
+      const op = content.ops[i];
+      const link = op.attributes?.link || '';
+      if (link) {
+        const embeddableTweet = twitterRe.test(link);
+        if (embeddableTweet) {
+          const id = link.match(twitterRe)[1];
+          if (typeof id === 'string' && id) {
+            console.log('id: ', id, typeof id);
+            // test link: https://twitter.com/sketch/status/1017789080871030784
+            content.ops[i] = {
+              insert: {
+                twitter: {
+                  id,
+                },
+              },
+            };
+          }
+        }
+      }
+    }
+
+    console.log('new content: ', content);
+
     setContentDelta({
-      ...editor.getContents(),
+      ...content,
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
   };
@@ -186,6 +222,22 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
+  const allFormats = useMemo(() => {
+    return [
+      'bold',
+      'italic',
+      'strike',
+      'code',
+      'link',
+      'blockquote',
+      'code-block',
+      'header',
+      'list',
+      'twitter',
+      'mention',
+    ];
+  }, []);
+
   return (
     <div className="QuillEditorWrapper">
       {isUploading && <LoadingIndicator />}
@@ -253,7 +305,7 @@ const ReactQuillEditor = ({
               }
               lastSelectionRef.current = selection;
             }}
-            formats={isMarkdownEnabled ? [] : undefined}
+            formats={isMarkdownEnabled ? [] : allFormats}
             modules={{
               toolbar: {
                 container: `#${toolbarId}`,
