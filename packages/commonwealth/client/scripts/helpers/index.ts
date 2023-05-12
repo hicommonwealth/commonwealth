@@ -29,6 +29,13 @@ export function threadStageToLabel(stage: ThreadStage) {
   }
 }
 
+export function isDefaultStage(stage: string) {
+  return (
+    stage === ThreadStage.Discussion ||
+    stage === parseCustomStages(app.chain.meta.customStages)[0]
+  );
+}
+
 export function parseCustomStages(str) {
   // Parse customStages into a `string[]` and then cast to ThreadStage[]
   // If parsing fails, return an empty array.
@@ -46,9 +53,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return default_stages;
   }
-  return arr
+  return (arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown) as ThreadStage[];
 }
 
 /*
