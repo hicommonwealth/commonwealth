@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import Sublayout from 'views/sublayout';
+import Sublayout from '../Sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 import { CWText } from '../components/component_kit/cw_text';
 import app from 'state';
@@ -18,7 +18,8 @@ import NodeInfo from 'models/NodeInfo';
 import ChainInfo from 'models/ChainInfo';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import { BalanceType } from '../../../../../common-common/src/types';
-import { set } from 'lodash';
+import { add, set } from 'lodash';
+import { isAddress } from 'web3-utils';
 
 // Allows admins to create/update RPC endpoints for chains
 const RPCEndpointTask = () => {
@@ -50,7 +51,8 @@ const RPCEndpointTask = () => {
     <div className="TaskGroup">
       <CWText type="h4">Switch/Add RPC Endpoint</CWText>
       <CWText type="caption">
-        Changes the RPC endpoint for a specific chain.
+        Changes the RPC endpoint for a specific chain, or adds an endpoint if it
+        doesn't yet exist.
       </CWText>
       <div className="MultiRow">
         <div className="TaskRow">
@@ -269,6 +271,79 @@ const DeleteChainTask = () => {
   );
 };
 
+const MakeSiteAdminTask = () => {
+  const [address, setAddress] = React.useState<string>('');
+  const [addressValidated, setAddressValidated] =
+    React.useState<boolean>(false);
+
+  return (
+    <div className="TaskGroup">
+      <CWText type="h4">Make Site Admin</CWText>
+      <CWText type="caption">
+        Makes a user (corresponding to a specified address) a site admin. Note
+        that this is equivalent to "god mode"- Don't do this unless you know
+        what you're doing.
+      </CWText>
+      <div className="TaskRow">
+        <CWTextInput
+          label="Address"
+          value={address}
+          onInput={(e) => {
+            setAddress(e.target.value);
+            if (e.target.value.length === 0) setAddressValidated(false);
+          }}
+          inputValidationFn={(value: string) => {
+            if (!isAddress(value)) {
+              setAddressValidated(false);
+              return ['failure', 'Not an address'];
+            }
+            setAddressValidated(true);
+            return [];
+          }}
+          placeholder="Enter an address to promote to site admin"
+        />
+        <CWButton
+          label="Promote"
+          className="TaskButton"
+          disabled={!addressValidated}
+          onClick={() => {
+            openConfirmation({
+              title: 'Promote to Site Admin',
+              description: `Are you sure you want promote ${address} to god mode? The apotheosis of a user is not to be taken lightly.`,
+              buttons: [
+                {
+                  label: 'promote',
+                  buttonType: 'mini-black',
+                  onClick: async () => {
+                    console.log({ address });
+                    try {
+                      await axios.post(`${app.serverUrl()}/updateSiteAdmin`, {
+                        address: address,
+                        siteAdmin: true,
+                        jwt: app.user.jwt,
+                      });
+                      setAddress('');
+                      notifySuccess('Address promoted');
+                    } catch (e) {
+                      notifyError('Error promoting address');
+
+                      console.error(e);
+                    }
+                  },
+                },
+                {
+                  label: 'Cancel',
+                  buttonType: 'mini-white',
+                },
+              ],
+            });
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 const AdminPanel = () => {
   const navigate = useCommonNavigate();
 
@@ -287,6 +362,7 @@ const AdminPanel = () => {
         <CWText type="h2">Site Admin Tasks</CWText>
         <DeleteChainTask />
         <RPCEndpointTask />
+        <MakeSiteAdminTask />
       </div>
     </Sublayout>
   );
