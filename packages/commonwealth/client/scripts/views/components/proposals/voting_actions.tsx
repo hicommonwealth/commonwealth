@@ -24,8 +24,8 @@ import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import type { AnyProposal } from 'models';
-import { VotingType } from 'models';
+import type { AnyProposal } from '../../../models/types';
+import { VotingType } from '../../../models/types';
 
 import app from 'state';
 

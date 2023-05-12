@@ -3,7 +3,7 @@ import 'pages/contracts/contracts_page.scss';
 import app from 'state';
 
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
@@ -34,7 +34,7 @@ const ContractsPage = () => {
   return (
     <Sublayout>
       <div className="ContractsPage">
-        <CWBreadcrumbs breadcrumbs={[{ label: 'Contracts', path: '' }]} />
+        <CWBreadcrumbs breadcrumbs={[{ label: 'Contracts' }]} />
         <div className="header-container">
           <CWText type="h3">Contract Action Templates</CWText>
           <CWButton

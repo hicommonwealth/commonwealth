@@ -5,10 +5,10 @@ import { useDropzone } from 'react-dropzone';
 import 'components/avatar_upload.scss';
 
 import app from 'state';
+import Account from '../../models/Account';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
-import type { Account } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 const uploadToS3 = async (file: File, signedUrl: string) => {

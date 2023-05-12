@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import type { ChainInfo, Comment } from 'models';
 
 import app from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
+import type Comment from '../../../models/Comment';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
@@ -67,8 +66,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
         );
 
         setIsLoading(false);
-
-        redraw();
       });
   };
 
@@ -86,8 +83,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
         ]);
 
         setIsLoading(false);
-
-        redraw();
       });
   };
 
@@ -125,7 +120,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
             content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
-                  reactors: reactors.map(r => r.Address.address),
+                  reactors: reactors.map((r) => r.Address.address),
                 })}
               </div>
             }

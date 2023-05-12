@@ -1,4 +1,3 @@
-import { redraw } from 'mithrilInterop';
 import type { SubmittableResult } from '@polkadot/api';
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import type {
@@ -11,10 +10,8 @@ import type { u128 } from '@polkadot/types';
 
 import type { Compact } from '@polkadot/types/codec';
 import type {
-  ActiveEraInfo,
   Call,
   DispatchError,
-  EraIndex,
   SessionIndex,
 } from '@polkadot/types/interfaces';
 import type { CallFunction, InterfaceTypes } from '@polkadot/types/types';
@@ -25,7 +22,6 @@ import { formatCoin } from 'adapters/currency';
 import BN from 'bn.js';
 
 import { SubstrateEvents } from 'chain-events/src';
-import { ChainNetwork } from 'common-common/src/types';
 
 import {
   notifyError,
@@ -33,19 +29,15 @@ import {
   notifySuccess,
 } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
-import type {
-  ChainInfo,
-  IChainModule,
-  ITXData,
-  ITXModalData,
-  NodeInfo,
-} from 'models';
-import { TransactionStatus } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
+import type ChainInfo from '../../../models/ChainInfo';
+import type { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
+import type NodeInfo from '../../../models/NodeInfo';
+import { TransactionStatus } from '../../../models/types';
 import { chainToEventNetwork } from '../../server/chain_entities';
 import type { SubstrateAccount } from './account';
 
@@ -159,7 +151,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         this.app.chain.networkError = null;
         this._suppressAPIDisconnectErrors = false;
         this._connectTime = 0;
-        redraw();
       }
     };
     const disconnectedCb = () => {
@@ -174,7 +165,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         setTimeout(() => {
           this._suppressAPIDisconnectErrors = false;
         }, CONNECT_TIMEOUT);
-        redraw();
       }
     };
     const errorCb = (err) => {
@@ -198,9 +188,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           console.log('chain connection timed out!');
           provider.disconnect();
           this._timedOut = true;
-          redraw();
         }, CONNECT_TIMEOUT);
-        redraw();
       }
     };
 
@@ -354,9 +342,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._totalbalance = this.coins(totalbalance);
     this._existentialdeposit = this.coins(existentialdeposit);
     this._sudoKey = sudokey ? sudokey.toString() : undefined;
-
-    // redraw
-    redraw();
     this._metadataInitialized = true;
   }
 
@@ -437,7 +422,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             }
           }
         });
-        redraw();
       }
     );
     this._eventsInitialized = true;
@@ -553,7 +537,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             } else {
               notifyError(err.toString());
             }
-            redraw();
             events.emit(TransactionStatus.Error.toString(), {
               err: err.toString(),
             });

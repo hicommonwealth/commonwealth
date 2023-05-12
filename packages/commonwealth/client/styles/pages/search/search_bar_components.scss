@@ -83,3 +83,8 @@
 .SearchBarMemberPreviewRow {
   @include everyRowStyles;
 }
+
+.SearchQuillRenderer {
+  max-height: 60px;
+  overflow-y: hidden;
+}

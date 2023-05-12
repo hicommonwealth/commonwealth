@@ -5,10 +5,10 @@ import { notifyError } from 'controllers/app/notifications';
 
 import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import type { ChainInfo } from 'models';
-import { IChainAdapter } from 'models';
 
 import type { IApp } from 'state';
+import type ChainInfo from '../../../../models/ChainInfo';
+import IChainAdapter from '../../../../models/IChainAdapter';
 import CompoundChain from './chain';
 import CompoundGovernance from './governance';
 

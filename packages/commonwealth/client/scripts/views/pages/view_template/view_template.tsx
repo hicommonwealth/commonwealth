@@ -2,7 +2,7 @@ import React from 'react';
 import 'view_template/view_template.scss';
 import app from 'state';
 
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
@@ -13,7 +13,7 @@ import {
 } from 'views/components/component_kit/cw_text_input';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
-import type Contract from 'client/scripts/models/Contract';
+import type Contract from 'models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'helpers/validateTypes';
@@ -41,6 +41,11 @@ type Json = {
       calldata: string[];
       values: string[][];
       description: string;
+    };
+    tx_params: {
+      value: string;
+      gas: string;
+      gasPrice: string;
     };
   };
 };
@@ -218,12 +223,28 @@ const ViewTemplatePage = () => {
     });
   };
 
+  const formatTransactionParams = () => {
+    const { tx_template } = json;
+    const txObject = {};
+    Object.keys(tx_template.tx_params).map((key) => {
+      const arg = tx_template.tx_params[key];
+      if (arg.startsWith('$')) {
+        txObject[key] = formState[arg.slice(1)];
+      } else {
+        txObject[key] = arg;
+      }
+    });
+    return txObject;
+  };
+
   const constructTxPreview = () => {
     const functionArgs = formatFunctionArgs();
+    const txParams = formatTransactionParams();
     const preview = {};
 
     preview['method'] = json.tx_template?.method;
     preview['args'] = functionArgs;
+    preview['tx_params'] = txParams;
 
     return JSON.stringify(preview, null, 4);
   };
@@ -323,11 +344,12 @@ const ViewTemplatePage = () => {
               );
 
               const functionArgs = formatFunctionArgs();
-
+              const txParams = formatFunctionArgs();
               const res = await callContractFunction({
                 contract: currentContract,
                 fn: functionAbi,
                 inputArgs: functionArgs,
+                tx_options: txParams,
               });
 
               if (res.status) {
@@ -360,8 +382,8 @@ const ViewTemplatePage = () => {
       <div className="ViewTemplatePage">
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Contracts', path: `/contracts` },
-            { label: templateNickname, path: '' },
+            { label: 'Contracts', path: `/contracts`, navigate },
+            { label: templateNickname },
           ]}
         />
         <CWText type="h3" className="header">

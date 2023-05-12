@@ -1,8 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import { Attachment, DiscussionDraft } from 'models';
 import moment from 'moment';
 import app from 'state';
+import Attachment from '../../models/Attachment';
+import DiscussionDraft from '../../models/DiscussionDraft';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {

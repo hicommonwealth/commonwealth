@@ -1,5 +1,5 @@
 import moment from 'moment';
-import type { Thread } from '../models';
+import type Thread from '../models/Thread';
 import { orderDiscussionsbyLastComment } from '../views/pages/discussions/helpers';
 import IdStore from './IdStore';
 

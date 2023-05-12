@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { ChainInfo } from 'models';
+import ChainInfo from '../../../models/ChainInfo';
 
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 import type { IEventLabel } from '../../../../../../chain-events/src';

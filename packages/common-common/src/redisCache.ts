@@ -95,13 +95,16 @@ export class RedisCache {
     });
 
     this.client.on('ready', () => {
-      log.info('RedisCache connection ready');
+      this.initialized = !!this.client.isOpen;
+      log.info(`RedisCache connection ready ${this.initialized}`);
     });
     this.client.on('reconnecting', () => {
-      log.info('RedisCache reconnecting');
+      this.initialized = !!this.client.isOpen;
+      log.info(`RedisCache reconnecting ${this.initialized}`);
     });
     this.client.on('end', () => {
-      log.info('RedisCache disconnected');
+      this.initialized = !!this.client.isOpen;
+      log.info(`RedisCache disconnected ${this.initialized}`);
     });
 
     if (!this.client.isOpen) {
@@ -126,31 +129,29 @@ export class RedisCache {
     namespace: RedisNamespaces,
     key: string,
     value: string,
-    duration = 0 // no ttl   
+    duration = 0 // no ttl
   ): Promise<boolean> {
-    if (!this.initialized) {
-      log.error(
-        'Redis client is not initialized. Run RedisCache.init() first!'
-      );
-      return false;
-    }
-    const finalKey = RedisCache.getNamespaceKey(namespace, key);
-
-    if (typeof value !== 'string') {
-      value = JSON.stringify(value);
-    }
-
     try {
+      if (!this.initialized) {
+        log.warn(
+          'Redis client is not initialized. Run RedisCache.init() first!'
+        );
+        return false;
+      }
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      if (typeof value !== 'string') {
+        value = JSON.stringify(value);
+      }
       if (duration > 0) {
         await this.client.set(finalKey, value, {
-          EX: duration
+          EX: duration,
         });
       } else {
         await this.client.set(finalKey, value);
       }
     } catch (e) {
       log.error(
-        `An error occurred while setting the following key value pair '${finalKey}: ${value}'`,
+        `An error occurred while setting the following key value pair '${namespace} ${key}: ${value}'`,
         e
       );
       return false;
@@ -163,15 +164,22 @@ export class RedisCache {
     namespace: RedisNamespaces,
     key: string
   ): Promise<string> {
-    if (!this.initialized) {
+    try {
+      if (!this.initialized) {
+        log.warn(
+          'Redis client is not initialized. Run RedisCache.init() first!'
+        );
+        return;
+      }
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      return await this.client.get(finalKey);
+    } catch (e) {
       log.error(
-        'Redis client is not initialized. Run RedisCache.init() first!'
+        `An error occurred while getting the following key '${key}'`,
+        e
       );
       return;
     }
-
-    const finalKey = RedisCache.getNamespaceKey(namespace, key);
-    return await this.client.get(finalKey);
   }
 
   /**
@@ -236,7 +244,7 @@ export class RedisCache {
 
       return data;
     } catch (e) {
-      console.log(e);
+      log.error(e);
       return false;
     }
   }
@@ -276,16 +284,16 @@ export class RedisCache {
           try {
             const resp = await this.client.del(key);
             count += resp;
-            console.log(`deleted key ${key} ${resp} ${count}`)
+            log.trace(`deleted key ${key} ${resp} ${count}`);
           } catch (err) {
-            console.log(`error deleting key ${key}`)
-            console.log(err);
+            log.trace(`error deleting key ${key}`);
+            log.trace(err);
           }
         }
       }
       return count;
     } catch (e) {
-      console.log(e);
+      log.error(e);
       return false;
     }
   }

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase } from 'common-common/src/types';
@@ -15,13 +14,14 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
+import Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import IWebWallet from '../../../models/IWebWallet';
 
 import { User } from '../user/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
-import type { Account, IWebWallet } from 'models';
-import { AddressInfo } from 'models';
 
 import {
   CWWalletOptionRow,
@@ -298,8 +298,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
     );
 
     await wallet.reset();
-
-    redraw();
   };
 
   return (

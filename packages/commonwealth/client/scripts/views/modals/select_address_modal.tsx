@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/select_address_modal.scss';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, RoleInfo } from 'models';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { formatAddressShort } from '../../../../shared/utils';
+import Account from '../../models/Account';
+import RoleInfo from '../../models/RoleInfo';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
@@ -51,7 +51,6 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
       })
       .then(() => {
         setIsLoading(false);
-        redraw();
         setSelectedIndex(null);
         // select the address, and close the form
         notifySuccess(
@@ -62,13 +61,11 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
           )}`
         );
         setActiveAccount(account).then(() => {
-          redraw();
           $(e.target).trigger('modalexit');
         });
       })
       .catch((err: any) => {
         setIsLoading(false);
-        redraw();
         notifyError(err.responseJSON.error);
       });
   };

@@ -34,7 +34,6 @@ const activeThreads = async (
     { model: models.Address, as: 'Address' },
     { model: models.Address, as: 'collaborators' },
     { model: models.Topic, as: 'topic', required: true },
-    { model: models.ChainEntityMeta, as: 'chain_entity_meta' },
   ];
 
   await Promise.all(

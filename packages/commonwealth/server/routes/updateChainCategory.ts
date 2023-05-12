@@ -1,54 +1,59 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
-import type { ChainCategoryInstance } from 'server/models/chain_category';
 import type { DB } from '../models';
-import type { TypedRequestBody } from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { ChainCategoryType } from 'common-common/src/types';
 
-type UpdateChainCategoryReq = Omit<ChainCategoryInstance, 'id'> & {
-  create: string;
+type UpdateChainCategoryReq = {
+  selected_tags: { [tag: string]: boolean };
+  chain_id: string;
   auth: string;
   jwt: string;
+};
+
+type UpdateChainCategoryRes = {
+  chain: string;
+  tags: ChainCategoryType[];
 };
 
 const updateChainCategory = async (
   models: DB,
   req: TypedRequestBody<UpdateChainCategoryReq>,
-  res: Response,
+  res: TypedResponse<UpdateChainCategoryRes>,
   next: NextFunction
 ) => {
-  if (req.body.create === 'true') {
-    const categoryEntry = await models.ChainCategory.findOne({
-      where: {
-        chain_id: req.body.chain_id,
-        category_type_id: req.body.category_type_id,
-      },
-    });
-    if (!categoryEntry) {
-      const category = await models.ChainCategory.create({
-        chain_id: req.body.chain_id,
-        category_type_id: req.body.category_type_id,
-      });
-      return success(res, category.toJSON());
-    }
+  const chain = await models.Chain.findOne({
+    where: {
+      id: req.body.chain_id,
+    },
+  });
+  if (!chain) throw new AppError('Invalid Chain Id');
 
-    return res.json({ status: 'Success' });
-  } else if (req.body.create === 'false') {
-    const categoryEntry = await models.ChainCategory.findOne({
-      where: {
-        chain_id: req.body.chain_id,
-        category_type_id: req.body.category_type_id,
-      },
-    });
+  const existingCategories = chain.category ? (chain.category as string[]) : [];
+  const updateCategories = Object.keys(req.body.selected_tags).filter((tag) => {
+    return (
+      req.body.selected_tags[tag] &&
+      Object.keys(ChainCategoryType).includes(tag)
+    );
+  });
 
-    if (categoryEntry) {
-      await categoryEntry.destroy();
-      return success(res, categoryEntry.toJSON());
-    }
-    return res.json({ status: 'Success' });
-  } else {
-    return next(new AppError('No update action specified.'));
+  if (
+    existingCategories.length !== updateCategories.length ||
+    !updateCategories.every(
+      (element, index) => element === existingCategories[index]
+    )
+  ) {
+    chain.category = updateCategories;
+    await chain.save();
   }
+  const updatedCategory = {
+    [req.body.chain_id]: updateCategories as ChainCategoryType[],
+  };
+  return success(res, {
+    chain: req.body.chain_id,
+    tags: updateCategories as ChainCategoryType[],
+  });
 };
 
 export default updateChainCategory;
