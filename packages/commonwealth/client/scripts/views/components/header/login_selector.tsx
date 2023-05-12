@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { initAppState } from 'state';
@@ -18,6 +18,7 @@ import { isSameAccount, pluralize } from 'helpers';
 import { setDarkMode } from 'helpers/darkMode';
 
 import app from 'state';
+import { LayoutContext } from 'views/Layout.context';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
@@ -292,11 +293,7 @@ const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
   );
 };
 
-type LoginSelectorProps = {
-  onJoinSuccess: () => void;
-};
-
-export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
+export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -304,6 +301,7 @@ export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
+  const { onRerender } = useContext(LayoutContext);
 
   useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
@@ -484,7 +482,7 @@ export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        onJoinSuccess(); // this triggers a state update from the parent to update the sibling component
+        onRerender();
       } catch (err) {
         console.error(err);
       }

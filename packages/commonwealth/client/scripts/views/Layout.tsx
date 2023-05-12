@@ -16,6 +16,7 @@ import { useParams } from 'react-router-dom';
 import { ChainType } from 'common-common/src/types';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorPage from 'views/pages/error';
+import { LayoutContext, LayoutContextProvider } from './Layout.context';
 
 const LoadingLayout = () => {
   return (
@@ -224,9 +225,20 @@ export const LayoutWrapper = ({ Component, params }) => {
     deferChain: params.deferChain,
   });
 
+  const [renderKey, setRenderKey] = useState('');
+
+  const onRerender = () => {
+    console.log('onRerender');
+    setRenderKey(Date.now().toString());
+  };
+
+  console.log('renderKey', renderKey);
+
   return (
     <LayoutComp scope={scope} deferChain={deferChain}>
-      <Component {...routerParams} />
+      <LayoutContext.Provider value={{ renderKey, onRerender }}>
+        <Component {...routerParams} />
+      </LayoutContext.Provider>
     </LayoutComp>
   );
 };
