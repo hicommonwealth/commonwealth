@@ -12,10 +12,14 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import app from 'state';
 import isValidJson from '../../../../../shared/validateJson';
 import { useCommonNavigate } from 'navigation/helpers';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 const CreateContractTemplateForm = () => {
   const navigate = useCommonNavigate();
   const { contract_id } = useParams();
+
+  const [stagedContractId, setStagedContractId] = useState(contract_id);
+  const contracts = app.contracts.getCommunityContracts();
 
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -28,11 +32,14 @@ const CreateContractTemplateForm = () => {
     try {
       setSaving(true);
 
+      console.log({ stagedContractId });
+
       await app.contracts.addTemplate({
         name: form.displayName,
         template: form.template,
         description: form.description,
-        contract_id,
+        contract_id: stagedContractId,
+        community: app.activeChainId(),
       });
 
       navigate(`/contracts`);
@@ -48,13 +55,42 @@ const CreateContractTemplateForm = () => {
     navigate(`/contracts`);
   };
 
-  const isCreatingDisabled = saving || !form.displayName || !form.template;
+  const isCreatingDisabled =
+    saving ||
+    !form.displayName ||
+    !form.template ||
+    stagedContractId === 'blank';
 
   return (
     <div className="CreateContractTemplateForm">
       <div className="form">
+        <div className="ContractDropdown">
+          <CWText type="caption" fontWeight="medium" className="input-label">
+            Contract
+          </CWText>
+          <CWDropdown
+            containerClassName="DropdownInput"
+            label="Select the contract you want your template to built on"
+            initialValue={
+              contract_id !== 'blank'
+                ? {
+                    label: app.contracts.getByIdentifier(contract_id).address,
+                    value: contract_id,
+                  }
+                : { label: 'Select contract address', value: '' }
+            }
+            options={contracts.map((contract) => {
+              return { label: contract.address, value: contract.id.toString() };
+            })}
+            onSelect={(item) => {
+              setStagedContractId(item.value);
+            }}
+            disabled={contract_id !== 'blank'}
+          />
+        </div>
+
         <CWText type="caption" fontWeight="medium" className="input-label">
-          Template Name
+          Template name
         </CWText>
         <CWTextInput
           value={form.displayName}
@@ -67,11 +103,12 @@ const CreateContractTemplateForm = () => {
           }}
         />
         <CWText type="caption" fontWeight="medium" className="input-label">
-          Action details
+          Template action details
         </CWText>
         <CWTextInput
+          label="Describe the action this template enables your community to execute"
           value={form.description}
-          placeholder="Briefly describe the action your template enables"
+          placeholder="Enter action details"
           onInput={(e) => {
             setForm((prevState) => ({
               ...prevState,
@@ -84,7 +121,7 @@ const CreateContractTemplateForm = () => {
         </CWText>
         <CWTextArea
           value={form.template}
-          placeholder="Enter relevant JSON Blob"
+          placeholder="Enter code"
           onInput={(e) => {
             setForm((prevState) => ({
               ...prevState,
@@ -105,9 +142,7 @@ const CreateContractTemplateForm = () => {
           }}
         />
       </div>
-
       <CWDivider className="divider" />
-
       <div className="buttons">
         <CWButton
           buttonType="secondary-black"

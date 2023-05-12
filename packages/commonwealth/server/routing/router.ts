@@ -170,7 +170,11 @@ import {
   updateCommunityContractTemplateMetadata,
   deleteCommunityContractTemplateMetadata,
 } from '../routes/proposalTemplate';
-import { createTemplate, getTemplates } from '../routes/templates';
+import {
+  createTemplate,
+  deleteTemplate,
+  getTemplates,
+} from '../routes/templates';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -378,6 +382,12 @@ function setupRouter(
     '/contract/template',
     passport.authenticate('jwt', { session: false }),
     getTemplates.bind(this, models)
+  );
+
+  router.delete(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    deleteTemplate.bind(this, models)
   );
 
   // community contract

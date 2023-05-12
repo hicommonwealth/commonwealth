@@ -115,7 +115,7 @@ const AdminSectionComponent = () => {
     ...(featureFlags.proposalTemplates
       ? [
           {
-            title: 'Contracts',
+            title: 'Contract action templates',
             containsChildren: false,
             displayData: null,
             hasDefaultToggle: false,
