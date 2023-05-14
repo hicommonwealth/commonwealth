@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 
-import { CacheDecorator } from 'common-common/src/cacheDecorator';
+import { CacheDecorator, FuncExecError } from 'common-common/src/cacheDecorator';
 import { RedisCache } from 'common-common/src/redisCache';
 import { RedisNamespaces } from 'common-common/src/types';
 import { CacheKeyDuration } from 'common-common/src/cacheKeyUtils';
@@ -291,7 +291,7 @@ describe('CacheDecorator', () => {
         mockRedis.isInitialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(false, fn, key, duration, RedisNamespaces.Function_Response);
-        await expect(wrapFn()).to.be.rejectedWith(err);
+        await expect(wrapFn()).to.be.rejectedWith('Error: test-error');
 
         // expect(result).to.equal('test-result');
         expect(mockRedis.getKey.calledOnce).to.be.true;
