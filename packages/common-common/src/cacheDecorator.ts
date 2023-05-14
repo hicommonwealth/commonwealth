@@ -19,6 +19,7 @@ export enum XCACHE_VALUES {
   NOKEY = 'NOKEY', // cache no key
 }
 
+type seconds = number;
 export class CacheDecorator {
   private redisCache: RedisCache;
 
@@ -41,8 +42,8 @@ export class CacheDecorator {
   public cacheWrap<T extends (...args: any[]) => any>(
     override: boolean,
     fn: T,
-    key: string, // keyGenerator: (...args: Parameters<T>) => string | CacheKeyDuration = defaultKeyGenerator,
-    duration: number,
+    key: ((...args: Parameters<T>) => string | CacheKeyDuration) | string,
+    duration: seconds,
     namespace: RedisNamespaces = RedisNamespaces.Function_Response
   ) {
     return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
@@ -56,8 +57,26 @@ export class CacheDecorator {
           return await fn(...args);
         }
 
+        // compute key
+        let cacheDuration = duration;
+        let cacheKey = null;
+        if(typeof key === 'function') {
+          const computeKey = key(...args);
+          if(typeof computeKey === 'string') {
+            cacheKey = computeKey;
+          } else {
+            // if cache key is object with cacheKey and cacheDuration
+            if (computeKey && isCacheKeyDuration(computeKey)) {
+              cacheDuration = computeKey.cacheDuration;
+              cacheKey = computeKey.cacheKey;
+            }
+          }
+        } else {
+          cacheKey = key;
+        }
+
         // If cache key is null 
-        if (!key || duration === undefined || duration === null) {
+        if (!cacheKey || cacheDuration === undefined || cacheDuration === null) {
           log.trace(`Cache key not found for ${fn.name}`);
           // call the function
           isFunctionCalled = true;
@@ -66,30 +85,37 @@ export class CacheDecorator {
 
         // If cache is disabled, skip caching
         if(!override) {
-          const cachedValue = await this.checkCache(key, namespace);
-          if (cachedValue) {
-            try {
-              // Try to parse and return the cached value as JSON
-              return JSON.parse(cachedValue);
+          let cachedValue;
+          try {
+              cachedValue = await this.checkCache(cacheKey, namespace);
+              if (cachedValue) {
+                log.trace(`FOUND in cache ${cacheKey}`);
+                // Try to parse and return the cached value as JSON
+                try {
+                  return JSON.parse(cachedValue);
+                } catch (error) {
+                  // If parsing fails, return the raw cached value
+                  log.warn(`Failed to parse cached value for ${key} as JSON, returning raw value. Error: ${error}`);
+                }
+              }
             } catch (error) {
               // If parsing fails, return the raw cached value
-              log.warn(`Failed to parse cached value for ${key} as JSON, returning raw value. Error: ${error}`);
-              return cachedValue as ReturnType<T>;
+              log.error(`Failed to fetch cached value for ${key} as JSON, ${error}`);
             }
-          }
         }
 
         // call the function and cache the response
         isFunctionCalled = true;
         const result = await fn(...args);
-        if(result === undefined) {
+        if(result === undefined || result === null) {
           log.warn(`Function ${fn.name} returned undefined, skipping cache`);
           return result;
         }
         try {
-          this.cacheResponse(key, JSON.stringify(result), duration, namespace);
+          const ret = await this.cacheResponse(cacheKey, JSON.stringify(result), cacheDuration, namespace);
+          if(!ret) throw new Error('Unable to set redis key returned false');
         } catch (error) {
-          log.error(`Error caching value for ${key}: ${error}`);
+          log.warn(`Error caching value for ${key}: ${error}`);
         }
         return result;
       } catch (error) {
@@ -108,7 +134,7 @@ export class CacheDecorator {
   // keyGenerator: function to generate cache key, default is the route path
   // namespace: namespace for the cache key, default is Route_Response
   public cacheMiddleware(
-    duration: number,
+    duration: seconds,
     keyGenerator: (
       req: Request
     ) => string | CacheKeyDuration = defaultKeyGenerator,
@@ -214,7 +240,7 @@ export class CacheDecorator {
     valueToCache: string,
     duration: number,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response
-  ) {
+  ): Promise<boolean> {
     if (!this.isEnabled()) return false;
 
     return await this.redisCache.setKey(
