@@ -42,6 +42,7 @@ import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupCEProxy from './server/util/entitiesProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
+import { getChainActivity } from './server/routes/status';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
@@ -267,7 +268,10 @@ async function main() {
   const globalActivityCache = new GlobalActivityCache(models);
 
   // initialize async to avoid blocking startup
-  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
+  if (!NO_GLOBAL_ACTIVITY_CACHE) {
+    globalActivityCache.start();
+    getChainActivity.startTask(models);
+  }
 
   // Declare Validation Middleware Service
   // middleware to use for all requests

@@ -19,6 +19,8 @@ import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 import { ETH_RPC } from '../config';
 import type { ChainCategoryType } from 'common-common/src/types';
+import { Activity } from 'common-common/src/daemons/activity';
+import { RedisNamespaces } from 'common-common/src/types';
 
 type ThreadCountQueryData = {
   concat: string;
@@ -340,6 +342,13 @@ export const getUserStatus = async (models: DB, user) => {
     email: user.email,
   };
 };
+export const getChainActivity = new Activity(
+  'getChainStatus',
+  getChainStatus,
+  'getChainStatus',
+  60 * 5, // 5 minutes
+  RedisNamespaces.Global_Response
+);
 
 export const status = async (
   models: DB,
@@ -347,7 +356,7 @@ export const status = async (
   res: TypedResponse<StatusResp>
 ) => {
   try {
-    const chainStatusPromise = getChainStatus(models);
+    const chainStatusPromise = getChainActivity.queryWithCache(models);
     const { user: reqUser } = req;
     if (!reqUser) {
       const {
