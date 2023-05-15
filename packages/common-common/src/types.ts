@@ -154,3 +154,12 @@ export enum DefaultPage {
   Overview = 'default_summary_view',
   Homepage = 'homepage',
 }
+
+export type HttpMethod =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head';

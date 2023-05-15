@@ -1,20 +1,19 @@
-import { NextFunction, Request, Response } from 'express';
+import {
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+  Router,
+} from 'express';
+import { HttpMethod } from 'common-common/src/types';
 
 const routesMethods: { [key: string]: string[] } = {};
-type HttpMethod =
-  | 'get'
-  | 'post'
-  | 'put'
-  | 'delete'
-  | 'patch'
-  | 'options'
-  | 'head';
 
 export const registerRoute = (
-  router,
+  router: Router,
   method: HttpMethod,
   path: string,
-  ...handlers: any[]
+  ...handlers: RequestHandler[]
 ) => {
   router[method](path, ...handlers);
   const realPath = `/api${path}`;

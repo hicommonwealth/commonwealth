@@ -1,20 +1,20 @@
-import { NextFunction, Request, Response } from 'express';
+import {
+  Express,
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+  Router,
+} from 'express';
+import { HttpMethod } from 'common-common/src/types';
 
 const routesMethods: { [key: string]: string[] } = {};
-type HttpMethod =
-  | 'get'
-  | 'post'
-  | 'put'
-  | 'delete'
-  | 'patch'
-  | 'options'
-  | 'head';
 
 export const registerRoute = (
-  router,
+  router: Express,
   method: HttpMethod,
   path: string,
-  ...handlers: any[]
+  ...handlers: RequestHandler[]
 ) => {
   router[method](path, ...handlers);
   if (!routesMethods[path]) routesMethods[path] = [];
