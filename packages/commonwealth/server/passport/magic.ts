@@ -1,6 +1,5 @@
 import { MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
-import { CosmosExtension } from '@magic-ext/cosmos';
 
 import { AppError, ServerError } from 'common-common/src/errors';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
@@ -14,6 +13,12 @@ import type { ProfileAttributes } from '../models/profile';
 
 import '../types';
 import { createRole } from '../util/roles';
+
+export interface MagicWalletAPI {
+  network: string | null;
+  public_address: string | null;
+  wallet_type: string | null;
+}
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
@@ -210,13 +215,16 @@ export function initMagicAuth(models: DB) {
             let newAddress;
 
             if (isCosmos) {
+              // TODO: why don't API types match npm package?
               const cosmosAddress = userMetadata.wallets.find(
-                (wallet) => wallet.wallet_type === 'COSMOS'
+                (wallet) =>
+                  (wallet as unknown as MagicWalletAPI).wallet_type === 'COSMOS'
               );
 
               newAddress = await models.Address.create(
                 {
-                  address: cosmosAddress.public_address,
+                  address: (cosmosAddress as unknown as MagicWalletAPI)
+                    .public_address,
                   chain: chain.id,
                   verification_token: 'MAGIC',
                   verification_token_expires: null,
