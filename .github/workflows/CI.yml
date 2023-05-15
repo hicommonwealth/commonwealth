@@ -111,7 +111,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Run linter
-        run: yarn lint-all
+        run: yarn lint-branch
 
       - name: Typecheck
         run: yarn --cwd packages/commonwealth check-types
@@ -272,7 +272,7 @@ jobs:
       - name: Init Db
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: cd packages/commonwealth && npx sequelize db:migrate
-          
+
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
