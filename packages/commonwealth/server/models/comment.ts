@@ -83,6 +83,11 @@ export default (
   );
 
   Comment.associate = (models) => {
+    models.Comment.belongsTo(models.Thread, {
+      foreignKey: 'thread_id',
+      targetKey: 'id',
+      as: 'commentThread'
+    })
     models.Comment.belongsTo(models.Chain, {
       foreignKey: 'chain',
       targetKey: 'id',
