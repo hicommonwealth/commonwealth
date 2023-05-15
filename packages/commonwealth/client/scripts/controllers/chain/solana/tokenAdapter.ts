@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import { ContractType } from 'common-common/src/types';
 import $ from 'jquery';
-import type { ITokenAdapter } from 'models';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import Solana from './adapter';
 
 export default class Token extends Solana implements ITokenAdapter {

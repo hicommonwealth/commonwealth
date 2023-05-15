@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 import { notifySuccess } from 'controllers/app/notifications';
-import { redraw } from 'mithrilInterop';
-import type { NotificationSubscription, Thread } from 'models';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
+import type Thread from '../../../models/Thread';
 import moment from 'moment';
 
 import app from 'state';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
@@ -44,7 +44,7 @@ export const handleToggleSubscription = async (
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
   isSubscribed: boolean,
-  setIsSubscribed?: Dispatch<SetStateAction<boolean>>,
+  setIsSubscribed?: Dispatch<SetStateAction<boolean>>
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
@@ -72,8 +72,6 @@ export const handleToggleSubscription = async (
     notifySuccess('Subscribed!');
   }
   if (setIsSubscribed) setIsSubscribed(!isSubscribed);
-
-  redraw();
 };
 
 export const getCommentSubscription = (thread: Thread) => {
@@ -94,7 +92,7 @@ export const getReactionSubscription = (thread: Thread) => {
 
 export const getThreadSubScriptionMenuItem = (
   thread: Thread,
-  setIsSubscribed: Dispatch<SetStateAction<boolean>>,
+  setIsSubscribed: Dispatch<SetStateAction<boolean>>
 ): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
@@ -109,9 +107,8 @@ export const getThreadSubScriptionMenuItem = (
         getCommentSubscription(thread),
         getReactionSubscription(thread),
         isSubscribed,
-        setIsSubscribed,
+        setIsSubscribed
       );
-      redraw();
     },
     label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
     iconLeft: isSubscribed ? 'unsubscribe' : 'bell',

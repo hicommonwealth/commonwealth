@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import 'modals/poll_editor_modal.scss';
 
-import type { Thread } from 'models';
+import type Thread from '../../models/Thread';
 
 import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';

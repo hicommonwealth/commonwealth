@@ -6,14 +6,13 @@ import type {
 import { formatCoin } from 'adapters/currency';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
-import type {
-  BinaryVote,
-  ChainEntity,
-  ChainEvent,
-  ITXModalData,
-  ProposalEndTime,
-} from 'models';
-import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
+import type ChainEvent from '../../../models/ChainEvent';
+import type { ITXModalData } from '../../../models/interfaces';
+import Proposal from '../../../models/Proposal';
+import type { ProposalEndTime } from '../../../models/types';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../models/types';
+import type { BinaryVote } from '../../../models/votes';
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';
 import type SubstrateChain from './shared';
@@ -161,7 +160,6 @@ export class SubstrateTreasuryProposal extends Proposal<
 
     this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
-    this.threadId = entity.threadId;
     this.threadTitle = entity.threadTitle;
 
     entity.chainEvents.forEach((e) => this.update(e));

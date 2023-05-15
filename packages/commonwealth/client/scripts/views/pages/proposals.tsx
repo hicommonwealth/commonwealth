@@ -8,7 +8,7 @@ import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
-import type { ProposalModule } from 'models';
+import type ProposalModule from '../../models/ProposalModule';
 import { initChain } from 'helpers/chain';
 import 'pages/proposals.scss';
 
@@ -18,7 +18,7 @@ import { ProposalCard } from 'views/components/proposal_card';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
 import { getStatusText } from '../components/proposal_card/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
@@ -54,17 +54,21 @@ const ProposalsPage = () => {
     isCosmosCompletedProposalsLoading,
     setIsCosmosCompletedProposalsLoading,
   ] = useState(false);
+  const [
+    isCosmosCompletedProposalsLoadingMore,
+    setIsCosmosCompletedProposalsLoadingMore,
+  ] = useState(false);
   const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
-    const initApi = async () => {
+    const chainInit = async () => {
       if (!hasFetchedApiRef.current) {
         hasFetchedApiRef.current = true;
         await initChain();
       }
     };
 
-    if (!app.chain?.apiInitialized) initApi();
+    if (!app.chain?.apiInitialized || !app.chain?.loaded) chainInit();
   }, [app.chain, initChain]);
 
   useEffect(() => {
@@ -87,6 +91,7 @@ const ProposalsPage = () => {
     app,
     setIsLoading: setIsCosmosCompletedProposalsLoading,
     isLoading: isCosmosCompletedProposalsLoading,
+    setIsLoadingMore: setIsCosmosCompletedProposalsLoadingMore,
   });
 
   if (isLoading) {
@@ -169,8 +174,8 @@ const ProposalsPage = () => {
       : (activeDemocracyProposals || [])
           .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
           .concat(
-            (activeCosmosProposals || []).map((proposal, i) => (
-              <ProposalCard key={i} proposal={proposal} />
+            (activeCosmosProposals || []).map((proposal) => (
+              <ProposalCard key={proposal.identifier} proposal={proposal} />
             ))
           )
           .concat(
@@ -245,9 +250,13 @@ const ProposalsPage = () => {
     (inactiveDemocracyProposals || [])
       .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
       .concat(
-        inactiveCosmosProposals?.length ? inactiveCosmosProposals.map((proposal, i) => (
-          <ProposalCard key={i} proposal={proposal} />
-        )) : []
+        inactiveCosmosProposals?.length
+          ? inactiveCosmosProposals
+              .map((proposal) => (
+                <ProposalCard key={proposal.identifier} proposal={proposal} />
+              ))
+              .concat(isCosmosCompletedProposalsLoadingMore && <CWSpinner />)
+          : []
       )
       .concat(
         (inactiveCompoundProposals || []).map((proposal, i) => (

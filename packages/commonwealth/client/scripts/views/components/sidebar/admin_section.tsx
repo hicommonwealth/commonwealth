@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
 import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
@@ -16,6 +15,7 @@ import type {
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
+import { matchRoutes, useLocation } from 'react-router-dom';
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
@@ -42,6 +42,7 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 
 const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
+  const location = useLocation();
 
   const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
     React.useState<boolean>(false);
@@ -50,13 +51,26 @@ const AdminSectionComponent = () => {
   const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
     React.useState<boolean>(false);
 
+  const matchesManageCommunityRoute = matchRoutes(
+    [{ path: '/manage' }, { path: ':scope/manage' }],
+    location
+  );
+  const matchesAnalyticsRoute = matchRoutes(
+    [{ path: '/analytics' }, { path: ':scope/analytics' }],
+    location
+  );
+  const matchesContractsRoute = matchRoutes(
+    [{ path: '/contracts' }, { path: ':scope/contracts' }],
+    location
+  );
+
   const adminGroupData: SectionGroupAttrs[] = [
     {
       title: 'Manage community',
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
-      isActive: _DEPRECATED_getRoute().includes('/manage'),
+      isActive: !!matchesManageCommunityRoute,
       isVisible: true,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
@@ -77,7 +91,7 @@ const AdminSectionComponent = () => {
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
-      isActive: _DEPRECATED_getRoute().includes('/analytics'),
+      isActive: !!matchesAnalyticsRoute,
       isVisible: true,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
@@ -96,11 +110,11 @@ const AdminSectionComponent = () => {
     ...(featureFlags.proposalTemplates
       ? [
           {
-            title: 'Contracts',
+            title: 'Contract action templates',
             containsChildren: false,
             displayData: null,
             hasDefaultToggle: false,
-            isActive: _DEPRECATED_getRoute().includes('/contracts'),
+            isActive: !!matchesContractsRoute,
             isVisible: true,
             isUpdated: false,
             onClick: (e, toggle: boolean) => {

@@ -53,6 +53,7 @@ export type ChainAttributes = {
   discord_config_id?: number;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
+  category?: any;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -66,6 +67,9 @@ export type ChainAttributes = {
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
   Contract?: ContractInstance;
+
+  created_at?: Date;
+  updated_at?: Date;
 };
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
@@ -147,10 +151,15 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      category: { type: dataTypes.JSONB, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: true },
+      updated_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       tableName: 'Chains',
-      timestamps: false,
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       underscored: false,
     }
   );

@@ -11,12 +11,10 @@ import * as CompoundTypes from './chains/compound/types';
 import * as Erc20Types from './chains/erc20/types';
 import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
-import * as CommonwealthTypes from './chains/commonwealth/types';
 import * as CosmosTypes from './chains/cosmos/types';
 import type { IErc721Contracts as ERC721Api } from './chains/erc721/types';
 import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
 import type { Api as CompoundApi } from './chains/compound/types';
-import type { Api as CommonwealthApi } from './chains/commonwealth/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -26,7 +24,6 @@ export type IChainEntityKind =
   | SubstrateTypes.EntityKind
   | CompoundTypes.EntityKind
   | AaveTypes.EntityKind
-  | CommonwealthTypes.EntityKind
   | CosmosTypes.EntityKind;
 export type IChainEventData =
   | SubstrateTypes.IEventData
@@ -34,7 +31,6 @@ export type IChainEventData =
   | AaveTypes.IEventData
   | Erc20Types.IEventData
   | Erc721Types.IEventData
-  | CommonwealthTypes.IEventData
   | CosmosTypes.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
@@ -42,15 +38,8 @@ export type IChainEventKind =
   | AaveTypes.EventKind
   | Erc20Types.EventKind
   | Erc721Types.EventKind
-  | CommonwealthTypes.EventKind
   | CosmosTypes.EventKind;
-export type IAPIs =
-  | SubstrateApi
-  | ERC721Api
-  | ERC20Api
-  | CompoundApi
-  | CommonwealthApi
-  | AaveApi;
+export type IAPIs = SubstrateApi | ERC721Api | ERC20Api | CompoundApi | AaveApi;
 export type IAnyListener = Listener<
   IAPIs,
   IStorageFetcher<IAPIs>,
@@ -65,7 +54,6 @@ export const ChainEventKinds = [
   ...AaveTypes.EventKinds,
   ...Erc20Types.EventKinds,
   ...Erc721Types.EventKinds,
-  ...CommonwealthTypes.EventKinds,
   ...CosmosTypes.EventKinds,
 ];
 
@@ -76,7 +64,6 @@ export enum SupportedNetwork {
   Compound = 'compound',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
-  Commonwealth = 'commonwealth',
   Cosmos = 'cosmos',
 }
 
@@ -244,9 +231,6 @@ export function getUniqueEntityKey(
   if (network === SupportedNetwork.Aave) {
     return 'id';
   }
-  if (network === SupportedNetwork.Commonwealth) {
-    return 'id';
-  }
   if (network === SupportedNetwork.Cosmos) {
     return 'id';
   }
@@ -326,26 +310,6 @@ export function eventToEntity(
         return [CosmosTypes.EntityKind.Proposal, EntityEventKind.Vote];
       default:
         return null;
-    }
-  }
-  if (network === SupportedNetwork.Commonwealth) {
-    switch (event) {
-      case CommonwealthTypes.EventKind.ProjectCreated: {
-        return [CommonwealthTypes.EntityKind.Project, EntityEventKind.Create];
-      }
-      // TODO: verify vote is correct here
-      case CommonwealthTypes.EventKind.ProjectBacked:
-      case CommonwealthTypes.EventKind.ProjectCurated:
-      case CommonwealthTypes.EventKind.ProjectWithdraw: {
-        return [CommonwealthTypes.EntityKind.Project, EntityEventKind.Vote];
-      }
-      case CommonwealthTypes.EventKind.ProjectSucceeded:
-      case CommonwealthTypes.EventKind.ProjectFailed: {
-        return [CommonwealthTypes.EntityKind.Project, EntityEventKind.Update];
-      }
-      default: {
-        return null;
-      }
     }
   }
   if (network === SupportedNetwork.Substrate) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'pages/discussions/thread_preview.scss';
 import {
@@ -7,13 +7,15 @@ import {
 } from 'identifiers';
 import moment from 'moment';
 
-import 'pages/discussions/thread_preview.scss';
-
 import app from 'state';
 import { slugify } from 'utils';
-import { isCommandClick, pluralize } from 'helpers';
-import { AddressInfo } from 'models';
-import type { Thread } from 'models';
+import {
+  isCommandClick,
+  isDefaultStage,
+  pluralize,
+  threadStageToLabel,
+} from 'helpers';
+import AddressInfo from '../../../models/AddressInfo';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import {
@@ -34,11 +36,14 @@ import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
+import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import Thread, { LinkSource } from 'models/Thread';
+import { IChainEntityKind } from 'chain-events/src';
+import { filterLinks } from 'helpers/threads';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -92,6 +97,23 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const isAuthor =
     app.user.activeAccount && thread.author === app.user.activeAccount.address;
 
+  const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+
+  const discussionLink = getProposalUrlPath(
+    thread.slug,
+    `${thread.identifier}-${slugify(thread.title)}`
+  );
+
+  const isStageDefault = isDefaultStage(thread.stage);
+  const isTagsRowVisible =
+    (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+
+  const handleStageTagClick = (e) => {
+    e.stopPropagation();
+    navigate(`/discussions?stage=${thread.stage}`);
+  };
+
   return (
     <>
       <div
@@ -100,13 +122,8 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           'ThreadPreview'
         )}
         onClick={(e) => {
-          const discussionLink = getProposalUrlPath(
-            thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
-          );
-
           if (isCommandClick(e)) {
-            window.open(discussionLink, '_blank');
+            window.open(`${getScopePrefix()}${discussionLink}`, '_blank');
             return;
           }
 
@@ -161,36 +178,44 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
             </CWText>
             {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
-            {thread.snapshotProposal && (
+            {linkedSnapshots.length > 0 && (
               <CWTag
                 type="active"
-                label={`Snap ${thread.snapshotProposal.slice(0, 4)}…`}
+                label={`Snap ${linkedSnapshots[0].identifier
+                  .toString()
+                  .slice(0, 4)}…`}
               />
             )}
           </div>
           <CWText type="caption" className="thread-preview">
             {thread.plaintext}
           </CWText>
-          {thread.chainEntities?.length > 0 && (
+          {isTagsRowVisible && (
             <div className="tags-row">
-              {thread.chainEntities
-                .sort((a, b) => {
-                  return +a.typeId - +b.typeId;
-                })
-                .map((ce) => {
-                  if (!chainEntityTypeToProposalShortName(ce.type)) return;
-                  return (
-                    <CWTag
-                      type="proposal"
-                      label={`${chainEntityTypeToProposalShortName(ce.type)} 
+              {thread.stage && !isStageDefault && (
+                <CWTag
+                  label={threadStageToLabel(thread.stage)}
+                  trimAt={20}
+                  type="stage"
+                  onClick={handleStageTagClick}
+                />
+              )}
+              {linkedProposals
+                .sort((a, b) => +a.identifier - +b.identifier)
+                .map((link) => (
+                  <CWTag
+                    key={`${link.source}-${link.identifier}`}
+                    type="proposal"
+                    label={`${chainEntityTypeToProposalShortName(
+                      'proposal' as IChainEntityKind
+                    )} 
                         ${
-                          Number.isNaN(parseInt(ce.typeId, 10))
+                          Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
-                            : ` #${ce.typeId}`
+                            : ` #${link.identifier}`
                         }`}
-                    />
-                  );
-                })}
+                  />
+                ))}
             </div>
           )}
           <div className="row-bottom">
@@ -211,7 +236,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   e.stopPropagation();
                 }}
               >
-                <SharePopover />
+                <SharePopover discussionLink={discussionLink} />
               </div>
               <div
                 onClick={(e) => {
@@ -263,9 +288,6 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
       <Modal
         content={
           <UpdateProposalStatusModal
-            onChangeHandler={() => {
-              // TODO update store and rerender
-            }}
             thread={thread}
             onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}
           />

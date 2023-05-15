@@ -1,13 +1,13 @@
 import React from 'react';
 
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type ErrorPageProps = { title?: any; message?: string };
 
 const ErrorPage = ({ message }: ErrorPageProps) => {
-  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
+  const chunkLoadingErrRe = /Loading chunk/;
 
   const isChunkLoadingError = () => {
     if (typeof message === 'string' && chunkLoadingErrRe.test(message)) {

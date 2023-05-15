@@ -1,14 +1,15 @@
 /* eslint-disable no-restricted-syntax */
+import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import { redraw } from 'mithrilInterop';
-import { Notification, NotificationSubscription } from 'models';
-import { modelFromServer } from 'models/NotificationSubscription';
-import { EventEmitter } from 'events';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
 
 import app from 'state';
 
 import { NotificationStore } from 'stores';
+import Notification from '../../models/Notification';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { RoleInfo } from 'models';
+import type RoleInfo from '../../../models/RoleInfo';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 

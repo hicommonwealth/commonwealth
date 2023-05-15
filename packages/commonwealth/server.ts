@@ -24,6 +24,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   RABBITMQ_URI,
+  ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
 } from './server/config';
@@ -230,7 +231,7 @@ async function main() {
 
   const rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: process.env.NODE_ENV,
+    environment: ROLLBAR_ENV,
     captureUncaught: true,
     captureUnhandledRejections: true,
   });

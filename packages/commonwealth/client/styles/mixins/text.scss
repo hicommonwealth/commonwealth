@@ -7,14 +7,14 @@
 @mixin b1 {
   font-family: $font-family-neue-haas-unica;
   font-size: 16px;
-  letter-spacing: 0.02em;
-  line-height: 24px;
+  letter-spacing: 0.01em;
+  line-height: 1.45;
 }
 
 @mixin b2 {
   font-family: $font-family-neue-haas-unica;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 15.25px;
+  line-height: 1.5;
 
   &.bold,
   &.italic {

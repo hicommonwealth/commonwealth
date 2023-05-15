@@ -5,8 +5,14 @@ import BN from 'bn.js';
 import { ProposalType } from 'common-common/src/types';
 import type { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import type NearChain from 'controllers/chain/near/chain';
-import type { ITXModalData, ProposalEndTime } from 'models';
-import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import type { ITXModalData } from '../../../../models/interfaces';
+import Proposal from '../../../../models/Proposal';
+import type { ProposalEndTime } from '../../../../models/types';
+import {
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../models/types';
 import moment from 'moment';
 import type { Near as NearApi } from 'near-api-js';
 import type NearSputnikDao from './dao';
@@ -230,10 +236,7 @@ export default class NearSputnikProposal extends Proposal<
         // ratio threshold: must have sufficient proportion
         const [numerator, denominator] = this._votePolicy.threshold;
         threshold = BN.min(
-          this._totalSupply
-            .muln(+numerator)
-            .divn(+denominator)
-            .addn(1),
+          this._totalSupply.muln(+numerator).divn(+denominator).addn(1),
           this._totalSupply
         );
       }

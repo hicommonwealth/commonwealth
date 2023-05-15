@@ -1,14 +1,14 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import moment from 'moment';
 
 import 'pages/search/index.scss';
 
 import type { SearchSort } from 'models/SearchQuery';
-import type { MinimumProfile as Profile } from 'models';
+import type MinimumProfile from '../../../models/MinimumProfile';
 import app from 'state';
 import { SearchContentType } from 'types';
-import { SearchScope } from 'models/SearchQuery';
-import { AddressInfo } from 'models';
+import { SearchScope } from '../../../models/SearchQuery';
+import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -156,7 +156,10 @@ const getCommunityResult = (community, setRoute) => {
 };
 
 const getMemberResult = (addr, setRoute) => {
-  const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
+  const profile: MinimumProfile = app.newProfiles.getProfile(
+    addr.chain,
+    addr.address
+  );
 
   const handleClick = () => {
     setRoute(`/profile/id/${profile.id}`, {}, null);

@@ -13,15 +13,16 @@ import type {
   QueryVotesResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
-import type { ITXModalData, IVote, ProposalEndTime } from 'models';
+import moment from 'moment';
+import { ITXModalData, IVote } from '../../../../../models/interfaces';
 import {
-  DepositVote,
-  Proposal,
+  ProposalEndTime,
   ProposalStatus,
   VotingType,
   VotingUnit,
-} from 'models';
-import moment from 'moment';
+} from '../../../../../models/types';
+import { DepositVote } from '../../../../../models/votes';
+import Proposal from '../../../../../models/Proposal';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';

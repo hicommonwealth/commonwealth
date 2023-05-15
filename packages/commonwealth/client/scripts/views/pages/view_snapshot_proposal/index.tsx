@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   Power,
@@ -9,10 +9,10 @@ import {
   VoteResultsData,
 } from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
-import { AddressInfo } from 'models';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -25,6 +25,7 @@ import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { LinkSource } from 'models/Thread';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -34,7 +35,6 @@ type ViewProposalPageProps = {
 
 export const ViewProposalPage = ({
   identifier,
-  scope,
   snapshotId,
 }: ViewProposalPageProps) => {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
@@ -44,12 +44,13 @@ export const ViewProposalPage = ({
   const [threads, setThreads] = useState<Array<{
     id: string;
     title: string;
-  }> | null>(null);
+  }> | null>([]);
 
   const symbol: string = space?.symbol || '';
   const validatedAgainstStrategies: boolean = !power
     ? true
     : power.totalScore > 0;
+
   const totalScore: number = power?.totalScore || 0;
   const votes: SnapshotProposalVote[] = voteResults?.votes || [];
   const totals: VoteResultsData = voteResults?.results || {
@@ -68,54 +69,58 @@ export const ViewProposalPage = ({
     return new AddressInfo(null, proposal.author, activeChainId, null);
   }, [proposal, activeChainId]);
 
-  const loadVotes = async (snapId: string, proposalId: string) => {
-    await app.snapshot.init(snapId);
-    if (!app.snapshot.initialized) {
-      return;
-    }
-
-    const currentProposal = app.snapshot.proposals.find(
-      (p) => p.id === proposalId
-    );
-    setProposal(currentProposal);
-
-    const currentSpace = app.snapshot.space;
-    setSpace(currentSpace);
-
-    const results = await getResults(currentSpace, currentProposal);
-    setVoteResults(results);
-
-    const powerRes = await getPower(
-      currentSpace,
-      currentProposal,
-      activeUserAddress
-    );
-    setPower(powerRes);
-
-    try {
-      if (app.activeChainId()) {
-        const threadsForSnapshot = await app.threads.fetchThreadIdsForSnapshot({
-          snapshot: currentProposal.id,
-        });
-        setThreads(threadsForSnapshot);
+  const loadVotes = useCallback(
+    async (snapId: string, proposalId: string) => {
+      await app.snapshot.init(snapId);
+      if (!app.snapshot.initialized) {
+        return;
       }
-    } catch (e) {
-      console.error(`Failed to fetch threads: ${e}`);
-    }
-  };
+
+      const currentProposal = app.snapshot.proposals.find(
+        (p) => p.id === proposalId
+      );
+      setProposal(currentProposal);
+
+      const currentSpace = app.snapshot.space;
+      setSpace(currentSpace);
+
+      const results = await getResults(currentSpace, currentProposal);
+      setVoteResults(results);
+
+      const powerRes = await getPower(
+        currentSpace,
+        currentProposal,
+        activeUserAddress
+      );
+      setPower(powerRes);
+
+      try {
+        if (app.activeChainId()) {
+          const threadsForSnapshot = await app.threads.getThreadsForLink({
+            link: {
+              source: LinkSource.Snapshot,
+              identifier: currentProposal.id,
+            },
+          });
+          setThreads(threadsForSnapshot);
+        }
+      } catch (e) {
+        console.error(`Failed to fetch threads: ${e}`);
+      }
+    },
+    [activeUserAddress]
+  );
 
   useEffect(() => {
     loadVotes(snapshotId, identifier).catch(console.error);
-  }, [identifier, snapshotId]);
+  }, [identifier, loadVotes, snapshotId]);
 
   if (!proposal) {
     return <PageLoading />;
   }
 
   return (
-    <Sublayout
-    // title="Snapshot Proposal"
-    >
+    <Sublayout>
       <CWContentPage
         showSidebar
         title={proposal.title}

@@ -5,7 +5,7 @@ import moment from 'moment';
 import 'components/profile/profile_activity_row.scss';
 
 import app from 'state';
-import type Thread from 'client/scripts/models/Thread';
+import type Thread from 'models/Thread';
 import withRouter, {
   navigateToCommunity,
   useCommonNavigate,
@@ -44,10 +44,14 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
       if (isThread) {
         decodedTitle = decodeURIComponent(encodeURIComponent(title));
       } else {
-        decodedTitle = decodeURIComponent(encodeURIComponent(comment.thread?.title));
+        decodedTitle = decodeURIComponent(
+          encodeURIComponent(comment.thread?.title)
+        );
       }
     } catch (e) {
-      console.error(`Could not decode title: "${title ? title : comment.thread?.title}"`);
+      console.error(
+        `Could not decode title: "${title ? title : comment.thread?.title}"`
+      );
       decodedTitle = title;
     }
   }

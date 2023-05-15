@@ -4,9 +4,10 @@ import app from 'state';
 import type Web3 from 'web3';
 import type { TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import type { AbiItem } from 'web3-utils';
-import type Contract from 'client/scripts/models/Contract';
-import type { IWebWallet } from 'client/scripts/models';
+import type Contract from 'models/Contract';
+import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
+import WebWalletController from '../../app/web_wallets';
 
 async function sendFunctionCall({
   fn,
@@ -14,12 +15,14 @@ async function sendFunctionCall({
   contract,
   functionTx,
   web3,
+  tx_options,
 }: {
   fn: AbiItem;
   signingWallet: IWebWallet<any>;
   contract: Contract;
   functionTx: any;
   web3: Web3;
+  tx_options?: any;
 }) {
   let txReceipt: TransactionReceipt | any;
   if (
@@ -28,11 +31,14 @@ async function sendFunctionCall({
     fn.constant !== true
   ) {
     // Sign Tx with PK if this is write function
-    const tx: TransactionConfig = {
+    let tx: TransactionConfig = {
       from: signingWallet.accounts[0],
       to: contract.address,
       data: functionTx,
     };
+
+    tx = tx_options ? Object.assign(tx, tx_options) : tx;
+
     const estimate = await web3.eth.estimateGas(tx);
     tx.gas = estimate;
     txReceipt = await web3.eth.sendTransaction(tx);
@@ -64,14 +70,16 @@ export async function callContractFunction({
   contract,
   fn,
   inputArgs,
+  tx_options,
 }: {
   contract: Contract;
   fn: AbiItem;
   inputArgs: string[];
+  tx_options?: any;
 }): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
   // get querying wallet
-  const signingWallet = await app.wallets.locateWallet(
+  const signingWallet = await WebWalletController.Instance.locateWallet(
     sender,
     ChainBase.Ethereum
   );
@@ -90,12 +98,14 @@ export async function callContractFunction({
     contract: Contract;
     functionTx: any;
     web3: Web3;
+    tx_options?: any;
   } = {
     fn,
     signingWallet,
     contract,
     functionTx,
     web3,
+    tx_options,
   };
   const txReceipt: TransactionReceipt | any = await sendFunctionCall(
     functionConfig

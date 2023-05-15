@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import {
   ChainBase,
   ChainNetwork,
@@ -20,6 +19,7 @@ import type {
   ToggleTree,
 } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
+import { matchRoutes, useLocation } from 'react-router-dom';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -46,6 +46,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 
 export const GovernanceSection = () => {
   const navigate = useCommonNavigate();
+  const location = useLocation();
 
   // Conditional Render Details
   const hasProposals =
@@ -158,46 +159,60 @@ export const GovernanceSection = () => {
     localStorage[`${app.activeChainId()}-governance-toggle-tree`]
   );
 
-  const onSnapshotProposal = (p) =>
-    p.startsWith(`/${app.activeChainId()}/snapshot`);
+  const matchesSnapshotProposalRoute = matchRoutes(
+    [{ path: '/snapshot/:space' }, { path: ':scope/snapshot/:space' }],
+    location
+  );
 
-  const onProposalPage = (p) =>
-    p.startsWith(`/${app.activeChainId()}/proposals`) ||
-    p.startsWith(
-      `/${app.activeChainId()}/proposal/${
-        ProposalType.SubstrateDemocracyProposal
-      }`
-    );
+  const matchesProposalRoute = matchRoutes(
+    [
+      { path: '/proposals' },
+      { path: ':scope/proposals' },
+      { path: `/proposal/${ProposalType.SubstrateDemocracyProposal}` },
+      { path: `:scope/proposal/${ProposalType.SubstrateDemocracyProposal}` },
+    ],
+    location
+  );
 
-  const onReferendaPage = (p) =>
-    p.startsWith(`/${app.activeChainId()}/referenda`) ||
-    p.startsWith(
-      `/${app.activeChainId()}/proposal/${
-        ProposalType.SubstrateDemocracyReferendum
-      }`
-    );
+  const matchesReferendaRoute = matchRoutes(
+    [
+      { path: '/referenda' },
+      { path: ':scope/referenda' },
+      { path: `/proposal/${ProposalType.SubstrateDemocracyReferendum}` },
+      { path: `:scope/proposal/${ProposalType.SubstrateDemocracyReferendum}` },
+    ],
+    location
+  );
 
-  const onTreasuryPage = (p) =>
-    p.startsWith(`/${app.activeChainId()}/treasury`) ||
-    p.startsWith(
-      `/${app.activeChainId()}/proposal/${
-        ProposalType.SubstrateTreasuryProposal
-      }`
-    );
+  const matchesTreasuryRoute = matchRoutes(
+    [
+      { path: '/treasury' },
+      { path: ':scope/treasury' },
+      { path: `/proposal/${ProposalType.SubstrateTreasuryProposal}` },
+      { path: `:scope/proposal/${ProposalType.SubstrateTreasuryProposal}` },
+    ],
+    location
+  );
 
-  const onTipsPage = (p) =>
-    p.startsWith(`/${app.activeChainId()}/tips`) ||
-    p.startsWith(
-      `/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`
-    );
+  const matchesTipsRoute = matchRoutes(
+    [
+      { path: '/tips' },
+      { path: ':scope/tips' },
+      { path: `/proposal/${ProposalType.SubstrateTreasuryTip}` },
+      { path: `:scope/proposal/${ProposalType.SubstrateTreasuryTip}` },
+    ],
+    location
+  );
 
-  const onNotificationsPage = (p) => p.startsWith('/notifications');
+  const matchesDelegateRoute = matchRoutes(
+    [{ path: '/delegate' }, { path: ':scope/delegate' }],
+    location
+  );
 
-  const onMembersPage = (p) =>
-    p.startsWith(`/${app.activeChainId()}/members`) ||
-    p.startsWith(`/${app.activeChainId()}/account/`);
-
-  if (onNotificationsPage(_DEPRECATED_getRoute())) return;
+  const matchesMembersRoute = matchRoutes(
+    [{ path: '/members' }, { path: ':scope/members' }],
+    location
+  );
 
   // ---------- Build Section Props ---------- //
 
@@ -209,8 +224,7 @@ export const GovernanceSection = () => {
     isVisible: true,
     isUpdated: true,
     isActive:
-      onMembersPage(_DEPRECATED_getRoute()) &&
-      (app.chain ? app.chain.serverLoaded : true),
+      !!matchesMembersRoute && (app.chain ? app.chain.serverLoaded : true),
     onClick: (e, toggle: boolean) => {
       handleRedirectClicks(navigate, e, '/members', app.activeChainId(), () => {
         setGovernanceToggleTree('children.Members.toggledState', toggle);
@@ -227,7 +241,7 @@ export const GovernanceSection = () => {
       ? toggleTreeState['children']['Snapshots']['toggledState']
       : false,
     isVisible: showSnapshotOptions,
-    isActive: onSnapshotProposal(_DEPRECATED_getRoute()),
+    isActive: !!matchesSnapshotProposalRoute,
     isUpdated: true,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
@@ -288,7 +302,7 @@ export const GovernanceSection = () => {
     },
     isVisible: showProposals,
     isUpdated: true,
-    isActive: onProposalPage(_DEPRECATED_getRoute()),
+    isActive: !!matchesProposalRoute,
     displayData: null,
   };
 
@@ -313,7 +327,7 @@ export const GovernanceSection = () => {
     },
     isVisible: showTreasury,
     isUpdated: true,
-    isActive: onTreasuryPage(_DEPRECATED_getRoute()),
+    isActive: !!matchesTreasuryRoute,
     displayData: null,
   };
 
@@ -337,7 +351,7 @@ export const GovernanceSection = () => {
     },
     isVisible: showReferenda,
     isUpdated: true,
-    isActive: onReferendaPage(_DEPRECATED_getRoute()),
+    isActive: !!matchesReferendaRoute,
     displayData: null,
   };
 
@@ -355,7 +369,7 @@ export const GovernanceSection = () => {
     },
     isVisible: showTips,
     isUpdated: true,
-    isActive: onTipsPage(_DEPRECATED_getRoute()),
+    isActive: !!matchesTipsRoute,
     displayData: null,
   };
 
@@ -368,7 +382,7 @@ export const GovernanceSection = () => {
       : false,
     isVisible: showCompoundOptions,
     isUpdated: true,
-    isActive: _DEPRECATED_getRoute() === `/${app.activeChainId()}/delegate`,
+    isActive: !!matchesDelegateRoute,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
       handleRedirectClicks(

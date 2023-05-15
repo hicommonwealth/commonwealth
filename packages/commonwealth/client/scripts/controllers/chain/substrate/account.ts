@@ -1,25 +1,13 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
-import type { ApiPromise } from '@polkadot/api';
-import { decodeAddress } from '@polkadot/keyring';
-import type { Vec } from '@polkadot/types';
-import type {
-  AccountId,
-  Balance,
-  BalanceLock,
-  BalanceLockTo212,
-  Conviction,
-  EraIndex,
-  Exposure,
-  StakingLedger,
-} from '@polkadot/types/interfaces';
+import type { AccountId, Conviction } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type { IAccountsModule } from 'models';
-import { Account } from 'models';
 
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import Account from '../../../models/Account';
+import { IAccountsModule } from '../../../models/interfaces';
 import SubstrateChain from './shared';
 
 type Delegation = [AccountId, Conviction] & Codec;

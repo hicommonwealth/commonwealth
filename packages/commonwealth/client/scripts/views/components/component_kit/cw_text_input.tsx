@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/component_kit/cw_text_input.scss';
 import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -191,7 +189,6 @@ export const CWTextInput = (props: TextInputProps) => {
               validationProps.setIsTyping(false);
               validationProps.setValidationStatus(undefined);
               validationProps.setStatusMessage(undefined);
-              redraw();
             } else {
               e.stopPropagation();
               validationProps.setIsTyping(true);
@@ -204,7 +201,6 @@ export const CWTextInput = (props: TextInputProps) => {
                     const result = inputValidationFn(e.currentTarget.value);
                     validationProps.setValidationStatus(result[0]);
                     validationProps.setStatusMessage(result[1]);
-                    redraw();
                   }
                 }, timeout)
               );
@@ -216,7 +212,6 @@ export const CWTextInput = (props: TextInputProps) => {
                 validationProps.setIsTyping(false);
                 validationProps.setValidationStatus(undefined);
                 validationProps.setStatusMessage(undefined);
-                redraw();
               } else {
                 const result = inputValidationFn(e.currentTarget.value);
                 validationProps.setValidationStatus(result[0]);

@@ -1,4 +1,4 @@
-import type { NotificationSubscription } from 'models';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 export const bundleSubs = (
   subs: Array<NotificationSubscription>
