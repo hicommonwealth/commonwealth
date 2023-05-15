@@ -199,7 +199,7 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image, url);
   };
 
-  const renderProposal = async (
+  const renderLinkPreview = async (
     scope: string,
     req,
     res,
@@ -223,12 +223,17 @@ const setupAppRoutes = (
 
   app.get('/:scope?/proposals', async (req, res) => {
     const scope = req.params.scope;
-    await renderProposal(scope, req, res);
+    await renderLinkPreview(scope, req, res);
   });
 
   app.get('/:scope?/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    await renderProposal(scope, req, res);
+    await renderLinkPreview(scope, req, res);
+  });
+
+  app.get('/:scope?/discussions', async (req, res) => {
+    const scope = req.params.scope;
+    await renderLinkPreview(scope, req, res);
   });
 
   app.get('/:scope?/discussion/:identifier', async (req, res) => {
@@ -258,7 +263,7 @@ const setupAppRoutes = (
       return;
     }
 
-    await renderProposal(scope, req, res, chain);
+    await renderLinkPreview(scope, req, res, chain);
   });
 
   async function getChain(req, scope: string) {
