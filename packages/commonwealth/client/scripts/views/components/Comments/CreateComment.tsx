@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import BN from 'bn.js';
 
-import 'components/comments/create_comment.scss';
+import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { weiToTokens, getDecimals } from 'helpers';
@@ -24,7 +24,7 @@ import {
 import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
 
-type CreateCommmentProps = {
+type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
   rootThread: Thread;
@@ -36,7 +36,7 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   updatedCommentsCallback,
-}: CreateCommmentProps) => {
+}: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     `new-thread-comment-${rootThread.id}`
   );
@@ -50,12 +50,10 @@ export const CreateComment = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    restoredDraft
-  );
+  const [contentDelta, setContentDelta] = useState<DeltaStatic>(restoredDraft);
 
-  const [sendingComment, setSendingComment] = React.useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [sendingComment, setSendingComment] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const editorValue = getTextFromDelta(contentDelta);
 
