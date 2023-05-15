@@ -101,15 +101,17 @@ describe('Integration tests for Compound Bravo', () => {
 
     it('Should capture votes on the created proposal', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
-      await sdk.advanceTime(String(secs), blocks)
       const currentBlock = await sdk.getBlock();
-      const diff = currentBlock.blockNumber - proposalCreatedBlockNum
-      console.log("Current block number - proposal create block number", diff);
-      console.log("Voting Delay:", 13140);
-      console.log("Voting delay + voting period", 13140 + 19710);
-      console.log("currentBlock - proposalCreatedBlock < votingDelay", diff < 13140);
-      console.log("currentBlock - proposalCreatedBlock > votingDelay + votingPeriod", diff > 13140 + 19710);
-      console.log(`Range: ${proposalCreatedBlockNum + 13140} < ${currentBlock.blockNumber} < ${proposalCreatedBlockNum + 13140 + 19710}`);
+      await sdk.advanceTime(String(secs), blocks);
+      await sdk.awaitBlock(currentBlock.blockNumber + blocks);
+      // const currentBlock = await sdk.getBlock();
+      // const diff = currentBlock.blockNumber - proposalCreatedBlockNum
+      // console.log("Current block number - proposal create block number", diff);
+      // console.log("Voting Delay:", 13140);
+      // console.log("Voting delay + voting period", 13140 + 19710);
+      // console.log("currentBlock - proposalCreatedBlock < votingDelay", diff < 13140);
+      // console.log("currentBlock - proposalCreatedBlock > votingDelay + votingPeriod", diff > 13140 + 19710);
+      // console.log(`Range: ${proposalCreatedBlockNum + 13140} < ${currentBlock.blockNumber} < ${proposalCreatedBlockNum + 13140 + 19710}`);
       const { block } = await sdk.castVote(proposalId, 1, true);
 
       await waitUntilBlock(block, listener);

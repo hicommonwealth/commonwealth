@@ -291,6 +291,20 @@ export class ChainTesting {
   }
 
   /**
+   * Given a desired block number, this function will wait until the chain reaches that block
+   * @param desiredBlockNum The desired block number to wait for
+   */
+  public async awaitBlock(desiredBlockNum: number){
+    while (true) {
+      const currentBlock = (await this.getBlock()).blockNumber;
+      if (currentBlock >= desiredBlockNum) {
+        return
+      }
+      await new Promise<void>(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  /**
    * advance the timestamp and block
    * @param seconds amount of seconds to add to timestamp
    * @param blocks amount of blocks to mine
