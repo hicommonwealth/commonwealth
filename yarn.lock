@@ -1775,7 +1775,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.17.8", "@babel/runtime@^7.7.6":
+"@babel/runtime@^7.17.8", "@babel/runtime@^7.21.0", "@babel/runtime@^7.7.6":
   version "7.21.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.21.5.tgz#8492dddda9644ae3bda3b45eabe87382caee7200"
   integrity sha512-8jI69toZqqcsnqGGqwGS4Qb1VwLOEp4hz+CXPywcvjs60u3B4Pom/U/7rm4W8tMOYEB+E9wgD0mW1l3r8qlI9Q==
@@ -4035,6 +4035,14 @@
   integrity sha512-PzmXk9x9MHyLn2fUztpAqWqvDmMiEJaQv/JcAoAOE8VdHrD9Hf/KWnE1RZtamuS2ngQRqvQPD0xotCGXW7eTxA==
   dependencies:
     "@babel/runtime" "^7.19.0"
+    axios "0.27.2"
+
+"@osmonauts/lcd@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@osmonauts/lcd/-/lcd-0.11.1.tgz#30e0d23960ec4a1d4513ecf881e3705de3306d54"
+  integrity sha512-mri4GnyLfLnT7VLXk6Z53IOd3a7VCQTuMSYGAK042IRgEZXLzjUYDOOTbCTsuJgncAAf51yDBNPOLqw/26jjsg==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
     axios "0.27.2"
 
 "@phosphor-icons/react@^2.0.8":
