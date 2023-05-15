@@ -8,7 +8,7 @@ import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
-import type { ProposalModule } from 'models';
+import type ProposalModule from '../../models/ProposalModule';
 import { initChain } from 'helpers/chain';
 import 'pages/proposals.scss';
 
@@ -18,7 +18,7 @@ import { ProposalCard } from 'views/components/proposal_card';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
 import { getStatusText } from '../components/proposal_card/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';

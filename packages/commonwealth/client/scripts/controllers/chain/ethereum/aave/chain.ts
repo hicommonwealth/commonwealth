@@ -45,11 +45,7 @@ export default class AaveChain extends EthereumChain {
   public async setDelegate(delegatee: string) {
     const token = this.aaveApi?.Token;
     if (!token) throw new Error('No token contract found');
-    const contract = await attachSigner(
-      this.app.wallets,
-      this.app.user.activeAccount,
-      token
-    );
+    const contract = await attachSigner(this.app.user.activeAccount, token);
     await contract.delegate(delegatee);
   }
 

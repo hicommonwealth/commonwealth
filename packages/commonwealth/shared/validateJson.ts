@@ -20,6 +20,15 @@ const schema = {
       properties: {
         method: { type: 'string' },
         args: { type: 'object' },
+        tx_params: {
+          type: 'object',
+          properties: {
+            value: { type: 'string' },
+            gas: { type: 'string' },
+            gasPrice: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
       },
       required: ['method'],
       additionalProperties: false,
@@ -60,7 +69,7 @@ const schema = {
             field_value: { type: 'string' },
             field_type: {
               type: 'string',
-              enum: ['h1', 'h2', 'h3', 'text'],
+              enum: ['h1', 'h2', 'h3', 'h4', 'text'],
             },
           },
           required: ['field_name', 'field_value'],

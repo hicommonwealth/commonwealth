@@ -74,6 +74,16 @@
     }
   }
 
+  &.stage {
+    background-color: $green-600;
+    border-radius: $border-radius-corners;
+
+    .tag-text.Text,
+    .tag-icon.Icon {
+      color: $white;
+    }
+  }
+
   &.new {
     background-color: $yellow-50;
     border-radius: 6px;

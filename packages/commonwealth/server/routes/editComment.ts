@@ -119,7 +119,7 @@ const editComment = async (
     const cwUrl =
       typeof proposal === 'string'
         ? getThreadUrlWithoutObject(comment.chain, proposal, finalComment)
-        : getThreadUrl(proposal, comment);
+        : getThreadUrl(proposal, comment?.id);
     const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
     // dispatch notifications to subscribers of the comment/thread

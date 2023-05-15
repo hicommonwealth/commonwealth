@@ -1,4 +1,4 @@
-import { MinimumProfile } from 'models';
+import  MinimumProfile from '../../../models/MinimumProfile';
 import { RangeStatic } from 'quill';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';

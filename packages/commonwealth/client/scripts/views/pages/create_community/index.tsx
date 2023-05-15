@@ -9,7 +9,7 @@ import 'pages/create_community.scss';
 import app from 'state';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';

@@ -16,7 +16,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import type { ThreadForm } from './types';
 import { useCommonNavigate } from 'navigation/helpers';

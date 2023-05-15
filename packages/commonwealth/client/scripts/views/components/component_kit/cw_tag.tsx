@@ -15,26 +15,40 @@ type TagType =
   | 'poll'
   | 'proposal'
   | 'referendum'
+  | 'stage'
   | 'new';
 
 export type TagProps = {
   iconName?: IconName;
   label: string;
   type?: TagType;
+  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  trimAt?: number;
 };
 
-export const CWTag = (props: TagProps) => {
-  const { iconName, label, type } = props;
+export const CWTag = ({ iconName, label, type, onClick, trimAt }: TagProps) => {
+  const displayLabel = () => {
+    if (!trimAt) {
+      return label;
+    }
+
+    if (label?.length <= trimAt) {
+      return label;
+    }
+
+    return label.slice(0, trimAt) + '...';
+  };
 
   return (
     <div
       className={getClasses<{ type?: TagType }>({ type }, ComponentType.Tag)}
+      onClick={onClick}
     >
       {!!iconName && (
         <CWIcon iconName={iconName} iconSize="small" className="tag-icon" />
       )}
       <CWText type="caption" fontWeight="medium" className="tag-text" noWrap>
-        {label}
+        {displayLabel()}
       </CWText>
     </div>
   );

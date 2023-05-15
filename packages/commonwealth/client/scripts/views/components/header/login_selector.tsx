@@ -5,7 +5,6 @@ import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -22,9 +21,10 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
+import WebWalletController from '../../../controllers/app/web_wallets';
 import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
-import { ITokenAdapter } from '../../../models/index';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -58,7 +58,6 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export const LoginSelectorMenuLeft = ({
-  activeAddressesWithRole,
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
@@ -119,7 +118,6 @@ export const LoginSelectorMenuLeft = ({
                 onClick={async () => {
                   await setActiveAccount(account);
                   setSelectedAddress(account.address);
-                  redraw();
                 }}
               >
                 <UserBlock
@@ -203,7 +201,9 @@ export const LoginSelectorMenuRight = ({
     /**
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
-    const walletConnectWallet = app.wallets.getByName(WalletId.WalletConnect);
+    const walletConnectWallet = WebWalletController.Instance.getByName(
+      WalletId.WalletConnect
+    );
     await walletConnectWallet.reset();
   };
 
@@ -224,7 +224,6 @@ export const LoginSelectorMenuRight = ({
                 ? toggleDarkMode(false, setIsDarkModeOn)
                 : toggleDarkMode(true, setIsDarkModeOn);
               e.stopPropagation();
-              redraw();
             }}
           />
           <div className="login-darkmode-label">
@@ -480,7 +479,6 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
       } catch (err) {
         console.error(err);
       }
