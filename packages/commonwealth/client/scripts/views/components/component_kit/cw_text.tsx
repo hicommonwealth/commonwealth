@@ -1,9 +1,9 @@
 import React from 'react';
 
-import 'components/component_kit/cw_text.scss';
 import { getClasses } from './helpers';
-
 import { ComponentType } from './types';
+
+import 'components/component_kit/cw_text.scss';
 
 type FontWeight =
   | 'regular'
