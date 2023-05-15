@@ -110,9 +110,12 @@
           },
           {
             "in": "query",
-            "name": "thread_id",
-            "type": "integer",
-            "description": "Filter comments by thread_id."
+            "name": "thread_ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Filter comments by comments in threads of specified thread_ids."
           },
           {
             "in": "query",
