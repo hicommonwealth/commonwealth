@@ -15,6 +15,7 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -295,7 +296,24 @@ export async function unlinkLogin(account: AddressInfo) {
 
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
+  let chainAddress;
+  const isCosmos = app.chain.meta.base === 'cosmos';
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: isCosmos
+      ? [
+          new CosmosExtension({
+            rpcUrl: app.chain.meta.node.url,
+          }),
+        ]
+      : null,
+  });
+
+  if (isCosmos) {
+    chainAddress = await magic.cosmos.changeAddress(
+      app.chain.meta.bech32Prefix
+    );
+  }
+
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
@@ -308,6 +326,7 @@ export async function loginWithMagicLink(email: string) {
     data: {
       // send chain/community to request
       chain: app.activeChainId(),
+      address: chainAddress,
     },
   });
   if (response.status === 'Success') {
