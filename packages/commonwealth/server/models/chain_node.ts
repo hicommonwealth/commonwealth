@@ -11,6 +11,7 @@ export type ChainNodeAttributes = {
   private_url?: string;
   balance_type: BalanceType;
   bech32?: string;
+  ss58?: number;
   name: string;
   description?: string;
 };

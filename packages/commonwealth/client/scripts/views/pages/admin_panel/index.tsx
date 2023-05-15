@@ -1,25 +1,22 @@
 import React, { useEffect } from 'react';
 
-import Sublayout from '../Sublayout';
-import { CWEmptyState } from '../components/component_kit/cw_empty_state';
-import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from '../../Sublayout';
+import { CWText } from '../../components/component_kit/cw_text';
 import app from 'state';
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { valueContainerCSS } from 'react-select/dist/declarations/src/components/containers';
-import { CWButton } from '../components/component_kit/cw_button';
-import { openConfirmation } from '../modals/confirmation_modal';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { openConfirmation } from '../../modals/confirmation_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import axios from 'axios';
 import 'pages/admin_panel.scss';
 import { detectURL } from 'helpers/threads';
-import { rpc } from '@polkadot/types/interfaces/definitions';
 import NodeInfo from 'models/NodeInfo';
 import ChainInfo from 'models/ChainInfo';
-import { CWDropdown } from '../components/component_kit/cw_dropdown';
-import { BalanceType } from '../../../../../common-common/src/types';
-import { add, set } from 'lodash';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { BalanceType } from '../../../../../../common-common/src/types';
 import { isAddress } from 'web3-utils';
+import { createChainNode, deleteChain, updateSiteAdmin } from './utils';
 
 // Allows admins to create/update RPC endpoints for chains
 const RPCEndpointTask = () => {
@@ -122,16 +119,12 @@ const RPCEndpointTask = () => {
                         let nodeId = null;
                         if (chainNodeNotCreated) {
                           // Create Chain Node if not yet created
-                          const res = await axios.post(
-                            `${app.serverUrl()}/createChainNode`,
-                            {
-                              url: rpcEndpoint,
-                              name: rpcName,
-                              bech32,
-                              balance_type: balanceType,
-                              jwt: app.user.jwt,
-                            }
-                          );
+                          const res = await createChainNode({
+                            url: rpcEndpoint,
+                            name: rpcName,
+                            bech32,
+                            balance_type: balanceType,
+                          });
                           nodeId = res.data.result.node_id;
                         }
 
@@ -245,10 +238,7 @@ const DeleteChainTask = () => {
                   buttonType: 'mini-red',
                   onClick: async () => {
                     try {
-                      await axios.post(`${app.serverUrl()}/deleteChain`, {
-                        id: deleteChainValue,
-                        jwt: app.user.jwt,
-                      });
+                      await deleteChain({ id: deleteChainValue });
                       setDeleteChainValue('');
                       notifySuccess('Community deleted');
                     } catch (e) {
@@ -315,12 +305,10 @@ const MakeSiteAdminTask = () => {
                   label: 'promote',
                   buttonType: 'mini-black',
                   onClick: async () => {
-                    console.log({ address });
                     try {
-                      await axios.post(`${app.serverUrl()}/updateSiteAdmin`, {
+                      await updateSiteAdmin({
                         address: address,
                         siteAdmin: true,
-                        jwt: app.user.jwt,
                       });
                       setAddress('');
                       notifySuccess('Address promoted');
@@ -344,7 +332,7 @@ const MakeSiteAdminTask = () => {
   );
 };
 
-const AdminPanel = () => {
+const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -368,4 +356,4 @@ const AdminPanel = () => {
   );
 };
 
-export default AdminPanel;
+export default AdminPanelPage;

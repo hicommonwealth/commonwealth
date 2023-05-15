@@ -8,8 +8,8 @@ class NodeStore extends IdStore<NodeInfo> {
     const urlVariants = [
       url,
       url.replace(/\/$/, ''),
-      url.replace(/^https?:\/\//, ''),
-      url.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+      url.replace(/^(https?:\/\/|wss?:\/\/)/, ''),
+      url.replace(/^(https?:\/\/|wss?:\/\/)/, '').replace(/\/$/, ''),
     ];
 
     return this._store.find((node) => urlVariants.includes(node.url));
