@@ -45,10 +45,12 @@ export const RecentThreadsHeader = ({
 
     window.addEventListener('resize', onResize);
     app.loginStateEmitter.on('redraw', forceRerender);
+    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       window.removeEventListener('resize', onResize);
       app.loginStateEmitter.off('redraw', forceRerender);
+      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
