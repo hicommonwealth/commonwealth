@@ -1343,14 +1343,6 @@ function setupRouter(
     authCallback.bind(this, models)
   );
 
-  registerRoute(
-    router,
-    'get',
-    '/auth/callback',
-    passport.authenticate('jwt', { session: false }),
-    authCallback.bind(this, models)
-  );
-
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
 
