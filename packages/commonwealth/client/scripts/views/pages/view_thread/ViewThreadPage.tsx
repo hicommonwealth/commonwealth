@@ -42,6 +42,7 @@ import {
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
+import { SnapshotCreationCard } from './snapshot_creation_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import {
   ExternalLink,
@@ -472,6 +473,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isAuthor ||
     isAdminOrMod;
 
+  // Todo who should actually be able to view this
+  const showCreateSnapshotOptions = isAuthor || isAdminOrMod;
+
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
@@ -784,6 +788,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             onChangeHandler={handleLinkedThreadChange}
                           />
                         )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showCreateSnapshotOptions
+              ? [
+                  {
+                    label: 'Snapshot',
+                    item: (
+                      <div className="cards-column">
+                        <SnapshotCreationCard
+                          thread={thread}
+                          allowSnapshotCreation={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleLinkedProposalChange}
+                        />
                       </div>
                     ),
                   },
