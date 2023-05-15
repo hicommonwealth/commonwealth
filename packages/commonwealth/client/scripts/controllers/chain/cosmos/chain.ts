@@ -13,13 +13,16 @@ import BN from 'bn.js';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { LCD } from 'chain-events/src/chains/cosmos/types';
 import ChainInfo from '../../../models/ChainInfo';
-import { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
+import {
+  IChainModule,
+  ITXData,
+  ITXModalData,
+} from '../../../models/interfaces';
 import WebWalletController from '../../app/web_wallets';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
@@ -123,7 +126,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this.app.chain.block.height = height;
 
     this.app.chain.networkStatus = ApiStatus.Connected;
-    redraw();
   }
 
   public async deinit(): Promise<void> {

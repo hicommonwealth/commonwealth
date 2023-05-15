@@ -1,7 +1,7 @@
 import React from 'react';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import EditProfileComponent from '../components/edit_profile';
 import { PageNotFound } from '../pages/404';
 

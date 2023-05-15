@@ -11,41 +11,29 @@ const checkbox = {
 export default checkbox;
 type Story = StoryObj<typeof checkbox>;
 
-const CheckBox = () => {
-  const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
-
-  return (
-    <CWCheckbox
-      checked={isCheckboxChecked}
-      label="Click me"
-      onChange={() => {
-        setIsCheckboxChecked(!isCheckboxChecked);
-      }}
-    />
-  );
-}
-
-export const ClickMe: Story = {
-  name: 'Click me',
-  render: () => <CheckBox />
-}
-
-export const Disabled: Story = {
-  name: 'Disabled',
-  render: () => <CWCheckbox label="Disabled" disabled />
-}
-
-export const CheckedAndDisabled: Story = {
-  name: 'Checked and disabled',
-  render: () => <CWCheckbox label="Checked and disabled" disabled checked />
-}
-
-export const Indeterminate: Story = {
-  name: 'Indeterminate',
-  render: () => <CWCheckbox label="Indeterminate" indeterminate />
-}
-
-export const IndeterminateAndDisabled: Story = {
-  name: 'Indeterminate and disabled',
-  render: () => <CWCheckbox label="Indeterminate and disabled" disabled indeterminate />
+export const Checkbox: Story = {
+  args: {
+    label: "Click me",
+    disabled: false,
+    checked: false,
+    indeterminate: false,
+  },
+  argTypes: {
+    label: {
+      control: { type: "text" },
+    },
+    disabled: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    checked: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    indeterminate: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+  },
+  render: ({...args}) => <CWCheckbox {...args}>{args.label}</CWCheckbox>
 }

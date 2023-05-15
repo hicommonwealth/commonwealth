@@ -10,7 +10,7 @@ import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
 import app from 'state';
-import { ChainEntitiesSelector } from '../components/chain_entities_selector';
+import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -77,7 +77,7 @@ export const UpdateProposalStatusModal = ({
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
   const showChainEvents =
-    !isCosmos && app.chainEntities.store.get(thread.chain).length > 0;
+    !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
 
   const handleSaveChanges = async () => {
     // set stage
