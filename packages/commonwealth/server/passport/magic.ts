@@ -1,4 +1,4 @@
-import type { MagicUserMetadata } from '@magic-sdk/admin';
+import { MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 import { CosmosExtension } from '@magic-ext/cosmos';
 
@@ -17,29 +17,34 @@ import { createRole } from '../util/roles';
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
+
   if (MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
-    const magic = new Magic(MAGIC_API_KEY, {
-      extensions: [
-        new CosmosExtension({
-          rpcUrl: 'cosmos rpc url',
-        }),
-      ],
-    });
+    const magic = new Magic(MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         // determine login location
         let chain, error;
         if (req.body.chain || req.body.community) {
           [chain, error] = await validateChain(models, req.body);
+          console.log('chain', chain);
           if (error) return cb(error);
         }
+
+        const isCosmos = chain.base === 'cosmos';
         const registrationChain = chain;
 
         // fetch user data from magic backend
         let userMetadata: MagicUserMetadata;
         try {
-          userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+          if (isCosmos) {
+            userMetadata = await magic.users.getMetadataByIssuerAndWallet(
+              user.issuer,
+              WalletType.COSMOS
+            );
+          } else {
+            userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+          }
         } catch (e) {
           return cb(
             new ServerError(
@@ -77,7 +82,7 @@ export function initMagicAuth(models: DB) {
           return cb(new AppError('Unsupported magic chain.'));
         }
 
-        // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address
+        // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address TODO
         if (!existingUser) {
           const chainId = registrationChain?.id ?? 'ethereum';
           const ethAddress = userMetadata.publicAddress;
@@ -154,7 +159,7 @@ export function initMagicAuth(models: DB) {
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newAddress.id, // always ethereum address
+                address_id: newAddress.id, // always ethereum address TODO
                 created_at: new Date(),
                 updated_at: new Date(),
               },
@@ -201,27 +206,52 @@ export function initMagicAuth(models: DB) {
         } else {
           // migrate to magic if email already exists
           await sequelize.transaction(async (t) => {
-            const ethAddress = userMetadata.publicAddress;
-            const newAddress = await models.Address.create(
-              {
-                address: ethAddress,
-                chain: 'ethereum',
-                verification_token: 'MAGIC',
-                verification_token_expires: null,
-                verified: new Date(), // trust addresses from magic
-                last_active: new Date(),
-                user_id: existingUser.id,
-                profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
-                wallet_id: WalletId.Magic,
-              },
-              { transaction: t }
-            );
+            const existingAddress = userMetadata.publicAddress;
+            let newAddress;
+
+            if (isCosmos) {
+              const cosmosAddress = userMetadata.wallets.find(
+                (wallet) => wallet.wallet_type === 'COSMOS'
+              );
+
+              newAddress = await models.Address.create(
+                {
+                  address: cosmosAddress.public_address,
+                  chain: chain.id,
+                  verification_token: 'MAGIC',
+                  verification_token_expires: null,
+                  verified: new Date(), // trust addresses from magic
+                  last_active: new Date(),
+                  user_id: existingUser.id,
+                  profile_id: (existingUser.Profiles[0] as ProfileAttributes)
+                    .id,
+                  wallet_id: WalletId.Magic,
+                },
+                { transaction: t }
+              );
+            } else {
+              newAddress = await models.Address.create(
+                {
+                  address: existingAddress,
+                  chain: 'ethereum',
+                  verification_token: 'MAGIC',
+                  verification_token_expires: null,
+                  verified: new Date(), // trust addresses from magic
+                  last_active: new Date(),
+                  user_id: existingUser.id,
+                  profile_id: (existingUser.Profiles[0] as ProfileAttributes)
+                    .id,
+                  wallet_id: WalletId.Magic,
+                },
+                { transaction: t }
+              );
+            }
 
             await models.SsoToken.create(
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newAddress.id, // always ethereum address
+                address_id: newAddress.id,
                 created_at: new Date(),
                 updated_at: new Date(),
               },
