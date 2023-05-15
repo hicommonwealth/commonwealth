@@ -104,8 +104,8 @@ describe('Integration tests for Aave', () => {
       const currentBlock = await sdk.getBlock();
       await sdk.advanceTime(String(secs), blocks);
       console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Proposal Created Block Number", proposalCreatedBlockNum);
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Desired block number", currentBlock.blockNumber + blocks);
-      await sdk.awaitBlock(currentBlock.blockNumber + blocks);
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Desired block number", currentBlock.number + blocks);
+      await sdk.awaitBlock(currentBlock.number + blocks);
       // const currentBlock = await sdk.getBlock();
       // const diff = currentBlock.blockNumber - proposalCreatedBlockNum
       // console.log("Current block number - proposal create block number", diff);
