@@ -16,6 +16,10 @@ describe('getProfiles Tests', () => {
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
+    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Threads, 2);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Comments, 2);
   });
 
   it('should return profiles with specified network correctly', async () => {
@@ -23,6 +27,10 @@ describe('getProfiles Tests', () => {
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
+    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Threads, 2);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Comments, 2);
   });
 
   it('should return count only when specified correctly', async () => {
