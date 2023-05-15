@@ -1,4 +1,3 @@
-import { IWebWallet, Account } from 'models';
 import { showSessionSigninModal } from 'views/modals/session_signin_modal';
 import { addressSwapper } from 'commonwealth/shared/utils';
 

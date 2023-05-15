@@ -11,8 +11,8 @@ import { openConfirmation } from './confirmation_modal';
 
 import 'modals/session_signin_modal.scss';
 
-import type { Account } from 'models';
 import app from 'state';
+import type Account from '../../models/Account';
 import WebWalletController from '../../controllers/app/web_wallets';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';

@@ -1,6 +1,5 @@
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import type { Chain } from '@canvas-js/interfaces';
 import { createCanvasSessionPayload } from 'canvas';
 import { initAppState } from 'state';
 import BN from 'bn.js';
