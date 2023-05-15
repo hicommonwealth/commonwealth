@@ -102,7 +102,9 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
+          bytes: Buffer.from(
+            canvas.serializeSessionPayload(canvasSessionPayload)
+          ),
         });
       } catch (error) {
         console.error(error);

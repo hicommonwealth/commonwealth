@@ -22,15 +22,24 @@ export class SolanaSessionController implements ISessionController {
     return this.signers[chainId][fromAddress].publicKey.toBase58();
   }
 
-  async hasAuthenticatedSession(chainId: string, fromAddress: string): Promise<boolean> {
+  async hasAuthenticatedSession(
+    chainId: string,
+    fromAddress: string
+  ): Promise<boolean> {
     this.getOrCreateSigner(chainId, fromAddress);
     return (
-      this.signers[chainId][fromAddress] !== undefined && this.auths[chainId][fromAddress] !== undefined
+      this.signers[chainId][fromAddress] !== undefined &&
+      this.auths[chainId][fromAddress] !== undefined
     );
   }
 
-  async getOrCreateAddress(chainId: string, fromAddress: string): Promise<string> {
-    return (await this.getOrCreateSigner(chainId, fromAddress)).publicKey.toBase58();
+  async getOrCreateAddress(
+    chainId: string,
+    fromAddress: string
+  ): Promise<string> {
+    return (
+      await this.getOrCreateSigner(chainId, fromAddress)
+    ).publicKey.toBase58();
   }
 
   async authSession(
@@ -43,24 +52,31 @@ export class SolanaSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      throw new Error("Invalid signature");
+      throw new Error('Invalid signature');
     }
     if (payload.sessionAddress !== this.getAddress(chainId, fromAddress)) {
       throw new Error(
         `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
-          chainId, fromAddress
+          chainId,
+          fromAddress
         )}`
       );
     }
     this.auths[chainId][fromAddress] = { payload, signature };
 
     const authStorageKey = `CW_SESSIONS-solana-${chainId}-${fromAddress}-auth`;
-    localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
+    localStorage.setItem(
+      authStorageKey,
+      JSON.stringify(this.auths[chainId][fromAddress])
+    );
   }
 
-  private async getOrCreateSigner(chainId: string, fromAddress: string): Promise<solw3.Keypair> {
-    this.auths[chainId] = this.auths[chainId] ?? {}
-    this.signers[chainId] = this.signers[chainId] ?? {}
+  private async getOrCreateSigner(
+    chainId: string,
+    fromAddress: string
+  ): Promise<solw3.Keypair> {
+    this.auths[chainId] = this.auths[chainId] ?? {};
+    this.signers[chainId] = this.signers[chainId] ?? {};
 
     const solw3 = await import('@solana/web3.js');
     if (this.signers[chainId][fromAddress] !== undefined) {
@@ -93,14 +109,19 @@ export class SolanaSessionController implements ISessionController {
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
-          console.log('Restored logged-out session:', this.getAddress(chainId, fromAddress));
+          console.log(
+            'Restored logged-out session:',
+            this.getAddress(chainId, fromAddress)
+          );
         }
       }
     } catch (err) {
       console.log('Could not restore previous session');
       this.signers[chainId][fromAddress] = solw3.Keypair.generate();
       delete this.auths[chainId][fromAddress];
-      const privateKey = bs58.encode(this.signers[chainId][fromAddress].secretKey);
+      const privateKey = bs58.encode(
+        this.signers[chainId][fromAddress].secretKey
+      );
       localStorage.setItem(storageKey, JSON.stringify({ privateKey }));
     }
     return this.signers[chainId][fromAddress];
@@ -116,8 +137,8 @@ export class SolanaSessionController implements ISessionController {
     action: Action;
     hash: string;
   }> {
-    this.auths[chainId] = this.auths[chainId] ?? {}
-    this.signers[chainId] = this.signers[chainId] ?? {}
+    this.auths[chainId] = this.auths[chainId] ?? {};
+    this.signers[chainId] = this.signers[chainId] ?? {};
 
     const signer = this.signers[chainId][fromAddress];
     const sessionPayload = this.auths[chainId][fromAddress]?.payload;

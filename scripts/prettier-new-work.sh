@@ -3,7 +3,7 @@ if ! (git rev-parse -q --verify MERGE_HEAD > /dev/null || [[ -n "$PRE_COMMIT_RUN
   export PRE_COMMIT_RUNNING=1
 
   # Run Prettier on changed JavaScript/TypeScript files
-  files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$')
+  files=$(git diff --name-only master)
 
   for file in $files
   do

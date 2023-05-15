@@ -1,4 +1,10 @@
-export const chains = ['eip155:*', 'cosmos:*', 'solana:*', 'polkadot:*', 'near:*'];
+export const chains = [
+  'eip155:*',
+  'cosmos:*',
+  'solana:*',
+  'polkadot:*',
+  'near:*',
+];
 
 export const models = {
   threads: {

@@ -1,7 +1,7 @@
 import type { ActionPayload, SessionPayload } from '@canvas-js/interfaces';
 import type { TypedMessage, MessageTypes } from '@metamask/eth-sig-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-import * as siwe from "siwe"
+import * as siwe from 'siwe';
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -14,7 +14,6 @@ export const TEST_BLOCK_INFO_STRING =
   '{"number":1,"hash":"0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf","timestamp":1665083987891}';
 export const TEST_BLOCK_INFO_BLOCKHASH =
   '0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf';
-
 
 export const getEIP712SignableAction = (
   message: ActionPayload
@@ -48,29 +47,37 @@ export const getEIP712SignableAction = (
   };
 };
 
-export const SiweMessageVersion = "1"
+export const SiweMessageVersion = '1';
 
-const chainPattern = /^eip155:(\d+)$/
+const chainPattern = /^eip155:(\d+)$/;
 
-export function createSiweMessage(payload: SessionPayload, domain: string, nonce: string) {
-	const chainPatternMatch = chainPattern.exec(payload.chain)
-	if (chainPatternMatch === null) {
-		throw new Error(`invalid chain: ${payload.chain} did not match ${chainPattern}`)
-	}
+export function createSiweMessage(
+  payload: SessionPayload,
+  domain: string,
+  nonce: string
+) {
+  const chainPatternMatch = chainPattern.exec(payload.chain);
+  if (chainPatternMatch === null) {
+    throw new Error(
+      `invalid chain: ${payload.chain} did not match ${chainPattern}`
+    );
+  }
 
-	const [_, chainId] = chainPatternMatch
+  const [_, chainId] = chainPatternMatch;
 
-	const message = new siwe.SiweMessage({
-		version: SiweMessageVersion,
-		domain: (new URL(domain)).host,
-		nonce: nonce,
-		address: payload.from,
-		uri: domain,
-		chainId: parseInt(chainId),
-		issuedAt: new Date(payload.sessionIssued).toISOString(),
-		expirationTime: new Date(payload.sessionIssued + payload.sessionDuration).toISOString(),
-		resources: [`ethereum:${payload.sessionAddress}:${payload.app}`],
-	})
+  const message = new siwe.SiweMessage({
+    version: SiweMessageVersion,
+    domain: new URL(domain).host,
+    nonce: nonce,
+    address: payload.from,
+    uri: domain,
+    chainId: parseInt(chainId),
+    issuedAt: new Date(payload.sessionIssued).toISOString(),
+    expirationTime: new Date(
+      payload.sessionIssued + payload.sessionDuration
+    ).toISOString(),
+    resources: [`ethereum:${payload.sessionAddress}:${payload.app}`],
+  });
 
-	return message.prepareMessage()
+  return message.prepareMessage();
 }

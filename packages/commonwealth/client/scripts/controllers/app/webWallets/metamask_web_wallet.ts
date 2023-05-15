@@ -9,7 +9,7 @@ import type Web3 from 'web3';
 
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
-import * as siwe from "siwe"
+import * as siwe from 'siwe';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
@@ -86,7 +86,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
     const signature = await this._web3.givenProvider.request({
       method: 'personal_sign',
-      params: [account.address, message]
+      params: [account.address, message],
     });
 
     return `${domain}/${nonce}/${signature}`;

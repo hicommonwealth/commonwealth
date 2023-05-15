@@ -675,7 +675,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           });
         },
         label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
-        iconLeft: isSubscribed ? 'unsubscribe' as const : 'bell' as const,
+        iconLeft: isSubscribed ? ('unsubscribe' as const) : ('bell' as const),
       },
     ];
   };

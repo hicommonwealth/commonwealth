@@ -72,7 +72,7 @@ const createReaction = async (
     proposal_id,
     address: author.address,
     chain: chain.id,
-    value: reaction
+    value: reaction,
   });
 
   let thread;

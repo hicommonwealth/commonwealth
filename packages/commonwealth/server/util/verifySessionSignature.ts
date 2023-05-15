@@ -16,7 +16,10 @@ import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createSiweMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
 import { addressSwapper } from '../../shared/utils';
-import { createCanvasSessionPayload, chainBaseToCanvasChainId } from '../../shared/canvas';
+import {
+  createCanvasSessionPayload,
+  chainBaseToCanvasChainId,
+} from '../../shared/canvas';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
@@ -246,14 +249,20 @@ const verifySessionSignature = async (
     // ethereum address handling
     //
     try {
-      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
-      const signaturePatternMatch = signaturePattern.exec(signatureString)
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/;
+      const signaturePatternMatch = signaturePattern.exec(signatureString);
       if (signaturePatternMatch === null) {
-        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+        throw new Error(
+          `Invalid signature: signature did not match ${signaturePattern}`
+        );
       }
-      const [_, domain, nonce, signatureData] = signaturePatternMatch
+      const [_, domain, nonce, signatureData] = signaturePatternMatch;
 
-      const siweMessage = createSiweMessage(canvasSessionPayload, domain, nonce)
+      const siweMessage = createSiweMessage(
+        canvasSessionPayload,
+        domain,
+        nonce
+      );
 
       if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(
@@ -261,7 +270,7 @@ const verifySessionSignature = async (
         );
       }
 
-      const address = verifyMessage(siweMessage, signatureData)
+      const address = verifyMessage(siweMessage, signatureData);
 
       isValid = addressModel.address.toLowerCase() === address.toLowerCase();
       if (!isValid) {

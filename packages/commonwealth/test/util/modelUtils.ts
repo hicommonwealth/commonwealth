@@ -1,5 +1,9 @@
 /* eslint-disable no-unused-expressions */
-import { personalSign, signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
+import {
+  personalSign,
+  signTypedData,
+  SignTypedDataVersion,
+} from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import type BN from 'bn.js';
@@ -8,10 +12,15 @@ import 'chai/register-should';
 import { BalanceType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import * as siwe from "siwe";
+import * as siwe from 'siwe';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from 'server/util/roles';
-import type { Action, Session, ActionPayload, SessionPayload } from '@canvas-js/interfaces';
+import type {
+  Action,
+  Session,
+  ActionPayload,
+  SessionPayload,
+} from '@canvas-js/interfaces';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
@@ -111,13 +120,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       TEST_BLOCK_INFO_BLOCKHASH
     );
     const nonce = siwe.generateNonce();
-    const domain = "https://commonwealth.test";
+    const domain = 'https://commonwealth.test';
     const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
     const signatureData = personalSign({
       privateKey: keypair.getPrivateKey(),
-      data: siweMessage
+      data: siweMessage,
     });
-    const signature = `${domain}/${nonce}/${signatureData}`
+    const signature = `${domain}/${nonce}/${signatureData}`;
     const session: Session = {
       type: 'session',
       payload: sessionPayload,
@@ -139,15 +148,23 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email, session, sign: (actionPayload: ActionPayload) => {
-      const { types, primaryType, domain, message } = getEIP712SignableAction(actionPayload)
-      const signature = signTypedData({
-        privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
-        data: getEIP712SignableAction(actionPayload),
-        version: SignTypedDataVersion.V4,
-      });
-      return signature;
-    }};
+    return {
+      address_id,
+      address,
+      user_id,
+      email,
+      session,
+      sign: (actionPayload: ActionPayload) => {
+        const { types, primaryType, domain, message } =
+          getEIP712SignableAction(actionPayload);
+        const signature = signTypedData({
+          privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
+          data: getEIP712SignableAction(actionPayload),
+          version: SignTypedDataVersion.V4,
+        });
+        return signature;
+      },
+    };
   }
   if (chain === 'edgeware') {
     const wallet_id = 'polkadot';
@@ -179,11 +196,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
-    const signature = keyPair.sign(stringToU8a(sortedStringify(sessionPayload)));
+    const signature = keyPair.sign(
+      stringToU8a(sortedStringify(sessionPayload))
+    );
     const session: Session = {
       type: 'session',
       payload: sessionPayload,
-      signature: new Buffer(signature).toString('hex')
+      signature: new Buffer(signature).toString('hex'),
     };
 
     const address_id = res.body.result.id;
@@ -194,12 +213,21 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email, session, sessionSigner: keyPair, sign: (actionPayload: ActionPayload) => {
-      const signatureBytes = sessionWallet.sign(stringToU8a(sortedStringify(actionPayload)));
-      const signature = new Buffer(signatureBytes).toString('hex');
-      return signature;
-    }};
-
+    return {
+      address_id,
+      address,
+      user_id,
+      email,
+      session,
+      sessionSigner: keyPair,
+      sign: (actionPayload: ActionPayload) => {
+        const signatureBytes = sessionWallet.sign(
+          stringToU8a(sortedStringify(actionPayload))
+        );
+        const signature = new Buffer(signatureBytes).toString('hex');
+        return signature;
+      },
+    };
   }
   throw new Error('invalid chain');
 };
@@ -255,7 +283,7 @@ export const createThread = async (args: ThreadArgs) => {
   const actionPayload: ActionPayload = {
     app: session.payload.app,
     block: session.payload.block,
-    call: "thread",
+    call: 'thread',
     callArgs: {
       community: chainId || '',
       title: encodeURIComponent(title),
@@ -263,7 +291,7 @@ export const createThread = async (args: ThreadArgs) => {
       link: url || '',
       topic: topicId || '',
     },
-    chain: "eip155:1",
+    chain: 'eip155:1',
     from: session.payload.from,
     timestamp: Date.now(),
   };
@@ -273,9 +301,9 @@ export const createThread = async (args: ThreadArgs) => {
     session: session.payload.sessionAddress,
     signature: sign(actionPayload),
   };
-  const canvas_session = sortedStringify(session)
-  const canvas_action = sortedStringify(action)
-  const canvas_hash = '' // getActionHash(action)
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
 
   const res = await chai.request
     .agent(app)
@@ -352,18 +380,27 @@ export interface CommentArgs {
 }
 
 export const createComment = async (args: CommentArgs) => {
-  const { chain, address, jwt, text, parentCommentId, thread_id, session, sign } = args;
+  const {
+    chain,
+    address,
+    jwt,
+    text,
+    parentCommentId,
+    thread_id,
+    session,
+    sign,
+  } = args;
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
     block: session.payload.block,
-    call: "comment",
+    call: 'comment',
     callArgs: {
       body: text,
       thread_id,
-      parent_comment_id: parentCommentId
+      parent_comment_id: parentCommentId,
     },
-    chain: "eip155:1",
+    chain: 'eip155:1',
     from: session.payload.from,
     timestamp: Date.now(),
   };
@@ -373,9 +410,9 @@ export const createComment = async (args: CommentArgs) => {
     session: session.payload.sessionAddress,
     signature: sign(actionPayload),
   };
-  const canvas_session = sortedStringify(session)
-  const canvas_action = sortedStringify(action)
-  const canvas_hash = '' // getActionHash(action)
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
   // TODO
 
   const res = await chai.request
@@ -438,14 +475,23 @@ export interface CreateReactionArgs {
 }
 
 export const createReaction = async (args: CreateReactionArgs) => {
-  const { chain, address, jwt, author_chain, reaction, comment_id, session, sign } = args;
+  const {
+    chain,
+    address,
+    jwt,
+    author_chain,
+    reaction,
+    comment_id,
+    session,
+    sign,
+  } = args;
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
     block: session.payload.block,
-    call: "reactComment",
+    call: 'reactComment',
     callArgs: { comment_id, value: reaction },
-    chain: "eip155:1",
+    chain: 'eip155:1',
     from: session.payload.from,
     timestamp: Date.now(),
   };
@@ -455,9 +501,9 @@ export const createReaction = async (args: CreateReactionArgs) => {
     session: session.payload.sessionAddress,
     signature: sign(actionPayload),
   };
-  const canvas_session = sortedStringify(session)
-  const canvas_action = sortedStringify(action)
-  const canvas_hash = '' // getActionHash(action)
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
   // TODO
 
   const res = await chai.request

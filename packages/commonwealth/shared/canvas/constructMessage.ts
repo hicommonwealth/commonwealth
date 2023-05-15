@@ -16,7 +16,7 @@ export const createCanvasSessionPayload = (
   // The blockhash is optional, but must be explicitly so
   if (block === undefined) throw new Error('Invalid Canvas signing message');
 
-  const caip2Prefix = chainBaseToCaip2(chainBase)
+  const caip2Prefix = chainBaseToCaip2(chainBase);
 
   const payload: SessionPayload = {
     app: placeholderMultihash,

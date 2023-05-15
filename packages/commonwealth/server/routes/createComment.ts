@@ -196,7 +196,7 @@ const createComment = async (
     text,
     address: author.address,
     chain: chain.id,
-    parent_comment_id: parent_id ? parseInt(parent_id, 10) : null
+    parent_comment_id: parent_id ? parseInt(parent_id, 10) : null,
   });
 
   // New comments get an empty version history initialized, which is passed

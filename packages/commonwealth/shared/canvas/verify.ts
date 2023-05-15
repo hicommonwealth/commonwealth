@@ -72,17 +72,22 @@ export const verify = async ({
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
-      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/
-      const signaturePatternMatch = signaturePattern.exec(signature)
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/;
+      const signaturePatternMatch = signaturePattern.exec(signature);
       if (signaturePatternMatch === null) {
-        throw new Error(`Invalid signature: signature did not match ${signaturePattern}`)
+        throw new Error(
+          `Invalid signature: signature did not match ${signaturePattern}`
+        );
       }
-      const [_, domain, nonce, signatureData] = signaturePatternMatch
+      const [_, domain, nonce, signatureData] = signaturePatternMatch;
 
-      const siweMessage = createSiweMessage(sessionPayload, domain, nonce)
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
 
       const ethersUtils = (await import('ethers')).utils;
-      const recoveredAddr = ethersUtils.verifyMessage(siweMessage, signatureData)
+      const recoveredAddr = ethersUtils.verifyMessage(
+        siweMessage,
+        signatureData
+      );
 
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }

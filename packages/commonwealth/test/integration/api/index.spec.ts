@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import * as siwe from "siwe";
+import * as siwe from 'siwe';
 import { createCanvasSessionPayload } from 'canvas';
 import app, { resetDatabase } from '../../../server-test';
 import {
@@ -82,14 +82,14 @@ describe('API Tests', () => {
         timestamp,
         TEST_BLOCK_INFO_BLOCKHASH
       );
-      createSiweMessage
+      createSiweMessage;
       // const data = getEIP712SignableSession(message);
       const nonce = siwe.generateNonce();
-      const domain = "https://commonwealth.test"
-      const siweMessage = createSiweMessage(message, domain, nonce)
+      const domain = 'https://commonwealth.test';
+      const siweMessage = createSiweMessage(message, domain, nonce);
       const privateKey = keypair.getPrivateKey();
-      const signatureData = personalSign({privateKey, data: siweMessage})
-      const signature = `${domain}/${nonce}/${signatureData}`
+      const signatureData = personalSign({ privateKey, data: siweMessage });
+      const signature = `${domain}/${nonce}/${signatureData}`;
       res = await chai
         .request(app)
         .post('/api/verifyAddress')

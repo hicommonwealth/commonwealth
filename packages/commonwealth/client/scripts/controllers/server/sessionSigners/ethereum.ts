@@ -21,14 +21,21 @@ export class EthereumSessionController implements ISessionController {
     return this.signers[chainId][fromAddress]?.address;
   }
 
-  async hasAuthenticatedSession(chainId: string, fromAddress: string): Promise<boolean> {
+  async hasAuthenticatedSession(
+    chainId: string,
+    fromAddress: string
+  ): Promise<boolean> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return (
-      this.signers[chainId][fromAddress] !== undefined && this.auths[chainId][fromAddress] !== undefined
+      this.signers[chainId][fromAddress] !== undefined &&
+      this.auths[chainId][fromAddress] !== undefined
     );
   }
 
-  async getOrCreateAddress(chainId: string, fromAddress: string): Promise<string> {
+  async getOrCreateAddress(
+    chainId: string,
+    fromAddress: string
+  ): Promise<string> {
     return (await this.getOrCreateSigner(chainId, fromAddress)).address;
   }
 
@@ -42,7 +49,7 @@ export class EthereumSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      throw new Error("Invalid signature");
+      throw new Error('Invalid signature');
     }
     if (
       payload.sessionAddress.toLowerCase() !==
@@ -56,12 +63,18 @@ export class EthereumSessionController implements ISessionController {
     this.auths[chainId][fromAddress] = { payload, signature };
 
     const authStorageKey = `CW_SESSIONS-eth-${chainId}-${fromAddress}-auth`;
-    localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
+    localStorage.setItem(
+      authStorageKey,
+      JSON.stringify(this.auths[chainId][fromAddress])
+    );
   }
 
-  private async getOrCreateSigner(chainId: string, fromAddress: string): Promise<ethers.Wallet> {
-    this.auths[chainId] = this.auths[chainId] ?? {}
-    this.signers[chainId] = this.signers[chainId] ?? {}
+  private async getOrCreateSigner(
+    chainId: string,
+    fromAddress: string
+  ): Promise<ethers.Wallet> {
+    this.auths[chainId] = this.auths[chainId] ?? {};
+    this.signers[chainId] = this.signers[chainId] ?? {};
 
     if (this.signers[chainId][fromAddress] !== undefined) {
       return this.signers[chainId][fromAddress];
@@ -96,7 +109,10 @@ export class EthereumSessionController implements ISessionController {
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
-          console.log('Restored logged-out session:', this.getAddress(chainId, fromAddress));
+          console.log(
+            'Restored logged-out session:',
+            this.getAddress(chainId, fromAddress)
+          );
         }
       }
     } catch (err) {
@@ -106,7 +122,9 @@ export class EthereumSessionController implements ISessionController {
       delete this.auths[chainId][fromAddress];
       localStorage.setItem(
         storageKey,
-        JSON.stringify({ privateKey: this.signers[chainId][fromAddress].privateKey })
+        JSON.stringify({
+          privateKey: this.signers[chainId][fromAddress].privateKey,
+        })
       );
     }
     return this.signers[chainId][fromAddress];
@@ -122,8 +140,8 @@ export class EthereumSessionController implements ISessionController {
     action: Action;
     hash: string;
   }> {
-    this.signers[chainId] = this.signers[chainId] ?? {}
-    this.auths[chainId] = this.auths[chainId] ?? {}
+    this.signers[chainId] = this.signers[chainId] ?? {};
+    this.auths[chainId] = this.auths[chainId] ?? {};
 
     const actionSigner = this.signers[chainId][fromAddress];
     const sessionPayload = this.auths[chainId][fromAddress]?.payload;

@@ -140,11 +140,14 @@ class CommentsController {
     let chainEntity;
     try {
       // TODO: Create a new type for proposal comments?
-      const { session, action, hash } = await app.sessions.signComment(address, {
-        thread_id: threadId,
-        body: unescapedText,
-        parent_comment_id: parentCommentId,
-      });
+      const { session, action, hash } = await app.sessions.signComment(
+        address,
+        {
+          thread_id: threadId,
+          body: unescapedText,
+          parent_comment_id: parentCommentId,
+        }
+      );
 
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
@@ -185,11 +188,14 @@ class CommentsController {
     const newBody = body || comment.text;
     try {
       // TODO: Change to PUT /comment
-      const { session, action, hash } = await app.sessions.signComment(app.user.activeAccount.address, {
-        thread_id: comment.threadId,
-        body,
-        parent_comment_id: comment.parentComment,
-      });
+      const { session, action, hash } = await app.sessions.signComment(
+        app.user.activeAccount.address,
+        {
+          thread_id: comment.threadId,
+          body,
+          parent_comment_id: comment.parentComment,
+        }
+      );
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
@@ -219,9 +225,12 @@ class CommentsController {
   }
 
   public async delete(comment) {
-    const { session, action, hash } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
-      comment_id: comment.canvasHash,
-    });
+    const { session, action, hash } = await app.sessions.signDeleteComment(
+      app.user.activeAccount.address,
+      {
+        comment_id: comment.canvasHash,
+      }
+    );
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {

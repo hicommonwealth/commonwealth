@@ -13,7 +13,10 @@ import { ISessionController } from '.';
 
 export class SubstrateSessionController implements ISessionController {
   keyring: Keyring = new Keyring({ ss58Format: 42 });
-  signers: Record<string, Record<string, { pair: IKeyringPair; privateKey: string }>> = {};
+  signers: Record<
+    string,
+    Record<string, { pair: IKeyringPair; privateKey: string }>
+  > = {};
   private auths: Record<
     number,
     Record<string, { payload: SessionPayload; signature: string }>
@@ -26,14 +29,21 @@ export class SubstrateSessionController implements ISessionController {
     });
   }
 
-  async hasAuthenticatedSession(chainId: string, fromAddress: string): Promise<boolean> {
+  async hasAuthenticatedSession(
+    chainId: string,
+    fromAddress: string
+  ): Promise<boolean> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return (
-      this.signers[chainId][fromAddress] !== undefined && this.auths[chainId][fromAddress] !== undefined
+      this.signers[chainId][fromAddress] !== undefined &&
+      this.auths[chainId][fromAddress] !== undefined
     );
   }
 
-  async getOrCreateAddress(chainId: string, fromAddress: string): Promise<string> {
+  async getOrCreateAddress(
+    chainId: string,
+    fromAddress: string
+  ): Promise<string> {
     return addressSwapper({
       address: (await this.getOrCreateSigner(chainId, fromAddress)).address,
       currentPrefix: 42,
@@ -50,24 +60,31 @@ export class SubstrateSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      throw new Error("Invalid signature");
+      throw new Error('Invalid signature');
     }
     if (payload.sessionAddress !== this.getAddress(chainId, fromAddress)) {
       throw new Error(
         `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
-          chainId, fromAddress
+          chainId,
+          fromAddress
         )}`
       );
     }
     this.auths[chainId][fromAddress] = { payload, signature };
 
     const authStorageKey = `CW_SESSIONS-substrate-${chainId}-${fromAddress}-auth`;
-    localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
+    localStorage.setItem(
+      authStorageKey,
+      JSON.stringify(this.auths[chainId][fromAddress])
+    );
   }
 
-  private async getOrCreateSigner(chainId: string, fromAddress: string): Promise<IKeyringPair> {
-    this.auths[chainId] = this.auths[chainId] ?? {}
-    this.signers[chainId] = this.signers[chainId] ?? {}
+  private async getOrCreateSigner(
+    chainId: string,
+    fromAddress: string
+  ): Promise<IKeyringPair> {
+    this.auths[chainId] = this.auths[chainId] ?? {};
+    this.signers[chainId] = this.signers[chainId] ?? {};
 
     if (this.signers[chainId][fromAddress] !== undefined) {
       return this.signers[chainId][fromAddress].pair;
@@ -99,7 +116,10 @@ export class SubstrateSessionController implements ISessionController {
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
-          console.log('Restored logged-out session:', this.getAddress(chainId, fromAddress));
+          console.log(
+            'Restored logged-out session:',
+            this.getAddress(chainId, fromAddress)
+          );
         }
       }
     } catch (err) {
@@ -127,8 +147,8 @@ export class SubstrateSessionController implements ISessionController {
     action: Action;
     hash: string;
   }> {
-    this.auths[chainId] = this.auths[chainId] ?? {}
-    this.signers[chainId] = this.signers[chainId] ?? {}
+    this.auths[chainId] = this.auths[chainId] ?? {};
+    this.signers[chainId] = this.signers[chainId] ?? {};
 
     const signer = this.signers[chainId][fromAddress];
     const sessionPayload = this.auths[chainId][fromAddress]?.payload;

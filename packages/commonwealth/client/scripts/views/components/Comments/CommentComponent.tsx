@@ -45,7 +45,8 @@ export const CommentComponent = ({
   threadLevel,
   updatedCommentsCallback,
 }: CommentProps) => {
-  const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] = React.useState<boolean>(false);
+  const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
+    React.useState<boolean>(false);
   const [verifiedAction, setVerifiedAction] = React.useState<Action>();
   const [verifiedSession, setVerifiedSession] = React.useState<Session>();
 
@@ -104,26 +105,26 @@ export const CommentComponent = ({
   };
 
   useEffect(() => {
-      try {
-        const session: Session = JSON.parse(comment.canvasSession);
-        const action: Action = JSON.parse(comment.canvasAction);
-        const actionSignerAddress = session?.payload?.sessionAddress;
-        if (
-          !comment.canvasSession ||
-          !comment.canvasAction ||
-          !actionSignerAddress
-        )
-          return;
-        verify({ session })
-          .then((result) => setVerifiedSession(session))
-          .catch((err) => console.log('Could not verify session'))
-        verify({ action, actionSignerAddress })
-          .then((result) => setVerifiedAction(action))
-          .catch((err) => console.log('Could not verify action'))
-      } catch (err) {
-        console.log('Unexpected error while verifying action/session');
+    try {
+      const session: Session = JSON.parse(comment.canvasSession);
+      const action: Action = JSON.parse(comment.canvasAction);
+      const actionSignerAddress = session?.payload?.sessionAddress;
+      if (
+        !comment.canvasSession ||
+        !comment.canvasAction ||
+        !actionSignerAddress
+      )
         return;
-      }
+      verify({ session })
+        .then((result) => setVerifiedSession(session))
+        .catch((err) => console.log('Could not verify session'));
+      verify({ action, actionSignerAddress })
+        .then((result) => setVerifiedAction(action))
+        .catch((err) => console.log('Could not verify action'));
+    } catch (err) {
+      console.log('Unexpected error while verifying action/session');
+      return;
+    }
   }, []);
 
   return (
@@ -179,20 +180,22 @@ export const CommentComponent = ({
                       </CWText>
                     </div>
                   )}
-                  {isCanvasVerifyModalVisible && <CWModal
-                   content={<CanvasVerifyDataModal obj={comment} />}
-                   onClose={() => setIsCanvasVerifyDataModalVisible(false)}
-                   open={isCanvasVerifyModalVisible}
-                    />}
+                  {isCanvasVerifyModalVisible && (
+                    <CWModal
+                      content={<CanvasVerifyDataModal obj={comment} />}
+                      onClose={() => setIsCanvasVerifyDataModalVisible(false)}
+                      open={isCanvasVerifyModalVisible}
+                    />
+                  )}
                   {verifiedAction && verifiedSession && (
                     <CWText
-                    type="caption"
-                    fontWeight="medium"
-                    className="verification-icon"
-                    onClick={() => setIsCanvasVerifyDataModalVisible(true)}
-                      >
+                      type="caption"
+                      fontWeight="medium"
+                      className="verification-icon"
+                      onClick={() => setIsCanvasVerifyDataModalVisible(true)}
+                    >
                       <CWIcon iconName="check" iconSize="xs" />
-                      </CWText>
+                    </CWText>
                   )}
                 </div>
                 <div className="menu-buttons-right">

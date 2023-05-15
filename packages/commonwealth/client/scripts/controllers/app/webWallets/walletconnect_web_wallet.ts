@@ -4,7 +4,7 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import type Web3 from 'web3';
-import * as siwe from "siwe"
+import * as siwe from 'siwe';
 
 import { hexToNumber } from 'web3-utils';
 import type { SessionPayload } from '@canvas-js/interfaces';

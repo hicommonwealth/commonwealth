@@ -21,7 +21,11 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 
 type SessionSigninModalProps = {
   onClose: () => void;
-  onVerified: (account: Account, newlyCreated: boolean, linked: boolean) => void;
+  onVerified: (
+    account: Account,
+    newlyCreated: boolean,
+    linked: boolean
+  ) => void;
 };
 
 export const SessionSigninModal = (props: SessionSigninModalProps) => {
@@ -41,47 +45,47 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
   return (
     <Modal
       content={
-
-    <div
-      className="SessionSigninModal"
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-    >
-      <div className="compact-modal-body">
-        <h3>Re-connect wallet</h3>
-        <p>
-          Your previous login was awhile ago. Re-connect your wallet to
-          continue:
-        </p>
-      </div>
-      <div className="compact-modal-actions">
-        <div>
-          <CWWalletsList
-            useSessionKeyLoginFlow={true}
-            wallets={wallets}
-            darkMode={false}
-            setSelectedWallet={(wallet) => {
-              /* do nothing */
-            }}
-            accountVerifiedCallback={(account, newlyCreated, linked) => {
-              onVerified(account, newlyCreated, linked)
-            }}
-            linking={false}
-            hasNoWalletsLink={false}
-            showResetWalletConnect={wcEnabled}
-          />
+        <div
+          className="SessionSigninModal"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <div className="compact-modal-body">
+            <h3>Re-connect wallet</h3>
+            <p>
+              Your previous login was awhile ago. Re-connect your wallet to
+              continue:
+            </p>
+          </div>
+          <div className="compact-modal-actions">
+            <div>
+              <CWWalletsList
+                useSessionKeyLoginFlow={true}
+                wallets={wallets}
+                darkMode={false}
+                setSelectedWallet={(wallet) => {
+                  /* do nothing */
+                }}
+                accountVerifiedCallback={(account, newlyCreated, linked) => {
+                  onVerified(account, newlyCreated, linked);
+                }}
+                linking={false}
+                hasNoWalletsLink={false}
+                showResetWalletConnect={wcEnabled}
+              />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
       }
       onClose={onClose}
-      open={true} />
+      open={true}
+    />
   );
 };
 
@@ -94,18 +98,28 @@ export const showSessionSigninModal = () => {
 
   root = createRoot(target);
 
-  return new Promise<{ account: Account, newlyCreated: boolean, linked: boolean }>((resolve, reject) => {
-    root.render(<SessionSigninModal
-                onVerified={(account: Account, newlyCreated: boolean, linked: boolean) => {
-                  resolve({ account, newlyCreated, linked });
-                  root.unmount();
-                  target.remove();
-                }}
-                onClose={() => {
-                  reject();
-                  root.unmount();
-                  target.remove();
-                }}
-      />);
+  return new Promise<{
+    account: Account;
+    newlyCreated: boolean;
+    linked: boolean;
+  }>((resolve, reject) => {
+    root.render(
+      <SessionSigninModal
+        onVerified={(
+          account: Account,
+          newlyCreated: boolean,
+          linked: boolean
+        ) => {
+          resolve({ account, newlyCreated, linked });
+          root.unmount();
+          target.remove();
+        }}
+        onClose={() => {
+          reject();
+          root.unmount();
+          target.remove();
+        }}
+      />
+    );
   });
 };

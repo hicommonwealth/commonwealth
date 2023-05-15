@@ -186,7 +186,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
       address
     );
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-    let validationBlockInfo
+    let validationBlockInfo;
     try {
       validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
     } catch (err) {
@@ -271,10 +271,11 @@ export const CWWalletsList = (props: WalletsListProps) => {
         address
       );
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-      let validationBlockInfo
+      let validationBlockInfo;
       try {
         validationBlockInfo =
-          wallet.getRecentBlock && (await wallet.getRecentBlock(chainIdentifier));
+          wallet.getRecentBlock &&
+          (await wallet.getRecentBlock(chainIdentifier));
       } catch (err) {
         // if getRecentBlock fails, continue with null blockhash
       }

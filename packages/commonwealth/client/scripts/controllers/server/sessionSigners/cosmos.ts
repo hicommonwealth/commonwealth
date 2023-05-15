@@ -21,7 +21,10 @@ import { fromDuration } from '../../../../../../common-common/src/cosmos-ts/src/
 export class CosmosSDKSessionController implements ISessionController {
   signers: Record<
     string,
-    Record<string, { signer: Secp256k1Wallet; bech32Address: string; privkey: string }>
+    Record<
+      string,
+      { signer: Secp256k1Wallet; bech32Address: string; privkey: string }
+    >
   > = {};
   private auths: Record<
     number,
@@ -32,14 +35,21 @@ export class CosmosSDKSessionController implements ISessionController {
     return this.signers[chainId][fromAddress]?.bech32Address;
   }
 
-  async hasAuthenticatedSession(chainId: string, fromAddress: string): Promise<boolean> {
+  async hasAuthenticatedSession(
+    chainId: string,
+    fromAddress: string
+  ): Promise<boolean> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return (
-      this.signers[chainId][fromAddress] !== undefined && this.auths[chainId][fromAddress] !== undefined
+      this.signers[chainId][fromAddress] !== undefined &&
+      this.auths[chainId][fromAddress] !== undefined
     );
   }
 
-  async getOrCreateAddress(chainId: string, fromAddress: string): Promise<string> {
+  async getOrCreateAddress(
+    chainId: string,
+    fromAddress: string
+  ): Promise<string> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return this.signers[chainId][fromAddress]?.bech32Address;
   }
@@ -54,28 +64,35 @@ export class CosmosSDKSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      throw new Error("Invalid signature");
+      throw new Error('Invalid signature');
     }
     if (payload.sessionAddress !== this.getAddress(chainId, fromAddress)) {
       throw new Error(
         `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
-          chainId, fromAddress
+          chainId,
+          fromAddress
         )}`
       );
     }
     this.auths[chainId][fromAddress] = { payload, signature };
 
     const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-${fromAddress}-auth`;
-    localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
+    localStorage.setItem(
+      authStorageKey,
+      JSON.stringify(this.auths[chainId][fromAddress])
+    );
   }
 
-  private async getOrCreateSigner(chainId: string, fromAddress: string): Promise<{
+  private async getOrCreateSigner(
+    chainId: string,
+    fromAddress: string
+  ): Promise<{
     signer: Secp256k1Wallet;
     bech32Address: string;
     privkey: string;
   }> {
-    this.auths[chainId] = this.auths[chainId] ?? {}
-    this.signers[chainId] = this.signers[chainId] ?? {}
+    this.auths[chainId] = this.auths[chainId] ?? {};
+    this.signers[chainId] = this.signers[chainId] ?? {};
 
     if (this.signers[chainId][fromAddress] !== undefined) {
       return this.signers[chainId][fromAddress];
@@ -93,7 +110,11 @@ export class CosmosSDKSessionController implements ISessionController {
       );
       const accounts = await signer.getAccounts();
       const address = accounts[0].address;
-      this.signers[chainId][fromAddress] = { signer, privkey, bech32Address: address };
+      this.signers[chainId][fromAddress] = {
+        signer,
+        privkey,
+        bech32Address: address,
+      };
 
       const auth = localStorage.getItem(authStorageKey);
       if (auth !== null) {
@@ -113,7 +134,10 @@ export class CosmosSDKSessionController implements ISessionController {
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
-          console.log('Restored logged-out session:', this.getAddress(chainId, fromAddress));
+          console.log(
+            'Restored logged-out session:',
+            this.getAddress(chainId, fromAddress)
+          );
         }
       }
     } catch (err) {
@@ -126,7 +150,11 @@ export class CosmosSDKSessionController implements ISessionController {
       const signer = await cosm.Secp256k1Wallet.fromKey(privkeyBytes);
       const accounts = await signer.getAccounts();
       const address = accounts[0].address;
-      this.signers[chainId][fromAddress] = { signer, privkey, bech32Address: address };
+      this.signers[chainId][fromAddress] = {
+        signer,
+        privkey,
+        bech32Address: address,
+      };
       delete this.auths[chainId][fromAddress];
       localStorage.setItem(storageKey, JSON.stringify({ privkey }));
     }
@@ -139,12 +167,18 @@ export class CosmosSDKSessionController implements ISessionController {
     call: string,
     callArgs: Record<string, ActionArgument>
   ): Promise<{ session: Session; action: Action; hash: string }> {
-    this.auths[chainId] = this.auths[chainId] ?? {}
-    this.signers[chainId] = this.signers[chainId] ?? {}
+    this.auths[chainId] = this.auths[chainId] ?? {};
+    this.signers[chainId] = this.signers[chainId] ?? {};
 
-    const { signer, privkey, bech32Address: address } = this.signers[chainId][fromAddress];
-    const sessionPayload: SessionPayload = this.auths[chainId][fromAddress]?.payload;
-    const sessionSignature: string = this.auths[chainId][fromAddress]?.signature;
+    const {
+      signer,
+      privkey,
+      bech32Address: address,
+    } = this.signers[chainId][fromAddress];
+    const sessionPayload: SessionPayload =
+      this.auths[chainId][fromAddress]?.payload;
+    const sessionSignature: string =
+      this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
 
     const actionPayload: ActionPayload = {

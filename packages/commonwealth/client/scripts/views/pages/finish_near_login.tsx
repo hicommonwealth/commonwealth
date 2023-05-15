@@ -125,7 +125,11 @@ const FinishNearLogin = () => {
         canvas.serializeSessionPayload(canvasSessionPayload)
       );
 
-      await acct.validate(signature, canvasSessionPayload.sessionIssued, chainId);
+      await acct.validate(
+        signature,
+        canvasSessionPayload.sessionIssued,
+        chainId
+      );
 
       app.sessions
         .getSessionController(ChainBase.NEAR)

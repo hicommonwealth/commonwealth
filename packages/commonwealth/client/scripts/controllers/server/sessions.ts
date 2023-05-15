@@ -2,10 +2,7 @@ import { IWebWallet, Account } from 'models';
 import { showSessionSigninModal } from 'views/modals/session_signin_modal';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
-import {
-  createCanvasSessionPayload,
-  chainBaseToCanvasChainId,
-} from 'canvas';
+import { createCanvasSessionPayload, chainBaseToCanvasChainId } from 'canvas';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
@@ -39,7 +36,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(
     wallet.chain,
     canvasChainId,
-    account.address,
+    account.address
   );
 
   const canvasSessionPayload = createCanvasSessionPayload(
@@ -58,8 +55,15 @@ export async function signSessionWithAccount<T extends { address: string }>(
       : null
   );
 
-  const signature = await wallet.signCanvasMessage(account, canvasSessionPayload);
-  return { signature, chainId: canvasChainId, sessionPayload: canvasSessionPayload };
+  const signature = await wallet.signCanvasMessage(
+    account,
+    canvasSessionPayload
+  );
+  return {
+    signature,
+    chainId: canvasChainId,
+    sessionPayload: canvasSessionPayload,
+  };
 }
 
 class SessionsController {
@@ -91,7 +95,10 @@ class SessionsController {
     chainId: string,
     fromAddress: string
   ): Promise<string> {
-    return this.getSessionController(chainBase).getOrCreateAddress(chainId, fromAddress);
+    return this.getSessionController(chainBase).getOrCreateAddress(
+      chainId,
+      fromAddress
+    );
   }
 
   // Provide authentication for a session address, by presenting a signed SessionPayload.
@@ -129,7 +136,7 @@ class SessionsController {
       chainBase === ChainBase.CosmosSDK
         ? app.chain?.meta.bech32Prefix
         : app.chain?.meta.node?.ethChainId;
-    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix)
+    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
 
     // Try to request a new session from the user, if one was not found.
     const controller = this.getSessionController(chainBase);
@@ -137,21 +144,27 @@ class SessionsController {
     // Load any past session
     const hasAuthenticatedSession = await controller.hasAuthenticatedSession(
       canvasChainId,
-      address,
+      address
     );
 
     if (!hasAuthenticatedSession) {
-      const { account, newlyCreated, linked } = await showSessionSigninModal().catch(() => {
-        const err = new Error();
-        (err as any).responseJSON = { error: 'Login canceled' };
-        throw err;
-      });
+      const { account, newlyCreated, linked } =
+        await showSessionSigninModal().catch(() => {
+          const err = new Error();
+          (err as any).responseJSON = { error: 'Login canceled' };
+          throw err;
+        });
 
       // The user may have signed using a different account
-      const sessionReauthed = await controller.hasAuthenticatedSession(canvasChainId, address);
+      const sessionReauthed = await controller.hasAuthenticatedSession(
+        canvasChainId,
+        address
+      );
       if (!sessionReauthed) {
         const err = new Error();
-        (err as any).responseJSON = { error: `Message signed with ${account.address}. Switch to this account to continue` };
+        (err as any).responseJSON = {
+          error: `Message signed with ${account.address}. Switch to this account to continue`,
+        };
         throw err;
       }
     }
@@ -171,7 +184,10 @@ class SessionsController {
   }
 
   // Public signer methods
-  public async signThread(address: string, { community, title, body, link, topic }) {
+  public async signThread(
+    address: string,
+    { community, title, body, link, topic }
+  ) {
     const { session, action, hash } = await this.sign(address, 'thread', {
       community: community || '',
       title,
@@ -189,7 +205,10 @@ class SessionsController {
     return { session, action, hash };
   }
 
-  public async signComment(address: string, { thread_id, body, parent_comment_id }) {
+  public async signComment(
+    address: string,
+    { thread_id, body, parent_comment_id }
+  ) {
     const { session, action, hash } = await this.sign(address, 'comment', {
       thread_id,
       body: encodeURIComponent(body),
@@ -199,9 +218,13 @@ class SessionsController {
   }
 
   public async signDeleteComment(address: string, { comment_id }) {
-    const { session, action, hash } = await this.sign(address, 'deleteComment', {
-      comment_id,
-    });
+    const { session, action, hash } = await this.sign(
+      address,
+      'deleteComment',
+      {
+        comment_id,
+      }
+    );
     return { session, action, hash };
   }
 
@@ -215,9 +238,13 @@ class SessionsController {
   }
 
   public async signDeleteThreadReaction(address: string, { thread_id }) {
-    const { session, action, hash } = await this.sign(address, 'unreactThread', {
-      thread_id,
-    });
+    const { session, action, hash } = await this.sign(
+      address,
+      'unreactThread',
+      {
+        thread_id,
+      }
+    );
     return { session, action, hash };
   }
 
@@ -231,9 +258,13 @@ class SessionsController {
   }
 
   public async signDeleteCommentReaction(address: string, { comment_id }) {
-    const { session, action, hash } = await this.sign(address, 'unreactComment', {
-      comment_id,
-    });
+    const { session, action, hash } = await this.sign(
+      address,
+      'unreactComment',
+      {
+        comment_id,
+      }
+    );
     return { session, action, hash };
   }
 }

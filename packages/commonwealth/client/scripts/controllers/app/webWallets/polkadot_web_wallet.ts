@@ -17,7 +17,8 @@ import IWebWallet from '../../../models/IWebWallet';
 declare let window: any;
 
 class PolkadotWebWalletController
-  implements IWebWallet<InjectedAccountWithMeta> {
+  implements IWebWallet<InjectedAccountWithMeta>
+{
   // GETTERS/SETTERS
   private polkadot;
   private _enabled: boolean;
@@ -77,7 +78,9 @@ class PolkadotWebWalletController
     canvasSessionPayload: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
-    const message = stringToHex(canvas.serializeSessionPayload(canvasSessionPayload));
+    const message = stringToHex(
+      canvas.serializeSessionPayload(canvasSessionPayload)
+    );
 
     const signer = await this.getSigner(account.address);
     const payload: SignerPayloadRaw = {

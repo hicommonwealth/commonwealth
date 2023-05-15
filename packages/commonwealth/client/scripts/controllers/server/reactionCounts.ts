@@ -129,15 +129,21 @@ class ReactionCountController {
       action = null,
       hash = null,
     } = reaction.thread_id
-      ? await app.sessions.signDeleteThreadReaction(app.user.activeAccount.address, {
-          thread_id: reaction.canvas_hash,
-        })
+      ? await app.sessions.signDeleteThreadReaction(
+          app.user.activeAccount.address,
+          {
+            thread_id: reaction.canvas_hash,
+          }
+        )
       : reaction.proposal_id
       ? {}
       : reaction.comment_id
-      ? await app.sessions.signDeleteCommentReaction(app.user.activeAccount.address, {
-          comment_id: reaction.canvas_hash,
-        })
+      ? await app.sessions.signDeleteCommentReaction(
+          app.user.activeAccount.address,
+          {
+            comment_id: reaction.canvas_hash,
+          }
+        )
       : {};
 
     // TODO Graham 4/24/22: Investigate necessity of this duplication
