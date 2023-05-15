@@ -113,6 +113,23 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image, url);
   });
 
+  app.get('/:scope?/overview', async (req, res) => {
+    // Retrieve chain
+    const scope = req.params.scope;
+    const chain = await getChain(req, scope);
+    const title = chain ? chain.name : 'Commonwealth';
+    const description = chain ? chain.description : '';
+    const image = chain?.icon_url
+      ? chain.icon_url.match(`^(http|https)://`)
+        ? chain.icon_url
+        : `https://commonwealth.im${chain.icon_url}`
+      : DEFAULT_COMMONWEALTH_LOGO;
+    const author = '';
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
+  });
+
   app.get('/:scope?/account/:address', async (req, res) => {
     // Retrieve title, description, and author from the database
     let title, description, author, profileData, image;
@@ -203,6 +220,11 @@ const setupAppRoutes = (
 
     renderWithMetaTags(res, title, description, author, image, url);
   };
+
+  app.get('/:scope?/proposals', async (req, res) => {
+    const scope = req.params.scope;
+    await renderProposal(scope, req, res);
+  });
 
   app.get('/:scope?/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
