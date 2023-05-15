@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import 'SublayoutHeader.scss';
 
@@ -26,7 +26,6 @@ export const SublayoutHeader = ({
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const [contentKey, setContentKey] = useState('');
 
   return (
     <div className="SublayoutHeader">
@@ -79,11 +78,11 @@ export const SublayoutHeader = ({
           />
         </div>
         <div className="DesktopMenuContainer">
-          <CreateContentPopover key={contentKey} />
+          <CreateContentPopover />
           <HelpMenuPopover />
           {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>
-        <LoginSelector onJoinSuccess={() => setContentKey('joined')} />
+        <LoginSelector />
       </div>
     </div>
   );

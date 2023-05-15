@@ -9,54 +9,26 @@ const radioButton = {
 } satisfies Meta<typeof CWRadioButton>;
 
 export default radioButton;
-// type Story = StoryObj<typeof radioButton>;
+type Story = StoryObj<typeof radioButton>;
 
-interface RadiobuttonProps {
-  value: string,
-  checked?: boolean,
-  disabled?: boolean,
-}
-
-const Radiobutton: FC<RadiobuttonProps> = ({value, checked, disabled}) => {
-  const [isRadioButtonChecked, setIsRadioButtonChecked] =
-    useState<boolean>(false);
-
-  return (
-    <CWRadioButton
-      value={value}
-      label={value}
-      disabled={disabled}
-      checked={isRadioButtonChecked === true || checked}
-      onChange={() => {
-        setIsRadioButtonChecked(true);
-      }}
-    />
-  )
-}
-
-// export const ProgressBarSuccess: Story = {
-export const RadioButton = {
-  name: 'Radio Button',
-  render: () => <Radiobutton value="Radio Button" />
-}
-
-export const DisabledRadioButton = {
-  name: 'Disabled Radio Button',
-  render: () => (
-    <Radiobutton
-      value="Disabled Radio Button"
-      disabled
-    />
-  )
-}
-
-export const CheckedAndDisabledRadioButton = {
-  name: 'Checked and Disabled Radio Button',
-  render: () => (
-    <Radiobutton
-      value="Checked and Disabled Radio Button"
-      disabled
-      checked
-    />
-  )
+export const RadioButton: Story = {
+  args: {
+    value: "Radio Button",
+    disabled: false,
+    checked: false,
+  },
+  argTypes: {
+    value: {
+      control: { type: "text" },
+    },
+    disabled: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    checked: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+  },
+  render: ({...args}) => <CWRadioButton {...args}/>
 }

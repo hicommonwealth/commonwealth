@@ -24,7 +24,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { useParams } from 'react-router-dom';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
-enum TemplateComponents {
+export enum TemplateComponents {
   DIVIDER = 'divider',
   TEXT = 'text',
   INPUT = 'input',
@@ -94,8 +94,6 @@ const ViewTemplatePage = () => {
         } catch (err) {
           console.log('err', err);
         }
-
-        console.log('parsedJSON', parsedJSON);
 
         for (const field of parsedJSON.form_fields) {
           switch (Object.keys(field)[0]) {

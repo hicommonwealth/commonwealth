@@ -42,11 +42,7 @@ const CHAINNETWORK_SHORT = {
   [ChainNetwork.Terra]: 'Terra',
 };
 
-type LoginSelectorProps = {
-  onJoinSuccess: () => void;
-};
-
-export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
+export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -227,7 +223,6 @@ export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        onJoinSuccess(); // this triggers a state update from the parent to update the sibling component
       } catch (err) {
         console.error(err);
       }

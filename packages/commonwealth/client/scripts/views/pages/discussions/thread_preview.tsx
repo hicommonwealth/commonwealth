@@ -9,7 +9,12 @@ import moment from 'moment';
 
 import app from 'state';
 import { slugify } from 'utils';
-import { isCommandClick, pluralize } from 'helpers';
+import {
+  isCommandClick,
+  isDefaultStage,
+  pluralize,
+  threadStageToLabel,
+} from 'helpers';
 import AddressInfo from '../../../models/AddressInfo';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
@@ -100,6 +105,15 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
     `${thread.identifier}-${slugify(thread.title)}`
   );
 
+  const isStageDefault = isDefaultStage(thread.stage);
+  const isTagsRowVisible =
+    (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+
+  const handleStageTagClick = (e) => {
+    e.stopPropagation();
+    navigate(`/discussions?stage=${thread.stage}`);
+  };
+
   return (
     <>
       <div
@@ -176,8 +190,16 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           <CWText type="caption" className="thread-preview">
             {thread.plaintext}
           </CWText>
-          {linkedProposals.length > 0 && (
+          {isTagsRowVisible && (
             <div className="tags-row">
+              {thread.stage && !isStageDefault && (
+                <CWTag
+                  label={threadStageToLabel(thread.stage)}
+                  trimAt={20}
+                  type="stage"
+                  onClick={handleStageTagClick}
+                />
+              )}
               {linkedProposals
                 .sort((a, b) => +a.identifier - +b.identifier)
                 .map((link) => (
