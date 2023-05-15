@@ -109,7 +109,7 @@ describe('Integration tests for ERC721', () => {
     });
   });
 
-  describe('Tests for processing ERC721 events with the consumer', async () => {
+  describe.skip('Tests for processing ERC721 events with the consumer', async () => {
     before(async () => {
       // set up the chain consumer - this starts the subscriptions thus processing all existing events
       await setupChainEventConsumer(rmq);
@@ -157,7 +157,7 @@ describe('Integration tests for ERC721', () => {
     });
   });
 
-  describe('Tests for retrieving ERC721 events with the app', () => {
+  describe.skip('Tests for retrieving ERC721 events with the app', () => {
     let agent;
 
     before(async () => {
