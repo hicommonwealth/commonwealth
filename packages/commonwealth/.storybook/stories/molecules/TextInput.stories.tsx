@@ -54,19 +54,60 @@ export const TextInput: Story = {
 }
 
 /** This input only accepts A-Z */
-export const OnlyLetters: Story = {
-  render: () => (
+export const OnlyLetters = {
+  args: {
+    label: "This input only accepts A-Z",
+    placeholder: "Type here",
+    disabled: false,
+    size: "large",
+    iconRight: undefined,
+    darkMode: false,
+    validationFailText: "Must enter characters A-Z",
+    validationSuccessText: "Input validated",
+  },
+  argTypes: {
+    label: {
+      control: { type: "text" },
+    },
+    placeholder: {
+      control: { type: "text" },
+    },
+    disabled: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    size: {
+      control: { type: "select" },
+      options: [ "small", "large" ],
+    },
+    iconRight: {
+      control: { type: "select" },
+      options: iconOptions,
+    },
+    darkMode: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    validationFailText: {
+      control: { type: "text" },
+    },
+    validationSuccessText: {
+      control: { type: "text" },
+    }
+  },
+  render: ({...args}) => (
     <CWTextInput
+      {...args}
       name="Form field"
       inputValidationFn={(val: string): [ValidationStatus, string] => {
         if (val.match(/[^A-Za-z]/)) {
-          return ['failure', 'Must enter characters A-Z'];
+          return ['failure', args.validationFailText];
         } else {
-          return ['success', 'Input validated'];
+          return ['success', args.validationSuccessText];
         }
       }}
-      label="This input only accepts A-Z"
-      placeholder="Type here"
+      label={args.label}
+      placeholder={args.placeholder}
     />
   ),
 };
