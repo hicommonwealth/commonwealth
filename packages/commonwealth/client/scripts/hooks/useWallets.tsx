@@ -64,7 +64,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const [cachedChainId, setCachedChainId] = useState<string | number>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [secondaryLinkAccount, setSecondaryLinkAccount] = useState<Account>();
-  // const [secondaryChainId, setSecondaryChainId] = useState<string | number>();
   const [isInCommunityPage, setIsInCommunityPage] = useState<boolean>();
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
   const [showMobile, setShowMobile] = useState<boolean>();
@@ -84,10 +83,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   useEffect(() => {
     // Determine if in a community
-    const tempisInCommunityPage = app.activeChainId() !== undefined;
-    setIsInCommunityPage(tempisInCommunityPage);
+    const tempIsInCommunityPage = app.activeChainId() !== undefined;
+    setIsInCommunityPage(tempIsInCommunityPage);
 
-    if (tempisInCommunityPage) {
+    if (tempIsInCommunityPage) {
       const chainbase = app.chain?.meta?.base;
       setWallets(WebWalletController.Instance.availableWallets(chainbase));
       setSidebarType('communityWalletOptions');
@@ -125,9 +124,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
       setPrimaryAccount(walletProps.initialAccount);
       setAddress(walletProps.initialAccount.address);
     }
-    // if (walletProps.initialWebWallet) {
-    //   this.selectedWallet = walletProps.initialWebWallet;
-    // }
     if (walletProps.initialWallets) {
       setWallets(walletProps.initialWallets);
     }
