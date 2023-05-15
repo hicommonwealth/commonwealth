@@ -11,7 +11,7 @@ import app from 'state';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import Sublayout from '../sublayout';
+import Sublayout from '../Sublayout';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000

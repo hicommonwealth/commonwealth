@@ -11,7 +11,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
 import { useCommonNavigate } from 'navigation/helpers';
