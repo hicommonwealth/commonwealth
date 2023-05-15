@@ -267,16 +267,14 @@ export const CreateContentSidebar = () => {
 
 export const CreateContentMenu = () => {
   const navigate = useCommonNavigate();
+  const { setMobileMenuName } = useSidebarStore();
 
   return (
     <CWMobileMenu
       className="CreateContentMenu"
       menuHeader={{
         label: 'Create',
-        onClick: () => {
-          app.mobileMenu = 'MainMenu';
-          app.sidebarRedraw.emit('redraw');
-        },
+        onClick: () => setMobileMenuName('MainMenu'),
       }}
       menuItems={getCreateContentMenuItems(navigate)}
     />

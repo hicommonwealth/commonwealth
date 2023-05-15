@@ -25,7 +25,7 @@ const Sublayout = ({
   onScroll,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible } = useSidebarStore();
+  const { menuVisible, mobileMenuName } = useSidebarStore();
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
@@ -71,7 +71,7 @@ const Sublayout = ({
           <div className="body-and-sticky-headers-container">
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
-            {isWindowSmallInclusive && app.mobileMenu ? (
+            {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
               <div className="Body" onScroll={onScroll}>

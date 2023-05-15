@@ -26,7 +26,8 @@ export const SublayoutHeader = ({
   onMobile,
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
-  const { menuVisible, setMenu, menuName } = useSidebarStore();
+  const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
+    useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
   const [contentKey, setContentKey] = useState('');
 
@@ -74,8 +75,7 @@ export const SublayoutHeader = ({
             iconButtonTheme="black"
             onClick={() => {
               setMenu({ name: menuName, isVisible: false });
-              app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-              app.sidebarRedraw.emit('redraw');
+              setMobileMenuName(mobileMenuName ? null : 'MainMenu');
             }}
           />
         </div>

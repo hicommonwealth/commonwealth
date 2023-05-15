@@ -24,8 +24,6 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
-import type { MobileMenuName } from 'views/AppMobileMenus';
-import type { SidebarMenuName } from 'views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
@@ -94,7 +92,6 @@ export interface IApp {
   // Web3
   snapshot: SnapshotController;
 
-  mobileMenu: MobileMenuName;
   sidebarRedraw: EventEmitter;
 
   loginState: LoginState;
@@ -192,7 +189,6 @@ const app: IApp = {
   loginStateEmitter: new EventEmitter(),
 
   // Global nav state
-  mobileMenu: null,
   sidebarRedraw: new EventEmitter(),
 
   config: {
