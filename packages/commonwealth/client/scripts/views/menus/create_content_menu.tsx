@@ -13,6 +13,7 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
@@ -179,9 +180,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         //   isCustomDomain: app.isCustomDomain(),
         //   communityType: null,
         // });
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
-        app.sidebarRedraw.emit('redraw');
+        sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
         navigate('/createCommunity', {}, null);
       },
     },
@@ -196,9 +195,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         //   isCustomDomain: app.isCustomDomain(),
         //   communityType: null,
         // });
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
-        app.sidebarRedraw.emit('redraw');
+        sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
 
         window.open(
           `https://discord.com/oauth2/authorize?client_id=${
@@ -221,6 +218,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           {
             label: 'New Thread',
             onClick: () => {
+              sidebarStore
+                .getState()
+                .setMenu({ name: 'default', isVisible: false });
               navigate('/new/discussion');
             },
             iconLeft: 'write',
@@ -243,6 +243,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
 export const CreateContentSidebar = () => {
   const navigate = useCommonNavigate();
+  const { setMenu } = useSidebarStore();
 
   return (
     <CWSidebarMenu
@@ -255,9 +256,7 @@ export const CreateContentSidebar = () => {
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            app.sidebarToggled = false;
-            app.sidebarMenu = 'default';
-            app.sidebarRedraw.emit('redraw');
+            setMenu({ name: 'default', isVisible: false });
           }, 200);
         },
       }}

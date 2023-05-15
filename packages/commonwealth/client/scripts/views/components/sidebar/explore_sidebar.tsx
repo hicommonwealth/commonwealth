@@ -6,8 +6,11 @@ import ChainInfo from '../../../models/ChainInfo';
 import app from 'state';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../component_kit/types';
+import useSidebarStore from 'state/ui/sidebar';
 
 export const ExploreCommunitiesSidebar = () => {
+  const { setMenu } = useSidebarStore();
+
   const allCommunities = app.config.chains
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -66,9 +69,7 @@ export const ExploreCommunitiesSidebar = () => {
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            app.sidebarToggled = false;
-            app.sidebarMenu = 'default';
-            app.sidebarRedraw.emit('redraw');
+            setMenu({ name: 'default', isVisible: false });
           }, 200);
         },
       }}

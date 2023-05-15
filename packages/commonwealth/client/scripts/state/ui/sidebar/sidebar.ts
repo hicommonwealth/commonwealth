@@ -7,7 +7,7 @@ interface SidebarStore {
   mobileMenuName: MobileMenuName;
   setMobileMenuName: (name: MobileMenuName) => void;
   menuName: SidebarMenuName;
-  menuVisibility: boolean;
+  menuVisible: boolean;
   setMenu: ({
     name,
     isVisible,
@@ -21,12 +21,12 @@ export const sidebarStore = createStore<SidebarStore>()((set) => ({
   mobileMenuName: null,
   setMobileMenuName: (name) => set(() => ({ mobileMenuName: name })),
   menuName: 'default',
-  menuVisibility: false,
+  menuVisible: false,
   setMenu: ({ name, isVisible }) =>
     set((state) => ({
       menuName: name,
-      menuVisibility:
-        typeof isVisible === 'boolean' ? isVisible : state.menuVisibility,
+      menuVisible:
+        typeof isVisible === 'boolean' ? isVisible : state.menuVisible,
     })),
 }));
 

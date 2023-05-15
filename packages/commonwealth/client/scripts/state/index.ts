@@ -95,10 +95,7 @@ export interface IApp {
   snapshot: SnapshotController;
 
   mobileMenu: MobileMenuName;
-  sidebarMenu: SidebarMenuName;
   sidebarRedraw: EventEmitter;
-
-  sidebarToggled: boolean;
 
   loginState: LoginState;
   loginStateEmitter: EventEmitter;
@@ -196,9 +193,7 @@ const app: IApp = {
 
   // Global nav state
   mobileMenu: null,
-  sidebarMenu: 'default',
   sidebarRedraw: new EventEmitter(),
-  sidebarToggled: false,
 
   config: {
     chains: new ChainStore(),
