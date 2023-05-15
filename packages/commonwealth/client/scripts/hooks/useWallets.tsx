@@ -36,6 +36,7 @@ import {
   loginToAxie,
   loginToNear,
 } from '../helpers/wallet';
+import useBrowserWindow from './useBrowserWindow';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -80,6 +81,18 @@ const useWallets = (walletProps: IuseWalletProps) => {
   );
 
   const isLinkingWallet = activeStep === 'selectPrevious';
+
+  useBrowserWindow({
+    onResize: () =>
+      breakpointFnValidator(
+        showMobile,
+        (state: boolean) => {
+          setShowMobile(state);
+        },
+        isWindowMediumSmallInclusive
+      ),
+    resizeListenerUpdateDeps: [showMobile],
+  });
 
   useEffect(() => {
     // Determine if in a community
@@ -128,32 +141,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
       setWallets(walletProps.initialWallets);
     }
   }, []);
-
-  useEffect(() => {
-    // eslint-disable-next-line no-restricted-globals
-    addEventListener('resize', () =>
-      breakpointFnValidator(
-        showMobile,
-        (state: boolean) => {
-          setShowMobile(state);
-        },
-        isWindowMediumSmallInclusive
-      )
-    );
-
-    return () => {
-      // eslint-disable-next-line no-restricted-globals
-      removeEventListener('resize', () =>
-        breakpointFnValidator(
-          showMobile,
-          (state: boolean) => {
-            setShowMobile(state);
-          },
-          isWindowMediumSmallInclusive
-        )
-      );
-    };
-  }, [showMobile]);
 
   // Handles Magic Link Login
   const onEmailLogin = async () => {
