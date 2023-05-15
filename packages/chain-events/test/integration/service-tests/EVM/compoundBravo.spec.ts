@@ -7,8 +7,8 @@ import {
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { compoundGovernor } from 'chain-testing/src/utils/governance/compoundGov';
-import { ChainTesting } from 'chain-testing/sdk/chainTesting';
+import { compoundGovernor } from '../../../../chain-testing/src/utils/governance/compoundGov';
+import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
