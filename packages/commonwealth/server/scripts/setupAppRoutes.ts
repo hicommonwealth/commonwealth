@@ -96,23 +96,6 @@ const setupAppRoutes = (
     res.send(twitterSafeHtml);
   };
 
-  app.get('/:scope?', async (req, res) => {
-    // Retrieve chain
-    const scope = req.params.scope;
-    const chain = await getChain(req, scope);
-    const title = chain ? chain.name : 'Commonwealth';
-    const description = chain ? chain.description : '';
-    const image = chain?.icon_url
-      ? chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`
-      : DEFAULT_COMMONWEALTH_LOGO;
-    const author = '';
-    const url = getUrl(req);
-
-    renderWithMetaTags(res, title, description, author, image, url);
-  });
-
   app.get('/:scope?/overview', async (req, res) => {
     // Retrieve chain
     const scope = req.params.scope;
@@ -271,6 +254,23 @@ const setupAppRoutes = (
       ? await models.Chain.findOne({ where: { id: scope } })
       : await models.Chain.findOne({ where: { custom_domain: req.hostname } });
   }
+
+  app.get('/:scope?', async (req, res) => {
+    // Retrieve chain
+    const scope = req.params.scope;
+    const chain = await getChain(req, scope);
+    const title = chain ? chain.name : 'Commonwealth';
+    const description = chain ? chain.description : '';
+    const image = chain?.icon_url
+      ? chain.icon_url.match(`^(http|https)://`)
+        ? chain.icon_url
+        : `https://commonwealth.im${chain.icon_url}`
+      : DEFAULT_COMMONWEALTH_LOGO;
+    const author = '';
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
+  });
 
   app.get('*', (req, res) => {
     log.info(`setupAppRoutes sendFiles ${req.path}`);
