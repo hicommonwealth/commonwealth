@@ -94,6 +94,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -111,6 +113,8 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Run linter
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
         run: yarn lint-branch
 
       - name: Typecheck

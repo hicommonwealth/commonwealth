@@ -15,6 +15,7 @@ const { Op } = Sequelize;
 export const getCommentsValidation = [
   query('community_id').isString().trim(),
   query('addresses').optional().toArray(),
+  query('thread_ids').optional().toArray(),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
 ];
@@ -29,7 +30,7 @@ export const getComments = async (
     return failure(res.status(400), errors);
   }
 
-  const { community_id, addresses, count_only } = req.query;
+  const { community_id, addresses, thread_ids, count_only } = req.query;
 
   const where = { chain: community_id };
 
@@ -41,6 +42,10 @@ export const getComments = async (
     });
 
     where['address_id'] = { [Op.in]: addressIds.map((p) => p.id) };
+  }
+
+  if (thread_ids) {
+    where['thread_id'] = { [Op.in]: thread_ids };
   }
 
   const include = [

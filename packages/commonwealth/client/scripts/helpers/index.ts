@@ -53,9 +53,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return default_stages;
   }
-  return (arr
+  return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown) as ThreadStage[];
+    .filter((s) => s) as unknown as ThreadStage[];
 }
 
 /*
@@ -85,7 +85,7 @@ export function externalLink(selector, target, children, setRouteCb) {
 // This function should not be used anymore for links.
 // Instead, <Link/> component from react-router is advised.
 // It is adjusted, not rewritten, as there are non-jsx components
-// that still use this method.ł
+// that still use this method.
 export function link(
   selector: string,
   target: string,
