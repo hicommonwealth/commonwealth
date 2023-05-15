@@ -13,7 +13,7 @@ const card = {
 } satisfies Meta<typeof CWCard>;
 
 export default card;
-// type Story = StoryObj<typeof card>;
+type Story = StoryObj<any>;
 
 interface CardProps {
   elevation: CardElevation | undefined,
@@ -24,7 +24,6 @@ interface CardProps {
 
 const Card: FC<CardProps> = (props) => {
   const { elevation, interactive = false, fullWidth } = props;
-  console.log('interactive:', interactive)
   return (
     <CWCard
       elevation={elevation}
@@ -37,46 +36,39 @@ const Card: FC<CardProps> = (props) => {
   )
 }
 
-// export const Elevation1: Story = {
-export const Elevation1 = {
-  name: 'Elevation 1',
-  render: () => (
-    <Card elevation="elevation-1" interactive>
-      <CWText fontWeight="semiBold">Card title</CWText>
-      <CWText>Elevation: 1</CWText>
-    </Card>
-  )
-}
-
-// export const Elevation2: Story = {
-export const Elevation2 = {
-  name: 'Elevation 2',
-  render: () => (
-    <Card elevation="elevation-2" interactive>
-      <CWText fontWeight="semiBold">Card title</CWText>
-      <CWText>Elevation: 2</CWText>
-    </Card>
-  )
-}
-
-// export const Elevation3: Story = {
-export const Elevation3 = {
-  name: 'Elevation 3',
-  render: () => (
-    <Card elevation="elevation-3" interactive>
-      <CWText fontWeight="semiBold">Card title</CWText>
-      <CWText>Elevation: 3</CWText>
-    </Card>
-  )
-}
-
-// export const Elevation3: Story = {
-export const FullWidth = {
-  name: 'Full width',
-  render: () => (
-    <Card elevation="elevation-3" interactive fullWidth>
-      <CWText fontWeight="semiBold">Card title</CWText>
-      <CWText>Full width</CWText>
+export const CardStory: Story = {
+  name: "Card",
+  args: {
+    elevation: "elevation-1",
+    fullWidth: false,
+    interactive: false,
+    title: "Card title",
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras magna.",
+  },
+  argTypes: {
+    elevation: {
+      control: { type: "select" },
+      options: [ "elevation-1", "elevation-2", "elevation-3" ],
+    },
+    fullWidth: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    interactive: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    title: {
+      control: { type: "text" }
+    },
+    content: {
+      control: { type: "text" }
+    },
+  },
+  render: ({...args}) => (
+    <Card elevation={args.elevation} {...args}>
+      <CWText fontWeight="semiBold">{args.title}</CWText>
+      <CWText>{args.content}</CWText>
     </Card>
   )
 }

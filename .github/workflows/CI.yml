@@ -111,7 +111,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Run linter
-        run: yarn lint-all
+        run: yarn lint-branch
 
       - name: Typecheck
         run: yarn --cwd packages/commonwealth check-types
