@@ -35,7 +35,6 @@ const entities: any = async (
   if (req.query.type) {
     entityFindOptions.where.type = req.query.type;
   }
-  // trigger lint CI
   if (req.query.type_id) {
     entityFindOptions.where.type_id = req.query.type_id;
   }
