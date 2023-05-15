@@ -3,8 +3,6 @@ import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
-import type { ChainCategoryInstance } from 'server/models/chain_category';
-import type { ChainCategoryTypeInstance } from 'server/models/chain_category_type';
 import type { ChainNodeInstance } from 'server/models/chain_node';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import type { DiscussionDraftAttributes } from 'server/models/discussion_draft';
@@ -35,8 +33,6 @@ type StatusResp = {
   }[];
   nodes: ChainNodeInstance[];
   notificationCategories: NotificationCategoryInstance[];
-  chainCategories: ChainCategoryInstance[];
-  chainCategoryTypes: ChainCategoryTypeInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
@@ -56,6 +52,7 @@ type StatusResp = {
     unseenPosts: { [chain: string]: number };
   };
   evmTestEnv?: string;
+  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
 };
 
 const getChainStatus = async (models: DB) => {
@@ -64,7 +61,6 @@ const getChainStatus = async (models: DB) => {
     nodes,
     notificationCategories,
     chainCategories,
-    chainCategoryTypes,
   ] = await Promise.all([
     models.Chain.findAll({
       where: { active: true },
@@ -131,7 +127,6 @@ const getChainStatus = async (models: DB) => {
     nodes,
     notificationCategories,
     chainCategories,
-    chainCategoryTypes,
     chainsWithSnapshots,
     threadCountQueryData
   };
@@ -164,7 +159,6 @@ export const status = async (
       nodes,
       notificationCategories,
       chainCategories,
-      chainCategoryTypes,
       chainsWithSnapshots,
       threadCountQueryData
      } = await getChainStatusWithCache(models);
@@ -177,10 +171,9 @@ export const status = async (
         chainsWithSnapshots,
         nodes,
         notificationCategories,
-        chainCategories,
-        chainCategoryTypes,
         recentThreads: threadCountQueryData,
         evmTestEnv: ETH_RPC,
+        chainCategoryMap: chainCategories,
       });
     }
 
@@ -371,8 +364,6 @@ export const status = async (
       chainsWithSnapshots,
       nodes,
       notificationCategories,
-      chainCategories,
-      chainCategoryTypes,
       recentThreads: threadCountQueryData,
       roles,
       loggedIn: true,
@@ -392,6 +383,7 @@ export const status = async (
         unseenPosts,
       },
       evmTestEnv: ETH_RPC,
+      chainCategoryMap: chainCategories,
     });
   } catch (error) {
     console.log(error);

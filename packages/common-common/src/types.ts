@@ -118,7 +118,6 @@ export enum ChainNetwork {
   Solana = 'solana',
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
-  CommonProtocol = 'common-protocol', // dummy chain used for event handling
   Evmos = 'evmos',
   Kava = 'kava',
 }

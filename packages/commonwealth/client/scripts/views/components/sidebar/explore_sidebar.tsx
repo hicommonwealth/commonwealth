@@ -1,7 +1,7 @@
 import React from 'react';
 
 import 'components/sidebar/explore_sidebar.scss';
-import { ChainInfo } from 'models';
+import ChainInfo from '../../../models/ChainInfo';
 
 import app from 'state';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';

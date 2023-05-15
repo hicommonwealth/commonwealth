@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import 'pages/general_contract/index.scss';
 
 import app from 'state';
-import type { Contract } from 'models';
+import type Contract from '../../../models/Contract';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -21,7 +21,7 @@ import {
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 type GeneralContractPageProps = {
   contractAddress?: string;
 };

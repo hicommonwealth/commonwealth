@@ -3,7 +3,7 @@ import BN from 'bn.js';
 import type { ERC20Votes } from 'common-common/src/eth/types';
 import { ContractType } from 'common-common/src/types';
 import type { BigNumber } from 'ethers';
-import type { ChainInfo } from 'models';
+import type ChainInfo from '../../../../models/ChainInfo';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI, { GovernorTokenType } from './api';
@@ -61,11 +61,7 @@ export default class CompoundChain extends EthereumChain {
       throw new Error('No token found, cannot fetch balance');
     }
     try {
-      const contract = await attachSigner(
-        this.app.wallets,
-        this.app.user.activeAccount,
-        this.compoundApi.Token
-      );
+      const contract = await attachSigner(this.app.user.activeAccount, this.compoundApi.Token);
       if (this.compoundApi.isTokenMPond(contract)) {
         // automatically delegate all token when using delegation on MPond
         const amount = await this.balanceOf(address);

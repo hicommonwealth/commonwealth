@@ -3,7 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 import app, { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import {
@@ -16,7 +16,9 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { signSessionWithAccount } from 'controllers/server/sessions';
 
 import { notifyError } from 'controllers/app/notifications';
-import type { Account, IWebWallet } from 'models';
+import WebWalletController from '../../controllers/app/web_wallets';
+import Account from '../../models/Account';
+import IWebWallet from '../../models/IWebWallet';
 
 import {
   breakpointFnValidator,
@@ -64,7 +66,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
 
     if (this.currentlyInCommunityPage) {
       const chainbase = app.chain?.meta?.base;
-      this.wallets = app.wallets.availableWallets(chainbase);
+      this.wallets = WebWalletController.Instance.availableWallets(chainbase);
       this.sidebarType = 'communityWalletOptions';
       this.bodyType = 'walletList';
     } else {
@@ -78,7 +80,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
       ].filter((base) => allChains.find((chain) => chain.base === base));
       this.wallets = _.flatten(
         sortedChainBases.map((base) => {
-          return app.wallets.availableWallets(base);
+          return WebWalletController.Instance.availableWallets(base);
         })
       );
       this.sidebarType = 'connectWallet';
@@ -184,7 +186,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           }
           if (onSuccess) onSuccess();
         }
-        redraw();
       } else {
         // log in as the new user
         await initAppState(false);
@@ -205,7 +206,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           }
           if (onSuccess) onSuccess();
         }
-        redraw();
       }
     };
 
@@ -320,13 +320,11 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         }
       }
       this.bodyType = 'welcome';
-      redraw();
     };
 
     // Handle branching logic for linking an account
     const linkExistingAccountCallback = async () => {
       this.bodyType = 'selectPrevious';
-      redraw();
     };
 
     // Handle signature and validation logic for linking an account
@@ -377,7 +375,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           vnode.attrs.onModalClose();
         }
         if (onSuccess) onSuccess();
-        redraw();
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');

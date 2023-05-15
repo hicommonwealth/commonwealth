@@ -1,12 +1,13 @@
-import type { ClassComponent } from 'mithrilInterop';
-import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ThreadStage } from 'models';
-import type { IChainAdapter, Account } from 'models';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
+import Account from '../models/Account';
+import IChainAdapter from '../models/IChainAdapter';
+import { ThreadStage } from '../models/types';
+import { render } from 'helpers/DEPRECATED_ReactRender';
+import { NavigateOptions, To } from 'react-router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -28,6 +29,13 @@ export function threadStageToLabel(stage: ThreadStage) {
   }
 }
 
+export function isDefaultStage(stage: string) {
+  return (
+    stage === ThreadStage.Discussion ||
+    stage === parseCustomStages(app.chain.meta.customStages)[0]
+  );
+}
+
 export function parseCustomStages(str) {
   // Parse customStages into a `string[]` and then cast to ThreadStage[]
   // If parsing fails, return an empty array.
@@ -45,9 +53,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return default_stages;
   }
-  return arr
+  return (arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown) as ThreadStage[];
 }
 
 /*
@@ -82,7 +90,11 @@ export function link(
   selector: string,
   target: string,
   children,
-  setRoute: ClassComponent['setRoute'],
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string
+  ) => void,
   extraAttrs?: object,
   saveScrollPositionAs?: string,
   beforeRouteSet?: () => void,

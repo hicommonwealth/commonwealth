@@ -18,13 +18,13 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowExtraSmall } from 'views/components/component_kit/helpers';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import Account from '../../../models/Account';
 
 import { getLoginText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import type { LoginProps } from './types';
-import { Account } from 'models';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
