@@ -1,4 +1,3 @@
-import 'components/component_kit/cw_wallets_list.scss';
 import { useEffect } from 'react';
 
 type IuseBrowserWindow = {
