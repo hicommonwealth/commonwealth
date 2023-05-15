@@ -28,19 +28,25 @@ export default class Token extends Ethereum implements ITokenAdapter {
     const account = this.accounts.get(activeAddress);
 
     // query balance -- defaults to native token
-    const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
-      chain: this.meta.id,
-      address: account.address,
-      author_chain: account.chain.id,
-      contract_address: this.contractAddress,
-    });
-    if (balanceResp.result) {
-      const balance = new BN(balanceResp.result, 10);
-      this.hasToken = balance && !balance.isZero();
-      if (balance) this.tokenBalance = balance;
-    } else {
+    try {
+      const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
+        chain: this.meta.id,
+        address: account.address,
+        author_chain: account.chain.id,
+        contract_address: this.contractAddress,
+      });
+      if (balanceResp.result) {
+        const balance = new BN(balanceResp.result, 10);
+        this.hasToken = balance && !balance.isZero();
+        if (balance) this.tokenBalance = balance;
+      } else {
+        this.hasToken = false;
+      }
+    } catch (e) {
+      console.log(e);
       this.hasToken = false;
     }
+
     return this.hasToken;
   }
 

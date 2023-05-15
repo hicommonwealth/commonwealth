@@ -171,13 +171,10 @@ export const WebhooksForm = () => {
         <CWText className="no-webhooks-text">
           No webhooks yet. Slack, Discord, and Telegram webhooks are supported.
           For more information and examples for setting these up, please view
-          our
-          {link(
-            'a',
-            'https://docs.commonwealth.im',
-            [' documentation.'],
-            navigate
-          )}
+          our{' '}
+          <a href="https://docs.commonwealth.im/commonwealth/for-admins-and-mods/capabilities/webhooks">
+            documentation.
+          </a>
         </CWText>
       )}
       <CWTextInput
