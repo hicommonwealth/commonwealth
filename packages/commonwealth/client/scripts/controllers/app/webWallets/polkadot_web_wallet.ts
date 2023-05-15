@@ -30,12 +30,6 @@ class PolkadotWebWalletController
   public readonly defaultNetwork = ChainNetwork.Edgeware;
   public readonly chain = ChainBase.Substrate;
 
-  constructor() {
-    // isWeb3Injected doesn't always return as "available" even when it's been
-    // injected into the browser, unless we call web3Enable() preemptively.
-    web3Enable('commonwealth');
-  }
-
   public get available() {
     return window?.injectedWeb3?.['polkadot-js'];
   }
