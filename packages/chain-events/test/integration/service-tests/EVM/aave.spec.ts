@@ -65,7 +65,7 @@ describe('Integration tests for Aave', () => {
   describe('Tests the Aave event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
-      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, null, null, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, chain);
       listener = listeners[chain_id] as Listener<
         Api,
         StorageFetcher,

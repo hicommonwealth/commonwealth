@@ -271,12 +271,10 @@ export async function getSubscriberChainData(
  */
 export async function runSubscriberAsFunction(
   producer: IRabbitMqHandler,
-  pool?: Pool,
-  rollbar?: Rollbar,
-  chain?: ChainAttributes
+  chain: ChainAttributes
 ) {
-  const chains = await getSubscriberChainData(pool, rollbar, chain);
-  return await processChains(producer, chains, rollbar);
+  const chains = await getSubscriberChainData(null, null, chain);
+  return await processChains(producer, chains, null);
 }
 
 /**

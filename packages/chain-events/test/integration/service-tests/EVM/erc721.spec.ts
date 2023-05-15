@@ -68,7 +68,7 @@ describe('Integration tests for ERC721', () => {
   describe('Tests the ERC721 event listener using the chain subscriber', async () => {
     before(async () => {
       // set up the chain subscriber
-      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, null, null, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, chain);
       listener = listeners[`erc721_${chain.ChainNode.url}`] as Listener<
         IErc721Contracts,
         never,
