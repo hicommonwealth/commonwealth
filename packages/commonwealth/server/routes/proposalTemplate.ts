@@ -257,7 +257,7 @@ export async function deleteCommunityContractTemplate(
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     const communityContract = await models.CommunityContract.findOne({
-      where: { contract_id },
+      where: { contract_id, chain_id },
     });
 
     const communityContractId = communityContract.id;

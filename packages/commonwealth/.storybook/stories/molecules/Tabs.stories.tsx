@@ -9,25 +9,32 @@ const tabs = {
 } satisfies Meta<typeof CWTab>;
 
 export default tabs;
-// type Story = StoryObj<typeof tabs>;
+type Story = StoryObj<any>;
 
-const Tabs: FC = () => {
+interface TabsProps {
+  label1: string,
+  label2: string,
+  label3: string,
+}
+
+const Tabs: FC<TabsProps> = (props) => {
+  const { label1, label2, label3, } = props;
   const [selectedTab, setSelectedTab] = useState<number>(1);
 
   return (
     <CWTabBar>
       <CWTab
-        label="A tab"
+        label={label1}
         onClick={() => setSelectedTab(1)}
         isSelected={selectedTab === 1}
       />
       <CWTab
-        label="Another tab"
+        label={label2}
         onClick={() => setSelectedTab(2)}
         isSelected={selectedTab === 2}
       />
       <CWTab
-        label="Yet another tab"
+        label={label3}
         onClick={() => setSelectedTab(3)}
         isSelected={selectedTab === 3}
       />
@@ -35,8 +42,29 @@ const Tabs: FC = () => {
   )
 }
 
-// export const Tab: Story = {
-export const Tab = {
+export const Tab: Story = {
   name: 'Tabs',
-  render: () => <Tabs />
+  args: {
+    label1: "A tab",
+    label2: "Another tab",
+    label3: "Yet another tab",
+  },
+  argTypes: {
+    label1: {
+      control: { type: "text" },
+    },
+    label2: {
+      control: { type: "text" },
+    },
+    label3: {
+      control: { type: "text" },
+    },
+  },
+  render: ({...args}) => (
+    <Tabs
+      label1={args.label1}
+      label2={args.label2}
+      label3={args.label3}
+    />
+  )
 }

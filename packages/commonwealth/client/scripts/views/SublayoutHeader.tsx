@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'sublayout_header.scss';
+import 'SublayoutHeader.scss';
 
 import app from '../state';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
@@ -43,13 +43,16 @@ export const SublayoutHeader = ({
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) && app.activeChainId() && (
-          <CWCommunityAvatar
-            size="large"
-            community={app.chain.meta}
-            onClick={() => { navigate('/discussions'); }}
-          />
-        )}
+        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) &&
+          app.activeChainId() && (
+            <CWCommunityAvatar
+              size="large"
+              community={app.chain.meta}
+              onClick={() => {
+                navigate('/discussions');
+              }}
+            />
+          )}
         {onMobile && app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"

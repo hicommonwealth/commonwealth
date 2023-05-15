@@ -58,7 +58,6 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export const LoginSelectorMenuLeft = ({
-  activeAddressesWithRole,
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
@@ -202,7 +201,9 @@ export const LoginSelectorMenuRight = ({
     /**
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
-    const walletConnectWallet = WebWalletController.Instance.getByName(WalletId.WalletConnect);
+    const walletConnectWallet = WebWalletController.Instance.getByName(
+      WalletId.WalletConnect
+    );
     await walletConnectWallet.reset();
   };
 

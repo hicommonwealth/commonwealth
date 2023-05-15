@@ -20,7 +20,7 @@ import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'footer.scss';
+import 'Footer.scss';
 
 import { isNotUndefined } from '../helpers/typeGuards';
 import { useCommonNavigate } from 'navigation/helpers';

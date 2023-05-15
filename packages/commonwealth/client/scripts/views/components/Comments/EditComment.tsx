@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import 'components/comments/edit_comment.scss';
+import 'components/Comments/EditComment.scss';
 import type Comment from '../../../models/Comment';
 
 import app from 'state';
@@ -20,21 +20,19 @@ type EditCommentProps = {
   updatedCommentsCallback?: () => void;
 };
 
-export const EditComment = (props: EditCommentProps) => {
-  const {
-    comment,
-    savedEdits,
-    setIsEditing,
-    shouldRestoreEdits,
-    updatedCommentsCallback,
-  } = props;
-
+export const EditComment = ({
+  comment,
+  savedEdits,
+  setIsEditing,
+  shouldRestoreEdits,
+  updatedCommentsCallback,
+}: EditCommentProps) => {
   const commentBody =
     shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
   const body = deserializeDelta(commentBody);
 
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
-  const [saving, setSaving] = React.useState<boolean>();
+  const [contentDelta, setContentDelta] = useState<DeltaStatic>(body);
+  const [saving, setSaving] = useState<boolean>();
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
