@@ -77,7 +77,7 @@ export const UpdateProposalStatusModal = ({
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
   const showChainEvents =
-    !isCosmos && app.chainEntities.store.get(thread.chain).length > 0;
+    !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
 
   const handleSaveChanges = async () => {
     // set stage
