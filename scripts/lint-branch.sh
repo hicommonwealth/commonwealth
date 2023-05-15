@@ -1,8 +1,10 @@
 # The base branch is provided by GitHub Actions. If it's not set, default to "master".
 BASE_BRANCH=${GITHUB_BASE_REF:-master}
 
-# Fetch the base branch
-git fetch origin $BASE_BRANCH
+# Fetch the base branch only if this script is running in GitHub Actions
+if [ -n "$GITHUB_BASE_REF" ]; then
+    git fetch origin $BASE_BRANCH
+fi
 
 # Get a list of changed .ts files
 LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep \\.ts)
