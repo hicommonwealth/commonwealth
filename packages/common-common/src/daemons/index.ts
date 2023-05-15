@@ -19,7 +19,9 @@ export class Daemons {
                 fn();
             } catch (err) {
                 console.error(`Error running task ${label}`, err);
+                // cancel task
                 clearInterval(jobId);
+                this.cancelTask(label);
             }
         }, ms);
 
@@ -36,11 +38,25 @@ export class Daemons {
         // cancel old task if it exists
         if (this.tasks.has(label)) {
             const oldJobId = this.tasks.get(label);
-            clearInterval(oldJobId);
+            if(oldJobId) {
+                log.info(`Cancelling old task ${label}`);
+                clearInterval(oldJobId);
+            }
         }
 
         // add to map
         this.tasks.set(label, jobId);
+
+        // call daemon immediately
+        try {
+            fn();
+        } catch (err) {
+            console.error(`Error running task ${label}`, err);
+            // cancel task
+            clearInterval(jobId);
+            this.cancelTask(label);
+            return;
+        }
         return jobId;
     }
 
@@ -52,10 +68,23 @@ export class Daemons {
                 clearInterval(jobId);
             } catch (err) {
                 console.warn('Error cancelling task', err);
+                // remove from map
+                return this.tasks.delete(label);
             }
         }
         // remove from map
-        this.tasks.delete(label);
+        return this.tasks.delete(label);
+    }
+
+    cancelAllTasks() {
+        log.info(`Cancelling all tasks`);
+        for (const label of this.tasks.keys()) {
+            this.cancelTask(label);
+        }
+    }
+
+    getTask(label: string) {
+        return this.tasks.get(label);
     }
 }
 
