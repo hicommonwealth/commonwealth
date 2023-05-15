@@ -8,7 +8,6 @@ import React, {
 
 import 'components/quill/markdown_formatted_text.scss';
 
-import app from 'state';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -22,7 +21,8 @@ import { loadScript } from 'helpers';
 import { debounce } from 'lodash';
 
 const fetchTwitterEmbedInfo = async (url: string) => {
-  const embedInfoUrl = `${app.serverUrl()}/twitterEmbed`;
+  // this will not work locally due to CORS
+  const embedInfoUrl = 'https://publish.twitter.com/oembed';
   const res = await axios.get(embedInfoUrl, {
     params: {
       url,
