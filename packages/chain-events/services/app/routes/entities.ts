@@ -42,7 +42,6 @@ const entities: any = async (
     entityFindOptions.where.completed = true;
   }
 
-  // test CI lint file change
   try {
     const fetchedEntities = await models.ChainEntity.findAll(entityFindOptions);
     return res.json({
