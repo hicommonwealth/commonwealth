@@ -1,10 +1,11 @@
-# Check if the master branch exists
-if ! git show-ref --quiet refs/remotes/origin/master; then
-    # Fetch the master branch from the origin
-    git fetch origin master
-fi
+# The base branch is provided by GitHub Actions. If it's not set, default to "master".
+BASE_BRANCH=${GITHUB_BASE_REF:-master}
 
-LINES=$(git diff origin/master...HEAD --name-only --diff-filter=d | grep \\.ts)
+# Fetch the base branch
+git fetch origin $BASE_BRANCH
+
+# Get a list of changed .ts files
+LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep \\.ts)
 
 if [ -z "$LINES" ]
 then
