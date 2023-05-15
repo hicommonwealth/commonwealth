@@ -103,17 +103,7 @@ describe('Integration tests for Aave', () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       const currentBlock = await sdk.getBlock();
       await sdk.advanceTime(String(secs), blocks);
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Proposal Created Block Number", proposalCreatedBlockNum);
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Desired block number", currentBlock.number + blocks);
       await sdk.awaitBlock(currentBlock.number + blocks);
-      // const currentBlock = await sdk.getBlock();
-      // const diff = currentBlock.blockNumber - proposalCreatedBlockNum
-      // console.log("Current block number - proposal create block number", diff);
-      // console.log("Voting Delay:", 13140);
-      // console.log("Voting delay + voting period", 13140 + 19710);
-      // console.log("currentBlock - proposalCreatedBlock < votingDelay", diff < 13140);
-      // console.log("currentBlock - proposalCreatedBlock > votingDelay + votingPeriod", diff > 13140 + 19710);
-      // console.log(`Range: ${proposalCreatedBlockNum + 13140} < ${currentBlock.blockNumber} < ${proposalCreatedBlockNum + 13140 + 19710}`);
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
       await waitUntilBlock(block, listener);
