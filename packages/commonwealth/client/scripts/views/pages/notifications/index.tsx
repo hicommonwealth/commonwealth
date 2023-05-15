@@ -4,7 +4,7 @@ import { Virtuoso } from 'react-virtuoso';
 import 'pages/notifications/index.scss';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import PageError from 'views/pages/error';
 import { NotificationRow } from './notification_row';
 import { CWButton } from '../../components/component_kit/cw_button';

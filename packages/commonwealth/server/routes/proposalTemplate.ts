@@ -17,6 +17,7 @@ type CreateCommunityContractTemplateAndMetadataReq = {
   community_id: number;
   template_id: number;
   chain_id: string;
+  enabled_by: string;
 };
 
 type CommunityContractTemplateAndMetadataResp = {
@@ -45,6 +46,7 @@ export async function createCommunityContractTemplateAndMetadata(
     contract_id,
     template_id,
     chain_id,
+    enabled_by,
   } = req.body;
 
   const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
@@ -91,6 +93,7 @@ export async function createCommunityContractTemplateAndMetadata(
       nickname,
       display_name,
       display_options,
+      enabled_by,
     });
 
     const newCCT = await models.CommunityContractTemplate.create({
@@ -254,7 +257,7 @@ export async function deleteCommunityContractTemplate(
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     const communityContract = await models.CommunityContract.findOne({
-      where: { contract_id },
+      where: { contract_id, chain_id },
     });
 
     const communityContractId = communityContract.id;

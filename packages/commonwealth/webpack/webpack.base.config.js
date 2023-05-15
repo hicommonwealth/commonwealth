@@ -47,7 +47,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
-          process.env.FLAG_PROPOSAL_TEMPLATES
+        process.env.FLAG_PROPOSAL_TEMPLATES
       ),
     }),
     new HtmlWebpackPlugin({
@@ -105,7 +105,7 @@ module.exports = {
           chunks: 'all',
         },
         snapshot: {
-          test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
+          test: /[\\/]node_modules[\\/](@apollo)[\\/]/,
           name: 'snapshot',
           chunks: 'all',
         },
@@ -155,7 +155,6 @@ module.exports = {
       vm: require.resolve('vm-browserify'),
       path: require.resolve('path-browserify'),
       stream: require.resolve('stream-browserify'),
-      zlib: require.resolve('browserify-zlib'),
     },
   },
   module: {

@@ -69,7 +69,8 @@ export default class DatabaseValidationService {
       validateChain
     );
     if (error) return next(new AppError(error));
-    if (!chain) return next(new AppError(Errors.InvalidCommunity));
+    if (req.query.chain !== ALL_CHAINS && !chain)
+      return next(new AppError(Errors.InvalidCommunity));
     // If the chain is valid, add it to the request object
     req.chain = chain;
     next();
@@ -90,5 +91,4 @@ export default class DatabaseValidationService {
     req.chain = chain;
     next();
   };
-
 }

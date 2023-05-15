@@ -1,11 +1,11 @@
 import React from 'react';
 
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 import 'pages/view_thread/edit_body.scss';
 import { notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
 import { ContentType } from 'types';
-import { clearEditingLocalStorage } from '../../components/comments/helpers';
+import { clearEditingLocalStorage } from '../../components/Comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../../components/react_quill_editor';

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { AddressInfo, NotificationSubscription } from 'models';
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
+import AddressInfo from '../../../models/AddressInfo';
+import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -25,7 +26,6 @@ import {
 import { bundleSubs } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
-import { redraw } from 'mithrilInterop';
 import { NotificationCategories } from 'common-common/src/types';
 
 const emailIntervalFrequencyMap = {

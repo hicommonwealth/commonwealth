@@ -8,8 +8,9 @@ import app from 'state';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
-import { AvatarUpload } from 'views/components/avatar_upload';
-import type { ChainInfo, RoleInfo } from 'models';
+import type ChainInfo from '../../../models/ChainInfo';
+import type RoleInfo from '../../../models/RoleInfo';
+import { AvatarUpload } from '../../components/avatar_upload';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -18,11 +19,7 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
-import {
-  buildCategoryMap,
-  setChainCategories,
-  setSelectedTags,
-} from './helpers';
+import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
 import { featureFlags } from 'helpers/feature-flags';
 
@@ -78,8 +75,6 @@ export const ChainMetadataRows = ({
     name: string;
   } | null>(null);
 
-  const categoryMap = buildCategoryMap();
-
   const getChannels = useCallback(async () => {
     try {
       const res = await app.discord.getChannels(chain.id);
@@ -118,13 +113,7 @@ export const ChainMetadataRows = ({
 
     // Update ChainCategories
     try {
-      for (const category of Object.keys(selectedTags2)) {
-        await setChainCategories(
-          categoryMap[category],
-          chain.id,
-          selectedTags2[category]
-        );
-      }
+      await setChainCategories(selectedTags2, chain.id);
     } catch (err) {
       console.log(err);
     }

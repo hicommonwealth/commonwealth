@@ -2,7 +2,7 @@ import React from 'react';
 
 import 'pages/landing/index.scss';
 
-import type { ChainInfo } from 'models';
+import ChainInfo from '../../../models/ChainInfo';
 
 import app, { LoginState } from 'state';
 import { Header } from './header';
@@ -11,7 +11,7 @@ import { CreatorsGallery } from './creators_gallery';
 import { TokenHolders } from './token_holders';
 import { CrowdfundingGallery } from './crowdfunding_gallery';
 import UserDashboard from '../user_dashboard';
-import { Footer } from '../../footer';
+import { Footer } from '../../Footer';
 import useForceRerender from 'hooks/useForceRerender';
 import { CWText } from '../../components/component_kit/cw_text';
 import { Carousel } from './carousel';

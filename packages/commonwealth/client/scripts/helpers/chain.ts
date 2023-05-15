@@ -1,10 +1,10 @@
 import app, { ApiStatus } from 'state';
-import { ChainInfo, NodeInfo } from 'models';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
 import type { NavigateFunction } from 'react-router-dom';
+import ChainInfo from '../models/ChainInfo';
+import NodeInfo from '../models/NodeInfo';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;
@@ -52,7 +52,6 @@ export const selectChain = async (
   await deinitChainOrCommunity();
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
-  setTimeout(() => redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
@@ -215,9 +214,6 @@ export const selectChain = async (
     });
   }
 
-  // Redraw with not-yet-loaded chain and return true to indicate
-  // initialization has finalized.
-  redraw();
   return true;
 };
 
@@ -243,9 +239,6 @@ export const initChain = async (): Promise<void> => {
 
   // Instantiate (again) to create chain-specific Account<> objects
   await updateActiveAddresses(chain);
-
-  // Finish redraw to remove loading dialog
-  redraw();
 };
 
 export const initNewTokenChain = async (

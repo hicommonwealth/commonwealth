@@ -5,7 +5,6 @@ import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -15,14 +14,17 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
-import { isSameAccount, pluralize, setDarkMode } from 'helpers';
-import type { Account } from 'models';
-import { AddressInfo, ITokenAdapter } from 'models';
+import { isSameAccount, pluralize } from 'helpers';
+import { setDarkMode } from 'helpers/darkMode';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
+import WebWalletController from '../../../controllers/app/web_wallets';
+import Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -56,7 +58,6 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export const LoginSelectorMenuLeft = ({
-  activeAddressesWithRole,
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
@@ -117,7 +118,6 @@ export const LoginSelectorMenuLeft = ({
                 onClick={async () => {
                   await setActiveAccount(account);
                   setSelectedAddress(account.address);
-                  redraw();
                 }}
               >
                 <UserBlock
@@ -201,7 +201,9 @@ export const LoginSelectorMenuRight = ({
     /**
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
-    const walletConnectWallet = app.wallets.getByName(WalletId.WalletConnect);
+    const walletConnectWallet = WebWalletController.Instance.getByName(
+      WalletId.WalletConnect
+    );
     await walletConnectWallet.reset();
   };
 
@@ -222,7 +224,6 @@ export const LoginSelectorMenuRight = ({
                 ? toggleDarkMode(false, setIsDarkModeOn)
                 : toggleDarkMode(true, setIsDarkModeOn);
               e.stopPropagation();
-              redraw();
             }}
           />
           <div className="login-darkmode-label">
@@ -478,7 +479,6 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
       } catch (err) {
         console.error(err);
       }
@@ -511,8 +511,8 @@ export const LoginSelector = () => {
             <CWButton
               buttonType="tertiary-black"
               onClick={async () => {
-                if(sameBaseAddressesRemoveDuplicates.length === 0) {
-                  setIsLoginModalOpen(true)
+                if (sameBaseAddressesRemoveDuplicates.length === 0) {
+                  setIsLoginModalOpen(true);
                 } else {
                   if (hasTermsOfService) {
                     setIsTOSModalOpen(true);
@@ -613,7 +613,10 @@ export const LoginSelector = () => {
       />
       <Modal
         content={
-          <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
+          <LoginModal
+            onSuccess={() => setIsJoined(true)}
+            onModalClose={() => setIsLoginModalOpen(false)}
+          />
         }
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}

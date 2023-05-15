@@ -2,12 +2,12 @@ import React from 'react';
 
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -57,11 +57,10 @@ type SnapshotInformationCardProps = {
   threads: Array<{ id: string; title: string }> | null;
 };
 
-export const SnapshotInformationCard = (
-  props: SnapshotInformationCardProps
-) => {
-  const { proposal, threads } = props;
-
+export const SnapshotInformationCard = ({
+  proposal,
+  threads,
+}: SnapshotInformationCardProps) => {
   const votingSystem = capitalize(
     proposal.type.split('-').join(' ').concat(' voting')
   );
@@ -123,15 +122,17 @@ export const SnapshotInformationCard = (
               url={`https://etherscan.io/block/${proposal.snapshot}`}
             />
           </div>
-          {!!threads && (
-            <div className="linked-discussions">
-              <CWText type="h5" fontWeight="semiBold">
-                Linked Discussions
-              </CWText>
-              {threads.map((thread) => (
-                <SnapshotThreadLink thread={thread} />
-              ))}
-            </div>
+          {threads.length > 0 && (
+            <>
+              <div className="linked-discussions">
+                <CWText type="h5" fontWeight="semiBold">
+                  Linked Discussions
+                </CWText>
+                {threads.map((thread) => (
+                  <SnapshotThreadLink thread={thread} key={thread.id} />
+                ))}
+              </div>
+            </>
           )}
         </div>
       }

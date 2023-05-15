@@ -5,8 +5,7 @@ import 'pages/search/search_bar.scss';
 
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { SearchQuery } from 'models';
-import { SearchScope } from 'models/SearchQuery';
+import SearchQuery, { SearchScope } from 'models/SearchQuery';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';

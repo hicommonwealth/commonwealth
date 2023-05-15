@@ -12,10 +12,11 @@ export type DropdownItemType = {
 
 type DropdownProps = {
   initialValue?: DropdownItemType;
-  label: string;
+  label?: string;
   onSelect?: (item: DropdownItemType) => void;
   options: Array<DropdownItemType>;
   containerClassName?: string;
+  disabled?: boolean;
 };
 
 export const CWDropdown = ({
@@ -24,6 +25,7 @@ export const CWDropdown = ({
   onSelect,
   containerClassName,
   initialValue,
+  disabled = false,
 }: DropdownProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedValue, setSelectedValue] = useState<DropdownItemType>(
@@ -44,6 +46,7 @@ export const CWDropdown = ({
         onClick={() => {
           setShowDropdown(!showDropdown);
         }}
+        disabled={disabled}
       />
       {showDropdown && (
         <div className="dropdown-options-display">
