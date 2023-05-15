@@ -20,7 +20,7 @@
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
-    "add-prettier-precommit": "grep -q 'prettier --write' ./.git/hooks/pre-commit || cat ./scripts/prettier-new-work.sh >> ./.git/hooks/pre-commit",
+    "add-prettier-precommit": "grep -q -s 'prettier --write' ./.git/hooks/pre-commit || cat ./scripts/prettier-new-work.sh >> ./.git/hooks/pre-commit",
     "setup-git-hooks": "yarn add-prettier-precommit && chmod +x ./.git/hooks/pre-commit"
   },
   "engines": {
