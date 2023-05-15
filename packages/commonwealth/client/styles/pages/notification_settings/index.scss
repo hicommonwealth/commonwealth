@@ -47,6 +47,10 @@
         max-width: 400px;
       }
     }
+
+    .alert-text {
+      color: $neutral-500;
+    }
   }
 
   .email-input-section {
@@ -97,11 +101,11 @@
   }
 
   .discussion-section-margin {
-    margin: 30px 0 8px 0;
+    margin: 30px 0 16px 0;
   }
 
   .chain-events-section-margin {
-    margin: 0 0 8px 0;
+    margin: 0 0 16px 0;
   }
 
   .chain-events-subscriptions-padding {
