@@ -2,8 +2,11 @@
 BASE_BRANCH=${GITHUB_BASE_REF:-master}
 
 # Fetch the base branch only if this script is running in GitHub Actions
+# and the base branch hasn't been fetched yet
 if [ -n "$GITHUB_BASE_REF" ]; then
-    git fetch origin $BASE_BRANCH
+    if ! git show-ref --quiet refs/remotes/origin/$BASE_BRANCH; then
+        git fetch origin $BASE_BRANCH
+    fi
 fi
 
 # Get a list of changed .ts files
