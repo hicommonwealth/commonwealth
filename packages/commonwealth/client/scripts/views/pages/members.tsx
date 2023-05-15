@@ -7,7 +7,7 @@ import app from 'state';
 import type MinimumProfile from '../../models/MinimumProfile';
 import { AccessLevel } from '../../../../shared/permissions';
 import { User } from 'views/components/user/user';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 
 type MemberInfo = {

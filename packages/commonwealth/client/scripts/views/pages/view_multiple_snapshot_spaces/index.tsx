@@ -7,7 +7,7 @@ import type Thread from '../../../models/Thread';
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';

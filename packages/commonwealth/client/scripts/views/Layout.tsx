@@ -1,16 +1,10 @@
 import React, { Suspense, useState } from 'react';
 
-// import type { ClassComponentRouter } from 'mithrilInterop';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 
-import 'layout.scss';
+import 'Layout.scss';
 
-import {
-  deinitChainOrCommunity,
-  initChain,
-  initNewTokenChain,
-  selectChain,
-} from 'helpers/chain';
+import { deinitChainOrCommunity, initChain, selectChain } from 'helpers/chain';
 
 import app from 'state';
 import { PageNotFound } from 'views/pages/404';

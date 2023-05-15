@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
-import 'sublayout.scss';
+import 'Sublayout.scss';
 
 import app from 'state';
 import { Sidebar } from 'views/components/sidebar';
-import { AppMobileMenus } from './app_mobile_menus';
+import { AppMobileMenus } from './AppMobileMenus';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
-import { Footer } from './footer';
-import { SublayoutBanners } from './sublayout_banners';
-import { SublayoutHeader } from './sublayout_header';
+import { Footer } from './Footer';
+import { SublayoutBanners } from './SublayoutBanners';
+import { SublayoutHeader } from './SublayoutHeader';
 import useForceRerender from 'hooks/useForceRerender';
 
 type SublayoutProps = {
