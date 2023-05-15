@@ -1,5 +1,6 @@
 import IWebWallet from '../models/IWebWallet';
 import Near from '../controllers/chain/near/adapter';
+import axios from 'axios';
 
 const getAddressFromWallet = (wallet: IWebWallet<any>) => {
   const selectedAddress = (() => {
@@ -24,18 +25,15 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
 };
 
 const loginToAxie = async (loginUrl = '') => {
-  const result = await $.post(loginUrl, {
-    issuer: 'AxieInfinity',
-  });
+  try {
+    const response = await axios.post(loginUrl, {
+      issuer: 'AxieInfinity',
+    });
 
-  if (result.status === 'Success' && result.result.stateId) {
-    const stateId = result.result.stateId;
-
-    // redirect to axie page for login
-    // eslint-disable-next-line max-len
+    const stateId = response.data.stateId;
     window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
-  } else {
-    console.log(result.error || 'Could not login');
+  } catch (error) {
+    console.log(error || 'Could not login');
   }
 };
 
