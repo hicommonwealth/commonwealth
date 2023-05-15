@@ -7,7 +7,7 @@ import type { DB } from '../database/database';
 import entities from './routes/entities';
 import eventActivity from './routes/eventActivity';
 import migrateEvent from './routes/migrateEvent';
-import {registerRoute} from 'chain-events/services/app/middleware';
+import { registerRoute } from 'chain-events/services/app/middleware';
 
 /**
  * Function that creates an Express Router for the ChainEvents app. This function defines all of our apps routes.
@@ -23,24 +23,6 @@ function setupRouter(models: DB): Router {
     'post',
     '/migrateEvent',
     migrateEvent.bind(this, models)
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/test',
-    passport.authenticate('jwt', { session: false }),
-    (req: Request, res: Response) => {
-      return res.status(200).json({ success: true });
-    }
-  );
-  registerRoute(
-    router,
-    'post',
-    '/test',
-    (req: Request, res: Response) => {
-      return res.status(200).json({ success: true });
-    }
   );
 
   return router;
