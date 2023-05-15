@@ -7,8 +7,8 @@ import {
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { compoundGovernor } from '../../../../chain-testing/src/utils/governance/compoundGov';
-import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
+import { compoundGovernor } from 'chain-testing/src/utils/governance/compoundGov';
+import { ChainTesting } from 'chain-testing/sdk/chainTesting';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
@@ -23,13 +23,6 @@ import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
 
 const { expect } = chai;
 chai.use(chaiHttp);
-
-// TODO: we can remove the delay if we simply delay for 0.5 seconds and check whether the listeners lastBlock is higher
-// than the block at which the event was emitted. If it is then we know the listener failed so we can exit the test
-// otherwise we keep looping -> set the mocha test timeout to a high ceiling so that if the listener block number is not
-// updating the test will fail
-
-// TODO: ensure that the lastBlockNumber in the listener is updated AFTER all events have been processed + published to the appropriate queues
 
 describe('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
