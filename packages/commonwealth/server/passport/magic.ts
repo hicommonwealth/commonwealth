@@ -1,5 +1,6 @@
 import type { MagicUserMetadata } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 import { AppError, ServerError } from 'common-common/src/errors';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
@@ -18,7 +19,13 @@ export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
   if (MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
-    const magic = new Magic(MAGIC_API_KEY);
+    const magic = new Magic(MAGIC_API_KEY, {
+      extensions: [
+        new CosmosExtension({
+          rpcUrl: 'cosmos rpc url',
+        }),
+      ],
+    });
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         // determine login location
