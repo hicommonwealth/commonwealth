@@ -86,7 +86,7 @@
 
   &.new {
     background-color: $yellow-50;
-    border-radius: 6px;
+    border-radius: $border-radius-corners-wider;
     padding: 4px 8px;
 
     .tag-text.Text {
