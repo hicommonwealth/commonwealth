@@ -293,14 +293,20 @@ export class ChainTesting {
   /**
    * Given a desired block number, this function will wait until the chain reaches that block
    * @param desiredBlockNum The desired block number to wait for
+   * @param maxWaitTime The maximum amount of time to wait for the desired block number. Default is 120 seconds
    */
-  public async awaitBlock(desiredBlockNum: number){
+  public async awaitBlock(desiredBlockNum: number, maxWaitTime = 60): Promise<void>{
+    let waitTime = 0;
+    /* eslint-disable */
     while (true) {
+      if (waitTime >= maxWaitTime) throw new Error('Timed out waiting for block');
       const currentBlock = (await this.getBlock()).blockNumber;
+      console.log(currentBlock);
       if (currentBlock >= desiredBlockNum) {
-        return
+        return;
       }
       await new Promise<void>(resolve => setTimeout(resolve, 1000));
+      waitTime += 1;
     }
   }
 

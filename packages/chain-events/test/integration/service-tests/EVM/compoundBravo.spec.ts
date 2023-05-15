@@ -103,6 +103,8 @@ describe('Integration tests for Compound Bravo', () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       const currentBlock = await sdk.getBlock();
       await sdk.advanceTime(String(secs), blocks);
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Proposal Created Block Number", proposalCreatedBlockNum);
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Desired block number", currentBlock.blockNumber + blocks);
       await sdk.awaitBlock(currentBlock.blockNumber + blocks);
       // const currentBlock = await sdk.getBlock();
       // const diff = currentBlock.blockNumber - proposalCreatedBlockNum
