@@ -35,15 +35,21 @@ const checkboxGroupOptions: Array<CheckboxType> = [
   },
 ];
 
-const FilterMenu: FC = () => {
+interface FilterMenuProps {
+  header: string;
+  groupOptions: Array<CheckboxType>;
+};
+
+const FilterMenu: FC<FilterMenuProps> = (props) => {
+  const { header, groupOptions } = props;
   const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
     Array<string>
   >([]);
 
   return (
     <CWFilterMenu
-      header="Stages"
-      filterMenuItems={checkboxGroupOptions}
+      header={header}
+      filterMenuItems={groupOptions}
       selectedItems={checkboxGroupSelected}
       onChange={(e) => {
         const itemValue = e.target.value;
@@ -62,5 +68,16 @@ const FilterMenu: FC = () => {
 // export const FilterMenuStory: Story = {
 export const FilterMenuStory = {
   name: 'Filter Menu',
-  render: () => <FilterMenu />
+  args: {
+    header: "Stages",
+    options: checkboxGroupOptions,
+  },
+  argTypes: {
+    header: {
+      control: { type: "text" },
+    }
+  },
+  render: ({...args}) => (
+    <FilterMenu header={args.header} groupOptions={args.options} />
+  )
 }
