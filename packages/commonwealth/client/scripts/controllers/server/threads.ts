@@ -301,7 +301,14 @@ class ThreadsController {
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
-      this.store.add(result);
+      const lastPinnedThreadIndex = this.store
+        .getAll()
+        .slice()
+        .reverse()
+        .findIndex((x) => x.pinned);
+      this.store.add(result, {
+        pushToIndex: this.store.getAll().length - lastPinnedThreadIndex,
+      });
       this.numTotalThreads += 1;
       this._listingStore.add(result);
       const activeEntity = app.chain;
