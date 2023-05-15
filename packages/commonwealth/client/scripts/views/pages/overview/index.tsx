@@ -40,10 +40,12 @@ const OverviewPage = () => {
   useEffect(() => {
     app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
+    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
+      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
