@@ -8,11 +8,22 @@
     width: calc(100% - 10%);
   }
 
-  .header {
-    margin: 32px 0 8px;
-  }
-
   .divider {
     margin: 40px 0 20px;
+  }
+
+  .header {
+    margin-top: 32px;
+  }
+
+  .CommunityInfo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 34px;
+
+    .label {
+      color: $neutral-600;
+    }
   }
 }

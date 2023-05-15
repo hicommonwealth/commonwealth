@@ -17,7 +17,7 @@ import app from 'state';
 import { pluralize } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';

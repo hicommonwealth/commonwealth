@@ -1,6 +1,3 @@
-import $ from 'jquery';
-
-import { redraw } from 'mithrilInterop';
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
 import { ChainCategoryType } from 'common-common/src/types';
@@ -35,7 +32,6 @@ export const setChainCategories = async (
           app.config.chainCategoryMap[newMap.chain] = newMap.tags;
         }
         resolve();
-        redraw();
       })
       .catch(() => {
         reject();

@@ -2,7 +2,7 @@ import React from 'react';
 
 import 'pages/loading.scss';
 
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
 
