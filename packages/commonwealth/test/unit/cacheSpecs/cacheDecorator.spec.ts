@@ -4,7 +4,8 @@ import { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 
-import { CacheDecorator, FuncExecError } from 'common-common/src/cacheDecorator';
+import { CacheDecorator } from 'common-common/src/cacheDecorator';
+import { Activity } from 'common-common/src/daemons/activity';
 import { RedisCache } from 'common-common/src/redisCache';
 import { RedisNamespaces } from 'common-common/src/types';
 import { CacheKeyDuration } from 'common-common/src/cacheKeyUtils';
@@ -298,6 +299,77 @@ describe('CacheDecorator', () => {
         expect(mockRedis.setKey.calledOnce).to.be.false; 
         expect(fn.calledOnce).to.be.true;
       });
+    });
+
+    describe('verify activity helper class', () => {
+      const ActivityLabel = 'test-activity';
+      const query = async (a, b, c) => {
+        console.log('running query with params', a, b, c);
+        return (a + b + c);        
+      };
+
+      const query2 = (callCount) => async (a, b, c) => {
+        callCount++;
+        if(callCount === 1) {
+          throw new Error('test-error');
+        }
+        return query(a, b, c);
+      };
+
+      const keyGenerator1 = (a, b, c) => {
+        return { cacheKey: `${a}-${b}-${c}`, cacheDuration: a+b+c } as CacheKeyDuration;
+      }
+
+      const keyGenerator2 = (a, b, c) => {
+        return `${a}-${b}-${c}`;
+      }
+
+      const keyGenerator3 = 'test-key';
+
+
+      it('should cache the function result and return it', async () => {
+        mockRedis.getKey.resolves(null);
+        mockRedis.setKey.resolves(true);
+        mockRedis.isInitialized.returns(true);
+
+        const activityWrapper = new Activity(ActivityLabel, query, keyGenerator1, 60, RedisNamespaces.Function_Response, cacheDecorator);
+        const wrapFn = activityWrapper.queryWithCache;
+        const result = await wrapFn(1, 2, 3);
+        expect(result).to.equal(6);
+        expect(mockRedis.getKey.calledWith(RedisNamespaces.Function_Response, '1-2-3')).to.be.true;
+        expect(mockRedis.getKey.calledOnce).to.be.true;
+        expect(mockRedis.setKey.calledOnce).to.be.true;
+        expect(mockRedis.setKey.calledWith(RedisNamespaces.Function_Response, '1-2-3', JSON.stringify(6), 6)).to.be.true;
+      });
+
+      it('should return the cached result if it exists', async () => {
+        mockRedis.getKey.resolves(JSON.stringify(8));
+        mockRedis.setKey.resolves(true);
+        mockRedis.isInitialized.returns(true);
+
+        const activityWrapper = new Activity(ActivityLabel, query, keyGenerator3, 60, RedisNamespaces.Function_Response, cacheDecorator);
+        const wrapFn = activityWrapper.queryWithCache;
+        const result = await wrapFn(1, 2, 3);
+        expect(result).to.equal(8);
+        expect(mockRedis.getKey.calledOnce).to.be.true;
+        expect(mockRedis.getKey.calledWith(RedisNamespaces.Function_Response, 'test-key')).to.be.true;
+        expect(mockRedis.setKey.called).to.be.false;
+      });
+
+      it('should not lookup cache, and override the cache', async () => {
+        mockRedis.setKey.resolves(true);
+        mockRedis.isInitialized.returns(true);
+
+        const activityWrapper = new Activity(ActivityLabel, query, keyGenerator2, 60, RedisNamespaces.Function_Response, cacheDecorator);
+        const wrapFn = activityWrapper.queryWithCacheOverride;
+        const result = await wrapFn(1, 2, 3);
+        expect(result).to.equal(6);
+        expect(mockRedis.getKey.called).to.be.false;
+        expect(mockRedis.setKey.calledOnce).to.be.true;
+        expect(mockRedis.setKey.calledWith(RedisNamespaces.Function_Response, '1-2-3', JSON.stringify(6), 60)).to.be.true;
+      });
+
+
     });
   });
 });

@@ -20,7 +20,7 @@ export enum XCACHE_VALUES {
 }
 
 type seconds = number;
-type KeyFunction<T extends (...args: any[]) => any> = ((...args: Parameters<T>) => string | CacheKeyDuration) | string;
+export type KeyFunction<T extends (...args: any[]) => any> = ((...args: Parameters<T>) => string | CacheKeyDuration) | string;
 
 export class FuncExecError extends Error {
   constructor(message) {
@@ -166,6 +166,7 @@ export class CacheDecorator {
     if (result !== undefined && result !== null) {
       try {
         const ret = await this.cacheResponse(cacheKey, JSON.stringify(result), cacheDuration, namespace);
+        //log.debug(`cacheWrap: SET ${cacheKey}`);
         if (!ret) throw new Error('Unable to set redis key returned false');
       } catch (error) {
         log.warn(`Error caching value for ${cacheKey}: ${error}`);
