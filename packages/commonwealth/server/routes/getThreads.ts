@@ -35,10 +35,6 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
           as: 'topic',
         },
         {
-          model: models.ChainEntityMeta,
-          as: 'chain_entity_meta',
-        },
-        {
           model: models.Reaction,
           as: 'reactions',
           include: [

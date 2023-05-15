@@ -12,7 +12,7 @@ import 'pages/new_proposal/index.scss';
 
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
 import { AaveProposalForm } from './aave_proposal_form';

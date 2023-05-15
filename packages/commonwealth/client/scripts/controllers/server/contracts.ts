@@ -326,11 +326,13 @@ class ContractsController {
     template,
     contract_id,
     description,
+    community,
   }: {
     name: string;
     template: string;
     contract_id: string;
     description: string;
+    community: string;
   }) {
     try {
       await $.post(`${app.serverUrl()}/contract/template`, {
@@ -340,6 +342,8 @@ class ContractsController {
         template,
         contract_id,
         description,
+        created_by: app.user.activeAccount.address,
+        created_for_community: community,
       });
 
       const contract = this._store.getById(contract_id);
@@ -348,6 +352,22 @@ class ContractsController {
     } catch (err) {
       console.log(err);
       throw new Error('Failed to create template');
+    }
+  }
+
+  public async deleteTemplate({ templateId }: { templateId: string }) {
+    try {
+      await $.ajax({
+        url: `${app.serverUrl()}/contract/template`,
+        data: {
+          jwt: app.user.jwt,
+          template_id: templateId,
+        },
+        type: 'DELETE',
+      });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to delete template');
     }
   }
 

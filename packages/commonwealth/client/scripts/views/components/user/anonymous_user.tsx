@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render } from 'mithrilInterop';
+import { render } from 'helpers/DEPRECATED_ReactRender';
 import jdenticon from 'jdenticon';
 
 import 'components/user/user.scss';
