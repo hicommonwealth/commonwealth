@@ -25,9 +25,11 @@ import {
   createDeltaFromText,
   ReactQuillEditor,
 } from '../../components/react_quill_editor';
-import { DeltaStatic } from 'quill';
+import { Delta, DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
 import Thread from 'client/scripts/models/Thread';
+import { deserializeDelta } from '../../components/react_quill_editor/utils';
+import { is } from 'bluebird';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -141,10 +143,27 @@ export const NewSnapshotProposalForm = ({
           }
         }
       }
-
       if (thread && thread.body) {
-        const delta = createDeltaFromText(thread.plaintext);
-        setContentDelta(delta);
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/discussion/')) {
+          const domain = window.location.origin;
+          const chainId = app.activeChainId();
+          const threadId = thread.id;
+
+          const linkText = `\n\nThis conversation was started on Commonwealth, see more discussion: `;
+          const linkUrl = `\n${domain}/${chainId}/discussion/${threadId}`;
+
+          const linkMarkdown = `${linkText}[here](${linkUrl})`;
+
+          const delta = createDeltaFromText(
+            thread.plaintext + linkMarkdown,
+            true
+          );
+          setContentDelta(delta);
+        } else {
+          const delta = createDeltaFromText(thread.plaintext);
+          setContentDelta(delta);
+        }
       }
 
       setForm(initialForm);
