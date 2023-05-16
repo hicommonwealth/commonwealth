@@ -30,7 +30,7 @@ const CWMobileMenuItem = (props: MenuItem) => {
       >
         <div className="mobile-menu-item-left">
           {iconLeft && <CWIcon iconName={iconLeft} />}
-          <CWText type="b2">{label} asdjsajdkh</CWText>
+          <CWText type="b2">{label}</CWText>
         </div>
         {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
       </div>
