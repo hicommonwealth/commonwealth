@@ -29,11 +29,12 @@ export const createNewProposal = async (
   }
 
   const bodyText = getTextFromDelta(JSON.parse(content));
+  console.log('bodyText', bodyText);
   if (bodyText.length === 0) {
     throw new Error(NewThreadErrors.NoBody);
   }
 
-  form.body = content; // use content, which is richtext
+  form.body = bodyText; // use content, which is richtext
   form.snapshot = await getSpaceBlockNumber(space.network);
   form.metadata.network = space.network;
   form.metadata.strategies = space.strategies;

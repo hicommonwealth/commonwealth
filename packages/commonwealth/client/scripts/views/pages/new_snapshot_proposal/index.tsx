@@ -170,6 +170,7 @@ export const NewSnapshotProposalForm = ({
     return () => {
       app.snapshot.snapshotEmitter.off('initialized', handleInitialized);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) return <CWSpinner />;

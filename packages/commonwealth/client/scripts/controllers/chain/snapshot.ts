@@ -40,7 +40,6 @@ class SnapshotController {
     this._initializing = false;
     this._initialized = true;
 
-    console.log('Snapshot initialized');
     this.snapshotEmitter.emit('initialized');
   }
 
