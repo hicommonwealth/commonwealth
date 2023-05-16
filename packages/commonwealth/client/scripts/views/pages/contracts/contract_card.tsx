@@ -111,14 +111,6 @@ export const ContractCard = ({
             {address}
           </CWText>
         </div>
-        <div className="label-group">
-          <CWText className="group-title" type="b2">
-            Address
-          </CWText>
-          <CWText className="address" type="b2">
-            {address}
-          </CWText>
-        </div>
         <div className="templates">
           {templates?.length ? (
             <>
@@ -148,7 +140,7 @@ export const ContractCard = ({
           ) : (
             <div className="no-templates-container">
               <CWText className="no-templates-info" type="b1">
-                You currently have no templates for this contract
+                You currently have no actions for this contract
               </CWText>
             </div>
           )}
