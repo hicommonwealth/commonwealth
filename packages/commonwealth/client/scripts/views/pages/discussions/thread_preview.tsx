@@ -51,10 +51,8 @@ type ThreadPreviewProps = {
 
 export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
-  const [
-    isUpdateProposalStatusModalOpen,
-    setIsUpdateProposalStatusModalOpen,
-  ] = useState(false);
+  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
+    useState(false);
 
   const [windowIsSmall, setWindowIsSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
@@ -183,7 +181,10 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
             {linkedSnapshots.length > 0 && (
               <CWTag
                 type="active"
-                label={`Snap ${linkedSnapshots[0].identifier
+                label={`Snap ${(linkedSnapshots[0].identifier.split('/')
+                  ? linkedSnapshots[0].identifier.split('/')[1]
+                  : linkedSnapshots[0].identifier
+                )
                   .toString()
                   .slice(0, 4)}…`}
               />
