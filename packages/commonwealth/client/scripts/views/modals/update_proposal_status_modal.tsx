@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
-import { getProposal, getSpace, loadMultipleSpacesData, SnapshotProposal } from 'helpers/snapshot_utils';
+import {
+  getProposal,
+  getSpace,
+  loadMultipleSpacesData,
+  SnapshotProposal,
+} from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
 import type ChainEntity from '../../models/ChainEntity';
@@ -98,26 +103,24 @@ export const UpdateProposalStatusModal = ({
         tempSnapshotProposals,
         getInitialSnapshots(thread)
       );
-      
 
       if (toAdd.length > 0) {
         let enrichedSnapshot;
-        if(app.chain.meta.snapshot?.length === 1){
+        if (app.chain.meta.snapshot?.length === 1) {
           enrichedSnapshot = toAdd.map((sn) => ({
             id: `${app.chain.meta.snapshot[0]}/${sn.id}`,
-            title: sn.title
-          }))
-        } else{
+            title: sn.title,
+          }));
+        } else {
           loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
             for (const { space: _space, proposals } of data) {
               const matchingSnapshot = proposals.find(
                 (sn) => sn.id === toAdd[0].id
               );
-              console.log(matchingSnapshot)
               if (matchingSnapshot) {
                 enrichedSnapshot = {
-                  id: `${_space.id}/${toAdd[0].id}`
-                }
+                  id: `${_space.id}/${toAdd[0].id}`,
+                };
                 break;
               }
             }
