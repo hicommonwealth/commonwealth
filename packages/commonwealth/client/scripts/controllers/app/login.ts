@@ -296,24 +296,28 @@ export async function unlinkLogin(account: AddressInfo) {
 
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
+  let chainAddress;
+  const isCosmos = app.chain.meta.base === 'cosmos';
+  console.log('isCosmos', isCosmos);
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: [
-      new CosmosExtension({
-        rpcUrl: app.chain.meta.node.url,
-      }),
-    ],
+    extensions: isCosmos
+      ? [
+          new CosmosExtension({
+            rpcUrl: app.chain.meta.node.url,
+          }),
+        ]
+      : null,
   });
 
-  console.log('magic', magic);
-
-  const chainAddress = await magic.cosmos.changeAddress(
-    app.chain.meta.bech32Prefix
-  );
+  if (isCosmos) {
+    chainAddress = await magic.cosmos.changeAddress(
+      app.chain.meta.bech32Prefix
+    );
+  }
 
   console.log('chainAddress', chainAddress);
 
   const didToken = await magic.auth.loginWithMagicLink({ email });
-  console.log('didToken', didToken);
 
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,

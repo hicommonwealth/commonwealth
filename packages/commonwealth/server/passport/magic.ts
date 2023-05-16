@@ -1,4 +1,4 @@
-import { MagicUserMetadata, WalletType } from '@magic-sdk/admin';
+import { MagicUserMetadata } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -13,12 +13,6 @@ import type { ProfileAttributes } from '../models/profile';
 
 import '../types';
 import { createRole } from '../util/roles';
-
-export interface MagicWalletAPI {
-  network: string | null;
-  public_address: string | null;
-  wallet_type: string | null;
-}
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
@@ -40,20 +34,12 @@ export function initMagicAuth(models: DB) {
           chainAddress = req.body.address;
         }
 
-        const isCosmos = chain.base === 'cosmos';
         const registrationChain = chain;
 
         // fetch user data from magic backend
         let userMetadata: MagicUserMetadata;
         try {
-          // if (isCosmos) {
-          //   userMetadata = await magic.users.getMetadataByIssuerAndWallet(
-          //     user.issuer,
-          //     WalletType.COSMOS
-          //   );
-          // } else {
           userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
-          // }
         } catch (e) {
           return cb(
             new ServerError(
@@ -216,47 +202,20 @@ export function initMagicAuth(models: DB) {
           // migrate to magic if email already exists
           await sequelize.transaction(async (t) => {
             const existingAddress = userMetadata.publicAddress;
-            let newAddress;
-
-            if (isCosmos) {
-              // TODO: why don't API types match npm package?
-              // const cosmosAddress = userMetadata.wallets.find(
-              //   (wallet) =>
-              //     (wallet as unknown as MagicWalletAPI).wallet_type === 'COSMOS'
-              // );
-
-              newAddress = await models.Address.create(
-                {
-                  address: chainAddress,
-                  chain: chain.id,
-                  verification_token: 'MAGIC',
-                  verification_token_expires: null,
-                  verified: new Date(), // trust addresses from magic
-                  last_active: new Date(),
-                  user_id: existingUser.id,
-                  profile_id: (existingUser.Profiles[0] as ProfileAttributes)
-                    .id,
-                  wallet_id: WalletId.Magic,
-                },
-                { transaction: t }
-              );
-            } else {
-              newAddress = await models.Address.create(
-                {
-                  address: existingAddress,
-                  chain: 'ethereum',
-                  verification_token: 'MAGIC',
-                  verification_token_expires: null,
-                  verified: new Date(), // trust addresses from magic
-                  last_active: new Date(),
-                  user_id: existingUser.id,
-                  profile_id: (existingUser.Profiles[0] as ProfileAttributes)
-                    .id,
-                  wallet_id: WalletId.Magic,
-                },
-                { transaction: t }
-              );
-            }
+            const newAddress = await models.Address.create(
+              {
+                address: chainAddress ?? existingAddress,
+                chain: chain.id,
+                verification_token: 'MAGIC',
+                verification_token_expires: null,
+                verified: new Date(), // trust addresses from magic
+                last_active: new Date(),
+                user_id: existingUser.id,
+                profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
+                wallet_id: WalletId.Magic,
+              },
+              { transaction: t }
+            );
 
             await models.SsoToken.create(
               {
