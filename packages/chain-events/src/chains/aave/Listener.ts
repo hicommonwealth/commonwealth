@@ -145,6 +145,12 @@ export class Listener extends BaseListener<
   }
 
   protected async processBlock(event: RawEvent): Promise<void> {
+    const cwEvents: CWEvent[] = await this._processor.process(event);
+
+    for (const evt of cwEvents) {
+      await this.handleEvent(evt as CWEvent<IEventData>);
+    }
+
     const { blockNumber } = event;
     if (
       !this._lastCachedBlockNumber ||
@@ -153,11 +159,6 @@ export class Listener extends BaseListener<
       this._lastCachedBlockNumber = blockNumber;
     }
 
-    const cwEvents: CWEvent[] = await this._processor.process(event);
-
-    for (const evt of cwEvents) {
-      await this.handleEvent(evt as CWEvent<IEventData>);
-    }
   }
 
   public get options(): AaveListenerOptions {

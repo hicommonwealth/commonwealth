@@ -2,7 +2,7 @@
  * Generic handler that stores the event in the database.
  */
 import { addPrefix, factory } from 'common-common/src/logging';
-import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { AbstractRabbitMQController } from 'common-common/src/rabbitmq/types';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
 import { StatsDController } from 'common-common/src/statsd';
@@ -31,7 +31,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models: DB,
-    private readonly _rmqController: RabbitMQController,
+    private readonly _rmqController: AbstractRabbitMQController,
     private readonly _chain?: string,
     private readonly _filterConfig: StorageFilterConfig = {}
   ) {
@@ -113,6 +113,7 @@ export default class extends IEventHandler {
 
       return dbEvent;
     } else {
+      log.warn(`Duplicate event: ${eventKey}: ${JSON.stringify(eventData)}`);
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
 

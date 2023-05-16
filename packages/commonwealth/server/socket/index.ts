@@ -2,7 +2,7 @@
 import { createAdapter } from '@socket.io/redis-adapter';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { RabbitMQController } from 'common-common/src/rabbitmq';
-import { RascalSubscriptions } from 'common-common/src/rabbitmq';
+import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import { StatsDController } from 'common-common/src/statsd';
