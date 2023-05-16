@@ -32,7 +32,6 @@ import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 const { expect } = chai;
 chai.use(chaiHttp);
 
-// Trigger CI
 describe('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
