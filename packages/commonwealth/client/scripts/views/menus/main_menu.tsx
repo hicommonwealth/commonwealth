@@ -3,8 +3,12 @@ import React from 'react';
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { MenuItem } from '../components/component_kit/types';
+import useSidebarStore from 'state/ui/sidebar';
+import { MobileMenuName } from 'views/AppMobileMenus';
 
-export const getMainMenuItems = (): Array<MenuItem> => {
+export const getMainMenuItems = (
+  setMobileMenuName: (name: MobileMenuName) => void
+): Array<MenuItem> => {
   return [
     ...((app.activeChainId()
       ? [
@@ -12,10 +16,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             label: 'Create',
             iconLeft: 'plusCircle',
             iconRight: 'chevronRight',
-            onClick: () => {
-              app.mobileMenu = 'CreateContentMenu';
-              app.sidebarRedraw.emit('redraw');
-            },
+            onClick: () => setMobileMenuName('CreateContentMenu'),
           },
         ]
       : []) as Array<MenuItem>),
@@ -23,10 +24,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       label: 'Help',
       iconLeft: 'help',
       iconRight: 'chevronRight',
-      onClick: () => {
-        app.mobileMenu = 'HelpMenu';
-        app.sidebarRedraw.emit('redraw');
-      },
+      onClick: () => setMobileMenuName('HelpMenu'),
     },
     ...((app.isLoggedIn()
       ? [
@@ -36,10 +34,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             iconRight: 'chevronRight',
             type: 'notification',
             hasUnreads: !!app.user?.notifications.numUnread,
-            onClick: () => {
-              app.mobileMenu = 'NotificationsMenu';
-              app.sidebarRedraw.emit('redraw');
-            },
+            onClick: () => setMobileMenuName('NotificationsMenu'),
           },
         ]
       : []) as Array<MenuItem>),
@@ -47,5 +42,12 @@ export const getMainMenuItems = (): Array<MenuItem> => {
 };
 
 export const MainMenu = () => {
-  return <CWMobileMenu className="MainMenu" menuItems={getMainMenuItems()} />;
+  const { setMobileMenuName } = useSidebarStore();
+
+  return (
+    <CWMobileMenu
+      className="MainMenu"
+      menuItems={getMainMenuItems(setMobileMenuName)}
+    />
+  );
 };

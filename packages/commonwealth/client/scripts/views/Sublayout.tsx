@@ -10,6 +10,7 @@ import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import useForceRerender from 'hooks/useForceRerender';
+import useSidebarStore from 'state/ui/sidebar';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -24,6 +25,7 @@ const Sublayout = ({
   onScroll,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
+  const { menuVisible, mobileMenuName } = useSidebarStore();
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
@@ -58,7 +60,7 @@ const Sublayout = ({
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = app.sidebarToggled || !isWindowSmall;
+  const showSidebar = menuVisible || !isWindowSmall;
 
   return (
     <div className="Sublayout">
@@ -69,7 +71,7 @@ const Sublayout = ({
           <div className="body-and-sticky-headers-container">
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
-            {isWindowSmallInclusive && app.mobileMenu ? (
+            {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
               <div className="Body" onScroll={onScroll}>
