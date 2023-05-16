@@ -5,6 +5,7 @@ import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findAllRoles } from '../util/roles';
+import { getChainActivity } from './status';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -194,6 +195,8 @@ const deleteChain = async (
       });
     });
   });
+
+  getChainActivity.queryWithCacheOverride(models);
 
   return success(res, { result: 'success' });
 };

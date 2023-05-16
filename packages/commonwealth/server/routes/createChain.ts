@@ -27,6 +27,7 @@ import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { getChainActivity } from './status';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -478,6 +479,8 @@ const createChain = async (
     communityType: null,
     event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
   });
+
+  getChainActivity.queryWithCacheOverride(models);
 
   return success(res, {
     chain: chain.toJSON(),

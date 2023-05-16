@@ -11,6 +11,7 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findOneRole } from '../util/roles';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { getChainActivity } from './status';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -220,6 +221,8 @@ const updateChain = async (
   (BigInt.prototype as any).toJSON = function () {
     return this.toString();
   };
+
+  getChainActivity.queryWithCacheOverride(models);
 
   return success(res, { ...chain.toJSON(), snapshot });
 };
