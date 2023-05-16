@@ -6,7 +6,6 @@ import app from 'state';
 import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import { User } from './user';
-import { AnonymousUser } from './anonymous_user';
 
 type UserGalleryProps = {
   addressesCount?: number;
@@ -34,28 +33,15 @@ export const UserGallery = (props: UserGalleryProps) => {
       {users
         .slice(0, Math.min(userCount, maxUsers))
         .map((user: Account | AddressInfo) => {
-          if (
-            user.chain.id !== app.chain?.id &&
-            user.chain.id !== app.chain?.base
-          ) {
-            return (
-              <AnonymousUser
-                avatarOnly
-                avatarSize={40}
-                showAsDeleted
-                distinguishingKey={user.address.slice(user.address.length - 3)}
-              />
-            );
-          } else {
-            return (
-              <User
-                user={user}
-                avatarOnly
-                popover={popover}
-                avatarSize={avatarSize}
-              />
-            );
-          }
+          return (
+            <User
+              user={user}
+              avatarOnly
+              showAsDeleted
+              popover={popover}
+              avatarSize={avatarSize}
+            />
+          );
         })}
       {overflowUsers > 0 && (
         <div
