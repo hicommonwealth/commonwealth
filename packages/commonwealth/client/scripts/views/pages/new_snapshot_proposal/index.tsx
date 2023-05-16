@@ -110,7 +110,7 @@ export const NewSnapshotProposalForm = ({
 
       const initialForm: ThreadForm = {
         name: !thread ? '' : thread.title,
-        body: !thread ? '' : thread.body,
+        body: !thread ? '' : thread.plaintext,
         choices: ['Yes', 'No'],
         range: '5d',
         start: new Date().getTime(),
