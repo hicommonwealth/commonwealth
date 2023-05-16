@@ -216,10 +216,7 @@ const setupAppRoutes = (
     await renderProposal(scope, req, res);
   });
 
-  app.get('/:scope?/discussions', async (req, res) => {
-    const scope = req.params.scope;
-    await renderProposal(scope, req, res);
-  });
+  app.get('/:scope?/discussions', renderGeneralPage);
 
   app.get('/:scope?/discussion/:identifier', async (req, res) => {
     const scope = req.params.scope;
