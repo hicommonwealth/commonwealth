@@ -297,12 +297,12 @@ export async function unlinkLogin(account: AddressInfo) {
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
   let chainAddress;
-  const isCosmos = app.chain.meta.base === ChainBase.CosmosSDK;
+  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: isCosmos
       ? [
           new CosmosExtension({
-            rpcUrl: app.chain.meta.node.url,
+            rpcUrl: app.chain.meta?.node?.url,
           }),
         ]
       : null,
