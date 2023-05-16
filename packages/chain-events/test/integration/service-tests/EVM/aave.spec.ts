@@ -14,12 +14,21 @@ import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import {eventMatch, findEvent, getEvmSecondsAndBlocks, waitUntilBlock} from '../../../util';
+import {
+  eventMatch,
+  findEvent,
+  getEvmSecondsAndBlocks,
+  waitUntilBlock,
+} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
-import {Api, EventKind} from "../../../../src/chains/aave/types";
-import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
-import { Listener } from "../../../../src";
-import {Processor, StorageFetcher, Subscriber} from "../../../../src/chains/aave";
+import { Api, EventKind } from '../../../../src/chains/aave/types';
+import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
+import { Listener } from '../../../../src';
+import {
+  Processor,
+  StorageFetcher,
+  Subscriber,
+} from '../../../../src/chains/aave';
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -35,13 +44,7 @@ describe('Integration tests for Aave', () => {
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
-  let listener: Listener<
-    Api,
-    StorageFetcher,
-    Processor,
-    Subscriber,
-    EventKind
-  >
+  let listener: Listener<Api, StorageFetcher, Processor, Subscriber, EventKind>;
   const contract = new aaveGovernor();
   const chain_id = 'ganache-fork-aave';
   const chain = {
@@ -65,7 +68,10 @@ describe('Integration tests for Aave', () => {
   describe('Tests the Aave event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
-      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(
+        rmq,
+        chain
+      );
       listener = listeners[chain_id] as Listener<
         Api,
         StorageFetcher,
@@ -100,7 +106,7 @@ describe('Integration tests for Aave', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
-      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      const { secs, blocks } = getEvmSecondsAndBlocks(3.5);
       const currentBlock = await sdk.getBlock();
       await sdk.advanceTime(String(secs), blocks);
       await sdk.awaitBlock(currentBlock.number + blocks);
@@ -125,7 +131,7 @@ describe('Integration tests for Aave', () => {
 
     it('Should capture proposal queued events', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
-      await sdk.advanceTime(String(secs), blocks)
+      await sdk.advanceTime(String(secs), blocks);
       const { block } = await sdk.queueProposal(proposalId, 'aave');
 
       await waitUntilBlock(block, listener);
@@ -148,7 +154,7 @@ describe('Integration tests for Aave', () => {
 
     it('Should capture proposal executed events', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
-      await sdk.advanceTime(String(secs), blocks)
+      await sdk.advanceTime(String(secs), blocks);
       const { block } = await sdk.executeProposal(proposalId, 'aave');
       await waitUntilBlock(block, listener);
 
@@ -222,13 +228,17 @@ describe('Integration tests for Aave', () => {
         propCreatedEvent.entity_id
       );
 
-      expect(rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length).to.equal(1);
-      expect(rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]).to.deep.equal({
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length
+      ).to.equal(1);
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]
+      ).to.deep.equal({
         author: relatedEntity.author,
         ce_id: relatedEntity.id,
         chain_id,
         entity_type_id: relatedEntity.type_id,
-        cud: 'create'
+        cud: 'create',
       });
     });
 
@@ -237,7 +247,11 @@ describe('Integration tests for Aave', () => {
         where: {
           chain: chain_id,
           event_data: {
-            [Op.and]: [Sequelize.literal(`event_data->>'kind' = '${EventKind.VoteEmitted}'`)],
+            [Op.and]: [
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.VoteEmitted}'`
+              ),
+            ],
           },
           block_number: events[EventKind.VoteEmitted].blockNumber,
         },
@@ -253,7 +267,9 @@ describe('Integration tests for Aave', () => {
           chain: chain_id,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = '${EventKind.ProposalQueued}'`),
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.ProposalQueued}'`
+              ),
             ],
           },
           block_number: events[EventKind.ProposalQueued].blockNumber,
@@ -270,7 +286,9 @@ describe('Integration tests for Aave', () => {
           chain: chain_id,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = '${EventKind.ProposalExecuted}'`),
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.ProposalExecuted}'`
+              ),
             ],
           },
           block_number: events[EventKind.ProposalExecuted].blockNumber,
@@ -382,10 +400,10 @@ describe('Integration tests for Aave', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id }
+      where: { chain: chain_id },
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id }
+      where: { chain: chain_id },
     });
   });
 });

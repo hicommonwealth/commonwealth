@@ -105,7 +105,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
-      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      const { secs, blocks } = getEvmSecondsAndBlocks(3.5);
       const currentBlock = await sdk.getBlock();
       console.log(
         `Valid voting block range: ${proposalCreatedBlockNum + 13140} - ${
