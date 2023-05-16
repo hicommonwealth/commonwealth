@@ -510,6 +510,7 @@ class ThreadsController {
         const result = this.modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._listingStore.add(result);
+        this.store.add(result);
         return result;
       },
       error: (err) => {

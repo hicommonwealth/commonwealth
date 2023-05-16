@@ -12,6 +12,7 @@ import { ThreadPreview } from './thread_preview';
 import { ThreadActionType } from '../../../../../shared/types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ThreadStage } from 'models/types';
+import Thread from 'models/Thread';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -69,6 +70,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
   };
 
+  const sortPinned = (threads: Thread[]) => {
+    return [...threads].sort((a, b) =>
+      a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
+    );
+  };
+
   // Event binding for actions that trigger a thread update (e.g. topic or stage change)
   useEffect(() => {
     app.threadUpdateEmitter.on('threadUpdated', (data) =>
@@ -112,14 +119,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           }
 
           if (finalThreads.length >= 20) {
-            setThreads(finalThreads);
+            setThreads(sortPinned(finalThreads));
             setInitializing(false);
             return;
           }
         }
         // else show all threads
         else {
-          setThreads(foundThreadsForChain);
+          setThreads(sortPinned(foundThreadsForChain));
           setInitializing(false);
           return;
         }
@@ -130,7 +137,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         .loadNextPage({ topicName, stageName, includePinnedThreads: true })
         .then((t) => {
           // Fetch first 20 + unpinned threads
-          setThreads(t);
+          setThreads(sortPinned(t));
           setInitializing(false);
         });
     });
@@ -158,7 +165,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         }
         return null;
       });
-      return finalThreads;
+      return sortPinned(finalThreads);
     });
   }, [stageName, topicName]);
 
