@@ -12,5 +12,23 @@ export default textarea;
 type Story = StoryObj<typeof textarea>;
 
 export const Textarea: Story = {
-  render: () => <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
+  args: {
+    label: "Text area",
+    placeholder: "Type here",
+  },
+  argTypes: {
+    label: {
+      control: { type: "text" },
+    },
+    placeholder: {
+      control: { type: "text" },
+    },
+  },
+  render: ({...args}) => (
+    <CWTextArea
+      name="Textarea"
+      label={args.label}
+      placeholder={args.placeholder}
+    />
+  ),
 };
