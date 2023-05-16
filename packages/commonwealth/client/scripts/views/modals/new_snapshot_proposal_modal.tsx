@@ -62,7 +62,7 @@ export const NewSnapshotProposalModal = ({
           </>
         ) : (
           <NewSnapshotProposalForm
-            snapshotId={snapshotId}
+            snapshotId={selectedSnapshotId}
             onSave={onSave}
             onModalClose={onModalClose}
           />

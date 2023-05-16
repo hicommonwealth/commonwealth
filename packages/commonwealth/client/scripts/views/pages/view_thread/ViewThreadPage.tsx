@@ -518,6 +518,27 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setThread(newThread);
   };
 
+  const handleNewSnapshotChange = ({
+    id,
+    snapshot_title,
+  }: {
+    id: string;
+    snapshot_title: string;
+  }) => {
+    const newLink: Link = {
+      source: LinkSource.Snapshot,
+      identifier: id,
+      title: snapshot_title,
+    };
+
+    const newThread = {
+      ...thread,
+      links: [...thread.links, newLink],
+    } as Thread;
+
+    setThread(newThread);
+  };
+
   const handleDeleteThread = () => {
     openConfirmation({
       title: 'Delete Thread',
@@ -803,7 +824,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <SnapshotCreationCard
                           thread={thread}
                           allowSnapshotCreation={isAuthor || isAdminOrMod}
-                          onChangeHandler={handleLinkedProposalChange}
+                          onChangeHandler={handleNewSnapshotChange}
                         />
                       </div>
                     ),

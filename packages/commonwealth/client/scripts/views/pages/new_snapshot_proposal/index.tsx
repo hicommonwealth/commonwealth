@@ -28,11 +28,17 @@ import {
 import { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
 
-type NewSnapshotProposalPageProps = {
+type NewSnapshotProposalFormProps = {
   snapshotId: string;
+  onSave?: (snapshotInfo: { id: string; title: string }) => void;
+  onModalClose?: () => void;
 };
 
-export const NewSnapshotProposalForm = ({ snapshotId }) => {
+export const NewSnapshotProposalForm = ({
+  snapshotId,
+  onSave,
+  onModalClose,
+}: NewSnapshotProposalFormProps) => {
   const navigate = useCommonNavigate();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -68,11 +74,15 @@ export const NewSnapshotProposalForm = ({ snapshotId }) => {
       setIsSaving(true);
 
       const content = JSON.stringify(contentDelta);
-      await createNewProposal(form, content, author, space);
+      const response = await createNewProposal(form, content, author, space);
 
       clearLocalStorage();
       notifySuccess('Snapshot Created!');
       navigate(`/snapshot/${space.id}`);
+
+      if (onSave) {
+        onSave({ id: response.id, title: response.title }); // Pass relevant information from the created proposal
+      }
     } catch (err) {
       notifyError(capitalize(err.message));
     } finally {

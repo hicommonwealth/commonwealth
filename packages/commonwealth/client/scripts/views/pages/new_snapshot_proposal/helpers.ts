@@ -61,7 +61,8 @@ export const createNewProposal = async (
     metadata: JSON.stringify({}),
   };
 
-  await createProposal(author.address, proposalPayload);
+  const resp = await createProposal(author.address, proposalPayload);
   await app.user.notifications.refresh();
   await app.snapshot.refreshProposals();
+  return resp;
 };
