@@ -222,7 +222,7 @@ const updateChain = async (
     return this.toString();
   };
 
-  getChainActivity.queryWithCacheOverride(models);
+  await getChainActivity.queryWithCacheOverride(models);
 
   return success(res, { ...chain.toJSON(), snapshot });
 };

@@ -480,7 +480,7 @@ const createChain = async (
     event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
   });
 
-  getChainActivity.queryWithCacheOverride(models);
+  await getChainActivity.queryWithCacheOverride(models);
 
   return success(res, {
     chain: chain.toJSON(),

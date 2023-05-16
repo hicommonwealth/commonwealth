@@ -40,7 +40,7 @@ const createChainNode = async (
     bech32: req.body.bech32,
   });
 
-  getChainActivity.queryWithCacheOverride(models);
+  await getChainActivity.queryWithCacheOverride(models);
   return success(res, { node_id: newChainNode.id });
 };
 

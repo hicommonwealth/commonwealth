@@ -196,7 +196,7 @@ const deleteChain = async (
     });
   });
 
-  getChainActivity.queryWithCacheOverride(models);
+  await getChainActivity.queryWithCacheOverride(models);
 
   return success(res, { result: 'success' });
 };
