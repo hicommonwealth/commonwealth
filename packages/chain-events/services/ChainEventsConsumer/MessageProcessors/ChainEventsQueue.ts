@@ -9,7 +9,7 @@ export type Ithis = {
 };
 
 /**
- * This function ingests chain-events from the RabbitMQ {@link RascalSubscriptions.ChainEvents} subscription and
+ * This function ingests chain-events from the RabbitMQ subscription and
  * processes each of them using the given handlers. Event handlers mainly update the database and republish messages
  * to other queues.
  * @param event {CWEvent} The chain-event to pass to all the handlers
