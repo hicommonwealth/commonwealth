@@ -518,18 +518,31 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setThread(newThread);
   };
 
-  const handleNewSnapshotChange = ({
+  const handleNewSnapshotChange = async ({
     id,
     snapshot_title,
   }: {
     id: string;
     snapshot_title: string;
   }) => {
+    console.log('new snapshot change');
     const newLink: Link = {
       source: LinkSource.Snapshot,
       identifier: id,
       title: snapshot_title,
     };
+    console.log('new link', newLink);
+
+    const toAdd = [newLink]; // Add this line to create an array with the new link
+
+    if (toAdd.length > 0) {
+      const updatedThread = await app.threads.addLinks({
+        threadId: thread.id,
+        links: toAdd,
+      });
+
+      const links = updatedThread.links;
+    }
 
     const newThread = {
       ...thread,
@@ -538,7 +551,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
     setThread(newThread);
   };
-
   const handleDeleteThread = () => {
     openConfirmation({
       title: 'Delete Thread',
