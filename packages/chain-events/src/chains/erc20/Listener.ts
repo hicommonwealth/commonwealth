@@ -123,10 +123,18 @@ export class Listener extends BaseListener<
     tokenName?: string
   ): Promise<void> {
     const cwEvents: CWEvent[] = await this._processor.process(event, tokenName);
-
+    console.log('cwEvents', cwEvents);
     // process events in sequence
     for (const e of cwEvents) {
       await this.handleEvent(e as CWEvent);
+    }
+
+    const { blockNumber } = event;
+    if (
+      !this._lastCachedBlockNumber ||
+      blockNumber > this._lastCachedBlockNumber
+    ) {
+      this._lastCachedBlockNumber = blockNumber;
     }
   }
 

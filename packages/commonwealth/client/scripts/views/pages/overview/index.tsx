@@ -70,7 +70,6 @@ const OverviewPage = () => {
   const topicSummaryRows: Array<{
     monthlyThreads: Array<Thread>;
     pinnedThreads: Array<Thread>;
-    allThreadsCount: number;
     topic: Topic;
   }> = topicsSorted.map((topic) => {
     const monthlyThreads = allMonthlyThreads.filter(
@@ -79,15 +78,11 @@ const OverviewPage = () => {
     const pinnedThreads = allPinnedThreads.filter(
       (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
-    const allThreadsCount = allThreads.filter(
-      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
-    ).length;
 
     return {
       monthlyThreads,
       pinnedThreads,
       topic,
-      allThreadsCount: allThreadsCount,
     };
   });
 

@@ -1,10 +1,10 @@
 import React from 'react';
 
-import app from 'state';
 import { CreateContentMenu } from './menus/create_content_menu';
 import { HelpMenu } from './menus/help_menu';
 import { MainMenu } from './menus/main_menu';
 import { NotificationsMenu } from './menus/notifications_menu';
+import useSidebarStore from 'state/ui/sidebar';
 
 const mobileMenuLookup = {
   CreateContentMenu,
@@ -16,7 +16,9 @@ const mobileMenuLookup = {
 export type MobileMenuName = keyof typeof mobileMenuLookup;
 
 export const AppMobileMenus = () => {
-  const ActiveMenu = mobileMenuLookup[app.mobileMenu];
+  const { mobileMenuName } = useSidebarStore();
+
+  const ActiveMenu = mobileMenuLookup[mobileMenuName];
 
   return <ActiveMenu />;
 };
