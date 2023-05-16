@@ -2,7 +2,7 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import type { WalletId } from 'common-common/src/types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
@@ -297,7 +297,7 @@ export async function unlinkLogin(account: AddressInfo) {
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
   let chainAddress;
-  const isCosmos = app.chain.meta.base === 'cosmos';
+  const isCosmos = app.chain.meta.base === ChainBase.CosmosSDK;
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: isCosmos
       ? [
