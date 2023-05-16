@@ -43,6 +43,7 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
+import { TemplateActionCard } from './template_action_card';
 import {
   ExternalLink,
   ThreadAuthor,
@@ -475,6 +476,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
+  const showTemplateOptions = isAuthor || isAdminOrMod;
+
   const canComment =
     app.user.activeAccount ||
     (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
@@ -817,6 +820,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showTemplateOptions
+              ? [
+                  {
+                    label: 'Template',
+                    item: (
+                      <div className="cards-column">
+                        <TemplateActionCard
+                          onButtonClick={() => setIsModalOpen(true)}
+                        />
                       </div>
                     ),
                   },
