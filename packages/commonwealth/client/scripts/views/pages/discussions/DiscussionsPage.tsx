@@ -70,8 +70,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
   };
 
-  const sortPinned = (threads: Thread[]) => {
-    return [...threads].sort((a, b) =>
+  const sortPinned = (t: Thread[]) => {
+    return [...t].sort((a, b) =>
       a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
     );
   };
