@@ -180,6 +180,8 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+import { cacheDecorator } from 'common-common/src/cacheDecorator';
+import { defaultUserKeyGenerator } from 'common-common/src/cacheKeyUtils';
 
 function setupRouter(
   endpoint: string,
@@ -770,6 +772,7 @@ function setupRouter(
   router.post(
     '/viewUserActivity',
     passport.authenticate('jwt', { session: false }),
+    cacheDecorator.cacheMiddleware(120, defaultUserKeyGenerator),
     viewUserActivity.bind(this, models)
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
