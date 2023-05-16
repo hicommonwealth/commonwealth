@@ -23,15 +23,14 @@ export function initMagicAuth(models: DB) {
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         // determine login location
-        let chain, error, chainAddress;
+        let chain, error, registrationChainAddress;
         if (req.body.chain || req.body.community) {
           [chain, error] = await validateChain(models, req.body);
-          console.log('chain', chain);
           if (error) return cb(error);
         }
 
         if (req.body.address) {
-          chainAddress = req.body.address;
+          registrationChainAddress = req.body.address;
         }
 
         const registrationChain = chain;
@@ -79,7 +78,6 @@ export function initMagicAuth(models: DB) {
 
         // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address TODO
         if (!existingUser) {
-          const chainId = registrationChain?.id ?? 'ethereum';
           const ethAddress = userMetadata.publicAddress;
           const result = await sequelize.transaction(async (t) => {
             // create new user and unverified address if doesn't exist
@@ -92,11 +90,11 @@ export function initMagicAuth(models: DB) {
               { transaction: t }
             );
 
-            // create an address on their selected chain
-            const newAddress = await models.Address.create(
+            // create a default Eth address
+            const newPublicAddress = await models.Address.create(
               {
-                address: chainAddress ?? ethAddress,
-                chain: chainId,
+                address: ethAddress,
+                chain: 'ethereum',
                 verification_token: 'MAGIC',
                 verification_token_expires: null,
                 verified: new Date(), // trust addresses from magic
@@ -107,14 +105,42 @@ export function initMagicAuth(models: DB) {
               },
               { transaction: t }
             );
+
+            // TODO: need this?
             await createRole(
               models,
-              newAddress.id,
-              chainId,
+              newPublicAddress.id,
+              'ethereum',
               'member',
               false,
               t
             );
+
+            if (registrationChainAddress) {
+              // create an address on their selected chain
+              const newRegistrationChainAddress = await models.Address.create(
+                {
+                  address: registrationChainAddress,
+                  chain: registrationChain.id,
+                  verification_token: 'MAGIC',
+                  verification_token_expires: null,
+                  verified: new Date(), // trust addresses from magic
+                  last_active: new Date(),
+                  user_id: newUser.id,
+                  profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
+                  wallet_id: WalletId.Magic,
+                },
+                { transaction: t }
+              );
+              await createRole(
+                models,
+                newRegistrationChainAddress.id,
+                registrationChain.id,
+                'member',
+                false,
+                t
+              );
+            }
 
             // Automatically create subscription to their own mentions
             await models.Subscription.create(
@@ -154,7 +180,7 @@ export function initMagicAuth(models: DB) {
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newAddress.id, // always ethereum address TODO
+                address_id: newPublicAddress.id, // always ethereum address TODO
                 created_at: new Date(),
                 updated_at: new Date(),
               },
@@ -201,11 +227,11 @@ export function initMagicAuth(models: DB) {
         } else {
           // migrate to magic if email already exists
           await sequelize.transaction(async (t) => {
-            const existingAddress = userMetadata.publicAddress;
-            const newAddress = await models.Address.create(
+            const ethAddress = userMetadata.publicAddress;
+            const newPublicAddress = await models.Address.create(
               {
-                address: chainAddress ?? existingAddress,
-                chain: chain.id,
+                address: ethAddress,
+                chain: 'ethereum',
                 verification_token: 'MAGIC',
                 verification_token_expires: null,
                 verified: new Date(), // trust addresses from magic
@@ -217,11 +243,29 @@ export function initMagicAuth(models: DB) {
               { transaction: t }
             );
 
+            if (registrationChainAddress) {
+              await models.Address.create(
+                {
+                  address: registrationChainAddress,
+                  chain: registrationChain.id,
+                  verification_token: 'MAGIC',
+                  verification_token_expires: null,
+                  verified: new Date(), // trust addresses from magic
+                  last_active: new Date(),
+                  user_id: existingUser.id,
+                  profile_id: (existingUser.Profiles[0] as ProfileAttributes)
+                    .id,
+                  wallet_id: WalletId.Magic,
+                },
+                { transaction: t }
+              );
+            }
+
             await models.SsoToken.create(
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newAddress.id,
+                address_id: newPublicAddress.id,
                 created_at: new Date(),
                 updated_at: new Date(),
               },
