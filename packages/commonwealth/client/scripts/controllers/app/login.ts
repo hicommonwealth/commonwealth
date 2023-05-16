@@ -298,7 +298,6 @@ export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
   let chainAddress;
   const isCosmos = app.chain.meta.base === 'cosmos';
-  console.log('isCosmos', isCosmos);
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: isCosmos
       ? [
@@ -315,10 +314,7 @@ export async function loginWithMagicLink(email: string) {
     );
   }
 
-  console.log('chainAddress', chainAddress);
-
   const didToken = await magic.auth.loginWithMagicLink({ email });
-
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {

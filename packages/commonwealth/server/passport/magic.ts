@@ -1,4 +1,4 @@
-import { MagicUserMetadata } from '@magic-sdk/admin';
+import type { MagicUserMetadata } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -76,7 +76,7 @@ export function initMagicAuth(models: DB) {
           return cb(new AppError('Unsupported magic chain.'));
         }
 
-        // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address TODO
+        // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address
         if (!existingUser) {
           const ethAddress = userMetadata.publicAddress;
           const result = await sequelize.transaction(async (t) => {
@@ -180,7 +180,7 @@ export function initMagicAuth(models: DB) {
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newPublicAddress.id, // always ethereum address TODO
+                address_id: newPublicAddress.id, // always ethereum address
                 created_at: new Date(),
                 updated_at: new Date(),
               },
@@ -265,7 +265,7 @@ export function initMagicAuth(models: DB) {
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newPublicAddress.id,
+                address_id: newPublicAddress.id, // always ethereum address
                 created_at: new Date(),
                 updated_at: new Date(),
               },
