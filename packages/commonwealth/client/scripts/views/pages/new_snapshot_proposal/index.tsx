@@ -32,9 +32,7 @@ type NewSnapshotProposalPageProps = {
   snapshotId: string;
 };
 
-export const NewSnapshotProposalPageComponent = ({
-  snapshotId,
-}: NewSnapshotProposalPageProps) => {
+export const NewSnapshotProposalForm = ({ snapshotId }) => {
   const navigate = useCommonNavigate();
 
   const [form, setForm] = useState<ThreadForm | null>(null);
@@ -139,7 +137,8 @@ export const NewSnapshotProposalPageComponent = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!form || !snapshotScoresFetched) return <PageLoading />;
+  if (!form || !snapshotScoresFetched) return <CWSpinner />;
+  if (!space) return null;
 
   const author = app.user.activeAccount;
 
@@ -165,88 +164,100 @@ export const NewSnapshotProposalPageComponent = ({
       (minScoreFromSpace > 0 && userScore > minScoreFromSpace) ||
       isMember);
 
+  // Check if the space object is not null before rendering the form
+
+  return (
+    <div className="NewSnapshotProposalForm">
+      <CWText type="h3" fontWeight="medium">
+        New Snapshot Proposal
+      </CWText>
+      {space.filters?.onlyMembers && !isMember && (
+        <CWText>
+          You need to be a member of the space in order to submit a proposal.
+        </CWText>
+      )}
+      {showScoreWarning ? (
+        <CWText>
+          You need to have a minimum of {space.filters.minScore} {space.symbol}{' '}
+          in order to submit a proposal.
+        </CWText>
+      ) : (
+        <CWSpinner />
+      )}
+      <CWTextInput
+        label="Question/Proposal"
+        placeholder="Should 0xMaki be our new Mayor?"
+        onInput={(e) => {
+          setForm({
+            ...form,
+            name: e.target.value,
+          });
+          localStorage.setItem(
+            `${app.activeChainId()}-new-snapshot-proposal-name`,
+            form.name
+          );
+        }}
+        defaultValue={form.name}
+      />
+      {form.choices.map((_, idx) => {
+        return (
+          <CWTextInput
+            key={`choice-${idx}`}
+            label={`Choice ${idx + 1}`}
+            placeholder={
+              idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
+            }
+            onInput={(e) => {
+              setForm({
+                ...form,
+                choices: form.choices.map((choice, i) =>
+                  i === idx ? e.target.value : choice
+                ),
+              });
+            }}
+            iconRight={
+              idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined
+            }
+            iconRightonClick={() => {
+              setForm({
+                ...form,
+                choices: form.choices.slice(0, -1),
+              });
+            }}
+          />
+        );
+      })}
+      <CWButton
+        iconLeft="plus"
+        label="Add voting choice"
+        onClick={() => {
+          setForm({
+            ...form,
+            choices: form.choices.concat(`Option ${form.choices.length + 1}`),
+          });
+        }}
+      />
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+        placeholder={'What is your proposal?'}
+      />
+      <CWButton
+        label="Publish"
+        disabled={!author || isSaving || !isValid}
+        onClick={handlePublish}
+      />
+    </div>
+  );
+};
+
+const NewSnapshotProposalPageComponent = ({
+  snapshotId,
+}: NewSnapshotProposalPageProps) => {
   return (
     <Sublayout>
       <div className="NewSnapshotProposalPage">
-        <CWText type="h3" fontWeight="medium">
-          New Snapshot Proposal
-        </CWText>
-        {space.filters?.onlyMembers && !isMember && (
-          <CWText>
-            You need to be a member of the space in order to submit a proposal.
-          </CWText>
-        )}
-        {showScoreWarning ? (
-          <CWText>
-            You need to have a minimum of {space.filters.minScore}{' '}
-            {space.symbol} in order to submit a proposal.
-          </CWText>
-        ) : (
-          <CWSpinner />
-        )}
-        <CWTextInput
-          label="Question/Proposal"
-          placeholder="Should 0xMaki be our new Mayor?"
-          onInput={(e) => {
-            setForm({
-              ...form,
-              name: e.target.value,
-            });
-            localStorage.setItem(
-              `${app.activeChainId()}-new-snapshot-proposal-name`,
-              form.name
-            );
-          }}
-          defaultValue={form.name}
-        />
-        {form.choices.map((_, idx) => {
-          return (
-            <CWTextInput
-              key={`choice-${idx}`}
-              label={`Choice ${idx + 1}`}
-              placeholder={
-                idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
-              }
-              onInput={(e) => {
-                setForm({
-                  ...form,
-                  choices: form.choices.map((choice, i) =>
-                    i === idx ? e.target.value : choice
-                  ),
-                });
-              }}
-              iconRight={
-                idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined
-              }
-              iconRightonClick={() => {
-                setForm({
-                  ...form,
-                  choices: form.choices.slice(0, -1),
-                });
-              }}
-            />
-          );
-        })}
-        <CWButton
-          iconLeft="plus"
-          label="Add voting choice"
-          onClick={() => {
-            setForm({
-              ...form,
-              choices: form.choices.concat(`Option ${form.choices.length + 1}`),
-            });
-          }}
-        />
-        <ReactQuillEditor
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-          placeholder={'What is your proposal?'}
-        />
-        <CWButton
-          label="Publish"
-          disabled={!author || isSaving || !isValid}
-          onClick={handlePublish}
-        />
+        <NewSnapshotProposalForm snapshotId={snapshotId} />
       </div>
     </Sublayout>
   );

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
-import { NewSnapshotProposalPageComponent } from '../new_snapshot_proposal';
+import { NewSnapshotProposalForm } from '../new_snapshot_proposal';
 import { Modal } from '../../components/component_kit/cw_modal';
 
 import 'pages/view_thread/snapshot_creation_card.scss';
@@ -45,8 +45,8 @@ export const SnapshotCreationCard = ({
       />
       <Modal
         content={
-          <NewSnapshotProposalPageComponent
-            thread={thread}
+          <NewSnapshotProposalForm
+            snapshotId={thread}
             onSave={onChangeHandler}
             onModalClose={() => setIsModalOpen(false)}
           />
