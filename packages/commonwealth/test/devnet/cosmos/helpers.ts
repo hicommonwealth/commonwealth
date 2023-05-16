@@ -25,7 +25,7 @@ import {
   getCompletedProposalsV1,
 } from 'controllers/chain/cosmos/gov/v1/utils-v1';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from 'chain-events/src/chain-bases/cosmos/types';
 
 const mnemonic =
   'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';

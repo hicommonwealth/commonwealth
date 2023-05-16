@@ -6,7 +6,7 @@ import type {
   RuntimeVersion,
 } from '@polkadot/types/interfaces';
 
-import { Poller } from '../../../src/chains/substrate/poller';
+import { Poller } from 'chain-events/src/chain-bases/substrate/poller';
 
 import { constructFakeApi } from './testUtil';
 

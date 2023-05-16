@@ -9,7 +9,7 @@ import {
   StorageFetcher,
   Subscriber,
   Listener,
-} from '../../../src/chains/substrate';
+} from 'chain-events/src/chain-bases/substrate';
 import { networkUrls } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 

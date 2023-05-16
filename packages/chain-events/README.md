@@ -214,7 +214,7 @@ async function subscribe(url) {
 ```
 
 Alternatively, the individual `Subscriber`, `Poller`, `StorageFetcher`, and `Processor` objects can be accessed directly on the `SubstrateEvents` object, and
-can be set up directly. For an example of this, see the initialization procedure in [subscribeFunc.ts](src/chains/substrate/subscribeFunc.ts).
+can be set up directly. For an example of this, see the initialization procedure in [subscribeFunc.ts](src/chain-bases/substrate/subscribeFunc.ts).
 
 ### Class Details
 
@@ -230,7 +230,7 @@ Each chain implements several abstract classes, described in [interfaces.ts](./s
 - `Subscriber` exposes a `subscribe()` method, which listens to the chain via the API and constructs a synthetic `Block` type when events occur, containing necessary data for later processing.
 - `Poller` exposes a `poll()` method, which attempts to fetch a range of past blocks and returns an Array of synthetic `Block`s. This is used for "catching up" on past events.
 - `StorageFetcher` exposes a `fetch()` method, which queries chain storage and constructs "fake" `Block`s, that represent what the original events may have looked like. This is used to quickly catch up on stateful Chain Entities from chains that prune past blocks (as most do).
-- `Processor` exposes a `process()` method, which takes a synthetic `Block` and attempts to convert it into a `CWEvent` (aka a ChainEvent), by running it through various "filters", found in the [filters](src/chains/substrate/filters) directory. The primary filter types used are as follows:
+- `Processor` exposes a `process()` method, which takes a synthetic `Block` and attempts to convert it into a `CWEvent` (aka a ChainEvent), by running it through various "filters", found in the [filters](src/chain-bases/substrate/filters) directory. The primary filter types used are as follows:
   - `ParseType` uses data from the chain to detect the ChainEvent kind of a `Block`. It is used to quickly filter out blocks that do not represent any kind of ChainEvent.
   - `Enrich` uses the API to query additional data about a ChainEvent that did not appear in the original `Block`, and constructs the final `CWEvent` object. This is used because many "events" on chains provide only minimal info, which we may want to augment for application purposes.
   - Two other filters exist, which are not used by the `Processor`, but may be useful in an application:

@@ -1,6 +1,6 @@
 import * as chai from 'chai';
 
-import { Label, Types } from '../../../src/chains/erc721';
+import { Label, Types } from '../../../src/chain-bases/EVM/erc721';
 
 const { assert } = chai;
 

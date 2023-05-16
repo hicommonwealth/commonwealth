@@ -5,7 +5,7 @@ import type {
   RuntimeVersion,
 } from '@polkadot/types/interfaces';
 
-import { Subscriber } from '../../../src/chains/substrate/subscriber';
+import { Subscriber } from 'chain-events/src/chain-bases/substrate/subscriber';
 
 import { constructFakeApi } from './testUtil';
 

@@ -2,9 +2,12 @@ import chai from 'chai';
 import { BigNumber, utils } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
-import { StorageFetcher } from '../../../src/chains/compound/storageFetcher';
-import type { RawEvent } from '../../../src/chains/compound/types';
-import { EventKind, ProposalState } from '../../../src/chains/compound/types';
+import { StorageFetcher } from 'chain-events/src/chain-bases/EVM/compound/storageFetcher';
+import type { RawEvent } from 'chain-events/src/chain-bases/EVM/compound/types';
+import {
+  EventKind,
+  ProposalState,
+} from 'chain-events/src/chain-bases/EVM/compound/types';
 import type { GovernorAlpha } from '../../../src/contractTypes';
 
 const { assert } = chai;

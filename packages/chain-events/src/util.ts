@@ -11,34 +11,34 @@ import type {
   IChainEventKind,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
-import { Listener as SubstrateListener } from './chains/substrate/Listener';
-import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
-import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
+import { Listener as SubstrateListener } from 'chain-events/src/chain-bases/substrate/Listener';
+import { Title as SubstrateTitle } from 'chain-events/src/chain-bases/substrate/filters/titler';
+import { Label as SubstrateLabel } from 'chain-events/src/chain-bases/substrate/filters/labeler';
 import {
   Listener as CompoundListener,
   Title as CompoundTitle,
   Label as CompoundLabel,
-} from './chains/compound';
+} from 'chain-bases/EVM/compound';
 import {
   Listener as Erc20Listener,
   Title as Erc20Title,
   Label as Erc20Label,
-} from './chains/erc20';
+} from 'chain-bases/EVM/erc20';
 import {
   Listener as Erc721Listener,
   Title as Erc721Title,
   Label as Erc721Label,
-} from './chains/erc721';
+} from 'chain-bases/EVM/erc721';
 import {
   Listener as AaveListener,
   Title as AaveTitle,
   Label as AaveLabel,
-} from './chains/aave';
+} from 'chain-bases/EVM/aave';
 import {
   Listener as CosmosListener,
   Title as CosmosTitle,
   Label as CosmosLabel,
-} from './chains/cosmos';
+} from 'chain-events/src/chain-bases/cosmos';
 import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
 

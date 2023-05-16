@@ -7,9 +7,9 @@ import type {
 import BN from 'bn.js';
 
 import { SupportedNetwork } from '../../../src';
-import { Processor } from '../../../src/chains/substrate/processor';
-import type { ISlash } from '../../../src/chains/substrate/types';
-import { EventKind } from '../../../src/chains/substrate/types';
+import { Processor } from 'chain-events/src/chain-bases/substrate/processor';
+import type { ISlash } from 'chain-events/src/chain-bases/substrate/types';
+import { EventKind } from 'chain-events/src/chain-bases/substrate/types';
 
 import { constructFakeApi } from './testUtil';
 

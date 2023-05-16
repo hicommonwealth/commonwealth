@@ -8,7 +8,7 @@ import {
   StorageFetcher,
   Subscriber,
   Listener,
-} from '../../../src/chains/aave';
+} from '../../../src/chain-bases/EVM/aave';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 

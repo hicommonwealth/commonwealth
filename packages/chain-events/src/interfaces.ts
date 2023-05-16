@@ -6,16 +6,16 @@ import type { ApiPromise as SubstrateApi } from '@polkadot/api';
 
 import type { ChainEventInstance } from '../services/database/models/chain_event';
 
-import * as SubstrateTypes from './chains/substrate/types';
-import * as CompoundTypes from './chains/compound/types';
-import * as Erc20Types from './chains/erc20/types';
-import * as Erc721Types from './chains/erc721/types';
-import * as AaveTypes from './chains/aave/types';
-import * as CosmosTypes from './chains/cosmos/types';
-import type { IErc721Contracts as ERC721Api } from './chains/erc721/types';
-import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
-import type { Api as CompoundApi } from './chains/compound/types';
-import type { Api as AaveApi } from './chains/aave/types';
+import * as SubstrateTypes from 'chain-events/src/chain-bases/substrate/types';
+import * as CompoundTypes from 'chain-events/src/chain-bases/EVM/compound/types';
+import * as Erc20Types from 'chain-events/src/chain-bases/EVM/erc20/types';
+import * as Erc721Types from 'chain-events/src/chain-bases/EVM/erc721/types';
+import * as AaveTypes from 'chain-events/src/chain-bases/EVM/aave/types';
+import * as CosmosTypes from 'chain-events/src/chain-bases/cosmos/types';
+import type { IErc721Contracts as ERC721Api } from 'chain-events/src/chain-bases/EVM/erc721/types';
+import type { IErc20Contracts as ERC20Api } from 'chain-events/src/chain-bases/EVM/erc20/types';
+import type { Api as CompoundApi } from 'chain-events/src/chain-bases/EVM/compound/types';
+import type { Api as AaveApi } from 'chain-events/src/chain-bases/EVM/aave/types';
 import type { Listener } from './Listener';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
@@ -39,12 +39,7 @@ export type IChainEventKind =
   | Erc20Types.EventKind
   | Erc721Types.EventKind
   | CosmosTypes.EventKind;
-export type IAPIs =
-  | SubstrateApi
-  | ERC721Api
-  | ERC20Api
-  | CompoundApi
-  | AaveApi;
+export type IAPIs = SubstrateApi | ERC721Api | ERC20Api | CompoundApi | AaveApi;
 export type IAnyListener = Listener<
   IAPIs,
   IStorageFetcher<IAPIs>,

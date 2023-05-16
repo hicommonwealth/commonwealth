@@ -8,7 +8,7 @@ import {
   StorageFetcher,
   Subscriber,
   Listener,
-} from '../../../src/chains/compound';
+} from '../../../src/chain-bases/EVM/compound';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 

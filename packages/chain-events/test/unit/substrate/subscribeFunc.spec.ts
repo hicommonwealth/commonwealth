@@ -1,7 +1,7 @@
 import chai from 'chai';
 
 import { EdgewareSpec } from '../../../scripts/specs/edgeware';
-import { createApi } from '../../../src/chains/substrate/subscribeFunc';
+import { createApi } from 'chain-events/src/chain-bases/substrate/subscribeFunc';
 
 const { assert } = chai;
 

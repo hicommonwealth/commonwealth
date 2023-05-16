@@ -2,9 +2,15 @@ import chai from 'chai';
 import { BigNumber } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
-import { StorageFetcher } from '../../../src/chains/aave/storageFetcher';
-import type { Proposal, RawEvent } from '../../../src/chains/aave/types';
-import { EventKind, ProposalState } from '../../../src/chains/aave/types';
+import { StorageFetcher } from 'chain-events/src/chain-bases/EVM/aave/storageFetcher';
+import type {
+  Proposal,
+  RawEvent,
+} from 'chain-events/src/chain-bases/EVM/aave/types';
+import {
+  EventKind,
+  ProposalState,
+} from 'chain-events/src/chain-bases/EVM/aave/types';
 import type { AaveGovernanceV2 } from '../../../src/contractTypes';
 
 const { assert } = chai;

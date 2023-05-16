@@ -2,8 +2,12 @@ import { ApiPromise } from '@polkadot/api';
 import { LogGroupControlSettings } from 'typescript-logging';
 import { factoryControl } from '../src/logging';
 import { CWEvent, IDisconnectedRange, IEventHandler } from '../src';
-import { createApi, Poller, Processor } from '../src/chains/substrate';
-import { Block } from '../src/chains/substrate/types';
+import {
+  createApi,
+  Poller,
+  Processor,
+} from 'chain-events/src/chain-bases/substrate';
+import { Block } from 'chain-events/src/chain-bases/substrate/types';
 
 export async function batchQuery(
   api: ApiPromise,

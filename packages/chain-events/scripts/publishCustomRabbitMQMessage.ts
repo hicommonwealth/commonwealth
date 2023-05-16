@@ -1,4 +1,4 @@
-import type { IEventData } from '../src/chains/aave/types';
+import type { IEventData } from 'chain-events/src/chain-bases/EVM/aave/types';
 import type { CWEvent } from '../src';
 import { SupportedNetwork } from '../src';
 import { publishRmqMsg } from 'common-common/src/rabbitmq/util';

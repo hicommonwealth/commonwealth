@@ -24,9 +24,12 @@ import type {
   IProposalQueued,
   IProposalExecuted,
   IVoteCast,
-} from '../../src/chains/compound/types';
-import { EventKind, ProposalState } from '../../src/chains/compound/types';
-import { subscribeEvents } from '../../src/chains/compound/subscribeFunc';
+} from 'chain-events/src/chain-bases/EVM/compound/types';
+import {
+  EventKind,
+  ProposalState,
+} from 'chain-events/src/chain-bases/EVM/compound/types';
+import { subscribeEvents } from 'chain-events/src/chain-bases/EVM/compound/subscribeFunc';
 import type { CWEvent, IChainEventData } from '../../src/interfaces';
 import { IEventHandler } from '../../src/interfaces';
 

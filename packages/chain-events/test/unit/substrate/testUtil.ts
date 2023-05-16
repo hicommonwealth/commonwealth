@@ -8,7 +8,7 @@ import type {
 } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 
-import { IdentityJudgement as JudgementEnum } from '../../../src/chains/substrate/types';
+import { IdentityJudgement as JudgementEnum } from 'chain-events/src/chain-bases/substrate/types';
 
 export function constructOption<T extends Codec>(value?: T): Option<T> {
   if (value) {

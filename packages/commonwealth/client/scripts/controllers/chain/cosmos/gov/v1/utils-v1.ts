@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import moment from 'moment';
 
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from 'chain-events/src/chain-bases/cosmos/types';
 import {
   ProposalSDKType,
   ProposalStatus,

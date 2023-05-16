@@ -18,12 +18,12 @@ import { QueryTypes } from 'sequelize';
 import { setupChainEventConsumer } from '../../../services/ChainEventsConsumer/chainEventsConsumer';
 import type { CWEvent } from '../../../src';
 import { SupportedNetwork } from '../../../src';
-import type * as AaveTypes from '../../../src/chains/aave/types';
+import type * as AaveTypes from '../../../src/chain-bases/EVM/aave/types';
 import type {
   IProposalCreated,
   ITransfer,
-} from '../../../src/chains/aave/types';
-import { EventKind } from '../../../src/chains/aave/types';
+} from '../../../src/chain-bases/EVM/aave/types';
+import { EventKind } from '../../../src/chain-bases/EVM/aave/types';
 import models from '../../../services/database/database';
 import { RABBITMQ_API_URI } from '../../../services/config';
 

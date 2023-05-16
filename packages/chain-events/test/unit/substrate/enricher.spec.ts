@@ -33,11 +33,11 @@ import type {
 } from '@polkadot/types/interfaces/offences';
 
 import { SupportedNetwork } from '../../../src';
-import { Enrich } from '../../../src/chains/substrate/filters/enricher';
+import { Enrich } from 'chain-events/src/chain-bases/substrate/filters/enricher';
 import {
   EventKind,
   IdentityJudgement,
-} from '../../../src/chains/substrate/types';
+} from 'chain-events/src/chain-bases/substrate/types';
 
 import {
   constructFakeApi,

@@ -3,7 +3,11 @@ import * as events from 'events';
 import * as chai from 'chai';
 import dotenv from 'dotenv';
 
-import { Processor, Subscriber, Listener } from '../../../src/chains/erc20';
+import {
+  Processor,
+  Subscriber,
+  Listener,
+} from '../../../src/chain-bases/EVM/erc20';
 import { networkUrls } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 

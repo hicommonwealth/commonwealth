@@ -2,7 +2,7 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { SigningStargateClient } from '@cosmjs/stargate';
 import { CosmosApiType } from './chain';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from 'chain-events/src/chain-bases/cosmos/types';
 
 export const getTMClient = async (
   rpcUrl: string

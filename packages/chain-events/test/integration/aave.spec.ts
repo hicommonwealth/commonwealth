@@ -29,12 +29,15 @@ import type {
   IDelegateChanged,
   IDelegatedPowerChanged,
   ITransfer,
-} from '../../src/chains/aave/types';
-import { EventKind, ProposalState } from '../../src/chains/aave/types';
-import { subscribeEvents } from '../../src/chains/aave/subscribeFunc';
+} from 'chain-events/src/chain-bases/EVM/aave/types';
+import {
+  EventKind,
+  ProposalState,
+} from 'chain-events/src/chain-bases/EVM/aave/types';
+import { subscribeEvents } from 'chain-events/src/chain-bases/EVM/aave/subscribeFunc';
 import type { CWEvent, IChainEventData } from '../../src/interfaces';
 import { IEventHandler, SupportedNetwork } from '../../src/interfaces';
-import { StorageFetcher } from '../../src/chains/aave/storageFetcher';
+import { StorageFetcher } from 'chain-events/src/chain-bases/EVM/aave/storageFetcher';
 
 function getProvider(): providers.Web3Provider {
   const web3Provider = require('ganache-cli').provider({

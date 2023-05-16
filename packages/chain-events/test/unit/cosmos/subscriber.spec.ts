@@ -1,7 +1,7 @@
 import chai from 'chai';
 
-import { Subscriber } from '../../../src/chains/cosmos/subscriber';
-import type { RawEvent } from '../../../src/chains/cosmos/types';
+import { Subscriber } from 'chain-events/src/chain-bases/cosmos/subscriber';
+import type { RawEvent } from 'chain-events/src/chain-bases/cosmos/types';
 
 import { getApi } from './util';
 

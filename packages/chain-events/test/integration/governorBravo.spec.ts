@@ -25,17 +25,17 @@ import type {
   IProposalExecuted,
   IProposalQueued,
   IVoteCast,
-} from '../../src/chains/compound/types';
+} from 'chain-events/src/chain-bases/EVM/compound/types';
 import {
   BravoSupport,
   EventKind,
   ProposalState,
-} from '../../src/chains/compound/types';
+} from 'chain-events/src/chain-bases/EVM/compound/types';
 import {
   createApi,
   StorageFetcher,
   subscribeEvents,
-} from '../../src/chains/compound';
+} from '../../src/chain-bases/EVM/compound';
 import type { CWEvent, IChainEventData } from '../../src';
 import { IEventHandler, SupportedNetwork } from '../../src';
 

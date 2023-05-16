@@ -16,7 +16,7 @@ import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from 'chain-events/src/chain-bases/cosmos/types';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,

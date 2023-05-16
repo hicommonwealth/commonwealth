@@ -29,12 +29,12 @@ import type {
   INewTip,
   ITipVoted,
   ITipClosing,
-} from '../../../src/chains/substrate/types';
+} from 'chain-events/src/chain-bases/substrate/types';
 import {
   EventKind,
   IdentityJudgement,
-} from '../../../src/chains/substrate/types';
-import { StorageFetcher } from '../../../src/chains/substrate/storageFetcher';
+} from 'chain-events/src/chain-bases/substrate/types';
+import { StorageFetcher } from 'chain-events/src/chain-bases/substrate/storageFetcher';
 
 import {
   constructFakeApi,

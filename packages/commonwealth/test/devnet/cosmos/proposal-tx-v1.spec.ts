@@ -12,7 +12,7 @@ import {
   getActiveProposalsV1,
   getCompletedProposalsV1,
 } from 'controllers/chain/cosmos/gov/v1/utils-v1';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from 'chain-events/src/chain-bases/cosmos/types';
 import { deposit, sendTx, setupTestSigner, waitOneBlock } from './helpers';
 
 const { expect, assert } = chai;
