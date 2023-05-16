@@ -110,6 +110,15 @@
           },
           {
             "in": "query",
+            "name": "thread_ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Filter comments by comments in threads of specified thread_ids."
+          },
+          {
+            "in": "query",
             "name": "count_only",
             "type": "boolean",
             "description": "Return only the number of entities found."

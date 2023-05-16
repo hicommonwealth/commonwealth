@@ -62,15 +62,22 @@ class Cosmos
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 
-    const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
-      chain: this.meta.id,
-      address: account.address,
-      author_chain: account.chain.id,
-    });
-    if (balanceResp.result) {
-      const balance = new BN(balanceResp.result, 10);
-      this.hasToken = balance && !balance.isZero();
-      if (balance) this.tokenBalance = balance;
+    try {
+      const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
+        chain: this.meta.id,
+        address: account.address,
+        author_chain: account.chain.id,
+      });
+      if (balanceResp.result) {
+        const balance = new BN(balanceResp.result, 10);
+        this.hasToken = balance && !balance.isZero();
+        if (balance) this.tokenBalance = balance;
+      } else {
+        this.hasToken = false;
+      }
+    } catch (e) {
+      console.log(e);
+      this.hasToken = false;
     }
   }
 }
