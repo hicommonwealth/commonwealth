@@ -47,6 +47,22 @@ describe('getComments Tests', () => {
     chai.assert.lengthOf(resp.result.comments, 5);
   });
 
+  it('should return comments with specified thread_id correctly', async () => {
+    const r: GetCommentsReq = {
+      community_id: testComments[0].chain,
+      thread_ids: [parseInt(testComments[0].thread_id)],
+    };
+
+    let resp = await get('/api/comments', r);
+
+    chai.assert.lengthOf(resp.result.comments, 2);
+
+    r.thread_ids.push(parseInt(testComments[2].thread_id));
+    resp = await get('/api/comments', r);
+
+    chai.assert.lengthOf(resp.result.comments, 5);
+  });
+
   it('should paginate correctly', async () => {
     const r: GetCommentsReq = {
       community_id: testComments[0].chain,

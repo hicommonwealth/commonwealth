@@ -81,6 +81,7 @@ export const EditTopicModal = ({
       default_offchain_template: featuredInNewPost
         ? serializeDelta(contentDelta)
         : null,
+      total_threads: topic.totalThreads || 0,
     };
 
     try {

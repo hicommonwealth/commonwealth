@@ -2,7 +2,7 @@
  * Processes events during migration, upgrading from simple notifications to entities.
  */
 import type { WhereOptions } from 'sequelize';
-import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { AbstractRabbitMQController } from 'common-common/src/rabbitmq/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import type { CWEvent } from '../../../src';
@@ -23,7 +23,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventHandler<ChainEventInstance> {
   constructor(
     private readonly _models: DB,
-    private readonly _rmqController: RabbitMQController,
+    private readonly _rmqController: AbstractRabbitMQController,
     private readonly _chain?: string
   ) {
     super();
