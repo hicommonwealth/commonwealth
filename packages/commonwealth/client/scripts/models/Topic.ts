@@ -10,6 +10,7 @@ class Topic {
   public readonly featuredInNewPost?: boolean;
   public order?: number;
   public readonly defaultOffchainTemplate?: string;
+  public totalThreads?: number;
 
   private _tokenThreshold?: BN;
   public get tokenThreshold() {
@@ -31,6 +32,7 @@ class Topic {
     order,
     default_offchain_template,
     token_threshold,
+    total_threads,
   }: {
     name: string;
     id: number;
@@ -42,6 +44,7 @@ class Topic {
     order?: number;
     default_offchain_template?: string;
     token_threshold?: BN | string | number;
+    total_threads: number;
   }) {
     this.name = name;
     this.id = id;
@@ -55,6 +58,7 @@ class Topic {
     if (token_threshold !== undefined) {
       this._tokenThreshold = new BN(token_threshold);
     }
+    this.totalThreads = total_threads || 0;
   }
 }
 
