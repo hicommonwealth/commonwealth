@@ -14,12 +14,20 @@ import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import {eventMatch, getEvmSecondsAndBlocks, waitUntilBlock} from '../../../util';
+import {
+  eventMatch,
+  getEvmSecondsAndBlocks,
+  waitUntilBlock,
+} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
-import {Api, EventKind} from "../../../../src/chains/compound/types";
-import {Processor, StorageFetcher, Subscriber} from "../../../../src/chains/compound";
-import { Listener } from "../../../../src";
-import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
+import { Api, EventKind } from '../../../../src/chains/compound/types';
+import {
+  Processor,
+  StorageFetcher,
+  Subscriber,
+} from '../../../../src/chains/compound';
+import { Listener } from '../../../../src';
+import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -35,13 +43,7 @@ describe('Integration tests for Compound Bravo', () => {
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
-  let listener: Listener<
-    Api,
-    StorageFetcher,
-    Processor,
-    Subscriber,
-    EventKind
-  >
+  let listener: Listener<Api, StorageFetcher, Processor, Subscriber, EventKind>;
   const contract = new compoundGovernor();
   const chain_id = 'ganache-fork-bravo';
   const chain = {
@@ -62,10 +64,13 @@ describe('Integration tests for Compound Bravo', () => {
     await rmq.init();
   });
 
-  describe('Tests the Bravo event listener using the chain subscriber', () => {
+  describe.only('Tests the Bravo event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
-      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(
+        rmq,
+        chain
+      );
       listener = listeners[chain_id] as Listener<
         Api,
         StorageFetcher,
@@ -102,6 +107,11 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture votes on the created proposal', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       const currentBlock = await sdk.getBlock();
+      console.log(
+        `Valid voting block range: ${proposalCreatedBlockNum + 13140} - ${
+          proposalCreatedBlockNum + 13140 + 19710
+        }`
+      );
       await sdk.advanceTime(String(secs), blocks);
       await sdk.awaitBlock(currentBlock.number + blocks);
       const { block } = await sdk.castVote(proposalId, 1, true);
@@ -125,7 +135,7 @@ describe('Integration tests for Compound Bravo', () => {
 
     it('Should capture proposal queued events', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
-      await sdk.advanceTime(String(secs), blocks)
+      await sdk.advanceTime(String(secs), blocks);
       const { block } = await sdk.queueProposal(proposalId);
 
       await waitUntilBlock(block, listener);
@@ -147,7 +157,7 @@ describe('Integration tests for Compound Bravo', () => {
 
     it('Should capture proposal executed events', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
-      await sdk.advanceTime(String(secs), blocks)
+      await sdk.advanceTime(String(secs), blocks);
       const { block } = await sdk.executeProposal(proposalId);
 
       await waitUntilBlock(block, listener);
@@ -226,13 +236,17 @@ describe('Integration tests for Compound Bravo', () => {
         propCreatedEvent.entity_id
       );
 
-      expect(rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length).to.equal(1);
-      expect(rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]).to.deep.equal({
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length
+      ).to.equal(1);
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]
+      ).to.deep.equal({
         author: relatedEntity.author,
         ce_id: relatedEntity.id,
         chain_id,
         entity_type_id: relatedEntity.type_id,
-        cud: 'create'
+        cud: 'create',
       });
     });
 
@@ -386,10 +400,10 @@ describe('Integration tests for Compound Bravo', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id }
+      where: { chain: chain_id },
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id }
+      where: { chain: chain_id },
     });
   });
 });

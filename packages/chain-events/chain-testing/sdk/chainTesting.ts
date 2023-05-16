@@ -104,7 +104,7 @@ export class ChainTesting {
     spender: string,
     amount: string,
     accountIndex?: number
-  ): Promise<{block: number}> {
+  ): Promise<{ block: number }> {
     const request: erc20Approve = {
       tokenAddress,
       spender,
@@ -125,7 +125,11 @@ export class ChainTesting {
    * @param to address to transfer to
    * @param amount amount in ether to receive
    */
-  public async getErc20(tokenAddress: string, to: string, amount: string): Promise<{block: number}> {
+  public async getErc20(
+    tokenAddress: string,
+    to: string,
+    amount: string
+  ): Promise<{ block: number }> {
     const fromBank = true;
     const request: erc20Transfer = { tokenAddress, to, amount, fromBank };
     const response = await axios.post(
@@ -295,16 +299,21 @@ export class ChainTesting {
    * @param desiredBlockNum The desired block number to wait for
    * @param maxWaitTime The maximum amount of time to wait for the desired block number. Default is 120 seconds
    */
-  public async awaitBlock(desiredBlockNum: number, maxWaitTime = 60): Promise<void>{
+  public async awaitBlock(
+    desiredBlockNum: number,
+    maxWaitTime = 60
+  ): Promise<void> {
     let waitTime = 0;
     /* eslint-disable */
     while (true) {
-      if (waitTime >= maxWaitTime) throw new Error('Timed out waiting for block');
+      if (waitTime >= maxWaitTime)
+        throw new Error('Timed out waiting for block');
       const currentBlock = (await this.getBlock()).number;
+      console.log(currentBlock);
       if (currentBlock >= desiredBlockNum) {
         return;
       }
-      await new Promise<void>(resolve => setTimeout(resolve, 1000));
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
       waitTime += 1;
     }
   }
