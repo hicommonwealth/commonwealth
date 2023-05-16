@@ -474,7 +474,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isAdminOrMod;
 
   // Todo who should actually be able to view this
-  const showCreateSnapshotOptions = isAuthor || isAdminOrMod;
+  const showCreateSnapshotOptions =
+    isAuthor || (isAdminOrMod && !!app.chain?.meta.snapshot.length);
 
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;

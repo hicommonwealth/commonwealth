@@ -35,6 +35,7 @@ type NewSnapshotProposalPageProps = {
 export const NewSnapshotProposalForm = ({ snapshotId }) => {
   const navigate = useCommonNavigate();
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [form, setForm] = useState<ThreadForm | null>(null);
   const [members, setMembers] = useState<string[]>([]);
   const [contentDelta, setContentDelta] = useState<DeltaStatic>(
@@ -82,7 +83,10 @@ export const NewSnapshotProposalForm = ({ snapshotId }) => {
   useEffect(() => {
     const init = async () => {
       await app.snapshot.init(snapshotId);
+    };
 
+    // Add event listener for SnapshotController
+    const handleInitialized = async () => {
       if (!app.snapshot.initialized) {
         return;
       }
@@ -132,13 +136,21 @@ export const NewSnapshotProposalForm = ({ snapshotId }) => {
       setSpace(snapshotSpace);
       setMembers(snapshotSpace.members);
       setSnapshotScoresFetched(true);
+      setLoading(false);
+      // Set loading to false after initialization is complete
     };
+
+    app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      app.snapshot.snapshotEmitter.off('initialized', handleInitialized);
+    };
   }, []);
 
-  if (!snapshotScoresFetched) return <CWSpinner />;
-  if (!space) return null;
+  if (loading) return <CWSpinner />;
 
   const author = app.user.activeAccount;
 
@@ -179,7 +191,10 @@ export const NewSnapshotProposalForm = ({ snapshotId }) => {
           in order to submit a proposal.
         </CWText>
       ) : (
-        <CWSpinner />
+        <CWText>
+          You need to meet the minimum quorum of {space.symbol} in order to
+          submit a proposal.
+        </CWText>
       )}
       <CWTextInput
         label="Question/Proposal"
