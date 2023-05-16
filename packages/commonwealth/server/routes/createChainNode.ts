@@ -2,6 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { BalanceType } from '../../../common-common/src/types';
+import { getChainActivity } from './status';
 
 export const Errors = {
   ChainExists: 'Chain Node already exists',
@@ -39,6 +40,7 @@ const createChainNode = async (
     bech32: req.body.bech32,
   });
 
+  getChainActivity.queryWithCacheOverride(models);
   return success(res, { node_id: newChainNode.id });
 };
 
