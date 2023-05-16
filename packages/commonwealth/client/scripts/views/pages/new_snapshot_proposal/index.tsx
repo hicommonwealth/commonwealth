@@ -137,7 +137,7 @@ export const NewSnapshotProposalForm = ({ snapshotId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!form || !snapshotScoresFetched) return <CWSpinner />;
+  if (!snapshotScoresFetched) return <CWSpinner />;
   if (!space) return null;
 
   const author = app.user.activeAccount;
@@ -168,9 +168,6 @@ export const NewSnapshotProposalForm = ({ snapshotId }) => {
 
   return (
     <div className="NewSnapshotProposalForm">
-      <CWText type="h3" fontWeight="medium">
-        New Snapshot Proposal
-      </CWText>
       {space.filters?.onlyMembers && !isMember && (
         <CWText>
           You need to be a member of the space in order to submit a proposal.
@@ -257,6 +254,9 @@ const NewSnapshotProposalPageComponent = ({
   return (
     <Sublayout>
       <div className="NewSnapshotProposalPage">
+        <CWText type="h3" fontWeight="medium">
+          New Snapshot Proposal
+        </CWText>
         <NewSnapshotProposalForm snapshotId={snapshotId} />
       </div>
     </Sublayout>

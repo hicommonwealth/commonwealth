@@ -1,0 +1,18 @@
+@import '../shared';
+
+.NewSnapshotProposalModal {
+  .compact-modal-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    width: 100%;
+  }
+}
