@@ -96,22 +96,7 @@ const setupAppRoutes = (
     res.send(twitterSafeHtml);
   };
 
-  app.get('/:scope?/overview', async (req, res) => {
-    // Retrieve chain
-    const scope = req.params.scope;
-    const chain = await getChain(req, scope);
-    const title = chain ? chain.name : 'Commonwealth';
-    const description = chain ? chain.description : '';
-    const image = chain?.icon_url
-      ? chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`
-      : DEFAULT_COMMONWEALTH_LOGO;
-    const author = '';
-    const url = getUrl(req);
-
-    renderWithMetaTags(res, title, description, author, image, url);
-  });
+  app.get('/:scope?/overview', renderGeneralPage);
 
   app.get('/:scope?/account/:address', async (req, res) => {
     // Retrieve title, description, and author from the database
@@ -182,7 +167,7 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image, url);
   };
 
-  const renderLinkPreview = async (
+  const renderProposal = async (
     scope: string,
     req,
     res,
@@ -204,19 +189,36 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image, url);
   };
 
+  async function renderGeneralPage(req, res) {
+    // Retrieve chain
+    const scope = req.params.scope;
+    const chain = await getChain(req, scope);
+    const title = chain ? chain.name : 'Commonwealth';
+    const description = chain ? chain.description : '';
+    const image = chain?.icon_url
+      ? chain.icon_url.match(`^(http|https)://`)
+        ? chain.icon_url
+        : `https://commonwealth.im${chain.icon_url}`
+      : DEFAULT_COMMONWEALTH_LOGO;
+    const author = '';
+    const url = getUrl(req);
+
+    renderWithMetaTags(res, title, description, author, image, url);
+  }
+
   app.get('/:scope?/proposals', async (req, res) => {
     const scope = req.params.scope;
-    await renderLinkPreview(scope, req, res);
+    await renderProposal(scope, req, res);
   });
 
   app.get('/:scope?/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    await renderLinkPreview(scope, req, res);
+    await renderProposal(scope, req, res);
   });
 
   app.get('/:scope?/discussions', async (req, res) => {
     const scope = req.params.scope;
-    await renderLinkPreview(scope, req, res);
+    await renderProposal(scope, req, res);
   });
 
   app.get('/:scope?/discussion/:identifier', async (req, res) => {
@@ -246,7 +248,7 @@ const setupAppRoutes = (
       return;
     }
 
-    await renderLinkPreview(scope, req, res, chain);
+    await renderProposal(scope, req, res, chain);
   });
 
   async function getChain(req, scope: string) {
@@ -255,22 +257,7 @@ const setupAppRoutes = (
       : await models.Chain.findOne({ where: { custom_domain: req.hostname } });
   }
 
-  app.get('/:scope?', async (req, res) => {
-    // Retrieve chain
-    const scope = req.params.scope;
-    const chain = await getChain(req, scope);
-    const title = chain ? chain.name : 'Commonwealth';
-    const description = chain ? chain.description : '';
-    const image = chain?.icon_url
-      ? chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`
-      : DEFAULT_COMMONWEALTH_LOGO;
-    const author = '';
-    const url = getUrl(req);
-
-    renderWithMetaTags(res, title, description, author, image, url);
-  });
+  app.get('/:scope?', renderGeneralPage);
 
   app.get('*', (req, res) => {
     log.info(`setupAppRoutes sendFiles ${req.path}`);
