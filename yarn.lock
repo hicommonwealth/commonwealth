@@ -1775,7 +1775,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.17.8", "@babel/runtime@^7.7.6":
+"@babel/runtime@^7.17.8", "@babel/runtime@^7.21.0", "@babel/runtime@^7.7.6":
   version "7.21.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.21.5.tgz#8492dddda9644ae3bda3b45eabe87382caee7200"
   integrity sha512-8jI69toZqqcsnqGGqwGS4Qb1VwLOEp4hz+CXPywcvjs60u3B4Pom/U/7rm4W8tMOYEB+E9wgD0mW1l3r8qlI9Q==
@@ -4035,6 +4035,14 @@
   integrity sha512-PzmXk9x9MHyLn2fUztpAqWqvDmMiEJaQv/JcAoAOE8VdHrD9Hf/KWnE1RZtamuS2ngQRqvQPD0xotCGXW7eTxA==
   dependencies:
     "@babel/runtime" "^7.19.0"
+    axios "0.27.2"
+
+"@osmonauts/lcd@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@osmonauts/lcd/-/lcd-0.11.1.tgz#30e0d23960ec4a1d4513ecf881e3705de3306d54"
+  integrity sha512-mri4GnyLfLnT7VLXk6Z53IOd3a7VCQTuMSYGAK042IRgEZXLzjUYDOOTbCTsuJgncAAf51yDBNPOLqw/26jjsg==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
     axios "0.27.2"
 
 "@phosphor-icons/react@^2.0.8":
@@ -24656,15 +24664,6 @@ ts-mocha@^6.0.0:
   optionalDependencies:
     tsconfig-paths "^3.5.0"
 
-ts-mocha@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/ts-mocha/-/ts-mocha-8.0.0.tgz#962d0fa12eeb6468aa1a6b594bb3bbc818da3ef0"
-  integrity sha512-Kou1yxTlubLnD5C3unlCVO7nh0HERTezjoVhVw/M5S1SqoUec0WgllQvPk3vzPMc6by8m6xD1uR1yRf8lnVUbA==
-  dependencies:
-    ts-node "7.0.1"
-  optionalDependencies:
-    tsconfig-paths "^3.5.0"
-
 ts-node-dev@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ts-node-dev/-/ts-node-dev-2.0.0.tgz#bdd53e17ab3b5d822ef519928dc6b4a7e0f13065"
@@ -25387,6 +25386,11 @@ use-resize-observer@^9.1.0:
   integrity sha512-R25VqO9Wb3asSD4eqtcxk8sJalvIOYBqS8MNZlpDSQ4l4xMQxC/J7Id9HoTqPq8FwULIn0PVW+OAqF2dyYbjow==
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
+
+use-sync-external-store@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 use@^3.1.0:
   version "3.1.1"
@@ -26936,3 +26940,10 @@ zen-observable@^0.8.14:
   version "0.8.15"
   resolved "https://registry.yarnpkg.com/zen-observable/-/zen-observable-0.8.15.tgz#96415c512d8e3ffd920afd3889604e30b9eaac15"
   integrity sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==
+
+zustand@^4.3.8:
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.3.8.tgz#37113df8e9e1421b0be1b2dca02b49b76210e7c4"
+  integrity sha512-4h28KCkHg5ii/wcFFJ5Fp+k1J3gJoasaIbppdgZFO4BPJnsNxL0mQXBSFgOgAdCdBj35aDTPvdAJReTMntFPGg==
+  dependencies:
+    use-sync-external-store "1.2.0"
