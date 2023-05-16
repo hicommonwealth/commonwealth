@@ -309,7 +309,9 @@ export class ChainTesting {
       if (waitTime >= maxWaitTime)
         throw new Error('Timed out waiting for block');
       const currentBlock = (await this.getBlock()).number;
-      console.log(currentBlock);
+      console.log(
+        `Current block: ${currentBlock}... waiting for ${desiredBlockNum}`
+      );
       if (currentBlock >= desiredBlockNum) {
         return;
       }

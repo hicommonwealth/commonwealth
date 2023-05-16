@@ -108,8 +108,18 @@ describe('Integration tests for Aave', () => {
     it('Should capture votes on the created proposal', async () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3.5);
       const currentBlock = await sdk.getBlock();
+      console.log(
+        `Valid voting block range: ${proposalCreatedBlockNum + 13140} - ${
+          proposalCreatedBlockNum + 13140 + 19710
+        }`
+      );
+      console.log(
+        `Current block: ${currentBlock.number}. Advancing ${blocks} to block ${
+          currentBlock.number + blocks
+        }`
+      );
       await sdk.advanceTime(String(secs), blocks);
-      await sdk.awaitBlock(currentBlock.number + blocks);
+      await sdk.awaitBlock(proposalCreatedBlockNum + 13140);
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
       await waitUntilBlock(block, listener);
