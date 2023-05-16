@@ -14,7 +14,10 @@ import { CWText } from '../../components/component_kit/cw_text';
 type SnapshotCreationCardProps = {
   thread: Thread;
   allowSnapshotCreation: boolean;
-  onChangeHandler: () => void;
+  onChangeHandler: (snapshotInfo: {
+    id: string;
+    snapshot_title: string;
+  }) => void;
 };
 
 export const SnapshotCreationCard = ({
@@ -46,7 +49,7 @@ export const SnapshotCreationCard = ({
       <Modal
         content={
           <NewSnapshotProposalModal
-            snapshotId={thread}
+            thread={thread}
             onSave={onChangeHandler}
             onModalClose={() => setIsModalOpen(false)}
           />

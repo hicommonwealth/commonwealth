@@ -27,15 +27,22 @@ import {
 } from '../../components/react_quill_editor';
 import { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
+import Thread from 'client/scripts/models/Thread';
+
+type NewSnapshotProposalPageProps = {
+  snapshotId: string;
+};
 
 type NewSnapshotProposalFormProps = {
   snapshotId: string;
-  onSave?: (snapshotInfo: { id: string; title: string }) => void;
+  thread?: Thread;
+  onSave?: (snapshotInfo: { id: string; snapshot_title: string }) => void;
   onModalClose?: () => void;
 };
 
 export const NewSnapshotProposalForm = ({
   snapshotId,
+  thread,
   onSave,
   onModalClose,
 }: NewSnapshotProposalFormProps) => {
@@ -81,7 +88,7 @@ export const NewSnapshotProposalForm = ({
       navigate(`/snapshot/${space.id}`);
 
       if (onSave) {
-        onSave({ id: response.id, title: response.title }); // Pass relevant information from the created proposal
+        onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
       }
     } catch (err) {
       notifyError(capitalize(err.message));
@@ -102,8 +109,8 @@ export const NewSnapshotProposalForm = ({
       }
 
       const initialForm: ThreadForm = {
-        name: '',
-        body: '',
+        name: !thread ? '' : thread.title,
+        body: !thread ? '' : thread.body,
         choices: ['Yes', 'No'],
         range: '5d',
         start: new Date().getTime(),
@@ -133,6 +140,11 @@ export const NewSnapshotProposalForm = ({
             console.error(e);
           }
         }
+      }
+
+      if (thread && thread.body) {
+        const delta = createDeltaFromText(thread.plaintext);
+        setContentDelta(delta);
       }
 
       setForm(initialForm);
