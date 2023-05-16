@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../components/component_kit/cw_modal';
-import { ViewTemplateForm } from '../pages/view_template'; // Import the extracted form component
+import ViewTemplateForm from '../pages/view_template/view_template_form'; // Import the extracted form component
 
 type TemplateFormModalProps = {
   isOpen: boolean;
