@@ -16,7 +16,6 @@ import { createRole } from '../util/roles';
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
-
   if (MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
     const magic = new Magic(MAGIC_API_KEY);
@@ -91,7 +90,7 @@ export function initMagicAuth(models: DB) {
             );
 
             // create a default Eth address
-            const newPublicAddress = await models.Address.create(
+            const newDefaultAddress = await models.Address.create(
               {
                 address: ethAddress,
                 chain: 'ethereum',
@@ -108,7 +107,7 @@ export function initMagicAuth(models: DB) {
 
             await createRole(
               models,
-              newPublicAddress.id,
+              newDefaultAddress.id,
               'ethereum',
               'member',
               false,
@@ -179,7 +178,7 @@ export function initMagicAuth(models: DB) {
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newPublicAddress.id, // always ethereum address
+                address_id: newDefaultAddress.id, // always ethereum address
                 created_at: new Date(),
                 updated_at: new Date(),
               },
@@ -257,7 +256,7 @@ export function initMagicAuth(models: DB) {
           // migrate to magic if email already exists
           await sequelize.transaction(async (t) => {
             const ethAddress = userMetadata.publicAddress;
-            const newPublicAddress = await models.Address.create(
+            const newDefaultAddress = await models.Address.create(
               {
                 address: ethAddress,
                 chain: 'ethereum',
@@ -294,7 +293,7 @@ export function initMagicAuth(models: DB) {
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newPublicAddress.id, // always ethereum address
+                address_id: newDefaultAddress.id, // always ethereum address
                 created_at: new Date(),
                 updated_at: new Date(),
               },
