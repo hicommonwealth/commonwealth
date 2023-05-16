@@ -6,6 +6,17 @@ export const Errors = {
   NotLoggedIn: 'Must be logged in to view user dashboard',
 };
 
+export function verifyLoggedIn(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.user) {
+    return next(new AppError(Errors.NotLoggedIn));
+  }
+  return next();
+}
+
 export default async (
   models: DB,
   req: Request,

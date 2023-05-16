@@ -52,7 +52,7 @@ import disableImmediateEmails from '../routes/subscription/disableImmediateEmail
 import viewNotifications, {
   NotificationCategories,
 } from '../routes/viewNotifications';
-import viewUserActivity from '../routes/viewUserActivity';
+import viewUserActivity, { verifyLoggedIn } from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
@@ -772,6 +772,7 @@ function setupRouter(
   router.post(
     '/viewUserActivity',
     passport.authenticate('jwt', { session: false }),
+    verifyLoggedIn,
     cacheDecorator.cacheMiddleware(120, defaultUserKeyGenerator),
     viewUserActivity.bind(this, models)
   );
