@@ -306,11 +306,15 @@ export async function loginWithMagicLink(email: string) {
 
   console.log('magic', magic);
 
-  const magic2 = await magic.cosmos.changeAddress(app.chain.meta.bech32Prefix);
+  const chainAddress = await magic.cosmos.changeAddress(
+    app.chain.meta.bech32Prefix
+  );
 
-  console.log('magic2', magic2);
+  console.log('chainAddress', chainAddress);
 
   const didToken = await magic.auth.loginWithMagicLink({ email });
+  console.log('didToken', didToken);
+
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
@@ -322,6 +326,7 @@ export async function loginWithMagicLink(email: string) {
     data: {
       // send chain/community to request
       chain: app.activeChainId(),
+      address: chainAddress,
     },
   });
   if (response.status === 'Success') {

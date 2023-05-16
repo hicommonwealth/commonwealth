@@ -29,11 +29,15 @@ export function initMagicAuth(models: DB) {
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         // determine login location
-        let chain, error;
+        let chain, error, chainAddress;
         if (req.body.chain || req.body.community) {
           [chain, error] = await validateChain(models, req.body);
           console.log('chain', chain);
           if (error) return cb(error);
+        }
+
+        if (req.body.address) {
+          chainAddress = req.body.address;
         }
 
         const isCosmos = chain.base === 'cosmos';
@@ -42,14 +46,14 @@ export function initMagicAuth(models: DB) {
         // fetch user data from magic backend
         let userMetadata: MagicUserMetadata;
         try {
-          if (isCosmos) {
-            userMetadata = await magic.users.getMetadataByIssuerAndWallet(
-              user.issuer,
-              WalletType.COSMOS
-            );
-          } else {
-            userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
-          }
+          // if (isCosmos) {
+          //   userMetadata = await magic.users.getMetadataByIssuerAndWallet(
+          //     user.issuer,
+          //     WalletType.COSMOS
+          //   );
+          // } else {
+          userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+          // }
         } catch (e) {
           return cb(
             new ServerError(
@@ -105,7 +109,7 @@ export function initMagicAuth(models: DB) {
             // create an address on their selected chain
             const newAddress = await models.Address.create(
               {
-                address: ethAddress,
+                address: chainAddress ?? ethAddress,
                 chain: chainId,
                 verification_token: 'MAGIC',
                 verification_token_expires: null,
@@ -216,15 +220,14 @@ export function initMagicAuth(models: DB) {
 
             if (isCosmos) {
               // TODO: why don't API types match npm package?
-              const cosmosAddress = userMetadata.wallets.find(
-                (wallet) =>
-                  (wallet as unknown as MagicWalletAPI).wallet_type === 'COSMOS'
-              );
+              // const cosmosAddress = userMetadata.wallets.find(
+              //   (wallet) =>
+              //     (wallet as unknown as MagicWalletAPI).wallet_type === 'COSMOS'
+              // );
 
               newAddress = await models.Address.create(
                 {
-                  address: (cosmosAddress as unknown as MagicWalletAPI)
-                    .public_address,
+                  address: chainAddress,
                   chain: chain.id,
                   verification_token: 'MAGIC',
                   verification_token_expires: null,
