@@ -26,6 +26,7 @@ export default class TopicGateCheck {
   }
 
   public static getUserBalance(): BN {
+    console.log('app.chain', app.chain);
     if (ITokenAdapter.instanceOf(app.chain)) {
       return new BN(app.chain.tokenBalance, 10);
     }
