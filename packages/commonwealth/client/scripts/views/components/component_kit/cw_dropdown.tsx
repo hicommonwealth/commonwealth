@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'components/component_kit/cw_dropdown.scss';
 import { CWText } from './cw_text';
@@ -31,6 +31,12 @@ export const CWDropdown = ({
   const [selectedValue, setSelectedValue] = useState<DropdownItemType>(
     initialValue ?? options[0]
   );
+
+  useEffect(() => {
+    if (initialValue == null) {
+      onSelect({ ...selectedValue });
+    }
+  }, [selectedValue, onSelect, initialValue]);
 
   return (
     <div className="dropdown-wrapper">
