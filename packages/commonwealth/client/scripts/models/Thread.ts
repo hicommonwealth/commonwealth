@@ -24,6 +24,7 @@ export enum LinkSource {
   Proposal = 'proposal',
   Thread = 'thread',
   Web = 'web',
+  Template = 'Template',
 }
 
 export type Link = {

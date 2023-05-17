@@ -466,6 +466,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -510,6 +511,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const newThread = {
       ...thread,
       stage,
+      links,
+    } as Thread;
+
+    setThread(newThread);
+  };
+
+  const handleLinkedTemplateChange = (links: Link[] = []) => {
+    const newThread = {
+      ...thread,
       links,
     } as Thread;
 
@@ -832,7 +842,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     item: (
                       <div className="cards-column">
                         <TemplateActionCard
-                          onButtonClick={() => setIsModalOpen(true)}
+                          thread={thread}
+                          onChangeHandler={handleLinkedTemplateChange}
                         />
                       </div>
                     ),

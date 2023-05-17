@@ -4,13 +4,16 @@ import { CWContentPageCard } from '../../components/component_kit/cw_content_pag
 import { TemplateActionModal } from '../../modals/template_action_modal'; // Import the new modal component
 
 import 'pages/view_thread/template_action_card.scss';
+import Thread, { Link } from 'client/scripts/models/Thread';
 
 type TemplateActionCardProps = {
-  threadContent: string; // Pass the thread content to the modal
+  thread: Thread; // Pass the thread content to the modal
+  onChangeHandler: (links?: Link[]) => void;
 };
 
 export const TemplateActionCard = ({
-  threadContent,
+  thread,
+  onChangeHandler,
 }: TemplateActionCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -30,8 +33,8 @@ export const TemplateActionCard = ({
       />
       <TemplateActionModal
         isOpen={isModalOpen}
-        threadContent={threadContent}
-        onSave={() => setIsModalOpen(false)}
+        threadContent={thread.body}
+        onSave={() => onChangeHandler}
         onClose={() => setIsModalOpen(false)}
       />
     </div>
