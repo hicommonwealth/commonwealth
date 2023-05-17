@@ -5,6 +5,7 @@ import { TemplateActionModal } from '../../modals/template_action_modal'; // Imp
 
 import 'pages/view_thread/template_action_card.scss';
 import Thread, { Link } from 'client/scripts/models/Thread';
+import { Modal } from '../../components/component_kit/cw_modal';
 
 type TemplateActionCardProps = {
   thread: Thread; // Pass the thread content to the modal
@@ -31,10 +32,16 @@ export const TemplateActionCard = ({
           </div>
         }
       />
-      <TemplateActionModal
-        isOpen={isModalOpen}
-        threadContent={thread.body}
-        onSave={() => onChangeHandler}
+      <Modal
+        content={
+          <TemplateActionModal
+            isOpen={isModalOpen}
+            thread={thread}
+            onSave={() => onChangeHandler}
+            onClose={() => setIsModalOpen(false)}
+          />
+        }
+        open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
     </div>

@@ -471,6 +471,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
     linkedProposals.length > 0 ||
+    linkedTemplates.length > 0 ||
     isAuthor ||
     isAdminOrMod;
 

@@ -54,6 +54,26 @@ const LinkedProposal = ({
   );
 };
 
+type LinkedTemplateProps = {
+  thread: Thread;
+  title: string;
+  contractAddress: string;
+  slug: string;
+};
+
+const LinkedTemplate = ({
+  thread,
+  title,
+  contractAddress,
+  slug,
+}: LinkedTemplateProps) => {
+  const templateLink = `${
+    app.isCustomDomain() ? '' : `/${thread.chain}`
+  }/${contractAddress}/${slug}`;
+
+  return <a href={templateLink}>{`${title ?? 'Template'} (${slug})`}</a>;
+};
+
 type LinkedProposalsCardProps = {
   onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
   showAddProposalButton: boolean;
@@ -78,6 +98,11 @@ export const LinkedProposalsCard = ({
 
   const initialProposalLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Proposal),
+    [thread.links]
+  );
+
+  const initialTemplateLinks = useMemo(
+    () => filterLinks(thread.links, LinkSource.Template),
     [thread.links]
   );
 
@@ -128,7 +153,9 @@ export const LinkedProposalsCard = ({
             </div>
           ) : (
             <div className="LinkedProposalsCard">
-              {initialProposalLinks.length > 0 || showSnapshot ? (
+              {initialProposalLinks.length > 0 ||
+              showSnapshot ||
+              initialTemplateLinks.length > 0 ? (
                 <div className="links-container">
                   {initialProposalLinks.length > 0 && (
                     <div className="linked-proposals">
@@ -151,10 +178,26 @@ export const LinkedProposalsCard = ({
                       {initialSnapshotLinks[0].title ?? snapshot.title}
                     </a>
                   )}
+                  {initialTemplateLinks.length > 0 && (
+                    <div className="linked-templates">
+                      {initialTemplateLinks.map((l) => {
+                        const [contractAddress, slug] = l.identifier.split('/');
+                        return (
+                          <LinkedTemplate
+                            key={l.identifier}
+                            thread={thread}
+                            title={l.title}
+                            contractAddress={contractAddress}
+                            slug={slug}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <CWText type="b2" className="no-proposals-text">
-                  There are currently no linked proposals.
+                  There are currently no linked proposals or templates.
                 </CWText>
               )}
               {showAddProposalButton && (
