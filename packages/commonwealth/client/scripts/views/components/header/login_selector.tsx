@@ -304,6 +304,12 @@ export const LoginSelector = () => {
     setIsJoined(!!app.user.activeAccount);
   }, [app.user.activeAccount]);
 
+  useEffect(() => {
+    if (!isLoginModalOpen && app.chain?.meta?.id == 'injective') {
+      forceRerender();
+    }
+  }, [isLoginModalOpen]);
+
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
 
@@ -511,7 +517,12 @@ export const LoginSelector = () => {
             <CWButton
               buttonType="tertiary-black"
               onClick={async () => {
-                if (sameBaseAddressesRemoveDuplicates.length === 0) {
+                if (
+                  sameBaseAddressesRemoveDuplicates.length === 0 ||
+                  app.chain?.meta?.id === 'injective' ||
+                  (app.user.activeAccount.address.slice(0, 3) === 'inj' &&
+                    app.chain?.meta.id !== 'injective')
+                ) {
                   setIsLoginModalOpen(true);
                 } else {
                   if (hasTermsOfService) {
