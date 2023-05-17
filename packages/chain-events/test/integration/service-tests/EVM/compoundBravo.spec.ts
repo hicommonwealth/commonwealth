@@ -32,6 +32,7 @@ import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 const { expect } = chai;
 chai.use(chaiHttp);
 
+// trigger CI
 describe('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
@@ -105,7 +106,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
-      const { secs, blocks } = getEvmSecondsAndBlocks(3.5);
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
       const currentBlock = await sdk.getBlock();
       console.log(
         `Valid voting block range: ${proposalCreatedBlockNum + 13140} - ${
@@ -118,7 +119,10 @@ describe('Integration tests for Compound Bravo', () => {
         }`
       );
       // await sdk.advanceTime(String(secs), blocks);
-      await sdk.safeAdvanceTime(blocks, proposalCreatedBlockNum + 13140);
+      await sdk.safeAdvanceTime(
+        proposalCreatedBlockNum + blocks,
+        proposalCreatedBlockNum + 13140
+      );
       const { block } = await sdk.castVote(proposalId, 1, true);
 
       await waitUntilBlock(block, listener);

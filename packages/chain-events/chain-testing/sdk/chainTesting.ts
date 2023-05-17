@@ -312,7 +312,6 @@ export class ChainTesting {
     while (true) {
       if (numTries >= maxNumTries)
         throw new Error('Timed out waiting for block');
-      23;
       const currentBlock = (await this.getBlock()).number;
       const numBlocksToAdvance = desiredBlockNum - currentBlock;
       console.log(
