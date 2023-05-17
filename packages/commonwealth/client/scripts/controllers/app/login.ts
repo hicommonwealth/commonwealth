@@ -3,7 +3,9 @@
  */
 import { initAppState } from 'state';
 import type { WalletId } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
@@ -297,6 +299,26 @@ export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
   const didToken = await magic.auth.loginWithMagicLink({ email });
+
+  // skip wallet.signCanvasMessage(), do the logic here instead
+  // TODO: merge with multichain magic login
+  const { Web3Provider } = await import('@ethersproject/providers');
+  const provider = new Web3Provider(magic.rpcProvider);
+  const signer = provider.getSigner();
+  const signerAddress = await signer.getAddress();
+
+  // TODO: provide blockhash as last argument
+  const timestamp = +new Date();
+  const { signature, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, timestamp);
+  await app.sessions.authSession(
+    ChainBase.Ethereum, // not: app.chain.base, etc.
+    chainId,
+    signerAddress,
+    sessionPayload,
+    signature
+  );
+
+  // skip Account.validate(), proceed directly to server login
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {

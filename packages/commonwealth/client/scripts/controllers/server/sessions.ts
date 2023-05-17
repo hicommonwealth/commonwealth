@@ -2,6 +2,7 @@ import { showSessionSigninModal } from 'views/modals/session_signin_modal';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import { createCanvasSessionPayload, chainBaseToCanvasChainId } from 'canvas';
+import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
@@ -38,7 +39,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
     account.address
   );
 
-  const canvasSessionPayload = createCanvasSessionPayload(
+  const sessionPayload = createCanvasSessionPayload(
     wallet.chain,
     canvasChainId,
     wallet.chain === ChainBase.Substrate
@@ -56,13 +57,54 @@ export async function signSessionWithAccount<T extends { address: string }>(
 
   const signature = await wallet.signCanvasMessage(
     account,
-    canvasSessionPayload
+    sessionPayload
   );
   return {
     signature,
     chainId: canvasChainId,
-    sessionPayload: canvasSessionPayload,
+    sessionPayload,
   };
+}
+
+export async function signSessionWithMagic(
+  walletChain = ChainBase.Ethereum,
+  signer,
+  timestamp: number,
+  blockhash = ''
+) {
+  const idOrPrefix =
+    walletChain === ChainBase.CosmosSDK
+      ? app.chain?.meta.bech32Prefix || 'cosmos'
+      : app.chain?.meta.node?.ethChainId || 1;
+  const canvasChainId = chainBaseToCanvasChainId(walletChain, idOrPrefix);
+  const signerAddress = await signer.getAddress();
+  const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+    walletChain,
+    canvasChainId,
+    signerAddress
+  );
+
+  const sessionPayload = createCanvasSessionPayload(
+    walletChain,
+    canvasChainId,
+    walletChain === ChainBase.Substrate
+      ? addressSwapper({
+          address: signerAddress,
+          currentPrefix: 42,
+        })
+      : signerAddress,
+    sessionPublicAddress,
+    timestamp,
+    blockhash,
+  );
+
+  // signature format: https://docs.canvas.xyz/docs/formats#ethereum
+  const siwe = await require('siwe');
+  const nonce = siwe.generateNonce();
+  const domain = document.location.origin;
+  const message = createSiweMessage(sessionPayload, domain, nonce);
+  const signature = await signer.signMessage(message);
+  return { signature: `${domain}/${nonce}/${signature}`, chainId: canvasChainId, sessionPayload };
 }
 
 class SessionsController {

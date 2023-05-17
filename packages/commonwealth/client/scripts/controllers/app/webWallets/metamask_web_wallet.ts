@@ -89,6 +89,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       params: [account.address, message],
     });
 
+    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
     return `${domain}/${nonce}/${signature}`;
   }
 
