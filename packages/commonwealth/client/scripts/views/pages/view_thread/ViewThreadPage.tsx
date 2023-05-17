@@ -806,6 +806,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              showDeleteButton={isAuthor || isAdmin}
+                              onDelete={() => {
+                                setInitializedPolls(false);
+                              }}
                             />
                           );
                         })}

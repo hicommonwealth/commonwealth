@@ -69,10 +69,19 @@ const deletePoll = async (
     });
     if (!polls) throw new AppError(Errors.NoPoll);
 
-    const poll = polls.find((p) => p.id === poll_id);
+    const poll = polls.find(
+      (p) => p.dataValues.id === parseInt(poll_id.toString())
+    );
     if (!poll) {
       throw new AppError(Errors.NoPoll);
     }
+
+    const votes = await models.Vote.findAll({
+      where: {
+        poll_id: poll.id,
+      },
+    });
+    await Promise.all(votes.map((v) => v.destroy()));
     await poll.destroy();
 
     if (polls.length === 1) {
