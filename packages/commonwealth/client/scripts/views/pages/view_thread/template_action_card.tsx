@@ -17,12 +17,12 @@ export const TemplateActionCard = ({
   return (
     <div>
       <CWContentPageCard
-        header="Turn into Proposal"
+        header="Add Template"
         content={
           <div className="TemplateActionCard">
             <CWButton
-              buttonType="primary-black"
-              label="Turn into proposal"
+              buttonType="mini-black"
+              label="Add Template"
               onClick={() => setIsModalOpen(true)}
             />
           </div>
