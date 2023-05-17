@@ -261,7 +261,13 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
               timestamp
             );
           await account.validate(signature, timestamp, chainId);
-          // Can't call authSession now, since chain.base is unknown, so we wait till action
+          app.sessions.authSession(
+            app.chain ? app.chain.base : this.selectedWallet.chain,
+            chainId,
+            account.address,
+            sessionPayload,
+            signature
+          );
           await logInWithAccount(account, true);
         } catch (e) {
           console.log(e);
@@ -270,12 +276,18 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         if (!linking) {
           try {
             const timestamp = +new Date();
-            const { signature, chainId } = await signSessionWithAccount(
+            const { signature, sessionPayload, chainId } = await signSessionWithAccount(
               this.selectedWallet,
               account,
               timestamp
             );
-            // Can't call authSession now, since chain.base is unknown, so we wait till action
+            app.sessions.authSession(
+              app.chain ? app.chain.base : this.selectedWallet.chain,
+              chainId,
+              account.address,
+              sessionPayload,
+              signature
+            );
             this.cachedWalletSignature = signature;
             this.cachedTimestamp = timestamp;
             this.cachedChainId = chainId;
