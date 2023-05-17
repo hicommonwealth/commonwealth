@@ -1,0 +1,53 @@
+@import '../../../../styles/shared';
+
+.select {
+    display: flex;
+    justify-content: space-between;
+    min-width: 144px;
+    max-width: max(24ch, 264px);
+    text-overflow: ellipsis;
+    padding: 10px 16px !important;
+    border-radius: $border-radius-md  !important;
+    cursor: pointer;
+    height: auto !important;
+    background-color: $white;
+    font-size: 14px;
+
+    &:hover,
+    &:active {
+        background-color: $neutral-50;
+    }
+}
+
+.select-options-wrapper {
+    min-width: 224px;
+    max-width: 320px;
+    text-overflow: ellipsis;
+    padding: 8px !important;
+    background-color: $white;
+    box-shadow: $elevation-3;
+    border-radius: $border-radius-md  !important;
+    overflow-y: auto;
+    max-height: 280px;
+}
+
+.select-option {
+    gap: 8px;
+    display: flex;
+    max-width: 34ch;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    align-items: center;
+    flex-direction: row;
+    text-overflow: ellipsis;
+    height: auto !important;
+    padding: 10px 12px !important;
+    border-radius: $border-radius-md  !important;
+    font-size: 14px;
+
+    &:hover,
+    &:active {
+        background-color: $neutral-50;
+    }
+}
