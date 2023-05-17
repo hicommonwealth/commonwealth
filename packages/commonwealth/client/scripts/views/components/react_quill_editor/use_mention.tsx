@@ -7,10 +7,7 @@ import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { debounce } from 'lodash';
-import { MentionCache } from './mention_cache';
-
-// local storage cache for mention search results
-const mentionCache = new MentionCache(1_000 * 60);
+import { TTLCache } from '../../../lib/search_results_cache';
 
 const Delta = Quill.import('delta');
 Quill.register('modules/mention', QuillMention);
@@ -24,6 +21,10 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
+  const mentionCache = useMemo(() => {
+    return new TTLCache(1_000 * 60, `mentions-${app.activeChainId()}`);
+  }, []);
+
   const selectMention = useCallback(
     (item: QuillMention) => {
       const editor = editorRef.current?.getEditor();
@@ -54,7 +55,7 @@ export const useMention = ({
         0
       );
     },
-    [lastSelectionRef]
+    [editorRef, lastSelectionRef]
   );
 
   const mention = useMemo(() => {

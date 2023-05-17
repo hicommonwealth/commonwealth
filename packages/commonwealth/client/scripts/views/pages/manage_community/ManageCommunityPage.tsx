@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
 import 'pages/manage_community/index.scss';
@@ -14,6 +14,7 @@ import { ChainMetadataRows } from './chain_metadata_rows';
 import { sortAdminsAndModsFirst } from './helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import { useDebounce } from 'usehooks-ts';
+import { TTLCache } from '../../../lib/search_results_cache';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -25,51 +26,65 @@ const ManageCommunityPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const fetch = (searchQuery?: string) => {
-    axios
-      .get(`${app.serverUrl()}/searchProfiles`, {
-        params: {
-          chain: app.activeChainId(),
-          search: searchQuery || '',
-          page_size: 100,
-          page: 1,
-          include_roles: true,
-        },
-      })
-      .then((res) => {
+  const membersCache = useMemo(() => {
+    return new TTLCache(
+      1_000 * 60,
+      `manage-community-members-${app.activeChainId()}`
+    );
+  }, []);
+
+  const fetch = async (searchQuery?: string) => {
+    try {
+      let profiles = [];
+
+      const cachedResult = membersCache.get(searchQuery);
+      if (cachedResult) {
+        profiles = cachedResult.profiles;
+      } else {
+        const res = await axios.get(`${app.serverUrl()}/searchProfiles`, {
+          params: {
+            chain: app.activeChainId(),
+            search: searchQuery || '',
+            page_size: 100,
+            page: 1,
+            include_roles: true,
+          },
+        });
         if (res.data.status !== 'Success') {
           throw new Error('Could not fetch members');
         }
+        membersCache.set(searchQuery, res.data.result);
+        profiles = res.data.result.profiles;
+      }
 
-        const memberAdmins = [];
-        const memberMods = [];
-        let roles = [];
+      const memberAdmins = [];
+      const memberMods = [];
+      let roles = [];
 
-        if (res.data.result.profiles.length > 0) {
-          roles = res.data.result.profiles.map((profile) => {
-            return {
-              ...(profile.roles[0] || {}),
-              Address: profile.addresses[0],
-            };
-          });
-          roles.sort(sortAdminsAndModsFirst).forEach((role) => {
-            if (role.permission === AccessLevel.Admin) {
-              memberAdmins.push(role);
-            } else if (role.permission === AccessLevel.Moderator) {
-              memberMods.push(role);
-            }
-          });
-        }
+      if (profiles.length > 0) {
+        roles = profiles.map((profile) => {
+          return {
+            ...(profile.roles[0] || {}),
+            Address: profile.addresses[0],
+          };
+        });
+        roles.sort(sortAdminsAndModsFirst).forEach((role) => {
+          if (role.permission === AccessLevel.Admin) {
+            memberAdmins.push(role);
+          } else if (role.permission === AccessLevel.Moderator) {
+            memberMods.push(role);
+          }
+        });
+      }
 
-        setAdmins(memberAdmins);
-        setMods(memberMods);
-        setRoleData(roles);
-        setInitialized(true);
-      })
-      .catch(() => {
-        setRoleData([]);
-        setInitialized(true);
-      });
+      setAdmins(memberAdmins);
+      setMods(memberMods);
+      setRoleData(roles);
+      setInitialized(true);
+    } catch (err) {
+      setRoleData([]);
+      setInitialized(true);
+    }
   };
 
   useEffect(() => {
