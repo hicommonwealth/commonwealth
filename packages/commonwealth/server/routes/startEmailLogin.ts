@@ -10,7 +10,7 @@ import {
 import { DynamicTemplate } from '../../shared/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
-import { validateChain } from '../middleware/validateChain';
+import { validateChainActivity } from '../middleware/validateChain';
 import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import sgMail from '@sendgrid/mail';
@@ -67,7 +67,7 @@ const startEmailLogin = async (
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
   const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
-  const [chain] = await validateChain(models, context);
+  const [chain] = await validateChainActivity.queryWithCache(models, context);
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;

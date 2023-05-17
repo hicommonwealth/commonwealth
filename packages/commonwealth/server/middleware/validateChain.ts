@@ -3,6 +3,8 @@
 
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
+import { Activity } from 'common-common/src/daemons/activity';
+import { RedisNamespaces } from 'common-common/src/types';
 
 export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',
@@ -13,7 +15,11 @@ export type ValidateChainParams = {
   chain_id?: string;
 };
 
-const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => ({
+const getChainQuery = (
+  chain_id: string,
+  models: DB,
+  includeTopics: boolean
+) => ({
   where: {
     id: chain_id,
   },
@@ -50,9 +56,38 @@ export const validateChain = async (
   return [chain, null];
 };
 
+const calcKey = (
+  models: DB,
+  params: ValidateChainParams,
+  includeTopics: Boolean
+) =>
+  `validateChain:${params.chain || params.chain_id}_${
+    includeTopics ? 'withTopics' : 'withoutTopics'
+  }`;
+export const validateChainActivity = new Activity(
+  'validateChain',
+  validateChain,
+  calcKey,
+  0,
+  RedisNamespaces.Global_Response
+);
+
 export const validateChainWithTopics = async (
   models: DB,
   params: ValidateChainParams
 ): Promise<[ChainInstance, string]> => {
-  return validateChain(models, params, true);
+  return validateChainActivity.queryWithCache(models, params, true);
+};
+
+export const recomputeValidateChainCache = async (models, chain_id) => {
+  await validateChainActivity.queryWithCacheOverride(
+    models,
+    { chain_id },
+    true
+  );
+  await validateChainActivity.queryWithCacheOverride(
+    models,
+    { chain_id },
+    false
+  );
 };

@@ -2,7 +2,10 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
-import { validateChain, validateChainWithTopics } from './validateChain';
+import {
+  validateChainActivity,
+  validateChainWithTopics,
+} from './validateChain';
 
 export const ALL_CHAINS = 'all_chains';
 
@@ -68,7 +71,7 @@ export default class DatabaseValidationService {
   ) => {
     const [chain, error] = await this.validateChainByRequestMethod(
       req,
-      validateChain
+      validateChainActivity.queryWithCache
     );
     if (error) return next(new AppError(error));
     if (req.query.chain !== ALL_CHAINS && !chain)

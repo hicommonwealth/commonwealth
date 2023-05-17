@@ -1,5 +1,5 @@
 import { AppError } from 'common-common/src/errors';
-import { validateChain } from '../middleware/validateChain';
+import { validateChainActivity } from '../middleware/validateChain';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -37,7 +37,9 @@ const setDiscordBotConfig = async (
     snapshot_channel_id,
   } = req.body;
 
-  const [error] = await validateChain(models, { chain_id });
+  const [error] = await validateChainActivity.queryWithCache(models, {
+    chain_id,
+  });
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {

@@ -5,6 +5,7 @@ import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findAllRoles } from '../util/roles';
+import { recomputeValidateChainCache } from '../middleware/validateChain';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -195,6 +196,7 @@ const deleteChain = async (
     });
   });
 
+  await recomputeValidateChainCache(models, chain.id);
   return success(res, { result: 'success' });
 };
 

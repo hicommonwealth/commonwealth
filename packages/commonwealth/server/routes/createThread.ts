@@ -23,6 +23,7 @@ import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { recomputeValidateChainCache } from '../middleware/validateChain';
 
 export const Errors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
@@ -444,6 +445,7 @@ const createThread = async (
     isCustomDomain: null,
   });
 
+  await recomputeValidateChainCache(models, chain.id);
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };
 

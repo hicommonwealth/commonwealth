@@ -9,7 +9,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { sequelize } from '../database';
-import { validateChain } from '../middleware/validateChain';
+import { validateChainActivity } from '../middleware/validateChain';
 import type { DB } from '../models';
 import { AddressAttributes, AddressInstance } from '../models/address';
 import { ChainInstance } from '../models/chain';
@@ -331,7 +331,7 @@ async function magicLoginRoute(
 
   // validate chain if provided (i.e. logging in on community page)
   if (req.body.chain) {
-    [chainToJoin, error] = await validateChain(models, req.body);
+    [chainToJoin, error] = await validateChainActivity.queryWithCache(models, req.body);
     if (error) return cb(error);
   }
 
