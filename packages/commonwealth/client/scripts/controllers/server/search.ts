@@ -272,12 +272,16 @@ class SearchController {
 
   public searchMentionableProfiles = async (
     searchTerm: string,
-    chainScope: string
+    chainScope: string,
+    pageSize?: number,
+    page?: number
   ) => {
     try {
       const response = await $.get(`${app.serverUrl()}/searchProfiles`, {
         chain: chainScope,
         search: searchTerm,
+        page_size: pageSize,
+        page,
       });
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);

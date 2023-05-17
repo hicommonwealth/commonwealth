@@ -1,4 +1,4 @@
-import  MinimumProfile from '../../../models/MinimumProfile';
+import MinimumProfile from '../../../models/MinimumProfile';
 import { RangeStatic } from 'quill';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
@@ -90,16 +90,17 @@ export const useMention = ({
             ];
           } else if (searchTerm.length > 2) {
             // try to get results from cache
-            let profiles = mentionCache.get(searchTerm);
+            let { profiles } = mentionCache.get(searchTerm) || {};
             if (!profiles) {
-              profiles = await app.search.searchMentionableProfiles(
+              const res = await app.search.searchMentionableProfiles(
                 searchTerm,
                 app.activeChainId()
               );
-              if (!profiles?.length) {
+              if (!res.profiles?.length) {
                 return;
               }
-              mentionCache.set(searchTerm, profiles);
+              profiles = res.profiles;
+              mentionCache.set(searchTerm, res);
             }
             formattedMatches = profiles.map((p: any) => {
               const profileId = p.id;

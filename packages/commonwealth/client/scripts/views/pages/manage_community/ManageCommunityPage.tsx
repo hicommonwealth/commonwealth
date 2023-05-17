@@ -13,6 +13,7 @@ import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { sortAdminsAndModsFirst } from './helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { useDebounce } from 'usehooks-ts';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -21,10 +22,19 @@ const ManageCommunityPage = () => {
   const [admins, setAdmins] = useState([]);
   const [mods, setMods] = useState([]);
 
-  const fetch = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+
+  const fetch = (searchQuery?: string) => {
     axios
-      .get(`${app.serverUrl()}/bulkMembers`, {
-        params: { chain: app.activeChainId() },
+      .get(`${app.serverUrl()}/searchProfiles`, {
+        params: {
+          chain: app.activeChainId(),
+          search: searchQuery || '',
+          page_size: 100,
+          page: 1,
+          include_roles: true,
+        },
       })
       .then((res) => {
         if (res.data.status !== 'Success') {
@@ -33,9 +43,16 @@ const ManageCommunityPage = () => {
 
         const memberAdmins = [];
         const memberMods = [];
+        let roles = [];
 
-        if (res.data.result.length > 0) {
-          res.data.result.sort(sortAdminsAndModsFirst).forEach((role) => {
+        if (res.data.result.profiles.length > 0) {
+          roles = res.data.result.profiles.map((profile) => {
+            return {
+              ...(profile.roles[0] || {}),
+              Address: profile.addresses[0],
+            };
+          });
+          roles.sort(sortAdminsAndModsFirst).forEach((role) => {
             if (role.permission === AccessLevel.Admin) {
               memberAdmins.push(role);
             } else if (role.permission === AccessLevel.Moderator) {
@@ -46,7 +63,7 @@ const ManageCommunityPage = () => {
 
         setAdmins(memberAdmins);
         setMods(memberMods);
-        setRoleData(res.data.result);
+        setRoleData(roles);
         setInitialized(true);
       })
       .catch(() => {
@@ -61,6 +78,12 @@ const ManageCommunityPage = () => {
     app.newProfiles.isFetched.off('redraw', forceRerender);
   }, [forceRerender]);
 
+  // on update debounced search term, fetch
+  useEffect(() => {
+    fetch(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
+
+  // on init, fetch
   useEffect(() => {
     if (!app.activeChainId()) {
       return;
@@ -134,7 +157,12 @@ const ManageCommunityPage = () => {
           onRoleUpdate={handleRoleUpdate}
           onSave={() => forceRerender()}
         />
-        <AdminPanelTabs onRoleUpgrade={handleRoleUpdate} roleData={roleData} />
+        <AdminPanelTabs
+          onRoleUpgrade={handleRoleUpdate}
+          roleData={roleData}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
       </div>
     </Sublayout>
   );
