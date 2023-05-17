@@ -74,7 +74,7 @@ const ViewSnapshotsProposalPage = lazy(
 const NewSnapshotProposalPage = lazy(
   () => import('views/pages/new_snapshot_proposal')
 );
-const AdminPanelPage = lazy(() => import('views/pages/admin_panel'));
+const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
@@ -360,7 +360,7 @@ const CommonDomainRoutes = () => [
 
   // SITE ADMIN
   <Route
-    path="/admin_panel"
+    path="/admin-panel"
     element={withLayout(AdminPanelPage, {
       deferChain: true,
     })}
