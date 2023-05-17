@@ -90,6 +90,7 @@ const updateChain = async (
     default_page,
     has_homepage,
     terms,
+    chain_node_id,
   } = req.body;
 
   let snapshot = req.body['snapshot[]'];
@@ -194,6 +195,9 @@ const updateChain = async (
     } else {
       chain.default_page = default_page;
     }
+  }
+  if (chain_node_id) {
+    chain.chain_node_id = chain_node_id;
   }
 
   // Set default allow/deny permissions
