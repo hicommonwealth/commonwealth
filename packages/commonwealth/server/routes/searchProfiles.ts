@@ -136,8 +136,6 @@ const searchProfiles = async (
       req.chain?.id
     );
 
-    console.log('num roles: ', roles.length);
-
     const addressIdRoles: Record<number, RoleInstanceWithPermission[]> = {};
     for (const role of roles) {
       const attributes = role.toJSON();
