@@ -6,7 +6,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import DeleteChainTask from './DeleteChainTask';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
-import 'pages/admin_panel.scss';
+import 'pages/AdminPanel.scss';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();

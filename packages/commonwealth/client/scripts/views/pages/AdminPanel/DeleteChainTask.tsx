@@ -6,7 +6,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { deleteChain } from './utils';
-import 'pages/admin_panel.scss';
+import 'pages/AdminPanel.scss';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 const DeleteChainTask = () => {
