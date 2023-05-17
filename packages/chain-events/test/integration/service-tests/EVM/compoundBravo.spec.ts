@@ -117,7 +117,6 @@ describe('Integration tests for Compound Bravo', () => {
           currentBlock.number + blocks
         }`
       );
-      // await sdk.advanceTime(String(secs), blocks);
       await sdk.safeAdvanceTime(
         proposalCreatedBlockNum + blocks,
         proposalCreatedBlockNum + 13140

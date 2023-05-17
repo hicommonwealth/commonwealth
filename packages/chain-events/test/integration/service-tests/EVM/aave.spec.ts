@@ -118,8 +118,6 @@ describe('Integration tests for Aave', () => {
           currentBlock.number + blocks
         }`
       );
-      // await sdk.advanceTime(String(secs), blocks);
-      // await sdk.awaitBlock(proposalCreatedBlockNum + 13140);
       await sdk.safeAdvanceTime(proposalCreatedBlockNum + blocks);
       const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
