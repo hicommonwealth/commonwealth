@@ -222,6 +222,9 @@ export const ERC20Form = (props: EthChainFormState) => {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               alt_wallet_url: ethChainFormFields.altWalletUrl,
               base: ChainBase.Ethereum,
+              id: id,
+              name: name,
+              address: ethChainFormFields.address,
               chain_string: ethChainFormFields.chainString,
               eth_chain_id: ethChainFormFields.ethChainId,
               icon_url: chainFormDefaultFields.iconUrl,

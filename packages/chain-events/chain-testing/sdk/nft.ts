@@ -21,7 +21,7 @@ export class ERC721 {
 
   /**
    * mint a new id for this nft
-   * @param tokenId new token id to mint(any number as string)
+   * @param tokenId new token id to mint (any number as a string)
    * @param to Account index to mint to
    * @returns
    */
@@ -53,7 +53,7 @@ export class ERC721 {
     to: number,
     from?: string,
     accountIndex?: number
-  ) {
+  ): Promise<{block: number}> {
     const request: erc721Approve = {
       nftAddress: this.address,
       tokenId,
@@ -81,7 +81,7 @@ export class ERC721 {
     to: number,
     from?: string,
     accountIndex?: number
-  ) {
+  ): Promise<{ block: number }> {
     const request: erc721Approve = {
       nftAddress: this.address,
       tokenId,

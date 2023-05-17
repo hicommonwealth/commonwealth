@@ -11,8 +11,12 @@ const voteButton = {
 export default voteButton;
 // type Story = StoryObj<typeof voteButton>;
 
-const VoteButton: FC = () => {
-  const [voteCount, setVoteCount] = useState<number>(0);
+interface VoteButtonProps {
+  count: number;
+}
+
+const VoteButton: FC<VoteButtonProps> = ({ count }) => {
+  const [voteCount, setVoteCount] = useState<number>(count);
 
   return (
     <CWThreadVoteButton
@@ -27,5 +31,13 @@ const VoteButton: FC = () => {
 // export const VoteButtonStory: Story = {
 export const VoteButtonStory = {
   name: 'Vote Button',
-  render: () => <VoteButton />
+  args: {
+    voteCount: 0,
+  },
+  argTypes: {
+    voteCount: {
+      control: { type: "number" },
+    },
+  },
+  render: ({...args}) => <VoteButton count={args.voteCount} />
 }

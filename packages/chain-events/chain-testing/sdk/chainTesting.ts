@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import {
   chainAdvanceTime,
   chainGetEth,
+  erc20Approve,
   erc20BalanceReq,
   erc20Transfer,
   govCompCreate,
@@ -92,12 +93,39 @@ export class ChainTesting {
   }
 
   /**
+   * Approve a spender to spend an ERC20 token
+   * @param tokenAddress ERC20 token address
+   * @param spender address to approve
+   * @param amount amount to approve
+   * @param accountIndex account index to create approve tx from(erc20.approve)
+   */
+  public async approveErc20(
+    tokenAddress: string,
+    spender: string,
+    amount: string,
+    accountIndex?: number
+  ): Promise<{block: number}> {
+    const request: erc20Approve = {
+      tokenAddress,
+      spender,
+      amount,
+      accountIndex,
+    };
+    const response = await axios.post(
+      `${this.host}/erc20/approve`,
+      JSON.stringify(request),
+      this.header
+    );
+    return response.data;
+  }
+
+  /**
    * Gets ERC20 tokens from a 'Bank Wallet'
    * @param tokenAddress ERC20 token address
    * @param to address to transfer to
    * @param amount amount in ether to receive
    */
-  public async getErc20(tokenAddress: string, to: string, amount: string) {
+  public async getErc20(tokenAddress: string, to: string, amount: string): Promise<{block: number}> {
     const fromBank = true;
     const request: erc20Transfer = { tokenAddress, to, amount, fromBank };
     const response = await axios.post(
@@ -201,7 +229,7 @@ export class ChainTesting {
       JSON.stringify(request),
       this.header
     );
-    response.data;
+    return response.data;
   }
 
   /**
@@ -263,12 +291,32 @@ export class ChainTesting {
   }
 
   /**
+   * Given a desired block number, this function will wait until the chain reaches that block
+   * @param desiredBlockNum The desired block number to wait for
+   * @param maxWaitTime The maximum amount of time to wait for the desired block number. Default is 120 seconds
+   */
+  public async awaitBlock(desiredBlockNum: number, maxWaitTime = 60): Promise<void>{
+    let waitTime = 0;
+    /* eslint-disable */
+    while (true) {
+      if (waitTime >= maxWaitTime) throw new Error('Timed out waiting for block');
+      const currentBlock = (await this.getBlock()).number;
+      if (currentBlock >= desiredBlockNum) {
+        return;
+      }
+      await new Promise<void>(resolve => setTimeout(resolve, 1000));
+      waitTime += 1;
+    }
+  }
+
+  /**
    * advance the timestamp and block
    * @param seconds amount of seconds to add to timestamp
+   * @param blocks amount of blocks to mine
    * @returns '{PreTime, PostTime}'
    */
-  public async advanceTime(seconds: string) {
-    const request: chainAdvanceTime = { seconds };
+  public async advanceTime(seconds: string, blocks = 1) {
+    const request: chainAdvanceTime = { seconds, blocks };
     const response = await axios.post(
       `${this.host}/chain/advanceTime`,
       JSON.stringify(request),

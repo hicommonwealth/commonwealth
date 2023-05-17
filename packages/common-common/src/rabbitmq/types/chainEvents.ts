@@ -1,6 +1,6 @@
 import type { CWEvent } from 'chain-events/src';
-import type { RmqMsgNamespace } from 'common-common/src/rabbitmq';
-import { RmqMsgFormatError } from 'common-common/src/rabbitmq';
+import type { RmqMsgNamespace } from 'common-common/src/rabbitmq/types';
+import { RmqMsgFormatError } from 'common-common/src/rabbitmq/types';
 
 /**
  * This class is merged with the namespace with the same name below so that within one object we have the invalid
