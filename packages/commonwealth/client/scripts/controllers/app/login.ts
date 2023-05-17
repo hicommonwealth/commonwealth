@@ -305,7 +305,9 @@ export async function loginWithMagicLink(email: string) {
     extensions: isCosmos
       ? [
           new CosmosExtension({
-            rpcUrl: app.chain.meta?.node?.url,
+            // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
+            // so we can't use app.chain.meta?.node?.url
+            rpcUrl: `${document.location.origin}/magicCosmosAPI/${app.chain.id}`
           }),
         ]
       : null,

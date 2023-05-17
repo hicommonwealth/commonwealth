@@ -16,6 +16,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const defaultCacheDuration = 60 * 10; // 10 minutes
 
 function setupCosmosProxy(app: Express, models: DB) {
+
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:chain',
@@ -53,10 +54,9 @@ function setupCosmosProxy(app: Express, models: DB) {
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
-    }
-  );
+    });
 
-  // for gov v1 queries.
+  // for gov v1 queries, and magic link
   app.use(
     '/cosmosLCD/:chain',
     bodyParser.text(),
@@ -90,11 +90,15 @@ function setupCosmosProxy(app: Express, models: DB) {
         });
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
-            response.data,
-            null,
-            2
-          )}`
+             response.data,
+             null,
+             2
+           )}`
         );
+        // special case: magicCosmosAPI is CORS-approved for the magic iframe
+        if (req.originalUrl.startsWith('/magicCosmosAPI')) {
+          res.setHeader('Access-Control-Allow-Origin', 'https://auth.magic.link');
+        }
         return res.send(response.data);
       } catch (err) {
         res.status(500).json({ message: err.message });
