@@ -221,7 +221,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         const { signature, chainId, sessionPayload } =
           await signSessionWithAccount(this.selectedWallet, account, timestamp);
         await account.validate(signature, timestamp, chainId);
-        app.sessions.authSession(
+        await app.sessions.authSession(
           app.chain.base,
           chainId,
           account.address,
@@ -261,7 +261,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
               timestamp
             );
           await account.validate(signature, timestamp, chainId);
-          app.sessions.authSession(
+          await app.sessions.authSession(
             app.chain ? app.chain.base : this.selectedWallet.chain,
             chainId,
             account.address,
@@ -361,7 +361,8 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           this.cachedTimestamp,
           this.cachedChainId
         );
-        // Can't call authSession now, since chain.base is unknown, so we wait till action
+        // TODO call authSession here, which requires special handling because of
+        // the call to signSessionWithAccount() earlier
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);
