@@ -70,6 +70,7 @@
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 1rem;
+  width: calc(100% - 15%);
 
   &:hover {
     background-color: #f0f0f0;
