@@ -160,3 +160,18 @@ export const countLinesQuill = (delta: DeltaStatic): number => {
 export const countLinesMarkdown = (text: string): number => {
   return text.split('\n').length - 1;
 };
+
+// fetchTwitterEmbedInfo fetches and returns the embed info (including HTML) for a tweet
+export const fetchTwitterEmbedInfo = async (url: string) => {
+  // this will not work locally due to CORS
+  const embedInfoUrl = 'https://publish.twitter.com/oembed';
+  const res = await axios.get(embedInfoUrl, {
+    params: {
+      url,
+    },
+  });
+  if (res.status >= 300) {
+    throw new Error(res.data);
+  }
+  return res.data;
+};

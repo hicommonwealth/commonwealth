@@ -12,27 +12,13 @@ import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
-import { countLinesMarkdown } from './utils';
+import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
 import removeMarkdown from 'markdown-to-text';
 import { QuillRendererProps } from './quill_renderer';
-import axios from 'axios';
 import { loadScript } from 'helpers';
 import { debounce } from 'lodash';
-
-const fetchTwitterEmbedInfo = async (url: string) => {
-  // this will not work locally due to CORS
-  const embedInfoUrl = 'https://publish.twitter.com/oembed';
-  const res = await axios.get(embedInfoUrl, {
-    params: {
-      url,
-    },
-  });
-  if (res.status >= 300) {
-    throw new Error(res.data);
-  }
-  return res.data;
-};
+import { twitterLinkRegex } from 'helpers/constants';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -129,13 +115,11 @@ export const MarkdownFormattedText = ({
         containerRef.current,
         NodeFilter.SHOW_ELEMENT
       );
-      const twitterRe =
-        /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
 
       while (walker?.nextNode()) {
         if (walker.currentNode instanceof HTMLAnchorElement) {
           const href = walker.currentNode?.href;
-          if (href.match(twitterRe)) {
+          if (href.match(twitterLinkRegex)) {
             // fetch embed info
             const embedInfo = await fetchTwitterEmbedInfo(href);
             if (embedInfo.result.html) {

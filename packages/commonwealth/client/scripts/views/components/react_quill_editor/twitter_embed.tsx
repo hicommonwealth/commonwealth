@@ -1,7 +1,8 @@
+import { twitterLinkRegex } from 'helpers/constants';
 import { loadScript } from 'helpers';
 import { cloneDeep } from 'lodash';
 import { DeltaStatic } from 'quill';
-import ReactQuill, { Quill } from 'react-quill';
+import { Quill } from 'react-quill';
 
 const BlockEmbed = Quill.import('blots/block/embed');
 
@@ -42,18 +43,15 @@ Quill.register('formats/twitter', TwitterBlot);
 export const convertTwitterLinksToEmbeds = (
   content: DeltaStatic
 ): DeltaStatic => {
-  const twitterRe =
-    /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
-
   const newContent = cloneDeep(content);
 
   for (let i = 0; i < (newContent.ops?.length || 0); i++) {
     const op = newContent.ops[i];
     const link = op.attributes?.link || '';
     if (link) {
-      const embeddableTweet = twitterRe.test(link);
+      const embeddableTweet = twitterLinkRegex.test(link);
       if (embeddableTweet) {
-        const id = link.match(twitterRe)[1];
+        const id = link.match(twitterLinkRegex)[1];
         if (typeof id === 'string' && id) {
           newContent.ops[i] = {
             insert: {
