@@ -4040,6 +4040,7 @@
     long "^4.0.0"
     secretjs "^0.17.0"
 
+<<<<<<< HEAD
 "@libp2p/bootstrap@^6.0.3":
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/@libp2p/bootstrap/-/bootstrap-6.0.3.tgz#0e91542808972ac966919d2b0a5bcdbf71144ca7"
@@ -4638,6 +4639,12 @@
     p-timeout "^6.0.0"
     wherearewe "^2.0.1"
     ws "^8.12.1"
+=======
+"@magic-ext/cosmos@^12.1.3":
+  version "12.1.3"
+  resolved "https://registry.yarnpkg.com/@magic-ext/cosmos/-/cosmos-12.1.3.tgz#4e7eed788d0611129cd6aeafa3d334a64623a1fd"
+  integrity sha512-tsCKMF+GTMd9jfdhm6VN9zXR/XrIoTzpa8Y0j74iFGiISm8PyHfyT4Sp+Y5KXP6E29dOBCaZfslK/rzHpn0SHA==
+>>>>>>> origin/mark.3824-magic-cosmos
 
 "@magic-sdk/admin@^0.1.0-beta.8":
   version "0.1.0-beta.10"
@@ -4649,34 +4656,34 @@
     express "^4.17.1"
     node-fetch "^2.6.0"
 
-"@magic-sdk/admin@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-1.8.0.tgz#2a89e80a2c509bf91fbb925177abe2bd95694c18"
-  integrity sha512-9QXSyLM72kKeCwCYYfTBzMQ1ww+bPGFTKoO22bNBhalDC/Z068THc1B6DtzE9kROHLwyBmdBd5o8wDDkvwEwrg==
+"@magic-sdk/admin@^1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-1.10.0.tgz#9c5e17f65fe136ba670446e2513d64f80e1544fe"
+  integrity sha512-byPp3DPpGyl+/71zN7lyKlLFEJuP944hI0NArHkJkCDsZBcSZ+6X3T9ipetnKz8MM2eCVTQB+HkYeNDd9lct2Q==
   dependencies:
     "@types/atob" "^2.1.2"
     atob "^2.1.2"
     ethereum-cryptography "^1.0.1"
     node-fetch "^2.6.0"
 
-"@magic-sdk/commons@^9.2.0":
-  version "9.2.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/commons/-/commons-9.2.0.tgz#ed1b1c2ea94d2735b0dc59f8b9a08fa3304a5de0"
-  integrity sha512-knMOccC3rVhaHzWAmcVA1hHeT38823gxht7Um1gUx4wMjJ7CCRTcBn38nd4ibfgXwTg2nIdw3MrgSyfjeFaKgQ==
+"@magic-sdk/commons@^13.1.3":
+  version "13.1.3"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/commons/-/commons-13.1.3.tgz#c7a60970f1e8fb67b6e3ad8b0668c3135fff728b"
+  integrity sha512-4cdQz81G/W3TjxnR1YAlKQslXr1BpyAjmv+VbhtrUzcIAJGKZXFQ8hbpkOPauK5qc+isHJPbEQ2Qj/BNn0R7Sg==
 
-"@magic-sdk/provider@^13.2.0":
-  version "13.2.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/provider/-/provider-13.2.0.tgz#db98b239c389341697bac6e9ac4fc252102c82de"
-  integrity sha512-56J8JoXKPVYYtVxRL/0Y0UhLFb/tdY3wWf4u3QZNtiArw6LGrNMLYr8HXb9pqTMV0eBVT9FEMmY68EHEIv4xwg==
+"@magic-sdk/provider@^17.1.3":
+  version "17.1.3"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/provider/-/provider-17.1.3.tgz#a5e708b0385c7b0d9b5d75523c9e7a39fffd7a54"
+  integrity sha512-1Bhu09EQmeNtBu4LwsYxaXOtbPvDRlzyMqCOlVls3pz1O0JZNoVGuDe4RBH4nLS6+3kTIIpyh+iAz4MLaVctnA==
   dependencies:
-    "@magic-sdk/types" "^11.2.0"
+    "@magic-sdk/types" "^15.1.3"
     eventemitter3 "^4.0.4"
     web3-core "1.5.2"
 
-"@magic-sdk/types@^11.2.0":
-  version "11.2.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-11.2.0.tgz#b17e622f0c75fbe2387fe71c92cc7a421e279bb9"
-  integrity sha512-pku7XklWE7TaHIlSfOoJoksnAgwR3PvL49wpUGHtd+QxmKtDxSbmWoHdllk6j/N3vd5eAk5Whxposp96QeYm/g==
+"@magic-sdk/types@^15.1.3":
+  version "15.1.3"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-15.1.3.tgz#57f8c814e5b8a9a16349e13b19cb981e69dc6671"
+  integrity sha512-ee0pIHoJkm3BX3WiunJYdQwqP0PNK46Rnelhc7RYq+pG46SuWAUGrJo2dzT7+RYJNo7dRqKNnVJ/WahPSLvkuQ==
 
 "@mapbox/node-pre-gyp@^1.0.0":
   version "1.0.6"
@@ -19296,14 +19303,14 @@ lz-string@^1.4.4:
   resolved "https://registry.yarnpkg.com/lz-string/-/lz-string-1.5.0.tgz#c1ab50f77887b712621201ba9fd4e3a6ed099941"
   integrity sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==
 
-magic-sdk@^13.2.0:
-  version "13.2.0"
-  resolved "https://registry.yarnpkg.com/magic-sdk/-/magic-sdk-13.2.0.tgz#c759c700ec94c4ad971851b6c53bd7ae38a3fcee"
-  integrity sha512-VXVHkhi+REynxdVUItVMs7WR7QxipgLuBHSr2qI8qhcjAzTim8OByRdx8eCYFgy8KkqIQEpuMX4fPzkTvWAV4Q==
+magic-sdk@^17.1.4:
+  version "17.1.4"
+  resolved "https://registry.yarnpkg.com/magic-sdk/-/magic-sdk-17.1.4.tgz#353fcbbca06e462d896058c8ca7f4108c3b6244e"
+  integrity sha512-VNRVIEiC+RH2l8U3XGMrJiPhTA7bpfen7cEqe25p/jCl6fPXxd9ISN1ZJN5ypj2KO8obbllY0evgkm6UgDi5zg==
   dependencies:
-    "@magic-sdk/commons" "^9.2.0"
-    "@magic-sdk/provider" "^13.2.0"
-    "@magic-sdk/types" "^11.2.0"
+    "@magic-sdk/commons" "^13.1.3"
+    "@magic-sdk/provider" "^17.1.3"
+    "@magic-sdk/types" "^15.1.3"
     localforage "^1.7.4"
 
 make-dir@^1.0.0:

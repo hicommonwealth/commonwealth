@@ -2,8 +2,7 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import type { WalletId } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -17,6 +16,7 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -297,7 +297,24 @@ export async function unlinkLogin(account: AddressInfo) {
 
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
+  let chainAddress;
+  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: isCosmos
+      ? [
+          new CosmosExtension({
+            rpcUrl: app.chain.meta?.node?.url,
+          }),
+        ]
+      : null,
+  });
+
+  if (isCosmos) {
+    chainAddress = await magic.cosmos.changeAddress(
+      app.chain.meta.bech32Prefix
+    );
+  }
+
   const didToken = await magic.auth.loginWithMagicLink({ email });
 
   // skip wallet.signCanvasMessage(), do the logic here instead
@@ -330,6 +347,7 @@ export async function loginWithMagicLink(email: string) {
     data: {
       // send chain/community to request
       chain: app.activeChainId(),
+      address: chainAddress,
     },
   });
   if (response.status === 'Success') {
