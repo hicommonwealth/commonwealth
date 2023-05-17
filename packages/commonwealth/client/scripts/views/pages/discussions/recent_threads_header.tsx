@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from 'react';
-
-import { parseCustomStages } from 'helpers';
+import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
+import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/discussions/recent_threads_header.scss';
+import React, { useEffect, useState } from 'react';
+import { matchRoutes } from 'react-router-dom';
+import app from 'state';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-
-import 'pages/discussions/recent_threads_header.scss';
-
-import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import { StagesMenu } from './stages_menu';
-import { TopicsMenu } from './topics_menu';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { EditTopicModal } from 'views/modals/edit_topic_modal';
-import useForceRerender from 'hooks/useForceRerender';
+import { Select } from '../../components/Select';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -81,6 +78,11 @@ export const RecentThreadsHeader = ({
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
+  const matchesDiscussionsTopicRoute = matchRoutes(
+    [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
+    location
+  );
+
   return (
     <div className="RecentThreadsHeader">
       {isUndefined(topic) && (
@@ -128,22 +130,122 @@ export const RecentThreadsHeader = ({
       )}
       {app.chain?.meta && (
         <div className="buttons-row">
+          <p className="filter-label">Sort</p>
+          <Select
+            selected={'newest'}
+            options={[
+              {
+                id: 1,
+                value: 'newest',
+                label: 'Newest',
+                iconLeft: 'sparkle',
+              },
+              {
+                id: 2,
+                value: 'oldest',
+                label: 'Oldest',
+                iconLeft: 'clockCounterClockwise',
+              },
+              {
+                id: 3,
+                value: 'likes',
+                label: 'Likes',
+                iconLeft: 'heart',
+              },
+              {
+                id: 4,
+                value: 'comments',
+                label: 'Comments',
+                iconLeft: 'chatDots',
+              },
+            ]}
+          />
+
+          <p style={{ marginLeft: 'auto' }}></p>
+          <p className="filter-label">Filter</p>
           {topics.length > 0 && (
-            <TopicsMenu
-              featuredTopics={featuredTopics}
-              otherTopics={otherTopics}
-              selectedTopic={selectedTopic}
-              topic={topic}
-              onEditClick={(editTopic) => setTopicSelectedToEdit(editTopic)}
+            <Select
+              selected={
+                matchesDiscussionsTopicRoute?.[0]?.params?.topic || 'All Topics'
+              }
+              onSelect={(item: any) =>
+                navigate(
+                  `/discussions` +
+                    (item === 'All Topics' ? '' : `/${item.value}`)
+                )
+              }
+              options={[
+                {
+                  id: 0,
+                  label: 'All Topics',
+                  value: 'All Topics',
+                },
+                ...[...featuredTopics, ...otherTopics].map((t) => ({
+                  id: t.id,
+                  value: t.name,
+                  label: t.name,
+                })),
+              ]}
+              dropdownPosition="bottom-end"
+              canEditOption={app.roles?.isAdminOfEntity({
+                chain: app.activeChainId(),
+              })}
+              onOptionEdit={(item: any) =>
+                setTopicSelectedToEdit(
+                  [...featuredTopics, ...otherTopics].find(
+                    (x) => x.id === item.id
+                  )
+                )
+              }
             />
           )}
           {stagesEnabled && (
-            <StagesMenu
-              selectedStage={selectedStage}
-              stage={stage}
-              stages={stages}
+            <Select
+              selected={selectedStage || 'All Stages'}
+              onSelect={(item: any) =>
+                navigate(
+                  `/discussions` +
+                    (item === 'All Stages' ? '' : `?stage=${item.value}`)
+                )
+              }
+              options={[
+                {
+                  id: 0,
+                  label: 'All Stages',
+                  value: 'All Stages',
+                },
+                ...stages.map((s) => ({
+                  id: s,
+                  value: s,
+                  label: `${threadStageToLabel(s)} ${
+                    s === ThreadStage.Voting ? app.threads.numVotingThreads : ''
+                  }`,
+                })),
+              ]}
+              dropdownPosition="bottom-end"
             />
           )}
+          <Select
+            selected={'allTime'}
+            options={[
+              {
+                id: 1,
+                value: 'allTime',
+                label: 'All Time',
+              },
+              {
+                id: 2,
+                value: 'month',
+                label: 'Month',
+              },
+              {
+                id: 3,
+                value: 'week',
+                label: 'Week',
+              },
+            ]}
+            dropdownPosition="bottom-end"
+          />
         </div>
       )}
 
