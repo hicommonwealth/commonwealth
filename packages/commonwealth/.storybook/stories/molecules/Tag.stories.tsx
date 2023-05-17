@@ -25,7 +25,7 @@ export const Tag: Story = {
       control: { type: "text" },
     },
     type: {
-      control: { type: "select" },
+      control: { type: "radio" },
     },
     iconName: {
       control: { type: "select" },
