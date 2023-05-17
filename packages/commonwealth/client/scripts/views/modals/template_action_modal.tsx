@@ -30,7 +30,7 @@ export const TemplateSelectorItem = ({
 }: TemplateSelectorItemProps) => {
   return (
     <div className="TemplateSelectorItem" onClick={onClick}>
-      <div className="template-nickname">{template.nickname}</div>
+      <div className="template-nickname">{template.name}</div>
       <div className="template-contract-address">
         Created By: {template.created_by}
       </div>
