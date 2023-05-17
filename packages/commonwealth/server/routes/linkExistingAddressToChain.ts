@@ -41,6 +41,12 @@ const linkExistingAddressToChain = async (
   if (!req.user?.id) {
     return next(new AppError(Errors.NeedLoggedIn));
   }
+  if (req.body.chain == 'injective') {
+    if (req.body.address.slice(0, 3) !== 'inj')
+      return next(new AppError('Must join with Injective address'));
+  } else if (req.body.address.slice(0, 3) === 'inj') {
+    return next(new AppError('Cannot join with an injective address'));
+  }
   const userId = req.user.id;
 
   const chain = await models.Chain.findOne({
