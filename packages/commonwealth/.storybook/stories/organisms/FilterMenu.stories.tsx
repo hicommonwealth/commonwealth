@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta } from "@storybook/react";
 
 import { CWFilterMenu } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_filter_menu';
 import type { CheckboxType } from '../../../client/scripts/views/components/component_kit/cw_checkbox';
@@ -10,7 +10,6 @@ const filter = {
 } satisfies Meta<typeof CWFilterMenu>;
 
 export default filter;
-// type Story = StoryObj<typeof filter>;
 
 const checkboxGroupOptions: Array<CheckboxType> = [
   {
@@ -65,7 +64,6 @@ const FilterMenu: FC<FilterMenuProps> = (props) => {
   )
 }
 
-// export const FilterMenuStory: Story = {
 export const FilterMenuStory = {
   name: 'Filter Menu',
   args: {
@@ -75,6 +73,14 @@ export const FilterMenuStory = {
   argTypes: {
     header: {
       control: { type: "text" },
+    }
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        "filterMenuItems",
+        "selectedItems",
+      ],
     }
   },
   render: ({...args}) => (

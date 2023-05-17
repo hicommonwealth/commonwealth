@@ -24,6 +24,29 @@ export const Textarea: Story = {
       control: { type: "text" },
     },
   },
+  parameters: {
+    controls: {
+      exclude: [
+        "autoComplete",
+        "autoFocus",
+        "containerClassName",
+        "defaultValue",
+        "disabled",
+        "value",
+        "iconRight",
+        "iconRightonClick",
+        "inputValidationFn",
+        "maxLength",
+        "name",
+        "onInput",
+        "onenterkey",
+        "tabIndex",
+        "manualStatusMessage",
+        "manualValidationStatus",
+        "validationStatus",
+      ],
+    }
+  },
   render: ({...args}) => (
     <CWTextArea
       name="Textarea"

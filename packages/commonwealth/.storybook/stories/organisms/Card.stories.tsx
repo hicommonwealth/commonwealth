@@ -47,7 +47,7 @@ export const CardStory: Story = {
   },
   argTypes: {
     elevation: {
-      control: { type: "select" },
+      control: { type: "radio" },
       options: [ "elevation-1", "elevation-2", "elevation-3" ],
     },
     fullWidth: {
@@ -64,6 +64,16 @@ export const CardStory: Story = {
     content: {
       control: { type: "text" }
     },
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        "onmouseover",
+        "onMouseEnter",
+        "onMouseLeave",
+        "className",
+      ],
+    }
   },
   render: ({...args}) => (
     <Card elevation={args.elevation} {...args}>

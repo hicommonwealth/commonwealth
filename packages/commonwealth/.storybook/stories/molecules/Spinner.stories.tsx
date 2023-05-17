@@ -11,4 +11,14 @@ const spinner = {
 export default spinner;
 type Story = StoryObj<typeof spinner>;
 
-export const Spinner: Story = { render: () => <CWSpinner /> }
+export const Spinner: Story = {
+  args: {
+    size: "xl",
+  },
+  argTypes: {
+    size: {
+      control: { type: "radio" },
+      options: ["xxs", "xs", "small", "medium", "large", "xl", "xxl"],
+    },
+  },
+  render: ({...args}) => <CWSpinner {...args} />}

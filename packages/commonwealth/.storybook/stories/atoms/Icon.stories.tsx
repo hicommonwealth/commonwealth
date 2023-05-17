@@ -55,6 +55,9 @@ export const IconStory: Story = {
       options: [ true, false ],
     },
   },
+  parameters: {
+    controls: { exclude: ["selected", "componentType", "argTypes"] }
+  },
   render: ({...args}) => <CWIcon {...args} />
 }
 
@@ -70,7 +73,7 @@ export const IconButtonStory: Story = {
   argTypes: {
     ...commonArgTypes,
     iconButtonTheme: {
-      control: { type: "select" },
+      control: { type: "radio" },
       options: ["black", "neutral", "primary", "hasBackground"],
     },
     disabled: {
@@ -80,6 +83,9 @@ export const IconButtonStory: Story = {
       options: [ true, false ],
     },
     // TODO handle selected
+  },
+  parameters: {
+    controls: { exclude: ["className", "componentType", "argTypes"] }
   },
   render: ({...args}) => <IconButton {...args} />
 }

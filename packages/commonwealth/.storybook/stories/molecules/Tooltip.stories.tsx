@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 
 import { CWTooltip } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_tooltip';
 import { CWAddressTooltip } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_address_tooltip';
@@ -17,7 +17,6 @@ const tooltip = {
 } satisfies Meta<typeof CWTooltip>;
 
 export default tooltip;
-// type Story = StoryObj<typeof tooltip>;
 
 type InteractionType = (e: any) => void;
 
@@ -45,7 +44,6 @@ const Tooltip: FC<TooltipProps> = (props) => {
   );
 }
 
-// export const Overview: Story = {
 export const Overview = {
   args: {
     content: `
@@ -68,6 +66,9 @@ export const Overview = {
       options: [ true, false ],
     },
   },
+  parameters: {
+    controls: { exclude: ["renderTrigger"], }
+  },
   render: ({...args}) => (
     <Tooltip
       content={args.content}
@@ -77,7 +78,6 @@ export const Overview = {
   ),
 }
 
-// export const AddressTooltip: Story = {
 export const AddressTooltip = {
   args: {
     address: "0xa5430730f12f1128bf10dfba38c8e00bc4d90eea",
@@ -92,7 +92,9 @@ export const AddressTooltip = {
       options: iconOptions,
     },
   },
-  name: 'Address tooltip',
+  parameters: {
+    controls: { exclude: ["content", "renderTrigger"], }
+  },
   render: ({...args}) => (
     <div className="tooltip-row">
       <CWAddressTooltip

@@ -48,6 +48,9 @@ export const Primary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "primary-red", "primary-blue", "primary-blue-dark", "primary-black" ]),
+  parameters: {
+    controls: { exclude: ["className"] }
+  },
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!')} />
   ),

@@ -29,11 +29,11 @@ export const Text: Story = {
       options: [ true, false ],
     },
     fontStyle: {
-      control: { type: "radio" },
+      control: { type: "inline-radio" },
       options: [ undefined, 'italic', 'uppercase' ],
     },
     fontWeight: {
-      control: { type: "radio" },
+      control: { type: "inline-radio" },
       options: [ "regular", "medium", "semiBold", "bold", "black", "italic", "uppercase" ],
     },
     isCentered: {
@@ -43,7 +43,7 @@ export const Text: Story = {
       options: [ true, false ],
     },
     type: {
-      control: { type: "radio" },
+      control: { type: "inline-radio" },
       options: [ "d1", "d2", "h1", "h2", "h3", "h4", "h5", "b1", "b2", "caption", "buttonSm", "buttonLg", "buttonMini" ],
     },
   },

@@ -7,6 +7,24 @@ import { iconLookup } from '../../../client/scripts/views/components/component_k
 
 const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
+const commonControlsToExclude = [
+  "autoComplete",
+  "containerClassName",
+  "defaultValue",
+  "autoFocus",
+  "value",
+  "iconRightonClick",
+  "maxLength",
+  "name",
+  "onInput",
+  "onenterkey",
+  "tabIndex",
+  "inputClassName",
+  "displayOnly",
+  "hasRightIcon",
+  "isTyping",
+];
+
 const input = {
   title: 'Molecules/TextInput',
   component: CWTextInput,
@@ -47,6 +65,18 @@ export const TextInput: Story = {
       control: { type: "boolean" },
       options: [ true, false ],
     },
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        ...commonControlsToExclude,
+        "autoFocus",
+        "inputValidationFn",
+        "manualStatusMessage",
+        "manualValidationStatus",
+        "validationStatus",
+      ],
+    }
   },
   render: ({...args}) => (
     <CWTextInput name="Text field" {...args} />
@@ -93,6 +123,11 @@ export const OnlyLetters = {
     },
     validationSuccessText: {
       control: { type: "text" },
+    }
+  },
+  parameters: {
+    controls: {
+      exclude: [ ...commonControlsToExclude ],
     }
   },
   render: ({...args}) => (

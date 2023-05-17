@@ -20,7 +20,14 @@ export const Breadcrumbs: Story = {
       { label: "Current" },
     ],
   },
-  argTypes: {},
+  argTypes: {
+    breadcrumbs: {
+      // mapping: breadcrumbs,
+      control: {
+        type: "object",
+      },
+    },
+  },
   render: ({...args}) => (
     <CWBreadcrumbs {...args} />
   )

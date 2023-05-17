@@ -74,11 +74,11 @@ export const PopoverMenuStory = {
   name: 'Popover Menu',
   args: {
     header1: "Community",
-    header2: "Universal",
     label1: "Create Thread",
     iconLabel1: "write",
     label2: "Create Snapshot",
     iconLabel2: "write",
+    header2: "Universal",
     label3: "Create Community",
     iconLabel3: "people",
     bottom: "Report",
@@ -94,19 +94,19 @@ export const PopoverMenuStory = {
     label1: {
       control: { type: "text" }
     },
+    label2: {
+      control: { type: "text" }
+    },
+    label3: {
+      control: { type: "text" }
+    },
     iconLabel1: {
       control: { type: "select" },
       options: iconOptions,
     },
-    label2: {
-      control: { type: "text" }
-    },
     iconLabel2: {
       control: { type: "select" },
       options: iconOptions,
-    },
-    label3: {
-      control: { type: "text" }
     },
     iconLabel3: {
       control: { type: "select" },
@@ -119,6 +119,14 @@ export const PopoverMenuStory = {
       control: { type: "select" },
       options: iconOptions,
     },
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        "menuItems",
+        "renderTrigger",
+      ],
+    }
   },
   render: ({...args}) => (
     <Popover

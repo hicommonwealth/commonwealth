@@ -13,7 +13,7 @@ export default dropdown;
 type Story = StoryObj<typeof dropdown>;
 
 interface DropdownProps {
-  label: string,
+  label: string | undefined,
   options: DropdownItemType[],
   onSelect: ((item: DropdownItemType) => void) | undefined,
 }
@@ -44,6 +44,15 @@ export const DropdownStory: Story = {
     label: {
       control: { type: "text" },
     },
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        "initialValue",
+        "containerClassName",
+        "disabled",
+      ],
+    }
   },
   render: ({...args}) => (
     <Dropdown

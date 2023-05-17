@@ -30,5 +30,8 @@ export const RadioButton: Story = {
       options: [ true, false ],
     },
   },
+  parameters: {
+    controls: { exclude: ["label", "groupName"] }
+  },
   render: ({...args}) => <CWRadioButton {...args}/>
 }
