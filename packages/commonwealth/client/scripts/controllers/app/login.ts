@@ -5,6 +5,7 @@ import { initAppState } from 'state';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
+import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
@@ -16,7 +17,6 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
-import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -297,6 +297,8 @@ export async function unlinkLogin(account: AddressInfo) {
 
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
+  const { CosmosExtension } = await import('@magic-ext/cosmos');
+
   let chainAddress;
   const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
@@ -309,31 +311,41 @@ export async function loginWithMagicLink(email: string) {
       : null,
   });
 
+  // skip wallet.signCanvasMessage(), do the logic here instead
   if (isCosmos) {
     chainAddress = await magic.cosmos.changeAddress(
       app.chain.meta.bech32Prefix
     );
+
+    const timestamp = +new Date();
+    const signer = { signMessage: magic.cosmos.sign }
+    const signerAddress = chainAddress; // check if this is correct?
+    const { signature, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.CosmosSDK, signer, signerAddress, timestamp); // TODO: provide blockhash as last argument
+    await app.sessions.authSession(
+      ChainBase.CosmosSDK,
+      chainId,
+      signerAddress,
+      sessionPayload,
+      signature
+    );
+  } else {
+    const { Web3Provider } = await import('@ethersproject/providers');
+    const provider = new Web3Provider(magic.rpcProvider);
+    const signer = provider.getSigner();
+    const signerAddress = await signer.getAddress();
+
+    const timestamp = +new Date();
+    const { signature, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp); // TODO: provide blockhash as last argument
+    await app.sessions.authSession(
+      ChainBase.Ethereum, // not: app.chain.base, etc.
+      chainId,
+      signerAddress,
+      sessionPayload,
+      signature
+    );
   }
 
   const didToken = await magic.auth.loginWithMagicLink({ email });
-
-  // skip wallet.signCanvasMessage(), do the logic here instead
-  // TODO: merge with multichain magic login
-  const { Web3Provider } = await import('@ethersproject/providers');
-  const provider = new Web3Provider(magic.rpcProvider);
-  const signer = provider.getSigner();
-  const signerAddress = await signer.getAddress();
-
-  // TODO: provide blockhash as last argument
-  const timestamp = +new Date();
-  const { signature, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, timestamp);
-  await app.sessions.authSession(
-    ChainBase.Ethereum, // not: app.chain.base, etc.
-    chainId,
-    signerAddress,
-    sessionPayload,
-    signature
-  );
 
   // skip Account.validate(), proceed directly to server login
   const response = await $.post({

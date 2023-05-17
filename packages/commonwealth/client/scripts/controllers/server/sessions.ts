@@ -3,6 +3,7 @@ import { addressSwapper } from 'commonwealth/shared/utils';
 
 import { createCanvasSessionPayload, chainBaseToCanvasChainId } from 'canvas';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
+import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
@@ -66,9 +67,11 @@ export async function signSessionWithAccount<T extends { address: string }>(
   };
 }
 
+// for eth and cosmos only, assumes chainbase is either Ethereum or CosmosSDK
 export async function signSessionWithMagic(
   walletChain = ChainBase.Ethereum,
   signer,
+  signerAddress,
   timestamp: number,
   blockhash = ''
 ) {
@@ -77,7 +80,6 @@ export async function signSessionWithMagic(
       ? app.chain?.meta.bech32Prefix || 'cosmos'
       : app.chain?.meta.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(walletChain, idOrPrefix);
-  const signerAddress = await signer.getAddress();
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(
     walletChain,
     canvasChainId,
@@ -98,13 +100,21 @@ export async function signSessionWithMagic(
     blockhash,
   );
 
-  // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-  const siwe = await require('siwe');
-  const nonce = siwe.generateNonce();
-  const domain = document.location.origin;
-  const message = createSiweMessage(sessionPayload, domain, nonce);
-  const signature = await signer.signMessage(message);
-  return { signature: `${domain}/${nonce}/${signature}`, chainId: canvasChainId, sessionPayload };
+  // skip wallet.signCanvasMessage(), do the logic here instead
+  if (walletChain === ChainBase.CosmosSDK) {
+    const canvas = await import('@canvas-js/interfaces');
+    const signDoc = await getADR036SignableSession(Buffer.from(canvas.serializeSessionPayload(sessionPayload)), signerAddress);
+    const signature = await signer.signMessage(signDoc.msgs[0], signDoc.fee);
+    return { signature, chainId: canvasChainId, sessionPayload };
+  } else {
+    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
+    const siwe = await require('siwe');
+    const nonce = siwe.generateNonce();
+    const domain = document.location.origin;
+    const message = createSiweMessage(sessionPayload, domain, nonce);
+    const signature = await signer.signMessage(message);
+    return { signature: `${domain}/${nonce}/${signature}`, chainId: canvasChainId, sessionPayload };
+  }
 }
 
 class SessionsController {
