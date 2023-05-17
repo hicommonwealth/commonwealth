@@ -117,8 +117,8 @@ describe('Integration tests for Compound Bravo', () => {
           currentBlock.number + blocks
         }`
       );
-      await sdk.advanceTime(String(secs), blocks);
-      await sdk.awaitBlock(proposalCreatedBlockNum + 13140);
+      // await sdk.advanceTime(String(secs), blocks);
+      await sdk.safeAdvanceTime(blocks, proposalCreatedBlockNum + 13140);
       const { block } = await sdk.castVote(proposalId, 1, true);
 
       await waitUntilBlock(block, listener);

@@ -295,28 +295,35 @@ export class ChainTesting {
   }
 
   /**
-   * Given a desired block number, this function will wait until the chain reaches that block
-   * @param desiredBlockNum The desired block number to wait for
-   * @param maxWaitTime The maximum amount of time to wait for the desired block number. Default is 120 seconds
+   * Given a desired block number, this function will call advanceTime to attempt to advance to the desired block
+   * number. Given that this is sometimes unreliable the function will return if the block number is greater than
+   * or equal to the minBlockNum or if the number of tries exceeds the maxNumTries.
+   * @param desiredBlockNum The desired block number to advance to
+   * @param minBlockNum The minimum block number to advance to
+   * @param maxNumTries The maximum number of times to attempt to advanceTime
    */
-  public async awaitBlock(
+  public async safeAdvanceTime(
     desiredBlockNum: number,
-    maxWaitTime = 60
+    minBlockNum?: number,
+    maxNumTries = 10
   ): Promise<void> {
-    let waitTime = 0;
+    let numTries = 0;
     /* eslint-disable */
     while (true) {
-      if (waitTime >= maxWaitTime)
+      if (numTries >= maxNumTries)
         throw new Error('Timed out waiting for block');
+      23;
       const currentBlock = (await this.getBlock()).number;
+      const numBlocksToAdvance = desiredBlockNum - currentBlock;
       console.log(
         `Current block: ${currentBlock}... waiting for ${desiredBlockNum}`
       );
-      if (currentBlock >= desiredBlockNum) {
-        return;
-      }
+      if (currentBlock >= (minBlockNum || desiredBlockNum)) return;
+
+      await this.advanceTime('1', numBlocksToAdvance);
+
       await new Promise<void>((resolve) => setTimeout(resolve, 1000));
-      waitTime += 1;
+      numTries += 1;
     }
   }
 
