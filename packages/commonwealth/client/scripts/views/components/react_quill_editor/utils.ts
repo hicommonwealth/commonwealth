@@ -35,10 +35,18 @@ export const getTextFromDelta = (delta: DeltaStatic): string => {
       if (op.insert?.image) {
         return true;
       }
+      if (op.insert?.twitter) {
+        return true;
+      }
       return false;
     })
     .reduce((acc, op) => {
-      const text = typeof op.insert === 'string' ? op.insert : '(image)\n';
+      const text =
+        typeof op.insert === 'string'
+          ? op.insert
+          : op.insert.twitter
+          ? '(tweet)'
+          : '(image)\n';
       return acc + text;
     }, '');
 };
