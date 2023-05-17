@@ -1,7 +1,7 @@
 import type events from 'events';
 
 import type { CWEvent, IChainEventData, IEventHandler } from '../src';
-import {ChainEventKinds, Listener} from '../src';
+import { ChainEventKinds, Listener } from '../src';
 import { expect } from 'chai';
 import Web3 from 'web3';
 
@@ -32,7 +32,7 @@ export function eventMatch(
   chain_id,
   proposalId?: string,
   transferAmount?: string,
-  from?: string,
+  from?: string
 ) {
   expect(event, 'event is undefined').to.not.be.undefined;
   if (proposalId)
@@ -52,27 +52,37 @@ export function eventMatch(
   expect(event.chain, 'event chain does not match').to.equal(chain_id);
 }
 
-export function findEvent(events: any[], kind: string, chain_id: string, blockNumber: number) {
-  return events.find((event) =>
-    event.data.kind === kind &&
-    event.chain === chain_id &&
-    event.blockNumber === blockNumber
+export function findEvent(
+  events: any[],
+  kind: string,
+  chain_id: string,
+  blockNumber: number
+) {
+  return events.find(
+    (event) =>
+      event.data.kind === kind &&
+      event.chain === chain_id &&
+      event.blockNumber === blockNumber
   );
 }
 
 export function getEvmSecondsAndBlocks(days: number) {
-  const secs = days * 86400;
+  const secs = Math.round(days * 86400);
   const blocks = Math.round(secs / 12 + 500);
   return { secs, blocks };
 }
 
 // sleeps until the listener reaches the desired block or until the maxWaitTime is reached
-export async function waitUntilBlock(blockNum: number, listener: Listener<any, any, any, any, any>, maxWaitTime = 120): Promise<void> {
+export async function waitUntilBlock(
+  blockNum: number,
+  listener: Listener<any, any, any, any, any>,
+  maxWaitTime = 120
+): Promise<void> {
   let waitTime = 0;
   while (true) {
     if (waitTime > maxWaitTime) break;
     if (listener.lastCachedBlockNumber >= blockNum) break;
-    await new Promise<void>(resolve => setTimeout(resolve, 1000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 1000));
     waitTime += 1;
   }
 }
