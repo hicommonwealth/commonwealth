@@ -279,7 +279,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           // Can't call authSession now, since chain.base is unknown, so we wait till action
           setCachedWalletSignature(signature);
           setCachedTimestamp(timestamp);
-          setCachedChainId(walletToUse.getChainId());
+          setCachedChainId(chainId);
           walletProps.onSuccess?.();
         } catch (e) {
           console.log(e);
