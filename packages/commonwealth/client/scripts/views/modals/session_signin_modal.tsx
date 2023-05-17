@@ -66,7 +66,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
           <div className="compact-modal-actions">
             <div>
               <CWWalletsList
-                useSessionKeyLoginFlow={true}
+                useSessionKeyRevalidationFlow={true}
                 wallets={wallets}
                 darkMode={false}
                 setSelectedWallet={(wallet) => {

@@ -150,7 +150,7 @@ type WalletsListProps = {
   ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linking?: boolean;
-  useSessionKeyLoginFlow?: boolean;
+  useSessionKeyRevalidationFlow?: boolean;
 };
 
 export const CWWalletsList = (props: WalletsListProps) => {
@@ -168,13 +168,13 @@ export const CWWalletsList = (props: WalletsListProps) => {
     accountVerifiedCallback,
     setBodyType,
     linking,
-    useSessionKeyLoginFlow,
+    useSessionKeyRevalidationFlow,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-  // We call handleNormalWalletLogin if we're using connecting a new wallet, and
-  // handleSessionKeyRevalidation if we're regenerating a session key.
+  // Use handleNormalWalletLogin for connecting a new wallet, and
+  // handleSessionKeyRevalidation for generating a new session key.
   async function handleSessionKeyRevalidation(
     wallet: IWebWallet<any>,
     address: string
@@ -400,7 +400,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                         }
                       }
 
-                      if (useSessionKeyLoginFlow) {
+                      if (useSessionKeyRevalidationFlow) {
                         await handleSessionKeyRevalidation(wallet, address);
                       } else {
                         await handleNormalWalletLogin(wallet, address);
@@ -426,7 +426,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                       } else {
                         address = wallet.accounts[accountIndex].address;
                       }
-                      if (useSessionKeyLoginFlow) {
+                      if (useSessionKeyRevalidationFlow) {
                         await handleSessionKeyRevalidation(wallet, address);
                       } else {
                         await handleNormalWalletLogin(wallet, address);
