@@ -2,6 +2,7 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import useInitApp from 'hooks/useInitApp';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
@@ -26,6 +27,7 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router(customDomain)} />
         <ToastContainer />
+        <ReactQueryDevtools />
       </QueryClientProvider>
     </StrictMode>
   );
