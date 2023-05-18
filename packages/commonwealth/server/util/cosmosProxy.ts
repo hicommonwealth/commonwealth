@@ -11,6 +11,7 @@ import {
 } from './cosmosCache';
 import { lookupKeyDurationInReq } from 'common-common/src/cacheKeyUtils';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
+import { bech32 } from 'bech32';
 
 const log = factory.getLogger(formatFilename(__filename));
 const defaultCacheDuration = 60 * 10; // 10 minutes
@@ -53,12 +54,11 @@ function setupCosmosProxy(app: Express, models: DB) {
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
-    }
-  );
+    });
 
-  // for gov v1 queries.
+  // for gov v1 queries
   app.use(
-    '/cosmosLCD/:chain',
+    '/cosmosLCD/:chain/*',
     bodyParser.text(),
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -90,11 +90,71 @@ function setupCosmosProxy(app: Express, models: DB) {
         });
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
-            response.data,
-            null,
-            2
-          )}`
+             response.data,
+             null,
+             2
+           )}`
         );
+        return res.send(response.data);
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
+    }
+  );
+
+  // for magic link queries
+  app.get(
+    '/magicCosmosAPI/:chain/auth/accounts/:address',
+    bodyParser.text(),
+    cacheDecorator.cacheMiddleware(
+      defaultCacheDuration,
+      lookupKeyDurationInReq
+    ),
+    async function cosmosProxy(req, res) {
+      log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
+      try {
+        log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
+        const chain = await models.Chain.findOne({
+          where: { id: req.params.chain },
+          include: models.ChainNode,
+        });
+        if (!chain) {
+          throw new AppError('Invalid chain');
+        }
+        const targetUrl = chain.ChainNode?.alt_wallet_url;
+        if (!targetUrl) {
+          throw new AppError('No LCD endpoint found');
+        }
+        log.trace(`Found cosmos endpoint: ${targetUrl}`);
+        // special case: rewrite cosmos- prefix to chain specific prefix
+        const { words } = bech32.decode(req.params.address);
+        const rewrittenAddress = bech32.encode(chain.bech32_prefix, words);
+        const rewrite = req.originalUrl
+          .replace(req.baseUrl, targetUrl)
+          .replace(req.params.address, rewrittenAddress)
+          .replace(`/magicCosmosAPI/${req.params.chain}`, '');
+
+        const response = await axios.get(rewrite, {
+          headers: {
+            origin: 'https://commonwealth.im',
+          },
+        });
+        log.trace(
+          `Got response from endpoint: ${JSON.stringify(
+             response.data,
+             null,
+             2
+           )}`
+        );
+        // special case: magic expects a cosmos-sdk/Account, while chains return
+        // cosmos-sdk/BaseAccount or other types. this seems to be a lauchpad vs
+        // stargate issue: https://github.com/cosmos/cosmjs/issues/702
+        if (response?.data?.result?.type === "cosmos-sdk/BaseAccount") {
+          response.data.result.type = "cosmos-sdk/Account"
+        }
+
+        // special case: magicCosmosAPI is CORS-approved for the magic iframe
+        res.setHeader('Access-Control-Allow-Origin', 'https://auth.magic.link');
         return res.send(response.data);
       } catch (err) {
         res.status(500).json({ message: err.message });
