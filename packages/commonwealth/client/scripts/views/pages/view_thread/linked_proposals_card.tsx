@@ -114,7 +114,7 @@ export const LinkedProposalsCard = ({
   }, [initialSnapshotLinks]);
 
   const showSnapshot =
-    initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
+    snapshot && initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
 
   return (
     <>
