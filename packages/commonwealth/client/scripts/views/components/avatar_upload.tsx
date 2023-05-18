@@ -5,8 +5,11 @@ import { useDropzone } from 'react-dropzone';
 import 'components/avatar_upload.scss';
 
 import app from 'state';
+import {
+  getAvatarFromChainInfo,
+  getAvatarFromProfile,
+} from '../../helpers/avatarHelpers';
 import Account from '../../models/Account';
-import { getAvatarFromChainInfo, getAvatarFromProfile } from './component_kit/cw_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';

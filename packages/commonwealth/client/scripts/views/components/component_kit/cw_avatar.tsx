@@ -15,18 +15,6 @@ type BaseAvatarProps = {
 
 type AvatarProps = BaseAvatarProps & { avatarUrl: string };
 
-export function getAvatarFromProfile(minimumProfile: MinimumProfile, size: number) {
-  return minimumProfile.avatarUrl
-    ? render(CWAvatar, { avatarUrl: minimumProfile.avatarUrl, size })
-    : render(CWJdenticon, { address: minimumProfile.id, size });
-}
-
-export function getAvatarFromChainInfo(chainInfo: ChainInfo, size: number) {
-  return chainInfo?.iconUrl
-    ? render(CWAvatar, { avatarUrl: chainInfo.iconUrl, size })
-    : render(CWJdenticon, { address: undefined, size });
-}
-
 export const CWAvatar = (props: AvatarProps) => {
   const { avatarUrl, size } = props;
 

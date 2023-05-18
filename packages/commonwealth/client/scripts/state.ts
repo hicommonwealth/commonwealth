@@ -189,7 +189,7 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  newProfiles: process.env.NODE_ENV === 'test' ? null : new NewProfilesController(),
+  newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
@@ -215,9 +215,6 @@ const app: IApp = {
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
-    if (process.env.NODE_ENV === 'test') {
-      return '/api';
-    }
     //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
     const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
 

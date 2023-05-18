@@ -2,10 +2,17 @@ import axios from 'axios';
 import { expect } from 'chai';
 import 'chai/register-should';
 import sinon from 'sinon';
-import { testAddresses, testProfiles } from 'test/integration/api/external/dbEntityHooks.spec';
-import NewProfilesController, { newProfilesChunkSize } from '../../../client/scripts/controllers/server/newProfiles';
+import {
+  testAddresses,
+  testProfiles,
+} from 'test/integration/api/external/dbEntityHooks.spec';
+import NewProfilesController, {
+  newProfilesChunkSize,
+} from '../../../client/scripts/controllers/server/newProfiles';
 import MinimumProfile from '../../../client/scripts/models/MinimumProfile';
 import app from '../../../client/scripts/state';
+
+app.serverUrl = () => '/api';
 
 describe('NewProfilesController tests', async () => {
   let newProfilesController;
@@ -21,12 +28,12 @@ describe('NewProfilesController tests', async () => {
 
   axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
     data: {
-      result: new Array(newProfilesChunkSize+1).fill({
+      result: new Array(newProfilesChunkSize + 1).fill({
         name: '',
         address: testAddresses[0].address,
         avatarUrl: '',
         profileId: 1,
-        lastActive: new Date()
+        lastActive: new Date(),
       }),
     },
   });
@@ -38,8 +45,13 @@ describe('NewProfilesController tests', async () => {
   it('should return the correct profile', async () => {
     const controller = new NewProfilesController();
     const expectedProfile = testProfiles[0];
-    const expectedAddress = testAddresses.filter(a => a.profile_id === expectedProfile.id)[0];
-    const actualProfile = controller.getProfile(expectedAddress.chain, expectedAddress.address);
+    const expectedAddress = testAddresses.filter(
+      (a) => a.profile_id === expectedProfile.id
+    )[0];
+    const actualProfile = controller.getProfile(
+      expectedAddress.chain,
+      expectedAddress.address
+    );
 
     expect(actualProfile.address).to.equal(expectedAddress.address);
     expect(actualProfile.chain).to.equal(expectedAddress.chain);
@@ -69,7 +81,9 @@ describe('NewProfilesController tests', async () => {
   it('Update profile should work correctly', async () => {
     const controller = new NewProfilesController();
     const expectedProfile = testProfiles[0];
-    const expectedAddress = testAddresses.filter(a => a.profile_id === expectedProfile.id)[0];
+    const expectedAddress = testAddresses.filter(
+      (a) => a.profile_id === expectedProfile.id
+    )[0];
     const data = { name: 'Test Name' };
 
     // Add profile to store
@@ -85,17 +99,19 @@ describe('NewProfilesController tests', async () => {
   it('assert chunking works correctly', async () => {
     const controller = new NewProfilesController();
     const expectedProfile = testProfiles[0];
-    const expectedAddress = testAddresses.filter(a => a.profile_id === expectedProfile.id)[0];
+    const expectedAddress = testAddresses.filter(
+      (a) => a.profile_id === expectedProfile.id
+    )[0];
     const data = { name: 'Test Name' };
 
     axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
       data: {
-        result: new Array(newProfilesChunkSize+1).fill({
+        result: new Array(newProfilesChunkSize + 1).fill({
           name: '',
           address: testAddresses[0].address,
           avatarUrl: '',
           profileId: 1,
-          lastActive: new Date()
+          lastActive: new Date(),
         }),
       },
     });
