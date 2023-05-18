@@ -1,10 +1,10 @@
-import { render } from '../mithrilInterop/index';
 import ChainInfo from '../models/ChainInfo';
 import MinimumProfile from '../models/MinimumProfile';
 import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
+import { render } from './DEPRECATED_ReactRender';
 
 export function getAvatarFromChainInfo(chainInfo: ChainInfo, size: number) {
   return chainInfo?.iconUrl

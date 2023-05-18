@@ -3,9 +3,6 @@ import React from 'react';
 import Jdenticon from 'react-jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
-import { render } from '../../../mithrilInterop/index';
-import ChainInfo from '../../../models/ChainInfo';
-import MinimumProfile from '../../../models/MinimumProfile';
 
 import { ComponentType } from './types';
 
