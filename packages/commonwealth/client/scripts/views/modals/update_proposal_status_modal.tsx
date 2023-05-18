@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import {
+  getProposal,
+  getSpace,
+  loadMultipleSpacesData,
+  SnapshotProposal,
+} from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
-import type { ChainEntity, Thread } from 'models';
-import { ThreadStage } from 'models';
+import type ChainEntity from '../../models/ChainEntity';
+import type Thread from '../../models/Thread';
+import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
 import app from 'state';
-import { ChainEntitiesSelector } from '../components/chain_entities_selector';
+import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -18,6 +24,7 @@ import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
 import { ProposalSelector } from '../components/cosmos_proposal_selector';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { ChainBase } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -48,7 +55,20 @@ export const UpdateProposalStatusModal = ({
   onModalClose,
   thread,
 }: UpdateProposalStatusModalProps) => {
-  const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
+  const { customStages } = app.chain.meta;
+  const stages = !customStages
+    ? [
+        ThreadStage.Discussion,
+        ThreadStage.ProposalInReview,
+        ThreadStage.Voting,
+        ThreadStage.Passed,
+        ThreadStage.Failed,
+      ]
+    : parseCustomStages(customStages);
+
+  const [tempStage, setTempStage] = useState(
+    stages.includes(thread.stage) ? thread.stage : null
+  );
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
   >(getInitialSnapshots(thread));
@@ -59,25 +79,10 @@ export const UpdateProposalStatusModal = ({
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
   >(getInitialCosmosProposals(thread));
 
-  if (!app.chain?.meta) {
-    return;
-  }
-
-  const { customStages } = app.chain.meta;
-
-  const stages = !customStages
-    ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
-      ]
-    : parseCustomStages(customStages);
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
   const showChainEvents =
-    !isCosmos && app.chainEntities.store.get(thread.chain).length > 0;
+    !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
 
   const handleSaveChanges = async () => {
     // set stage
@@ -87,12 +92,8 @@ export const UpdateProposalStatusModal = ({
         stage: tempStage,
       });
     } catch (err) {
-      console.log('Failed to update stage');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? `${err.responseJSON.error}. Make sure one is selected.`
-          : 'Failed to update stage, make sure one is selected'
-      );
+      notifyError(`Failed to update stage. Make sure one is selected.`);
+      throw new Error('Failed to update stage');
     }
 
     let links: Link[] = thread.links;
@@ -104,9 +105,30 @@ export const UpdateProposalStatusModal = ({
       );
 
       if (toAdd.length > 0) {
+        let enrichedSnapshot;
+        if (app.chain.meta.snapshot?.length === 1) {
+          enrichedSnapshot = toAdd.map((sn) => ({
+            id: `${app.chain.meta.snapshot[0]}/${sn.id}`,
+            title: sn.title,
+          }));
+        } else {
+          loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+            for (const { space: _space, proposals } of data) {
+              const matchingSnapshot = proposals.find(
+                (sn) => sn.id === toAdd[0].id
+              );
+              if (matchingSnapshot) {
+                enrichedSnapshot = {
+                  id: `${_space.id}/${toAdd[0].id}`,
+                };
+                break;
+              }
+            }
+          });
+        }
         const updatedThread = await app.threads.addLinks({
           threadId: thread.id,
-          links: toAdd.map((sn) => ({
+          links: enrichedSnapshot.map((sn) => ({
             source: LinkSource.Snapshot,
             identifier: String(sn.id),
             title: sn.title,
@@ -266,7 +288,7 @@ export const UpdateProposalStatusModal = ({
               ? { value: tempStage, label: threadStageToLabel(tempStage) }
               : null
           }
-          placeholder="Select the stage"
+          placeholder="Select a stage"
           isSearchable={false}
           options={stages.map((stage) => ({
             value: stage,

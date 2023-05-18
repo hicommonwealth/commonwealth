@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 import $ from 'jquery';
-import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
 import app from 'state';
 import { initAppState } from 'state';
@@ -9,6 +8,7 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useSearchParams } from 'react-router-dom';
 
 // creates address, initializes account, and redirects to main page
 const validate = async (
@@ -44,9 +44,10 @@ const validate = async (
 const FinishAxieLogin = () => {
   const [error, setError] = useState('');
   const navigate = useCommonNavigate();
+  const [searchParams] = useSearchParams();
 
-  const token = _DEPRECATED_getSearchParams('token');
-  const stateId = _DEPRECATED_getSearchParams('stateId');
+  const token = searchParams.get('token');
+  const stateId = searchParams.get('stateId');
 
   useEffect(() => {
     validate(token, stateId, 'axie-infinity', navigate).then((res) => {
@@ -54,7 +55,7 @@ const FinishAxieLogin = () => {
         setError(res);
       }
     });
-  }, []);
+  }, [navigate, stateId, token]);
 
   console.log('finish axie login');
 

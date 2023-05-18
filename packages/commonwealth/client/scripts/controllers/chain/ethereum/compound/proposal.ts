@@ -12,14 +12,12 @@ import { utils } from 'ethers';
 import { blocknumToTime } from 'helpers';
 import { capitalize } from 'lodash';
 
-import type {
-  ChainEntity,
-  ChainEvent,
-  ITXModalData,
-  IVote,
-  ProposalEndTime,
-} from 'models';
-import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import type ChainEntity from '../../../../models/ChainEntity';
+import type ChainEvent from '../../../../models/ChainEvent';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
+import Proposal from '../../../../models/Proposal';
+import type { ProposalEndTime} from '../../../../models/types';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
 import moment from 'moment';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
@@ -373,11 +371,7 @@ export default class CompoundProposal extends Proposal<
     }
 
     let tx: ContractTransaction;
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Contract
-    );
+    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Contract);
     try {
       const gasLimit = await contract.estimateGas['cancel(uint256)'](
         this.data.identifier
@@ -392,11 +386,7 @@ export default class CompoundProposal extends Proposal<
         this._Gov.api.contractAddress,
         this._Gov.api.Provider
       );
-      const ozContract = await attachSigner(
-        this._Gov.app.wallets,
-        this._Gov.app.user.activeAccount,
-        contractNoSigner
-      );
+      const ozContract = await attachSigner(this._Gov.app.user.activeAccount, contractNoSigner);
       const descriptionHash = utils.keccak256(
         utils.toUtf8Bytes(this.data.description)
       );
@@ -432,11 +422,7 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already queued');
     }
 
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Contract
-    );
+    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Contract);
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
@@ -478,11 +464,7 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already executed');
     }
 
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Contract
-    );
+    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Contract);
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
@@ -525,11 +507,7 @@ export default class CompoundProposal extends Proposal<
   // TODO: support reason field
   public async submitVoteWebTx(vote: CompoundProposalVote) {
     const address = vote.account.address;
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      vote.account,
-      this._Gov.api.Contract
-    );
+    const contract = await attachSigner(vote.account, this._Gov.api.Contract);
     if (!(await this._Chain.isDelegate(address, this.data.startBlock))) {
       throw new Error('Must have voting balance at proposal start');
     }

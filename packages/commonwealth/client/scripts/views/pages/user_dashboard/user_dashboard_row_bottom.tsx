@@ -12,7 +12,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { subscribeToThread } from './helpers';
-import { NotificationSubscription } from 'client/scripts/models';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 import useForceRerender from 'hooks/useForceRerender';
 
 type UserDashboardRowBottomProps = {

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
 import 'modals/edit_topic_modal.scss';
-import { Topic } from 'models';
+import Topic from '../../models/Topic';
 
 import app from 'state';
 
@@ -81,6 +81,7 @@ export const EditTopicModal = ({
       default_offchain_template: featuredInNewPost
         ? serializeDelta(contentDelta)
         : null,
+      total_threads: topic.totalThreads || 0,
     };
 
     try {

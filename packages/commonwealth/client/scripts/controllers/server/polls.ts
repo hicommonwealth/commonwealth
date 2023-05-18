@@ -1,9 +1,10 @@
 /* eslint-disable no-restricted-globals */
 import $ from 'jquery';
-import { Poll, Vote } from 'models';
+import Poll from '../../models/Poll';
+import Vote from '../../models/Vote';
+import Thread from '../../models/Thread';
 import moment from 'moment';
 import app from 'state';
-import { redraw } from 'mithrilInterop';
 
 import PollStore from 'stores/PollStore';
 
@@ -100,6 +101,9 @@ class PollsController {
       },
       success: (response) => {
         const modeledPoll = modelFromServer(response.result);
+        const thread = app.threads.getById(threadId);
+        const updatedThread = new Thread({ ...thread, hasPoll: true });
+        app.threads.updateThreadInStore(updatedThread);
         this._store.add(modeledPoll);
       },
       error: (err) => {
@@ -124,9 +128,8 @@ class PollsController {
         chain_id: app.activeChainId(),
         jwt: app.user.jwt,
       },
-      success: (response) => {
+      success: () => {
         this._store.remove(this._store.getById(pollId));
-        redraw();
       },
       error: (err) => {
         console.log('Failed to delete poll');

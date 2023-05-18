@@ -1,4 +1,4 @@
-import type { IAccountsModule } from 'models';
+import type { IAccountsModule } from '../../../models/interfaces';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 

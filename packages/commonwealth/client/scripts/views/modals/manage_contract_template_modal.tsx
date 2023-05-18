@@ -93,6 +93,7 @@ const ManageContractTemplateModal = ({
       community_id: communityId,
       template_id: templateIdForm,
       contract_id: contractId,
+      enabled_by: app.user.activeAccount.address,
     };
 
     try {
@@ -219,7 +220,7 @@ const ManageContractTemplateModal = ({
         )}
         <CWDivider className="divider" />
         <CWText type="h5" className="subtitle" fontWeight="medium">
-          Set metadata for template instance
+          Set metadata for action
         </CWText>
         <CWText type="caption" fontWeight="medium" className="input-label">
           Display Name

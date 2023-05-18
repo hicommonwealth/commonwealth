@@ -2,7 +2,7 @@ import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { threadStageToLabel } from 'helpers';
-import { ThreadStage } from 'models';
+import { ThreadStage } from '../../../models/types';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -15,7 +15,6 @@ import {
   usePopover,
 } from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadsFilterMenuItemProps = {
   iconRight?: React.ReactNode;
@@ -46,13 +45,13 @@ type StagesMenuProps = {
   selectedStage: ThreadStage;
   stage: string;
   stages: Array<ThreadStage>;
+  onStageChange: (stage: string) => void;
 };
 
 export const StagesMenu = (props: StagesMenuProps) => {
   const { selectedStage, stage, stages } = props;
 
   const popoverProps = usePopover();
-  const navigate = useCommonNavigate();
 
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
@@ -76,7 +75,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                 isSelected={!stage}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate('/discussions');
+                  props.onStageChange('');
                 }}
               />
               <CWDivider />
@@ -86,7 +85,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                   isSelected={stage === targetStage}
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate(`/discussions?stage=${targetStage}`);
+                    props.onStageChange(targetStage);
                   }}
                   label={`
                     ${threadStageToLabel(targetStage)} ${

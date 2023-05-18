@@ -1,5 +1,4 @@
 /* eslint-disable no-async-promise-executor */
-import { Contract } from 'client/scripts/models';
 import { ServerError } from 'common-common/src/errors';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
@@ -62,9 +61,19 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     >
   >Promise.all([
     // topics
-    models.Topic.findAll({
-      where: { chain_id: chain.id },
-    }),
+    models.sequelize.query(
+      `SELECT 
+        *,
+        (
+          SELECT COUNT(*)::int FROM "Threads" 
+          WHERE chain = :chain_id AND topic_id = t.id AND deleted_at IS NULL 
+        ) as total_threads
+      FROM "Topics" t WHERE chain_id = :chain_id AND deleted_at IS NULL`,
+      {
+        replacements: { chain_id: chain.id },
+        type: QueryTypes.SELECT,
+      }
+    ),
 
     // admins
     findAllRoles(
@@ -235,7 +244,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   return res.json({
     status: 'Success',
     result: {
-      topics: topics.map((t) => t.toJSON()),
+      topics: topics,
       numVotingThreads,
       numTotalThreads,
       admins: admins.map((a) => a.toJSON()),

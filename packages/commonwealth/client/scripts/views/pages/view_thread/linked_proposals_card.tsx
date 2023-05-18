@@ -7,7 +7,9 @@ import {
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import type { ChainEntity, Thread, ThreadStage } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
+import type Thread from '../../../models/Thread';
+import type { ThreadStage } from '../../../models/types';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -82,33 +84,32 @@ export const LinkedProposalsCard = ({
   useEffect(() => {
     if (initialSnapshotLinks.length > 0) {
       const proposal = initialSnapshotLinks[0];
-      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-        for (const { space: _space, proposals } of data) {
-          const matchingSnapshot = proposals.find(
-            (sn) => sn.id === proposal.identifier
-          );
-
-          if (matchingSnapshot) {
-            setSnapshot(matchingSnapshot);
-            setSpace(_space);
-            break;
+      if (proposal.identifier.includes('/')) {
+        setSnapshotUrl(
+          `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+            proposal.identifier
+          }`
+        );
+      } else {
+        loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+          for (const { space: _space, proposals } of data) {
+            const matchingSnapshot = proposals.find(
+              (sn) => sn.id === proposal.identifier
+            );
+            if (matchingSnapshot) {
+              setSnapshot(matchingSnapshot);
+              setSpace(_space);
+              setSnapshotUrl(
+                `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+                  _space.id
+                }/${matchingSnapshot.id}`
+              );
+              break;
+            }
           }
-        }
-        if (proposal.identifier.includes('/')) {
-          setSnapshotUrl(
-            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-              proposal.identifier
-            }`
-          );
-        } else if (space && snapshot) {
-          setSnapshotUrl(
-            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-              space.id
-            }/${snapshot.id}`
-          );
-        }
-        setSnapshotProposalsLoaded(true);
-      });
+        });
+      }
+      setSnapshotProposalsLoaded(true);
     }
   }, [initialSnapshotLinks]);
 

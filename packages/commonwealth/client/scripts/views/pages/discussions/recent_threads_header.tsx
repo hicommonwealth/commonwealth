@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
-import type { Topic } from 'models';
-import { ThreadStage } from 'models';
+import type Topic from '../../../models/Topic';
+import { ThreadStage } from '../../../models/types';
 
 import 'pages/discussions/recent_threads_header.scss';
 
@@ -45,10 +45,12 @@ export const RecentThreadsHeader = ({
 
     window.addEventListener('resize', onResize);
     app.loginStateEmitter.on('redraw', forceRerender);
+    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       window.removeEventListener('resize', onResize);
       app.loginStateEmitter.off('redraw', forceRerender);
+      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
@@ -78,6 +80,26 @@ export const RecentThreadsHeader = ({
     : parseCustomStages(customStages);
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
+
+  const buildUrlAndNavigate = (updatedTopic: string, updatedStage: string) => {
+    let url = updatedTopic ? `/${updatedTopic}` : '';
+    url += updatedStage ? `?stage=${updatedStage}` : '';
+    navigate(`/discussions${url}`);
+  };
+
+  const onTopicChange = (updatedTopic) => {
+    buildUrlAndNavigate(
+      updatedTopic,
+      stage // keep the current stage in url if any
+    );
+  };
+
+  const onStageChange = (updatedStage) => {
+    buildUrlAndNavigate(
+      topic, // keep the current topic in url (if any)
+      updatedStage
+    );
+  };
 
   return (
     <div className="RecentThreadsHeader">
@@ -133,6 +155,7 @@ export const RecentThreadsHeader = ({
               selectedTopic={selectedTopic}
               topic={topic}
               onEditClick={(editTopic) => setTopicSelectedToEdit(editTopic)}
+              onTopicChange={onTopicChange}
             />
           )}
           {stagesEnabled && (
@@ -140,6 +163,7 @@ export const RecentThreadsHeader = ({
               selectedStage={selectedStage}
               stage={stage}
               stages={stages}
+              onStageChange={onStageChange}
             />
           )}
         </div>
