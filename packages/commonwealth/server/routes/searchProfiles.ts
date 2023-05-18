@@ -57,9 +57,12 @@ const searchProfiles = async (
   const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
     limit: Math.min(parseInt(options.page_size, 10) || 100, 100),
     page: parseInt(options.page, 10) || 1,
-    orderBy: '"Profiles".profile_name',
-    orderDirection: 'ASC',
+    orderBy: 'last_active',
+    orderDirection: 'DESC',
+    nullsLast: true,
   });
+
+  console.log('paginationSort: ', paginationSort);
 
   const bind: any = {
     searchTerm: `%${options.search}%`,
@@ -79,7 +82,8 @@ const searchProfiles = async (
       "Profiles".created_at,
       array_agg("Addresses".id) as address_ids,
       array_agg("Addresses".chain) as chains,
-      array_agg("Addresses".address) as addresses
+      array_agg("Addresses".address) as addresses,
+      MAX("Addresses".last_active) as last_active
     FROM
       "Profiles"
     JOIN
