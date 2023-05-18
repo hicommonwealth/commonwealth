@@ -8,7 +8,7 @@ export type LoginSidebarType =
   | 'newAddressLinked'
   | 'newOrReturning';
 
-export type LoginBodyType =
+export type LoginActiveStep =
   | 'allSet'
   | 'connectWithEmail'
   | 'redirectToSign'
@@ -20,34 +20,41 @@ export type LoginBodyType =
   | 'welcome';
 
 export type LoginProps = {
+  isNewlyCreated: boolean;
+  isLinkingOnMobile: boolean;
+  signerAccount: Account;
   address: string;
-  currentlyInCommunityPage: boolean;
-  bodyType: LoginBodyType;
+  isInCommunityPage: boolean;
+  activeStep: LoginActiveStep;
   profiles: Array<ProfileRowProps>;
   sidebarType: LoginSidebarType;
   username: string;
   wallets: Array<IWebWallet<any>>;
-  magicLoading: boolean;
+  isMagicLoading: boolean;
   setAddress: (address: string) => void;
-  setBodyType: (bodyType: LoginBodyType) => void;
-  handleEmailLoginCallback: () => void;
+  setActiveStep: (activeStep: LoginActiveStep) => void;
   handleSetAvatar: (avatarUrl: string) => void;
   handleSetUsername: (username: string) => void;
   handleSetEmail: (e: any) => void;
-  setProfiles: (profiles: Array<ProfileRowProps>) => void;
   setSidebarType: (sidebarType: string) => void;
-  setSelectedWallet: (wallet: IWebWallet<any>) => void;
-  setSelectedLinkingWallet: (wallet: IWebWallet<any>) => void;
-  linkExistingAccountCallback: () => void;
-  createNewAccountCallback: () => void;
-  accountVerifiedCallback: (
+  canResetWalletConnect: boolean;
+  onEmailLogin: () => void;
+  onConnectAnotherWay: () => void;
+  onLinkExistingAccount: () => void;
+  onCreateNewAccount: () => void;
+  onAccountLogin?: () => void;
+  onSaveProfileInfo: () => void;
+  onPerformLinking: () => void;
+  onModalClose: () => void;
+  onResetWalletConnect: () => void;
+  onAccountVerified: (
     account: Account,
     newlyCreated: boolean,
     linking: boolean
   ) => Promise<void>;
-  logInWithAccountCallback?: () => void;
-  saveProfileInfoCallback: () => void;
-  performLinkingCallback: () => void;
-  showResetWalletConnect: boolean;
-  onModalClose: () => void;
+  onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
+  onWalletAddressSelect: (
+    wallet: IWebWallet<any>,
+    address: string
+  ) => Promise<void>;
 };
