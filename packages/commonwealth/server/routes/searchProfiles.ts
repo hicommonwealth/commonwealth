@@ -71,9 +71,7 @@ const searchProfiles = async (
 
   const chainWhere = bind.chain ? `"Addresses".chain = $chain AND` : '';
 
-  // get profiles and aggregate all addresses for each profile
-  const profiles = await models.sequelize.query(
-    `
+  const sqlWithoutPagination = `
     SELECT
       "Profiles".id,
       "Profiles".user_id,
@@ -81,8 +79,7 @@ const searchProfiles = async (
       "Profiles".created_at,
       array_agg("Addresses".id) as address_ids,
       array_agg("Addresses".chain) as chains,
-      array_agg("Addresses".address) as addresses,
-      COUNT(*) OVER() AS total_count
+      array_agg("Addresses".address) as addresses
     FROM
       "Profiles"
     JOIN
@@ -92,6 +89,26 @@ const searchProfiles = async (
       "Profiles".profile_name ILIKE $searchTerm
     GROUP BY
       "Profiles".id
+  `;
+
+  const totalCountResult = await models.sequelize.query(
+    `
+      SELECT COUNT(*) FROM (
+        ${sqlWithoutPagination}
+      ) as c
+    `,
+    {
+      bind,
+      type: QueryTypes.SELECT,
+    }
+  );
+  const totalCount: number =
+    parseInt((totalCountResult?.[0] as any)?.count, 10) || 0;
+
+  // get profiles and aggregate all addresses for each profile
+  const profiles = await models.sequelize.query(
+    `
+    ${sqlWithoutPagination}
     ${paginationSort}
   `,
     {
@@ -153,11 +170,6 @@ const searchProfiles = async (
       }
     }
   }
-
-  const totalCount: number =
-    parseInt((profilesWithAddresses?.[0] as any)?.total_count, 10) ||
-    profiles?.length ||
-    0;
 
   return res.json({
     status: 'Success',
