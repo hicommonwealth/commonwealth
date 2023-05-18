@@ -33,6 +33,7 @@ type ContentPageProps = {
   title: string | React.ReactNode;
 
   // optional
+  lastEdited?: moment.Moment | number;
   author?: React.ReactNode;
   actions?: Array<PopoverMenuItem>;
   body?: React.ReactNode;
@@ -55,6 +56,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     comments,
     contentBodyLabel,
     createdAt,
+    lastEdited,
     headerComponents,
     readOnly,
     showSidebar,
@@ -71,6 +73,9 @@ export const CWContentPage = (props: ContentPageProps) => {
       : 'sidebarView'
   );
   const [tabSelected, setTabSelected] = React.useState<number>(0);
+
+  const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
+  const createdOrEditedText = lastEdited ? 'Edited' : 'Published'
 
   React.useEffect(() => {
     const onResize = () => {
@@ -101,15 +106,15 @@ export const CWContentPage = (props: ContentPageProps) => {
         )}
         <div className="header-info-row">
           {author}
-          {typeof createdAt === 'number' ||
-            (moment.isMoment(createdAt) && createdAt.isValid() && (
+          {typeof createdOrEditedDate === 'number' ||
+            (moment.isMoment(createdOrEditedDate) && createdOrEditedDate.isValid() && (
               <CWText type="caption" className="header-text">
-                published on {moment(createdAt).format('l')}
+                • &nbsp; {createdOrEditedText} on {moment(createdOrEditedDate).format('l')} &nbsp; •
               </CWText>
             ))}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
-              {pluralize(viewCount, 'view')}
+            {pluralize(viewCount, 'view')}
             </CWText>
           )}
           {headerComponents}
