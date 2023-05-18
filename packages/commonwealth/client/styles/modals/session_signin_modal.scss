@@ -1,25 +1,24 @@
 @import '../shared';
 
-.SessionSigninModal {
-  max-width: 440px;
+.SessionRevalidationModal {
+  max-width: 480px;
 
   .compact-modal-body {
     h3 {
       margin-bottom: 6px;
     }
   }
-  .compact-modal-actions {
-    display: flex;
-    gap: 8px;
-  }
 
-  .WalletsList {
-    .wallets {
-      height: initial;
-      padding-bottom: initial;
-    }
-    .wallets-and-link-container {
-      margin-bottom: 0;
-    }
+  .buttons-row {
+    margin-top: 10px;
+  }
+  .Button {
+    margin-top: 6px;
+    width: 100%;
+  }
+  .Spinner {
+    margin: 0 auto 10px;
+    width: 100%;
+    text-align: center;
   }
 }
