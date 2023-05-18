@@ -24,7 +24,6 @@ import { NewThreadTag } from '../discussions/NewThreadTag';
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
   pinnedThreads: Array<Thread>;
-  allThreadsCount: number;
   topic: Topic;
 };
 
@@ -32,7 +31,6 @@ export const TopicSummaryRow = ({
   monthlyThreads,
   pinnedThreads,
   topic,
-  allThreadsCount,
 }: TopicSummaryRowProps) => {
   const navigate = useCommonNavigate();
 
@@ -66,7 +64,7 @@ export const TopicSummaryRow = ({
             fontWeight="medium"
             className="threads-count-text"
           >
-            {allThreadsCount} Threads
+            {topic.totalThreads || 0} Threads
           </CWText>
         </div>
         {topic.description && <CWText type="b2">{topic.description}</CWText>}

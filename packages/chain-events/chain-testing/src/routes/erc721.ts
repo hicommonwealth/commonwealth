@@ -17,12 +17,12 @@ export const approve721 = async (req: Request, res: Response) => {
     const account = request.accountIndex
       ? accounts[request.accountIndex]
       : request.from;
-    const txReceipt = request.all
+    const txReceipt = !request.all
       ? await contract.methods
           .approve(accounts[request.to], request.tokenId)
           .send({ from: account, gasLimit: 500000 })
       : await contract.methods
-          .setApprovalForAll(accounts[request.to])
+          .setApprovalForAll(accounts[request.to], true)
           .send({ from: account, gasLimit: 500000 });
     res.status(200).json({ block: txReceipt['blockNumber'] }).send();
   } catch (err) {
@@ -98,7 +98,7 @@ export const mintBurn721 = async (req: Request, res: Response) => {
     const tx = request.mint
       ? await contract.methods.safeMint(accounts[request.to], request.tokenId)
       : await contract.methods.burn(request.tokenId);
-    const txReceipt = tx.send({ from: accounts[0], gas: 500000 });
+    const txReceipt = await tx.send({ from: accounts[0], gas: 500000 });
 
     res.status(200).json({ block: txReceipt['blockNumber'] }).send();
   } catch (err) {

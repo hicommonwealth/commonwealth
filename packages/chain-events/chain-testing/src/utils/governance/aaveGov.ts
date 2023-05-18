@@ -45,10 +45,14 @@ export class aaveGovernor implements IGovernor {
         '0x2426029bb07fa6f4c7c60d427f63abbca45cf592822b01c3f7910f3735560c2b'
       )
       .send({ from: accounts, gasLimit: 500000 });
-    // Advance time to make active
-    const secs = 86400;
-    const blocks = secs / 12 + 500;
-    await advanceEvmTime(secs, blocks);
+
+    if (advanceDays) {
+      // Advance time to make active
+      const secs = Number(advanceDays) * 86400;
+      const blocks = secs / 12 + 500;
+      await advanceEvmTime(secs, blocks);
+    }
+
     return {
       proposalId: String(
         proposalId['events']['ProposalCreated']['returnValues'][0]

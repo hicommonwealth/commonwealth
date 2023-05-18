@@ -14,7 +14,7 @@ import type MinimumProfile from '../../models/MinimumProfile';
 import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
-import type Topic from '../../models/Topic';
+import Topic from '../../models/Topic';
 import { ThreadStage } from '../../models/types';
 import moment from 'moment';
 
@@ -22,6 +22,7 @@ import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
+import { ThreadActionType } from '../../../../shared/types';
 import { Link, LinkSource } from 'server/models/thread';
 import axios from 'axios';
 
@@ -247,8 +248,6 @@ class ThreadsController {
       links,
     });
 
-    ThreadsController.Instance.store.add(t);
-
     return t;
   }
 
@@ -302,7 +301,14 @@ class ThreadsController {
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
-      this.store.add(result);
+      const lastPinnedThreadIndex = this.store
+        .getAll()
+        .slice()
+        .reverse()
+        .findIndex((x) => x.pinned);
+      this.store.add(result, {
+        pushToIndex: this.store.getAll().length - lastPinnedThreadIndex,
+      });
       this.numTotalThreads += 1;
       this._listingStore.add(result);
       const activeEntity = app.chain;
@@ -439,7 +445,11 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
-        app.threadUpdateEmitter.emit('threadUpdated', {});
+        app.threadUpdateEmitter.emit('threadUpdated', {
+          action: ThreadActionType.StageChange,
+          stage: args.stage,
+          threadId: args.threadId,
+        });
         return result;
       },
       error: (err) => {
@@ -463,17 +473,29 @@ class ThreadsController {
         read_only: args.readOnly,
       },
       success: (response) => {
-        const result = this.modelFromServer(response.result);
-        // Post edits propagate to all thread stores
-        this._listingStore.add(result);
-        this._overviewStore.update(result);
-        return result;
+        const thread = this.modelFromServer(response.result);
+
+        // update thread in store
+        const foundThread = this._store.getByIdentifier(thread.identifier);
+        const finalThread = new Thread({
+          ...((foundThread || {}) as any),
+          readOnly: args.readOnly,
+        });
+        this._store.update(finalThread);
+        this._listingStore.add(finalThread);
+        this._overviewStore.update(finalThread);
+
+        return thread;
       },
       error: (err) => {
         notifyError('Could not update thread read_only');
         console.error(err);
       },
     });
+  }
+
+  public async updateThreadInStore(thread: Thread) {
+    this._store.update(thread);
   }
 
   public async pin(args: { proposal: Thread }) {
@@ -488,6 +510,7 @@ class ThreadsController {
         const result = this.modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._listingStore.add(result);
+        this.store.add(result);
         return result;
       },
       error: (err) => {
@@ -633,16 +656,32 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.result.map((rawThread) => {
+      /**
+       * rawThread has a different DS than the threads in store
+       * here we will find if thread is in store and if so use most keys
+       * of that data else if there is a valid key rawThread then it will
+       * replace existing key from foundThread
+       */
       const thread = this.modelFromServer(rawThread);
-      const existing = this._store.getByIdentifier(thread.id);
-      if (existing) this._store.remove(existing);
-      else {
-        this._store.update(thread);
+      const foundThread = this._store.getByIdentifier(thread.identifier);
+      const finalThread = new Thread({
+        ...((foundThread || {}) as any),
+        ...((thread || {}) as any),
+      });
+      finalThread.associatedReactions =
+        thread.associatedReactions.length > 0
+          ? thread.associatedReactions
+          : foundThread?.associatedReactions || [];
+      finalThread.numberOfComments =
+        rawThread?.comments?.length || foundThread?.numberOfComments || 0;
+      this._store.update(finalThread);
+      if (foundThread) {
         this.numTotalThreads += 1;
       }
+
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
-      this.fetchReactionsCount([thread]);
-      return thread;
+      this.fetchReactionsCount([finalThread]);
+      return finalThread;
     });
   }
 
