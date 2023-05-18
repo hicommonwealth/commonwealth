@@ -125,6 +125,14 @@ export class Listener extends BaseListener<
     for (const e of cwEvents) {
       await this.handleEvent(e as CWEvent);
     }
+
+    const { blockNumber } = event;
+    if (
+      !this._lastCachedBlockNumber ||
+      blockNumber > this._lastCachedBlockNumber
+    ) {
+      this._lastCachedBlockNumber = blockNumber;
+    }
   }
 
   public get options(): Erc721ListenerOptions {

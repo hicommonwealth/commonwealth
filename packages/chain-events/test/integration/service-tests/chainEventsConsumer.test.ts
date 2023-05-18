@@ -1,11 +1,15 @@
 import chai from 'chai';
 import {
+  getRabbitMQConfig,
+  RabbitMQController,
+} from 'common-common/src/rabbitmq';
+import {
   RascalExchanges,
   RascalQueues,
   RascalRoutingKeys,
   RmqCENotificationCUD,
   RmqEntityCUD,
-} from 'common-common/src/rabbitmq';
+} from 'common-common/src/rabbitmq/types';
 import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import {
   getQueueStats,
@@ -25,7 +29,8 @@ import type {
 } from '../../../src/chain-bases/EVM/aave/types';
 import { EventKind } from '../../../src/chain-bases/EVM/aave/types';
 import models from '../../../services/database/database';
-import { RABBITMQ_API_URI } from '../../../services/config';
+import { RABBITMQ_API_URI, RABBITMQ_URI } from '../../../services/config';
+import { BrokerConfig } from 'rascal';
 
 const { expect } = chai;
 
@@ -37,8 +42,11 @@ NOTE: Queues in this environment are automatically cleared everytime the Service
  */
 
 async function startConsumer() {
-  const consumer = await setupChainEventConsumer();
-  return consumer;
+  const rmqController = new RabbitMQController(
+    <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+  );
+  await rmqController.init();
+  return await setupChainEventConsumer(rmqController);
 }
 
 // TODO: tests only work using local or vultr rabbitmq due to Vhost in url

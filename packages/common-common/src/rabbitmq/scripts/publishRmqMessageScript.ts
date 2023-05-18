@@ -7,7 +7,7 @@ import { EventKind } from 'chain-events/src/chain-bases/EVM/aave/types';
 import type { CWEvent } from 'chain-events/src';
 import { SupportedNetwork } from 'chain-events/src';
 import { v4 as uuidv4 } from 'uuid';
-import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq';
+import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_API_URI } from 'commonwealth/server/config';
 
 async function publishRmqMessageScript() {

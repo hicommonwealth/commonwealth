@@ -10,13 +10,18 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import useWallets from '../../hooks/useWallets';
 
 type SessionSigninModalProps = {
   onModalClose: () => void;
 };
 
 export const SessionSigninModal = (props: SessionSigninModalProps) => {
-  const { onModalClose } = props;
+  const {
+    onWalletAddressSelect,
+    onWalletSelect,
+    onResetWalletConnect,
+  } = useWallets({ ...props, useSessionKeyLoginFlow: true });
 
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
@@ -51,16 +56,15 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
       <div className="compact-modal-actions">
         <div>
           <CWWalletsList
-            useSessionKeyLoginFlow={true}
-            wallets={wallets}
+            onResetWalletConnect={onResetWalletConnect}
+            onWalletAddressSelect={onWalletAddressSelect}
+            onWalletSelect={onWalletSelect}
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onConnectAnotherWay={() => {}}
             darkMode={false}
-            setSelectedWallet={(wallet) => {
-              /* do nothing */
-            }}
-            accountVerifiedCallback={() => onModalClose()}
-            linking={false}
+            wallets={wallets}
             hasNoWalletsLink={false}
-            showResetWalletConnect={wcEnabled}
+            canResetWalletConnect={wcEnabled}
           />
         </div>
       </div>
