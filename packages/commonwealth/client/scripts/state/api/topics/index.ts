@@ -35,7 +35,7 @@ const createTopic = async ({
     chain: app.activeChainId(),
   });
 
-  return response.data;
+  return new Topic(response.data);
 };
 
 export const useCreateTopicMutation = () => {
@@ -66,5 +66,39 @@ export const useFetchTopicsQuery = ({ chainId }: FetchTopicsProps) => {
     queryKey: ['bulkTopics', chainId],
     queryFn: () => fetchTopics({ chainId }),
     staleTime: 1000,
+  });
+};
+
+interface EditTopicProps {
+  topic: Topic;
+  featuredOrder?: number;
+}
+
+const editTopic = async ({ topic, featuredOrder }: EditTopicProps) => {
+  const response = await axios.post(`${app.serverUrl()}/editTopic`, {
+    id: topic.id,
+    chain: topic.chainId,
+    name: topic.name,
+    description: topic.description,
+    telegram: topic.telegram,
+    featured_in_sidebar: topic.featuredInSidebar,
+    featured_in_new_post: topic.featuredInNewPost,
+    default_offchain_template: topic.defaultOffchainTemplate,
+    featured_order: featuredOrder,
+    address: app.user.activeAccount.address,
+    jwt: app.user.jwt,
+  });
+
+  return new Topic(response.data);
+};
+
+export const useEditTopicMutation = () => {
+  return useMutation({
+    mutationFn: editTopic,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['bulkTopics', variables.topic.chainId],
+      });
+    },
   });
 };

@@ -23,6 +23,7 @@ import {
   serializeDelta,
 } from '../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { useEditTopicMutation } from 'state/api/topics';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -43,7 +44,7 @@ export const EditTopicModal = ({
   } = topic;
 
   const navigate = useCommonNavigate();
-
+  const { mutateAsync: editTopic } = useEditTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -85,7 +86,7 @@ export const EditTopicModal = ({
     };
 
     try {
-      await app.topics.edit(new Topic(topicInfo));
+      await editTopic({ topic: new Topic(topicInfo) });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
       setErrorMsg(err.message || err);

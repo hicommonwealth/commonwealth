@@ -34,37 +34,37 @@ class TopicsController {
   //   return this._store.add(topic);
   // }
 
-  public async edit(topic: Topic, featuredOrder?: number) {
-    try {
-      // TODO: Change to PUT /topic
-      const response = await $.post(`${app.serverUrl()}/editTopic`, {
-        id: topic.id,
-        chain: topic.chainId,
-        name: topic.name,
-        description: topic.description,
-        telegram: topic.telegram,
-        featured_in_sidebar: topic.featuredInSidebar,
-        featured_in_new_post: topic.featuredInNewPost,
-        default_offchain_template: topic.defaultOffchainTemplate,
-        featured_order: featuredOrder,
-        address: app.user.activeAccount.address,
-        jwt: app.user.jwt,
-      });
-      const result = new Topic(response.result);
-      if (this._store.getById(result.id)) {
-        this._store.remove(this._store.getById(result.id));
-      }
-      this._store.add(result);
-      return result;
-    } catch (err) {
-      console.log('Failed to edit topic');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to edit topic'
-      );
-    }
-  }
+  // public async edit(topic: Topic, featuredOrder?: number) {
+  //   try {
+  //     // TODO: Change to PUT /topic
+  //     const response = await $.post(`${app.serverUrl()}/editTopic`, {
+  //       id: topic.id,
+  //       chain: topic.chainId,
+  //       name: topic.name,
+  //       description: topic.description,
+  //       telegram: topic.telegram,
+  //       featured_in_sidebar: topic.featuredInSidebar,
+  //       featured_in_new_post: topic.featuredInNewPost,
+  //       default_offchain_template: topic.defaultOffchainTemplate,
+  //       featured_order: featuredOrder,
+  //       address: app.user.activeAccount.address,
+  //       jwt: app.user.jwt,
+  //     });
+  //     const result = new Topic(response.result);
+  //     if (this._store.getById(result.id)) {
+  //       this._store.remove(this._store.getById(result.id));
+  //     }
+  //     this._store.add(result);
+  //     return result;
+  //   } catch (err) {
+  //     console.log('Failed to edit topic');
+  //     throw new Error(
+  //       err.responseJSON && err.responseJSON.error
+  //         ? err.responseJSON.error
+  //         : 'Failed to edit topic'
+  //     );
+  //   }
+  // }
 
   public async setTopicThreshold(topic: Topic, token_threshold: string) {
     try {
