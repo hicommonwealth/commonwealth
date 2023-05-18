@@ -198,24 +198,24 @@ class TopicsController {
   //   return { id, name, description, telegram, selected };
   // };
 
-  public updateFeaturedOrder = async (featuredTopics: Topic[]) => {
-    const orderedIds = featuredTopics
-      .sort((a, b) => a.order - b.order)
-      .map((t) => t.id);
-    const response = await $.post(`${app.serverUrl()}/orderTopics`, {
-      chain: app.activeChainId(),
-      'order[]': orderedIds,
-      jwt: app.user.jwt,
-    });
-
-    (response.result || []).forEach((t) => {
-      // TODO Graham 3/29/22: Add 'update' method to TopicStore,
-      // consolidate add/remove methods
-      const modeledTopic = new Topic(t);
-      this.store.remove(modeledTopic);
-      this.store.add(modeledTopic);
-    });
-  };
+  // public updateFeaturedOrder = async (featuredTopics: Topic[]) => {
+  //   const orderedIds = featuredTopics
+  //     .sort((a, b) => a.order - b.order)
+  //     .map((t) => t.id);
+  //   const response = await $.post(`${app.serverUrl()}/orderTopics`, {
+  //     chain: app.activeChainId(),
+  //     'order[]': orderedIds,
+  //     jwt: app.user.jwt,
+  //   });
+  //
+  //   (response.result || []).forEach((t) => {
+  //     // TODO Graham 3/29/22: Add 'update' method to TopicStore,
+  //     // consolidate add/remove methods
+  //     const modeledTopic = new Topic(t);
+  //     this.store.remove(modeledTopic);
+  //     this.store.add(modeledTopic);
+  //   });
+  // };
 }
 
 export default TopicsController;

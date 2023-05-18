@@ -125,3 +125,32 @@ export const useDeleteTopicMutation = () => {
     },
   });
 };
+
+interface UpdateFeaturedTopicsOrderProps {
+  featuredTopics: Topic[];
+}
+
+const updateFeaturedTopicsOrder = async ({
+  featuredTopics,
+}: UpdateFeaturedTopicsOrderProps) => {
+  const orderedIds = featuredTopics
+    .sort((a, b) => a.order - b.order)
+    .map((t) => t.id);
+
+  await axios.post(`${app.serverUrl()}/orderTopics`, {
+    chain: app.activeChainId(),
+    orderedIds,
+    jwt: app.user.jwt,
+  });
+};
+
+export const useUpdateFeaturedTopicsOrderMutation = () => {
+  return useMutation({
+    mutationFn: updateFeaturedTopicsOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['bulkTopics'],
+      });
+    },
+  });
+};
