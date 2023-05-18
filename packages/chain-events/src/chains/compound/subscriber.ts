@@ -35,7 +35,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   }
 
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
-    const provider = this._api.governance.provider;
+    return 12;
+    const provider = this._api.provider;
 
     // retrieves the last numEstimateBlocks blocks to estimate block time
     const currentBlockNum = await provider.getBlockNumber();
@@ -126,7 +127,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     eventSourceMap: EvmEventSourceMapType,
     numEstimateBlocks = 10
   ): Promise<void> {
-    const provider = this._api.governance.provider;
+    const provider = this._api.provider;
     if (this.subIntervalId) {
       this.log.info('Already subscribed!');
       return;
