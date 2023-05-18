@@ -21,6 +21,7 @@ import {
   ReactQuillEditor,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
+import { useCreateTopicMutation } from 'state/api/topics';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -28,7 +29,7 @@ type NewTopicModalProps = {
 
 export const NewTopicModal = (props: NewTopicModalProps) => {
   const { onModalClose } = props;
-
+  const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
@@ -164,15 +165,14 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             e.preventDefault();
 
             try {
-              await app.topics.add(
+              await createTopic({
                 name,
                 description,
-                null,
                 featuredInSidebar,
                 featuredInNewPost,
-                tokenThreshold || '0',
-                serializeDelta(contentDelta)
-              );
+                tokenThreshold,
+                defaultOffchainTemplate: serializeDelta(contentDelta),
+              });
 
               navigate(`/discussions/${encodeURI(name.toString().trim())}`);
 

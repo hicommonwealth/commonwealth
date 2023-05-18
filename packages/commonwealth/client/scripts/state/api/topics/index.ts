@@ -2,11 +2,12 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import app from 'state';
 import axios from 'axios';
 import Topic from 'models/Topic';
+import { queryClient } from 'state/api/config';
 
 interface CreateTopicProps {
   name: string;
   description: string;
-  telegram: string;
+  telegram?: string;
   featuredInSidebar: boolean;
   featuredInNewPost: boolean;
   tokenThreshold: string;
@@ -28,7 +29,7 @@ const createTopic = async ({
     telegram,
     featured_in_sidebar: featuredInSidebar,
     featured_in_new_post: featuredInNewPost,
-    token_threshold: tokenThreshold,
+    token_threshold: tokenThreshold || '0',
     default_offchain_template: defaultOffchainTemplate,
     jwt: app.user.jwt,
     chain: app.activeChainId(),
@@ -40,6 +41,9 @@ const createTopic = async ({
 export const useCreateTopicMutation = () => {
   return useMutation({
     mutationFn: createTopic,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bulkTopics'] });
+    },
   });
 };
 
