@@ -164,6 +164,10 @@ export default (
       foreignKey: 'thread_id',
       as: 'reactions',
     });
+    models.Thread.hasMany(models.Comment, {
+      foreignKey: 'thread_id',
+      as: 'comments',
+    });
     models.Thread.hasMany(models.Collaboration);
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',

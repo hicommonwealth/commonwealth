@@ -2,8 +2,9 @@
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import { redraw } from 'mithrilInterop';
-import NotificationSubscription, { modelFromServer } from 'models/NotificationSubscription';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
 
 import app from 'state';
 

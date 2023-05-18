@@ -11,7 +11,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -40,10 +40,12 @@ const OverviewPage = () => {
   useEffect(() => {
     app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
+    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
+      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
@@ -68,7 +70,6 @@ const OverviewPage = () => {
   const topicSummaryRows: Array<{
     monthlyThreads: Array<Thread>;
     pinnedThreads: Array<Thread>;
-    allThreadsCount: number;
     topic: Topic;
   }> = topicsSorted.map((topic) => {
     const monthlyThreads = allMonthlyThreads.filter(
@@ -77,15 +78,11 @@ const OverviewPage = () => {
     const pinnedThreads = allPinnedThreads.filter(
       (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
-    const allThreadsCount = allThreads.filter(
-      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
-    ).length;
 
     return {
       monthlyThreads,
       pinnedThreads,
       topic,
-      allThreadsCount: allThreadsCount,
     };
   });
 

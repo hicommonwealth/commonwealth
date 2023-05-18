@@ -69,7 +69,7 @@ const schema = {
             field_value: { type: 'string' },
             field_type: {
               type: 'string',
-              enum: ['h1', 'h2', 'h3', 'text'],
+              enum: ['h1', 'h2', 'h3', 'h4', 'text'],
             },
           },
           required: ['field_name', 'field_value'],

@@ -18,7 +18,7 @@ import { ProposalCard } from 'views/components/proposal_card';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
 import { getStatusText } from '../components/proposal_card/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';

@@ -11,6 +11,7 @@ import type {
   SidebarSectionAttrs,
   SubSectionAttrs,
 } from './types';
+import useSidebarStore from 'state/ui/sidebar';
 
 const SubSection = (props: SubSectionAttrs) => {
   const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =
@@ -61,6 +62,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     title,
   } = props;
 
+  const { setMenu, menuName, menuVisible } = useSidebarStore();
   const [toggled, setToggled] = React.useState<boolean>(
     hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
   );
@@ -74,9 +76,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     if (containsChildren) {
       setToggled(!toggled);
     }
-
-    app.sidebarToggled = !app.sidebarToggled;
-    app.sidebarRedraw.emit('redraw');
+    setMenu({ name: menuName, isVisible: menuVisible });
 
     onClick(e, toggled);
   };

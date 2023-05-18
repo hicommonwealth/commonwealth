@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { pluralize } from 'helpers';
+import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
@@ -13,24 +13,24 @@ import { slugify } from 'utils';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-// import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-// import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { getClasses } from '../../components/component_kit/helpers';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
-// import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { useCommonNavigate } from 'navigation/helpers';
+import { CWTag } from 'views/components/component_kit/cw_tag';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
   pinnedThreads: Array<Thread>;
-  allThreadsCount: number;
   topic: Topic;
 };
 
-export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
-  const { monthlyThreads, pinnedThreads, topic, allThreadsCount } = props;
+export const TopicSummaryRow = ({
+  monthlyThreads,
+  pinnedThreads,
+  topic,
+}: TopicSummaryRowProps) => {
   const navigate = useCommonNavigate();
 
   const topSortedThreads = monthlyThreads
@@ -40,19 +40,6 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
       return bLastUpdated.valueOf() - aLastUpdated.valueOf();
     })
     .slice(0, 5 - monthlyThreads.length);
-
-  // const isAdmin =
-  //   app.roles.isRoleOfCommunity({
-  //     role: 'admin',
-  //     chain: app.activeChainId(),
-  //   }) || app.user.isSiteAdmin;
-
-  // const isAdminOrMod =
-  //   isAdmin ||
-  //   app.roles.isRoleOfCommunity({
-  //     role: 'moderator',
-  //     chain: app.activeChainId(),
-  //   });
 
   const threadsToDisplay = pinnedThreads.concat(topSortedThreads);
 
@@ -76,7 +63,7 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
             fontWeight="medium"
             className="threads-count-text"
           >
-            {allThreadsCount} Threads
+            {topic.totalThreads || 0} Threads
           </CWText>
         </div>
         {topic.description && <CWText type="b2">{topic.description}</CWText>}
@@ -89,7 +76,9 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
           );
 
           const user = app.chain.accounts.get(thread.author);
-          // const commentsCount = app.comments.nComments(thread);
+
+          const isStageDefault = isDefaultStage(thread.stage);
+          const isTagsRowVisible = thread.stage && !isStageDefault;
 
           return (
             <div key={idx}>
@@ -137,6 +126,16 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                   {thread.plaintext}
                 </CWText>
 
+                {isTagsRowVisible && (
+                  <div className="tags-row">
+                    <CWTag
+                      label={threadStageToLabel(thread.stage)}
+                      trimAt={20}
+                      type="stage"
+                    />
+                  </div>
+                )}
+
                 <div className="row-bottom">
                   <div className="comments-and-users">
                     <div className="comments-count">
@@ -145,13 +144,6 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                         {pluralize(thread.numberOfComments, 'comment')}
                       </CWText>
                     </div>
-                    {/* TODO Gabe 10/3/22 - user gallery blocked by changes to user model */}
-                    {/* <div className="user-gallery">
-                        <div className="avatars-row">
-                          {gallery.map((u) => u.profile.getAvatar(16))}
-                        </div>
-                        <CWText type="caption">+4 others</CWText>
-                      </div> */}
                   </div>
                   <div className="row-bottom-menu">
                     <div
@@ -161,63 +153,8 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                         e.stopPropagation();
                       }}
                     >
-                      <SharePopover discussionLink={discussionLink}/>
+                      <SharePopover discussionLink={discussionLink} />
                     </div>
-                    {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
-                    {/* {isAdminOrMod && (
-                        <div
-                          onClick={(e) => {
-                            // prevent clicks from propagating to discussion row
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}
-                        >
-                          <CWPopoverMenu
-                            menuItems={[
-                              {
-                                label: 'Delete',
-                                iconLeft: 'trash',
-                                onClick: async (e) => {
-                                  e.preventDefault();
-
-                                  const confirmed =
-                                    await confirmationModalWithText(
-                                      'Delete this entire thread?'
-                                    )();
-
-                                  if (!confirmed) return;
-
-                                  app.threads.delete(thread).then(() => {
-                                  });
-                                },
-                              },
-                              {
-                                label: thread.readOnly
-                                  ? 'Unlock thread'
-                                  : 'Lock thread',
-                                iconLeft: 'lock',
-                                onClick: (e) => {
-                                  e.preventDefault();
-                                  app.threads
-                                    .setPrivacy({
-                                      threadId: thread.id,
-                                      readOnly: !thread.readOnly,
-                                    })
-                                    .then(() => {
-                                      redraw();
-                                    });
-                                },
-                              },
-                            ]}
-                            trigger={
-                              <CWIconButton
-                                iconSize="small"
-                                iconName="dotsVertical"
-                              />
-                            }
-                          />
-                        </div>
-                      )} */}
                   </div>
                 </div>
               </div>

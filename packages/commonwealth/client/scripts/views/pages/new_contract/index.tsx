@@ -7,7 +7,7 @@ import { ChainBase } from 'common-common/src/types';
 import AddContractAndAbiForm from './add_contract_and_abi_form';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
@@ -31,12 +31,12 @@ const NewContractPage = () => {
       <div className="NewContractPage">
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Contracts', path: `/contracts`, navigate },
-            { label: 'Add Contract and ABI' },
+            { label: 'Contract action templates', path: `/contracts` },
+            { label: 'Add contract and ABI', path: '' },
           ]}
         />
         <CWText type="h3" className="header">
-          Add Contract and ABI
+          Add contract and ABI
         </CWText>
         <CWText className="subheader" type="b1">
           Add contracts and their corresponding ABI files to your community.

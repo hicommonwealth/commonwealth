@@ -36,25 +36,20 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
+    JSON.stringify(newTree);
 };
 
 const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
-  const [
-    isEditTopicThresholdsModalOpen,
-    setIsEditTopicThresholdsModalOpen,
-  ] = React.useState<boolean>(false);
-  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] = React.useState<
-    boolean
-  >(false);
-  const [isNewTopicModalOpen, setIsNewTopicModalOpen] = React.useState<boolean>(
-    false
-  );
+  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
+    React.useState<boolean>(false);
+  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
+    React.useState<boolean>(false);
+  const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
+    React.useState<boolean>(false);
 
   const matchesManageCommunityRoute = matchRoutes(
     [{ path: '/manage' }, { path: ':scope/manage' }],
@@ -115,7 +110,7 @@ const AdminSectionComponent = () => {
     ...(featureFlags.proposalTemplates
       ? [
           {
-            title: 'Contracts',
+            title: 'Contract action templates',
             containsChildren: false,
             displayData: null,
             hasDefaultToggle: false,

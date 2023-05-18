@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Web3 from 'web3';
-import getProvider from '../utils/getProvider';
+import getProvider, { providerUrl } from '../utils/getProvider';
 import axios from 'axios';
 import { chainAdvanceTime, chainGetEth } from '../types';
 
@@ -51,7 +51,7 @@ export const advanceEvmTime = async (
 ) => {
   const advance_secs = Web3.utils.numberToHex(time).toString();
   await axios.post(
-    'http://chain:8545',
+    providerUrl,
     // '{"jsonrpc": "2.0", "id": 1, "method": "evm_increaseTime", "params": ["0x15180"] }',
     {
       jsonrpc: '2.0',
@@ -66,7 +66,7 @@ export const advanceEvmTime = async (
     }
   );
   await axios.post(
-    'http://chain:8545',
+    providerUrl,
     {
       jsonrpc: '2.0',
       id: 1,
@@ -80,6 +80,7 @@ export const advanceEvmTime = async (
     }
   );
 };
+
 export const advanceTimestamp = async (req: Request, res: Response) => {
   try {
     const request: chainAdvanceTime = req.body;
@@ -87,7 +88,7 @@ export const advanceTimestamp = async (req: Request, res: Response) => {
       preTime: (await getBlockInfo()).timestamp.toString(),
       postTime: '0',
     };
-    await advanceEvmTime(request.seconds, 1);
+    await advanceEvmTime(request.seconds, request.blocks);
     results.postTime = (await getBlockInfo()).timestamp.toString();
     res.status(200).json(results).send();
   } catch (err) {

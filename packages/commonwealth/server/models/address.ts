@@ -129,6 +129,10 @@ export default (
     });
     models.Address.hasOne(models.SsoToken);
     models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
+    models.Address.hasMany(models.Comment, { foreignKey: 'address_id' });
+    models.Address.hasMany(models.Thread, {
+      foreignKey: 'address_id',
+    });
     models.Address.belongsToMany(models.Thread, {
       through: models.Collaboration,
       as: 'collaboration',

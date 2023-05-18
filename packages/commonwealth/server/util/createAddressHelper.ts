@@ -40,6 +40,12 @@ export async function createAddressHelper(
   if (!req.wallet_id || !Object.values(WalletId).includes(req.wallet_id)) {
     return next(new AppError(Errors.NeedWallet));
   }
+  if (req.chain == 'injective') {
+    if (req.address.slice(0, 3) !== 'inj')
+      return next(new AppError('Must join with Injective address'));
+  } else if (req.address.slice(0, 3) === 'inj') {
+    return next(new AppError('Cannot join with an injective address'));
+  }
 
   const chain = await models.Community.findOne({
     where: { id: req.chain },
