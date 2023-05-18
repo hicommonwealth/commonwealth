@@ -76,12 +76,9 @@ const deletePoll = async (
       throw new AppError(Errors.NoPoll);
     }
 
-    const votes = await models.Vote.findAll({
-      where: {
-        poll_id: poll.id,
-      },
+    await models.Vote.destroy({
+      where: { poll_id: poll.id },
     });
-    await Promise.all(votes.map((v) => v.destroy()));
     await poll.destroy();
 
     if (polls.length === 1) {
