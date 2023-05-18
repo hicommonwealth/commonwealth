@@ -33,7 +33,37 @@ const ManageCommunityPage = () => {
     );
   }, []);
 
-  const fetch = async (searchQuery?: string) => {
+  const fetchAdmins = async () => {
+    const memberAdmins = [];
+    const memberMods = [];
+
+    try {
+      const res = await axios.get(
+        `${app.serverUrl()}/roles`.replace('/api', '/external'),
+        {
+          params: {
+            community_id: app.activeChainId(),
+            permissions: ['admin', 'moderator'],
+          },
+        }
+      );
+      const roles = res.data.result?.roles || [];
+      roles.forEach((role) => {
+        if (role.permission === AccessLevel.Admin) {
+          memberAdmins.push(role);
+        } else if (role.permission === AccessLevel.Moderator) {
+          memberMods.push(role);
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
+    setAdmins(memberAdmins);
+    setMods(memberMods);
+  };
+
+  const searchMembers = async (searchQuery?: string) => {
     try {
       let profiles = [];
 
@@ -57,8 +87,6 @@ const ManageCommunityPage = () => {
         profiles = res.data.result.profiles;
       }
 
-      const memberAdmins = [];
-      const memberMods = [];
       let roles = [];
 
       if (profiles.length > 0) {
@@ -68,17 +96,7 @@ const ManageCommunityPage = () => {
             Address: profile.addresses[0],
           };
         });
-        roles.sort(sortAdminsAndModsFirst).forEach((role) => {
-          if (role.permission === AccessLevel.Admin) {
-            memberAdmins.push(role);
-          } else if (role.permission === AccessLevel.Moderator) {
-            memberMods.push(role);
-          }
-        });
       }
-
-      setAdmins(memberAdmins);
-      setMods(memberMods);
       setRoleData(roles);
       setInitialized(true);
     } catch (err) {
@@ -95,7 +113,7 @@ const ManageCommunityPage = () => {
 
   // on update debounced search term, fetch
   useEffect(() => {
-    fetch(debouncedSearchTerm);
+    searchMembers(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
   // on init, fetch
@@ -104,7 +122,8 @@ const ManageCommunityPage = () => {
       return;
     }
 
-    fetch();
+    fetchAdmins();
+    searchMembers();
   }, []);
 
   const isAdmin =
@@ -159,7 +178,7 @@ const ManageCommunityPage = () => {
       );
     }
 
-    fetch();
+    searchMembers();
   };
 
   return (
