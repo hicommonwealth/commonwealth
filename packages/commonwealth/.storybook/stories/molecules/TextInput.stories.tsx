@@ -81,7 +81,7 @@ export const TextInput: Story = {
   render: ({...args}) => (
     <CWTextInput name="Text field" {...args} />
   )
-}
+};
 
 /** This input only accepts A-Z */
 export const OnlyLetters = {

@@ -17,6 +17,7 @@ import { CWText } from '../component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { featureFlags } from 'helpers/feature-flags';
+import useSidebarStore from 'state/ui/sidebar';
 
 export type SidebarMenuName =
   | 'default'
@@ -27,6 +28,7 @@ export const Sidebar = () => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
+  const { menuName } = useSidebarStore();
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
@@ -45,7 +47,7 @@ export const Sidebar = () => {
 
   return (
     <div className="Sidebar">
-      {app.sidebarMenu === 'default' && (
+      {menuName === 'default' && (
         <div className="sidebar-default-menu">
           <SidebarQuickSwitcher />
           {app.chain && (
@@ -82,8 +84,8 @@ export const Sidebar = () => {
           )}
         </div>
       )}
-      {app.sidebarMenu === 'createContent' && <CreateContentSidebar />}
-      {app.sidebarMenu === 'exploreCommunities' && (
+      {menuName === 'createContent' && <CreateContentSidebar />}
+      {menuName === 'exploreCommunities' && (
         <ExploreCommunitiesSidebar />
       )}
     </div>

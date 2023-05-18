@@ -21,4 +21,5 @@ export const Spinner: Story = {
       options: ["xxs", "xs", "small", "medium", "large", "xl", "xxl"],
     },
   },
-  render: ({...args}) => <CWSpinner {...args} />}
+  render: ({...args}) => <CWSpinner {...args} />
+};

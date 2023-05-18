@@ -68,7 +68,7 @@ const Popover: FC<PopoverProps> = (props) => {
       )}
     />
   );
-}
+};
 
 export const PopoverMenuStory = {
   name: 'Popover Menu',
@@ -142,4 +142,4 @@ export const PopoverMenuStory = {
       iconBottom={args.iconBottom}
     />
   )
-}
+};

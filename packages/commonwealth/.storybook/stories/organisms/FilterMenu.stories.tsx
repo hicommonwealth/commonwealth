@@ -62,7 +62,7 @@ const FilterMenu: FC<FilterMenuProps> = (props) => {
       }}
     />
   )
-}
+};
 
 export const FilterMenuStory = {
   name: 'Filter Menu',
@@ -86,4 +86,4 @@ export const FilterMenuStory = {
   render: ({...args}) => (
     <FilterMenu header={args.header} groupOptions={args.options} />
   )
-}
+};

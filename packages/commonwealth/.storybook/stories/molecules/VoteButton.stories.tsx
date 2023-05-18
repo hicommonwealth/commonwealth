@@ -25,7 +25,7 @@ const VoteButton: FC<VoteButtonProps> = ({ count }) => {
       voteCount={voteCount}
     />
   )
-}
+};
 
 export const VoteButtonStory = {
   name: 'Vote Button',
@@ -38,4 +38,4 @@ export const VoteButtonStory = {
     },
   },
   render: ({...args}) => <VoteButton count={args.voteCount} />
-}
+};

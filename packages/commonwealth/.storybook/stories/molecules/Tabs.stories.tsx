@@ -40,7 +40,7 @@ const Tabs: FC<TabsProps> = ({tabLabels}) => {
       ))}
     </CWTabBar>
   )
-}
+};
 
 export const Tab: Story = {
   name: 'Tabs',
@@ -54,4 +54,4 @@ export const Tab: Story = {
     controls: { exclude: ["label", "disabled", "isSelected"] }
   },
   render: ({...args}) => <Tabs tabLabels={args.tabLabels} />
-}
+};

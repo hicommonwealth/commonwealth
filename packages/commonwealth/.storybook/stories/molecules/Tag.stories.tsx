@@ -33,4 +33,4 @@ export const Tag: Story = {
     },
   },
   render: ({...args}) => <CWTag {...args} />
-}
+};

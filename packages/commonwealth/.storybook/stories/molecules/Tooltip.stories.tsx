@@ -42,7 +42,7 @@ const Tooltip: FC<TooltipProps> = (props) => {
       )}
     />
   );
-}
+};
 
 export const Overview = {
   args: {
@@ -76,7 +76,7 @@ export const Overview = {
       hasBackground={args.hasBackground}
     />
   ),
-}
+};
 
 export const AddressTooltip = {
   args: {
@@ -108,4 +108,4 @@ export const AddressTooltip = {
       />
     </div>
   )
-}
+};

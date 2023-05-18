@@ -1,14 +1,15 @@
 import React from 'react';
 
-import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { FeedbackModal } from '../modals/feedback_modal';
 import { Modal } from '../components/component_kit/cw_modal';
+import useSidebarStore from 'state/ui/sidebar';
 
 export const HelpMenu = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const { setMobileMenuName } = useSidebarStore();
 
   return (
     <React.Fragment>
@@ -16,10 +17,7 @@ export const HelpMenu = () => {
         className="HelpMenu"
         menuHeader={{
           label: 'Help',
-          onClick: () => {
-            app.mobileMenu = 'MainMenu';
-            app.sidebarRedraw.emit('redraw');
-          },
+          onClick: () => setMobileMenuName('MainMenu'),
         }}
         menuItems={[
           {

@@ -20,7 +20,7 @@ interface CardProps {
   interactive?: boolean,
   fullWidth?: boolean,
   children: any,
-}
+};
 
 const Card: FC<CardProps> = (props) => {
   const { elevation, interactive = false, fullWidth } = props;
@@ -34,7 +34,7 @@ const Card: FC<CardProps> = (props) => {
       {props.children}
     </CWCard>
   )
-}
+};
 
 export const CardStory: Story = {
   name: "Card",
@@ -81,4 +81,4 @@ export const CardStory: Story = {
       <CWText>{args.content}</CWText>
     </Card>
   )
-}
+};

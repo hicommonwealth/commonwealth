@@ -16,7 +16,7 @@ interface DropdownProps {
   label: string | undefined,
   options: DropdownItemType[],
   onSelect: ((item: DropdownItemType) => void) | undefined,
-}
+};
 
 const Dropdown: FC<DropdownProps> = (props) => {
   const { label, options, onSelect } = props;
@@ -61,4 +61,4 @@ export const DropdownStory: Story = {
       onSelect={args.onSelect}
     />
   )
-}
+};
