@@ -223,31 +223,36 @@ export function initMagicAuth(models: DB) {
           console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
 
           if (registrationChainAddress) {
-            // create an address on their selected chain
+            // insert an address for their selected chain if it doesn't exist
             await sequelize.transaction(async (t) => {
-              const newRegistrationChainAddress = await models.Address.create(
-                {
-                  address: registrationChainAddress,
-                  chain: registrationChain.id,
-                  verification_token: 'MAGIC',
-                  verification_token_expires: null,
-                  verified: new Date(), // trust addresses from magic
-                  last_active: new Date(),
-                  user_id: existingUser.id,
-                  profile_id: (existingUser.Profiles[0] as ProfileAttributes)
-                    .id,
-                  wallet_id: WalletId.Magic,
-                },
-                { transaction: t }
-              );
-              await createRole(
-                models,
-                newRegistrationChainAddress.id,
-                registrationChain.id,
-                'member',
-                false,
-                t
-              );
+              const [newRegistrationChainAddress, created] =
+                await models.Address.findOrCreate({
+                  where: {
+                    address: registrationChainAddress,
+                    chain: registrationChain.id,
+                    user_id: existingUser.id,
+                    profile_id: (existingUser.Profiles[0] as ProfileAttributes)
+                      .id,
+                    wallet_id: WalletId.Magic,
+                  },
+                  defaults: {
+                    verification_token: 'MAGIC',
+                    verification_token_expires: null,
+                    verified: new Date(),
+                    last_active: new Date(),
+                  },
+                  transaction: t,
+                });
+              if (created) {
+                await createRole(
+                  models,
+                  newRegistrationChainAddress.id,
+                  registrationChain.id,
+                  'member',
+                  false,
+                  t
+                );
+              }
             });
           }
 
