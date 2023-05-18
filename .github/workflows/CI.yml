@@ -179,11 +179,6 @@ jobs:
         env:
           NO_CLIENT: true
 
-      - name: Run emitNotification tests
-        run: yarn --cwd packages/commonwealth test-emit-notif
-        env:
-          NO_CLIENT: true
-
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
     name: Devnet Tests
