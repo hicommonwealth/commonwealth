@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import 'components/thread_selector.scss';
 import { notifyError } from 'controllers/app/notifications';
-import type { Thread } from 'models';
+import type Thread from '../../../models/Thread';
 import type { SearchParams } from 'models/SearchQuery';
 import app from 'state';
 import { CWTextInput } from '../component_kit/cw_text_input';

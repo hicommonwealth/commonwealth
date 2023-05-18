@@ -8,7 +8,7 @@ import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NotAdmin: 'Must be admin',
+  NotAdmin: 'Must be a site admin',
   NeedChainId: 'Must provide chain id',
   NoChain: 'Chain not found',
   CannotDeleteChain: 'Cannot delete this protected chain',
@@ -22,8 +22,6 @@ export const Errors = {
 
 type deleteChainReq = {
   id: string;
-  airplaneSecret?: string;
-  airplaneManualSecret?: string;
 };
 
 type deleteChainResp = { result: string };
@@ -34,21 +32,10 @@ const deleteChain = async (
   res: TypedResponse<deleteChainResp>,
   next: NextFunction
 ) => {
-  const { id, airplaneSecret, airplaneManualSecret } = req.body;
+  const { id } = req.body;
 
-  if (
-    !process.env.AIRPLANE_DELETE_COMMUNITY_SECRET ||
-    airplaneSecret !== process.env.AIRPLANE_DELETE_COMMUNITY_SECRET
-  ) {
-    return next(new AppError(Errors.BadSecret));
-  }
-
-  // Check Manually typed in secret
-  if (
-    !process.env.AIRPLANE_DELETE_COMMUNITY_MANUAL_SECRET ||
-    airplaneManualSecret !== process.env.AIRPLANE_DELETE_COMMUNITY_MANUAL_SECRET
-  ) {
-    return next(new AppError(Errors.BadSecret));
+  if (!req.user.isAdmin) {
+    return next(new AppError(Errors.NotAdmin));
   }
 
   if (!id) {
@@ -134,13 +121,6 @@ const deleteChain = async (
         transaction: t,
       });
 
-      await models.LinkedThread.destroy({
-        where: {
-          linked_thread: { [Op.in]: threads.map((thread) => thread.id) },
-        },
-        transaction: t,
-      });
-
       await models.Vote.destroy({
         where: { chain_id: chain.id },
         transaction: t,
@@ -163,11 +143,6 @@ const deleteChain = async (
 
       const addresses = await models.Address.findAll({
         where: { chain: chain.id },
-      });
-
-      await models.ChainCategory.destroy({
-        where: { chain_id: chain.id },
-        transaction: t,
       });
 
       await models.CommunityBanner.destroy({

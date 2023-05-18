@@ -3,7 +3,6 @@
 @mixin bareAvatar {
   position: relative;
   display: inline-block;
-  margin: -3px 0;
   margin-right: 8px;
   background: $white;
   border-radius: $border-radius-round;
@@ -69,7 +68,7 @@
 }
 
 .User {
-  display: inline-block;
+  display: flex;
   white-space: nowrap;
 
   > a {

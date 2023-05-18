@@ -1,4 +1,4 @@
-import { render } from 'mithrilInterop';
+import { render } from 'helpers/DEPRECATED_ReactRender';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
@@ -152,7 +152,7 @@ export const renderQuillDelta = (
           })
         );
       })
-    : consolidateOrderedLists(groups).map((group, i) => {
+    : consolidateOrderedLists(groups).map((group) => {
         const renderChild = (child, ii) => {
           // handle images
           if (child.insert?.image) {
@@ -170,8 +170,8 @@ export const renderQuillDelta = (
               },
               [
                 render('iframe', {
-                  frameborder: 0,
-                  allowfullscreen: true,
+                  frameBorder: 0,
+                  allowFullscreen: true,
                   src: child.insert?.video,
                   key: 1,
                 }),
@@ -200,7 +200,7 @@ export const renderQuillDelta = (
               'blockquote',
               {
                 key: ii,
-                class: 'twitter-tweet',
+                className: 'twitter-tweet',
               },
               render('a', {
                 tabIndex: -1,
@@ -389,7 +389,7 @@ export const renderQuillDelta = (
               render(
                 getGroupTag(_group),
                 { key: `extra-${iii}` },
-                temp.pop().map(({ tag, content, key }, index) => {
+                temp.pop().map(({ tag, content }, index) => {
                   return render(tag, { key: index }, content);
                 })
               )
@@ -399,7 +399,7 @@ export const renderQuillDelta = (
           return render(
             getGroupTag(_group),
             { key: ii },
-            temp[0].map(({ tag, content, key }, index) => {
+            temp[0].map(({ tag, content }, index) => {
               return render(tag, { key: index }, content);
             })
           );

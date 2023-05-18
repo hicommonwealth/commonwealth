@@ -71,11 +71,16 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getThreadUrl = (type, thread, comment?) => {
+export const getThreadUrl = (thread: {
+  chain: string;
+  type_id?: string | number;
+  id?: string | number;
+  title?: string;
+}, comment?: string | number): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
-  const cId = comment ? `?comment=${comment.id}` : '';
+  const cId = comment ? `?comment=${comment}` : '';
 
   return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
@@ -96,7 +101,7 @@ export const getThreadUrlWithoutObject = (
     : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
 };
 
-export const getCommunityUrl = (community) => {
+export const getCommunityUrl = (community: string): string => {
   return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${community}`
     : `http://localhost:8080/${community}`;

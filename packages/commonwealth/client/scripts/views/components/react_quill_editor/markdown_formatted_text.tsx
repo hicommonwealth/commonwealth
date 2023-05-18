@@ -1,12 +1,24 @@
-import React, { useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+
+import 'components/quill/markdown_formatted_text.scss';
+
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
-import { countLinesMarkdown } from './utils';
+import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
 import removeMarkdown from 'markdown-to-text';
 import { QuillRendererProps } from './quill_renderer';
+import { loadScript } from 'helpers';
+import { debounce } from 'lodash';
+import { twitterLinkRegex } from 'helpers/constants';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -17,6 +29,15 @@ markdownRenderer.link = (href, title, text) => {
   } ${
     OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
   } href="${href}">${text}</a>`;
+};
+markdownRenderer.image = (href, title, text) => {
+  if (href?.startsWith('ipfs://')) {
+    const hash = href.split('ipfs://')[1];
+    if (hash) {
+      href = `https://ipfs.io/ipfs/${hash}`;
+    }
+  }
+  return `<img alt="${text}" src="${href}"/>`;
 };
 marked.setOptions({
   renderer: markdownRenderer,
@@ -30,12 +51,14 @@ type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
 };
 
+// NOTE: Do NOT use this directly. Use QuillRenderer instead.
 export const MarkdownFormattedText = ({
   doc,
   hideFormatting,
   searchTerm,
   cutoffLines,
 }: MarkdownFormattedTextProps) => {
+  const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
   const isTruncated: boolean = useMemo(() => {
@@ -85,9 +108,63 @@ export const MarkdownFormattedText = ({
 
   const toggleDisplay = () => setUserExpand(!userExpand);
 
+  const convertTwitterLinks = useCallback(
+    debounce(async () => {
+      // walk through rendered markdown DOM elements
+      const walker = document.createTreeWalker(
+        containerRef.current,
+        NodeFilter.SHOW_ELEMENT
+      );
+
+      while (walker?.nextNode()) {
+        if (walker.currentNode instanceof HTMLAnchorElement) {
+          const href = walker.currentNode?.href;
+          if (href.match(twitterLinkRegex)) {
+            // fetch embed info
+            const embedInfo = await fetchTwitterEmbedInfo(href);
+            if (embedInfo.result.html) {
+              // load widget script
+              const w = window as any;
+              const callback = () => {
+                setTimeout(() => {
+                  w.twttr?.widgets?.load();
+                  // add embed
+                  const embedEl = document.createElement('div');
+                  embedEl.innerHTML = embedInfo.result.html;
+                  walker?.currentNode?.parentElement?.insertBefore(
+                    embedEl,
+                    walker.currentNode
+                  );
+                }, 1);
+              };
+              if (!w.twttr) {
+                loadScript('//platform.twitter.com/widgets.js').then(callback);
+              } else {
+                callback();
+              }
+            }
+          }
+        }
+      }
+    }, 300),
+    []
+  );
+
+  // when doc is rendered, convert twitter links to embeds
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+    convertTwitterLinks();
+    return () => {
+      convertTwitterLinks.cancel();
+    };
+  }, [finalDoc]);
+
   return (
     <>
       <div
+        ref={containerRef}
         className={getClasses<{ collapsed?: boolean }>(
           { collapsed: isTruncated },
           'MarkdownFormattedText'

@@ -2,12 +2,15 @@ import type WalletConnectProvider from '@walletconnect/web3-provider';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
 import app from 'state';
 import type Web3 from 'web3';
 
 import { hexToNumber } from 'web3-utils';
 import type { SessionPayload } from '@canvas-js/interfaces';
+import Account from '../../../models/Account';
+import BlockInfo from '../../../models/BlockInfo';
+import ChainInfo from '../../../models/ChainInfo';
+import IWebWallet from '../../../models/IWebWallet';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -103,7 +106,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
     const WalletConnectProvider = (await import('@walletconnect/web3-provider'))
       .default;
-    this._provider = new WalletConnectProvider({ rpc, chainId });
+    this._provider = new WalletConnectProvider({ rpc });
 
     // destroy pre-existing session if exists
     if (this._provider.wc?.connected) {

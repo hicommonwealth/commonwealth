@@ -13,12 +13,15 @@
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-rmq": "sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management",
+    "start-redis": "sudo docker run -it -d --rm --name redis -p 6379:6379 redis:latest",
     "format-check": "prettier --check .",
     "format": "prettier --write .",
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
-    "stylelint": "stylelint packages/commonwealth/client/styles/*"
+    "stylelint": "stylelint packages/commonwealth/client/styles/*",
+    "add-prettier-precommit": "grep -q -s 'prettier --write' ./.git/hooks/pre-commit || cat ./scripts/prettier-new-work.sh >> ./.git/hooks/pre-commit",
+    "setup-git-hooks": "yarn add-prettier-precommit && chmod +x ./.git/hooks/pre-commit"
   },
   "engines": {
     "node": "18.x"

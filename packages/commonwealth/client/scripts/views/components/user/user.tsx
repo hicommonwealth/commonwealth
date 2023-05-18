@@ -7,10 +7,10 @@ import 'components/user/user.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
-import type { Account } from 'models';
-import { MinimumProfile as Profile } from 'models';
-import { AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import MinimumProfile from '../../../models/MinimumProfile';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
@@ -36,8 +36,9 @@ type UserAttrs = {
   onClick?: (e: any) => void;
   popover?: boolean;
   showAddressWithDisplayName?: boolean; // show address inline with the display name
+  showAsDeleted?: boolean;
   showRole?: boolean;
-  user: Account | AddressInfo | Profile;
+  user: Account | AddressInfo | MinimumProfile | undefined;
 };
 
 export const User = (props: UserAttrs) => {
@@ -51,6 +52,7 @@ export const User = (props: UserAttrs) => {
     onClick,
     popover,
     showRole,
+    showAsDeleted = false,
   } = props;
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
@@ -63,7 +65,7 @@ export const User = (props: UserAttrs) => {
     app.newProfiles.isFetched.off('redraw', () => {
       forceRerender();
     });
-  }, []);
+  }, [forceRerender]);
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
@@ -73,87 +75,92 @@ export const User = (props: UserAttrs) => {
 
   const avatarSize = props.avatarSize || 16;
 
-  const showAvatar = !hideAvatar;
+  const showAvatar = user ? !hideAvatar : false;
 
-  if (!user) return;
+  // if (!user) return;
 
   let account: Account;
-
-  let profile: Profile;
-
-  const loggedInUserIsAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({
-      chain: app.activeChainId(),
-    });
-
+  let profile: MinimumProfile;
+  let addrShort: string;
+  let loggedInUserIsAdmin = false;
+  let friendlyChainName: string | undefined;
+  let adminsAndMods = [];
   let role;
 
-  const addrShort = formatAddressShort(
-    user.address,
-    typeof user.chain === 'string' ? user.chain : user.chain?.id,
-    false,
-    maxCharLength
-  );
+  if (user) {
+    loggedInUserIsAdmin =
+      app.user.isSiteAdmin ||
+      app.roles.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
 
-  const friendlyChainName = app.config.chains.getById(
-    typeof user.chain === 'string' ? user.chain : user.chain?.id
-  )?.name;
+    addrShort = formatAddressShort(
+      user.address,
+      typeof user.chain === 'string' ? user.chain : user.chain?.id,
+      false,
+      maxCharLength
+    );
 
-  const adminsAndMods = app.chain?.meta.adminsAndMods || [];
+    friendlyChainName = app.config.chains.getById(
+      typeof user.chain === 'string' ? user.chain : user.chain?.id
+    )?.name;
 
-  if (props.user instanceof AddressInfo) {
-    const chainId = props.user.chain;
+    adminsAndMods = app.chain?.meta.adminsAndMods || [];
 
-    const address = props.user.address;
+    if (props.user instanceof AddressInfo) {
+      const chainId = props.user.chain;
 
-    if (!chainId || !address) return;
+      const address = props.user.address;
 
-    // only load account if it's possible to, using the current chain
-    if (app.chain && app.chain.id === chainId.id) {
-      try {
-        account = app.chain.accounts.get(address);
-      } catch (e) {
-        console.log('legacy account error, carry on');
-        account = null;
+      if (!chainId || !address) return;
+
+      // only load account if it's possible to, using the current chain
+      if (app.chain && app.chain.id === chainId.id) {
+        try {
+          account = app.chain.accounts.get(address);
+        } catch (e) {
+          console.log('legacy account error, carry on');
+          account = null;
+        }
       }
-    }
 
-    profile = app.newProfiles.getProfile(chainId.id, address);
+      profile = app.newProfiles.getProfile(chainId.id, address);
 
-    role = adminsAndMods.find(
-      (r) => r.address === address && r.address_chain === chainId.id
-    );
-  } else if (props.user instanceof Profile) {
-    profile = props.user;
+      role = adminsAndMods.find(
+        (r) => r.address === address && r.address_chain === chainId.id
+      );
+    } else if (props.user instanceof MinimumProfile) {
+      profile = props.user;
 
-    // only load account if it's possible to, using the current chain
-    if (app.chain && app.chain.id === profile.chain) {
-      try {
-        account = app.chain.accounts.get(profile.address);
-      } catch (e) {
-        console.error(e);
-        account = null;
+      // only load account if it's possible to, using the current chain
+      if (app.chain && app.chain.id === profile.chain) {
+        try {
+          account = app.chain.accounts.get(profile.address);
+        } catch (e) {
+          console.error(e);
+          account = null;
+        }
       }
+
+      role = adminsAndMods.find(
+        (r) =>
+          r.address === profile.address && r.address_chain === profile.chain
+      );
+    } else {
+      account = props.user;
+      // TODO: we should remove this, since account should always be of type Account,
+      // but we currently inject objects of type 'any' on the profile page
+      const chainId = account.chain.id;
+
+      profile = app.newProfiles.getProfile(chainId, account.address);
+
+      role = adminsAndMods.find(
+        (r) => r.address === account.address && r.address_chain === chainId
+      );
     }
-
-    role = adminsAndMods.find(
-      (r) => r.address === profile.address && r.address_chain === profile.chain
-    );
-  } else {
-    account = props.user;
-    // TODO: we should remove this, since account should always be of type Account,
-    // but we currently inject objects of type 'any' on the profile page
-    const chainId = account.chain.id;
-
-    profile = app.newProfiles.getProfile(chainId, account.address);
-
-    role = adminsAndMods.find(
-      (r) => r.address === account.address && r.address_chain === chainId
-    );
   }
 
-  const getRoleTags = (long?: boolean) => (
+  const getRoleTags = () => (
     <>
       {/* role in commonwealth forum */}
       {showRole && role && (
@@ -213,20 +220,20 @@ export const User = (props: UserAttrs) => {
                     </div>
                   </>
                 )}
-                {getRoleTags(false)}
+                {getRoleTags()}
               </>,
               handleClick
             )
           ) : (
             <a className="user-display-name username">
-              {!profile || !profile?.id ? (
-                !profile?.id ? (
-                  `${profile.address.slice(0, 8)}...${profile.address.slice(
-                    -5
-                  )}`
+              {!profile ? (
+                showAsDeleted ? (
+                  'Deleted'
                 ) : (
-                  addrShort
+                  'Anonymous'
                 )
+              ) : !profile.id ? (
+                addrShort
               ) : !showAddressWithDisplayName ? (
                 profile.name
               ) : (
@@ -237,7 +244,8 @@ export const User = (props: UserAttrs) => {
                   </div>
                 </>
               )}
-              {getRoleTags(false)}
+
+              {getRoleTags()}
             </a>
           )}
           {account &&
@@ -246,6 +254,7 @@ export const User = (props: UserAttrs) => {
                 account.address === address && ghostAddress
             ) && (
               <img
+                alt="ghost"
                 src="/static/img/ghost.svg"
                 width="20px"
                 style={{ display: 'inline-block' }}
@@ -258,74 +267,76 @@ export const User = (props: UserAttrs) => {
 
   const userPopover = (
     <React.Fragment>
-      <div
-        className="UserPopover"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        <div className="user-avatar">
-          {!profile
-            ? null
-            : profile.avatarUrl
-            ? profile.getAvatar(36)
-            : profile.getAvatar(32)}
-        </div>
-        <div className="user-name">
-          {app.chain &&
-            app.chain.base === ChainBase.Substrate &&
-            link(
-              'a.user-display-name',
-              profile?.id ? `/profile/id/${profile.id}` : 'javascript:',
-              !profile || !profile?.id ? (
-                !profile?.id ? (
-                  `${profile.address.slice(0, 8)}...${profile.address.slice(
-                    -5
-                  )}`
+      {profile && (
+        <div
+          className="UserPopover"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <div className="user-avatar">
+            {!profile
+              ? null
+              : profile.avatarUrl
+              ? profile.getAvatar(36)
+              : profile.getAvatar(32)}
+          </div>
+          <div className="user-name">
+            {app.chain &&
+              app.chain.base === ChainBase.Substrate &&
+              link(
+                'a.user-display-name',
+                profile?.id ? `/profile/id/${profile.id}` : 'javascript:',
+                !profile || !profile?.id ? (
+                  !profile?.id ? (
+                    `${profile.address.slice(0, 8)}...${profile.address.slice(
+                      -5
+                    )}`
+                  ) : (
+                    addrShort
+                  )
+                ) : !showAddressWithDisplayName ? (
+                  profile.name
                 ) : (
-                  addrShort
-                )
-              ) : !showAddressWithDisplayName ? (
-                profile.name
-              ) : (
-                <React.Fragment>
-                  {profile.name}
-                  <div className="id-short">
-                    {formatAddressShort(profile.address, profile.chain)}
-                  </div>
-                </React.Fragment>
-              ),
-              handleClick
-            )}
+                  <React.Fragment>
+                    {profile.name}
+                    <div className="id-short">
+                      {formatAddressShort(profile.address, profile.chain)}
+                    </div>
+                  </React.Fragment>
+                ),
+                handleClick
+              )}
+          </div>
+          {profile?.address && (
+            <div className="user-address">
+              {formatAddressShort(
+                profile.address,
+                profile.chain,
+                false,
+                maxCharLength
+              )}
+            </div>
+          )}
+          {friendlyChainName && (
+            <div className="user-chain">{friendlyChainName}</div>
+          )}
+          {/* always show roleTags in UserPopover */}
+          {getRoleTags()}
+          {/* If Admin Allow Banning */}
+          {loggedInUserIsAdmin && (
+            <div className="ban-wrapper">
+              <CWButton
+                onClick={() => {
+                  setIsModalOpen(true);
+                }}
+                label="Ban User"
+                buttonType="primary-red"
+              />
+            </div>
+          )}
         </div>
-        {profile?.address && (
-          <div className="user-address">
-            {formatAddressShort(
-              profile.address,
-              profile.chain,
-              false,
-              maxCharLength
-            )}
-          </div>
-        )}
-        {friendlyChainName && (
-          <div className="user-chain">{friendlyChainName}</div>
-        )}
-        {/* always show roleTags in UserPopover */}
-        {getRoleTags(true)}
-        {/* If Admin Allow Banning */}
-        {loggedInUserIsAdmin && (
-          <div className="ban-wrapper">
-            <CWButton
-              onClick={() => {
-                setIsModalOpen(true);
-              }}
-              label="Ban User"
-              buttonType="primary-red"
-            />
-          </div>
-        )}
-      </div>
+      )}
       <Modal
         content={
           <BanUserModal
@@ -346,7 +357,7 @@ export const User = (props: UserAttrs) => {
       onMouseLeave={popoverProps.handleInteraction}
     >
       {userFinal}
-      <Popover content={userPopover} {...popoverProps} />
+      {user && <Popover content={userPopover} {...popoverProps} />}
     </div>
   ) : (
     userFinal

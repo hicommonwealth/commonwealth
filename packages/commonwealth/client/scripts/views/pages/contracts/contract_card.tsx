@@ -4,7 +4,7 @@ import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { ContractTemplateCard } from './contract_template_card';
-import type { Contract } from '../../../models';
+import type Contract from '../../../models/Contract';
 
 import app from 'state';
 
@@ -97,23 +97,25 @@ export const ContractCard = ({
     <>
       <CWCard fullWidth className="ContractCard">
         <div className="header">
-          <div>
-            <CWText type="caption" className="label">
-              Contract
-            </CWText>
-            <CWText className="address">{address}</CWText>
-          </div>
-          <CWIconButton
-            className="delete-icon"
-            iconName="trash"
-            onClick={handleDeleteContract}
-          />
+          <CWText type="caption" className="label" fontStyle="uppercase">
+            CONTRACT
+          </CWText>
+
+          <CWIconButton iconName="trash" onClick={handleDeleteContract} />
+        </div>
+        <div className="label-group">
+          <CWText className="group-title" type="b2">
+            Address
+          </CWText>
+          <CWText className="address" type="b2">
+            {address}
+          </CWText>
         </div>
         <div className="templates">
           {templates?.length ? (
             <>
-              <CWText type="caption" className="label">
-                Actions
+              <CWText type="caption" className="label" fontStyle="uppercase">
+                ACTIONS
               </CWText>
               <div className="templates-container">
                 {templates.map((template) => (
@@ -125,6 +127,8 @@ export const ContractCard = ({
                     nickname={template.cctmd.nickname}
                     slug={template.cctmd.slug}
                     display={template.cctmd.display_options}
+                    enabledBy={template.cctmd.enabled_by}
+                    enabledAt={template.cctmd.created_at}
                     cctmd_id={template.cctmd.id}
                     cct_id={template.id}
                     handleShowModal={handleOpenManageContractTemplateModal}
@@ -136,7 +140,7 @@ export const ContractCard = ({
           ) : (
             <div className="no-templates-container">
               <CWText className="no-templates-info" type="b1">
-                You currently have no templates for this contract
+                You currently have no actions for this contract
               </CWText>
             </div>
           )}
@@ -144,7 +148,7 @@ export const ContractCard = ({
             <CWButton
               className="add-template-btn"
               buttonType="tertiary-black"
-              label="Enable Action"
+              label="Enable action"
               iconLeft="plus"
               onClick={() => handleOpenManageContractTemplateModal()}
             />
@@ -156,7 +160,7 @@ export const ContractCard = ({
                 className="cta"
                 onClick={handleCreateNewTemplate}
               >
-                Create a New Template
+                Create a new template
               </CWText>
             </CWText>
           )}

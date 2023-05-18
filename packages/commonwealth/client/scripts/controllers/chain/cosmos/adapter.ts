@@ -1,9 +1,10 @@
 import BN from 'bn.js';
 import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
-import type { ChainInfo, ITokenAdapter } from 'models';
-import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
+import IChainAdapter from '../../../models/IChainAdapter';
+import type ITokenAdapter from '../../../models/ITokenAdapter';
 import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
@@ -61,15 +62,22 @@ class Cosmos
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 
-    const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
-      chain: this.meta.id,
-      address: account.address,
-      author_chain: account.chain.id,
-    });
-    if (balanceResp.result) {
-      const balance = new BN(balanceResp.result, 10);
-      this.hasToken = balance && !balance.isZero();
-      if (balance) this.tokenBalance = balance;
+    try {
+      const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
+        chain: this.meta.id,
+        address: account.address,
+        author_chain: account.chain.id,
+      });
+      if (balanceResp.result) {
+        const balance = new BN(balanceResp.result, 10);
+        this.hasToken = balance && !balance.isZero();
+        if (balance) this.tokenBalance = balance;
+      } else {
+        this.hasToken = false;
+      }
+    } catch (e) {
+      console.log(e);
+      this.hasToken = false;
     }
   }
 }

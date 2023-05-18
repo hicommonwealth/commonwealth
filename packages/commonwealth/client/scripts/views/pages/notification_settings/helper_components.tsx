@@ -2,20 +2,20 @@ import React from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
 import { getNotificationUrlPath } from 'identifiers';
-import type { NotificationSubscription } from 'models';
-import { AddressInfo } from 'models';
 
 import 'pages/notification_settings/helper_components.scss';
+import AddressInfo from '../../../models/AddressInfo';
+import NotificationSubscription from '../../../models/NotificationSubscription';
 
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import { renderQuillTextBody } from '../../components/react_quill_editor/helpers';
 import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 const getTextRows = (
   subscription: NotificationSubscription,
@@ -95,9 +95,7 @@ const getTextRows = (
           </CWText>
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
-          {renderQuillTextBody(subscription.Comment.text, {
-            hideFormatting: true,
-          })}
+          <QuillRenderer doc={subscription.Comment.text} hideFormatting />
         </CWText>
       </>
     );

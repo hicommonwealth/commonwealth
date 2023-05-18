@@ -1,6 +1,8 @@
 import axios from 'axios';
 import type { DeltaStatic } from 'quill';
 
+export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
+
 // createDeltaFromText returns a new DeltaStatic object from a string
 export const createDeltaFromText = (
   str: string,
@@ -33,10 +35,18 @@ export const getTextFromDelta = (delta: DeltaStatic): string => {
       if (op.insert?.image) {
         return true;
       }
+      if (op.insert?.twitter) {
+        return true;
+      }
       return false;
     })
     .reduce((acc, op) => {
-      const text = typeof op.insert === 'string' ? op.insert : '(image)\n';
+      const text =
+        typeof op.insert === 'string'
+          ? op.insert
+          : op.insert.twitter
+          ? '(tweet)'
+          : '(image)\n';
       return acc + text;
     }, '');
 };
@@ -151,42 +161,17 @@ export const countLinesMarkdown = (text: string): number => {
   return text.split('\n').length - 1;
 };
 
-type QuillDraft = {
-  key: string;
-  lastSavedAt: number;
-  contentDelta: SerializableDeltaStatic;
-};
-
-const createDraftKey = (key: string) => `cw-draft-${key}`;
-
-// saveDraft saves the delta to local storage by key
-export const saveDraft = (key: string, contentDelta: DeltaStatic) => {
-  if (!key) {
-    return;
+// fetchTwitterEmbedInfo fetches and returns the embed info (including HTML) for a tweet
+export const fetchTwitterEmbedInfo = async (url: string) => {
+  // this will not work locally due to CORS
+  const embedInfoUrl = 'https://publish.twitter.com/oembed';
+  const res = await axios.get(embedInfoUrl, {
+    params: {
+      url,
+    },
+  });
+  if (res.status >= 300) {
+    throw new Error(res.data);
   }
-  const data: QuillDraft = {
-    key,
-    lastSavedAt: Date.now(),
-    contentDelta,
-  };
-  localStorage.setItem(createDraftKey(key), JSON.stringify(data));
-};
-
-// restoreDraft returns the delta queried from local storage by key
-export const restoreDraft = (key: string): QuillDraft | null => {
-  if (!key) {
-    return null;
-  }
-  const data = localStorage.getItem(createDraftKey(key));
-  if (!data) {
-    return null;
-  }
-  return JSON.parse(data) as QuillDraft;
-};
-
-export const clearDraft = (key: string) => {
-  if (!key) {
-    return;
-  }
-  localStorage.removeItem(createDraftKey(key));
+  return res.data;
 };

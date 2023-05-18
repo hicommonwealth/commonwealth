@@ -4,39 +4,10 @@ import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
 import $ from 'jquery';
-import type { NotificationSubscription } from 'models';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 import app from 'state';
 import { DashboardViews } from '.';
-import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
-import { MarkdownFormattedText } from '../../components/react_quill_editor/markdown_formatted_text';
-
-export const getCommentPreview = (commentText) => {
-  // TODO Graham 6-5-22: Duplicate with notification_row.ts? See relevant note there
-  let decodedCommentText;
-
-  try {
-    const doc = JSON.parse(decodeURIComponent(commentText));
-
-    if (!doc.ops) throw new Error();
-
-    decodedCommentText = <QuillFormattedText doc={doc} />;
-  } catch (e) {
-    let doc = decodeURIComponent(commentText);
-
-    const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
-
-    const matches = doc['matchAll'](regexp);
-
-    Array.from(matches).forEach((match) => {
-      doc = doc.replace(match[0], match[1]);
-    });
-
-    decodedCommentText = <MarkdownFormattedText doc={doc.slice(0, 140)} />;
-  }
-
-  return decodedCommentText;
-};
 
 // Subscriptions
 export const subscribeToThread = async (
@@ -101,10 +72,12 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       chains.add(event.chain);
     }
 
-    const res: { result: { id: string; icon_url: string }[]; status: boolean } =
-      await $.post(`${app.serverUrl()}/viewChainIcons`, {
-        chains: JSON.stringify(Array.from(chains)),
-      });
+    const res: {
+      result: { id: string; icon_url: string }[];
+      status: boolean;
+    } = await $.post(`${app.serverUrl()}/viewChainIcons`, {
+      chains: JSON.stringify(Array.from(chains)),
+    });
 
     const chainIconUrls = {};
     for (const item of res.result) {

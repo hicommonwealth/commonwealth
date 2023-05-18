@@ -2,7 +2,7 @@ import React from 'react';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
-import { ChainInfo } from 'models';
+import ChainInfo from '../../../models/ChainInfo';
 
 import app from 'state';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
@@ -10,10 +10,12 @@ import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useSidebarStore from 'state/ui/sidebar';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const { setMenu } = useSidebarStore();
 
   const allCommunities = app.config.chains
     .getAll()
@@ -35,8 +37,7 @@ export const SidebarQuickSwitcher = () => {
             iconName="plusCircle"
             iconButtonTheme="black"
             onClick={() => {
-              app.sidebarMenu = 'createContent';
-              app.sidebarRedraw.emit('redraw');
+              setMenu({ name: 'createContent' });
             }}
           />
         )}
@@ -44,8 +45,7 @@ export const SidebarQuickSwitcher = () => {
           iconName="compass"
           iconButtonTheme="black"
           onClick={() => {
-            app.sidebarMenu = 'exploreCommunities';
-            app.sidebarRedraw.emit('redraw');
+            setMenu({ name: 'exploreCommunities' });
           }}
         />
       </div>

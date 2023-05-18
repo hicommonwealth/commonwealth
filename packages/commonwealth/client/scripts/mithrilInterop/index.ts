@@ -9,73 +9,16 @@
  */
 
 import type { FunctionComponent, ReactNode } from 'react';
-import { createElement, Component as ReactComponent } from 'react';
+import { Component as ReactComponent } from 'react';
 import type {
   NavigateFunction,
   Location,
   NavigateOptions,
 } from 'react-router-dom';
-import { createRoot } from 'react-dom/client';
 import { getScopePrefix } from 'navigation/helpers';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];
-
-// corresponds to Mithril's `m()` call
-export const render = (
-  tag: string | React.ComponentType,
-  attrs: any = {},
-  ...children: any[]
-) => {
-  let className = attrs?.className;
-
-  // check if selector uses classes (.) and convert to props, as
-  // Mithril supports e.g. `.User.etc` tags while React does not
-  if (typeof tag === 'string' && tag.includes('.')) {
-    const [selector, ...classes] = tag.split('.');
-
-    if (className) {
-      className = `${className} ${classes.join(' ')}`;
-    } else {
-      className = classes.join(' ');
-    }
-
-    // replace pure class selector (e.g. .User) with div (e.g. div.User)
-    tag = selector || 'div';
-  }
-
-  // handle children without attrs => corresponds to `m(tag, children)`
-  if (Array.isArray(attrs) || typeof attrs !== 'object') {
-    children = attrs;
-    attrs = { className };
-  } else {
-    attrs = { ...attrs };
-  }
-
-  // ensure vnode.className exists
-  attrs.className = className;
-
-  // react forbids <img> tags to have children
-  if (tag === 'img') {
-    return createElement(tag, attrs);
-  }
-
-  // ensure vnode.children exists as mithril expects
-  attrs.children = children;
-
-  return createElement(tag, attrs, ...children);
-};
-
-// corresponds to Mithril's `m.trust()` call, which is used to render inner HTML directly
-render.trust = (html: string, wrapper?: string) => {
-  if (wrapper) {
-    return createElement(wrapper, {
-      dangerouslySetInnerHTML: { __html: html },
-    });
-  } else {
-    return createElement('div', { dangerouslySetInnerHTML: { __html: html } });
-  }
-};
 
 // Mithril component type, maps to FC
 export type Component<Props = unknown> = FunctionComponent<Props>;
@@ -207,42 +150,4 @@ export function redraw(sync = false, component?: any) {
   } else {
     // console.trace('no-op redraw called!');
   }
-}
-
-// m.mount() shim
-export function rootMount(element: Element, component?: any | null) {
-  return createRoot(element).render(component);
-}
-
-// m.render() shim
-export function rootRender(el: Element, vnodes: Children) {
-  return rootMount(el, render('div', {}, vnodes));
-}
-
-// ROUTING FUNCTIONS
-// Do not use for new features. Instead, take a look on react-router hook => "useSearchParams"
-export function _DEPRECATED_getSearchParams(name?: string) {
-  const search = new URLSearchParams(window.location.search);
-  return search.get(name);
-}
-
-// m.route.get() shim
-// Do not use for new features. Instead, take a look on react-router hook => "useLocation"
-export function _DEPRECATED_getRoute() {
-  return window.location.pathname;
-}
-
-// This should not be used for setting the route, because it does not use react-router.
-// Instead, it uses native history API, and because react router does not recognize the
-// path change, the page has to be reloaded programmatically.
-// This is only for legacy code, where react router is not accessible (eg in controllers or JS classes).
-// Always use "withRouter" for react class components or "useNavigate" for functional components.
-export function _DEPRECATED_dangerouslySetRoute(route: string) {
-  window.history.pushState('', '', route);
-  window.location.reload();
-
-  const html = document.getElementsByTagName('html')[0];
-  if (html) html.scrollTo(0, 0);
-  const body = document.getElementsByTagName('body')[0];
-  if (body) body.scrollTo(0, 0);
 }

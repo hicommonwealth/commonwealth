@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import { ContractType } from 'common-common/src/types';
 import $ from 'jquery';
-import type { ITokenAdapter } from 'models';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import Solana from './adapter';
 
 export default class Token extends Solana implements ITokenAdapter {
@@ -24,18 +24,23 @@ export default class Token extends Solana implements ITokenAdapter {
       this.contractAddress = solanaContract.address;
     }
 
-    const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
-      chain: this.meta.id,
-      address: account.address,
-      author_chain: account.chain.id,
-      contract_address: this.contractAddress,
-    });
-    if (balanceResp.result) {
-      const balance = new BN(balanceResp.result, 10);
-      this.hasToken = balance && !balance.isZero();
-      if (balance) this.tokenBalance = balance;
-    } else {
+    try {
+      const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
+        chain: this.meta.id,
+        address: account.address,
+        author_chain: account.chain.id,
+        contract_address: this.contractAddress,
+      });
+      if (balanceResp.result) {
+        const balance = new BN(balanceResp.result, 10);
+        this.hasToken = balance && !balance.isZero();
+        if (balance) this.tokenBalance = balance;
+      } else {
+        this.hasToken = false;
+      }
+    } catch (e) {
       this.hasToken = false;
+      console.log(e);
     }
   }
 

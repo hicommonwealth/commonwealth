@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { AddressInfo, NotificationSubscription } from 'models';
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
+import Sublayout from 'views/Sublayout';
+import AddressInfo from '../../../models/AddressInfo';
+import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -25,7 +26,6 @@ import {
 import { bundleSubs } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
-import { redraw } from 'mithrilInterop';
 import { NotificationCategories } from 'common-common/src/types';
 
 const emailIntervalFrequencyMap = {
@@ -118,6 +118,108 @@ const NotificationSettingsPage = () => {
           Notification settings for all new threads, comments, mentions, likes,
           and chain events in the following communities.
         </CWText>
+        <div className="email-management-section">
+          <div className="text-description">
+            <CWText type="h5">Scheduled Email Digest</CWText>
+            <CWText type="b2" className="subtitle-text">
+              Bundle top posts from all your communities via email as often as
+              you need it.
+            </CWText>
+          </div>
+          {app.user.emailVerified ? (
+            <PopoverMenu
+              renderTrigger={(onclick) => (
+                <CWButton
+                  buttonType="mini-white"
+                  label={emailIntervalFrequencyMap[currentFrequency]}
+                  iconRight="chevronDown"
+                  onClick={onclick}
+                />
+              )}
+              menuItems={[
+                {
+                  label: 'Once a week',
+                  onClick: () => {
+                    app.user.updateEmailInterval('weekly');
+                    setCurrentFrequency('weekly');
+                    forceRerender();
+                  },
+                },
+                {
+                  label: 'Never',
+                  onClick: () => {
+                    app.user.updateEmailInterval('never');
+                    setCurrentFrequency('never');
+                    forceRerender();
+                  },
+                },
+              ]}
+            />
+          ) : (
+            <CWText className="alert-text">
+              Verify Email to set Digest Interval
+            </CWText>
+          )}
+        </div>
+        {(!app.user.email || !app.user.emailVerified) && (
+          <div className="email-input-section">
+            <CWCard fullWidth className="email-card">
+              {sentEmail ? (
+                <div className="loading-state">
+                  <CWText>
+                    Check your email to verify the your account. Refresh this
+                    page when finished connecting.
+                  </CWText>
+                </div>
+              ) : (
+                <>
+                  <CWText type="h5">Email Request</CWText>
+                  <CWText type="b1">
+                    Mmm...seems like we don't have your email on file? Enter
+                    your email below so we can send you scheduled email digests.
+                  </CWText>
+                  <div className="email-input-row">
+                    <CWTextInput
+                      placeholder="Enter Email"
+                      containerClassName="email-input"
+                      inputValidationFn={(value) => {
+                        const validEmailRegex = /\S+@\S+\.\S+/;
+
+                        if (!validEmailRegex.test(value)) {
+                          setEmailValidated(false);
+                          return [
+                            'failure',
+                            'Please enter a valid email address',
+                          ];
+                        } else {
+                          setEmailValidated(true);
+                          return [];
+                        }
+                      }}
+                      onInput={(e) => {
+                        setEmail(e.target.value);
+                      }}
+                    />
+                    <CWButton
+                      label="Save"
+                      buttonType="primary-black"
+                      disabled={!emailValidated}
+                      onClick={() => {
+                        try {
+                          app.user.updateEmail(email);
+                          setSentEmail(true);
+                          // forceRerender();
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+            </CWCard>
+          </div>
+        )}
         <CWText
           type="h4"
           fontWeight="semiBold"
@@ -232,104 +334,6 @@ const NotificationSettingsPage = () => {
         >
           Discussion
         </CWText>
-        <div className="email-management-section">
-          <div className="text-description">
-            <CWText type="h5">Scheduled Email Digest</CWText>
-            <CWText type="b2" className="subtitle-text">
-              Bundle top posts from all your communities via email as often as
-              you need it.
-            </CWText>
-          </div>
-          <PopoverMenu
-            renderTrigger={(onclick) => (
-              <CWButton
-                buttonType="mini-white"
-                label={emailIntervalFrequencyMap[currentFrequency]}
-                iconRight="chevronDown"
-                onClick={onclick}
-              />
-            )}
-            menuItems={[
-              {
-                label: 'Once a week',
-                onClick: () => {
-                  app.user.updateEmailInterval('weekly');
-                  setCurrentFrequency('weekly');
-                  forceRerender();
-                },
-              },
-              {
-                label: 'Never',
-                onClick: () => {
-                  app.user.updateEmailInterval('never');
-                  setCurrentFrequency('never');
-                  forceRerender();
-                },
-              },
-            ]}
-          />
-        </div>
-        {(!app.user.email || !app.user.emailVerified) &&
-          currentFrequency !== 'never' && (
-            <div className="email-input-section">
-              <CWCard fullWidth className="email-card">
-                {sentEmail ? (
-                  <div className="loading-state">
-                    <CWText>
-                      Check your email to verify the your account. Refresh this
-                      page when finished connecting.
-                    </CWText>
-                  </div>
-                ) : (
-                  <>
-                    <CWText type="h5">Email Request</CWText>
-                    <CWText type="b1">
-                      Mmm...seems like we don't have your email on file? Enter
-                      your email below so we can send you scheduled email
-                      digests.
-                    </CWText>
-                    <div className="email-input-row">
-                      <CWTextInput
-                        placeholder="Enter Email"
-                        containerClassName="email-input"
-                        inputValidationFn={(value) => {
-                          const validEmailRegex = /\S+@\S+\.\S+/;
-
-                          if (!validEmailRegex.test(value)) {
-                            setEmailValidated(false);
-                            return [
-                              'failure',
-                              'Please enter a valid email address',
-                            ];
-                          } else {
-                            setEmailValidated(true);
-                            return [];
-                          }
-                        }}
-                        onInput={(e) => {
-                          setEmail(e.target.value);
-                        }}
-                      />
-                      <CWButton
-                        label="Save"
-                        buttonType="primary-black"
-                        disabled={!emailValidated}
-                        onClick={() => {
-                          try {
-                            app.user.updateEmail(email);
-                            setSentEmail(true);
-                            // forceRerender();
-                          } catch (e) {
-                            console.log(e);
-                          }
-                        }}
-                      />
-                    </div>
-                  </>
-                )}
-              </CWCard>
-            </div>
-          )}
         <div className="column-header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}

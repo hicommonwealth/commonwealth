@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import type { Thread, Topic } from 'models';
+import type Thread from '../../../models/Thread';
+import type Topic from '../../../models/Topic';
 
 import 'pages/overview/index.scss';
 
@@ -10,7 +11,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -39,10 +40,12 @@ const OverviewPage = () => {
   useEffect(() => {
     app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
+    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
+      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
@@ -50,6 +53,7 @@ const OverviewPage = () => {
   const allPinnedThreads = app.threads.listingStore.getThreads({
     pinned: true,
   });
+  const allThreads = app.threads.store.getAll();
 
   const topics = app.topics.getByCommunity(app.activeChainId());
 
@@ -69,13 +73,17 @@ const OverviewPage = () => {
     topic: Topic;
   }> = topicsSorted.map((topic) => {
     const monthlyThreads = allMonthlyThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
     const pinnedThreads = allPinnedThreads.filter(
-      (thread) => topic.id === thread.topic.id
+      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
 
-    return { monthlyThreads, pinnedThreads, topic };
+    return {
+      monthlyThreads,
+      pinnedThreads,
+      topic,
+    };
   });
 
   return !topicSummaryRows.length && !app.threads.initialized ? (

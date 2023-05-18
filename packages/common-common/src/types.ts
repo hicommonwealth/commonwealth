@@ -118,7 +118,6 @@ export enum ChainNetwork {
   Solana = 'solana',
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
-  CommonProtocol = 'common-protocol', // dummy chain used for event handling
   Evmos = 'evmos',
   Kava = 'kava',
 }
@@ -135,6 +134,10 @@ export enum BalanceType {
 
 export enum RedisNamespaces {
   Chat_Socket = 'chat_socket',
+  Route_Response = 'route_response',
+  Function_Response = 'function_response',
+  Global_Response = 'global_response',
+  Test_Redis = 'test_redis',
 }
 
 export interface ISnapshotNotification {

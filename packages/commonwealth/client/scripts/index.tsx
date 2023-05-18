@@ -7,7 +7,7 @@ import 'index.scss';
 import '../../static/fonts/fonts.css';
 import 'react-toastify/dist/ReactToastify.css';
 
-import App from './app';
+import App from './App';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
