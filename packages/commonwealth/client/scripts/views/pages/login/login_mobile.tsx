@@ -182,6 +182,7 @@ export const LoginMobile = ({
           <div className="inner-body-container">
             {!magicLoading ? (
               <CWTextInput
+                autoFocus={true}
                 label="email address"
                 placeholder="your-email@email.com"
                 onInput={handleSetEmail}

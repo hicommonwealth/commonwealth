@@ -112,6 +112,7 @@ export const LoginDesktop = ({
             </div>
             {!magicLoading ? (
               <CWTextInput
+                autoFocus={true}
                 label="email address"
                 placeholder="your-email@email.com"
                 onInput={handleSetEmail}
