@@ -13,6 +13,10 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
 
+export const formatAddress = (address: string) => {
+  return `${address.slice(0, 8)}...${address.slice(-5)}`;
+};
+
 export const UserBlock = (props: {
   addressDisplayOptions?: AddressDisplayOptions;
   avatarSize?: number;
@@ -73,7 +77,7 @@ export const UserBlock = (props: {
           <div>
             {highlightSearchTerm
               ? highlightedAddress
-              : `${profile.address.slice(0, 8)}...${profile.address.slice(-5)}`}
+              : formatAddress(profile.address)}
           </div>
           {profile?.address && showChainName && (
             <div className="address-divider"> · </div>

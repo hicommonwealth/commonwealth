@@ -1,5 +1,5 @@
-import { openConfirmation} from 'views/modals/confirmation_modal';
 import { openSessionRevalidation } from 'views/modals/session_revalidation_modal';
+import { formatAddress } from 'views/components/user/user_block';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import { createCanvasSessionPayload, chainBaseToCanvasChainId } from 'canvas';
@@ -214,12 +214,12 @@ class SessionsController {
       // The user may have signed using a different account
       const sessionReauthed = await controller.hasAuthenticatedSession(
         canvasChainId,
-        signedWithAddress
+        address,
       );
       if (!sessionReauthed) {
         const err = new Error();
         (err as any).responseJSON = {
-          error: `Message signed with ${signedWithAddress}. Switch to this account to continue`,
+          error: `Expected signature from ${formatAddress(address)}, got signature from ${formatAddress(signedWithAddress)}.`,
         };
         throw err;
       }
