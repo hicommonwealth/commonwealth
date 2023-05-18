@@ -88,7 +88,7 @@ class SearchController {
       }
 
       if (scope.includes(SearchScope.Members)) {
-        const profiles = await this.searchMentionableProfiles(
+        const { profiles } = await this.searchMentionableProfiles(
           searchTerm,
           chainScope
         );
