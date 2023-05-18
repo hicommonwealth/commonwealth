@@ -147,6 +147,13 @@ function setupCosmosProxy(app: Express, models: DB) {
              2
            )}`
         );
+        // special case: magic expects a cosmos-sdk/Account, while chains return
+        // cosmos-sdk/BaseAccount or other types. this seems to be a lauchpad vs
+        // stargate issue: https://github.com/cosmos/cosmjs/issues/702
+        if (response?.data?.result?.type === "cosmos-sdk/BaseAccount") {
+          response.data.result.type = "cosmos-sdk/Account"
+        }
+
         // special case: magicCosmosAPI is CORS-approved for the magic iframe
         res.setHeader('Access-Control-Allow-Origin', 'https://auth.magic.link');
         return res.send(response.data);
