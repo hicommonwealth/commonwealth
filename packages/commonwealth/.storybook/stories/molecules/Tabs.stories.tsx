@@ -13,27 +13,25 @@ type Story = StoryObj<any>;
 
 const tabLabels = [ "A tab", "Another tab", "Yet another tab" ];
 
-const argTypesObj = (strArray: string[], control: string) => {
-  const obj = {};
-  strArray.forEach((attribute) => {
-    obj[attribute] = { control: { type: control } };
-  });
-  return obj;
-};
+const argsObj = (controlLabel: string, arr: string[]) => {
+  let obj = {}
 
-interface TabsProps {
-  tabLabels: string[],
+  for (let i = 0; i < arr.length; i++) {
+    let attribute = controlLabel + " " + (i+1);
+    obj[attribute] = arr[i];
+  }
+
+  return obj;
 }
 
-const Tabs: FC<TabsProps> = ({tabLabels}) => {
+const Tabs: FC = (args) => {
   const [selectedTab, setSelectedTab] = useState<number>(1);
 
   return (
     <CWTabBar>
-      {tabLabels.map((label, i) => (
+      {Object.entries(args).map((label: any, i) => (
         <CWTab
-          key={i}
-          label={label}
+          label={label[1]}
           onClick={() => setSelectedTab(i+1)}
           isSelected={selectedTab === i+1}
         />
@@ -44,14 +42,16 @@ const Tabs: FC<TabsProps> = ({tabLabels}) => {
 
 export const Tab: Story = {
   name: 'Tabs',
-  args: {
-    tabLabels: tabLabels,
-  },
-  argTypes: { 
-    ...argTypesObj(tabLabels, "text"),
-  },
+  args: argsObj("Tab", tabLabels),
   parameters: {
-    controls: { exclude: ["label", "disabled", "isSelected"] }
+    controls: {
+      exclude: [
+        "disabled",
+        "isSelected",
+        "label",
+        "onClick"
+      ],
+    },
   },
-  render: ({...args}) => <Tabs tabLabels={args.tabLabels} />
+  render: ({...args}) => <Tabs {...args} />
 };
