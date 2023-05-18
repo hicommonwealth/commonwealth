@@ -221,44 +221,6 @@ export function initMagicAuth(models: DB) {
           ssoToken.updated_at = new Date();
           await ssoToken.save();
           console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
-          const addressExistsForChain = existingUser.Addresses?.some(
-            (a) => a.chain === chain.id
-          );
-
-          if (registrationChainAddress && !addressExistsForChain) {
-            // insert an address for their selected chain if it doesn't exist
-            await sequelize.transaction(async (t) => {
-              const [newRegistrationChainAddress, created] =
-                await models.Address.findOrCreate({
-                  where: {
-                    address: registrationChainAddress,
-                    chain: registrationChain.id,
-                    user_id: existingUser.id,
-                    profile_id: (existingUser.Profiles[0] as ProfileAttributes)
-                      .id,
-                    wallet_id: WalletId.Magic,
-                  },
-                  defaults: {
-                    verification_token: 'MAGIC',
-                    verification_token_expires: null,
-                    verified: new Date(),
-                    last_active: new Date(),
-                  },
-                  transaction: t,
-                });
-              if (created) {
-                await createRole(
-                  models,
-                  newRegistrationChainAddress.id,
-                  registrationChain.id,
-                  'member',
-                  false,
-                  t
-                );
-              }
-            });
-          }
-
           return cb(null, existingUser);
         } else {
           // migrate to magic if email already exists

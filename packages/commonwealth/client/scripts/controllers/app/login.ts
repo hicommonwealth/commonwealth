@@ -309,9 +309,14 @@ export async function loginWithMagicLink(email: string) {
   });
 
   if (isCosmos) {
-    chainAddress = await magic.cosmos.changeAddress(
-      app.chain.meta.bech32Prefix
-    );
+    const bech32Prefix = app.chain.meta.bech32Prefix;
+    try {
+      chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
+    } catch (err) {
+      console.error(
+        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+      );
+    }
   }
 
   const didToken = await magic.auth.loginWithMagicLink({ email });
