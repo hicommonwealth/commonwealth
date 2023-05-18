@@ -6,7 +6,7 @@ import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import * as siwe from 'siwe';
-import { createCanvasSessionPayload } from 'canvas';
+import { createCanvasSessionPayload } from '../../../shared/canvas';
 import app, { resetDatabase } from '../../../server-test';
 import {
   createSiweMessage,
