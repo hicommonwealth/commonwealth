@@ -24,7 +24,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = ['evmos'];
+  public readonly specificChains = ['evmos', 'injective'];
 
   public get available() {
     return !!window.keplr;

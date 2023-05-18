@@ -17,6 +17,7 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,

@@ -22,8 +22,8 @@ import type { LoginProps } from './types';
 
 export const LoginDesktop = ({
   address,
-  bodyType,
-  setBodyType,
+  activeStep,
+  setActiveStep,
   handleSetAvatar,
   handleSetUsername,
   profiles,
@@ -31,47 +31,45 @@ export const LoginDesktop = ({
   sidebarType,
   username,
   wallets,
-  setSelectedWallet,
-  createNewAccountCallback,
-  linkExistingAccountCallback,
-  accountVerifiedCallback,
-  handleEmailLoginCallback,
-  saveProfileInfoCallback,
-  performLinkingCallback,
-  setSelectedLinkingWallet,
-  magicLoading,
-  showResetWalletConnect,
+  onCreateNewAccount,
+  onLinkExistingAccount,
+  onEmailLogin,
+  onSaveProfileInfo,
+  onPerformLinking,
+  isMagicLoading,
+  canResetWalletConnect,
   onModalClose,
+  onConnectAnotherWay,
+  onResetWalletConnect,
+  onWalletSelect,
+  onWalletAddressSelect,
 }: LoginProps) => {
   return (
     <div className="LoginDesktop">
       <LoginDesktopSidebar
         sidebarType={sidebarType}
-        createNewAccountCallback={createNewAccountCallback}
-        linkExistingAccountCallback={linkExistingAccountCallback}
+        onCreateNewAccount={onCreateNewAccount}
+        onLinkExistingAccount={onLinkExistingAccount}
         wallets={wallets}
       />
       <div className="body">
         <CWIconButton iconName="close" onClick={onModalClose} />
 
-        {bodyType === 'walletList' && (
+        {activeStep === 'walletList' && (
           <div className="inner-body-container centered">
             <LoginBoilerplate />
             <CWWalletsList
-              connectAnotherWayOnclick={() => {
-                setBodyType('connectWithEmail');
-              }}
+              onConnectAnotherWay={onConnectAnotherWay}
               wallets={wallets}
-              setSelectedWallet={setSelectedWallet}
-              setBodyType={setBodyType}
-              accountVerifiedCallback={accountVerifiedCallback}
-              linking={false}
-              showResetWalletConnect={showResetWalletConnect}
+              canResetWalletConnect={canResetWalletConnect}
+              onResetWalletConnect={onResetWalletConnect}
+              onWalletSelect={onWalletSelect}
+              onWalletAddressSelect={onWalletAddressSelect}
             />
           </div>
         )}
 
-        {bodyType === 'selectAccountType' && (
+        {activeStep === 'selectAccountType' && (
           <div className="inner-body-container centered">
             <div className="header-container">
               <CWText
@@ -97,7 +95,7 @@ export const LoginDesktop = ({
           </div>
         )}
 
-        {bodyType === 'connectWithEmail' && (
+        {activeStep === 'connectWithEmail' && (
           <div className="inner-body-container">
             <div className="header-container">
               <CWText
@@ -110,13 +108,13 @@ export const LoginDesktop = ({
               </CWText>
               <LoginBoilerplate />
             </div>
-            {!magicLoading ? (
+            {!isMagicLoading ? (
               <CWTextInput
                 autoFocus={true}
                 label="email address"
                 placeholder="your-email@email.com"
                 onInput={handleSetEmail}
-                onenterkey={handleEmailLoginCallback}
+                onenterkey={onEmailLogin}
               />
             ) : (
               <CWSpinner />
@@ -126,15 +124,15 @@ export const LoginDesktop = ({
                 label="Back"
                 buttonType="secondary-blue"
                 onClick={() => {
-                  setBodyType('walletList');
+                  setActiveStep('walletList');
                 }}
               />
-              <CWButton label="Connect" onClick={handleEmailLoginCallback} />
+              <CWButton label="Connect" onClick={onEmailLogin} />
             </div>
           </div>
         )}
 
-        {bodyType === 'welcome' && (
+        {activeStep === 'welcome' && (
           <div className="inner-body-container">
             <div className="header-container">
               <CWText
@@ -155,11 +153,11 @@ export const LoginDesktop = ({
               onAvatarChangeHandler={handleSetAvatar}
               onUsernameChangeHandler={handleSetUsername}
             />
-            <CWButton label="Finish" onClick={saveProfileInfoCallback} />
+            <CWButton label="Finish" onClick={onSaveProfileInfo} />
           </div>
         )}
 
-        {bodyType === 'ethWalletList' && (
+        {activeStep === 'ethWalletList' && (
           <div className="inner-body-container">
             <div className="header-container">
               <CWText
@@ -176,14 +174,16 @@ export const LoginDesktop = ({
               </CWText>
             </div>
             <CWWalletsList
-              setSelectedWallet={setSelectedWallet}
               hasNoWalletsLink={false}
               wallets={wallets}
-              showResetWalletConnect={showResetWalletConnect}
+              canResetWalletConnect={canResetWalletConnect}
+              onResetWalletConnect={onResetWalletConnect}
+              onWalletAddressSelect={onWalletAddressSelect}
+              onWalletSelect={onWalletSelect}
             />
           </div>
         )}
-        {bodyType === 'selectPrevious' && (
+        {activeStep === 'selectPrevious' && (
           <div className="inner-body-container">
             <div className="header-container">
               <CWText
@@ -200,20 +200,17 @@ export const LoginDesktop = ({
               </CWText>
             </div>
             <CWWalletsList
-              connectAnotherWayOnclick={() => {
-                setBodyType('connectWithEmail');
-              }}
+              onConnectAnotherWay={onConnectAnotherWay}
               wallets={wallets}
-              setSelectedWallet={setSelectedLinkingWallet}
-              setBodyType={setBodyType}
-              accountVerifiedCallback={accountVerifiedCallback}
-              linking
-              showResetWalletConnect={showResetWalletConnect}
+              canResetWalletConnect={canResetWalletConnect}
+              onResetWalletConnect={onResetWalletConnect}
+              onWalletAddressSelect={onWalletAddressSelect}
+              onWalletSelect={onWalletSelect}
             />
           </div>
         )}
 
-        {bodyType === 'selectProfile' && (
+        {activeStep === 'selectProfile' && (
           <div className="inner-body-container">
             <div className="header-container">
               <CWText
@@ -233,11 +230,11 @@ export const LoginDesktop = ({
               </CWText>
             </div>
             <CWProfilesList profiles={profiles} />
-            <CWButton label="Finish" onClick={performLinkingCallback} />
+            <CWButton label="Finish" onClick={onPerformLinking} />
           </div>
         )}
 
-        {bodyType === 'allSet' && (
+        {activeStep === 'allSet' && (
           <div className="inner-body-container">
             <div className="header-container">
               <CWText

@@ -38,6 +38,10 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
             },
           ],
         },
+        {
+          model: models.Comment,
+          as: 'comments',
+        },
       ],
     });
   } catch (e) {

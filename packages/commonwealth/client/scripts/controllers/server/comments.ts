@@ -6,11 +6,11 @@ import moment from 'moment';
 
 import app from 'state';
 import { CommentsStore } from 'stores';
+import Thread from '../../models/Thread';
 import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
 import type { IUniqueId } from '../../models/interfaces';
-import type Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
 
 export const modelFromServer = (comment) => {
@@ -169,6 +169,18 @@ class CommentsController {
       this._store.add(newComment);
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
+
+      // increment thread count in thread store
+      const thread = app.threads.getById(threadId);
+      if (thread) {
+        app.threads.updateThreadInStore(
+          new Thread({
+            ...thread,
+            numberOfComments: thread.numberOfComments + 1,
+          })
+        );
+      }
+
       return newComment;
     } catch (err) {
       console.log('Failed to create comment');
@@ -224,7 +236,7 @@ class CommentsController {
     }
   }
 
-  public async delete(comment) {
+  public async delete(comment: any, threadId: number) {
     const { session, action, hash } = await app.sessions.signDeleteComment(
       app.user.activeAccount.address,
       {
@@ -251,6 +263,18 @@ class CommentsController {
           const softDeletion = new Comment(revisedComment);
           this._store.remove(existing);
           this._store.add(softDeletion);
+
+          // decrement thread count in thread store
+          const thread = app.threads.getById(threadId);
+          if (thread) {
+            app.threads.updateThreadInStore(
+              new Thread({
+                ...thread,
+                numberOfComments: thread.numberOfComments - 1,
+              })
+            );
+          }
+
           resolve(result);
         })
         .catch((e) => {

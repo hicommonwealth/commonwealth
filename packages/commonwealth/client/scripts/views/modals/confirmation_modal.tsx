@@ -18,7 +18,7 @@ interface ConfirmationModalProps {
   removeModal: () => void;
 }
 
-export const ConfirmationModal = ({
+const ConfirmationModal = ({
   title,
   description,
   buttons,
