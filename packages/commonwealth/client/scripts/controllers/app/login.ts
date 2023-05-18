@@ -308,6 +308,7 @@ export async function loginWithMagicLink(email: string) {
       : null,
   });
 
+  // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
   if (isCosmos) {
     const bech32Prefix = app.chain.meta.bech32Prefix;
     try {
