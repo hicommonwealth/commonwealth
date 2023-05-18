@@ -89,6 +89,8 @@ const searchProfiles = async (
     WHERE
       ${chainWhere}
       "Profiles".profile_name ILIKE $searchTerm
+      OR
+      "Addresses".address ILIKE $searchTerm
     GROUP BY
       "Profiles".id
   `;
