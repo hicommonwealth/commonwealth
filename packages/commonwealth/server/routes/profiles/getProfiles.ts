@@ -62,7 +62,7 @@ const getProfiles = async (
       model: models.Address,
       required: true,
       include: [
-        { model: models.Chain, required: true, where: { active: true } },
+        { model: models.Community, required: true, where: { active: true } },
         { model: models.Thread },
         { model: models.Comment, include: [{ model: models.Thread }] },
       ],
