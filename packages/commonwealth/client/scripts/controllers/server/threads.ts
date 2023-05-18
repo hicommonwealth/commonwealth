@@ -24,6 +24,7 @@ import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
 import { Link, LinkSource } from 'server/models/thread';
 import axios from 'axios';
+import { ThreadActionType } from 'types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -397,6 +398,37 @@ class ThreadsController {
         );
       },
     });
+  }
+
+  public async updateTopic(
+    threadId: number,
+    topicName: string,
+    topicId?: number
+  ): Promise<Topic> {
+    try {
+      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+        jwt: app.user.jwt,
+        thread_id: threadId,
+        topic_id: topicId,
+        topic_name: topicName,
+        address: app.user.activeAccount.address,
+      });
+      const result = new Topic(response.result);
+
+      app.threadUpdateEmitter.emit('threadUpdated', {
+        threadId,
+        action: ThreadActionType.TopicChange,
+      });
+
+      return result;
+    } catch (err) {
+      console.log('Failed to update thread topic');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update thread topic'
+      );
+    }
   }
 
   public async delete(proposal) {
