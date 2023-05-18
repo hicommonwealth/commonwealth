@@ -48,9 +48,10 @@ export const DropdownStory: Story = {
   parameters: {
     controls: {
       exclude: [
-        "initialValue",
         "containerClassName",
         "disabled",
+        "initialValue",
+        "onSelect",
       ],
     }
   },

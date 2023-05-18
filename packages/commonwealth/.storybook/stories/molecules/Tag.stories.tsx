@@ -19,6 +19,7 @@ export const Tag: Story = {
     label: "Ref #90",
     type: "active",
     iconName: undefined,
+    trimAt: 20,
   },
   argTypes: {
     label: {
@@ -31,6 +32,12 @@ export const Tag: Story = {
       control: { type: "select" },
       options: iconOptions,
     },
+    trimAt: {
+      control: { type: "number" },
+    },
+  },
+  parameters: {
+    controls: { exclude: [ "onClick" ] },
   },
   render: ({...args}) => <CWTag {...args} />
 };

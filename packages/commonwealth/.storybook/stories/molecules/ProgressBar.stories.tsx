@@ -19,7 +19,7 @@ export const ProgressBar: Story = {
 		label: "Progress Bar",
 		progressStatus: "selected",
 		iconName: "check",
-		subtext: undefined,
+		subtext: "",
   },
   argTypes: {
     progress: {

@@ -16,6 +16,7 @@ const commonControlsToExclude = [
   "iconRightonClick",
   "maxLength",
   "name",
+  "onClick",
   "onInput",
   "onenterkey",
   "tabIndex",

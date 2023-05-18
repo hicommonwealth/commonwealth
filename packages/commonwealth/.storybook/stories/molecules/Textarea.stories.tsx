@@ -38,6 +38,7 @@ export const Textarea: Story = {
         "inputValidationFn",
         "maxLength",
         "name",
+        "onClick",
         "onInput",
         "onenterkey",
         "tabIndex",

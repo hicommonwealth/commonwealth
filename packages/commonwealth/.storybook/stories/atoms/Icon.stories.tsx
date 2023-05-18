@@ -42,6 +42,13 @@ const commonArgTypes = {
   },
 };
 
+const commonExcludedControls = [
+  "argTypes",
+  "className",
+  "componentType",
+  "onClick",
+];
+
 export const IconStory: Story = {
   name: "Overview",
   args: {
@@ -58,9 +65,7 @@ export const IconStory: Story = {
   parameters: {
     controls: {
       exclude: [
-        "argTypes",
-        "className",
-        "componentType",
+        ...commonExcludedControls,
         "iconButtonTheme",
         "selected",
       ],
@@ -94,11 +99,7 @@ export const IconButtonStory: Story = {
   },
   parameters: {
     controls: {
-      exclude: [
-        "argTypes",
-        "className",
-        "componentType",
-      ],
+      exclude: [ ...commonExcludedControls ],
     },
   },
   render: ({...args}) => <IconButton {...args} />

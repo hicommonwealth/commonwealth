@@ -79,6 +79,7 @@ export const FilterMenuStory = {
     controls: {
       exclude: [
         "filterMenuItems",
+        "onChange",
         "selectedItems",
       ],
     }

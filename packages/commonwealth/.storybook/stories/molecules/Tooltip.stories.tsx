@@ -46,10 +46,7 @@ const Tooltip: FC<TooltipProps> = (props) => {
 
 export const Overview = {
   args: {
-    content: `
-      I am an informational tool tip here to provide \
-      extra details on things people may need more help on.
-    `,
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque orci.",
     iconName: "infoEmpty",
     hasBackground: false,
   },

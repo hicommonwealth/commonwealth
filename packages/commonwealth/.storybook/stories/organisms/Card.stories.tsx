@@ -68,6 +68,7 @@ export const CardStory: Story = {
   parameters: {
     controls: {
       exclude: [
+        "onClick",
         "onmouseover",
         "onMouseEnter",
         "onMouseLeave",
