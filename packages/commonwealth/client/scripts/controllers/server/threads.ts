@@ -700,7 +700,7 @@ class ThreadsController {
     const chain = app.activeChainId();
     const params = {
       chain,
-      cutoff_date: this.listingStore.isInitialized(options)
+      to_date: this.listingStore.isInitialized(options)
         ? this.listingStore.getCutoffDate(options).toISOString()
         : moment().toISOString(),
     };
