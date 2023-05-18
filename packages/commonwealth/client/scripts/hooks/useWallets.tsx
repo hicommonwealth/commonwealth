@@ -1,4 +1,5 @@
 import { ChainBase } from 'common-common/src/types';
+import type { SessionPayload } from '@canvas-js/interfaces';
 import 'components/component_kit/cw_wallets_list.scss';
 import {
   completeClientLogin,
@@ -62,7 +63,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     useState<IWebWallet<any>>();
   const [cachedWalletSignature, setCachedWalletSignature] = useState<string>();
   const [cachedTimestamp, setCachedTimestamp] = useState<number>();
-  const [cachedChainId, setCachedChainId] = useState<string | number>();
+  const [cachedChainId, setCachedChainId] = useState<string>();
+  const [cachedSessionPayload, setCachedSessionPayload] = useState<SessionPayload>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [secondaryLinkAccount, setSecondaryLinkAccount] = useState<Account>();
   const [isInCommunityPage, setIsInCommunityPage] = useState<boolean>();
@@ -278,7 +280,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (!linking) {
         try {
           const timestamp = +new Date();
-          const { signature, chainId } = await signSessionWithAccount(
+          const { signature, chainId, sessionPayload } = await signSessionWithAccount(
             walletToUse,
             account,
             timestamp
@@ -287,6 +289,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           setCachedWalletSignature(signature);
           setCachedTimestamp(timestamp);
           setCachedChainId(chainId);
+          setCachedSessionPayload(sessionPayload);
           walletProps.onSuccess?.();
         } catch (e) {
           console.log(e);
@@ -304,7 +307,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const onCreateNewAccount = async () => {
     try {
       if (selectedWallet.chain !== 'near') {
-        const { signature, sessionPayload, chainId } = await primaryAccount.validate(
+        await primaryAccount.validate(
           cachedWalletSignature,
           cachedTimestamp,
           cachedChainId
@@ -312,10 +315,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
         // TODO: test this flow
         await app.sessions.authSession(
           selectedWallet.chain,
-          chainId,
+          cachedChainId,
           primaryAccount.address,
-          sessionPayload,
-          signature
+          cachedSessionPayload,
+          cachedWalletSignature
         );
       }
       await onLogInWithAccount(primaryAccount, false, false);
