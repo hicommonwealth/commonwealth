@@ -41,6 +41,7 @@ import {
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
+import updateSiteAdmin from '../routes/updateSiteAdmin';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -160,6 +161,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import createChainNode from '../routes/createChainNode';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -212,6 +214,11 @@ function setupRouter(
     '/updateAddress',
     passport.authenticate('jwt', { session: false }),
     updateAddress.bind(this, models)
+  );
+  router.post(
+    '/updateSiteAdmin',
+    passport.authenticate('jwt', { session: false }),
+    updateSiteAdmin.bind(this, models)
   );
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
@@ -300,6 +307,12 @@ function setupRouter(
   router.get(
     '/getSupportedEthChains',
     getSupportedEthChains.bind(this, models)
+  );
+
+  router.post(
+    '/createChainNode',
+    passport.authenticate('jwt', { session: false }),
+    createChainNode.bind(this, models)
   );
 
   // threads

@@ -3,27 +3,39 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
         CREATE TEMPORARY TABLE notif_to_delete AS
         SELECT id
         FROM "Notifications"
         WHERE notification_data::jsonb ? 'thread_id' AND
                 (notification_data::jsonb ->> 'thread_id') NOT IN (SELECT id::text FROM "Threads");
-      `, { raw: true, transaction: t })
+      `,
+        { raw: true, transaction: t }
+      );
 
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
           DELETE FROM "NotificationsRead"
           WHERE notification_id IN (SELECT id FROM notif_to_delete);
-      `, { raw: true, transaction: t });
+      `,
+        { raw: true, transaction: t }
+      );
 
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
         DELETE FROM "Notifications"
         WHERE id IN (SELECT id FROM notif_to_delete);
-      `, { raw: true, transaction: t });
+      `,
+        { raw: true, transaction: t }
+      );
 
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
         DROP TABLE notif_to_delete;
-      `, { raw: true, transaction: t });
+      `,
+        { raw: true, transaction: t }
+      );
 
       await queryInterface.addColumn(
         'Notifications',
