@@ -58,7 +58,7 @@ function setupCosmosProxy(app: Express, models: DB) {
 
   // for gov v1 queries
   app.use(
-    '/cosmosLCD/:chain/*',
+    '/cosmosLCD/:chain',
     bodyParser.text(),
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
