@@ -27,7 +27,8 @@ const bulkThreads = async (
   next: NextFunction
 ) => {
   const chain = req.chain;
-  const { cutoff_date, topic_id, includePinnedThreads, stage } = req.query;
+  const { cutoff_date, topic_id, includePinnedThreads, stage, orderBy } =
+    req.query;
 
   const bind = { chain: chain.id };
 
@@ -45,14 +46,23 @@ const bulkThreads = async (
 
   let threads;
   if (cutoff_date) {
+    const orderByQueries = {
+      'createdAt:asc': 'threads.thread_created ASC',
+      'createdAt:desc': 'threads.thread_created DESC',
+      'numberOfComments:asc': 'threads_number_of_comments ASC',
+      'numberOfComments:desc': 'threads_number_of_comments DESC',
+      'numOfLikes:asc': 'threads_total_likes ASC',
+      'numOfLikes:desc': 'threads_total_likes DESC',
+    };
+
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.chain AS addr_chain, threads.thread_id, thread_title,
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage,
         threads.has_poll, threads.plaintext,
-        threads.url, threads.pinned, threads.number_of_comments,
-        threads.reaction_ids, threads.reaction_type, threads.addresses_reacted,
+        threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
+        threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0) as threads_total_likes,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
@@ -63,7 +73,7 @@ const bulkThreads = async (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
           t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted,
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes,
           t.has_poll,
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
@@ -77,7 +87,7 @@ const bulkThreads = async (
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN (
-            SELECT thread_id, COUNT(*) AS number_of_comments
+            SELECT thread_id, COUNT(*)::int AS number_of_comments
             FROM "Comments"
             WHERE deleted_at IS NULL
             GROUP BY thread_id
@@ -85,6 +95,7 @@ const bulkThreads = async (
         ON t.id = comments.thread_id
         LEFT JOIN (
             SELECT thread_id,
+            COUNT(r.id)::int AS total_likes,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
             STRING_AGG(r.id::text, ',') AS reaction_ids
@@ -100,13 +111,19 @@ const bulkThreads = async (
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $created_at AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
-           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
+           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
       ON threads.topic_id = topics.id
-      ${includePinnedThreads ? 'ORDER BY threads.pinned DESC' : ''}`;
+      ${includePinnedThreads || orderByQueries[orderBy] ? 'ORDER BY ' : ''}
+      ${
+        orderByQueries[orderBy]
+          ? orderByQueries[orderBy] + (includePinnedThreads ? ',' : '')
+          : ''
+      }
+      ${includePinnedThreads ? ' threads.pinned DESC' : ''}`;
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
@@ -149,7 +166,7 @@ const bulkThreads = async (
           address: t.addr_address,
           chain: t.addr_chain,
         },
-        numberOfComments: t.number_of_comments,
+        numberOfComments: t.threads_number_of_comments,
         reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
         addressesReacted: t.addresses_reacted
           ? t.addresses_reacted.split(',')
@@ -211,8 +228,9 @@ const bulkThreads = async (
       type: QueryTypes.SELECT,
     }
   );
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
-    .length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   threads = await Promise.all(threads);
 
