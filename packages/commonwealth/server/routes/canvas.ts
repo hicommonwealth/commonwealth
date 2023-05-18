@@ -4,17 +4,20 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import * as Sequelize from 'sequelize';
 
-type CanvasDataReq = {
+import type { Action, Session } from '@canvas-js/interfaces';
+import { verifyThread, verifyComment, verifyReaction } from '../../shared/canvas/serverVerify';
+
+type CanvasGetReq = {
   query: {
     before: string;
   };
 };
-type CanvasDataResp = {};
+type CanvasGetResp = unknown;
 
 export const getCanvasData = async (
   models: DB,
-  req: TypedRequestBody<CanvasDataReq>,
-  res: TypedResponse<CanvasDataResp>
+  req: TypedRequestBody<CanvasGetReq>,
+  res: TypedResponse<CanvasGetResp>
 ) => {
   const before = req.body.query?.before ?? null;
 
@@ -51,24 +54,36 @@ ORDER BY updated_at DESC LIMIT 50;
     })
     .filter((value) => value !== null);
 
-  return res.json({
-    status: 'Success',
-    result,
-  });
+
+  return success(res, result);
 };
+
+type CanvasPostReq = {
+  canvas_action: Action,
+  canvas_session: Session,
+  canvas_hash: string
+};
+type CanvasPostResp = {};
 
 export const postCanvasData = async (
   models: DB,
-  req: TypedRequestBody<CanvasDataReq>,
-  res: TypedResponse<CanvasDataResp>
+  req: TypedRequestBody<CanvasPostReq>,
+  res: TypedResponse<CanvasPostResp>
 ) => {
   const data = {};
+  const { canvas_action, canvas_session, canvas_hash } = req.body;
 
-  // branch:
-  // create thread | create comment | create reaction
+  // TODO: Implement verification and call the create
+  // thread/comment/reaction server method with POST data pre-filled.
+  if (canvas_action.payload.call === "thread") {
+    await verifyThread(canvas_action, canvas_session, canvas_hash, {});
+  } else if (canvas_action.payload.call === "comment") {
+    await verifyComment(canvas_action, canvas_session, canvas_hash, {});
+  } else if (canvas_action.payload.call === "reaction") {
+    await verifyReaction(canvas_action, canvas_session, canvas_hash, {});
+  }
 
-  return res.json({
-    status: 'Success',
-    result: {},
-  });
+  // TODO: Return some kind of identifier for the generated data.
+  const result = {};
+  return success(res, result);
 };
