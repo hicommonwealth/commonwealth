@@ -63,12 +63,8 @@ const lookupAddressIsOwnedByUser = async (
     return [null, 'Not logged in'];
   }
 
-  if (!req.body?.author_chain) {
-    return [null, 'Must provide author chain'];
-  }
-
-  if (!req.body?.address) {
-    return [null, 'Must provide an address'];
+  if (!req.body?.author_chain || !req.body?.address) {
+    return [null, 'Invalid public key/chain'];
   }
 
   const author = await models.Address.findOne({
@@ -78,19 +74,9 @@ const lookupAddressIsOwnedByUser = async (
       user_id: req.user.id,
     },
   });
-
-  if (!author) {
-    return [null, 'Could not find author'];
+  if (!author || !author.verified || author.user_id !== req.user.id) {
+    return [null, 'Invalid public key/chain'];
   }
-
-  if (!author.verified) {
-    return [null, 'Author is not verified'];
-  }
-
-  if (author.user_id !== req.user.id) {
-    return [null, 'Author is not owned by user'];
-  }
-
   return [author, null];
 };
 
