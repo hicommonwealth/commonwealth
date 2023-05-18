@@ -12,6 +12,7 @@ import {
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { ThreadsFilterMenuItem } from './stages_menu';
+import { useCommonNavigate } from 'navigation/helpers';
 import type Topic from '../../../models/Topic';
 import { matchRoutes } from 'react-router-dom';
 
@@ -21,7 +22,6 @@ type TopicsMenuProps = {
   selectedTopic: Topic;
   topic: string;
   onEditClick: (topic: Topic) => void;
-  onTopicChange: (topic: string) => void;
 };
 
 export const TopicsMenu = ({
@@ -30,8 +30,8 @@ export const TopicsMenu = ({
   selectedTopic,
   topic,
   onEditClick,
-  onTopicChange,
 }: TopicsMenuProps) => {
+  const navigate = useCommonNavigate();
   const popoverProps = usePopover();
 
   const matchesDiscussionsTopicRoute = matchRoutes(
@@ -56,7 +56,7 @@ export const TopicsMenu = ({
                 label="All Topics"
                 isSelected={!topic}
                 onClick={() => {
-                  onTopicChange('');
+                  navigate('/discussions');
                 }}
               />
               <CWDivider />
@@ -71,7 +71,7 @@ export const TopicsMenu = ({
                     isSelected={active}
                     onClick={(e) => {
                       e.preventDefault();
-                      onTopicChange(t.name);
+                      navigate(`/discussions/${t.name}`);
                     }}
                     iconRight={
                       app.roles?.isAdminOfEntity({

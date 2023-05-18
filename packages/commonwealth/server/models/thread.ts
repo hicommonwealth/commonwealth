@@ -5,7 +5,6 @@ import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
-import {NotificationAttributes} from "./notification";
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -46,6 +45,7 @@ export type ThreadAttributes = {
 
   created_at?: Date;
   updated_at?: Date;
+  last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
 
@@ -55,7 +55,6 @@ export type ThreadAttributes = {
   Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
-  Notifications?: NotificationAttributes[];
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -116,6 +115,7 @@ export default (
       // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
     },
@@ -166,15 +166,8 @@ export default (
       foreignKey: 'thread_id',
       as: 'reactions',
     });
-    models.Thread.hasMany(models.Comment, {
-      foreignKey: 'thread_id',
-      as: 'comments',
-    });
     models.Thread.hasMany(models.Collaboration);
     models.Thread.hasMany(models.Poll, {
-      foreignKey: 'thread_id',
-    });
-    models.Thread.hasMany(models.Notification, {
       foreignKey: 'thread_id',
     });
     models.Thread.hasOne(models.ChainEntityMeta, {

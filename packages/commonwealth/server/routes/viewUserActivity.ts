@@ -17,42 +17,35 @@ export default async (
   }
   const { id } = req.user;
 
-  /**
-   * The CTE gets the thread id and latest/max notification id for all threads and comments in
-   * chains (communities) that the user has joined. It also assigns a rank (row number) based on descending order of
-   * the max notification ids. More recent notifications will have a higher rank than old notifications:
-   * thread_id  max_notification_id    thread_rank
-   *  10681,         5645365,               1
-   *  10680,         5645362,               2
-   */
   const query = `
-      WITH ranked_thread_notifs as (SELECT n.thread_id                                 AS thread_id,
-                                           MAX(n.id)                                   as mx_not_id,
-                                           ROW_NUMBER() OVER (ORDER BY MAX(n.id) DESC) as thread_rank
-                                    FROM "Notifications" n
-                                    WHERE n.category_id IN ('new-thread-creation', 'new-comment-creation')
-                                      AND n.chain_id IN (SELECT a."chain" FROM "Addresses" a WHERE a.user_id = ?)
-                                      AND n.thread_id IS NOT NULL
-                                    GROUP BY n.thread_id)
-      -- this section combines the ranked thread ids from above with comments and reactions in order to
-      -- count the number of reactions and comments associated with each thread. It also joins the ranked thread ids
-      -- with notifications and threads in order to retrieve notification data and thread view counts respectively
-      SELECT nt.thread_id,
-             nts.created_at                                as last_activity,
-             nts.notification_data,
-             nts.category_id,
-             MAX(thr.view_count)                           as view_count,
-             COUNT(DISTINCT oc.id)                         AS comment_count,
-             COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
-      FROM ranked_thread_notifs nt
-               INNER JOIN "Notifications" nts ON nt.mx_not_id = nts.id
-               LEFT JOIN "Comments" oc ON nt.thread_id = oc.thread_id
-               LEFT JOIN "Reactions" tr ON nt.thread_id = tr.thread_id
-               LEFT JOIN "Reactions" cr ON oc.id = cr.comment_id
-               LEFT JOIN "Threads" thr ON thr.id = nt.thread_id
-      WHERE nt.thread_rank <= 50
-      GROUP BY nt.thread_id, nts.created_at, nts.notification_data, nts.category_id
-      ORDER BY nts.created_at DESC;
+    SELECT nt.thread_id, nts.created_at as last_activity, nts.notification_data, nts.category_id,
+      MAX(thr.view_count) as view_count,
+      COUNT(DISTINCT oc.id) AS comment_count,
+      COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
+    FROM
+      (SELECT nnn.mx_not_id, nnn.thread_id,
+          ROW_NUMBER() OVER (ORDER BY mx_not_id DESC) as thread_rank
+        FROM
+        (SELECT DISTINCT nn.thread_id, nn.mx_not_id
+          FROM (SELECT (n.notification_data::jsonb->>'thread_id') AS thread_id,
+                  MAX(n.id) OVER (PARTITION BY (n.notification_data::jsonb->>'thread_id')) AS mx_not_id
+                FROM "Notifications" n
+                WHERE n.category_id IN('new-thread-creation','new-comment-creation')
+                  AND n.chain_id IN(SELECT a."chain" FROM "Addresses" a WHERE a.user_id = ?)
+                ORDER BY id DESC
+                FETCH FIRST 500 ROWS ONLY
+                ) nn
+          ) nnn
+      ) nt
+    INNER JOIN "Notifications" nts ON nt.mx_not_id = nts.id
+    LEFT JOIN "Comments" oc ON nt.thread_id = CAST(oc.thread_id AS VARCHAR)
+      --TODO: eval execution path with alternate aggregations
+    LEFT JOIN "Reactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
+    LEFT JOIN "Reactions" cr ON oc.id = cr.comment_id
+    LEFT JOIN "Threads" thr ON thr.id = CAST(nt.thread_id AS int)
+    WHERE nt.thread_rank <= 50
+    GROUP BY nt.thread_id, nts.created_at, nts.notification_data, nts.category_id
+    ORDER BY nts.created_at DESC;
   `;
 
   const notifications: any = await models.sequelize.query(query, {

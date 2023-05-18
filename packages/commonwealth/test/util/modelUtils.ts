@@ -44,6 +44,7 @@ export async function addAllowDenyPermissionsForCommunityRole(
   deny_permission: number | undefined
 ) {
   try {
+    console.log('addAllowDenyPermissionsForCommunityRole');
     const permissionsManager = new PermissionManager();
     // get community role object from the database
     const communityRole = await models.CommunityRole.findOne({
@@ -70,6 +71,7 @@ export async function addAllowDenyPermissionsForCommunityRole(
     }
     // save community role object to the database
     const updatedRole = await communityRole.save();
+    console.log('updatedRole', updatedRole);
   } catch (err) {
     throw new Error(err);
   }
@@ -84,6 +86,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+    console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
@@ -187,7 +190,7 @@ export interface ThreadArgs {
   jwt: any;
   address: string;
   kind: string;
-  stage?: string;
+  stage: string;
   chainId: string;
   title: string;
   topicName?: string;
@@ -541,58 +544,3 @@ export class MockTokenBalanceProvider extends BalanceProvider<
     }
   }
 }
-
-export interface JoinCommunityArgs {
-  jwt: string;
-  address_id: number;
-  address: string;
-  chain: string;
-  originChain: string;
-}
-export const joinCommunity = async (args: JoinCommunityArgs) => {
-  const { jwt, address, chain, originChain, address_id } = args;
-  try {
-    await chai.request
-      .agent(app)
-      .post('/api/linkExistingAddressToChain')
-      .set('Accept', 'application/json')
-      .send({
-        address,
-        chain,
-        originChain,
-        jwt
-      });
-  } catch (e) {
-    console.error("Failed to link an existing address to a chain");
-    console.error(e);
-    return false;
-  }
-
-  try {
-    await createRole(models, address_id, chain, 'member', false);
-  } catch (e) {
-    console.error("Failed to create a role for a new member");
-    console.error(e);
-    return false;
-  }
-
-  try {
-    await chai.request
-      .agent(app)
-      .post('/api/setDefaultRole')
-      .set('Accept', 'application/json')
-      .send({
-        address,
-        author_chain: chain,
-        chain,
-        jwt,
-        auth: 'true'
-      });
-  } catch (e) {
-    console.error("Failed to set default role");
-    console.error(e);
-    return false;
-  }
-
-  return true;
-};
