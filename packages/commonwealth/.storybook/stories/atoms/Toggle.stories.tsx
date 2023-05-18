@@ -43,6 +43,11 @@ export const Simple: Story = {
       options: [ true, false ],
     }
   },
+  parameters: {
+    controls: {
+      exclude: [ "className" ],
+    },
+  },
   render: ({...args}) => <CWToggle {...args} />
 };
 

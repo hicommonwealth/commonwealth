@@ -56,7 +56,15 @@ export const IconStory: Story = {
     },
   },
   parameters: {
-    controls: { exclude: ["selected", "componentType", "argTypes"] }
+    controls: {
+      exclude: [
+        "argTypes",
+        "className",
+        "componentType",
+        "iconButtonTheme",
+        "selected",
+      ],
+    },
   },
   render: ({...args}) => <CWIcon {...args} />
 }
@@ -85,7 +93,13 @@ export const IconButtonStory: Story = {
     // TODO handle selected
   },
   parameters: {
-    controls: { exclude: ["className", "componentType", "argTypes"] }
+    controls: {
+      exclude: [
+        "argTypes",
+        "className",
+        "componentType",
+      ],
+    },
   },
   render: ({...args}) => <IconButton {...args} />
 }

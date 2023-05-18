@@ -93,7 +93,7 @@ export const AddressTooltip = {
     },
   },
   parameters: {
-    controls: { exclude: ["content", "renderTrigger"], }
+    controls: { exclude: ["content", "renderTrigger", "hasBackground"], }
   },
   render: ({...args}) => (
     <div className="tooltip-row">

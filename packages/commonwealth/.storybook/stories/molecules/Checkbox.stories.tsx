@@ -36,7 +36,7 @@ export const Checkbox: Story = {
     },
   },
   parameters: {
-    controls: { exclude: ["className", "groupName"] }
+    controls: { exclude: ["className", "groupName", "value"] }
   },
   render: ({...args}) => <CWCheckbox {...args}>{args.label}</CWCheckbox>
 }

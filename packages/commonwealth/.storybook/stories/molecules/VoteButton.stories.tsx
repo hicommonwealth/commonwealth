@@ -37,5 +37,10 @@ export const VoteButtonStory = {
       control: { type: "number" },
     },
   },
+  parameters: {
+    controls: {
+      exclude: [ "updateVoteCount" ],
+    },
+  },
   render: ({...args}) => <VoteButton count={args.voteCount} />
 };
