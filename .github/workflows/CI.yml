@@ -3,7 +3,11 @@ name: CI
 env:
   ROLLBAR_ENV: 'GitHubCI'
 
-on: [push]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
   # These tests run slowly, so run them in a separate job
@@ -90,6 +94,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -107,7 +113,9 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Run linter
-        run: yarn lint-all
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: yarn lint-branch
 
       - name: Typecheck
         run: yarn --cwd packages/commonwealth check-types
@@ -171,14 +179,18 @@ jobs:
         env:
           NO_CLIENT: true
 
+      - name: Run emitNotification tests
+        run: yarn --cwd packages/commonwealth test-emit-notif
+        env:
+          NO_CLIENT: true
+
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
+    name: Devnet Tests
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node: [ 18 ]
-    name: Devnet Tests
-    runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres
@@ -203,10 +215,14 @@ jobs:
         image: irowan/heroku-csdk
         ports:
          - 5050:5050
+      cosmos_beta_test_app:
+        image: mhagel1/csdk-beta
+        ports:
+         - 5051:5051
       redis:
         image: redis:latest
         ports:
-          - 6379:6379
+         - 6379:6379
 
     steps:
       - name: Checkout
@@ -227,15 +243,7 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
-          
-      - name: Run Devnet tests
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
-        env:
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-        
+      ## EVM Section:
       - name: Start EVM Testnet
         run: |
           /usr/bin/docker pull trufflesuite/ganache;
@@ -251,3 +259,142 @@ jobs:
 
       - name: Stop EVM Chain
         run: docker stop chain
+
+      ## Cosmos Section:
+      # We only run Cosmos devnet tests if any files in the following folders changes
+      - name: Get changed Cosmos devnet-related files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            packages/commonwealth/test/devnet/cosmos/**/*
+            packages/commonwealth/server/util/cosmosProxy.ts
+            packages/chain-events/cosmos-chain-testing/**/*
+            packages/common-common/src/cosmos-ts/**/*
+
+      - name: Run following steps if any file(s) in the Cosmos folders change
+        if: steps.changed-files-specific.outputs.all_changed_files
+        run: |
+          echo "One or more Cosmos Devnet-related files has changed."
+          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
+
+      - name: Init Db
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: cd packages/commonwealth && npx sequelize db:migrate
+
+      - name: Run Cosmos Devnet tests
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
+        env:
+          PORT: 8080
+          USES_DOCKER_PGSQL: true
+
+  chain-event-integration:
+    strategy:
+      matrix:
+        node: [ 18 ]
+    name: Chain Events Integration Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: commonwealth_chain_events
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      evm_test_app:
+        image: irowan/common_chain_tests
+        ports:
+          - 3000:3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
+      - name: Get changed chain-events files
+        id: changed-files-chain-events
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            packages/chain-events/**/*
+            packages/common-common/src/eth/**/*
+            packages/common-common/src/rabbitmq/**/*
+            packages/common-common/src/serviceConsumer.ts
+
+      - name: Run following steps if any file(s) in the chain-events folders change
+        if: steps.changed-files-chain-events.outputs.all_changed_files
+        run: |
+          echo "One or more chain-events-related files has changed."
+          echo "List all the files that have changed: ${{ steps.changed-files-chain-events.outputs.all_changed_files }}"
+
+      - name: Init CE Db
+        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
+        run: >
+          cd packages/chain-events &&
+          PGPASSWORD=edgeware psql -h localhost -p 5432 -d commonwealth_chain_events -U commonwealth -f "CE_default.dump" &&
+          npx sequelize db:migrate
+
+      - name: Start ganache
+        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
+        run: |
+          yarn --cwd packages/chain-events/chain-testing
+          yarn --cwd packages/chain-events/chain-testing ganache > ganacheLog.log 2>&1 &
+          sleep 20
+
+      - name: Start chain-testing SDK
+        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
+        run: |
+          sudo fuser -k 3000/tcp || true
+          CE_CI_TESTING=true RPC_HOST=ganache CHAIN_PORT=3000 yarn --cwd packages/chain-events/chain-testing start > sdkLog.log 2>&1 &
+          sleep 15
+
+      - name: Run Chain Events Integration Tests
+        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
+        run: yarn --cwd packages/chain-events test-services
+
+      - name: Typecheck
+        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
+        run: yarn --cwd packages/chain-events check-types
+
+      - name: Display Ganache logs
+        if: always() # Ensure this step runs even if previous steps failed
+        run: |
+          if [ -f ganacheLog.log ]; then
+            cat ganacheLog.log
+          else
+            echo "ganacheLog.log does not exist."
+          fi
+
+      - name: Display SDK logs
+        if: always() # Ensure this step runs even if previous steps failed
+        run: |
+          if [ -f sdkLog.log ]; then
+            cat sdkLog.log
+          else
+            echo "sdkLog.log does not exist."
+          fi

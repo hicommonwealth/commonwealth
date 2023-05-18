@@ -1,5 +1,3 @@
-import { redraw } from 'mithrilInterop';
-
 import { formatCoin } from 'adapters/currency';
 import { CompoundTypes } from 'chain-events/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -51,16 +49,13 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
       if (vote instanceof AaveProposalVote) {
         balance = vote.power;
         balancesCache[vote.account.address] = vote.format();
-        redraw();
       } else if (vote instanceof CompoundProposalVote) {
         balance = formatCoin(app.chain.chain.coins(vote.power), true);
         balancesCache[vote.account.address] = balance;
-        redraw();
       } else {
         vote.account.balance.then((b) => {
           balance = b;
           balancesCache[vote.account.address] = formatCoin(b, true);
-          redraw();
         });
         balance = '--';
       }
@@ -84,7 +79,6 @@ export const cancelProposal = (
       .cancelTx()
       .then(() => {
         onModalClose();
-        redraw();
       })
       .catch((err) => {
         onModalClose();
@@ -95,7 +89,6 @@ export const cancelProposal = (
       .cancelTx()
       .then(() => {
         onModalClose();
-        redraw();
       })
       .catch((err) => {
         onModalClose();

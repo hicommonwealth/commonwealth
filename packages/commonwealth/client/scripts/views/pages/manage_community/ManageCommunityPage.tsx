@@ -6,7 +6,7 @@ import 'pages/manage_community/index.scss';
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
 import RoleInfo from '../../../models/RoleInfo';
-import Sublayout from '../../sublayout';
+import Sublayout from '../../Sublayout';
 import ErrorPage from '../error';
 import { PageLoading } from '../loading';
 import { AdminPanelTabs } from './admin_panel_tabs';

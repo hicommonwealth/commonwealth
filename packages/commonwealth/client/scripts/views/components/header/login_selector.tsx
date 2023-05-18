@@ -5,7 +5,6 @@ import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -59,7 +58,6 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export const LoginSelectorMenuLeft = ({
-  activeAddressesWithRole,
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
@@ -120,7 +118,6 @@ export const LoginSelectorMenuLeft = ({
                 onClick={async () => {
                   await setActiveAccount(account);
                   setSelectedAddress(account.address);
-                  redraw();
                 }}
               >
                 <UserBlock
@@ -204,7 +201,9 @@ export const LoginSelectorMenuRight = ({
     /**
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
-    const walletConnectWallet = WebWalletController.Instance.getByName(WalletId.WalletConnect);
+    const walletConnectWallet = WebWalletController.Instance.getByName(
+      WalletId.WalletConnect
+    );
     await walletConnectWallet.reset();
   };
 
@@ -225,7 +224,6 @@ export const LoginSelectorMenuRight = ({
                 ? toggleDarkMode(false, setIsDarkModeOn)
                 : toggleDarkMode(true, setIsDarkModeOn);
               e.stopPropagation();
-              redraw();
             }}
           />
           <div className="login-darkmode-label">
@@ -305,6 +303,12 @@ export const LoginSelector = () => {
   useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
   }, [app.user.activeAccount]);
+
+  useEffect(() => {
+    if (!isLoginModalOpen && app.chain?.meta?.id == 'injective') {
+      forceRerender();
+    }
+  }, [isLoginModalOpen]);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
@@ -481,7 +485,6 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
       } catch (err) {
         console.error(err);
       }
@@ -514,7 +517,12 @@ export const LoginSelector = () => {
             <CWButton
               buttonType="tertiary-black"
               onClick={async () => {
-                if (sameBaseAddressesRemoveDuplicates.length === 0) {
+                if (
+                  sameBaseAddressesRemoveDuplicates.length === 0 ||
+                  app.chain?.meta?.id === 'injective' ||
+                  (app.user.activeAccount?.address?.slice(0, 3) === 'inj' &&
+                    app.chain?.meta.id !== 'injective')
+                ) {
                   setIsLoginModalOpen(true);
                 } else {
                   if (hasTermsOfService) {

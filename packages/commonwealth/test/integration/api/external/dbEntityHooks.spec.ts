@@ -123,6 +123,7 @@ beforeEach(async () => {
           name: 'cmntest',
           network: 'cmntest',
           type: 'offchain',
+          active: true,
           default_symbol: 'cmntest',
         },
       })
@@ -135,6 +136,7 @@ beforeEach(async () => {
           name: 'cmntest2',
           network: 'cmntest',
           type: 'offchain',
+          active: true,
           default_symbol: 'cmntest2',
         },
       }).catch((e) => console.log(e))

@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/component_kit/cw_sidebar_menu.scss';
 
 import app from 'state';
@@ -14,6 +12,7 @@ import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import useSidebarStore from 'state/ui/sidebar';
 
 type CWSidebarMenuItemProps = {
   isStarred?: boolean;
@@ -21,6 +20,7 @@ type CWSidebarMenuItemProps = {
 
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
+  const { setMenu } = useSidebarStore();
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
 
   if (props.type === 'default') {
@@ -62,9 +62,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          app.sidebarToggled = false;
-          app.sidebarMenu = 'default';
-          app.sidebarRedraw.emit('redraw');
+          setMenu({ name: 'default', isVisible: false });
           navigateToCommunity({
             navigate,
             path: '/',
@@ -93,7 +91,6 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
                 e.stopPropagation();
                 await app.communities.setStarred(item.id);
                 setIsStarred((prevState) => !prevState);
-                redraw();
               }}
             />
           </div>
@@ -112,6 +109,7 @@ type SidebarMenuProps = {
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
+  const { setMenu } = useSidebarStore();
 
   return (
     <div
@@ -158,9 +156,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             label: 'Explore communities',
             iconLeft: 'compass',
             onClick: () => {
-              app.sidebarToggled = false;
-              app.sidebarMenu = 'default';
-              app.sidebarRedraw.emit('redraw');
+              setMenu({ name: 'default', isVisible: false });
               navigate('/communities', {}, null);
             },
           },
@@ -169,9 +165,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             label: 'Notification settings',
             iconLeft: 'person',
             onClick: () => {
-              app.sidebarToggled = false;
-              app.sidebarMenu = 'default';
-              app.sidebarRedraw.emit('redraw');
+              setMenu({ name: 'default', isVisible: false });
               navigate('/notification-settings');
             },
           } as MenuItem,

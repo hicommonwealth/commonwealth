@@ -41,6 +41,7 @@ import {
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
+import updateSiteAdmin from '../routes/updateSiteAdmin';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -160,6 +161,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import createChainNode from '../routes/createChainNode';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -170,7 +172,11 @@ import {
   updateCommunityContractTemplateMetadata,
   deleteCommunityContractTemplateMetadata,
 } from '../routes/proposalTemplate';
-import { createTemplate, getTemplates } from '../routes/templates';
+import {
+  createTemplate,
+  deleteTemplate,
+  getTemplates,
+} from '../routes/templates';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -208,6 +214,11 @@ function setupRouter(
     '/updateAddress',
     passport.authenticate('jwt', { session: false }),
     updateAddress.bind(this, models)
+  );
+  router.post(
+    '/updateSiteAdmin',
+    passport.authenticate('jwt', { session: false }),
+    updateSiteAdmin.bind(this, models)
   );
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
@@ -298,6 +309,12 @@ function setupRouter(
     getSupportedEthChains.bind(this, models)
   );
 
+  router.post(
+    '/createChainNode',
+    passport.authenticate('jwt', { session: false }),
+    createChainNode.bind(this, models)
+  );
+
   // threads
   router.post(
     '/createThread',
@@ -378,6 +395,12 @@ function setupRouter(
     '/contract/template',
     passport.authenticate('jwt', { session: false }),
     getTemplates.bind(this, models)
+  );
+
+  router.delete(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    deleteTemplate.bind(this, models)
   );
 
   // community contract

@@ -2,12 +2,11 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import type { WalletId } from 'common-common/src/types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
-import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
 import Account from '../../models/Account';
@@ -16,6 +15,7 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -35,7 +35,7 @@ export async function setActiveAccount(account: Account): Promise<void> {
   const role = app.roles.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-    app.chain.activeAddressHasToken(account.address).then(() => redraw());
+    await app.chain.activeAddressHasToken(account.address);
   }
 
   if (!role || role.is_user_default) {
@@ -123,7 +123,6 @@ export async function completeClientLogin(account: Account) {
     ) {
       app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
-    redraw();
   } catch (e) {
     console.trace(e);
   }
@@ -298,7 +297,24 @@ export async function unlinkLogin(account: AddressInfo) {
 
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
+  let chainAddress;
+  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: isCosmos
+      ? [
+          new CosmosExtension({
+            rpcUrl: app.chain.meta?.node?.url,
+          }),
+        ]
+      : null,
+  });
+
+  if (isCosmos) {
+    chainAddress = await magic.cosmos.changeAddress(
+      app.chain.meta.bech32Prefix
+    );
+  }
+
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
@@ -311,6 +327,7 @@ export async function loginWithMagicLink(email: string) {
     data: {
       // send chain/community to request
       chain: app.activeChainId(),
+      address: chainAddress,
     },
   });
   if (response.status === 'Success') {
