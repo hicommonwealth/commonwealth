@@ -44,7 +44,7 @@ type IuseWalletProps = {
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
-  onSuccess?: () => void;
+  onSuccess?: (account: Account) => void;
   onModalClose: () => void;
   useSessionKeyLoginFlow?: boolean;
 };
@@ -155,10 +155,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      await loginWithMagicLink(email);
+      const address = await loginWithMagicLink(email);
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess(address);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();
@@ -203,7 +203,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     if (exitOnComplete) {
       walletProps.onModalClose();
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess(account.address);
     }
   };
 
@@ -215,7 +215,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     currentWallet?: IWebWallet<any>
   ) => {
     if (walletProps.useSessionKeyLoginFlow) {
-      walletProps.onModalClose();
+      walletProps.onSuccess?.(account.address);
       return;
     }
 
@@ -290,7 +290,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           setCachedTimestamp(timestamp);
           setCachedChainId(chainId);
           setCachedSessionPayload(sessionPayload);
-          walletProps.onSuccess?.();
+          walletProps.onSuccess?.(account.address);
         } catch (e) {
           console.log(e);
         }
@@ -386,7 +386,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           data
         );
       }
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess(primaryAccount.profile.address);
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
       walletProps.onModalClose();
     } catch (e) {

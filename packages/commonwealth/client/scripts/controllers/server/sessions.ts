@@ -1,4 +1,5 @@
-import { showSessionSigninModal } from 'views/modals/session_signin_modal';
+import { openConfirmation} from 'views/modals/confirmation_modal';
+import { openSessionRevalidation } from 'views/modals/session_revalidation_modal';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import { createCanvasSessionPayload, chainBaseToCanvasChainId } from 'canvas';
@@ -199,22 +200,26 @@ class SessionsController {
     );
 
     if (!hasAuthenticatedSession) {
-      const { account, newlyCreated, linked } =
-        await showSessionSigninModal().catch(() => {
-          const err = new Error();
-          (err as any).responseJSON = { error: 'Login canceled' };
-          throw err;
-        });
+      const signedWithAddress = await new Promise((resolve, reject) => {
+        openSessionRevalidation({
+          onVerified: (address) => resolve(address),
+          onClose: () => {
+            const err = new Error();
+            (err as any).responseJSON = { error: 'Login canceled' };
+            reject(err);
+          }
+        })
+      });
 
       // The user may have signed using a different account
       const sessionReauthed = await controller.hasAuthenticatedSession(
         canvasChainId,
-        address
+        signedWithAddress
       );
       if (!sessionReauthed) {
         const err = new Error();
         (err as any).responseJSON = {
-          error: `Message signed with ${account.address}. Switch to this account to continue`,
+          error: `Message signed with ${signedWithAddress}. Switch to this account to continue`,
         };
         throw err;
       }

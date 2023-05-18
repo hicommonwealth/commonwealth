@@ -373,6 +373,7 @@ export async function loginWithMagicLink(email: string) {
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses(c);
     }
+    return chainAddress;
   } else {
     throw new Error(`Magic auth unsuccessful: ${response.status}`);
   }
