@@ -315,9 +315,15 @@ export async function loginWithMagicLink(email: string) {
 
   // skip wallet.signCanvasMessage(), do the logic here instead
   if (isCosmos) {
-    chainAddress = await magic.cosmos.changeAddress(
-      app.chain.meta.bech32Prefix
-    );
+    // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
+    const bech32Prefix = app.chain.meta.bech32Prefix;
+    try {
+      chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
+    } catch (err) {
+      console.error(
+        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+      );
+    }
 
     const timestamp = +new Date();
     const signer = { signMessage: magic.cosmos.sign }

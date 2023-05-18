@@ -45,6 +45,7 @@ export type ThreadAttributes = {
 
   created_at?: Date;
   updated_at?: Date;
+  last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
 
@@ -114,6 +115,7 @@ export default (
       // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
     },
@@ -163,10 +165,6 @@ export default (
     models.Thread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
-    });
-    models.Thread.hasMany(models.Comment, {
-      foreignKey: 'thread_id',
-      as: 'comments',
     });
     models.Thread.hasMany(models.Collaboration);
     models.Thread.hasMany(models.Poll, {
