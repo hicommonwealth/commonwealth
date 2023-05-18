@@ -62,8 +62,6 @@ const searchProfiles = async (
     nullsLast: true,
   });
 
-  console.log('paginationSort: ', paginationSort);
-
   const bind: any = {
     searchTerm: `%${options.search}%`,
     ...paginationBind,
