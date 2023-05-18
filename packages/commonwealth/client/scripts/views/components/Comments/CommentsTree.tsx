@@ -112,6 +112,7 @@ export const CommentsTree = ({
               isLocked={thread instanceof Thread && thread.readOnly}
               setIsGloballyEditing={setIsGloballyEditing}
               threadLevel={threadLevel}
+              threadId={thread.id}
               updatedCommentsCallback={updatedCommentsCallback}
             />
             {!!children.length &&
