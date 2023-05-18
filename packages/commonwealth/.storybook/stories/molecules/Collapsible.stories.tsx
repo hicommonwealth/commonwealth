@@ -14,11 +14,22 @@ export default collapsible;
 
 // export const Collapsible: Story = {
 export const Collapsible = {
-  name: 'Collapsible',
-  render: () => (
+  args: {
+    headerContent: "Header content",
+    collapsibleContent: "Body content",
+  },
+  argTypes: {
+    headerContent: {
+      control: { type: "text" }
+    },
+    collapsibleContent: {
+      control: { type: "text" }
+    },
+  },
+  render: ({...args}) => (
     <CWCollapsible
-      headerContent={<CWText>Header content</CWText>}
-      collapsibleContent={<CWText>Body content</CWText>}
+      headerContent={<CWText>{args.headerContent}</CWText>}
+      collapsibleContent={<CWText>{args.collapsibleContent}</CWText>}
     />
   )
 }

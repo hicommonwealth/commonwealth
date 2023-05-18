@@ -28,21 +28,27 @@ type CommentProps = {
   isLocked: boolean;
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
+  threadId: number;
   updatedCommentsCallback?: () => void;
 };
 
-export const CommentComponent = ({
-  comment,
-  handleIsReplying,
-  isLast,
-  isLocked,
-  setIsGloballyEditing,
-  threadLevel,
-  updatedCommentsCallback,
-}: CommentProps) => {
-  const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
-  const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>(false);
-  const [savedEdits, setSavedEdits] = useState<string>('');
+export const CommentComponent = (props: CommentProps) => {
+  const {
+    comment,
+    handleIsReplying,
+    isLast,
+    isLocked,
+    setIsGloballyEditing,
+    threadLevel,
+    updatedCommentsCallback,
+    threadId,
+  } = props;
+
+  const [isEditingComment, setIsEditingComment] =
+    React.useState<boolean>(false);
+  const [shouldRestoreEdits, setShouldRestoreEdits] =
+    React.useState<boolean>(false);
+  const [savedEdits, setSavedEdits] = React.useState<string>('');
 
   const { isLoggedIn } = useUserLoggedIn();
 
@@ -78,7 +84,7 @@ export const CommentComponent = ({
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              await app.comments.delete(comment);
+              await app.comments.delete(comment, threadId);
               updatedCommentsCallback();
             } catch (e) {
               console.log(e);

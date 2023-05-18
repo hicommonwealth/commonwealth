@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import 'SublayoutHeader.scss';
 
@@ -14,6 +14,7 @@ import { SearchBar } from './pages/search/search_bar';
 import { useCommonNavigate } from 'navigation/helpers';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useSidebarStore from 'state/ui/sidebar';
 
 type SublayoutHeaderProps = {
   hideSearch?: boolean;
@@ -25,8 +26,9 @@ export const SublayoutHeader = ({
   onMobile,
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
+  const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
+    useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
-  const [contentKey, setContentKey] = useState('');
 
   return (
     <div className="SublayoutHeader">
@@ -44,7 +46,7 @@ export const SublayoutHeader = ({
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) &&
+        {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
           app.activeChainId() && (
             <CWCommunityAvatar
               size="large"
@@ -57,10 +59,9 @@ export const SublayoutHeader = ({
         {onMobile && app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"
-            iconName={app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
+            iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
-              app.sidebarToggled = !app.sidebarToggled;
-              app.sidebarRedraw.emit('redraw');
+              setMenu({ name: menuName, isVisible: !menuVisible });
             }}
           />
         )}
@@ -72,18 +73,17 @@ export const SublayoutHeader = ({
             iconName="dotsVertical"
             iconButtonTheme="black"
             onClick={() => {
-              app.sidebarToggled = false;
-              app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-              app.sidebarRedraw.emit('redraw');
+              setMenu({ name: menuName, isVisible: false });
+              setMobileMenuName(mobileMenuName ? null : 'MainMenu');
             }}
           />
         </div>
         <div className="DesktopMenuContainer">
-          <CreateContentPopover key={contentKey} />
+          <CreateContentPopover />
           <HelpMenuPopover />
           {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>
-        <LoginSelector onJoinSuccess={() => setContentKey('joined')} />
+        <LoginSelector />
       </div>
     </div>
   );

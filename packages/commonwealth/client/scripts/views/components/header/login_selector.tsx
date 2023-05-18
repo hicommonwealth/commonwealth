@@ -58,7 +58,6 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export const LoginSelectorMenuLeft = ({
-  activeAddressesWithRole,
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
@@ -292,11 +291,7 @@ const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
   );
 };
 
-type LoginSelectorProps = {
-  onJoinSuccess: () => void;
-};
-
-export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
+export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -308,6 +303,12 @@ export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
   useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
   }, [app.user.activeAccount]);
+
+  useEffect(() => {
+    if (!isLoginModalOpen && app.chain?.meta?.id == 'injective') {
+      forceRerender();
+    }
+  }, [isLoginModalOpen]);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
@@ -484,7 +485,6 @@ export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        onJoinSuccess(); // this triggers a state update from the parent to update the sibling component
       } catch (err) {
         console.error(err);
       }
@@ -517,7 +517,12 @@ export const LoginSelector = ({ onJoinSuccess }: LoginSelectorProps) => {
             <CWButton
               buttonType="tertiary-black"
               onClick={async () => {
-                if (sameBaseAddressesRemoveDuplicates.length === 0) {
+                if (
+                  sameBaseAddressesRemoveDuplicates.length === 0 ||
+                  app.chain?.meta?.id === 'injective' ||
+                  (app.user.activeAccount?.address?.slice(0, 3) === 'inj' &&
+                    app.chain?.meta.id !== 'injective')
+                ) {
                   setIsLoginModalOpen(true);
                 } else {
                   if (hasTermsOfService) {

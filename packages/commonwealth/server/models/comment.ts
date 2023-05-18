@@ -87,8 +87,17 @@ export default (
       foreignKey: 'chain',
       targetKey: 'id',
     });
+    models.Comment.belongsTo(models.Thread, {
+      foreignKey: 'thread_id',
+      targetKey: 'id',
+    });
     models.Comment.belongsTo(models.Address, {
       foreignKey: 'address_id',
+      targetKey: 'id',
+    });
+    models.Comment.belongsTo(models.Thread, {
+      foreignKey: 'thread_id',
+      constraints: false,
       targetKey: 'id',
     });
     models.Comment.hasMany(models.Attachment, {
