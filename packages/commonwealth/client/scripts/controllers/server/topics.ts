@@ -102,13 +102,10 @@ class TopicsController {
         this._store.remove(this._store.getById(result.id));
       }
       this._store.add(result);
-      app.threadUpdateEmitter.emit('threadUpdated', {
-        threadId,
-        action: ThreadActionType.TopicChange,
-      });
-      const thread = app.threads.getById(threadId);
-      thread.topic = result;
-      app.threads.updateThreadInStore(thread);
+      app.threadUpdateEmitter.emit(
+        'threadUpdated',
+        { threadId, action: ThreadActionType.TopicChange }
+      );
       return result;
     } catch (err) {
       console.log('Failed to update topic');

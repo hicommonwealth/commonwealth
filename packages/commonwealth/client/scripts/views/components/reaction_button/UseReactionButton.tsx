@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import TopicGateCheck from '../../../controllers/chain/ethereum/gatedTopic';
 import type ChainInfo from '../../../models/ChainInfo';
-import Thread from '../../../models/Thread';
+import type Thread from '../../../models/Thread';
 import app from '../../../state';
 
 export const useReactionButton = (thread: Thread, setReactors) => {
@@ -49,7 +49,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
   const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
 
   const dislike = async () => {
-    if (reactedId === -1 || !hasReacted || isLoading) {
+    if (reactedId === -1) {
       return;
     }
 
@@ -63,20 +63,10 @@ export const useReactionButton = (thread: Thread, setReactors) => {
         );
         setReactedId(-1);
         setHasReacted(false);
-
-        // update in store
-        const foundThread = app.threads.getById(thread.id);
-        if (foundThread) {
-          foundThread.associatedReactions = [
-            ...foundThread.associatedReactions,
-          ].filter((x) => x.address !== activeAddress);
-          app.threads.updateThreadInStore(foundThread);
-        }
+        setIsLoading(false);
       })
       .catch((e) => {
         console.log(e);
-      })
-      .finally(() => {
         setIsLoading(false);
       });
   };
@@ -86,50 +76,17 @@ export const useReactionButton = (thread: Thread, setReactors) => {
     chainId: string,
     userAddress: string
   ) => {
-    const foundThread = app.threads.getById(thread.id);
-    if (
-      (foundThread &&
-        foundThread.associatedReactions.find(
-          (x) => x.address === activeAddress
-        )) ||
-      reactedId !== -1 ||
-      hasReacted ||
-      isLoading
-    ) {
-      return;
-    }
-
     setIsLoading(true);
     app.threadReactions
       .createOnThread(userAddress, thread, 'like')
       .then((reaction) => {
         setReactedId(reaction.id);
-        setReactors((oldReactors) => [
-          ...oldReactors.filter((o) => o !== activeAddress),
-          activeAddress,
-        ]);
+        setReactors((oldReactors) => [...oldReactors, activeAddress]);
         setHasReacted(true);
-
-        // update in store
-        const tempReaction = {
-          id: (reaction.id + '') as any,
-          type: reaction.reaction,
-          address: activeAddress,
-        };
-        if (foundThread) {
-          foundThread.associatedReactions = [
-            ...foundThread.associatedReactions.filter(
-              (x) => x.address !== activeAddress
-            ),
-            tempReaction,
-          ];
-          app.threads.updateThreadInStore(foundThread);
-        }
+        setIsLoading(false);
       })
       .catch((e) => {
         console.log(e);
-      })
-      .finally(() => {
         setIsLoading(false);
       });
   };
