@@ -9,7 +9,7 @@ import type {
   ActionArgument,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import { ISessionController, InvalidSession } from '.';
 
 export class NEARSessionController implements ISessionController {
   private signers: Record<string, Record<string, KeyPairEd25519>> = {};
@@ -144,6 +144,8 @@ export class NEARSessionController implements ISessionController {
     const sessionPayload = this.auths[chainId][fromAddress]?.payload;
     const sessionSignature = this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
+
+    if (!sessionPayload || !sessionSignature) throw new InvalidSession();
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,

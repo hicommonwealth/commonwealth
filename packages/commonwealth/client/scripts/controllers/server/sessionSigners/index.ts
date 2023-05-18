@@ -11,6 +11,8 @@ import type {
   ActionArgument,
 } from '@canvas-js/interfaces';
 
+export class InvalidSession extends Error {}
+
 export abstract class ISessionController {
   // Get the current user's human-readable session address.
   abstract getAddress(chainId: string, fromAddress: string): string | null;

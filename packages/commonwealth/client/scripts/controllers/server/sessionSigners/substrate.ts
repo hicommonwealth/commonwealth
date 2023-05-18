@@ -9,7 +9,7 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import { ISessionController, InvalidSession } from '.';
 
 export class SubstrateSessionController implements ISessionController {
   keyring: Keyring = new Keyring({ ss58Format: 42 });
@@ -154,6 +154,8 @@ export class SubstrateSessionController implements ISessionController {
     const sessionPayload = this.auths[chainId][fromAddress]?.payload;
     const sessionSignature = this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
+
+    if (!sessionPayload || !sessionSignature) throw new InvalidSession();
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,

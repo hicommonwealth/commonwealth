@@ -9,7 +9,7 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import { ISessionController, InvalidSession } from '.';
 
 export class SolanaSessionController implements ISessionController {
   signers: Record<string, Record<string, solw3.Keypair>> = {};
@@ -144,6 +144,8 @@ export class SolanaSessionController implements ISessionController {
     const sessionPayload = this.auths[chainId][fromAddress]?.payload;
     const sessionSignature = this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
+
+    if (!sessionPayload || !sessionSignature) throw new InvalidSession();
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,

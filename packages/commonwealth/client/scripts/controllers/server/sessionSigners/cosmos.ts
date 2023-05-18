@@ -14,7 +14,7 @@ import type {
   ActionPayload,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import { ISessionController, InvalidSession } from '.';
 import { getADR036SignableAction } from 'adapters/chain/cosmos/keys';
 import { fromDuration } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 
@@ -180,6 +180,8 @@ export class CosmosSDKSessionController implements ISessionController {
     const sessionSignature: string =
       this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
+
+    if (!sessionPayload || !sessionSignature) throw new InvalidSession();
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,

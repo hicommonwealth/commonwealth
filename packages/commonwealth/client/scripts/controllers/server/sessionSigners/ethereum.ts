@@ -8,7 +8,7 @@ import type {
 } from '@canvas-js/interfaces';
 import { verify as verifyCanvasSessionSignature } from 'canvas';
 import { getEIP712SignableAction } from 'adapters/chain/ethereum/keys';
-import { ISessionController } from '.';
+import { ISessionController, InvalidSession } from '.';
 
 export class EthereumSessionController implements ISessionController {
   private signers: Record<number, Record<string, ethers.Wallet>> = {};
@@ -147,6 +147,8 @@ export class EthereumSessionController implements ISessionController {
     const sessionPayload = this.auths[chainId][fromAddress]?.payload;
     const sessionSignature = this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
+
+    if (!sessionPayload || !sessionSignature || !actionSigner) throw new InvalidSession();
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,

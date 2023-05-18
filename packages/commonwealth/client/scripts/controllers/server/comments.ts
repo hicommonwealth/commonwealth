@@ -183,7 +183,7 @@ class CommentsController {
 
       return newComment;
     } catch (err) {
-      console.log('Failed to create comment');
+      console.log('Failed to create comment', err.stack);
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
