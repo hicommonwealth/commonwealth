@@ -23,7 +23,7 @@ import {
   serializeDelta,
 } from '../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { useEditTopicMutation } from 'state/api/topics';
+import { useDeleteTopicMutation, useEditTopicMutation } from 'state/api/topics';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -45,6 +45,7 @@ export const EditTopicModal = ({
 
   const navigate = useCommonNavigate();
   const { mutateAsync: editTopic } = useEditTopicMutation();
+  const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -104,14 +105,11 @@ export const EditTopicModal = ({
           label: 'Delete',
           buttonType: 'mini-red',
           onClick: async () => {
-            const topicInfo = {
-              id,
-              name: name,
+            await deleteTopic({
+              topicId: id,
+              topicName: name,
               chainId: app.activeChainId(),
-            };
-
-            await app.topics.remove(topicInfo);
-
+            });
             navigate('/');
           },
         },

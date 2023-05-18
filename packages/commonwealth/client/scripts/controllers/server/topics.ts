@@ -125,26 +125,26 @@ class TopicsController {
   //     );
   //   }
   // }
-
-  public async remove(topic) {
-    try {
-      // TODO: Change to DELETE /topic
-      await $.post(`${app.serverUrl()}/deleteTopic`, {
-        id: topic.id,
-        chain: topic.chainId,
-        jwt: app.user.jwt,
-      });
-      this._store.remove(this._store.getById(topic.id));
-      app.threads.listingStore.removeTopic(topic.name);
-    } catch (err) {
-      console.log('Failed to delete topic');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to delete topic'
-      );
-    }
-  }
+  //
+  // public async remove(topic) {
+  //   try {
+  //     // TODO: Change to DELETE /topic
+  //     await $.post(`${app.serverUrl()}/deleteTopic`, {
+  //       id: topic.id,
+  //       chain: topic.chainId,
+  //       jwt: app.user.jwt,
+  //     });
+  //     this._store.remove(this._store.getById(topic.id));
+  //     app.threads.listingStore.removeTopic(topic.name);
+  //   } catch (err) {
+  //     console.log('Failed to delete topic');
+  //     throw new Error(
+  //       err.responseJSON && err.responseJSON.error
+  //         ? err.responseJSON.error
+  //         : 'Failed to delete topic'
+  //     );
+  //   }
+  // }
 
   // public async refreshAll(chainId, reset = false) {
   //   try {
