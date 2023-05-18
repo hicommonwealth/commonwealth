@@ -22,7 +22,6 @@ module.exports = {
             column.column_name === 'chain' || column.column_name === 'chain_id'
         );
         if (changeColumnName) {
-          console.log(table);
           await queryInterface.renameColumn(
             table,
             changeColumnName.column_name,
