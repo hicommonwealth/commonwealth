@@ -1,10 +1,10 @@
-type SearchResultsCacheEntry = {
+type TTLCacheEntry = {
   cacheKey: string;
   cacheValue: any;
   expiresAt: number;
 };
 
-const isEntryExpired = (entry: SearchResultsCacheEntry): boolean => {
+const isEntryExpired = (entry: TTLCacheEntry): boolean => {
   return Date.now() >= entry.expiresAt;
 };
 
@@ -33,7 +33,7 @@ export class TTLCache {
     if (!entry) {
       return null;
     }
-    const parsedEntry = JSON.parse(entry) as SearchResultsCacheEntry;
+    const parsedEntry = JSON.parse(entry) as TTLCacheEntry;
     if (isEntryExpired(parsedEntry)) {
       localStorage.removeItem(cacheKey);
       return null;

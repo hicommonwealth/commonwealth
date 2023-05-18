@@ -7,7 +7,7 @@ import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { debounce } from 'lodash';
-import { TTLCache } from '../../../lib/search_results_cache';
+import { TTLCache } from '../../../helpers/ttl_cache';
 
 const Delta = Quill.import('delta');
 Quill.register('modules/mention', QuillMention);

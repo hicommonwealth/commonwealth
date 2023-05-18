@@ -14,7 +14,7 @@ import { ChainMetadataRows } from './chain_metadata_rows';
 import { sortAdminsAndModsFirst } from './helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import { useDebounce } from 'usehooks-ts';
-import { TTLCache } from '../../../lib/search_results_cache';
+import { TTLCache } from '../../../helpers/ttl_cache';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
