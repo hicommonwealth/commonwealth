@@ -2,7 +2,7 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import type { WalletId } from 'common-common/src/types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
@@ -15,6 +15,7 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -295,7 +296,30 @@ export async function unlinkLogin(account: AddressInfo) {
 
 export async function loginWithMagicLink(email: string) {
   const { Magic } = await import('magic-sdk');
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
+  let chainAddress;
+  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: isCosmos
+      ? [
+          new CosmosExtension({
+            rpcUrl: app.chain.meta?.node?.url,
+          }),
+        ]
+      : null,
+  });
+
+  // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
+  if (isCosmos) {
+    const bech32Prefix = app.chain.meta.bech32Prefix;
+    try {
+      chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
+    } catch (err) {
+      console.error(
+        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+      );
+    }
+  }
+
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
@@ -308,6 +332,7 @@ export async function loginWithMagicLink(email: string) {
     data: {
       // send chain/community to request
       chain: app.activeChainId(),
+      address: chainAddress,
     },
   });
   if (response.status === 'Success') {

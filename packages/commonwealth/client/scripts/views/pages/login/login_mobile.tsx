@@ -1,73 +1,69 @@
-import React, { useState } from 'react';
-
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import 'pages/login/login_mobile.scss';
+import React from 'react';
 import app from 'state';
-import { isMobile } from 'react-device-detect';
-
-import {
-  CWProfileRow,
-  CWProfilesList,
-} from 'views/components/component_kit/cw_profiles_list';
 import { CWAccountCreationButton } from 'views/components/component_kit/cw_account_creation_button';
 import { CWAddress } from 'views/components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from 'views/components/component_kit/cw_avatar_username_input';
 import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import {
+  CWProfileRow,
+  CWProfilesList,
+} from 'views/components/component_kit/cw_profiles_list';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowExtraSmall } from 'views/components/component_kit/helpers';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import Account from '../../../models/Account';
-
 import { getLoginText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import type { LoginProps } from './types';
-import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 export const LoginMobile = ({
+  signerAccount,
   address,
-  bodyType,
-  setBodyType,
+  activeStep,
+  setActiveStep,
   handleSetAvatar,
   handleSetUsername,
   profiles,
   handleSetEmail,
   username,
   wallets,
-  setSelectedWallet,
-  createNewAccountCallback,
-  linkExistingAccountCallback,
-  accountVerifiedCallback,
-  handleEmailLoginCallback,
-  saveProfileInfoCallback,
-  performLinkingCallback,
-  setSelectedLinkingWallet,
-  magicLoading,
-  showResetWalletConnect,
+  onCreateNewAccount,
+  onLinkExistingAccount,
+  onAccountVerified,
+  onEmailLogin,
+  onSaveProfileInfo,
+  onPerformLinking,
+  isMagicLoading,
+  canResetWalletConnect,
   onModalClose,
+  onConnectAnotherWay,
+  onResetWalletConnect,
+  onWalletSelect,
+  onWalletAddressSelect,
+  isNewlyCreated,
+  isLinkingOnMobile,
 }: LoginProps) => {
   const hasBoilerplate =
-    bodyType === 'walletList' ||
-    bodyType === 'connectWithEmail' ||
-    bodyType === 'ethWalletList';
+    activeStep === 'walletList' ||
+    activeStep === 'connectWithEmail' ||
+    activeStep === 'ethWalletList';
 
-  const hasCreationButtons = bodyType === 'selectAccountType';
-  const { headerText, bodyText } = getLoginText(bodyType);
-
-  const [signerAccount, setSignerAccount] = useState<Account>(null);
-  const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
-  const [isLinkingOnMobile, setIsLinkingOnMobile] = useState<boolean>(false);
+  const hasCreationButtons = activeStep === 'selectAccountType';
+  const { headerText, bodyText } = getLoginText(activeStep);
 
   return (
     <div className="LoginMobile">
       <CWIconButton
         iconName="close"
         onClick={async () => {
-          if (bodyType === 'redirectToSign' && !app.user.activeAccount) {
+          if (activeStep === 'redirectToSign' && !app.user.activeAccount) {
             // Reset WC if we quit the login flow before signing in
             const wallet = wallets.find(
               (w) =>
@@ -80,45 +76,38 @@ export const LoginMobile = ({
           onModalClose();
         }}
       />
-      {bodyType === 'ethWalletList' && <LoginEthAlert />}
-      <div className={bodyType}>
+      {activeStep === 'ethWalletList' && <LoginEthAlert />}
+      <div className={activeStep}>
         <LoginText headerText={headerText} bodyText={bodyText} isMobile />
         {hasCreationButtons && (
           <div className="account-creation-buttons-row">
-            <CWAccountCreationButton onClick={createNewAccountCallback} />
+            <CWAccountCreationButton onClick={onCreateNewAccount} />
             <CWAccountCreationButton
               creationType="linkAccount"
-              onClick={linkExistingAccountCallback}
+              onClick={onLinkExistingAccount}
             />
           </div>
         )}
 
-        {bodyType === 'walletList' && (
+        {activeStep === 'walletList' && (
           <CWWalletsList
-            connectAnotherWayOnclick={() => {
-              setBodyType('connectWithEmail');
-            }}
+            onConnectAnotherWay={onConnectAnotherWay}
             wallets={wallets}
             darkMode
-            setSelectedWallet={setSelectedWallet}
-            setBodyType={setBodyType}
-            accountVerifiedCallback={accountVerifiedCallback}
-            showResetWalletConnect={showResetWalletConnect}
-            isMobile={isMobile}
-            linking={false}
-            setSignerAccount={setSignerAccount}
-            setIsNewlyCreated={setIsNewlyCreated}
-            setIsLinkingOnMobile={setIsLinkingOnMobile}
+            canResetWalletConnect={canResetWalletConnect}
+            onResetWalletConnect={onResetWalletConnect}
+            onWalletSelect={onWalletSelect}
+            onWalletAddressSelect={onWalletAddressSelect}
           />
         )}
 
-        {bodyType === 'redirectToSign' && (
+        {activeStep === 'redirectToSign' && (
           <div className="inner-body-container">
             <CWButton
               label="Sign with Wallet"
               onClick={() => {
                 // TODO: Handle link account case (third param here)
-                accountVerifiedCallback(
+                onAccountVerified(
                   signerAccount,
                   isNewlyCreated,
                   isLinkingOnMobile
@@ -132,24 +121,19 @@ export const LoginMobile = ({
           </div>
         )}
 
-        {bodyType === 'selectPrevious' && (
+        {activeStep === 'selectPrevious' && (
           <CWWalletsList
-            connectAnotherWayOnclick={() => {
-              setBodyType('connectWithEmail');
-            }}
+            onConnectAnotherWay={onConnectAnotherWay}
             wallets={wallets}
             darkMode
-            setSelectedWallet={setSelectedLinkingWallet}
-            setBodyType={setBodyType}
-            accountVerifiedCallback={accountVerifiedCallback}
-            showResetWalletConnect={showResetWalletConnect}
-            linking
-            isMobile={isMobile}
-            setIsLinkingOnMobile={setIsLinkingOnMobile}
+            canResetWalletConnect={canResetWalletConnect}
+            onResetWalletConnect={onResetWalletConnect}
+            onWalletSelect={onWalletSelect}
+            onWalletAddressSelect={onWalletAddressSelect}
           />
         )}
 
-        {bodyType === 'welcome' && (
+        {activeStep === 'welcome' && (
           <div className="inner-body-container">
             <CWAvatarUsernameInput
               address={address}
@@ -159,11 +143,11 @@ export const LoginMobile = ({
               onUsernameChangeHandler={handleSetUsername}
               orientation="vertical"
             />
-            <CWButton label="Finish" onClick={saveProfileInfoCallback} />
+            <CWButton label="Finish" onClick={onSaveProfileInfo} />
           </div>
         )}
 
-        {bodyType === 'selectProfile' && (
+        {activeStep === 'selectProfile' && (
           <div className="inner-body-container">
             <div className="inner-inner-body-container">
               <CWText type="h5" fontWeight="medium" className="inner-body-text">
@@ -175,17 +159,17 @@ export const LoginMobile = ({
               </CWText>
               <CWProfilesList profiles={profiles} darkMode />
             </div>
-            <CWButton label="Finish" onClick={performLinkingCallback} />
+            <CWButton label="Finish" onClick={onPerformLinking} />
           </div>
         )}
-        {bodyType === 'connectWithEmail' && (
+        {activeStep === 'connectWithEmail' && (
           <div className="inner-body-container">
-            {!magicLoading ? (
+            {!isMagicLoading ? (
               <CWTextInput
                 label="email address"
                 placeholder="your-email@email.com"
                 onInput={handleSetEmail}
-                onenterkey={handleEmailLoginCallback}
+                onenterkey={onEmailLogin}
               />
             ) : (
               <CWSpinner />
@@ -195,19 +179,19 @@ export const LoginMobile = ({
                 label="Back"
                 buttonType="secondary-blue-dark"
                 onClick={() => {
-                  setBodyType('walletList');
+                  setActiveStep('walletList');
                 }}
               />
               <CWButton
                 label="Connect"
-                onClick={handleEmailLoginCallback}
+                onClick={onEmailLogin}
                 buttonType="primary-blue-dark"
               />
             </div>
           </div>
         )}
 
-        {bodyType === 'allSet' && (
+        {activeStep === 'allSet' && (
           <div className="inner-body-container">
             <div className="inner-inner-body-container">
               <CWText type="h5" fontWeight="medium" className="inner-body-text">
