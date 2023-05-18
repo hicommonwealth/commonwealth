@@ -200,7 +200,7 @@ class SessionsController {
     );
 
     if (!hasAuthenticatedSession) {
-      const signedWithAddress = await new Promise((resolve, reject) => {
+      const signedWithAddress: string = await new Promise((resolve, reject) => {
         openSessionRevalidation({
           onVerified: (verifiedAddress) => resolve(verifiedAddress),
           onClose: () => {

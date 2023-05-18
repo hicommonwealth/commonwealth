@@ -44,7 +44,7 @@ type IuseWalletProps = {
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
-  onSuccess?: (account: Account) => void;
+  onSuccess?: (address: string) => void;
   onModalClose: () => void;
   useSessionKeyLoginFlow?: boolean;
 };
