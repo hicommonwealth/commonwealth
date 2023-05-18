@@ -65,7 +65,6 @@ export const Select = (props: SelectProps) => {
   return (
     <ClickAwayListener
       onClickAway={async () => {
-        console.log('outside');
         popoverProps.setAnchorEl(null);
         props.onClose && (await props.onClose());
       }}

@@ -19,12 +19,16 @@ import { Select } from '../../components/Select';
 type RecentThreadsHeaderProps = {
   stage: string;
   topic: string;
+  featuredFilter: string;
+  dateRange: string;
   totalThreadCount: number;
 };
 
 export const RecentThreadsHeader = ({
   stage,
   topic,
+  featuredFilter,
+  dateRange,
   totalThreadCount,
 }: RecentThreadsHeaderProps) => {
   const navigate = useCommonNavigate();
@@ -83,6 +87,28 @@ export const RecentThreadsHeader = ({
     location
   );
 
+  const onFilterSelect = ({
+    topic = matchesDiscussionsTopicRoute?.[0]?.params?.topic || '',
+    filterKey = '',
+    filterVal = '',
+  }) => {
+    const urlParams = Object.fromEntries(
+      new URLSearchParams(window.location.search)
+    );
+    urlParams[filterKey] = filterVal;
+
+    if (filterVal === '') {
+      delete urlParams[filterKey];
+    }
+
+    navigate(
+      `/discussions${topic ? `/${topic}` : ''}?` +
+        Object.keys(urlParams)
+          .map((x) => `${x}=${urlParams[x]}`)
+          .join('&')
+    );
+  };
+
   return (
     <div className="RecentThreadsHeader">
       {isUndefined(topic) && (
@@ -132,7 +158,13 @@ export const RecentThreadsHeader = ({
         <div className="buttons-row">
           <p className="filter-label">Sort</p>
           <Select
-            selected={'newest'}
+            selected={featuredFilter || 'newest'}
+            onSelect={(item: any) => {
+              onFilterSelect({
+                filterKey: 'featured',
+                filterVal: item.value,
+              });
+            }}
             options={[
               {
                 id: 1,
@@ -169,10 +201,9 @@ export const RecentThreadsHeader = ({
                 matchesDiscussionsTopicRoute?.[0]?.params?.topic || 'All Topics'
               }
               onSelect={(item: any) =>
-                navigate(
-                  `/discussions` +
-                    (item === 'All Topics' ? '' : `/${item.value}`)
-                )
+                onFilterSelect({
+                  topic: item === 'All Topics' ? '' : item.value,
+                })
               }
               options={[
                 {
@@ -203,10 +234,10 @@ export const RecentThreadsHeader = ({
             <Select
               selected={selectedStage || 'All Stages'}
               onSelect={(item: any) =>
-                navigate(
-                  `/discussions` +
-                    (item === 'All Stages' ? '' : `?stage=${item.value}`)
-                )
+                onFilterSelect({
+                  filterKey: 'stage',
+                  filterVal: item.value === 'All Stages' ? '' : item.value,
+                })
               }
               options={[
                 {
@@ -226,7 +257,13 @@ export const RecentThreadsHeader = ({
             />
           )}
           <Select
-            selected={'allTime'}
+            selected={dateRange || 'allTime'}
+            onSelect={(item: any) => {
+              onFilterSelect({
+                filterKey: 'dateRange',
+                filterVal: item.value,
+              });
+            }}
             options={[
               {
                 id: 1,

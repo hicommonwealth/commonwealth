@@ -1,13 +1,18 @@
 /* eslint-disable no-restricted-globals */
+import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
-
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { EventEmitter } from 'events';
 import $ from 'jquery';
+import moment from 'moment';
+import { Link, LinkSource } from 'server/models/thread';
+import app from 'state';
+import { ProposalStore, RecentListingStore } from 'stores';
+import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 /* eslint-disable no-restricted-syntax */
-
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
@@ -16,14 +21,6 @@ import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import { ThreadStage } from '../../models/types';
-import moment from 'moment';
-
-import app from 'state';
-import { ProposalStore, RecentListingStore } from 'stores';
-import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { EventEmitter } from 'events';
-import { Link, LinkSource } from 'server/models/thread';
-import axios from 'axios';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -686,6 +683,8 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
     includePinnedThreads?: boolean;
+    featuredFilter: string;
+    dateRange: string;
   }) {
     // Used to reset pagination when switching between topics
     if (this._resetPagination) {
@@ -696,13 +695,58 @@ class ThreadsController {
     if (this.listingStore.isDepleted(options)) {
       return;
     }
-    const { topicName, stageName, includePinnedThreads } = options;
+    const {
+      topicName,
+      stageName,
+      includePinnedThreads,
+      featuredFilter,
+      dateRange,
+    } = options;
+
+    const today = moment();
+    const from_date = (() => {
+      if (dateRange) {
+        if (['week', 'month'].includes(dateRange.toLowerCase())) {
+          return today.startOf(dateRange.toLowerCase() as any).toISOString();
+        }
+
+        if (dateRange.toLowerCase() === 'allTime') {
+          return new Date(0).toISOString();
+        }
+      }
+
+      return null;
+    })();
+    const to_date = (() => {
+      if (dateRange) {
+        if (['week', 'month'].includes(dateRange.toLowerCase())) {
+          return today.endOf(dateRange.toLowerCase() as any).toISOString();
+        }
+
+        if (dateRange.toLowerCase() === 'allTime') {
+          return moment().toISOString();
+        }
+      }
+
+      return this.listingStore.isInitialized(options)
+        ? this.listingStore.getCutoffDate(options).toISOString()
+        : moment().toISOString();
+    })();
+
+    const featuredFilterQueryMap = {
+      newest: 'createdAt:desc',
+      oldest: 'createdAt:asc',
+      likes: 'numberOfLikes:desc',
+      comments: 'numberOfComments:desc',
+    };
+
     const chain = app.activeChainId();
     const params = {
       chain,
-      to_date: this.listingStore.isInitialized(options)
-        ? this.listingStore.getCutoffDate(options).toISOString()
-        : moment().toISOString(),
+      ...(from_date && { from_date }),
+      to_date,
+      orderBy:
+        featuredFilterQueryMap[featuredFilter] || featuredFilterQueryMap.newest,
     };
     const topicId = app.topics.getByName(topicName, chain)?.id;
 

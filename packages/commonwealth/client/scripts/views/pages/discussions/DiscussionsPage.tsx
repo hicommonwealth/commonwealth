@@ -1,16 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
-import { useSearchParams } from 'react-router-dom';
-
 import 'pages/discussions/index.scss';
-
+import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Virtuoso } from 'react-virtuoso';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { ThreadActionType } from '../../../../../shared/types';
 import app from '../../../state';
 import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
-import { ThreadActionType } from '../../../../../shared/types';
-import { CWText } from 'views/components/component_kit/cw_text';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -22,6 +20,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
+  const featuredFilter: string = searchParams.get('featured');
+  const dateRange: string = searchParams.get('dateRange');
 
   const handleThreadUpdate = (data: {
     threadId: number;
@@ -72,17 +72,28 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useEffect(() => {
     app.threads.resetPagination();
     app.threads
-      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+      .loadNextPage({
+        topicName,
+        stageName,
+        includePinnedThreads: true,
+        featuredFilter,
+        dateRange,
+      })
       .then((t) => {
         // Fetch first 20 + unpinned threads
         setThreads(t);
         // !totalThreads && setTotalThreads(totalResults);
         setInitializing(false);
       });
-  }, [stageName, topicName]);
+  }, [stageName, topicName, featuredFilter, dateRange]);
 
   const loadMore = useCallback(async () => {
-    const newThreads = await app.threads.loadNextPage({ topicName, stageName });
+    const newThreads = await app.threads.loadNextPage({
+      topicName,
+      stageName,
+      featuredFilter,
+      dateRange,
+    });
     // If no new threads (we reached the end)
     if (!newThreads) {
       return;
@@ -90,11 +101,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     // !totalThreads && setTotalThreads(response.totalResults);
     return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
-  }, [stageName, topicName, totalThreads]);
+  }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
   if (initializing) {
     return <PageLoading />;
   }
+
   return (
     <Sublayout hideFooter={true}>
       <div className="DiscussionsPage">
@@ -117,6 +129,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 <RecentThreadsHeader
                   topic={topicName}
                   stage={stageName}
+                  featuredFilter={featuredFilter}
+                  dateRange={dateRange}
                   totalThreadCount={threads ? totalThreads : 0}
                 />
               );
