@@ -88,7 +88,7 @@ export const RecentThreadsHeader = ({
   );
 
   const onFilterSelect = ({
-    topic = matchesDiscussionsTopicRoute?.[0]?.params?.topic || '',
+    pickedTopic = matchesDiscussionsTopicRoute?.[0]?.params?.topic || '',
     filterKey = '',
     filterVal = '',
   }) => {
@@ -102,7 +102,7 @@ export const RecentThreadsHeader = ({
     }
 
     navigate(
-      `/discussions${topic ? `/${topic}` : ''}?` +
+      `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
         Object.keys(urlParams)
           .map((x) => `${x}=${urlParams[x]}`)
           .join('&')
@@ -202,7 +202,7 @@ export const RecentThreadsHeader = ({
               }
               onSelect={(item: any) =>
                 onFilterSelect({
-                  topic: item === 'All Topics' ? '' : item.value,
+                  pickedTopic: item === 'All Topics' ? '' : item.value,
                 })
               }
               options={[
