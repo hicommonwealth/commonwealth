@@ -11,6 +11,8 @@
   @include collapsible();
   @include hidden-formatting();
 
+  width: 100%;
+
   p {
     display: block;
     margin-block-start: 1em;
