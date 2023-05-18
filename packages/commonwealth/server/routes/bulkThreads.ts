@@ -27,7 +27,7 @@ const bulkThreads = async (
   next: NextFunction
 ) => {
   const chain = req.chain;
-  const { cutoff_date, topic_id, includePinnedThreads, stage, orderBy } =
+  const { to_date, from_date, topic_id, includePinnedThreads, stage, orderBy } =
     req.query;
 
   const bind = { chain: chain.id };
@@ -42,10 +42,11 @@ const bulkThreads = async (
     bind['stage'] = stage;
   }
 
-  bind['created_at'] = cutoff_date;
+  bind['from_date'] = from_date;
+  bind['to_date'] = to_date;
 
   let threads;
-  if (cutoff_date) {
+  if (to_date) {
     const orderByQueries = {
       'createdAt:asc': 'threads.thread_created ASC',
       'createdAt:desc': 'threads.thread_created DESC',
@@ -109,7 +110,7 @@ const bulkThreads = async (
           AND t.chain = $chain
           ${topicOptions}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
-          (COALESCE(t.last_commented_on, t.created_at) < $created_at AND t.pinned = false))
+          (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
            reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
@@ -117,6 +118,13 @@ const bulkThreads = async (
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
       ON threads.topic_id = topics.id
+      ${from_date ? ' WHERE threads.thread_created > $from_date ' : ''}
+      ${
+        to_date
+          ? (from_date ? ' AND ' : ' WHERE ') +
+            ' threads.thread_created < $to_date '
+          : ''
+      }
       ${includePinnedThreads || orderByQueries[orderBy] ? 'ORDER BY ' : ''}
       ${
         orderByQueries[orderBy]
