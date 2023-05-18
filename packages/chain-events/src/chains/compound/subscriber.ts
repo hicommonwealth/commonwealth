@@ -35,7 +35,6 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   }
 
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
-    return 12;
     const provider = this._api.provider;
 
     // retrieves the last numEstimateBlocks blocks to estimate block time
