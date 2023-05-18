@@ -295,7 +295,7 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-export async function loginWithMagicLink(email: string) {
+export async function loginWithMagicLink(email: string, onlyRevalidateSession?: boolean) {
   const { Magic } = await import('magic-sdk');
   const { CosmosExtension } = await import('@magic-ext/cosmos');
 
@@ -336,6 +336,9 @@ export async function loginWithMagicLink(email: string) {
       sessionPayload,
       signature
     );
+    if (onlyRevalidateSession) {
+      return signerAddress;
+    }
   } else {
     const { Web3Provider } = await import('@ethersproject/providers');
     const provider = new Web3Provider(magic.rpcProvider);
@@ -351,6 +354,9 @@ export async function loginWithMagicLink(email: string) {
       sessionPayload,
       signature
     );
+    if (onlyRevalidateSession) {
+      return signerAddress;
+    }
   }
 
   const didToken = await magic.auth.loginWithMagicLink({ email });

@@ -9,13 +9,17 @@ import { createRoot } from 'react-dom/client';
 import 'modals/session_signin_modal.scss';
 
 import app from 'state';
+import useWallets from '../../hooks/useWallets';
 import type Account from '../../models/Account';
 import WebWalletController from '../../controllers/app/web_wallets';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import useWallets from '../../hooks/useWallets';
+import { notifyError } from 'controllers/app/notifications';
+import { loginWithMagicLink } from 'controllers/app/login';
 
 type SessionRevalidationModalProps = {
   onClose: () => void;
@@ -24,7 +28,6 @@ type SessionRevalidationModalProps = {
 
 const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationModalProps) => {
   const [open, setOpen] = useState(true);
-
   const {
     onWalletAddressSelect,
     onWalletSelect,
@@ -38,7 +41,6 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
       onVerified(address);
     }
   });
-
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
 
@@ -49,6 +51,32 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
         w instanceof TerraWalletConnectWebWalletController) &&
       w.enabled
   );
+
+  // magic-related state
+  const [connectWithEmail, setConnectWithEmail] = useState(false);
+  const [email, setEmail] = useState();
+  const [isMagicLoading, setIsMagicLoading] = useState(false);
+
+  const handleSetEmail = (e) => setEmail(e.target.value);
+  const onEmailLogin = async () => {
+    setIsMagicLoading(true);
+
+    if (!email) {
+      notifyError('Please enter a valid email address.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      const newlyVerifiedMagicAddress = await loginWithMagicLink(email, true);
+      setIsMagicLoading(false);
+      onVerified(newlyVerifiedMagicAddress);
+    } catch (e) {
+      notifyError("Couldn't send magic link");
+      setIsMagicLoading(false);
+      console.error(e);
+    }
+  }
 
   return (
     <Modal
@@ -73,18 +101,40 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
           </div>
           <div className="compact-modal-actions">
             <div>
+          {connectWithEmail ?
+            <div>
+              {!isMagicLoading ? (
+                <CWTextInput
+                  autoFocus={true}
+                  label="email address"
+                  placeholder="your-email@email.com"
+                  onInput={handleSetEmail}
+                  onenterkey={onEmailLogin}
+                />
+              ) : (
+                <CWSpinner />
+              )}
+              <div className="buttons-row">
+                <CWButton
+                  label="Back"
+                  buttonType="secondary-blue"
+                  onClick={() => setConnectWithEmail(false)}
+                />
+                <CWButton label="Connect" onClick={onEmailLogin} />
+              </div>
+            </div>
+            :
               <CWWalletsList
-                    useSessionKeyRevalidationFlow={true}
+                useSessionKeyRevalidationFlow={true}
                 onResetWalletConnect={onResetWalletConnect}
                 onWalletAddressSelect={onWalletAddressSelect}
                 onWalletSelect={onWalletSelect}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                onConnectAnotherWay={() => {}}
+                onConnectAnotherWay={() => setConnectWithEmail(true)}
                 darkMode={false}
                 wallets={wallets}
                 hasNoWalletsLink={false}
                 canResetWalletConnect={wcEnabled}
-              />
+            />}
             </div>
           </div>
         </div>
