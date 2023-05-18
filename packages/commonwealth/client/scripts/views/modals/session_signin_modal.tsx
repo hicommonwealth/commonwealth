@@ -36,7 +36,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
     onWalletAddressSelect,
     onWalletSelect,
     onResetWalletConnect,
-  } = useWallets({ ...props, useSessionKeyLoginFlow: true });
+  } = useWallets({ ...props, useSessionKeyLoginFlow: true, onModalClose: () => {} });
 
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
@@ -83,10 +83,8 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             canResetWalletConnect={wcEnabled}
           />
         </div>
-      }
-      onClose={onClose}
-      open={true}
-    />
+      </div>
+    </div>
   );
 };
 
