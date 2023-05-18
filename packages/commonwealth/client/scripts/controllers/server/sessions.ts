@@ -202,7 +202,7 @@ class SessionsController {
     if (!hasAuthenticatedSession) {
       const signedWithAddress = await new Promise((resolve, reject) => {
         openSessionRevalidation({
-          onVerified: (address) => resolve(address),
+          onVerified: (verifiedAddress) => resolve(verifiedAddress),
           onClose: () => {
             const err = new Error();
             (err as any).responseJSON = { error: 'Login canceled' };

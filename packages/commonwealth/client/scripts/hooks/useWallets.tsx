@@ -155,10 +155,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      const address = await loginWithMagicLink(email);
+      const magicAddress = await loginWithMagicLink(email);
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(address);
+      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();

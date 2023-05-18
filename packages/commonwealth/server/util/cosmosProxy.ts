@@ -106,7 +106,6 @@ function setupCosmosProxy(app: Express, models: DB) {
   app.get(
     '/magicCosmosAPI/:chain/auth/accounts/:address',
     bodyParser.text(),
-    calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       defaultCacheDuration,
       lookupKeyDurationInReq
