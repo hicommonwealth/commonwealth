@@ -288,7 +288,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: All Chain Event Unit And Integration Tests
+    name: Chain Events Integration Tests
     runs-on: ubuntu-latest
 
     services:

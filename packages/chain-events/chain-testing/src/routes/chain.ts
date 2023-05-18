@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Web3 from 'web3';
-import getProvider, {providerUrl} from '../utils/getProvider';
+import getProvider, { providerUrl } from '../utils/getProvider';
 import axios from 'axios';
 import { chainAdvanceTime, chainGetEth } from '../types';
 
@@ -80,6 +80,7 @@ export const advanceEvmTime = async (
     }
   );
 };
+
 export const advanceTimestamp = async (req: Request, res: Response) => {
   try {
     const request: chainAdvanceTime = req.body;
