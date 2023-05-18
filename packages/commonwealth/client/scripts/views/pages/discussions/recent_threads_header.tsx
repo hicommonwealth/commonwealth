@@ -18,6 +18,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import useForceRerender from 'hooks/useForceRerender';
+import { useFetchTopicsQuery } from 'state/api/topics';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -56,7 +57,11 @@ export const RecentThreadsHeader = ({
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  // const topics = app.topics.getByCommunity(app.activeChainId());
+
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const featuredTopics = topics
     .filter((t) => t.featuredInSidebar)

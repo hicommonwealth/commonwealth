@@ -14,7 +14,7 @@ import type MinimumProfile from '../../models/MinimumProfile';
 import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
-import type Topic from '../../models/Topic';
+import Topic from '../../models/Topic';
 import { ThreadStage } from '../../models/types';
 import moment from 'moment';
 
@@ -193,9 +193,11 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
-    let topicFromStore = null;
+    // let topicFromStore = null;
+    let topicModel = null;
     if (topic?.id) {
-      topicFromStore = app.topics.store.getById(topic.id);
+      // topicFromStore = app.topics.store.getById(topic.id);
+      topicModel = new Topic(topic);
     }
 
     let decodedTitle;
@@ -222,7 +224,7 @@ class ThreadsController {
       body: decodedBody,
       createdAt: moment(created_at),
       attachments,
-      topic: topicFromStore,
+      topic: topicModel,
       kind,
       stage,
       chain,
@@ -794,6 +796,7 @@ class ThreadsController {
       this._store.clear();
       this._listingStore.clear();
     }
+    console.log('initialThreads', initialThreads);
     for (const thread of initialThreads) {
       const modeledThread = this.modelFromServer(thread);
       if (!thread.Address) {

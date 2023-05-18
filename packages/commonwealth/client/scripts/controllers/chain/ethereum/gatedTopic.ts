@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import ITokenAdapter from '../../../models/ITokenAdapter';
 import app from 'state';
+// import { queryClient } from 'state/api/config';
 
 export default class TopicGateCheck {
   public static isGatedTopic(topicName: string): boolean {
@@ -18,6 +19,8 @@ export default class TopicGateCheck {
   }
 
   public static getTopicThreshold(topicName: string): BN {
+    // const here = queryClient.getQueryData(['bulkTopics', app.activeChainId()]);
+
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
       return app.topics.getByName(topicName, app.activeChainId())
         ?.tokenThreshold;
