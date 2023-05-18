@@ -36,7 +36,13 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
     onWalletAddressSelect,
     onWalletSelect,
     onResetWalletConnect,
-  } = useWallets({ ...props, useSessionKeyLoginFlow: true, onModalClose: () => {} });
+  } = useWallets({
+    ...props,
+    useSessionKeyLoginFlow: true,
+    onModalClose: () => {
+      // TODO: close the modal automatically
+    }
+  });
 
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
