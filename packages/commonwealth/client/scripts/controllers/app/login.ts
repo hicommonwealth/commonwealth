@@ -325,34 +325,45 @@ export async function loginWithMagicLink(email: string, onlyRevalidateSession?: 
       );
     }
 
+    // Request the cosmos chain ID, since this is used by Magic to generate
+    // the signed message. The API is already used by the Magic iframe,
+    // but they don't expose the results.
+    const nodeInfo = await $.get(`${document.location.origin}/magicCosmosAPI/${app.chain.id}/node_info`);
+    const chainId = nodeInfo.node_info.network;
+
     const timestamp = +new Date();
     const signer = { signMessage: magic.cosmos.sign }
-    const signerAddress = chainAddress; // check if this is correct?
-    const { signature, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.CosmosSDK, signer, signerAddress, timestamp); // TODO: provide blockhash as last argument
+    const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.CosmosSDK, signer, chainAddress, timestamp);
+    // TODO: provide blockhash as last argument to signSessionWithMagic
+    const signature = signed.signatures[0];
+    signature.chain_id = chainId;
     await app.sessions.authSession(
+      // not app.chain.base, since we don't know where the user is logging in
       ChainBase.CosmosSDK,
       chainId,
-      signerAddress,
+      chainAddress,
       sessionPayload,
-      signature
+      JSON.stringify(signature),
     );
     if (onlyRevalidateSession) {
-      return signerAddress;
+      return chainAddress;
     }
   } else {
     const { Web3Provider } = await import('@ethersproject/providers');
     const provider = new Web3Provider(magic.rpcProvider);
     const signer = provider.getSigner();
-    const signerAddress = await signer.getAddress();
+    const signerAddress = await signer.getAddress(); // should be the same as chainAddress
 
     const timestamp = +new Date();
-    const { signature, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp); // TODO: provide blockhash as last argument
+    const { signed, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp);
+    // TODO: provide blockhash as last argument to signSessionWithMagic
     await app.sessions.authSession(
-      ChainBase.Ethereum, // not: app.chain.base, etc.
+      // not app.chain.base, since we don't know where the user is logging in
+      ChainBase.Ethereum,
       chainId,
       signerAddress,
       sessionPayload,
-      signature
+      signed
     );
     if (onlyRevalidateSession) {
       return signerAddress;

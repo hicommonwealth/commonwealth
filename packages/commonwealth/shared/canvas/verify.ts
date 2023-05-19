@@ -187,27 +187,31 @@ export const verify = async ({
       );
     } else {
       // verify cosmos sessions
+      // - launchpad sessions (legacy) have signature of format { pubkey, signature, chain_id }
+      //   and chain_id needs to be stripped and attached to signDoc instead
+      // - stargate sessions (ADR-036) have signature of format { pubkey, signature }
       const canvas = await importCanvas();
-      const signDocPayload = await getADR036SignableSession(
+      const { pub_key, signature: predecodedSignature, chain_id } = JSON.parse(signature)
+      const signDoc = await getADR036SignableSession(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
         payload.from
       );
-      const signDocDigest = new cosmCrypto.Sha256(
-        cosmAmino.serializeSignDoc(signDocPayload)
-      ).digest();
+      if (chain_id !== undefined) {
+        signDoc.chain_id = chain_id;
+      }
+      const signDocDigest = new cosmCrypto.Sha256(cosmAmino.serializeSignDoc(signDoc)).digest();
       const prefix = cosmEncoding.Bech32.decode(payload.from).prefix;
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
-      const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature(
-        JSON.parse(signature)
-      );
+      const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature({ pub_key, signature: predecodedSignature });
       if (
         payload.from !==
         cosmEncoding.Bech32.encode(
           prefix,
           cosmAmino.rawSecp256k1PubkeyToRawAddress(pubkey)
         )
-      )
+      ) {
         return false;
+      }
       const secpSignature =
         cosmCrypto.Secp256k1Signature.fromFixedLength(decodedSignature);
       const valid = await cosmCrypto.Secp256k1.verifySignature(

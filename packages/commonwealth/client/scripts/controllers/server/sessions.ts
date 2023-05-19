@@ -104,9 +104,9 @@ export async function signSessionWithMagic(
   // skip wallet.signCanvasMessage(), do the logic here instead
   if (walletChain === ChainBase.CosmosSDK) {
     const canvas = await import('@canvas-js/interfaces');
-    const signDoc = await getADR036SignableSession(Buffer.from(canvas.serializeSessionPayload(sessionPayload)), signerAddress);
-    const signature = await signer.signMessage(signDoc.msgs[0], signDoc.fee);
-    return { signature, chainId: canvasChainId, sessionPayload };
+    const { msgs, fee } = await getADR036SignableSession(Buffer.from(canvas.serializeSessionPayload(sessionPayload)), signerAddress);
+    const signed = await signer.signMessage(msgs, fee); // this is a cosmos tx
+    return { signed, sessionPayload };
   } else {
     // signature format: https://docs.canvas.xyz/docs/formats#ethereum
     const siwe = await require('siwe');
@@ -114,7 +114,7 @@ export async function signSessionWithMagic(
     const domain = document.location.origin;
     const message = createSiweMessage(sessionPayload, domain, nonce);
     const signature = await signer.signMessage(message);
-    return { signature: `${domain}/${nonce}/${signature}`, chainId: canvasChainId, sessionPayload };
+    return { signed: `${domain}/${nonce}/${signature}`, sessionPayload };
   }
 }
 
