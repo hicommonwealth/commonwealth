@@ -1,0 +1,28 @@
+import axios from 'axios';
+import app from 'state';
+import { useMutation } from '@tanstack/react-query';
+
+interface DeleteTopicProps {
+  topicId: number;
+  chainId: string;
+  topicName: string;
+}
+
+const deleteTopic = async ({ topicId, chainId }: DeleteTopicProps) => {
+  await axios.post(`${app.serverUrl()}/deleteTopic`, {
+    id: topicId,
+    chain: chainId,
+    jwt: app.user.jwt,
+  });
+};
+
+const useDeleteTopicMutation = () => {
+  return useMutation({
+    mutationFn: deleteTopic,
+    onSuccess: (data, variables) => {
+      app.threads.listingStore.removeTopic(variables.topicName);
+    },
+  });
+};
+
+export default useDeleteTopicMutation;
