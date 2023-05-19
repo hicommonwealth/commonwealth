@@ -15,7 +15,7 @@ function fmtAddr(addr: string) {
  */
 export const Label: LabelerFilter = (
   blockNumber: number,
-  chainId: string,
+  communityId: string,
   data: IEventData
 ): IEventLabel => {
   switch (data.kind) {
@@ -23,7 +23,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Submitted',
         label: `Proposal ${data.id} was submitted!`,
-        linkUrl: chainId ? `/${chainId}/proposal/${data.id}` : null,
+        linkUrl: communityId ? `/${communityId}/proposal/${data.id}` : null,
       };
     case EventKind.Deposit:
       return {
@@ -31,13 +31,13 @@ export const Label: LabelerFilter = (
         label: `${fmtAddr(data.depositor)} made a deposit on proposal ${
           data.id
         }.`,
-        linkUrl: chainId ? `/${chainId}/proposal/${data.id}` : null,
+        linkUrl: communityId ? `/${communityId}/proposal/${data.id}` : null,
       };
     case EventKind.Vote:
       return {
         heading: 'Vote',
         label: `${fmtAddr(data.voter)} voted on proposal ${data.id}.`,
-        linkUrl: chainId ? `/${chainId}/proposal/${data.id}` : null,
+        linkUrl: communityId ? `/${communityId}/proposal/${data.id}` : null,
         icon: 'vote',
       };
     default: {
@@ -45,7 +45,7 @@ export const Label: LabelerFilter = (
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = data;
       throw new Error(
-        `[${SupportedNetwork.Cosmos}::${chainId}]: Unknown event type`
+        `[${SupportedNetwork.Cosmos}::${communityId}]: Unknown event type`
       );
     }
   }

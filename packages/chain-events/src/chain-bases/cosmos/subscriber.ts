@@ -10,9 +10,9 @@ import { addPrefix, factory } from '../../logging';
 import type { RawEvent, Api } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
-  private _name: string;
+  private readonly _origin: string;
 
-  private _pollTime: number;
+  private readonly _pollTime: number;
 
   private _listener: NodeJS.Timeout | null;
 
@@ -20,13 +20,13 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
 
   protected readonly log;
 
-  constructor(api: Api, name: string, pollTime = 15 * 1000, verbose = false) {
+  constructor(api: Api, origin: string, pollTime = 15 * 1000, verbose = false) {
     super(api, verbose);
-    this._name = name;
+    this._origin = origin;
     this._pollTime = pollTime;
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Cosmos, this._name])
+      addPrefix(__filename, [SupportedNetwork.Cosmos, this._origin])
     );
   }
 
@@ -88,7 +88,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       // set disconnected range to recover past blocks via "polling"
       this._lastBlockHeight = disconnectedRange.startBlock;
       this.log.info(
-        `Polling Cosmos "${this._name}" events from ${this._lastBlockHeight}.`
+        `Polling Cosmos "${this._origin}" events from ${this._lastBlockHeight}.`
       );
     }
     const listenFunc = async () => {
@@ -99,7 +99,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       }
     };
     await listenFunc();
-    this.log.info(`Starting Cosmos "${this._name}" listener.`);
+    this.log.info(`Starting Cosmos "${this._origin}" listener.`);
     this._listener = setInterval(listenFunc, this._pollTime);
   }
 

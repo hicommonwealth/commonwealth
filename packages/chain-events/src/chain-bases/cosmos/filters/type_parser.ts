@@ -6,9 +6,9 @@ import { SupportedNetwork } from '../../../interfaces';
  * This is the Type Parser function, which takes a raw Event
  * and determines which of our local event kinds it belongs to.
  */
-export function ParseType(typeUrl: string, chain?: string): EventKind | null {
+export function ParseType(typeUrl: string, origin?: string): EventKind | null {
   const log = factory.getLogger(
-    addPrefix(__filename, [SupportedNetwork.Cosmos, chain])
+    addPrefix(__filename, [SupportedNetwork.Cosmos, origin])
   );
   switch (typeUrl) {
     case '/cosmos.gov.v1beta1.MsgSubmitProposal':

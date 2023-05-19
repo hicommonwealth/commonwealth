@@ -21,16 +21,16 @@ export interface ICosmosSubscribeOptions extends ISubscribeOptions<Api> {
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @param typeOverrides
- * @param chain
+ * @param origin
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
   url: string,
   retryTimeMs = 10 * 1000,
-  chain?: string
+  origin?: string
 ): Promise<Api> {
   const log = factory.getLogger(
-    addPrefix(__filename, [SupportedNetwork.Cosmos, chain])
+    addPrefix(__filename, [SupportedNetwork.Cosmos, origin])
   );
   for (let i = 0; i < 3; ++i) {
     try {
@@ -59,7 +59,7 @@ export async function createApi(
 
   throw new Error(
     `[${SupportedNetwork.Cosmos}${
-      chain ? `::${chain}` : ''
+      origin ? `::${origin}` : ''
     }]: Failed to start Cosmos chain at ${url}`
   );
 }
