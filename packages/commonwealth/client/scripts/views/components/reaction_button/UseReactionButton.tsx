@@ -40,13 +40,8 @@ export const useReactionButton = (thread: Thread, setReactors) => {
     app.user.isSiteAdmin ||
     app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
-  let topicName = '';
-
-  if (thread.topic && app.topics) {
-    topicName = thread.topic.name;
-  }
-
-  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
+  const isUserForbidden =
+    !isAdmin && TopicGateCheck.isGatedTopic(thread.topic?.name);
 
   const dislike = async () => {
     if (reactedId === -1) {

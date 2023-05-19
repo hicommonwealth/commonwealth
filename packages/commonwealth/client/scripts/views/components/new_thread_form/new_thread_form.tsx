@@ -81,7 +81,8 @@ export const NewThreadForm = () => {
 
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
-      deltaString
+      deltaString,
+      !!hasTopics
     );
 
     setIsSaving(true);

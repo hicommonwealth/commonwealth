@@ -1,4 +1,3 @@
-import topics from 'controllers/server/topics';
 import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';
@@ -6,13 +5,14 @@ import { notifyError } from 'controllers/app/notifications';
 
 export const checkNewThreadErrors = (
   { threadTitle, threadKind, threadTopic, threadUrl }: NewThreadFormType,
-  bodyText?: string
+  bodyText?: string,
+  hasTopics?: boolean
 ) => {
   if (!threadTitle) {
     return notifyError(NewThreadErrors.NoTitle);
   }
 
-  if (!threadTopic && topics.length > 0) {
+  if (!threadTopic && hasTopics) {
     return notifyError(NewThreadErrors.NoTopic);
   }
 

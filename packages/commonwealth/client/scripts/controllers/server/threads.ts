@@ -835,7 +835,7 @@ class ThreadsController {
       this._store.clear();
       this._listingStore.clear();
     }
-    console.log('initialThreads', initialThreads);
+
     for (const thread of initialThreads) {
       const modeledThread = this.modelFromServer(thread);
       if (!thread.Address) {
