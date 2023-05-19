@@ -53,12 +53,9 @@ const search = async (
       params.chain = chain.id;
     }
 
-    const threads = await models.Thread.findAll({
+    const threads = await models.Thread.scope('excludeAttributes').findAll({
       where: params,
       limit: parseInt(options.page_size, 10) || 20,
-      attributes: {
-        exclude: ['body', 'plaintext', 'version_history'],
-      },
       include: [
         {
           model: models.Address,

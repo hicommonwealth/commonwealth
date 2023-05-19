@@ -118,7 +118,7 @@ const deleteChain = async (
         transaction: t,
       });
 
-      const threads = await models.Thread.findAll({
+      const threads = await models.Thread.scope('excludeAttributes').findAll({
         where: { chain: chain.id },
       });
 

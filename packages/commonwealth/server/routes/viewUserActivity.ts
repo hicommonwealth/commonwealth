@@ -61,7 +61,7 @@ export default async (
     replacements: [id],
   });
 
-  const comments = await models.Comment.findAll({
+  const comments = await models.Comment.scope('excludeAttributes').findAll({
     where: {
       thread_id: notifications.map((n) => n.thread_id),
     },

@@ -143,6 +143,20 @@ export default (
         { fields: ['chain', 'has_poll'] },
         { fields: ['canvas_hash'] },
       ],
+      scopes: {
+        excludeAttributes: () => ({
+          attributes: {
+            exclude: [
+              'canvas_action',
+              'canvas_session',
+              'canvas_hash',
+              'body',
+              'plaintext',
+              'version_history',
+            ],
+          },
+        }),
+      },
     }
   );
 

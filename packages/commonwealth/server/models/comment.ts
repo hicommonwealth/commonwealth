@@ -86,6 +86,23 @@ export default (
         { fields: ['thread_id'] },
         { fields: ['canvas_hash'] },
       ],
+      scopes: {
+        excludeAttributes: () => ({
+          attributes: {
+            exclude: [
+              'canvas_action',
+              'canvas_session',
+              'canvas_hash',
+              'plaintext',
+              'text',
+              'version_history',
+            ],
+          },
+        }),
+        withAddress: () => ({
+          include: [{ model: sequelize.models.Address, as: 'Address' }],
+        }),
+      },
     }
   );
 

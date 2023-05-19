@@ -61,7 +61,7 @@ const getNewProfile = async (
   });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
-  const threads = await models.Thread.findAll({
+  const threads = await models.Thread.scope('excludeAttributes').findAll({
     where: {
       address_id: {
         [Op.in]: addressIds,
@@ -73,7 +73,7 @@ const getNewProfile = async (
     ],
   });
 
-  const comments = await models.Comment.findAll({
+  const comments = await models.Comment.scope('excludeAttributes').findAll({
     where: {
       address_id: {
         [Op.in]: addressIds,
