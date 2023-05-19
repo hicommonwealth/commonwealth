@@ -15,7 +15,6 @@ import type { ContractInstance } from '../models/contract';
 import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
-import type { TopicInstance } from '../models/topic';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
@@ -30,7 +29,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
 
   // parallelized queries
   const [
-    topics,
     admins,
     mostActiveUsers,
     threadsInVoting,
@@ -43,7 +41,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   ] = await (<
     Promise<
       [
-        TopicInstance[],
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
@@ -60,21 +57,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       ]
     >
   >Promise.all([
-    // topics
-    models.sequelize.query(
-      `SELECT 
-        *,
-        (
-          SELECT COUNT(*)::int FROM "Threads" 
-          WHERE chain = :chain_id AND topic_id = t.id AND deleted_at IS NULL 
-        ) as total_threads
-      FROM "Topics" t WHERE chain_id = :chain_id AND deleted_at IS NULL`,
-      {
-        replacements: { chain_id: chain.id },
-        type: QueryTypes.SELECT,
-      }
-    ),
-
     // admins
     findAllRoles(
       models,
@@ -244,7 +226,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   return res.json({
     status: 'Success',
     result: {
-      topics: topics,
       numVotingThreads,
       numTotalThreads,
       admins: admins.map((a) => a.toJSON()),

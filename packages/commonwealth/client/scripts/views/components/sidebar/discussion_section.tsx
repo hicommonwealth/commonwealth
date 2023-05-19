@@ -52,12 +52,6 @@ export const DiscussionSection = () => {
     location
   );
 
-  // const topics2 = app.topics.store
-  //   .getByCommunity(app.activeChainId())
-  //   .filter((t) => t.featuredInSidebar)
-  //   .sort((a, b) => a.name.localeCompare(b.name))
-  //   .sort((a, b) => a.order - b.order);
-
   const { data: topicsData } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });

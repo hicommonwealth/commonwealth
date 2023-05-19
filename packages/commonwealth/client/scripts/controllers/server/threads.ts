@@ -195,10 +195,8 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
-    // let topicFromStore = null;
     let topicModel = null;
     if (topic?.id) {
-      // topicFromStore = app.topics.store.getById(topic.id);
       topicModel = new Topic(topic);
     }
 
