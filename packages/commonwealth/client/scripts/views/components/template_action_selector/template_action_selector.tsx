@@ -7,62 +7,79 @@ import app from 'state';
 
 type TemplateSelectorProps = {
   onSelect: (template: any) => void;
+  tempTemplates: Array<Pick<any, 'identifier' | 'title'>>;
   thread: Thread;
-  onSave: () => void;
-  onClose: () => void;
+  isOpen: boolean;
 };
 
 export const TemplateSelector = ({
   onSelect,
-  onClose,
-  onSave,
+  tempTemplates,
+  isOpen,
 }: TemplateSelectorProps) => {
-  const [allTemplates, setAllTemplates] = useState<Array<any>>([]);
+  // Add a new state for contracts
+  const [contracts, setContracts] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
+  const [fetched, setFetched] = useState(false);
+  const [allTemplates, setAllTemplates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const getTemplatesForAllContracts = async () => {
-    const contractsInStore = app.contracts.getCommunityContracts();
-    for (const contract of contractsInStore) {
+  // Fetch contracts
+  const fetchContracts = async () => {
+    setLoading(true);
+    const contractsInStore = await app.contracts.getCommunityContracts();
+    setContracts(contractsInStore);
+    setLoading(false);
+  };
+
+  // Fetch templates
+  const fetchTemplates = async () => {
+    setLoading(true);
+    const fetchedTemplates = [];
+    for (const contract of contracts) {
       const templates = await app.contracts.getTemplatesForContract(
         contract.id
       );
-      allTemplates.push(...templates);
+      fetchedTemplates.push(...templates);
     }
-
-    return allTemplates;
+    setAllTemplates(fetchedTemplates);
+    setLoading(false);
+    setFetched(true);
   };
 
-  const fetchTemplates = async () => {
-    await getTemplatesForAllContracts().then((templates) => {
-      setAllTemplates(templates);
-      console.log('All templates:', allTemplates);
-      setLoading(false); // Set loading state to false after templates are fetched
-    });
-  };
-
+  // Fetch contracts when the modal is open
   useEffect(() => {
-    if (allTemplates.length === 0) setLoading(true); // Set loading state to true before fetching templates
-    fetchTemplates();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allTemplates]);
+    if (isOpen && !loading && !fetched) {
+      fetchContracts();
+    }
+  }, [isOpen, loading, fetched]);
+
+  // Fetch templates when contracts state changes
+  useEffect(() => {
+    if (contracts.length > 0) {
+      fetchTemplates();
+    }
+  }, [contracts]);
 
   const templates = useMemo(() => {
     if (!searchTerm.length) return allTemplates;
     else {
       allTemplates
         .sort((a, b) => b.created_at - a.created_at)
-        .filter(({ nickname }) =>
-          nickname.toLowerCase().includes(searchTerm.toLowerCase())
+        .filter(({ name }) =>
+          name.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }
   }, [allTemplates, searchTerm]);
 
   const renderItem = useCallback(
     (i: number, template: any) => {
-      const isSelected = !!tempTemplates.find(
-        ({ identifier }) => template.identifier === String(identifier)
-      );
+      const isSelected = !!tempTemplates.find(({ identifier }) => {
+        console.log('template.contractAddress:', template.contractAddress);
+        console.log('identifier', identifier);
+        console.log('identifier.split:', identifier.split('/')[0]);
+        template.contractAddress === identifier.split('/')[0];
+      });
 
       return (
         <TemplateSelectorItem
