@@ -9,7 +9,7 @@ import { EventKind } from '../types';
  */
 export const Title: TitlerFilter = (
   kind: EventKind,
-  chain?: string
+  origin?: string
 ): IEventTitle => {
   switch (kind) {
     case EventKind.ProposalCanceled: {
@@ -72,7 +72,7 @@ export const Title: TitlerFilter = (
       const _exhaustiveMatch: never = kind;
       throw new Error(
         `[${SupportedNetwork.Aave}${
-          chain ? `::${chain}` : ''
+          origin ? `::${origin}` : ''
         }]: Unknown event type`
       );
     }

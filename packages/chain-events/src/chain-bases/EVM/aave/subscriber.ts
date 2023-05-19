@@ -9,17 +9,17 @@ import { addPrefix, factory } from '../../../logging';
 import type { RawEvent, Api } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
-  private _name: string;
+  private readonly _origin: string;
 
   private _listener: Listener | null;
 
   protected readonly log;
 
-  constructor(api: Api, name: string, verbose = false) {
+  constructor(api: Api, origin: string, verbose = false) {
     super(api, verbose);
-    this._name = name;
+    this._origin = origin;
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Aave, this._name])
+      addPrefix(__filename, [SupportedNetwork.Aave, this._origin])
     );
   }
 
@@ -28,7 +28,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
    */
   public async subscribe(cb: (event: RawEvent) => void): Promise<void> {
     this._listener = (event: RawEvent): void => {
-      const logStr = `Received ${this._name} event: ${JSON.stringify(
+      const logStr = `Received ${this._origin} event: ${JSON.stringify(
         event,
         null,
         2

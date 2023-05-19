@@ -5,9 +5,9 @@ import { addPrefix, factory } from './logging';
 export async function createProvider(
   ethNetworkUrl: string,
   network?: string,
-  chain?: string
+  origin?: string
 ): Promise<providers.Web3Provider> {
-  const log = factory.getLogger(addPrefix(__filename, [network, chain]));
+  const log = factory.getLogger(addPrefix(__filename, [network, origin]));
   try {
     const Web3 = (await import('web3')).default;
     const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl, {

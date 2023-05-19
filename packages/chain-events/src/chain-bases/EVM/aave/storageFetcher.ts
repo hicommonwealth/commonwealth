@@ -24,14 +24,14 @@ type IEntityEventData =
 export class StorageFetcher extends IStorageFetcher<Api> {
   protected readonly log;
 
-  protected readonly chain;
+  protected readonly origin;
 
-  constructor(protected readonly _api: Api, chain?: string) {
+  constructor(protected readonly _api: Api, origin?: string) {
     super(_api);
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Aave, chain])
+      addPrefix(__filename, [SupportedNetwork.Aave, origin])
     );
-    this.chain = chain;
+    this.origin = origin;
   }
 
   private _currentBlock: number;

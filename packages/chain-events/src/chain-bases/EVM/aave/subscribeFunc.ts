@@ -25,24 +25,24 @@ import type { IEventData, RawEvent, Api } from './types';
  * @param ethNetworkUrl
  * @param governanceAddress
  * @param retryTimeMs
- * @param chain
+ * @param origin
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
   ethNetworkUrl: string,
   governanceAddress: string,
   retryTimeMs = 10 * 1000,
-  chain?: string
+  origin?: string
 ): Promise<Api> {
   const log = factory.getLogger(
-    addPrefix(__filename, [SupportedNetwork.Aave, chain])
+    addPrefix(__filename, [SupportedNetwork.Aave, origin])
   );
   for (let i = 0; i < 3; ++i) {
     try {
       const provider = await createProvider(
         ethNetworkUrl,
         SupportedNetwork.Aave,
-        chain
+        origin
       );
 
       // fetch governance contract
@@ -109,7 +109,7 @@ export async function createApi(
 
   throw new Error(
     `[${SupportedNetwork.Aave} ${
-      chain ? `::${chain}` : ''
+      origin ? `::${origin}` : ''
     }]: Failed to start Aave listener for ${governanceAddress} at ${ethNetworkUrl}`
   );
 }
