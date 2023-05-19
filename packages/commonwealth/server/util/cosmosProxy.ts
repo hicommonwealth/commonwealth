@@ -102,7 +102,55 @@ function setupCosmosProxy(app: Express, models: DB) {
     }
   );
 
-  // for magic link queries
+  // two cosmos-api proxies for the magic link iframe
+  // - node_info for fetching chain status (used by magic iframe, and magic login flow)
+  // - auth/accounts/:address for fetching address status (use by magic iframe)
+  app.use(
+    '/magicCosmosAPI/:chain/node_info',
+    bodyParser.text(),
+    cacheDecorator.cacheMiddleware(
+      defaultCacheDuration,
+      lookupKeyDurationInReq
+    ),
+    async function cosmosProxy(req, res) {
+      log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
+      try {
+        log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
+        const chain = await models.Chain.findOne({
+          where: { id: req.params.chain },
+          include: models.ChainNode,
+        });
+        if (!chain) {
+          throw new AppError('Invalid chain');
+        }
+        const targetUrl = chain.ChainNode?.alt_wallet_url;
+        if (!targetUrl) {
+          throw new AppError('No LCD endpoint found');
+        }
+        log.trace(`Found cosmos endpoint: ${targetUrl}`);
+
+        const response = await axios.get(targetUrl + '/node_info', {
+          headers: {
+            origin: 'https://commonwealth.im',
+          },
+        });
+        log.trace(
+          `Got response from endpoint: ${JSON.stringify(
+            response.data,
+            null,
+            2
+          )}`
+        );
+
+        // special case: support magic iframe + commonwealth clients (including custom domains)
+        // this is a single route and should be easy to cache
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        return res.send(response.data);
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
+    }
+  );
   app.get(
     '/magicCosmosAPI/:chain/auth/accounts/:address',
     bodyParser.text(),
@@ -141,16 +189,22 @@ function setupCosmosProxy(app: Express, models: DB) {
         });
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
-             response.data,
-             null,
-             2
-           )}`
+            response.data,
+            null,
+            2
+          )}`
         );
-        // special case: magic expects a cosmos-sdk/Account, while chains return
-        // cosmos-sdk/BaseAccount or other types. this seems to be a lauchpad vs
-        // stargate issue: https://github.com/cosmos/cosmjs/issues/702
-        if (response?.data?.result?.type === "cosmos-sdk/BaseAccount") {
-          response.data.result.type = "cosmos-sdk/Account"
+        // magic expects a cosmos-sdk/Account, while lcd endpoints usually return
+        // cosmos-sdk/BaseAccount. this seems to be a launchpad vs stargate issue:
+        // https://github.com/cosmos/cosmjs/issues/702
+        if (response?.data?.result?.type === 'cosmos-sdk/BaseAccount') {
+          response.data.result.type = 'cosmos-sdk/Account';
+          response.data.result.value = {
+            address: rewrittenAddress,
+            public_key: { type: 'tendermint/PubKeySecp256k1', value: '' },
+            account_number: '0',
+            sequence: '0',
+          };
         }
 
         // special case: magicCosmosAPI is CORS-approved for the magic iframe
