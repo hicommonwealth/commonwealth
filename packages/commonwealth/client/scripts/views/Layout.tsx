@@ -58,7 +58,6 @@ const shouldDeferChainLoading = ({ deferChain }: ShouldDeferChainAttrs) => {
 type LayoutAttrs = {
   deferChain?: boolean;
   scope?: string;
-  // router?: ClassComponentRouter;
   children: React.ReactNode;
 };
 
