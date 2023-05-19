@@ -1,5 +1,6 @@
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
+import moment from 'moment';
 import 'pages/discussions/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -11,6 +12,7 @@ import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
+
 type DiscussionsPageProps = {
   topicName?: string;
 };
@@ -69,6 +71,44 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
   };
 
+  /**
+   * the api will return sorted results and those are stored in state, when user
+   * changes the filter we dont make a new api call, and use the state. New data is
+   * fetched from api when user has reached the end of page.
+   * ---
+   * This function is responsible for sorting threads in state that were earlier
+   * sorted by another featured flag
+   */
+  const sortByFeaturedFilter = (t: Thread[]) => {
+    if (featuredFilter === 'oldest') {
+      return [...t].sort((a, b) =>
+        moment(a.createdAt).diff(moment(b.createdAt))
+      );
+    }
+
+    if (featuredFilter === 'comments') {
+      return [...t].sort((a, b) => b.numberOfComments - a.numberOfComments);
+    }
+
+    if (featuredFilter === 'likes') {
+      return [...t].sort(
+        (a, b) => b.associatedReactions.length - a.associatedReactions.length
+      );
+    }
+
+    // Default: Assuming featuredFilter === 'newest'
+    return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
+  };
+
+  /**
+   * the api will return sorted results and those are stored in state, when user
+   * changes the filter we dont make a new api call, and use the state. New data is
+   * fetched from api when user has reached the end of page.
+   * ---
+   * This function is responsible for sorting threads in state. Maybe the user pins a
+   * thread, this thread is still in a lower position in the state object/arrary. This
+   * function will sort those correctly.
+   */
   const sortPinned = (t: Thread[]) => {
     return [...t].sort((a, b) =>
       a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
@@ -117,15 +157,30 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             finalThreads = finalThreads.filter((x) => x.stage === stageName);
           }
 
+          // get threads for date filter
+          if (
+            dateRange &&
+            ['week', 'month'].includes(dateRange.toLowerCase())
+          ) {
+            const today = moment();
+            const from_date = today.startOf(dateRange.toLowerCase() as any);
+            const to_date = today.endOf(dateRange.toLowerCase() as any);
+
+            finalThreads = finalThreads.filter(
+              (x) =>
+                moment(x.createdAt) > from_date && moment(x.createdAt) < to_date
+            );
+          }
+
           if (finalThreads.length >= 20) {
-            setThreads(sortPinned(finalThreads));
+            setThreads(sortPinned(sortByFeaturedFilter(finalThreads)));
             setInitializing(false);
             return;
           }
         }
         // else show all threads
         else {
-          setThreads(sortPinned(foundThreadsForChain));
+          setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
           setInitializing(false);
           return;
         }
@@ -142,7 +197,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         })
         .then((t) => {
           // Fetch first 20 + unpinned threads
-          setThreads(sortPinned(t));
+          setThreads(sortPinned(sortByFeaturedFilter(t)));
           setInitializing(false);
         });
     });
@@ -175,7 +230,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         }
         return null;
       });
-      return sortPinned(finalThreads);
+      return sortPinned(sortByFeaturedFilter(finalThreads));
     });
   }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 

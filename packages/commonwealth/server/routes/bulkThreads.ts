@@ -52,8 +52,8 @@ const bulkThreads = async (
       'createdAt:desc': 'threads.thread_created DESC',
       'numberOfComments:asc': 'threads_number_of_comments ASC',
       'numberOfComments:desc': 'threads_number_of_comments DESC',
-      'numOfLikes:asc': 'threads_total_likes ASC',
-      'numOfLikes:desc': 'threads_total_likes DESC',
+      'numberOfLikes:asc': 'threads_total_likes ASC',
+      'numberOfLikes:desc': 'threads_total_likes DESC',
     };
 
     const query = `
