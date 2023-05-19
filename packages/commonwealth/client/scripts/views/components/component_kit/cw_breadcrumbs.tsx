@@ -11,7 +11,7 @@ export type BreadcrumbsType = {
   navigate?: (url: string) => void;
 };
 
-export type BreadcrumbsProps = {
+type BreadcrumbsProps = {
   breadcrumbs: Array<BreadcrumbsType>;
 };
 

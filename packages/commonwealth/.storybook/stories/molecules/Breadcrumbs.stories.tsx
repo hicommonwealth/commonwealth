@@ -30,17 +30,13 @@ const argsObjToArr = (argsObj: any) => {
   return breadcrumbsArr;
 }
 
-const Breadcrumbs: FC = (args) => {
-  return (
-    <CWBreadcrumbs breadcrumbs={argsObjToArr(args)} />
-  );
-};
-
 export const BreadcrumbsStory = {
   name: 'Breadcrumbs',
   args: argsObj("Breadcrumb", labels),
   parameters: {
     controls: { exclude: [ "breadcrumbs" ] },
   },
-  render: ({...args}) => <Breadcrumbs {...args} />,
+  render: ({...args}) => (
+    <CWBreadcrumbs breadcrumbs={argsObjToArr(args)} />
+  ),
 }
