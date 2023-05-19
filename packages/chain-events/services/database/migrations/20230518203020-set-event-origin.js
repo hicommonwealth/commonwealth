@@ -12,7 +12,7 @@ module.exports = {
         `
         CREATE TABLE "EventOrigins" as (
           SELECT *
-          FROM dblink(${CW_DB_URL}, '
+          FROM dblink('${CW_DB_URL}', '
             SELECT C.id, CN.name, C2.address
             FROM "ChainNodes" CN
                JOIN "Chains" C on CN.id = C.chain_node_id
