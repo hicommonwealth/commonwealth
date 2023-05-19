@@ -1,6 +1,13 @@
 
 import { UserOperationBuilder } from 'userop';
 import Web3 from 'web3';
+import { BigNumberish } from "ethers"
+
+interface GasEstimate {
+    preVerificationGas: BigNumberish;
+    verificationGas: BigNumberish;
+    callGasLimit: BigNumberish;
+  }
 
 export class DelegationAccount extends UserOperationBuilder{
     private provider: Web3
@@ -8,7 +15,7 @@ export class DelegationAccount extends UserOperationBuilder{
     constructor(provider: Web3){
         super()
         provider = provider;
-        this.useMiddleware(this.fetchGasPrice)
+        this.useMiddleware(this.fetchGasConfig)
         this.useMiddleware(this.signUserOperation);
     }
 
@@ -18,13 +25,46 @@ export class DelegationAccount extends UserOperationBuilder{
     };
 
     //TODO: build out
-    async fetchGasPrice(ctx){
+    async fetchGasConfig(ctx){
         // Fetch the latest gas prices.
-        ctx.op.maxFeePerGas = "";
-        ctx.op.maxPriorityFeePerGas = "";
-        ctx.op.preVerificationGas = "";
-        ctx.op.verificationGasLimit = "";
-        ctx.op.callGasLimit = "";
+        // Gas Prices
+        const [fee, block] = await Promise.all([
+            this.provider.givenProvider.send(
+            {
+                jsonrpc: '2.0',
+                method: 'eth_maxPriorityFeePerGas',
+                params: [],
+                id: 1
+            }
+            ),
+            this.provider.givenProvider.send(
+            {
+                jsonrpc: '2.0',
+                method: 'eth_blockNumber',
+                params: [],
+                id: 1
+            }
+            )
+          ]);
+        const tip = fee;
+        const buffer = tip.div(100).mul(13);
+        const maxPriorityFeePerGas = tip.add(buffer);
+        
+        ctx.op.maxFeePerGas = block.baseFeePerGas
+        ? block.baseFeePerGas.mul(2).add(maxPriorityFeePerGas)
+        : maxPriorityFeePerGas;
+        ctx.op.maxPriorityFeePerGas = maxPriorityFeePerGas;
+        
+        //Gas limits
+        //TODO: this should be a bundler provider not w3
+        const est = (await provider.send("eth_estimateUserOperationGas", [
+            OpToJSON(ctx.op),
+            ctx.entryPoint,
+          ])) as GasEstimate;
+      
+        ctx.op.preVerificationGas = est.preVerificationGas;
+        ctx.op.verificationGasLimit = est.verificationGas;
+        ctx.op.callGasLimit = est.callGasLimit;
     };
 
     execute(to: string, value: string, data: string, senderWallet: string) {
