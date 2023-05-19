@@ -9,7 +9,7 @@ import { EventKind } from '../types';
  */
 export const Title: TitlerFilter = (
   kind: EventKind,
-  chain?: string
+  origin?: string
 ): IEventTitle => {
   switch (kind) {
     case EventKind.BalanceTransfer: {
@@ -330,7 +330,7 @@ export const Title: TitlerFilter = (
       const _exhaustiveMatch: never = kind;
       throw new Error(
         `[${SupportedNetwork.Substrate}${
-          chain ? `::${chain}` : ''
+          origin ? `::${origin}` : ''
         }]: unknown event type`
       );
     }

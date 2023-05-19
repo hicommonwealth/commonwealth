@@ -22,11 +22,11 @@ export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
   constructor(
     protected readonly _api: ApiPromise,
     protected _verbose = false,
-    chain?: string
+    origin?: string
   ) {
     super(_api);
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+      addPrefix(__filename, [SupportedNetwork.Substrate, origin])
     );
   }
 

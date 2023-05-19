@@ -18,7 +18,7 @@ export class Processor extends IEventProcessor<ApiPromise, Block> {
   constructor(
     protected _api: ApiPromise,
     private _enricherConfig: EnricherConfig = {},
-    protected readonly chain?: string
+    protected readonly origin?: string
   ) {
     super(_api);
   }
@@ -40,7 +40,7 @@ export class Processor extends IEventProcessor<ApiPromise, Block> {
     const log = factory.getLogger(
       addPrefix(__filename, [
         SupportedNetwork.Substrate,
-        this.chain || block.versionName,
+        this.origin || block.versionName,
       ])
     );
 

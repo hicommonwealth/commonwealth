@@ -46,10 +46,10 @@ import { EventKind, parseJudgement, EntityKind } from './types';
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   protected readonly log;
 
-  constructor(protected readonly _api: ApiPromise, chain?: string) {
+  constructor(protected readonly _api: ApiPromise, origin?: string) {
     super(_api);
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+      addPrefix(__filename, [SupportedNetwork.Substrate, origin])
     );
   }
 

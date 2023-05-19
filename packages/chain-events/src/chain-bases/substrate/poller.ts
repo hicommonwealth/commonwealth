@@ -12,10 +12,10 @@ import type { Block } from './types';
 export class Poller extends IEventPoller<ApiPromise, Block> {
   protected readonly log;
 
-  constructor(protected _api: ApiPromise, protected readonly chain?: string) {
+  constructor(protected _api: ApiPromise, protected readonly origin?: string) {
     super(_api);
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+      addPrefix(__filename, [SupportedNetwork.Substrate, origin])
     );
   }
 

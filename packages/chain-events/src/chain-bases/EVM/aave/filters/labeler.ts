@@ -17,7 +17,7 @@ function fmtAddr(addr: string) {
  */
 export const Label: LabelerFilter = (
   blockNumber: number,
-  chainId: string,
+  communityId: string,
   data: IEventData,
   origin?: string
 ): IEventLabel => {
@@ -26,8 +26,8 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Canceled',
         label: `Proposal ${data.id} was cancelled.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/onchainproposal/${data.id}`
+        linkUrl: communityId
+          ? `/${communityId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -35,8 +35,8 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Created',
         label: `Proposal ${data.id} was created.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/onchainproposal/${data.id}`
+        linkUrl: communityId
+          ? `/${communityId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -44,8 +44,8 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Executed',
         label: `Proposal ${data.id} was executed.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/onchainproposal/${data.id}`
+        linkUrl: communityId
+          ? `/${communityId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -55,8 +55,8 @@ export const Label: LabelerFilter = (
         label: `Proposal ${data.id} queued up. Execution time: ${moment
           .unix(data.executionTime)
           .format()}.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/onchainproposal/${data.id}`
+        linkUrl: communityId
+          ? `/${communityId}/proposal/onchainproposal/${data.id}`
           : null,
       };
     }
@@ -66,8 +66,8 @@ export const Label: LabelerFilter = (
         label: `Voter (${data.voter}) voted with weight ${data.votingPower} ${
           data.support ? 'against' : 'for'
         } proposal ${data.id}.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/onchainproposal/${data.id}`
+        linkUrl: communityId
+          ? `/${communityId}/proposal/onchainproposal/${data.id}`
           : null,
         icon: 'vote',
       };
@@ -78,7 +78,9 @@ export const Label: LabelerFilter = (
         label: `User ${fmtAddr(data.delegator)} delegated to ${fmtAddr(
           data.delegatee
         )}.`,
-        linkUrl: chainId ? `/${chainId}/account/${data.delegator}` : null,
+        linkUrl: communityId
+          ? `/${communityId}/account/${data.delegator}`
+          : null,
         icon: 'delegate',
       };
     }
@@ -86,7 +88,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Delegated Power Changed',
         label: `User ${fmtAddr(data.who)} updated their delegation power.`,
-        linkUrl: chainId ? `/${chainId}/account/${data.who}` : null,
+        linkUrl: communityId ? `/${communityId}/account/${data.who}` : null,
         icon: 'delegate',
       };
     }

@@ -64,20 +64,20 @@ export function Title(
   }
 }
 
-export function Label(chain: string, event: CWEvent): IEventLabel {
+export function Label(communityId: string, event: CWEvent): IEventLabel {
   switch (event.network) {
     case SupportedNetwork.Substrate:
-      return SubstrateLabel(event.blockNumber, chain, event.data);
+      return SubstrateLabel(event.blockNumber, communityId, event.data);
     case SupportedNetwork.Aave:
-      return AaveLabel(event.blockNumber, chain, event.data);
+      return AaveLabel(event.blockNumber, communityId, event.data);
     case SupportedNetwork.Compound:
-      return CompoundLabel(event.blockNumber, chain, event.data);
+      return CompoundLabel(event.blockNumber, communityId, event.data);
     case SupportedNetwork.ERC20:
-      return Erc20Label(event.blockNumber, chain, event.data);
+      return Erc20Label(event.blockNumber, communityId, event.data);
     case SupportedNetwork.ERC721:
-      return Erc721Label(event.blockNumber, chain, event.data);
+      return Erc721Label(event.blockNumber, communityId, event.data);
     case SupportedNetwork.Cosmos:
-      return CosmosLabel(event.blockNumber, chain, event.data);
+      return CosmosLabel(event.blockNumber, communityId, event.data);
     default:
       throw new Error(`Invalid network: ${event.network}`);
   }

@@ -26,16 +26,16 @@ export interface ISubstrateSubscribeOptions
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @param typeOverrides
- * @param chain
+ * @param origin
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
   url: string,
   typeOverrides: RegisteredTypes = {},
-  chain?: string
+  origin?: string
 ): Promise<ApiPromise> {
   const log = factory.getLogger(
-    addPrefix(__filename, [SupportedNetwork.Substrate, chain])
+    addPrefix(__filename, [SupportedNetwork.Substrate, origin])
   );
   for (let i = 0; i < 3; ++i) {
     const provider = new WsProvider(url, 0);
@@ -68,7 +68,7 @@ export async function createApi(
 
   throw new Error(
     `[${SupportedNetwork.Substrate}${
-      chain ? `::${chain}` : ''
+      origin ? `::${origin}` : ''
     }]: Failed to connect to API endpoint at: ${url}`
   );
 }
