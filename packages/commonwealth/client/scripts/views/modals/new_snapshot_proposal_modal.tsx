@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 import app from 'state';
@@ -25,12 +24,14 @@ export const NewSnapshotProposalModal = ({
     null
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const snapshotOptions =
-    app.chain?.meta.snapshot.map((snapshot) => ({
-      value: snapshot,
-      label: snapshot,
-    })) || [];
+  const snapshotOptions = useMemo(
+    () =>
+      app.chain?.meta.snapshot.map((snapshot) => ({
+        value: snapshot,
+        label: snapshot,
+      })) || [],
+    []
+  );
 
   useEffect(() => {
     if (snapshotOptions.length > 0) {

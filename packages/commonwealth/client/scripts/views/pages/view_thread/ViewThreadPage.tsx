@@ -525,23 +525,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     id: string;
     snapshot_title: string;
   }) => {
-    console.log('new snapshot change');
     const newLink: Link = {
       source: LinkSource.Snapshot,
       identifier: id,
       title: snapshot_title,
     };
-    console.log('new link', newLink);
-
     const toAdd = [newLink]; // Add this line to create an array with the new link
 
     if (toAdd.length > 0) {
-      const updatedThread = await app.threads.addLinks({
+      await app.threads.addLinks({
         threadId: thread.id,
         links: toAdd,
       });
-
-      const links = updatedThread.links;
     }
 
     const newThread = {

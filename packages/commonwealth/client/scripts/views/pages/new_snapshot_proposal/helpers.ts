@@ -29,7 +29,6 @@ export const createNewProposal = async (
   }
 
   const bodyText = getTextFromDelta(JSON.parse(content));
-  console.log('bodyText', bodyText);
   if (bodyText.length === 0) {
     throw new Error(NewThreadErrors.NoBody);
   }

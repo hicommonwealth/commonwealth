@@ -25,11 +25,9 @@ import {
   createDeltaFromText,
   ReactQuillEditor,
 } from '../../components/react_quill_editor';
-import { Delta, DeltaStatic } from 'quill';
+import { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
 import Thread from 'client/scripts/models/Thread';
-import { deserializeDelta } from '../../components/react_quill_editor/utils';
-import { is } from 'bluebird';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -178,18 +176,14 @@ export const NewSnapshotProposalForm = ({
       setMembers(snapshotSpace.members);
       setSnapshotScoresFetched(true);
       setLoading(false);
-      // Set loading to false after initialization is complete
     };
 
-    app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
     init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
 
-    // Clean up the event listener when the component is unmounted
     return () => {
       app.snapshot.snapshotEmitter.off('initialized', handleInitialized);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) return <CWSpinner />;
