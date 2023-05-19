@@ -1,5 +1,4 @@
 import Thread from 'models/Thread';
-import { ThreadStage } from 'models/types';
 import moment from 'moment';
 import 'pages/discussions/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -12,7 +11,6 @@ import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
-
 type DiscussionsPageProps = {
   topicName?: string;
 };
@@ -29,23 +27,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;
-    stage: ThreadStage;
   }) => {
-    const { threadId, action, stage } = data;
-
-    if (action === ThreadActionType.StageChange) {
-      setThreads((oldThreads) => {
-        const updatedThreads = [...oldThreads].filter(
-          // make sure that if we have an active stage filter (from the dropdown)
-          // then we also filter the current list for the current stage only
-          (x) => x.stage === stageName
-        );
-        const foundThread = updatedThreads.find((x) => x.id === threadId);
-        if (foundThread) foundThread.stage = stage;
-        return updatedThreads;
-      });
-      return;
-    }
+    const { threadId, action } = data;
 
     if (
       action === ThreadActionType.TopicChange ||
@@ -235,19 +218,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
   if (initializing) {
-    return <PageLoading hideSearch={false} />;
+    return <PageLoading />;
   }
-
   return (
-    <Sublayout hideFooter={true} hideSearch={false}>
+    <Sublayout hideFooter={true}>
       <div className="DiscussionsPage">
         <Virtuoso
           style={{ height: '100%', width: '100%' }}
           data={threads}
           itemContent={(i, thread) => {
-            return (
-              <ThreadPreview thread={thread} key={thread.id + thread.stage} />
-            );
+            return <ThreadPreview thread={thread} key={thread.id} />;
           }}
           endReached={loadMore}
           overscan={200}
