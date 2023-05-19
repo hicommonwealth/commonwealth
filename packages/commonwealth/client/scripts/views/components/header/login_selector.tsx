@@ -520,7 +520,7 @@ export const LoginSelector = () => {
                 if (
                   sameBaseAddressesRemoveDuplicates.length === 0 ||
                   app.chain?.meta?.id === 'injective' ||
-                  (app.user.activeAccount.address.slice(0, 3) === 'inj' &&
+                  (app.user.activeAccount?.address?.slice(0, 3) === 'inj' &&
                     app.chain?.meta.id !== 'injective')
                 ) {
                   setIsLoginModalOpen(true);

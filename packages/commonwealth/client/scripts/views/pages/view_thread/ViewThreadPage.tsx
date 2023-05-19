@@ -725,6 +725,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           />
         }
         createdAt={thread.createdAt}
+        lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
         headerComponents={
