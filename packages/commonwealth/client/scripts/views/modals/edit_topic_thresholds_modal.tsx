@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { getDecimals } from 'helpers';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 import type Topic from '../../models/Topic';
@@ -11,6 +11,7 @@ import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useSetTopicThresholdMutation } from 'state/api/topics';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -19,7 +20,7 @@ type EditTopicThresholdsRowProps = {
 const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
   const [newTokenThresholdInWei, setNewTokenThresholdInWei] =
     React.useState<string>();
-
+  const { mutateAsync: setTopicThreshold } = useSetTopicThresholdMutation();
   const { topic } = props;
 
   if (typeof newTokenThresholdInWei !== 'string') {
@@ -46,16 +47,17 @@ const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
             e.preventDefault();
 
             try {
-              const status = await app.topics.setTopicThreshold(
-                topic,
-                newTokenThresholdInWei
-              );
+              await setTopicThreshold({
+                topicId: topic.id,
+                topicThreshold: newTokenThresholdInWei,
+              });
 
-              if (status === 'Success') {
-                notifySuccess('Successfully updated threshold value');
-              } else {
-                notifyError('Could not update threshold value');
-              }
+              // TODO
+              // if (status === 'Success') {
+              //   notifySuccess('Successfully updated threshold value');
+              // } else {
+              //   notifyError('Could not update threshold value');
+              // }
             } catch (err) {
               notifyError(`Invalid threshold value: ${err.message}`);
             }

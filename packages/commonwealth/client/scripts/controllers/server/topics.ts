@@ -66,27 +66,27 @@ class TopicsController {
   //   }
   // }
 
-  public async setTopicThreshold(topic: Topic, token_threshold: string) {
-    try {
-      const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
-        topic_id: topic.id,
-        token_threshold,
-        jwt: app.user.jwt,
-      });
-      if (response.status === 'Success') {
-        // update stored value immediately
-        topic.setTokenThreshold(new BN(token_threshold));
-      }
-      return response.status;
-    } catch (err) {
-      console.log('Failed to edit topic');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to edit topic'
-      );
-    }
-  }
+  // public async setTopicThreshold(topic: Topic, token_threshold: string) {
+  //   try {
+  //     const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
+  //       topic_id: topic.id,
+  //       token_threshold,
+  //       jwt: app.user.jwt,
+  //     });
+  //     if (response.status === 'Success') {
+  //       // update stored value immediately
+  //       topic.setTokenThreshold(new BN(token_threshold));
+  //     }
+  //     return response.status;
+  //   } catch (err) {
+  //     console.log('Failed to edit topic');
+  //     throw new Error(
+  //       err.responseJSON && err.responseJSON.error
+  //         ? err.responseJSON.error
+  //         : 'Failed to edit topic'
+  //     );
+  //   }
+  // }
 
   // public async add(
   //   name: string,

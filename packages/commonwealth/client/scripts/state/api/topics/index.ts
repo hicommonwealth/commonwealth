@@ -154,3 +154,30 @@ export const useUpdateFeaturedTopicsOrderMutation = () => {
     },
   });
 };
+
+interface SetTopicThresholdProps {
+  topicId: number;
+  topicThreshold: string;
+}
+
+const setTopicThreshold = async ({
+  topicId,
+  topicThreshold,
+}: SetTopicThresholdProps) => {
+  await axios.post(`${app.serverUrl()}/setTopicThreshold`, {
+    topic_id: topicId,
+    token_threshold: topicThreshold,
+    jwt: app.user.jwt,
+  });
+};
+
+export const useSetTopicThresholdMutation = () => {
+  return useMutation({
+    mutationFn: setTopicThreshold,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['bulkTopics'],
+      });
+    },
+  });
+};
