@@ -1,6 +1,7 @@
 import axios from 'axios';
 import app from 'state';
 import { useMutation } from '@tanstack/react-query';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface DeleteTopicProps {
   topicId: number;
@@ -19,8 +20,11 @@ const deleteTopic = async ({ topicId, chainId }: DeleteTopicProps) => {
 const useDeleteTopicMutation = () => {
   return useMutation({
     mutationFn: deleteTopic,
-    onSuccess: (data, variables) => {
-      app.threads.listingStore.removeTopic(variables.topicName);
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: [ApiEndpoints.BulkTopics, variables.chainId],
+      });
+      await app.threads.listingStore.removeTopic(variables.topicName);
     },
   });
 };

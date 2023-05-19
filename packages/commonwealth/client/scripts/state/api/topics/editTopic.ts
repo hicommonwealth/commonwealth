@@ -30,8 +30,8 @@ const editTopic = async ({ topic, featuredOrder }: EditTopicProps) => {
 const useEditTopicMutation = () => {
   return useMutation({
     mutationFn: editTopic,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
         queryKey: [ApiEndpoints.BulkTopics, variables.topic.chainId],
       });
     },

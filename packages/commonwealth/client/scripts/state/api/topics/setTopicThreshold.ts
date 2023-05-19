@@ -2,18 +2,19 @@ import axios from 'axios';
 import app from 'state';
 import { useMutation } from '@tanstack/react-query';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import Topic from 'models/Topic';
 
 interface SetTopicThresholdProps {
-  topicId: number;
+  topic: Topic;
   topicThreshold: string;
 }
 
 const setTopicThreshold = async ({
-  topicId,
+  topic,
   topicThreshold,
 }: SetTopicThresholdProps) => {
   await axios.post(`${app.serverUrl()}/setTopicThreshold`, {
-    topic_id: topicId,
+    topic_id: topic.id,
     token_threshold: topicThreshold,
     jwt: app.user.jwt,
   });
@@ -22,9 +23,9 @@ const setTopicThreshold = async ({
 const useSetTopicThresholdMutation = () => {
   return useMutation({
     mutationFn: setTopicThreshold,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BulkTopics],
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: [ApiEndpoints.BulkTopics, variables.topic.chainId],
       });
     },
   });

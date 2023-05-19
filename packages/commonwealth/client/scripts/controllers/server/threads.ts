@@ -738,12 +738,13 @@ class ThreadsController {
         : moment().toISOString(),
     };
 
-    const data = queryClient.getQueryData<Topic[]>([
-      ApiEndpoints.BulkTopics,
-      app.chain.id,
-    ]);
+    const topics =
+      (await queryClient.ensureQueryData<Topic[]>([
+        ApiEndpoints.BulkTopics,
+        app.chain.id,
+      ])) || [];
 
-    const topicId = data?.find((el) => el.name === topicName)?.id;
+    const topicId = topics.find(({ name }) => name === topicName)?.id;
 
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;

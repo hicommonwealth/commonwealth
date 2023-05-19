@@ -35,14 +35,16 @@ const createTopic = async ({
     chain: app.activeChainId(),
   });
 
-  return new Topic(response.data);
+  return new Topic(response.data.result);
 };
 
 const useCreateTopicMutation = () => {
   return useMutation({
     mutationFn: createTopic,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ApiEndpoints.BulkTopics] });
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: [ApiEndpoints.BulkTopics, data.chainId],
+      });
     },
   });
 };

@@ -14,21 +14,24 @@ import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
-import { queryClient } from 'state/api/config';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 import Topic from 'models/Topic';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
-  const data =
-    queryClient.getQueryData<Topic[]>(['bulkTopics', app.chain.id]) || [];
-  const topics = data
-    .reduce(
-      (acc, current) => (current.featuredInNewPost ? [...acc, current] : acc),
-      []
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const topics =
+    queryClient.getQueryData<Topic[]>([
+      ApiEndpoints.BulkTopics,
+      app.chain.id,
+    ]) ||
+    []
+      .reduce(
+        (acc, current) => (current.featuredInNewPost ? [...acc, current] : acc),
+        []
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
 
   const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
 

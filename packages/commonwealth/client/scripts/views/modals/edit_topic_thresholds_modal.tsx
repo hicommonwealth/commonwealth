@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { getDecimals } from 'helpers';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 import type Topic from '../../models/Topic';
@@ -18,13 +18,16 @@ import {
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
+  onClose: () => void;
 };
 
-const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
+const EditTopicThresholdsRow = ({
+  topic,
+  onClose,
+}: EditTopicThresholdsRowProps) => {
   const [newTokenThresholdInWei, setNewTokenThresholdInWei] =
     React.useState<string>();
   const { mutateAsync: setTopicThreshold } = useSetTopicThresholdMutation();
-  const { topic } = props;
 
   if (typeof newTokenThresholdInWei !== 'string') {
     setNewTokenThresholdInWei(topic.tokenThreshold?.toString() || '0');
@@ -51,16 +54,11 @@ const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
 
             try {
               await setTopicThreshold({
-                topicId: topic.id,
+                topic,
                 topicThreshold: newTokenThresholdInWei,
               });
-
-              // TODO
-              // if (status === 'Success') {
-              //   notifySuccess('Successfully updated threshold value');
-              // } else {
-              //   notifyError('Could not update threshold value');
-              // }
+              onClose();
+              notifySuccess('Successfully updated threshold value');
             } catch (err) {
               notifyError(`Invalid threshold value: ${err.message}`);
             }
@@ -75,9 +73,9 @@ type EditTopicThresholdsModalProps = {
   onModalClose: () => void;
 };
 
-export const EditTopicThresholdsModal = (
-  props: EditTopicThresholdsModalProps
-) => {
+export const EditTopicThresholdsModal = ({
+  onModalClose,
+}: EditTopicThresholdsModalProps) => {
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
@@ -93,7 +91,7 @@ export const EditTopicThresholdsModal = (
     <div className="EditTopicThresholdsModal">
       <div className="compact-modal-title">
         <h3>Edit topic thresholds</h3>
-        <CWIconButton iconName="close" onClick={() => props.onModalClose()} />
+        <CWIconButton iconName="close" onClick={onModalClose} />
       </div>
       <div className="compact-modal-body">
         {topics.length > 0 ? (
@@ -108,7 +106,13 @@ export const EditTopicThresholdsModal = (
               return 0;
             })
             .map((topic) => {
-              return <EditTopicThresholdsRow topic={topic} key={topic.id} />;
+              return (
+                <EditTopicThresholdsRow
+                  topic={topic}
+                  key={topic.id}
+                  onClose={onModalClose}
+                />
+              );
             })
         ) : (
           <CWText>There are no topics in this community yet</CWText>
