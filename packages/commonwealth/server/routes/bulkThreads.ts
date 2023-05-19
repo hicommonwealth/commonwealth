@@ -126,12 +126,13 @@ const bulkThreads = async (
           : ''
       }
       ${includePinnedThreads || orderByQueries[orderBy] ? 'ORDER BY ' : ''}
+      ${includePinnedThreads ? ' threads.pinned DESC' : ''}
       ${
         orderByQueries[orderBy]
-          ? orderByQueries[orderBy] + (includePinnedThreads ? ',' : '')
+          ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy]
           : ''
       }
-      ${includePinnedThreads ? ' threads.pinned DESC' : ''}`;
+      `;
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
