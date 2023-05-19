@@ -11,7 +11,7 @@ export const Label: LabelerFilter = (
   blockNumber: number,
   chainId: string,
   data: IEventData,
-  chain?: string
+  origin?: string
 ): IEventLabel => {
   switch (data.kind) {
     case EventKind.ProposalCanceled: {
@@ -68,7 +68,7 @@ export const Label: LabelerFilter = (
       const _exhaustiveMatch: never = data;
       throw new Error(
         `[${SupportedNetwork.Compound}${
-          chain ? `::${chain}` : ''
+          origin ? `::${origin}` : ''
         }]: Unknown event type`
       );
     }

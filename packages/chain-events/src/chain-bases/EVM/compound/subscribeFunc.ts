@@ -26,20 +26,20 @@ import type { IEventData, RawEvent, Api } from './types';
  * @param ethNetworkUrlOrProvider
  * @param governorAddress
  * @param retryTimeMs
- * @param chain
+ * @param origin
  */
 export async function createApi(
   ethNetworkUrlOrProvider: string | providers.JsonRpcProvider,
   governorAddress: string,
   retryTimeMs = 10 * 1000,
-  chain?: string
+  origin?: string
 ): Promise<Api> {
   const ethNetworkUrl =
     typeof ethNetworkUrlOrProvider === 'string'
       ? ethNetworkUrlOrProvider
       : ethNetworkUrlOrProvider.connection.url;
   const log = factory.getLogger(
-    addPrefix(__filename, [SupportedNetwork.Compound, chain])
+    addPrefix(__filename, [SupportedNetwork.Compound, origin])
   );
 
   for (let i = 0; i < 3; ++i) {
@@ -49,7 +49,7 @@ export async function createApi(
           ? await createProvider(
               ethNetworkUrlOrProvider,
               SupportedNetwork.Compound,
-              chain
+              origin
             )
           : ethNetworkUrlOrProvider;
 
@@ -83,7 +83,7 @@ export async function createApi(
 
   throw new Error(
     `[${SupportedNetwork.Compound}${
-      chain ? `::${chain}` : ''
+      origin ? `::${origin}` : ''
     }]: Failed to start Compound listener for ${governorAddress} at ${ethNetworkUrl}`
   );
 }

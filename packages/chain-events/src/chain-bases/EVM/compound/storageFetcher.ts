@@ -18,10 +18,10 @@ import { EventKind, isGovernorAlpha } from './types';
 export class StorageFetcher extends IStorageFetcher<Api> {
   private readonly log;
 
-  constructor(protected readonly _api: Api, chain?: string) {
+  constructor(protected readonly _api: Api, origin?: string) {
     super(_api);
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Compound, chain])
+      addPrefix(__filename, [SupportedNetwork.Compound, origin])
     );
   }
 
