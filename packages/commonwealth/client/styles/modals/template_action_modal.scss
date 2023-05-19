@@ -62,16 +62,14 @@
   }
 }
 
-.TemplateSelectorItem {
+.template-item {
   display: flex;
   flex-direction: column;
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  margin-bottom: 1rem;
-  width: calc(100% - 15%);
-  
+    
   .selected {
     background-color: #f0f0f0;
   }

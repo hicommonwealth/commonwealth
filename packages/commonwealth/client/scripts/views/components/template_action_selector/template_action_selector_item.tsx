@@ -1,5 +1,6 @@
 import React from 'react';
 import { CWCheck } from '../component_kit/cw_icons/cw_icons';
+import { CWText } from '../component_kit/cw_text';
 
 import 'modals/template_action_modal.scss';
 
@@ -15,11 +16,17 @@ export const TemplateSelectorItem = ({
   isSelected = false,
 }: TemplateSelectorItemProps) => {
   return (
-    <div className="TemplateSelectorItem" onClick={onClick}>
+    <div className="template-item" onClick={onClick}>
       <div className="selected">{isSelected && <CWCheck />}</div>
-      <div className="template-nickname">{template.name}</div>
-      <div className="template-contract-address">
-        Created By: {template.created_by}
+      <div className="text">
+        <CWText fontWeight="medium" truncate noWrap>
+          <div id={template.name}></div> {template.name}
+        </CWText>
+        <CWText type="caption" truncate>
+          {template.created_by
+            ? `Created By: ${template.created_by}`
+            : 'No creator information'}
+        </CWText>
       </div>
     </div>
   );
