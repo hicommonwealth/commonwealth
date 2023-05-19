@@ -161,6 +161,8 @@ export const SplTokenForm = () => {
 
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
+              id: id,
+              name: name,
               address: mint,
               base: ChainBase.Solana,
               icon_url: chainFormDefaultFields.iconUrl,
