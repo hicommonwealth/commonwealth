@@ -19,7 +19,6 @@ import {
   useNewThreadForm,
   useAuthorName,
   checkNewThreadErrors,
-  updateTopicList,
 } from './helpers';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
@@ -27,23 +26,28 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import { useFetchTopicsQuery } from 'state/api/topics';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
-
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
   const chainId = app.chain.id;
-  const hasTopics = !!app.topics.getByCommunity(chainId).length;
+  const hasTopics = topics?.length;
   const author = app.user.activeAccount;
   const { authorName } = useAuthorName();
   const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
-  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
-    return (
-      isAdmin ||
-      t.tokenThreshold.isZero() ||
-      !TopicGateCheck.isGatedTopic(t.name)
-    );
-  });
+  const topicsForSelector =
+    topics ||
+    [].filter((t) => {
+      return (
+        isAdmin ||
+        t.tokenThreshold.isZero() ||
+        !TopicGateCheck.isGatedTopic(t.name)
+      );
+    });
 
   const {
     threadTitle,
@@ -108,7 +112,6 @@ export const NewThreadForm = () => {
       clearDraft();
 
       navigate(`/discussion/${result.id}`);
-      updateTopicList(result.topic, app.chain);
     } catch (err) {
       console.error(err);
     } finally {

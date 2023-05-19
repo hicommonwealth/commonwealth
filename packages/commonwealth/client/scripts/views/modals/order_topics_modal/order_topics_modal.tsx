@@ -10,15 +10,17 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import DraggableTopicsList from './draggable_topics_list';
 import { CWText } from '../../components/component_kit/cw_text';
-import { useUpdateFeaturedTopicsOrderMutation } from 'state/api/topics';
+import {
+  useFetchTopicsQuery,
+  useUpdateFeaturedTopicsOrderMutation,
+} from 'state/api/topics';
 
 type OrderTopicsModalProps = {
   onModalClose: () => void;
 };
 
-const getSortedTopics = (): Topic[] => {
-  const topics = app.topics
-    .getByCommunity(app.chain.id)
+const getSortedTopics = (rawTopics: Topic[]): Topic[] => {
+  const topics = rawTopics
     .filter((topic) => topic.featuredInSidebar)
     .map((topic) => ({ ...topic } as Topic));
 
@@ -36,9 +38,17 @@ const getSortedTopics = (): Topic[] => {
 };
 
 export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
-  const [topics, setTopics] = useState<Topic[]>(() => getSortedTopics());
+  const { data: rawTopics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+
   const { mutateAsync: updateFeaturedTopicsOrder } =
     useUpdateFeaturedTopicsOrderMutation();
+
+  const [topics, setTopics] = useState<Topic[]>(() =>
+    getSortedTopics(rawTopics)
+  );
+
   const handleSave = async () => {
     try {
       await updateFeaturedTopicsOrder({ featuredTopics: topics });

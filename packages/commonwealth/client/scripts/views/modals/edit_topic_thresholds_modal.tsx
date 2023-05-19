@@ -11,7 +11,10 @@ import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { useSetTopicThresholdMutation } from 'state/api/topics';
+import {
+  useFetchTopicsQuery,
+  useSetTopicThresholdMutation,
+} from 'state/api/topics';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -75,14 +78,16 @@ type EditTopicThresholdsModalProps = {
 export const EditTopicThresholdsModal = (
   props: EditTopicThresholdsModalProps
 ) => {
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+
   if (
     !app.user.isSiteAdmin &&
     !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
   ) {
     return null;
   }
-
-  const topics = app.topics.getByCommunity(app.activeChainId());
 
   return (
     <div className="EditTopicThresholdsModal">

@@ -57,8 +57,6 @@ export const RecentThreadsHeader = ({
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
-  // const topics = app.topics.getByCommunity(app.activeChainId());
-
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });

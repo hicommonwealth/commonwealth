@@ -59,8 +59,6 @@ const OverviewPage = () => {
     chainId: app.activeChainId(),
   });
 
-  // const topics = app.topics.getByCommunity(app.activeChainId());
-
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
 
   const topicsFiltered = anyTopicsFeatured

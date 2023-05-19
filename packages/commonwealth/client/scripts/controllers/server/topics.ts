@@ -18,9 +18,9 @@ class TopicsController {
     return this._store.getById(id);
   }
 
-  public getByCommunity(communityId) {
-    return this._store.getByCommunity(communityId);
-  }
+  // public getByCommunity(communityId) {
+  //   return this._store.getByCommunity(communityId);
+  // }
 
   // public getByName(name, communityId) {
   //   return this._store.getByName(name, communityId);

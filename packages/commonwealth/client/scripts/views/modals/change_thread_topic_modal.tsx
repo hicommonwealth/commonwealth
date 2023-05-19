@@ -8,6 +8,7 @@ import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { TopicSelector } from '../components/topic_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useFetchTopicsQuery } from 'state/api/topics';
 
 type ChangeThreadTopicModalProps = {
   onChangeHandler: (topic: Topic) => void;
@@ -21,7 +22,9 @@ export const ChangeThreadTopicModal = ({
   thread,
 }: ChangeThreadTopicModalProps) => {
   const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const handleSaveChanges = async () => {
     try {
