@@ -60,7 +60,23 @@ const FinishAxieLogin = () => {
   console.log('finish axie login');
 
   if (error) {
-    return <ErrorPage title="Login Error" message={error} />;
+    return (
+      <ErrorPage
+        title="Login Error"
+        message={
+          <div>
+            {error}
+            <br />
+            <br />
+            <div>
+              If this is your first time encountering this error, log out of{' '}
+              <a href="https://app.axieinfinity.com">Ronin Wallet</a> and{' '}
+              <a href="/axie-infinity">try logging in again</a>.
+            </div>
+          </div>
+        }
+      />
+    );
   } else {
     return <PageLoading />;
   }
