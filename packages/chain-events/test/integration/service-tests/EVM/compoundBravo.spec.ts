@@ -20,12 +20,12 @@ import {
   waitUntilBlock,
 } from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
-import { Api, EventKind } from '../../../../src/chains/compound/types';
+import { Api, EventKind } from '../../../../src/chain-bases/EVM/compound/types';
 import {
   Processor,
   StorageFetcher,
   Subscriber,
-} from '../../../../src/chains/compound';
+} from '../../../../src/chain-bases/EVM/compound';
 import { Listener } from '../../../../src';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 
@@ -54,6 +54,7 @@ describe('Integration tests for Compound Bravo', () => {
     contract_address: contract.contractAddress,
     verbose_logging: false,
     ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
+    origin: `Ethereum (Mainnet): ${contract.contractAddress}`,
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;

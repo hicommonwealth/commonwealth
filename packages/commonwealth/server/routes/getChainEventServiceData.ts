@@ -46,6 +46,7 @@ export const getChainEventServiceData = async (
                                 "ChainNodes".id                          as chain_node_id,
                                 "ChainNodes".private_url,
                                 "ChainNodes".url,
+                                "ChainNodes".name,
                                 "Contracts".address,
                                 ROW_NUMBER() OVER (ORDER BY "Chains".id) AS index
                          FROM "Chains"
@@ -58,14 +59,14 @@ export const getChainEventServiceData = async (
                            AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
                                 ("Chains".base = 'substrate' AND "Chains".type = 'chain') OR
                                 ("Chains".base = 'cosmos' AND ("Chains".type='token' OR "Chains".type='chain'))))
-      SELECT allChains.id,
-             allChains.substrate_spec,
+      SELECT allChains.substrate_spec,
              allChains.address                                                 as contract_address,
              allChains.network,
              allChains.base,
              allChains.ce_verbose                                              as verbose_logging,
              JSON_BUILD_OBJECT('id', allChains.chain_node_id, 'url',
-                               COALESCE(allChains.private_url, allChains.url)) as "ChainNode"
+                               COALESCE(allChains.private_url, allChains.url)) as "ChainNode",
+             allChains.name + ': ' + allChains.address                         as origin
       FROM allChains
       WHERE MOD(allChains.index, ${numChainSubs}) = ${chainSubIndex};
   `;

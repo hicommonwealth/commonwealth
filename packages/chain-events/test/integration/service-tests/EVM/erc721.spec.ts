@@ -15,11 +15,14 @@ import { setupChainEventConsumer } from '../../../../services/ChainEventsConsume
 import { Op, Sequelize } from 'sequelize';
 import { createChainEventsApp } from '../../../../services/app/Server';
 import { ERC721 } from '../../../../chain-testing/sdk/nft';
-import {EventKind, IErc721Contracts} from "../../../../src/chains/erc721/types";
-import {Processor, Subscriber} from "../../../../src/chains/erc721";
-import { Listener } from "../../../../src";
-import {IListenerInstances} from "../../../../services/ChainSubscriber/types";
-import {waitUntilBlock} from "../../../util";
+import {
+  EventKind,
+  IErc721Contracts,
+} from '../../../../src/chain-bases/EVM/erc721/types';
+import { Processor, Subscriber } from '../../../../src/chain-bases/EVM/erc721';
+import { Listener } from '../../../../src';
+import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
+import { waitUntilBlock } from '../../../util';
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -60,6 +63,7 @@ describe('Integration tests for ERC721', () => {
       contract_address: nft.address,
       verbose_logging: true,
       ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
+      origin: `Ethereum (Mainnet): ${nft.address}`,
     };
     // initialize the mock rabbitmq controller
     await rmq.init();
@@ -68,7 +72,10 @@ describe('Integration tests for ERC721', () => {
   describe('Tests the ERC721 event listener using the chain subscriber', async () => {
     before(async () => {
       // set up the chain subscriber
-      const listeners: IListenerInstances = await runSubscriberAsFunction(rmq, chain);
+      const listeners: IListenerInstances = await runSubscriberAsFunction(
+        rmq,
+        chain
+      );
       listener = listeners[`erc721_${chain.ChainNode.url}`] as Listener<
         IErc721Contracts,
         never,
@@ -122,9 +129,7 @@ describe('Integration tests for ERC721', () => {
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'transfer'`),
-              Sequelize.literal(
-                `event_data->>'from' = '${accounts[1]}'`
-              ),
+              Sequelize.literal(`event_data->>'from' = '${accounts[1]}'`),
             ],
           },
           block_number: events['transfer'].blockNumber,
@@ -141,12 +146,8 @@ describe('Integration tests for ERC721', () => {
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'approval'`),
-              Sequelize.literal(
-                `event_data->>'owner' = '${accounts[2]}'`
-              ),
-              Sequelize.literal(
-                `event_data->>'approved' = '${accounts[3]}'`
-              ),
+              Sequelize.literal(`event_data->>'owner' = '${accounts[2]}'`),
+              Sequelize.literal(`event_data->>'approved' = '${accounts[3]}'`),
             ],
           },
           block_number: events['approval'].blockNumber,
@@ -208,10 +209,10 @@ describe('Integration tests for ERC721', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id }
+      where: { chain: chain_id },
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id }
+      where: { chain: chain_id },
     });
   });
 });

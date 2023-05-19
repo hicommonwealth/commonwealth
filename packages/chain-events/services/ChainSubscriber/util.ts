@@ -17,7 +17,7 @@ import type { DB } from '../database/database';
 import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
-import {IRabbitMqHandler} from "../ChainEventsConsumer/ChainEventHandlers";
+import { IRabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -169,27 +169,27 @@ export async function manageRegularListeners(
   // for ease of use create a new object containing all listener instances that are not ERC20 or ERC721
   const regListenerInstances: IListenerInstances = {};
   const activeListenerNames: string[] = [];
-  for (const [name, instance] of Object.entries(listenerInstances)) {
+  for (const [origin, instance] of Object.entries(listenerInstances)) {
     if (
-      !name.startsWith(ChainNetwork.ERC20) &&
-      !name.startsWith(ChainNetwork.ERC721)
+      !origin.startsWith(ChainNetwork.ERC20) &&
+      !origin.startsWith(ChainNetwork.ERC721)
     )
-      regListenerInstances[name] = instance;
-    activeListenerNames.push(name);
+      regListenerInstances[origin] = instance;
+    activeListenerNames.push(origin);
   }
 
   // delete any listeners that should no longer be active on this ChainSubscriber instance
-  const updatedChainIds = chains.map((chain) => chain.id);
-  Object.keys(regListenerInstances).forEach((name) => {
-    if (!updatedChainIds.includes(name)) {
-      log.info(`[${name}]: Deleting chain listener...`);
-      listenerInstances[name].unsubscribe();
-      delete listenerInstances[name];
+  const updatedChainOrigins = chains.map((chain) => chain.origin);
+  Object.keys(regListenerInstances).forEach((origin) => {
+    if (!updatedChainOrigins.includes(origin)) {
+      log.info(`[${origin}]: Deleting chain listener...`);
+      listenerInstances[origin].unsubscribe();
+      delete listenerInstances[origin];
     }
   });
 
   const newChains = chains.filter((chain) => {
-    return !activeListenerNames.includes(chain.id);
+    return !activeListenerNames.includes(chain.origin);
   });
 
   // create listeners for all the new chains -- this does not update any existing chains!
@@ -229,22 +229,29 @@ async function setupNewListeners(
       continue;
     }
     try {
-      log.info(`Starting listener for: ${chain.id}`);
-      listenerInstances[chain.id] = await createListener(chain.id, network, {
-        address: chain.contract_address,
-        archival: false,
-        url: chain.ChainNode.url,
-        spec: chain.substrate_spec,
-        skipCatchup: false,
-        verbose: false, // using this will print event before chain is added to it
-        enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-        discoverReconnectRange: discoverReconnectRange.bind(models),
-      });
+      log.info(`Starting listener for: ${chain.origin}`);
+      listenerInstances[chain.origin] = await createListener(
+        chain.id,
+        network,
+        {
+          address: chain.contract_address,
+          archival: false,
+          url: chain.ChainNode.url,
+          spec: chain.substrate_spec,
+          skipCatchup: false,
+          verbose: false, // using this will print event before chain is added to it
+          enricherConfig: { balanceTransferThresholdPermill: 10_000 },
+          discoverReconnectRange: discoverReconnectRange.bind(models),
+        }
+      );
     } catch (error) {
-      delete listenerInstances[chain.id];
-      log.error(`Unable to create a listener instance for ${chain.id}`, error);
+      delete listenerInstances[chain.origin];
+      log.error(
+        `Unable to create a listener instance for ${chain.origin}`,
+        error
+      );
       rollbar?.critical(
-        `Unable to create a listener instance for ${chain.id}`,
+        `Unable to create a listener instance for ${chain.origin}`,
         error
       );
       continue;
@@ -275,14 +282,14 @@ async function setupNewListeners(
       ];
 
     // add the rabbitmq handler and the events it should ignore
-    listenerInstances[chain.id].eventHandlers.rabbitmq = {
+    listenerInstances[chain.origin].eventHandlers.rabbitmq = {
       handler: producer,
       excludedEvents,
     };
 
     // add the logger and the events it should ignore if required
     if (chain.verbose_logging) {
-      listenerInstances[chain.id].eventHandlers.logger = {
+      listenerInstances[chain.origin].eventHandlers.logger = {
         handler: generalLogger,
         excludedEvents,
       };
@@ -290,11 +297,11 @@ async function setupNewListeners(
 
     try {
       // subscribe the listener to its chain/RPC if it isn't yet subscribed
-      log.info(`Subscribing listener: ${chain.id}`);
-      await listenerInstances[chain.id].subscribe();
+      log.info(`Subscribing listener: ${chain.origin}`);
+      await listenerInstances[chain.origin].subscribe();
     } catch (e) {
-      delete listenerInstances[chain.id];
-      log.error(`Failed to subscribe listener: ${chain.id}`, e);
+      delete listenerInstances[chain.origin];
+      log.error(`Failed to subscribe listener: ${chain.origin}`, e);
     }
   }
 }
@@ -314,35 +321,38 @@ async function updateExistingListeners(
 ) {
   for (const chain of allChains) {
     // skip a chain if the listener is inactive due to an error occurring for that specific listener i.e. connection error
-    if (!listenerInstances[chain.id]) continue;
+    if (!listenerInstances[chain.origin]) continue;
     // if the chain is a substrate chain and its spec has changed since the last
     // check then update the active listener with the new spec
     if (
       chain.base === ChainBase.Substrate &&
       !_.isEqual(
         chain.substrate_spec,
-        (<SubstrateEvents.Listener>listenerInstances[chain.id]).options.spec
+        (<SubstrateEvents.Listener>listenerInstances[chain.origin]).options.spec
       )
     ) {
-      log.info(`Spec for ${chain.id} changed... restarting listener`);
+      log.info(`Spec for ${chain.origin} changed... restarting listener`);
       try {
         await (<SubstrateEvents.Listener>(
-          listenerInstances[chain.id]
+          listenerInstances[chain.origin]
         )).updateSpec(chain.substrate_spec);
       } catch (error) {
-        log.error(`Unable to update substrate spec for ${chain.id}!`, error);
+        log.error(
+          `Unable to update substrate spec for ${chain.origin}!`,
+          error
+        );
         rollbar?.critical(
-          `Unable to update substrate spec for ${chain.id}!`,
+          `Unable to update substrate spec for ${chain.origin}!`,
           error
         );
       }
     }
 
     if (
-      listenerInstances[chain.id].eventHandlers.logger &&
+      listenerInstances[chain.origin].eventHandlers.logger &&
       !chain.verbose_logging
     ) {
-      delete listenerInstances[chain.id].eventHandlers.logger;
+      delete listenerInstances[chain.origin].eventHandlers.logger;
     }
   }
 }

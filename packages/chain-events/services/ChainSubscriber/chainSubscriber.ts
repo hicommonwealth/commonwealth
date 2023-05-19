@@ -21,7 +21,8 @@ import {
   RABBITMQ_URI,
   REPEAT_TIME,
   ROLLBAR_SERVER_TOKEN,
-  CHAIN_SUBSCRIBER_INDEX, ROLLBAR_ENV,
+  CHAIN_SUBSCRIBER_INDEX,
+  ROLLBAR_ENV,
 } from '../config';
 
 import {
@@ -117,7 +118,7 @@ export async function processChains(
 
   log.info('Finished scheduled process.');
 
-  return listenerInstances
+  return listenerInstances;
 }
 
 /**
@@ -208,13 +209,14 @@ export async function getSubscriberChainData(
     // this query will ignore all network types, token types, contract types, as well has_chain_events_listener
     // use this ONLY if you know what you are doing (must be a compatible chain)
     const query = `
-        SELECT C.id,
-               C.substrate_spec,
+        SELECT C.substrate_spec,
                C2.address                                                              as contract_address,
                C.network,
                C.base,
                C.ce_verbose                                                            as verbose_logging,
-               JSON_BUILD_OBJECT('id', CN.id, 'url', COALESCE(CN.private_url, CN.url)) as "ChainNode"
+               JSON_BUILD_OBJECT('id', CN.id, 'url', COALESCE(CN.private_url, CN.url), 'name', CN.name) as "ChainNode",
+               CN.name,
+               CN.name + ': ' + C2.address as origin
         FROM "Chains" C
                  JOIN "ChainNodes" CN on C.chain_node_id = CN.id
                  LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id

@@ -6,11 +6,11 @@ import type { IAnyListener } from '../../src';
 export type IListenerInstances = { [key: string]: IAnyListener };
 
 export type ChainAttributes = {
-  id: string;
   base: ChainBase;
   network: ChainNetwork;
   substrate_spec: RegisteredTypes;
   contract_address: string;
   verbose_logging: boolean;
-  ChainNode: { id: number; url: string };
+  ChainNode: { id: number; url: string; name: string };
+  origin: string;
 };

@@ -21,14 +21,14 @@ import {
   waitUntilBlock,
 } from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
-import { Api, EventKind } from '../../../../src/chains/aave/types';
+import { Api, EventKind } from '../../../../src/chain-bases/EVM/aave/types';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 import { Listener } from '../../../../src';
 import {
   Processor,
   StorageFetcher,
   Subscriber,
-} from '../../../../src/chains/aave';
+} from '../../../../src/chain-bases/EVM/aave';
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -54,7 +54,12 @@ describe('Integration tests for Aave', () => {
     substrate_spec: null,
     contract_address: contract.contractAddress,
     verbose_logging: false,
-    ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
+    ChainNode: {
+      id: 1,
+      url: 'http://127.0.0.1:8545',
+      name: 'Ethereum (Mainnet)',
+    },
+    origin: `Ethereum (Mainnet): ${contract.contractAddress}`,
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;
