@@ -4,7 +4,7 @@ import Sublayout from 'views/Sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
-type ErrorPageProps = { title?: any; message?: string };
+type ErrorPageProps = { title?: any; message?: string | JSX.Element };
 
 const ErrorPage = ({ message }: ErrorPageProps) => {
   const chunkLoadingErrRe = /Loading chunk/;
