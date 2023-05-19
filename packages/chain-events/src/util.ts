@@ -18,22 +18,22 @@ import {
   Listener as CompoundListener,
   Title as CompoundTitle,
   Label as CompoundLabel,
-} from 'chain-bases/EVM/compound';
+} from './chain-bases/EVM/compound';
 import {
   Listener as Erc20Listener,
   Title as Erc20Title,
   Label as Erc20Label,
-} from 'chain-bases/EVM/erc20';
+} from './chain-bases/EVM/erc20';
 import {
   Listener as Erc721Listener,
   Title as Erc721Title,
   Label as Erc721Label,
-} from 'chain-bases/EVM/erc721';
+} from './chain-bases/EVM/erc721';
 import {
   Listener as AaveListener,
   Title as AaveTitle,
   Label as AaveLabel,
-} from 'chain-bases/EVM/aave';
+} from './chain-bases/EVM/aave';
 import {
   Listener as CosmosListener,
   Title as CosmosTitle,
@@ -85,12 +85,12 @@ export function Label(chain: string, event: CWEvent): IEventLabel {
 
 /**
  * Creates a listener instance and returns it if no error occurs. This function throws on error.
- * @param chain The chain to create a listener for
+ * @param origin The chain to create a listener for
  * @param options The listener options for the specified chain
  * @param network the listener network to use
  */
 export async function createListener(
-  chain: string,
+  origin: string,
   network: SupportedNetwork,
   options: {
     address?: string;
@@ -122,12 +122,12 @@ export async function createListener(
     IEventSubscriber<any, any>,
     any
   >;
-  const log = factory.getLogger(addPrefix(__filename, [network, chain]));
+  const log = factory.getLogger(addPrefix(__filename, [network, origin]));
 
   if (network === SupportedNetwork.Substrate) {
     // start a substrate listener
     listener = new SubstrateListener(
-      chain,
+      origin,
       options.url,
       options.spec,
       !!options.archival,
@@ -139,7 +139,7 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.Compound) {
     listener = new CompoundListener(
-      chain,
+      origin,
       options.address,
       options.url,
       !!options.skipCatchup,
@@ -148,7 +148,7 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.ERC20) {
     listener = new Erc20Listener(
-      chain,
+      origin,
       options.tokenAddresses || [options.address],
       options.url,
       Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
@@ -157,7 +157,7 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.ERC721) {
     listener = new Erc721Listener(
-      chain,
+      origin,
       options.tokenAddresses || [options.address],
       options.url,
       Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
@@ -165,7 +165,7 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.Aave) {
     listener = new AaveListener(
-      chain,
+      origin,
       options.address,
       options.url,
       !!options.skipCatchup,
@@ -174,7 +174,7 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.Cosmos) {
     listener = new CosmosListener(
-      chain,
+      origin,
       options.url,
       !!options.skipCatchup,
       options.pollTime,

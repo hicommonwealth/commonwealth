@@ -49,21 +49,21 @@ export abstract class Listener<
 
   protected _lastCachedBlockNumber: number;
 
-  protected readonly _chain: string;
+  protected readonly _origin: string;
 
   protected readonly _verbose: boolean;
 
   protected constructor(
     network: SupportedNetwork,
-    chain: string,
+    origin: string,
     verbose?: boolean
   ) {
-    this._chain = chain;
+    this._origin = origin;
     this.eventHandlers = {};
     this._verbose = !!verbose;
     this.globalExcludedEvents = [];
 
-    log = factory.getLogger(addPrefix(__filename, [network, chain]));
+    log = factory.getLogger(addPrefix(__filename, [network, origin]));
   }
 
   public abstract init(): Promise<void>;
@@ -88,7 +88,7 @@ export abstract class Listener<
   protected async handleEvent(event: CWEvent<IChainEventData>): Promise<void> {
     let prevResult;
 
-    event.chain = this._chain;
+    event.chain = this._origin;
     event.received = Date.now();
 
     for (const key of Object.keys(this.eventHandlers)) {
@@ -110,8 +110,8 @@ export abstract class Listener<
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   protected abstract processBlock(block: any): Promise<void>;
 
-  public get chain(): string {
-    return this._chain;
+  public get origin(): string {
+    return this._origin;
   }
 
   public get subscribed(): boolean {
@@ -138,7 +138,7 @@ export abstract class Listener<
     }
 
     // fetch the block number of the last event from database
-    let offlineRange = await this.discoverReconnectRange(this._chain);
+    let offlineRange = await this.discoverReconnectRange(this._origin);
 
     if (
       this._lastCachedBlockNumber &&

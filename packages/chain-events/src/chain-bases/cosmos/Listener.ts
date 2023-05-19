@@ -37,7 +37,7 @@ export class Listener extends BaseListener<
     super(SupportedNetwork.Cosmos, chain, verbose);
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Cosmos, this._chain])
+      addPrefix(__filename, [SupportedNetwork.Cosmos, this._origin])
     );
 
     this._options = {
@@ -52,17 +52,17 @@ export class Listener extends BaseListener<
 
   public async init(): Promise<void> {
     try {
-      this._api = await createApi(this._options.url, 10 * 1000, this._chain);
+      this._api = await createApi(this._options.url, 10 * 1000, this._origin);
     } catch (error) {
       this.log.error(`Fatal error occurred while starting the API`);
       throw error;
     }
 
     try {
-      this._processor = new Processor(this._api, this._chain);
+      this._processor = new Processor(this._api, this._origin);
       this._subscriber = new Subscriber(
         this._api,
-        this._chain,
+        this._origin,
         this._options.pollTime,
         this._verbose
       );
@@ -74,7 +74,7 @@ export class Listener extends BaseListener<
     }
 
     try {
-      this.storageFetcher = new StorageFetcher(this._api, this._chain);
+      this.storageFetcher = new StorageFetcher(this._api, this._origin);
     } catch (error) {
       this.log.error(
         `Fatal error occurred while starting the Ethereum dater and storage fetcher`
@@ -86,7 +86,7 @@ export class Listener extends BaseListener<
   public async subscribe(): Promise<void> {
     if (!this._subscriber) {
       this.log.info(
-        `Subscriber for ${this._chain} isn't initialized. Please run init() first!`
+        `Subscriber for ${this._origin} isn't initialized. Please run init() first!`
       );
       return;
     }
@@ -99,7 +99,7 @@ export class Listener extends BaseListener<
 
     try {
       this.log.info(
-        `Subscribing to Cosmos chain: ${this._chain}, on url ${this._options.url}`
+        `Subscribing to Cosmos chain: ${this._origin}, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(
         this.processBlock.bind(this),

@@ -37,7 +37,7 @@ export class Listener extends BaseListener<
     super(SupportedNetwork.Aave, chain, verbose);
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Aave, this._chain])
+      addPrefix(__filename, [SupportedNetwork.Aave, this._origin])
     );
 
     this._options = {
@@ -57,7 +57,7 @@ export class Listener extends BaseListener<
         this._options.url,
         this._options.govContractAddress,
         10 * 1000,
-        this._chain
+        this._origin
       );
     } catch (error) {
       this.log.error(`Fatal error occurred while starting the API`);
@@ -65,9 +65,9 @@ export class Listener extends BaseListener<
     }
 
     try {
-      this._processor = new Processor(this._api, this._chain);
-      this._subscriber = new Subscriber(this._api, this._chain, this._verbose);
-      this.storageFetcher = new StorageFetcher(this._api, this._chain);
+      this._processor = new Processor(this._api, this._origin);
+      this._subscriber = new Subscriber(this._api, this._origin, this._verbose);
+      this.storageFetcher = new StorageFetcher(this._api, this._origin);
     } catch (error) {
       this.log.error(
         `Fatal error occurred while starting the Processor, StorageFetcher and Subscriber`
@@ -79,7 +79,7 @@ export class Listener extends BaseListener<
   public async subscribe(): Promise<void> {
     if (!this._subscriber) {
       this.log.info(
-        `Subscriber for ${this._chain} isn't initialized. Please run init() first!`
+        `Subscriber for ${this._origin} isn't initialized. Please run init() first!`
       );
       return;
     }
@@ -89,7 +89,7 @@ export class Listener extends BaseListener<
 
     try {
       this.log.info(
-        `Subscribing to Aave contract: ${this._chain}, on url ${this._options.url}`
+        `Subscribing to Aave contract: ${this._origin}, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;
@@ -158,7 +158,6 @@ export class Listener extends BaseListener<
     ) {
       this._lastCachedBlockNumber = blockNumber;
     }
-
   }
 
   public get options(): AaveListenerOptions {

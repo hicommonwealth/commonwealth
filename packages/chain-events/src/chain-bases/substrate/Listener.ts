@@ -49,7 +49,7 @@ export class Listener extends BaseListener<
     super(SupportedNetwork.Substrate, chain, verbose);
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Substrate, this._chain])
+      addPrefix(__filename, [SupportedNetwork.Substrate, this._origin])
     );
 
     this._options = {
@@ -70,7 +70,7 @@ export class Listener extends BaseListener<
       this._api = await createApi(
         this._options.url,
         this._options.spec,
-        this._chain
+        this._origin
       );
 
       this._api.on('connected', this.processMissedBlocks);
@@ -80,17 +80,17 @@ export class Listener extends BaseListener<
     }
 
     try {
-      this._poller = new Poller(this._api, this._chain);
+      this._poller = new Poller(this._api, this._origin);
       this._processor = new Processor(
         this._api,
         this._options.enricherConfig,
-        this._chain
+        this._origin
       );
-      this.storageFetcher = new StorageFetcher(this._api, this._chain);
+      this.storageFetcher = new StorageFetcher(this._api, this._origin);
       this._subscriber = await new Subscriber(
         this._api,
         this._verbose,
-        this._chain
+        this._origin
       );
     } catch (error) {
       this.log.error(
@@ -113,7 +113,7 @@ export class Listener extends BaseListener<
 
     try {
       this.log.info(
-        `Subscribing to ${this._chain} on url ${this._options.url}`
+        `Subscribing to ${this._origin} on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;

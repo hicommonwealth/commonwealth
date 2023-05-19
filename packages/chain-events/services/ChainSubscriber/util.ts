@@ -231,7 +231,7 @@ async function setupNewListeners(
     try {
       log.info(`Starting listener for: ${chain.origin}`);
       listenerInstances[chain.origin] = await createListener(
-        chain.id,
+        chain.ChainNode.name,
         network,
         {
           address: chain.contract_address,
