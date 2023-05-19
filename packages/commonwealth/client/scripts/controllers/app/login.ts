@@ -340,7 +340,7 @@ export async function loginWithMagicLink(email: string, onlyRevalidateSession?: 
     signature.chain_id = chainId;
     await app.sessions.authSession(
       ChainBase.CosmosSDK, // not app.chain.base, since we don't know where the user is logging in
-      chainBaseToCanvasChainId(ChainBase.CosmosSDK), // not the cosmos chain id, since that might change
+      chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
       chainAddress,
       sessionPayload,
       JSON.stringify(signature),
@@ -355,11 +355,11 @@ export async function loginWithMagicLink(email: string, onlyRevalidateSession?: 
     const signerAddress = await signer.getAddress(); // should be the same as chainAddress
 
     const timestamp = +new Date();
-    const { signed, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp);
+    const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp);
     // TODO: provide blockhash as last argument to signSessionWithMagic
     await app.sessions.authSession(
       ChainBase.Ethereum, // not app.chain.base, since we don't know where the user is logging in
-      chainId,
+      chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
       signerAddress,
       sessionPayload,
       signed

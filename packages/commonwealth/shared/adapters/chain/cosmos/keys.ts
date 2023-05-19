@@ -46,11 +46,11 @@ export const getADR036SignableAction = async (
 
 export const getADR036SignableSession = async (
   token: Uint8Array,
-  address: string
+  address: string,
+  chainId = "",
 ): Promise<StdSignDoc> => {
   const accountNumber = 0;
   const sequence = 0;
-  const chainId = '';
   const fee: StdFee = {
     gas: '0',
     amount: [],

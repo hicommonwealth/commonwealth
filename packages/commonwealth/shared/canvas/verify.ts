@@ -194,11 +194,9 @@ export const verify = async ({
       const { pub_key, signature: predecodedSignature, chain_id } = JSON.parse(signature)
       const signDoc = await getADR036SignableSession(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
-        payload.from
+        payload.from,
+        chain_id, // if undefined, signDoc produces an ADR-036 signature
       );
-      if (chain_id !== undefined) {
-        signDoc.chain_id = chain_id;
-      }
       const signDocDigest = new cosmCrypto.Sha256(cosmAmino.serializeSignDoc(signDoc)).digest();
       const prefix = cosmEncoding.Bech32.decode(payload.from).prefix;
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
