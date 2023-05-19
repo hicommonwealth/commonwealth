@@ -43,7 +43,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .filter-section {
