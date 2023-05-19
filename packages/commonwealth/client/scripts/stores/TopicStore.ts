@@ -41,9 +41,9 @@ class TopicStore extends IdStore<Topic> {
     return this._topicsByCommunity[communityId] || [];
   }
 
-  public getByName(name, communityId): Topic {
-    return this.getByCommunity(communityId).find((t) => t.name === name);
-  }
+  // public getByName(name, communityId): Topic {
+  //   return this.getByCommunity(communityId).find((t) => t.name === name);
+  // }
 }
 
 export default TopicStore;

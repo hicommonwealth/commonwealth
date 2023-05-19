@@ -1,10 +1,6 @@
-import BN from 'bn.js';
-import $ from 'jquery';
 import Topic from '../../models/Topic';
-import app from 'state';
 
 import { TopicStore } from 'stores';
-import { ThreadActionType } from '../../../../shared/types';
 
 class TopicsController {
   private _store: TopicStore = new TopicStore();
@@ -26,9 +22,9 @@ class TopicsController {
     return this._store.getByCommunity(communityId);
   }
 
-  public getByName(name, communityId) {
-    return this._store.getByName(name, communityId);
-  }
+  // public getByName(name, communityId) {
+  //   return this._store.getByName(name, communityId);
+  // }
 
   // public addToStore(topic: Topic) {
   //   return this._store.add(topic);

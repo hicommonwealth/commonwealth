@@ -25,6 +25,7 @@ import { EventEmitter } from 'events';
 import { Link, LinkSource } from 'server/models/thread';
 import axios from 'axios';
 import { ThreadActionType } from 'types';
+import { queryClient } from 'state/api/config';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -738,7 +739,13 @@ class ThreadsController {
         ? this.listingStore.getCutoffDate(options).toISOString()
         : moment().toISOString(),
     };
-    const topicId = app.topics.getByName(topicName, chain)?.id;
+
+    const data = queryClient.getQueryData<Topic[]>([
+      'bulkTopics',
+      app.chain.id,
+    ]);
+
+    const topicId = data?.find((el) => el.name === topicName)?.id;
 
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;

@@ -17,7 +17,7 @@ type OrderTopicsModalProps = {
 };
 
 const getSortedTopics = (): Topic[] => {
-  const topics = app.topics.store
+  const topics = app.topics
     .getByCommunity(app.chain.id)
     .filter((topic) => topic.featuredInSidebar)
     .map((topic) => ({ ...topic } as Topic));
