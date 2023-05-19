@@ -113,7 +113,7 @@ const bulkThreads = async (
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
            reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes)
-          ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
+          ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
@@ -132,6 +132,7 @@ const bulkThreads = async (
           ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy]
           : ''
       }
+      LIMIT 20
       `;
     let preprocessedThreads;
     try {
