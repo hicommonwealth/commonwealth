@@ -7,7 +7,7 @@ module.exports = {
         'Addresses',
         'role',
         {
-          type: Sequelize.ENUM('member', 'admin', 'moderator'),
+          type: Sequelize.ENUM('member', 'moderator', 'admin'),
           allowNull: false,
           defaultValue: 'member',
         },
@@ -22,14 +22,15 @@ module.exports = {
       const ids = roles.map((r) => r.address_id);
       const permissions = roles.map((r) => r.permission);
 
-      // Make the update in one query
+      // Make the update in one query, cast the permissions to the enum
       await queryInterface.sequelize.query(
         `
         UPDATE "Addresses"
         SET role = CASE 
             ${ids
               .map(
-                (id, index) => `WHEN id = ${id} THEN '${permissions[index]}'`
+                (id, index) =>
+                  `WHEN id = ${id} THEN '${permissions[index]}'::"enum_Addresses_role"`
               )
               .join(' ')}
         END
@@ -38,6 +39,7 @@ module.exports = {
         { transaction: t }
       );
 
+      // drop unused tables
       await queryInterface.dropTable('RoleAssignments', { transaction: t });
       await queryInterface.dropTable('CommunityRoles', { transaction: t });
       await queryInterface.dropTable('Roles', { transaction: t });
