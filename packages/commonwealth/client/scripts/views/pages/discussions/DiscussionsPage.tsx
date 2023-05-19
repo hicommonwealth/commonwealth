@@ -115,78 +115,21 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      // always reset pagination on page change
-      app.threads.resetPagination();
-
-      // check if store already has atleast 20 threads for this community -> topic/stage,
-      // if so dont fetch more for now (scrolling will fetch more)
-      const chain = app.activeChainId();
-      const foundThreadsForChain = app.threads.store
-        .getAll()
-        .filter((x) => x.chain === chain);
-      if (foundThreadsForChain.length >= 20) {
-        if (topicName || stageName) {
-          let finalThreads = foundThreadsForChain;
-
-          // get threads for current topic
-          const topicId = app.topics.getByName(topicName, chain)?.id;
-          if (topicId) {
-            finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
-          }
-
-          // get threads for current stage
-          if (stageName) {
-            finalThreads = finalThreads.filter((x) => x.stage === stageName);
-          }
-
-          // get threads for date filter
-          if (
-            dateRange &&
-            ['week', 'month'].includes(dateRange.toLowerCase())
-          ) {
-            const today = moment();
-            const from_date = today.startOf(dateRange.toLowerCase() as any);
-            const to_date = today.endOf(dateRange.toLowerCase() as any);
-
-            finalThreads = finalThreads.filter(
-              (x) =>
-                moment(x.createdAt) > from_date && moment(x.createdAt) < to_date
-            );
-          }
-
-          if (finalThreads.length >= 20) {
-            setThreads(sortPinned(sortByFeaturedFilter(finalThreads)));
-            setInitializing(false);
-            return;
-          }
-        }
-        // else show all threads
-        else {
-          setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
-          setInitializing(false);
-          return;
-        }
-      }
-
-      // if the store has <= 20 threads then fetch more
-      app.threads
-        .loadNextPage({
-          topicName,
-          stageName,
-          includePinnedThreads: true,
-          featuredFilter,
-          dateRange,
-        })
-        .then((t) => {
-          // Fetch first 20 + unpinned threads
-          setThreads(sortPinned(sortByFeaturedFilter(t)));
-          setInitializing(false);
-        });
-    });
-
-    return () => clearTimeout(timerId);
-  }, [stageName, topicName, featuredFilter, dateRange]);
+    app.threads.resetPagination();
+    app.threads
+      .loadNextPage({
+        topicName,
+        stageName,
+        includePinnedThreads: true,
+        featuredFilter,
+        dateRange,
+      })
+      .then((t) => {
+        // Fetch first 20 + unpinned threads
+        setThreads(sortPinned(sortByFeaturedFilter(t)));
+        setInitializing(false);
+      });
+  }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
     const newThreads = await app.threads.loadNextPage({
