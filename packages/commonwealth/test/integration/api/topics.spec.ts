@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import { ApiEndpoints } from 'state/api/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -82,7 +83,7 @@ describe('Topic Tests', () => {
     it('Should pass /bulkTopics', async () => {
       const res = await chai.request
         .agent(app)
-        .get('/api/bulkTopics')
+        .get(`/api${ApiEndpoints.BulkTopics}`)
         .set('Accept', 'application/json')
         .query({
           chain,

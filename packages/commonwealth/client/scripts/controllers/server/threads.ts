@@ -25,7 +25,7 @@ import { EventEmitter } from 'events';
 import { Link, LinkSource } from 'server/models/thread';
 import axios from 'axios';
 import { ThreadActionType } from 'types';
-import { queryClient } from 'state/api/config';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -739,7 +739,7 @@ class ThreadsController {
     };
 
     const data = queryClient.getQueryData<Topic[]>([
-      'bulkTopics',
+      ApiEndpoints.BulkTopics,
       app.chain.id,
     ]);
 

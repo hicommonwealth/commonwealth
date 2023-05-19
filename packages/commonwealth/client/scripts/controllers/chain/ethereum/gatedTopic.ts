@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import ITokenAdapter from '../../../models/ITokenAdapter';
 import app from 'state';
-import { queryClient } from 'state/api/config';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 import Topic from 'models/Topic';
 
 export default class TopicGateCheck {
@@ -9,7 +9,7 @@ export default class TopicGateCheck {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
       // TODO getByName
       const data = queryClient.getQueryData<Topic[]>([
-        'bulkTopics',
+        ApiEndpoints.BulkTopics,
         app.chain.id,
       ]);
 
@@ -29,7 +29,7 @@ export default class TopicGateCheck {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
       // TODO getByName
       const data = queryClient.getQueryData<Topic[]>([
-        'bulkTopics',
+        ApiEndpoints.BulkTopics,
         app.chain.id,
       ]);
 

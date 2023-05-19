@@ -2,7 +2,9 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import app from 'state';
 import axios from 'axios';
 import Topic from 'models/Topic';
-import { queryClient } from 'state/api/config';
+import { ApiEndpoints, queryClient } from 'state/api/config';
+
+const TOPICS_STALE_TIME = 30 * 1_000; // 30 s
 
 interface CreateTopicProps {
   name: string;
@@ -42,7 +44,7 @@ export const useCreateTopicMutation = () => {
   return useMutation({
     mutationFn: createTopic,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bulkTopics'] });
+      queryClient.invalidateQueries({ queryKey: [ApiEndpoints.BulkTopics] });
     },
   });
 };
@@ -52,20 +54,23 @@ interface FetchTopicsProps {
 }
 
 const fetchTopics = async ({ chainId }: FetchTopicsProps) => {
-  const response = await axios.get(`${app.serverUrl()}/bulkTopics`, {
-    params: {
-      chain: chainId || app.activeChainId(),
-    },
-  });
+  const response = await axios.get(
+    `${app.serverUrl()}${ApiEndpoints.BulkTopics}`,
+    {
+      params: {
+        chain: chainId || app.activeChainId(),
+      },
+    }
+  );
 
   return response.data.result.map((t) => new Topic(t));
 };
 
 export const useFetchTopicsQuery = ({ chainId }: FetchTopicsProps) => {
   return useQuery({
-    queryKey: ['bulkTopics', chainId],
+    queryKey: [ApiEndpoints.BulkTopics, chainId],
     queryFn: () => fetchTopics({ chainId }),
-    staleTime: 1000,
+    staleTime: TOPICS_STALE_TIME,
   });
 };
 
@@ -97,7 +102,7 @@ export const useEditTopicMutation = () => {
     mutationFn: editTopic,
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['bulkTopics', variables.topic.chainId],
+        queryKey: [ApiEndpoints.BulkTopics, variables.topic.chainId],
       });
     },
   });
@@ -149,7 +154,7 @@ export const useUpdateFeaturedTopicsOrderMutation = () => {
     mutationFn: updateFeaturedTopicsOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['bulkTopics'],
+        queryKey: [ApiEndpoints.BulkTopics],
       });
     },
   });
@@ -176,7 +181,7 @@ export const useSetTopicThresholdMutation = () => {
     mutationFn: setTopicThreshold,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['bulkTopics'],
+        queryKey: [ApiEndpoints.BulkTopics],
       });
     },
   });
