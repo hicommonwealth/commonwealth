@@ -10,6 +10,7 @@ export type ChainEntityAttributes = {
   type: string;
   type_id: string;
   queued: number;
+  contract_address?: string;
   author?: string;
   completed?: boolean;
   created_at?: Date;
@@ -47,6 +48,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 },
+      contract_address: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'ChainEntities',
@@ -57,7 +59,10 @@ export default (
       paranoid: false,
       indexes: [
         { fields: ['id'] },
-        { fields: ['chain', 'type', 'id'], unique: true },
+        {
+          fields: ['chain', 'type', 'type_id', 'contract_address'],
+          unique: true,
+        },
       ],
     }
   );

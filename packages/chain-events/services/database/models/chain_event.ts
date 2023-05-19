@@ -13,6 +13,7 @@ export type ChainEventAttributes = {
   block_number: number;
   event_data: any;
   queued: number;
+  contract_address?: string;
   entity_id?: number;
   network: SupportedNetwork;
   chain: string;
@@ -44,6 +45,7 @@ export default (
       queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 },
       chain: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
+      contract_address: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'ChainEvents',
