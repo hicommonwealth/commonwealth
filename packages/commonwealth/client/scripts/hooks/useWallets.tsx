@@ -312,7 +312,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
           cachedTimestamp,
           cachedChainId
         );
-        // TODO: test this flow
         await app.sessions.authSession(
           selectedWallet.chain,
           cachedChainId,
@@ -363,7 +362,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
         cachedTimestamp,
         cachedChainId
       );
-      // TODO: test this flow
       // TODO: call authSession here, which requires special handling because of
       // the call to signSessionWithAccount() earlier
       await onLogInWithAccount(primaryAccount, true);

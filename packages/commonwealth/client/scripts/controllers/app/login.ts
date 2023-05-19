@@ -6,6 +6,7 @@ import { ChainBase, WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
+import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
@@ -338,9 +339,8 @@ export async function loginWithMagicLink(email: string, onlyRevalidateSession?: 
     const signature = signed.signatures[0];
     signature.chain_id = chainId;
     await app.sessions.authSession(
-      // not app.chain.base, since we don't know where the user is logging in
-      ChainBase.CosmosSDK,
-      chainId,
+      ChainBase.CosmosSDK, // not app.chain.base, since we don't know where the user is logging in
+      chainBaseToCanvasChainId(ChainBase.CosmosSDK), // not the cosmos chain id, since that might change
       chainAddress,
       sessionPayload,
       JSON.stringify(signature),
@@ -358,8 +358,7 @@ export async function loginWithMagicLink(email: string, onlyRevalidateSession?: 
     const { signed, chainId, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp);
     // TODO: provide blockhash as last argument to signSessionWithMagic
     await app.sessions.authSession(
-      // not app.chain.base, since we don't know where the user is logging in
-      ChainBase.Ethereum,
+      ChainBase.Ethereum, // not app.chain.base, since we don't know where the user is logging in
       chainId,
       signerAddress,
       sessionPayload,

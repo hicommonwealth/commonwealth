@@ -55,7 +55,7 @@ export function chainBaseToCanvasChainId(
 ): string {
   // The Canvas chain id is a stringified ETH chain ID, or Cosmos bech32 prefix, or equivalent.
   if (chainBase === ChainBase.CosmosSDK) {
-    // TODO: get the chain id
+    // Temporarily locked to cosmoshub-1, since we don't have the live chain ID for cosmos chains
     return 'cosmoshub-1';
   } else if (chainBase === ChainBase.Ethereum) {
     return idOrPrefix.toString();
