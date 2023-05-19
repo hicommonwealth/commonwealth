@@ -224,8 +224,8 @@ export function initMagicAuth(models: DB) {
 
           const addressExistsForChain = existingUser.Addresses?.some(
             (a) =>
-              a.chain === chain.id ||
-              (chain.base === 'cosmos' &&
+              chain?.id === a.chain ||
+              (chain?.base === 'cosmos' &&
                 (a.address.startsWith('cosmos') ||
                   a.address.startsWith('osmo')))
           );
