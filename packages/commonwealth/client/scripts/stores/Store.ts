@@ -13,7 +13,7 @@ abstract class Store<T> {
 
     // Only add unique elements to store
     if (index === -1) {
-      options && options.pushToIndex
+      options && options.pushToIndex >= 0
         ? this._store.splice(options.pushToIndex, 0, item)
         : this._store.push(item);
     } else {

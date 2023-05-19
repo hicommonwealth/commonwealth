@@ -305,9 +305,9 @@ class ThreadsController {
         .getAll()
         .slice()
         .reverse()
-        .findIndex((x) => x.pinned);
+        .findIndex((x) => x.pinned === true);
       this.store.add(result, {
-        pushToIndex: this.store.getAll().length - lastPinnedThreadIndex,
+        pushToIndex: lastPinnedThreadIndex || 0,
       });
       this.numTotalThreads += 1;
       this._listingStore.add(result);
