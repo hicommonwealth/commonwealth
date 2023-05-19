@@ -24,8 +24,6 @@ module.exports = {
         { transaction: t }
       );
 
-      // TODO: verify that migration fails if the above dblink query fails
-
       await queryInterface.addColumn(
         'ChainEvents',
         'contract_address',
