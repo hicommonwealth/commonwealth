@@ -17,6 +17,10 @@
     &:active {
         border-radius: 1px solid $primary-500;
     }
+
+    .button-text {
+        margin-right: auto;
+    }
 }
 
 .select-options-wrapper {
