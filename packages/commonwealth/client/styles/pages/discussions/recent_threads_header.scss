@@ -39,9 +39,16 @@
     color: $neutral-600;
   }
 
-  .buttons-row {
+  .filter-row {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .filter-section {
+    display: flex;
+    flex-wrap: nowrap;
     gap: 8px;
   }
 
@@ -50,6 +57,30 @@
     place-items: center;
     font-weight: bold;
     font-size: 14px;
-    margin-right: 8px;
+    margin-right: 16px;
+    width: 34px;
+  }
+
+  @include smallInclusive {
+    .filter-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+
+  @include extraSmall {
+    .filter-section-right {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .filter-section-top {
+      align-items: flex-start
+    }
+
+    .filter-label {
+      padding: 8px 0;
+    }
   }
 }

@@ -11,11 +11,11 @@
     cursor: pointer;
     height: auto !important;
     background-color: $white;
-    font-size: 14px;
+    font-size: 14px !important;
 
     &:hover,
     &:active {
-        background-color: $neutral-50;
+        border-radius: 1px solid $primary-500;
     }
 }
 
@@ -25,10 +25,13 @@
     text-overflow: ellipsis;
     padding: 8px !important;
     background-color: $white;
-    box-shadow: $elevation-3;
     border-radius: $border-radius-md  !important;
     overflow-y: auto;
     max-height: 280px;
+    margin-top: 4px;
+    font-size: 14px !important;
+    border: 1px solid $neutral-200;
+    box-shadow: $elevation-6;
 }
 
 .select-option {
@@ -44,10 +47,10 @@
     height: auto !important;
     padding: 10px 12px !important;
     border-radius: $border-radius-md  !important;
-    font-size: 14px;
+    font-size: 14px !important;
 
     &:hover,
     &:active {
-        background-color: $neutral-50;
+        background-color: $primary-100;
     }
 }

@@ -155,134 +155,142 @@ export const RecentThreadsHeader = ({
         </>
       )}
       {app.chain?.meta && (
-        <div className="buttons-row">
-          <p className="filter-label">Sort</p>
-          <Select
-            selected={featuredFilter || 'newest'}
-            onSelect={(item: any) => {
-              onFilterSelect({
-                filterKey: 'featured',
-                filterVal: item.value,
-              });
-            }}
-            options={[
-              {
-                id: 1,
-                value: 'newest',
-                label: 'Newest',
-                iconLeft: 'sparkle',
-              },
-              {
-                id: 2,
-                value: 'oldest',
-                label: 'Oldest',
-                iconLeft: 'clockCounterClockwise',
-              },
-              {
-                id: 3,
-                value: 'likes',
-                label: 'Likes',
-                iconLeft: 'heart',
-              },
-              {
-                id: 4,
-                value: 'comments',
-                label: 'Comments',
-                iconLeft: 'chatDots',
-              },
-            ]}
-          />
+        <div className="filter-row">
+          <div className="filter-section">
+            <p className="filter-label">Sort</p>
+            <Select
+              selected={featuredFilter || 'newest'}
+              onSelect={(item: any) => {
+                onFilterSelect({
+                  filterKey: 'featured',
+                  filterVal: item.value,
+                });
+              }}
+              options={[
+                {
+                  id: 1,
+                  value: 'newest',
+                  label: 'Newest',
+                  iconLeft: 'sparkle',
+                },
+                {
+                  id: 2,
+                  value: 'oldest',
+                  label: 'Oldest',
+                  iconLeft: 'clockCounterClockwise',
+                },
+                {
+                  id: 3,
+                  value: 'likes',
+                  label: 'Likes',
+                  iconLeft: 'heart',
+                },
+                {
+                  id: 4,
+                  value: 'comments',
+                  label: 'Comments',
+                  iconLeft: 'chatDots',
+                },
+              ]}
+            />
+          </div>
 
-          <p style={{ marginLeft: 'auto' }}></p>
-          <p className="filter-label">Filter</p>
-          {topics.length > 0 && (
-            <Select
-              selected={
-                matchesDiscussionsTopicRoute?.[0]?.params?.topic || 'All Topics'
-              }
-              onSelect={(item: any) =>
-                onFilterSelect({
-                  pickedTopic: item === 'All Topics' ? '' : item.value,
-                })
-              }
-              options={[
-                {
-                  id: 0,
-                  label: 'All Topics',
-                  value: 'All Topics',
-                },
-                ...[...featuredTopics, ...otherTopics].map((t) => ({
-                  id: t.id,
-                  value: t.name,
-                  label: t.name,
-                })),
-              ]}
-              dropdownPosition="bottom-end"
-              canEditOption={app.roles?.isAdminOfEntity({
-                chain: app.activeChainId(),
-              })}
-              onOptionEdit={(item: any) =>
-                setTopicSelectedToEdit(
-                  [...featuredTopics, ...otherTopics].find(
-                    (x) => x.id === item.id
-                  )
-                )
-              }
-            />
-          )}
-          {stagesEnabled && (
-            <Select
-              selected={selectedStage || 'All Stages'}
-              onSelect={(item: any) =>
-                onFilterSelect({
-                  filterKey: 'stage',
-                  filterVal: item.value === 'All Stages' ? '' : item.value,
-                })
-              }
-              options={[
-                {
-                  id: 0,
-                  label: 'All Stages',
-                  value: 'All Stages',
-                },
-                ...stages.map((s) => ({
-                  id: s,
-                  value: s,
-                  label: `${threadStageToLabel(s)} ${
-                    s === ThreadStage.Voting ? app.threads.numVotingThreads : ''
-                  }`,
-                })),
-              ]}
-              dropdownPosition="bottom-end"
-            />
-          )}
-          <Select
-            selected={dateRange || 'allTime'}
-            onSelect={(item: any) => {
-              onFilterSelect({
-                filterKey: 'dateRange',
-                filterVal: item.value,
-              });
-            }}
-            options={[
-              {
-                id: 1,
-                value: 'allTime',
-                label: 'All Time',
-              },
-              {
-                id: 2,
-                value: 'month',
-                label: 'Month',
-              },
-              {
-                id: 3,
-                value: 'week',
-                label: 'Week',
-              },
-            ]}
-            dropdownPosition="bottom-end"
-          />
+          <div className="filter-section filter-section-top">
+            <p className="filter-label">Filter</p>
+            <div className="filter-section filter-section-right">
+              {topics.length > 0 && (
+                <Select
+                  selected={
+                    matchesDiscussionsTopicRoute?.[0]?.params?.topic ||
+                    'All Topics'
+                  }
+                  onSelect={(item: any) =>
+                    onFilterSelect({
+                      pickedTopic: item === 'All Topics' ? '' : item.value,
+                    })
+                  }
+                  options={[
+                    {
+                      id: 0,
+                      label: 'All Topics',
+                      value: 'All Topics',
+                    },
+                    ...[...featuredTopics, ...otherTopics].map((t) => ({
+                      id: t.id,
+                      value: t.name,
+                      label: t.name,
+                    })),
+                  ]}
+                  dropdownPosition="bottom-end"
+                  canEditOption={app.roles?.isAdminOfEntity({
+                    chain: app.activeChainId(),
+                  })}
+                  onOptionEdit={(item: any) =>
+                    setTopicSelectedToEdit(
+                      [...featuredTopics, ...otherTopics].find(
+                        (x) => x.id === item.id
+                      )
+                    )
+                  }
+                />
+              )}
+              {stagesEnabled && (
+                <Select
+                  selected={selectedStage || 'All Stages'}
+                  onSelect={(item: any) =>
+                    onFilterSelect({
+                      filterKey: 'stage',
+                      filterVal: item.value === 'All Stages' ? '' : item.value,
+                    })
+                  }
+                  options={[
+                    {
+                      id: 0,
+                      label: 'All Stages',
+                      value: 'All Stages',
+                    },
+                    ...stages.map((s) => ({
+                      id: s,
+                      value: s,
+                      label: `${threadStageToLabel(s)} ${
+                        s === ThreadStage.Voting
+                          ? app.threads.numVotingThreads
+                          : ''
+                      }`,
+                    })),
+                  ]}
+                  dropdownPosition="bottom-end"
+                />
+              )}
+              <Select
+                selected={dateRange || 'allTime'}
+                onSelect={(item: any) => {
+                  onFilterSelect({
+                    filterKey: 'dateRange',
+                    filterVal: item.value,
+                  });
+                }}
+                options={[
+                  {
+                    id: 1,
+                    value: 'allTime',
+                    label: 'All Time',
+                  },
+                  {
+                    id: 2,
+                    value: 'month',
+                    label: 'Month',
+                  },
+                  {
+                    id: 3,
+                    value: 'week',
+                    label: 'Week',
+                  },
+                ]}
+                dropdownPosition="bottom-end"
+              />
+            </div>
+          </div>
         </div>
       )}
 
