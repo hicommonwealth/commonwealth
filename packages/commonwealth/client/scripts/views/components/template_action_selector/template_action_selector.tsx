@@ -10,30 +10,22 @@ type TemplateSelectorProps = {
   tempTemplates: Array<Pick<any, 'identifier' | 'title'>>;
   thread: Thread;
   isOpen: boolean;
+  contracts: Array<any>;
 };
 
 export const TemplateSelector = ({
   onSelect,
   tempTemplates,
   isOpen,
+  contracts,
 }: TemplateSelectorProps) => {
   // Add a new state for contracts
-  const [contracts, setContracts] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(false);
   const [allTemplates, setAllTemplates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch contracts
-  const fetchContracts = async () => {
-    setLoading(true);
-    const contractsInStore = await app.contracts.getCommunityContracts();
-    setContracts(contractsInStore);
-    setLoading(false);
-  };
-
-  // Fetch templates
-  const fetchTemplates = async () => {
+  const fetchTemplates = useCallback(async () => {
     setLoading(true);
     const fetchedTemplates = [];
     for (const contract of contracts) {
@@ -45,21 +37,14 @@ export const TemplateSelector = ({
     setAllTemplates(fetchedTemplates);
     setLoading(false);
     setFetched(true);
-  };
-
-  // Fetch contracts when the modal is open
-  useEffect(() => {
-    if (isOpen && !loading && !fetched) {
-      fetchContracts();
-    }
-  }, [isOpen, loading, fetched]);
+  }, [contracts]);
 
   // Fetch templates when contracts state changes
   useEffect(() => {
     if (contracts.length > 0) {
       fetchTemplates();
     }
-  }, [contracts]);
+  }, [contracts, fetchTemplates]);
 
   const templates = useMemo(() => {
     if (!searchTerm.length) return allTemplates;
@@ -74,12 +59,9 @@ export const TemplateSelector = ({
 
   const renderItem = useCallback(
     (i: number, template: any) => {
-      const isSelected = !!tempTemplates.find(({ identifier }) => {
-        console.log('template.contractAddress:', template.contractAddress);
-        console.log('identifier', identifier);
-        console.log('identifier.split:', identifier.split('/')[0]);
-        template.contractAddress === identifier.split('/')[0];
-      });
+      const isSelected = !!tempTemplates.find(
+        ({ identifier }) => String(template.id) === identifier
+      );
 
       return (
         <TemplateSelectorItem
