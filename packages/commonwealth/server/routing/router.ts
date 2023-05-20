@@ -83,7 +83,7 @@ import viewVotes from '../routes/viewVotes';
 import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import deleteThread from '../routes/deleteThread';
-import addEditors from '../routes/addEditors';
+import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
 import getThreadsOld from '../routes/getThreads';
@@ -455,6 +455,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
+    addEditorValidation,
     addEditors.bind(this, models)
   );
   router.post(

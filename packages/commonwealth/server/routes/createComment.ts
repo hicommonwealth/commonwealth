@@ -23,7 +23,6 @@ import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
@@ -145,13 +144,9 @@ const createComment = async (
     (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
   ) {
     // skip check for admins
-    const isAdmin = await findAllRoles(
-      models,
-      { where: { address_id: author.id } },
-      chain.id,
-      ['admin']
-    );
-    if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
+    const isAdmin = author.permission === 'admin';
+
+    if (thread?.topic_id && !req.user.isAdmin && !isAdmin) {
       try {
         const canReact = await validateTopicThreshold(
           tokenBalanceCache,
@@ -305,7 +300,7 @@ const createComment = async (
               chain: mention[0] || null,
               address: mention[1],
             },
-            include: [models.User, models.RoleAssignment],
+            include: [models.User],
           });
           return user;
         })

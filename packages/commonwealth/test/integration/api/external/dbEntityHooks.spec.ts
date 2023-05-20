@@ -11,12 +11,10 @@ import type { ReactionAttributes } from 'server/models/reaction';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { TopicAttributes } from 'server/models/topic';
 import type { ProfileAttributes } from '../../../../server/models/profile';
-import type { RoleAttributes } from '../../../../server/models/role';
 import type { RuleAttributes } from '../../../../server/models/rule';
 
 const Op = Sequelize.Op;
 
-/* eslint-disable import/no-mutable-exports */
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
@@ -27,7 +25,6 @@ export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
-export let testRoles: RoleAttributes[];
 export let testRules: RuleAttributes[];
 
 async function clearTestEntities() {
@@ -51,7 +48,6 @@ async function clearTestEntities() {
     force: true,
   });
   await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Role.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
 }
 
 beforeEach(async () => {
@@ -175,21 +171,6 @@ beforeEach(async () => {
               verification_token: '',
               profile_id: -i - 1,
               verified: moment.now(),
-            },
-          })
-        )[0]
-    )
-  );
-
-  testRoles = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Role.findOrCreate({
-            where: {
-              id: -i - 1,
-              address_id: -i - 1,
-              chain_id: 'cmntest',
             },
           })
         )[0]

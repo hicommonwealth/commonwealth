@@ -1,12 +1,9 @@
+import { Permission } from 'common-common/src/roles';
 import type { WalletId } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes, ChainInstance } from './chain';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes, UserInstance } from './user';
@@ -34,7 +31,7 @@ export type AddressAttributes = {
   Chain?: ChainAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  RoleAssignments?: RoleAssignmentAttributes[];
+  permission?: Permission;
   SsoToken?: SsoTokenAttributes;
 };
 
@@ -42,7 +39,6 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
-  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
@@ -128,7 +124,6 @@ export default (
       targetKey: 'id',
     });
     models.Address.hasOne(models.SsoToken);
-    models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Comment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Thread, {
       foreignKey: 'address_id',

@@ -9,9 +9,7 @@ import {
   everyonePermissions,
 } from '../../shared/permissions';
 import type { DB } from '../models';
-import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Permission } from '../models/role';
-import type { RoleAssignmentAttributes } from '../models/role_assignment';
 import type { AddressInstance } from '../models/address';
 import type { RoleObject } from '../../shared/types';
 

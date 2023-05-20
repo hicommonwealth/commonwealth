@@ -412,60 +412,16 @@ export interface AssignRoleArgs {
   role: Permission;
 }
 
-export const assignRole = async (args: AssignRoleArgs) => {
-  const communityRole = await models.CommunityRole.findOne({
-    where: { chain_id: args.chainOrCommObj.chain_id, name: args.role },
-  });
-  const role = await models['RoleAssignment'].create({
-    address_id: args.address_id,
-    community_role_id: communityRole.id,
-  });
-
-  return role;
-};
-
 export const updateRole = async (args: AssignRoleArgs) => {
-  const currentRole = await findOneRole(
-    models,
-    { where: { address_id: args.address_id } },
-    args.chainOrCommObj.chain_id
-  );
-  let role;
-  // Can only be a promotion
-  if (currentRole.toJSON().permission === 'member') {
-    role = await createRole(
-      models,
-      args.address_id,
-      args.chainOrCommObj.chain_id,
-      args.role
-    );
-  }
-  // Can be demoted or promoted
-  else if (currentRole.toJSON().permission === 'moderator') {
-    // Demotion
-    if (args.role === 'member') {
-      role = await models['RoleAssignment'].destroy({
-        where: {
-          community_role_id: currentRole.toJSON().community_role_id,
-          address_id: args.address_id,
-        },
-      });
-    }
-    // Promotion
-    else if (args.role === 'admin') {
-      role = await createRole(
-        models,
-        args.address_id,
-        args.chainOrCommObj.chain_id,
-        args.role
-      );
-    }
-  }
-  // If current role is admin, you cannot change it is the assumption
-  else {
-    return null;
-  }
+  const role = await models['Role'].findOne({
+    where: {
+      ...args.chainOrCommObj,
+      address_id: args.address_id,
+    },
+  });
   if (!role) return null;
+  role.permission = args.role;
+  await role.save();
   return role;
 };
 
