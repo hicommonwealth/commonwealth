@@ -49,11 +49,10 @@ export const TemplateSelector = ({
   const templates = useMemo(() => {
     if (!searchTerm.length) return allTemplates;
     else {
-      allTemplates
-        .sort((a, b) => b.created_at - a.created_at)
-        .filter(({ name }) =>
-          name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+      console.log(allTemplates);
+      return allTemplates.filter(({ name }) =>
+        name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
   }, [allTemplates, searchTerm]);
 

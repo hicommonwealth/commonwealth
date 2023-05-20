@@ -31,6 +31,13 @@
     flex: 1;
   }
 
+  .empty-component{
+    padding-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .proposal-item {
     padding-block: 6px;
     display: flex;
