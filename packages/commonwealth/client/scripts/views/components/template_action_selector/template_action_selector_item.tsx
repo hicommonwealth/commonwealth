@@ -6,7 +6,7 @@ import 'modals/template_action_modal.scss';
 
 type TemplateSelectorItemProps = {
   template: any;
-  onClick: () => void;
+  onClick: (template: any) => void;
   isSelected?: boolean;
 };
 
@@ -16,7 +16,7 @@ export const TemplateSelectorItem = ({
   isSelected = false,
 }: TemplateSelectorItemProps) => {
   return (
-    <div className="template-item" onClick={onClick}>
+    <div className="template-item" onClick={() => onClick(template)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
         <CWText fontWeight="medium" truncate noWrap>
