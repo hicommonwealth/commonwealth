@@ -231,6 +231,7 @@ async function setupNewListeners(
     try {
       log.info(`Starting listener for: ${chain.origin}`);
       listenerInstances[chain.origin] = await createListener(
+        chain.origin,
         chain.ChainNode.name,
         network,
         {
@@ -383,26 +384,35 @@ export function getListenerNames(
  * chain-event.
  * WARNING: This function requires to be binded with a PG pool instance
  * e.g. discoverReconnectRange.bind({ pool })
- * @param chain
+ * @param chainName
+ * @param contractAddress
  */
-async function discoverReconnectRange(this: DB, chain: string) {
+async function discoverReconnectRange(
+  this: DB,
+  chainName: string,
+  contractAddress: string = null
+) {
+  let prefix;
+  if (contractAddress) prefix = chainName + '::' + contractAddress + '::';
+  else prefix = chainName;
+
   let latestBlock;
   try {
     latestBlock = await this.ChainEvent.max('block_number', {
-      where: { chain },
+      where: { chain_name: chainName, contract_address: contractAddress },
     });
 
     if (latestBlock) {
       log.info(
-        `[${chain}]: Discovered chain event in db at block ${latestBlock}.`
+        `[${prefix}]: Discovered chain event in db at block ${latestBlock}.`
       );
       return { startBlock: latestBlock + 1 };
     }
-    log.info(`[${chain}]: No chain-events found in the database`);
+    log.info(`[${prefix}]: No chain-events found in the database`);
     return { startBlock: null };
   } catch (error) {
     log.warn(
-      `[${chain}]: An error occurred while discovering offline time range`,
+      `[${prefix}]: An error occurred while discovering offline time range`,
       error
     );
   }

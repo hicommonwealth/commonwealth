@@ -83,6 +83,7 @@ export default class extends IEventHandler {
         type: type.toString(),
         type_id,
         chain_name: event.chainName,
+        contract_address: event.contractAddress || null,
         author,
         completed,
       });
@@ -90,6 +91,7 @@ export default class extends IEventHandler {
       const publishData: RmqEntityCUD.RmqMsgType = {
         ce_id: dbEntity.id,
         chain_name: dbEntity.chain_name,
+        contract_address: dbEntity.contract_address,
         author,
         entity_type_id: type_id,
         cud: 'create',
@@ -125,6 +127,7 @@ export default class extends IEventHandler {
           type: type.toString(),
           type_id,
           chain_name: event.chainName,
+          contract_address: event.contractAddress || null,
         },
       });
       if (!dbEntity) {

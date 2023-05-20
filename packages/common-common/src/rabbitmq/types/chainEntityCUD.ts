@@ -4,6 +4,7 @@ import { RmqMsgFormatError } from './index';
 interface IRmqMsgCreateEntityCUD {
   ce_id: number;
   chain_name: string;
+  contract_address?: string;
   author?: string;
   entity_type_id: string;
   cud: 'create';

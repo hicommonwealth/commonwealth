@@ -65,7 +65,7 @@ describe('Integration tests for Compound Bravo', () => {
     await rmq.init();
   });
 
-  describe.only('Tests the Bravo event listener using the chain subscriber', () => {
+  describe('Tests the Bravo event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
       const listeners: IListenerInstances = await runSubscriberAsFunction(

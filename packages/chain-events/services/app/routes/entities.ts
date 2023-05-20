@@ -4,7 +4,7 @@ import { AppError, ServerError } from 'common-common/src/errors';
 import type { DB } from '../../database/database';
 
 export const Errors = {
-  NeedChain: 'Must provide a chain to fetch entities from',
+  NeedChain: 'Must provide a chain name to fetch entities from',
 };
 
 const entities: any = async (
@@ -13,7 +13,7 @@ const entities: any = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.query.chain) {
+  if (!req.query.chain_name) {
     return next(new AppError(Errors.NeedChain));
   }
 
@@ -26,7 +26,7 @@ const entities: any = async (
     ],
     order: [['created_at', 'DESC']],
     where: {
-      chain: req.query.chain,
+      chain_name: req.query.chain_name,
     },
   };
   if (req.query.id) {
@@ -40,6 +40,9 @@ const entities: any = async (
   }
   if (req.query.completed) {
     entityFindOptions.where.completed = true;
+  }
+  if (req.query.contract_address) {
+    entityFindOptions.where.contract_address = req.query.contract_address;
   }
 
   try {

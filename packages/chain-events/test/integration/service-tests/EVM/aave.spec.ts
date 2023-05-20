@@ -3,6 +3,7 @@ import { MockRabbitMqHandler } from '../../../../services/ChainEventsConsumer/Ch
 import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import {
   RascalPublications,
+  RascalQueues,
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
@@ -33,7 +34,7 @@ import {
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe('Integration tests for Aave', () => {
+describe.only('Integration tests for Aave', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
@@ -46,20 +47,19 @@ describe('Integration tests for Aave', () => {
 
   let listener: Listener<Api, StorageFetcher, Processor, Subscriber, EventKind>;
   const contract = new aaveGovernor();
-  const chain_id = 'ganache-fork-aave';
+  const chainName = 'Ethereum (testnet)';
   const chain = {
-    id: chain_id,
     base: ChainBase.Ethereum,
     network: ChainNetwork.Aave,
     substrate_spec: null,
     contract_address: contract.contractAddress,
-    verbose_logging: false,
+    verbose_logging: true,
     ChainNode: {
       id: 1,
       url: 'http://127.0.0.1:8545',
-      name: 'Ethereum (Mainnet)',
+      name: chainName,
     },
-    origin: `Ethereum (Mainnet): ${contract.contractAddress}`,
+    origin: `${chainName}::${contract.contractAddress}`,
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;
@@ -77,7 +77,7 @@ describe('Integration tests for Aave', () => {
         rmq,
         chain
       );
-      listener = listeners[chain_id] as Listener<
+      listener = listeners[chain.origin] as Listener<
         Api,
         StorageFetcher,
         Processor,
@@ -98,14 +98,20 @@ describe('Integration tests for Aave', () => {
       events[EventKind.ProposalCreated] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         EventKind.ProposalCreated,
-        chain_id,
-        proposalCreatedBlockNum
+        chainName,
+        proposalCreatedBlockNum,
+        chain.contract_address
       );
 
+      expect(
+        events[EventKind.ProposalCreated],
+        `${EventKind.ProposalCreated} event not found in the ${RascalQueues.ChainEvents} queue`
+      ).to.not.be.undefined;
       eventMatch(
         events[EventKind.ProposalCreated],
         EventKind.ProposalCreated,
-        chain_id,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -114,8 +120,8 @@ describe('Integration tests for Aave', () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       const currentBlock = await sdk.getBlock();
       console.log(
-        `Valid voting block range: ${proposalCreatedBlockNum + 13140} - ${
-          proposalCreatedBlockNum + 13140 + 19710
+        `Valid voting block range: ${proposalCreatedBlockNum + 7200} - ${
+          proposalCreatedBlockNum + 7200 + 21000
         }`
       );
       console.log(
@@ -128,17 +134,24 @@ describe('Integration tests for Aave', () => {
 
       await waitUntilBlock(block, listener);
 
+      console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
       events[EventKind.VoteEmitted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         EventKind.VoteEmitted,
-        chain_id,
-        block
+        chainName,
+        block,
+        chain.contract_address
       );
 
+      expect(
+        events[EventKind.ProposalCreated],
+        `${EventKind.VoteEmitted} event not found in the ${RascalQueues.ChainEvents} queue`
+      ).to.not.be.undefined;
       eventMatch(
         events[EventKind.VoteEmitted],
         EventKind.VoteEmitted,
-        chain_id,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -154,14 +167,16 @@ describe('Integration tests for Aave', () => {
       events[EventKind.ProposalQueued] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         EventKind.ProposalQueued,
-        chain_id,
-        block
+        chainName,
+        block,
+        chain.contract_address
       );
 
       eventMatch(
         events[EventKind.ProposalQueued],
         EventKind.ProposalQueued,
-        chain_id,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -175,14 +190,16 @@ describe('Integration tests for Aave', () => {
       events[EventKind.ProposalExecuted] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         EventKind.ProposalExecuted,
-        chain_id,
-        block
+        chainName,
+        block,
+        chain.contract_address
       );
 
       eventMatch(
         events[EventKind.ProposalExecuted],
         EventKind.ProposalExecuted,
-        chain_id,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -209,31 +226,42 @@ describe('Integration tests for Aave', () => {
     it('Should process proposal created events', async () => {
       const propCreatedEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'proposal-created'`),
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.ProposalCreated}'`
+              ),
             ],
           },
           block_number: events[EventKind.ProposalCreated].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
+      expect(
+        propCreatedEvent,
+        'Proposal created event not found in the database'
+      ).to.exist;
 
-      expect(propCreatedEvent, 'Proposal created event not found').to.exist;
-      eventMatch(
-        rmq.queuedMessages[
-          RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][0].event,
-        EventKind.ProposalCreated,
-        chain_id,
-        proposalId
-      );
+      const propCreatedNotif = rmq.queuedMessages[
+        RascalSubscriptions.ChainEventNotificationsCUDMain
+      ].find((msg) => msg.ChainEvent.id === propCreatedEvent.id);
+
+      expect(
+        propCreatedNotif,
+        'Proposal created notification not found'
+      ).to.deep.equal({
+        ChainEvent: propCreatedEvent.toJSON(),
+        event: events[EventKind.ProposalCreated],
+        cud: 'create',
+      });
 
       relatedEntity = await models.ChainEntity.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           type_id: proposalId,
           type: 'proposal',
+          contract_address: chain.contract_address,
         },
       });
 
@@ -250,7 +278,8 @@ describe('Integration tests for Aave', () => {
       ).to.deep.equal({
         author: relatedEntity.author,
         ce_id: relatedEntity.id,
-        chain_id,
+        chain_name: chainName,
+        contract_address: chain.contract_address,
         entity_type_id: relatedEntity.type_id,
         cud: 'create',
       });
@@ -259,7 +288,7 @@ describe('Integration tests for Aave', () => {
     it('Should process vote cast events', async () => {
       const voteCastEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
               Sequelize.literal(
@@ -268,6 +297,7 @@ describe('Integration tests for Aave', () => {
             ],
           },
           block_number: events[EventKind.VoteEmitted].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
 
@@ -278,7 +308,7 @@ describe('Integration tests for Aave', () => {
     it('Should process proposal queued events', async () => {
       const propQueuedEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
               Sequelize.literal(
@@ -287,6 +317,7 @@ describe('Integration tests for Aave', () => {
             ],
           },
           block_number: events[EventKind.ProposalQueued].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
 
@@ -297,7 +328,7 @@ describe('Integration tests for Aave', () => {
     it('Should process proposal executed events', async () => {
       const propExecutedEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
               Sequelize.literal(
@@ -306,6 +337,7 @@ describe('Integration tests for Aave', () => {
             ],
           },
           block_number: events[EventKind.ProposalExecuted].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
 
@@ -317,7 +349,8 @@ describe('Integration tests for Aave', () => {
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][1].event,
         EventKind.ProposalExecuted,
-        chain_id,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -349,7 +382,8 @@ describe('Integration tests for Aave', () => {
         (e) =>
           e.event_data.kind === EventKind.ProposalCreated &&
           e.event_data.id == proposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(
         proposalCreatedEvent,
@@ -357,7 +391,7 @@ describe('Integration tests for Aave', () => {
       ).to.exist;
 
       res = await agent.get(
-        `/api/entities?type=proposal&type_id=${proposalId}&chain=${chain_id}`
+        `/api/entities?type=proposal&type_id=${proposalId}&chain_name=${chainName}&contract_address=${chain.contract_address}`
       );
       expect(res.status).to.equal(200);
       expect(
@@ -376,7 +410,8 @@ describe('Integration tests for Aave', () => {
         (e) =>
           e.event_data.kind === EventKind.VoteEmitted &&
           e.event_data.id == proposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
@@ -390,7 +425,8 @@ describe('Integration tests for Aave', () => {
         (e) =>
           e.event_data.kind === EventKind.ProposalQueued &&
           e.event_data.id == proposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
@@ -404,7 +440,8 @@ describe('Integration tests for Aave', () => {
         (e) =>
           e.event_data.kind === EventKind.ProposalExecuted &&
           e.event_data.id == proposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
@@ -414,10 +451,16 @@ describe('Integration tests for Aave', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
+      where: {
+        chain_name: chainName,
+        contract_address: chain.contract_address,
+      },
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id },
+      where: {
+        chain_name: chainName,
+        contract_address: chain.contract_address,
+      },
     });
   });
 });

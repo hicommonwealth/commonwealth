@@ -92,11 +92,13 @@ export function getEventOrigin(event: CWEvent): string {
 /**
  * Creates a listener instance and returns it if no error occurs. This function throws on error.
  * @param origin The chain to create a listener for
+ * @param chainName
  * @param options The listener options for the specified chain
  * @param network the listener network to use
  */
 export async function createListener(
   origin: string,
+  chainName: string,
   network: SupportedNetwork,
   options: {
     address?: string;
@@ -172,6 +174,7 @@ export async function createListener(
   } else if (network === SupportedNetwork.Aave) {
     listener = new AaveListener(
       origin,
+      chainName,
       options.address,
       options.url,
       !!options.skipCatchup,

@@ -65,7 +65,7 @@ export async function processChains(
   const chains = []; // any listener that is not an erc20 or erc721 token and require independent listenerInstances
   for (const chain of chainsAndTokens) {
     StatsDController.get().increment('ce.should-exist-listeners', {
-      chain: chain.id,
+      chain: chain.origin,
       network: chain.network,
       base: chain.base,
     });
@@ -216,7 +216,7 @@ export async function getSubscriberChainData(
                C.ce_verbose                                                            as verbose_logging,
                JSON_BUILD_OBJECT('id', CN.id, 'url', COALESCE(CN.private_url, CN.url), 'name', CN.name) as "ChainNode",
                CN.name,
-               CN.name + ': ' + C2.address as origin
+               CN.name + '::' + C2.address as origin
         FROM "Chains" C
                  JOIN "ChainNodes" CN on C.chain_node_id = CN.id
                  LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id

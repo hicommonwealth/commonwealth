@@ -85,7 +85,7 @@ export default class extends IEventHandler {
       block_number: event.blockNumber,
       event_data: event.data,
       network: event.network,
-      contract_address: event.contractAddress,
+      contract_address: event.contractAddress || null,
       chain_name: event.chainName,
     };
 

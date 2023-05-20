@@ -29,12 +29,18 @@ export class TestHandler implements IEventHandler {
 export function eventMatch(
   event: any,
   kind: string,
-  chain_id,
+  chainName: string,
+  contractAddress?: string,
   proposalId?: string,
   transferAmount?: string,
   from?: string
 ) {
   expect(event, 'event is undefined').to.not.be.undefined;
+  if (contractAddress)
+    expect(event.contractAddress, 'contract address does not match').to.equal(
+      contractAddress
+    );
+
   if (proposalId)
     expect(parseInt(event.data.id), 'proposal id does not match').to.equal(
       Number(proposalId)
@@ -49,20 +55,22 @@ export function eventMatch(
     expect(event.data.from, 'from address does not match').to.equal(from);
 
   expect(event.data.kind, 'event kind does not match').to.equal(kind);
-  expect(event.chain, 'event chain does not match').to.equal(chain_id);
+  expect(event.chainName, 'event chain does not match').to.equal(chainName);
 }
 
 export function findEvent(
   events: any[],
   kind: string,
-  chain_id: string,
-  blockNumber: number
+  chainName: string,
+  blockNumber: number,
+  contractAddress?: string
 ) {
   return events.find(
     (event) =>
       event.data.kind === kind &&
-      event.chain === chain_id &&
-      event.blockNumber === blockNumber
+      event.chainName === chainName &&
+      event.blockNumber === blockNumber &&
+      event.contractAddress === contractAddress
   );
 }
 
