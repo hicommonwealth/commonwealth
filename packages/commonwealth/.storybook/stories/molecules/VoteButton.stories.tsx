@@ -12,7 +12,7 @@ export default voteButton;
 
 interface VoteButtonProps {
   count: number;
-}
+};
 
 const VoteButton: FC<VoteButtonProps> = ({ count }) => {
   const [voteCount, setVoteCount] = useState<number>(count);

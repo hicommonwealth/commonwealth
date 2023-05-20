@@ -9,6 +9,14 @@ import { iconLookup, IconName } from '../../../client/scripts/views/components/c
 
 import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
+interface TooltipProps {
+  content: string | React.ReactNode;
+  iconName: IconName;
+  hasBackground?: boolean;
+};
+
+type InteractionType = (e: any) => void;
+
 const iconOptions = [ ...Object.keys(iconLookup) ];
 
 const tooltip = {
@@ -17,14 +25,6 @@ const tooltip = {
 } satisfies Meta<typeof CWTooltip>;
 
 export default tooltip;
-
-type InteractionType = (e: any) => void;
-
-interface TooltipProps {
-  content: string | React.ReactNode;
-  iconName: IconName;
-  hasBackground?: boolean;
-}
 
 const Tooltip: FC<TooltipProps> = (props) => {
   const { content, iconName, hasBackground } = props;

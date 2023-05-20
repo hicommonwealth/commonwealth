@@ -5,15 +5,6 @@ import { PopoverMenu, PopoverMenuItem } from '../../../client/scripts/views/comp
 import { CWIconButton } from '../../../client/scripts/views/components/component_kit/cw_icon_button';
 import { iconLookup, IconName } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
-const iconOptions = [ ...Object.keys(iconLookup) ];
-
-const popoverMenu = {
-  title: 'Organisms/Popover Menu',
-  component: PopoverMenu,
-} satisfies Meta<typeof PopoverMenu>;
-
-export default popoverMenu;
-
 interface PopoverProps {
   header1: string;
   header2: string;
@@ -26,6 +17,15 @@ interface PopoverProps {
   iconLabel3: IconName;
   iconBottom: IconName;
 };
+
+const iconOptions = [ ...Object.keys(iconLookup) ];
+
+const popoverMenu = {
+  title: 'Organisms/Popover Menu',
+  component: PopoverMenu,
+} satisfies Meta<typeof PopoverMenu>;
+
+export default popoverMenu;
 
 const popoverMenuOptions = (options: PopoverProps): Array<PopoverMenuItem> => {
   return [

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { CWDropdown } from '../../../client/scripts/views/components/component_kit/cw_dropdown';
 import { DropdownItemType } from '../../../client/scripts/views/components/component_kit/cw_dropdown';
-import { ArgsObject } from '../helpers';
+import { argsToOptions, objectArrayToArgs } from '../helpers';
 
 const dropdown = {
   title: 'Organisms/Dropdown',
@@ -23,35 +23,6 @@ const options: DropdownItemType[] = [
   { label: 'Dropdown Option 3', value: 'dropdownOption3' },
 ];
 
-const argsToOptions = (args: any) => {
-  let arr: DropdownItemType[] = [];
-
-  Object.values(args).map((option: any) => {
-    let obj: DropdownItemType = {
-      label: option as string,
-      value: option,
-    };
-    arr.push(obj);
-  });
-  
-  return arr;
-}
-
-const objectArrayToArgs = (
-  controlLabel: string,
-  arr: any[],
-  objProperty: string,
-) => {
-  let obj: ArgsObject = {};
-
-  for (let i: number = 0; i < arr.length; i++) {
-    let property = controlLabel + " " + (i+1);
-    obj[property] = arr[i][objProperty];
-  }
-
-  return obj;
-}
-
 const Dropdown: FC<DropdownProps> = (props) => {
   const { label, onSelect } = props;
   const options = (({ label, onSelect, ...o }) => o)(props);
@@ -59,7 +30,7 @@ const Dropdown: FC<DropdownProps> = (props) => {
   return (
     <CWDropdown
       label={label}
-      options={argsToOptions(options)}
+      options={argsToOptions<DropdownItemType>(options, "label", "value")}
       onSelect={onSelect}
     />
   );

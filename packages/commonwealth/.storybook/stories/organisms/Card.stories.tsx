@@ -7,6 +7,13 @@ import { notifySuccess } from '../../../client/scripts/controllers/app/notificat
 
 import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
+interface CardProps {
+  elevation: CardElevation | undefined,
+  interactive?: boolean,
+  fullWidth?: boolean,
+  children: any,
+};
+
 const card = {
   title: 'Organisms/Card',
   component: CWCard,
@@ -14,13 +21,6 @@ const card = {
 
 export default card;
 type Story = StoryObj<any>;
-
-interface CardProps {
-  elevation: CardElevation | undefined,
-  interactive?: boolean,
-  fullWidth?: boolean,
-  children: any,
-};
 
 const Card: FC<CardProps> = (props) => {
   const { elevation, interactive = false, fullWidth } = props;
