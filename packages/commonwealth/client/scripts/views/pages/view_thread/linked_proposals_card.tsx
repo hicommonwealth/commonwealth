@@ -23,6 +23,7 @@ import { Modal } from '../../components/component_kit/cw_modal';
 import { Link, LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
 import { filterLinks } from 'helpers/threads';
+import smartTruncate from 'smart-truncate';
 
 type LinkedProposalProps = {
   thread: Thread;
@@ -71,7 +72,12 @@ const LinkedTemplate = ({
     app.isCustomDomain() ? '' : `/${thread.chain}`
   }/${contractAddress}/${slug}`;
 
-  return <a href={templateLink}>{`${title ?? 'Template'} (${slug})`}</a>;
+  return (
+    <a href={templateLink}>{`${title ?? 'Template'} (${smartTruncate(
+      contractAddress,
+      6
+    )}`}</a>
+  );
 };
 
 type LinkedProposalsCardProps = {
@@ -180,10 +186,11 @@ export const LinkedProposalsCard = ({
                   {initialTemplateLinks.length > 0 && (
                     <div className="linked-templates">
                       {initialTemplateLinks.map((l) => {
-                        const [contractAddress, slug] = l.identifier.split('/');
+                        const [id, contractAddress, slug] =
+                          l.identifier.split('/');
                         return (
                           <LinkedTemplate
-                            key={l.identifier}
+                            key={id}
                             thread={thread}
                             title={l.title}
                             contractAddress={contractAddress}
