@@ -7,6 +7,11 @@ module.exports = {
         process.env.CW_DB_URL ||
         'postgresql://commonwealth:edgeware@localhost/commonwealth';
 
+      await queryInterface.sequelize.query(
+        `CREATE EXTENSION IF NOT EXISTS dblink;`,
+        { transaction: t }
+      );
+
       // fetch ChainNode.name and CommunityContract.address from Commonwealth db
       await queryInterface.sequelize.query(
         `
