@@ -18,7 +18,7 @@ type TemplateFormModalProps = {
 
 const getInitialTemplates = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Template).map((l) => ({
-    identifier: l.identifier,
+    identifier: l.identifier.split('/')[0],
     title: l.title,
   }));
 
@@ -63,13 +63,25 @@ export const TemplateActionModal = ({
     );
   };
 
+  const getContractAndCct = (identifier, _contracts) => {
+    const contract = contracts.find((c) => {
+      return c.ccts.some((cct) => String(cct.templateId) === identifier);
+    });
+
+    const cct = contract.ccts.find(
+      (_cct) => String(_cct.templateId) === identifier
+    );
+
+    const newIdentifier = `${identifier}/${contract.address}${cct.cctmd.slug}`;
+
+    return { contract, cct, newIdentifier };
+  };
+
   const handleSaveChanges = async () => {
     try {
-      const initialTemplates = []; // Fetch initial templates from the thread
-
       const { toAdd, toDelete } = getAddedAndDeleted(
         tempTemplates,
-        initialTemplates,
+        getInitialTemplates(thread),
         'identifier'
       );
 
@@ -79,14 +91,7 @@ export const TemplateActionModal = ({
       if (toAdd.length > 0) {
         const updatedLinks = toAdd.map(({ identifier, title }) => {
           // Find the contract with the specific templateId in its ccts
-          const contract = contracts.find((c) => {
-            return c.ccts.some((cct) => String(cct.templateId) === identifier);
-          });
-
-          const cct = contract.ccts.find(
-            (_cct) => String(_cct.templateId) === identifier
-          );
-          const newIdentifier = `${identifier}/${contract.address}${cct.cctmd.slug}`;
+          const { newIdentifier } = getContractAndCct(identifier, contracts);
 
           return {
             source: LinkSource.Template,
@@ -106,10 +111,14 @@ export const TemplateActionModal = ({
       if (toDelete.length > 0) {
         const updatedThread = await app.threads.deleteLinks({
           threadId: thread.id,
-          links: toDelete.map(({ identifier }) => ({
-            source: LinkSource.Template,
-            identifier: String(identifier),
-          })),
+          links: toDelete.map(({ identifier }) => {
+            const { newIdentifier } = getContractAndCct(identifier, contracts);
+
+            return {
+              source: LinkSource.Template,
+              identifier: newIdentifier,
+            };
+          }),
         });
 
         setLinks(updatedThread.links);
