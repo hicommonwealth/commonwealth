@@ -27,14 +27,15 @@ export class Listener extends BaseListener<
   protected readonly log;
 
   constructor(
-    chain: string,
+    origin: string,
+    chainName: string,
     contractAddress: string,
     url?: string,
     skipCatchup?: boolean,
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    super(SupportedNetwork.Compound, chain, verbose);
+    super(SupportedNetwork.Compound, chainName, origin, verbose);
 
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.Compound, this._origin])
@@ -126,8 +127,10 @@ export class Listener extends BaseListener<
     const cwEvents: CWEvent[] = await this._processor.process(event);
 
     // process events in sequence
-    for (const evt of cwEvents)
+    for (const evt of cwEvents) {
+      evt.contractAddress = this._options.contractAddress;
       await this.handleEvent(evt as CWEvent<IEventData>);
+    }
 
     const { blockNumber } = event;
     if (

@@ -148,6 +148,7 @@ export async function createListener(
   } else if (network === SupportedNetwork.Compound) {
     listener = new CompoundListener(
       origin,
+      chainName,
       options.address,
       options.url,
       !!options.skipCatchup,
