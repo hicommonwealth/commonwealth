@@ -39,8 +39,8 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
       data.chain_event_id &&
       typeof data.chain_event_id === 'string' &&
       data.category_id === 'chain-event' &&
-      data.chain_id &&
-      typeof data.chain_id === 'string' &&
+      data.chain_name &&
+      typeof data.chain_name === 'string' &&
       data.updated_at &&
       data.created_at &&
       typeof data.ChainEvent.chain_event_type_id === 'string' &&

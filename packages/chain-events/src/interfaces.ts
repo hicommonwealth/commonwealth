@@ -77,13 +77,14 @@ export enum EntityEventKind {
 
 export interface CWEvent<IEventData = IChainEventData> {
   blockNumber: number;
-  includeAddresses?: string[];
-  excludeAddresses?: string[];
-
   data: IEventData;
   network: SupportedNetwork;
-  chain?: string;
+  chainName: string;
+
+  contractAddress?: string;
   received?: number;
+  includeAddresses?: string[];
+  excludeAddresses?: string[];
 }
 
 // handles individual events by sending them off to storage/notifying

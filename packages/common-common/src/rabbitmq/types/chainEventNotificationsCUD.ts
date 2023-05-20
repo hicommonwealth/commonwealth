@@ -26,8 +26,8 @@ export const RmqCENotificationCUD: RmqMsgNamespace<IRmqMsgCreateCENotificationsC
         typeof data.ChainEvent.block_number === 'number' &&
         data.ChainEvent.event_data &&
         Object.values(SupportedNetwork).includes(data.ChainEvent.network) &&
-        data.ChainEvent.chain &&
-        typeof data.ChainEvent.chain === 'string' &&
+        data.ChainEvent.chain_name &&
+        typeof data.ChainEvent.chain_name === 'string' &&
         typeof data.ChainEvent.entity_id === 'number' &&
         typeof data.event.blockNumber === 'number' &&
         data.event.data &&

@@ -51,13 +51,17 @@ export abstract class Listener<
 
   protected readonly _origin: string;
 
+  protected readonly _chainName: string;
+
   protected readonly _verbose: boolean;
 
   protected constructor(
     network: SupportedNetwork,
+    chainName: string,
     origin: string,
     verbose?: boolean
   ) {
+    this._chainName = chainName;
     this._origin = origin;
     this.eventHandlers = {};
     this._verbose = !!verbose;
@@ -88,7 +92,7 @@ export abstract class Listener<
   protected async handleEvent(event: CWEvent<IChainEventData>): Promise<void> {
     let prevResult;
 
-    event.chain = this._origin;
+    event.chainName = this._chainName;
     event.received = Date.now();
 
     for (const key of Object.keys(this.eventHandlers)) {
@@ -116,6 +120,10 @@ export abstract class Listener<
 
   public get subscribed(): boolean {
     return this._subscribed;
+  }
+
+  public get chainName(): string {
+    return this._chainName;
   }
 
   public abstract get options(): any;

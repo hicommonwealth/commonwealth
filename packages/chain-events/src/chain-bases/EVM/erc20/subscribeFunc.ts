@@ -27,7 +27,7 @@ export interface IErc20SubscribeOptions
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param ethNetworkUrl
  * @param tokenAddresses
- * @param tokenNames
+ * @param origins
  * @param retryTimeMs
  * @returns a promise resolving to an ApiPromise once the connection has been established
 
@@ -35,7 +35,7 @@ export interface IErc20SubscribeOptions
 export async function createApi(
   ethNetworkUrl: string,
   tokenAddresses: string[],
-  tokenNames?: string[],
+  origins?: string[],
   retryTimeMs = 10 * 1000
 ): Promise<IErc20Contracts> {
   const log = factory.getLogger(
@@ -54,7 +54,7 @@ export async function createApi(
         ERC20Factory.connect(o, provider)
       );
       const deployResults: IErc20Contracts = { provider, tokens: [] };
-      for (const [contract, tokenName] of _.zip(tokenContracts, tokenNames) as [
+      for (const [contract, origin] of _.zip(tokenContracts, origins) as [
         ERC20,
         string | undefined
       ][]) {
@@ -64,11 +64,11 @@ export async function createApi(
           deployResults.tokens.push({
             contract,
             totalSupply,
-            tokenName,
+            origin,
           });
         } catch (err) {
           log.error(
-            `Error loading token ${contract.address} (${tokenName}): ${err.message}`
+            `Error loading token ${contract.address} (${origin}): ${err.message}`
           );
         }
       }

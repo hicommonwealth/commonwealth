@@ -34,7 +34,9 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
       typeof data.blockNumber === 'number' &&
       data.data &&
       data.network &&
-      typeof data.network === 'string'
+      typeof data.network === 'string' &&
+      data.chainName &&
+      typeof data.chainName === 'string'
     );
   },
 

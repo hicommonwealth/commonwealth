@@ -11,11 +11,7 @@ import type { DB } from '../../database/database';
 import type { ChainEventInstance } from '../../database/models/chain_event';
 
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
-import {
-  EntityEventKind,
-  eventToEntity,
-  IEventHandler,
-} from 'chain-events/src';
+import { eventToEntity, getEventOrigin, IEventHandler } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
 
 export interface StorageFilterConfig {
@@ -32,7 +28,6 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models: DB,
     private readonly _rmqController: AbstractRabbitMQController,
-    private readonly _chain?: string,
     private readonly _filterConfig: StorageFilterConfig = {}
   ) {
     super();
@@ -75,11 +70,9 @@ export default class extends IEventHandler {
    * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent): Promise<ChainEventInstance> {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(
-      addPrefix(__filename, [event.network, event.chain])
+      addPrefix(__filename, [event.network, getEventOrigin(event)])
     );
-    const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
     const shouldSkip = await this._shouldSkip(event);
@@ -92,7 +85,8 @@ export default class extends IEventHandler {
       block_number: event.blockNumber,
       event_data: event.data,
       network: event.network,
-      chain,
+      contract_address: event.contractAddress,
+      chain_name: event.chainName,
     };
 
     // duplicate event check
@@ -117,7 +111,10 @@ export default class extends IEventHandler {
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
 
-      StatsDController.get().increment('ce.event-cache-chain-hit', { chain });
+      // TODO: figure out new tags for StatsD here
+      StatsDController.get().increment('ce.event-cache-chain-hit', {
+        chainName: getEventOrigin(event),
+      });
 
       const cacheStats = this.eventCache.getStats();
       StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);

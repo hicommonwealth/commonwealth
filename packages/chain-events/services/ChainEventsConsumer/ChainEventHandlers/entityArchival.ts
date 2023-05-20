@@ -20,6 +20,7 @@ import type {
 import {
   EntityEventKind,
   eventToEntity,
+  getEventOrigin,
   getUniqueEntityKey,
   IEventHandler,
 } from 'chain-events/src';
@@ -30,8 +31,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models: DB,
-    private readonly _rmqController: AbstractRabbitMQController,
-    private readonly _chain?: string
+    private readonly _rmqController: AbstractRabbitMQController
   ) {
     super();
   }
@@ -47,18 +47,14 @@ export default class extends IEventHandler {
     event: CWEvent<IChainEventData>,
     dbEvent: ChainEventInstance
   ) {
+    const origin = getEventOrigin(event);
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(
-      addPrefix(__filename, [event.network, event.chain])
+      addPrefix(__filename, [event.network, origin])
     );
 
-    // if chain is stored in the event then that will override the class property
-    // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
-    const chain = event.chain || this._chain;
     if (!dbEvent) {
-      log.warn(
-        `no db event found for event ${event.chain}-${event.data.kind}!`
-      );
+      log.warn(`no db event found for event ${origin}-${event.data.kind}!`);
       return;
     }
 
@@ -86,14 +82,14 @@ export default class extends IEventHandler {
       const dbEntity = await this._models.ChainEntity.create({
         type: type.toString(),
         type_id,
-        chain,
+        chain_name: event.chainName,
         author,
         completed,
       });
 
       const publishData: RmqEntityCUD.RmqMsgType = {
         ce_id: dbEntity.id,
-        chain_id: dbEntity.chain,
+        chain_name: dbEntity.chain_name,
         author,
         entity_type_id: type_id,
         cud: 'create',
@@ -128,7 +124,7 @@ export default class extends IEventHandler {
         where: {
           type: type.toString(),
           type_id,
-          chain,
+          chain_name: event.chainName,
         },
       });
       if (!dbEntity) {

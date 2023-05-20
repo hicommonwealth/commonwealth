@@ -83,12 +83,26 @@ module.exports = {
         { transaction: t }
       );
 
+      await queryInterface.renameColumn('ChainEvents', 'chain', 'chain_name', {
+        transaction: t,
+      });
+      await queryInterface.renameColumn('ChainEvents', 'chain', 'chain_name', {
+        transaction: t,
+      });
+
       // TODO: drop EventOrigins table in follow up PR/migration so we can revert easily
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.renameColumn('ChainEvents', 'chain_name', 'chain', {
+        transaction: t,
+      });
+      await queryInterface.renameColumn('ChainEvents', 'chain_name', 'chain', {
+        transaction: t,
+      });
+
       // remove the new ChainEntity unique constraint
       await queryInterface.sequelize.query(
         `

@@ -83,6 +83,12 @@ export function Label(communityId: string, event: CWEvent): IEventLabel {
   }
 }
 
+export function getEventOrigin(event: CWEvent): string {
+  if (event.contractAddress)
+    return event.chainName + ':' + event.contractAddress;
+  else return event.chainName;
+}
+
 /**
  * Creates a listener instance and returns it if no error occurs. This function throws on error.
  * @param origin The chain to create a listener for

@@ -28,19 +28,19 @@ export class Listener extends BaseListener<
     chain: string,
     tokenAddresses: string[],
     url?: string,
-    tokenNames?: string[],
+    origins?: string[],
     verbose?: boolean
   ) {
     super(SupportedNetwork.ERC721, chain, verbose);
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.ERC721])
+      addPrefix(__filename, [SupportedNetwork.ERC721, chain])
     );
 
     this._options = {
       url,
       tokenAddresses,
-      tokenNames,
+      origins: origins,
     };
 
     this._subscribed = false;
@@ -51,7 +51,7 @@ export class Listener extends BaseListener<
       this._api = await createApi(
         this._options.url,
         this._options.tokenAddresses,
-        this._options.tokenNames,
+        this._options.origins,
         10000
       );
     } catch (error) {
@@ -79,7 +79,7 @@ export class Listener extends BaseListener<
     try {
       this.log.info(
         `Subscribing to the following token(s): ${
-          this.options.tokenNames || '[token names not given!]'
+          this.options.origins || '[token names not given!]'
         }, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));

@@ -15,7 +15,7 @@ function fmtAddr(addr: string) {
  */
 export const Label: LabelerFilter = (
   blockNumber: number,
-  chainId: string,
+  communityId: string,
   data: IEventData
 ): IEventLabel => {
   switch (data.kind) {
@@ -30,7 +30,7 @@ export const Label: LabelerFilter = (
     case EventKind.Transfer:
       return {
         heading: 'Transfer',
-        label: `Transfer of ${data.value} on ${chainId} from ${data.from} to ${data.to}.`,
+        label: `Transfer of ${data.value} on ${communityId} from ${data.from} to ${data.to}.`,
         icon: 'transfer',
       };
     default: {
@@ -38,7 +38,7 @@ export const Label: LabelerFilter = (
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = data;
       throw new Error(
-        `[${SupportedNetwork.ERC20}::${chainId}]: Unknown event type`
+        `[${SupportedNetwork.ERC20}::${communityId}]: Unknown event type`
       );
     }
   }

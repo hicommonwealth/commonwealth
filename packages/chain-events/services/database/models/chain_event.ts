@@ -16,7 +16,7 @@ export type ChainEventAttributes = {
   contract_address?: string;
   entity_id?: number;
   network: SupportedNetwork;
-  chain: string;
+  chain_name: string;
   created_at?: Date;
   updated_at?: Date;
 
@@ -43,7 +43,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain_name: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
       contract_address: { type: dataTypes.STRING, allowNull: true },
     },

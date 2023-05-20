@@ -1,5 +1,8 @@
 import type { RmqCENotificationCUD } from 'common-common/src/rabbitmq/types';
-import {AbstractRabbitMQController, RascalPublications} from 'common-common/src/rabbitmq/types';
+import {
+  AbstractRabbitMQController,
+  RascalPublications,
+} from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
 import type { ChainEventInstance } from '../../database/models/chain_event';
@@ -9,6 +12,7 @@ import type { CWEvent, IChainEventKind } from 'chain-events/src';
 import {
   EntityEventKind,
   eventToEntity,
+  getEventOrigin,
   IEventHandler,
 } from 'chain-events/src';
 
@@ -26,7 +30,7 @@ export default class extends IEventHandler {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public async handle(event: CWEvent, dbEvent: ChainEventInstance) {
     const log = factory.getLogger(
-      addPrefix(__filename, [event.network, event.chain])
+      addPrefix(__filename, [event.network, getEventOrigin(event)])
     );
 
     if (!dbEvent) {

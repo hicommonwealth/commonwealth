@@ -23,19 +23,17 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventHandler<ChainEventInstance> {
   constructor(
     private readonly _models: DB,
-    private readonly _rmqController: AbstractRabbitMQController,
-    private readonly _chain?: string
+    private readonly _rmqController: AbstractRabbitMQController
   ) {
     super();
   }
 
   /**
    * Handles an event during the migration process, by creating or updating existing
-   * events depending whether we've seen them before.
+   * events depending on whether we've seen them before.
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public async handle(event: CWEvent) {
-    const chain = event.chain || this._chain;
+    const chainName = event.chainName;
 
     // case by entity type to determine what value to look for
     const createOrUpdateModel = async (
@@ -50,11 +48,11 @@ export default class extends IEventHandler<ChainEventInstance> {
               [queryFieldName]: fieldValue,
               // votes will be unique by data rather than by type
               event_data: event.data as any,
-              chain,
+              chain_name: chainName,
             }
           : {
               [queryFieldName]: fieldValue,
-              chain,
+              chain_name: chainName,
             };
       const existingEvent = await this._models.ChainEvent.findOne({
         where: queryArgs,
@@ -71,7 +69,7 @@ export default class extends IEventHandler<ChainEventInstance> {
         block_number: event.blockNumber,
         event_data: event.data,
         network: event.network,
-        chain,
+        chain_name: chainName,
       });
     };
 

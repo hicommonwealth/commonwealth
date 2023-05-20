@@ -22,15 +22,15 @@ export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
    * Parse events out of an ethereum block and standardizes their format
    * for processing.
    * @param event
-   * @param tokenName
+   * @param origin
    * @returns an array of processed events
    */
   public async process(
     event: RawEvent,
-    tokenName?: string
+    origin?: string
   ): Promise<CWEvent<IEventData>[]> {
     const log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
+      addPrefix(__filename, [SupportedNetwork.ERC20, origin])
     );
     const kind = ParseType(event.event);
     if (!kind) return [];
@@ -42,7 +42,7 @@ export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
         event,
         this._enricherConfig
       );
-      cwEvent.chain = tokenName;
+      cwEvent.chain = origin;
       return cwEvent ? [cwEvent] : [];
     } catch (e) {
       log.error(

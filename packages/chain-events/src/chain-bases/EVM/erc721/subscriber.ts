@@ -24,11 +24,11 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
    * Initializes subscription to chain and starts emitting events.
    */
   public async subscribe(
-    cb: (event: RawEvent, tokenName?: string) => void
+    cb: (event: RawEvent, origin?: string) => void
   ): Promise<void> {
-    this._listener = (tokenName: string, event: RawEvent): void => {
+    this._listener = (origin: string, event: RawEvent): void => {
       const log = factory.getLogger(
-        addPrefix(__filename, [SupportedNetwork.ERC721, tokenName])
+        addPrefix(__filename, [SupportedNetwork.ERC721, origin])
       );
       const logStr = `Received ${this._name} event: ${JSON.stringify(
         event,
@@ -37,10 +37,10 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
       )}.`;
       // eslint-disable-next-line no-unused-expressions
       this._verbose ? log.info(logStr) : log.trace(logStr);
-      cb(event, tokenName);
+      cb(event, origin);
     };
-    this._api.tokens.forEach(({ contract, tokenName }) =>
-      contract.on('*', this._listener.bind(this, tokenName))
+    this._api.tokens.forEach(({ contract, origin }) =>
+      contract.on('*', this._listener.bind(this, origin))
     );
   }
 
@@ -70,7 +70,7 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
     try {
       const contract = ERC721Factory.connect(tokenAddress, this.api.provider);
       await contract.deployed();
-      this.api.tokens.push({ contract, tokenName });
+      this.api.tokens.push({ contract, origin: tokenName });
       contract.on('*', this._listener.bind(this, tokenName));
     } catch (e) {
       await sleep(retryTimeMs);

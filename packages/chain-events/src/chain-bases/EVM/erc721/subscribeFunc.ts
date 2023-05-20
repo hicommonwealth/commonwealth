@@ -25,7 +25,7 @@ export interface IErc721SubscribeOptions
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param ethNetworkUrl
  * @param tokenAddresses
- * @param tokenNames
+ * @param origins
  * @param retryTimeMs
  * @returns a promise resolving to an ApiPromise once the connection has been established
 
@@ -33,7 +33,7 @@ export interface IErc721SubscribeOptions
 export async function createApi(
   ethNetworkUrl: string,
   tokenAddresses: string[],
-  tokenNames?: string[],
+  origins?: string[],
   retryTimeMs = 10 * 1000
 ): Promise<IErc721Contracts> {
   const log = factory.getLogger(
@@ -52,7 +52,7 @@ export async function createApi(
         ERC721Factory.connect(o, provider)
       );
       const deployResults: IErc721Contracts = { provider, tokens: [] };
-      for (const [contract, tokenName] of _.zip(tokenContracts, tokenNames) as [
+      for (const [contract, tokenName] of _.zip(tokenContracts, origins) as [
         ERC721,
         string | undefined
       ][]) {
@@ -60,7 +60,7 @@ export async function createApi(
           await contract.deployed();
           deployResults.tokens.push({
             contract,
-            tokenName,
+            origin: tokenName,
           });
         } catch (err) {
           log.error(

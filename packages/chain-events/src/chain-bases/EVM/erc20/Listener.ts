@@ -26,14 +26,14 @@ export class Listener extends BaseListener<
   protected readonly log;
 
   constructor(
-    chain: string,
+    origin: string,
     tokenAddresses: string[],
     url?: string,
     tokenNames?: string[],
     enricherConfig?: EnricherConfig,
     verbose?: boolean
   ) {
-    super(SupportedNetwork.ERC20, chain, verbose);
+    super(SupportedNetwork.ERC20, origin, verbose);
 
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.ERC20])

@@ -6,7 +6,7 @@ import type { ModelStatic, ModelInstance } from './types';
 
 export type ChainEntityAttributes = {
   id: number;
-  chain: string;
+  chain_name: string;
   type: string;
   type_id: string;
   queued: number;
@@ -36,7 +36,7 @@ export default (
     'ChainEntity',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain_name: { type: dataTypes.STRING, allowNull: false },
       type: { type: dataTypes.STRING, allowNull: false },
       type_id: { type: dataTypes.STRING, allowNull: false },
       completed: {
