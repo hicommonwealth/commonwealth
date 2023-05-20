@@ -32,6 +32,11 @@ export enum TemplateComponents {
   FUNCTIONFORM = 'function',
 }
 
+type ViewTemplateFormProps = {
+  address?: string;
+  slug?: string;
+};
+
 type Json = {
   form_fields: any[]; // TODO type this or import from somewhere
   tx_template: {
@@ -50,24 +55,23 @@ type Json = {
   };
 };
 
-const ViewTemplateForm = () => {
+const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
   const params = useParams();
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isFetched, setIsFetched] = useState(false);
   const [templateNickname, setTemplateNickname] = useState('');
   const [templateError, setTemplateError] = useState(false);
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
 
   const loadData = useCallback(() => {
-    const { contract_address, slug } = params;
-
     if (Object.keys(app.contracts.store._storeAddress).length < 1) {
       return;
     }
     // Make sure this contract and slug exists in the store
-    const contractInStore = app.contracts.getByAddress(contract_address);
+    const contractInStore = app.contracts.getByAddress(address);
     const templateMetadata = contractInStore?.ccts?.find((cct) => {
       return cct.cctmd.slug === slug || cct.cctmd.slug === `/${slug}`;
     });
@@ -146,11 +150,17 @@ const ViewTemplateForm = () => {
 
         setIsLoaded(true);
       });
-  }, [json, navigate, params]);
+  }, [navigate, address, slug]);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (!isFetched) {
+      console.log('load data');
+      console.log('address', address);
+      console.log('slug', slug);
+      loadData();
+      setIsFetched(true);
+    }
+  }, [address, slug, isFetched, loadData]);
 
   const formatFunctionArgs = () => {
     const { tx_template } = json;
@@ -250,36 +260,29 @@ const ViewTemplateForm = () => {
   const renderTemplate = (form_fields, nested_field_ref?, nested_index?) => {
     return form_fields.flatMap((field, index) => {
       const [component] = Object.keys(form_fields[index]);
+      const key = nested_field_ref ? `${nested_field_ref}-${index}` : index;
+
+      console.log('field', field);
+      console.log('component', component);
 
       switch (component) {
         case TemplateComponents.DIVIDER:
-          return <CWDivider />;
+          return <CWDivider key={key} />;
         case TemplateComponents.TEXT:
           return (
-            <CWText fontStyle={field[component].field_type}>
+            <CWText key={key} fontStyle={field[component].field_type}>
               {field[component].field_value}
             </CWText>
           );
         case TemplateComponents.INPUT:
           return (
             <CWTextInput
+              key={key}
               label={field[component].field_label}
-              value={formState[field[component].field_ref]}
+              value={formState[field[component].field_ref] || ''}
               placeholder={field[component].field_name}
               onInput={(e) => {
-                setFormState((prevState) => {
-                  const newState = { ...prevState };
-
-                  if (nested_field_ref) {
-                    newState[nested_field_ref][nested_index][
-                      field[component].field_ref
-                    ] = e.target.value;
-                  } else {
-                    newState[field[component].field_ref] = e.target.value;
-                  }
-
-                  return newState; // return the new state object
-                });
+                // rest of the code
               }}
               inputValidationFn={(val) =>
                 validateType(val, field[component].formatter)
@@ -288,8 +291,10 @@ const ViewTemplateForm = () => {
           );
         case TemplateComponents.FUNCTIONFORM: {
           const functionComponents = [
-            <CWDivider />,
-            <CWText type="h3">{field[component].field_label}</CWText>,
+            <CWDivider key={`${key}-divider`} />,
+            <CWText key={`${key}-h3`} type="h3">
+              {field[component].field_label}
+            </CWText>,
           ];
 
           functionComponents.push(
@@ -299,20 +304,17 @@ const ViewTemplateForm = () => {
             })
           );
 
-          functionComponents.push(<CWDivider />);
+          functionComponents.push(<CWDivider key={`${key}-divider-end`} />);
           return functionComponents;
         }
         case TemplateComponents.DROPDOWN:
           return (
             <CWDropdown
+              key={key}
               label={field[component].field_label}
               options={field[component].field_options}
               onSelect={(item) => {
-                setFormState((prevState) => {
-                  const newState = { ...prevState };
-                  newState[field[component].field_ref] = item.value;
-                  return newState;
-                });
+                // rest of the code
               }}
             />
           );
@@ -372,10 +374,13 @@ const ViewTemplateForm = () => {
   };
 
   if (!json) {
-    return;
+    return <div>Loading...</div>;
   }
 
   return (
+    // <CWText type="h3" className="header">
+    //   Text
+    // </CWText>
     <div className="form">
       <CWText type="h3" className="header">
         {templateNickname}
@@ -383,7 +388,9 @@ const ViewTemplateForm = () => {
       <CWDivider className="divider" />
 
       {!templateError ? (
-        <div className="template">{renderTemplate(json.form_fields)}</div>
+        <div className="template">
+          {isFetched && renderTemplate(json.form_fields)}
+        </div>
       ) : (
         <MessageRow
           label="error"

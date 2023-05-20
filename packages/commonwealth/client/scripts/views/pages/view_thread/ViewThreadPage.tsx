@@ -44,6 +44,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { TemplateActionCard } from './template_action_card';
+import { ViewTemplateFormCard } from './view_template_form_card';
 import {
   ExternalLink,
   ThreadAuthor,
@@ -175,6 +176,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (!thread) {
       return;
     }
+
+    console.log('thread', thread);
+    console.log('linkedTemplates', linkedTemplates);
+    console.log('linkedTemplates[0]', linkedTemplates[0]);
 
     // load proposal
     if (!prefetch[threadId]['threadReactionsStarted']) {
@@ -479,6 +484,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
   const showTemplateOptions = isAuthor || isAdminOrMod;
+
+  const showLinkedTemplateOptions = linkedTemplates.length > 0;
 
   const canComment =
     app.user.activeAccount ||
@@ -832,6 +839,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showLinkedTemplateOptions
+              ? [
+                  {
+                    label: 'View Template',
+                    item: (
+                      <div className="cards-column">
+                        <ViewTemplateFormCard
+                          address={linkedTemplates[0]?.identifier.split('/')[1]}
+                          slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                        />
                       </div>
                     ),
                   },
