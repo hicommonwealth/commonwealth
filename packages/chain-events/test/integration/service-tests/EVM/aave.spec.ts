@@ -34,7 +34,7 @@ import {
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe.only('Integration tests for Aave', () => {
+describe('Integration tests for Aave', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents

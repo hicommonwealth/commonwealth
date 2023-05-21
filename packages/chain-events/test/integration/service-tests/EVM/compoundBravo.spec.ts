@@ -32,7 +32,7 @@ import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe('Integration tests for Compound Bravo', () => {
+describe.only('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
@@ -45,16 +45,15 @@ describe('Integration tests for Compound Bravo', () => {
 
   let listener: Listener<Api, StorageFetcher, Processor, Subscriber, EventKind>;
   const contract = new compoundGovernor();
-  const chain_id = 'ganache-fork-bravo';
+  const chainName = 'Ethereum (Ganache)';
   const chain = {
-    id: chain_id,
     base: ChainBase.Ethereum,
     network: ChainNetwork.Compound,
     substrate_spec: null,
     contract_address: contract.contractAddress,
     verbose_logging: false,
-    ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
-    origin: `Ethereum (Mainnet): ${contract.contractAddress}`,
+    ChainNode: { id: 1, url: 'http://127.0.0.1:8545', name: chainName },
+    origin: `${chainName}::${contract.contractAddress}`,
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;
@@ -72,7 +71,7 @@ describe('Integration tests for Compound Bravo', () => {
         rmq,
         chain
       );
-      listener = listeners[chain_id] as Listener<
+      listener = listeners[chain.origin] as Listener<
         Api,
         StorageFetcher,
         Processor,
@@ -90,7 +89,7 @@ describe('Integration tests for Compound Bravo', () => {
       proposalCreatedBlockNum = result.block;
       await waitUntilBlock(proposalCreatedBlockNum, listener);
 
-      events['proposal-created'] =
+      events[EventKind.ProposalCreated] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
 
       // verify the event was created and appended to the correct queue
@@ -99,8 +98,9 @@ describe('Integration tests for Compound Bravo', () => {
       ).to.equal(1, 'Event not captured');
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
-        'proposal-created',
-        chain_id,
+        EventKind.ProposalCreated,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -126,7 +126,7 @@ describe('Integration tests for Compound Bravo', () => {
 
       await waitUntilBlock(block, listener);
 
-      events['vote-cast'] =
+      events[EventKind.VoteCast] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
 
       // verify the event was created and appended to the correct queue
@@ -135,8 +135,9 @@ describe('Integration tests for Compound Bravo', () => {
       ).to.equal(2);
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][1],
-        'vote-cast',
-        chain_id,
+        EventKind.VoteCast,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -148,7 +149,7 @@ describe('Integration tests for Compound Bravo', () => {
 
       await waitUntilBlock(block, listener);
 
-      events['proposal-queued'] =
+      events[EventKind.ProposalQueued] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][2];
 
       // verify the event was created and appended to the correct queue
@@ -157,8 +158,9 @@ describe('Integration tests for Compound Bravo', () => {
       ).to.equal(3);
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][2],
-        'proposal-queued',
-        chain_id,
+        EventKind.ProposalQueued,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -170,7 +172,7 @@ describe('Integration tests for Compound Bravo', () => {
 
       await waitUntilBlock(block, listener);
 
-      events['proposal-executed'] =
+      events[EventKind.ProposalExecuted] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][3];
 
       // verify the event was created and appended to the correct queue
@@ -179,8 +181,9 @@ describe('Integration tests for Compound Bravo', () => {
       ).to.equal(4);
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][3],
-        'proposal-executed',
-        chain_id,
+        EventKind.ProposalExecuted,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -207,13 +210,16 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal created events', async () => {
       const propCreatedEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'proposal-created'`),
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.ProposalCreated}'`
+              ),
             ],
           },
-          block_number: events['proposal-created'].blockNumber,
+          block_number: events[EventKind.ProposalCreated].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
 
@@ -222,20 +228,26 @@ describe('Integration tests for Compound Bravo', () => {
         rmq.queuedMessages[RascalSubscriptions.ChainEventNotificationsCUDMain]
           .length
       ).to.equal(2);
-      eventMatch(
-        rmq.queuedMessages[
-          RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][0].event,
-        'proposal-created',
-        chain_id,
-        proposalId
-      );
+
+      const propCreatedNotif = rmq.queuedMessages[
+        RascalSubscriptions.ChainEventNotificationsCUDMain
+      ].find((msg) => msg.ChainEvent.id === propCreatedEvent.id);
+
+      expect(
+        propCreatedNotif,
+        'Proposal created notification not found'
+      ).to.deep.equal({
+        ChainEvent: propCreatedEvent.toJSON(),
+        event: events[EventKind.ProposalCreated],
+        cud: 'create',
+      });
 
       relatedEntity = await models.ChainEntity.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           type_id: '0x' + parseInt(proposalId).toString(16),
           type: 'proposal',
+          contract_address: chain.contract_address,
         },
       });
 
@@ -252,7 +264,8 @@ describe('Integration tests for Compound Bravo', () => {
       ).to.deep.equal({
         author: relatedEntity.author,
         ce_id: relatedEntity.id,
-        chain_id,
+        chain_name: chainName,
+        contract_address: chain.contract_address,
         entity_type_id: relatedEntity.type_id,
         cud: 'create',
       });
@@ -261,11 +274,16 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process vote cast events', async () => {
       const voteCastEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
-            [Op.and]: [Sequelize.literal(`event_data->>'kind' = 'vote-cast'`)],
+            [Op.and]: [
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.VoteCast}'`
+              ),
+            ],
           },
-          block_number: events['vote-cast'].blockNumber,
+          block_number: events[EventKind.VoteCast].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
 
@@ -276,13 +294,16 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal queued events', async () => {
       const propQueuedEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'proposal-queued'`),
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.ProposalQueued}'`
+              ),
             ],
           },
-          block_number: events['proposal-queued'].blockNumber,
+          block_number: events[EventKind.ProposalQueued].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
 
@@ -293,13 +314,16 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal executed events', async () => {
       const propExecutedEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'proposal-executed'`),
+              Sequelize.literal(
+                `event_data->>'kind' = '${EventKind.ProposalExecuted}'`
+              ),
             ],
           },
-          block_number: events['proposal-executed'].blockNumber,
+          block_number: events[EventKind.ProposalExecuted].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
 
@@ -311,7 +335,8 @@ describe('Integration tests for Compound Bravo', () => {
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][1].event,
         'proposal-executed',
-        chain_id,
+        chainName,
+        chain.contract_address,
         proposalId
       );
     });
@@ -343,7 +368,8 @@ describe('Integration tests for Compound Bravo', () => {
         (e) =>
           e.event_data.kind === 'proposal-created' &&
           e.event_data.id === hexProposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(
         proposalCreatedEvent,
@@ -351,7 +377,7 @@ describe('Integration tests for Compound Bravo', () => {
       ).to.exist;
 
       res = await agent.get(
-        `/api/entities?type=proposal&type_id=${hexProposalId}&chain=${chain_id}`
+        `/api/entities?type=proposal&type_id=${hexProposalId}&chain_name=${chainName}&contract_address=${chain.contract_address}`
       );
       expect(res.status).to.equal(200);
       expect(
@@ -370,7 +396,8 @@ describe('Integration tests for Compound Bravo', () => {
         (e) =>
           e.event_data.kind === 'vote-cast' &&
           e.event_data.id === hexProposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
@@ -384,7 +411,8 @@ describe('Integration tests for Compound Bravo', () => {
         (e) =>
           e.event_data.kind === 'proposal-queued' &&
           e.event_data.id === hexProposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
@@ -398,7 +426,8 @@ describe('Integration tests for Compound Bravo', () => {
         (e) =>
           e.event_data.kind === 'proposal-executed' &&
           e.event_data.id === hexProposalId &&
-          e.chain === chain_id
+          e.chain_name === chainName &&
+          e.contract_address === chain.contract_address
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
@@ -408,10 +437,16 @@ describe('Integration tests for Compound Bravo', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
+      where: {
+        chain_name: chainName,
+        contract_address: chain.contract_address,
+      },
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id },
+      where: {
+        chain_name: chainName,
+        contract_address: chain.contract_address,
+      },
     });
   });
 });

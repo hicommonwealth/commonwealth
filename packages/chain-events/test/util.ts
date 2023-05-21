@@ -94,3 +94,9 @@ export async function waitUntilBlock(
     waitTime += 1;
   }
 }
+
+export function notificationCUDMatch() {}
+
+export function entityCUDMatch() {}
+
+export function cwEventMatch() {}
