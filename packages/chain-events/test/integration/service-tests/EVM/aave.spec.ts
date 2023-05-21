@@ -16,9 +16,11 @@ import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
 import {
-  eventMatch,
-  findEvent,
+  cwEventMatch,
+  entityCUDMatch,
+  findCwEvent,
   getEvmSecondsAndBlocks,
+  notificationCUDMatch,
   waitUntilBlock,
 } from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
@@ -47,7 +49,7 @@ describe('Integration tests for Aave', () => {
 
   let listener: Listener<Api, StorageFetcher, Processor, Subscriber, EventKind>;
   const contract = new aaveGovernor();
-  const chainName = 'Ethereum (testnet)';
+  const chainName = 'Ethereum (Ganache)';
   const chain = {
     base: ChainBase.Ethereum,
     network: ChainNetwork.Aave,
@@ -95,25 +97,27 @@ describe('Integration tests for Aave', () => {
       proposalCreatedBlockNum = result.block;
       await waitUntilBlock(proposalCreatedBlockNum, listener);
 
-      events[EventKind.ProposalCreated] = findEvent(
+      events[EventKind.ProposalCreated] = findCwEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-        EventKind.ProposalCreated,
-        chainName,
-        proposalCreatedBlockNum,
-        chain.contract_address
+        {
+          kind: EventKind.ProposalCreated,
+          chainName: chainName,
+          blockNumber: proposalCreatedBlockNum,
+          contractAddress: chain.contract_address,
+        }
       );
 
       expect(
         events[EventKind.ProposalCreated],
         `${EventKind.ProposalCreated} event not found in the ${RascalQueues.ChainEvents} queue`
       ).to.not.be.undefined;
-      eventMatch(
-        events[EventKind.ProposalCreated],
-        EventKind.ProposalCreated,
+      cwEventMatch(events[EventKind.ProposalCreated], {
+        kind: EventKind.ProposalCreated,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        blockNumber: proposalCreatedBlockNum,
+        contractAddress: chain.contract_address,
+        proposalId,
+      });
     });
 
     it('Should capture votes on the created proposal', async () => {
@@ -135,25 +139,27 @@ describe('Integration tests for Aave', () => {
       await waitUntilBlock(block, listener);
 
       console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
-      events[EventKind.VoteEmitted] = findEvent(
+      events[EventKind.VoteEmitted] = findCwEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-        EventKind.VoteEmitted,
-        chainName,
-        block,
-        chain.contract_address
+        {
+          kind: EventKind.VoteEmitted,
+          chainName,
+          blockNumber: block,
+          contractAddress: chain.contract_address,
+        }
       );
 
       expect(
         events[EventKind.ProposalCreated],
         `${EventKind.VoteEmitted} event not found in the ${RascalQueues.ChainEvents} queue`
       ).to.not.be.undefined;
-      eventMatch(
-        events[EventKind.VoteEmitted],
-        EventKind.VoteEmitted,
+      cwEventMatch(events[EventKind.VoteEmitted], {
+        kind: EventKind.VoteEmitted,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        blockNumber: block,
+        contractAddress: chain.contract_address,
+        proposalId,
+      });
     });
 
     it('Should capture proposal queued events', async () => {
@@ -164,21 +170,23 @@ describe('Integration tests for Aave', () => {
       await waitUntilBlock(block, listener);
       // await delay(12000);
 
-      events[EventKind.ProposalQueued] = findEvent(
+      events[EventKind.ProposalQueued] = findCwEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-        EventKind.ProposalQueued,
-        chainName,
-        block,
-        chain.contract_address
+        {
+          kind: EventKind.ProposalQueued,
+          chainName,
+          blockNumber: block,
+          contractAddress: chain.contract_address,
+        }
       );
 
-      eventMatch(
-        events[EventKind.ProposalQueued],
-        EventKind.ProposalQueued,
+      cwEventMatch(events[EventKind.ProposalQueued], {
+        kind: EventKind.ProposalQueued,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        blockNumber: block,
+        contractAddress: chain.contract_address,
+        proposalId,
+      });
     });
 
     it('Should capture proposal executed events', async () => {
@@ -187,21 +195,23 @@ describe('Integration tests for Aave', () => {
       const { block } = await sdk.executeProposal(proposalId, 'aave');
       await waitUntilBlock(block, listener);
 
-      events[EventKind.ProposalExecuted] = findEvent(
+      events[EventKind.ProposalExecuted] = findCwEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
-        EventKind.ProposalExecuted,
-        chainName,
-        block,
-        chain.contract_address
+        {
+          kind: EventKind.ProposalExecuted,
+          chainName,
+          blockNumber: block,
+          contractAddress: chain.contract_address,
+        }
       );
 
-      eventMatch(
-        events[EventKind.ProposalExecuted],
-        EventKind.ProposalExecuted,
+      cwEventMatch(events[EventKind.ProposalExecuted], {
+        kind: EventKind.ProposalExecuted,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        blockNumber: block,
+        contractAddress: chain.contract_address,
+        proposalId,
+      });
     });
 
     xit('Should capture proposal cancelled events', async () => {
@@ -247,10 +257,7 @@ describe('Integration tests for Aave', () => {
         RascalSubscriptions.ChainEventNotificationsCUDMain
       ].find((msg) => msg.ChainEvent.id === propCreatedEvent.id);
 
-      expect(
-        propCreatedNotif,
-        'Proposal created notification not found'
-      ).to.deep.equal({
+      notificationCUDMatch(propCreatedNotif, {
         ChainEvent: propCreatedEvent.toJSON(),
         event: events[EventKind.ProposalCreated],
         cud: 'create',
@@ -273,16 +280,17 @@ describe('Integration tests for Aave', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length
       ).to.equal(1);
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]
-      ).to.deep.equal({
-        author: relatedEntity.author,
-        ce_id: relatedEntity.id,
-        chain_name: chainName,
-        contract_address: chain.contract_address,
-        entity_type_id: relatedEntity.type_id,
-        cud: 'create',
-      });
+      entityCUDMatch(
+        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0],
+        {
+          author: relatedEntity.author,
+          ce_id: relatedEntity.id,
+          chain_name: chainName,
+          contract_address: chain.contract_address,
+          entity_type_id: relatedEntity.type_id,
+          cud: 'create',
+        }
+      );
     });
 
     it('Should process vote cast events', async () => {
@@ -344,14 +352,17 @@ describe('Integration tests for Aave', () => {
       expect(propExecutedEvent).to.exist;
       expect(relatedEntity.id).to.equal(propExecutedEvent.entity_id);
 
-      eventMatch(
+      cwEventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][1].event,
-        EventKind.ProposalExecuted,
-        chainName,
-        chain.contract_address,
-        proposalId
+        {
+          kind: EventKind.ProposalExecuted,
+          chainName,
+          blockNumber: events[EventKind.ProposalExecuted].blockNumber,
+          contractAddress: chain.contract_address,
+          proposalId,
+        }
       );
     });
   });

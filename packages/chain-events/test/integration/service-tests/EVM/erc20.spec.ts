@@ -11,7 +11,7 @@ import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
 import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/chainSubscriber';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { eventMatch, waitUntilBlock } from '../../../util';
+import { cwEventMatch, waitUntilBlock } from '../../../util';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
@@ -98,7 +98,7 @@ describe('Integration tests for ERC20', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(1, 'Should have captured 1 transfer event');
-      eventMatch(msg, 'transfer', chain_id, null, transferAmount);
+      cwEventMatch(msg, 'transfer', chain_id, null, transferAmount);
     });
 
     it('Should capture approval events', async () => {
@@ -114,7 +114,7 @@ describe('Integration tests for ERC20', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(2, 'Should have captured 1 approval event');
-      eventMatch(msg, 'approval', chain_id, null, transferAmount);
+      cwEventMatch(msg, 'approval', chain_id, null, transferAmount);
     });
   });
 

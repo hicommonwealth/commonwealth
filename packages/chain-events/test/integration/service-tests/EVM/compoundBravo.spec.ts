@@ -15,8 +15,10 @@ import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
 import {
-  eventMatch,
+  cwEventMatch,
+  entityCUDMatch,
   getEvmSecondsAndBlocks,
+  notificationCUDMatch,
   waitUntilBlock,
 } from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
@@ -96,13 +98,13 @@ describe.only('Integration tests for Compound Bravo', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(1, 'Event not captured');
-      eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
-        EventKind.ProposalCreated,
+      cwEventMatch(rmq.queuedMessages[RascalSubscriptions.ChainEvents][0], {
+        kind: EventKind.ProposalCreated,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        contractAddress: chain.contract_address,
+        blockNumber: proposalCreatedBlockNum,
+        proposalId,
+      });
     });
 
     it('Should capture votes on the created proposal', async () => {
@@ -133,13 +135,13 @@ describe.only('Integration tests for Compound Bravo', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(2);
-      eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][1],
-        EventKind.VoteCast,
+      cwEventMatch(rmq.queuedMessages[RascalSubscriptions.ChainEvents][1], {
+        kind: EventKind.VoteCast,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        contractAddress: chain.contract_address,
+        blockNumber: block,
+        proposalId,
+      });
     });
 
     it('Should capture proposal queued events', async () => {
@@ -156,13 +158,13 @@ describe.only('Integration tests for Compound Bravo', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(3);
-      eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][2],
-        EventKind.ProposalQueued,
+      cwEventMatch(rmq.queuedMessages[RascalSubscriptions.ChainEvents][2], {
+        kind: EventKind.ProposalQueued,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        contractAddress: chain.contract_address,
+        blockNumber: block,
+        proposalId,
+      });
     });
 
     it('Should capture proposal executed events', async () => {
@@ -179,20 +181,18 @@ describe.only('Integration tests for Compound Bravo', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(4);
-      eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][3],
-        EventKind.ProposalExecuted,
+      cwEventMatch(rmq.queuedMessages[RascalSubscriptions.ChainEvents][3], {
+        kind: EventKind.ProposalExecuted,
         chainName,
-        chain.contract_address,
-        proposalId
-      );
+        contractAddress: chain.contract_address,
+        blockNumber: block,
+        proposalId,
+      });
     });
 
     xit('Should capture proposal cancelled events', async () => {
       const proposalIdToCancel = await sdk.createProposal(1);
       await sdk.cancelProposal(proposalIdToCancel);
-
-      // await delay(10000);
 
       // verify the event was created and appended to the correct queue
       expect(
@@ -233,10 +233,7 @@ describe.only('Integration tests for Compound Bravo', () => {
         RascalSubscriptions.ChainEventNotificationsCUDMain
       ].find((msg) => msg.ChainEvent.id === propCreatedEvent.id);
 
-      expect(
-        propCreatedNotif,
-        'Proposal created notification not found'
-      ).to.deep.equal({
+      notificationCUDMatch(propCreatedNotif, {
         ChainEvent: propCreatedEvent.toJSON(),
         event: events[EventKind.ProposalCreated],
         cud: 'create',
@@ -259,16 +256,17 @@ describe.only('Integration tests for Compound Bravo', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length
       ).to.equal(1);
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]
-      ).to.deep.equal({
-        author: relatedEntity.author,
-        ce_id: relatedEntity.id,
-        chain_name: chainName,
-        contract_address: chain.contract_address,
-        entity_type_id: relatedEntity.type_id,
-        cud: 'create',
-      });
+      entityCUDMatch(
+        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0],
+        {
+          author: relatedEntity.author,
+          ce_id: relatedEntity.id,
+          chain_name: chainName,
+          contract_address: chain.contract_address,
+          entity_type_id: relatedEntity.type_id,
+          cud: 'create',
+        }
+      );
     });
 
     it('Should process vote cast events', async () => {
@@ -330,14 +328,17 @@ describe.only('Integration tests for Compound Bravo', () => {
       expect(propExecutedEvent).to.exist;
       expect(relatedEntity.id).to.equal(propExecutedEvent.entity_id);
 
-      eventMatch(
+      cwEventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][1].event,
-        'proposal-executed',
-        chainName,
-        chain.contract_address,
-        proposalId
+        {
+          kind: EventKind.ProposalExecuted,
+          chainName,
+          contractAddress: chain.contract_address,
+          blockNumber: events[EventKind.ProposalExecuted].blockNumber,
+          proposalId,
+        }
       );
     });
   });

@@ -4,6 +4,10 @@ import type { CWEvent, IChainEventData, IEventHandler } from '../src';
 import { ChainEventKinds, Listener } from '../src';
 import { expect } from 'chai';
 import Web3 from 'web3';
+import {
+  RmqCENotificationCUD,
+  RmqEntityCUD,
+} from 'common-common/src/rabbitmq/types';
 
 export class TestHandler implements IEventHandler {
   private counter = 0;
@@ -26,51 +30,58 @@ export class TestHandler implements IEventHandler {
   }
 }
 
-export function eventMatch(
-  event: any,
-  kind: string,
-  chainName: string,
-  contractAddress?: string,
-  proposalId?: string,
-  transferAmount?: string,
-  from?: string
-) {
-  expect(event, 'event is undefined').to.not.be.undefined;
-  if (contractAddress)
-    expect(event.contractAddress, 'contract address does not match').to.equal(
-      contractAddress
-    );
-
-  if (proposalId)
-    expect(parseInt(event.data.id), 'proposal id does not match').to.equal(
-      Number(proposalId)
-    );
-
-  if (transferAmount)
-    expect(event.data.value, 'transfer amount does not match').to.equal(
-      Web3.utils.toWei(transferAmount)
-    );
-
-  if (from)
-    expect(event.data.from, 'from address does not match').to.equal(from);
-
-  expect(event.data.kind, 'event kind does not match').to.equal(kind);
-  expect(event.chainName, 'event chain does not match').to.equal(chainName);
+export interface MinUniqueCWEventData {
+  kind: string;
+  chainName: string;
+  blockNumber: number;
+  contractAddress?: string;
 }
 
-export function findEvent(
-  events: any[],
-  kind: string,
-  chainName: string,
-  blockNumber: number,
-  contractAddress?: string
-) {
-  return events.find(
+export function findCwEvent(events: CWEvent[], data: MinUniqueCWEventData) {
+  const matchingEvents = events.filter(
     (event) =>
-      event.data.kind === kind &&
-      event.chainName === chainName &&
-      event.blockNumber === blockNumber &&
-      event.contractAddress === contractAddress
+      event.data.kind === data.kind &&
+      event.chainName === data.chainName &&
+      event.blockNumber === data.blockNumber &&
+      event.contractAddress === data.contractAddress
+  );
+
+  if (matchingEvents.length > 1)
+    throw new Error(
+      'Multiple matching events found. Please provide more specific search data'
+    );
+  else return matchingEvents[0];
+}
+
+export interface CwEventMatchOptions extends MinUniqueCWEventData {
+  proposalId?: string;
+  transferAmount?: string;
+  from?: string;
+}
+
+export function cwEventMatch(event: CWEvent<any>, data: CwEventMatchOptions) {
+  expect(event, 'event is undefined').to.not.be.undefined;
+  if (data.contractAddress)
+    expect(event.contractAddress, 'contract address does not match').to.equal(
+      data.contractAddress
+    );
+
+  if (data.proposalId)
+    expect(parseInt(event.data.id), 'proposal id does not match').to.equal(
+      Number(data.proposalId)
+    );
+
+  if (data.transferAmount)
+    expect(event.data.value, 'transfer amount does not match').to.equal(
+      Web3.utils.toWei(data.transferAmount)
+    );
+
+  if (data.from)
+    expect(event.data.from, 'from address does not match').to.equal(data.from);
+
+  expect(event.data.kind, 'event kind does not match').to.equal(data.kind);
+  expect(event.chainName, 'event chain does not match').to.equal(
+    data.chainName
   );
 }
 
@@ -95,8 +106,18 @@ export async function waitUntilBlock(
   }
 }
 
-export function notificationCUDMatch() {}
+export function notificationCUDMatch(
+  notification: RmqCENotificationCUD.RmqMsgType,
+  data: RmqCENotificationCUD.RmqMsgType
+) {
+  RmqCENotificationCUD.checkMsgFormat(notification);
+  expect(notification).to.deep.equal(data);
+}
 
-export function entityCUDMatch() {}
-
-export function cwEventMatch() {}
+export function entityCUDMatch(
+  entityMsg: RmqEntityCUD.RmqMsgType,
+  data: RmqEntityCUD.RmqMsgType
+) {
+  RmqEntityCUD.checkMsgFormat(entityMsg);
+  expect(entityMsg).to.deep.equal(data);
+}
