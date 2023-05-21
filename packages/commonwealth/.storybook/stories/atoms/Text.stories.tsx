@@ -16,13 +16,13 @@ type Story = StoryObj<typeof text>;
 export const Text: Story = {
   name: 'Overview',
   args: {
-    disabled: false,
-    fontStyle: undefined,
+    children: "Display1 semi bold",
     fontWeight: "semiBold",
+    fontStyle: undefined,
+    type: "d1",
+    disabled: false,
     isCentered: false,
     noWrap: false,
-    type: "d1",
-    children: "Display1 semi bold",
   },
   argTypes: {
     disabled: {
@@ -45,6 +45,11 @@ export const Text: Story = {
     type: {
       control: { type: "inline-radio" },
       options: [ "d1", "d2", "h1", "h2", "h3", "h4", "h5", "b1", "b2", "caption", "buttonSm", "buttonLg", "buttonMini" ],
+    },
+  },
+  parameters: {
+    controls: {
+      exclude: [ "className", "truncate", ],
     },
   },
   render: ({...args}) => (

@@ -14,9 +14,9 @@ export const argsObj = (controlLabel: string, arr: string[]) => {
 }
 
 export const objectArrayToArgs = (
-  controlLabel: string,
   arr: any[],
   objProperty: string,
+  controlLabel: string,
 ) => {
   let obj: ArgsObject = {};
 

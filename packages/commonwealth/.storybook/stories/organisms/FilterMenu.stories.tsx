@@ -71,7 +71,7 @@ export const FilterMenuStory = {
   name: 'Filter Menu',
   args: {
     header: "Stages",
-    ...objectArrayToArgs("Filter", checkboxGroupOptions, "label")
+    ...objectArrayToArgs(checkboxGroupOptions, "label", "Filter")
   },
   argTypes: {
     header: {

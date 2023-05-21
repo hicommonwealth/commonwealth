@@ -40,7 +40,7 @@ export const DropdownStory = {
   name: 'Dropdown',
   args: {
     label: "Dropdown",
-    ...objectArrayToArgs("Option", options, "label"),
+    ...objectArrayToArgs(options, "label", "Option"),
     onSelect: (item: DropdownItemType) => console.log('Selected option: ', item?.label),
   },
   argTypes: {
