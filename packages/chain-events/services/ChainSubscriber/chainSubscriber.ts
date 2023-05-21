@@ -85,7 +85,6 @@ export async function processChains(
     } else chains.push(chain);
   }
 
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', tokens);
   // this creates/updates/deletes a single listener in listenerInstances called 'erc20' or 'erc721' respectively
   await manageErcListeners(tokens, listenerInstances, producer, rollbar);
 

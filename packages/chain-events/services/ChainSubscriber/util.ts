@@ -17,13 +17,6 @@ import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
 import { IRabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
-import {
-  EventKind,
-  IErc20Contracts,
-} from 'chain-events/src/chain-bases/EVM/erc20/types';
-import { Processor, Subscriber } from 'chain-events/src/chain-bases/EVM/erc20';
-import { Listener } from 'chain-events/src';
-import { IErc721Contracts } from 'chain-events/src/chain-bases/EVM/erc721/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -57,6 +50,7 @@ export async function manageErcListeners(
   for (const [listenerName, tokens] of Object.entries(groupedTokens)) {
     // skip if listener doesn't exist
     if (!listenerInstances[listenerName]) continue;
+    log.info(`Updating listener: ${listenerName}`);
 
     const newTokenAddresses = tokens.map((chain) => chain.contract_address);
     const existingListener = listenerInstances[listenerName];
@@ -88,6 +82,7 @@ export async function manageErcListeners(
   for (const [listenerName, tokens] of Object.entries(groupedTokens)) {
     // skip if listener already exists
     if (listenerInstances[listenerName]) continue;
+    log.info(`Creating listener: ${listenerName}`);
 
     // these assumptions are safe because we are grouping by ChainNode.name thus all tokens under
     // a specific listenerName will have the same url and chainName
@@ -170,8 +165,8 @@ export async function manageRegularListeners(
   const activeListenerNames: string[] = [];
   for (const [origin, instance] of Object.entries(listenerInstances)) {
     if (
-      !origin.startsWith(ChainNetwork.ERC20) &&
-      !origin.startsWith(ChainNetwork.ERC721)
+      !origin.includes(ChainNetwork.ERC20) &&
+      !origin.includes(ChainNetwork.ERC721)
     )
       regListenerInstances[origin] = instance;
     activeListenerNames.push(origin);

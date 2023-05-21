@@ -94,7 +94,6 @@ describe.only('Integration tests for ERC20', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(1, 'Should have captured 1 transfer event');
-      console.log('>>>>>>>>>>>>>>>>>>Transfer event: ', msg);
       cwEventMatch(msg, {
         kind: EventKind.Transfer,
         chainName,
@@ -118,7 +117,6 @@ describe.only('Integration tests for ERC20', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(2, 'Should have captured 1 approval event');
-      console.log('>>>>>>>>>>>>>>>>>>Approval event: ', msg);
       cwEventMatch(msg, {
         kind: EventKind.Approval,
         chainName,
@@ -195,7 +193,10 @@ describe.only('Integration tests for ERC20', () => {
         res.body.result,
         'The request body should contain an array of events'
       ).to.exist;
-      expect(res.body.result[0].chain).to.equal(chain_id);
+      expect(res.body.result[0].chain_name).to.equal(chainName);
+      expect(res.body.result[0].contract_address).to.equal(
+        chain.contract_address
+      );
       expect(res.body.result[0].event_data.kind).to.equal('approval');
       expect(res.body.result[0].event_data.value).to.equal(
         Web3.utils.toWei(transferAmount)
@@ -209,7 +210,10 @@ describe.only('Integration tests for ERC20', () => {
         res.body.result,
         'The request body should contain an array of events'
       ).to.exist;
-      expect(res.body.result[1].chain).to.equal(chain_id);
+      expect(res.body.result[1].chain_name).to.equal(chainName);
+      expect(res.body.result[1].contract_address).to.equal(
+        chain.contract_address
+      );
       expect(res.body.result[1].event_data.kind).to.equal('transfer');
       expect(res.body.result[1].event_data.value).to.equal(
         Web3.utils.toWei(transferAmount)
@@ -220,12 +224,6 @@ describe.only('Integration tests for ERC20', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: {
-        chain_name: chainName,
-        contract_address: chain.contract_address,
-      },
-    });
-    await models.ChainEntity.destroy({
       where: {
         chain_name: chainName,
         contract_address: chain.contract_address,
