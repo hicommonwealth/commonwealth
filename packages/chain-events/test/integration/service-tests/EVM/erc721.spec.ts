@@ -22,7 +22,8 @@ import {
 import { Processor, Subscriber } from '../../../../src/chain-bases/EVM/erc721';
 import { Listener } from '../../../../src';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
-import { waitUntilBlock } from '../../../util';
+import { cwEventMatch, findCwEvent, waitUntilBlock } from '../../../util';
+import { getErcListenerName } from 'chain-events/services/ChainSubscriber/util';
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -47,7 +48,7 @@ describe('Integration tests for ERC721', () => {
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let nft: ERC721, chain, accounts;
   const token_id = '138';
-  const chain_id = 'ganache-fork-erc721';
+  const chainName = 'Ethereum (Ganache)';
   const randomWallet = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
 
   const sdk = new ChainTesting('http://127.0.0.1:3000');
@@ -56,14 +57,13 @@ describe('Integration tests for ERC721', () => {
     accounts = await sdk.getAccounts();
     nft = await sdk.deployNFT();
     chain = {
-      id: chain_id,
       base: ChainBase.Ethereum,
       network: ChainNetwork.ERC721,
       substrate_spec: null,
       contract_address: nft.address,
       verbose_logging: true,
-      ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
-      origin: `Ethereum (Mainnet): ${nft.address}`,
+      ChainNode: { id: 1, url: 'http://127.0.0.1:8545', name: chainName },
+      origin: `${chainName}::${nft.address}`,
     };
     // initialize the mock rabbitmq controller
     await rmq.init();
@@ -76,7 +76,7 @@ describe('Integration tests for ERC721', () => {
         rmq,
         chain
       );
-      listener = listeners[`erc721_${chain.ChainNode.url}`] as Listener<
+      listener = listeners[getErcListenerName(chain)] as Listener<
         IErc721Contracts,
         never,
         Processor,
@@ -90,29 +90,46 @@ describe('Integration tests for ERC721', () => {
       const { block } = await nft.transferERC721(token_id, 2, accounts[1]);
       await waitUntilBlock(block, listener);
 
-      const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents].find(
-        (e) =>
-          e.data.kind === 'transfer' &&
-          e.chain === chain_id &&
-          e.data.from === accounts[1]
+      events[EventKind.Transfer] = findCwEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        {
+          kind: EventKind.Transfer,
+          chainName,
+          blockNumber: block,
+          contractAddress: chain.contract_address,
+        }
       );
-      events['transfer'] = msg;
-      expect(msg, 'Event not captured').to.exist;
+      cwEventMatch(events[EventKind.Transfer], {
+        kind: EventKind.Transfer,
+        chainName,
+        blockNumber: block,
+        contractAddress: chain.contract_address,
+        from: accounts[1],
+        to: accounts[2],
+      });
     });
 
     it('Should capture approval events', async () => {
       const { block } = await nft.approveERC721(token_id, 3, accounts[2]);
       await waitUntilBlock(block, listener);
 
-      const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents].find(
-        (e) =>
-          e.data.kind === 'approval' &&
-          e.chain === chain_id &&
-          e.data.owner === accounts[2] &&
-          e.data.approved === accounts[3]
+      events[EventKind.Approval] = findCwEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        {
+          kind: EventKind.Approval,
+          chainName,
+          blockNumber: block,
+          contractAddress: chain.contract_address,
+        }
       );
-      events['approval'] = msg;
-      expect(msg, 'Event not captured').to.exist;
+      cwEventMatch(events[EventKind.Approval], {
+        kind: EventKind.Approval,
+        chainName,
+        blockNumber: block,
+        contractAddress: chain.contract_address,
+        owner: accounts[2],
+        approved: accounts[3],
+      });
     });
   });
 
@@ -125,7 +142,7 @@ describe('Integration tests for ERC721', () => {
     it('Should process transfer events', async () => {
       const transferEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'transfer'`),
@@ -133,6 +150,7 @@ describe('Integration tests for ERC721', () => {
             ],
           },
           block_number: events['transfer'].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
       expect(transferEvent, 'The transfer event should be in the database').to
@@ -142,7 +160,7 @@ describe('Integration tests for ERC721', () => {
     it('Should process approval events', async () => {
       const approvalEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'approval'`),
@@ -151,6 +169,7 @@ describe('Integration tests for ERC721', () => {
             ],
           },
           block_number: events['approval'].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
       expect(approvalEvent, 'The approval event should be in the database').to
@@ -179,8 +198,8 @@ describe('Integration tests for ERC721', () => {
       ).to.exist;
       const event = res.body.result.find(
         (e) =>
-          e.chain === chain_id &&
-          e.event_data.kind === 'approval' &&
+          e.chain_name === chainName &&
+          e.event_data.kind === EventKind.Approval &&
           e.event_data.owner === accounts[2] &&
           e.event_data.approved === accounts[3]
       );
@@ -198,8 +217,8 @@ describe('Integration tests for ERC721', () => {
 
       const event = res.body.result.find(
         (e) =>
-          e.chain === chain_id &&
-          e.event_data.kind === 'transfer' &&
+          e.chain_name === chainName &&
+          e.event_data.kind === EventKind.Transfer &&
           e.event_data.from === accounts[1]
       );
       expect(event, 'The transfer event should be in the response').to.exist;
@@ -209,10 +228,10 @@ describe('Integration tests for ERC721', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
-    });
-    await models.ChainEntity.destroy({
-      where: { chain: chain_id },
+      where: {
+        chain_name: chainName,
+        contract_address: chain.contract_address,
+      },
     });
   });
 });

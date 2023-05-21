@@ -58,6 +58,8 @@ export interface CwEventMatchOptions extends MinUniqueCWEventData {
   transferAmount?: string;
   from?: string;
   to?: string;
+  owner?: string;
+  approved?: string;
 }
 
 export function cwEventMatch(event: CWEvent<any>, data: CwEventMatchOptions) {
@@ -82,6 +84,16 @@ export function cwEventMatch(event: CWEvent<any>, data: CwEventMatchOptions) {
 
   if (data.to)
     expect(event.data.to, 'to address does not match').to.equal(data.to);
+
+  if (data.owner)
+    expect(event.data.owner, 'owner address does not match').to.equal(
+      data.owner
+    );
+
+  if (data.approved)
+    expect(event.data.approved, 'approved address does not match').to.equal(
+      data.approved
+    );
 
   expect(event.blockNumber, 'event block number does not match').to.equal(
     data.blockNumber

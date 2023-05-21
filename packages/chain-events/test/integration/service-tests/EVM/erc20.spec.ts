@@ -21,14 +21,14 @@ import {
   IErc20Contracts,
 } from '../../../../src/chain-bases/EVM/erc20/types';
 import { Processor, Subscriber } from '../../../../src/chain-bases/EVM/erc20';
-import { Listener, SupportedNetwork } from '../../../../src';
+import { Listener } from '../../../../src';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 import { getErcListenerName } from 'chain-events/services/ChainSubscriber/util';
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe.only('Integration tests for ERC20', () => {
+describe('Integration tests for ERC20', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
