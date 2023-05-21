@@ -26,23 +26,21 @@ export class Listener extends BaseListener<
   protected readonly log;
 
   constructor(
-    origin: string,
+    chainName: string,
     tokenAddresses: string[],
-    url?: string,
-    tokenNames?: string[],
+    url: string,
     enricherConfig?: EnricherConfig,
     verbose?: boolean
   ) {
-    super(SupportedNetwork.ERC20, origin, verbose);
+    super(SupportedNetwork.ERC20, chainName, chainName, verbose);
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.ERC20])
+      addPrefix(__filename, [SupportedNetwork.ERC20, chainName])
     );
 
     this._options = {
       url,
       tokenAddresses,
-      tokenNames,
       enricherConfig: enricherConfig || {},
     };
 
@@ -54,7 +52,7 @@ export class Listener extends BaseListener<
       this._api = await createApi(
         this._options.url,
         this._options.tokenAddresses,
-        this._options.tokenNames,
+        this._chainName,
         10000
       );
     } catch (error) {
@@ -81,9 +79,7 @@ export class Listener extends BaseListener<
 
     try {
       this.log.info(
-        `Subscribing to the following token(s): ${
-          this.options.tokenNames || '[token names not given!]'
-        }, on url ${this._options.url}`
+        `Subscribing to the following token(s): ${this.options.tokenAddresses}, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
       this._subscribed = true;
@@ -120,12 +116,15 @@ export class Listener extends BaseListener<
 
   protected async processBlock(
     event: RawEvent,
-    tokenName?: string
+    tokenAddress?: string
   ): Promise<void> {
-    const cwEvents: CWEvent[] = await this._processor.process(event, tokenName);
-    console.log('cwEvents', cwEvents);
+    const cwEvents: CWEvent[] = await this._processor.process(
+      event,
+      tokenAddress
+    );
     // process events in sequence
     for (const e of cwEvents) {
+      e.chainName = this._chainName;
       await this.handleEvent(e as CWEvent);
     }
 

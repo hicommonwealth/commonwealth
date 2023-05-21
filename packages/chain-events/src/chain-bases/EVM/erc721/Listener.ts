@@ -25,22 +25,20 @@ export class Listener extends BaseListener<
   protected readonly log;
 
   constructor(
-    chain: string,
+    chainName: string,
     tokenAddresses: string[],
-    url?: string,
-    origins?: string[],
+    url: string,
     verbose?: boolean
   ) {
-    super(SupportedNetwork.ERC721, chain, verbose);
+    super(SupportedNetwork.ERC721, chainName, chainName, verbose);
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.ERC721, chain])
+      addPrefix(__filename, [SupportedNetwork.ERC721, chainName])
     );
 
     this._options = {
       url,
       tokenAddresses,
-      origins: origins,
     };
 
     this._subscribed = false;
@@ -51,7 +49,7 @@ export class Listener extends BaseListener<
       this._api = await createApi(
         this._options.url,
         this._options.tokenAddresses,
-        this._options.origins,
+        this._chainName,
         10000
       );
     } catch (error) {
@@ -79,7 +77,7 @@ export class Listener extends BaseListener<
     try {
       this.log.info(
         `Subscribing to the following token(s): ${
-          this.options.origins || '[token names not given!]'
+          this.options.tokenAddresses || '[token names not given!]'
         }, on url ${this._options.url}`
       );
       await this._subscriber.subscribe(this.processBlock.bind(this));
@@ -117,12 +115,16 @@ export class Listener extends BaseListener<
 
   protected async processBlock(
     event: RawEvent,
-    tokenName?: string
+    tokenAddress?: string
   ): Promise<void> {
-    const cwEvents: CWEvent[] = await this._processor.process(event, tokenName);
+    const cwEvents: CWEvent[] = await this._processor.process(
+      event,
+      tokenAddress
+    );
 
     // process events in sequence
     for (const e of cwEvents) {
+      e.chainName = this._chainName;
       await this.handleEvent(e as CWEvent);
     }
 

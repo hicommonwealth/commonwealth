@@ -26,12 +26,14 @@ import {
 } from '../config';
 
 import {
+  getErcListenerName,
   getListenerNames,
   manageErcListeners,
   manageRegularListeners,
 } from './util';
 import type { ChainAttributes, IListenerInstances } from './types';
 import v8 from 'v8';
+import { SupportedNetwork } from 'chain-events/src';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -62,6 +64,9 @@ export async function processChains(
 
   const erc20Tokens = [];
   const erc721Tokens = [];
+
+  // group tokens by chain type (ERC20/ERC721) and by chainName (Ethereum/Cosmos)
+  const tokens: { [key: string]: ChainAttributes[] } = {};
   const chains = []; // any listener that is not an erc20 or erc721 token and require independent listenerInstances
   for (const chain of chainsAndTokens) {
     StatsDController.get().increment('ce.should-exist-listeners', {
@@ -71,39 +76,18 @@ export async function processChains(
     });
 
     if (
-      chain.network === ChainNetwork.ERC20 &&
-      chain.base === ChainBase.Ethereum
+      chain.network === ChainNetwork.ERC20 ||
+      chain.network === ChainNetwork.ERC721
     ) {
-      erc20Tokens.push(chain);
-    } else if (
-      chain.network === ChainNetwork.ERC721 &&
-      chain.base === ChainBase.Ethereum
-    ) {
-      erc721Tokens.push(chain);
-    } else {
-      chains.push(chain);
-    }
+      const key = getErcListenerName(chain);
+      if (!tokens[key]) tokens[key] = [];
+      tokens[key].push(chain);
+    } else chains.push(chain);
   }
 
-  // group the erc20s and erc721s by url so that we only create 1 listener/subscriber for each endpoint
-  const erc20ByUrl = _.groupBy(erc20Tokens, (token) => token.ChainNode.url);
-  const erc721ByUrl = _.groupBy(erc721Tokens, (token) => token.ChainNode.url);
-
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', tokens);
   // this creates/updates/deletes a single listener in listenerInstances called 'erc20' or 'erc721' respectively
-  await manageErcListeners(
-    ChainNetwork.ERC20,
-    erc20ByUrl,
-    listenerInstances,
-    producer,
-    rollbar
-  );
-  await manageErcListeners(
-    ChainNetwork.ERC721,
-    erc721ByUrl,
-    listenerInstances,
-    producer,
-    rollbar
-  );
+  await manageErcListeners(tokens, listenerInstances, producer, rollbar);
 
   await manageRegularListeners(chains, listenerInstances, producer, rollbar);
 

@@ -34,7 +34,7 @@ import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe.only('Integration tests for Compound Bravo', () => {
+describe('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents

@@ -5,7 +5,7 @@ import type { ERC721 } from '../../../contractTypes';
 
 interface IErc721Contract {
   contract: ERC721;
-  origin?: string;
+  contractAddress: string;
 }
 
 export interface IErc721Contracts {
@@ -16,7 +16,6 @@ export interface IErc721Contracts {
 export interface ListenerOptions {
   url: string;
   tokenAddresses: string[];
-  origins?: string[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

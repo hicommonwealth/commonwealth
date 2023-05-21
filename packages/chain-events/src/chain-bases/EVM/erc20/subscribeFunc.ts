@@ -27,7 +27,7 @@ export interface IErc20SubscribeOptions
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param ethNetworkUrl
  * @param tokenAddresses
- * @param origins
+ * @param chainName
  * @param retryTimeMs
  * @returns a promise resolving to an ApiPromise once the connection has been established
 
@@ -35,11 +35,11 @@ export interface IErc20SubscribeOptions
 export async function createApi(
   ethNetworkUrl: string,
   tokenAddresses: string[],
-  origins?: string[],
+  chainName: string,
   retryTimeMs = 10 * 1000
 ): Promise<IErc20Contracts> {
   const log = factory.getLogger(
-    addPrefix(__filename, [SupportedNetwork.ERC20])
+    addPrefix(__filename, [SupportedNetwork.ERC20, chainName])
   );
 
   for (let i = 0; i < 3; ++i) {
@@ -50,26 +50,22 @@ export async function createApi(
       );
       log.info(`Connection to ${ethNetworkUrl} successful!`);
 
-      const tokenContracts = tokenAddresses.map((o) =>
-        ERC20Factory.connect(o, provider)
-      );
+      const tokenContracts = tokenAddresses.map((o) => {
+        return { contract: ERC20Factory.connect(o, provider), address: o };
+      });
       const deployResults: IErc20Contracts = { provider, tokens: [] };
-      for (const [contract, origin] of _.zip(tokenContracts, origins) as [
-        ERC20,
-        string | undefined
-      ][]) {
+
+      for (const { contract, address } of tokenContracts) {
         try {
           await contract.deployed();
           const totalSupply = new BN((await contract.totalSupply()).toString());
           deployResults.tokens.push({
             contract,
             totalSupply,
-            origin,
+            contractAddress: address,
           });
         } catch (err) {
-          log.error(
-            `Error loading token ${contract.address} (${origin}): ${err.message}`
-          );
+          log.error(`Error loading token ${contract.address}: ${err.message}`);
         }
       }
       return deployResults;
@@ -105,7 +101,7 @@ export const subscribeEvents: SubscribeFunc<
     event: CWEvent<IEventData>,
     tokenName?: string
   ): Promise<void> => {
-    event.chain = (tokenName as never) || chain;
+    event.chainName = (tokenName as never) || chain;
     event.received = Date.now();
     let prevResult = null;
     for (const handler of handlers) {

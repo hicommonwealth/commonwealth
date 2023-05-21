@@ -3,7 +3,6 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type Rollbar from 'rollbar';
 
-import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import type { SubstrateEvents } from '../../src';
 import {
   createListener,
@@ -18,29 +17,35 @@ import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
 import { IRabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
+import {
+  EventKind,
+  IErc20Contracts,
+} from 'chain-events/src/chain-bases/EVM/erc20/types';
+import { Processor, Subscriber } from 'chain-events/src/chain-bases/EVM/erc20';
+import { Listener } from 'chain-events/src';
+import { IErc721Contracts } from 'chain-events/src/chain-bases/EVM/erc721/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const generalLogger = new LoggingHandler();
 
+export function getErcListenerName(chain: ChainAttributes): string {
+  return `${chain.ChainNode.name}::${chain.network}`;
+}
+
 export async function manageErcListeners(
-  network: ChainNetwork,
-  groupedTokens: { [url: string]: ChainAttributes[] },
+  groupedTokens: { [origin: string]: ChainAttributes[] },
   listenerInstances: IListenerInstances,
   producer: IRabbitMqHandler,
   rollbar?: Rollbar
 ): Promise<void> {
   // delete any listeners that have no more tokens to listen to
-  const currentChainUrls = Object.keys(groupedTokens);
   for (const listenerName of Object.keys(listenerInstances)) {
     if (
-      (listenerName.startsWith(ChainNetwork.ERC20) &&
-        network === ChainNetwork.ERC20) ||
-      (listenerName.startsWith(ChainNetwork.ERC721) &&
-        network === ChainNetwork.ERC721)
+      listenerName.includes(SupportedNetwork.ERC20) ||
+      listenerName.includes(SupportedNetwork.ERC721)
     ) {
-      const url = listenerName.slice(listenerName.indexOf('_') + 1);
-      if (!currentChainUrls.includes(url)) {
+      if (!groupedTokens[listenerName]) {
         log.info(`Deleting listener: ${listenerName}`);
         await listenerInstances[listenerName].unsubscribe();
         delete listenerInstances[listenerName];
@@ -48,107 +53,101 @@ export async function manageErcListeners(
     }
   }
 
-  // create/update erc listeners
-  for (const [url, tokens] of Object.entries(groupedTokens)) {
-    const listenerName = `${network}_${url}`;
-    const listener = listenerInstances[listenerName];
-    const tokenAddresses = tokens.map((chain) => chain.contract_address);
-    const tokenNames = tokens.map((chain) => chain.id);
+  // update erc listeners
+  for (const [listenerName, tokens] of Object.entries(groupedTokens)) {
+    // skip if listener doesn't exist
+    if (!listenerInstances[listenerName]) continue;
 
-    // if there is an existing listener for the given url and the tokens assigned
-    // to it are different from the tokens given then delete the listener so that
-    // we can create a new one with the updated token list
+    const newTokenAddresses = tokens.map((chain) => chain.contract_address);
+    const existingListener = listenerInstances[listenerName];
+
     if (
-      listener &&
-      !_.isEqual(tokenAddresses, listener.options.tokenAddresses)
+      newTokenAddresses.length !=
+        existingListener.options.tokenAddresses.length ||
+      !_.isEqual(newTokenAddresses, existingListener.options.tokenAddresses)
     ) {
-      log.info(`Deleting listener: ${listenerName}`);
-      await listener.unsubscribe();
+      // if the tokens for a listener have changed unsub and delete the listener, so it is recreated
+      log.info(
+        `Updating listener ${listenerName} to contracts: ${newTokenAddresses.join(
+          ', '
+        )}`
+      );
+      await existingListener.unsubscribe();
       delete listenerInstances[listenerName];
+    } else {
+      // if the tokens list is the same update the logging handler tokenAddresses
+      (
+        existingListener.eventHandlers.logging?.handler as ErcLoggingHandler
+      ).tokenAddresses = tokens
+        .filter((token) => token.verbose_logging)
+        .map((token) => token.contract_address);
+    }
+  }
+
+  // create erc listeners
+  for (const [listenerName, tokens] of Object.entries(groupedTokens)) {
+    // skip if listener already exists
+    if (listenerInstances[listenerName]) continue;
+
+    // these assumptions are safe because we are grouping by ChainNode.name thus all tokens under
+    // a specific listenerName will have the same url and chainName
+    const network = tokens[0].network;
+    const url = tokens[0].ChainNode.url;
+    const chainName = tokens[0].ChainNode.name;
+    const tokenAddresses = tokens.map((chain) => chain.contract_address);
+    try {
+      listenerInstances[listenerName] = await createListener(
+        listenerName,
+        chainName,
+        network as unknown as SupportedNetwork,
+        {
+          tokenAddresses,
+          url,
+        }
+      );
+    } catch (e) {
+      log.error(
+        `An error occurred while starting listener ${listenerName} for ${JSON.stringify(
+          tokenAddresses
+        )} connecting to ${url}`,
+        e
+      );
+      rollbar?.critical(
+        `An error occurred while starting listener ${listenerName} for ${JSON.stringify(
+          tokenAddresses
+        )} connecting to ${url}`,
+        e
+      );
     }
 
-    // if the listener does not exist then create a new one
-    if (!listenerInstances[listenerName]) {
-      let supportedNetwork: SupportedNetwork;
-      switch (network) {
-        case ChainNetwork.ERC20:
-          supportedNetwork = SupportedNetwork.ERC20;
-          break;
-        case ChainNetwork.ERC721:
-          supportedNetwork = SupportedNetwork.ERC721;
-          break;
-        default:
-          break;
-      }
+    log.info(`Adding RabbitMQ event handler to listener: ${listenerName}`);
+    listenerInstances[listenerName].eventHandlers.rabbitmq = {
+      handler: producer,
+      excludedEvents: [],
+    };
 
-      try {
-        listenerInstances[listenerName] = await createListener(
-          network,
-          supportedNetwork,
-          {
-            url,
-            tokenAddresses,
-            tokenNames,
-            verbose: false,
-          }
-        );
-      } catch (e) {
-        log.error(
-          `An error occurred while starting a listener for ${JSON.stringify(
-            tokenNames
-          )} connecting to ${url}`,
-          e
-        );
-        rollbar?.critical(
-          `An error occurred while starting a listener for ${JSON.stringify(
-            tokenNames
-          )} connecting to ${url}`,
-          e
-        );
-      }
-    }
-
-    // get all the tokens who have verbose_logging set to true
-    const tokenLog = tokens
+    // array of token addresses that require verbose logging
+    const verboseTokenAddresses = tokens
       .filter((token) => token.verbose_logging)
-      .map((token) => token.id);
+      .map((token) => token.contract_address);
 
-    let logger = <ErcLoggingHandler>(
-      (<unknown>listenerInstances[listenerName].eventHandlers.logger)
-    );
-    // create the logger if this is a brand-new listener
-    if (!logger && tokenLog.length > 0) {
-      log.info(`Create a logger for listener: ${listenerName}`);
-      if (network === ChainNetwork.ERC20)
-        logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
-      else if (network === ChainNetwork.ERC721)
-        logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
+    // if there are any tokens that require verbose logging, add the logging handler to the listener
+    if (verboseTokenAddresses.length > 0) {
+      log.info(`Adding verbose logging to listener: ${listenerName}`);
+      const logger = new ErcLoggingHandler(network, verboseTokenAddresses);
 
-      listenerInstances[listenerName].eventHandlers.logger = {
+      listenerInstances[listenerName].eventHandlers.logging = {
         handler: logger,
         excludedEvents: [],
       };
-    } else if (logger && tokenLog.length === 0) {
-      log.info(`Deleting logger on listener: ${listenerName}`);
-      delete listenerInstances[listenerName].eventHandlers.logger;
-    } else if (logger && tokenLog.length > 0) {
-      // update the tokens to log events for
-      logger.tokenNames = tokenLog;
     }
 
-    if (!listenerInstances[listenerName].eventHandlers.rabbitmq) {
-      log.info(`Adding RabbitMQ event handler to listener: ${listenerName}`);
-      listenerInstances[listenerName].eventHandlers.rabbitmq = {
-        handler: producer,
-        excludedEvents: [],
-      };
-    }
-
-    // subscribe the listener to its chain/RPC if it isn't yet subscribed
-    if (!listenerInstances[listenerName].subscribed) {
-      log.info(`Subscribing listener: ${listenerName}`);
-      await listenerInstances[listenerName].subscribe();
-    }
+    log.info(
+      `Subscribing listener ${listenerName} to contracts: ${tokenAddresses.join(
+        ', '
+      )}`
+    );
+    await listenerInstances[listenerName].subscribe();
   }
 }
 

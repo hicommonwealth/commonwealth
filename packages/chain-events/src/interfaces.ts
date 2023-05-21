@@ -79,7 +79,7 @@ export interface CWEvent<IEventData = IChainEventData> {
   blockNumber: number;
   data: IEventData;
   network: SupportedNetwork;
-  chainName: string;
+  chainName?: string;
 
   contractAddress?: string;
   received?: number;

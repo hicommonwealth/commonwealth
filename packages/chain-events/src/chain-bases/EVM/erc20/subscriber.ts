@@ -25,11 +25,11 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
    * Initializes subscription to chain and starts emitting events.
    */
   public async subscribe(
-    cb: (event: RawEvent, origin?: string) => void
+    cb: (event: RawEvent, contractAddress: string) => void
   ): Promise<void> {
-    this._listener = (origin: string, event: RawEvent): void => {
+    this._listener = (contractAddress: string, event: RawEvent): void => {
       const log = factory.getLogger(
-        addPrefix(__filename, [SupportedNetwork.ERC20, origin])
+        addPrefix(__filename, [SupportedNetwork.ERC20, contractAddress])
       );
       const logStr = `Received ${this._origin} event: ${JSON.stringify(
         event,
@@ -38,10 +38,10 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
       )}.`;
       // eslint-disable-next-line no-unused-expressions
       this._verbose ? log.info(logStr) : log.trace(logStr);
-      cb(event, origin);
+      cb(event, contractAddress);
     };
-    this._api.tokens.forEach(({ contract, origin }) =>
-      contract.on('*', this._listener.bind(this, origin))
+    this._api.tokens.forEach(({ contract, contractAddress }) =>
+      contract.on('*', this._listener.bind(this, contractAddress))
     );
   }
 
@@ -49,37 +49,6 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     if (this._listener) {
       this._api.tokens.forEach(({ contract }) => contract.removeAllListeners());
       this._listener = null;
-    }
-  }
-
-  public async addNewToken(
-    tokenAddress: string,
-    origin?: string,
-    retryTimeMs = 10 * 1000,
-    retries = 5
-  ): Promise<void> {
-    const log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.ERC20, origin])
-    );
-    const existingToken = this.api.tokens.find(({ contract }) => {
-      return contract.address === tokenAddress;
-    });
-    if (existingToken) {
-      log.info('Token is already being monitored');
-      return;
-    }
-    try {
-      const contract = ERC20Factory.connect(tokenAddress, this.api.provider);
-      await contract.deployed();
-      const totalSupply = new BN((await contract.totalSupply()).toString());
-      this.api.tokens.push({ contract, totalSupply, origin });
-      contract.on('*', this._listener.bind(this, origin));
-    } catch (e) {
-      await sleep(retryTimeMs);
-      if (retries > 0) {
-        log.error('Retrying connection...');
-        this.addNewToken(tokenAddress, origin, retryTimeMs, retries - 1);
-      }
     }
   }
 }

@@ -5,7 +5,6 @@ import {
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
-import { compoundGovernor } from '../../../../chain-testing/src/utils/governance/compoundGov';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
 import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/chainSubscriber';
@@ -22,13 +21,14 @@ import {
   IErc20Contracts,
 } from '../../../../src/chain-bases/EVM/erc20/types';
 import { Processor, Subscriber } from '../../../../src/chain-bases/EVM/erc20';
-import { Listener } from '../../../../src';
+import { Listener, SupportedNetwork } from '../../../../src';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
+import { getErcListenerName } from 'chain-events/services/ChainSubscriber/util';
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe('Integration tests for ERC20', () => {
+describe.only('Integration tests for ERC20', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
@@ -36,8 +36,6 @@ describe('Integration tests for ERC20', () => {
 
   // holds event data, so we can verify the integrity of the events across all services
   const events = {};
-  // holds the relevant entity instance - used to ensure foreign keys are applied properly
-  let relatedEntity;
 
   let listener: Listener<
     IErc20Contracts,
@@ -47,19 +45,17 @@ describe('Integration tests for ERC20', () => {
     EventKind
   >;
 
-  const contract = new compoundGovernor();
-  const chain_id = 'ganache-fork-busd';
+  const chainName = 'Ethereum (Ganache)';
   const randomWallet = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
   const BUSDAddress = '0x4Fabb145d64652a948d72533023f6E7A623C7C53';
   const chain = {
-    id: chain_id,
     base: ChainBase.Ethereum,
     network: ChainNetwork.ERC20,
     substrate_spec: null,
     contract_address: BUSDAddress,
     verbose_logging: false,
-    ChainNode: { id: 1, url: 'http://127.0.0.1:8545' },
-    origin: `Ethereum (Mainnet): ${BUSDAddress}}`,
+    ChainNode: { id: 1, url: 'http://127.0.0.1:8545', name: chainName },
+    origin: chainName,
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   const transferAmount = '100';
@@ -76,7 +72,7 @@ describe('Integration tests for ERC20', () => {
         rmq,
         chain
       );
-      listener = listeners[`erc20_${chain.ChainNode.url}`] as Listener<
+      listener = listeners[getErcListenerName(chain)] as Listener<
         IErc20Contracts,
         never,
         Processor,
@@ -94,11 +90,19 @@ describe('Integration tests for ERC20', () => {
       await waitUntilBlock(block, listener);
 
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
-      events['transfer'] = msg;
+      events[EventKind.Transfer] = msg;
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(1, 'Should have captured 1 transfer event');
-      cwEventMatch(msg, 'transfer', chain_id, null, transferAmount);
+      console.log('>>>>>>>>>>>>>>>>>>Transfer event: ', msg);
+      cwEventMatch(msg, {
+        kind: EventKind.Transfer,
+        chainName,
+        blockNumber: block,
+        contractAddress: chain.contract_address,
+        transferAmount,
+        to: randomWallet,
+      });
     });
 
     it('Should capture approval events', async () => {
@@ -114,7 +118,14 @@ describe('Integration tests for ERC20', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(2, 'Should have captured 1 approval event');
-      cwEventMatch(msg, 'approval', chain_id, null, transferAmount);
+      console.log('>>>>>>>>>>>>>>>>>>Approval event: ', msg);
+      cwEventMatch(msg, {
+        kind: EventKind.Approval,
+        chainName,
+        blockNumber: block,
+        contractAddress: chain.contract_address,
+        transferAmount,
+      });
     });
   });
 
@@ -127,7 +138,7 @@ describe('Integration tests for ERC20', () => {
     it('Should process transfer events', async () => {
       const transferEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'transfer'`),
@@ -137,6 +148,7 @@ describe('Integration tests for ERC20', () => {
             ],
           },
           block_number: events['transfer'].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
       expect(transferEvent, 'The transfer event should be in the database').to
@@ -146,7 +158,7 @@ describe('Integration tests for ERC20', () => {
     it('Should process approval events', async () => {
       const approvalEvent = await models.ChainEvent.findOne({
         where: {
-          chain: chain_id,
+          chain_name: chainName,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'approval'`),
@@ -156,6 +168,7 @@ describe('Integration tests for ERC20', () => {
             ],
           },
           block_number: events['approval'].blockNumber,
+          contract_address: chain.contract_address,
         },
       });
       expect(approvalEvent, 'The approval event should be in the database').to
@@ -207,10 +220,16 @@ describe('Integration tests for ERC20', () => {
   after(async () => {
     await rmq.shutdown();
     await models.ChainEvent.destroy({
-      where: { chain: chain_id },
+      where: {
+        chain_name: chainName,
+        contract_address: chain.contract_address,
+      },
     });
     await models.ChainEntity.destroy({
-      where: { chain: chain_id },
+      where: {
+        chain_name: chainName,
+        contract_address: chain.contract_address,
+      },
     });
   });
 });

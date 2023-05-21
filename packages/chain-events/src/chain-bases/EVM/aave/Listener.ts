@@ -30,7 +30,7 @@ export class Listener extends BaseListener<
     origin: string,
     chainName: string,
     govContractAddress: string,
-    url?: string,
+    url: string,
     skipCatchup?: boolean,
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>

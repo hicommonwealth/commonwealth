@@ -25,7 +25,7 @@ export interface IErc721SubscribeOptions
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param ethNetworkUrl
  * @param tokenAddresses
- * @param origins
+ * @param chainName
  * @param retryTimeMs
  * @returns a promise resolving to an ApiPromise once the connection has been established
 
@@ -33,7 +33,7 @@ export interface IErc721SubscribeOptions
 export async function createApi(
   ethNetworkUrl: string,
   tokenAddresses: string[],
-  origins?: string[],
+  chainName: string,
   retryTimeMs = 10 * 1000
 ): Promise<IErc721Contracts> {
   const log = factory.getLogger(
@@ -48,23 +48,25 @@ export async function createApi(
       );
       log.info(`Connection to ${ethNetworkUrl} successful!`);
 
-      const tokenContracts = tokenAddresses.map((o) =>
-        ERC721Factory.connect(o, provider)
-      );
+      const tokenContracts = tokenAddresses.map((o) => {
+        return {
+          contract: ERC721Factory.connect(o, provider),
+          contractAddress: o,
+        };
+      });
+
       const deployResults: IErc721Contracts = { provider, tokens: [] };
-      for (const [contract, tokenName] of _.zip(tokenContracts, origins) as [
-        ERC721,
-        string | undefined
-      ][]) {
+
+      for (const { contract, contractAddress } of tokenContracts) {
         try {
           await contract.deployed();
           deployResults.tokens.push({
             contract,
-            origin: tokenName,
+            contractAddress,
           });
         } catch (err) {
           log.error(
-            `Error loading token ${contract.address} (${tokenName}): ${err.message}`
+            `Error loading token ${contract.address} (${contractAddress}): ${err.message}`
           );
         }
       }
@@ -101,7 +103,7 @@ export const subscribeEvents: SubscribeFunc<
     event: CWEvent<IEventData>,
     tokenName?: string
   ): Promise<void> => {
-    event.chain = (tokenName as never) || chain;
+    event.chainName = (tokenName as never) || chain;
     event.received = Date.now();
     let prevResult = null;
     for (const handler of handlers) {

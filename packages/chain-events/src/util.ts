@@ -101,15 +101,14 @@ export async function createListener(
   chainName: string,
   network: SupportedNetwork,
   options: {
+    url: string;
     address?: string;
     tokenAddresses?: string[];
-    tokenNames?: string[];
     verbose?: boolean;
     skipCatchup?: boolean;
     startBlock?: number;
     archival?: boolean;
     spec?: RegisteredTypes;
-    url?: string;
     enricherConfig?: any;
     pollTime?: number;
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>;
@@ -157,19 +156,17 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.ERC20) {
     listener = new Erc20Listener(
-      origin,
+      chainName,
       options.tokenAddresses || [options.address],
       options.url,
-      Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
       options.enricherConfig,
       !!options.verbose
     );
   } else if (network === SupportedNetwork.ERC721) {
     listener = new Erc721Listener(
-      origin,
+      chainName,
       options.tokenAddresses || [options.address],
       options.url,
-      Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
       !!options.verbose
     );
   } else if (network === SupportedNetwork.Aave) {

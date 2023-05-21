@@ -57,6 +57,7 @@ export interface CwEventMatchOptions extends MinUniqueCWEventData {
   proposalId?: string;
   transferAmount?: string;
   from?: string;
+  to?: string;
 }
 
 export function cwEventMatch(event: CWEvent<any>, data: CwEventMatchOptions) {
@@ -79,6 +80,12 @@ export function cwEventMatch(event: CWEvent<any>, data: CwEventMatchOptions) {
   if (data.from)
     expect(event.data.from, 'from address does not match').to.equal(data.from);
 
+  if (data.to)
+    expect(event.data.to, 'to address does not match').to.equal(data.to);
+
+  expect(event.blockNumber, 'event block number does not match').to.equal(
+    data.blockNumber
+  );
   expect(event.data.kind, 'event kind does not match').to.equal(data.kind);
   expect(event.chainName, 'event chain does not match').to.equal(
     data.chainName

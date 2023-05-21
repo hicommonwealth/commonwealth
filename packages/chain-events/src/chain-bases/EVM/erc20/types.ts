@@ -9,7 +9,7 @@ import type { EnricherConfig } from './filters/enricher';
 interface IErc20Contract {
   contract: ERC20;
   totalSupply: BN;
-  origin?: string;
+  contractAddress: string;
 }
 
 export interface IErc20Contracts {
@@ -20,7 +20,6 @@ export interface IErc20Contracts {
 export interface ListenerOptions {
   url: string;
   tokenAddresses: string[];
-  origins?: string[];
   enricherConfig: EnricherConfig;
 }
 
