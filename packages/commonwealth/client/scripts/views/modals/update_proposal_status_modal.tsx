@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import {
+  getProposal,
+  getSpace,
+  loadMultipleSpacesData,
+  SnapshotProposal,
+} from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
 import type ChainEntity from '../../models/ChainEntity';
@@ -77,7 +82,7 @@ export const UpdateProposalStatusModal = ({
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
   const showChainEvents =
-    !isCosmos && app.chainEntities.store.get(thread.chain).length > 0;
+    !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
 
   const handleSaveChanges = async () => {
     // set stage
@@ -100,9 +105,30 @@ export const UpdateProposalStatusModal = ({
       );
 
       if (toAdd.length > 0) {
+        let enrichedSnapshot;
+        if (app.chain.meta.snapshot?.length === 1) {
+          enrichedSnapshot = toAdd.map((sn) => ({
+            id: `${app.chain.meta.snapshot[0]}/${sn.id}`,
+            title: sn.title,
+          }));
+        } else {
+          loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+            for (const { space: _space, proposals } of data) {
+              const matchingSnapshot = proposals.find(
+                (sn) => sn.id === toAdd[0].id
+              );
+              if (matchingSnapshot) {
+                enrichedSnapshot = {
+                  id: `${_space.id}/${toAdd[0].id}`,
+                };
+                break;
+              }
+            }
+          });
+        }
         const updatedThread = await app.threads.addLinks({
           threadId: thread.id,
-          links: toAdd.map((sn) => ({
+          links: enrichedSnapshot.map((sn) => ({
             source: LinkSource.Snapshot,
             identifier: String(sn.id),
             title: sn.title,
