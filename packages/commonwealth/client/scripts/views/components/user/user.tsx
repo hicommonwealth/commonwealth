@@ -1,5 +1,4 @@
-/* eslint-disable no-script-url */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { link } from 'helpers';
 
@@ -18,6 +17,7 @@ import { CWText } from '../component_kit/cw_text';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { Avatar } from 'views/components/Avatar';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -67,7 +67,7 @@ export const User = ({
     });
   }, [forceRerender]);
 
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const popoverProps = usePopover();
 
@@ -179,11 +179,11 @@ export const User = ({
 
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
-      {!profile
-        ? null
-        : profile.avatarUrl
-        ? profile.getAvatar(avatarSize)
-        : profile.getAvatar(avatarSize - 4)}
+      <Avatar
+        url={profile?.avatarUrl}
+        size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
+        address={profile?.id}
+      />
     </div>
   ) : (
     <div
@@ -195,7 +195,11 @@ export const User = ({
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
-          {profile && profile.getAvatar(avatarSize)}
+          <Avatar
+            url={profile?.avatarUrl}
+            size={avatarSize}
+            address={profile?.id}
+          />
         </div>
       )}
       {
@@ -273,11 +277,11 @@ export const User = ({
           }}
         >
           <div className="user-avatar">
-            {!profile
-              ? null
-              : profile.avatarUrl
-              ? profile.getAvatar(36)
-              : profile.getAvatar(32)}
+            <Avatar
+              url={profile?.avatarUrl}
+              size={profile?.avatarUrl ? 36 : 32}
+              address={profile?.id}
+            />
           </div>
           <div className="user-name">
             {app.chain &&
