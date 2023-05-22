@@ -54,7 +54,6 @@ export default (
       updatedAt: 'updated_at',
       indexes: [
         { fields: ['id'] },
-        { fields: ['chain', 'thread_id', 'proposal_id', 'comment_id'] },
         { fields: ['address_id'] },
         {
           fields: [
