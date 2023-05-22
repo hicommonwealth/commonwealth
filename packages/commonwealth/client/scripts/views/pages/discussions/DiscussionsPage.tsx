@@ -1,20 +1,20 @@
 import Thread from 'models/Thread';
 import moment from 'moment';
 import 'pages/discussions/index.scss';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ThreadActionType } from '../../../../../shared/types';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadTimelineFilterTypes,
+} from '../../../models/types';
 import app from '../../../state';
 import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
-import {
-  ThreadTimelineFilterTypes,
-  ThreadFeaturedFilterTypes,
-} from '../../../models/types';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -25,6 +25,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
+  const pageNumber = useRef<number>(0);
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured'
@@ -132,29 +133,32 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         includePinnedThreads: true,
         featuredFilter,
         dateRange,
+        page: pageNumber.current,
       })
       .then((t) => {
         // Fetch first 20 + unpinned threads
-        setThreads(sortPinned(sortByFeaturedFilter(t)));
+        setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
         setInitializing(false);
       });
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
-    const newThreads = await app.threads.loadNextPage({
+    const response = await app.threads.loadNextPage({
       topicName,
       stageName,
       featuredFilter,
       dateRange,
+      page: pageNumber.current + 1,
     });
     // If no new threads (we reached the end)
-    if (!newThreads) {
+    if (!response.threads) {
       return;
     }
 
+    pageNumber.current = response.page;
     return setThreads((oldThreads) => {
       const finalThreads = [...oldThreads];
-      newThreads.map((x) => {
+      response.threads.map((x) => {
         const foundIndex = finalThreads.findIndex(
           (y) => y.identifier === x.identifier
         );
