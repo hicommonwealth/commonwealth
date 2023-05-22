@@ -14,6 +14,12 @@ module.exports = {
         'offchain_comments_chain_object_id',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `
+        ALTER INDEX "comments_chain_object_id" RENAME TO "comments_chain_parent_id";
+      `,
+        { transaction: t }
+      );
       await queryInterface.removeIndex('Comments', 'comments_id', {
         transaction: t,
       });
@@ -26,10 +32,6 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         'ALTER INDEX "offchain_comments_chain_updated_at" RENAME TO "comments_chain_updated_at"',
-        { transaction: t }
-      );
-      await queryInterface.sequelize.query(
-        'ALTER INDEX "offchain_comments_root_id" RENAME TO "comments_root_id"',
         { transaction: t }
       );
       await queryInterface.removeColumn('Comments', 'root_id', {
