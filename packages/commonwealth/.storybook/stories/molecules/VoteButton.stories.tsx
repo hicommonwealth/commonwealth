@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import type { Meta } from '@storybook/react';
 
 import { CWThreadVoteButton } from '../../../client/scripts/views/components/component_kit/cw_thread_vote_button';
@@ -16,6 +16,8 @@ interface VoteButtonProps {
 
 const VoteButton: FC<VoteButtonProps> = ({ count }) => {
   const [voteCount, setVoteCount] = useState<number>(count);
+
+  useEffect(() => setVoteCount(count), [count]);
 
   return (
     <CWThreadVoteButton
