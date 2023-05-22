@@ -18,7 +18,7 @@ import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { LogDescription } from '@ethersproject/abi/src.ts/interface';
+import { Interface, LogDescription } from '@ethersproject/abi/src.ts/interface';
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -129,7 +129,7 @@ export abstract class IEventSubscriber<Api, RawEvent> {
 export type EvmEventSourceMapType = {
   [address: string]: {
     eventSignatures: string[];
-    parseLog: (log: { topics: Array<string>; data: string }) => LogDescription;
+    api: Interface,
   };
 };
 

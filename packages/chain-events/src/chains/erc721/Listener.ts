@@ -103,9 +103,7 @@ export class Listener extends BaseListener<
         eventSignatures: Object.keys(token.contract.interface.events).map((x) =>
           ethers.utils.id(x)
         ),
-        parseLog: token.contract.interface.parseLog.bind(
-          token.contract.interface.parseLog
-        ),
+        api: token.contract.interface
       };
     }
     return tokenHashMap;

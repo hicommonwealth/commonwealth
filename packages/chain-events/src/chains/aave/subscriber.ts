@@ -1,7 +1,7 @@
 /**
  * Fetches events from Aave contract in real time.
  */
-import type { Listener } from '@ethersproject/providers';
+import type { Listener, Log } from '@ethersproject/providers';
 
 import {
   EvmEventSourceMapType,
@@ -13,6 +13,7 @@ import { addPrefix, factory } from '../../logging';
 import type { RawEvent, Api } from './types';
 import Timeout = NodeJS.Timeout;
 import { JsonRpcProvider } from '@ethersproject/providers';
+import { ethers } from 'ethers';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;
@@ -63,8 +64,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       );
       // default to Ethereum block time
       return 15;
-    }
-
+    } 
+    maxBlockTime = 5
     this.log.info(`Polling interval: ${maxBlockTime} seconds`);
     return maxBlockTime;
   }
@@ -76,38 +77,38 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     const currentBlockNum = await provider.getBlockNumber();
     console.log('New current block number:', currentBlockNum);
     if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
-      for (let i = this.lastBlockNumber + 1; i <= currentBlockNum; i++) {
-        const logs = await provider.getLogs({
-          fromBlock: this.lastBlockNumber,
-          toBlock: currentBlockNum,
-        });
+      const logs: Log[] = await provider.send('eth_getLogs', [{
+        fromBlock: ethers.BigNumber.from(this.lastBlockNumber + 1).toHexString(),
+        toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
+        address: [
+          this._api.aaveToken.address,
+          this._api.governance.address,
+          this._api.stkAaveToken.address
+        ],
+      }])
 
-        // filter the logs we need
-        for (const log of logs) {
-          if (
-            this.eventSourceMap[
-              log.address.toLowerCase()
-            ]?.eventSignatures.includes(log.topics[0])
-          ) {
-            const parsedRawEvent =
-              this.eventSourceMap[log.address.toLowerCase()].parseLog(log);
+      for (const log of logs) {
 
-            const rawEvent: RawEvent = {
-              address: log.address.toLowerCase(),
-              args: parsedRawEvent.args as any,
-              name: parsedRawEvent.name,
-              blockNumber: log.blockNumber,
-            };
+        if(!this.eventSourceMap[log.address.toLowerCase()].eventSignatures
+        .includes(log.topics[0])) continue;
 
-            const logStr = `Found the following event log in block ${
-              log.blockNumber
-            }: ${JSON.stringify(rawEvent, null, 2)}.`;
-            // eslint-disable-next-line no-unused-expressions
-            this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
+          const parsedRawEvent =
+            this.eventSourceMap[log.address.toLowerCase()].api.parseLog(log);
 
-            cb(rawEvent);
-          }
-        }
+          const rawEvent: RawEvent = {
+            address: log.address.toLowerCase(),
+            args: parsedRawEvent.args as any,
+            name: parsedRawEvent.name,
+            blockNumber: parseInt(log.blockNumber, 16)
+          };
+
+          const logStr = `Found the following event log in block ${
+            log.blockNumber
+          }: ${JSON.stringify(rawEvent, null, 2)}.`;
+          // eslint-disable-next-line no-unused-expressions
+          this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
+
+          cb(rawEvent);
       }
     }
     this.lastBlockNumber = currentBlockNum;
