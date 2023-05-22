@@ -22,8 +22,8 @@ import {
   getClasses,
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { ThreadPreviewReactionButtonBig } from '../../components/reaction_button/ThreadPreviewReactionButtonBig';
-import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
+import { ThreadPreviewReactionButtonBig } from '../../components/ReactionButton/ThreadPreviewReactionButtonBig';
+import { ThreadReactionPreviewButtonSmall } from '../../components/ReactionButton/ThreadPreviewReactionButtonSmall';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import {

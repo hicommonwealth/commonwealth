@@ -15,6 +15,7 @@ import {
   usePopover,
 } from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadsFilterMenuItemProps = {
   iconRight?: React.ReactNode;
@@ -45,13 +46,13 @@ type StagesMenuProps = {
   selectedStage: ThreadStage;
   stage: string;
   stages: Array<ThreadStage>;
-  onStageChange: (stage: string) => void;
 };
 
 export const StagesMenu = (props: StagesMenuProps) => {
   const { selectedStage, stage, stages } = props;
 
   const popoverProps = usePopover();
+  const navigate = useCommonNavigate();
 
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
@@ -75,7 +76,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                 isSelected={!stage}
                 onClick={(e) => {
                   e.preventDefault();
-                  props.onStageChange('');
+                  navigate('/discussions');
                 }}
               />
               <CWDivider />
@@ -85,7 +86,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                   isSelected={stage === targetStage}
                   onClick={(e) => {
                     e.preventDefault();
-                    props.onStageChange(targetStage);
+                    navigate(`/discussions?stage=${targetStage}`);
                   }}
                   label={`
                     ${threadStageToLabel(targetStage)} ${

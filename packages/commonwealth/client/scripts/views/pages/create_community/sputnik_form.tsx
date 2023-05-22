@@ -147,7 +147,7 @@ export const SputnikForm = () => {
 
             await initAppState(false);
 
-            navigate(`${window.location.origin}/${res.result.chain.id}`);
+            navigate(`/${res.result.chain.id}`);
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Adding DAO failed.');
             console.error(err.responseJSON?.error || err.message);

@@ -61,14 +61,17 @@
 
 .LoginMobile {
   @include mediumSmallInclusive {
+    background-color: #342e37;
     background-image: url('/static/img/login-background-mediumsmall.png');
   }
 
   @include small {
+    background-color: #342e37;
     background-image: url('/static/img/login-background-small.png');
   }
 
   @include extraSmall {
+    background-color: #342e37;
     background-image: url('/static/img/login-background-extrasmall.png');
   }
 
