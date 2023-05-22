@@ -130,16 +130,19 @@ export const AvatarUpload = ({
       </div>
       <div className="inner-container">
         <input {...getInputProps()} />
-        {showAvatar ? (
-          <Avatar address={address} url={avatarUrl} size={avatarSize} />
-        ) : files.length === 1 ? (
+
+        {files.length === 1 ? (
           <img
             src={files[0].preview}
             onLoad={() => {
               URL.revokeObjectURL(files[0].preview);
             }}
           />
-        ) : null}
+        ) : (
+          showAvatar && (
+            <Avatar address={address} url={avatarUrl} size={avatarSize} />
+          )
+        )}
       </div>
     </div>
   );
