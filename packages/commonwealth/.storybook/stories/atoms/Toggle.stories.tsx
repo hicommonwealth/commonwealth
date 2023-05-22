@@ -12,8 +12,8 @@ const toggle = {
 export default toggle;
 type Story = StoryObj<typeof toggle>;
 
-const Toggle: FC<ToggleStyleProps> = (args) => {
-  const { checked, disabled } = args;
+const Toggle: FC<ToggleStyleProps> = (props) => {
+  const { checked, disabled } = props;
   const [isChecked, setIsChecked] = useState<boolean | undefined>(checked);
 
   useEffect(() => setIsChecked(checked), [checked]);
