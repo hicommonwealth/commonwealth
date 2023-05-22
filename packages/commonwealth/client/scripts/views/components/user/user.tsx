@@ -41,19 +41,19 @@ type UserAttrs = {
   user: Account | AddressInfo | MinimumProfile | undefined;
 };
 
-export const User = (props: UserAttrs) => {
-  // TODO: Fix showRole logic to fetch the role from chain
-  const {
-    avatarOnly,
-    hideAvatar,
-    showAddressWithDisplayName,
-    user,
-    linkify,
-    onClick,
-    popover,
-    showRole,
-    showAsDeleted = false,
-  } = props;
+export const User = ({
+  avatarOnly,
+  hideAvatar,
+  showAddressWithDisplayName,
+  user,
+  linkify,
+  onClick,
+  popover,
+  showRole,
+  showAsDeleted = false,
+  addressDisplayOptions,
+  avatarSize: size,
+}: UserAttrs) => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
 
@@ -71,13 +71,11 @@ export const User = (props: UserAttrs) => {
 
   const popoverProps = usePopover();
 
-  const { maxCharLength } = props.addressDisplayOptions || {};
+  const { maxCharLength } = addressDisplayOptions || {};
 
-  const avatarSize = props.avatarSize || 16;
+  const avatarSize = size || 16;
 
   const showAvatar = user ? !hideAvatar : false;
-
-  // if (!user) return;
 
   let account: Account;
   let profile: MinimumProfile;
@@ -107,10 +105,10 @@ export const User = (props: UserAttrs) => {
 
     adminsAndMods = app.chain?.meta.adminsAndMods || [];
 
-    if (props.user instanceof AddressInfo) {
-      const chainId = props.user.chain;
+    if (user instanceof AddressInfo) {
+      const chainId = user.chain;
 
-      const address = props.user.address;
+      const address = user.address;
 
       if (!chainId || !address) return;
 
@@ -129,8 +127,8 @@ export const User = (props: UserAttrs) => {
       role = adminsAndMods.find(
         (r) => r.address === address && r.address_chain === chainId.id
       );
-    } else if (props.user instanceof MinimumProfile) {
-      profile = props.user;
+    } else if (user instanceof MinimumProfile) {
+      profile = user;
 
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
@@ -147,7 +145,7 @@ export const User = (props: UserAttrs) => {
           r.address === profile.address && r.address_chain === profile.chain
       );
     } else {
-      account = props.user;
+      account = user;
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
       const chainId = account.chain.id;
@@ -266,7 +264,7 @@ export const User = (props: UserAttrs) => {
   );
 
   const userPopover = (
-    <React.Fragment>
+    <>
       {profile && (
         <div
           className="UserPopover"
@@ -298,12 +296,12 @@ export const User = (props: UserAttrs) => {
                 ) : !showAddressWithDisplayName ? (
                   profile.name
                 ) : (
-                  <React.Fragment>
+                  <>
                     {profile.name}
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
-                  </React.Fragment>
+                  </>
                 ),
                 handleClick
               )}
@@ -321,7 +319,6 @@ export const User = (props: UserAttrs) => {
           {friendlyChainName && (
             <div className="user-chain">{friendlyChainName}</div>
           )}
-          {/* always show roleTags in UserPopover */}
           {getRoleTags()}
           {/* If Admin Allow Banning */}
           {loggedInUserIsAdmin && (
@@ -347,7 +344,7 @@ export const User = (props: UserAttrs) => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 
   return popover ? (

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 
-import 'components/avatar_upload.scss';
+import 'components/Avatar/AvatarUpload.scss';
 
 import app from 'state';
-import Account from '../../models/Account';
-import { CWIconButton } from './component_kit/cw_icon_button';
-import { getClasses } from './component_kit/helpers';
-import { ComponentType } from './component_kit/types';
+import Account from '../../../models/Account';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { getClasses } from '../component_kit/helpers';
+import { ComponentType } from '../component_kit/types';
 import { notifyError } from 'controllers/app/notifications';
 
 const uploadToS3 = async (file: File, signedUrl: string) => {
