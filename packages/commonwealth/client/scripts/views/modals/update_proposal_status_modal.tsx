@@ -21,7 +21,7 @@ import { SnapshotProposalSelector } from '../components/snapshot_proposal_select
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { Link, LinkSource } from 'models/Thread';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
-import { ProposalSelector } from '../components/cosmos_proposal_selector';
+import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { ChainBase } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -310,7 +310,7 @@ export const UpdateProposalStatusModal = ({
           />
         )}
         {isCosmos && (
-          <ProposalSelector
+          <CosmosProposalSelector
             onSelect={handleSelectCosmosProposal}
             proposalsToSet={tempCosmosProposals}
           />
