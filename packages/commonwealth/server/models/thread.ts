@@ -5,7 +5,7 @@ import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
-import {NotificationAttributes} from "./notification";
+import { NotificationAttributes } from './notification';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
