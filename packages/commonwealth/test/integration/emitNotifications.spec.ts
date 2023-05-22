@@ -1,14 +1,19 @@
-import chai from "chai";
-import chaiHttp from "chai-http";
-import app, {resetDatabase} from "../../server-test";
-import * as modelUtils from "../util/modelUtils";
-import jwt from "jsonwebtoken";
-import {JWT_SECRET} from "../../server/config";
-import {JoinCommunityArgs, ThreadArgs} from "../util/modelUtils";
-import emitNotifications from "../../server/util/emitNotifications";
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import { resetDatabase } from '../../server-test';
+import * as modelUtils from '../util/modelUtils';
+import { JoinCommunityArgs } from '../util/modelUtils';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../../server/config';
+import emitNotifications from '../../server/util/emitNotifications';
 import models from '../../server/database';
-import {NotificationCategories, ProposalType} from "common-common/src/types";
-import {IPostNotificationData} from "types";
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import {
+  IPostNotificationData,
+  SnapshotEventType,
+  SnapshotNotification,
+} from 'types';
+import { Op, Sequelize } from 'sequelize';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -44,16 +49,15 @@ describe.only('emitNotifications tests', () => {
     userId = firstUser.user_id;
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
-    userJWT = jwt.sign(
-      { id: userId, email: firstUser.email },
-      JWT_SECRET
-    );
+    userJWT = jwt.sign({ id: userId, email: firstUser.email }, JWT_SECRET);
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
-    const secondUser = await modelUtils.createAndVerifyAddress({ chain: chain });
+    const secondUser = await modelUtils.createAndVerifyAddress({
+      chain: chain,
+    });
     userId2 = secondUser.user_id;
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
@@ -69,8 +73,8 @@ describe.only('emitNotifications tests', () => {
       address_id: userAddressId2,
       address: userAddress2,
       chain: chain2,
-      originChain: chain
-    }
+      originChain: chain,
+    };
     const res = await modelUtils.joinCommunity(communityArgs);
     expect(res).to.equal(true);
 
@@ -95,14 +99,14 @@ describe.only('emitNotifications tests', () => {
       thread_id: thread.id,
       address_id: userAddressId2,
       text: commentBody,
-      chain
+      chain,
     });
 
     reaction = await models.Reaction.create({
       chain,
       thread_id: thread.id,
       address_id: userAddressId,
-      reaction: 'like'
+      reaction: 'like',
     });
   });
 
@@ -122,8 +126,8 @@ describe.only('emitNotifications tests', () => {
         root_title: title,
         chain_id: chain,
         author_address: userAddress2,
-        author_chain: chain
-      }
+        author_chain: chain,
+      };
 
       await emitNotifications(
         models,
@@ -136,20 +140,22 @@ describe.only('emitNotifications tests', () => {
         where: {
           chain_id: chain,
           category_id: NotificationCategories.NewThread,
-          thread_id: thread.id
-        }
+          thread_id: thread.id,
+        },
       });
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
-      expect((notif.toJSON()).notification_data).to.deep.equal(JSON.stringify(notification_data));
+      expect(notif.toJSON().notification_data).to.deep.equal(
+        JSON.stringify(notification_data)
+      );
 
       const notifRead = await models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
           notification_id: notif.id,
           user_id: userId,
-          is_read: false
-        }
+          is_read: false,
+        },
       });
       expect(notifRead).to.not.be.null;
     });
@@ -160,7 +166,7 @@ describe.only('emitNotifications tests', () => {
         category_id: NotificationCategories.NewComment,
         object_id: `discussion_${thread.id}`,
         chain_id: chain,
-        offchain_thread_id: thread.id
+        offchain_thread_id: thread.id,
       });
 
       const notification_data: IPostNotificationData = {
@@ -171,8 +177,8 @@ describe.only('emitNotifications tests', () => {
         comment_text: commentBody,
         chain_id: chain,
         author_address: userAddress2,
-        author_chain: chain
-      }
+        author_chain: chain,
+      };
 
       const object_id = `discussion_${thread.id}`;
       await emitNotifications(
@@ -186,19 +192,21 @@ describe.only('emitNotifications tests', () => {
         where: {
           chain_id: chain,
           category_id: NotificationCategories.NewComment,
-        }
+        },
       });
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
-      expect((notif.toJSON()).notification_data).to.deep.equal(JSON.stringify(notification_data));
+      expect(notif.toJSON().notification_data).to.deep.equal(
+        JSON.stringify(notification_data)
+      );
 
       const notifRead = await models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
           notification_id: notif.id,
           user_id: userId,
-          is_read: false
-        }
+          is_read: false,
+        },
       });
       expect(notifRead).to.not.be.null;
     });
@@ -209,7 +217,7 @@ describe.only('emitNotifications tests', () => {
         category_id: NotificationCategories.NewReaction,
         object_id: `discussion_${thread.id}`,
         chain_id: chain,
-        offchain_thread_id: thread.id
+        offchain_thread_id: thread.id,
       });
 
       const notification_data: IPostNotificationData = {
@@ -219,8 +227,8 @@ describe.only('emitNotifications tests', () => {
         root_title: title,
         chain_id: chain,
         author_address: userAddress,
-        author_chain: chain
-      }
+        author_chain: chain,
+      };
       await emitNotifications(
         models,
         NotificationCategories.NewReaction,
@@ -232,22 +240,72 @@ describe.only('emitNotifications tests', () => {
         where: {
           chain_id: chain,
           category_id: NotificationCategories.NewReaction,
-          thread_id: thread.id
-        }
+          thread_id: thread.id,
+        },
       });
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
-      expect((notif.toJSON()).notification_data).to.deep.equal(JSON.stringify(notification_data));
+      expect(notif.toJSON().notification_data).to.deep.equal(
+        JSON.stringify(notification_data)
+      );
 
       const notifRead = await models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
           notification_id: notif.id,
           user_id: userId,
-          is_read: false
-        }
+          is_read: false,
+        },
       });
       expect(notifRead).to.not.be.null;
+    });
+  });
+
+  describe.only('SnapshotNotificationData', () => {
+    it('should generate a notification for a new snapshot proposal', async () => {
+      const space = 'plutusclub.eth';
+      const subscription = await models.Subscription.create({
+        subscriber_id: userId,
+        category_id: NotificationCategories.SnapshotProposal,
+        object_id: space,
+        snapshot_id: space,
+      });
+
+      const snapshotNotificationData = {
+        eventType: 'proposal/created',
+        space,
+        id: '0x8b65f5c841816e9fbe54da3fb79ab7abf3444ddc4ca228f97e8c347a53695a98',
+        title: 'Drop confirm',
+        body: '',
+        choices: ['Yes', 'No'],
+        start: 1680610125,
+        expire: 1680869325,
+      };
+
+      const eventType: SnapshotEventType = SnapshotEventType.Created;
+      const notififcation_data = {
+        eventType,
+        ...snapshotNotificationData,
+      } as unknown as SnapshotNotification & { eventType: SnapshotEventType };
+
+      await emitNotifications(
+        models,
+        NotificationCategories.SnapshotProposal,
+        snapshotNotificationData.space,
+        notififcation_data,
+        {
+          notificationCategory: eventType,
+          body: snapshotNotificationData.body,
+          title: snapshotNotificationData.title,
+        }
+      );
+
+      const notif = await models.Notification.findOne({
+        where: {
+          category_id: NotificationCategories.SnapshotProposal,
+        },
+      });
+      expect(notif).to.exist;
     });
   });
 });
