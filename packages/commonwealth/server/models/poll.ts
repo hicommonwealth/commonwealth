@@ -35,8 +35,8 @@ export default (
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
       chain_id: { type: dataTypes.STRING, allowNull: false },
 
-      prompt: { type: dataTypes.TEXT, allowNull: false },
-      options: { type: dataTypes.STRING, allowNull: true },
+      prompt: { type: dataTypes.STRING, allowNull: false },
+      options: { type: dataTypes.STRING, allowNull: false },
       ends_at: { type: dataTypes.DATE, allowNull: true },
 
       created_at: { type: dataTypes.DATE, allowNull: false },

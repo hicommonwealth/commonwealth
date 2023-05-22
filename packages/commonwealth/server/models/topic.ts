@@ -58,7 +58,7 @@ export default (
       },
       featured_in_new_post: {
         type: dataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: false,
       },
       order: { type: dataTypes.INTEGER, allowNull: true },
@@ -82,6 +82,7 @@ export default (
           exclude: ['created_at', 'updated_at', 'deleted_at'],
         },
       },
+      indexes: [{ fields: ['chain_id'] }],
     }
   );
 

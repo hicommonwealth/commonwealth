@@ -90,7 +90,7 @@ export default (
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
       snapshot_id: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         allowNull: true,
       },
     },
@@ -99,11 +99,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [
-        { fields: ['subscriber_id'] },
-        { fields: ['category_id', 'object_id', 'is_active'] },
-        { fields: ['offchain_thread_id'] },
-      ],
+      indexes: [{ fields: ['subscriber_id'] }, { fields: ['thread_id'] }],
     }
   );
 

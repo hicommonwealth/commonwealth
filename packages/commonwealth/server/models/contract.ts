@@ -46,7 +46,7 @@ export default (
       decimals: { type: dataTypes.INTEGER, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
       symbol: { type: dataTypes.STRING, allowNull: true },
-      type: { type: dataTypes.STRING, allowNull: true }, // for governance erc20, etc. formerly network
+      type: { type: dataTypes.STRING, allowNull: false }, // for governance erc20, etc. formerly network
       abi_id: { type: dataTypes.INTEGER, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

@@ -78,7 +78,7 @@ export default (
     'User',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      email: { type: dataTypes.STRING },
+      email: { type: dataTypes.STRING, allowNull: true },
       emailVerified: {
         type: dataTypes.BOOLEAN,
         allowNull: false,

@@ -54,11 +54,7 @@ export default (
       updatedAt: 'updated_at',
       tableName: 'Roles',
       underscored: true,
-      indexes: [
-        { fields: ['address_id'] },
-        { fields: ['chain_id'] },
-        { fields: ['address_id', 'chain_id'], unique: true },
-      ],
+      indexes: [{ fields: ['address_id', 'chain_id'], unique: true }],
     }
   );
 

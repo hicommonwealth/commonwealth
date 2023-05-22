@@ -12,6 +12,7 @@ export type SocialAccountAttributes = {
   id?: number;
   created_at?: Date;
   updated_at?: Date;
+  user_id?: number;
 
   // associations
   User?: UserAttributes | UserAttributes['id'];
@@ -42,6 +43,7 @@ export default (
       refresh_token: { type: dataTypes.STRING },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      user_id: { type: dataTypes.INTEGER, allowNull: true },
     },
     {
       timestamps: true,
@@ -49,7 +51,7 @@ export default (
       updatedAt: 'updated_at',
       tableName: 'SocialAccounts',
       underscored: true,
-      indexes: [{ fields: ['user_id'] }, { fields: ['user_id', 'provider'] }],
+      indexes: [{ fields: ['user_id', 'provider'] }],
     }
   );
 

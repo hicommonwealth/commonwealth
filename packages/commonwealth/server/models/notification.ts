@@ -33,7 +33,11 @@ export default (
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       notification_data: { type: dataTypes.TEXT, allowNull: false },
-      chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
+      chain_event_id: {
+        type: dataTypes.INTEGER,
+        allowNull: true,
+        unique: true,
+      },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
       category_id: { type: dataTypes.STRING, allowNull: false },

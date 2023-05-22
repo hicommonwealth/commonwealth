@@ -23,7 +23,7 @@ export default (
     'ContractAbi',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      nickname: { type: dataTypes.STRING, allowNull: true },
+      nickname: { type: dataTypes.STRING, allowNull: true, unique: true },
       abi: { type: dataTypes.JSONB, allowNull: false, unique: true },
       verified: {
         type: dataTypes.BOOLEAN,

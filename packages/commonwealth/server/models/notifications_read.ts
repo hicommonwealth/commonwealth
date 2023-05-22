@@ -27,7 +27,7 @@ export default (
   const NotificationsRead = <NotificationsReadModelStatic>sequelize.define(
     'NotificationsRead',
     {
-      id: { type: dataTypes.INTEGER },
+      id: { type: dataTypes.INTEGER, allowNull: false },
       subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
       notification_id: { type: dataTypes.INTEGER, primaryKey: true },
       is_read: {
@@ -35,13 +35,13 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      user_id: { type: dataTypes.INTEGER },
+      user_id: { type: dataTypes.INTEGER, allowNull: false },
     },
     {
       tableName: 'NotificationsRead',
       underscored: true,
       timestamps: false,
-      indexes: [{ fields: ['subscription_id'] }],
+      indexes: [{ fields: ['subscription_id'] }, { fields: ['user_id'] }],
     }
   );
 

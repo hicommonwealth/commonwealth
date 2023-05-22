@@ -53,7 +53,6 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [
-        { fields: ['id'] },
         { fields: ['address_id'] },
         {
           fields: [

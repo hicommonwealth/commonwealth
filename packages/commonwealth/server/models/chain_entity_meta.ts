@@ -45,7 +45,7 @@ export default (
       timestamps: false,
       underscored: true,
       paranoid: false,
-      indexes: [{ fields: ['id'] }],
+      indexes: [{ fields: ['chain'] }],
     }
   );
 

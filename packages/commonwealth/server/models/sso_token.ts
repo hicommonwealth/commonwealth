@@ -39,7 +39,7 @@ export default (
       tableName: 'SsoTokens',
       underscored: true,
       timestamps: true,
-      indexes: [{ fields: ['id'] }, { fields: ['issuer', 'address_id'] }],
+      indexes: [{ fields: ['issuer', 'address_id'] }],
       defaultScope: {
         attributes: {
           exclude: [
