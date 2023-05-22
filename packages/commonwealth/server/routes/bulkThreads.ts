@@ -30,33 +30,32 @@ const bulkThreads = async (
   const { to_date, from_date, topic_id, includePinnedThreads, stage, orderBy } =
     req.query;
 
-  const bind = { chain: chain.id };
-
-  let topicOptions = '';
-  if (topic_id) {
-    topicOptions += `AND t.topic_id = $topic_id `;
-    bind['topic_id'] = topic_id;
-  }
-  if (stage) {
-    topicOptions += `AND t.stage = $stage `;
-    bind['stage'] = stage;
-  }
-
-  bind['from_date'] = from_date;
-  bind['to_date'] = to_date;
-
-  let threads;
-  if (to_date) {
-    const orderByQueries = {
-      'createdAt:asc': 'threads.thread_created ASC',
-      'createdAt:desc': 'threads.thread_created DESC',
-      'numberOfComments:asc': 'threads_number_of_comments ASC',
-      'numberOfComments:desc': 'threads_number_of_comments DESC',
-      'numberOfLikes:asc': 'threads_total_likes ASC',
-      'numberOfLikes:desc': 'threads_total_likes DESC',
+  // query params that bind to sql query
+  const bind = (() => {
+    return {
+      to_date,
+      from_date,
+      chain: chain.id,
+      ...(stage && { stage }),
+      ...(topic_id && { topic_id }),
     };
+  })();
 
-    const query = `
+  // sql query parts that order results by provided query param
+  const orderByQueries = {
+    'createdAt:asc': 'threads.thread_created ASC',
+    'createdAt:desc': 'threads.thread_created DESC',
+    'numberOfComments:asc': 'threads_number_of_comments ASC',
+    'numberOfComments:desc': 'threads_number_of_comments DESC',
+    'numberOfLikes:asc': 'threads_total_likes ASC',
+    'numberOfLikes:desc': 'threads_total_likes DESC',
+  };
+
+  // get response threads from query
+  let responseThreads;
+  try {
+    responseThreads = await models.sequelize.query(
+      `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.chain AS addr_chain, threads.thread_id, thread_title,
         thread_chain, thread_created, threads.kind,
@@ -108,11 +107,12 @@ const bulkThreads = async (
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
           AND t.chain = $chain
-          ${topicOptions}
+          ${topic_id ? ` AND t.topic_id = $topic_id ` : ''}
+          ${stage ? ` AND t.stage = $stage ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
-           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes)
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
       ON threads.address_id = addr.id
@@ -133,99 +133,67 @@ const bulkThreads = async (
           : ''
       }
       LIMIT 20
-      `;
-    let preprocessedThreads;
-    try {
-      preprocessedThreads = await models.sequelize.query(query, {
+    `,
+      {
         bind,
         type: QueryTypes.SELECT,
-      });
-    } catch (e) {
-      console.log(e);
-      return next(new ServerError('Could not fetch threads'));
-    }
-
-    threads = preprocessedThreads.map(async (t) => {
-      const collaborators = JSON.parse(t.collaborators[0]).address?.length
-        ? t.collaborators.map((c) => JSON.parse(c))
-        : [];
-      const { chain_entity_meta } = await processLinks(t);
-
-      const last_edited = getLastEdited(t);
-
-      const data = {
-        id: t.thread_id,
-        title: t.thread_title,
-        url: t.url,
-        body: t.body,
-        last_edited,
-        kind: t.kind,
-        stage: t.stage,
-        read_only: t.read_only,
-        pinned: t.pinned,
-        chain: t.thread_chain,
-        created_at: t.thread_created,
-        links: t.links,
-        collaborators,
-        chain_entity_meta,
-        has_poll: t.has_poll,
-        last_commented_on: t.last_commented_on,
-        plaintext: t.plaintext,
-        Address: {
-          id: t.addr_id,
-          address: t.addr_address,
-          chain: t.addr_chain,
-        },
-        numberOfComments: t.threads_number_of_comments,
-        reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
-        addressesReacted: t.addresses_reacted
-          ? t.addresses_reacted.split(',')
-          : [],
-        reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
-      };
-      if (t.topic_id) {
-        data['topic'] = {
-          id: t.topic_id,
-          name: t.topic_name,
-          description: t.topic_description,
-          chainId: t.topic_chain,
-          telegram: t.telegram,
-        };
       }
-      return data;
-    });
-  } else {
-    threads =
-      // TODO: May need to include last_commented_on in order, if this else is used
-      (
-        await models.Thread.findAll({
-          where: { chain: chain.id },
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-            },
-            {
-              model: models.Address,
-              as: 'collaborators',
-            },
-            {
-              model: models.Topic,
-              as: 'topic',
-            },
-          ],
-          attributes: { exclude: ['version_history'] },
-          order: [['created_at', 'DESC']],
-        })
-      ).map(async (t) => {
-        const row = t.toJSON();
-        const last_edited = getLastEdited(row);
-        const { chain_entity_meta } = await processLinks(t);
-        row['chain_entity_meta'] = chain_entity_meta;
-        row['last_edited'] = last_edited;
-        return row;
-      });
+    );
+  } catch (e) {
+    console.log(e);
+    return next(new ServerError('Could not fetch threads'));
   }
+
+  // transform thread response
+  let threads = responseThreads.map(async (t) => {
+    const collaborators = JSON.parse(t.collaborators[0]).address?.length
+      ? t.collaborators.map((c) => JSON.parse(c))
+      : [];
+    const { chain_entity_meta } = await processLinks(t);
+
+    const last_edited = getLastEdited(t);
+
+    const data = {
+      id: t.thread_id,
+      title: t.thread_title,
+      url: t.url,
+      body: t.body,
+      last_edited,
+      kind: t.kind,
+      stage: t.stage,
+      read_only: t.read_only,
+      pinned: t.pinned,
+      chain: t.thread_chain,
+      created_at: t.thread_created,
+      links: t.links,
+      collaborators,
+      chain_entity_meta,
+      has_poll: t.has_poll,
+      last_commented_on: t.last_commented_on,
+      plaintext: t.plaintext,
+      Address: {
+        id: t.addr_id,
+        address: t.addr_address,
+        chain: t.addr_chain,
+      },
+      numberOfComments: t.threads_number_of_comments,
+      reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
+      addressesReacted: t.addresses_reacted
+        ? t.addresses_reacted.split(',')
+        : [],
+      reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
+    };
+    if (t.topic_id) {
+      data['topic'] = {
+        id: t.topic_id,
+        name: t.topic_name,
+        description: t.topic_description,
+        chainId: t.topic_chain,
+        telegram: t.telegram,
+      };
+    }
+    return data;
+  });
 
   const countsQuery = `
      SELECT id, title, stage FROM "Threads"
