@@ -30,7 +30,10 @@ export function linkExistingAddressToChainOrCommunity(
   });
 }
 
-export async function setActiveAccount(account: Account): Promise<void> {
+export async function setActiveAccount(
+  account: Account,
+  shouldRedraw = true
+): Promise<void> {
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
 
@@ -44,7 +47,10 @@ export async function setActiveAccount(account: Account): Promise<void> {
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      app.user.setActiveAccounts(
+        app.user.activeAccounts.concat([account]),
+        shouldRedraw
+      );
     }
     return;
   }
@@ -75,7 +81,10 @@ export async function setActiveAccount(account: Account): Promise<void> {
     app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
     0
   ) {
-    app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+    app.user.setActiveAccounts(
+      app.user.activeAccounts.concat([account]),
+      shouldRedraw
+    );
   }
 }
 
@@ -150,14 +159,21 @@ export async function updateLastVisited(
   }
 }
 
-export async function updateActiveAddresses(chain?: ChainInfo) {
+export async function updateActiveAddresses({
+  chain,
+  shouldRedraw = true,
+}: {
+  chain?: ChainInfo;
+  shouldRedraw?: boolean;
+}) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
       .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
-      .filter((addr) => addr)
+      .filter((addr) => addr),
+    shouldRedraw
   );
 
   // select the address that the new chain should be initialized with
@@ -167,7 +183,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
-    await setActiveAccount(memberAddresses[0]);
+    await setActiveAccount(memberAddresses[0], shouldRedraw);
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
@@ -182,7 +198,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
           a.address === existingAddress.address
         );
       });
-      if (account) await setActiveAccount(account);
+      if (account) await setActiveAccount(account, shouldRedraw);
     }
   }
 }
@@ -342,7 +358,7 @@ export async function loginWithMagicLink(email: string) {
       const c = app.user.selectedChain
         ? app.user.selectedChain
         : app.config.chains.getById(app.activeChainId());
-      await updateActiveAddresses(c);
+      await updateActiveAddresses({ chain: c });
     }
   } else {
     throw new Error(`Magic auth unsuccessful: ${response.status}`);
