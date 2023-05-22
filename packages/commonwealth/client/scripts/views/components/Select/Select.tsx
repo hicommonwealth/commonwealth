@@ -55,7 +55,7 @@ export const Select = ({
       {/* needs to be div instead of fragment so listener can work */}
       <div>
         <CWButton
-          className="select"
+          className="Select"
           {...(selectedOption &&
             selectedOption.iconLeft && { iconLeft: selectedOption.iconLeft })}
           iconRight={popoverProps.anchorEl ? 'carotUp' : 'carotDown'}
@@ -72,7 +72,7 @@ export const Select = ({
         />
         <Popover
           content={
-            <div className="select-options-wrapper">
+            <div className="Select-Options-Wrapper">
               {options.map((option, i) => {
                 const label = option.label || option;
                 const current = option.value || option;

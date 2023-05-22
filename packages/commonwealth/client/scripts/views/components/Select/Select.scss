@@ -1,6 +1,6 @@
 @import '../../../../styles/shared';
 
-.select {
+.Select {
     display: flex;
     justify-content: space-between;
     min-width: 144px;
@@ -23,7 +23,7 @@
     }
 }
 
-.select-options-wrapper {
+.Select-Options-Wrapper {
     min-width: 224px;
     max-width: 320px;
     text-overflow: ellipsis;
