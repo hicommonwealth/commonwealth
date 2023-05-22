@@ -144,7 +144,9 @@ export default async function emitNotifications(
           (<IPostNotificationData>notification_data).chain_id ||
           (<ICommunityNotificationData>notification_data).chain ||
           (<IChatNotification>notification_data).chain_id,
-        thread_id: Number((<IPostNotificationData>notification_data).thread_id)
+        thread_id:
+          Number((<IPostNotificationData>notification_data).thread_id) ||
+          undefined,
       });
     }
   }
