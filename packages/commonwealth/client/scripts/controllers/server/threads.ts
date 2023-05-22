@@ -712,7 +712,7 @@ class ThreadsController {
 
       // calculate 'from' and 'to' dates
       const today = moment();
-      const from_date = (() => {
+      const fromDate = (() => {
         if (dateRange) {
           if (
             [
@@ -732,7 +732,7 @@ class ThreadsController {
 
         return null;
       })();
-      const to_date = (() => {
+      const toDate = (() => {
         if (dateRange) {
           if (
             [
@@ -767,8 +767,8 @@ class ThreadsController {
         ...(topicId && { topic_id: topicId }),
         ...(stageName && { stage: stageName }),
         ...(includePinnedThreads && { includePinnedThreads: true }),
-        ...(from_date && { from_date }),
-        to_date,
+        ...(fromDate && { from_date: fromDate }),
+        to_date: toDate,
         orderBy:
           featuredFilterQueryMap[featuredFilter] ||
           featuredFilterQueryMap.newest,
