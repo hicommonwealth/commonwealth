@@ -1,6 +1,7 @@
 /* eslint-disable quotes */
 import { ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { Link, ThreadInstance } from '../models/thread';
@@ -26,16 +27,33 @@ const bulkThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const chain = req.chain;
-  const { to_date, from_date, topic_id, includePinnedThreads, stage, orderBy } =
-    req.query;
+  const {
+    // endpoint specific filters
+    stage,
+    topic_id,
+    includePinnedThreads,
+    // pagination params
+    limit,
+    page,
+    orderBy,
+    to_date,
+    from_date,
+  } = req.query;
 
   // query params that bind to sql query
   const bind = (() => {
+    const _limit = parseInt(limit ? (limit > 500 ? 500 : limit) : 20) || 20;
+    const _page = parseInt(page) || 1;
+    const _offset = _limit * (_page - 1) || 0;
+    const _to_date = to_date || moment().toISOString();
+
     return {
-      to_date,
       from_date,
-      chain: chain.id,
+      to_date: _to_date,
+      page: _page,
+      limit: _limit,
+      offset: _offset,
+      chain: req.chain.id,
       ...(stage && { stage }),
       ...(topic_id && { topic_id }),
     };
@@ -132,7 +150,7 @@ const bulkThreads = async (
           ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy]
           : ''
       }
-      LIMIT 20
+      LIMIT $limit OFFSET $offset
     `,
       {
         bind,
@@ -217,6 +235,8 @@ const bulkThreads = async (
     result: {
       numVotingThreads,
       threads,
+      limit: bind.limit,
+      page: bind.page,
     },
   });
 };
