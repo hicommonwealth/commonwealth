@@ -8,7 +8,9 @@ type SnapshotProposalLinkRedirectProps = {
   scope: string;
 };
 
-export default function SnapshotProposalLinkRedirect({ identifier }: SnapshotProposalLinkRedirectProps) {
+export default function SnapshotProposalLinkRedirect({
+  identifier,
+}: SnapshotProposalLinkRedirectProps) {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export default function SnapshotProposalLinkRedirect({ identifier }: SnapshotPro
         const newLink = {
           source: 'snapshot',
           title,
-          identifier: `${space}/${identifier}}`
+          identifier: `${space}/${identifier}}`,
         };
 
         // 3. redirect
@@ -31,7 +33,7 @@ export default function SnapshotProposalLinkRedirect({ identifier }: SnapshotPro
         // TODO: show error page
         throw new Error('could not find entity');
       }
-    }
+    };
 
     fetchSnapshotData();
   }, [navigate]);

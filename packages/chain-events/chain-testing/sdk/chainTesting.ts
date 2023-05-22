@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import {
   chainAdvanceTime,
   chainGetEth,
+  erc20Approve,
   erc20BalanceReq,
   erc20Transfer,
   govCompCreate,
@@ -92,12 +93,43 @@ export class ChainTesting {
   }
 
   /**
+   * Approve a spender to spend an ERC20 token
+   * @param tokenAddress ERC20 token address
+   * @param spender address to approve
+   * @param amount amount to approve
+   * @param accountIndex account index to create approve tx from(erc20.approve)
+   */
+  public async approveErc20(
+    tokenAddress: string,
+    spender: string,
+    amount: string,
+    accountIndex?: number
+  ): Promise<{ block: number }> {
+    const request: erc20Approve = {
+      tokenAddress,
+      spender,
+      amount,
+      accountIndex,
+    };
+    const response = await axios.post(
+      `${this.host}/erc20/approve`,
+      JSON.stringify(request),
+      this.header
+    );
+    return response.data;
+  }
+
+  /**
    * Gets ERC20 tokens from a 'Bank Wallet'
    * @param tokenAddress ERC20 token address
    * @param to address to transfer to
    * @param amount amount in ether to receive
    */
-  public async getErc20(tokenAddress: string, to: string, amount: string) {
+  public async getErc20(
+    tokenAddress: string,
+    to: string,
+    amount: string
+  ): Promise<{ block: number }> {
     const fromBank = true;
     const request: erc20Transfer = { tokenAddress, to, amount, fromBank };
     const response = await axios.post(
@@ -201,7 +233,7 @@ export class ChainTesting {
       JSON.stringify(request),
       this.header
     );
-    response.data;
+    return response.data;
   }
 
   /**
@@ -263,12 +295,45 @@ export class ChainTesting {
   }
 
   /**
+   * Given a desired block number, this function will call advanceTime to attempt to advance to the desired block
+   * number. Given that this is sometimes unreliable the function will return if the block number is greater than
+   * or equal to the minBlockNum or if the number of tries exceeds the maxNumTries.
+   * @param desiredBlockNum The desired block number to advance to
+   * @param minBlockNum The minimum block number to advance to
+   * @param maxNumTries The maximum number of times to attempt to advanceTime
+   */
+  public async safeAdvanceTime(
+    desiredBlockNum: number,
+    minBlockNum?: number,
+    maxNumTries = 10
+  ): Promise<void> {
+    let numTries = 0;
+    /* eslint-disable */
+    while (true) {
+      if (numTries >= maxNumTries)
+        throw new Error('Timed out waiting for block');
+      const currentBlock = (await this.getBlock()).number;
+      const numBlocksToAdvance = desiredBlockNum - currentBlock;
+      console.log(
+        `Current block: ${currentBlock}... waiting for ${desiredBlockNum}`
+      );
+      if (currentBlock >= (minBlockNum || desiredBlockNum)) return;
+
+      await this.advanceTime('1', numBlocksToAdvance);
+
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      numTries += 1;
+    }
+  }
+
+  /**
    * advance the timestamp and block
    * @param seconds amount of seconds to add to timestamp
+   * @param blocks amount of blocks to mine
    * @returns '{PreTime, PostTime}'
    */
-  public async advanceTime(seconds: string) {
-    const request: chainAdvanceTime = { seconds };
+  public async advanceTime(seconds: string, blocks = 1) {
+    const request: chainAdvanceTime = { seconds, blocks };
     const response = await axios.post(
       `${this.host}/chain/advanceTime`,
       JSON.stringify(request),

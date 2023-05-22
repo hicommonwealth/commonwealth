@@ -17,7 +17,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
 import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 import ceModels from 'chain-events/services/database/database';
-
+import { AbstractRabbitMQController } from 'common-common/src/rabbitmq/types';
 import {
   getRabbitMQConfig,
   RabbitMQController,
@@ -61,7 +61,7 @@ async function fetchData(url: string, data: any) {
 
 async function migrateChainEntity(
   chain: string,
-  rmqController: RabbitMQController
+  rmqController: AbstractRabbitMQController
 ): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info(`Fetching node info for ${chain}...`);
@@ -164,7 +164,7 @@ async function migrateChainEntity(
 }
 
 async function migrateChainEntities(
-  rmqController: RabbitMQController
+  rmqController: AbstractRabbitMQController
 ): Promise<void> {
   const chains = await fetchData(
     `${CW_SERVER_URL}/api/getSubscribedChains`,
@@ -206,6 +206,6 @@ export async function runEntityMigrations(chainId?: string): Promise<void> {
   }
 }
 
-if (process.argv[2] === 'run-as-script') {
-  runEntityMigrations(process.argv[3]);
+if (require.main === module) {
+  runEntityMigrations(process.argv[2]);
 }
