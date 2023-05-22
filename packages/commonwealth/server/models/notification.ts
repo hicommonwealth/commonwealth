@@ -15,6 +15,7 @@ export type NotificationAttributes = {
   entity_id: number;
   created_at?: Date;
   updated_at?: Date;
+  thread_id?: number;
   NotificationsRead?: NotificationsReadAttributes[];
 };
 
@@ -41,6 +42,7 @@ export default (
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
       category_id: { type: dataTypes.STRING, allowNull: false },
+      thread_id: { type: dataTypes.INTEGER, allowNull: true },
     },
     {
       tableName: 'Notifications',
@@ -63,6 +65,10 @@ export default (
     });
     models.Notification.belongsTo(models.Chain, {
       foreignKey: 'chain_id',
+      targetKey: 'id',
+    });
+    models.Notification.belongsTo(models.Thread, {
+      foreignKey: 'thread_id',
       targetKey: 'id',
     });
   };

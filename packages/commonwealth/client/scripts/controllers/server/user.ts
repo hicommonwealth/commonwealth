@@ -78,9 +78,14 @@ export class UserController {
     return this._activeAccounts;
   }
 
-  private _setActiveAccounts(activeAccounts: Account[]): void {
+  private _setActiveAccounts(
+    activeAccounts: Account[],
+    shouldRedraw = true
+  ): void {
     this._activeAccounts = activeAccounts;
-    this.isFetched.emit('redraw');
+    if (shouldRedraw) {
+      this.isFetched.emit('redraw');
+    }
   }
 
   private _socialAccounts: SocialAccount[] = [];
@@ -231,8 +236,11 @@ export class UserController {
     );
   }
 
-  public setActiveAccounts(activeAccounts: Account[]): void {
-    this._setActiveAccounts(activeAccounts);
+  public setActiveAccounts(
+    activeAccounts: Account[],
+    shouldRedraw = true
+  ): void {
+    this._setActiveAccounts(activeAccounts, shouldRedraw);
   }
 
   public addActiveAddress(address: Account): void {
