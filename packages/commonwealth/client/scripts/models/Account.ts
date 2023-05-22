@@ -113,7 +113,8 @@ class Account {
   public async validate(
     signature: string,
     timestamp: number,
-    chainId: string | number
+    chainId: string | number,
+    shouldRedraw = true
   ) {
     if (!this._validationToken && !this._validationBlockInfo) {
       throw new Error('no validation token found');
@@ -158,7 +159,7 @@ class Account {
               return !ghostAddress;
             })
           );
-          app.user.setActiveAccounts([]);
+          app.user.setActiveAccounts([], shouldRedraw);
         }
       }
     }
