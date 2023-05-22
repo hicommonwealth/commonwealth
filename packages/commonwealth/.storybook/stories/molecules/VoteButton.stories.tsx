@@ -30,7 +30,7 @@ const VoteButton: FC<VoteButtonProps> = ({ count }) => {
 };
 
 export const VoteButtonStory = {
-  name: 'Vote Button',
+  name: "Vote Button",
   args: {
     voteCount: 0,
   },

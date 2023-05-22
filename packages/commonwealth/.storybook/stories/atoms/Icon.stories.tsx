@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWIcon } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
@@ -19,6 +19,8 @@ type Story = StoryObj<typeof icons>;
 const IconButton: FC<IconComponentProps> = (props) => {
   const { selected = false } = props;
   const [isSelected, setIsSelected] = useState<boolean>(selected);
+
+  useEffect(() => setIsSelected(!isSelected), [selected]);
 
   return (
     <CWIconButton
