@@ -1,0 +1,22 @@
+@import '../../../../styles/shared';
+
+.select-option {
+    gap: 8px;
+    display: flex;
+    max-width: 34ch;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    align-items: center;
+    flex-direction: row;
+    text-overflow: ellipsis;
+    height: auto !important;
+    padding: 10px 12px !important;
+    border-radius: $border-radius-md  !important;
+    font-size: 14px !important;
+
+    &:hover,
+    &:active {
+        background-color: $primary-100;
+    }
+}
