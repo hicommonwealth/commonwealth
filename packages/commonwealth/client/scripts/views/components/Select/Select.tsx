@@ -9,6 +9,7 @@ import { Option } from './Option';
 import './Select.scss';
 
 export type SelectProps = {
+  placeholder?: string;
   selected: string;
   onSelect?: (
     v:
@@ -36,6 +37,7 @@ export const Select = ({
   onSelect,
   canEditOption,
   dropdownPosition,
+  placeholder = 'Select an option',
 }: SelectProps) => {
   const popoverProps = usePopover();
 
@@ -58,7 +60,11 @@ export const Select = ({
             selectedOption.iconLeft && { iconLeft: selectedOption.iconLeft })}
           iconRight={popoverProps.anchorEl ? 'carotUp' : 'carotDown'}
           buttonType="mini-white"
-          label={selectedOption.label || selectedOption}
+          label={
+            selectedOption
+              ? selectedOption.label || selectedOption
+              : placeholder
+          }
           onClick={async (e) => {
             popoverProps.handleInteraction(e);
             onOpen && (await onOpen());
