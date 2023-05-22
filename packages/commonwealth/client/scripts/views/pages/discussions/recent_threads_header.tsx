@@ -15,12 +15,16 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { Select } from '../../components/Select';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadTimelineFilterTypes,
+} from '../../../models/types';
 
 type RecentThreadsHeaderProps = {
   stage: string;
   topic: string;
-  featuredFilter: string;
-  dateRange: string;
+  featuredFilter: ThreadFeaturedFilterTypes;
+  dateRange: ThreadTimelineFilterTypes;
   totalThreadCount: number;
 };
 
@@ -159,35 +163,35 @@ export const RecentThreadsHeader = ({
           <div className="filter-section">
             <p className="filter-label">Sort</p>
             <Select
-              selected={featuredFilter || 'newest'}
+              selected={featuredFilter || ThreadFeaturedFilterTypes.Newest}
               onSelect={(item: any) => {
                 onFilterSelect({
                   filterKey: 'featured',
-                  filterVal: item.value,
+                  filterVal: item.value as ThreadFeaturedFilterTypes,
                 });
               }}
               options={[
                 {
                   id: 1,
-                  value: 'newest',
+                  value: ThreadFeaturedFilterTypes.Newest,
                   label: 'Newest',
                   iconLeft: 'sparkle',
                 },
                 {
                   id: 2,
-                  value: 'oldest',
+                  value: ThreadFeaturedFilterTypes.Oldest,
                   label: 'Oldest',
                   iconLeft: 'clockCounterClockwise',
                 },
                 {
                   id: 3,
-                  value: 'likes',
+                  value: ThreadFeaturedFilterTypes.MostLikes,
                   label: 'Likes',
                   iconLeft: 'heart',
                 },
                 {
                   id: 4,
-                  value: 'comments',
+                  value: ThreadFeaturedFilterTypes.MostComments,
                   label: 'Comments',
                   iconLeft: 'chatDots',
                 },
@@ -263,27 +267,27 @@ export const RecentThreadsHeader = ({
                 />
               )}
               <Select
-                selected={dateRange || 'allTime'}
+                selected={dateRange || ThreadTimelineFilterTypes.AllTime}
                 onSelect={(item: any) => {
                   onFilterSelect({
                     filterKey: 'dateRange',
-                    filterVal: item.value,
+                    filterVal: item.value as ThreadTimelineFilterTypes,
                   });
                 }}
                 options={[
                   {
                     id: 1,
-                    value: 'allTime',
+                    value: ThreadTimelineFilterTypes.AllTime,
                     label: 'All Time',
                   },
                   {
                     id: 2,
-                    value: 'month',
+                    value: ThreadTimelineFilterTypes.ThisMonth,
                     label: 'Month',
                   },
                   {
                     id: 3,
-                    value: 'week',
+                    value: ThreadTimelineFilterTypes.ThisWeek,
                     label: 'Week',
                   },
                 ]}

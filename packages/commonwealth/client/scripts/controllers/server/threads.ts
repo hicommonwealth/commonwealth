@@ -20,7 +20,11 @@ import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
-import { ThreadStage } from '../../models/types';
+import {
+  ThreadStage,
+  ThreadFeaturedFilterTypes,
+  ThreadTimelineFilterTypes,
+} from '../../models/types';
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
@@ -682,8 +686,8 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
     includePinnedThreads?: boolean;
-    featuredFilter: string;
-    dateRange: string;
+    featuredFilter: ThreadFeaturedFilterTypes;
+    dateRange: ThreadTimelineFilterTypes;
   }) {
     // Used to reset pagination when switching between topics
     if (this._resetPagination) {
@@ -705,11 +709,18 @@ class ThreadsController {
     const today = moment();
     const from_date = (() => {
       if (dateRange) {
-        if (['week', 'month'].includes(dateRange.toLowerCase())) {
-          return today.startOf(dateRange.toLowerCase() as any).toISOString();
+        if (
+          [
+            ThreadTimelineFilterTypes.ThisMonth,
+            ThreadTimelineFilterTypes.ThisWeek,
+          ].includes(dateRange)
+        ) {
+          return today
+            .startOf(dateRange.toLowerCase().replace('this', '') as any)
+            .toISOString();
         }
 
-        if (dateRange.toLowerCase() === 'allTime') {
+        if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
           return new Date(0).toISOString();
         }
       }
@@ -718,11 +729,18 @@ class ThreadsController {
     })();
     const to_date = (() => {
       if (dateRange) {
-        if (['week', 'month'].includes(dateRange.toLowerCase())) {
-          return today.endOf(dateRange.toLowerCase() as any).toISOString();
+        if (
+          [
+            ThreadTimelineFilterTypes.ThisMonth,
+            ThreadTimelineFilterTypes.ThisWeek,
+          ].includes(dateRange)
+        ) {
+          return today
+            .endOf(dateRange.toLowerCase().replace('this', '') as any)
+            .toISOString();
         }
 
-        if (dateRange.toLowerCase() === 'allTime') {
+        if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
           return moment().toISOString();
         }
       }
@@ -735,8 +753,8 @@ class ThreadsController {
     const featuredFilterQueryMap = {
       newest: 'createdAt:desc',
       oldest: 'createdAt:asc',
-      likes: 'numberOfLikes:desc',
-      comments: 'numberOfComments:desc',
+      mostLikes: 'numberOfLikes:desc',
+      mostComments: 'numberOfComments:desc',
     };
 
     const chain = app.activeChainId();

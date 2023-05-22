@@ -11,6 +11,11 @@ import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
+import {
+  ThreadTimelineFilterTypes,
+  ThreadFeaturedFilterTypes,
+} from '../../../models/types';
+
 type DiscussionsPageProps = {
   topicName?: string;
 };
@@ -21,8 +26,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
-  const featuredFilter: string = searchParams.get('featured');
-  const dateRange: string = searchParams.get('dateRange');
+  const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
+    'featured'
+  ) as ThreadFeaturedFilterTypes;
+  const dateRange: ThreadTimelineFilterTypes = searchParams.get(
+    'dateRange'
+  ) as ThreadTimelineFilterTypes;
 
   const handleThreadUpdate = (data: {
     threadId: number;
@@ -63,17 +72,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
    * sorted by another featured flag
    */
   const sortByFeaturedFilter = (t: Thread[]) => {
-    if (featuredFilter === 'oldest') {
+    if (featuredFilter === ThreadFeaturedFilterTypes.Oldest) {
       return [...t].sort((a, b) =>
         moment(a.createdAt).diff(moment(b.createdAt))
       );
     }
 
-    if (featuredFilter === 'comments') {
+    if (featuredFilter === ThreadFeaturedFilterTypes.MostComments) {
       return [...t].sort((a, b) => b.numberOfComments - a.numberOfComments);
     }
 
-    if (featuredFilter === 'likes') {
+    if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
       return [...t].sort(
         (a, b) => b.associatedReactions.length - a.associatedReactions.length
       );
