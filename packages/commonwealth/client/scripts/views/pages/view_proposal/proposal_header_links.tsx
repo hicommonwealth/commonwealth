@@ -3,7 +3,7 @@ import React from 'react';
 import 'pages/view_proposal/proposal_header_links.scss';
 
 import { ProposalType } from 'common-common/src/types';
-import { externalLink, extractDomain, link } from 'helpers';
+import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -13,54 +13,8 @@ type ProposalHeaderLinkProps = {
   proposal: AnyProposal;
 };
 
-// "View in Subscan"
-export const BlockExplorerLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
-  return (
-    <div className="HeaderLink">
-      {externalLink(
-        'a',
-        proposal['blockExplorerLink'],
-        [
-          proposal['blockExplorerLinkLabel'] ||
-            extractDomain(proposal['blockExplorerLink']),
-        ],
-        navigate
-      )}
-      <CWIcon iconName="externalLink" iconSize="small" />
-    </div>
-  );
-};
-
-// "Vote on polkadot-js"
-export const VotingInterfaceLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
-  return (
-    <div className="HeaderLink">
-      {externalLink(
-        'a',
-        proposal['votingInterfaceLink'],
-        [
-          proposal['votingInterfaceLinkLabel'] ||
-            extractDomain(proposal['votingInterfaceLink']),
-        ],
-        navigate
-      )}
-      <CWIcon iconName="externalLink" iconSize="small" />
-    </div>
-  );
-};
-
 // "Go to discussion"
-export const ThreadLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
+export const ThreadLink = ({ proposal }: ProposalHeaderLinkProps) => {
   const navigate = useCommonNavigate();
 
   const path = getProposalUrlPath(
