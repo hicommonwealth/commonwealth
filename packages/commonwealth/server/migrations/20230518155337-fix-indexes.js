@@ -187,7 +187,7 @@ module.exports = {
       );
 
       // SocialAccounts
-      await queryInterface.dropIndex(
+      await queryInterface.removeIndex(
         'SocialAccounts',
         'social_accounts_user_id',
         { transaction: t }
