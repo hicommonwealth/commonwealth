@@ -67,7 +67,14 @@ export const CheckboxStory = {
     },
   },
   parameters: {
-    controls: { exclude: ["className", "groupName", "value"] }
+    controls: {
+      exclude: [
+        "className",
+        "groupName",
+        "value",
+        "onChange",
+      ],
+    },
   },
   render: ({...args}) => (
     <Checkbox

@@ -7,8 +7,6 @@ import { CWIcon } from '../../../client/scripts/views/components/component_kit/c
 import { CWIconButton } from '../../../client/scripts/views/components/component_kit/cw_icon_button';
 import { iconLookup, IconName } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
-import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
-
 interface TooltipProps {
   content: string | React.ReactNode;
   iconName: IconName;

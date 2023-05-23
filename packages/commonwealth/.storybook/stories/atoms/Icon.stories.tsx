@@ -97,7 +97,6 @@ export const IconButtonStory: Story = {
     selected: {
       options: [ true, false ],
     },
-    // TODO handle selected
   },
   parameters: {
     controls: {
