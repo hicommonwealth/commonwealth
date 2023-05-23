@@ -316,7 +316,7 @@ export async function loginWithMagicLink(email: string) {
     extensions: [
       new CosmosExtension({
         // default to Osmosis URL
-        rpcUrl: app.chain.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
+        rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
       }),
     ]
   });

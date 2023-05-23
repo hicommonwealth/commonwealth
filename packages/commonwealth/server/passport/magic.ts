@@ -27,6 +27,9 @@ export function initMagicAuth(models: DB) {
         if (req.body.chain || req.body.community) {
           [chain, error] = await validateChain(models, req.body);
           if (error) return cb(error);
+        } else {
+          // default to Osmosis as secondary chain
+          chain = await models.Chain.findOne({ where: { id: 'osmosis' }});
         }
 
         // grab cosmos address for registration
