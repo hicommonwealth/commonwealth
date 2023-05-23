@@ -27,14 +27,15 @@ export class Listener extends BaseListener<
   protected readonly log;
 
   constructor(
-    chain: string,
-    url?: string,
+    origin: string,
+    chainName: string,
+    url: string,
     skipCatchup?: boolean,
     pollTime?: number,
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    super(SupportedNetwork.Cosmos, chain, verbose);
+    super(SupportedNetwork.Cosmos, chainName, origin, verbose);
 
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.Cosmos, this._origin])
@@ -110,17 +111,6 @@ export class Listener extends BaseListener<
       this.log.error(`Subscription error: ${error.message}`);
       throw error;
     }
-  }
-
-  public async updateUrl(url: string): Promise<void> {
-    if (url === this._options.url) {
-      this.log.warn(`The chain URL is already set to ${url}`);
-      return;
-    }
-    this._options.url = url;
-
-    await this.init();
-    if (this._subscribed === true) await this.subscribe();
   }
 
   protected async processBlock(event: RawEvent): Promise<void> {

@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.6 (Ubuntu 14.6-1.pgdg20.04+1)
--- Dumped by pg_dump version 14.6
+-- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
 
--- Started on 2022-12-15 13:10:17 EST
+-- Started on 2023-05-23 14:02:51 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,7 +19,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 6 (class 2615 OID 16440)
+-- TOC entry 7 (class 2615 OID 23441065)
 -- Name: heroku_ext; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -27,7 +27,24 @@ CREATE SCHEMA heroku_ext;
 
 
 --
--- TOC entry 2 (class 3079 OID 16441)
+-- TOC entry 3 (class 3079 OID 23639550)
+-- Name: dblink; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS dblink WITH SCHEMA public;
+
+
+--
+-- TOC entry 3450 (class 0 OID 0)
+-- Dependencies: 3
+-- Name: EXTENSION dblink; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION dblink IS 'connect to other PostgreSQL databases from within a database';
+
+
+--
+-- TOC entry 2 (class 3079 OID 23441066)
 -- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -35,7 +52,7 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA heroku_ext;
 
 
 --
--- TOC entry 4348 (class 0 OID 0)
+-- TOC entry 3451 (class 0 OID 0)
 -- Dependencies: 2
 -- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
 --
@@ -48,25 +65,26 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 213 (class 1259 OID 16466)
+-- TOC entry 216 (class 1259 OID 23441091)
 -- Name: ChainEntities; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public."ChainEntities" (
     id integer NOT NULL,
-    chain character varying(255) NOT NULL,
+    chain_name character varying(255) NOT NULL,
     type character varying(255) NOT NULL,
     type_id character varying(255) NOT NULL,
     completed boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     author character varying(255),
-    queued smallint DEFAULT 0 NOT NULL
+    queued smallint DEFAULT 0 NOT NULL,
+    contract_address character varying(255)
 );
 
 
 --
--- TOC entry 214 (class 1259 OID 16473)
+-- TOC entry 217 (class 1259 OID 23441098)
 -- Name: ChainEntities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -80,8 +98,8 @@ CREATE SEQUENCE public."ChainEntities_id_seq"
 
 
 --
--- TOC entry 4349 (class 0 OID 0)
--- Dependencies: 214
+-- TOC entry 3452 (class 0 OID 0)
+-- Dependencies: 217
 -- Name: ChainEntities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -89,38 +107,26 @@ ALTER SEQUENCE public."ChainEntities_id_seq" OWNED BY public."ChainEntities".id;
 
 
 --
--- TOC entry 215 (class 1259 OID 16474)
--- Name: ChainEventTypes; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public."ChainEventTypes" (
-    id character varying(255) NOT NULL,
-    chain character varying(255) NOT NULL,
-    event_name character varying(255) NOT NULL,
-    event_network character varying(255),
-    queued smallint DEFAULT 0 NOT NULL
-);
-
-
---
--- TOC entry 216 (class 1259 OID 16480)
+-- TOC entry 218 (class 1259 OID 23441099)
 -- Name: ChainEvents; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public."ChainEvents" (
     id integer NOT NULL,
-    chain_event_type_id character varying(255) NOT NULL,
     block_number integer NOT NULL,
     event_data jsonb NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     entity_id integer,
-    queued smallint DEFAULT 0 NOT NULL
+    queued smallint DEFAULT 0 NOT NULL,
+    network character varying(255) NOT NULL,
+    chain_name character varying(255) NOT NULL,
+    contract_address character varying(255)
 );
 
 
 --
--- TOC entry 217 (class 1259 OID 16486)
+-- TOC entry 219 (class 1259 OID 23441105)
 -- Name: ChainEvents_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -134,8 +140,8 @@ CREATE SEQUENCE public."ChainEvents_id_seq"
 
 
 --
--- TOC entry 4350 (class 0 OID 0)
--- Dependencies: 217
+-- TOC entry 3453 (class 0 OID 0)
+-- Dependencies: 219
 -- Name: ChainEvents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -143,7 +149,19 @@ ALTER SEQUENCE public."ChainEvents_id_seq" OWNED BY public."ChainEvents".id;
 
 
 --
--- TOC entry 218 (class 1259 OID 16487)
+-- TOC entry 222 (class 1259 OID 23639596)
+-- Name: EventOrigins; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."EventOrigins" (
+    id character varying(255),
+    name character varying(255),
+    address character varying(255)
+);
+
+
+--
+-- TOC entry 220 (class 1259 OID 23441106)
 -- Name: SequelizeMeta; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -153,7 +171,7 @@ CREATE TABLE public."SequelizeMeta" (
 
 
 --
--- TOC entry 4179 (class 2604 OID 16490)
+-- TOC entry 3284 (class 2604 OID 23441109)
 -- Name: ChainEntities id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -161,7 +179,7 @@ ALTER TABLE ONLY public."ChainEntities" ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 4182 (class 2604 OID 16491)
+-- TOC entry 3286 (class 2604 OID 23441110)
 -- Name: ChainEvents id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -169,46 +187,1732 @@ ALTER TABLE ONLY public."ChainEvents" ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 4342 (class 0 OID 16487)
--- Dependencies: 218
+-- TOC entry 3444 (class 0 OID 23639596)
+-- Dependencies: 222
+-- Data for Name: EventOrigins; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public."EventOrigins" (id, name, address) FROM stdin;
+beanstalk	Ethereum (Mainnet)	0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5
+dao-masters	Ethereum (Mainnet)	0x7F6B4d98789d283622D6B85d0efa3a7928C59B89
+peso	Polygon (Mumbai)	0x6e9659d35c2012fe4CE158424d2C2C9d6C89C0cC
+lico-token	BSC	0x4F3266a56589357B4f8082918b14B923693e57f0
+hhstaking	Matic	0xFB37a81dfEE68A897060f805016fbC47727C1f59
+dopex	Ethereum (Mainnet)	0xeec2be5c91ae7f8a338e1e5f3b5de49d07afdc81
+rug-dao	Ethereum (Mainnet)	0x6235CAEea7C515DaC14060Ec23a760090655F21b
+sporosdao	Arbitrum (Mainnet)	0x28FEac06Dc72188b385478b507f7c7a39a7026d5
+neuron	Ethereum (Mainnet)	0xAD447b514a6b365af81B7646Bdc976Ae36C1D2D1
+daopunks	Ethereum (Mainnet)	0x700f045de43fce6d2c25df0288b41669b7566bbe
+apeswap	BSC	0xddb3bd8645775f59496c821e4f55a7ea6a6dc299
+clone-x-x-takashi-murakami	Ethereum (Mainnet)	0x09fECB9B9fafd7032ACd9e807f1E5E6B4A2833f1
+we-are-all-going-to-die	Ethereum (Mainnet)	0x659A4BdaAaCc62d2bd9Cb18225D9C89b5B697A5A
+blockchainspace	Ethereum (Mainnet)	0x83e9f223e1edb3486f876ee888d76bfba26c475a
+haqq	Matic	0x9c891326Fd8b1a713974f73bb604677E1E63396D
+ankr-forum	Ethereum (Mainnet)	0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4
+voteescrowed-insure	Ethereum (Mainnet)	0x3dc07E60ecB3d064d20c386217ceeF8e3905916b
+passportoffreeland	Matic	0x62f05d429fb3b2583B7535EC62b8213032504193
+harmonyone	Ethereum (Mainnet)	0x799a4202c12ca952cB311598a024C80eD371a41e
+spiritswap	Fantom	0x2FBFf41a9efAEAE77538bd63f1ea489494acdc08
+exodia	Fantom	0x3b57f3FeAaF1e8254ec680275Ee6E7727C7413c7
+agave	xDAI	0x610525b415c1BFAeAB1a3fc3d85D87b92f048221
+kylin-network	Ethereum (Mainnet)	0x67b6d479c7bb412c54e03dca8e1bc6740ce6b99c
+bitdao	Ethereum (Mainnet)	0x1a4b46696b2bb4794eb3d4c26f1c55f9170fa4c5
+quant	Ethereum (Mainnet)	0x4a220e6096b25eadb88358cb44068a3248254675
+lobis	Ethereum (Mainnet)	0xdec41db0c33f3f6f3cb615449c311ba22d418a8d
+lyra	Ethereum (Mainnet)	0x01BA67AAC7f75f647D94220Cc98FB30FCc5105Bf
+alpha-finance	Ethereum (Mainnet)	0xa1faa113cbe53436df28ff0aee54275c13b40975
+apecoin	Ethereum (Mainnet)	0x4d224452801ACEd8B2F0aebE155379bb5D594381
+rari-governance-tok	Ethereum (Mainnet)	0xd291e7a03283640fdc51b121ac401383a46cc623
+moonbirds	Ethereum (Mainnet)	0x23581767a106ae21c074b2276d25e5c3e136a68b
+fiat-dao	Ethereum (Mainnet)	0xed1480d12be41d92f36f5f7bdd88212e381a3677
+affiliate-dao	Matic	0x36a74ad5653fc7b9580039dab423b8deb1a97092
+phonon-dao	Ethereum (Mainnet)	0x758B4684BE769E92eeFeA93f60DDA0181eA303Ec
+divine-dao	Ethereum (Mainnet)	0xB5e09e6Bf6a5E96934B3fd99a40F7EDACa1173Ed
+polygon	Ethereum (Mainnet)	0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0
+dodo	Ethereum (Mainnet)	0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd
+zapper-dao	Ethereum (Mainnet)	0xfaff15c6cdaca61a4f87d329689293e07c98f578
+redacted-cartel	Ethereum (Mainnet)	0xcc94faf235cc5d3bf4bed3a30db5984306c86abc
+hummingbot-foundation	Ethereum (Mainnet)	0xE5097D9baeAFB89f9bcB78C9290d545dB5f9e9CB
+banana-finance	Ethereum (Mainnet)	0x21f54372c07b930b79c5c2d9bb0eaaca86c3b298
+hashes	Ethereum (Mainnet)	0xD07e72b00431af84AD438CA995Fd9a7F0207542d
+ideamarket	Arbitrum (Mainnet)	0xC6C77506134cFc29E62cF35cEb2b964bE313FBC9
+1inch	Ethereum (Mainnet)	0x111111111117dc0aa78b770fa6a738034120c302
+bankless-dao	Ethereum (Mainnet)	0x2d94aa3e47d9d5024503ca8491fce9a2fb4da198
+notional	Ethereum (Mainnet)	0xCFEAead4947f0705A14ec42aC3D44129E1Ef3eD5
+cypherpunk-zero	Ethereum (Mainnet)	0x3e86d6cf041b719c575f57050697c115f0a53758
+sperax	Arbitrum (Mainnet)	0x5575552988A3A80504bBaeB1311674fCFd40aD4B
+showtime-launches-free-nfts	Matic	0x6AD5d231222506a924413F543E0FCD3c2207cbd1
+sagamore	Ethereum (Mainnet)	0xf7a3f84B278e999965b4692E5D09F8BBAcC2C0f3
+luxy	Matic	0xd4945a3d0de9923035521687d4bf18cc9b0c7c2a
+fa-dao	Matic	0x9C492cab368D1aF9f36b4575d817299cF1aad55F
+plutus	Arbitrum (Mainnet)	0x51318B7D00db7ACc4026C88c3952B66278B6A67F
+soongovernance	Ethereum (Mainnet)	0xaA2C0cf54cB418eB24E7e09053B82C875C68bb88
+orange-dao	Ethereum (Mainnet)	0x1bBD79f1Ecb3f2cCC586A5E3A26eE1d1D2E1991f
+swaggylions-club	Matic	0x687171b34344B18489095bAce3C9196AE012A553
+reputable	Matic	0xbe5825728410c8C36036D0d22EAcd24c19616F2C
+cf-vote-token	Ethereum (Ropsten)	0xda71208E149AEB4674B2773F33CB69cBcae1ABf1
+local-cf-vote-token	Ethereum (Ropsten)	0xe1F6f56Eb89175Cdf35a80A3477d8e4F67af67fF
+muhaha	Ethereum (Mainnet)	0xE31574a4a08bC16205D472eaC6379551a90B58D2
+pace	Ethereum (Mainnet)	0xBd3ed2ec7143BFF88b24Ce9cBDfd0e62Aa410534
+flexusd	Ethereum (Mainnet)	0xa774ffb4af6b0a91331c084e1aebae6ad535e6f3
+mtest	Celo	0x2E9f8C5b7d7bC46cB350A3FdCe33538418D114fA
+mtest122	Celo	0x4CE371b7477C09791a07bA6Ab5507f0EA1B0BbA6
+coinflex	Ethereum (Mainnet)	0x14c92fA89A2322fD2fcC928620ac67503c05627B
+apeswapnft	BSC	0x78d864ad0F19Aa50053295e900124A0d8A164f86
+seachain	BSC	0x36b24b2f78725495e858af9e72f7df69dade3dca
+awm-club	Ethereum (Mainnet)	0x7032e8CafbefBdCc2aAE25300e2Cff34D05789f0
+younicorn	Ethereum (Mainnet)	0x088782255Ca6c99cAbB635208eD5b95e42162fD7
+moola-market	Celo	0xde457ed1A713C290C4f8dE1dE0D0308Fc7722937
+cryptokitties	Ethereum (Mainnet)	0x06012c8cf97BEaD5deAe237070F9587f8E7A266d
+stagecf	Ethereum (Mainnet)	0x770A6fCE0E3277d57415b08e867f81Cfc9095bd5
+moola	BSC	0xbddd7d426274fc5f370817c80c06b86d651963e4
+treasure-dao	Arbitrum (Mainnet)	0x51Fc5F5319E96157B32b15a12B408d4798f8BF16
+ma-sorare	Matic	0x31dFFd763acfeeA5F03DFE0F51D69D84d63D8733
+radiant	Arbitrum (Mainnet)	0x0C4681e6C0235179ec3D4F4fc4DF3d14FDD96017
+humans	Ethereum (Mainnet)	0x8fac8031e079f409135766c7d5de29cf22ef897c
+community-trial	Ethereum (Mainnet)	0x301A373beBF0160c0583394855D5b10d00a4168a
+vitae3	Matic	0x663C213D13BcD5B496055bF8Acd783f174055895
+latticegovernancetoken	Ethereum (Mainnet)	0xc6a22cc9acd40b4f31467a3580d4d69c3387f349
+synapse-protocol	Ethereum (Mainnet)	0x0f2d719407fdbeff09d87557abb7232601fd9f29
+lattice-gateway	Ethereum (Mainnet)	0xC6A22CC9aCD40b4f31467a3580d4D69C3387F349
+ch-wagmi	Ethereum (Mainnet)	0x45f731995da303a7618ec14eccc0d33293027711
+wonderland	Ethereum (Mainnet)	0x355D72Fb52AD4591B2066E43e89A7A38CF5cb341
+beta-finance	Ethereum (Mainnet)	0xbe1a001fe942f96eea22ba08783140b9dcc09d28
+amaten	Ethereum (Mainnet)	0x2509ee05b8df07ec75046e24bbf1cfcdb8b2a183
+scream	Fantom	0xe0654C8e6fd4D733349ac7E09f6f23DA256bF475
+tokenlon	Ethereum (Mainnet)	0x0000000000095413afc295d19edeb1ad7b71c952
+green-light	Ethereum (Mainnet)	0x70fadbe1f2cccbaf98ac88fdcf94a0509a48e46d
+blockhub-dao	Ethereum (Mainnet)	0xc3ea6b85f936d0ea78da293ad6aea65b0c59fb25
+scrv	Ethereum (Mainnet)	0xd38aeb759891882e78e957c80656572503d8c1b1
+rally	Ethereum (Mainnet)	0xf1f955016ecbcd7321c7266bccfb96c68ea5e49b
+pegasus	Ethereum (Mainnet)	0x931ad0628aa11791c26ff4d41ce23e40c31c5e4e
+finest	Solana (Mainnet beta)	v8GkhmcqNLeu6mm8GPnCcomDG2AP2DT3ui6mknZ79mb
+reportingtoken	Ethereum (Mainnet)	0x190dA1B9fA124BD872e9166bA3c7Dd656A11E8F8
+crust-network	Ethereum (Mainnet)	0x32a7c02e79c4ea1008dd6564b35f131428673c41
+aavegotchi	Ethereum (Mainnet)	0x3f382dbd960e3a9bbceae22651e88158d2791550
+azuki	Ethereum (Mainnet)	0x910524678c0b1b23ffb9285a81f99c29c11cbaed
+masknetwork	Ethereum (Mainnet)	0x69af81e73a73b40adf4f3d4223cd9b1ece623074
+aave	Ethereum (Mainnet)	0xEC568fffba86c094cf06b22134B23074DFE2252c
+tribe	Ethereum (Mainnet)	0x0BEF27FEB58e857046d630B2c03dFb7bae567494
+abracadabra-money	Ethereum (Mainnet)	0x26fa3fffb6efe8c1e69103acb4044c26b9a106a9
+singularitydao	Ethereum (Mainnet)	0x993864e43caa7f7f12953ad6feb1d1ca635b875f
+bethereum	Ethereum (Mainnet)	0x14c926f2290044b647e1bf2072e67b495eff1905
+tokemak	Ethereum (Mainnet)	0x2e9d63788249371f1dfc918a52f8d799f4a38c94
+terran-coin	Ethereum (Mainnet)	0x490e3f4af13e1616ec97a8c6600c1061a8d0253e
+yearn-finance	Ethereum (Mainnet)	0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e
+eosdac	Ethereum (Mainnet)	0x7e9e431a0b8c4d532c745b1043c7fa29a48d4fba
+bitchcoin	Ethereum (Mainnet)	0x5e86F887fF9676a58f25A6E057B7a6B8d65e1874
+snoop-doge	Ethereum (Mainnet)	0x072c46f392e729c1f0d92a307c2c6dba06b5d078
+linksdao	Ethereum (Mainnet)	0x696115768BBEf67Be8bd408d760332A7EfbEE92D
+earnbase	Ethereum (Mainnet)	0xa6fb1df483b24eeab569e19447e0e107003b9e15
+spartacus-dao	Fantom	0x5602df4a94eb6c680190accfa2a475621e0ddbdc
+hector-dao	Fantom	0x5c4fdfc5233f935f20d2adba572f770c2e377ab0
+forcer	Ethereum (Mainnet)	0xc1fb6c015fc535abd331d3029de76a62e412fb23
+rss3	Ethereum (Mainnet)	0xc98D64DA73a6616c42117b582e832812e7B8D57F
+morpheus-labs	Ethereum (Mainnet)	0x4a527d8fc13c5203ab24ba0944f4cb14658d1db6
+doubloon-token	Arbitrum (Mainnet)	0xd3f1da62cafb7e7bc6531ff1cef6f414291f03d3
+compound	Ethereum (Mainnet)	0xc00e94cb662c3520282e6f5717214004a7f26888
+morpheus-swap	Fantom	0xB66b5D38E183De42F21e92aBcAF3c712dd5d6286
+vulcan-forged	Ethereum (Mainnet)	0x9534ad65fb398e27ac8f4251dae1780b989d136e
+buzzed-bear-hideout	Ethereum (Mainnet)	0x4923017F3B7fAC4e096b46e401c0662F0B7E393f
+badger-dao	Ethereum (Mainnet)	0x3472a5a71965499acd81997a54bba8d852c6e53d
+populous	Ethereum (Mainnet)	0xd4fa1460f537bb9085d22c7bccb5dd450ef28e3a
+linear	Ethereum (Mainnet)	0x3e9bc21c9b189c09df3ef1b824798658d5011937
+celer-network	Ethereum (Mainnet)	0x4f9254c83eb525f9fcf346490bbb3ed28a81c667
+hzb	Solana (Mainnet beta)	EgunFXyGMyGkAy5mWhL1CcHT9RqDTn9vE1HWEbF7jMkC
+education-ecosystem	Ethereum (Mainnet)	0x5b26c5d0772e5bbac8b3182ae9a13f9bb2d03765
+oi-kattoi	Solana (Mainnet beta)	BuV1JEQexEsYXFpJmEAQLXJVUVzYYkjYpGc6wsp1LFcD
+fortuna-dao	Ethereum (Mainnet)	0xf5206C274B85D89aDA9DF34aEb2071126583Abdd
+ki	Ethereum (Mainnet)	0x4f6103bad230295bacf30f914fda7d4273b7f585
+circuits-of-value	Ethereum (Mainnet)	0x3d658390460295fb963f54dc0899cfb1c30776df
+phantom-dao-mainnet	Fantom	0x2B6BCCa642Aee17EfEDB45018fd111B190930421
+sentinel-old	Ethereum (Mainnet)	0xa44e5137293e855b1b7bc7e2c6f8cd796ffcb037
+project-inverse	Ethereum (Mainnet)	0x44f262622248027f8e2a8fb1090c4cf85072392c
+fingerprint	Ethereum (Mainnet)	0xd9a8cfe21c232d485065cb62a96866799d4645f7
+gameswap	Ethereum (Mainnet)	0xaac41ec512808d64625576eddd580e7ea40ef8b2
+jones-dao	Arbitrum (Mainnet)	0x10393c20975cf177a3513071bc110f7962cd67da
+autonomies-testnet-dao	Polygon (Mumbai)	0xac4610582926DcF22bf327AbB6F6aC82BD49FE0f
+royale	Ethereum (Mainnet)	0x7eaf9c89037e4814dc0d9952ac7f888c784548db
+multiverse	Ethereum (Mainnet)	0xc91b523a59acc63a64f61fc7bbfb4bfc82dd25f2
+ito-utility-token	Ethereum (Mainnet)	0xd36a0e7b741542208ae0fbb35453c893d0136625
+public-mint	Ethereum (Mainnet)	0x0cdf9acd87e940837ff21bb40c9fd55f68bba059
+allbridge	Ethereum (Mainnet)	0xa11bd36801d8fa4448f0ac4ea7a62e3634ce8c7c
+darwinia-network-na	Ethereum (Mainnet)	0x9469d013805bffb7d3debe5e7839237e535ec483
+alex	Ethereum (Mainnet)	0x8BA6DcC667d3FF64C1A2123cE72FF5F0199E5315
+forefront	Ethereum (Mainnet)	0x7e9d8f07a64e363e97a648904a89fb4cd5fb94cd
+babydoge-eth	Ethereum (Mainnet)	0xac8e13ecc30da7ff04b842f21a62a1fb0f10ebd5
+ftmguru	Fantom	0xf43Cc235E686d7BC513F53Fbffb61F760c3a1882
+radicle	Ethereum (Mainnet)	0x31c8eacbffdd875c74b94b077895bd78cf1e64a3
+defi-omega	Ethereum (Mainnet)	0xee3b9b531f4c564c70e14b7b3bb7d516f33513ff
+reserve	Ethereum (Mainnet)	0x196f4727526ea7fb1e17b2071b3d8eaa38486988
+tether-usd	Ethereum (Mainnet)	0xdAC17F958D2ee523a2206206994597C13D831ec7
+options-market	Ethereum (Mainnet)	0x9b75848172677042269c63365b57b0a51c21d031
+shapeshift-fox-toke	Ethereum (Mainnet)	0xc770eefad204b5180df6a14ee197d99d808ee52d
+gala	Ethereum (Mainnet)	0x15d4c048f83bd7e37d49ea4c83a07267ec4203da
+dehive	Ethereum (Mainnet)	0x62dc4817588d53a056cbbd18231d91ffccd34b2a
+harmony-nft-dao	Harmony	0xfb3b955e4a79ec5939915a3da9c6cab1a8e2b54f
+finance-vote	Ethereum (Mainnet)	0x45080a6531d671ddff20db42f93792a489685e32
+vesuvius	Ethereum (Mainnet)	0x383518188c0c6d7730d91b2c03a03c837814a899
+unmarshal	Ethereum (Mainnet)	0x5a666c7d92e5fa7edcb6390e4efd6d0cdd69cf37
+loom-network-new	Ethereum (Mainnet)	0x42476f744292107e34519f9c357927074ea3f75d
+waxe	Ethereum (Mainnet)	0x7a2bc711e19ba6aff6ce8246c546e8c4b4944dfd
+cosmo-coin	Ethereum (Mainnet)	0xd1e10c37a27d95d95720291b1dc6f12f74c71443
+write	Ethereum (Mainnet)	0x622236bb180256b6ae1a935dae08dc0356141632
+alpha-token	Ethereum (Mainnet)	0xffc63b9146967a1ba33066fb057ee3722221acf0
+snglsdao-governance	Ethereum (Mainnet)	0xc4199fb6ffdb30a829614beca030f9042f1c3992
+open-governance-tok	Ethereum (Mainnet)	0x69e8b9528cabda89fe846c67675b5d73d463a916
+impossible-finance	Ethereum (Mainnet)	0xb0e1fc65c1a741b4662b813eb787d369b8614af1
+telcoin	Ethereum (Mainnet)	0x467bccd9d29f223bce8043b84e8c8b282827790f
+ribbon	Ethereum (Mainnet)	0x6123B0049F904d730dB3C36a31167D9d4121fA6B
+sunder-goverance-to	Ethereum (Mainnet)	0xbdbf245c690d54b67c6e610a28486a2c6de08be6
+malayan-ducat-council	Matic	0x2ad37791A88E79434900352B57E1dF45dF98BB77
+insuretoken	Ethereum (Ropsten)	0x94a6e144117CC658C459dFeF4eF52Ed73b672c86
+lightitupdao	Harmony	0xf531d5b254643bEC0Fd0204079F4067215553520
+presearch	Ethereum (Mainnet)	0xec213f83defb583af3a000b1c0ada660b1902a0f
+lion	Ethereum (Mainnet)	0xD8Aaa606DBA50F7615Db4EBF0E439AF062BEfEb3
+pibble	Ethereum (Mainnet)	0x1864ce27e9f7517047933caae530674e8c70b8a7
+epns	Ethereum (Mainnet)	0xf418588522d5dd018b425E472991E52EBBeEEEEE
+mars-token	Ethereum (Mainnet)	0x4e30910845f0cb4f66781b35c832eafc09774022
+ethereum-push-notif	Ethereum (Mainnet)	0xf418588522d5dd018b425e472991e52ebbeeeeee
+fantom	Ethereum (Mainnet)	0x4e15361fd6b4bb609fa63c81a2be19d873717870
+anchor-protocol	Ethereum (Mainnet)	0x0f3adc247e91c3c50bc08721355a41037e89bc20
+opium	Ethereum (Mainnet)	0x888888888889c00c67689029d7856aac1065ec11
+lukso-token	Ethereum (Mainnet)	0xa8b919680258d369114910511cc87595aec0be6d
+balancer	Ethereum (Mainnet)	0xba100000625a3754423978a60c9317c58a424e3d
+gamestarter	Ethereum (Mainnet)	0xd567b5f02b9073ad3a982a099a23bf019ff11d1c
+carbon	Ethereum (Mainnet)	0xcdeee767bed58c5325f68500115d4b722b3724ee
+caave	Ethereum (Mainnet)	0xe65cdb6479bac1e22340e4e755fae7e509ecd06c
+assangedao	Ethereum (Mainnet)	0x59d1e836F7b7210A978b25a855085cc46fd090B5
+lambda	Ethereum (Mainnet)	0x8971f9fd7196e5cee2c1032b50f656855af7dd26
+decentragora-credits	Ethereum (Mainnet)	0xc4fa4C67deC29f710153C3f22Fe2949fD2A9Bcb8
+ash	Ethereum (Mainnet)	0x64d91f12ece7362f91a6f8e7940cd55f05060b92
+locgame	Ethereum (Mainnet)	0x60eb57d085c59932d5faa6c6026268a4386927d0
+bunnytoken	Ethereum (Mainnet)	0x755eb14d2feff2939eb3026f5cad9d03775b9ff4
+reserve-rights-toke	Ethereum (Mainnet)	0x8762db106b2c2a0bccb3a80d1ed41273552616e8
+happy-bunnies	Ethereum (Mainnet)	0x619d00fd13bf1204b67f2030ebaf6196f57e99a1
+whale	Ethereum (Mainnet)	0x9355372396e3F6daF13359B7b607a3374cc638e0
+uma	Ethereum (Mainnet)	0x04fa0d235c4abf4bcf4787af4cf447de572ef828
+spookyswap	Fantom	0x841fad6eae12c286d1fd18d1d525dffa75c7effe
+vemensa	Ethereum (Ropsten)	0xC43bDbb8004C718c7a666dc7cc0b49d90728Bef2
+sefi	Ethereum (Mainnet)	0x773258b03c730f84af10dfcb1bfaa7487558b8ac
+delta-exchange-toke	Ethereum (Mainnet)	0xab93df617f51e1e415b5b4f8111f122d6b48e55c
+derivadao	Ethereum (Mainnet)	0x3a880652f47bfaa771908c07dd8673a787daed3a
+uniqly	Ethereum (Mainnet)	0x3758e00b100876c854636ef8db61988931bb8025
+reflexer-ungovernan	Ethereum (Mainnet)	0x6243d8cea23066d098a15582d81a598b4e8391f4
+alchemist	Ethereum (Mainnet)	0x88acdd2a6425c3faae4bc9650fd7e27e0bebb7ab
+revv	Ethereum (Mainnet)	0x557b933a7c2c45672b610f8954a3deb39a51a8ca
+dogefi	Ethereum (Mainnet)	0x9b9087756eca997c5d595c840263001c9a26646d
+harvest-finance	Ethereum (Mainnet)	0xa0246c9032bc3a600820415ae600c6388619a14d
+golem	Ethereum (Mainnet)	0x7dd9c5cba05e151c895fde1cf355c9a1d5da6429
+rocket-pool	Ethereum (Mainnet)	0xb4efd85c19999d84251304bda99e90b92300bd93
+maker	Ethereum (Mainnet)	0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2
+convex-finance	Ethereum (Mainnet)	0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b
+holo	Ethereum (Mainnet)	0x6c6ee5e31d828de241282b9606c8e98ea48526e2
+karma-dao	Ethereum (Mainnet)	0xdfe691f37b6264a90ff507eb359c45d55037951c
+solareum	Ethereum (Mainnet)	0x56ee8c9bd1d445a3324ad83e86d8be309db8f85d
+utopia-genesis-foun	Ethereum (Mainnet)	0xe4ae84448db5cfe1daf1e6fb172b469c161cb85f
+popcorn-token	Ethereum (Mainnet)	0x3080ec2a6960432f179c66d388099a48e82e2047
+flux-token	Ethereum (Mainnet)	0x54735d716995071585a4f6ba341a6ded79756f09
+arbiswap	Ethereum (Mainnet)	0xad0887734461af8c6033068bde4047dbe84074cc
+cardstarter	Ethereum (Mainnet)	0x3d6f0dea3ac3c607b3998e6ce14b6350721752d9
+seen	Ethereum (Mainnet)	0xca3fe04c7ee111f0bbb02c328c699226acf9fd33
+delta-financial	Ethereum (Mainnet)	0x9ea3b5b4ec044b70375236a281986106457b20ef
+algovest	Ethereum (Mainnet)	0x94d916873b22c9c1b53695f1c002f78537b9b3b2
+alphadex	Ethereum (Mainnet)	0x3516415161c478df10adbb8bb884cc83fbd5f11a
+epik-protocol	Ethereum (Mainnet)	0xdaf88906ac1de12ba2b1d2f7bfc94e9638ac40c4
+coldstack	Ethereum (Mainnet)	0x675bbc7514013e2073db7a919f6e4cbef576de37
+verasity	Ethereum (Mainnet)	0xf411903cbc70a74d22900a5de66a2dda66507255
+graphlinq-protocol	Ethereum (Mainnet)	0x9f9c8ec3534c3ce16f928381372bfbfbfb9f4d24
+staker-dao	Ethereum (Mainnet)	0x89dcff5fd892f2bfc8b75dba12804b651f769579
+mstable-governance	Ethereum (Mainnet)	0xa3bed4e1c75d00fa6f4e5e6922db7261b5e9acd2
+frax	Ethereum (Mainnet)	0xd74034C6109A23B6c7657144cAcBbBB82BDCB00E
+funtoken	Ethereum (Mainnet)	0x419d0d8bdd9af5e606ae2232ed285aff190e711b
+fuse	Ethereum (Mainnet)	0x970b9bb2c0444f5e81e9d0efb84c8ccdcdcaf84d
+paladin-protocol	Ethereum (Mainnet)	0xab846fb6c81370327e784ae7cbb6d6a6af6ff4bf
+aiwork	Ethereum (Mainnet)	0x68c85b9f78f30a0df5ac5723e4e700037f185415
+storj	Ethereum (Mainnet)	0xb64ef51c888972c908cfacf59b47c1afbc0ab8ac
+labra-finance	Ethereum (Mainnet)	0x106d3c66d22d2dd0446df23d7f5960752994d600
+uniswap	Ethereum (Mainnet)	0xC4e172459f1E7939D522503B81AFAaC1014CE6F6
+kine-protocol	Ethereum (Mainnet)	0xcbfef8fdd706cde6f208460f2bf39aa9c785f05d
+blackmoon-crypto	Ethereum (Mainnet)	0xdf6ef343350780bf8c3410bf062e0c015b1dd671
+staker-token	Ethereum (Mainnet)	0x426567f78e74577f8a6233b635970eb729631e05
+dai	Ethereum (Mainnet)	0x6b175474e89094c44da98b954eedeac495271d0f
+rai-finance	Ethereum (Mainnet)	0xf30547ff2df1f1cbe5c8dd758b3dd098c856e38f
+idle	Ethereum (Mainnet)	0x875773784af8135ea0ef43b5a374aad105c5d39e
+band-protocol	Ethereum (Mainnet)	0xba11d00c5f74255f56a5e366f4f77f5a186d7f55
+dafi-protocol	Ethereum (Mainnet)	0xfc979087305a826c2b2a0056cfaba50aad3e6439
+visor	Ethereum (Mainnet)	0xf938424f7210f31df2aee3011291b658f872e91e
+global-coin-researc	Ethereum (Mainnet)	0x6307b25a665efc992ec1c1bc403c38f3ddd7c661
+timers	Ethereum (Mainnet)	0x8feef860e9fa9326ff9d7e0058f637be8579cc29
+odinbrowser	Ethereum (Mainnet)	0x57c8d5d5b87a1580fdaf996cef674bb0d7f14c98
+yam	Ethereum (Mainnet)	0x0aacfbec6a24756c20d41914f2caba817c0d8521
+polkastarter	Ethereum (Mainnet)	0x83e6f1e41cdd28eaceb20cb649155049fac3d5aa
+kleros	Ethereum (Mainnet)	0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d
+fei-protocol	Ethereum (Mainnet)	0x956f47f50a910163d8bf957cf5846d573e7f87ca
+dracula-token	Ethereum (Mainnet)	0xb78b3320493a4efaa1028130c5ba26f0b6085ef8
+universe-xyz	Ethereum (Mainnet)	0x618679df9efcd19694bb1daa8d00718eacfa2883
+honey	Ethereum (Mainnet)	0xc3589f56b6869824804a5ea29f2c9886af1b0fce
+ethersocks	Ethereum (Mainnet)	0x300a902513815028e97fc79e92082ce6a98d3b74
+thorchain-erc20	Ethereum (Mainnet)	0x3155ba85d5f96b2d030a4966af206230e46849cb
+rac	Ethereum (Mainnet)	0xc22b30e4cce6b78aaaadae91e44e73593929a3e9
+dogeswap	Ethereum (Mainnet)	0xb4fbed161bebcb37afb1cb4a6f7ca18b977ccb25
+finexboxtoken	Ethereum (Mainnet)	0xe6d2c3cb986db66818c14c7032db05d1d2a6ee74
+polymath-network	Ethereum (Mainnet)	0x9992ec3cf6a55b00978cddf2b27bc6882d88d1ec
+eden	Ethereum (Mainnet)	0x1559FA1b8F28238FD5D76D9f434ad86FD20D1559
+amp	Ethereum (Mainnet)	0xff20817765cb7f73d4bde2e66e067e58d11095c2
+loot	Ethereum (Mainnet)	0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7
+crypto-international	Ethereum (Mainnet)	0x12E951934246186F50146235d541D3bD1D463E4d
+primedao	Ethereum (Mainnet)	0xe59064a8185ed1fca1d17999621efedfab4425c9
+thorstarter	Ethereum (Mainnet)	0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c
+dragonchain	Ethereum (Mainnet)	0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e
+gooddao	Ethereum (Mainnet)	0x603B8C0F110E037b51A381CBCacAbb8d6c6E4543
+volatilityprotocol	Ethereum (Mainnet)	0x5166e09628b696285e3a151e84fb977736a83575
+meebits-dao	Ethereum (Mainnet)	0x4eE4f96838454E67Fce92B2c53b0f1a97D047179
+librefreelencer	Ethereum (Mainnet)	0x449efe48ad7cd423bab056276639f8120cd4f9a3
+idex	Ethereum (Mainnet)	0xb705268213d593b8fd88d3fdeff93aff5cbdcfae
+quickswap	Ethereum (Mainnet)	0x6c28aef8977c9b773996d0e8376d2ee379446f2f
+skale	Ethereum (Mainnet)	0x00c83aecc790e8a4453e5dd3b0b4b3680501a7a7
+dsla	Ethereum (Mainnet)	0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe
+anata	Ethereum (Mainnet)	0xf729f878F95548BC7F14B127c96089cf121505F8
+avastar-founder-43	Ethereum (Mainnet)	0x96fF8715B2f8C769C93244C07b0EdE45bCc54F7B
+apple-network	Ethereum (Mainnet)	0x3c45b24359fb0e107a4eaa56bd0f2ce66c99a0e5
+caspian	Ethereum (Mainnet)	0xa6446d655a0c34bc4f05042ee88170d056cbaf45
+curve-dao-token	Ethereum (Mainnet)	0xd533a949740bb3306d119cc777fa900ba034cd52
+lido-dao	Ethereum (Mainnet)	0x5a98fcbea516cf06857215779fd812ca3bef1b32
+daohaus	Ethereum (Mainnet)	0xf2051511b9b121394fa75b8f7d4e7424337af687
+governor-dao	Ethereum (Mainnet)	0x515d7e9d75e2b76db60f8a051cd890eba23286bc
+friends-with-benefi	Ethereum (Mainnet)	0x35bd01fc9d6d5d81ca9e055db88dc49aa2c699a8
+the-graph	Ethereum (Mainnet)	0xc944e90c64b2c07662a292be6244bdf05cda44a7
+unisocks	Ethereum (Mainnet)	0x23b608675a2b2fb1890d3abbd85c5775c51691d5
+barnbridge	Ethereum (Mainnet)	0x0391D2021f89DC339F60Fff84546EA23E337750f
+mars	Ethereum (Mainnet)	0x66c0dded8433c9ea86c8cf91237b14e10b4d70b7
+tracer	Ethereum (Mainnet)	0x9c4a4204b79dd291d6b6571c5be8bbcd0622f050
+bridge-token	BSC	0x1562c99ad7179b7D1d862fF4E8BfF6CC016a97ee
+good	Matic	0x482D5046f9813a04c8fd946245f67769FA74Cd99
+reef-finance	Ethereum (Mainnet)	0xfe3e6a25e6b192a42a44ecddcd13796471735acf
+dao-maker	Ethereum (Mainnet)	0x0f51bb10119727a7e5ea3538074fb341f56b09ad
+essentia	Ethereum (Mainnet)	0xfc05987bd2be489accf0f509e44b0145d68240f7
+origin-protocol	Ethereum (Mainnet)	0x8207c1ffc5b6804f6024322ccf34f29c3541ae26
+uno-re	Ethereum (Mainnet)	0x474021845c4643113458ea4414bdb7fb74a01a77
+nft-protocol	Ethereum (Mainnet)	0xcb8d1260f9c92a3a545d409466280ffdd7af7042
+orchid	Ethereum (Mainnet)	0x4575f41308EC1483f3d399aa9a2826d74Da13Deb
+marblecoin	Ethereum (Mainnet)	0x8888889213DD4dA823EbDD1e235b09590633C150
+ampleforth	Ethereum (Mainnet)	0xd46ba6d942050d489dbd938a2c909a5d5039a161
+dogen-finance	Ethereum (Mainnet)	0x17eb50fdd2995696ee82912a80a9766fcbb0ecca
+iexec-rlc	Ethereum (Mainnet)	0x607f4c5bb672230e8672085532f7e901544a7375
+nest-protocol	Ethereum (Mainnet)	0x04abeda201850ac0124161f037efd70c74ddc74c
+stakewise	Ethereum (Mainnet)	0x48c3399719b582dd63eb5aadf12a40b4c3f52fa2
+unique-one	Ethereum (Mainnet)	0x93dfaf57d986b9ca77df9376c50878e013d9c7c8
+sora	Ethereum (Mainnet)	0x40fd72257597aa14c7231a7b1aaa29fce868f677
+gnosis	Ethereum (Mainnet)	0x6810e776880c02933d47db1b9fc05908e5386b96
+chiliz	Ethereum (Mainnet)	0x3506424f91fd33084466f402d5d97f05f8e3b4af
+singularitynet	Ethereum (Mainnet)	0x5b7533812759b45c2b44c19e320ba2cd2681b542
+dopedao	Ethereum (Mainnet)	0x7ae1d57b58fa6411f32948314badd83583ee0e8c
+paper	Ethereum (Mainnet)	0xddce093888c8dc636677cd29bc6c68d35cfdac33
+yearofthebanner	Ethereum (Mainnet)	0xF642FB8A7cD8e52f71117F9cd2680755F35a5599
+pooltogether	Ethereum (Mainnet)	0x0cec1a9154ff802e7934fc916ed7ca50bde6844e
+gearbox	Ethereum (Mainnet)	0xba3335588d9403515223f109edc4eb7269a9ab5d
+bloom	Ethereum (Mainnet)	0x107c4504cd79c5d2696ea0030a8dd4e92601b82e
+dope	Ethereum (Mainnet)	0x8707276df042e89669d69a177d3da7dc78bd8723
+carbon-utility-toke	Ethereum (Mainnet)	0xe2da716381d7e0032cecaa5046b34223fc3f218d
+candle	Ethereum (Mainnet)	0xbc138bd20c98186cc0342c8e380953af0cb48ba8
+bitpanda-ecosystem	Ethereum (Mainnet)	0x1b073382e63411e3bcffe90ac1b9a43fefa1ec6f
+trustlines-network	Ethereum (Mainnet)	0x679131f591b4f369acb8cd8c51e68596806c3916
+get-protocol	Ethereum (Mainnet)	0x8a854288a5976036a725879164ca3e91d30c6a1b
+bootleg-nft	Ethereum (Mainnet)	0xc8ce75f643ecad864fc625902a6a07371f38320d
+kyber-network-crystal	Ethereum (Mainnet)	0xdd974D5C2e2928deA5F71b9825b8b646686BD200
+dxdao	Ethereum (Mainnet)	0xa1d65e8fb6e87b60feccbc582f7f97804b725521
+ftx-token	Ethereum (Mainnet)	0x50d1c9771902476076ecfc8b2a83ad6b9355a4c9
+dextf	Ethereum (Mainnet)	0x5f64ab1544d28732f0a24f4713c2c8ec0da089f0
+decentraland	Ethereum (Mainnet)	0x0f5d2fb29fb7d3cfee444a200298f468908cc942
+telos	Ethereum (Mainnet)	0x7825e833d495f3d1c28872415a4aee339d26ac88
+polkaswap	Ethereum (Mainnet)	0x519c1001d550c0a1dae7d1fc220f7d14c2a521bb
+apy-finance	Ethereum (Mainnet)	0x95a4492f028aa1fd432ea71146b433e7b4446611
+ionchain	Ethereum (Mainnet)	0xbc647aad10114b89564c0a7aabe542bd0cf2c5af
+jewel	Ethereum (Mainnet)	0x8275ebf521dc217aa79c88132017a5bcef001dd9
+infinity-token	Ethereum (Mainnet)	0x7fe4fbad1fee10d6cf8e08198608209a9275944c
+indexed-finance	Ethereum (Mainnet)	0x86772b1409b61c639eaac9ba0acfbb6e238e5f83
+celsius-network	Ethereum (Mainnet)	0xaaaebe6fe48e54f431b0c390cfaf0b017d09d42d
+injective-protocol	Ethereum (Mainnet)	0xe28b3b32b6c345a34ff64674606124dd5aceca30
+shiba-inu	Ethereum (Mainnet)	0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce
+dogelon-mars	Ethereum (Mainnet)	0x761d38e5ddf6ccf6cf7c55759d5210750b5d60f3
+sushi	Ethereum (Mainnet)	0x6b3595068778dd592e39a122f4f5a5cf09c90fe2
+onchainmonkey	Ethereum (Mainnet)	0x960b7a6bcd451c9968473f7bbfd9be826efd549a
+susd	Ethereum (Mainnet)	0x57ab1ec28d129707052df4df418d58a2d46d5f51
+community-token	Ethereum (Mainnet)	0x1b4052d98fb1888c2bf3b8d3b930e0aff8a910df
+commons-earth	Ethereum (Mainnet)	0xcae838187c1f813fc3bfae6387bf34aeacb5bef6
+keep-network	Ethereum (Mainnet)	0x85eee30c52b0b379b046fb0f85f4f3dc3009afec
+union-protocol-gove	Ethereum (Mainnet)	0x226f7b842e0f0120b7e194d05432b3fd14773a9d
+chainlink	Ethereum (Mainnet)	0x514910771af9ca656af840dff83e8264ecf986ca
+celo	Celo	0xA87710B8DC870483a2bE526EBca9F5048720eDce
+bella-protocol	Ethereum (Mainnet)	0xa91ac63d040deb1b7a5e4d4134ad23eb0ba07e14
+tranquil	Harmony	0xcf1709ad76a79d5a60210f23e81ce2460542a836
+bifrost	Ethereum (Mainnet)	0x0c7d5ae016f806603cb1782bea29ac69471cab9c
+vegawallet-token	Ethereum (Mainnet)	0x94236591125e935f5ac128bb3d5062944c24958c
+polkadex	Ethereum (Mainnet)	0xf59ae934f6fe444afc309586cc60a84a0f89aaea
+dotmoovs	Ethereum (Mainnet)	0x24ec2ca132abf8f6f8a6e24a1b97943e31f256a7
+0x	Ethereum (Mainnet)	0xe41d2489571d322189246dafa5ebde1f4699f498
+augur	Ethereum (Mainnet)	0x221657776846890989a759ba2973e427dff5c9bb
+gooddollar	Ethereum (Mainnet)	0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B
+kirobo	Ethereum (Mainnet)	0xb1191f691a355b43542bea9b8847bc73e7abb137
+apenft	Ethereum (Mainnet)	0xef40b859d21e4d566a3d713e756197c021bffaaa
+okexchain	Ethereum (Mainnet)	0x7f67ffcaf6362f3e45ccb09e512770c0fd2ac42a
+aleph-im	Ethereum (Mainnet)	0x27702a26126e0b3702af63ee09ac4d1a084ef628
+parallel	Ethereum (Mainnet)	0x68037790a0229e9ce6eaa8a99ea92964106c4703
+livepeer	Ethereum (Mainnet)	0x58b6a8a3302369daec383334672404ee733ab239
+1x-short-bnb-token	Ethereum (Mainnet)	0x2840ad41cf25ad58303ba24c416e79dce4161b4f
+magic	Harmony	0x892d81221484f690c0a97d3dd18b9144a3ecdfb7
+one	Ethereum (Mainnet)	0x946551dd05c5abd7cc808927480225ce36d8c475
+unilend-finance	Ethereum (Mainnet)	0x0202be363b8a4820f3f4de7faf5224ff05943ab1
+growth-defi	Ethereum (Mainnet)	0x09e64c2b61a5f1690ee6fbed9baf5d6990f8dfd0
+serum	Ethereum (Mainnet)	0x476c5e26a75bd202a9683ffd34359c0cc15be0ff
+rarible	Ethereum (Mainnet)	0xfca59cd816ab1ead66534d82bc21e7515ce441cf
+genomesdao-pos	Matic	0x34667ED7C36cBBbF2d5d5c5c8d6Eb76a094EDb9F
+selenium	Ethereum (Mainnet)	0x2ac22ebc138ff127566f68db600addad7df38d38
+terrausd	Ethereum (Mainnet)	0xa47c8bf37f92abed4a126bda807a7b7498661acd
+chihua-token	Ethereum (Mainnet)	0x26ff6d16549a00ba8b36ce3159b5277e6e798d18
+doge-killer	Ethereum (Mainnet)	0x27c70cd1946795b66be9d954418546998b546634
+fox-token	Ethereum (Mainnet)	0xc770eefad204b5180df6a14ee197d99d808ee52d
+vitadao	Ethereum (Mainnet)	0x81f8f0bb1cb2a06649e51913a151f0e7ef6fa321
+truebit-protocol	Ethereum (Mainnet)	0xf65b5c5104c4fafd4b709d9d60a185eae063276c
+metricexchange	Ethereum (Mainnet)	0xefc1c73a3d8728dc4cf2a18ac5705fe93e5914ac
+dfx-finance	Ethereum (Mainnet)	0x888888435fde8e7d4c54cab67f206e4199454c60
+matrexcoin	Ethereum (Mainnet)	0xc3e2de0b661cf58f66bde8e896905399ded58af5
+nftlootbox	Ethereum (Mainnet)	0x7b3d36eb606f873a75a6ab68f8c999848b04f935
+cocos-bcx	Ethereum (Mainnet)	0xc4c7ea4fab34bd9fb9a5e1b1a98df76e26e6407c
+bitcoinbrand	Ethereum (Mainnet)	0xf2cee90309418353a57717eca26c4f8754f0d84e
+work-quest	Ethereum (Mainnet)	0x06677dc4fe12d3ba3c7ccfd0df8cd45e4d4095bf
+the-people-s-coin	Ethereum (Mainnet)	0xe1030b48b2033314979143766d7dc1f40ef8ce11
+loopring	Ethereum (Mainnet)	0xbbbbca6a901c926f240b89eacb641d8aec7aeafd
+railgun	Ethereum (Mainnet)	0xe76c6c83af64e4c60245d8c7de953df673a7a33d
+sand	Ethereum (Mainnet)	0x3845badAde8e6dFF049820680d1F14bD3903a5d0
+b-protocol	Ethereum (Mainnet)	0xbbbbbbb5aa847a2003fbc6b5c16df0bd1e725f61
+api3	Ethereum (Mainnet)	0x0b38210ea11411557c13457d4da7dc6ea731b88a
+powertrade-fuel	Ethereum (Mainnet)	0xc57d533c50bc22247d49a368880fb49a1caa39f7
+poseidon-network	Ethereum (Mainnet)	0x2822f6d1b2f41f93f33d937bc7d84a8dfa4f4c21
+nexo	Ethereum (Mainnet)	0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206
+taklimakan-network	Ethereum (Mainnet)	0x2c36204a0712a2a50e54a62f7c4f01867e78cb53
+terablock	Ethereum (Mainnet)	0xa1ed0364d53394209d61ae8bfdb8ff50484d8c91
+human-protocol	Ethereum (Mainnet)	0xd1ba9bac957322d6e8c07a160a3a8da11a0d2867
+meeb-vault-nftx	Ethereum (Mainnet)	0x641927e970222b10b2e8cdbc96b1b4f427316f16
+plasma-finance	Ethereum (Mainnet)	0x054d64b73d3d8a21af3d764efd76bcaa774f3bb2
+hoge-finance	Ethereum (Mainnet)	0xfad45e47083e4607302aa43c65fb3106f1cd7607
+harrison-first	Ethereum (Mainnet)	0x9903A4Cd589DA8e434f264deAFc406836418578E
+sensitrust	Ethereum (Mainnet)	0x04e0af0af1b7f0023c6b12af5a94df59b0e8cf59
+boringdao	Ethereum (Mainnet)	0xbc19712feb3a26080ebf6f2f7849b417fdd792ca
+juicebox-dao	Ethereum (Mainnet)	0x3abf2a4f8452ccc2cf7b4c1e4663147600646f66
+proof-of-attendance-protocol	Ethereum (Mainnet)	0x22c1f6050e56d2876009903609a2cc3fef83b415
+xmon	Ethereum (Mainnet)	0x3aada3e213abf8529606924d8d1c55cbdc70bf74
+stargatetoken	Ethereum (Mainnet)	0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6
+piedao-btc	Ethereum (Mainnet)	0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd
+katana-finance	Ethereum (Mainnet)	0xe6410569602124506658ff992f258616ea2d4a3d
+freeway-token	Ethereum (Mainnet)	0xf151980e7a781481709e8195744bf2399fb3cba4
+one-genesis	Ethereum (Mainnet)	0x8a4491936a8e5a1662c8a755932b83dbe9634b0d
+cream	Ethereum (Mainnet)	0x2ba592f78db6436527729929aaf6c908497cb200
+alatelecoin-markets	Ethereum (Mainnet)	0x3ad2e9b136d0107c35af53c4ec703994e1f28415
+saddle-dao	Ethereum (Mainnet)	0xf1dc500fde233a4055e25e5bbf516372bc4f6871
+raid-guild	Ethereum (Mainnet)	0x154e35c2b0024b3e079c5c5e4fc31c979c189ccb
+tellor	Ethereum (Mainnet)	0x88dF592F8eb5D7Bd38bFeF7dEb0fBc02cf3778a0
+mothership	Ethereum (Mainnet)	0x68aa3f232da9bdc2343465545794ef3eea5209bd
+yieldguildgames	Ethereum (Mainnet)	0x25f8087ead173b73d6e8b84329989a8eea16cf73
+proof-of-humanity	Ethereum (Mainnet)	0xDd1Ad9A21Ce722C151A836373baBe42c868cE9a4
+bent-finance	Ethereum (Mainnet)	0x01597E397605Bf280674Bf292623460b4204C375
+insurace	Ethereum (Mainnet)	0x544c42fbb96b39b21df61cf322b5edc285ee7429
+component	Ethereum (Mainnet)	0x9f20ed5f919dc1c1695042542c13adcfc100dcab
+themis	Ethereum (Mainnet)	0xcd1cb16a67937ff8af5d726e2681010ce1e9891a
+cre8r	Ethereum (Mainnet)	0xaa61D5dec73971CD4a026ef2820bB87b4a4Ed8d6
+xbtc	Ethereum (Mainnet)	0xecbf566944250dde88322581024e611419715f7a
+spice	Ethereum (Mainnet)	0x1fdab294eda5112b7d066ed8f2e4e562d5bcc664
+butterfly-protocol	Ethereum (Mainnet)	0xf680429328caaacabee69b7a9fdb21a71419c063
+umbria-network	Ethereum (Mainnet)	0xa4bbe66f151b22b167127c770016b15ff97dd35c
+hapi	Ethereum (Mainnet)	0xd9c2d319cd7e6177336b0a9c93c21cb48d84fb54
+defiking	Ethereum (Mainnet)	0xa17de0ab0a97bc5e56fa8b39ebfc81cc3f1f349e
+sentinel-protocol	Ethereum (Mainnet)	0xc86d054809623432210c107af2e3f619dcfbf652
+mirror-protocol	Ethereum (Mainnet)	0x09a3ecafa817268f77be1283176b946c4ff2e608
+polaris-share	Ethereum (Mainnet)	0xc691bc298a304d591ad9b352c7a8d216de9f2ced
+trips-community	Ethereum (Mainnet)	0x1350fbe8ce27762ec19134bf8fc405a427fe9bf1
+allianceblock	Ethereum (Mainnet)	0x00a8b738e453ffd858a7edf03bccfe20412f0eb0
+cvp-token	Ethereum (Mainnet)	0x19fd4c760a7d4a38aee9f226035cbc9fdf434ffe
+impactmarket	Celo	0x8f8BB984e652Cb8D0aa7C9D6712Ec2020EB1BAb4
+antimatter	Ethereum (Mainnet)	0x9b99cca871be05119b2012fd4474731dd653febe
+oasis-city	Ethereum (Mainnet)	0x24700a297960e8477ce3ca6c58b70a7af3410398
+galaxy-pool-coin	Ethereum (Mainnet)	0x5cf501e64786444e025c5b24025f98399538ea5d
+tokenplace	Ethereum (Mainnet)	0x4fb721ef3bf99e0f2c193847afa296b9257d3c30
+zort	Ethereum (Mainnet)	0x825cd4201f8a2bbb1a69668eac4e5fa71283273d
+dusk-network	Ethereum (Mainnet)	0x940a2db1b7008b6c776d4faaca729d6d4a4aa551
+futureswap	Ethereum (Mainnet)	0x0e192d382a36de7011f795acc4391cd302003606
+cmdx	Ethereum (Mainnet)	0xb2c19ba4d5246d4c587a62f0dfe9f78083568455
+cyclone-protocol	Ethereum (Mainnet)	0x8861cff2366c1128fd699b68304ad99a0764ef9a
+one-cash	Ethereum (Mainnet)	0xd90e69f67203ebe02c917b5128629e77b4cd92dc
+daostack	Ethereum (Mainnet)	0x543ff227f64aa17ea132bf9886cab5db55dcaddf
+bifi	Ethereum (Mainnet)	0x2791bfd60d232150bff86b39b7146c0eaaa2ba81
+krause-house	Ethereum (Mainnet)	0x9f6f91078a5072a8b54695dafa2374ab3ccd603b
+lobis-finance	Ethereum (Mainnet)	0xdec41db0c33f3f6f3cb615449c311ba22d418a8d
+squiggle-dao	Ethereum (Mainnet)	0x373acda15ce392362e4b46ed97a7feecd7ef9eb8
+templedao	Ethereum (Mainnet)	0x470ebf5f030ed85fc1ed4c2d36b9dd02e77cf1b7
+standard-protocol	Ethereum (Mainnet)	0x9040e237c3bf18347bb00957dc22167d0f2b999d
+dao-playmarket-2-0	Ethereum (Mainnet)	0xc1322d8ae3b0e2e437e0ae36388d0cfd2c02f1c9
+yearn-finance-dot	Ethereum (Mainnet)	0x2e6539edc3b76f1e21b71d214527faba875f70f3
+everest	Ethereum (Mainnet)	0xebd9d99a3982d547c5bb4db7e3b1f9f14b67eb83
+scanetchain	Ethereum (Mainnet)	0xADF8B8050639b6236915f7516d69dE714672F0bF
+qidao	Matic	0x580A84C73811E1839F75d86d75d88cCa0c241fF4
+niftyx-protocol	Ethereum (Mainnet)	0xed0439eacf4c4965ae4613d77a5c2efe10e5f183
+numeraire	Ethereum (Mainnet)	0x1776e1f26f98b1a5df9cd347953a26dd3cb46671
+dai-stablecoin	Ethereum (Mainnet)	0x6b175474e89094c44da98b954eedeac495271d0f
+oiler	Ethereum (Mainnet)	0x0275e1001e293c46cfe158b3702aade0b99f88a5
+wrapped-celo	Ethereum (Mainnet)	0xe452e6ea2ddeb012e20db73bf5d3863a3ac8d77a
+banana	Ethereum (Mainnet)	0xe2311ae37502105b442bbef831e9b53c5d2e9b3b
+gro-protocol	Ethereum (Mainnet)	0x3ec8798b81485a254928b70cda1cf0a2bb0b74d7
+goop-troop	Ethereum (Mainnet)	0x15A2d6C2b4B9903C27f50Cb8B32160ab17F186E2
+mask-token	Ethereum (Mainnet)	0xfdd7399e22918ba7234f5568cc2ef922489f7ba6
+sovereign	Ethereum (Mainnet)	0x2b1149104e925f5ed009582ce2fe97318bf3954d
+hakkafinance	Ethereum (Mainnet)	0x0e29e5abbb5fd88e28b2d355774e73bd47de3bcd
+head-dao	Ethereum (Mainnet)	0xfc01a9C57f793F9Ce4A1F4BD678Ddeab14c3e130
+illuvium	Ethereum (Mainnet)	0x767fe9edc9e0df98e07454847909b5e959d7ca0e
+liquity	Ethereum (Mainnet)	0x6dea81c8171d0ba574754ef6f8b412f2ed88c54d
+polymath	Ethereum (Mainnet)	0x9992ec3cf6a55b00978cddf2b27bc6882d88d1ec
+aladdindao	Ethereum (Mainnet)	0xb26C4B3Ca601136Daf98593feAeff9E0CA702a8D
+decentral-games	Ethereum (Mainnet)	0x4b520c812e8430659fc9f12f6d0c39026c83588d
+freerossdao	Ethereum (Mainnet)	0x4cd0c43b0d53bc318cc5342b77eb6f124e47f526
+shark-dao	Ethereum (Mainnet)	0x232afce9f1b3aae7cb408e482e847250843db931
+mantradao	Ethereum (Mainnet)	0x3593d125a4f7849a1b059e64f4517a86dd60c95d
+pendle	Ethereum (Mainnet)	0x808507121b80c02388fad14726482e061b8da827
+metronome	Ethereum (Mainnet)	0xa3d58c4e56fedcae3a7c43a725aee9a71f0ece4e
+nexusmutual	Ethereum (Mainnet)	0xd7c49cee7e9188cca6ad8ff264c1da2e69d4cf3b
+secret-erc20	Ethereum (Mainnet)	0x2b89bf8ba858cd2fcee1fada378d5cd6936968be
+keep3rv1	Ethereum (Mainnet)	0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44
+digg	Ethereum (Mainnet)	0x798d1be841a82a273720ce31c822c61a67a601c3
+metis	Ethereum (Mainnet)	0xa9598333b99d14d90bc81cad8af82c4c70625e75
+bird-money	Ethereum (Mainnet)	0x70401dfd142a16dc7031c56e862fc88cb9537ce0
+richardclub	Matic	0xCed534185012424cd4939D4Dd78B4757D0134b6c
+vanilla	Ethereum (Mainnet)	0xbf900809f4c73e5a3476eb183d8b06a27e61f8e5
+geodb	Ethereum (Mainnet)	0x147faf8de9d8d8daae129b187f0d02d819126750
+vether	Ethereum (Mainnet)	0x4ba6ddd7b89ed838fed25d208d4f644106e34279
+btc-lite	Ethereum (Mainnet)	0x5acd19b9c91e596b1f062f18e3d02da7ed8d1e50
+alchemix	Ethereum (Mainnet)	0xdbdb4d16eda451d0503b854cf79d55697f90c8df
+instadapp	Ethereum (Mainnet)	0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb
+rekt	Ethereum (Mainnet)	0x4cab0abc80fe1c0521cbb5e9810a1c88c3942f91
+mochi-inu	Ethereum (Mainnet)	0x60ef10edff6d600cd91caeca04caed2a2e605fe5
+paraswap	Ethereum (Mainnet)	0xcafe001067cdef266afb7eb5a286dcfd277f3de5
+superfarm	Ethereum (Mainnet)	0xe53ec727dbdeb9e2d5456c3be40cff031ab40a55
+status	Ethereum (Mainnet)	0x744d70fdbe2ba4cf95131626614a1763df805b9e
+unidex	Ethereum (Mainnet)	0x95b3497bbcccc46a8f45f5cf54b0878b39f8d96c
+overline-emblem	Ethereum (Mainnet)	0xdb0acc14396d108b3c5574483acb817855c9dc8d
+arcgovernance	Ethereum (Mainnet)	0x1321f1f1aa541a56c31682c57b80ecfccd9bb288
+ethereum-name-service	Ethereum (Mainnet)	0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72
+ren	Ethereum (Mainnet)	0x408e41876cccdc0f92210600ef50372656052a38
+superrare-dao	Ethereum (Mainnet)	0xba5BDe662c17e2aDFF1075610382B9B691296350
+utrust	Ethereum (Mainnet)	0xdc9ac3c20d1ed0b540df9b1fedc10039df13f99c
+picklefinance	Ethereum (Mainnet)	0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5
+convex-crv	Ethereum (Mainnet)	0x62b9c7356a2dc64a1969e19c23e4f579f9810aa7
+chronic-token	Ethereum (Mainnet)	0x19fab8f7dffff38268644eaebd3d538f68036000
+daoventures	Ethereum (Mainnet)	0x77dce26c03a9b833fc2d7c31c22da4f42e9d9582
+autonio	Ethereum (Mainnet)	0xc813ea5e3b48bebeedb796ab42a30c5599b01740
+dydx	Ethereum (Mainnet)	0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2
+bepro-network	Ethereum (Mainnet)	0xcf3c8be2e2c42331da80ef210e9b1b307c03d36a
+bgan-vault-nftx	Ethereum (Mainnet)	0xc3b5284b2c0cfa1871a6ac63b6d6ee43c08bdc79
+everipedia	Ethereum (Mainnet)	0x579cea1889991f68acc35ff5c3dd0621ff29b0c9
+nodeseeds	Ethereum (Mainnet)	0x747f564d258612ec5c4e24742c5fd4110bcbe46b
+frax-share	Ethereum (Mainnet)	0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0
+linkpool	Ethereum (Mainnet)	0x99295f1141d58a99e939f7be6bbe734916a875b8
+charged-particles	Ethereum (Mainnet)	0x02d3a27ac3f55d5d91fb0f52759842696a864217
+tornado-cash	Ethereum (Mainnet)	0x77777feddddffc19ff86db637967013e6c6a116c
+fetch-ai	Ethereum (Mainnet)	0xaea46a60368a7bd060eec7df8cba43b7ef41ad85
+truefi	Ethereum (Mainnet)	0x4c19596f5aaff459fa38b0f7ed92f11ae6543784
+stake-dao	Ethereum (Mainnet)	0x73968b9a57c6e53d41345fd57a6e6ae27d6cdb2f
+binance-smart-chain	Ethereum (Mainnet)	0x4e9a46ea6a22f3894abee2302ad42fd3b69e21e2
+nestree	Ethereum (Mainnet)	0x65ccd72c0813ce6f2703593b633202a0f3ca6a0c
+sentinel-chain	Ethereum (Mainnet)	0xa13f0743951b4f6e3e3aa039f682e17279f52bc3
+bayc-vault-nftx	Ethereum (Mainnet)	0xea47b64e1bfccb773a0420247c0aa0a3c1d2e5c5
+wootrade-network	Ethereum (Mainnet)	0x4691937a7508860f876c9c0a2a617e7d9e945d4b
+enzyme	Ethereum (Mainnet)	0xec67005c4e498ec7f55e092bd1d35cbc47c91892
+iotex-network	Ethereum (Mainnet)	0x6fb3e0a217407efff7ca062d46c26e5d60a14d69
+sake	Ethereum (Mainnet)	0xe9f84de264e91529af07fa2c746e934397810334
+ethereum-erush	Ethereum (Mainnet)	0x3cc5eb07e0e1227613f1df58f38b549823d11cb9
+anchor	Ethereum (Mainnet)	0x5456bc77dd275c45c3c15f0cf936b763cf57c3b5
+safemoon-inu	Ethereum (Mainnet)	0xcd7492db29e2ab436e819b249452ee1bbdf52214
+hex	Ethereum (Mainnet)	0x2b591e99afe9f32eaa6214f7b7629768c40eeb39
+digicol-token	Ethereum (Mainnet)	0x63b8b7d4a3efd0735c4bffbd95b332a55e4eb851
+crypto-puzzles	Ethereum (Mainnet)	0xe0bdfe2ce51f44556309665d59818ccb541ff067
+marlin	Ethereum (Mainnet)	0x777992c2E4EDF704e49680468a9299C6679e37F6
+gitcoin	Ethereum (Mainnet)	0xde30da39c46104798bb5aa3fe8b9e0e1f348163f
+smooth-love-potion	Ethereum (Mainnet)	0xCC8Fa225D80b9c7D42F96e9570156c65D6cAAa25
+jenny-metaverse-dao	Ethereum (Mainnet)	0xa499648fd0e80fd911972bbeb069e4c20e68bf22
+stargaze-protocol	Ethereum (Mainnet)	0xa9a8377287ea9c6b8b4249dd502e75d34148fc5b
+covalent	Ethereum (Mainnet)	0xd417144312dbf50465b1c641d016962017ef6240
+paid-network	Ethereum (Mainnet)	0x1614f18fc94f47967a3fbe5ffcd46d4e7da3d787
+keeperdao	Ethereum (Mainnet)	0xfa5047c9c78b8877af97bdcb85db743fd7313d4a
+cvault-finance	Ethereum (Mainnet)	0x62359ed7505efc61ff1d56fef82158ccaffa23d7
+blockswap-network	Ethereum (Mainnet)	0x7d4b1d793239707445305d8d2456d2c735f6b25b
+perpetual-protocol	Ethereum (Mainnet)	0xbc396689893d065f41bc2c6ecbee5e0085233447
+floki-inu	Ethereum (Mainnet)	0x43f11c02439e2736800433b4594994bd43cd066d
+wizard-vault-nftx	Ethereum (Mainnet)	0x87931e7ad81914e7898d07c68f145fc0a553d8fb
+mnft	Ethereum (Mainnet)	0xDB7eB3edE973665b1BB9F3016861E3255062E4ED
+game-of-bitcoins	Ethereum (Mainnet)	0xE400013Df86249838B720eaB5a7F816aD82433c0
+technology-innovati	Ethereum (Mainnet)	0x07de533cbc72395c32eb8981ddccd2cc6a6e1c4e
+spell-token	Ethereum (Mainnet)	0x090185f2135308bad17527004364ebcc2d37e5f6
+aventus	Ethereum (Mainnet)	0x0d88ed6e74bbfd96b831231638b66c05571e824f
+anoncats	Ethereum (Mainnet)	0xe7141C205a7a74241551dAF007537A041867e0B0
+blocktanium	Ethereum (Mainnet)	0x9d62526f5ce701950c30f2caca70edf70f9fbf0f
+baconcoin	Ethereum (Mainnet)	0x3b5f11dbac1476af17957c6e5991f21c826743dd
+goldfinch	Ethereum (Mainnet)	0xdab396cCF3d84Cf2D07C4454e10C8A6F5b008D2b
+earth	Matic	0x62004fAbc12677dD2392394Aa0838959043cCb34
+nildao	Ethereum (Mainnet)	0x05a46f1e545526fb803ff974c790acea34d1f2d6
+hundred-finance	Arbitrum (Mainnet)	0x10010078a54396f62c96df8532dc2b4847d47ed3
+hash-token	Ethereum (Mainnet)	0xeb1112ac78d537853150e2a07e8b765e29d3f019
+crust-shadow	Ethereum (Mainnet)	0x2620638eda99f9e7e902ea24a285456ee9438861
+marlin-testnet	Ethereum (Ropsten)	0xEa2923b099b4B588FdFAD47201d747e3b9599A5f
+freedom-dao	xDAI	0x8B841D6689e20F3F8291C1C35a7BD80448Cf7826
+bzx-protocol	Ethereum (Mainnet)	0x56d811088235f11c8920698a204a5010a788f4b3
+cryptex-finance	Ethereum (Mainnet)	0x321c2fe4446c7c963dc41dd58879af648838f98d
+lovechain	Ethereum (Mainnet)	0xe3c864307b5592404431649de541c259497e2bd1
+origintrail	Ethereum (Mainnet)	0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f
+bancor-network-toke	Ethereum (Mainnet)	0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c
+aragon	Ethereum (Mainnet)	0xa117000000f279d81a1d3cc75430faa017fa5a2e
+project-senpai	Ethereum (Mainnet)	0x5a705745373a780814c379ef17810630d529efe0
+flowchain	Ethereum (Mainnet)	0x32c4adb9cf57f972bc375129de91c897b4f364f1
+usd-coin	Ethereum (Mainnet)	0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+cryptopunks	Ethereum (Mainnet)	0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB
+synthetix-network-token	Ethereum (Mainnet)	0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F
+omg-network	Ethereum (Mainnet)	0xd26114cd6ee289accf82350c8d8487fedb8a0c07
+index-cooperative	Ethereum (Mainnet)	0x0954906da0bf32d5479e25f46056d22f08464cab
+popsicle-finance	Ethereum (Mainnet)	0xf16e81dce15b08f326220742020379b855b87df9
+edgeless	Ethereum (Mainnet)	0x08711d3b02c8758f2fb3ab4e80228418a7f8e39c
+hifi-finance	Ethereum (Mainnet)	0xdf2c7238198ad8b389666574f2d8bc411a4b7428
+ocean-protocol	Ethereum (Mainnet)	0x967da4048cd07ab37855c090aaf366e4ce1b9f48
+fingerprints-dao	Ethereum (Mainnet)	0x4dd28568d05f09b02220b09c2cb307bfd837cb95
+basic-attention-tok	Ethereum (Mainnet)	0x0d8775f648430679a709e98d2b0cb6250d2887ef
+float-protocol	Ethereum (Mainnet)	0x24a6a37576377f63f194caa5f518a60f45b42921
+pebbles	Ethereum (Mainnet)	0x55648de19836338549130b1af587f16bea46f66b
+convergence	Ethereum (Mainnet)	0xc834fa996fa3bec7aad3693af486ae53d8aa8b50
+friesdao	Ethereum (Mainnet)	0xFA57F00D948bb6a28072f5416fCbF7836C3d62dD
+suterusu	Ethereum (Mainnet)	0xaa2ce7ae64066175e0b90497ce7d9c190c315db4
+million	Ethereum (Mainnet)	0x6b4c7a5e3f0b99fcd83e9c089bddd6c7fce5c611
+lixir-finance	Ethereum (Mainnet)	0xd0345d30fd918d7682398acbcdf139c808998709
+coin98	Ethereum (Mainnet)	0xae12c5930881c53715b369cec7606b70d8eb229f
+switcheo	Ethereum (Mainnet)	0xb4371da53140417cbb3362055374b10d97e420bb
+cat-token	Ethereum (Mainnet)	0x56015bbe3c01fe05bc30a8a9a9fd9a88917e7db3
+terra-virtua-kolect	Ethereum (Mainnet)	0xd084b83c305dafd76ae3e1b4e1f1fe2ecccb3988
+arpa-chain	Ethereum (Mainnet)	0xba50933c268f567bdc86e1ac131be072c6b0b71a
+audius	Ethereum (Mainnet)	0x18aaa7115705e8be94bffebde57af9bfc265b998
+idlewbtc-best-yiel	Ethereum (Mainnet)	0x8c81121b15197fa0eeaee1dc75533419dcfd3151
+timecoin-protocol	Ethereum (Mainnet)	0x5d45aa01b73c971c65f3df409c9b3627b8fe2726
+usdcoin	Ethereum (Mainnet)	0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+crypto-com-coin	Ethereum (Mainnet)	0xa0b73e1ff0b80914ab6fe0444e65848c4c34450b
+magic-internet-mone	Ethereum (Mainnet)	0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3
+warp-finance	Ethereum (Mainnet)	0xed40834a13129509a89be39a9be9c0e96a0ddd71
+bao-finance	Ethereum (Mainnet)	0x374cb8c27130e2c9e04f44303f3c8351b9de61c1
+maximum-viable-potential.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+yaway.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+jascha.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+Ref Finance.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+kindessgrocerycoop.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+hak.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+croncat.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+codame.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+aurora.sputnikdao.near.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+hype.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+marmaj.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+curators.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+auroradao.sputnik-dao.near.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+prod_dev.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+auroradao.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+poseidon nft dao.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+cryptob3auty.sputnik-dao.near	NEAR (Mainnet)	maximum-viable-potential.sputnik-dao.near
+aragon-dao	Ethereum (Mainnet)	0xa117000000f279d81a1d3cc75430faa017fa5a2e
+rocket-fuel	Ethereum (Mainnet)	0x4176dBd1CEaC89036f60b3316e0bfafc29f0807A
+viberate	Ethereum (Mainnet)	0x2c974b2d0ba1716e644c1fc59982a89ddd2ff724
+lido-dao	Ethereum (Mainnet)	0x5a98fcbea516cf06857215779fd812ca3bef1b32
+maker	Ethereum (Mainnet)	0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2
+secret-erc20	Ethereum (Mainnet)	0x2b89bf8ba858cd2fcee1fada378d5cd6936968be
+secret-erc20	Ethereum (Mainnet)	0x2b89bf8ba858cd2fcee1fada378d5cd6936968be
+secret-erc20	Ethereum (Mainnet)	0x2b89bf8ba858cd2fcee1fada378d5cd6936968be
+secret-erc20	Ethereum (Mainnet)	0x2b89bf8ba858cd2fcee1fada378d5cd6936968be
+secret-erc20	Ethereum (Mainnet)	0x2b89bf8ba858cd2fcee1fada378d5cd6936968be
+secret-erc20	Ethereum (Mainnet)	0x2b89bf8ba858cd2fcee1fada378d5cd6936968be
+reef-finance	Ethereum (Mainnet)	0xfe3e6a25e6b192a42a44ecddcd13796471735acf
+reef-finance	Ethereum (Mainnet)	0xfe3e6a25e6b192a42a44ecddcd13796471735acf
+alpha-finance	Ethereum (Mainnet)	0xa1faa113cbe53436df28ff0aee54275c13b40975
+reef	Ethereum (Mainnet)	0xfe3e6a25e6b192a42a44ecddcd13796471735acf
+game-of-bitcoins	Ethereum (Mainnet)	0xE400013Df86249838B720eaB5a7F816aD82433c0
+game-of-bitcoins	Ethereum (Mainnet)	0xE400013Df86249838B720eaB5a7F816aD82433c0
+game-of-bitcoins	Ethereum (Mainnet)	0xE400013Df86249838B720eaB5a7F816aD82433c0
+game-of-bitcoins	Ethereum (Mainnet)	0xE400013Df86249838B720eaB5a7F816aD82433c0
+game-of-bitcoins	Ethereum (Mainnet)	0xE400013Df86249838B720eaB5a7F816aD82433c0
+game-of-bitcoins	Ethereum (Mainnet)	0xE400013Df86249838B720eaB5a7F816aD82433c0
+kali-sweat-arbitrum	Arbitrum (Mainnet)	0x9227659196a9977f61f43794ca0e116d2b1334a4
+alpha-fund	Ethereum (Mainnet)	0xa16001DD47f505B7B7c5639c710A52209E4e8904
+proof-of-apes	Ethereum (Mainnet)	0x1d2d542e6D9d85A712deB4D1a7D96a16CE00B8cE
+shrimptest	Ethereum (Mainnet)	0x3db7dcde996d28525e658c8f6747c8c4986aecc5
+full-send-metacard	Ethereum (Mainnet)	0x7eCb204feD7e386386CAb46a1fcB823ec5067aD5
+glory-dream-club	Ethereum (Mainnet)	0x28104B89DcA6B4277f7470Ac83cEC6C2781f9C65
+massive-energy-dao	Ethereum (Mainnet)	0xbbA091502c8AaD5790B909164F9951edc5bb2450
+blue-sunset	Ethereum (Mainnet)	0x93C7e108Db1769377Ef9B4A47aF2e982a8848a03
+mfers	Ethereum (Mainnet)	0x79FCDEF22feeD20eDDacbB2587640e45491b757f
+b-protocol-forum	Ethereum (Mainnet)	0xbbBBBBB5AA847A2003fbC6b5C16DF0Bd1E725f61
+testpremia	Ethereum (Mainnet)	0xff650e83Fd10206D61CF67f8285d214CFDb8e961
+new-test	Matic	0x97871a7f737bb82c1cf5c6aa48dbcca853f07355
+ps-test-3	Matic	0xda139eca4eb58c833cc57ae5ae332f81a1bdadda
+gooddao-governance	GoodDAO Governance	0x603b8c0f110e037b51a381cbcacabb8d6c6e4543
+gdao	GoodDAO Governance	0x603b8c0f110e037b51a381cbcacabb8d6c6e4543
+inner-i-network	Solana (Mainnet beta)	JAfH8yjjAzHfcRxrV8FVkdCRuf7Rqvd1SUxMntRS3Htw
+innerinetworkini	Solana (Mainnet beta)	JAfH8yjjAzHfcRxrV8FVkdCRuf7Rqvd1SUxMntRS3Htw
+innerinetwork	Solana (Mainnet beta)	JAfH8yjjAzHfcRxrV8FVkdCRuf7Rqvd1SUxMntRS3Htw
+innerinetcompany	Solana (Mainnet beta)	JAfH8yjjAzHfcRxrV8FVkdCRuf7Rqvd1SUxMntRS3Htw
+inner-i-net-company	Solana (Mainnet beta)	JAfH8yjjAzHfcRxrV8FVkdCRuf7Rqvd1SUxMntRS3Htw
+inneri	Solana (Mainnet beta)	JAfH8yjjAzHfcRxrV8FVkdCRuf7Rqvd1SUxMntRS3Htw
+gooddao-gov-forum	GoodDAO Governance	0x603b8c0f110e037b51a381cbcacabb8d6c6e4543
+official-pagedao-membership	Matic	0xd9Ff4B61817fF3246d012fF8918e3e8b8dfA5A39
+ocean-protocol-verz	Ethereum (Mainnet)	0x967da4048cd07ab37855c090aaf366e4ce1b9f48
+paladin-token	Ethereum (Mainnet)	0xab846fb6c81370327e784ae7cbb6d6a6af6ff4bf
+allianceblockdao	Ethereum (Mainnet)	0x00a8b738e453ffd858a7edf03bccfe20412f0eb0
+common-protocol	Ethereum (Goerli)	0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a
+timeless-finance	Ethereum (Mainnet)	0xfd0205066521550d7d7ab19da8f72bb004b4c341
+timelessfinance	Ethereum (Mainnet)	0xf17d23136B4FeAd139f54fB766c8795faae09660
+moneta	Ethereum (Mainnet)	0x1ea48b9965bb5086f3b468e50ed93888a661fc17
+gelatonetwork	Ethereum (Mainnet)	0x15b7c0c907e4C6b9AdaAaabC300C08991D6CEA05
+web3camp-token	BSC	0xB806FA32eBDC04E5Dbdd2ad83E75C8F7D8E8ef8b
+all-in-for-sport	Matic	0xEEd76F3D0dE104827357B37Aa2F0Ce3701E4Ae28
+umami-dao	Arbitrum (Mainnet)	0x1622bF67e6e5747b81866fE0b85178a93C7F86e3
+gmdao	Ethereum (Mainnet)	0x36F4D96Fe0D4Eb33cdC2dC6C0bCA15b9Cdd0d648
+human-community	Ethereum (Mainnet)	0xd1ba9BAC957322D6e8c07a160a3A8dA11A0d2867
+matic-token	Matic	0x0000000000000000000000000000000000001010
+panacare-dao	Matic	0x0000000000000000000000000000000000001010
+panacaredao	Matic	0x0000000000000000000000000000000000001010
+down-vault-pos	Matic	0xA934bcBf24A7272781197b6559230c30bf0BB2e6
+allianceblock-nexera-token	Ethereum (Mainnet)	0x644192291cc835a93d6330b24ea5f5fedd0eef9e
+xcult-house	Fantom	0x718670c88F2daa222d44908C1c253253FF96aE21
+cult-house	Fantom	0x4Ed9C2aba77141433c462B8EE835B7fC39Ec449A
+deliland-governance	Fantom	0x16DCdC7BB3235a60243b34875c9D86a4980Da26d
+seedx	BSC	0x0cBfDea4F45A486Cc7dB53CB6e37b312A137C605
+era7-game-of-truth	BSC	0x6f9F0c4ad9Af7EbD61Ac5A1D4e0F2227F7B0E5f9
+xdefi	Ethereum (Mainnet)	0x72b886d09c117654ab7da13a14d603001de0b777
+lithosphere	BSC	0x61909950e1bfB5d567C5463CbD33Dc1cdC85eE93
+gravidao-moloch	Matic	0xA55F5Ab27038ee8E0a91d68C7fB69F2406E41c12
+sector-finance	Arbitrum (Mainnet)	0x0b63c61bba4a876a6eb8b5e596800f7649a9b71e
+testclip	BSC	0x1c79be6214a5198ca916394F59c355f6F3FB4375
+oqdao	Ethereum (Mainnet)	0x2EAe034eaD753Cc09175B09a28e281cFb2be7BA7
+aranetwork	Ethereum (Mainnet)	\N
+delx	Ethereum (Mainnet)	\N
+arable-protocol	Ethereum (Mainnet)	\N
+bnmhgjgfh	Ethereum (Mainnet)	\N
+cosmos-airdrops	Ethereum (Mainnet)	\N
+congruent-dao	Ethereum (Mainnet)	\N
+x25154	Ethereum (Mainnet)	\N
+lensprotocol	Ethereum (Mainnet)	\N
+mingtian	Ethereum (Mainnet)	\N
+temco	Ethereum (Mainnet)	\N
+rclub	Ethereum (Mainnet)	\N
+test2132	Ethereum (Mainnet)	\N
+mayflower	Ethereum (Mainnet)	\N
+zitrone-dao	NEAR (Mainnet)	\N
+atom-airdrops	FaceFi	\N
+bnhjhf	Ethereum (Mainnet)	\N
+spiral-da	Ethereum (Mainnet)	\N
+newone	Ethereum (Mainnet)	\N
+dxcvsdc	Ethereum (Mainnet)	\N
+cryptoraf	Ethereum (Mainnet)	\N
+zk-safe-dao	Ethereum (Mainnet)	\N
+omg	Ethereum (Mainnet)	\N
+hello	Ethereum (Mainnet)	\N
+thoughtleadership	Ethereum (Mainnet)	\N
+mingming1381	Ethereum (Mainnet)	\N
+sdsag	Ethereum (Mainnet)	\N
+gunlgplsfgdewr	Ethereum (Mainnet)	\N
+solana-devnet	Solana (Devnet)	\N
+jojos-invest-dao	Ethereum (Mainnet)	\N
+kuntsevo	Ethereum (Mainnet)	\N
+vdl	Vidulum (Mainnet)	\N
+regen	Regen Network	\N
+hjyuf	Ethereum (Mainnet)	\N
+nft-wally	Ethereum (Mainnet)	\N
+andromeda-protocol	Osmosis	\N
+anna	Ethereum (Mainnet)	\N
+panda	Ethereum (Mainnet)	\N
+iconica5454545454545	Ethereum (Mainnet)	\N
+qwqwqwqwwqwq	Ethereum (Mainnet)	\N
+beermandao	Ethereum (Mainnet)	\N
+kyve	KYVE Network	\N
+ethereum	Ethereum (Mainnet)	\N
+bluedao	Ethereum (Mainnet)	\N
+comdex	Osmosis	\N
+beerman	Ethereum (Mainnet)	\N
+commonwealth-sucks-asses	Ethereum (Mainnet)	\N
+jee	Ethereum (Mainnet)	\N
+ryujin	Ethereum (Mainnet)	\N
+common-test	Ethereum (Mainnet)	\N
+loaimere	Ethereum (Mainnet)	\N
+xx-network	Ethereum (Mainnet)	\N
+testde	Osmosis	\N
+ovesh001	Ethereum (Mainnet)	\N
+avator	Ethereum (Mainnet)	\N
+mine2	Osmosis	\N
+eth20	Ethereum (Mainnet)	\N
+test-sup	Ethereum (Mainnet)	\N
+6	Ethereum (Mainnet)	\N
+fairvote01	Ethereum (Mainnet)	\N
+kazinori	Ethereum (Mainnet)	\N
+common-test1	Ethereum (Mainnet)	\N
+genesisl1	Osmosis	\N
+runitdownmid22	Ethereum (Mainnet)	\N
+ember-sword	Ethereum (Mainnet)	\N
+gd	Ethereum (Mainnet)	\N
+7racker	Osmosis	\N
+ens	Ethereum (Mainnet)	\N
+digitalgirlmia	Ethereum (Mainnet)	\N
+panteon	Ethereum (Mainnet)	\N
+states-dao	Osmosis	\N
+x	Ethereum (Mainnet)	\N
+poseidon-nft-dao	Ethereum (Mainnet)	\N
+cosmos	Osmosis	\N
+zyclubb	Ethereum (Mainnet)	\N
+sushiswap	Ethereum (Mainnet)	\N
+dogeflower	Ethereum (Mainnet)	\N
+facefi	FaceFi	\N
+debt-dao	Ethereum (Mainnet)	\N
+0xmayflower	NEAR (Mainnet)	\N
+ibu-inu-dao	Ethereum (Mainnet)	\N
+davidma	Ethereum (Mainnet)	\N
+jackal-protocol	Jackal Protocol	\N
+dogekim	Ethereum (Mainnet)	\N
+naruto	Ethereum (Mainnet)	\N
+avator321	Ethereum (Mainnet)	\N
+commonwealth-im	Ethereum (Mainnet)	\N
+aptos-discussion-dao	Ethereum (Mainnet)	\N
+front	Osmosis	\N
+glorious-dream	Ethereum (Mainnet)	\N
+anthony8876	Ethereum (Mainnet)	\N
+common	Ethereum (Mainnet)	\N
+kirkys-club	Ethereum (Mainnet)	\N
+fishdao	Ethereum (Mainnet)	\N
+gsb-dao	Ethereum (Mainnet)	\N
+script-tv	Ethereum (Mainnet)	\N
+whyCommonwealth	NEAR (Mainnet)	\N
+D3CIS	Ethereum (Mainnet)	\N
+wttt	Ethereum (Mainnet)	\N
+swell	Ethereum (Mainnet)	\N
+medibloc	Osmosis	\N
+synapseprotcool	Ethereum (Mainnet)	\N
+running-dao	Ethereum (Mainnet)	\N
+lifedao	Ethereum (Mainnet)	\N
+infinity	Ethereum (Mainnet)	\N
+moonztest	Ethereum (Mainnet)	\N
+112231223	Ethereum (Mainnet)	\N
+orca-protocol	Ethereum (Mainnet)	\N
+ammadao	Ethereum (Mainnet)	\N
+wttt0099	Ethereum (Mainnet)	\N
+dig-chain	Osmosis	\N
+el-team-de-nico	Ethereum (Mainnet)	\N
+rabbithole	Ethereum (Mainnet)	\N
+bigyak-axie-club	Ethereum (Mainnet)	\N
+supernova	Osmosis	\N
+potiondao	Ethereum (Mainnet)	\N
+dmeter	Ethereum (Mainnet)	\N
+ade	Ethereum (Mainnet)	\N
+lgpl	Ethereum (Mainnet)	\N
+neta-money	Juno	\N
+mainrl-labs	Ethereum (Mainnet)	\N
+cmn-protocol	Ethereum (Mainnet)	\N
+higher-mind....dfgdfg 	Ethereum (Mainnet)	\N
+bayc	Ethereum (Mainnet)	\N
+scriptnetwor	Ethereum (Mainnet)	\N
+curvance	Ethereum (Mainnet)	\N
+yang	Osmosis	\N
+mitosis-genesis	Ethereum (Mainnet)	\N
+bluerock	Ethereum (Mainnet)	\N
+gamedao	Ethereum (Mainnet)	\N
+club	Ethereum (Mainnet)	\N
+rh-ecosystem	Ethereum (Mainnet)	\N
+just-say-hi-for-youself	Ethereum (Mainnet)	\N
+hashflow	Ethereum (Mainnet)	\N
+pk786	Ethereum (Mainnet)	\N
+distributed-republic	Ethereum (Mainnet)	\N
+commonwealthi	Ethereum (Mainnet)	\N
+entry-dao	Ethereum (Mainnet)	\N
+PEntest	NEAR (Mainnet)	\N
+zeta42	Ethereum (Mainnet)	\N
+ara-network	Ethereum (Mainnet)	\N
+test-bed-for-wormss	Ethereum (Mainnet)	\N
+ponyo	Ethereum (Mainnet)	\N
+testtestests	Ethereum (Mainnet)	\N
+wonderverse	Ethereum (Mainnet)	\N
+just-say-hi-for-youself2	Ethereum (Mainnet)	\N
+megacorp-dao	Ethereum (Mainnet)	\N
+shfj	Ethereum (Mainnet)	\N
+0xatom	Osmosis	\N
+mingtianhuihaode	Ethereum (Mainnet)	\N
+rebus	Osmosis	\N
+zephlin-squad	Ethereum (Mainnet)	\N
+leisuredao	Ethereum (Mainnet)	\N
+gravity-bridge	Gravity Chain	\N
+socius	Ethereum (Mainnet)	\N
+jackwang1233	Ethereum (Mainnet)	\N
+unstateschool-dao	Ethereum (Mainnet)	\N
+odin-protocol	Osmosis	\N
+how-pice-btc	Ethereum (Mainnet)	\N
+harry-sea	Ethereum (Mainnet)	\N
+hello-tester	Ethereum (Mainnet)	\N
+xiaocong	Ethereum (Mainnet)	\N
+lobby3-draft-communituy	Ethereum (Mainnet)	\N
+pheasant-dao	FaceFi	\N
+chihuahua	Chihuahua	\N
+11112211	Ethereum (Mainnet)	\N
+richdao	Ethereum (Mainnet)	\N
+stride	Polkachu	\N
+linksdao-test	Ethereum (Mainnet)	\N
+mhhui88	Ethereum (Mainnet)	\N
+p00ls	Ethereum (Mainnet)	\N
+l-team-de-nico	Ethereum (Mainnet)	\N
+hyperglot	Ethereum (Mainnet)	\N
+nat	Ethereum (Mainnet)	\N
+wynd	Wynd	\N
+okabe	Ethereum (Mainnet)	\N
+have-a-nice-day-all-lfg	Ethereum (Mainnet)	\N
+sdfdg	Ethereum (Mainnet)	\N
+osmosis	Osmosis	\N
+andromeda-governance	Andromeda (Testnet)	\N
+testnet-airdrop	Ethereum (Mainnet)	\N
+com-mon-dao	Ethereum (Mainnet)	\N
+go-myb1	Ethereum (Mainnet)	\N
+why-commonwealth-is-great	Ethereum (Mainnet)	\N
+airdrops	Ethereum (Mainnet)	\N
+pentest	Osmosis	\N
+liyangege	Osmosis	\N
+shithub	Osmosis	\N
+del	Ethereum (Mainnet)	\N
+meta	Ethereum (Mainnet)	\N
+mardz	Ethereum (Mainnet)	\N
+usdc-airdrops	Ethereum (Mainnet)	\N
+test2	Ethereum (Mainnet)	\N
+sanbai	Ethereum (Mainnet)	\N
+yffvt2	Ethereum (Mainnet)	\N
+polymesh-network	Ethereum (Mainnet)	\N
+nana	Ethereum (Mainnet)	\N
+zuoyeverse	Ethereum (Mainnet)	\N
+commonbot-test	Ethereum (Mainnet)	\N
+iconicaexperimental77	Ethereum (Mainnet)	\N
+pfeilstorch	Edgeware (Mainnet)	\N
+meta-ape-acid-club	Ethereum (Mainnet)	\N
+recowsearchy	Ethereum (Mainnet)	\N
+weee	Ethereum (Mainnet)	\N
+script-network-tv	Ethereum (Mainnet)	\N
+govmos	Osmosis	\N
+omniflix-network	Osmosis	\N
+ara	Ethereum (Mainnet)	\N
+teritori	Osmosis	\N
+azk	Ethereum (Mainnet)	\N
+global-unity	Ethereum (Mainnet)	\N
+aliquo-protocol	Ethereum (Mainnet)	\N
+entry	FaceFi	\N
+near	NEAR (Mainnet)	\N
+0x8848	Ethereum (Mainnet)	\N
+eth88888888	Ethereum (Mainnet)	\N
+mayflowers	Ethereum (Mainnet)	\N
+taotie	Ethereum (Mainnet)	\N
+111	Ethereum (Mainnet)	\N
+12	Ethereum (Mainnet)	\N
+glory-dream	Ethereum (Mainnet)	\N
+cosmo-airdrops	Ethereum (Mainnet)	\N
+rawrdaotest	Ethereum (Mainnet)	\N
+thedesigncow	Ethereum (Mainnet)	\N
+test-alex-1	Ethereum (Mainnet)	\N
+contract-audit	Ethereum (Mainnet)	\N
+zhongyitong	Ethereum (Mainnet)	\N
+test-bed-for-worms	Ethereum (Mainnet)	\N
+sei	sei	\N
+rieser-stern	Ethereum (Mainnet)	\N
+web3-and-privacy	NEAR (Mainnet)	\N
+dopexx	Ethereum (Mainnet)	\N
+creating-new-starter-community-failed	Ethereum (Mainnet)	\N
+nonce-classic	NEAR (Mainnet)	\N
+stakeeasy	Osmosis	\N
+entertainment-dao	Ethereum (Mainnet)	\N
+testne	Ethereum (Mainnet)	\N
+eqeqre2e2e2t3434t34t3t34t43	Ethereum (Mainnet)	\N
+atomheart	Ethereum (Mainnet)	\N
+common-dao	Ethereum (Mainnet)	\N
+confidao	Ethereum (Mainnet)	\N
+karma	Ethereum (Mainnet)	\N
+2	Ethereum (Mainnet)	\N
+nanaweb3	Ethereum (Mainnet)	\N
+tiamo	Ethereum (Mainnet)	\N
+kongdelu	Ethereum (Mainnet)	\N
+commonwealth	Ethereum (Mainnet)	\N
+agrime	Ethereum (Mainnet)	\N
+moonyandfriendstest	Ethereum (Mainnet)	\N
+kichain	KiChain	\N
+sei-network	sei	\N
+oiuy879785	Ethereum (Mainnet)	\N
+candydao	Ethereum (Mainnet)	\N
+bugbounty	Ethereum (Mainnet)	\N
+lajke	Osmosis	\N
+vidulum	Osmosis	\N
+bulesky	Ethereum (Mainnet)	\N
+mytestcommunity	Ethereum (Mainnet)	\N
+medibloc-forum	Panacea	\N
+000	Ethereum (Mainnet)	\N
+kava	Kava	\N
+okp4-network	Ethereum (Mainnet)	\N
+zyclub	Ethereum (Mainnet)	\N
+0x663	Ethereum (Mainnet)	\N
+b33ust	Osmosis	\N
+synapse	Ethereum (Mainnet)	\N
+chain4energy	Osmosis	\N
+train-of-the-century	Ethereum (Mainnet)	\N
+testdo-not-join	NEAR (Mainnet)	\N
+lobby3-draft-community	Ethereum (Mainnet)	\N
+cashmerelabs	Ethereum (Mainnet)	\N
+ardholders	Ethereum (Mainnet)	\N
+stan-god-damn	Ethereum (Mainnet)	\N
+rfgerg1e	Ethereum (Mainnet)	\N
+web3-com	Ethereum (Mainnet)	\N
+side-project	Osmosis	\N
+25t54344	Ethereum (Mainnet)	\N
+gomyb1	Ethereum (Mainnet)	\N
+daodao	Ethereum (Mainnet)	\N
+sneaker-league	Ethereum (Mainnet)	\N
+lys-eth	Ethereum (Mainnet)	\N
+embaixadores-polkadot-brasil	Ethereum (Mainnet)	\N
+gergerggergergergergre	Ethereum (Mainnet)	\N
+cz	Ethereum (Mainnet)	\N
+waiheke-central-marine	Ethereum (Mainnet)	\N
+s-i-n-g-u-l-a-r-i-t-y	Ethereum (Mainnet)	\N
+vin6789	Ethereum (Mainnet)	\N
+testshow	Osmosis	\N
+superdao	Ethereum (Mainnet)	\N
+xiabing-fdao	Ethereum (Mainnet)	\N
+hello-world	Ethereum (Mainnet)	\N
+plasm	Plasmnet	\N
+taozi	Ethereum (Mainnet)	\N
+hashflowdao1	Ethereum (Mainnet)	\N
+anyong	Ethereum (Mainnet)	\N
+ioiukj	Ethereum (Mainnet)	\N
+yotta21	Ethereum (Mainnet)	\N
+dfdsx	Ethereum (Mainnet)	\N
+banklessafrica	Ethereum (Mainnet)	\N
+hydradx	HydraDX	\N
+tornado	Ethereum (Mainnet)	\N
+liberty-labs-dao	Ethereum (Mainnet)	\N
+hero	Ethereum (Mainnet)	\N
+jobs-dao	Ethereum (Mainnet)	\N
+testedi	Ethereum (Mainnet)	\N
+airdrop	Ethereum (Mainnet)	\N
+element-finance	Ethereum (Mainnet)	\N
+0xkillerwhale	Ethereum (Mainnet)	\N
+lec16	Ethereum (Mainnet)	\N
+coincapital	Ethereum (Mainnet)	\N
+spiral-daa	Ethereum (Mainnet)	\N
+runitdownmid	Ethereum (Mainnet)	\N
+sdafgasdg	Ethereum (Mainnet)	\N
+../	NEAR (Mainnet)	\N
+teste-only	Ethereum (Mainnet)	\N
+aman	Ethereum (Mainnet)	\N
+haoyexing	Ethereum (Mainnet)	\N
+cheqd	Cheqd	\N
+ninjas	Ethereum (Mainnet)	\N
+ross	Ethereum (Mainnet)	\N
+edgeware-testnet	Edgeware (Testnet)	\N
+0x6634	Ethereum (Mainnet)	\N
+spiral-da00wewe	Ethereum (Mainnet)	\N
+itheum	Ethereum (Mainnet)	\N
+chinese-community	Ethereum (Mainnet)	\N
+propy	Ethereum (Mainnet)	\N
+mimi	Ethereum (Mainnet)	\N
+planets-of-cosmos	Osmosis	\N
+space-lord-on-here113766	Ethereum (Mainnet)	\N
+99918	Ethereum (Mainnet)	\N
+my-nft	Ethereum (Mainnet)	\N
+songcamp-test	Ethereum (Mainnet)	\N
+test-alex-11	Ethereum (Mainnet)	\N
+jack	Ethereum (Mainnet)	\N
+seedxapp	Ethereum (Mainnet)	\N
+pm-arassssadasdasedaweadsadaqswdaw	Ethereum (Mainnet)	\N
+dashboard/for-you	NEAR (Mainnet)	\N
+web3-future	Ethereum (Mainnet)	\N
+keynes	Ethereum (Mainnet)	\N
+sifchain	Sifchain	\N
+lunarc-dao	Ethereum (Mainnet)	\N
+sagg	FaceFi	\N
+testjusttest	Ethereum (Mainnet)	\N
+osmosis-local	Cosmos (localhost)	\N
+wttt00	Ethereum (Mainnet)	\N
+xiaomin	Ethereum (Mainnet)	\N
+aura-finance	Ethereum (Mainnet)	\N
+zkdao	Ethereum (Mainnet)	\N
+okdao	Ethereum (Mainnet)	\N
+cryptoliens	Ethereum (Mainnet)	\N
+tyesr	Ethereum (Mainnet)	\N
+0-verse	Osmosis	\N
+terms	NEAR (Mainnet)	\N
+88888	Ethereum (Mainnet)	\N
+/test/account/0x881db96aAC40a507DE991f36A149B4327F03Fece	NEAR (Mainnet)	\N
+commonwealthim	Ethereum (Mainnet)	\N
+max	Ethereum (Mainnet)	\N
+phantom-dao	Ethereum (Mainnet)	\N
+'test	Osmosis	\N
+0just-say-hi0cic	Ethereum (Mainnet)	\N
+hi-bro	Ethereum (Mainnet)	\N
+aofanadolu	Ethereum (Mainnet)	\N
+tendermoney	Ethereum (Mainnet)	\N
+rfgerg	Ethereum (Mainnet)	\N
+etereoethar	Ethereum (Mainnet)	\N
+jlkiouiuyytuytuyt	Ethereum (Mainnet)	\N
+swell-network	Ethereum (Mainnet)	\N
+/../terms	NEAR (Mainnet)	\N
+kusama	Kusama	\N
+bitshares	NEAR (Mainnet)	\N
+goblin-council	Ethereum (Mainnet)	\N
+1	Ethereum (Mainnet)	\N
+hello-greeting-every-day	Ethereum (Mainnet)	\N
+titi	Ethereum (Mainnet)	\N
+/../members	Osmosis	\N
+source	Osmosis	\N
+test-bug-community	Ethereum (Mainnet)	\N
+sunday	Ethereum (Mainnet)	\N
+scriptnetworktv	Ethereum (Mainnet)	\N
+gmaing	NEAR (Mainnet)	\N
+digm-dao	Ethereum (Mainnet)	\N
+terrible-dao	Ethereum (Mainnet)	\N
+space-lord-on-here	Ethereum (Mainnet)	\N
+maia-dao	Ethereum (Mainnet)	\N
+loop-power-dao	FaceFi	\N
+verses	Ethereum (Mainnet)	\N
+yuxiao	Ethereum (Mainnet)	\N
+planq	Planq	\N
+y2k-finance-dao	NEAR (Mainnet)	\N
+new-dao	Ethereum (Mainnet)	\N
+gradient-protocol	Ethereum (Mainnet)	\N
+mingming138m	Osmosis	\N
+lumaotoken	Ethereum (Mainnet)	\N
+swell-staking	Ethereum (Mainnet)	\N
+just-do-it	Ethereum (Mainnet)	\N
+kujira	Osmosis	\N
+yzdlh	Ethereum (Mainnet)	\N
+s	Osmosis	\N
+midas-capital	Ethereum (Mainnet)	\N
+nolus	Osmosis	\N
+cdt	Ethereum (Mainnet)	\N
+crow-network	Osmosis	\N
+anothertestcommunityxxx	Ethereum (Mainnet)	\N
+iconicaexperimental77777777777777	Ethereum (Mainnet)	\N
+vesta-finance	Ethereum (Mainnet)	\N
+snapshots	Ethereum (Mainnet)	\N
+testsdadasd	Ethereum (Mainnet)	\N
+rugpull-support-group	Ethereum (Mainnet)	\N
+artnr	Ethereum (Mainnet)	\N
+centrifuge	Centrifuge	\N
+crabdao	Ethereum (Mainnet)	\N
+azkk	Ethereum (Mainnet)	\N
+darwinia	Darwinia	\N
+streetlife.sputnik-dao.near	NEAR (Mainnet)	\N
+webb	Edgeware (Mainnet)	\N
+talkwater	Ethereum (Mainnet)	\N
+spiral1-dao	Ethereum (Mainnet)	\N
+web3dao	Ethereum (Mainnet)	\N
+distributedrepublic	Ethereum (Mainnet)	\N
+hanbing	Ethereum (Mainnet)	\N
+asdfg	Ethereum (Mainnet)	\N
+inner-i-forum	Osmosis	\N
+crust	Crust Network	\N
+lyun	Ethereum (Mainnet)	\N
+will-the-price-of-btc-go-up-or-down-in-2022	Ethereum (Mainnet)	\N
+go-myb	Ethereum (Mainnet)	\N
+crescent	Osmosis	\N
+stakeeasyfinance	Osmosis	\N
+testcreate	Ethereum (Mainnet)	\N
+treasure-island	Ethereum (Mainnet)	\N
+craterdao	Ethereum (Mainnet)	\N
+witchboard	Ethereum (Mainnet)	\N
+justlovewrl	Ethereum (Mainnet)	\N
+commondao	Ethereum (Mainnet)	\N
+snapshots01	Ethereum (Mainnet)	\N
+xyz	Ethereum (Mainnet)	\N
+csdk-beta	cosmos sdk v0.45.0	\N
+cryptothai	Ethereum (Mainnet)	\N
+dao-masons	Ethereum (Mainnet)	\N
+september	Ethereum (Mainnet)	\N
+useless-dao	Ethereum (Mainnet)	\N
+landestina	Osmosis	\N
+my	Ethereum (Mainnet)	\N
+shen	Ethereum (Mainnet)	\N
+electric-pill-dao	Ethereum (Mainnet)	\N
+cosmos-station-airdrops	Ethereum (Mainnet)	\N
+stanford-gsb-dao	Ethereum (Mainnet)	\N
+daoplomats	Osmosis	\N
+666888bbb	Ethereum (Mainnet)	\N
+abc890	Ethereum (Mainnet)	\N
+metafluence	NEAR (Mainnet)	\N
+john	Ethereum (Mainnet)	\N
+mingming1	Ethereum (Mainnet)	\N
+raw-dao	Ethereum (Mainnet)	\N
+zchuh	Ethereum (Mainnet)	\N
+metal-thugs	Ethereum (Mainnet)	\N
+robot	Ethereum (Mainnet)	\N
+kawawa	Ethereum (Mainnet)	\N
+testingcommunity	Osmosis	\N
+zyclubb555	Ethereum (Mainnet)	\N
+sdfsdfsdfsdfzxf123	Ethereum (Mainnet)	\N
+mimic-club	Ethereum (Mainnet)	\N
+grindery	NEAR (Mainnet)	\N
+wynd-dao	Osmosis	\N
+space-lord	Ethereum (Mainnet)	\N
+congruent-community	Ethereum (Mainnet)	\N
+atom-airdrop	Ethereum (Mainnet)	\N
+logpage	Ethereum (Mainnet)	\N
+/test	Osmosis	\N
+inv3st-dao	Ethereum (Mainnet)	\N
+httpswwwfacebookcomnaturesonecbd	Ethereum (Mainnet)	\N
+defrag-dao	Ethereum (Mainnet)	\N
+gaming	NEAR (Mainnet)	\N
+edgeware	Edgeware (Mainnet)	\N
+bloberino	Ethereum (Mainnet)	\N
+yomi	Osmosis	\N
+crescent-network	Osmosis	\N
+h2o-governance	Ethereum (Mainnet)	\N
+fghfgh	Ethereum (Mainnet)	\N
+wushuai	Ethereum (Mainnet)	\N
+aptos-spooks	Ethereum (Mainnet)	\N
+eth886688	Ethereum (Mainnet)	\N
+injective	Injective (Mainnet)	\N
+xiabing-dao	Ethereum (Mainnet)	\N
+gigatoken	NEAR (Mainnet)	\N
+stkwind	Ethereum (Mainnet)	\N
+test3	Ethereum (Mainnet)	\N
+balatero	Ethereum (Mainnet)	\N
+malcoln	Ethereum (Mainnet)	\N
+asdfasdfasdfasdf	Ethereum (Mainnet)	\N
+seeds-nh1	Ethereum (Mainnet)	\N
+bailan	Ethereum (Mainnet)	\N
+121212	Ethereum (Mainnet)	\N
+6gdf	Ethereum (Mainnet)	\N
+wangzong	Ethereum (Mainnet)	\N
+unstateschool	Ethereum (Mainnet)	\N
+test-alex	Ethereum (Mainnet)	\N
+likecoin	Osmosis	\N
+my-nft-community	Ethereum (Mainnet)	\N
+streelife-movie	NEAR (Mainnet)	\N
+ssd	Ethereum (Mainnet)	\N
+btc-price-end-of-the-year	Ethereum (Mainnet)	\N
+dslatest	Ethereum (Mainnet)	\N
+dao-common	Ethereum (Mainnet)	\N
+alphacapital	FaceFi	\N
+scriptnetwork	Ethereum (Mainnet)	\N
+blurt	Osmosis	\N
+gunlgpl	Ethereum (Mainnet)	\N
+raised-on-hip-hop	Ethereum (Mainnet)	\N
+kkrotcommunity	Osmosis	\N
+injective-testnet	Injective (Testnet)	\N
+third-prime-dao	Ethereum (Mainnet)	\N
+genesis	Osmosis	\N
+baima-community	Ethereum (Mainnet)	\N
+666888	Ethereum (Mainnet)	\N
+genshin	Ethereum (Mainnet)	\N
+common-dao-eth	Ethereum (Mainnet)	\N
+script-network	Ethereum (Mainnet)	\N
+sumo-axie-club	Ethereum (Mainnet)	\N
+ipsmeena	Ethereum (Mainnet)	\N
+geeks-council	Osmosis	\N
+jay	Ethereum (Mainnet)	\N
+usemate	Ethereum (Mainnet)	\N
+cosmos-korean-forum	Ethereum (Mainnet)	\N
+ch90dao	Ethereum (Mainnet)	\N
+victor	Osmosis	\N
+enn	Ethereum (Mainnet)	\N
+anyone	Ethereum (Mainnet)	\N
+phala	Khala Chain	\N
+van	Ethereum (Mainnet)	\N
+definitydao	Ethereum (Mainnet)	\N
+akshay	Ethereum (Mainnet)	\N
+cross-ubi-dao.sputnik-dao.near	NEAR (Mainnet)	\N
+kulupu	Kulupu	\N
+what-a-start	Ethereum (Mainnet)	\N
+daotown	Ethereum (Mainnet)	\N
+privatekkrio	Osmosis	\N
+gkdbz	Ethereum (Mainnet)	\N
+tetetetetetestttttt	Ethereum (Mainnet)	\N
+dao	Ethereum (Mainnet)	\N
+crypto-currency-foundation	Osmosis	\N
+holidao	Ethereum (Mainnet)	\N
+ingroup	Ethereum (Mainnet)	\N
+0just-say-hi0c	Ethereum (Mainnet)	\N
+poolzfinance	Ethereum (Mainnet)	\N
+moutai	Ethereum (Mainnet)	\N
+goblin	Ethereum (Mainnet)	\N
+wynd-forum	Osmosis	\N
+zigzag-airdrop-dao	Ethereum (Mainnet)	\N
+gdtk-research	Ethereum (Mainnet)	\N
+wushuai123	Ethereum (Mainnet)	\N
+bunka	FaceFi	\N
+posthuman-validator	Osmosis	\N
+umi	Ethereum (Mainnet)	\N
+test1234	Ethereum (Mainnet)	\N
+ccarella	Ethereum (Mainnet)	\N
+terralunacommunity	Osmosis	\N
+artsect	Ethereum (Mainnet)	\N
+snapshots010	Ethereum (Mainnet)	\N
+sdsag4	Ethereum (Mainnet)	\N
+solana	Solana (Mainnet beta)	\N
+omniflix	Osmosis	\N
+anu-initiative-dao	Ethereum (Mainnet)	\N
+mykic	Osmosis	\N
+solana-testnet	Solana (Testnet)	\N
+gdfgdfg	Ethereum (Mainnet)	\N
+diaosicn	Ethereum (Mainnet)	\N
+odin	ODIN Protocol	\N
+new-order-dao	Ethereum (Mainnet)	\N
+iokjlyu	Ethereum (Mainnet)	\N
+strategic-humanitarian-aid-response-dao	Ethereum (Mainnet)	\N
+boot	Osmosis	\N
+recowsearchie	Ethereum (Mainnet)	\N
+test-2124	Ethereum (Mainnet)	\N
+wlin	Ethereum (Mainnet)	\N
+hermes-omnichain	Ethereum (Mainnet)	\N
+anthony	Ethereum (Mainnet)	\N
+bprotocol	Ethereum (Mainnet)	\N
+biaogedao	Ethereum (Mainnet)	\N
+kljasgasdg	FaceFi	\N
+cosmpass	FaceFi	\N
+csdk-beta-ci	cosmos sdk v0.45.0 CI	\N
+fffff	Ethereum (Mainnet)	\N
+mediocratopia	FaceFi	\N
+meme-network	FaceFi	\N
+enso	Ethereum (Mainnet)	\N
+xuxubaobao	Ethereum (Mainnet)	\N
+keto-matcha-blue-recensioni-negative	Ethereum (Mainnet)	\N
+6-6-6	Ethereum (Mainnet)	\N
+islamic-coin	Haqq Network	\N
+dystoworld	Ethereum (Mainnet)	\N
+Pentest	NEAR (Mainnet)	\N
+soulswap	Ethereum (Mainnet)	\N
+hamirebel	Ethereum (Mainnet)	\N
+klikoiy	Ethereum (Mainnet)	\N
+seeds-xyz	Ethereum (Mainnet)	\N
+finteh	Ethereum (Mainnet)	\N
+ssv-community	Ethereum (Mainnet)	\N
+syncswap	Ethereum (Mainnet)	\N
+justicedao	Ethereum (Mainnet)	\N
+harry	Ethereum (Mainnet)	\N
+kimdogedoge	Ethereum (Mainnet)	\N
+mhhui888	Ethereum (Mainnet)	\N
+synthients	Ethereum (Mainnet)	\N
+arto-dao	Osmosis	\N
+freedom	Ethereum (Mainnet)	\N
+deva90	Ethereum (Mainnet)	\N
+swell-liquid-eth-staking	Ethereum (Mainnet)	\N
+sdsd12345	Ethereum (Mainnet)	\N
+zhang-hua	Ethereum (Mainnet)	\N
+gm-inj-ninjas	Ethereum (Mainnet)	\N
+banklessdao-writers-guild	Ethereum (Mainnet)	\N
+la-starter-test-dao	Ethereum (Mainnet)	\N
+joint-family	Ethereum (Mainnet)	\N
+thexperiemtnalasdasdad-lasdkjasirwjdask	Ethereum (Mainnet)	\N
+network-ara	Ethereum (Mainnet)	\N
+dawdawfac	Ethereum (Mainnet)	\N
+naturesonecbdgummies	NEAR (Mainnet)	\N
+rugdao	Ethereum (Mainnet)	\N
+planetary-council	Ethereum (Mainnet)	\N
+ixsa	Ethereum (Mainnet)	\N
+shibdao	Ethereum (Mainnet)	\N
+bobob784878	Ethereum (Mainnet)	\N
+betpub	Ethereum (Mainnet)	\N
+rok-community	Ethereum (Mainnet)	\N
+killerwhale	Ethereum (Mainnet)	\N
+test43215	Ethereum (Mainnet)	\N
+hiboo	Ethereum (Mainnet)	\N
+9536	Ethereum (Mainnet)	\N
+chronic-chain	Osmosis	\N
+pulsar	Ethereum (Mainnet)	\N
+9966	Ethereum (Mainnet)	\N
+fairvote02	Ethereum (Mainnet)	\N
+newsa	Ethereum (Mainnet)	\N
+gauntzytest	Ethereum (Mainnet)	\N
+reallygoodvaults	Ethereum (Mainnet)	\N
+cow-love	Ethereum (Mainnet)	\N
+0xxkillerwhale	Ethereum (Mainnet)	\N
+kappaboys	Ethereum (Mainnet)	\N
+bitoro-forum	Ethereum (Mainnet)	\N
+fishdao2	Osmosis	\N
+gfhr8768	Ethereum (Mainnet)	\N
+cerberus-zone	Cerberus	\N
+untezio	Osmosis	\N
+maneki-cosmos-dao	Osmosis	\N
+jackwang123	Ethereum (Mainnet)	\N
+warlock-zone	Ethereum (Mainnet)	\N
+435334	Ethereum (Mainnet)	\N
+wildfire	Ethereum (Mainnet)	\N
+kava-network	Osmosis	\N
+heyui	Ethereum (Mainnet)	\N
+lensdao	Ethereum (Mainnet)	\N
+blue-chip-ballers	FaceFi	\N
+testokk	FaceFi	\N
+eqe	Ethereum (Mainnet)	\N
+hicommonwealth	Ethereum (Mainnet)	\N
+noice	Ethereum (Mainnet)	\N
+sandy	Ethereum (Mainnet)	\N
+harry-jia	Ethereum (Mainnet)	\N
+starha	Ethereum (Mainnet)	\N
+cascadia	Ethereum (Mainnet)	\N
+carbon-protocol	Carbon Network	\N
+resolute-dao	Ethereum (Mainnet)	\N
+opoiuiu	Ethereum (Mainnet)	\N
+wang-yu	Ethereum (Mainnet)	\N
+9999a	Ethereum (Mainnet)	\N
+x251544545454545	Ethereum (Mainnet)	\N
+richerlee	Ethereum (Mainnet)	\N
+podouy	Ethereum (Mainnet)	\N
+clover	CLV Chain (Clover)	\N
+blorg	Ethereum (Mainnet)	\N
+prueba-1	Ethereum (Mainnet)	\N
+doctorwho11	Ethereum (Mainnet)	\N
+coolcat	Osmosis	\N
+test/members	Osmosis	\N
+poap-club	Ethereum (Mainnet)	\N
+0xsunday	Ethereum (Mainnet)	\N
+dsla-protocol	Ethereum (Mainnet)	\N
+azkrale	Ethereum (Mainnet)	\N
+testing	FaceFi	\N
+evmos	Evmos	\N
+majinl	Ethereum (Mainnet)	\N
+noomscom	Ethereum (Mainnet)	\N
+blzedasdas0	Ethereum (Mainnet)	\N
+savea	Ethereum (Mainnet)	\N
+secret-network	Secret Network	\N
+asd45	Ethereum (Mainnet)	\N
+/test/members	Osmosis	\N
+satio2015	Ethereum (Mainnet)	\N
+haotian12	Ethereum (Mainnet)	\N
+kkdemian	Ethereum (Mainnet)	\N
+pepemon	Ethereum (Mainnet)	\N
+mingming	Ethereum (Mainnet)	\N
+basindao	Osmosis	\N
+interestprotocol	Ethereum (Mainnet)	\N
+fzm2018	Ethereum (Mainnet)	\N
+ara-protocol	Ethereum (Mainnet)	\N
+test-jogi	Ethereum (Mainnet)	\N
+jus	Ethereum (Mainnet)	\N
+testai	Ethereum (Mainnet)	\N
+minh-quang	Ethereum (Mainnet)	\N
+synapseprotocol	Ethereum (Mainnet)	\N
+community-lyy	Ethereum (Mainnet)	\N
+stargaze	Stargaze	\N
+stakeeasy-project	Osmosis	\N
+decntral	Ethereum (Mainnet)	\N
+patica	Ethereum (Mainnet)	\N
+nramadas-test	Ethereum (Mainnet)	\N
+xcasdwew	Ethereum (Mainnet)	\N
+doctorwho	Ethereum (Mainnet)	\N
+niqi001	Ethereum (Mainnet)	\N
+ens110	Ethereum (Mainnet)	\N
+fortunedao	FaceFi	\N
+membrane	Ethereum (Mainnet)	\N
+justice	Ethereum (Mainnet)	\N
+cosmos-korean	Ethereum (Mainnet)	\N
+ki-chain	FaceFi	\N
+planets-of-cosmos-dao	Osmosis	\N
+akshay-kumar-sharma	Ethereum (Mainnet)	\N
+PEntest/	NEAR (Mainnet)	\N
+capapult	FaceFi	\N
+cc0headz	Ethereum (Mainnet)	\N
+gustakesgg	Ethereum (Mainnet)	\N
+gydedao	NEAR (Mainnet)	\N
+quicksilver-zone	Ethereum (Mainnet)	\N
+ukrainian-dao	Ethereum (Mainnet)	\N
+souleigh-web3	Ethereum (Mainnet)	\N
+iopiuyuytr564	Ethereum (Mainnet)	\N
+g63-club	Ethereum (Mainnet)	\N
+564fdff	Ethereum (Mainnet)	\N
+humanity-test	Ethereum (Mainnet)	\N
+dajidali	Ethereum (Mainnet)	\N
+dfgdfggz	Ethereum (Mainnet)	\N
+dymension-hub	Dymension-Hub	\N
+tester	Osmosis	\N
+zappquant	Ethereum (Mainnet)	\N
+developerdao	Ethereum (Mainnet)	\N
+hi-thailand-community	Ethereum (Mainnet)	\N
+eth8866887	Ethereum (Mainnet)	\N
+umee	Umee	\N
+kirky-club	Ethereum (Mainnet)	\N
+diaosi	Ethereum (Mainnet)	\N
+mohankumar	Ethereum (Mainnet)	\N
+agency	Edgeware (Mainnet)	\N
+cozynyc	Ethereum (Mainnet)	\N
+jogidao	Ethereum (Mainnet)	\N
+nftogetherland	Ethereum (Mainnet)	\N
+trial-2	Ethereum (Mainnet)	\N
+ogclub	Ethereum (Mainnet)	\N
+persistence	Persistence	\N
+supe	Ethereum (Mainnet)	\N
+raw-dao-junoswap	Juno	\N
+streetclub	Ethereum (Mainnet)	\N
+test2-sal	Ethereum (Mainnet)	\N
+whoopmasters	Ethereum (Mainnet)	\N
+99998	Ethereum (Mainnet)	\N
+patrickmeiermeiermeier	Ethereum (Mainnet)	\N
+aysheva	Ethereum (Mainnet)	\N
+moongems-community	Ethereum (Mainnet)	\N
+neptune-test	Ethereum (Mainnet)	\N
+rektmaker	Osmosis	\N
+poolydao	Ethereum (Mainnet)	\N
+zcxcav	Ethereum (Mainnet)	\N
+metaguild	Ethereum (Mainnet)	\N
+dalaoge	Ethereum (Mainnet)	\N
+likan	Ethereum (Mainnet)	\N
+accell-mobile	Ethereum (Mainnet)	\N
+c-dao	Ethereum (Mainnet)	\N
+nation3	Ethereum (Mainnet)	\N
+oraichain	Oraichain	\N
+nick1491	Ethereum (Mainnet)	\N
+0xroot	Ethereum (Mainnet)	\N
+logos-dao	Ethereum (Mainnet)	\N
+abc88	Ethereum (Mainnet)	\N
+ion	Osmosis	\N
+spiral-da0ereeree	Ethereum (Mainnet)	\N
+dfm	Ethereum (Mainnet)	\N
+web30	Ethereum (Mainnet)	\N
+space-lord-113766364236747236	Ethereum (Mainnet)	\N
+test01lys	Ethereum (Mainnet)	\N
+124512	Ethereum (Mainnet)	\N
+buidlerdao	Ethereum (Mainnet)	\N
+khala	Khala Chain	\N
+csdk	cosmos sdk devnet	\N
+knoxedge	Ethereum (Mainnet)	\N
+hk1730	Ethereum (Mainnet)	\N
+guojinmao	Ethereum (Mainnet)	\N
+near-testnet	NEAR (Testnet)	\N
+validator-quality-assurance-review-process	NEAR (Mainnet)	\N
+bulroon	Ethereum (Mainnet)	\N
+testrecord	Ethereum (Mainnet)	\N
+terp-network	Terp Network 	\N
+atom-airdrop-2023	Ethereum (Mainnet)	\N
+designcow	Ethereum (Mainnet)	\N
+dao-test	Ethereum (Mainnet)	\N
+0just-say-hi0	Ethereum (Mainnet)	\N
+test-bed-for-wormsss	Ethereum (Mainnet)	\N
+octorber	Ethereum (Mainnet)	\N
+gm	Ethereum (Mainnet)	\N
+wewewewewee	Ethereum (Mainnet)	\N
+shentu	Ethereum (Mainnet)	\N
+poyno-dao	Ethereum (Mainnet)	\N
+jackwang	Ethereum (Mainnet)	\N
+y2k-dao	Ethereum (Mainnet)	\N
+lol	Ethereum (Mainnet)	\N
+bondz	Ethereum (Mainnet)	\N
+alchemy	Ethereum (Mainnet)	\N
+kasdl	Ethereum (Mainnet)	\N
+qnt-dao	Ethereum (Mainnet)	\N
+0xseptember	Ethereum (Mainnet)	\N
+x2	Ethereum (Mainnet)	\N
+ong-long-ago	Ethereum (Mainnet)	\N
+richer	Ethereum (Mainnet)	\N
+doterth	Ethereum (Mainnet)	\N
+govmos-2	Osmosis	\N
+kunji-finance	Ethereum (Mainnet)	\N
+halo	Ethereum (Mainnet)	\N
+overdao	Ethereum (Mainnet)	\N
+test1	Ethereum (Mainnet)	\N
+thala	Ethereum (Mainnet)	\N
+bulrrun	FaceFi	\N
+jesse	Ethereum (Mainnet)	\N
+dhjahdahs	Osmosis	\N
+md-alamin	Ethereum (Mainnet)	\N
+vzsdfza	Ethereum (Mainnet)	\N
+nodle-network	Nodle Protocol	\N
+lidia	Ethereum (Mainnet)	\N
+hashflow1	Ethereum (Mainnet)	\N
+statesdao	NEAR (Mainnet)	\N
+run	Ethereum (Mainnet)	\N
+dcentral	Ethereum (Mainnet)	\N
+anthonys	Ethereum (Mainnet)	\N
+dymension	Dymension	\N
+ether	Ethereum (Mainnet)	\N
+coinweb	Ethereum (Mainnet)	\N
+alex-test-2	Ethereum (Mainnet)	\N
+startree	Ethereum (Mainnet)	\N
+666	Ethereum (Mainnet)	\N
+moneta-dao	Ethereum (Mainnet)	\N
+straightedge	Straightedge	\N
+web3	Ethereum (Mainnet)	\N
+shentu-chain	Shentu Chain	\N
+pulsechain-live-spaces	Ethereum (Mainnet)	\N
+test-community	Ethereum (Mainnet)	\N
+gfrtdf	Ethereum (Mainnet)	\N
+decent	Edgeware (Mainnet)	\N
+doctorwho1	Ethereum (Mainnet)	\N
+just-say-hi	Ethereum (Mainnet)	\N
+olga	Ethereum (Mainnet)	\N
+terra	Terra	\N
+lets-fucking-smurf-private-club	Ethereum (Mainnet)	\N
+bentiao	Ethereum (Mainnet)	\N
+signaller	Ethereum (Mainnet)	\N
+blockchan	FaceFi	\N
+xyx178	Ethereum (Mainnet)	\N
+mydao	Ethereum (Mainnet)	\N
+hashflowdao110	Ethereum (Mainnet)	\N
+solarpunk-dao	Ethereum (Mainnet)	\N
+xiaohuahua-nft-community	Ethereum (Mainnet)	\N
+axie-lore	Ethereum (Mainnet)	\N
+0xkenneth	Ethereum (Mainnet)	\N
+testing-forum-do-not-delete	Ethereum (Mainnet)	\N
+polaris-dao	Edgeware (Mainnet)	\N
+cata	Ethereum (Mainnet)	\N
+testzone	Ethereum (Mainnet)	\N
+gustakes	Ethereum (Mainnet)	\N
+555	Ethereum (Mainnet)	\N
+anya-anya-club	Ethereum (Mainnet)	\N
+dymgovtest	FaceFi	\N
+maroccr	Ethereum (Mainnet)	\N
+alter	Osmosis	\N
+cosmos-airdrop	Osmosis	\N
+teelmea	Ethereum (Mainnet)	\N
+smolverse	Ethereum (Mainnet)	\N
+terra-classic	FaceFi	\N
+hyperhash-staking	Ethereum (Mainnet)	\N
+y2k-finance	Ethereum (Mainnet)	\N
+fetchai	Osmosis	\N
+troop-community	Ethereum (Mainnet)	\N
+wangzongjing	Ethereum (Mainnet)	\N
+junhokim	Ethereum (Mainnet)	\N
+haotian	Ethereum (Mainnet)	\N
+sentinel	Osmosis	\N
+exponential-capital	Ethereum (Mainnet)	\N
+bolsheviks	Ethereum (Mainnet)	\N
+babylon	FaceFi	\N
+archway-forum	Archway	\N
+fatman-dao	Osmosis	\N
+draco3413	Ethereum (Mainnet)	\N
+stafihub	Stafihub	\N
+agoric	Agoric	\N
+polkadot	Polkadot	\N
+peeple-dao	Ethereum (Mainnet)	\N
+testdao	Ethereum (Mainnet)	\N
+the-systems-universe	Ethereum (Mainnet)	\N
+the-creepz	Ethereum (Mainnet)	\N
+blzed	Ethereum (Mainnet)	\N
+856743	Ethereum (Mainnet)	\N
+axie-infinity	Ronin	\N
+lys	Ethereum (Mainnet)	\N
+curedao	Ethereum (Mainnet)	\N
+pm-ara	Ethereum (Mainnet)	\N
+entrydao	Ethereum (Mainnet)	\N
+dexter-zone	Osmosis	\N
+magicklu	Edgeware (Mainnet)	\N
+dami	Ethereum (Mainnet)	\N
+zeo	Ethereum (Mainnet)	\N
+xlaad	Ethereum (Mainnet)	\N
+thinkium	Ethereum (Mainnet)	\N
+test/members/	NEAR (Mainnet)	\N
+juno	Juno	\N
+draco	Ethereum (Mainnet)	\N
+doctor	Ethereum (Mainnet)	\N
+reality	Osmosis	\N
+fairvote	Ethereum (Mainnet)	\N
+daokorea	Osmosis	\N
+stakeeasy-protocol	Osmosis	\N
+stride-protocol	Polkachu	\N
+andromeda	Osmosis	\N
+csdk-v1	cosmos sdk v0.46.11	\N
+vadim	Ethereum (Mainnet)	\N
+clandestina	Osmosis	\N
+huntezio	Osmosis	\N
+orakuru	Ethereum (Mainnet)	\N
+zephlin-battalion	Ethereum (Mainnet)	\N
+kukushonok	Ethereum (Mainnet)	\N
+evmos-testing-zone	Osmosis	\N
+dao-society	Ethereum (Mainnet)	\N
+aura-network	Osmosis	\N
+dalaoges-community	Ethereum (Mainnet)	\N
+cross-ubi-dao	NEAR (Mainnet)	\N
+akashji	Ethereum (Mainnet)	\N
+eqeqre2e2e2	Ethereum (Mainnet)	\N
+teadao	Ethereum (Mainnet)	\N
+degen-gang	Ethereum (Mainnet)	\N
+bitsong-forum	Bitsong	\N
+safaf	Ethereum (Mainnet)	\N
+hashflowdao	Ethereum (Mainnet)	\N
+xyyyz	NEAR (Mainnet)	\N
+freeway	Ethereum (Mainnet)	\N
+rajpal-pagare	Ethereum (Mainnet)	\N
+have-you-paid-attention-to-icp-will-it-work	Ethereum (Mainnet)	\N
+lzy	Osmosis	\N
+decentragora	Ethereum (Mainnet)	\N
+ps-test1	Ethereum (Mainnet)	\N
+3windao-triple-win-foundation	Ethereum (Mainnet)	\N
+kawawasssss	Ethereum (Mainnet)	\N
+test/	Osmosis	\N
+echelon	Osmosis	\N
+stafi	Stafi	\N
+rfgerg1	Ethereum (Mainnet)	\N
+creating-new-starter-community-failed123	Ethereum (Mainnet)	\N
+xiaohuahua-nft-investment-community	Ethereum (Mainnet)	\N
+testinganotherchain	Ethereum (Mainnet)	\N
+roketo	Ethereum (Mainnet)	\N
+saage	Osmosis	\N
+//google.com	Osmosis	\N
+sample	Osmosis	\N
+dao-with-web3	Ethereum (Mainnet)	\N
+charliedao	Ethereum (Mainnet)	\N
+wavely	FaceFi	\N
+chainx	ChainX	\N
+crescent-forum	Crescent Network	\N
+overlay	Ethereum (Mainnet)	\N
+xiabing-fddddao	Ethereum (Mainnet)	\N
+duckheadz	Ethereum (Mainnet)	\N
+zz9899440	Ethereum (Mainnet)	\N
+stitcha-network-test-governance	Ethereum (Mainnet)	\N
+camelia	Ethereum (Mainnet)	\N
+junoelite	Osmosis	\N
+\.
+
+
+--
+-- TOC entry 3443 (class 0 OID 23441106)
+-- Dependencies: 220
 -- Data for Name: SequelizeMeta; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public."SequelizeMeta" (name) FROM stdin;
 20220916001452-queued-data-consistency.js
 20221007140244-trim-entities-table.js
+20221216162714-remove-cosmos-voting-events.js
+20221206094622-move-chain-to-event.js
+20230317035117-remove-chain-column.js
+20221206100637-move-network-to-event.js
+20230401044247-redo-cet-migrations.js
+20230401044247-remove-chain-event-types.js
+20230401055258-delete-unused-events.js
+20230518203020-set-event-origin.js
 \.
 
 
 --
--- TOC entry 4351 (class 0 OID 0)
--- Dependencies: 214
+-- TOC entry 3454 (class 0 OID 0)
+-- Dependencies: 217
 -- Name: ChainEntities_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."ChainEntities_id_seq"', 2495, true);
+SELECT pg_catalog.setval('public."ChainEntities_id_seq"', 2716, true);
 
 
 --
--- TOC entry 4352 (class 0 OID 0)
--- Dependencies: 217
+-- TOC entry 3455 (class 0 OID 0)
+-- Dependencies: 219
 -- Name: ChainEvents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."ChainEvents_id_seq"', 8368263, true);
+SELECT pg_catalog.setval('public."ChainEvents_id_seq"', 9450474, true);
 
 
 --
--- TOC entry 4184 (class 2606 OID 172110)
--- Name: ChainEntities ChainEntities_chain_type_type_id_uk; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3288 (class 2606 OID 23639607)
+-- Name: ChainEntities ChainEntities_chain_type_type_id_contract_address_uk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public."ChainEntities"
-    ADD CONSTRAINT "ChainEntities_chain_type_type_id_uk" UNIQUE (chain, type, type_id);
+    ADD CONSTRAINT "ChainEntities_chain_type_type_id_contract_address_uk" UNIQUE (chain_name, type, type_id, contract_address);
 
 
 --
--- TOC entry 4186 (class 2606 OID 172112)
+-- TOC entry 3290 (class 2606 OID 23639226)
 -- Name: ChainEntities ChainEntities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -217,16 +1921,7 @@ ALTER TABLE ONLY public."ChainEntities"
 
 
 --
--- TOC entry 4190 (class 2606 OID 172114)
--- Name: ChainEventTypes ChainEventTypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public."ChainEventTypes"
-    ADD CONSTRAINT "ChainEventTypes_pkey" PRIMARY KEY (id);
-
-
---
--- TOC entry 4193 (class 2606 OID 172116)
+-- TOC entry 3295 (class 2606 OID 23639228)
 -- Name: ChainEvents ChainEvents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -235,7 +1930,7 @@ ALTER TABLE ONLY public."ChainEvents"
 
 
 --
--- TOC entry 4196 (class 2606 OID 172122)
+-- TOC entry 3298 (class 2606 OID 23639230)
 -- Name: SequelizeMeta SequelizeMeta_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -244,7 +1939,7 @@ ALTER TABLE ONLY public."SequelizeMeta"
 
 
 --
--- TOC entry 4191 (class 1259 OID 172123)
+-- TOC entry 3293 (class 1259 OID 23639231)
 -- Name: ChainEvents_entity_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -252,23 +1947,23 @@ CREATE INDEX "ChainEvents_entity_id_idx" ON public."ChainEvents" USING btree (en
 
 
 --
--- TOC entry 4187 (class 1259 OID 172124)
+-- TOC entry 3291 (class 1259 OID 23639232)
 -- Name: chain_entities_chain; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX chain_entities_chain ON public."ChainEntities" USING btree (chain);
+CREATE INDEX chain_entities_chain ON public."ChainEntities" USING btree (chain_name);
 
 
 --
--- TOC entry 4188 (class 1259 OID 172125)
+-- TOC entry 3292 (class 1259 OID 23639233)
 -- Name: chain_entities_chain_completed; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX chain_entities_chain_completed ON public."ChainEntities" USING btree (chain, completed);
+CREATE INDEX chain_entities_chain_completed ON public."ChainEntities" USING btree (chain_name, completed);
 
 
 --
--- TOC entry 4194 (class 1259 OID 172126)
+-- TOC entry 3296 (class 1259 OID 23639234)
 -- Name: chain_events_entity_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -276,16 +1971,7 @@ CREATE INDEX chain_events_entity_id ON public."ChainEvents" USING btree (entity_
 
 
 --
--- TOC entry 4197 (class 2606 OID 172127)
--- Name: ChainEvents ChainEvents_chain_event_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public."ChainEvents"
-    ADD CONSTRAINT "ChainEvents_chain_event_type_id_fkey" FOREIGN KEY (chain_event_type_id) REFERENCES public."ChainEventTypes"(id);
-
-
---
--- TOC entry 4198 (class 2606 OID 172132)
+-- TOC entry 3299 (class 2606 OID 23639235)
 -- Name: ChainEvents ChainEvents_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -293,7 +1979,7 @@ ALTER TABLE ONLY public."ChainEvents"
     ADD CONSTRAINT "ChainEvents_entity_id_fkey" FOREIGN KEY (entity_id) REFERENCES public."ChainEntities"(id);
 
 
--- Completed on 2022-12-15 13:10:24 EST
+-- Completed on 2023-05-23 14:02:51 CEST
 
 --
 -- PostgreSQL database dump complete
