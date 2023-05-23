@@ -6,9 +6,9 @@ module.exports = {
       const renameIndex = async (oldIndexName, newIndexName) => {
         await queryInterface.sequelize.query(
           `
-              ALTER INDEX "${oldIndexName}" RENAME TO "${newIndexName}";
+              ALTER INDEX IF EXISTS "${oldIndexName}" RENAME TO "${newIndexName}";
           `,
-          { transaction: t, logging: console.log }
+          { transaction: t }
         );
       };
 
@@ -18,7 +18,7 @@ module.exports = {
               ALTER TABLE "${tableName}"
                   RENAME CONSTRAINT "${oldName}" TO "${newName}";
           `,
-          { transaction: t, logging: console.log }
+          { transaction: t }
         );
       };
 
@@ -107,16 +107,31 @@ module.exports = {
         'Threads_author_id_fkey'
       );
 
+      // for some reason this renaming fails when executed on a completely fresh db instance while all the others
+      // execute with no issues thus here we first check if the fkey exists and skip the renaming if it doesn't
+      const [res] = await queryInterface.sequelize.query(
+        `
+          SELECT 1
+          FROM information_schema.table_constraints
+          WHERE constraint_name = 'OffchainTopics_rule_id_fkey'
+            AND table_name = 'Topics';
+      `,
+        { transaction: t }
+      );
+
+      if (res.length > 0) {
+        await renameConstraint(
+          'Topics',
+          'OffchainTopics_rule_id_fkey',
+          'Topics_rule_id_fkey'
+        );
+      }
+
       // Topics
       await renameConstraint(
         'Topics',
         'OffchainThreadCategories_pkey',
         'Topics_pkey'
-      );
-      await renameConstraint(
-        'Topics',
-        'OffchainTopics_rule_id_fkey',
-        'Topics_rule_id_fkey'
       );
 
       // Votes
