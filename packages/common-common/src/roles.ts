@@ -1,1 +1,1 @@
-export type Permission = 'member' | 'moderator' | 'admin';
+export type Role = 'member' | 'moderator' | 'admin';

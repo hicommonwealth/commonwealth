@@ -16,8 +16,6 @@ import sleep from 'sleep-promise';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from 'test/util/modelUtils';
-import { addAllowDenyPermissionsForCommunityRole } from 'test/util/modelUtils';
-import { Action } from 'shared/permissions';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
@@ -82,13 +80,6 @@ describe('Thread Tests', () => {
     userJWT2 = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
-
-    addAllowDenyPermissionsForCommunityRole(
-      'member',
-      chain2,
-      0,
-      Action.CREATE_THREAD
-    );
   });
 
   describe('/createThread', () => {

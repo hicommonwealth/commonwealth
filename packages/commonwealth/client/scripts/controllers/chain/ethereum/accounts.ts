@@ -47,7 +47,13 @@ class EthereumAccounts
     try {
       return this._store.getByAddress(address);
     } catch (e) {
-      return new EthereumAccount(this.app, this._Chain, this, address);
+      return new EthereumAccount(
+        this.app,
+        this._Chain,
+        this,
+        address,
+        'member'
+      );
     }
   }
 

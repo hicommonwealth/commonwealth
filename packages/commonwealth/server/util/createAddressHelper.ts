@@ -1,16 +1,15 @@
-import crypto from 'crypto';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { bech32 } from 'bech32';
-import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { createRole, findOneRole } from './roles';
-import { mixpanelTrack } from './mixpanelUtil';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import crypto from 'crypto';
+import type { NextFunction } from 'express';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import type { UserInstance } from '../models/user';
-import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import type { DB } from '../models';
+import type { UserInstance } from '../models/user';
 import { Errors } from '../routes/createAddress';
+import { mixpanelTrack } from './mixpanelUtil';
 
 type CreateAddressReq = {
   address: string;
@@ -132,18 +131,6 @@ export async function createAddressHelper(
 
     const updatedObj = await existingAddress.save();
 
-    // even if this is the existing address, there is a case to login to community through this address's chain
-    // if community is valid, then we should create a role between this community vs address
-    if (req.community) {
-      const role = await findOneRole(
-        models,
-        { where: { address_id: updatedObj.id } },
-        req.community
-      );
-      if (!role) {
-        await createRole(models, updatedObj.id, req.community, 'member');
-      }
-    }
     return { ...updatedObj.toJSON(), newly_created: false };
   } else {
     // address doesn't exist, add it to the database
@@ -176,12 +163,6 @@ export async function createAddressHelper(
         last_active,
         wallet_id: req.wallet_id,
       });
-
-      // if user.id is undefined, the address is being used to create a new user,
-      // and we should automatically give it a Role in its native chain (or community)
-      if (!user) {
-        await createRole(models, newObj.id, req.chain, 'member');
-      }
 
       if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({

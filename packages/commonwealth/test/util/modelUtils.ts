@@ -5,10 +5,10 @@ import { stringToU8a } from '@polkadot/util';
 import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
+import { Role } from 'common-common/src/roles';
 import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import { createRole, findOneRole } from 'server/util/roles';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
@@ -19,8 +19,6 @@ import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type { Permission } from '../../server/models/role';
-
 import {
   constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
@@ -36,46 +34,6 @@ export const generateEthAddress = () => {
   const address = Web3.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
-
-export async function addAllowDenyPermissionsForCommunityRole(
-  role_name: Permission,
-  chain_id: string,
-  allow_permission: number | undefined,
-  deny_permission: number | undefined
-) {
-  try {
-    console.log('addAllowDenyPermissionsForCommunityRole');
-    const permissionsManager = new PermissionManager();
-    // get community role object from the database
-    const communityRole = await models.CommunityRole.findOne({
-      where: {
-        chain_id,
-        name: role_name,
-      },
-    });
-    let denyPermission;
-    let allowPermission;
-    if (deny_permission) {
-      denyPermission = permissionsManager.addDenyPermission(
-        BigInt(communityRole?.deny || 0),
-        deny_permission
-      );
-      communityRole.deny = denyPermission;
-    }
-    if (allow_permission) {
-      allowPermission = permissionsManager.addAllowPermission(
-        BigInt(communityRole?.allow || 0),
-        allow_permission
-      );
-      communityRole.allow = allowPermission;
-    }
-    // save community role object to the database
-    const updatedRole = await communityRole.save();
-    console.log('updatedRole', updatedRole);
-  } catch (err) {
-    throw new Error(err);
-  }
-}
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
@@ -409,7 +367,7 @@ export interface AssignRoleArgs {
   chainOrCommObj: {
     chain_id: string;
   };
-  role: Permission;
+  role: Role;
 }
 
 export const updateRole = async (args: AssignRoleArgs) => {

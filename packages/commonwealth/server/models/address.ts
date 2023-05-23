@@ -1,4 +1,4 @@
-import { Permission } from 'common-common/src/roles';
+import { Role } from 'common-common/src/roles';
 import type { WalletId } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
@@ -31,7 +31,7 @@ export type AddressAttributes = {
   Chain?: ChainAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  permission?: Permission;
+  permission?: Role;
   SsoToken?: SsoTokenAttributes;
 };
 

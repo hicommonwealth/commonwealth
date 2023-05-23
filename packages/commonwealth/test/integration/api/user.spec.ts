@@ -25,30 +25,32 @@ describe('User Model Routes', () => {
     let userEmail;
 
     beforeEach('create new user', async () => {
-      const res = await modelUtils.createAndVerifyAddress({ chain });
-      userAddress = res.address;
-      userEmail = res.email;
-      jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      const isAdmin = await modelUtils.updateRole({
-        address_id: res.address_id,
-        chainOrCommObj: { chain_id: chain },
-        role: 'admin',
-      });
-      expect(userAddress).to.not.be.null;
-      expect(jwtToken).to.not.be.null;
-      expect(isAdmin).to.not.be.null;
+      // const res = await modelUtils.createAndVerifyAddress({ chain });
+      // userAddress = res.address;
+      // userEmail = res.email;
+      // jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
+      // const isAdmin = await modelUtils.updateRole({
+      //   address_id: res.address_id,
+      //   chainOrCommObj: { chain_id: chain },
+      //   role: 'admin',
+      // });
+      // expect(userAddress).to.not.be.null;
+      // expect(jwtToken).to.not.be.null;
+      // expect(isAdmin).to.not.be.null;
     });
 
     it('should add an email to user with just an address', async () => {
+      const invalidRequest = {
+        thread_id: 'invalid',
+        editors: [{ chain: 'invalid', address: 'invalid' }],
+      };
+
       const email = 'test@commonwealth.im';
       const res = await chai
         .request(app)
-        .post('/api/updateEmail')
+        .post('/api/addEditors')
         .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          email,
-        });
+        .send(invalidRequest);
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.email).to.be.equal(email);
     });

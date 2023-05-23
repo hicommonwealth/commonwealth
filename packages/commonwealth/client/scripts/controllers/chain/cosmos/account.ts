@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import { Role } from 'common-common/src/roles';
 import CosmosChain from 'controllers/chain/cosmos/chain';
 import type { CosmosToken } from 'controllers/chain/cosmos/types';
 import _ from 'lodash';
@@ -23,9 +24,10 @@ export default class CosmosAccount extends Account {
     app: IApp,
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
-    address: string
+    address: string,
+    role: Role
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: app.chain.meta, address, role });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

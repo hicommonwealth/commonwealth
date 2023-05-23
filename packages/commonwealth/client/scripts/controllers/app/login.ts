@@ -264,6 +264,7 @@ export async function createUserWithAddress(
     walletId,
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
+    role: response.result.role,
   });
   return { account, newlyCreated: response.result.newly_created };
 }

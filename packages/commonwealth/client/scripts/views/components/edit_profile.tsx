@@ -196,6 +196,7 @@ const EditProfileComponent = () => {
           chain: addresses[0].chain,
           address: addresses[0].address,
           profile: oldProfile,
+          role: addresses[0].role,
         })
       );
     } else {

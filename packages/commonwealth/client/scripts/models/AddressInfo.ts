@@ -1,3 +1,4 @@
+import { Role } from 'common-common/src/roles';
 import type { WalletId } from 'common-common/src/types';
 import app from 'state';
 import Account from './Account';
@@ -11,6 +12,7 @@ class AddressInfo extends Account {
     id: number | null | undefined,
     address: string,
     chainId: string,
+    role: Role,
     keytype?: string,
     walletId?: WalletId,
     ghostAddress?: boolean,
@@ -24,6 +26,7 @@ class AddressInfo extends Account {
       addressId: id,
       walletId,
       ghostAddress,
+      role,
     });
     this.id = id;
     this.keytype = keytype;

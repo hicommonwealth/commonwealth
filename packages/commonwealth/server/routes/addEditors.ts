@@ -6,7 +6,6 @@ import { IThreadCollaborator } from 'models/Thread';
 import { Op } from 'sequelize';
 import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
-import { AddressAttributes } from '../models/address';
 import { failure } from '../types';
 import emitNotifications from '../util/emitNotifications';
 
@@ -53,19 +52,21 @@ const addEditors = async (
 
   if (!thread) return next(new AppError(Errors.InvalidThread));
 
-  const collaborators: AddressAttributes[] = (
-    await models.Address.findOne({
-      where: {
-        chain: {
-          [Op.in]: Array.from(editorChains),
-        },
-        address: {
-          [Op.in]: Array.from(editorAddresses),
-        },
+  const collaborators = await models.Address.findAll({
+    where: {
+      chain: {
+        [Op.in]: Array.from(editorChains),
       },
-      include: [models.User],
-    })
-  )[0];
+      address: {
+        [Op.in]: Array.from(editorAddresses),
+      },
+    },
+    include: [models.User],
+  });
+
+  if (!collaborators) {
+    return next(new AppError(Errors.InvalidEditor));
+  }
 
   // Make sure that we query every collaborator provided.
   if (

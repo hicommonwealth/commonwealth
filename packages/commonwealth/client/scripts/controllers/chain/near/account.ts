@@ -1,5 +1,6 @@
 /* eslint-disable no-use-before-define */
 import type { NearToken } from 'adapters/chain/near/types';
+import { Role } from 'common-common/src/roles';
 import { Account as NearJsAccount, keyStores } from 'near-api-js';
 import type { AccountView } from 'near-api-js/lib/providers/provider';
 import type { IApp } from 'state';
@@ -35,9 +36,10 @@ export class NearAccount extends Account {
     app: IApp,
     Chain: NearChain,
     Accounts: NearAccounts,
-    address: string
+    address: string,
+    role: Role
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: app.chain.meta, address, role });
     this._walletConnection = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;
@@ -100,7 +102,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
     try {
       acct = this._store.getByAddress(address);
     } catch (e) {
-      acct = new NearAccount(this.app, this._Chain, this, address);
+      acct = new NearAccount(this.app, this._Chain, this, address, 'member');
     }
     return acct;
   }

@@ -510,8 +510,8 @@ setupAPI(
   globalActivityCache,
   databaseValidationService
 );
-setupCosmosProxy(app, models);
-setupCacheTestEndpoints(app);
+// setupCosmosProxy(app, models);
+// setupCacheTestEndpoints(app);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

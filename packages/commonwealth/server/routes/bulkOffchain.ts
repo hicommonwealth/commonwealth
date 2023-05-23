@@ -7,17 +7,14 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import type { CommunityRoleInstance } from 'server/models/community_role';
+import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { DB } from '../models';
 import type { ChatChannelInstance } from '../models/chat_channel';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';
-import type { RoleInstanceWithPermission } from '../util/roles';
-import { findAllRoles } from '../util/roles';
 
 export const Errors = {};
 
@@ -39,7 +36,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     rules,
     communityBanner,
     contractsWithTemplatesData,
-    communityRoles,
   ] = await (<
     Promise<
       [
@@ -55,8 +51,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           contract: ContractInstance;
           ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
-        }>,
-        CommunityRoleInstance[]
+        }>
       ]
     >
   >Promise.all([
@@ -76,12 +71,9 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     ),
 
     // admins
-    findAllRoles(
-      models,
-      { include: [models.Address], order: [['created_at', 'DESC']] },
-      chain.id,
-      ['admin', 'moderator']
-    ),
+    models.Address.findAll({
+      where: { chain: chain.id, role: { [Op.in]: ['admin', 'moderator'] } },
+    }),
     // most active users
     new Promise(async (resolve, reject) => {
       try {
@@ -232,7 +224,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
-    models.CommunityRole.findAll({ where: { chain_id: chain.id } }),
   ]));
 
   const numVotingThreads = threadsInVoting.filter(

@@ -1,3 +1,4 @@
+import { Role } from 'common-common/src/roles';
 import _ from 'lodash';
 import type { IApp } from 'state';
 import Account from '../../../models/Account';
@@ -38,9 +39,10 @@ export default class SolanaAccount extends Account {
     app: IApp,
     ChainInfo: SolanaChain,
     Accounts: SolanaAccounts,
-    address: string
+    address: string,
+    role: Role
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: app.chain.meta, address, role });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

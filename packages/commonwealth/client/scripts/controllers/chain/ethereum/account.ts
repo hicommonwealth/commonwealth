@@ -1,5 +1,6 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
+import { Role } from 'common-common/src/roles';
 import type { IApp } from 'state';
 import Account from '../../../models/Account';
 import type EthereumAccounts from './accounts';
@@ -26,9 +27,10 @@ export default class EthereumAccount extends Account {
     app: IApp,
     ChainInfo: EthereumChain,
     Accounts: EthereumAccounts,
-    address: string
+    address: string,
+    role: Role
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: app.chain.meta, address, role });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

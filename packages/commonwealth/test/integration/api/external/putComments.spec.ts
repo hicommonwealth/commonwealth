@@ -2,8 +2,10 @@ import chai from 'chai';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import models from 'server/database';
+import app from '../../../../server-test';
 import { JWT_SECRET } from '../../../../server/config';
-import { put } from './appHook.spec';
+import { Errors } from '../../../../server/routes/addEditors';
+import { post, put } from './appHook.spec';
 import {
   testAddresses,
   testChains,

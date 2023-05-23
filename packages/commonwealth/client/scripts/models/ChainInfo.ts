@@ -12,7 +12,6 @@ import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
-import type CommunityRole from './CommunityRole';
 
 class ChainInfo {
   public readonly id: string;
@@ -52,7 +51,6 @@ class ChainInfo {
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
-  public communityRoles: CommunityRole[];
   public cosmosGovernanceVersion?: string;
 
   public get node() {
@@ -132,7 +130,6 @@ class ChainInfo {
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
-    this.communityRoles = communityRoles;
     this.cosmosGovernanceVersion = cosmosGovernanceVersion;
   }
 

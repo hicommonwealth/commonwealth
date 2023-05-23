@@ -1,3 +1,4 @@
+import { Role } from 'common-common/src/roles';
 import type { WalletId } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
@@ -10,6 +11,7 @@ class Account {
   public readonly address: string;
   public readonly chain: ChainInfo;
   public readonly ghostAddress: boolean;
+  public readonly role: Role;
 
   // validation token sent by server
   private _validationToken?: string;
@@ -36,10 +38,12 @@ class Account {
     validationBlockInfo,
     profile,
     ignoreProfile,
+    role,
   }: {
     // required args
     chain: ChainInfo;
     address: string;
+    role: Role;
 
     // optional args
     addressId?: number;
@@ -57,6 +61,7 @@ class Account {
     // Because there won't be any chain base or chain class
     this.chain = chain;
     this.address = address;
+    this.role = role;
     this._addressId = addressId;
     this._walletId = walletId;
     this._validationToken = validationToken;
