@@ -356,6 +356,7 @@ export async function loginWithMagicLink({
         // send chain/community to request
         chain: app.activeChainId(),
         address: chainAddress,
+        jwt: app.user.jwt,
       },
     });
     if (response.status === 'Success') {
@@ -398,6 +399,7 @@ export async function handleSocialLoginCallback() {
     },
     data: {
       chain: app.activeChainId(),
+      jwt: app.user.jwt,
     },
   });
   console.log('Server response:', response);
