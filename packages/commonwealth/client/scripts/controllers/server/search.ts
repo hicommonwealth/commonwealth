@@ -274,7 +274,8 @@ class SearchController {
     searchTerm: string,
     chainScope: string,
     pageSize?: number,
-    page?: number
+    page?: number,
+    includeRoles?: boolean
   ) => {
     try {
       const response = await $.get(`${app.serverUrl()}/searchProfiles`, {
@@ -282,6 +283,7 @@ class SearchController {
         search: searchTerm,
         page_size: pageSize,
         page,
+        include_roles: includeRoles,
       });
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);

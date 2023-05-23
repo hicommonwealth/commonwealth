@@ -88,9 +88,11 @@ const searchProfiles = async (
       "Addresses" on "Profiles".user_id = "Addresses".user_id
     WHERE
       ${chainWhere}
-      "Profiles".profile_name ILIKE $searchTerm
-      OR
-      "Addresses".address ILIKE $searchTerm
+      (
+        "Profiles".profile_name ILIKE $searchTerm
+        OR
+        "Addresses".address ILIKE $searchTerm
+      )
     GROUP BY
       "Profiles".id
   `;
@@ -154,7 +156,8 @@ const searchProfiles = async (
           },
         },
       },
-      req.chain?.id
+      req.chain?.id,
+      ['member', 'moderator', 'admin']
     );
 
     const addressIdRoles: Record<number, RoleInstanceWithPermission[]> = {};

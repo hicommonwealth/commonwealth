@@ -14,6 +14,7 @@ import { MembersSearchBar } from '../components/members_search_bar';
 
 type MemberInfo = {
   profile: MinimumProfile;
+  role: any;
 };
 
 const MembersPage = () => {
@@ -34,7 +35,8 @@ const MembersPage = () => {
       searchQuery || '',
       app.activeChainId(),
       50,
-      newPage
+      newPage,
+      true
     );
 
     if (response.totalCount) {
@@ -48,6 +50,7 @@ const MembersPage = () => {
       address_chain: p.addresses?.[0]?.chain,
       chain_id: p.addresses?.[0]?.chain,
       profile_name: p.profile_name,
+      roles: p.roles,
     }));
 
     const accessLevelOrder = Object.values(AccessLevel);
@@ -72,6 +75,7 @@ const MembersPage = () => {
       );
       return {
         profile: minProfile,
+        role: p.roles.find((role) => role.chain_id === app.activeChainId()),
       };
     });
 
@@ -121,6 +125,7 @@ const MembersPage = () => {
               <div className="member-row" key={index}>
                 <User
                   user={profileInfo.profile}
+                  role={profileInfo.role}
                   showRole
                   hideAvatar={false}
                   linkify
