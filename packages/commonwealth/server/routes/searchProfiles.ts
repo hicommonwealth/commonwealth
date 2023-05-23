@@ -77,6 +77,7 @@ const searchProfiles = async (
       "Profiles".id,
       "Profiles".user_id,
       "Profiles".profile_name,
+      "Profiles".avatar_url,
       "Profiles".created_at,
       array_agg("Addresses".id) as address_ids,
       array_agg("Addresses".chain) as chains,
@@ -132,6 +133,7 @@ const searchProfiles = async (
       id: profile.id,
       user_id: profile.user_id,
       profile_name: profile.profile_name,
+      avatar_url: profile.avatar_url,
       addresses: profile.address_ids.map((_, i) => ({
         id: profile.address_ids[i],
         chain: profile.chains[i],

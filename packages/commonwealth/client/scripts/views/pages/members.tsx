@@ -50,25 +50,16 @@ const MembersPage = () => {
       address_chain: p.addresses?.[0]?.chain,
       chain_id: p.addresses?.[0]?.chain,
       profile_name: p.profile_name,
+      avatar_url: p.avatar_url,
       roles: p.roles,
     }));
 
-    const accessLevelOrder = Object.values(AccessLevel);
-
-    const membersCopy = [...members];
-
-    const membersCopySortedByPerms = membersCopy.sort(
-      (a, b) =>
-        accessLevelOrder.indexOf(a.permission) -
-        accessLevelOrder.indexOf(b.permission)
-    );
-
-    const profiles: Array<MemberInfo> = membersCopySortedByPerms.map((p) => {
+    const profiles: Array<MemberInfo> = members.map((p) => {
       const minProfile = new MinimumProfile(p.address, p.chain);
       minProfile.initialize(
         p.profile_name,
         p.address,
-        null,
+        p.avatar_url,
         p.id,
         p.chain,
         null
