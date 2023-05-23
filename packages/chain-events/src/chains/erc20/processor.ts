@@ -25,10 +25,10 @@ export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
    * @param tokenName
    * @returns an array of processed events
    */
-  public async process(
-    event: RawEvent,
-    tokenName?: string
-  ): Promise<CWEvent<IEventData>[]> {
+  public async process(event: RawEvent): Promise<CWEvent<IEventData>[]> {
+    const tokenName = this._api.tokens.find(
+      (t) => t.contract.address.toLowerCase() == event.address.toLowerCase()
+    ).tokenName;
     const log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
     );

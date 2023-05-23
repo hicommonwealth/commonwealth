@@ -129,7 +129,7 @@ export abstract class IEventSubscriber<Api, RawEvent> {
 export type EvmEventSourceMapType = {
   [address: string]: {
     eventSignatures: string[];
-    api: Interface,
+    api: Interface;
   };
 };
 

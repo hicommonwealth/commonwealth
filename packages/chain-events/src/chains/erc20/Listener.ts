@@ -106,7 +106,7 @@ export class Listener extends BaseListener<
         eventSignatures: Object.keys(token.contract.interface.events).map((x) =>
           ethers.utils.id(x)
         ),
-        api: token.contract.interface
+        api: token.contract.interface,
       };
     }
     return tokenHashMap;
@@ -137,12 +137,8 @@ export class Listener extends BaseListener<
     }
   }
 
-  protected async processBlock(
-    event: RawEvent,
-    tokenName?: string
-  ): Promise<void> {
-    const cwEvents: CWEvent[] = await this._processor.process(event, tokenName);
-    console.log('cwEvents', cwEvents);
+  protected async processBlock(event: RawEvent): Promise<void> {
+    const cwEvents: CWEvent[] = await this._processor.process(event);
     // process events in sequence
     for (const e of cwEvents) {
       await this.handleEvent(e as CWEvent);

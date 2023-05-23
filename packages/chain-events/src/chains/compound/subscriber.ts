@@ -39,7 +39,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     const provider = this._api.provider;
 
     // retrieves the last numEstimateBlocks blocks to estimate block time
-    const currentBlockNum = await provider.getBlockNumber();
+    const currentBlockNum = (await provider.getBlockNumber()) - 100;
     this.log.info(`Current Block: ${currentBlockNum}`);
     const blockPromises = [];
     for (
@@ -64,9 +64,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
         new Error(`maxBlockTime is 0.`)
       );
       // default to Ethereum block time
-      return 15;
+      return 12;
     }
-    maxBlockTime = 5
     this.log.info(`Polling interval: ${maxBlockTime} seconds`);
     return maxBlockTime;
   }
@@ -78,17 +77,24 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     const currentBlockNum = await provider.getBlockNumber();
     console.log('New current block number:', currentBlockNum);
     if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
-      const logs: Log[] = await provider.send('eth_getLogs', [{
-        fromBlock: ethers.BigNumber.from(this.lastBlockNumber + 1).toHexString(),
-        toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
-        address: this._api.address,
-      }]);
+      const logs: Log[] = await provider.send('eth_getLogs', [
+        {
+          fromBlock: ethers.BigNumber.from(
+            this.lastBlockNumber + 1
+          ).toHexString(),
+          toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
+          address: this._api.address,
+        },
+      ]);
       // filter the logs we need
       for (const log of logs) {
-
-        if(!this.eventSourceMap[log.address.toLowerCase()].eventSignatures
-        .includes(log.topics[0])) continue;
-        console.log(log.blockNumber)
+        if (
+          !this.eventSourceMap[
+            log.address.toLowerCase()
+          ].eventSignatures.includes(log.topics[0])
+        )
+          continue;
+        console.log(log.blockNumber);
         const parsedRawEvent =
           this.eventSourceMap[log.address.toLowerCase()].api.parseLog(log);
 
@@ -96,7 +102,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
           address: log.address.toLowerCase(),
           args: parsedRawEvent.args as any,
           name: parsedRawEvent.name,
-          blockNumber: parseInt(log.blockNumber,16),
+          blockNumber: parseInt(log.blockNumber, 16),
           data: log.data,
         };
 

@@ -38,13 +38,16 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
   constructor(api: IErc721Contracts, name: string, verbose = false) {
     super(api, verbose);
     this._name = name;
+    this.log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.ERC721, this._name])
+    );
   }
 
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
     const provider = this._api.provider;
 
     // retrieves the last numEstimateBlocks blocks to estimate block time
-    const currentBlockNum = await provider.getBlockNumber();
+    const currentBlockNum = (await provider.getBlockNumber()) - 100;
     this.log.info(`Current Block: ${currentBlockNum}`);
     const blockPromises = [];
     for (
@@ -59,6 +62,7 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
     let maxBlockTime = 0;
 
     for (let i = 1; i < timestamps.length; i++) {
+      console.log(maxBlockTime, timestamps[i] - timestamps[i - 1]);
       if (maxBlockTime < timestamps[i] - timestamps[i - 1])
         maxBlockTime = timestamps[i] - timestamps[i - 1];
     }
@@ -69,7 +73,7 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
         new Error(`maxBlockTime is 0.`)
       );
       // default to Ethereum block time
-      return 15;
+      return 12;
     }
 
     this.log.info(`Polling interval: ${maxBlockTime} seconds`);
@@ -83,36 +87,44 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
     const currentBlockNum = await provider.getBlockNumber();
     console.log('New current block number:', currentBlockNum);
     if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
-
-      const logs: Log[] = await provider.send('eth_getLogs', [{
-        fromBlock: ethers.BigNumber.from(this.lastBlockNumber + 1).toHexString(),
-        toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
-        address: this._api.tokens.map(t => t.contract.address),
-      }])
+      const logs: Log[] = await provider.send('eth_getLogs', [
+        {
+          fromBlock: ethers.BigNumber.from(
+            this.lastBlockNumber + 1
+          ).toHexString(),
+          toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
+          address: this._api.tokens.map((t) =>
+            t.contract.address.toLowerCase()
+          ),
+        },
+      ]);
 
       // filter the logs we need
       for (const log of logs) {
+        if (
+          !this.eventSourceMap[
+            log.address.toLowerCase()
+          ].eventSignatures.includes(log.topics[0])
+        )
+          continue;
 
-        if(!this.eventSourceMap[log.address.toLowerCase()].eventSignatures
-        .includes(log.topics[0])) continue;
+        const parsedRawEvent =
+          this.eventSourceMap[log.address.toLowerCase()].api.parseLog(log);
 
-          const parsedRawEvent =
-            this.eventSourceMap[log.address.toLowerCase()].api.parseLog(log);
+        const rawEvent: RawEvent = {
+          address: log.address.toLowerCase(),
+          args: parsedRawEvent.args as any,
+          name: parsedRawEvent.name,
+          blockNumber: parseInt(log.blockNumber, 16),
+        };
 
-          const rawEvent: RawEvent = {
-            address: log.address.toLowerCase(),
-            args: parsedRawEvent.args as any,
-            name: parsedRawEvent.name,
-            blockNumber: parseInt(log.blockNumber, 16),
-          };
+        const logStr = `Found the following event log in block ${
+          log.blockNumber
+        }: ${JSON.stringify(rawEvent, null, 2)}.`;
+        // eslint-disable-next-line no-unused-expressions
+        this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
 
-          const logStr = `Found the following event log in block ${
-            log.blockNumber
-          }: ${JSON.stringify(rawEvent, null, 2)}.`;
-          // eslint-disable-next-line no-unused-expressions
-          this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
-
-          cb(rawEvent);
+        cb(rawEvent);
       }
     }
     this.lastBlockNumber = currentBlockNum;
