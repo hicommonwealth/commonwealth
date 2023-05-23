@@ -84,7 +84,7 @@ module.exports = {
 
       // Threads
       await renameIndex('offchain_threads_author_id', 'thread_author_id');
-      await renameIndex('Threads', 'offchain_threads_chain', 'threads_chain');
+      await renameIndex('offchain_threads_chain', 'threads_chain');
       await renameIndex(
         'offchain_threads_chain_created_at',
         'threads_chain_created_at'
