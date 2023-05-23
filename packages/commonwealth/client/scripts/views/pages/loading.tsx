@@ -8,14 +8,13 @@ import { CWText } from '../components/component_kit/cw_text';
 
 type PageLoadingProps = {
   message?: string;
-  hideSearch?: boolean;
 };
 
 export const PageLoading = (props: PageLoadingProps) => {
-  const { message, hideSearch = true } = props;
+  const { message } = props;
 
   return (
-    <Sublayout hideSearch={hideSearch}>
+    <Sublayout hideSearch>
       <div className="LoadingPage">
         <div className="inner-content">
           <CWSpinner size="xl" />

@@ -81,26 +81,6 @@ export const RecentThreadsHeader = ({
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
-  const buildUrlAndNavigate = (updatedTopic: string, updatedStage: string) => {
-    let url = updatedTopic ? `/${updatedTopic}` : '';
-    url += updatedStage ? `?stage=${updatedStage}` : '';
-    navigate(`/discussions${url}`);
-  };
-
-  const onTopicChange = (updatedTopic) => {
-    buildUrlAndNavigate(
-      updatedTopic,
-      stage // keep the current stage in url if any
-    );
-  };
-
-  const onStageChange = (updatedStage) => {
-    buildUrlAndNavigate(
-      topic, // keep the current topic in url (if any)
-      updatedStage
-    );
-  };
-
   return (
     <div className="RecentThreadsHeader">
       {isUndefined(topic) && (
@@ -155,7 +135,6 @@ export const RecentThreadsHeader = ({
               selectedTopic={selectedTopic}
               topic={topic}
               onEditClick={(editTopic) => setTopicSelectedToEdit(editTopic)}
-              onTopicChange={onTopicChange}
             />
           )}
           {stagesEnabled && (
@@ -163,7 +142,6 @@ export const RecentThreadsHeader = ({
               selectedStage={selectedStage}
               stage={stage}
               stages={stages}
-              onStageChange={onStageChange}
             />
           )}
         </div>

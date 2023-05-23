@@ -1,25 +1,8 @@
 abstract class Store<T> {
   protected _store: T[] = [];
 
-  public add(
-    item: T,
-    options?: { eqFn?: (a: T) => boolean; pushToIndex?: number }
-  ): Store<T> {
-    // public add(item: T, eqFn?: (a: T) => boolean): Store<T> {
-    const index =
-      options && options.eqFn
-        ? this._store.findIndex(options.eqFn)
-        : this._store.indexOf(item);
-
-    // Only add unique elements to store
-    if (index === -1) {
-      options && options.pushToIndex
-        ? this._store.splice(options.pushToIndex, 0, item)
-        : this._store.push(item);
-    } else {
-      this._store[index] = item;
-    }
-
+  public add(item: T): Store<T> {
+    this._store.push(item);
     return this;
   }
 

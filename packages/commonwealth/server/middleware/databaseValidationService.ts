@@ -53,7 +53,6 @@ export default class DatabaseValidationService {
       req
     );
     if (!author) {
-      console.error(authorError);
       return next(new AppError(Errors.InvalidUser));
     }
     if (authorError) return next(new AppError(authorError));
