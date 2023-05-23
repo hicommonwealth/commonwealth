@@ -51,8 +51,6 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       }
       const balance = await api.eth.getBalance(address);
       //IANHERE
-      if (api.givenProvider.connected)
-        (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
       // use native token if no args provided
       return balance;
     }
@@ -78,9 +76,6 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       to: tokenAddress,
       data: calldata,
     });
-    //IANHERE
-    if (api.givenProvider.connected)
-      (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
     return api.eth.abi.decodeParameter('uint256', result).toString();
   }
 }
