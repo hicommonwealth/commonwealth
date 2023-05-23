@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { clientAnalyticsTrack } from '../../../shared/analytics/client-track';
 import { AnalyticsPayload } from '../../../shared/analytics/types';
+import app from 'state';
 
 export function useBrowserAnalyticsTrack({
   payload,
@@ -15,7 +16,10 @@ export function useBrowserAnalyticsTrack({
   useEffect(() => {
     if (!onAction && payload && !hasFiredRef.current) {
       try {
-        clientAnalyticsTrack(payload);
+        clientAnalyticsTrack({
+          ...payload,
+          properties: { userAddress: app?.user?.activeAccount?.address },
+        });
         hasFiredRef.current = true;
       } catch (e) {
         console.log('Failed to track event:', e.message);
@@ -28,7 +32,10 @@ export function useBrowserAnalyticsTrack({
     (actionPayload: AnalyticsPayload) => {
       if (onAction) {
         try {
-          clientAnalyticsTrack(actionPayload);
+          clientAnalyticsTrack({
+            ...actionPayload,
+            properties: { userAddress: app?.user?.activeAccount?.address },
+          });
         } catch (e) {
           console.log('Failed to track event:', e.message);
         }

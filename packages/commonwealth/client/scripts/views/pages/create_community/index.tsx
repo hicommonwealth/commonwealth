@@ -16,6 +16,8 @@ import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
 import { useEthChainFormState } from './hooks';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -42,6 +44,10 @@ const CreateCommunity = () => {
   );
   const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
     useEthChainFormState();
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW },
+  });
 
   useEffect(() => {
     const fetchEthChains = async () => {

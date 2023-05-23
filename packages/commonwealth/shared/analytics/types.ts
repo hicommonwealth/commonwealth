@@ -55,11 +55,15 @@ export interface AnalyticsPayload {
   chainBase?: string;
   community?: string;
   chain?: string;
+  userAddress?: string;
+  properties?: any; // base properties type
 }
 
 export interface BaseMixpanelPayload extends AnalyticsPayload {
   event: MixpanelEvents;
   isCustomDomain: boolean;
+  userAddress?: string;
+  properties?: any;
 }
 
 export const providers = ['mixpanel']; // add other providers here
