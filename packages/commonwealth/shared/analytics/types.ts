@@ -46,7 +46,16 @@ export type MixpanelEvents =
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent;
 
-export interface BaseMixpanelPayload {
+export interface AnalyticsPayload {
+  event: any; // base event type
+  isCustomDomain?: boolean;
+  communityType?: string;
+  chainBase?: string;
+  community?: string;
+  chain?: string;
+}
+
+export interface BaseMixpanelPayload extends AnalyticsPayload {
   event: MixpanelEvents;
   isCustomDomain: boolean;
 }

@@ -5,12 +5,12 @@ import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { createRole, findOneRole } from './roles';
-import { mixpanelTrack } from './mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import type { UserInstance } from '../models/user';
 import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
+import { serverAnalyticsTrack } from '../../shared/analytics';
 
 type CreateAddressReq = {
   address: string;
@@ -183,13 +183,12 @@ export async function createAddressHelper(
         await createRole(models, newObj.id, req.chain, 'member');
       }
 
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-          chain: req.chain,
-          isCustomDomain: null,
-        });
-      }
+      serverAnalyticsTrack({
+        event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
+        chain: req.chain,
+        isCustomDomain: null,
+      });
+
       return { ...newObj.toJSON(), newly_created: true };
     } catch (e) {
       return next(e);

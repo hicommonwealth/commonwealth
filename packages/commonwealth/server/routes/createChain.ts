@@ -21,12 +21,12 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-// import { mixpanelTrack } from '../util/mixpanelUtil';
-
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { serverAnalyticsTrack } from '../../shared/analytics';
+import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -472,14 +472,12 @@ const createChain = async (
     });
   }
 
-  if (process.env.NODE_ENV !== 'test') {
-    // mixpanelTrack({
-    //   chainBase: req.body.base,
-    //   isCustomDomain: null,
-    //   communityType: null,
-    //   event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-    // });
-  }
+  serverAnalyticsTrack({
+    chainBase: req.body.base,
+    isCustomDomain: null,
+    communityType: null,
+    event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+  });
 
   return success(res, {
     chain: chain.toJSON(),
