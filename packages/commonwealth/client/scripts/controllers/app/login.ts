@@ -310,67 +310,30 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
+async function constructMagic() {
+  const { Magic } = await import('magic-sdk');
+  const { OAuthExtension } = await import('@magic-ext/oauth');
+  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
+  const rpcUrl = (isCosmos && app.chain.meta?.node?.url) || app.config.chains.getById('osmosis').node.url;
+  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: [
+      new CosmosExtension({
+        rpcUrl,
+      }),
+      new OAuthExtension(),
+    ]
+  });
+}
+
 export async function loginWithMagicLink({
   email, provider
 }: { email?: string, provider?: string }) {
   if (!email && !provider) throw new Error('Must provider email or provider');
-  const { Magic } = await import('magic-sdk');
-  const { OAuthExtension } = await import('@magic-ext/oauth');
-  let chainAddress;
-  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
-
-  // construct providers array based on args / chain
-  const extensions = [
-    isCosmos && new CosmosExtension({
-      rpcUrl: app.chain.meta?.node?.url,
-    }),
-    provider && new OAuthExtension(),
-  ].filter((x) => !!x);
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions
-  });
-
-  // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-  if (isCosmos) {
-    const bech32Prefix = app.chain.meta.bech32Prefix;
-    try {
-      chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
-    } catch (err) {
-      console.error(
-        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
-      );
-    }
-  }
+  const magic = await constructMagic();
 
   if (email) {
     const didToken = await magic.auth.loginWithMagicLink({ email });
-    const response = await $.post({
-      url: `${app.serverUrl()}/auth/magic`,
-      headers: {
-        Authorization: `Bearer ${didToken}`,
-      },
-      xhrFields: {
-        withCredentials: true,
-      },
-      data: {
-        // send chain/community to request
-        chain: app.activeChainId(),
-        address: chainAddress,
-        jwt: app.user.jwt,
-      },
-    });
-    if (response.status === 'Success') {
-      // log in as the new user (assume all verification done server-side)
-      await initAppState(false);
-      if (app.chain) {
-        const c = app.user.selectedChain
-          ? app.user.selectedChain
-          : app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses({ chain: c });
-      }
-    } else {
-      throw new Error(`Magic auth unsuccessful: ${response.status}`);
-    }
+    await handleSocialLoginCallback(didToken);
   } else {
     // provider-based login
     await magic.oauth.loginWithRedirect({
@@ -380,19 +343,21 @@ export async function loginWithMagicLink({
   }
 }
 
-export async function handleSocialLoginCallback() {
-  const { Magic } = await import('magic-sdk');
-  const { OAuthExtension } = await import('@magic-ext/oauth');
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: [new OAuthExtension()],
-  });
-  const result = await magic.oauth.getRedirectResult();
-  console.log('Magic redirect result:', result);
+export async function handleSocialLoginCallback(didToken?: string) {
+  if (!didToken) {
+    const magic = await constructMagic();
+    const result = await magic.oauth.getRedirectResult();
+    console.log('Magic redirect result:', result);
+    didToken = result.magic.idToken;
+  }
+
+  // kick off validation flow
+  // TODO
 
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
-      Authorization: `Bearer ${result.magic.idToken}`,
+      Authorization: `Bearer ${didToken}`,
     },
     xhrFields: {
       withCredentials: true,
