@@ -232,15 +232,7 @@ export function initMagicAuth(models: DB) {
           await ssoToken.save();
           console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
 
-          const addressExistsForChain = existingUser.Addresses?.some(
-            (a) =>
-              chain?.id === a.chain ||
-              (chain?.base === 'cosmos' &&
-                (a.address.startsWith('cosmos') ||
-                  a.address.startsWith('osmo')))
-          );
-
-          if (registrationChainAddress && !addressExistsForChain) {
+          if (registrationChainAddress) {
             // insert an address for their selected chain if it doesn't exist
             await sequelize.transaction(async (t) => {
               const [newRegistrationChainAddress, created] =
@@ -251,10 +243,10 @@ export function initMagicAuth(models: DB) {
                       : userMetadata.publicAddress,
                     chain: registrationChain.id,
                     user_id: existingUser.id,
-                    profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
                     wallet_id: WalletId.Magic,
                   },
                   defaults: {
+                    profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
                     verification_token: 'MAGIC',
                     verification_token_expires: null,
                     verified: new Date(),
