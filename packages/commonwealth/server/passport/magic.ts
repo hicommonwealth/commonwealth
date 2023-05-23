@@ -188,7 +188,7 @@ async function mergeLogins(
     ]
   });
 
-  // update addresses for magic user to point to original user
+  // update MAGIC addresses for incoming magic user to point to current user
   await models.Address.update(
     {
       user_id: loggedInUser.id,
@@ -196,12 +196,11 @@ async function mergeLogins(
     },
     {
       where: {
+        wallet_id: WalletId.Magic,
         user_id: magicUser.id,
       },
     }
   );
-
-  // TODO: delete original user / profile??
 
   // TODO: send move email
 
