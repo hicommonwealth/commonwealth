@@ -16,8 +16,11 @@ try {
 // ----- Client Side Mixpanel Library Utils ------ //
 export function mixpanelBrowserTrack<T extends BaseMixpanelPayload>(data: T) {
   const { event, ...payload } = data;
-
-  mixpanel.track(event, payload);
+  try {
+    mixpanel.track(event, payload);
+  } catch (e) {
+    console.log(`Failed to track event, ${event.toString()}:`, e.message);
+  }
 }
 
 // ----- Server Side Analytics Agnostic Provider Utils ------ //

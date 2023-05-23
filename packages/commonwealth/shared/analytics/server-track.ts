@@ -31,6 +31,7 @@ export function serverAnalyticsTrack(payload: AnalyticsPayload) {
       case 'mixpanel':
         mixpanelTrack(payload as BaseMixpanelPayload);
         break;
+      // Add more providers here
       default:
         throw new Error(`Unsupported provider: ${provider}`);
     }
