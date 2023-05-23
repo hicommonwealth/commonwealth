@@ -9,7 +9,7 @@ import 'pages/treasury.scss';
 import app from 'state';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { ProposalCard } from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/ProposalCard';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/Sublayout';

@@ -11,11 +11,15 @@ import { WebhooksForm } from './webhooks_form';
 type AdminPanelTabsProps = {
   onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: Array<RoleInfo>;
+  searchTerm: string;
+  setSearchTerm: (v: string) => void;
 };
 
 export const AdminPanelTabs = ({
   onRoleUpgrade,
   roleData,
+  searchTerm,
+  setSearchTerm,
 }: AdminPanelTabsProps) => {
   const [currentTab, setCurrentTab] = React.useState<number>(1);
 
@@ -41,6 +45,8 @@ export const AdminPanelTabs = ({
         <UpgradeRolesForm
           roleData={roleData}
           onRoleUpgrade={(x, y) => onRoleUpgrade(x, y)}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
         />
       )}
       {currentTab === 2 && <WebhooksForm />}

@@ -47,6 +47,7 @@ export interface govCompCreate {
 
 export interface chainAdvanceTime {
   seconds: string;
+  blocks: number | string;
 }
 
 export interface chainGetEth {

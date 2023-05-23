@@ -1,8 +1,8 @@
-import type { MagicUserMetadata } from '@magic-sdk/admin';
+import { MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 
 import { AppError, ServerError } from 'common-common/src/errors';
-import { NotificationCategories, WalletId } from 'common-common/src/types';
+import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
 import passport from 'passport';
 import { Strategy as MagicStrategy } from 'passport-magic';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
@@ -13,6 +13,7 @@ import type { ProfileAttributes } from '../models/profile';
 
 import '../types';
 import { createRole } from '../util/roles';
+import { ChainAttributes } from '../models/chain';
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
@@ -26,8 +27,19 @@ export function initMagicAuth(models: DB) {
         if (req.body.chain || req.body.community) {
           [chain, error] = await validateChain(models, req.body);
           if (error) return cb(error);
+        } else {
+          // default to Osmosis as secondary chain
+          chain = await models.Chain.findOne({ where: { id: 'osmosis' }});
         }
-        const registrationChain = chain;
+
+        // grab cosmos address for registration
+        const cosmosMetadata = await magic.users.getMetadataByIssuerAndWallet(
+          user.issuer,
+          WalletType.COSMOS
+        );
+        const registrationChainAddress = (cosmosMetadata?.wallets[0] as any)?.public_address;
+
+        const registrationChain: ChainAttributes = chain;
 
         // fetch user data from magic backend
         let userMetadata: MagicUserMetadata;
@@ -72,7 +84,6 @@ export function initMagicAuth(models: DB) {
 
         // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address
         if (!existingUser) {
-          const chainId = registrationChain?.id ?? 'ethereum';
           const ethAddress = userMetadata.publicAddress;
           const result = await sequelize.transaction(async (t) => {
             // create new user and unverified address if doesn't exist
@@ -85,11 +96,14 @@ export function initMagicAuth(models: DB) {
               { transaction: t }
             );
 
-            // create an address on their selected chain
-            const newAddress = await models.Address.create(
+            // create a default Eth address
+            const ethereumChain = registrationChain.base === ChainBase.Ethereum
+              ? registrationChain.id
+              : 'ethereum';
+            const newDefaultAddress = await models.Address.create(
               {
                 address: ethAddress,
-                chain: chainId,
+                chain: ethereumChain,
                 verification_token: 'MAGIC',
                 verification_token_expires: null,
                 verified: new Date(), // trust addresses from magic
@@ -100,14 +114,44 @@ export function initMagicAuth(models: DB) {
               },
               { transaction: t }
             );
+
             await createRole(
               models,
-              newAddress.id,
-              chainId,
+              newDefaultAddress.id,
+              ethereumChain,
               'member',
               false,
               t
             );
+
+            if (registrationChainAddress) {
+              // create an address on their selected chain
+              const cosmosChain = registrationChain.base === ChainBase.CosmosSDK
+                ? registrationChain.id
+                : 'osmosis';
+              const newRegistrationChainAddress = await models.Address.create(
+                {
+                  address: registrationChainAddress,
+                  chain: cosmosChain,
+                  verification_token: 'MAGIC',
+                  verification_token_expires: null,
+                  verified: new Date(), // trust addresses from magic
+                  last_active: new Date(),
+                  user_id: newUser.id,
+                  profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
+                  wallet_id: WalletId.Magic,
+                },
+                { transaction: t }
+              );
+              await createRole(
+                models,
+                newRegistrationChainAddress.id,
+                cosmosChain,
+                'member',
+                false,
+                t
+              );
+            }
 
             // Automatically create subscription to their own mentions
             await models.Subscription.create(
@@ -147,7 +191,7 @@ export function initMagicAuth(models: DB) {
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newAddress.id, // always ethereum address
+                address_id: newDefaultAddress.id, // always ethereum address
                 created_at: new Date(),
                 updated_at: new Date(),
               },
@@ -190,12 +234,48 @@ export function initMagicAuth(models: DB) {
           ssoToken.updated_at = new Date();
           await ssoToken.save();
           console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
+
+          if (registrationChainAddress) {
+            // insert an address for their selected chain if it doesn't exist
+            await sequelize.transaction(async (t) => {
+              const [newRegistrationChainAddress, created] =
+                await models.Address.findOrCreate({
+                  where: {
+                    address: registrationChain.base === ChainBase.CosmosSDK
+                      ? registrationChainAddress
+                      : userMetadata.publicAddress,
+                    chain: registrationChain.id,
+                    user_id: existingUser.id,
+                    wallet_id: WalletId.Magic,
+                  },
+                  defaults: {
+                    profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
+                    verification_token: 'MAGIC',
+                    verification_token_expires: null,
+                    verified: new Date(),
+                    last_active: new Date(),
+                  },
+                  transaction: t,
+                });
+              if (created) {
+                await createRole(
+                  models,
+                  newRegistrationChainAddress.id,
+                  registrationChain.id,
+                  'member',
+                  false,
+                  t
+                );
+              }
+            });
+          }
+
           return cb(null, existingUser);
         } else {
           // migrate to magic if email already exists
           await sequelize.transaction(async (t) => {
             const ethAddress = userMetadata.publicAddress;
-            const newAddress = await models.Address.create(
+            const newDefaultAddress = await models.Address.create(
               {
                 address: ethAddress,
                 chain: 'ethereum',
@@ -210,11 +290,28 @@ export function initMagicAuth(models: DB) {
               { transaction: t }
             );
 
+            if (registrationChainAddress) {
+              await models.Address.create(
+                {
+                  address: registrationChainAddress,
+                  chain: registrationChain.id,
+                  verification_token: 'MAGIC',
+                  verification_token_expires: null,
+                  verified: new Date(), // trust addresses from magic
+                  last_active: new Date(),
+                  user_id: existingUser.id,
+                  profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
+                  wallet_id: WalletId.Magic,
+                },
+                { transaction: t }
+              );
+            }
+
             await models.SsoToken.create(
               {
                 issuer: userMetadata.issuer,
                 issued_at: user.claim.iat,
-                address_id: newAddress.id, // always ethereum address
+                address_id: newDefaultAddress.id, // always ethereum address
                 created_at: new Date(),
                 updated_at: new Date(),
               },

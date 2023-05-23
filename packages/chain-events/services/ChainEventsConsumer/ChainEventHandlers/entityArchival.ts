@@ -3,9 +3,11 @@
  */
 
 import { addPrefix, factory } from 'common-common/src/logging';
-import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import type { RmqEntityCUD } from 'common-common/src/rabbitmq/types';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import {
+  AbstractRabbitMQController,
+  RascalPublications,
+} from 'common-common/src/rabbitmq/types';
 
 import type { DB } from '../../database/database';
 
@@ -28,7 +30,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models: DB,
-    private readonly _rmqController: RabbitMQController,
+    private readonly _rmqController: AbstractRabbitMQController,
     private readonly _chain?: string
   ) {
     super();
@@ -55,7 +57,7 @@ export default class extends IEventHandler {
     const chain = event.chain || this._chain;
     if (!dbEvent) {
       log.warn(
-        `no db event found for event ${event.chain}::${event.data.kind}!`
+        `no db event found for event ${event.chain}-${event.data.kind}!`
       );
       return;
     }

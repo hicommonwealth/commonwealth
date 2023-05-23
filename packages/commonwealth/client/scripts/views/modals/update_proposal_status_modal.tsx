@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import {
+  getProposal,
+  getSpace,
+  loadMultipleSpacesData,
+  SnapshotProposal,
+} from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
 import type ChainEntity from '../../models/ChainEntity';
@@ -16,7 +21,7 @@ import { SnapshotProposalSelector } from '../components/snapshot_proposal_select
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { Link, LinkSource } from 'models/Thread';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
-import { ProposalSelector } from '../components/cosmos_proposal_selector';
+import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { ChainBase } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -100,9 +105,30 @@ export const UpdateProposalStatusModal = ({
       );
 
       if (toAdd.length > 0) {
+        let enrichedSnapshot;
+        if (app.chain.meta.snapshot?.length === 1) {
+          enrichedSnapshot = toAdd.map((sn) => ({
+            id: `${app.chain.meta.snapshot[0]}/${sn.id}`,
+            title: sn.title,
+          }));
+        } else {
+          loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+            for (const { space: _space, proposals } of data) {
+              const matchingSnapshot = proposals.find(
+                (sn) => sn.id === toAdd[0].id
+              );
+              if (matchingSnapshot) {
+                enrichedSnapshot = {
+                  id: `${_space.id}/${toAdd[0].id}`,
+                };
+                break;
+              }
+            }
+          });
+        }
         const updatedThread = await app.threads.addLinks({
           threadId: thread.id,
-          links: toAdd.map((sn) => ({
+          links: enrichedSnapshot.map((sn) => ({
             source: LinkSource.Snapshot,
             identifier: String(sn.id),
             title: sn.title,
@@ -284,7 +310,7 @@ export const UpdateProposalStatusModal = ({
           />
         )}
         {isCosmos && (
-          <ProposalSelector
+          <CosmosProposalSelector
             onSelect={handleSelectCosmosProposal}
             proposalsToSet={tempCosmosProposals}
           />
