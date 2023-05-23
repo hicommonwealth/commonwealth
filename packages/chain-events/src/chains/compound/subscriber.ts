@@ -102,7 +102,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
           address: log.address.toLowerCase(),
           args: parsedRawEvent.args as any,
           name: parsedRawEvent.name,
-          blockNumber: parseInt(log.blockNumber, 16),
+          blockNumber: parseInt(log.blockNumber.toString(), 16),
           data: log.data,
         };
 

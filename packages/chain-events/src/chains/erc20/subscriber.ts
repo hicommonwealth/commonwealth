@@ -110,7 +110,7 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
           address: log.address.toLowerCase(),
           args: parsedRawEvent.args as any,
           name: parsedRawEvent.name,
-          blockNumber: parseInt(log.blockNumber, 16),
+          blockNumber: parseInt(log.blockNumber.toString(), 16),
         };
 
         const logStr = `Found the following event log in block ${
