@@ -1,4 +1,4 @@
-import  MinimumProfile from '../../../models/MinimumProfile';
+import MinimumProfile from '../../../models/MinimumProfile';
 import { RangeStatic } from 'quill';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
@@ -88,7 +88,7 @@ export const useMention = ({
                 component: node.outerHTML,
               },
             ];
-          } else if (searchTerm.length > 2) {
+          } else {
             // try to get results from cache
             let profiles = mentionCache.get(searchTerm);
             if (!profiles) {
@@ -106,8 +106,17 @@ export const useMention = ({
               const profileAddress = p.addresses[0]?.address;
               const profileName = p.profile_name;
               const profileChain = p.addresses[0]?.chain;
+              const avatarUrl = p.avatar_url;
 
               const profile = new MinimumProfile(profileAddress, profileChain);
+              profile.initialize(
+                profileName,
+                profileAddress,
+                avatarUrl,
+                profileId,
+                profileChain,
+                null
+              );
               const node = document.createElement('div');
 
               let avatar;
