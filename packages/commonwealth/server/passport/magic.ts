@@ -21,6 +21,12 @@ export function initMagicAuth(models: DB) {
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
+        console.log(`
+        ******** MAGIC TOKEN CONTENTS ******
+        ** Provided encrypted from client **
+        ************************************
+        ${JSON.stringify(user, null, 2)}
+        `);
         // determine login location
         let chain, error, registrationChainAddress;
         if (req.body.chain || req.body.community) {
@@ -38,6 +44,12 @@ export function initMagicAuth(models: DB) {
         let userMetadata: MagicUserMetadata;
         try {
           userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+          console.log(`
+          ********* USER METADATA **************
+          ** Provided by Magic from Admin SDK **
+          **************************************
+          ${JSON.stringify(userMetadata, null, 2)}
+          `);
         } catch (e) {
           return cb(
             new ServerError(
