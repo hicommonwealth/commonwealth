@@ -18,8 +18,12 @@ describe('getProfiles Tests', () => {
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Threads, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Comments, 2);
+
+    const profiles = resp.result.profiles.filter(
+      (p) => p.id === testAddresses[0].id
+    )[0];
+    chai.assert.lengthOf(profiles.Addresses[0].Threads, 2);
+    chai.assert.lengthOf(profiles.Addresses[0].Comments, 2);
   });
 
   it('should return profiles with specified network correctly', async () => {
@@ -31,8 +35,12 @@ describe('getProfiles Tests', () => {
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Threads, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Comments, 2);
+
+    const profiles = resp.result.profiles.filter(
+      (p) => p.id === testAddresses[0].id
+    )[0];
+    chai.assert.lengthOf(profiles.Addresses[0].Threads, 2);
+    chai.assert.lengthOf(profiles.Addresses[0].Comments, 2);
   });
 
   it('should return count only when specified correctly', async () => {
