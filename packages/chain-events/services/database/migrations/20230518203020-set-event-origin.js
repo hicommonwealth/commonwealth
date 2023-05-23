@@ -2,6 +2,8 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    // this migration should not run in CI because it would require setting up the CW db for CE tests.
+    // Instead, the CE_default.dump is updated such that this migration has already executed
     await queryInterface.sequelize.transaction(async (t) => {
       const CW_DB_URL =
         process.env.CW_DB_URL ||
@@ -15,17 +17,17 @@ module.exports = {
       // fetch ChainNode.name and CommunityContract.address from Commonwealth db
       await queryInterface.sequelize.query(
         `
-        CREATE TABLE "EventOrigins" as (
-          SELECT *
-          FROM dblink('${CW_DB_URL}', '
-            SELECT C.id, CN.name, C2.address
-            FROM "ChainNodes" CN
-               JOIN "Chains" C on CN.id = C.chain_node_id
-               LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id
-               LEFT JOIN "Contracts" C2 on CC.contract_id = C2.id
-          ') as "cw_data"(id VARCHAR(255), name VARCHAR(255), address VARCHAR(255))
-        );
-      `,
+      CREATE TABLE "EventOrigins" as (
+        SELECT *
+        FROM dblink('${CW_DB_URL}', '
+          SELECT C.id, CN.name, C2.address
+          FROM "ChainNodes" CN
+             JOIN "Chains" C on CN.id = C.chain_node_id
+             LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id
+             LEFT JOIN "Contracts" C2 on CC.contract_id = C2.id
+        ') as "cw_data"(id VARCHAR(255), name VARCHAR(255), address VARCHAR(255))
+      );
+    `,
         { transaction: t }
       );
 
