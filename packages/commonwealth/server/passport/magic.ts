@@ -1,4 +1,4 @@
-import type { MagicUserMetadata } from '@magic-sdk/admin';
+import { MagicUserMetadata } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import { Op, Transaction } from 'sequelize';
@@ -12,12 +12,13 @@ import { sequelize } from '../database';
 import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
 import type { ProfileAttributes } from '../models/profile';
-
 import '../types';
 import { createRole } from '../util/roles';
 import { TypedRequestBody } from '../types';
 import { UserInstance } from '../models/user';
 import { AddressInstance } from '../models/address';
+
+// TODO: update file for cosmos changes from master
 
 // Creates a trusted address in a community
 async function createMagicAddress(
