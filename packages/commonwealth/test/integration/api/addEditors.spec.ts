@@ -3,8 +3,8 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import { AddEditorsBody, Errors } from '../../../server/routes/addEditors';
-import { get, post } from './external/appHook.spec';
+import { Errors } from '../../../server/routes/addEditors';
+import { post } from './external/appHook.spec';
 import {
   testAddresses,
   testThreads,

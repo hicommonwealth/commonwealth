@@ -4,7 +4,6 @@ import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -56,7 +55,9 @@ const deleteChain = async (
     return next(new AppError(Errors.NoChain));
   }
 
-  const admin = await findOneRole(models, {}, chain.id, ['admin']);
+  const admin = await models.Address.findOne({
+    where: { chain: chain.id, role: 'admin' },
+  });
   if (admin) {
     return next(new AppError(Errors.AdminPresent));
   }
@@ -93,11 +94,6 @@ const deleteChain = async (
       });
 
       await models.Topic.destroy({
-        where: { chain_id: chain.id },
-        transaction: t,
-      });
-
-      await models.Role.destroy({
         where: { chain_id: chain.id },
         transaction: t,
       });
@@ -156,31 +152,10 @@ const deleteChain = async (
         transaction: t,
       });
 
-      await models.RoleAssignment.destroy({
-        where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
-        transaction: t,
-      });
-
       await models.Address.destroy({
         where: { chain: chain.id },
         transaction: t,
       });
-
-      const communityRoles = await models.CommunityRole.findAll({
-        where: { chain_id: chain.id },
-        transaction: t,
-      });
-
-      await models.RoleAssignment.destroy({
-        where: {
-          community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
-        },
-        transaction: t,
-      });
-
-      await Promise.all(
-        communityRoles.map((r) => r.destroy({ transaction: t }))
-      );
 
       await models.Chain.destroy({
         where: { id: chain.id },

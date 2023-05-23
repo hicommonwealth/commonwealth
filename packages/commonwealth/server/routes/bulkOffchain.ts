@@ -9,6 +9,7 @@ import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { DB } from '../models';
+import { AddressInstance } from '../models/address';
 import type { ChatChannelInstance } from '../models/chat_channel';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
@@ -40,7 +41,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     Promise<
       [
         TopicInstance[],
-        RoleInstanceWithPermission[],
+        AddressInstance[],
         unknown,
         ThreadInstance[],
         [{ count: string }],
@@ -72,7 +73,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
 
     // admins
     models.Address.findAll({
-      where: { chain: chain.id, role: { [Op.in]: ['admin', 'moderator'] } },
+      where: {
+        chain: chain.id,
+        role: { [Op.in]: ['admin', 'moderator'] },
+      },
     }),
     // most active users
     new Promise(async (resolve, reject) => {
@@ -250,7 +254,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),
-      communityRoles: communityRoles.map((r) => r.toJSON()),
     },
   });
 };

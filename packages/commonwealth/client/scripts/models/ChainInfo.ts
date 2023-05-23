@@ -92,7 +92,6 @@ class ChainInfo {
     tokenName,
     adminOnlyPolling,
     discord_config_id,
-    communityRoles,
     cosmosGovernanceVersion,
   }) {
     this.id = id;
@@ -223,7 +222,6 @@ class ChainInfo {
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
-      communityRoles: community_roles,
       cosmosGovernanceVersion: cosmos_governance_version,
     });
   }

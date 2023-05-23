@@ -31,7 +31,7 @@ export type AddressAttributes = {
   Chain?: ChainAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  permission?: Role;
+  role?: Role;
   SsoToken?: SsoTokenAttributes;
 };
 

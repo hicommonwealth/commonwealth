@@ -5,8 +5,8 @@ import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
 import { formatAddressShort } from 'helpers';
+import { AccessLevel } from '../../../../../server/util/permissions';
 import type RoleInfo from '../../../models/RoleInfo';
-import { AccessLevel } from '../../../../../shared/permissions';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';

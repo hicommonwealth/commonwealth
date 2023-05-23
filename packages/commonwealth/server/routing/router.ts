@@ -60,7 +60,9 @@ import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
 import searchProfiles from '../routes/searchProfiles';
-import upgradeMember from '../routes/upgradeMember';
+import upgradeMember, {
+  upgradeMemberValidation,
+} from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
 
@@ -648,6 +650,7 @@ function setupRouter(
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
+    upgradeMemberValidation,
     upgradeMember.bind(this, models)
   );
 

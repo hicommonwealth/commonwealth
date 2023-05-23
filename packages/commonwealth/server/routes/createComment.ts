@@ -144,7 +144,7 @@ const createComment = async (
     (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
   ) {
     // skip check for admins
-    const isAdmin = author.permission === 'admin';
+    const isAdmin = author.role === 'admin';
 
     if (thread?.topic_id && !req.user.isAdmin && !isAdmin) {
       try {
