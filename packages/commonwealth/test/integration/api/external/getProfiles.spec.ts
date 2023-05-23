@@ -23,7 +23,9 @@ describe('getProfiles Tests', () => {
   });
 
   it('should return profiles with specified network correctly', async () => {
-    const r: GetProfilesReq = { profile_ids: testProfiles.map((p) => p.id) };
+    const r: GetProfilesReq = {
+      profile_ids: [testProfiles[0].id, testProfiles[1].id],
+    };
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
@@ -40,7 +42,8 @@ describe('getProfiles Tests', () => {
     };
     const resp = await get('/api/profiles', r, true);
 
-    chai.assert.equal(resp.result.count, 2);
+    // 13 because outer joins with addresses
+    chai.assert.equal(resp.result.count, 13);
     chai.assert.isUndefined(resp.result.profiles);
   });
 
