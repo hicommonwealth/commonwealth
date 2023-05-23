@@ -38,6 +38,7 @@ export function initMagicAuth(models: DB) {
         let userMetadata: MagicUserMetadata;
         try {
           userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+          console.log('User metadata:', userMetadata);
         } catch (e) {
           return cb(
             new ServerError(
@@ -198,30 +199,34 @@ export function initMagicAuth(models: DB) {
           return cb(null, newUser);
         } else if (existingUser.Addresses?.length > 0) {
           // each user should only ever have one token issued by Magic
-          const ssoToken = await models.SsoToken.findOne({
-            where: {
-              issuer: user.issuer,
-            },
-            include: [
-              {
-                model: models.Address,
-                where: { address: user.publicAddress },
-                required: true,
+          try {
+            const ssoToken = await models.SsoToken.findOne({
+              where: {
+                issuer: user.issuer,
               },
-            ],
-          });
-          // login user if they registered via magic
-          if (user.claim.iat <= ssoToken.issued_at) {
-            console.log('Replay attack detected.');
-            return cb(null, null, {
-              message: `Replay attack detected for user ${user.publicAddress}}.`,
+              include: [
+                {
+                  model: models.Address,
+                  where: { address: user.publicAddress },
+                  required: true,
+                },
+              ],
             });
+            // login user if they registered via magic
+            if (user.claim.iat <= ssoToken.issued_at) {
+              console.log('Replay attack detected.');
+              return cb(null, null, {
+                message: `Replay attack detected for user ${user.publicAddress}}.`,
+              });
+            }
+            ssoToken.issued_at = user.claim.iat;
+            ssoToken.updated_at = new Date();
+            await ssoToken.save();
+            console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
+          } catch (e) {
+            console.error('Error fetching SsoToken:', error);
+            return cb(new Error('Error fetching SsoToken.'));
           }
-          ssoToken.issued_at = user.claim.iat;
-          ssoToken.updated_at = new Date();
-          await ssoToken.save();
-          console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
-
           const addressExistsForChain = existingUser.Addresses?.some(
             (a) =>
               chain?.id === a.chain ||

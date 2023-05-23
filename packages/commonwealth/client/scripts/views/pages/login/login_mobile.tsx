@@ -38,6 +38,7 @@ export const LoginMobile = ({
   onLinkExistingAccount,
   onAccountVerified,
   onEmailLogin,
+  onSocialLogin,
   onSaveProfileInfo,
   onPerformLinking,
   isMagicLoading,
@@ -165,12 +166,31 @@ export const LoginMobile = ({
         {activeStep === 'connectWithEmail' && (
           <div className="inner-body-container">
             {!isMagicLoading ? (
-              <CWTextInput
-                label="email address"
-                placeholder="your-email@email.com"
-                onInput={handleSetEmail}
-                onenterkey={onEmailLogin}
-              />
+              <>
+                <CWTextInput
+                  label="email address"
+                  placeholder="your-email@email.com"
+                  onInput={handleSetEmail}
+                  onenterkey={onEmailLogin}
+                />
+                <div className="buttons-row">
+                  <CWButton
+                    label="Github"
+                    buttonType="primary-blue-dark"
+                    onClick={() => onSocialLogin('github')}
+                  />
+                  <CWButton
+                    label="Google"
+                    buttonType="primary-blue-dark"
+                    onClick={() => onSocialLogin('google')}
+                  />
+                  <CWButton
+                    label="Apple"
+                    buttonType="primary-blue-dark"
+                    onClick={() => onSocialLogin('apple')}
+                  />
+                </div>
+              </>
             ) : (
               <CWSpinner />
             )}

@@ -38,6 +38,7 @@ export const LoginModal = (props: LoginModalAttrs) => {
     onResetWalletConnect,
     onPerformLinking,
     onEmailLogin,
+    onSocialLogin,
     onLinkExistingAccount,
     setAvatarUrl,
     setEmail,
@@ -67,6 +68,7 @@ export const LoginModal = (props: LoginModalAttrs) => {
       onCreateNewAccount={onCreateNewAccount}
       onLinkExistingAccount={onLinkExistingAccount}
       onEmailLogin={onEmailLogin}
+      onSocialLogin={onSocialLogin}
       onSaveProfileInfo={onSaveProfileInfo}
       onPerformLinking={onPerformLinking}
       onModalClose={props.onModalClose}
