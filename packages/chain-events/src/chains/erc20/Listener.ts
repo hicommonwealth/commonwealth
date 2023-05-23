@@ -165,12 +165,6 @@ export class Listener extends BaseListener<
     // force type to any because the Ethers Provider interface does not include the original
     // Web3 provider, yet it exists under provider.provider
     const provider = <any>this._api.provider;
-
-    // WebSocket ReadyState - more info: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
-    const readyState = provider.provider.connection._readyState === 1;
-    const socketConnected = provider.provider.connected;
-    const polling = provider.polling;
-
-    return readyState && socketConnected && polling;
+    return provider.provider ? true : false;
   }
 }

@@ -62,7 +62,6 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
     let maxBlockTime = 0;
 
     for (let i = 1; i < timestamps.length; i++) {
-      console.log(maxBlockTime, timestamps[i] - timestamps[i - 1]);
       if (maxBlockTime < timestamps[i] - timestamps[i - 1])
         maxBlockTime = timestamps[i] - timestamps[i - 1];
     }
