@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      const renameIndex = async (tableName, oldIndexName, newIndexName) => {
+      const renameIndex = async (oldIndexName, newIndexName) => {
         await queryInterface.sequelize.query(
           `
           ALTER INDEX "${oldIndexName}" RENAME TO "${newIndexName}";
@@ -127,26 +127,21 @@ module.exports = {
 
       // Reactions
       // no this index name is not a bug it's just cutoff in the db
-      await queryInterface.sequelize.query(`
-        ALTER INDEX "offchain_reactions_chain_address_id_thread_id_proposal_id_comme" RENAME TO "reactions_chain_address_id_thread_id_proposal_id_comment_id";
-      `);
-      await queryInterface.sequelize.query(
-        `
-        ALTER INDEX "offchain_reactions_address_id" RENAME TO "reactions_address_id";
-      `,
-        { transaction: t }
+      await renameIndex(
+        'offchain_reactions_chain_address_id_thread_id_proposal_id_comme',
+        'reactions_chain_address_id_thread_id_proposal_id_comment_id'
       );
-      await queryInterface.sequelize.query(
-        `
-        ALTER INDEX "offchain_reactions_chain_comment_id" RENAME TO "reactions_chain_comment_id";
-      `,
-        { transaction: t }
+      await renameIndex(
+        'offchain_reactions_address_id',
+        'reactions_address_id'
       );
-      await queryInterface.sequelize.query(
-        `
-        ALTER INDEX "offchain_reactions_chain_thread_id" RENAME TO "reactions_chain_thread_id";
-      `,
-        { transaction: t }
+      await renameIndex(
+        'offchain_reactions_chain_comment_id',
+        'reactions_chain_comment_id'
+      );
+      await renameIndex(
+        'offchain_reactions_chain_thread_id',
+        'reactions_chain_thread_id'
       );
       await queryInterface.sequelize.query(
         `
@@ -207,38 +202,23 @@ module.exports = {
       });
 
       // Threads
-      await renameIndex(
-        'Threads',
-        'offchain_threads_author_id',
-        'thread_author_id'
-      );
+      await renameIndex('offchain_threads_author_id', 'thread_author_id');
       await renameIndex('Threads', 'offchain_threads_chain', 'threads_chain');
       await renameIndex(
-        'Threads',
         'offchain_threads_chain_created_at',
         'threads_chain_created_at'
       );
       await renameIndex(
-        'Threads',
         'offchain_threads_chain_pinned',
         'threads_chain_pinned'
       );
       await renameIndex(
-        'Threads',
         'offchain_threads_chain_updated_at',
         'threads_chain_updated_at'
       );
-      await renameIndex(
-        'Threads',
-        'offchain_threads_created_at',
-        'threads_created_at'
-      );
-      await renameIndex(
-        'Threads',
-        'offchain_threads_updated_at',
-        'threads_updated_at'
-      );
-      await renameIndex('Threads', 'OffchainThreads_search', 'threads_search');
+      await renameIndex('offchain_threads_created_at', 'threads_created_at');
+      await renameIndex('offchain_threads_updated_at', 'threads_updated_at');
+      await renameIndex('OffchainThreads_search', 'threads_search');
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Threads"
