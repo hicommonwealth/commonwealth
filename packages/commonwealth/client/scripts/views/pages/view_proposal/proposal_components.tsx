@@ -11,7 +11,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import {
   getStatusClass,
   getStatusText,
-} from '../../components/proposal_card/helpers';
+} from '../../components/ProposalCard/helpers';
 import { cancelProposal } from '../../components/proposals/helpers';
 import {
   BlockExplorerLink,
