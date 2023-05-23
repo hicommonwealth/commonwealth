@@ -25,7 +25,7 @@ import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
-import { serverAnalyticsTrack } from '../../shared/analytics';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 
 const MAX_IMAGE_SIZE_KB = 500;

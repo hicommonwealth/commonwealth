@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import type { DB } from '../models';
 import { redirectWithLoginError } from './finishEmailLogin';
-import { serverAnalyticsTrack } from '../../shared/analytics';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
   const token = req.query.token;

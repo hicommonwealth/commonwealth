@@ -46,6 +46,8 @@ export type MixpanelEvents =
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent;
 
+export type AnalyticsEvent = MixpanelEvents; // add other providers events here
+
 export interface AnalyticsPayload {
   event: any; // base event type
   isCustomDomain?: boolean;
@@ -60,32 +62,4 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   isCustomDomain: boolean;
 }
 
-export interface MixpanelPageViewPayload extends BaseMixpanelPayload {
-  event: MixpanelPageViewEvent;
-}
-
-export interface MixpanelCommunityInteractionPayload
-  extends BaseMixpanelPayload {
-  event: MixpanelCommunityInteractionEvent;
-  community: string;
-}
-
-export interface MixpanelLoginPayload extends BaseMixpanelPayload {
-  event: MixpanelLoginEvent;
-}
-
-export interface MixpanelUserSignupPayload extends BaseMixpanelPayload {
-  chain: string;
-  event: MixpanelUserSignupEvent;
-}
-
-export interface MixpanelErrorCapturePayload extends BaseMixpanelPayload {
-  message: string;
-  community: string;
-  event: MixpanelErrorCaptureEvent;
-}
-
-export interface MixpanelSnapshotEventsPayload extends BaseMixpanelPayload {
-  event: MixpanelSnapshotEvents;
-  space: string;
-}
+export const providers = ['mixpanel']; // add other providers here

@@ -17,7 +17,7 @@ import { success } from '../types';
 import { createRole } from '../util/roles';
 
 import { redirectWithLoginError } from './finishEmailLogin';
-import { serverAnalyticsTrack } from '../../shared/analytics';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const log = factory.getLogger(formatFilename(__filename));
 

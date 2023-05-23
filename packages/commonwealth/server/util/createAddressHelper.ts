@@ -10,7 +10,7 @@ import type { UserInstance } from '../models/user';
 import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
-import { serverAnalyticsTrack } from '../../shared/analytics';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 type CreateAddressReq = {
   address: string;

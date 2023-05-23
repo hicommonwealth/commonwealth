@@ -28,7 +28,7 @@ import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySignature from '../util/verifySignature';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { serverAnalyticsTrack } from '../../shared/analytics';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const log = factory.getLogger(formatFilename(__filename));
 

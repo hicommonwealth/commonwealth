@@ -1,8 +1,5 @@
+import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 import Mixpanel from 'mixpanel';
-import mixpanel from 'mixpanel-browser';
-import type { BaseMixpanelPayload } from './types';
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
 
 let mixpanelNode;
 
@@ -24,13 +21,18 @@ export function mixpanelTrack<T extends BaseMixpanelPayload>(data: T) {
   try {
     mixpanelNode?.track(event, payload);
   } catch (e) {
-    log.error(`Failed to track event, ${event.toString()}:`, e.message);
+    console.log(`Failed to track event, ${event.toString()}:`, e.message);
   }
 }
 
-// ----- Client Side Mixpanel Library Utils ------ //
-export function mixpanelBrowserTrack<T extends BaseMixpanelPayload>(data: T) {
-  const { event, ...payload } = data;
-
-  mixpanel.track(event, payload);
+export function serverAnalyticsTrack(payload: AnalyticsPayload) {
+  providers.forEach((provider) => {
+    switch (provider) {
+      case 'mixpanel':
+        mixpanelTrack(payload as BaseMixpanelPayload);
+        break;
+      default:
+        throw new Error(`Unsupported provider: ${provider}`);
+    }
+  });
 }

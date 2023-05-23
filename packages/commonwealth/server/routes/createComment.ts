@@ -26,7 +26,7 @@ import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { serverAnalyticsTrack } from '../../shared/analytics';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
