@@ -172,8 +172,12 @@ export default (
       as: 'topics',
       foreignKey: 'chain_id',
     });
-    models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.Thread.scope('excludeAttributes'), {
+      foreignKey: 'chain',
+    });
+    models.Chain.hasMany(models.Comment.scope('excludeAttributes'), {
+      foreignKey: 'chain',
+    });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,

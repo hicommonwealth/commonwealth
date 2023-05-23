@@ -74,7 +74,10 @@ export const getThreads = async (
   if (topic_id) where['topic_id'] = topic_id;
   if (address_ids) where['address_id'] = { [Op.in]: address_ids };
   if (include_comments)
-    include.push({ model: models.Comment, required: false });
+    include.push({
+      model: models.Comment.scope('excludeAttributes'),
+      required: false,
+    });
 
   let threads, count;
   if (!count_only) {

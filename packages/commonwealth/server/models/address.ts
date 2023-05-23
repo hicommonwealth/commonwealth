@@ -129,8 +129,10 @@ export default (
     });
     models.Address.hasOne(models.SsoToken);
     models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
-    models.Address.hasMany(models.Comment, { foreignKey: 'address_id' });
-    models.Address.hasMany(models.Thread, {
+    models.Address.hasMany(models.Comment.scope('excludeAttributes'), {
+      foreignKey: 'address_id',
+    });
+    models.Address.hasMany(models.Thread.scope('excludeAttributes'), {
       foreignKey: 'address_id',
     });
     models.Address.belongsToMany(models.Thread, {

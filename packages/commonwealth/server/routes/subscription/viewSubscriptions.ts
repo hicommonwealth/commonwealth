@@ -18,7 +18,7 @@ export default async (
 
   const associationParams: any = [
     {
-      model: models.Thread,
+      model: models.Thread.scope('excludeAttributes'),
       as: 'Thread',
       include: [
         {
@@ -28,7 +28,7 @@ export default async (
       ],
     },
     {
-      model: models.Comment,
+      model: models.Comment.scope('excludeAttributes'),
       as: 'Comment',
       include: [models.Address],
     },

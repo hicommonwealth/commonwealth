@@ -85,7 +85,7 @@ export default (
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.Topic.hasMany(models.Thread, {
+    models.Topic.hasMany(models.Thread.scope('excludeAttributes'), {
       as: 'threads',
       foreignKey: 'topic_id',
     });
