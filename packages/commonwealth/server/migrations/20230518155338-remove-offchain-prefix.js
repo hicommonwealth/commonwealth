@@ -8,7 +8,7 @@ module.exports = {
           `
               ALTER INDEX "${oldIndexName}" RENAME TO "${newIndexName}";
           `,
-          { transaction: t }
+          { transaction: t, logging: console.log }
         );
       };
 
@@ -18,7 +18,7 @@ module.exports = {
               ALTER TABLE "${tableName}"
                   RENAME CONSTRAINT "${oldName}" TO "${newName}";
           `,
-          { transaction: t }
+          { transaction: t, logging: console.log }
         );
       };
 
