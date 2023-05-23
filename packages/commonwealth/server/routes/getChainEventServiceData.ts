@@ -66,7 +66,7 @@ export const getChainEventServiceData = async (
              allChains.ce_verbose                                              as verbose_logging,
              JSON_BUILD_OBJECT('id', allChains.chain_node_id, 'url',
                                COALESCE(allChains.private_url, allChains.url)) as "ChainNode",
-             allChains.name + '::' + allChains.address                         as origin
+             CONCAT_WS('::', allChains.name, allChains.address)                         as origin
       FROM allChains
       WHERE MOD(allChains.index, ${numChainSubs}) = ${chainSubIndex};
   `;

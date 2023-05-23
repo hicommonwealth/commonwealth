@@ -182,6 +182,7 @@ export async function createListener(
   } else if (network === SupportedNetwork.Cosmos) {
     listener = new CosmosListener(
       origin,
+      chainName,
       options.url,
       !!options.skipCatchup,
       options.pollTime,

@@ -69,10 +69,10 @@ export async function manageErcListeners(
       await existingListener.unsubscribe();
       delete listenerInstances[listenerName];
     } else {
+      const loggingHandler = existingListener.eventHandlers.logging
+        ?.handler as ErcLoggingHandler;
       // if the tokens list is the same update the logging handler tokenAddresses
-      (
-        existingListener.eventHandlers.logging?.handler as ErcLoggingHandler
-      ).tokenAddresses = tokens
+      loggingHandler.tokenAddresses = tokens
         .filter((token) => token.verbose_logging)
         .map((token) => token.contract_address);
     }

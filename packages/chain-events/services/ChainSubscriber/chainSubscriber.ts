@@ -199,7 +199,7 @@ export async function getSubscriberChainData(
                C.ce_verbose                                                            as verbose_logging,
                JSON_BUILD_OBJECT('id', CN.id, 'url', COALESCE(CN.private_url, CN.url), 'name', CN.name) as "ChainNode",
                CN.name,
-               CN.name + '::' + C2.address as origin
+               CONCAT_WS('::', CN.name, C2.address) as origin
         FROM "Chains" C
                  JOIN "ChainNodes" CN on C.chain_node_id = CN.id
                  LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id
@@ -208,6 +208,7 @@ export async function getSubscriberChainData(
     `;
 
     cachedChainsAndTokens = (await pool.query<ChainAttributes>(query)).rows;
+    console.log('>>>>>>>>>>>>>>>>>>>>>>', cachedChainsAndTokens);
     return cachedChainsAndTokens;
   } else {
     try {
