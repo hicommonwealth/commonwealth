@@ -94,8 +94,11 @@ export const ERC721Form = (props: EthChainFormState) => {
           console.log('Querying chain for ERC info');
 
           const Web3 = (await import('web3')).default;
-
-          const provider = new Web3.providers.WebsocketProvider(args.url);
+          //IANHERE
+          const provider =
+            args.url.slice(0, 4) == 'http'
+              ? new Web3.providers.HttpProvider(args.url)
+              : new Web3.providers.WebsocketProvider(args.url);
 
           try {
             const ethersProvider = new providers.Web3Provider(provider);
@@ -131,7 +134,7 @@ export const ERC721Form = (props: EthChainFormState) => {
           chainFormDefaultFields.setTelegram('');
           chainFormDefaultFields.setGithub('');
 
-          provider.disconnect(1000, 'finished');
+          if (provider.connected) provider.disconnect(1000, 'finished');
         }
 
         chainFormState.setLoaded(true);
