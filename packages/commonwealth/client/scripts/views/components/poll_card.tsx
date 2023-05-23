@@ -370,7 +370,7 @@ export const PollCard = ({
             iconName="close"
             iconSize="small"
             className="poll-delete-button"
-            onClick={(e) => {
+            onClick={() => {
               setDeleteModalOpen(true);
             }}
           />
