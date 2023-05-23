@@ -313,13 +313,8 @@ export async function unlinkLogin(account: AddressInfo) {
 async function constructMagic() {
   const { Magic } = await import('magic-sdk');
   const { OAuthExtension } = await import('@magic-ext/oauth');
-  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
-  const rpcUrl = (isCosmos && app.chain.meta?.node?.url) || app.config.chains.getById('osmosis').node.url;
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: [
-      new CosmosExtension({
-        rpcUrl,
-      }),
       new OAuthExtension(),
     ]
   });
@@ -332,8 +327,8 @@ export async function loginWithMagicLink({
   const magic = await constructMagic();
 
   if (email) {
-    const didToken = await magic.auth.loginWithMagicLink({ email });
-    await handleSocialLoginCallback(didToken);
+    const bearer = await magic.auth.loginWithMagicLink({ email });
+    await handleSocialLoginCallback(bearer);
   } else {
     // provider-based login
     await magic.oauth.loginWithRedirect({
@@ -343,21 +338,18 @@ export async function loginWithMagicLink({
   }
 }
 
-export async function handleSocialLoginCallback(didToken?: string) {
-  if (!didToken) {
+export async function handleSocialLoginCallback(bearer?: string) {
+  if (!bearer) {
     const magic = await constructMagic();
     const result = await magic.oauth.getRedirectResult();
+    bearer = result.oauth.accessToken;
     console.log('Magic redirect result:', result);
-    didToken = result.magic.idToken;
   }
-
-  // kick off validation flow
-  // TODO
 
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
-      Authorization: `Bearer ${didToken}`,
+      Authorization: `Bearer ${bearer}`,
     },
     xhrFields: {
       withCredentials: true,

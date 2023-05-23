@@ -1,11 +1,13 @@
 import type { MagicUserMetadata } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
+import { verify } from 'jsonwebtoken';
+import { Op, Transaction } from 'sequelize';
 
 import { ServerError } from 'common-common/src/errors';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
-import { MAGIC_API_KEY } from '../config';
+import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { sequelize } from '../database';
 import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
@@ -14,11 +16,10 @@ import type { ProfileAttributes } from '../models/profile';
 import '../types';
 import { createRole } from '../util/roles';
 import { TypedRequestBody } from '../types';
-import { UserAttributes, UserInstance } from '../models/user';
-import { Transaction } from 'sequelize';
+import { UserInstance } from '../models/user';
 import { AddressInstance } from '../models/address';
-import { ChainAttributes } from '../models/chain';
 
+// Creates a trusted address in a community
 async function createMagicAddress(
   models: DB,
   chain: string,
@@ -54,36 +55,12 @@ async function createMagicAddress(
   return addressInstance;
 }
 
-async function createMagicSubscriptions(models: DB, user_id: number, t?: Transaction) {
-  // Automatically create subscription to their own mentions
-  await models.Subscription.create(
-    {
-      subscriber_id: user_id,
-      category_id: NotificationCategories.NewMention,
-      object_id: `user-${user_id}`,
-      is_active: true,
-    },
-    { transaction: t }
-  );
-
-  // Automatically create a subscription to collaborations
-  await models.Subscription.create(
-    {
-      subscriber_id: user_id,
-      category_id: NotificationCategories.NewCollaboration,
-      object_id: `user-${user_id}`,
-      is_active: true,
-    },
-    { transaction: t }
-  );
-}
-
+// User is logged out + selects magic, and provides a new email. Create a new user for them.
 async function createNewMagicUser(
   models: DB,
   userMetadata: MagicUserMetadata,
   providedUser: MagicUser,
-  registrationChain: ChainAttributes,
-  registrationChainAddress: string,
+  chain?: string,
 ): Promise<UserInstance> {
   const canonicalAddress = userMetadata.publicAddress;
 
@@ -100,30 +77,39 @@ async function createNewMagicUser(
 
     const canonicalAddressInstance = await createMagicAddress(
       models,
-      'ethereum',
+      chain || 'ethereum',
       newUser.id,
       (newUser.Profiles[0] as ProfileAttributes).id,
       canonicalAddress,
       t
     );
 
-    if (registrationChainAddress) {
-      await createMagicAddress(
-        models,
-        registrationChain.id,
-        newUser.id,
-        (newUser.Profiles[0] as ProfileAttributes).id,
-        registrationChainAddress,
-        t
-      );
-    }
+    // Automatically create subscription to their own mentions
+    await models.Subscription.create(
+      {
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewMention,
+        object_id: `user-${newUser.id}`,
+        is_active: true,
+      },
+      { transaction: t }
+    );
 
-    await createMagicSubscriptions(models, newUser.id, t);
+    // Automatically create a subscription to collaborations
+    await models.Subscription.create(
+      {
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewCollaboration,
+        object_id: `user-${newUser.id}`,
+        is_active: true,
+      },
+      { transaction: t }
+    );
 
     // create token with provided user/address
     await models.SsoToken.create(
       {
-        issuer: userMetadata.issuer,
+        issuer: providedUser.issuer,
         issued_at: providedUser.claim.iat,
         address_id: canonicalAddressInstance.id, // always ethereum address
         created_at: new Date(),
@@ -135,23 +121,15 @@ async function createNewMagicUser(
     return newUser;
   });
 
-  // re-fetch user to include address object
-  const newUser = await models.User.findOne({
-    where: {
-      id: result.id,
-    },
-    include: [models.Address],
-  });
-  return newUser;
+  return result;
 }
 
+// User is logged out + selects magic, and provides an existing email. Log them in.
 async function loginExistingMagicUser(
   models: DB,
   existingUser: UserInstance,
-  userMetadata: MagicUserMetadata,
   providedUser: MagicUser,
-  registrationChain: ChainAttributes,
-  registrationChainAddress: string
+  chain?: string
 ): Promise<UserInstance> {
   const ssoToken = await models.SsoToken.findOne({
     where: {
@@ -160,76 +138,126 @@ async function loginExistingMagicUser(
     include: [
       {
         model: models.Address,
-        where: { address: userMetadata.publicAddress },
+        where: { address: providedUser.publicAddress },
         required: true,
       },
     ],
   });
+
   // login user if they registered via magic
   if (providedUser.claim.iat <= ssoToken.issued_at) {
     console.log('Replay attack detected.');
-    throw new Error(`Replay attack detected for user ${userMetadata.publicAddress}}.`);
+    throw new Error(`Replay attack detected for user ${providedUser.publicAddress}}.`);
   }
   ssoToken.issued_at = providedUser.claim.iat;
   ssoToken.updated_at = new Date();
   await ssoToken.save();
   console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
 
-  const addressExistsForChain = existingUser.Addresses?.some(
-    (a) =>
-      registrationChain?.id === a.chain ||
-      (registrationChain?.base === 'cosmos' &&
-        (a.address.startsWith('cosmos') ||
-          a.address.startsWith('osmo')))
-  );
-
-  if (registrationChainAddress && !addressExistsForChain) {
-    // insert an address for their selected chain if it doesn't exist
-    await sequelize.transaction(async (t) => {
-      const [newRegistrationChainAddress, created] =
-        await models.Address.findOrCreate({
-          where: {
-            address: registrationChainAddress,
-            chain: registrationChain.id,
-            user_id: existingUser.id,
-            profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
-            wallet_id: WalletId.Magic,
-          },
-          defaults: {
-            verification_token: 'MAGIC',
-            verification_token_expires: null,
-            verified: new Date(),
-            last_active: new Date(),
-          },
-          transaction: t,
-        });
-      if (created) {
-        await createRole(
-          models,
-          newRegistrationChainAddress.id,
-          registrationChain.id,
-          'member',
-          false,
-          t
-        );
-      }
-    });
+  // auto "join" community logged in against
+  if (chain && ssoToken.Address.chain !== chain) {
+    await createMagicAddress(
+      models,
+      chain,
+      existingUser.id,
+      existingUser.Profiles[0].id,
+      providedUser.publicAddress,
+    );
   }
   return existingUser;
+}
+
+// User is logged in + selects magic, and provides an existing email different from their current
+// authentication. Move their addresses from the provided email to the currently logged in user.
+async function mergeLogins(
+  models: DB,
+  loggedInUserId: number,
+  providedUser: MagicUser,
+  magicUser: UserInstance,
+) {
+  // first, verify the existing magic user to ensure they're not performing a replay attack
+  await loginExistingMagicUser(models, magicUser, providedUser);
+
+  // then, merge their information into the logged-in user
+  const loggedInUser = await models.User.findOne({
+    where: { id: loggedInUserId },
+    include: [
+      {
+        model: models.Profile,
+      },
+    ]
+  });
+
+  // update addresses for magic user to point to original user
+  await models.Address.update(
+    {
+      user_id: loggedInUser.id,
+      profile_id: loggedInUser.Profiles[0].id,
+    },
+    {
+      where: {
+        user_id: magicUser.id,
+      },
+    }
+  );
+
+  // TODO: delete original user / profile??
+
+  // TODO: send move email
+
+  return loggedInUser;
+}
+
+// User is logged in + selects magic, and provides a totally new email. Add the new Magic address
+// to the existing User.
+async function addMagicToUser(
+  models: DB,
+  loggedInUserId: number,
+  providedUser: MagicUser,
+  chain?: string,
+) {
+  const loggedInUser = await models.User.findOne({
+    where: { id: loggedInUserId },
+    include: [
+      {
+        model: models.Profile,
+      },
+    ]
+  });
+
+  // create new address on logged-in user
+  const canonicalAddressInstance = await createMagicAddress(
+    models,
+    chain || 'ethereum',
+    loggedInUser.id,
+    (loggedInUser.Profiles[0] as ProfileAttributes).id,
+    providedUser.publicAddress,
+  );
+
+  // create new token with provided user/address
+  await models.SsoToken.create(
+    {
+      issuer: providedUser.issuer,
+      issued_at: providedUser.claim.iat,
+      address_id: canonicalAddressInstance.id, // always ethereum address
+      created_at: new Date(),
+      updated_at: new Date(),
+    }
+  );
+  return loggedInUser;
 }
 
 async function magicLoginRoute(
   magic: Magic,
   models: DB,
   req: TypedRequestBody<{
-    address?: string,
     chain?: string,
+    jwt?: string,
   }>,
-  user: MagicUser,
+  magicUser: MagicUser,
   cb: DoneFunc
 ) {
-  console.log(user);
-  let chain, error, registrationChainAddress;
+  let chain, error, user_id;
 
   // validate chain if provided (i.e. logging in on community page)
   if (req.body.chain) {
@@ -237,17 +265,20 @@ async function magicLoginRoute(
     if (error) return cb(error);
   }
 
-  // validate address if provided (i.e. cosmos changed address)
-  if (req.body.address) {
-    registrationChainAddress = req.body.address;
+  // check if the user is logged in already (provided valid JWT)
+  if (req.body.jwt) {
+    try {
+      const { id } = verify(req.body.jwt, JWT_SECRET) as { id: number, email: string | null };
+      user_id = id;
+    } catch (e) {
+      return cb('Could not verify login');
+    }
   }
-
-  const registrationChain = chain;
 
   // fetch user data from magic backend
   let userMetadata: MagicUserMetadata;
   try {
-    userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+    userMetadata = await magic.users.getMetadataByIssuer(magicUser.issuer);
     console.log('User metadata:', userMetadata);
   } catch (e) {
     return cb(
@@ -259,9 +290,6 @@ async function magicLoginRoute(
 
   const canonicalAddress = userMetadata.publicAddress;
 
-  // check if the user is already logged in
-  const loggedInUser: UserAttributes | undefined = req.user;
-
   // check if new signup or login
   const existingUser = await models.User.scope('withPrivateData').findOne(
     {
@@ -271,8 +299,9 @@ async function magicLoginRoute(
           where: {
             wallet_id: WalletId.Magic,
             address: canonicalAddress,
+            verified: { [Op.ne]: null },
           },
-          required: false,
+          required: true,
         },
         {
           model: models.Profile,
@@ -281,35 +310,59 @@ async function magicLoginRoute(
     }
   );
 
-  if (loggedInUser && existingUser) {
+  if (existingUser.id === user_id) {
+    // already logged in as existing user, do nothing
+    return cb(null, existingUser);
+  }
+
+  let final_id;
+  if (user_id && existingUser) {
     // user is already logged in + has already linked the provided magic address.
-    // TODO: we should merge the existing magic user with the logged in user, unless
-    //   the two are identical, in which case we should do nothing.
-  } else if (!loggedInUser && existingUser) {
+    // merge the existing magic user with the logged in user
+    const finalUser = await mergeLogins(
+      models,
+      user_id,
+      magicUser,
+      existingUser
+    );
+    final_id = finalUser.id;
+  } else if (!user_id && existingUser) {
     // user is logging in with an existing magic account
     const returnedUser = await loginExistingMagicUser(
       models,
       existingUser,
-      userMetadata,
-      user,
-      registrationChain,
-      registrationChainAddress
+      magicUser,
+      chain
     );
-    return cb(null, returnedUser);
-  } else if (loggedInUser && !existingUser) {
+    final_id = returnedUser.id;
+  } else if (user_id && !existingUser) {
     // user is already logged in and is linking a new magic login to their account
-    // TODO: create + add the magic addresses
+    const finalUser = await addMagicToUser(
+      models,
+      user_id,
+      magicUser,
+      chain
+    );
+    final_id = finalUser.id;
   } else {
     // completely new user: create user, profile, addresses
     const newUser = await createNewMagicUser(
       models,
       userMetadata,
-      user,
-      registrationChain,
-      registrationChainAddress
+      magicUser,
+      chain
     );
-    return cb(null, newUser);
+    final_id = newUser.id;
   }
+
+  // always re-fetch user to include address object
+  const finalUser = await models.User.findOne({
+    where: {
+      id: final_id,
+    },
+    include: [models.Address],
+  });
+  return cb(null, finalUser);
 }
 
 export function initMagicAuth(models: DB) {

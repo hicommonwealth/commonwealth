@@ -1007,7 +1007,7 @@ function setupRouter(
   router.post(
     '/auth/magic',
     // TODO: verify working without jwt
-    passport.authenticate('jwt', { session: false }),
+    // passport.authenticate('jwt', { session: false }),
     passport.authenticate('magic'), (req, res) => {
       return res.json({ status: 'Success', result: req.user.toJSON() });
     }
