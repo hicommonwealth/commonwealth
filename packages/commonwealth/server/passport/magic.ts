@@ -1,4 +1,4 @@
-import { MagicUserMetadata, MagicWallet, WalletType } from '@magic-sdk/admin';
+import { MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 
 import { AppError, ServerError } from 'common-common/src/errors';

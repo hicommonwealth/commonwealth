@@ -2,7 +2,7 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
