@@ -32,6 +32,12 @@ module.exports = {
         { transaction: t }
       );
 
+      await queryInterface.removeConstraint(
+        'ChainEntityMeta',
+        'ChainEntityMeta_chain_fkey',
+        { transaction: t }
+      );
+
       await queryInterface.sequelize.query(
         `
           CREATE TABLE "EventOrigins" as (
@@ -109,6 +115,17 @@ module.exports = {
       );
 
       await queryInterface.removeColumn('ChainEntityMeta', 'contract_address', {
+        transaction: t,
+      });
+
+      await queryInterface.addConstraint('ChainEntityMeta', {
+        fields: ['chain'],
+        type: 'foreign key',
+        name: 'ChainEntityMeta_chain_fkey',
+        references: {
+          table: 'Chains',
+          field: 'id',
+        },
         transaction: t,
       });
     });
