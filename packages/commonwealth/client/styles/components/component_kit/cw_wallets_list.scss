@@ -8,7 +8,7 @@
   .wallets-and-link-container {
     display: flex;
     flex-direction: column;
-    margin-bottom: 24px;
+    margin-top: 16px;
 
     .wallets {
       display: flex;
@@ -17,7 +17,6 @@
       overflow-y: auto;
       width: 284px;
       // preserves box shadow in scroll container
-      max-height: 176px;
       margin-bottom: -4px;
       padding-bottom: 4px;
 
@@ -25,12 +24,20 @@
 
       &.darkMode {
         // no box shadow
-        height: 172px;
         margin-bottom: 0;
         padding-bottom: 0;
 
         @include visibleScrollbar(dark);
       }
+    }
+
+    .wallets-divider {
+      margin: 8px 0;
+      width: 272px;
+    }
+
+    .discord {
+      color: #5865F2 !important;
     }
 
     .wallet-list-links {
