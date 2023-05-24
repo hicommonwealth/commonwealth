@@ -43,16 +43,18 @@ const MembersPage = () => {
       setTotalCount(response.totalCount);
     }
 
-    const members = response.profiles.map((p) => ({
-      id: p.id,
-      address_id: p.addresses?.[0]?.id,
-      address: p.addresses?.[0]?.address,
-      address_chain: p.addresses?.[0]?.chain,
-      chain_id: p.addresses?.[0]?.chain,
-      profile_name: p.profile_name,
-      avatar_url: p.avatar_url,
-      roles: p.roles,
-    }));
+    const members = response.profiles
+      .map((p) => ({
+        id: p.id,
+        address_id: p.addresses?.[0]?.id,
+        address: p.addresses?.[0]?.address,
+        address_chain: p.addresses?.[0]?.chain,
+        chain_id: p.addresses?.[0]?.chain,
+        profile_name: p.profile_name,
+        avatar_url: p.avatar_url,
+        roles: p.roles,
+      }))
+      .filter((p) => p.roles.length > 0);
 
     const profiles: Array<MemberInfo> = members.map((p) => {
       const minProfile = new MinimumProfile(p.address, p.chain);
@@ -66,7 +68,11 @@ const MembersPage = () => {
       );
       return {
         profile: minProfile,
-        role: p.roles.find((role) => role.chain_id === app.activeChainId()),
+        role: p.roles.find(
+          (role) =>
+            role.chain_id === app.activeChainId() &&
+            ['admin', 'moderator'].includes(role.permission)
+        ),
       };
     });
 
