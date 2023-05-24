@@ -55,6 +55,33 @@
       gap: 8px;
       justify-content: center;
       margin-top: 24px;
+
+      .wallet-back-btn {
+        border-color: transparent !important;
+        background-color: transparent !important;
+
+        .Icon {
+          color: $white  !important;
+        }
+
+        .Text {
+          font-weight: 400 !important;
+          color: $white  !important;
+        }
+
+        &:hover {
+          border-color: transparent !important;
+        }
+      }
+
+      .wallet-magic-btn {
+        border-color: $primary-500  !important;
+        background-color: $primary-500  !important;
+
+        .Text {
+          color: $white  !important;
+        }
+      }
     }
   }
 }
@@ -82,7 +109,7 @@
   height: 100%;
   justify-content: center;
   overflow-y: auto;
-  padding: 0px 24px 0px 24px;
+  padding: 24px;
   width: 100%;
 
   .IconButton {
@@ -92,7 +119,7 @@
   }
 
   .walletList {
-    margin-bottom: 60px;
+    // margin-bottom: 60px;
     width: 368px;
 
     @include innerBodyStyles;

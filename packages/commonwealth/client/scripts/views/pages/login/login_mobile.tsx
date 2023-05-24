@@ -50,6 +50,7 @@ export const LoginMobile = ({
   onWalletAddressSelect,
   isNewlyCreated,
   isLinkingOnMobile,
+  onNavigateToWalletList,
 }: LoginProps) => {
   const hasBoilerplate =
     activeStep === 'walletList' ||
@@ -99,6 +100,7 @@ export const LoginMobile = ({
             onResetWalletConnect={onResetWalletConnect}
             onWalletSelect={onWalletSelect}
             onWalletAddressSelect={onWalletAddressSelect}
+            onSocialLogin={onSocialLogin}
           />
         )}
 
@@ -131,6 +133,7 @@ export const LoginMobile = ({
             onResetWalletConnect={onResetWalletConnect}
             onWalletSelect={onWalletSelect}
             onWalletAddressSelect={onWalletAddressSelect}
+            onSocialLogin={onSocialLogin}
           />
         )}
 
@@ -166,48 +169,33 @@ export const LoginMobile = ({
         {activeStep === 'connectWithEmail' && (
           <div className="inner-body-container">
             {!isMagicLoading ? (
-              <>
+              <div className="email-form-wrapper">
                 <CWTextInput
-                  label="email address"
-                  placeholder="your-email@email.com"
+                  label="Email address"
+                  placeholder="Email address"
+                  className="login-email-field"
                   onInput={handleSetEmail}
                   onenterkey={onEmailLogin}
                 />
-                <div className="buttons-row">
+                <div className="buttons-row email-form-buttons">
                   <CWButton
-                    label="Github"
-                    buttonType="primary-blue-dark"
-                    onClick={() => onSocialLogin('github')}
+                    iconLeft="arrowLeft"
+                    label="Back"
+                    buttonType="secondary-blue"
+                    className="wallet-back-btn"
+                    onClick={onNavigateToWalletList}
                   />
                   <CWButton
-                    label="Google"
-                    buttonType="primary-blue-dark"
-                    onClick={() => onSocialLogin('google')}
-                  />
-                  <CWButton
-                    label="Apple"
-                    buttonType="primary-blue-dark"
-                    onClick={() => onSocialLogin('apple')}
+                    label="Login with Magic"
+                    buttonType="secondary-blue"
+                    className="wallet-magic-btn"
+                    onClick={onEmailLogin}
                   />
                 </div>
-              </>
+              </div>
             ) : (
               <CWSpinner />
             )}
-            <div className="buttons-row">
-              <CWButton
-                label="Back"
-                buttonType="secondary-blue-dark"
-                onClick={() => {
-                  setActiveStep('walletList');
-                }}
-              />
-              <CWButton
-                label="Connect"
-                onClick={onEmailLogin}
-                buttonType="primary-blue-dark"
-              />
-            </div>
           </div>
         )}
 
