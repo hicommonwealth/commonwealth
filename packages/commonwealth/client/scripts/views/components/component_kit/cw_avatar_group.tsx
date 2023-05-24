@@ -37,7 +37,7 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
     <div className="AvatarGroup">
       <div className="avatar-group-icons">
         {truncatedProfiles.map((profile, i) => {
-          if (profile.avatarUrl) {
+          if (profile?.avatarUrl) {
             return (
               <div className="avatar-group-icon" key={i}>
                 <CWAvatar avatarUrl={profile.avatarUrl} size={16} />
