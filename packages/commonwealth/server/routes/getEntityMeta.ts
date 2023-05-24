@@ -5,8 +5,8 @@ import type { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta'
 import type { DB } from '../models';
 
 export const Errors = {
-  NeedChain: 'Must provide a chain to fetch entities from',
-  InvalidChain: 'Invalid chain',
+  NeedChainName: 'Must provide a chainName to fetch entities from',
+  InvalidChain: 'Invalid chainName',
 };
 
 const getEntityMeta = async (
@@ -15,21 +15,17 @@ const getEntityMeta = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.query.chain) {
-    return next(new AppError(Errors.NeedChain));
+  if (!req.query.chain_name) {
+    return next(new AppError(Errors.NeedChainName));
   }
 
-  const chain = await models.Chain.findOne({
-    where: { id: req.query.chain },
-  });
-
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
-  }
+  const contract_address = req.query.contract_address || null;
 
   const entityMetaWhereOptions: WhereOptions<ChainEntityMetaAttributes> = {
-    chain: chain.id,
+    chain_name: req.query.chain_name,
+    contract_address,
   };
+
   if (req.query.id) {
     entityMetaWhereOptions.id = req.query.id;
   }

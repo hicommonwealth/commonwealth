@@ -179,7 +179,6 @@ export default (
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
-    models.Chain.hasMany(models.ChainEntityMeta, { foreignKey: 'chain' });
   };
 
   return Chain;

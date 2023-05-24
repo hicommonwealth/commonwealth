@@ -114,9 +114,13 @@ class ChainEntityController {
    * @param id the chain entity id
    */
   public async getOneEntity(chain: string, id: string): Promise<ChainEntity> {
+    const options: any = {
+      chain_name: app.user.selectedChain.node.name,
+      contract_address: app.contracts.getCommunityContracts()[0].address,
+    };
     const [entities, entityMetas] = await Promise.all([
-      getFetch(`${app.serverUrl()}/ce/entities`, { chain, id }),
-      getFetch(`${app.serverUrl()}/getEntityMeta`, { chain, ce_id: id }),
+      getFetch(`${app.serverUrl()}/ce/entities`, options),
+      getFetch(`${app.serverUrl()}/getEntityMeta`, options),
     ]);
     const data = ChainEntityController._formatEntitiesWithMeta(
       entities,
@@ -138,7 +142,10 @@ class ChainEntityController {
       return this._store.get(chain);
     }
 
-    const options: any = { chain };
+    const options: any = {
+      chain_name: app.user.selectedChain.node.name,
+      contract_address: app.contracts.getCommunityContracts()[0].address,
+    };
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
@@ -154,9 +161,11 @@ class ChainEntityController {
   }
 
   public async getRawEntities(chain: string): Promise<ChainEntity[]> {
-    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, {
-      chain,
-    });
+    const options: any = {
+      chain_name: app.user.selectedChain.node.name,
+      contract_address: app.contracts.getCommunityContracts()[0].address,
+    };
+    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, options);
     const data = [];
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {

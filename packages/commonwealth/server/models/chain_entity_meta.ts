@@ -9,12 +9,12 @@ export type ChainEntityMetaAttributes = {
   // (used to match chain-entity-meta with chain-entities from chain-events)
   ce_id: number;
   title?: string;
-  chain: string;
+  chain_name: string;
   author?: string;
   type_id?: string;
   project_chain?: string;
+  contract_address?: string;
 
-  Chain?: ChainAttributes;
   ProjectChain?: ChainAttributes;
 };
 
@@ -35,25 +35,22 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       ce_id: { type: dataTypes.INTEGER, allowNull: false, unique: true },
       title: { type: dataTypes.STRING, allowNull: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      chain_name: { type: dataTypes.STRING, allowNull: false },
       author: { type: dataTypes.STRING, allowNull: true },
       type_id: { type: dataTypes.STRING, allowNull: true },
       project_chain: { type: dataTypes.STRING, allowNull: true },
+      contract_address: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'ChainEntityMeta',
       timestamps: false,
       underscored: true,
       paranoid: false,
-      indexes: [{ fields: ['id'] }],
+      indexes: [{ fields: ['chain_name', 'contract_address'] }],
     }
   );
 
   ChainEntityMeta.associate = (models) => {
-    models.ChainEntityMeta.belongsTo(models.Chain, {
-      foreignKey: 'chain',
-      targetKey: 'id',
-    });
     models.ChainEntityMeta.belongsTo(models.Chain, {
       foreignKey: 'project_chain',
       targetKey: 'id',
