@@ -120,7 +120,13 @@
 
       .email-form-buttons {
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
+        gap: 12px;
+
+        .Button {
+          width: 100%;
+        }
       }
     }
   }

@@ -111,16 +111,16 @@ export const LoginDesktop = ({
                 />
                 <div className="buttons-row email-form-buttons">
                   <CWButton
-                    iconLeft="arrowLeft"
-                    label="Back"
-                    buttonType="secondary-blue"
-                    className="wallet-back-btn"
-                    onClick={onNavigateToWalletList}
-                  />
-                  <CWButton
                     label="Login with Magic"
                     className="wallet-magic-btn"
                     onClick={onEmailLogin}
+                  />
+                  <CWButton
+                    iconLeft="arrowLeft"
+                    label="Back to login options"
+                    buttonType="secondary-blue"
+                    className="wallet-back-btn"
+                    onClick={onNavigateToWalletList}
                   />
                 </div>
               </div>

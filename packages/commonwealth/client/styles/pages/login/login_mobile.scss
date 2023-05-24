@@ -49,12 +49,20 @@
       width: 320px;
     }
 
+    .email-form-wrapper {
+      width: 100%;
+    }
+
     .buttons-row {
       display: flex;
-      flex-direction: row;
-      gap: 8px;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
       margin-top: 24px;
+
+      .Button {
+        width: 100%;
+      }
 
       .wallet-back-btn {
         border-color: transparent !important;

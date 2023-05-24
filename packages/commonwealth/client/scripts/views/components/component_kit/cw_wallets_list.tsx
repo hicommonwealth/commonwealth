@@ -204,12 +204,32 @@ export const CWWalletsList = (props: WalletsListProps) => {
           <CWDivider className="wallets-divider" />
 
           <CWAuthButton
+            type="google"
+            label="Sign in with Google"
+            darkMode={darkMode}
+            onClick={async () => onSocialLogin('google')}
+          />
+
+          <CWText
+            type="b2"
+            className={getClasses<{ darkMode?: boolean }>(
+              { darkMode },
+              'connect-another-way-link'
+            )}
+          >
+            <a onClick={onConnectAnotherWay}>
+              Sign in with another email address
+            </a>
+          </CWText>
+
+          <CWDivider className="wallets-divider" />
+          {/* <CWAuthButton
             type="email"
             label="Email"
             darkMode={darkMode}
             onClick={onConnectAnotherWay}
             className="CustomIcon large email-auth-btn"
-          />
+          /> */}
           <CWAuthButton
             type="discord"
             label="Discord"

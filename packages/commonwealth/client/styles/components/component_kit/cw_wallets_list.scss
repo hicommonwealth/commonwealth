@@ -76,6 +76,11 @@
   }
 
   .connect-another-way-link {
+    font-size: 14px;
+    text-align: right;
+    margin-left: auto;
+    margin-right: 16px;
+
     a {
       color: $primary-500;
       cursor: pointer;
