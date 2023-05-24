@@ -656,6 +656,7 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.result.map((rawThread) => {
+      console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
        * here we will find if thread is in store and if so use most keys
@@ -673,7 +674,7 @@ class ThreadsController {
           ? thread.associatedReactions
           : foundThread?.associatedReactions || [];
       finalThread.numberOfComments =
-        rawThread?.comments?.length || foundThread?.numberOfComments || 0;
+        rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
       this._store.update(finalThread);
       if (foundThread) {
         this.numTotalThreads += 1;

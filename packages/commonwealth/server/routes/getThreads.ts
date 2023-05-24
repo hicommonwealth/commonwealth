@@ -2,6 +2,7 @@ import { ServerError } from 'common-common/src/errors';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
+import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 
 const getThreads = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
@@ -44,13 +45,19 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
         },
       ],
     });
+
+    threads = await getThreadsWithCommentCount({
+      threads: threads.map((th) => th.toJSON()),
+      models,
+      chainId: chain?.id,
+    });
   } catch (e) {
     console.log(e);
     throw new ServerError(e);
   }
 
   return threads.length
-    ? res.json({ status: 'Success', result: threads.map((th) => th.toJSON()) })
+    ? res.json({ status: 'Success', result: threads })
     : res.json({ status: 'Failure' });
 };
 
