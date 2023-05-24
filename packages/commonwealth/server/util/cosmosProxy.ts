@@ -12,7 +12,6 @@ import {
 } from './cosmosCache';
 import { lookupKeyDurationInReq } from 'common-common/src/cacheKeyUtils';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import chain from 'server/models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 const defaultCacheDuration = 60 * 10; // 10 minutes
@@ -32,6 +31,27 @@ async function getChainNode(req, res, next) {
     res.status(500).json({ message: err.message });
   }
 }
+
+const onProxyRes = function (proxyRes, req, res) {
+  console.log('RAW response', JSON.stringify(proxyRes.headers));
+};
+
+const proxy = (req, res, next) => {
+  console.log('proxying', req.path);
+  createProxyMiddleware({
+    target: req.chain.ChainNode.url,
+    pathRewrite: { [req.url]: '/' },
+    onProxyReq: fixRequestBody,
+    onProxyRes,
+    changeOrigin: true,
+  });
+  next();
+};
+
+const onProxyReq = function (proxyReq, req, res) {
+  console.log('RAW request', JSON.stringify(proxyReq.headers));
+  // return fixRequestBody(proxyReq, req);
+};
 
 function setupCosmosProxy(app: Express, models: DB) {
   // using bodyParser here because cosmjs generates text/plain type headers
@@ -58,33 +78,17 @@ function setupCosmosProxy(app: Express, models: DB) {
         res.status(500).json({ message: err.message });
       }
     },
-    async (req, res, next) => {
-      await createProxyMiddleware({
-        target: req.chain.ChainNode.url,
-        pathRewrite: { [req.url]: '/' },
-        onProxyReq: fixRequestBody,
-      });
-      next();
-    },
+    proxy,
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
-        // log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
-        // const chain = await models.Chain.findOne({
-        //   where: { id: req.params.chain },
-        //   include: models.ChainNode,
-        // });
-        // if (!chain) {
-        //   throw new AppError('Invalid chain');
-        // }
-        // log.trace(`Found cosmos endpoint: ${chain.ChainNode.url}`);
         console.log('req.url', req.url);
         const response = await axios.post(req.chain.ChainNode.url, req.body, {
           headers: {
             origin: 'https://commonwealth.im',
           },
         });
-        log.trace(
+        console.log(
           // `Got response from endpoint:`
           `Got response from endpoint: ${JSON.stringify(
             response.data,
