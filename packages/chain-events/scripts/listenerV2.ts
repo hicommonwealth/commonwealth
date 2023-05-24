@@ -93,7 +93,6 @@ async function main(): Promise<any> {
         ? [argv.contractAddress]
         : sc.tokenAddresses,
       verbose: false,
-      spec: sc.spec || <any>networkSpecs[sc.chain],
       enricherConfig: sc.enricherConfig || {
         balanceTransferThreshold: 500_000,
       },

@@ -232,7 +232,6 @@ async function setupNewListeners(
           address: chain.contract_address,
           archival: false,
           url: chain.ChainNode.url,
-          spec: chain.substrate_spec,
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
@@ -319,30 +318,6 @@ async function updateExistingListeners(
     if (!listenerInstances[chain.origin]) continue;
     // if the chain is a substrate chain and its spec has changed since the last
     // check then update the active listener with the new spec
-    if (
-      chain.base === ChainBase.Substrate &&
-      !_.isEqual(
-        chain.substrate_spec,
-        (<SubstrateEvents.Listener>listenerInstances[chain.origin]).options.spec
-      )
-    ) {
-      log.info(`Spec for ${chain.origin} changed... restarting listener`);
-      try {
-        await (<SubstrateEvents.Listener>(
-          listenerInstances[chain.origin]
-        )).updateSpec(chain.substrate_spec);
-      } catch (error) {
-        log.error(
-          `Unable to update substrate spec for ${chain.origin}!`,
-          error
-        );
-        rollbar?.critical(
-          `Unable to update substrate spec for ${chain.origin}!`,
-          error
-        );
-      }
-    }
-
     if (
       listenerInstances[chain.origin].eventHandlers.logger &&
       !chain.verbose_logging

@@ -60,6 +60,7 @@ export type PaginationSqlOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
+  nullsLast?: boolean;
 };
 export type PaginationSqlResult = {
   sql: string;
@@ -74,13 +75,16 @@ export type PaginationSqlBind = PaginationSqlResult['bind'];
 export const buildPaginationSql = (
   options: PaginationSqlOptions
 ): PaginationSqlResult => {
-  const { limit, page, orderBy, orderDirection } = options;
+  const { limit, page, orderBy, orderDirection, nullsLast } = options;
   let sql = '';
   const bind: PaginationSqlBind = {};
   if (typeof limit === 'number') {
     sql += `ORDER BY ${orderBy} `;
     if (['ASC', 'DESC'].includes(orderDirection)) {
       sql += `${orderDirection} `;
+      if (nullsLast) {
+        sql += 'NULLS LAST ';
+      }
     } else {
       sql += 'DESC ';
     }
