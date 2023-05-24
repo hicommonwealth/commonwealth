@@ -4,6 +4,7 @@ import chai from 'chai';
 
 import { Subscriber } from '../../../src/chains/compound/subscriber';
 import type { Api, RawEvent } from '../../../src/chains/compound/types';
+import { ethers } from 'ethers';
 
 const { assert } = chai;
 
@@ -15,7 +16,10 @@ const constructEvent = (data): RawEvent => {
 
 describe('Compound Event Subscriber Tests', () => {
   it('should callback with event data', async (done) => {
-    const compoundApi = new EventEmitter();
+    const compoundApi = {
+      event: new EventEmitter(),
+      provider: new ethers.providers.JsonRpcProvider('http://127.0.0.1:8545'),
+    };
     const subscriber = new Subscriber(
       compoundApi as unknown as Api,
       'compound-test'
@@ -29,7 +33,7 @@ describe('Compound Event Subscriber Tests', () => {
       assert.deepEqual(event, receivedEvent);
     };
     subscriber.subscribe(cb, {}).then(() => {
-      compoundApi.emit('*', event);
+      compoundApi.event.emit('*', event);
     });
     done();
   });
@@ -45,7 +49,10 @@ describe('Compound Event Subscriber Tests', () => {
   });
 
   it('should unsubscribe successfully', (done) => {
-    const compoundApi = new EventEmitter();
+    const compoundApi = {
+      event: new EventEmitter(),
+      provider: new ethers.providers.JsonRpcProvider('http://127.0.0.1:8545'),
+    };
     const subscriber = new Subscriber(
       compoundApi as unknown as Api,
       'compound-test'
@@ -55,7 +62,7 @@ describe('Compound Event Subscriber Tests', () => {
     };
     subscriber.subscribe(cb, {}).then(() => {
       subscriber.unsubscribe();
-      assert.deepEqual(compoundApi.listeners('*'), []);
+      assert.deepEqual(compoundApi.event.listeners('*'), []);
       done();
     });
   });
