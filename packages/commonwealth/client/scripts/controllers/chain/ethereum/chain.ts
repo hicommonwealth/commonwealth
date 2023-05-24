@@ -55,7 +55,6 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   public async _initApi(node: NodeInfo): Promise<Web3> {
     try {
-      const Web3 = (await import('web3')).default;
       const provider =
         node.url.slice(0, 4) == 'http'
           ? new Web3.providers.HttpProvider(node.url)
