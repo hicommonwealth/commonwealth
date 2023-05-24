@@ -361,6 +361,8 @@ function getProfileMetadata({ provider, userInfo }): { username?: string, avatar
   } else if (provider === 'twitter') {
     // for twitter: result.oauth.userInfo.name / profile
     return { username: userInfo.name, avatarUrl: userInfo.profile };
+  } else if (provider === 'google') {
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
   }
   return {};
 }
