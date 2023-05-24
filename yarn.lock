@@ -2672,6 +2672,13 @@
   resolved "https://registry.yarnpkg.com/@magic-ext/cosmos/-/cosmos-12.2.1.tgz#3bb2b3282d62ea1b2e9b7575556a076cebee4f9a"
   integrity sha512-cNLRL3IZiCktEahlF7JcJVotGap8iPoeDIJ4GgiS5bIHXiTQTl4EKPVi97ta8+NbJCv5qIkTCOnSbTDO6kwFQw==
 
+"@magic-ext/oauth@^11.1.1":
+  version "11.2.0"
+  resolved "https://registry.yarnpkg.com/@magic-ext/oauth/-/oauth-11.2.0.tgz#21b5d8f7a58463f324db2d7315f065fcec3c2046"
+  integrity sha512-F308JC5+dVOutsLtBJBdPshDGPOlchAlcedJoqcBie/NBr8VRq0eI3+cRWcvz6LFHnn6nD83g5FIOYS1C8X4KA==
+  dependencies:
+    "@magic-sdk/types" "^15.2.0"
+
 "@magic-sdk/admin@^0.1.0-beta.8":
   version "0.1.0-beta.10"
   resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-0.1.0-beta.10.tgz#06986660303721cd69933193098152ddea424f05"
@@ -2710,6 +2717,11 @@
   version "15.2.1"
   resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-15.2.1.tgz#8d4ed1a2af45d601d9ddacab5067ff17d5c6e56c"
   integrity sha512-rRj/LOywjmgttPJBkbYLnvNx1p+ZNh0Dt4tFUhe/Z5SVMEpvwLC2hoxsU1JK0EBuEtnPf4WjbJaXIMaoshSHtA==
+
+"@magic-sdk/types@^15.2.0":
+  version "15.2.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-15.2.0.tgz#b0f1fa352b2cdbd4b1ba2a3666407900e41fc311"
+  integrity sha512-oS6yShBsBWWhTsEZtEPqJ2cY+b/7iQlqh36eeySKlWFPXQXbakTx20Tbr6CI0svFWQNDgX240hfHbyF2PRClxQ==
 
 "@mapbox/node-pre-gyp@^1.0.0":
   version "1.0.10"
