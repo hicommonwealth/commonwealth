@@ -194,7 +194,7 @@ async function loginExistingMagicUser({
       ssoToken.issued_at = decodedMagicToken.claim.iat;
       ssoToken.updated_at = new Date();
       await ssoToken.save({ transaction });
-      log.info('SSO TOKEN HANDLED NORMALLY');
+      log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
       // situation for legacy SsoToken instances:
       // - they only have profile_id set, no issuer or address_id
@@ -207,7 +207,7 @@ async function loginExistingMagicUser({
         transaction,
       });
       if (malformedSsoToken) {
-        log.info('DETECTED LEGACY / MALFORMED SSO TOKEN');
+        log.trace('DETECTED LEGACY / MALFORMED SSO TOKEN');
         if (decodedMagicToken.claim.iat <= malformedSsoToken.issued_at) {
           log.warn('Replay attack detected.');
           throw new Error(`Replay attack detected for user ${decodedMagicToken.publicAddress}}.`);
@@ -318,7 +318,7 @@ async function magicLoginRoute(
   decodedMagicToken: MagicUser,
   cb: DoneFunc
 ) {
-  log.info(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
+  log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let chainToJoin: ChainInstance, error, loggedInUser: UserInstance;
 
   const generatedAddresses = [{
@@ -347,7 +347,7 @@ async function magicLoginRoute(
           },
         ]
       });
-      log.info(`DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`);
+      log.trace(`DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`);
       if (!loggedInUser) {
         throw new Error('User not found');
       }
@@ -364,7 +364,7 @@ async function magicLoginRoute(
       decodedMagicToken.issuer,
       WalletType.COSMOS
     );
-    log.info(`MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`);
+    log.trace(`MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`);
 
     const cosmosAddress = (magicUserMetadata?.wallets[0] as any)?.public_address;
     if (!cosmosAddress) {
@@ -427,11 +427,11 @@ async function magicLoginRoute(
       }
     );
   }
-  log.info(`EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`);
+  log.trace(`EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`);
 
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
     // already logged in as existing user, do nothing
-    log.info('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
+    log.trace('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
     return cb(null, existingUserInstance);
   }
 
@@ -449,19 +449,19 @@ async function magicLoginRoute(
     if (loggedInUser && existingUserInstance) {
       // user is already logged in + has already linked the provided magic address.
       // merge the existing magic user with the logged in user
-      log.info('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
+      log.trace('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
       finalUser = await mergeLogins(magicContext);
     } else if (!loggedInUser && existingUserInstance) {
       // user is logging in with an existing magic account
-      log.info('CASE 2: LOGGING INTO EXISTING MAGIC USER');
+      log.trace('CASE 2: LOGGING INTO EXISTING MAGIC USER');
       finalUser = await loginExistingMagicUser(magicContext);
     } else if (loggedInUser && !existingUserInstance) {
       // user is already logged in and is linking a new magic login to their account
-      log.info('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
+      log.trace('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
       finalUser = await addMagicToUser(magicContext);
     } else {
       // completely new user: create user, profile, addresses
-      log.info('CASE 4: CREATING NEW MAGIC USER');
+      log.trace('CASE 4: CREATING NEW MAGIC USER');
       finalUser = await createNewMagicUser(magicContext);
     }
   } catch (e) {
@@ -469,7 +469,7 @@ async function magicLoginRoute(
     return cb(e);
   }
 
-  log.info(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
+  log.trace(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
   return cb(null, finalUser);
 }
 

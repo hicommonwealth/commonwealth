@@ -374,7 +374,7 @@ export async function handleSocialLoginCallback(bearer?: string) {
     const result = await magic.oauth.getRedirectResult();
     profileMetadata = getProfileMetadata(result.oauth);
     bearer = result.magic.idToken;
-    console.log('Magic redirect result:', result);
+    // console.log('Magic redirect result:', result);
   }
 
   const response = await $.post({
@@ -392,7 +392,6 @@ export async function handleSocialLoginCallback(bearer?: string) {
       avatarUrl: profileMetadata?.avatarUrl,
     },
   });
-  console.log('Server response:', response);
 
   if (response.status === 'Success') {
     await initAppState(false);
