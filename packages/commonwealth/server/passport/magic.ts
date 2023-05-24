@@ -397,7 +397,7 @@ async function magicLoginRoute(
       ],
     }
   );
-  if (!existingUserInstance) {
+  if (!existingUserInstance && magicUserMetadata.email) {
     // if unable to locate a magic user by address, attempt to locate by email.
     // only legacy users (pre-magic or magic but with broken assumptions) should
     // trigger this case, as it was formerly canonical.
