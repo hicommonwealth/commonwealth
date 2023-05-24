@@ -208,6 +208,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             label="Email"
             darkMode={darkMode}
             onClick={onConnectAnotherWay}
+            className="CustomIcon large email-auth-btn"
           />
           <CWAuthButton
             type="discord"

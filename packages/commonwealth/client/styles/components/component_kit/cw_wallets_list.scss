@@ -28,6 +28,10 @@
         padding-bottom: 0;
 
         @include visibleScrollbar(dark);
+
+        .WalletOptionRow .email-auth-btn {
+          stroke: $white  !important;
+        }
       }
     }
 

@@ -8,21 +8,6 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
-const buttonsConfig = {
-  discord: {
-    label: 'Discord',
-    icon: 'discord',
-  },
-  github: {
-    label: 'Github',
-    icon: 'github',
-  },
-  twitter: {
-    label: 'Twitter',
-    icon: 'twitter',
-  },
-};
-
 type AuthButtonStylesProps = {
   disabled?: boolean;
   darkMode?: boolean;
@@ -30,12 +15,13 @@ type AuthButtonStylesProps = {
 
 type AuthButtonProps = {
   onClick?: () => void;
-  type: CustomIconName | keyof typeof buttonsConfig;
+  type: CustomIconName | 'discord' | 'twitter' | 'github';
   label?: string;
+  className?: string;
 } & AuthButtonStylesProps;
 
 export const CWAuthButton = (props: AuthButtonProps) => {
-  const { disabled = false, darkMode, onClick, type, label } = props;
+  const { disabled = false, darkMode, onClick, type, label, className } = props;
 
   return (
     <div
@@ -48,9 +34,19 @@ export const CWAuthButton = (props: AuthButtonProps) => {
       )}
       onClick={onClick}
     >
-      {iconLookup[type] && <CWIcon iconSize="large" iconName={type as any} />}
+      {iconLookup[type] && (
+        <CWIcon
+          iconSize="large"
+          iconName={type as any}
+          {...(className && { className })}
+        />
+      )}
       {customIconLookup[type] && (
-        <CWCustomIcon iconSize="large" iconName={type as any} />
+        <CWCustomIcon
+          iconSize="large"
+          iconName={type as any}
+          {...(className && { className })}
+        />
       )}
       <CWText
         type="h5"
