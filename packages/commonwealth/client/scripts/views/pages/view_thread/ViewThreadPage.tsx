@@ -712,9 +712,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           />
         }
         createdAt={thread.createdAt}
+        updatedAt={thread.updatedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
+        lockedAt={thread.lockedAt}
         headerComponents={
           !isStageDefault && <ThreadStageComponent stage={thread.stage} />
         }
@@ -758,14 +760,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           </div>
         }
         comments={
-          !thread.readOnly && (
-            <CommentsTree
-              comments={comments}
-              thread={thread}
-              setIsGloballyEditing={setIsGloballyEditing}
-              updatedCommentsCallback={updatedCommentsCallback}
-            />
-          )
+          <CommentsTree
+            comments={comments}
+            thread={thread}
+            setIsGloballyEditing={setIsGloballyEditing}
+            updatedCommentsCallback={updatedCommentsCallback}
+          />
         }
         sidebarComponents={
           [

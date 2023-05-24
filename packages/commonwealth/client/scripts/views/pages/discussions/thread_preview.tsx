@@ -44,6 +44,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Thread, { LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
 import { filterLinks } from 'helpers/threads';
+import { LockWithTooltip } from '../../components/lock_with_tooltip';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -160,7 +161,12 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              {isLocked && <CWIcon iconName="lock" iconSize="small" />}
+              {isLocked && (
+                <LockWithTooltip
+                  lockedAt={thread.lockedAt}
+                  updatedAt={thread.updatedAt}
+                />
+              )}
             </div>
             <div className="top-row-icons">
               {isHot(thread) && <div className="flame" />}
@@ -211,7 +217,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                     type="proposal"
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
-                    )} 
+                    )}
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''

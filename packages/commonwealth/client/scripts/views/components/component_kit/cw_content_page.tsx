@@ -15,6 +15,8 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { isWindowMediumSmallInclusive } from './helpers';
 import { ComponentType } from './types';
+import { CWTooltip } from './cw_popover/cw_tooltip';
+import { LockWithTooltip } from '../lock_with_tooltip';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -30,6 +32,7 @@ export type SidebarComponents = [
 
 type ContentPageProps = {
   createdAt: moment.Moment | number;
+  updatedAt?: moment.Moment;
   title: string | React.ReactNode;
 
   // optional
@@ -41,6 +44,7 @@ type ContentPageProps = {
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   headerComponents?: React.ReactNode;
   readOnly?: boolean;
+  lockedAt?: moment.Moment;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: React.ReactNode;
@@ -56,9 +60,11 @@ export const CWContentPage = (props: ContentPageProps) => {
     comments,
     contentBodyLabel,
     createdAt,
+    updatedAt,
     lastEdited,
     headerComponents,
     readOnly,
+    lockedAt,
     showSidebar,
     sidebarComponents,
     subBody,
@@ -75,7 +81,7 @@ export const CWContentPage = (props: ContentPageProps) => {
   const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
-  const createdOrEditedText = lastEdited ? 'Edited' : 'Published'
+  const createdOrEditedText = lastEdited ? 'Edited' : 'Published';
 
   React.useEffect(() => {
     const onResize = () => {
@@ -107,18 +113,22 @@ export const CWContentPage = (props: ContentPageProps) => {
         <div className="header-info-row">
           {author}
           {typeof createdOrEditedDate === 'number' ||
-            (moment.isMoment(createdOrEditedDate) && createdOrEditedDate.isValid() && (
-              <CWText type="caption" className="header-text">
-                • &nbsp; {createdOrEditedText} on {moment(createdOrEditedDate).format('l')} &nbsp; •
-              </CWText>
-            ))}
+            (moment.isMoment(createdOrEditedDate) &&
+              createdOrEditedDate.isValid() && (
+                <CWText type="caption" className="header-text">
+                  • &nbsp; {createdOrEditedText} on{' '}
+                  {moment(createdOrEditedDate).format('l')} &nbsp; •
+                </CWText>
+              ))}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
-            {pluralize(viewCount, 'view')}
+              {pluralize(viewCount, 'view')}
             </CWText>
           )}
           {headerComponents}
-          {readOnly && <CWIcon iconName="lock" iconSize="small" />}
+          {readOnly && (
+            <LockWithTooltip lockedAt={lockedAt} updatedAt={updatedAt} />
+          )}
           {actions && (
             <PopoverMenu
               renderTrigger={(onclick) => (
