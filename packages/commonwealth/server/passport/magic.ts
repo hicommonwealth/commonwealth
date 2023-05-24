@@ -376,8 +376,10 @@ async function magicLoginRoute(
     );
   }
 
-  // check if new signup or login
-  const existingUserInstance = await models.User.scope('withPrivateData').findOne(
+  // first, attempt to locate an existing magic user by canonical address.
+  // this is the properly modern method of identifying users, as it conforms to
+  // the DID standard.
+  let existingUserInstance = await models.User.scope('withPrivateData').findOne(
     {
       include: [
         {
@@ -395,6 +397,21 @@ async function magicLoginRoute(
       ],
     }
   );
+  if (!existingUserInstance) {
+    // if unable to locate a magic user by address, attempt to locate by email.
+    // only legacy users (pre-magic or magic but with broken assumptions) should
+    // trigger this case, as it was formerly canonical.
+    existingUserInstance = await models.User.scope('withPrivateData').findOne(
+      {
+        where: { email: magicUserMetadata.email },
+        include: [
+          {
+            model: models.Profile,
+          },
+        ],
+      }
+    );
+  }
   log.info(`EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`);
 
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
@@ -412,23 +429,28 @@ async function magicLoginRoute(
     existingUserInstance,
     loggedInUser
   };
-  if (loggedInUser && existingUserInstance) {
-    // user is already logged in + has already linked the provided magic address.
-    // merge the existing magic user with the logged in user
-    log.info('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
-    finalUser = await mergeLogins(magicContext);
-  } else if (!loggedInUser && existingUserInstance) {
-    // user is logging in with an existing magic account
-    log.info('CASE 2: LOGGING INTO EXISTING MAGIC USER');
-    finalUser = await loginExistingMagicUser(magicContext);
-  } else if (loggedInUser && !existingUserInstance) {
-    // user is already logged in and is linking a new magic login to their account
-    log.info('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
-    finalUser = await addMagicToUser(magicContext);
-  } else {
-    // completely new user: create user, profile, addresses
-    log.info('CASE 4: CREATING NEW MAGIC USER');
-    finalUser = await createNewMagicUser(magicContext);
+  try {
+    if (loggedInUser && existingUserInstance) {
+      // user is already logged in + has already linked the provided magic address.
+      // merge the existing magic user with the logged in user
+      log.info('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
+      finalUser = await mergeLogins(magicContext);
+    } else if (!loggedInUser && existingUserInstance) {
+      // user is logging in with an existing magic account
+      log.info('CASE 2: LOGGING INTO EXISTING MAGIC USER');
+      finalUser = await loginExistingMagicUser(magicContext);
+    } else if (loggedInUser && !existingUserInstance) {
+      // user is already logged in and is linking a new magic login to their account
+      log.info('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
+      finalUser = await addMagicToUser(magicContext);
+    } else {
+      // completely new user: create user, profile, addresses
+      log.info('CASE 4: CREATING NEW MAGIC USER');
+      finalUser = await createNewMagicUser(magicContext);
+    }
+  } catch (e) {
+    log.error(`Failed to log in user ${JSON.stringify(e, null, 2)}`);
+    return cb(e);
   }
 
   log.info(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);

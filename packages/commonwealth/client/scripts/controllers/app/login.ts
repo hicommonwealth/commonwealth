@@ -346,7 +346,7 @@ export async function handleSocialLoginCallback(bearer?: string) {
   if (!bearer) {
     const magic = await constructMagic();
     const result = await magic.oauth.getRedirectResult();
-    bearer = result.oauth.accessToken;
+    bearer = result.magic.idToken;
     console.log('Magic redirect result:', result);
   }
 
