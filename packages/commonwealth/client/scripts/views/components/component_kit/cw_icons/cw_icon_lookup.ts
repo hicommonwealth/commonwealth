@@ -96,6 +96,7 @@ export const customIconLookup = {
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
   'terra-walletconnect': CustomIcons.CWWalletConnect,
+  email: CustomIcons.CWEmail,
 };
 
 export type IconName = keyof typeof iconLookup;
