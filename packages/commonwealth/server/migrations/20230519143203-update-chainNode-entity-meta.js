@@ -81,7 +81,10 @@ module.exports = {
       await queryInterface.addIndex(
         'ChainEntityMeta',
         ['chain_name', 'contract_address'],
-        { transaction: t }
+        {
+          name: 'chain_entity_meta_chain_name_contract_address',
+          transaction: t,
+        }
       );
     });
   },
@@ -133,6 +136,12 @@ module.exports = {
         },
         transaction: t,
       });
+
+      await queryInterface.removeIndex(
+        'ChainEntityMeta',
+        'chain_entity_meta_chain_name_contract_address',
+        { transaction: t }
+      );
     });
   },
 };
