@@ -342,10 +342,35 @@ export async function loginWithMagicLink({
   }
 }
 
+// Cannot get proper type due to code splitting
+function getProfileMetadata({ provider, userInfo }): { username?: string, avatarUrl?: string } {
+  // provider: result.oauth.provider (twitter, discord, github)
+  if (provider === 'discord') {
+    // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
+    //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
+    const { avatar, id, username } = userInfo.sources['https://discord.com/api/users/@me'];
+    if (avatar) {
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
+      return { username, avatarUrl };
+    } else {
+      return { username };
+    }
+  } else if (provider === 'github') {
+    // for github: result.oauth.userInfo.name / picture
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
+  } else if (provider === 'twitter') {
+    // for twitter: result.oauth.userInfo.name / profile
+    return { username: userInfo.name, avatarUrl: userInfo.profile };
+  }
+  return {};
+}
+
 export async function handleSocialLoginCallback(bearer?: string) {
+  let profileMetadata: { username?: string, avatarUrl?: string } = {};
   if (!bearer) {
     const magic = await constructMagic();
     const result = await magic.oauth.getRedirectResult();
+    profileMetadata = getProfileMetadata(result.oauth);
     bearer = result.magic.idToken;
     console.log('Magic redirect result:', result);
   }
@@ -361,6 +386,8 @@ export async function handleSocialLoginCallback(bearer?: string) {
     data: {
       chain: app.activeChainId(),
       jwt: app.user.jwt,
+      username: profileMetadata?.username,
+      avatarUrl: profileMetadata?.avatarUrl,
     },
   });
   console.log('Server response:', response);

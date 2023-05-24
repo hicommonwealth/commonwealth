@@ -13,7 +13,7 @@ import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
 import { AddressAttributes, AddressInstance } from '../models/address';
 import { ChainInstance } from '../models/chain';
-import type { ProfileAttributes } from '../models/profile';
+import type { ProfileAttributes, ProfileInstance } from '../models/profile';
 import { SsoTokenInstance } from '../models/sso_token';
 import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
@@ -28,6 +28,7 @@ type MagicLoginContext = {
   generatedAddresses: Array<{ address: string, chain: string }>;
   existingUserInstance?: UserInstance;
   loggedInUser?: UserInstance;
+  profileMetadata?: { username?: string, avatarUrl?: string };
 };
 
 const DEFAULT_ETH_CHAIN = 'ethereum';
@@ -88,18 +89,30 @@ async function createMagicAddressInstances(
 
 // User is logged out + selects magic, and provides a new email. Create a new user for them.
 async function createNewMagicUser({
-  models, decodedMagicToken, magicUserMetadata, generatedAddresses
+  models, decodedMagicToken, magicUserMetadata, generatedAddresses, profileMetadata
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.createWithProfile(
       models,
       {
-        email: magicUserMetadata.email,
+        email: magicUserMetadata.email || null,
         emailVerified: true,
       },
       { transaction }
     );
+
+    // update profile with metadata if exists
+    const newProfile = newUser.Profiles[0] as ProfileInstance;
+    if (profileMetadata?.username) {
+      newProfile.profile_name = profileMetadata.username;
+    }
+    if (profileMetadata?.avatarUrl) {
+      newProfile.avatar_url = profileMetadata.avatarUrl;
+    }
+    if (profileMetadata?.username || profileMetadata?.avatarUrl) {
+      await newProfile.save({ transaction })
+    }
 
     const addressInstances: AddressAttributes[] = await createMagicAddressInstances(
       models,
@@ -299,6 +312,8 @@ async function magicLoginRoute(
   req: TypedRequestBody<{
     chain?: string,
     jwt?: string,
+    username?: string,
+    avatarUrl?: string,
   }>,
   decodedMagicToken: MagicUser,
   cb: DoneFunc
@@ -427,7 +442,8 @@ async function magicLoginRoute(
     magicUserMetadata,
     generatedAddresses,
     existingUserInstance,
-    loggedInUser
+    loggedInUser,
+    profileMetadata: { username: req.body.username, avatarUrl: req.body.avatarUrl },
   };
   try {
     if (loggedInUser && existingUserInstance) {
