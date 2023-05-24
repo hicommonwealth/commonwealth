@@ -130,7 +130,7 @@ const send = async (models, content: WebhookContent) => {
       },
       include: [models.Profile],
     });
-    profile = await address.getProfile();
+    profile = await address.Profile;
   } catch (err) {
     // pass nothing if no matching address is found
   }
