@@ -3,7 +3,6 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type Rollbar from 'rollbar';
 
-import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import type { SubstrateEvents } from '../../src';
 import {
   createListener,
@@ -17,7 +16,7 @@ import type { DB } from '../database/database';
 import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
-import {IRabbitMqHandler} from "../ChainEventsConsumer/ChainEventHandlers";
+import { IRabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -234,7 +233,6 @@ async function setupNewListeners(
         address: chain.contract_address,
         archival: false,
         url: chain.ChainNode.url,
-        spec: chain.substrate_spec,
         skipCatchup: false,
         verbose: false, // using this will print event before chain is added to it
         enricherConfig: { balanceTransferThresholdPermill: 10_000 },
@@ -317,27 +315,6 @@ async function updateExistingListeners(
     if (!listenerInstances[chain.id]) continue;
     // if the chain is a substrate chain and its spec has changed since the last
     // check then update the active listener with the new spec
-    if (
-      chain.base === ChainBase.Substrate &&
-      !_.isEqual(
-        chain.substrate_spec,
-        (<SubstrateEvents.Listener>listenerInstances[chain.id]).options.spec
-      )
-    ) {
-      log.info(`Spec for ${chain.id} changed... restarting listener`);
-      try {
-        await (<SubstrateEvents.Listener>(
-          listenerInstances[chain.id]
-        )).updateSpec(chain.substrate_spec);
-      } catch (error) {
-        log.error(`Unable to update substrate spec for ${chain.id}!`, error);
-        rollbar?.critical(
-          `Unable to update substrate spec for ${chain.id}!`,
-          error
-        );
-      }
-    }
-
     if (
       listenerInstances[chain.id].eventHandlers.logger &&
       !chain.verbose_logging

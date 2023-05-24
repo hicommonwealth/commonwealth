@@ -107,15 +107,7 @@ async function migrateChainEntity(
 
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
-    if (chainInstance.base === ChainBase.Substrate) {
-      const nodeUrl = constructSubstrateUrl(node.private_url || node.url);
-      console.log(chainInstance.substrate_spec);
-      const api = await SubstrateEvents.createApi(
-        nodeUrl,
-        chainInstance.substrate_spec
-      );
-      fetcher = new SubstrateEvents.StorageFetcher(api);
-    } else if (chainInstance.base === ChainBase.CosmosSDK) {
+    if (chainInstance.base === ChainBase.CosmosSDK) {
       const api = await CosmosEvents.createApi(node.private_url || node.url);
       fetcher = new CosmosEvents.StorageFetcher(api);
     } else if (chainInstance.network === ChainNetwork.Compound) {

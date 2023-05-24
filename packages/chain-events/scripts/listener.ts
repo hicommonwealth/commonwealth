@@ -130,28 +130,7 @@ async function getTokenList(tokenListUrl: string): Promise<TokenListEntry[]> {
 
 console.log(`Connecting to ${chain} on url ${url}...`);
 
-if (network === SupportedNetwork.Substrate) {
-  SubstrateEvents.createApi(url, spec as any).then(async (api) => {
-    const fetcher = new SubstrateEvents.StorageFetcher(api);
-    try {
-      const fetched = await fetcher.fetch();
-      console.log(fetched.map((f) => f.data));
-    } catch (err) {
-      console.log(err);
-      console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
-    }
-    SubstrateEvents.subscribeEvents({
-      chain,
-      api,
-      handlers: [new StandaloneEventHandler()],
-      skipCatchup,
-      archival,
-      startBlock,
-      verbose: true,
-      enricherConfig: { balanceTransferThresholdPermill: 1_000 }, // 0.1% of total issuance
-    });
-  });
-} else if (network === SupportedNetwork.Compound) {
+if (network === SupportedNetwork.Compound) {
   CompoundEvents.createApi(url, contract).then(async (api) => {
     const fetcher = new CompoundEvents.StorageFetcher(api);
     try {
