@@ -126,14 +126,49 @@ export default async function emitNotifications(
         }
   );
 
+  // the chain_id associated with a chain-event -> currently used as a connection between community agnostic
+  // events and the existing community centric chain-event notifications.
+  let chain_id: string;
+
   // if the notification does not yet exist create it here
   if (!notification) {
     if (isChainEventData) {
+      if (chainEvent.contract_address) {
+        const contracts = await models.Contract.findOne({
+          where: {
+            address: chainEvent.contract_address,
+          },
+          include: [
+            {
+              model: models.CommunityContract,
+              required: true,
+              attributes: ['chain_id'],
+            },
+          ],
+        });
+
+        if (!contracts) {
+          log.error(
+            `Could not find the contract associated with the following chain-event: ${JSON.stringify(
+              chainEvent
+            )}`
+          );
+          return;
+        }
+        chain_id = contracts.CommunityContract.chain_id;
+      } else {
+        // TODO: this is a temporary fix until Notifications/Subscriptions is refactored
+        //
+        if (chainEvent.chain_name === 'Osmosis') {
+          chain_id = 'osmosis';
+        }
+      }
+
       notification = await models.Notification.create({
         notification_data: JSON.stringify(chainEvent),
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
-        chain_id: chainEvent.chain,
+        chain_id: chain_id,
         entity_id: chainEvent.entity_id,
       });
     } else {
@@ -183,7 +218,6 @@ export default async function emitNotifications(
         subscription.subscriber_id
       );
     } else {
-      // TODO: rollbar reported issue originates from here
       log.info(
         `Subscription: ${JSON.stringify(
           subscription.toJSON()
@@ -201,8 +235,8 @@ export default async function emitNotifications(
 
   // send emails
   for (const subscription of subscriptions) {
-    if (msg && isChainEventData && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+    if (msg && isChainEventData && chain_id) {
+      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chain_id}/notifications?id=${notification.id}`;
     }
     if (msg && subscription?.immediate_email && subscription?.User) {
       // kick off async call and immediately return

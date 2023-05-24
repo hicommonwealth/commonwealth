@@ -64,7 +64,9 @@ export class ChainEventsNamespace {
 
   private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.getChain === notification.ChainEvent.chain
+      // TODO: don't want to switch away from chain_id based subs for the time being so either include chain in the
+      //    notification at the emitNotification level or use some kind of getChainIdForEvent adapter here
+      (sub) => sub.getChain === notification.chain_id
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally

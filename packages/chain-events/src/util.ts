@@ -1,43 +1,43 @@
 import type { RegisteredTypes } from '@polkadot/types/types';
 
 import type {
+  CWEvent,
+  IChainEventKind,
   IDisconnectedRange,
+  IEventLabel,
   IEventProcessor,
   IEventSubscriber,
-  IStorageFetcher,
-  CWEvent,
   IEventTitle,
-  IEventLabel,
-  IChainEventKind,
+  IStorageFetcher,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
 import { Listener as SubstrateListener } from 'chain-events/src/chain-bases/substrate/Listener';
 import { Title as SubstrateTitle } from 'chain-events/src/chain-bases/substrate/filters/titler';
 import { Label as SubstrateLabel } from 'chain-events/src/chain-bases/substrate/filters/labeler';
 import {
+  Label as CompoundLabel,
   Listener as CompoundListener,
   Title as CompoundTitle,
-  Label as CompoundLabel,
 } from './chain-bases/EVM/compound';
 import {
+  Label as Erc20Label,
   Listener as Erc20Listener,
   Title as Erc20Title,
-  Label as Erc20Label,
 } from './chain-bases/EVM/erc20';
 import {
+  Label as Erc721Label,
   Listener as Erc721Listener,
   Title as Erc721Title,
-  Label as Erc721Label,
 } from './chain-bases/EVM/erc721';
 import {
+  Label as AaveLabel,
   Listener as AaveListener,
   Title as AaveTitle,
-  Label as AaveLabel,
 } from './chain-bases/EVM/aave';
 import {
+  Label as CosmosLabel,
   Listener as CosmosListener,
   Title as CosmosTitle,
-  Label as CosmosLabel,
 } from 'chain-events/src/chain-bases/cosmos';
 import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
