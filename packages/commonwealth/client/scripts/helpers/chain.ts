@@ -205,7 +205,7 @@ export const selectChain = async (
   app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
-  await updateActiveAddresses(chain);
+  await updateActiveAddresses({ chain });
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
@@ -238,7 +238,7 @@ export const initChain = async (): Promise<void> => {
   console.log(`${chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses(chain);
+  await updateActiveAddresses({ chain });
 };
 
 export const initNewTokenChain = async (
