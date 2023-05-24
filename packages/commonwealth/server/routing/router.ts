@@ -180,7 +180,6 @@ import {
   getTemplates,
 } from '../routes/templates';
 
-import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
@@ -631,15 +630,6 @@ function setupRouter(
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models)
   );
-
-  // roles
-  router.get('/roles', controllers.getRoles.bind(this, models));
-  router.post('/roles', controllers.createRole.bind(this, models));
-  router.patch('/roles', controllers.updateRole.bind(this, models));
-  // permissions
-  router.get('/permissions', controllers.getPermissions.bind(this, models));
-  router.post('/permissions', controllers.createPermission.bind(this, models));
-  router.patch('/permissions', controllers.updatePermission.bind(this, models));
 
   router.get(
     '/bulkMembers',

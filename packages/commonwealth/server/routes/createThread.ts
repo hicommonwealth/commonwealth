@@ -7,8 +7,6 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { Action, PermissionError } from '../../shared/permissions';
-import { findAllRoles, isAddressPermitted } from '../util/roles';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
@@ -119,7 +117,7 @@ const dispatchHooks = async (
                 chain: mention[0] || null,
                 address: mention[1] || null,
               },
-              include: [models.User, models.RoleAssignment],
+              include: [models.User],
             });
           } catch (err) {
             throw new ServerError(err);
@@ -201,16 +199,6 @@ const createThread = async (
   const chain = req.chain;
 
   const author = req.address;
-
-  const permission_error = await isAddressPermitted(
-    models,
-    author.id,
-    chain.id,
-    Action.CREATE_THREAD
-  );
-  if (!permission_error) {
-    return next(new AppError(PermissionError.NOT_PERMITTED));
-  }
 
   const {
     topic_name,
@@ -333,13 +321,11 @@ const createThread = async (
         chain.network === ChainNetwork.Ethereum)
     ) {
       // skip check for admins
-      const isAdmin = await findAllRoles(
-        models,
-        { where: { address_id: author.id } },
-        chain.id,
-        ['admin']
-      );
-      if (!req.user.isAdmin && isAdmin.length === 0) {
+      const authorRole = await models.Address.findOne({
+        where: { id: author.id },
+        include: ['role'],
+      });
+      if (!req.user.isAdmin && authorRole.role !== 'admin') {
         const canReact = await validateTopicThreshold(
           tokenBalanceCache,
           models,

@@ -1,6 +1,3 @@
-import type { Permission } from '../models/role';
-import { findOneRole } from './roles';
-
 // Roles hierarchically encompass the roles below them.
 // siteAdmins are granted permission to perform all actions allowed of chainAdmins, chainMods, and chainMembers.
 // chainAdmins are granted permission to perform all actions allowed of chainMods and chainMembers.
@@ -8,6 +5,9 @@ import { findOneRole } from './roles';
 
 // The minimum_role param species the lowest-ranking role that has permission to
 // perform a given action being validated against.
+
+import { Role } from 'common-common/src/roles';
+import { Op } from 'sequelize';
 
 const validateRoles = async (
   models,
@@ -23,19 +23,21 @@ const validateRoles = async (
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
 
-  const allowedRoles: Permission[] =
+  const allowedRoles: Role[] =
     minimum_role === 'member'
       ? ['admin', 'moderator', 'member']
       : minimum_role === 'moderator'
       ? ['admin', 'moderator']
       : ['admin'];
 
-  const userRole = await findOneRole(
-    models,
-    { where: { address_id: userOwnedAddressIds } },
-    chain_id,
-    allowedRoles
-  );
+  const userRole = await models.Address.findOne({
+    where: {
+      chain: chain_id,
+      id: { [Op.in]: userOwnedAddressIds },
+      role: { [Op.in]: allowedRoles },
+    },
+    attributes: ['role'],
+  });
 
   return !!userRole;
 };

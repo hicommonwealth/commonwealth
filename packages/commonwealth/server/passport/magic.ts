@@ -12,7 +12,7 @@ import type { DB } from '../models';
 import type { ProfileAttributes } from '../models/profile';
 
 import '../types';
-import { createRole } from '../util/roles';
+import createRole from '../routes/createRole';
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
@@ -105,15 +105,6 @@ export function initMagicAuth(models: DB) {
               { transaction: t }
             );
 
-            await createRole(
-              models,
-              newDefaultAddress.id,
-              'ethereum',
-              'member',
-              false,
-              t
-            );
-
             if (registrationChainAddress) {
               // create an address on their selected chain
               const newRegistrationChainAddress = await models.Address.create(
@@ -129,14 +120,6 @@ export function initMagicAuth(models: DB) {
                   wallet_id: WalletId.Magic,
                 },
                 { transaction: t }
-              );
-              await createRole(
-                models,
-                newRegistrationChainAddress.id,
-                registrationChain.id,
-                'member',
-                false,
-                t
               );
             }
 
@@ -239,14 +222,6 @@ export function initMagicAuth(models: DB) {
                   wallet_id: WalletId.Magic,
                 },
                 { transaction: t }
-              );
-              await createRole(
-                models,
-                newRegistrationChainAddress.id,
-                registrationChain.id,
-                'member',
-                false,
-                t
               );
             });
           }

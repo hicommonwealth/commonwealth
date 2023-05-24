@@ -5,11 +5,7 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 import { ProposalType } from 'common-common/src/types';
-import {
-  AccessLevel,
-  everyonePermissions,
-  PermissionManager,
-} from './permissions';
+import { AccessLevel, everyonePermissions } from '../server/util/permissions';
 import type { RoleObject } from './types';
 
 export const getNextPollEndingTime = (now) => {
@@ -71,12 +67,15 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getThreadUrl = (thread: {
-  chain: string;
-  type_id?: string | number;
-  id?: string | number;
-  title?: string;
-}, comment?: string | number): string => {
+export const getThreadUrl = (
+  thread: {
+    chain: string;
+    type_id?: string | number;
+    id?: string | number;
+    title?: string;
+  },
+  comment?: string | number
+): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
@@ -276,37 +275,3 @@ export const addressSwapper = (options: {
     return options.address;
   }
 };
-
-export function aggregatePermissions(
-  roles: RoleObject[],
-  chain_permissions: { allow: bigint; deny: bigint }
-) {
-  const permissionsManager = new PermissionManager();
-
-  const ORDER: AccessLevel[] = [
-    AccessLevel.Member,
-    AccessLevel.Moderator,
-    AccessLevel.Admin,
-  ];
-
-  function compare(o1: RoleObject, o2: RoleObject) {
-    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
-  }
-
-  roles = roles.sort(compare);
-
-  const permissionsAllowDeny: Array<{
-    allow: bigint;
-    deny: bigint;
-  }> = roles.map(({ allow, deny }) => ({ allow, deny }));
-
-  // add chain default permissions to beginning of permissions array
-  permissionsAllowDeny.unshift(chain_permissions);
-
-  // compute permissions
-  const permission: bigint = permissionsManager.computePermissions(
-    everyonePermissions,
-    permissionsAllowDeny
-  );
-  return permission;
-}

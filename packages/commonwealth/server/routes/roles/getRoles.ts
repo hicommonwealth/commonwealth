@@ -43,15 +43,17 @@ export const getRoles = async (
 
   let roles, count;
   if (!count_only) {
-    ({ rows: roles, count } = await models.Role.findAndCountAll({
+    ({ rows: roles, count } = await models.Address.findAndCountAll({
       where,
       include,
+      attributes: ['address', 'role', 'created_at', 'updated_at'],
       ...formatPagination(req.query),
     }));
   } else {
-    count = await models.Role.count({
+    count = await models.Address.count({
       where,
       include,
+      attributes: ['address', 'role', 'created_at', 'updated_at'],
       ...formatPagination(req.query),
     });
   }

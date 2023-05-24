@@ -1,6 +1,5 @@
 import type { Transaction } from 'sequelize/types';
 import type { DB } from '../models';
-import { findOneRole } from '../util/roles';
 import { RuleType } from '../util/rules/ruleTypes';
 
 type SchemaT = { AdminOnlyRule: [] };
@@ -23,14 +22,8 @@ export default class AdminOnlyRule extends RuleType<SchemaT> {
   ): Promise<boolean> {
     const addressInstance = await models.Address.findOne({
       where: { address, chain },
+      attributes: ['role'],
     });
-    const role = await findOneRole(
-      models,
-      {
-        where: { address_id: addressInstance.id },
-      },
-      chain
-    );
-    return role?.permission === 'admin';
+    return addressInstance?.role === 'admin';
   }
 }

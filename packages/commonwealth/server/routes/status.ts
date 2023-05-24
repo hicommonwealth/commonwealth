@@ -15,8 +15,6 @@ import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
-import type { RoleInstanceWithPermission } from '../util/roles';
-import { findAllRoles } from '../util/roles';
 import { ETH_RPC } from '../config';
 import type { ChainCategoryType } from 'common-common/src/types';
 
@@ -33,7 +31,6 @@ type StatusResp = {
   nodes: ChainNodeInstance[];
   notificationCategories: NotificationCategoryInstance[];
   recentThreads: ThreadCountQueryData[];
-  roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
   user?: {
     email: string;
@@ -163,11 +160,6 @@ export const status = async (
     const myAddressIds: number[] = Array.from(
       addresses.map((address) => address.id)
     );
-
-    const roles = await findAllRoles(models, {
-      where: { address_id: { [Op.in]: myAddressIds } },
-      include: [models.Address],
-    });
 
     const discussionDrafts = await models.DiscussionDraft.findAll({
       where: {
@@ -343,7 +335,6 @@ export const status = async (
       nodes,
       notificationCategories,
       recentThreads: threadCountQueryData,
-      roles,
       loggedIn: true,
       user: {
         email: user.email,

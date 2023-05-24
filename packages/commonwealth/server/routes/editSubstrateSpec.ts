@@ -2,7 +2,6 @@ import { AppError } from 'common-common/src/errors';
 import { ChainBase } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
-import { findAllRoles } from '../util/roles';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
@@ -23,13 +22,13 @@ const editSubstrateSpec = async (
       user_id: req.user.id,
     },
   });
-  const requesterIsAdmin = await findAllRoles(
-    models,
-    { where: { address_id: adminAddress.id } },
-    chain.id,
-    ['admin']
-  );
-  if (!requesterIsAdmin && !req.user.isAdmin)
+
+  const authorRole = await models.Address.findOne({
+    where: { id: adminAddress.id },
+    include: ['role'],
+  });
+
+  if (authorRole.role !== 'admin' && !req.user.isAdmin)
     return next(new AppError('Must be admin to edit'));
 
   const node = await chain.getChainNode();

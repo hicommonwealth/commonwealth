@@ -6,9 +6,9 @@ import Sequelize from 'sequelize';
 import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
-import { createRole, findOneRole } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import createRole from './createRole';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -161,16 +161,6 @@ const linkExistingAddressToChain = async (
     const ownedAddresses = await models.Address.findAll({
       where: { user_id: originalAddress.user_id },
     });
-
-    const role = await findOneRole(
-      models,
-      { where: { address_id: addressId } },
-      req.body.chain
-    );
-
-    if (!role) {
-      await createRole(models, addressId, req.body.chain, 'member');
-    }
 
     return res.json({
       status: 'Success',

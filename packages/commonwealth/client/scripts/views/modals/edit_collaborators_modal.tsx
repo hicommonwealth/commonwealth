@@ -6,7 +6,6 @@ import 'modals/edit_collaborators_modal.scss';
 
 import type { IThreadCollaborator } from '../../models/Thread';
 import type Thread from '../../models/Thread';
-import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 
 import app from 'state';
 import { User } from '../components/user/user';
@@ -29,9 +28,7 @@ export const EditCollaboratorsModal = ({
   onCollaboratorsUpdated,
 }: EditCollaboratorsModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<
-    Array<RoleInstanceWithPermissionAttributes>
-  >([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [collaborators, setCollaborators] = useState<
     Array<IThreadCollaborator>
   >(thread.collaborators);
@@ -49,11 +46,9 @@ export const EditCollaboratorsModal = ({
         if (response.data.status !== 'Success') {
           throw new Error('Could not fetch members');
         } else {
-          const results: Array<RoleInstanceWithPermissionAttributes> =
-            response.data.result.filter(
-              (role: RoleInstanceWithPermissionAttributes) =>
-                role.Address.address !== app.user.activeAccount?.address
-            );
+          const results = response.data.result.filter(
+            (address) => address.address !== app.user.activeAccount?.address
+          );
 
           setSearchResults(results);
         }

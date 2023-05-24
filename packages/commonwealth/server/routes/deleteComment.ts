@@ -1,9 +1,9 @@
+import { author } from '@polkadot/types/interfaces/definitions';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
-import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -55,13 +55,15 @@ const deleteComment = async (
         },
         include: [models.Chain],
       });
-      const requesterIsAdminOrMod = await findOneRole(
-        models,
-        { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-        comment?.Chain?.id,
-        ['admin', 'moderator']
-      );
-      if (!requesterIsAdminOrMod) {
+      const requester = await models.Address.findOne({
+        where: {
+          id: { [Op.in]: userOwnedAddressIds },
+          chain: comment?.Chain?.id,
+        },
+        attributes: ['role'],
+      });
+
+      if (requester?.role !== 'admin' && requester?.role !== 'moderator') {
         return next(new AppError(Errors.NotOwned));
       }
     }

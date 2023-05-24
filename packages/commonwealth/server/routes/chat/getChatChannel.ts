@@ -1,6 +1,4 @@
 import { AppError } from 'common-common/src/errors';
-import { Action } from '../../../shared/permissions';
-import { checkReadPermitted } from '../../util/roles';
 import type { DB } from '../../models';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { success } from '../../types';
@@ -30,13 +28,6 @@ export default async (
   if (!req.query.chain_id) {
     throw new AppError(Errors.NoChainId);
   }
-
-  await checkReadPermitted(
-    models,
-    req.query.chain_id,
-    Action.VIEW_CHAT_CHANNELS,
-    req.user?.id
-  );
 
   const channel = await models.ChatChannel.findOne({
     where: {

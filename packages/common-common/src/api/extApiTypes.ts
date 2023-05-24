@@ -1,17 +1,17 @@
 // contains types for external api
 
-import type { ThreadAttributes } from 'commonwealth/server/models/thread';
-import type { CommentAttributes } from 'commonwealth/server/models/comment';
-import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import type { ChainAttributes } from 'commonwealth/server/models/chain';
+import type { CommentAttributes } from 'commonwealth/server/models/comment';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
+import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
+import type { RuleAttributes } from 'commonwealth/server/models/rule';
+import type { ThreadAttributes } from 'commonwealth/server/models/thread';
+import type { TopicAttributes } from 'commonwealth/server/models/topic';
 import type {
   BalanceProviderResp,
   ChainNodeResp,
 } from 'token-balance-cache/src';
-import type { TopicAttributes } from 'commonwealth/server/models/topic';
-import type { RoleAttributes } from 'commonwealth/server/models/role';
-import type { RuleAttributes } from 'commonwealth/server/models/rule';
+import { Role } from '../roles';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -141,10 +141,14 @@ export type GetRolesReq = {
   count_only?: boolean;
 } & IPagination;
 
-export type GetRolesResp = { roles?: RoleAttributes[]; count: number };
-
-export type PostRolesReq = {
-  roles: (RoleAttributes & { community_id: string })[];
+export type GetRolesResp = {
+  roles?: {
+    address: string;
+    role: Role;
+    created_at: string;
+    updated_at: string;
+  };
+  count: number;
 };
 
 export type GetRulesReq = {

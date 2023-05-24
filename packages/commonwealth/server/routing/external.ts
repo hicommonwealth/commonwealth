@@ -152,24 +152,6 @@ export function addExternalRoutes(
   );
 
   router.get('/roles', getRolesValidation, getRoles.bind(this, models));
-  router.post(
-    '/roles',
-    passport.authenticate('jwt', { session: false }),
-    postRolesValidation,
-    addEntities.bind(
-      this,
-      'chain_id',
-      models,
-      (a) => models.Role.bulkCreate(a),
-      (req: TypedRequest<PostRolesReq>) => req.body.roles
-    )
-  );
-  router.delete(
-    '/roles',
-    passport.authenticate('jwt', { session: false }),
-    onlyIds,
-    deleteEntities.bind(this, 'chain_id', models, models.Role)
-  );
 
   router.get('/rules', getRulesValidation, getRules.bind(this, models));
   router.post(

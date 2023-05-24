@@ -8,6 +8,7 @@ import {
 } from 'common-common/src/types';
 /* eslint-disable dot-notation */
 import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getThreadUrl } from '../../shared/utils';
@@ -15,7 +16,6 @@ import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
@@ -116,14 +116,15 @@ const createReaction = async (
     chain &&
     (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
   ) {
-    // skip check for admins
-    const isAdmin = await findAllRoles(
-      models,
-      { where: { address_id: author.id } },
-      chain.id,
-      ['admin']
-    );
-    if (thread && !req.user.isAdmin && isAdmin.length === 0) {
+    const adminRole = await models.Address.findOne({
+      where: {
+        chain: author.chain,
+        address: author.address,
+      },
+      attributes: ['role'],
+    });
+
+    if (thread && !req.user.isAdmin && adminRole?.role !== 'admin') {
       try {
         const canReact = await validateTopicThreshold(
           tokenBalanceCache,

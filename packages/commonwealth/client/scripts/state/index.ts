@@ -13,7 +13,6 @@ import PollsController from 'controllers/server/polls';
 import ReactionCountsController from 'controllers/server/reactionCounts';
 import ReactionsController from 'controllers/server/reactions';
 import ThreadReactionsController from 'controllers/server/reactions/ThreadReactionsController';
-import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
 import ThreadsController from 'controllers/server/threads';
@@ -84,7 +83,6 @@ export interface IApp {
 
   // User
   user: UserController;
-  roles: RolesController;
   recentActivity: RecentActivityController;
   newProfiles: NewProfilesController;
   sessions: SessionsController;
@@ -129,7 +127,6 @@ export interface IApp {
 
 // INJECT DEPENDENCIES
 const user = new UserController();
-const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
@@ -181,7 +178,6 @@ const app: IApp = {
 
   // User
   user,
-  roles,
   recentActivity: new RecentActivityController(),
   newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
@@ -265,7 +261,6 @@ export async function initAppState(
             );
           });
 
-        app.roles.setRoles(data.result.roles);
         app.config.notificationCategories =
           data.result.notificationCategories.map((json) =>
             NotificationCategory.fromJSON(json)
