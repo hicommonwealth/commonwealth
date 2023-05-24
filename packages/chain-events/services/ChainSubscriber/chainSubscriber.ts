@@ -21,7 +21,8 @@ import {
   RABBITMQ_URI,
   REPEAT_TIME,
   ROLLBAR_SERVER_TOKEN,
-  CHAIN_SUBSCRIBER_INDEX, ROLLBAR_ENV,
+  CHAIN_SUBSCRIBER_INDEX,
+  ROLLBAR_ENV,
 } from '../config';
 
 import {
@@ -117,7 +118,7 @@ export async function processChains(
 
   log.info('Finished scheduled process.');
 
-  return listenerInstances
+  return listenerInstances;
 }
 
 /**
@@ -259,7 +260,7 @@ export async function getSubscriberChainData(
         return cachedChainsAndTokens;
       } else {
         log.info(`No cached chains. Retrying in ${REPEAT_TIME} minute(s)`);
-        return;
+        return [];
       }
     }
   }
@@ -286,13 +287,11 @@ export async function runSubscriberAsServer() {
   let producer, pool, rollbar;
   try {
     ({ producer, pool, rollbar } = await initSubscriberTools());
-    setInterval(
-      runSubscriberAsFunction,
-      REPEAT_TIME * 60000,
-      producer,
-      pool,
-      rollbar
-    );
+    const main = async () => {
+      const chains = await getSubscriberChainData(pool, rollbar, null);
+      return await processChains(producer, chains, rollbar);
+    };
+    setInterval(main, REPEAT_TIME * 60000);
   } catch (e) {
     log.error('Fatal error occurred', e);
     rollbar.critical('Fatal error occurred', e);

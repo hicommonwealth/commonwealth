@@ -1,8 +1,8 @@
-import type { MagicUserMetadata } from '@magic-sdk/admin';
+import { MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 
 import { AppError, ServerError } from 'common-common/src/errors';
-import { NotificationCategories, WalletId } from 'common-common/src/types';
+import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
 import passport from 'passport';
 import { Strategy as MagicStrategy } from 'passport-magic';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
@@ -13,6 +13,8 @@ import type { ProfileAttributes } from '../models/profile';
 
 import '../types';
 import { createRole } from '../util/roles';
+import { ChainAttributes } from '../models/chain';
+import address, { AddressAttributes } from '../models/address';
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
@@ -22,17 +24,23 @@ export function initMagicAuth(models: DB) {
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         // determine login location
-        let chain, error, registrationChainAddress;
+        let chain, error;
         if (req.body.chain || req.body.community) {
           [chain, error] = await validateChain(models, req.body);
           if (error) return cb(error);
+        } else {
+          // default to Osmosis as secondary chain
+          chain = await models.Chain.findOne({ where: { id: 'osmosis' }});
         }
 
-        if (req.body.address) {
-          registrationChainAddress = req.body.address;
-        }
+        // grab cosmos address for registration
+        const cosmosMetadata = await magic.users.getMetadataByIssuerAndWallet(
+          user.issuer,
+          WalletType.COSMOS
+        );
+        const registrationChainAddress = (cosmosMetadata?.wallets[0] as any)?.public_address;
 
-        const registrationChain = chain;
+        const registrationChain: ChainAttributes = chain;
 
         // fetch user data from magic backend
         let userMetadata: MagicUserMetadata;
@@ -90,10 +98,13 @@ export function initMagicAuth(models: DB) {
             );
 
             // create a default Eth address
+            const ethereumChain = registrationChain.base === ChainBase.Ethereum
+              ? registrationChain.id
+              : 'ethereum';
             const newDefaultAddress = await models.Address.create(
               {
                 address: ethAddress,
-                chain: 'ethereum',
+                chain: ethereumChain,
                 verification_token: 'MAGIC',
                 verification_token_expires: null,
                 verified: new Date(), // trust addresses from magic
@@ -108,7 +119,7 @@ export function initMagicAuth(models: DB) {
             await createRole(
               models,
               newDefaultAddress.id,
-              'ethereum',
+              ethereumChain,
               'member',
               false,
               t
@@ -116,10 +127,13 @@ export function initMagicAuth(models: DB) {
 
             if (registrationChainAddress) {
               // create an address on their selected chain
+              const cosmosChain = registrationChain.base === ChainBase.CosmosSDK
+                ? registrationChain.id
+                : 'osmosis';
               const newRegistrationChainAddress = await models.Address.create(
                 {
                   address: registrationChainAddress,
-                  chain: registrationChain.id,
+                  chain: cosmosChain,
                   verification_token: 'MAGIC',
                   verification_token_expires: null,
                   verified: new Date(), // trust addresses from magic
@@ -133,7 +147,7 @@ export function initMagicAuth(models: DB) {
               await createRole(
                 models,
                 newRegistrationChainAddress.id,
-                registrationChain.id,
+                cosmosChain,
                 'member',
                 false,
                 t
@@ -210,40 +224,78 @@ export function initMagicAuth(models: DB) {
               },
             ],
           });
-          // login user if they registered via magic
-          if (user.claim.iat <= ssoToken.issued_at) {
-            console.log('Replay attack detected.');
-            return cb(null, null, {
-              message: `Replay attack detected for user ${user.publicAddress}}.`,
-            });
+
+          if (ssoToken) {
+            // login user if they registered via magic
+            if (user.claim.iat <= ssoToken.issued_at) {
+              console.log('Replay attack detected.');
+              return cb(null, null, {
+                message: `Replay attack detected for user ${user.publicAddress}}.`,
+              });
+            }
+            ssoToken.issued_at = user.claim.iat;
+            ssoToken.updated_at = new Date();
+            await ssoToken.save();
+          } else {
+            const magicAddress = (
+              existingUser.Addresses as AddressAttributes[]
+            ).find((a) => a.address === user.publicAddress);
+
+            let address_id = magicAddress?.id;
+            if (!magicAddress) {
+              // user lacks address corresponding to magic token -- create for them
+              const newDefaultAddress = await models.Address.create(
+                {
+                  address: user.publicAddress,
+                  chain: 'ethereum',
+                  verification_token: 'MAGIC',
+                  verification_token_expires: null,
+                  verified: new Date(), // trust addresses from magic
+                  last_active: new Date(),
+                  user_id: existingUser.id,
+                  profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
+                  wallet_id: WalletId.Magic,
+                }
+              );
+
+              await createRole(
+                models,
+                newDefaultAddress.id,
+                'ethereum',
+                'member',
+                false
+              );
+              address_id = newDefaultAddress.id;
+            }
+
+            // handle legacy case for missing SsoTokens
+            await models.SsoToken.create(
+              {
+                issuer: userMetadata.issuer,
+                issued_at: user.claim.iat,
+                address_id: address_id,
+                created_at: new Date(),
+                updated_at: new Date(),
+              }
+            );
           }
-          ssoToken.issued_at = user.claim.iat;
-          ssoToken.updated_at = new Date();
-          await ssoToken.save();
-          console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
+          console.log(`Found existing user.`);
 
-          const addressExistsForChain = existingUser.Addresses?.some(
-            (a) =>
-              chain?.id === a.chain ||
-              (chain?.base === 'cosmos' &&
-                (a.address.startsWith('cosmos') ||
-                  a.address.startsWith('osmo')))
-          );
-
-          if (registrationChainAddress && !addressExistsForChain) {
+          if (registrationChainAddress) {
             // insert an address for their selected chain if it doesn't exist
             await sequelize.transaction(async (t) => {
               const [newRegistrationChainAddress, created] =
                 await models.Address.findOrCreate({
                   where: {
-                    address: registrationChainAddress,
+                    address: registrationChain.base === ChainBase.CosmosSDK
+                      ? registrationChainAddress
+                      : userMetadata.publicAddress,
                     chain: registrationChain.id,
                     user_id: existingUser.id,
-                    profile_id: (existingUser.Profiles[0] as ProfileAttributes)
-                      .id,
                     wallet_id: WalletId.Magic,
                   },
                   defaults: {
+                    profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
                     verification_token: 'MAGIC',
                     verification_token_expires: null,
                     verified: new Date(),
@@ -294,8 +346,7 @@ export function initMagicAuth(models: DB) {
                   verified: new Date(), // trust addresses from magic
                   last_active: new Date(),
                   user_id: existingUser.id,
-                  profile_id: (existingUser.Profiles[0] as ProfileAttributes)
-                    .id,
+                  profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
                   wallet_id: WalletId.Magic,
                 },
                 { transaction: t }

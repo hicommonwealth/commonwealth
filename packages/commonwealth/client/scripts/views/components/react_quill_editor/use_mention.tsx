@@ -1,4 +1,4 @@
-import  MinimumProfile from '../../../models/MinimumProfile';
+import MinimumProfile from '../../../models/MinimumProfile';
 import { RangeStatic } from 'quill';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
@@ -7,10 +7,7 @@ import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { debounce } from 'lodash';
-import { MentionCache } from './mention_cache';
-
-// local storage cache for mention search results
-const mentionCache = new MentionCache(1_000 * 60);
+import { TTLCache } from '../../../helpers/ttl_cache';
 
 const Delta = Quill.import('delta');
 Quill.register('modules/mention', QuillMention);
@@ -24,6 +21,10 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
+  const mentionCache = useMemo(() => {
+    return new TTLCache(1_000 * 60, `mentions-${app.activeChainId()}`);
+  }, []);
+
   const selectMention = useCallback(
     (item: QuillMention) => {
       const editor = editorRef.current?.getEditor();
@@ -54,7 +55,7 @@ export const useMention = ({
         0
       );
     },
-    [lastSelectionRef]
+    [editorRef, lastSelectionRef]
   );
 
   const mention = useMemo(() => {
@@ -90,16 +91,17 @@ export const useMention = ({
             ];
           } else if (searchTerm.length > 2) {
             // try to get results from cache
-            let profiles = mentionCache.get(searchTerm);
+            let { profiles } = mentionCache.get(searchTerm) || {};
             if (!profiles) {
-              profiles = await app.search.searchMentionableProfiles(
+              const res = await app.search.searchMentionableProfiles(
                 searchTerm,
                 app.activeChainId()
               );
-              if (!profiles?.length) {
+              if (!res.profiles?.length) {
                 return;
               }
-              mentionCache.set(searchTerm, profiles);
+              profiles = res.profiles;
+              mentionCache.set(searchTerm, res);
             }
             formattedMatches = profiles.map((p: any) => {
               const profileId = p.id;
