@@ -1,5 +1,4 @@
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import assert from 'assert';
 import type { IAccountsModule } from '../../../models/interfaces';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
@@ -39,9 +38,13 @@ class EthereumAccounts
 
   public fromAddress(address: string): EthereumAccount {
     if (address.indexOf('0x') !== -1) {
-      assert(address.length === 42);
+      if (address.length !== 42) {
+        console.error(`Invalid address length! ${address}`);
+      }
     } else {
-      assert(address.length === 40);
+      if (address.length !== 40) {
+        console.error(`Invalid address length! ${address}`);
+      }
       address = `0x${address}`;
     }
     try {
