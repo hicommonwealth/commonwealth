@@ -23,10 +23,17 @@
     }
   }
 
-  .callout-text.Text {
-    background-color: $neutral-200;
-    border-radius: $border-radius-corners;
-    padding: 16px;
+  .callout-text {
+    &.lock-icon {
+      color: red;
+      background-color: blue;
+      margin-top: 10px;
+    }
+    &.Text {
+      background-color: $neutral-200;
+      border-radius: $border-radius-corners;
+      padding: 16px;
+    }
   }
 }
 
