@@ -18,9 +18,9 @@ type AvatarGroupProps = {
 export const CWAvatarGroup = (props: AvatarGroupProps) => {
   const { profiles, chainId } = props;
 
-  if (!profiles || profiles?.length === 0) return;
+  if (!profiles || profiles?.filter((p) => !!p).length === 0) return;
 
-  const truncatedProfiles = profiles.slice(0, 4).reverse();
+  const truncatedProfiles = profiles.filter((p) => !!p).slice(0, 4).reverse();
 
   const count = profiles.length - 4;
   let countText;
@@ -37,7 +37,7 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
     <div className="AvatarGroup">
       <div className="avatar-group-icons">
         {truncatedProfiles.map((profile, i) => {
-          if (profile?.avatarUrl) {
+          if (profile.avatarUrl) {
             return (
               <div className="avatar-group-icon" key={i}>
                 <CWAvatar avatarUrl={profile.avatarUrl} size={16} />
