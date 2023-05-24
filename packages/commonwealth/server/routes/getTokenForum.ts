@@ -45,7 +45,6 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
 
   try {
     const Web3 = (await import('web3')).default;
-    //IANHERE
     const node_url = node?.private_url || url;
     const provider =
       node_url.slice(0, 4) == 'http'
@@ -54,7 +53,8 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
 
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(address);
-    if (provider.connected) provider.disconnect(1000, 'finished');
+    if (provider instanceof Web3.providers.WebsocketProvider)
+      provider.disconnect(1000, 'finished');
     if (code === '0x') {
       // Account returns 0x, Smart contract returns bytecode
       return res.json({

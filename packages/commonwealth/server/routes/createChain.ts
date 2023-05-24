@@ -189,7 +189,7 @@ const createChain = async (
       altWalletUrl = node.alt_wallet_url;
       privateUrl = node.private_url;
     }
-    //IANHERE
+
     const node_url = privateUrl || url;
     const provider =
       node_url.slice(0, 4) == 'http'
@@ -198,7 +198,8 @@ const createChain = async (
 
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
-    if (provider.connected) provider.disconnect(1000, 'finished');
+    if (provider instanceof Web3.providers.WebsocketProvider)
+      provider.disconnect(1000, 'finished');
     if (code === '0x') {
       return next(new AppError(Errors.InvalidAddress));
     }

@@ -101,7 +101,6 @@ export const ERC20Form = (props: EthChainFormState) => {
           console.log('Querying chain for ERC info');
 
           const Web3 = (await import('web3')).default;
-          //IANHERE
           const provider =
             args.url.slice(0, 4) == 'http'
               ? new Web3.providers.HttpProvider(args.url)
@@ -142,8 +141,8 @@ export const ERC20Form = (props: EthChainFormState) => {
           chainFormDefaultFields.setElement('');
           chainFormDefaultFields.setTelegram('');
           chainFormDefaultFields.setGithub('');
-
-          if (provider.connected) provider.disconnect(1000, 'finished');
+          if (provider instanceof Web3.providers.WebsocketProvider)
+            provider.disconnect(1000, 'finished');
         }
 
         chainFormState.setLoaded(true);

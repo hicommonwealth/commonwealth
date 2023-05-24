@@ -28,7 +28,6 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
     opts: EthBPOpts
   ): Promise<Web3> {
     const node_url = node.private_url || node.url;
-    //IANHERE
     const provider =
       node_url.slice(0, 4) == 'http'
         ? new Web3.providers.HttpProvider(node_url)
@@ -50,7 +49,8 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
         throw new Error('Invalid address');
       }
       const balance = await api.eth.getBalance(address);
-      //IANHERE
+      if (api.currentProvider instanceof Web3.providers.WebsocketProvider)
+        (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
       // use native token if no args provided
       return balance;
     }
@@ -76,6 +76,8 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       to: tokenAddress,
       data: calldata,
     });
+    if (api.currentProvider instanceof Web3.providers.WebsocketProvider)
+        (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
     return api.eth.abi.decodeParameter('uint256', result).toString();
   }
 }
