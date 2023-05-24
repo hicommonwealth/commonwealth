@@ -73,7 +73,16 @@ export const LoginModal = (props: LoginModalAttrs) => {
       onPerformLinking={onPerformLinking}
       onModalClose={props.onModalClose}
       onAccountVerified={onAccountVerified}
-      onConnectAnotherWay={() => setActiveStep('connectWithEmail')}
+      onConnectAnotherWay={() => {
+        setActiveStep('connectWithEmail');
+        setSidebarType('emailLogin');
+      }}
+      onNavigateToWalletList={() => {
+        setActiveStep('walletList');
+        setSidebarType(
+          isInCommunityPage ? 'communityWalletOptions' : 'connectWallet'
+        );
+      }}
       onResetWalletConnect={onResetWalletConnect}
       onWalletSelect={onWalletSelect}
       onWalletAddressSelect={onWalletAddressSelect}

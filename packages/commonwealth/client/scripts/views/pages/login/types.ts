@@ -4,6 +4,7 @@ import type { ProfileRowProps } from '../../components/component_kit/cw_profiles
 
 export type LoginSidebarType =
   | 'connectWallet'
+  | 'emailLogin'
   | 'communityWalletOptions'
   | 'newAddressLinked'
   | 'newOrReturning';
@@ -58,4 +59,5 @@ export type LoginProps = {
     wallet: IWebWallet<any>,
     address: string
   ) => Promise<void>;
+  onNavigateToWalletList: () => void;
 };
