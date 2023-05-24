@@ -24,15 +24,15 @@
   }
 
   .callout-text {
-    &.lock-icon {
-      color: red;
-      background-color: blue;
-      margin-top: 10px;
-    }
-    &.Text {
-      background-color: $neutral-200;
-      border-radius: $border-radius-corners;
-      padding: 16px;
+    display: flex;
+    align-items: center;
+    background-color: #F7F6F7;
+    color: #656167;
+    padding: 16px 24px 16px 24px;
+    border-radius: $border-radius-corners;
+
+    .Text {
+      margin-left: 10px;
     }
   }
 }

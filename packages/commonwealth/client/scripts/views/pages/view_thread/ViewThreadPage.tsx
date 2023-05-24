@@ -54,6 +54,7 @@ import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_po
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { filterLinks } from 'helpers/threads';
 import { isDefaultStage } from 'helpers';
+import { LockMessage } from './lock_message';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -739,33 +740,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
-                  thread.lockedAt ? (
-                    <div className="callout-text">
-                      <CWIcon
-                        className="lock-icon"
-                        iconName="lock"
-                        iconSize="small"
-                      />
-                      <CWText type="h5">
-                        This thread was locked on{' '}
-                        {thread.lockedAt.format('MM/DD/YY')}, meaning it can no
-                        longer be edited or commented on.
-                      </CWText>
-                    </div>
-                  ) : (
-                    <div className="callout-text">
-                      <CWIcon
-                        className="lock-icon"
-                        iconName="lock"
-                        iconSize="small"
-                      />
-                      <CWText type="h5">
-                        This thread has been locked, meaning it can no longer be
-                        edited or commented on. Thread was locked prior to{' '}
-                        {thread.updatedAt.format('MM/DD/YY')}.
-                      </CWText>
-                    </div>
-                  )
+                  <LockMessage
+                    lockedAt={thread.lockedAt}
+                    updatedAt={thread.updatedAt}
+                  />
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}
@@ -780,12 +758,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           </div>
         }
         comments={
-          <CommentsTree
-            comments={comments}
-            thread={thread}
-            setIsGloballyEditing={setIsGloballyEditing}
-            updatedCommentsCallback={updatedCommentsCallback}
-          />
+          !thread.readOnly && (
+            <CommentsTree
+              comments={comments}
+              thread={thread}
+              setIsGloballyEditing={setIsGloballyEditing}
+              updatedCommentsCallback={updatedCommentsCallback}
+            />
+          )
         }
         sidebarComponents={
           [
