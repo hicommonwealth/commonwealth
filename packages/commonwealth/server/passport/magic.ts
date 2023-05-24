@@ -292,6 +292,7 @@ async function addMagicToUser({
   return loggedInUser;
 }
 
+// Entrypoint into the magic passport strategy
 async function magicLoginRoute(
   magic: Magic,
   models: DB,
@@ -302,6 +303,7 @@ async function magicLoginRoute(
   decodedMagicToken: MagicUser,
   cb: DoneFunc
 ) {
+  log.info(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let chainToJoin: ChainInstance, error, loggedInUser: UserInstance;
 
   const generatedAddresses = [{
@@ -330,6 +332,7 @@ async function magicLoginRoute(
           },
         ]
       });
+      log.info(`DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`);
       if (!loggedInUser) {
         throw new Error('User not found');
       }
@@ -346,6 +349,7 @@ async function magicLoginRoute(
       decodedMagicToken.issuer,
       WalletType.COSMOS
     );
+    log.info(`MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`);
 
     const cosmosAddress = (magicUserMetadata?.wallets[0] as any)?.public_address;
     if (!cosmosAddress) {
@@ -391,6 +395,7 @@ async function magicLoginRoute(
       ],
     }
   );
+  log.info(`EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`);
 
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
     // already logged in as existing user, do nothing
@@ -426,6 +431,7 @@ async function magicLoginRoute(
     finalUser = await createNewMagicUser(magicContext);
   }
 
+  log.info(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
   return cb(null, finalUser);
 }
 
