@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
+import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
 import { initAppState } from 'state';
 import app from 'state';
@@ -33,12 +33,7 @@ const FinishSocialLogin = () => {
   }, []);
 
   if (validationError) {
-    return (
-      <Sublayout>
-        <p>Social login error: {validationError}</p>
-        <button onClick={() => navigate('/')}>Return Home</button>
-      </Sublayout>
-    );
+    return <ErrorPage message={validationError} />;
   } else {
     return <PageLoading />;
   }
