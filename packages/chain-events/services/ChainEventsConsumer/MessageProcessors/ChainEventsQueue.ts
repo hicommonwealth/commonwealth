@@ -20,10 +20,11 @@ export async function processChainEvents(
 ): Promise<void> {
   let prevResult = null;
   StatsDController.get().increment('ce.event', {
-    chain: event.chain || '',
+    chainName: event.chainName,
     network: event.network,
     blockNumber: `${event.blockNumber}`,
     kind: event.data.kind,
+    contract_address: event.contractAddress || '',
   });
   for (const handler of this.allChainEventHandlers) {
     try {

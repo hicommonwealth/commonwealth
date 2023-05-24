@@ -11,9 +11,9 @@ export class httpPostHandler implements IEventHandler {
   }
 
   public async handle(event: CWEvent): Promise<any> {
-    const log = factory.getLogger(
-      addPrefix(__filename, [event.network, event.chain])
-    );
+    const prefixes = [event.network, event.chainName];
+    if (event.contractAddress) prefixes.push(event.contractAddress);
+    const log = factory.getLogger(addPrefix(__filename, prefixes));
 
     try {
       const res = await fetch(this.url, {

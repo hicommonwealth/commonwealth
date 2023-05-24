@@ -87,15 +87,10 @@ async function migrateChainEntity(
   // 2. for each node, fetch and migrate chain entities
   log.info(`Fetching and migrating chain entities for: ${chain}`);
   try {
-    const migrationHandler = new MigrationHandler(
-      ceModels,
-      rmqController,
-      chain
-    );
+    const migrationHandler = new MigrationHandler(ceModels, rmqController);
     const entityArchivalHandler = new EntityArchivalHandler(
       ceModels,
-      rmqController,
-      chain
+      rmqController
     );
 
     const excludedNotificationEvents = [EventKind.DemocracyTabled];

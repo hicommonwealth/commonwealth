@@ -3,19 +3,7 @@
 Chain Events is a library for subscribing and processing synthetic blockchain events.
 
 ## Standalone Usage
-
-This package includes an "event listener" script located at [listener.ts](./scripts/listener.ts),
-which permits real-time listening for on-chain events, and can be used for testing a chain connection, pushing events to
-a queue, or/and running chain-events as a node.
-
-The following is an example usage, connecting to a local node running on edgeware mainnet:
-
-```bash
-~/chain-events$ yarn build
-~/chain-events$ yarn listen -n edgeware -u ws://localhost:9944
-```
-
-The full set of options is listed as, with only `-n` required:
+// TODO: update
 
 ```
 Options:

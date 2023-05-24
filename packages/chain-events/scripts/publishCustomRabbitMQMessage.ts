@@ -31,7 +31,8 @@ async function main() {
     blockNumber: 16170754,
     data: <any>ceData,
     network: SupportedNetwork.Aave,
-    chain: 'dydx',
+    chainName: 'Ethereum (Mainnet)',
+    contractAddress: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
   };
 
   const publishJson = await publishRmqMsg(
@@ -51,7 +52,11 @@ async function clear() {
     await models.sequelize.transaction(async (t) => {
       const entityId = (
         await models.ChainEntity.findOne({
-          where: { chain: 'dydx', type_id: '10' },
+          where: {
+            chain_name: 'Ethereum (Mainnet)',
+            type_id: '10',
+            contract_address: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
+          },
           transaction: t,
         })
       )?.id;

@@ -47,7 +47,6 @@ export const generateHandlers = (
   const storageHandler = new StorageHandler(
     ceModels,
     rmqController,
-    chain.id,
     storageConfig
   );
 
@@ -63,8 +62,7 @@ export const generateHandlers = (
   // creates and updates ChainEntity rows corresponding with entity-related events
   const entityArchivalHandler = new EntityArchivalHandler(
     ceModels,
-    rmqController,
-    chain.id
+    rmqController
   );
 
   // the set of handlers, run sequentially on all incoming chain events
