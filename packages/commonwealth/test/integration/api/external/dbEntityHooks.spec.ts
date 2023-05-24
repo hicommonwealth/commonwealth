@@ -37,10 +37,10 @@ async function clearTestEntities() {
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
   });
-  await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Rule.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Chain.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
