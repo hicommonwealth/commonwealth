@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -10,8 +10,6 @@ import 'pages/new_snapshot_proposal.scss';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';

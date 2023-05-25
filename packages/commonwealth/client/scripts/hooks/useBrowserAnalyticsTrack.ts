@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { clientAnalyticsTrack } from '../../../shared/analytics/client-track';
 import { AnalyticsPayload } from '../../../shared/analytics/types';
 import app from 'state';
