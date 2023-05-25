@@ -55,7 +55,7 @@ export const Select = ({
       {/* needs to be div instead of fragment so listener can work */}
       <div>
         <CWButton
-          className="Select"
+          className={`Select ${popoverProps.anchorEl ? 'active' : ''}`}
           {...(selectedOption &&
             selectedOption.iconLeft && { iconLeft: selectedOption.iconLeft })}
           iconRight={popoverProps.anchorEl ? 'carotUp' : 'carotDown'}

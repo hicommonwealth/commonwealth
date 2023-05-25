@@ -14,9 +14,15 @@
     padding: 10px 12px !important;
     border-radius: $border-radius-md  !important;
     font-size: 14px !important;
+    min-height: 40px;
+    line-height: 20px;
 
     &:hover,
     &:active {
-        background-color: $primary-100;
+        background-color: $neutral-100-new;
+    }
+
+    &.isSelected {
+        background-color: $neutral-50;
     }
 }

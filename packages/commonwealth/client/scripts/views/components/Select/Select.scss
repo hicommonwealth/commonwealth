@@ -12,14 +12,24 @@
     height: auto !important;
     background-color: $white;
     font-size: 14px !important;
+    border-width: 2px !important;
+    border-style: solid !important;
+    border-color: $neutral-200-new  !important;
 
-    &:hover,
+    &:hover {
+        border-color: $primary-600-new  !important;
+    }
+
     &:active {
-        border-radius: 1px solid $primary-500;
+        border-color: $primary-500  !important;
     }
 
     .button-text {
         margin-right: auto;
+    }
+
+    &.active {
+        border-color: $primary-500  !important;
     }
 }
 
@@ -34,6 +44,6 @@
     max-height: 336px;
     margin-top: 4px;
     font-size: 14px !important;
-    border: 1px solid $neutral-200;
+    border: 1px solid $neutral-200-new  !important;
     box-shadow: $elevation-6;
 }
