@@ -3,22 +3,23 @@ import { isUndefined } from 'helpers/typeGuards';
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/recent_threads_header.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import type Topic from '../../../models/Topic';
-import { ThreadStage } from '../../../models/types';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadStage,
+  ThreadTimelineFilterTypes,
+} from '../../../models/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { Select } from '../../components/Select';
-import {
-  ThreadFeaturedFilterTypes,
-  ThreadTimelineFilterTypes,
-} from '../../../models/types';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -38,6 +39,26 @@ export const RecentThreadsHeader = ({
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
   const forceRerender = useForceRerender();
+  const filterRowRef = useRef<HTMLDivElement>();
+  const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
+    useState<'bottom-end' | 'bottom-start'>('bottom-end');
+
+  const onFilterResize = () => {
+    if (filterRowRef.current) {
+      setRightFiltersDropdownPosition(
+        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end'
+      );
+    }
+  };
+
+  useBrowserWindow({
+    onResize: onFilterResize,
+    resizeListenerUpdateDeps: [],
+  });
+
+  useEffect(() => {
+    onFilterResize();
+  }, []);
 
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
     isWindowExtraSmall(window.innerWidth)
@@ -159,7 +180,7 @@ export const RecentThreadsHeader = ({
         </>
       )}
       {app.chain?.meta && (
-        <div className="filter-row">
+        <div className="filter-row" ref={filterRowRef}>
           <div className="filter-section">
             <p className="filter-label">Sort</p>
             <Select
@@ -225,7 +246,7 @@ export const RecentThreadsHeader = ({
                       label: t.name,
                     })),
                   ]}
-                  dropdownPosition="bottom-end"
+                  dropdownPosition={rightFiltersDropdownPosition}
                   canEditOption={app.roles?.isAdminOfEntity({
                     chain: app.activeChainId(),
                   })}
@@ -263,7 +284,7 @@ export const RecentThreadsHeader = ({
                       }`,
                     })),
                   ]}
-                  dropdownPosition="bottom-end"
+                  dropdownPosition={rightFiltersDropdownPosition}
                 />
               )}
               <Select
@@ -291,7 +312,7 @@ export const RecentThreadsHeader = ({
                     label: 'Week',
                   },
                 ]}
-                dropdownPosition="bottom-end"
+                dropdownPosition={rightFiltersDropdownPosition}
               />
             </div>
           </div>
