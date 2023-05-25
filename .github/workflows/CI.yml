@@ -125,7 +125,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Unit And Integration Tests
+    name: CW Unit And Integration Tests
     runs-on: ubuntu-latest
 
     services:
@@ -254,9 +254,6 @@ jobs:
       - name: Run Token Balance Cache Unit Tests
         run: yarn --cwd packages/token-balance-cache test
 
-      - name: Run Chain Events Unit Tests
-        run: yarn --cwd packages/chain-events unit-test
-
       - name: Stop EVM Chain
         run: docker stop chain
 
@@ -293,7 +290,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Chain Events Integration Tests
+    name: CE Integration and Unit Tests
     runs-on: ubuntu-latest
 
     services:
@@ -373,13 +370,17 @@ jobs:
           CE_CI_TESTING=true RPC_HOST=ganache CHAIN_PORT=3000 yarn --cwd packages/chain-events/chain-testing start > sdkLog.log 2>&1 &
           sleep 15
 
+      - name: Typecheck
+        if: steps.changed-files-chain-events.outputs.any_changed == 'true'
+        run: yarn --cwd packages/chain-events check-types
+
       - name: Run Chain Events Integration Tests
         if: steps.changed-files-chain-events.outputs.any_changed == 'true'
         run: yarn --cwd packages/chain-events test-services
 
-      - name: Typecheck
+      - name: Run Chain Events Unit Tests
         if: steps.changed-files-chain-events.outputs.any_changed == 'true'
-        run: yarn --cwd packages/chain-events check-types
+        run: yarn --cwd packages/chain-events unit-test
 
       - name: Display Ganache logs
         if: always() # Ensure this step runs even if previous steps failed
