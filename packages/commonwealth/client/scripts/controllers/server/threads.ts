@@ -114,6 +114,7 @@ class ThreadsController {
       title,
       body,
       last_edited,
+      marked_as_spam_at,
       version_history,
       Attachments,
       created_at,
@@ -193,6 +194,8 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
+    const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+
     let topicFromStore = null;
     if (topic?.id) {
       topicFromStore = app.topics.store.getById(topic.id);
@@ -234,6 +237,7 @@ class ThreadsController {
       chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
+      markedAsSpamAt,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
