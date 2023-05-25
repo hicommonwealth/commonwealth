@@ -24,7 +24,7 @@ export function mixpanelBrowserTrack<T extends BaseMixpanelPayload>(data: T) {
 }
 
 // ----- Server Side Analytics Agnostic Provider Utils ------ //
-export function clientAnalyticsTrack(payload: AnalyticsPayload) {
+export function clientAnalyticsTrack<T extends AnalyticsPayload>(payload: T) {
   providers.forEach((provider) => {
     switch (provider) {
       case 'mixpanel':

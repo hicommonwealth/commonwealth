@@ -25,7 +25,7 @@ export function mixpanelTrack<T extends BaseMixpanelPayload>(data: T) {
   }
 }
 
-export function serverAnalyticsTrack(payload: AnalyticsPayload) {
+export function serverAnalyticsTrack<T extends AnalyticsPayload>(payload: T) {
   providers.forEach((provider) => {
     switch (provider) {
       case 'mixpanel':

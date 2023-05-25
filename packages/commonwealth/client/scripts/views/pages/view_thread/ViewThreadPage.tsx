@@ -54,6 +54,8 @@ import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_po
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { filterLinks } from 'helpers/threads';
 import { isDefaultStage } from 'helpers';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export type ThreadPrefetch = {
   [identifier: string]: {

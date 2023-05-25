@@ -3,11 +3,17 @@ import { clientAnalyticsTrack } from '../../../shared/analytics/client-track';
 import { AnalyticsPayload } from '../../../shared/analytics/types';
 import app from 'state';
 
-export function useBrowserAnalyticsTrack({
+/**
+ * Hook to capture analytics events on the browser
+ * @param payload Formatted analytics payload
+ * @param onAction whether to fire on action or on component mount
+ * @returns trackAnalytics function to fire analytics event
+ */
+export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
   payload,
   onAction = false,
 }: {
-  payload?: AnalyticsPayload;
+  payload?: T;
   onAction?: boolean;
 }) {
   const hasFiredRef = useRef(false);
@@ -18,7 +24,7 @@ export function useBrowserAnalyticsTrack({
       try {
         clientAnalyticsTrack({
           ...payload,
-          properties: { userAddress: app?.user?.activeAccount?.address },
+          userAddress: app.user?.activeAccount?.address ?? null,
         });
         hasFiredRef.current = true;
       } catch (e) {
@@ -34,7 +40,6 @@ export function useBrowserAnalyticsTrack({
         try {
           clientAnalyticsTrack({
             ...actionPayload,
-            properties: { userAddress: app?.user?.activeAccount?.address },
           });
         } catch (e) {
           console.log('Failed to track event:', e.message);

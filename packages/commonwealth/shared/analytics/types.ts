@@ -51,19 +51,11 @@ export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 export interface AnalyticsPayload {
   event: any; // base event type
   isCustomDomain?: boolean;
-  communityType?: string;
-  chainBase?: string;
-  community?: string;
-  chain?: string;
-  userAddress?: string;
-  properties?: any; // base properties type
 }
 
 export interface BaseMixpanelPayload extends AnalyticsPayload {
   event: MixpanelEvents;
-  isCustomDomain: boolean;
   userAddress?: string;
-  properties?: any;
 }
 
 export const providers = ['mixpanel']; // add other providers here

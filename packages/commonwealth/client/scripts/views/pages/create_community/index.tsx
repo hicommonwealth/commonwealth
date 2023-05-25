@@ -46,7 +46,9 @@ const CreateCommunity = () => {
     useEthChainFormState();
 
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
+    },
   });
 
   useEffect(() => {
