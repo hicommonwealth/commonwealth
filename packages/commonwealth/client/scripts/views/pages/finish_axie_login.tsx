@@ -32,7 +32,7 @@ const validate = async (
   if (result.status === 'Success') {
     await initAppState();
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
-    await updateActiveAddresses(selectedChainMeta);
+    await updateActiveAddresses({ chain: selectedChainMeta });
     console.log('Navigating to axie infinite community');
     setRoute('/axie-infinity');
   } else {

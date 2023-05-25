@@ -123,6 +123,8 @@ function setupCosmosProxy(app: Express, models: DB) {
         if (!chain) {
           throw new AppError('Invalid chain');
         }
+        // TODO: test for other chains
+        // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
         const targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
           throw new AppError('No LCD endpoint found');
@@ -169,6 +171,8 @@ function setupCosmosProxy(app: Express, models: DB) {
         if (!chain) {
           throw new AppError('Invalid chain');
         }
+        // TODO: test for other chains
+        // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
         const targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
           throw new AppError('No LCD endpoint found');

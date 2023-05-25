@@ -39,6 +39,7 @@ type UserAttrs = {
   showAsDeleted?: boolean;
   showRole?: boolean;
   user: Account | AddressInfo | MinimumProfile | undefined;
+  role?: { permission: string };
 };
 
 export const User = (props: UserAttrs) => {
@@ -54,6 +55,9 @@ export const User = (props: UserAttrs) => {
     showRole,
     showAsDeleted = false,
   } = props;
+
+  let { role } = props;
+
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
 
@@ -85,7 +89,6 @@ export const User = (props: UserAttrs) => {
   let loggedInUserIsAdmin = false;
   let friendlyChainName: string | undefined;
   let adminsAndMods = [];
-  let role;
 
   if (user) {
     loggedInUserIsAdmin =
@@ -126,9 +129,11 @@ export const User = (props: UserAttrs) => {
 
       profile = app.newProfiles.getProfile(chainId.id, address);
 
-      role = adminsAndMods.find(
-        (r) => r.address === address && r.address_chain === chainId.id
-      );
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) => r.address === address && r.address_chain === chainId.id
+        );
+      }
     } else if (props.user instanceof MinimumProfile) {
       profile = props.user;
 
@@ -142,10 +147,12 @@ export const User = (props: UserAttrs) => {
         }
       }
 
-      role = adminsAndMods.find(
-        (r) =>
-          r.address === profile.address && r.address_chain === profile.chain
-      );
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) =>
+            r.address === profile.address && r.address_chain === profile.chain
+        );
+      }
     } else {
       account = props.user;
       // TODO: we should remove this, since account should always be of type Account,
@@ -154,9 +161,11 @@ export const User = (props: UserAttrs) => {
 
       profile = app.newProfiles.getProfile(chainId, account.address);
 
-      role = adminsAndMods.find(
-        (r) => r.address === account.address && r.address_chain === chainId
-      );
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) => r.address === account.address && r.address_chain === chainId
+        );
+      }
     }
   }
 

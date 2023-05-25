@@ -21,6 +21,11 @@ import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { addressSwapper } from 'utils';
 import { setDarkMode } from '../helpers/darkMode';
+import {
+  getAddressFromWallet,
+  loginToAxie,
+  loginToNear,
+} from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
 import type { ProfileRowProps } from '../views/components/component_kit/cw_profiles_list';
@@ -32,11 +37,6 @@ import type {
   LoginActiveStep,
   LoginSidebarType,
 } from '../views/pages/login/types';
-import {
-  getAddressFromWallet,
-  loginToAxie,
-  loginToNear,
-} from '../helpers/wallet';
 import useBrowserWindow from './useBrowserWindow';
 
 type IuseWalletProps = {
@@ -197,7 +197,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         const chain =
           app.user.selectedChain ||
           app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses(chain);
+        await updateActiveAddresses({ chain, shouldRedraw: shouldRedrawApp });
       }
     }
 
@@ -310,7 +310,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
         await primaryAccount.validate(
           cachedWalletSignature,
           cachedTimestamp,
-          cachedChainId
+          cachedChainId,
+          false
         );
         await app.sessions.authSession(
           selectedWallet.chain,
@@ -326,7 +327,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // it we need to get the id from api
       await app.newProfiles.updateProfileForAccount(
         primaryAccount.profile.address,
-        {}
+        {},
+        false
       );
     } catch (e) {
       console.log(e);

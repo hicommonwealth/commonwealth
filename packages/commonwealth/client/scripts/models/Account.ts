@@ -113,7 +113,8 @@ class Account {
   public async validate(
     signature: string,
     timestamp: number,
-    chainId: string | number
+    chainId: string | number,
+    shouldRedraw = true
   ) {
     if (!signature) {
       throw new Error('signature required for validation');
@@ -156,7 +157,7 @@ class Account {
               return !ghostAddress;
             })
           );
-          app.user.setActiveAccounts([]);
+          app.user.setActiveAccounts([], shouldRedraw);
         }
       }
     }

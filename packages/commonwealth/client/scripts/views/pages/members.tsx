@@ -1,65 +1,122 @@
-import React, { useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
+import React, { useEffect, useRef, useState } from 'react';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import 'pages/members.scss';
 
 import app from 'state';
-import type MinimumProfile from '../../models/MinimumProfile';
-import { AccessLevel } from '../../../../shared/permissions';
+import MinimumProfile from '../../models/MinimumProfile';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/Sublayout';
 import { CWText } from '../components/component_kit/cw_text';
+import { AccessLevel } from 'permissions';
+import { useDebounce } from 'usehooks-ts';
+import { MembersSearchBar } from '../components/members_search_bar';
 
 type MemberInfo = {
   profile: MinimumProfile;
+  role: any;
 };
 
 const MembersPage = () => {
+  const containerRef = useRef<VirtuosoHandle>();
+
   const [membersList, setMembersList] = React.useState<Array<MemberInfo>>([]);
-  const [customScrollParent, setCustomScrollParent] = useState(null);
+  const [totalCount, setTotalCount] = useState<number>(1);
+  const [page, setPage] = useState<number>(1);
 
-  const activeInfo = app.chain.meta;
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  React.useEffect(() => {
-    const fetch = async () => {
-      await activeInfo.getMembers(activeInfo.id);
+  const handleLoadNextPage = async (searchQuery: string, reset: boolean) => {
+    const newPage = reset ? 1 : page + 1;
+    setPage(newPage);
 
-      const accessLevelOrder = Object.values(AccessLevel);
+    const response = await app.search.searchMentionableProfiles(
+      searchQuery || '',
+      app.activeChainId(),
+      50,
+      newPage,
+      true
+    );
 
-      const membersCopy = [...activeInfo.members];
+    if (response.totalCount) {
+      setTotalCount(response.totalCount);
+    }
 
-      const membersCopySortedByPerms = membersCopy.sort(
-        (a, b) =>
-          accessLevelOrder.indexOf(a.permission) -
-          accessLevelOrder.indexOf(b.permission)
+    const members = response.profiles.map((p) => ({
+      id: p.id,
+      address_id: p.addresses?.[0]?.id,
+      address: p.addresses?.[0]?.address,
+      address_chain: p.addresses?.[0]?.chain,
+      chain_id: p.addresses?.[0]?.chain,
+      profile_name: p.profile_name,
+      avatar_url: p.avatar_url,
+      roles: p.roles,
+    }));
+
+    const profiles: Array<MemberInfo> = members.map((p) => {
+      const minProfile = new MinimumProfile(p.address, p.chain);
+      minProfile.initialize(
+        p.profile_name,
+        p.address,
+        p.avatar_url,
+        p.id,
+        p.chain,
+        null
       );
+      return {
+        profile: minProfile,
+        role: p.roles.find((role) => role.chain_id === app.activeChainId()),
+      };
+    });
 
-      const profiles: Array<MemberInfo> = membersCopySortedByPerms.map(
-        (role) => ({
-          profile: app.newProfiles.getProfile(role.address_chain, role.address),
-        })
-      );
-
+    if (reset) {
       setMembersList(profiles);
-    };
+      if (containerRef) {
+        containerRef.current.scrollToIndex(0);
+      }
+    } else {
+      setMembersList([...membersList, ...profiles]);
+    }
+  };
 
-    fetch();
-  }, [activeInfo]);
+  // on debounced search term change, refresh search results
+  useEffect(() => {
+    if (debouncedSearchTerm === '') {
+      handleLoadNextPage('', true);
+      return;
+    }
+    if (debouncedSearchTerm.length >= 3) {
+      handleLoadNextPage(debouncedSearchTerm, true);
+    }
+  }, [debouncedSearchTerm]);
+
+  // on init, load first page
+  useEffect(() => {
+    handleLoadNextPage('', true);
+  }, []);
 
   return (
     <Sublayout>
-      <div className="MembersPage" ref={setCustomScrollParent}>
+      <div className="MembersPage">
         <CWText type="h3" fontWeight="medium">
-          Members ({membersList.length})
+          Members ({totalCount})
         </CWText>
+        <MembersSearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          chainName={app.activeChainId()}
+        />
         <Virtuoso
+          ref={containerRef}
           data={membersList}
-          customScrollParent={customScrollParent}
+          endReached={() => handleLoadNextPage(searchTerm, false)}
           itemContent={(index, profileInfo) => {
             return (
               <div className="member-row" key={index}>
                 <User
                   user={profileInfo.profile}
+                  role={profileInfo.role}
                   showRole
                   hideAvatar={false}
                   linkify
