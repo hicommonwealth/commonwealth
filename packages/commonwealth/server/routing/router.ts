@@ -481,7 +481,7 @@ function setupRouter(
   );
   router.get(
     '/getThreads',
-    databaseValidationService.validateChain,
+    // databaseValidationService.validateChain,
     getThreadsOld.bind(this, models)
   );
   router.get(
@@ -1007,7 +1007,7 @@ function setupRouter(
   router.post(
     '/auth/magic',
     passport.authenticate('magic'), (req, res) => {
-      return res.json({ status: 'Success', result: req.user.toJSON() });
+    return res.json({ status: 'Success', result: req.user.toJSON() });
     }
   );
 

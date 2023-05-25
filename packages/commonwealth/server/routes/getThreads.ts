@@ -45,7 +45,6 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
     threads = await getThreadsWithCommentCount({
       threads: threads.map((th) => th.toJSON()),
       models,
-      chainId: chain?.id,
     });
   } catch (e) {
     console.log(e);
