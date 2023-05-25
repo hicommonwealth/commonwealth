@@ -68,9 +68,10 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
     }
 
     try {
-      const newlyVerifiedMagicAddress = await loginWithMagicLink(email, true);
-      setIsMagicLoading(false);
-      onVerified(newlyVerifiedMagicAddress);
+      // const newlyVerifiedMagicAddress = await loginWithMagicLink({ email });
+      // TODO: call revalidate session directly
+      // setIsMagicLoading(false);
+      // onVerified(newlyVerifiedMagicAddress);
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
@@ -130,6 +131,8 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
                 onWalletAddressSelect={onWalletAddressSelect}
                 onWalletSelect={onWalletSelect}
                 onConnectAnotherWay={() => setConnectWithEmail(true)}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onSocialLogin={() => null}
                 darkMode={false}
                 wallets={wallets}
                 hasNoWalletsLink={false}

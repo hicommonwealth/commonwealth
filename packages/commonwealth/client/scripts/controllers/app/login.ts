@@ -312,97 +312,152 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-export async function loginWithMagicLink(email: string, onlyRevalidateSession?: boolean) {
+async function constructMagic() {
   const { Magic } = await import('magic-sdk');
+  const { OAuthExtension } = await import('@magic-ext/oauth');
   const { CosmosExtension } = await import('@magic-ext/cosmos');
-
-  let chainAddress;
-  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: isCosmos
-      ? [
-          new CosmosExtension({
-            // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
-            // so we can't use app.chain.meta?.node?.url
-            rpcUrl: `${document.location.origin}/magicCosmosAPI/${app.chain.id}`
-          }),
-        ]
-      : null,
+  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: [
+      new OAuthExtension(),
+      new CosmosExtension({
+        // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
+        // so we can't use app.chain.meta?.node?.url
+        rpcUrl: `${document.location.origin}/magicCosmosAPI/${app.chain.id}`
+      }),
+    ]
   });
+}
 
-  // skip wallet.signCanvasMessage(), do the logic here instead
-  if (isCosmos) {
-    // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-    const bech32Prefix = app.chain.meta.bech32Prefix;
-    try {
-      chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
-    } catch (err) {
-      console.error(
-        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
-      );
-    }
+export async function loginWithMagicLink({
+  email, provider
+}: { email?: string, provider?: string }) {
+  if (!email && !provider) throw new Error('Must provider email or provider');
+  const magic = await constructMagic();
 
-    // Request the cosmos chain ID, since this is used by Magic to generate
-    // the signed message. The API is already used by the Magic iframe,
-    // but they don't expose the results.
-    const nodeInfo = await $.get(`${document.location.origin}/magicCosmosAPI/${app.chain.id}/node_info`);
-    const chainId = nodeInfo.node_info.network;
-
-    const timestamp = +new Date();
-    const signer = { signMessage: magic.cosmos.sign }
-    const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.CosmosSDK, signer, chainAddress, timestamp);
-    // TODO: provide blockhash as last argument to signSessionWithMagic
-    const signature = signed.signatures[0];
-    signature.chain_id = chainId;
-    await app.sessions.authSession(
-      ChainBase.CosmosSDK, // not app.chain.base, since we don't know where the user is logging in
-      chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
-      chainAddress,
-      sessionPayload,
-      JSON.stringify(signature),
-    );
-    if (onlyRevalidateSession) {
-      return chainAddress;
-    }
+  if (email) {
+    const bearer = await magic.auth.loginWithMagicLink({ email });
+    await handleSocialLoginCallback(bearer);
+    return "0x0"; // TODO
   } else {
-    const { Web3Provider } = await import('@ethersproject/providers');
-    const provider = new Web3Provider(magic.rpcProvider);
-    const signer = provider.getSigner();
-    const signerAddress = await signer.getAddress(); // should be the same as chainAddress
+    // provider-based login
+    const address = await magic.oauth.loginWithRedirect({
+      provider: provider as any,
+      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+    });
+    return "0x0"; // TODO
+  }
+}
 
-    const timestamp = +new Date();
-    const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp);
-    // TODO: provide blockhash as last argument to signSessionWithMagic
-    await app.sessions.authSession(
-      ChainBase.Ethereum, // not app.chain.base, since we don't know where the user is logging in
-      chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
-      signerAddress,
-      sessionPayload,
-      signed
-    );
-    if (onlyRevalidateSession) {
-      return signerAddress;
+// Cannot get proper type due to code splitting
+function getProfileMetadata({ provider, userInfo }): { username?: string, avatarUrl?: string } {
+  // provider: result.oauth.provider (twitter, discord, github)
+  if (provider === 'discord') {
+    // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
+    //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
+    const { avatar, id, username } = userInfo.sources['https://discord.com/api/users/@me'];
+    if (avatar) {
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
+      return { username, avatarUrl };
+    } else {
+      return { username };
     }
+  } else if (provider === 'github') {
+    // for github: result.oauth.userInfo.name / picture
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
+  } else if (provider === 'twitter') {
+    // for twitter: result.oauth.userInfo.name / profile
+    return { username: userInfo.name, avatarUrl: userInfo.profile };
+  } else if (provider === 'google') {
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
+  }
+  return {};
+}
+
+export async function handleSocialLoginCallback(bearer?: string) {
+  let profileMetadata: { username?: string, avatarUrl?: string } = {};
+  if (!bearer) {
+    const magic = await constructMagic();
+    const result = await magic.oauth.getRedirectResult();
+    profileMetadata = getProfileMetadata(result.oauth);
+    bearer = result.magic.idToken;
+    // console.log('Magic redirect result:', result);
   }
 
-  const didToken = await magic.auth.loginWithMagicLink({ email });
+  // // skip wallet.signCanvasMessage(), do the logic here instead
+  // if (isCosmos) {
+  //   // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
+  //   const bech32Prefix = app.chain.meta.bech32Prefix;
+  //   try {
+  //     chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
+  //   } catch (err) {
+  //     console.error(
+  //       `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+  //     );
+  //   }
+
+  //   // Request the cosmos chain ID, since this is used by Magic to generate
+  //   // the signed message. The API is already used by the Magic iframe,
+  //   // but they don't expose the results.
+  //   const nodeInfo = await $.get(`${document.location.origin}/magicCosmosAPI/${app.chain.id}/node_info`);
+  //   const chainId = nodeInfo.node_info.network;
+
+  //   const timestamp = +new Date();
+  //   const signer = { signMessage: magic.cosmos.sign }
+  //   const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.CosmosSDK, signer, chainAddress, timestamp);
+  //   // TODO: provide blockhash as last argument to signSessionWithMagic
+  //   const signature = signed.signatures[0];
+  //   signature.chain_id = chainId;
+  //   await app.sessions.authSession(
+  //     ChainBase.CosmosSDK, // not app.chain.base, since we don't know where the user is logging in
+  //     chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
+  //     chainAddress,
+  //     sessionPayload,
+  //     JSON.stringify(signature),
+  //   );
+  //   if (onlyRevalidateSession) {
+  //     return chainAddress;
+  //   }
+  // } else {
+  //   const { Web3Provider } = await import('@ethersproject/providers');
+  //   const provider = new Web3Provider(magic.rpcProvider);
+  //   const signer = provider.getSigner();
+  //   const signerAddress = await signer.getAddress(); // should be the same as chainAddress
+
+  //   const timestamp = +new Date();
+  //   const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, signerAddress, timestamp);
+  //   // TODO: provide blockhash as last argument to signSessionWithMagic
+  //   await app.sessions.authSession(
+  //     ChainBase.Ethereum, // not app.chain.base, since we don't know where the user is logging in
+  //     chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
+  //     signerAddress,
+  //     sessionPayload,
+  //     signed
+  //   );
+  //   if (onlyRevalidateSession) {
+  //     return signerAddress;
+  //   }
+  // }
+  //
+  // const didToken = await magic.auth.loginWithMagicLink({ email });
 
   // skip Account.validate(), proceed directly to server login
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
-      Authorization: `Bearer ${didToken}`,
+      Authorization: `Bearer ${bearer}`,
     },
     xhrFields: {
       withCredentials: true,
     },
     data: {
-      // send chain/community to request
       chain: app.activeChainId(),
+      jwt: app.user.jwt,
+      username: profileMetadata?.username,
+      avatarUrl: profileMetadata?.avatarUrl,
     },
   });
+
   if (response.status === 'Success') {
-    // log in as the new user (assume all verification done server-side)
     await initAppState(false);
     if (app.chain) {
       const c = app.user.selectedChain
@@ -410,8 +465,7 @@ export async function loginWithMagicLink(email: string, onlyRevalidateSession?: 
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
-    return chainAddress;
   } else {
-    throw new Error(`Magic auth unsuccessful: ${response.status}`);
+    throw new Error(`Social auth unsuccessful: ${response.status}`);
   }
 }

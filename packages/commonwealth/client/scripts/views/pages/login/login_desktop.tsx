@@ -34,6 +34,7 @@ export const LoginDesktop = ({
   onCreateNewAccount,
   onLinkExistingAccount,
   onEmailLogin,
+  onSocialLogin,
   onSaveProfileInfo,
   onPerformLinking,
   isMagicLoading,
@@ -43,6 +44,7 @@ export const LoginDesktop = ({
   onResetWalletConnect,
   onWalletSelect,
   onWalletAddressSelect,
+  onNavigateToWalletList,
 }: LoginProps) => {
   return (
     <div className="LoginDesktop">
@@ -57,7 +59,6 @@ export const LoginDesktop = ({
 
         {activeStep === 'walletList' && (
           <div className="inner-body-container centered">
-            <LoginBoilerplate />
             <CWWalletsList
               onConnectAnotherWay={onConnectAnotherWay}
               wallets={wallets}
@@ -65,7 +66,9 @@ export const LoginDesktop = ({
               onResetWalletConnect={onResetWalletConnect}
               onWalletSelect={onWalletSelect}
               onWalletAddressSelect={onWalletAddressSelect}
+              onSocialLogin={onSocialLogin}
             />
+            <LoginBoilerplate />
           </div>
         )}
 
@@ -97,37 +100,36 @@ export const LoginDesktop = ({
 
         {activeStep === 'connectWithEmail' && (
           <div className="inner-body-container">
-            <div className="header-container">
-              <CWText
-                type="h3"
-                fontWeight="semiBold"
-                className="header-text"
-                isCentered
-              >
-                Connect With Email?
-              </CWText>
-              <LoginBoilerplate />
-            </div>
             {!isMagicLoading ? (
-              <CWTextInput
-                autoFocus={true}
-                label="email address"
-                placeholder="your-email@email.com"
-                onInput={handleSetEmail}
-                onenterkey={onEmailLogin}
-              />
+              <div className="email-form-wrapper">
+                <CWTextInput
+                  autoFocus={true}
+                  label="Email address"
+                  placeholder="Email address"
+                  className="login-email-field"
+                  onInput={handleSetEmail}
+                  onenterkey={onEmailLogin}
+                />
+                <div className="buttons-row email-form-buttons">
+                  <CWButton
+                    label="Login with Magic"
+                    className="wallet-magic-btn"
+                    onClick={onEmailLogin}
+                  />
+                  <CWButton
+                    iconLeft="arrowLeft"
+                    label="Back to login options"
+                    buttonType="secondary-blue"
+                    className="wallet-back-btn"
+                    onClick={onNavigateToWalletList}
+                  />
+                </div>
+              </div>
             ) : (
               <CWSpinner />
             )}
-            <div className="buttons-row">
-              <CWButton
-                label="Back"
-                buttonType="secondary-blue"
-                onClick={() => {
-                  setActiveStep('walletList');
-                }}
-              />
-              <CWButton label="Connect" onClick={onEmailLogin} />
+            <div className="header-container">
+              <LoginBoilerplate />
             </div>
           </div>
         )}
@@ -180,6 +182,7 @@ export const LoginDesktop = ({
               onResetWalletConnect={onResetWalletConnect}
               onWalletAddressSelect={onWalletAddressSelect}
               onWalletSelect={onWalletSelect}
+              onSocialLogin={onSocialLogin}
             />
           </div>
         )}
@@ -206,6 +209,7 @@ export const LoginDesktop = ({
               onResetWalletConnect={onResetWalletConnect}
               onWalletAddressSelect={onWalletAddressSelect}
               onWalletSelect={onWalletSelect}
+              onSocialLogin={onSocialLogin}
             />
           </div>
         )}

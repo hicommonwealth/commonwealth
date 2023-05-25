@@ -25,10 +25,12 @@ describe('User Dashboard API', () => {
   const kind = 'discussion';
 
   let userJWT;
+  let userSession;
   let userId;
   let userAddress;
   let userAddressId;
   let userJWT2;
+  let userSession2;
   let userId2;
   let userAddress2;
   let userAddressId2;
@@ -46,6 +48,7 @@ describe('User Dashboard API', () => {
       { id: userId, email: firstUser.email },
       JWT_SECRET
     );
+    userSession = { session: firstUser.session, sign: firstUser.sign };
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
@@ -56,6 +59,7 @@ describe('User Dashboard API', () => {
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
     userJWT2 = jwt.sign({ id: userId2, email: secondUser.email }, JWT_SECRET);
+    userSession2 = { session: secondUser.session, sign: secondUser.sign };
     expect(userId2).to.not.be.null;
     expect(userAddress2).to.not.be.null;
     expect(userAddressId2).to.not.be.null;
@@ -88,7 +92,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName
+      topicName,
+      session: userSession.session,
+      sign: userSession.sign,
     }
     threadOne = await modelUtils.createThread(threadOneArgs);
     expect(threadOne.status).to.equal('Success');
@@ -102,7 +108,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName
+      topicName,
+      session: userSession2.session,
+      sign: userSession2.sign,
     }
     //
     // // create a thread in both 'ethereum' and 'alex' communities
@@ -196,7 +204,9 @@ describe('User Dashboard API', () => {
           body,
           readOnly: false,
           kind,
-          topicName
+          topicName,
+          session: userSession2.session,
+          sign: userSession2.sign,
         }
         const res = await modelUtils.createThread(threadArgs);
         expect(res.status).to.equal('Success');

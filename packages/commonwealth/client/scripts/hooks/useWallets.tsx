@@ -155,7 +155,29 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      const magicAddress = await loginWithMagicLink(email);
+      const magicAddress = await loginWithMagicLink({ email });
+      setIsMagicLoading(false);
+
+      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
+
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        walletProps.onModalClose();
+      } else {
+        walletProps.onModalClose();
+      }
+    } catch (e) {
+      notifyError("Couldn't send magic link");
+      setIsMagicLoading(false);
+      console.error(e);
+    }
+  };
+
+  // New callback for handling social login
+  const onSocialLogin = async (provider: string) => {
+    setIsMagicLoading(true);
+
+    try {
+      const magicAddress = await loginWithMagicLink({ provider });
       setIsMagicLoading(false);
 
       if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
@@ -599,6 +621,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     onResetWalletConnect,
     onPerformLinking,
     onEmailLogin,
+    onSocialLogin,
     onLinkExistingAccount,
     setAvatarUrl,
     setEmail,
