@@ -229,6 +229,5 @@ export const ethChainRows = (
       state.setNodeUrl('');
       state.setAltWalletUrl('');
     }
-    state.setLoaded(false);
   }
 };
