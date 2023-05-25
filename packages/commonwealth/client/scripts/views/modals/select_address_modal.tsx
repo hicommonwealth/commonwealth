@@ -1,24 +1,24 @@
-import React from 'react';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { formatAsTitleCase, isSameAccount } from 'helpers';
 
 import $ from 'jquery';
 
 import 'modals/select_address_modal.scss';
+import React from 'react';
 
 import app from 'state';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { isSameAccount, formatAsTitleCase } from 'helpers';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setActiveAccount } from 'controllers/app/login';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { formatAddressShort } from '../../../../shared/utils';
 import Account from '../../models/Account';
 import RoleInfo from '../../models/RoleInfo';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
-import { UserBlock } from '../components/user/user_block';
 import { getClasses } from '../components/component_kit/helpers';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { openConfirmation } from 'views/modals/confirmation_modal';
+import { UserBlock } from '../components/user/user_block';
 
 type SelectAddressModalProps = {
   onModalClose: () => void;
@@ -44,30 +44,24 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
       (a) => a.address === account.address && a.chain.id === account.chain.id
     );
 
-    app.roles
-      .createRole({
-        address: addressInfo,
-        chain: app.activeChainId(),
-      })
-      .then(() => {
-        setIsLoading(false);
-        setSelectedIndex(null);
-        // select the address, and close the form
-        notifySuccess(
-          `Joined with ${formatAddressShort(
-            addressInfo.address,
-            addressInfo.chain.id,
-            true
-          )}`
-        );
-        setActiveAccount(account).then(() => {
-          $(e.target).trigger('modalexit');
-        });
-      })
-      .catch((err: any) => {
-        setIsLoading(false);
-        notifyError(err.responseJSON.error);
+    try {
+      setIsLoading(false);
+      setSelectedIndex(null);
+      // select the address, and close the form
+      notifySuccess(
+        `Joined with ${formatAddressShort(
+          addressInfo.address,
+          addressInfo.chain.id,
+          true
+        )}`
+      );
+      setActiveAccount(account).then(() => {
+        $(e.target).trigger('modalexit');
       });
+    } catch (err) {
+      setIsLoading(false);
+      notifyError(err.responseJSON.error);
+    }
   };
 
   const deleteRole = async (index) => {

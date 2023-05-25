@@ -200,18 +200,6 @@ export const LoginSelector = () => {
             account.setValidationToken(verification_token);
             console.log('setting validation token');
           }
-          if (
-            activeChainId &&
-            !app.roles.getRoleInCommunity({
-              account,
-              chain: activeChainId,
-            })
-          ) {
-            await app.roles.createRole({
-              address: _.omit(addressInfo, 'chain'),
-              chain: activeChainId,
-            });
-          }
           await setActiveAccount(account);
           if (
             app.user.activeAccounts.filter((a) => isSameAccount(a, account))

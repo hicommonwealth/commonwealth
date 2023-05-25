@@ -64,7 +64,6 @@ import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
 
-import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
 import setDefaultRole from '../routes/setDefaultRole';
 
@@ -691,13 +690,6 @@ function setupRouter(
     getWebhooks.bind(this, models)
   );
 
-  // roles
-  router.post(
-    '/createRole',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createRole.bind(this, models)
-  );
   router.post(
     '/deleteRole',
     passport.authenticate('jwt', { session: false }),
@@ -1004,12 +996,9 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post(
-    '/auth/magic',
-    passport.authenticate('magic'), (req, res) => {
-      return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
-  );
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
+    return res.json({ status: 'Success', result: req.user.toJSON() });
+  });
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(

@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import type { CommunityRoleAttributes } from '../../../server/models/community_role';
-import { getHighestRoleFromCommunityRoles } from '../../../server/util/roles';
+import { getHighestRoleFromAddresses } from '../../../server/util/roles';
 
 describe('getHighestRoleFromCommunityRoles() unit tests', () => {
   it('should return highest role', async () => {
@@ -24,7 +24,7 @@ describe('getHighestRoleFromCommunityRoles() unit tests', () => {
         deny: BigInt(0),
       },
     ];
-    const role = await getHighestRoleFromCommunityRoles(roles);
+    const role = await getHighestRoleFromAddresses(roles);
     assert.equal(role.name, 'admin');
   });
 });

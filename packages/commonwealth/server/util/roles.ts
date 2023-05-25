@@ -1,19 +1,20 @@
-import type { Transaction, FindOptions } from 'sequelize';
+import type { FindOptions, Transaction } from 'sequelize';
 import { Op } from 'sequelize';
-import { aggregatePermissions } from '../../shared/utils';
+import CommunityRole from '../../client/scripts/models/CommunityRole';
 import type { Action } from '../../shared/permissions';
 import {
-  PermissionManager,
-  PermissionError,
-  ToCheck,
   everyonePermissions,
+  PermissionError,
+  PermissionManager,
+  ToCheck,
 } from '../../shared/permissions';
+import type { RoleObject } from '../../shared/types';
+import { aggregatePermissions } from '../../shared/utils';
 import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
 import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Permission } from '../models/role';
 import type { RoleAssignmentAttributes } from '../models/role_assignment';
-import type { AddressInstance } from '../models/address';
-import type { RoleObject } from '../../shared/types';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;
@@ -66,56 +67,73 @@ export async function getHighestRoleFromCommunityRoles(
   }
 }
 
+function convertToAddressQuery(findOptions: FindOptions) {
+  if (findOptions.where['address_id']) {
+    findOptions.where['id'] = findOptions.where['address_id'];
+    delete findOptions.where['address_id'];
+  }
+
+  return findOptions;
+}
+
 // Server side helpers
 export async function findAllCommunityRolesWithRoleAssignments(
   models: DB,
-  findOptions: FindOptions<RoleAssignmentAttributes>,
+  findOptions: FindOptions<AddressInstance | { address_id: number }>,
   chain_id?: string,
   permissions?: Permission[]
 ): Promise<CommunityRoleAttributes[]> {
   let roleFindOptions: any;
-  const whereCondition = {};
-  if (chain_id) {
-    whereCondition['chain_id'] = chain_id;
-  }
   if (permissions) {
     roleFindOptions = {
       where: {
-        [Op.and]: [
-          { chain_id },
-          {
-            name: {
-              [Op.or]: permissions,
-            },
-          },
-        ],
+        chain: chain_id,
+        role: { [Op.in]: permissions },
       },
-      include: [
-        {
-          model: models.RoleAssignment,
-          ...findOptions,
-        },
-      ],
     };
   } else {
     roleFindOptions = {
-      where: whereCondition,
-      include: [
-        {
-          model: models.RoleAssignment,
-          ...findOptions,
-        },
-      ],
+      where: chain_id,
     };
   }
 
-  const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
-  return communityRoles.map((communityRole) => communityRole.toJSON());
+  // if where exists, replace address_id with id, append it to our where
+  if (findOptions.where) {
+    findOptions = convertToAddressQuery(findOptions);
+    roleFindOptions.where = { ...roleFindOptions.where, ...findOptions.where };
+  }
+
+  // we need to take care of includes, if it includes models.Address, we need to remove this from the query
+  // but keep the where portion and merge it in with our where portion
+  let addressInclude;
+  if (Array.isArray(findOptions.include)) {
+    // if address is included in list of includes, add it to query
+    addressInclude = findOptions.include.find(
+      (i) => i['model'] === models.Address
+    );
+  } else if (findOptions.include['model'] === models.Address) {
+    // if address is included as only include, add it to query
+    addressInclude = findOptions.include;
+  }
+
+  if (addressInclude) {
+    roleFindOptions.where = { ...addressInclude.where, ...findOptions.where };
+    addressInclude = null; // remove it from the include query
+  }
+
+  roleFindOptions.include = findOptions.include;
+  roleFindOptions.attributes = findOptions.attributes;
+
+  const addresses = await models.Address.findAll(roleFindOptions);
+  return addresses.map(
+    (a) =>
+      new CommunityRole(a.id, a.role, a.chain, 0, 0, a.created_at, a.updated_at)
+  );
 }
 
 export async function findAllRoles(
   models: DB,
-  findOptions: FindOptions<RoleAssignmentAttributes>,
+  findOptions: FindOptions<AddressInstance | { address_id: number }>,
   chain_id?: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission[]> {
@@ -186,35 +204,6 @@ export async function findOneRole(
     );
   }
   return role;
-}
-
-export async function createDefaultCommunityRoles(
-  models: DB,
-  chain_id: string
-): Promise<void> {
-  // Create default roles
-  try {
-    await models.CommunityRole.create({
-      chain_id,
-      name: 'member',
-      allow: BigInt(0),
-      deny: BigInt(0),
-    });
-    await models.CommunityRole.create({
-      chain_id,
-      name: 'moderator',
-      allow: BigInt(0),
-      deny: BigInt(0),
-    });
-    await models.CommunityRole.create({
-      chain_id,
-      name: 'admin',
-      allow: BigInt(0),
-      deny: BigInt(0),
-    });
-  } catch (error) {
-    throw new Error(`Couldn't create default community roles ${error}`);
-  }
 }
 
 export async function createRole(
@@ -360,13 +349,7 @@ export async function getActiveAddress(
   }
   /* check if any of the addresses has a role assignment that is_user_default is true
   and if true return that address instance */
-  const activeAddress = addressInstances.find((a) => {
-    if (a.RoleAssignments && a.RoleAssignments.length > 0) {
-      if (a.RoleAssignments.some((r) => r.is_user_default)) return a;
-    }
-    return undefined;
-  });
-  return activeAddress;
+  return addressInstances.find((a) => a.is_user_default);
 }
 
 export async function isAnyonePermitted(

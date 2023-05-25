@@ -1,5 +1,7 @@
 import { Permission } from 'server/models/role';
 
+// DEPRECATED. This class is currently obtained by getting Address information.
+// If you can, just query for address instead.
 class CommunityRole {
   public readonly id: number;
   public readonly name: Permission;
@@ -9,7 +11,7 @@ class CommunityRole {
   public readonly createdAt: moment.Moment;
   public readonly updatedAt: moment.Moment;
 
-  constructor({ id, name, chain_id, allow, deny, createdAt, updatedAt }) {
+  constructor(id, name, chain_id, allow, deny, createdAt, updatedAt) {
     this.id = id;
     this.name = name;
     this.chain_id = chain_id;
@@ -28,15 +30,15 @@ class CommunityRole {
     createdAt,
     updatedAt,
   }) {
-    return new CommunityRole({
+    return new CommunityRole(
       id,
       name,
       chain_id,
       allow,
       deny,
       createdAt,
-      updatedAt,
-    });
+      updatedAt
+    );
   }
 }
 

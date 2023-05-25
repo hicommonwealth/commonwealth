@@ -21,10 +21,8 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-// import { mixpanelTrack } from '../util/mixpanelUtil';
 
 import type { RoleInstanceWithPermission } from '../util/roles';
-import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
@@ -348,8 +346,6 @@ const createChain = async (
     has_homepage: true,
   });
 
-  await createDefaultCommunityRoles(models, chain.id);
-
   if (req.body.address) {
     const erc20Abi = await models.ContractAbi.findOne({
       where: {
@@ -453,14 +449,6 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    role = await createRole(
-      models,
-      addressToBeAdmin.id,
-      chain.id,
-      'admin',
-      true
-    );
-
     await models.Subscription.findOrCreate({
       where: {
         subscriber_id: req.user.id,
