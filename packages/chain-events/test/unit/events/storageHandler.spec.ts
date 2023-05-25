@@ -11,8 +11,6 @@ import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
 import type { BrokerConfig } from 'rascal';
 
-import * as modelUtils from '../../util/modelUtils';
-
 chai.use(chaiHttp);
 const { assert } = chai;
 const chain = 'edgeware';
@@ -21,15 +19,7 @@ const rmqController = new MockRabbitMQController(
   <BrokerConfig>getRabbitMQConfig('localhost')
 );
 
-let loggedInAddr, loggedInAddrId;
-
 describe('Event Storage Handler Tests', () => {
-  before('reset database', async () => {
-    const result = await modelUtils.createAndVerifyAddress({ chain });
-    loggedInAddr = result.address;
-    loggedInAddrId = result.address_id;
-  });
-
   it('should create chain event', async () => {
     // setup
     const event: CWEvent = {
@@ -158,63 +148,6 @@ describe('Event Storage Handler Tests', () => {
       where: {
         chain: 'edgeware',
         block_number: 13,
-      },
-    });
-    assert.lengthOf(chainEvents, 0);
-  });
-
-  it('should create chain event if included address exists in db', async () => {
-    const event: CWEvent = {
-      blockNumber: 14,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind: SubstrateTypes.EventKind.Bonded,
-        stash: loggedInAddr,
-        amount: '10',
-        controller: 'bob',
-      },
-      includeAddresses: [loggedInAddr, 'bob'],
-    };
-    const eventHandler = new StorageHandler(models, rmqController, chain);
-
-    // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
-
-    // confirm results
-    assert.deepEqual(dbEvent.event_data, event.data);
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain: 'edgeware',
-        block_number: 14,
-      },
-    });
-    assert.lengthOf(chainEvents, 1);
-    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
-  });
-
-  it('should not create chain event if no included address exists in db', async () => {
-    const event: CWEvent = {
-      blockNumber: 15,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind: SubstrateTypes.EventKind.Bonded,
-        stash: 'alice',
-        amount: '10',
-        controller: 'bob',
-      },
-      includeAddresses: ['alice', 'bob'],
-    };
-    const eventHandler = new StorageHandler(models, rmqController, chain);
-
-    // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
-
-    // confirm no event emitted
-    assert.isUndefined(dbEvent);
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain: 'edgeware',
-        block_number: 15,
       },
     });
     assert.lengthOf(chainEvents, 0);

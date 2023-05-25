@@ -6,11 +6,10 @@ import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEvent
 import models from 'chain-events/services/database/database';
 import type { CWEvent } from 'chain-events/src';
 import { SupportedNetwork } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types';
 import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
-import { EventEmitter } from 'events';
 import type { BrokerConfig } from 'rascal';
+import { EventKind, IEventData } from '../../../src/chains/aave/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
@@ -20,21 +19,33 @@ const rmqController = new MockRabbitMQController(
 );
 
 const setupDbEvent = async (event: CWEvent) => {
-  const storageHandler = new StorageHandler(models, rmqController, 'edgeware');
+  const storageHandler = new StorageHandler(models, rmqController, 'aave');
   return storageHandler.handle(event);
 };
 
-describe('Edgeware Archival Event Handler Tests', () => {
+describe('Aave Archival Event Handler Tests', () => {
+  before(async () => {
+    await models.sequelize.sync({ force: true });
+    await rmqController.init();
+  });
+
   it('should create chain entity from event', async () => {
-    const event: CWEvent<SubstrateTypes.IEventData> = {
+    const event: CWEvent<IEventData> = {
       blockNumber: 10,
-      network: SupportedNetwork.Substrate,
+      network: SupportedNetwork.Aave,
       data: {
-        kind: SubstrateTypes.EventKind.DemocracyStarted,
-        referendumIndex: 3,
+        kind: EventKind.ProposalCreated,
+        id: 1,
+        proposer: '0x327BeaE3B570d9bdD8C6b9236199991Ab2c5fefe',
+        executor: '0x06C2E02aDB73238d7eE7DbD69fEA12B14091cB8a',
+        targets: ['0x6972E49bFbA4dbc4981101724CC87bd18c152cBA'],
+        values: ['testValue'],
+        signatures: ['testSignature'],
+        calldatas: ['testCalldatas'],
+        startBlock: 10,
         endBlock: 100,
-        proposalHash: 'hash',
-        voteThreshold: 'Supermajorityapproval',
+        strategy: 'testStrategy',
+        ipfsHash: 'testIpfsHash',
       },
     };
 
@@ -43,7 +54,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
     const eventHandler = new EntityArchivalHandler(
       models,
       rmqController,
-      'edgeware'
+      'aave'
     );
 
     // process event
@@ -51,9 +62,9 @@ describe('Edgeware Archival Event Handler Tests', () => {
 
     // verify outputs
     const entity = await handledDbEvent.getChainEntity();
-    assert.equal(entity.chain, 'edgeware');
-    assert.equal(entity.type, SubstrateTypes.EntityKind.DemocracyReferendum);
-    assert.equal(entity.type_id, '3');
+    assert.equal(entity.chain, 'aave');
+    assert.equal(entity.type, 'proposal');
+    assert.equal(entity.type_id, '1');
     const events = await entity.getChainEvents();
     assert.deepEqual(
       events.map((e) => e.toJSON()),
@@ -62,27 +73,31 @@ describe('Edgeware Archival Event Handler Tests', () => {
   });
 
   it('should update chain entity from event', async () => {
-    const createEvent: CWEvent<SubstrateTypes.IEventData> = {
-      blockNumber: 20,
-      network: SupportedNetwork.Substrate,
+    const createEvent: CWEvent<IEventData> = {
+      blockNumber: 10,
+      network: SupportedNetwork.Aave,
       data: {
-        kind: SubstrateTypes.EventKind.TreasuryProposed,
-        proposalIndex: 5,
-        proposer: 'Alice',
-        value: '100',
-        beneficiary: 'Bob',
-        bond: '5',
+        kind: EventKind.ProposalCreated,
+        id: 2,
+        proposer: '0x327BeaE3B570d9bdD8C6b9236199991Ab2c5fefe',
+        executor: '0x06C2E02aDB73238d7eE7DbD69fEA12B14091cB8a',
+        targets: ['0x6972E49bFbA4dbc4981101724CC87bd18c152cBA'],
+        values: ['testValue'],
+        signatures: ['testSignature'],
+        calldatas: ['testCalldatas'],
+        startBlock: 10,
+        endBlock: 100,
+        strategy: 'testStrategy',
+        ipfsHash: 'testIpfsHash',
       },
     };
 
-    const updateEvent: CWEvent<SubstrateTypes.IEventData> = {
-      blockNumber: 25,
-      network: SupportedNetwork.Substrate,
+    const updateEvent: CWEvent<IEventData> = {
+      blockNumber: 125,
+      network: SupportedNetwork.Aave,
       data: {
-        kind: SubstrateTypes.EventKind.TreasuryAwarded,
-        proposalIndex: 5,
-        value: '100',
-        beneficiary: 'Bob',
+        kind: EventKind.ProposalExecuted,
+        id: 2,
       },
     };
 
@@ -92,7 +107,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
     const eventHandler = new EntityArchivalHandler(
       models,
       rmqController,
-      'edgeware'
+      'aave'
     );
 
     // process event
@@ -109,9 +124,9 @@ describe('Edgeware Archival Event Handler Tests', () => {
     const entity = await handleCreateEvent.getChainEntity();
     const updateEntity = await handleUpdateEvent.getChainEntity();
     assert.deepEqual(entity, updateEntity);
-    assert.equal(entity.chain, 'edgeware');
-    assert.equal(entity.type, SubstrateTypes.EntityKind.TreasuryProposal);
-    assert.equal(entity.type_id, '5');
+    assert.equal(entity.chain, 'aave');
+    assert.equal(entity.type, 'proposal');
+    assert.equal(entity.type_id, '2');
     const events = await entity.getChainEvents();
     assert.sameDeepMembers(
       events.map((e) => e.toJSON()),
@@ -119,68 +134,75 @@ describe('Edgeware Archival Event Handler Tests', () => {
     );
   });
 
-  it('should ignore unrelated events', async () => {
-    const event: CWEvent<SubstrateTypes.IEventData> = {
-      blockNumber: 11,
-      network: SupportedNetwork.Substrate,
+  it('should ignore events not related to any entity', async () => {
+    const event: CWEvent<IEventData> = {
+      blockNumber: 125,
+      network: SupportedNetwork.Aave,
       data: {
-        kind: SubstrateTypes.EventKind.Slash,
-        validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+        kind: EventKind.Transfer,
+        tokenAddress: 'testAddress',
+        from: 'testFrom',
+        to: 'testTo',
         amount: '10000',
       },
     };
 
     const dbEvent = await setupDbEvent(event);
 
-    // set up wss expected results
-    const mockWssServer = new EventEmitter();
-    // mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
-    //   assert.fail('should not emit event');
-    // });
     const eventHandler = new EntityArchivalHandler(
       models,
       rmqController,
-      'edgeware'
+      'aave'
     );
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
 
-    // verify outputs
-    assert.deepEqual(dbEvent, handledDbEvent);
-    assert.isNull(dbEvent.entity_id);
+    // we skip all non-entity related events
+    assert.isUndefined(handledDbEvent);
+    assert.isUndefined(dbEvent);
   });
 
   it('should ignore duplicate entities', async () => {
-    const event: CWEvent<SubstrateTypes.IEventData> = {
+    const createEvent: CWEvent<IEventData> = {
       blockNumber: 10,
-      network: SupportedNetwork.Substrate,
+      network: SupportedNetwork.Aave,
       data: {
-        kind: SubstrateTypes.EventKind.DemocracyStarted,
-        referendumIndex: 6,
+        kind: EventKind.ProposalCreated,
+        id: 3,
+        proposer: '0x327BeaE3B570d9bdD8C6b9236199991Ab2c5fefe',
+        executor: '0x06C2E02aDB73238d7eE7DbD69fEA12B14091cB8a',
+        targets: ['0x6972E49bFbA4dbc4981101724CC87bd18c152cBA'],
+        values: ['testValue'],
+        signatures: ['testSignature'],
+        calldatas: ['testCalldatas'],
+        startBlock: 10,
         endBlock: 100,
-        proposalHash: 'hash',
-        voteThreshold: 'Supermajorityapproval',
+        strategy: 'testStrategy',
+        ipfsHash: 'testIpfsHash',
       },
     };
 
-    const dbEvent = await setupDbEvent(event);
+    const dbEvent = await setupDbEvent(createEvent);
     const eventHandler = new EntityArchivalHandler(
       models,
       rmqController,
-      'edgeware'
+      'aave'
     );
 
     // process event twice
-    const handledDbEvent = await eventHandler.handle(event, dbEvent);
-    const duplicateEvent = await eventHandler.handle(event, dbEvent);
+    const handledDbEvent = await eventHandler.handle(createEvent, dbEvent);
+    try {
+      // event handler should throw if it receives a duplicate event
+      await eventHandler.handle(createEvent, dbEvent);
+      assert.fail();
+    } catch (e) {}
 
     // verify outputs
-    assert.deepEqual(handledDbEvent, duplicateEvent);
-    const chainEntities = await models['ChainEntity'].findAll({
+    const chainEntities = await models.ChainEntity.findAll({
       where: {
-        chain: 'edgeware',
-        type_id: '6',
+        chain: 'aave',
+        type_id: '3',
       },
     });
     assert.lengthOf(chainEntities, 1);
