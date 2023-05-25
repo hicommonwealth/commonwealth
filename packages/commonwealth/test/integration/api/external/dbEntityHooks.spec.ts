@@ -205,6 +205,7 @@ beforeEach(async () => {
               chain: 'cmntest',
               topic_id: -1,
               kind: 'discussion',
+              read_only: false,
             },
           })
         )[0]

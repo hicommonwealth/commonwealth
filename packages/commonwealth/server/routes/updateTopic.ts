@@ -4,7 +4,7 @@ import type { NextFunction, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
 
-enum UpdateTopicErrors {
+export enum UpdateTopicErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
   NoAddr = 'Must provide address',
