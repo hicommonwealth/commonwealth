@@ -4,7 +4,6 @@ import type { AddressModelStatic } from './models/address';
 import type { AttachmentModelStatic } from './models/attachment';
 import type { BanModelStatic } from './models/ban';
 import type { ChainModelStatic } from './models/chain';
-import type { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
 import type { ChainNodeModelStatic } from './models/chain_node';
 import type { ChatChannelModelStatic } from './models/chat_channel';
 import type { ChatMessageModelStatic } from './models/chat_message';
@@ -49,7 +48,6 @@ export type Models = {
   Address: AddressModelStatic;
   Ban: BanModelStatic;
   Chain: ChainModelStatic;
-  ChainEntityMeta: ChainEntityMetaModelStatic;
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;

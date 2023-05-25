@@ -80,8 +80,6 @@ import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
-import fetchEntityTitle from '../routes/fetchEntityTitle';
-import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import deleteThread from '../routes/deleteThread';
 import addEditors from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
@@ -130,7 +128,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
-import getEntityMeta from '../routes/getEntityMeta';
 import { getTokensFromLists } from '../routes/getTokensFromLists';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
@@ -376,8 +373,6 @@ function setupRouter(
     viewVotes.bind(this, models)
   );
 
-  router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
-
   router.post(
     '/contractAbi',
     passport.authenticate('jwt', { session: false }),
@@ -444,12 +439,6 @@ function setupRouter(
     deleteCommunityContractTemplateMetadata.bind(this, models)
   );
 
-  router.post(
-    '/updateChainEntityTitle',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateChainEntityTitle.bind(this, models)
-  );
   router.post(
     '/addEditors',
     passport.authenticate('jwt', { session: false }),
@@ -1004,12 +993,9 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post(
-    '/auth/magic',
-    passport.authenticate('magic'), (req, res) => {
-      return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
-  );
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
+    return res.json({ status: 'Success', result: req.user.toJSON() });
+  });
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
@@ -1026,8 +1012,6 @@ function setupRouter(
 
   // logout
   router.get('/logout', logout.bind(this, models));
-
-  router.get('/getEntityMeta', getEntityMeta.bind(this, models));
 
   // snapshotAPI
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
