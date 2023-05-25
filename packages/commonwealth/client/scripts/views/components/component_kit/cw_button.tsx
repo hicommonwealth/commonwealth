@@ -9,29 +9,46 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-type ButtonType =
-  | 'primary-red'
-  | 'primary-blue'
-  | 'primary-black'
-  | 'secondary-red'
-  | 'secondary-blue'
-  | 'secondary-black'
-  | 'tertiary-blue'
-  | 'tertiary-black'
-  | 'lg-primary-red'
-  | 'lg-primary-blue'
-  | 'lg-secondary-red'
-  | 'lg-secondary-blue'
-  | 'lg-tertiary-red'
-  | 'lg-tertiary-blue'
-  | 'primary-blue-dark'
-  | 'secondary-blue-dark'
-  | 'mini-black'
-  | 'mini-white'
-  | 'mini-red';
+// type ButtonType =
+//   | 'primary-red'
+//   | 'primary-blue'
+//   | 'primary-black'
+//   | 'secondary-red'
+//   | 'secondary-blue'
+//   | 'secondary-black'
+//   | 'tertiary-blue'
+//   | 'tertiary-black'
+//   | 'lg-primary-red'
+//   | 'lg-primary-blue'
+//   | 'lg-secondary-red'
+//   | 'lg-secondary-blue'
+//   | 'lg-tertiary-red'
+//   | 'lg-tertiary-blue'
+//   | 'primary-blue-dark'
+//   | 'secondary-blue-dark'
+//   | 'mini-black'
+//   | 'mini-white'
+//   | 'mini-red';
+
+  type ButtonType =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'destructive';
+
+type ButtonHeight =
+  | 'lg'
+  | 'med'
+  | 'sm';
+
+type ButtonWidth =
+  | 'narrow'
+  | 'wide';
 
 type ButtonStyleProps = {
   buttonType?: ButtonType;
+  buttonHeight?: ButtonHeight;
+  buttonWidth?: ButtonWidth;
 } & BaseStyleProps;
 
 export type ButtonProps = {
@@ -53,7 +70,9 @@ const getTextType = (buttonType: ButtonType) => {
 
 export const CWButton = (props: ButtonProps) => {
   const {
-    buttonType = 'primary-blue',
+    buttonType = 'primary',
+    buttonHeight = 'med',
+    buttonWidth = 'narrow',
     className,
     disabled = false,
     iconLeft,
@@ -64,28 +83,32 @@ export const CWButton = (props: ButtonProps) => {
   } = props;
 
   return (
-    <button
-      className={getClasses<ButtonStyleProps>(
-        {
-          disabled,
-          buttonType,
-          className,
-        },
-        ComponentType.Button
-      )}
-      onClick={onClick}
-      disabled={disabled}
-      {...otherProps}
-    >
-      {!!iconLeft && (
-        <CWIcon iconName={iconLeft} iconSize="small" className="button-icon" />
-      )}
-      <CWText type={getTextType(buttonType)} className="button-text" noWrap>
-        {label}
-      </CWText>
-      {!!iconRight && (
-        <CWIcon iconName={iconRight} iconSize="small" className="button-icon" />
-      )}
-    </button>
+    <div className={`btn-border ${buttonType}`}>
+      <button
+        className={getClasses<ButtonStyleProps>(
+          {
+            disabled,
+            buttonType,
+            buttonHeight,
+            buttonWidth,
+            className,
+          },
+          ComponentType.Button
+        )}
+        onClick={onClick}
+        disabled={disabled}
+        {...otherProps}
+      >
+        {!!iconLeft && (
+          <CWIcon iconName={iconLeft} className="button-icon" />
+        )}
+        <CWText type={getTextType(buttonType)} className="button-text" noWrap>
+          {label}
+        </CWText>
+        {!!iconRight && (
+          <CWIcon iconName={iconRight} className="button-icon" />
+        )}
+      </button>
+    </div>
   );
 };
