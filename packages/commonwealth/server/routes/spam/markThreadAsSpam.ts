@@ -3,11 +3,13 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../../models';
 import { Op, Sequelize } from 'sequelize';
 import { success } from '../../types';
+import { findAllRoles } from '../../util/roles';
 
 export const Errors = {
   InvalidThreadId: 'Thread ID invalid',
   NotLoggedIn: 'Not logged in',
   ThreadNotFound: 'Could not find Thread',
+  NotAdmin: 'Not an admin',
 };
 
 export default async (
@@ -25,27 +27,43 @@ export default async (
     return next(new AppError(Errors.NotLoggedIn));
   }
 
-  const userAddressIds = (await req.user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-
-  const [affectedCount] = await models.Thread.update(
-    {
-      marked_as_spam_at: Sequelize.literal('CURRENT_TIMESTAMP'),
+  const thread = await models.Thread.findOne({
+    where: {
+      id: threadId,
     },
-    {
-      where: {
-        id: threadId,
-        address_id: {
-          [Op.in]: userAddressIds,
-        },
-      },
-    }
-  );
-
-  if (affectedCount === 0) {
+  });
+  if (!thread) {
     return next(new AppError(Errors.ThreadNotFound));
   }
+  const userOwnedAddressIds = (await req.user.getAddresses())
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  if (!userOwnedAddressIds.includes(thread.address_id)) {
+    // is not author
+    const roles = await findAllRoles(
+      models,
+      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+      thread.chain,
+      ['admin', 'moderator']
+    );
+    const role = roles.find((r) => {
+      return r.chain_id === thread.chain;
+    });
+    if (!role) {
+      return next(new AppError(Errors.NotAdmin));
+    }
+  }
 
-  return success(res, {});
+  await thread.update({
+    marked_as_spam_at: Sequelize.literal('CURRENT_TIMESTAMP'),
+  });
+
+  // get thread with updated timestamp
+  const updatedThread = await models.Thread.findOne({
+    where: {
+      id: thread.id,
+    },
+  });
+
+  return success(res, updatedThread);
 };
