@@ -1004,9 +1004,12 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
-    return res.json({ status: 'Success', result: req.user.toJSON() });
-  });
+  router.post(
+    '/auth/magic',
+    passport.authenticate('magic'), (req, res) => {
+      return res.json({ status: 'Success', result: req.user.toJSON() });
+    }
+  );
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(

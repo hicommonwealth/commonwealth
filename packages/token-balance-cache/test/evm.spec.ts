@@ -39,6 +39,6 @@ describe('EVM Token BP unit tests', () => {
         await nft.mint('137', 0);
         const token = nft.address;
         const balance = await tbc.getBalancesForAddresses(1, [accounts[0]], 'eth-token', {contractType: 'erc721', tokenAddress: token});
-        assert.equal(balance.balances[accounts[0]], 10e18.toString());
+        assert.equal(balance.balances[accounts[0]], "1");
       });
 });

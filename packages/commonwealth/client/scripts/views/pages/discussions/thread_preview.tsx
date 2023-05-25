@@ -22,8 +22,8 @@ import {
   getClasses,
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { ThreadPreviewReactionButtonBig } from '../../components/reaction_button/ThreadPreviewReactionButtonBig';
-import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
+import { ThreadPreviewReactionButtonBig } from '../../components/ReactionButton/ThreadPreviewReactionButtonBig';
+import { ThreadReactionPreviewButtonSmall } from '../../components/ReactionButton/ThreadPreviewReactionButtonSmall';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import {
@@ -32,6 +32,7 @@ import {
   getThreadSubScriptionMenuItem,
   isHot,
 } from './helpers';
+import { NewThreadTag } from './NewThreadTag';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -160,6 +161,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
+              <NewThreadTag threadCreatedAt={thread.createdAt}/>
               {isLocked && <CWIcon iconName="lock" iconSize="small" />}
             </div>
             <div className="top-row-icons">

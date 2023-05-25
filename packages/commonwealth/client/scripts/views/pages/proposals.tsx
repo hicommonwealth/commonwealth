@@ -14,13 +14,13 @@ import 'pages/proposals.scss';
 
 import app from 'state';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { ProposalCard } from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/ProposalCard';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
-import { getStatusText } from '../components/proposal_card/helpers';
+import { getStatusText } from '../components/ProposalCard/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import {
   CompoundProposalStats,

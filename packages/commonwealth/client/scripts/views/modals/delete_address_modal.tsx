@@ -73,7 +73,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
           Address will be removed from the following linked profile.
         </CWText>
         <div className="profile">
-          {profile.avatarUrl ? (
+          {profile?.avatarUrl ? (
             <img src={profile.avatarUrl} />
           ) : (
             <img

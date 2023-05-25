@@ -11,7 +11,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
-import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
+import { CommentReactionButton } from '../ReactionButton/CommentReactionButton';
 import { SharePopover } from '../share_popover';
 import { EditComment } from './EditComment';
 import { clearEditingLocalStorage } from './helpers';
