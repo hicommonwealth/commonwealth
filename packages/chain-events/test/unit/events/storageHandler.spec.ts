@@ -6,7 +6,6 @@ import models from 'chain-events/services/database/database';
 
 import type { CWEvent } from 'chain-events/src';
 import { SupportedNetwork } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types';
 import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
 import type { BrokerConfig } from 'rascal';
