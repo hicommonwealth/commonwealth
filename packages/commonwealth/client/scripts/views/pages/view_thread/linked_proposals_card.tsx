@@ -32,17 +32,11 @@ type LinkedProposalProps = {
   ceCompleted?: ChainEntity['completed'];
 };
 
-const LinkedProposal = ({
-  thread,
-  title,
-  ceType,
-  ceTypeId,
-  ceCompleted,
-}: LinkedProposalProps) => {
+const BuildProposalLink = (ceType: IChainEntityKind, ceTypeId: string, chain: string, title: string, ceCompleted: boolean) => {
   const slug = chainEntityTypeToProposalSlug(ceType);
 
   const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
+    app.isCustomDomain() ? '' : `/${chain}`
   }${getProposalUrlPath(slug, ceTypeId, true)}`;
 
   return (
@@ -52,6 +46,24 @@ const LinkedProposal = ({
       }`}
     </a>
   );
+}
+
+const LinkedProposal = ({
+  thread,
+  title,
+  ceType,
+  ceTypeId,
+  ceCompleted,
+}: LinkedProposalProps) => {
+
+  if(!title){
+    app.chainEntities.getOneEntity(thread.chain, ceTypeId).then((entity)=> {
+      return BuildProposalLink(entity.type, entity.typeId, thread.chain, entity.title, ceCompleted)
+    });
+  }
+
+  return BuildProposalLink(ceType, ceTypeId, thread.chain, title, ceCompleted)
+
 };
 
 type LinkedProposalsCardProps = {
