@@ -8,7 +8,6 @@ import MinimumProfile from '../../models/MinimumProfile';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/Sublayout';
 import { CWText } from '../components/component_kit/cw_text';
-import { AccessLevel } from 'permissions';
 import { useDebounce } from 'usehooks-ts';
 import { MembersSearchBar } from '../components/members_search_bar';
 
@@ -66,7 +65,11 @@ const MembersPage = () => {
       );
       return {
         profile: minProfile,
-        role: p.roles.find((role) => role.chain_id === app.activeChainId()),
+        role: p.roles.find(
+          (role) =>
+            role.chain_id === app.activeChainId() &&
+            ['admin', 'moderator'].includes(role.permission)
+        ),
       };
     });
 
@@ -89,11 +92,13 @@ const MembersPage = () => {
     if (debouncedSearchTerm.length >= 3) {
       handleLoadNextPage(debouncedSearchTerm, true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm]);
 
   // on init, load first page
   useEffect(() => {
     handleLoadNextPage('', true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
