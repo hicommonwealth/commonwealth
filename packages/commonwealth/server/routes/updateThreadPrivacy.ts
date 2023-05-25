@@ -2,7 +2,6 @@ import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
@@ -33,14 +32,13 @@ const updateThreadPrivacy = async (
       .map((addr) => addr.id);
     if (!userOwnedAddressIds.includes(thread.address_id)) {
       // is not author
-      const roles = await findAllRoles(
-        models,
-        { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-        thread.chain,
-        ['admin', 'moderator']
-      );
-      const role = roles.find((r) => {
-        return r.chain_id === thread.chain;
+      const role = await models.Address.findOne({
+        where: {
+          chain: thread.chain,
+          id: { [Op.in]: userOwnedAddressIds },
+          role: { [Op.in]: ['admin', 'moderator'] },
+        },
+        attributes: ['role'],
       });
       if (!role) return next(new AppError(Errors.NotAdmin));
     }

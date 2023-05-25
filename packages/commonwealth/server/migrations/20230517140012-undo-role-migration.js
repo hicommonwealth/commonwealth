@@ -5,6 +5,16 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
         'Addresses',
+        'is_user_default',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        { transaction: t }
+      );
+      await queryInterface.addColumn(
+        'Addresses',
         'role',
         {
           type: Sequelize.ENUM('member', 'moderator', 'admin'),

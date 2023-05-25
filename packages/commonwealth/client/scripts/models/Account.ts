@@ -12,6 +12,7 @@ class Account {
   public readonly chain: ChainInfo;
   public readonly ghostAddress: boolean;
   public readonly role: Role;
+  public readonly isUserDefault: boolean;
 
   // validation token sent by server
   private _validationToken?: string;
@@ -39,11 +40,13 @@ class Account {
     profile,
     ignoreProfile,
     role,
+    isUserDefault,
   }: {
     // required args
     chain: ChainInfo;
     address: string;
     role: Role;
+    isUserDefault: boolean;
 
     // optional args
     addressId?: number;
@@ -62,6 +65,7 @@ class Account {
     this.chain = chain;
     this.address = address;
     this.role = role;
+    this.isUserDefault = isUserDefault;
     this._addressId = addressId;
     this._walletId = walletId;
     this._validationToken = validationToken;

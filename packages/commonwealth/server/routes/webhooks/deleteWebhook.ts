@@ -1,6 +1,6 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import { findAllRoles } from '../../util/roles';
+import { Op } from 'sequelize';
 import Errors from './errors';
 
 const deleteWebhook = async (
@@ -15,19 +15,19 @@ const deleteWebhook = async (
   // only admins should be able to get webhooks
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   const addresses = await req.user.getAddresses();
-  const adminRoles = await findAllRoles(
-    models,
-    {
-      where: {
-        address_id: addresses
+  const adminRole = await models.Address.findOne({
+    where: {
+      chain: chain.id,
+      id: {
+        [Op.in]: addresses
           .filter((addr) => !!addr.verified)
           .map((addr) => addr.id),
       },
+      role: { [Op.in]: ['admin', 'moderator'] },
     },
-    chain.id,
-    ['admin']
-  );
-  if (!req.user.isAdmin && adminRoles.length === 0)
+    attributes: ['role'],
+  });
+  if (!req.user.isAdmin && adminRole)
     return next(new AppError(Errors.NotAdmin));
   // delete webhook
   if (!req.body.webhookUrl) return next(new AppError(Errors.MissingWebhook));

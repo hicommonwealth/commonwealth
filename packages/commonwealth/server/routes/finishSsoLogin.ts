@@ -15,8 +15,6 @@ import type { UserAttributes } from '../models/user';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import { createRole } from '../util/roles';
-
 import { redirectWithLoginError } from './finishEmailLogin';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -322,15 +320,6 @@ const finishSsoLogin = async (
           wallet_id: WalletId.Ronin,
         },
         { transaction: t }
-      );
-
-      await createRole(
-        models,
-        newAddress.id,
-        AXIE_INFINITY_CHAIN_ID,
-        'member',
-        false,
-        t
       );
 
       // Automatically create subscription to their own mentions

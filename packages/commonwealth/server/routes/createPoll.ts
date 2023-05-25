@@ -1,9 +1,9 @@
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
+import { Op } from 'sequelize';
 import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
-import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
@@ -62,13 +62,12 @@ const createPoll = async (
 
     // check if admin_only flag is set
     if (thread.Chain?.admin_only_polling) {
-      const role = await findOneRole(
-        models,
-        { where: { address_id: thread.address_id } },
-        thread.Chain.id,
-        ['admin']
-      );
-      if (role && !req.user.isAdmin) {
+      const userMembership = await models.Address.findOne({
+        where: { chain: chain.id, id: { [Op.in]: userOwnedAddressIds } },
+        attributes: ['role'],
+      });
+
+      if (userMembership?.role && !req.user.isAdmin) {
         return next(new AppError(Errors.MustBeAdmin));
       }
     }

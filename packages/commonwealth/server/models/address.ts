@@ -12,6 +12,8 @@ export type AddressAttributes = {
   address: string;
   chain: string;
   verification_token: string;
+  role: Role;
+  is_user_default: boolean;
   id?: number;
   verification_token_expires?: Date;
   verified?: Date;
@@ -31,7 +33,6 @@ export type AddressAttributes = {
   Chain?: ChainAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  role?: Role;
   SsoToken?: SsoTokenAttributes;
 };
 
@@ -54,6 +55,16 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
       chain: { type: dataTypes.STRING, allowNull: false },
+      role: {
+        type: dataTypes.ENUM('member', 'moderator', 'admin'),
+        defaultValue: 'member',
+        allowNull: false,
+      },
+      is_user_default: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
       verification_token: { type: dataTypes.STRING, allowNull: false },
       verification_token_expires: { type: dataTypes.DATE, allowNull: true },
       verified: { type: dataTypes.DATE, allowNull: true },

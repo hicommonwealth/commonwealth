@@ -2,7 +2,6 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -38,13 +37,16 @@ const createTopic = async (
   const userAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const adminRoles = await findAllRoles(
-    models,
-    { where: { address_id: { [Op.in]: userAddressIds } } },
-    chain.id,
-    ['admin', 'moderator']
-  );
-  if (!req.user.isAdmin && adminRoles.length === 0) {
+  const adminRoles = await models.Address.findOne({
+    where: {
+      chain: chain.id,
+      id: { [Op.in]: userAddressIds },
+      role: { [Op.in]: ['admin', 'moderator'] },
+    },
+    attributes: ['role'],
+  });
+
+  if (!req.user.isAdmin && adminRoles) {
     return next(new AppError(Errors.MustBeAdmin));
   }
 

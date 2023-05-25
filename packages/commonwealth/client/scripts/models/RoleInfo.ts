@@ -1,4 +1,4 @@
-import type { AccessLevel } from 'permissions';
+import { Role } from 'common-common/src/roles';
 import type AddressInfo from './AddressInfo';
 
 class RoleInfo {
@@ -8,7 +8,7 @@ class RoleInfo {
   public readonly address: string;
   public readonly address_chain: string;
   public readonly chain_id: string;
-  public permission: AccessLevel;
+  public permission: Role;
   public allow: bigint;
   public deny: bigint;
   public is_user_default: boolean;
@@ -19,7 +19,7 @@ class RoleInfo {
     address: string,
     address_chain: string,
     chain_id: string,
-    permission: AccessLevel,
+    permission: Role,
     allow: bigint,
     deny: bigint,
     is_user_default: boolean

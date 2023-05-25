@@ -8,7 +8,6 @@ import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
@@ -88,15 +87,13 @@ const editThread = async (
     },
   });
 
-  const admin = await findOneRole(
-    models,
-    { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    chain.id,
-    ['admin']
-  );
+  const userMembership = await models.Address.findOne({
+    where: { chain: chain.id, id: { [Op.in]: userOwnedAddressIds } },
+    attributes: ['role'],
+  });
 
   // check if banned
-  if (!admin) {
+  if (userMembership?.role !== 'admin') {
     const [canInteract, banError] = await banCache.checkBan({
       chain: chain.id,
       address: author.address,
@@ -106,7 +103,7 @@ const editThread = async (
     }
   }
 
-  if (collaboration || admin) {
+  if (collaboration || userMembership) {
     thread = await models.Thread.findOne({
       where: {
         id: thread_id,

@@ -3,7 +3,6 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import { findAllRoles } from '../util/roles';
 
 enum UpdateTopicErrors {
   NoUser = 'Not logged in',
@@ -42,14 +41,14 @@ const updateTopic = async (
     },
   });
 
-  const roles: any[] = await findAllRoles(
-    models,
-    { where: { address_id: { [Op.in]: userAddressIds } } },
-    thread.chain,
-    ['admin', 'moderator']
-  );
-
-  const isAdminOrMod = roles.length > 0;
+  const isAdminOrMod = await models.Address.findOne({
+    where: {
+      chain: thread.chain,
+      id: { [Op.in]: userAddressIds },
+      role: { [Op.in]: ['admin', 'moderator'] },
+    },
+    attributes: ['role'],
+  });
 
   if (!isAdminOrMod) {
     const isAuthor = await models.Thread.findOne({

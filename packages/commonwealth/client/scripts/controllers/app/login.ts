@@ -32,13 +32,12 @@ export function linkExistingAddressToChainOrCommunity(
 
 export async function setActiveAccount(account: Account): Promise<void> {
   const chain = app.activeChainId();
-  const role = app.roles.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
     await app.chain.activeAddressHasToken(account.address);
   }
 
-  if (!role || role.is_user_default) {
+  if (!account.role || account.isUserDefault) {
     app.user.ephemerallySetActiveAccount(account);
     if (
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
@@ -65,11 +64,6 @@ export async function setActiveAccount(account: Account): Promise<void> {
     notifyError('Could not set active account');
   }
 
-  // update is_user_default
-  app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
-    r.is_user_default = false;
-  });
-  role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
   if (
     app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
@@ -90,29 +84,10 @@ export async function completeClientLogin(account: Account) {
         account.addressId,
         account.address,
         account.chain.id,
-        account.walletId
+        account.role,
+        account.isUserDefault
       );
       app.user.addresses.push(addressInfo);
-    }
-
-    // link the address to the community
-    if (app.chain) {
-      try {
-        if (
-          !app.roles.getRoleInCommunity({
-            account,
-            chain: app.activeChainId(),
-          })
-        ) {
-          await app.roles.createRole({
-            address: addressInfo,
-            chain: app.activeChainId(),
-          });
-        }
-      } catch (e) {
-        // this may fail if the role already exists, e.g. if the address is being migrated from another user
-        console.error('Failed to create role');
-      }
     }
 
     // set the address as active
@@ -161,9 +136,9 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   );
 
   // select the address that the new chain should be initialized with
-  const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.roles.isMember({ chain: chain.id, account });
-  });
+  const memberAddresses = app.user.activeAccounts.filter(
+    (account) => account.role === 'member'
+  );
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
@@ -171,9 +146,9 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = app.roles.getDefaultAddressInCommunity({
-      chain: chain.id,
-    });
+    const existingAddress = app.user.activeAccounts.find(
+      (account) => account.isUserDefault
+    );
 
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
@@ -265,6 +240,7 @@ export async function createUserWithAddress(
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
     role: response.result.role,
+    isUserDefault: response.result.isUserDefault,
   });
   return { account, newlyCreated: response.result.newly_created };
 }

@@ -9,7 +9,6 @@ import type { DB } from '../models';
 import type { ChainAttributes } from '../models/chain';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { findOneRole } from '../util/roles';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
 export const Errors = {
@@ -57,12 +56,12 @@ const updateChain = async (
     const userAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
-    const userMembership = await findOneRole(
-      models,
-      { where: { address_id: { [Op.in]: userAddressIds } } },
-      chain.id,
-      ['admin']
-    );
+
+    const userMembership = await models.Address.findOne({
+      where: { chain: chain.id, id: { [Op.in]: userAddressIds } },
+      attributes: ['role'],
+    });
+
     if (!req.user.isAdmin && !userMembership) {
       return next(new AppError(Errors.NotAdmin));
     }

@@ -25,9 +25,10 @@ export default class CosmosAccount extends Account {
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
     address: string,
-    role: Role
+    role: Role,
+    isUserDefault: boolean
   ) {
-    super({ chain: app.chain.meta, address, role });
+    super({ chain: app.chain.meta, address, role, isUserDefault });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

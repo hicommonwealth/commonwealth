@@ -2,7 +2,6 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
-import { findAllRoles } from '../util/roles';
 
 const communityStats = async (
   models: DB,
@@ -20,13 +19,16 @@ const communityStats = async (
   const userAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const adminRoles = await findAllRoles(
-    models,
-    { where: { address_id: { [Op.in]: userAddressIds } } },
-    chain.id,
-    ['admin', 'moderator']
-  );
-  if (!req.user.isAdmin && adminRoles.length === 0) {
+  const adminRoles = await models.Address.findOne({
+    where: {
+      chain: chain.id,
+      id: { [Op.in]: userAddressIds },
+      role: { [Op.in]: ['admin', 'moderator'] },
+    },
+    attributes: ['role'],
+  });
+
+  if (!req.user.isAdmin && adminRoles) {
     return next(new AppError('Must be admin'));
   }
 

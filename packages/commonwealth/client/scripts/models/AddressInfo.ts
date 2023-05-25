@@ -13,6 +13,7 @@ class AddressInfo extends Account {
     address: string,
     chainId: string,
     role: Role,
+    isUserDefault: boolean,
     keytype?: string,
     walletId?: WalletId,
     ghostAddress?: boolean,
@@ -27,6 +28,7 @@ class AddressInfo extends Account {
       walletId,
       ghostAddress,
       role,
+      isUserDefault,
     });
     this.id = id;
     this.keytype = keytype;

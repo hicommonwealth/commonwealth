@@ -40,7 +40,14 @@ export default class CosmosAccounts
     try {
       acct = this._store.getByAddress(address);
     } catch (e) {
-      acct = new CosmosAccount(this.app, this._Chain, this, address, acct.role);
+      acct = new CosmosAccount(
+        this.app,
+        this._Chain,
+        this,
+        address,
+        acct.role,
+        acct.isUserDefault
+      );
     }
     return acct;
   }
