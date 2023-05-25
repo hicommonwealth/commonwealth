@@ -1,40 +1,25 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
-
 import type {
   IDisconnectedRange,
   IEventProcessor,
   IEventSubscriber,
   IStorageFetcher,
   CWEvent,
-  IEventTitle,
   IEventLabel,
-  IChainEventKind,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
 import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import {
   Listener as CompoundListener,
-  Title as CompoundTitle,
   Label as CompoundLabel,
 } from './chains/compound';
-import {
-  Listener as Erc20Listener,
-  Title as Erc20Title,
-  Label as Erc20Label,
-} from './chains/erc20';
+import { Listener as Erc20Listener, Label as Erc20Label } from './chains/erc20';
 import {
   Listener as Erc721Listener,
-  Title as Erc721Title,
   Label as Erc721Label,
 } from './chains/erc721';
-import {
-  Listener as AaveListener,
-  Title as AaveTitle,
-  Label as AaveLabel,
-} from './chains/aave';
+import { Listener as AaveListener, Label as AaveLabel } from './chains/aave';
 import {
   Listener as CosmosListener,
-  Title as CosmosTitle,
   Label as CosmosLabel,
 } from './chains/cosmos';
 import type { Listener } from './Listener';
