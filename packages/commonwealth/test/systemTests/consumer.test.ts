@@ -115,40 +115,4 @@ describe('Tests for the commonwealth-app consumer', () => {
       },
     });
   });
-
-  it('Should process chain-entity messages from the ChainEntityCUD queue', async () => {
-    const maxEntityId: number = await models.ChainEntityMeta.max('ce_id');
-    if (!maxEntityId) throw new Error('Failed to get max entity id');
-
-    const entity: RmqEntityCUD.RmqMsgType = {
-      ce_id: maxEntityId + 1,
-      chain_id: 'aave',
-      cud: 'create',
-      entity_type_id: '123',
-    };
-
-    const publishJson = await publishRmqMsg(
-      RABBITMQ_API_URI,
-      RascalExchanges.CUD,
-      RascalRoutingKeys.ChainEntityCUD,
-      entity
-    );
-    expect(publishJson.routed, 'Failed to publish message').to.be.true;
-
-    // give time for the consumer to process the message
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const dbResult = models.ChainEntityMeta.findOne({
-      where: {
-        ce_id: entity.ce_id,
-      },
-    });
-    expect(dbResult).to.not.be.null;
-
-    await models.ChainEntityMeta.destroy({
-      where: {
-        ce_id: entity.ce_id,
-      },
-    });
-  });
 });

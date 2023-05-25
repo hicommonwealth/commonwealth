@@ -8,7 +8,10 @@ type ChainEntityLinkRedirectProps = {
   scope: string;
 };
 
-export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEntityLinkRedirectProps) {
+export default function ChainEntityLinkRedirect({
+  identifier,
+  scope,
+}: ChainEntityLinkRedirectProps) {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -18,11 +21,10 @@ export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEnti
         const entity = await app.chainEntities.getOneEntity(scope, identifier);
 
         // 2. query data to construct new link
-        const { title, type, typeId } = entity;
+        const { type, typeId } = entity;
         const newLink = {
           source: 'proposal',
-          title,
-          identifier: type === 'proposal' ? `${typeId}` : `${type}/${typeId}}`
+          identifier: type === 'proposal' ? `${typeId}` : `${type}/${typeId}}`,
         };
 
         // 3. redirect
@@ -31,7 +33,7 @@ export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEnti
         // TODO: show error page
         throw new Error('could not find entity');
       }
-    }
+    };
 
     fetchChainEntityData();
   }, [navigate]);

@@ -126,7 +126,6 @@ class ThreadsController {
       url,
       pinned,
       collaborators,
-      chain_entity_meta,
       has_poll,
       polls = [], // associated Polls
       reactions,
@@ -174,19 +173,6 @@ class ThreadsController {
       });
     }
 
-    const chainEntitiesProcessed: ChainEntity[] = [];
-    if (chain_entity_meta) {
-      for (const meta of chain_entity_meta) {
-        const full_entity = Array.from(app.chainEntities.store.values())
-          .flat()
-          .filter((e) => e.id === meta.ce_id)[0];
-        if (full_entity) {
-          if (meta.title) full_entity.title = meta.title;
-          chainEntitiesProcessed.push(full_entity);
-        }
-      }
-    }
-
     const lastEditedProcessed = last_edited
       ? moment(last_edited)
       : versionHistoryProcessed && versionHistoryProcessed?.length > 1
@@ -231,7 +217,6 @@ class ThreadsController {
       url,
       pinned,
       collaborators,
-      chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
       hasPoll: has_poll,

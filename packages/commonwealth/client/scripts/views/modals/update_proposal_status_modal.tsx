@@ -73,7 +73,7 @@ export const UpdateProposalStatusModal = ({
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
   >(getInitialSnapshots(thread));
   const [tempProposals, setTempProposals] = useState<
-    Array<Pick<ChainEntity, 'typeId' | 'title'>>
+    Array<Pick<ChainEntity, 'typeId'>>
   >(getInitialProposals(thread));
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>

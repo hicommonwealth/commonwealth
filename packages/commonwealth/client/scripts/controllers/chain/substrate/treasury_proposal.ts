@@ -10,7 +10,7 @@ import type ChainEntity from '../../../models/ChainEntity';
 import type ChainEvent from '../../../models/ChainEvent';
 import type { ITXModalData } from '../../../models/interfaces';
 import Proposal from '../../../models/Proposal';
-import type { ProposalEndTime} from '../../../models/types';
+import type { ProposalEndTime } from '../../../models/types';
 import { ProposalStatus, VotingType, VotingUnit } from '../../../models/types';
 import type { BinaryVote } from '../../../models/votes';
 import type SubstrateAccounts from './account';
@@ -158,7 +158,7 @@ export class SubstrateTreasuryProposal extends Proposal<
       ? this._Accounts.fromAddress(this.data.proposer)
       : null;
 
-    this.title = entity.title || this.generateTitle();
+    this.title = this.generateTitle();
     this.createdAt = entity.createdAt;
     this.threadTitle = entity.threadTitle;
 

@@ -178,11 +178,11 @@ class SubstrateDemocracyProposal extends Proposal<
       this._method = preimage.method;
       this._section = preimage.section;
       this._preimage = preimage;
-      this.title = entity.title || formatCall(preimage);
+      this.title = formatCall(preimage);
     } else {
-      this.title =
-        entity.title ||
-        `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
+      this.title = `Proposal ${formatProposalHashShort(
+        eventData.proposalHash
+      )}`;
     }
 
     entity.chainEvents.forEach((e) => this.update(e));

@@ -6,18 +6,16 @@ class ChainEntity {
   public readonly chain: string;
   public readonly type: IChainEntityKind;
   public readonly typeId: string;
-  public readonly author: string;
 
+  // TODO: remove threadTitle?
   public readonly threadTitle?: string;
   public readonly createdAt?: moment.Moment;
   public readonly completed?: boolean;
+  public readonly author?: string;
 
   // This id is the chain-events service chain-entity id -> equivalent to ce_id in ChainEntityMeta in main service
   // This id is only available when the chain-entity is loaded from the server and NOT from the chain
   public readonly id?: number;
-
-  // these values cannot be readonly because they are updated when the chain-entity metadata is added to the instance
-  public title?: string;
 
   private _updatedAt?: moment.Moment;
   public get updatedAt() {
@@ -48,7 +46,6 @@ class ChainEntity {
     updatedAt,
     id,
     threadTitle,
-    title,
     author,
     completed,
   }: {
@@ -61,7 +58,6 @@ class ChainEntity {
     threadTitle: string;
     author: string;
     id?: number;
-    title?: string;
     completed?: boolean;
   }) {
     this.id = id;
@@ -69,7 +65,6 @@ class ChainEntity {
     this.type = type;
     this.typeId = typeId;
     this.threadTitle = decodeURIComponent(threadTitle);
-    this.title = title;
     this.author = author;
     this.createdAt = moment(createdAt);
     this.completed = completed;
@@ -108,7 +103,6 @@ class ChainEntity {
       updatedAt: updated_at,
       id,
       threadTitle: Thread?.title,
-      title,
       author,
       completed,
     });

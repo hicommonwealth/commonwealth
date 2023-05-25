@@ -175,9 +175,6 @@ export default (
     models.Thread.hasMany(models.Notification, {
       foreignKey: 'thread_id',
     });
-    models.Thread.hasOne(models.ChainEntityMeta, {
-      foreignKey: 'id',
-    });
   };
 
   return Thread;

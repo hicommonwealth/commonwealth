@@ -64,12 +64,6 @@ const deleteChain = async (
   // eslint-disable-next-line no-new
   new Promise(async () => {
     await models.sequelize.transaction(async (t) => {
-      // TODO: need a parallel API call to chain-events to destroy chain-entities there too
-      await models.ChainEntityMeta.destroy({
-        where: { chain: chain.id },
-        transaction: t,
-      });
-
       await models.User.update(
         {
           selected_chain_id: null,
