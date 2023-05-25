@@ -249,7 +249,7 @@ async function setupNewListeners(
     }
 
     // if a substrate chain then ignore some events
-    let excludedEvents = [];
+    const excludedEvents = [];
 
     // add the rabbitmq handler and the events it should ignore
     listenerInstances[chain.id].eventHandlers.rabbitmq = {
