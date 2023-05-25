@@ -27,6 +27,8 @@ import {
 } from '../../components/react_quill_editor';
 import { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -36,6 +38,8 @@ export const NewSnapshotProposalPageComponent = ({
   snapshotId,
 }: NewSnapshotProposalPageProps) => {
   const navigate = useCommonNavigate();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   const [form, setForm] = useState<ThreadForm | null>(null);
   const [members, setMembers] = useState<string[]>([]);
@@ -72,6 +76,9 @@ export const NewSnapshotProposalPageComponent = ({
       await createNewProposal(form, content, author, space);
 
       clearLocalStorage();
+      trackAnalytics({
+        event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_CREATED,
+      });
       notifySuccess('Snapshot Created!');
       navigate(`/snapshot/${space.id}`);
     } catch (err) {

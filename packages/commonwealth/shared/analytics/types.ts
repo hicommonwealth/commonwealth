@@ -1,15 +1,21 @@
 export const enum MixpanelPageViewEvent {
   LANDING_PAGE_VIEW = 'Landing Page Viewed',
   COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
+  THREAD_PAGE_VIEW = 'Thread Page Viewed',
+  DASHBOARD_VIEW = 'Dashbboard Page Viewed',
 }
 
 export const enum MixpanelCommunityInteractionEvent {
   CREATE_THREAD = 'Create New Thread',
   CREATE_COMMENT = 'Create New Comment',
   CREATE_REACTION = 'Create New Reaction',
+  LINKED_PROPOSAL = 'Linked Proposal',
+  LINKED_THREAD = 'Linked Thread',
+  UPDATE_STAGE = 'Update Stage',
 }
 
 export const enum MixpanelLoginEvent {
+  MAGIC_LOGIN = 'Login with Magic',
   LOGIN = 'Login to Commonwealth',
 }
 
@@ -35,6 +41,7 @@ export const enum MixpanelSnapshotEvents {
   SNAPSHOT_PAGE_VISIT = 'Snapshot Page Visited',
   SNAPSHOT_PROPOSAL_VIEWED = 'Snapshot Proposal Viewed',
   SNAPSHOT_VOTE_OCCURRED = 'Snapshot Vote Occurred',
+  SNAPSHOT_PROPOSAL_CREATED = 'Snapshot Proposal Created',
 }
 
 export type MixpanelEvents =
@@ -49,13 +56,14 @@ export type MixpanelEvents =
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 
 export interface AnalyticsPayload {
-  event: any; // base event type
-  isCustomDomain?: boolean;
+  event: AnalyticsEvent; // base event type
 }
 
 export interface BaseMixpanelPayload extends AnalyticsPayload {
   event: MixpanelEvents;
   userAddress?: string;
+  community?: string;
+  communityType?: string;
 }
 
 export const providers = ['mixpanel']; // add other providers here

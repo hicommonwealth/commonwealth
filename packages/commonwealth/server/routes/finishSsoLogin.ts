@@ -376,6 +376,10 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.findOne({
         where: { address: checksumAddress },
       });
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
+      });
       return success(res, { address: newAddress });
     } else {
       // re-fetch user to include address object, if freshly created

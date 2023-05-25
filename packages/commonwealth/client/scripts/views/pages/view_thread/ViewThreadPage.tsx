@@ -103,6 +103,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsEditingBody(false);
   };
 
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+  });
+
   const threadUpdatedCallback = (newTitle: string, body: string) => {
     setThread(
       new Thread({
