@@ -49,6 +49,7 @@ export type ThreadAttributes = {
   last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
+  marked_as_spam_at?: Date;
 
   // associations
   Chain?: ChainAttributes;
@@ -120,6 +121,7 @@ export default (
       last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
+      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       timestamps: true,

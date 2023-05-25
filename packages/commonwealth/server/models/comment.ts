@@ -23,6 +23,7 @@ export type CommentAttributes = {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+  marked_as_spam_at?: Date;
 
   // associations
   Chain?: ChainAttributes;
@@ -61,6 +62,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
+      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       timestamps: true,

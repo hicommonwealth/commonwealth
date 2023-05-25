@@ -182,6 +182,8 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
+import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
 
 function setupRouter(
   endpoint: string,
@@ -957,6 +959,19 @@ function setupRouter(
     getLinks.bind(this, models)
   );
 
+  // spam
+  router.post(
+    '/threads/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markThreadAsSpam.bind(this, models)
+  );
+
+  router.post(
+    '/comments/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markCommentAsSpam.bind(this, models)
+  );
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -1004,12 +1019,9 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post(
-    '/auth/magic',
-    passport.authenticate('magic'), (req, res) => {
-      return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
-  );
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
+    return res.json({ status: 'Success', result: req.user.toJSON() });
+  });
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
