@@ -523,3 +523,34 @@ export const CWWalletConnect = (props: CustomIconProps) => {
     </svg>
   );
 };
+
+export const CWEmail = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+  return (
+    <svg
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      stroke="#656167"
+      {...otherProps}
+    >
+      <path
+        d="M4 7h24v17a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7Z"
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M28 7 16 18 4 7"
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
