@@ -1,9 +1,10 @@
 import { AppError } from 'common-common/src/errors';
 import { isRole } from 'common-common/src/roles';
 import type { NextFunction, Request, Response } from 'express';
-import { body } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
+import { failure } from '../types';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
@@ -27,6 +28,11 @@ const upgradeMember = async (
   res: Response,
   next: NextFunction
 ) => {
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return next(new AppError(errors[0].msg));
+  }
+
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
 
   const chain = req.chain;
@@ -41,11 +47,14 @@ const upgradeMember = async (
   const addresses = await models.Address.findAll({
     where: {
       chain: chain.id,
-      address: { [Op.in]: [address.id, ...requesterAddressIds] },
+      [Op.or]: {
+        id: { [Op.in]: requesterAddressIds },
+        address: address,
+      },
     },
   });
 
-  const targetAddress = addresses.find((a) => address.id === a.id);
+  const targetAddress = addresses.find((a) => address === a.address);
 
   // check if address provided exists
   if (!targetAddress) return next(new AppError(Errors.NoMember));

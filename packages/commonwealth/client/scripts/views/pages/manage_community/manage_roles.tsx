@@ -134,6 +134,8 @@ export const ManageRoles = ({
                     addr.id,
                     addr.address,
                     role.chain_id,
+                    role.permission,
+                    role.is_user_default,
                     null,
                     addr.walletId
                   )

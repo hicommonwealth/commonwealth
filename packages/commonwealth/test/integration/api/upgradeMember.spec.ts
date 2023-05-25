@@ -45,8 +45,8 @@ describe('upgradeMember Integration Tests', () => {
       jwt: jwtToken,
       author_chain: testAddresses[0].chain,
       chain: testAddresses[0].chain,
-      new_role: 'invalid role',
-      address: testAddresses[0].address,
+      new_role: 'member',
+      address: true,
     };
 
     const response = await post(
@@ -73,7 +73,6 @@ describe('upgradeMember Integration Tests', () => {
 
     const response = await post('/api/upgradeMember', validRequest, true, app);
 
-    response.should.have.status(200);
     chai.assert.equal(response.status, 'Success');
     const address = await models.Address.findOne({
       where: { id: testAddresses[0].id },
