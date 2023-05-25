@@ -679,8 +679,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
-  console.log('thread url', thread.url);
-
   return (
     <Sublayout>
       <CWContentPage

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-import { link } from 'helpers';
+import { Link } from 'react-router-dom';
 
 import 'components/user/user.scss';
 
@@ -206,9 +205,10 @@ export const User = ({
         <>
           {/* non-substrate name */}
           {linkify && profile?.id ? (
-            link(
-              'a.user-display-name.username',
-              profile ? `/profile/id/${profile.id}` : 'javascript:',
+            <Link
+              className="user-display-name username"
+              to={profile ? `/profile/id/${profile.id}` : undefined}
+            >
               <>
                 {!profile ? (
                   addrShort
@@ -223,9 +223,8 @@ export const User = ({
                   </>
                 )}
                 {getRoleTags()}
-              </>,
-              handleClick
-            )
+              </>
+            </Link>
           ) : (
             <a className="user-display-name username">
               {!profile ? (
@@ -284,12 +283,12 @@ export const User = ({
             />
           </div>
           <div className="user-name">
-            {app.chain &&
-              app.chain.base === ChainBase.Substrate &&
-              link(
-                'a.user-display-name',
-                profile?.id ? `/profile/id/${profile.id}` : 'javascript:',
-                !profile || !profile?.id ? (
+            {app.chain && app.chain.base === ChainBase.Substrate && (
+              <Link
+                className="user-display-name substrate@"
+                to={profile?.id ? `/profile/id/${profile.id}` : undefined}
+              >
+                {!profile || !profile?.id ? (
                   !profile?.id ? (
                     `${profile.address.slice(0, 8)}...${profile.address.slice(
                       -5
@@ -306,9 +305,9 @@ export const User = ({
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
                   </>
-                ),
-                handleClick
-              )}
+                )}
+              </Link>
+            )}
           </div>
           {profile?.address && (
             <div className="user-address">
