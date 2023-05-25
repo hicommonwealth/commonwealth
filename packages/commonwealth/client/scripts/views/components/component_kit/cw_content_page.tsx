@@ -68,14 +68,14 @@ export const CWContentPage = (props: ContentPageProps) => {
   } = props;
 
   const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
-    isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+    isWindowMediumSmallInclusive(window.innerWidth) || !showSidebar
       ? 'tabsView'
       : 'sidebarView'
   );
   const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
-  const createdOrEditedText = lastEdited ? 'Edited' : 'Published'
+  const createdOrEditedText = lastEdited ? 'Edited' : 'Published';
 
   React.useEffect(() => {
     const onResize = () => {
@@ -107,14 +107,16 @@ export const CWContentPage = (props: ContentPageProps) => {
         <div className="header-info-row">
           {author}
           {typeof createdOrEditedDate === 'number' ||
-            (moment.isMoment(createdOrEditedDate) && createdOrEditedDate.isValid() && (
-              <CWText type="caption" className="header-text">
-                • &nbsp; {createdOrEditedText} on {moment(createdOrEditedDate).format('l')} &nbsp; •
-              </CWText>
-            ))}
+            (moment.isMoment(createdOrEditedDate) &&
+              createdOrEditedDate.isValid() && (
+                <CWText type="caption" className="header-text">
+                  • &nbsp; {createdOrEditedText} on{' '}
+                  {moment(createdOrEditedDate).format('l')} &nbsp; •
+                </CWText>
+              ))}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
-            {pluralize(viewCount, 'view')}
+              {pluralize(viewCount, 'view')}
             </CWText>
           )}
           {headerComponents}
