@@ -218,6 +218,9 @@ export const EthDaoForm = (props: EthChainFormState) => {
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               base: ChainBase.Ethereum,
+              id: id,
+              name: name,
+              address: ethChainFormFields.address,
               chain_string: ethChainFormFields.chainString,
               eth_chain_id: ethChainFormFields.ethChainId,
               jwt: app.user.jwt,

@@ -19,6 +19,7 @@ import { User } from '../../components/user/user';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWTag } from 'views/components/component_kit/cw_tag';
+import { NewThreadTag } from '../discussions/NewThreadTag';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
@@ -108,6 +109,7 @@ export const TopicSummaryRow = ({
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
+                    <NewThreadTag threadCreatedAt={thread.createdAt}/>
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}

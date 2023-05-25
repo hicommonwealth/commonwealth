@@ -54,80 +54,104 @@ type StatusResp = {
   chainCategoryMap: { [chain: string]: ChainCategoryType[] };
 };
 
+const getChainStatus = async (models: DB) => {
+  const [chains, nodes, notificationCategories] = await Promise.all([
+    models.Chain.findAll({
+      where: { active: true },
+      include: [
+        {
+          model: models.Topic,
+          as: 'topics',
+        },
+        {
+          model: models.ChainNode,
+          required: true,
+        },
+      ],
+    }),
+    models.ChainNode.findAll(),
+    models.NotificationCategory.findAll(),
+  ]);
+
+  const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
+  for (const chain of chains) {
+    if (chain.category !== null) {
+      chainCategories[chain.id] = chain.category as ChainCategoryType[];
+    }
+  }
+
+  const chainsIds = chains.map((chain) => chain.id);
+  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+    await models.CommunitySnapshotSpaces.findAll({
+      where: {
+        chain_id: {
+          [Op.in]: chainsIds,
+        },
+      },
+      include: {
+        model: models.SnapshotSpace,
+        as: 'snapshot_space',
+      },
+    });
+
+  const chainsWithSnapshots = chains.map((chain) => {
+    const chainSnapshotSpaces = snapshotSpaces.filter(
+      (space) => space.chain_id === chain.id
+    );
+    const snapshotSpaceNames = chainSnapshotSpaces.map(
+      (space) => space.snapshot_space?.snapshot_space
+    );
+    return {
+      chain,
+      snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
+    };
+  });
+
+  const thirtyDaysAgo = new Date(
+    (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+  );
+
+  const threadCountQueryData: ThreadCountQueryData[] =
+    await models.sequelize.query(
+      `
+      SELECT "Threads".chain, COUNT("Threads".id) 
+      FROM "Threads"
+      WHERE "Threads".created_at > :thirtyDaysAgo
+      AND "Threads".deleted_at IS NULL
+      AND "Threads".chain IS NOT NULL
+      GROUP BY "Threads".chain;
+      `,
+      { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
+    );
+
+  return {
+    chains,
+    nodes,
+    notificationCategories,
+    chainCategories,
+    chainsWithSnapshots,
+    threadCountQueryData,
+  };
+};
+
 export const status = async (
   models: DB,
   req: TypedRequestQuery,
   res: TypedResponse<StatusResp>
 ) => {
   try {
-    const [chains, nodes, notificationCategories] = await Promise.all([
-      models.Chain.findAll({
-        where: { active: true },
-        include: [
-          {
-            model: models.Topic,
-            as: 'topics',
-          },
-          {
-            model: models.ChainNode,
-            required: true,
-          },
-        ],
-      }),
-      models.ChainNode.findAll(),
-      models.NotificationCategory.findAll(),
-    ]);
+    const {
+      chains,
+      nodes,
+      notificationCategories,
+      chainCategories,
+      chainsWithSnapshots,
+      threadCountQueryData,
+    } = await getChainStatus(models);
 
-    const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
-    for (const chain of chains) {
-      if (chain.category !== null) {
-        chainCategories[chain.id] = chain.category as ChainCategoryType[];
-      }
-    }
-
-    const chainsWithSnapshots = await Promise.all(
-      chains.map(async (chain) => {
-        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] =
-          await models.CommunitySnapshotSpaces.findAll({
-            where: {
-              chain_id: chain.id,
-            },
-            include: {
-              model: models.SnapshotSpace,
-              as: 'snapshot_space',
-            },
-          });
-
-        const snapshot_space_names = snapshot_spaces.map((space) => {
-          return space.snapshot_space?.snapshot_space;
-        });
-
-        return {
-          chain,
-          snapshot: snapshot_space_names.length > 0 ? snapshot_space_names : [],
-        };
-      })
-    );
-
-    const thirtyDaysAgo = new Date(
-      (new Date() as any) - 1000 * 24 * 60 * 60 * 30
-    );
     const { user } = req;
 
     if (!user) {
-      const threadCountQueryData: ThreadCountQueryData[] =
-        await models.sequelize.query(
-          `
-        SELECT "Threads".chain, COUNT("Threads".id) 
-        FROM "Threads"
-        WHERE "Threads".created_at > :thirtyDaysAgo
-        AND "Threads".deleted_at IS NULL
-        AND "Threads".chain IS NOT NULL
-        GROUP BY "Threads".chain;
-        `,
-          { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
-        );
-
       return success(res, {
         chainsWithSnapshots,
         nodes,
@@ -175,24 +199,6 @@ export const status = async (
       },
       include: [models.Address, models.Attachment],
     });
-
-    const threadCountQueryData: ThreadCountQueryData[] =
-      await models.sequelize.query(
-        `
-      SELECT "Threads".chain, COUNT("Threads".id) 
-      FROM "Threads"
-      WHERE "Threads".created_at > :thirtyDaysAgo
-      AND "Threads".deleted_at IS NULL
-      AND "Threads".chain IS NOT NULL
-      GROUP BY "Threads".chain;
-      `,
-        {
-          replacements: {
-            thirtyDaysAgo,
-          },
-          type: QueryTypes.SELECT,
-        }
-      );
 
     // get starred communities for user
     const starredCommunities = await models.StarredCommunity.findAll({

@@ -1,0 +1,60 @@
+@import '../shared';
+
+.unreads-icon svg {
+  cursor: pointer;
+}
+
+.NotificationsMenu {
+  background-color: $white;
+  border: 1px solid $neutral-300;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-3;
+  display: flex;
+  flex-direction: column;
+  width: 296px;
+
+  @include smallInclusive {
+    border: none;
+    box-shadow: none;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+  }
+
+  .header {
+    border-bottom: 1px solid $neutral-300;
+    display: flex;
+    height: 40px;
+
+    @include smallInclusive {
+      > * {
+        margin: auto;
+      }
+    }
+  }
+
+  .notification-list {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 480px;
+    justify-content: center;
+
+    @include smallInclusive {
+      height: calc(100% - 40px);
+    }
+  }
+
+  .footer {
+    border-top: 1px solid $neutral-300;
+    display: flex;
+    gap: 8px;
+    height: 40px;
+    padding: 0 8px;
+    width: 100%;
+
+    > .Button {
+      flex: 1;
+    }
+  }
+}

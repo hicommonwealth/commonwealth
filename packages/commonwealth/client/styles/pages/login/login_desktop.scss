@@ -2,14 +2,14 @@
 
 .LoginDesktop {
   display: flex;
-  height: 424px;
+  min-height: 424px;
   width: 664px;
 
   .body {
     align-items: center;
     display: flex;
     flex-direction: column;
-    height: 424px;
+    min-height: 424px;
     justify-content: space-between;
     padding: 16px 24px;
     width: 400px;
@@ -32,7 +32,8 @@
       }
 
       .LoginBoilerplate {
-        margin: 32px;
+        margin: 0 32px;
+        margin-bottom: 16px;
       }
 
       .header-container {
@@ -54,6 +55,7 @@
 
         .LoginBoilerplate {
           margin: 0 32px;
+          margin-bottom: 16px;
         }
 
         .subheader-text.Text {
@@ -85,6 +87,46 @@
         flex-direction: row;
         gap: 8px;
         justify-content: center;
+
+        .wallet-back-btn {
+          border-color: transparent !important;
+
+          .Text {
+            font-weight: 400 !important;
+          }
+
+          &:hover {
+            border-color: transparent !important;
+          }
+        }
+
+        .wallet-magic-btn {
+          background-color: $neutral-700  !important;
+
+          &:hover {
+            background-color: $black  !important;
+          }
+        }
+
+      }
+
+      .email-form-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 24px;
+        margin-top: 80px;
+      }
+
+      .email-form-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 12px;
+
+        .Button {
+          width: 100%;
+        }
       }
     }
   }
