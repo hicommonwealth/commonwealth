@@ -3,7 +3,7 @@ import type { LoginActiveStep } from './types';
 export const getLoginText = (activeStep: LoginActiveStep) => {
   if (activeStep === 'walletList') {
     return {
-      headerText: 'Connect Your Wallet',
+      headerText: 'Login to Commonwealth',
       bodyText: `Many communities require different wallets 
       based on the chain they are built on and 
       the types of tokens members hold.`,
@@ -39,8 +39,8 @@ export const getLoginText = (activeStep: LoginActiveStep) => {
     };
   } else if (activeStep === 'connectWithEmail') {
     return {
-      headerText: 'Connect with email?',
-      bodyText: `Use Magic Link to connect with email and generate an address.`,
+      headerText: 'Enter your email',
+      bodyText: `Follow the instructions provided to login to Commonwealth with your email.`,
     };
   } else if (activeStep === 'ethWalletList') {
     return {
