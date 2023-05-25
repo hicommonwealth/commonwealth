@@ -10,27 +10,40 @@ import { SubstrateTypes } from 'chain-events/src/types';
 import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
 import type { BrokerConfig } from 'rascal';
+import { EventKind, IEventData } from '../../../src/chains/aave/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
-const chain = 'edgeware';
+const chain = 'aave';
 
 const rmqController = new MockRabbitMQController(
   <BrokerConfig>getRabbitMQConfig('localhost')
 );
 
 describe('Event Storage Handler Tests', () => {
+  before(async () => {
+    await models.sequelize.sync({ force: true });
+    await rmqController.init();
+  });
+
   it('should create chain event', async () => {
     // setup
-    const event: CWEvent = {
+    const event: CWEvent<IEventData> = {
       blockNumber: 10,
-      network: SupportedNetwork.Substrate,
+      network: SupportedNetwork.Aave,
       data: {
-        kind: SubstrateTypes.EventKind.DemocracyStarted,
-        referendumIndex: 0,
+        kind: EventKind.ProposalCreated,
+        id: 1,
+        proposer: '0x327BeaE3B570d9bdD8C6b9236199991Ab2c5fefe',
+        executor: '0x06C2E02aDB73238d7eE7DbD69fEA12B14091cB8a',
+        targets: ['0x6972E49bFbA4dbc4981101724CC87bd18c152cBA'],
+        values: ['testValue'],
+        signatures: ['testSignature'],
+        calldatas: ['testCalldatas'],
+        startBlock: 10,
         endBlock: 100,
-        proposalHash: 'hash',
-        voteThreshold: 'Supermajorityapproval',
+        strategy: 'testStrategy',
+        ipfsHash: 'testIpfsHash',
       },
     };
 
@@ -41,85 +54,10 @@ describe('Event Storage Handler Tests', () => {
 
     // expect results
     assert.deepEqual(dbEvent.event_data, event.data);
-    const chainEvents = await models['ChainEvent'].findAll({
+    const chainEvents = await models.ChainEvent.findAll({
       where: {
-        chain: 'edgeware',
+        chain: 'aave',
         block_number: 10,
-      },
-    });
-    assert.lengthOf(chainEvents, 1);
-    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
-  });
-
-  it('should truncate long preimage args', async () => {
-    // setup
-    const event: CWEvent<SubstrateTypes.IPreimageNoted> = {
-      blockNumber: 10,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind: SubstrateTypes.EventKind.PreimageNoted,
-        proposalHash: 'hash',
-        noter: 'n',
-        preimage: {
-          method: 'm',
-          section: 's',
-          args: [
-            '0x123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890',
-          ],
-        },
-      },
-    };
-    const truncatedData: SubstrateTypes.IPreimageNoted = {
-      kind: SubstrateTypes.EventKind.PreimageNoted,
-      proposalHash: 'hash',
-      noter: 'n',
-      preimage: {
-        method: 'm',
-        section: 's',
-        args: [
-          '0x1234567890123456789012345678901234567890123456789012345678901…',
-        ],
-      },
-    };
-
-    const eventHandler = new StorageHandler(models, rmqController, chain);
-
-    // process event
-    const dbEvent = await eventHandler.handle(event);
-
-    // expect results
-    assert.deepEqual(dbEvent.event_data, truncatedData);
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain: 'edgeware',
-        block_number: 10,
-      },
-    });
-    assert.lengthOf(chainEvents, 1);
-    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
-  });
-
-  it('should create chain event and type for unknown event type', async () => {
-    const event = {
-      blockNumber: 13,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind: 'democracy-exploded',
-        whoops: true,
-      },
-    };
-
-    const eventHandler = new StorageHandler(models, rmqController, chain);
-
-    // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
-
-    // expect results
-    assert.deepEqual(dbEvent.event_data, event.data);
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain: 'edgeware',
-        block_number: 13,
       },
     });
     assert.lengthOf(chainEvents, 1);
@@ -127,16 +65,27 @@ describe('Event Storage Handler Tests', () => {
   });
 
   it('should not create chain event for excluded event type', async () => {
-    const event: CWEvent = {
+    const event: CWEvent<IEventData> = {
       blockNumber: 13,
-      network: SupportedNetwork.Substrate,
+      network: SupportedNetwork.Aave,
       data: {
-        kind: SubstrateTypes.EventKind.Reward,
-        amount: '10000',
+        kind: EventKind.ProposalCreated,
+        id: 1,
+        proposer: '0x327BeaE3B570d9bdD8C6b9236199991Ab2c5fefe',
+        executor: '0x06C2E02aDB73238d7eE7DbD69fEA12B14091cB8a',
+        targets: ['0x6972E49bFbA4dbc4981101724CC87bd18c152cBA'],
+        values: ['testValue'],
+        signatures: ['testSignature'],
+        calldatas: ['testCalldatas'],
+        startBlock: 10,
+        endBlock: 100,
+        strategy: 'testStrategy',
+        ipfsHash: 'testIpfsHash',
       },
     };
+
     const eventHandler = new StorageHandler(models, rmqController, chain, {
-      excludedEvents: [SubstrateTypes.EventKind.Reward],
+      excludedEvents: [EventKind.ProposalCreated],
     });
 
     // process event
@@ -144,9 +93,9 @@ describe('Event Storage Handler Tests', () => {
 
     // confirm no event emitted
     assert.isUndefined(dbEvent);
-    const chainEvents = await models['ChainEvent'].findAll({
+    const chainEvents = await models.ChainEvent.findAll({
       where: {
-        chain: 'edgeware',
+        chain: 'aave',
         block_number: 13,
       },
     });

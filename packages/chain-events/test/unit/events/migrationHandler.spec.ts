@@ -23,7 +23,7 @@ const setupDbEvent = async (event: CWEvent) => {
   return storageHandler.handle(event);
 };
 
-describe.only('Aave Migration Event Handler Tests', () => {
+describe('Aave Migration Event Handler Tests', () => {
   before(async () => {
     await models.sequelize.sync({ force: true });
     await rmqController.init();
