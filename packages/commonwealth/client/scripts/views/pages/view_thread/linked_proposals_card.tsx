@@ -58,7 +58,11 @@ const LinkedProposal = ({
 
   if(!title){
     app.chainEntities.getOneEntity(thread.chain, ceTypeId).then((entity)=> {
-      return BuildProposalLink(entity.type, entity.typeId, thread.chain, entity.title, ceCompleted)
+      if(entity.chain == thread.chain){
+        return BuildProposalLink(entity.type, entity.typeId, thread.chain, entity.title, ceCompleted)
+      }else {
+        return BuildProposalLink(ceType, ceTypeId, thread.chain, title, ceCompleted)
+      }
     });
   }
 
