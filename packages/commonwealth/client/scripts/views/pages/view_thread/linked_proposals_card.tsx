@@ -64,10 +64,9 @@ const LinkedProposal = ({
         return BuildProposalLink(ceType, ceTypeId, thread.chain, title, ceCompleted)
       }
     });
+  }else{
+    return BuildProposalLink(ceType, ceTypeId, thread.chain, title, ceCompleted)
   }
-
-  return BuildProposalLink(ceType, ceTypeId, thread.chain, title, ceCompleted)
-
 };
 
 type LinkedProposalsCardProps = {
