@@ -310,33 +310,90 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-export async function loginWithMagicLink(email: string) {
+async function constructMagic() {
   const { Magic } = await import('magic-sdk');
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+  const { OAuthExtension } = await import('@magic-ext/oauth');
+  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: [
+      new OAuthExtension(),
       new CosmosExtension({
         // default to Osmosis URL
         rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
       }),
     ]
   });
+}
 
-  const didToken = await magic.auth.loginWithMagicLink({ email });
+export async function loginWithMagicLink({
+  email, provider
+}: { email?: string, provider?: string }) {
+  if (!email && !provider) throw new Error('Must provider email or provider');
+  const magic = await constructMagic();
+
+  if (email) {
+    const bearer = await magic.auth.loginWithMagicLink({ email });
+    await handleSocialLoginCallback(bearer);
+  } else {
+    // provider-based login
+    await magic.oauth.loginWithRedirect({
+      provider: provider as any,
+      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+    });
+  }
+}
+
+// Cannot get proper type due to code splitting
+function getProfileMetadata({ provider, userInfo }): { username?: string, avatarUrl?: string } {
+  // provider: result.oauth.provider (twitter, discord, github)
+  if (provider === 'discord') {
+    // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
+    //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
+    const { avatar, id, username } = userInfo.sources['https://discord.com/api/users/@me'];
+    if (avatar) {
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
+      return { username, avatarUrl };
+    } else {
+      return { username };
+    }
+  } else if (provider === 'github') {
+    // for github: result.oauth.userInfo.name / picture
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
+  } else if (provider === 'twitter') {
+    // for twitter: result.oauth.userInfo.name / profile
+    return { username: userInfo.name, avatarUrl: userInfo.profile };
+  } else if (provider === 'google') {
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
+  }
+  return {};
+}
+
+export async function handleSocialLoginCallback(bearer?: string) {
+  let profileMetadata: { username?: string, avatarUrl?: string } = {};
+  if (!bearer) {
+    const magic = await constructMagic();
+    const result = await magic.oauth.getRedirectResult();
+    profileMetadata = getProfileMetadata(result.oauth);
+    bearer = result.magic.idToken;
+    // console.log('Magic redirect result:', result);
+  }
+
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
-      Authorization: `Bearer ${didToken}`,
+      Authorization: `Bearer ${bearer}`,
     },
     xhrFields: {
       withCredentials: true,
     },
     data: {
-      // send chain/community to request
       chain: app.activeChainId(),
+      jwt: app.user.jwt,
+      username: profileMetadata?.username,
+      avatarUrl: profileMetadata?.avatarUrl,
     },
   });
+
   if (response.status === 'Success') {
-    // log in as the new user (assume all verification done server-side)
     await initAppState(false);
     if (app.chain) {
       const c = app.user.selectedChain
@@ -345,6 +402,6 @@ export async function loginWithMagicLink(email: string) {
       await updateActiveAddresses({ chain: c });
     }
   } else {
-    throw new Error(`Magic auth unsuccessful: ${response.status}`);
+    throw new Error(`Social auth unsuccessful: ${response.status}`);
   }
 }

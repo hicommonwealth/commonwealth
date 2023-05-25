@@ -4,6 +4,7 @@ import type { ProfileRowProps } from '../../components/component_kit/cw_profiles
 
 export type LoginSidebarType =
   | 'connectWallet'
+  | 'emailLogin'
   | 'communityWalletOptions'
   | 'newAddressLinked'
   | 'newOrReturning';
@@ -38,7 +39,8 @@ export type LoginProps = {
   handleSetEmail: (e: any) => void;
   setSidebarType: (sidebarType: string) => void;
   canResetWalletConnect: boolean;
-  onEmailLogin: () => void;
+  onEmailLogin: () => Promise<void>;
+  onSocialLogin: (provider: string) => Promise<void>;
   onConnectAnotherWay: () => void;
   onLinkExistingAccount: () => void;
   onCreateNewAccount: () => void;
@@ -57,4 +59,5 @@ export type LoginProps = {
     wallet: IWebWallet<any>,
     address: string
   ) => Promise<void>;
+  onNavigateToWalletList: () => void;
 };
