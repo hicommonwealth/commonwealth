@@ -41,6 +41,7 @@ export const iconLookup = {
   flame: Icons.CWFlame,
   gear: Icons.CWGear,
   github: Icons.CWGithub,
+  google: Icons.CWGoogle,
   hamburger: Icons.CWHamburger,
   hash: Icons.CWHash,
   heartEmpty: Icons.CWHeartEmpty,
@@ -85,6 +86,7 @@ export const iconLookup = {
 };
 
 export const customIconLookup = {
+  email: CustomIcons.CWEmail,
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWMetaMask,
   keplr: CustomIcons.CWKeplr,
