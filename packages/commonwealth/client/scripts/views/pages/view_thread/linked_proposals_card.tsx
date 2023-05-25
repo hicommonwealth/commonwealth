@@ -32,11 +32,17 @@ type LinkedProposalProps = {
   ceCompleted?: ChainEntity['completed'];
 };
 
-const BuildProposalLink = (ceType: IChainEntityKind, ceTypeId: string, chain: string, title: string, ceCompleted: boolean) => {
+const LinkedProposal = ({
+  thread,
+  title,
+  ceType,
+  ceTypeId,
+  ceCompleted,
+}: LinkedProposalProps) => {
   const slug = chainEntityTypeToProposalSlug(ceType);
 
   const threadLink = `${
-    app.isCustomDomain() ? '' : `/${chain}`
+    app.isCustomDomain() ? '' : `/${thread.chain}`
   }${getProposalUrlPath(slug, ceTypeId, true)}`;
 
   return (
@@ -46,27 +52,6 @@ const BuildProposalLink = (ceType: IChainEntityKind, ceTypeId: string, chain: st
       }`}
     </a>
   );
-}
-
-const LinkedProposal = ({
-  thread,
-  title,
-  ceType,
-  ceTypeId,
-  ceCompleted,
-}: LinkedProposalProps) => {
-
-  if(!title){
-    app.chainEntities.getOneEntity(thread.chain, ceTypeId).then((entity)=> {
-      if(entity.chain == thread.chain){
-        return BuildProposalLink(entity.type, entity.typeId, thread.chain, entity.title, ceCompleted)
-      }else {
-        return BuildProposalLink(ceType, ceTypeId, thread.chain, title, ceCompleted)
-      }
-    });
-  }else{
-    return BuildProposalLink(ceType, ceTypeId, thread.chain, title, ceCompleted)
-  }
 };
 
 type LinkedProposalsCardProps = {
@@ -127,6 +112,21 @@ export const LinkedProposalsCard = ({
       setSnapshotProposalsLoaded(true);
     }
   }, [initialSnapshotLinks]);
+
+  useEffect(() => {
+    initialProposalLinks.forEach(async (link) => {
+      if (!link.title) {
+        const entity = await app.chainEntities.getOneEntity(
+          thread.chain,
+          link.identifier
+        );
+        if (entity.chain === thread.chain) {
+          link.title = entity.title;
+          link.identifier = entity.typeId;
+        }
+      }
+    });
+  }, [initialProposalLinks]);
 
   const showSnapshot =
     snapshot && initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
