@@ -8,7 +8,6 @@ import {
   RascalQueues,
   RascalRoutingKeys,
   RmqCENotificationCUD,
-  RmqEntityCUD,
 } from 'common-common/src/rabbitmq/types';
 import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import {
@@ -344,19 +343,6 @@ describe('Tests for the ChainEventsConsumer service', () => {
       },
     });
     expect(cetResult).to.not.be.null;
-
-    // check that a message was added to the chain-entity cud queue
-    const message = await getRmqMessage(
-      RABBITMQ_API_URI,
-      RascalQueues.ChainEntityCUDMain,
-      false
-    );
-    expect(message).to.have.property('length');
-    expect(message.length).to.equal(1);
-    expect(
-      RmqEntityCUD.isValidMsgFormat(JSON.parse(message[0].payload)),
-      'The message has an incorrect type'
-    ).to.be.true;
 
     await models.ChainEvent.destroy({
       where: {

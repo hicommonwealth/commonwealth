@@ -3,11 +3,7 @@
  */
 
 import { addPrefix, factory } from 'common-common/src/logging';
-import type { RmqEntityCUD } from 'common-common/src/rabbitmq/types';
-import {
-  AbstractRabbitMQController,
-  RascalPublications,
-} from 'common-common/src/rabbitmq/types';
+import { AbstractRabbitMQController } from 'common-common/src/rabbitmq/types';
 
 import type { DB } from '../../database/database';
 
@@ -90,24 +86,6 @@ export default class extends IEventHandler {
         author,
         completed,
       });
-
-      const publishData: RmqEntityCUD.RmqMsgType = {
-        ce_id: dbEntity.id,
-        chain_id: dbEntity.chain,
-        author,
-        entity_type_id: type_id,
-        cud: 'create',
-      };
-
-      await this._rmqController.safePublish(
-        publishData,
-        dbEntity.id,
-        RascalPublications.ChainEntityCUDMain,
-        {
-          sequelize: this._models.sequelize,
-          model: this._models.ChainEntity,
-        }
-      );
 
       if (dbEvent.entity_id !== dbEntity.id) {
         dbEvent.entity_id = dbEntity.id;

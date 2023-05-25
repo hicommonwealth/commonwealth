@@ -102,10 +102,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             ...queueConfig,
             options: queueOptions,
           },
-          [RascalQueues.ChainEntityCUDMain]: {
-            ...queueConfig,
-            options: queueOptions,
-          },
           [RascalQueues.ChainEventNotificationsCUDMain]: {
             ...queueConfig,
             options: queueOptions,
@@ -138,12 +134,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             destination: RascalQueues.ChainEvents,
             destinationType: 'queue',
             bindingKey: RascalRoutingKeys.ChainEvents,
-          },
-          [RascalBindings.ChainEntityCUDMain]: {
-            source: RascalExchanges.CUD,
-            destination: RascalQueues.ChainEntityCUDMain,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.ChainEntityCUD,
           },
           [RascalBindings.ChainEventNotificationsCUD]: {
             source: RascalExchanges.CUD,
@@ -182,11 +172,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             routingKey: RascalRoutingKeys.ChainEvents,
             ...publicationConfig,
           },
-          [RascalPublications.ChainEntityCUDMain]: {
-            exchange: RascalExchanges.CUD,
-            routingKey: RascalRoutingKeys.ChainEntityCUD,
-            ...publicationConfig,
-          },
+
           [RascalPublications.ChainEventNotificationsCUDMain]: {
             exchange: RascalExchanges.CUD,
             routingKey: RascalRoutingKeys.ChainEventNotificationsCUD,
@@ -211,10 +197,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
         subscriptions: {
           [RascalSubscriptions.ChainEvents]: {
             queue: RascalQueues.ChainEvents,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.ChainEntityCUDMain]: {
-            queue: RascalQueues.ChainEntityCUDMain,
             ...subscriptionConfig,
           },
           [RascalSubscriptions.ChainEventNotificationsCUDMain]: {
