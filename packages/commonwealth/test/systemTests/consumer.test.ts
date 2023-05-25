@@ -5,10 +5,7 @@ import { SupportedNetwork } from 'chain-events/src';
 import type * as AaveTypes from 'chain-events/src/chains/aave/types';
 import type { ITransfer } from 'chain-events/src/chains/aave/types';
 import { EventKind } from 'chain-events/src/chains/aave/types';
-import type {
-  RmqCENotificationCUD,
-  RmqEntityCUD,
-} from 'common-common/src/rabbitmq/types';
+import type { RmqCENotificationCUD } from 'common-common/src/rabbitmq/types';
 import {
   RascalExchanges,
   RascalQueues,
