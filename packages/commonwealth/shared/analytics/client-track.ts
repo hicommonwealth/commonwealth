@@ -7,7 +7,7 @@ try {
   } else if (process.env.NODE_ENV === 'development') {
     // NOTE: Only works if NODE_ENV defined in .env
     // Make sure that is set to development if you want to use backend Mixpanel locally.
-    mixpanel.init('312b6c5fadb9a88d98dc1fb38de5d900', { debug: true });
+    mixpanel.init(process.env.MIXPANEL_DEV_TOKEN, { debug: true });
   }
 } catch (e) {
   console.log('Unable to initialized the backend mixpanel client: ', e);

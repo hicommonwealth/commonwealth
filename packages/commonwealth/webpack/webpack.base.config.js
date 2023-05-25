@@ -28,6 +28,11 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.MIXPANEL_DEV_TOKEN': JSON.stringify(
+        process.env.MIXPANEL_DEV_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900'
+      ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.MAGIC_PUBLISHABLE_KEY': JSON.stringify(
         process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4'
       ),
