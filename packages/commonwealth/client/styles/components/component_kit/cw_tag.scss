@@ -83,4 +83,19 @@
       color: $white;
     }
   }
+
+  &.new {
+    background-color: $yellow-50;
+    border-radius: $border-radius-corners-wider;
+    padding: 4px 8px;
+
+    .tag-text.Text {
+      color: $yellow-600;
+    }
+    .tag-icon.Icon {
+      stroke: $yellow-600;
+      padding: 0;
+      fill: none;
+    }
+  }
 }
