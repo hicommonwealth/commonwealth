@@ -97,8 +97,8 @@ export const SearchBar = () => {
       setSearchResults(results);
       app.search.addToHistory(searchQuery);
     } catch (err) {
+      console.error(err);
       setSearchResults({});
-
       notifyError(
         err.responseJSON?.error || err.responseText || err.toString()
       );
