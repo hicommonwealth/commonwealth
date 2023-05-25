@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWCard, CardElevation } from "../../../client/scripts/views/components/component_kit/cw_card";
+import { CWCard } from "../../../client/scripts/views/components/component_kit/cw_card";
 import { CWText } from "../../../client/scripts/views/components/component_kit/cw_text";
 
 import "../../../client/styles/components/component_kit/cw_component_showcase.scss";
@@ -42,7 +42,7 @@ const BorderCard: FC<BorderCardProps> = ({ border }) => {
 
 export const Border: Story = {
   args: {
-    border: "Widgets",
+    border: "Regular",
   },
   argTypes: {
     border: {
