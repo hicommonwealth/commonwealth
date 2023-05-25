@@ -1,17 +1,13 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
-
 import type {
   CWEvent,
-  IChainEventKind,
   IDisconnectedRange,
   IEventLabel,
   IEventProcessor,
   IEventSubscriber,
-  IEventTitle,
   IStorageFetcher,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
-import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
+import { Label as SubstrateLabel } from './chain-bases/substrate/filters/labeler';
 import {
   Label as CompoundLabel,
   Listener as CompoundListener,
@@ -84,7 +80,6 @@ export async function createListener(
     skipCatchup?: boolean;
     startBlock?: number;
     archival?: boolean;
-    url?: string;
     enricherConfig?: any;
     pollTime?: number;
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>;

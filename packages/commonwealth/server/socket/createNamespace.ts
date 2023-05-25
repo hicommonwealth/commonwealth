@@ -85,7 +85,7 @@ export async function publishToChainEventsRoom(
   notification: ChainEventNotification
 ) {
   this.server
-    .to(notification.ChainEvent.chain)
+    .to(notification.chain_id)
     .emit(WebsocketMessageNames.ChainEventNotification, notification);
 }
 
