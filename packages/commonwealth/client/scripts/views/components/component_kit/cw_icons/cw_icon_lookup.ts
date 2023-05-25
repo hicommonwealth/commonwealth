@@ -7,6 +7,7 @@ import {
   Sparkle,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
+import { CWNewStar } from './cw_icons';
 import * as Icons from './cw_icons';
 import { withPhosphorIcon } from './cw_phosphor_icons';
 
@@ -70,6 +71,7 @@ export const iconLookup = {
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
   mute: Icons.CWMute,
+  newStar: Icons.CWNewStar,
   people: Icons.CWPeople,
   person: Icons.CWPerson,
   pin: Icons.CWPin,
