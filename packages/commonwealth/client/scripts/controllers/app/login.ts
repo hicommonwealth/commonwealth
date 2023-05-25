@@ -337,14 +337,13 @@ export async function loginWithMagicLink({
   if (email) {
     const bearer = await magic.auth.loginWithMagicLink({ email });
     await handleSocialLoginCallback(bearer);
-    return "0x0"; // TODO
+    return bearer;
   } else {
     // provider-based login
     const address = await magic.oauth.loginWithRedirect({
       provider: provider as any,
       redirectURI: new URL('/finishsociallogin', window.location.origin).href,
     });
-    return "0x0"; // TODO
   }
 }
 

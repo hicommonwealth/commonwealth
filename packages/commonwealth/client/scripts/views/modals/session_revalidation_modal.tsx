@@ -23,7 +23,7 @@ import { loginWithMagicLink } from 'controllers/app/login';
 
 type SessionRevalidationModalProps = {
   onClose: () => void;
-  onVerified: (address: string) => void;
+  onVerified: (address: string | undefined) => void;
 };
 
 const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationModalProps) => {
@@ -37,7 +37,7 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
     onModalClose: () => {
       // do nothing, let the user close out of session revalidation
     },
-    onSuccess: (address: string) => {
+    onSuccess: (address: string | undefined) => {
       onVerified(address);
     }
   });

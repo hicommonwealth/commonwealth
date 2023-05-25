@@ -44,7 +44,7 @@ type IuseWalletProps = {
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
-  onSuccess?: (address: string) => void;
+  onSuccess?: (address?: string | undefined) => void;
   onModalClose: () => void;
   useSessionKeyLoginFlow?: boolean;
 };
@@ -155,10 +155,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      const magicAddress = await loginWithMagicLink({ email });
+      const bearer = await loginWithMagicLink({ email });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
+      if (walletProps.onSuccess) walletProps.onSuccess();
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();
