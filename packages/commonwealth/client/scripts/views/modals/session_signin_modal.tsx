@@ -17,11 +17,8 @@ type SessionSigninModalProps = {
 };
 
 export const SessionSigninModal = (props: SessionSigninModalProps) => {
-  const {
-    onWalletAddressSelect,
-    onWalletSelect,
-    onResetWalletConnect,
-  } = useWallets({ ...props, useSessionKeyLoginFlow: true });
+  const { onWalletAddressSelect, onWalletSelect, onResetWalletConnect } =
+    useWallets({ ...props, useSessionKeyLoginFlow: true });
 
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
@@ -59,6 +56,8 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             onResetWalletConnect={onResetWalletConnect}
             onWalletAddressSelect={onWalletAddressSelect}
             onWalletSelect={onWalletSelect}
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onSocialLogin={() => null}
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             onConnectAnotherWay={() => {}}
             darkMode={false}
