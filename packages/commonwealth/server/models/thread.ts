@@ -123,8 +123,7 @@ export default (
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
       locked_at: {
         type: dataTypes.DATE,
-        allowNull: false,
-        defaultValue: false,
+        allowNull: true,
       },
     },
     {

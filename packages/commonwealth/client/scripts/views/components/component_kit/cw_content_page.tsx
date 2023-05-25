@@ -10,12 +10,10 @@ import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { isWindowMediumSmallInclusive } from './helpers';
 import { ComponentType } from './types';
-import { CWTooltip } from './cw_popover/cw_tooltip';
 import { LockWithTooltip } from '../lock_with_tooltip';
 
 export type ContentPageSidebarItem = {
