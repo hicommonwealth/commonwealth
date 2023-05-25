@@ -2,7 +2,7 @@ import * as yargs from 'yargs';
 
 import { createListener, LoggingHandler, SupportedNetwork } from '../src';
 
-import { networkUrls, contracts, networkSpecs } from './listenerUtils';
+import { networkUrls, contracts } from './listenerUtils';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -42,15 +42,6 @@ const { argv } = yargs.options({
 });
 
 const shortcuts = {
-  substrate: {
-    chain: 'edgeware',
-    network: SupportedNetwork.Substrate,
-    url: networkUrls.edgeware,
-    spec: networkSpecs.edgeware,
-    enricherConfig: {
-      balanceTransferThreshold: 500_000,
-    },
-  },
   erc20: {
     chain: 'erc20',
     network: SupportedNetwork.ERC20,

@@ -5,12 +5,7 @@
  */
 
 import type { IDisconnectedRange, IStorageFetcher } from 'chain-events/src';
-import {
-  AaveEvents,
-  CompoundEvents,
-  CosmosEvents,
-  SubstrateEvents,
-} from 'chain-events/src';
+import { AaveEvents, CompoundEvents, CosmosEvents } from 'chain-events/src';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
@@ -25,11 +20,9 @@ import {
 import fetch from 'node-fetch';
 import type { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI } from '../../commonwealth/server/config';
-import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
 import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';
 import NotificationsHandler from '../services/ChainEventsConsumer/ChainEventHandlers/notification';
 import models from '../services/database/database';
-import { EventKind } from '../src/chains/substrate/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -98,11 +91,9 @@ async function migrateChainEntity(
       chain
     );
 
-    const excludedNotificationEvents = [EventKind.DemocracyTabled];
     const notificationsHandler = new NotificationsHandler(
       models,
-      rmqController,
-      excludedNotificationEvents
+      rmqController
     );
 
     let fetcher: IStorageFetcher<any>;
