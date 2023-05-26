@@ -258,6 +258,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // load existing events and subscribe to future via client node connection
   public async initChainEntities(): Promise<void> {
+    await this._app.chainEntities.refresh(this.app.chain.id);
     console.warn('Substrate chain-events are not supported!');
   }
 
