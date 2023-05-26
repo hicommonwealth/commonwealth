@@ -9,14 +9,18 @@ import app from 'state';
 const hasExecutedFinishSocialLogin = {};
 
 const validate = async (setRoute) => {
+  let redirectTo = (new URLSearchParams(window.location.search)).get('redirectTo');
+  if (redirectTo?.startsWith("/finishsociallogin")) {
+    redirectTo = null;
+  }
+
   await handleSocialLoginCallback();
   await initAppState();
 
-  // TODO: redirect to correct path
   if (app.activeChainId()) {
-    setRoute(`/account/${app.activeChainId()}`);
+    setRoute(redirectTo || `/account/${app.activeChainId()}`);
   } else {
-    setRoute('/dashboard');
+    setRoute(redirectTo || '/dashboard');
   }
 };
 

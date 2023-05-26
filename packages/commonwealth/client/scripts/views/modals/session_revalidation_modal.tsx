@@ -20,10 +20,6 @@ import { CWSpinner } from '../components/component_kit/cw_spinner';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  startLoginWithMagicLink,
-  handleSocialLoginCallback,
-} from 'controllers/app/login';
 
 type SessionRevalidationModalProps = {
   onClose: () => void;

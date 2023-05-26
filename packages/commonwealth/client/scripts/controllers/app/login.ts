@@ -338,10 +338,12 @@ async function constructMagic(isCosmos) {
 export async function startLoginWithMagicLink({
   email,
   provider,
+  redirectTo,
   isCosmos,
 }: {
   email?: string;
   provider?: string;
+  redirectTo?: string;
   isCosmos: boolean;
 }) {
   if (!email && !provider)
@@ -355,9 +357,10 @@ export async function startLoginWithMagicLink({
     return { bearer, address };
   } else {
     // provider-based login
+    const redirectToParams = redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : '';
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
-      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+      redirectURI: new URL('/finishsociallogin' + redirectToParams, window.location.origin).href,
     });
     const info = await magic.user.getInfo();
     return { address: info.publicAddress };

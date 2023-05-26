@@ -160,6 +160,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       const { bearer, address: magicAddress } = await startLoginWithMagicLink({
         email,
         isCosmos,
+        redirectTo: document.location.pathname + document.location.search,
       });
       setIsMagicLoading(false);
 
@@ -175,7 +176,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   // New callback for handling social login
   const onSocialLogin = async (provider: string, onlyRevalidateSessionKey?: boolean) => {
-    debugger;
     setIsMagicLoading(true);
 
     try {
@@ -183,6 +183,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       const { bearer, address: magicAddress } = await startLoginWithMagicLink({
         provider,
         isCosmos,
+        redirectTo: document.location.pathname + document.location.search,
       });
       setIsMagicLoading(false);
 
