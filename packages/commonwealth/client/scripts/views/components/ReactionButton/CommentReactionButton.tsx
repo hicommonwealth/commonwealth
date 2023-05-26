@@ -65,7 +65,7 @@ export const CommentReactionButton = ({
         setReactors(
           reactors.filter(({ Address }) => Address.address !== userAddress)
         );
-
+      }).finally(() => {
         setIsLoading(false);
       });
   };
@@ -82,7 +82,7 @@ export const CommentReactionButton = ({
             Address: { address: userAddress, chain },
           },
         ]);
-
+      }).finally(() => {
         setIsLoading(false);
       });
   };
