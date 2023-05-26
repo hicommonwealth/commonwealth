@@ -1,10 +1,10 @@
-@mixin iconAndText($icon-color, $text-color) {
+@mixin iconAndText($color) {
   .Icon.button-icon {
-    color: $icon-color;
+    color: $color;
   }
 
   .Text.button-text {
-    color: $text-color;
+    color: $color;
   }
 }
 
@@ -15,3 +15,327 @@
   @include iconAndText($neutral-300);
 }
 
+@mixin primaryRed {
+  background-color: $rorange-500;
+  box-shadow: $elevation-1;
+
+  @include iconAndText($white);
+
+  &:hover {
+    background-color: $rorange-300;
+    box-shadow: none;
+  }
+
+  &:active {
+    background-color: $rorange-200;
+    box-shadow: none;
+
+    @include iconAndText($rorange-300);
+  }
+
+  &.disabled {
+    background-color: $neutral-50;
+
+    @include disabled;
+  }
+}
+
+@mixin primaryBlue {
+  background-color: $primary-500;
+  box-shadow: $elevation-1;
+
+  @include iconAndText($white);
+
+  &:hover {
+    background-color: $primary-300;
+    box-shadow: none;
+  }
+
+  &:active {
+    background-color: $primary-200;
+    box-shadow: none;
+
+    @include iconAndText($primary-300);
+  }
+
+  &.disabled {
+    background-color: $neutral-50;
+
+    @include disabled;
+  }
+}
+
+@mixin primaryBlack {
+  background-color: $neutral-800;
+  box-shadow: $elevation-1;
+
+  @include iconAndText($white);
+
+  &:hover {
+    background-color: $neutral-700;
+    box-shadow: none;
+  }
+
+  &:active {
+    background-color: $neutral-600;
+    box-shadow: none;
+
+    @include iconAndText($neutral-100);
+  }
+
+  &.disabled {
+    background-color: $neutral-50;
+
+    @include disabled;
+  }
+}
+
+@mixin secondaryRed {
+  background-color: $white;
+  border-color: $rorange-500;
+
+  @include iconAndText($rorange-500);
+
+  &:hover {
+    background-color: $rorange-50;
+    border-color: $rorange-300;
+
+    @include iconAndText($rorange-300);
+  }
+
+  &:active {
+    background-color: $rorange-100;
+    border-color: $rorange-200;
+
+    @include iconAndText($rorange-200);
+  }
+
+  &.disabled {
+    border-color: $neutral-300;
+
+    @include disabled;
+  }
+}
+
+@mixin secondaryBlue {
+  background-color: $white;
+  border-color: $primary-500;
+
+  @include iconAndText($primary-500);
+
+  &:hover {
+    background-color: $primary-50;
+    border-color: $primary-300;
+
+    @include iconAndText($primary-300);
+  }
+
+  &:active {
+    background-color: $primary-100;
+    border-color: $primary-200;
+
+    @include iconAndText($primary-200);
+  }
+
+  &.disabled {
+    border-color: $neutral-300;
+
+    @include disabled;
+  }
+}
+
+@mixin secondaryBlack {
+  background-color: $white;
+  border-color: $neutral-800;
+
+  @include iconAndText($neutral-800);
+
+  &:hover {
+    background-color: $neutral-50;
+    border-color: $neutral-600;
+
+    @include iconAndText($neutral-600);
+  }
+
+  &:active {
+    background-color: $neutral-100;
+    border-color: $neutral-400;
+
+    @include iconAndText($neutral-400);
+  }
+
+  &.disabled {
+    border-color: $neutral-300;
+
+    @include disabled;
+  }
+}
+
+@mixin tertiaryBlue {
+  background-color: transparent;
+
+  @include iconAndText($primary-500);
+
+  &:hover {
+    @include iconAndText($primary-300);
+  }
+
+  &:active {
+    @include iconAndText($primary-100);
+  }
+
+  &.disabled {
+    @include disabled;
+  }
+}
+
+@mixin tertiaryBlack {
+  background-color: transparent;
+
+  @include iconAndText($neutral-800);
+
+  &:hover {
+    @include iconAndText($neutral-600);
+  }
+
+  &:active {
+    @include iconAndText($neutral-500);
+  }
+
+  &.disabled {
+    @include disabled;
+  }
+}
+
+@mixin primaryBlueDark {
+  background-color: $primary-500;
+  box-shadow: $elevation-1;
+
+  @include iconAndText($white);
+
+  &:hover {
+    background-color: $primary-300;
+    box-shadow: none;
+  }
+
+  &:active {
+    background-color: $primary-200;
+    box-shadow: none;
+
+    @include iconAndText($primary-300);
+  }
+
+  &.disabled {
+    background-color: $neutral-700;
+    box-shadow: none;
+    pointer-events: none;
+
+    @include iconAndText($neutral-500);
+  }
+}
+
+@mixin secondaryBlueDark {
+  background-color: transparent;
+  border-color: $primary-200;
+
+  @include iconAndText($primary-200);
+
+  &:hover {
+    background-color: $primary-50;
+    border-color: $primary-300;
+
+    @include iconAndText($primary-300);
+  }
+
+  &:active {
+    background-color: $primary-100;
+    border-color: $primary-200;
+
+    @include iconAndText($primary-200);
+  }
+
+  &.disabled {
+    background-color: transparent;
+    border-color: $neutral-600;
+    box-shadow: none;
+    pointer-events: none;
+
+    @include iconAndText($neutral-600);
+  }
+}
+
+@mixin miniBlack {
+  align-items: center;
+  padding: 4px 12px;
+  background: $neutral-800;
+  border-radius: $border-radius-rounded-corners;
+  box-shadow: $elevation-1;
+
+  &:hover {
+    background: $neutral-700;
+  }
+
+  &:active {
+    background: $neutral-400;
+    box-shadow: none;
+  }
+
+  &.disabled {
+    background: $neutral-200;
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  @include iconAndText($white);
+}
+
+@mixin miniWhite {
+  align-items: center;
+  padding: 4px 12px;
+  background: $white;
+  border: 1px solid $neutral-300;
+  border-radius: $border-radius-rounded-corners;
+
+  &:hover {
+    border-color: $primary-200;
+  }
+
+  &:active {
+    border-color: $primary-500;
+  }
+
+  &.disabled {
+    background: $neutral-50;
+    border: 1px solid $neutral-100;
+    pointer-events: none;
+
+    @include iconAndText($neutral-300);
+  }
+
+  @include iconAndText($neutral-800);
+}
+
+@mixin miniRed {
+  align-items: center;
+  padding: 4px 12px;
+  background: $white;
+  border: 1px solid $rorange-600;
+  border-radius: $border-radius-rounded-corners;
+
+  &:hover {
+    border-color: $rorange-500;
+  }
+
+  &:active {
+    border-color: $rorange-300;
+  }
+
+  &.disabled {
+    border: 1px solid $rorange-200;
+    pointer-events: none;
+
+    @include iconAndText($rorange-200);
+  }
+
+  @include iconAndText($rorange-600);
+}

@@ -1,50 +1,5 @@
 @import '../../shared';
 
-.btn-border {
-  &.primary {
-    border: 2px solid $transparent;
-    &:focus-within {
-      border: 2px solid $neutral-700;
-    }
-  }
-
-  &.destructive {
-    border: 2px solid $transparent;
-    &:focus-within {
-      border: 2px solid $rorange-600;
-    }
-  }
-
-  &.primary, &.destructive {
-    padding: 2px;
-    border-radius: 10px;
-    width: fit-content;
-  }
-
-  &.secondary, &.tertiary {
-    border: 2px solid $transparent;
-    margin: 2px;
-    border-radius: 8px;
-    width: fit-content;
-  }
-
-  &.secondary {
-    &:focus-within {
-      border: 2px solid $neutral-800;
-
-      .Button {
-        border: 1px solid $transparent;
-      }
-    }
-  }
-
-  &.tertiary {
-    &:focus-within {
-      border: 2px solid $blue-600;
-    }
-  }
-}
-
 .Button {
   align-items: center;
   border: 2px solid transparent;
@@ -52,6 +7,8 @@
   cursor: pointer;
   display: flex;
   flex-direction: row;
+  gap: 8px;
+  height: 36px;
   justify-content: center;
   padding: 6px 20px;
   width: fit-content;
@@ -64,154 +21,103 @@
     outline: none;
   }
 
-  &.sm {
-    height: 2rem;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-    gap: 0.625rem;
+  &.primary-red {
+    @include primaryRed;
   }
 
-  &.med {
-    height: 2.5rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+  &.primary-blue {
+    @include primaryBlue;
   }
 
-  &.lg {
-    gap: 0.7rem;
-    height: 3rem;
-    padding-top: 0.625rem;
-    padding-bottom: 0.625rem;
-
-    .Text.button-text {
-      font-size: 1rem;
-    }
-
-    .Icon {
-      height: 1.25rem;
-      width: 1.25rem;
-    }
+  &.primary-black {
+    @include primaryBlack;
   }
 
-  &.sm, &.med {
-    gap: 0.625rem;
-    .Text.button-text {
-      font-size: 0.875rem;
-    }
-
-    .Icon {
-      height: 1rem;
-      width: 1rem;
-    }
+  &.secondary-red {
+    @include secondaryRed;
   }
 
-  &.disabled {
-    pointer-events: none;
+  &.secondary-blue {
+    @include secondaryBlue;
   }
 
-  &.narrow {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  &.secondary-black {
+    @include secondaryBlack;
   }
 
-  &.wide {
-    padding-left: 4rem;
-    padding-right: 4rem;
+  &.tertiary-blue {
+    @include tertiaryBlue;
   }
 
-  &.primary {
-    background-color: $neutral-700;
-    @include iconAndText($neutral-25, $neutral-25);
-  
-    &:hover {
-      background-color: $neutral-800;
-      @include iconAndText($neutral-25, $white);
-    }
-  
-    &:active {
-      background-color: $neutral-700;
-      @include iconAndText($neutral-25, $white);
-    }
-
-    &:focus {
-      background-color: $neutral-800;
-      @include iconAndText($white, $white);
-    }
-  
-    &.disabled {
-      background-color: $neutral-200;
-      @include iconAndText($neutral-400, $neutral-400);
-    }
+  &.tertiary-black {
+    @include tertiaryBlack;
   }
 
-  &.secondary {
-    background-color: $white;
-    border: 1px solid $neutral-700;
-    @include iconAndText($neutral-800, $neutral-700);
-  
-    &:hover {
-      background-color: $neutral-50;
-      @include iconAndText($neutral-800, $neutral-800);
-    }
-  
-    &:active {
-      background-color: $white;
-      border: 1px solid $neutral-800;
-      @include iconAndText($neutral-800, $neutral-700);
-    }
+  &.lg-primary-red {
+    border-radius: $border-radius-rounded-corners;
+    height: 40px;
 
-    &:focus {
-      background-color: $neutral-50;
-      @include iconAndText($neutral-800, $neutral-800);
-    }
-  
-    &.disabled {
-      background-color: $neutral-50;
-      border: 1px solid $neutral-200;
-      @include iconAndText($neutral-400, $neutral-400);
-    }
+    @include primaryRed;
   }
 
-  &.tertiary {
-    border: 4px solid $transparent;
-    @include iconAndText($blue-500, $blue-500);
-  
-    &:hover {
-      @include iconAndText($blue-600, $blue-600);
-    }
-  
-    &:active {
-      @include iconAndText($blue-500, $blue-500);
-    }
+  &.lg-primary-blue {
+    border-radius: $border-radius-rounded-corners;
+    height: 40px;
 
-    &:focus {
-      @include iconAndText($blue-600, $blue-600);
-    }
-  
-    &.disabled {
-      @include iconAndText($neutral-400, $neutral-400);
-    }
+    @include primaryBlue;
   }
 
-  &.destructive {
-    background-color: $rorange-500;
-    @include iconAndText($white, $white);
-  
-    &:hover {
-      background-color: $rorange-600;
-    }
-  
-    &:active {
-      background-color: $rorange-500;
-    }
+  &.lg-secondary-red {
+    height: 40px;
 
-    &:focus {
-      background-color: $rorange-600;
-    }
+    @include primaryRed; // large styles are off by one because primary has more border radius
+  }
 
-    &.disabled {
-      background-color: $neutral-200;
-      @include iconAndText($neutral-400, $neutral-400);
-    }
+  &.lg-secondary-blue {
+    height: 40px;
+
+    @include primaryBlue;
+  }
+
+  &.lg-tertiary-red {
+    height: 40px;
+
+    @include secondaryRed;
+  }
+
+  &.lg-tertiary-blue {
+    height: 40px;
+
+    @include secondaryBlue;
+  }
+
+  &.primary-blue-dark {
+    height: 40px;
+
+    @include primaryBlueDark;
+  }
+
+  &.secondary-blue-dark {
+    height: 40px;
+
+    @include secondaryBlueDark;
+  }
+
+  &.mini-black {
+    height: 24px;
+
+    @include miniBlack;
+  }
+
+  &.mini-white {
+    height: 24px;
+
+    @include miniWhite;
+  }
+
+  &.mini-red {
+    height: 24px;
+
+    @include miniRed;
   }
 }

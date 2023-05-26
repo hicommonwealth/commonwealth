@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 
 import 'components/component_kit/cw_component_showcase.scss';
+import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWAuthButton } from './cw_auth_button';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
-import { CWButton } from './cw_button';
+import { CWButton } from './new_designs/cw_button';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -181,7 +182,7 @@ export const ComponentShowcase = () => {
             buttons: [
               {
                 label: 'Delete',
-                buttonType: 'primary',
+                buttonType: 'destructive',
                 onClick: () => {
                   notifySuccess('Deleted');
                 },
