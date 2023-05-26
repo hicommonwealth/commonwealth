@@ -125,7 +125,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: CW Unit And Integration Tests
+    name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
 
     services:
@@ -290,7 +290,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: CE Integration and Unit Tests
+    name: Chain Events Integration and Unit Tests
     runs-on: ubuntu-latest
 
     services:
