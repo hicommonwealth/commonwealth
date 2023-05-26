@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import app from 'state';
 import { PageLoading } from './loading';
 import { useCommonNavigate } from 'navigation/helpers';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 
 type ChainEntityLinkRedirectProps = {
   identifier: string;
@@ -22,9 +23,9 @@ export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEnti
         const newLink = {
           source: 'proposal',
           title,
-          identifier: type === 'proposal' ? `${typeId}` : `${type}/${typeId}`
+          identifier: type === 'proposal' ? `${typeId}` : `${chainEntityTypeToProposalSlug(type)}/${typeId}`
         };
-        
+
         // 3. redirect
         navigate(`/proposal/${newLink.identifier}`, { replace: true });
       } catch (e) {
