@@ -137,44 +137,8 @@ const ManageCommunityPage = () => {
     return <ErrorPage message={'Must be admin'} />;
   }
 
-  const handleRoleUpdate = (oldRole, newRole) => {
-    // newRole doesn't have the Address property that oldRole has,
-    // Add the missing Address property to the newRole, then splice it into the array.
-    newRole.Address = oldRole.Address;
-
-    const predicate = (r) => {
-      return r.id === oldRole.id;
-    };
-
-    app.roles.addRole(newRole);
-    app.roles.removeRole(predicate);
-
-    const { adminsAndMods } = app.chain.meta;
-
-    if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
-      const idx = adminsAndMods.findIndex(predicate);
-
-      if (idx !== -1) {
-        adminsAndMods.splice(idx, 1);
-      }
-    }
-
-    if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
-      adminsAndMods.push(
-        new RoleInfo(
-          newRole.id,
-          newRole.Address?.id || newRole.address_id,
-          newRole.Address.address,
-          newRole.Address.chain,
-          newRole.chain_id,
-          newRole.permission,
-          newRole.allow,
-          newRole.deny,
-          newRole.is_user_default
-        )
-      );
-    }
-
+  const handleRoleUpdate = () => {
+    fetchAdmins();
     searchMembers();
   };
 
