@@ -7,16 +7,17 @@ import { initAppState } from 'state';
 import app from 'state';
 
 const validate = async (setRoute) => {
-  try {
-    await handleSocialLoginCallback();
-    await initAppState();
-    if (app.activeChainId()) {
-      setRoute(`/account/${app.activeChainId()}`);
-    } else {
-      setRoute('/dashboard');
-    }
-  } catch (error) {
-    return `Error: ${error.message}`;
+  if (window.location.search === '') {
+    console.warn("Unexpected: magic login redirect should return some URL parameters")
+  }
+  await handleSocialLoginCallback();
+  await initAppState();
+
+  // TODO: redirect to correct path
+  if (app.activeChainId()) {
+    setRoute(`/account/${app.activeChainId()}`);
+  } else {
+    setRoute('/dashboard');
   }
 };
 
@@ -25,9 +26,13 @@ const FinishSocialLogin = () => {
   const [validationError, setValidationError] = useState<string>('');
 
   useEffect(() => {
-    validate(navigate).then((error) => {
+    validate(navigate).catch((error) => {
       if (typeof error === 'string') {
         setValidationError(error);
+      } else if (error && typeof error.message === 'string') {
+        setValidationError(error.message);
+      } else {
+        setValidationError("Error logging in, please try again");
       }
     });
   }, []);

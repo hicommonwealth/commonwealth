@@ -5,6 +5,7 @@ import _ from 'underscore';
 import { uuidv4 } from 'lib/util';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
+import { ChainBase } from 'common-common/src/types';
 
 import 'modals/session_signin_modal.scss';
 
@@ -19,7 +20,7 @@ import { CWSpinner } from '../components/component_kit/cw_spinner';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
-import { loginWithMagicLink } from 'controllers/app/login';
+import { startLoginWithMagicLink, handleSocialLoginCallback } from 'controllers/app/login';
 
 type SessionRevalidationModalProps = {
   onClose: () => void;
@@ -68,10 +69,13 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
     }
 
     try {
-      // const newlyVerifiedMagicAddress = await loginWithMagicLink({ email });
-      // TODO: call revalidate session directly
-      // setIsMagicLoading(false);
-      // onVerified(newlyVerifiedMagicAddress);
+      const isCosmos = app.chain?.meta?.base === ChainBase.CosmosSDK;
+      const { bearer, address } = await startLoginWithMagicLink({ email, isCosmos });
+      const newlyVerifiedMagicAddress = await handleSocialLoginCallback(bearer);
+      debugger;
+      // TODO
+      setIsMagicLoading(false);
+      onVerified(newlyVerifiedMagicAddress);
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);

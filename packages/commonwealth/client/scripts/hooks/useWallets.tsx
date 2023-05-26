@@ -4,7 +4,7 @@ import 'components/component_kit/cw_wallets_list.scss';
 import {
   completeClientLogin,
   createUserWithAddress,
-  loginWithMagicLink,
+  startLoginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
@@ -155,7 +155,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      const bearer = await loginWithMagicLink({ email });
+      const isCosmos = app.meta?.chain?.base === ChainBase.CosmosSDK;
+      const { bearer, address } = await startLoginWithMagicLink({ email, isCosmos });
       setIsMagicLoading(false);
 
       if (walletProps.onSuccess) walletProps.onSuccess();
@@ -168,7 +169,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
-      console.error(e);
+      console.error(e.stack);
     }
   };
 
@@ -177,10 +178,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setIsMagicLoading(true);
 
     try {
-      const magicAddress = await loginWithMagicLink({ provider });
+      const isCosmos = app.meta?.chain?.base === ChainBase.CosmosSDK;
+      const { bearer, address } = await startLoginWithMagicLink({ provider, isCosmos });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
+      if (walletProps.onSuccess) walletProps.onSuccess(address);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();
@@ -190,7 +192,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
-      console.error(e);
+      console.error(e.stack);
     }
   };
 
