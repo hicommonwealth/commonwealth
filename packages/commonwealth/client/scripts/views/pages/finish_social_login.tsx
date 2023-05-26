@@ -6,13 +6,9 @@ import { handleSocialLoginCallback } from 'controllers/app/login';
 import { initAppState } from 'state';
 import app from 'state';
 
+const hasExecutedFinishSocialLogin = {};
+
 const validate = async (setRoute) => {
-  if (window.location.search === '') {
-    console.warn(
-      'Unexpected: magic login redirect should return some URL parameters'
-    );
-  }
-  // TODO: pass whether we're just revalidating the current user login into state, and pass it here
   await handleSocialLoginCallback();
   await initAppState();
 
