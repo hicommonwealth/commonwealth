@@ -67,6 +67,7 @@ const deleteChain = async (
             community_role_id:
               admins[0]._roleAssignmentAttributes.community_role_id,
           },
+          transaction: t,
         });
       }
       // TODO: need a parallel API call to chain-events to destroy chain-entities there too
