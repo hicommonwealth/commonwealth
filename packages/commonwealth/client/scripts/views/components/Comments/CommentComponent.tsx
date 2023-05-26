@@ -46,15 +46,15 @@ export const CommentComponent = ({
   updatedCommentsCallback,
 }: CommentProps) => {
   const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
-    React.useState<boolean>(false);
-  const [verifiedAction, setVerifiedAction] = React.useState<Action>();
-  const [verifiedSession, setVerifiedSession] = React.useState<Session>();
+    useState<boolean>(false);
+  const [verifiedAction, setVerifiedAction] = useState<Action>();
+  const [verifiedSession, setVerifiedSession] = useState<Session>();
 
   const [isEditingComment, setIsEditingComment] =
-    React.useState<boolean>(false);
+    useState<boolean>(false);
   const [shouldRestoreEdits, setShouldRestoreEdits] =
-    React.useState<boolean>(false);
-  const [savedEdits, setSavedEdits] = React.useState<string>('');
+    useState<boolean>(false);
+  const [savedEdits, setSavedEdits] = useState<string>('');
 
   const { isLoggedIn } = useUserLoggedIn();
 
@@ -118,16 +118,16 @@ export const CommentComponent = ({
       )
         return;
       verify({ session })
-        .then((result) => setVerifiedSession(session))
-        .catch((err) => console.log('Could not verify session'));
+        .then(() => setVerifiedSession(session))
+        .catch((err) => console.log('Could not verify session', err.stack));
       verify({ action, actionSignerAddress })
-        .then((result) => setVerifiedAction(action))
-        .catch((err) => console.log('Could not verify action'));
+        .then(() => setVerifiedAction(action))
+        .catch((err) => console.log('Could not verify action', err.stack));
     } catch (err) {
       console.log('Unexpected error while verifying action/session');
       return;
     }
-  }, []);
+  }, [comment.canvasAction, comment.canvasSession]);
 
   return (
     <div className={`Comment comment-${comment.id}`}>

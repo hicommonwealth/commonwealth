@@ -12,7 +12,8 @@ const validate = async (setRoute) => {
       'Unexpected: magic login redirect should return some URL parameters'
     );
   }
-  await handleSocialLoginCallback(); // TODO: pass whether we're just revalidating the current user login into state, and pass it here
+  // TODO: pass whether we're just revalidating the current user login into state, and pass it here
+  await handleSocialLoginCallback();
   await initAppState();
 
   // TODO: redirect to correct path
@@ -37,7 +38,7 @@ const FinishSocialLogin = () => {
         setValidationError('Error logging in, please try again');
       }
     });
-  }, []);
+  }, [navigate]);
 
   if (validationError) {
     return <ErrorPage message={validationError} />;

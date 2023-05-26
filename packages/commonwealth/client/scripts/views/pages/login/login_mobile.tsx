@@ -27,7 +27,6 @@ export const LoginMobile = ({
   signerAccount,
   address,
   activeStep,
-  setActiveStep,
   handleSetAvatar,
   handleSetUsername,
   profiles,

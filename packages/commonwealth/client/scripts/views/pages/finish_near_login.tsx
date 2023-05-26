@@ -1,5 +1,4 @@
 import React from 'react';
-import type { NavigateFunction } from 'react-router-dom';
 import { createCanvasSessionPayload } from 'canvas';
 import { initAppState } from 'state';
 import BN from 'bn.js';

@@ -118,7 +118,6 @@ export class NEARSessionController implements ISessionController {
       }
     } catch (err) {
       console.log('Could not restore previous session');
-      const nearApiUtils = await import('near-api-js/lib/utils');
       this.signers[chainId][fromAddress] = KeyPairEd25519.fromRandom();
       delete this.auths[chainId][fromAddress];
       const secretKey: string = this.signers[chainId][fromAddress].secretKey;

@@ -1,5 +1,3 @@
-import { getActionHash, getSessionHash } from '@canvas-js/interfaces';
-import { chainBaseToCanvasChain } from './chainMappings';
 import { verify } from './verify';
 import { import_ } from '@brillout/import';
 

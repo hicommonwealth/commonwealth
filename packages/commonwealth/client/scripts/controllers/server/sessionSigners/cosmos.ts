@@ -1,11 +1,7 @@
 import { verify as verifyCanvasSessionSignature } from 'canvas';
 import type {
-  AminoMsg,
-  StdSignDoc,
-  StdFee,
   Secp256k1Wallet,
 } from '@cosmjs/amino';
-import type { Secp256k1 } from '@cosmjs/crypto';
 
 import type {
   Action,
@@ -16,7 +12,6 @@ import type {
 } from '@canvas-js/interfaces';
 import { ISessionController, InvalidSession } from '.';
 import { getADR036SignableAction } from 'adapters/chain/cosmos/keys';
-import { fromDuration } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 
 export class CosmosSDKSessionController implements ISessionController {
   signers: Record<

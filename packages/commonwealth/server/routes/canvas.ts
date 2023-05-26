@@ -1,8 +1,6 @@
-import { AppError } from 'common-common/src/errors';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import * as Sequelize from 'sequelize';
 
 import type { Action, Session } from '@canvas-js/interfaces';
 import {
@@ -25,13 +23,19 @@ export const getCanvasData = async (
 ) => {
   const before = req.body.query?.before ?? null;
 
-  const [rows, metadata] = await models.sequelize.query(
+  const [rows] = await models.sequelize.query(
     `
-(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at FROM "Threads" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW()) ORDER BY updated_at DESC LIMIT 50)
+(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at
+    FROM "Threads" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW())
+    ORDER BY updated_at DESC LIMIT 50)
 UNION
-(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at FROM "Comments" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW()) ORDER BY updated_at DESC LIMIT 50)
+(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at
+    FROM "Comments" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW())
+    ORDER BY updated_at DESC LIMIT 50)
 UNION
-(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at FROM "Reactions" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW()) ORDER BY updated_at DESC LIMIT 50)
+(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at
+    FROM "Reactions" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW())
+    ORDER BY updated_at DESC LIMIT 50)
 ORDER BY updated_at DESC LIMIT 50;
 `,
     { replacements: [before, before, before] }

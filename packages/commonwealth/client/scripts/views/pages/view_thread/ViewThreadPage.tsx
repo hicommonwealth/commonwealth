@@ -39,7 +39,6 @@ import {
   getReactionSubscription,
   handleToggleSubscription,
 } from '../discussions/helpers';
-import { NewThreadTag } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';

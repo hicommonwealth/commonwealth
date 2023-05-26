@@ -5,7 +5,6 @@ import { initAppState } from 'state';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
-import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';

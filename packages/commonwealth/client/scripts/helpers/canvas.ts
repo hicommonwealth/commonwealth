@@ -1,6 +1,4 @@
-import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
-import * as siwe from 'siwe';
 
 import {
   createSiweMessage,
@@ -36,9 +34,10 @@ export const verify = async ({
     // verify ethereum signature
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
-      const canvasEthereum = await import('@canvas-js/chain-ethereum');
       const { domain, types, message } = getEIP712SignableAction(actionPayload);
-      // vs. const [domain, types, value] = canvasEthereum.getAction(actionPayload);
+      // vs.
+      // const canvasEthereum = await import('@canvas-js/chain-ethereum');
+      // const [domain, types, value] = canvasEthereum.getAction(actionPayload);
       const recoveredAddr = ethersUtils.verifyTypedData(
         domain as any,
         types,

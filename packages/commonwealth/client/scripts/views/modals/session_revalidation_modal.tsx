@@ -78,8 +78,7 @@ const SessionRevalidationModal = ({
         isCosmos,
       });
       const newlyVerifiedMagicAddress = await handleSocialLoginCallback(bearer);
-      debugger;
-      // TODO
+      // TODO: compare and verify these are the same
       setIsMagicLoading(false);
       onVerified(newlyVerifiedMagicAddress);
     } catch (e) {

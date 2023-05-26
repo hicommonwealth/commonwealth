@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import $ from 'jquery';
 import type { Action, Session } from '@canvas-js/interfaces';
 
-import { CWButton } from '../components/component_kit/cw_button';
 import { verify } from 'canvas';
 
 import 'modals/canvas_verify_data_modal.scss';
@@ -41,7 +39,7 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
         .then((result) => setVerifiedAction(result))
         .catch((err) => console.error('Could not verify action:', err));
     });
-  }, []);
+  }, [obj.canvasAction, obj.canvasSession]);
 
   return (
     <div

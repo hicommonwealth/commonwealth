@@ -23,7 +23,6 @@ import type { LoginProps } from './types';
 export const LoginDesktop = ({
   address,
   activeStep,
-  setActiveStep,
   handleSetAvatar,
   handleSetUsername,
   profiles,

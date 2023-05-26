@@ -157,13 +157,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
-      const { bearer, address } = await startLoginWithMagicLink({
+      const { bearer, address: magicAddress } = await startLoginWithMagicLink({
         email,
         isCosmos,
       });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();
@@ -183,13 +183,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     try {
       const isCosmos = app?.chain?.base === ChainBase.CosmosSDK;
-      const { bearer, address } = await startLoginWithMagicLink({
+      const { bearer, address: magicAddress } = await startLoginWithMagicLink({
         provider,
         isCosmos,
       });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(address);
+      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();
