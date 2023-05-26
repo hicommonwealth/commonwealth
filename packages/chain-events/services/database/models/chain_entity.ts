@@ -55,10 +55,7 @@ export default (
       updatedAt: 'updated_at',
       underscored: true,
       paranoid: false,
-      indexes: [
-        { fields: ['id'] },
-        { fields: ['chain', 'type', 'id'], unique: true },
-      ],
+      indexes: [{ fields: ['chain', 'type', 'type_id'], unique: true }],
     }
   );
 
