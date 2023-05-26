@@ -291,7 +291,7 @@ class SearchController {
       return response.result;
     } catch (e) {
       console.error(e);
-      return [];
+      return { profiles: [] };
     }
   };
 
