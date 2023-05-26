@@ -157,22 +157,34 @@ const ManageCommunityPage = () => {
       if (idx !== -1) {
         adminsAndMods.splice(idx, 1);
       }
+      if (oldRole.permission === 'admin') {
+        setAdmins(admins.filter((a) => a.id !== oldRole.id));
+      }
+      if (oldRole.permission === 'moderator') {
+        setMods(mods.filter((a) => a.id !== oldRole.id));
+      }
     }
 
     if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
-      adminsAndMods.push(
-        new RoleInfo(
-          newRole.id,
-          newRole.Address?.id || newRole.address_id,
-          newRole.Address.address,
-          newRole.Address.chain,
-          newRole.chain_id,
-          newRole.permission,
-          newRole.allow,
-          newRole.deny,
-          newRole.is_user_default
-        )
+      const roleInfo = new RoleInfo(
+        newRole.id,
+        newRole.Address?.id || newRole.address_id,
+        newRole.Address.address,
+        newRole.Address.chain,
+        newRole.chain_id,
+        newRole.permission,
+        newRole.allow,
+        newRole.deny,
+        newRole.is_user_default
       );
+      adminsAndMods.push(roleInfo);
+
+      if (newRole.permission === 'admin') {
+        setAdmins([...admins, newRole]);
+      }
+      if (newRole.permission === 'moderator') {
+        setMods([...mods, newRole]);
+      }
     }
 
     searchMembers();
@@ -189,7 +201,7 @@ const ManageCommunityPage = () => {
           onSave={() => forceRerender()}
         />
         <AdminPanelTabs
-          onRoleUpgrade={handleRoleUpdate}
+          onRoleUpdate={handleRoleUpdate}
           roleData={roleData}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
