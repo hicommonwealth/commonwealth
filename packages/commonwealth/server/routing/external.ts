@@ -44,7 +44,6 @@ import {
   getTokenBalance,
   getTokenBalanceValidation,
 } from '../routes/getTokenBalance';
-import { getRoles, getRolesValidation } from '../routes/roles/getRoles';
 import { getRules, getRulesValidation } from '../routes/rulesext/getRules';
 import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
 import type { TypedRequest } from '../types';

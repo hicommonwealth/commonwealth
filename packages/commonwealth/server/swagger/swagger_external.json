@@ -364,42 +364,6 @@
         }
       }
     },
-    "/roles": {
-      "get": {
-        "summary": "Returns a list of roles.",
-        "parameters": [
-          {
-            "name": "community_id",
-            "in": "query",
-            "type": "string",
-            "description": "The ID of the community."
-          },
-          {
-            "in": "query",
-            "name": "addresses",
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "List of addresses."
-          },
-          {
-            "name": "count_only",
-            "in": "query",
-            "type": "string",
-            "description": "Return only the number of entities found."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of roles."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
     "/rules": {
       "get": {
         "summary": "Returns a list of rules.",
