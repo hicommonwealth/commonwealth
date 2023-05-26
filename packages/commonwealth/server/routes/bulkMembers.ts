@@ -4,6 +4,7 @@ import type { DB } from '../models';
 import type { Request, Response } from 'express';
 import { findAllRoles } from '../util/roles';
 
+// NOTE: this endpoint does not search across profiles, only addresses
 const bulkMembers = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
   const searchTerm = req.query.searchTerm;
