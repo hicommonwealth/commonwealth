@@ -1,20 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
-import { initAppState } from 'state';
-import app from 'state';
 
 const validate = async (setRoute) => {
+  console.log('validating');
   try {
     await handleSocialLoginCallback();
-    await initAppState();
-    if (app.activeChainId()) {
-      setRoute(`/account/${app.activeChainId()}`);
-    } else {
-      setRoute('/dashboard');
-    }
+    // TODO: add redirect from localstorage.
+    setRoute('/dashboard');
   } catch (error) {
     return `Error: ${error.message}`;
   }
@@ -22,14 +17,20 @@ const validate = async (setRoute) => {
 
 const FinishSocialLogin = () => {
   const navigate = useCommonNavigate();
+  const didValidateRef = useRef(false);
   const [validationError, setValidationError] = useState<string>('');
 
   useEffect(() => {
-    validate(navigate).then((error) => {
-      if (typeof error === 'string') {
-        setValidationError(error);
-      }
-    });
+    // must use ref to avoid double-calling of magic side effect. Double calling is
+    // due to React strict mode simulation.
+    if (didValidateRef.current === false) {
+      didValidateRef.current = true;
+      validate(navigate).then((error) => {
+        if (typeof error === 'string') {
+          setValidationError(error);
+        }
+      });
+    }
   }, []);
 
   if (validationError) {
