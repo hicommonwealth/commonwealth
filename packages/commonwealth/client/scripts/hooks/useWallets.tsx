@@ -102,7 +102,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setIsInCommunityPage(tempIsInCommunityPage);
 
     if (tempIsInCommunityPage) {
-      const chainbase = app.chain?.meta?.base;
+      const chainbase = app.chain?.base;
       setWallets(WebWalletController.Instance.availableWallets(chainbase));
       setSidebarType('communityWalletOptions');
       setActiveStep('walletList');
@@ -155,7 +155,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      const isCosmos = app.meta?.chain?.base === ChainBase.CosmosSDK;
+      const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
       const { bearer, address } = await startLoginWithMagicLink({ email, isCosmos });
       setIsMagicLoading(false);
 
@@ -178,7 +178,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setIsMagicLoading(true);
 
     try {
-      const isCosmos = app.meta?.chain?.base === ChainBase.CosmosSDK;
+      const isCosmos = app?.chain?.base === ChainBase.CosmosSDK;
       const { bearer, address } = await startLoginWithMagicLink({ provider, isCosmos });
       setIsMagicLoading(false);
 

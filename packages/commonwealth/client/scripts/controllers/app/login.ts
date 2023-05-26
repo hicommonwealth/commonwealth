@@ -350,13 +350,12 @@ export async function startLoginWithMagicLink({ email, provider, isCosmos }: {
     return { bearer, address };
   } else {
     // provider-based login
-    const address = await magic.oauth.loginWithRedirect({
+    await magic.oauth.loginWithRedirect({
       provider: provider as any,
       redirectURI: new URL('/finishsociallogin', window.location.origin).href,
     });
-    debugger;
-    // TODO: is this really the address?
-    return { address };
+    const info = await magic.user.getInfo();
+    return { address: info.publicAddress };
   }
 }
 
@@ -386,7 +385,7 @@ function getProfileMetadata({ provider, userInfo }): { username?: string, avatar
 }
 
 // Given a magic bearer token, generate a session key for the user, and (optionally) also log them in
-export async function handleSocialLoginCallback(bearer?: string, onlyRevalidateSession: boolean): string {
+export async function handleSocialLoginCallback(bearer?: string | undefined, onlyRevalidateSession?: boolean): Promise<string> {
   let profileMetadata: { username?: string, avatarUrl?: string } = {};
 
   const isCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK; // TODO: This won't work for SSO
@@ -399,7 +398,7 @@ export async function handleSocialLoginCallback(bearer?: string, onlyRevalidateS
     // console.log('Magic redirect result:', result);
   }
 
-  const info = await magic.wallet.getInfo();
+  const info = await magic.user.getInfo();
   const magicAddress = info.publicAddress;
 
   // Sign a session

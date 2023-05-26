@@ -10,7 +10,7 @@ const validate = async (setRoute) => {
   if (window.location.search === '') {
     console.warn("Unexpected: magic login redirect should return some URL parameters")
   }
-  await handleSocialLoginCallback();
+  await handleSocialLoginCallback(); // TODO: pass whether we're just revalidating the current user login into state, and pass it here
   await initAppState();
 
   // TODO: redirect to correct path
