@@ -3,7 +3,8 @@
   "compilerOptions": {
     "lib": ["es2019"],
     "typeRoots": ["./node_modules/@types"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["mocha"]
   },
   "paths": {
     "common-common": ["../../packages/common-common"],
