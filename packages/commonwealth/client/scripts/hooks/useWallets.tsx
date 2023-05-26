@@ -146,7 +146,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   }, []);
 
   // Handles Magic Link Login
-  const onEmailLogin = async () => {
+  const onEmailLogin = async (onlyRevalidateSessionKey?: boolean) => {
     setIsMagicLoading(true);
 
     if (!email) {
@@ -165,11 +165,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
       if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
-      if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
-      } else {
-        walletProps.onModalClose();
-      }
+      walletProps.onModalClose();
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
@@ -178,7 +174,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 
   // New callback for handling social login
-  const onSocialLogin = async (provider: string) => {
+  const onSocialLogin = async (provider: string, onlyRevalidateSessionKey?: boolean) => {
+    debugger;
     setIsMagicLoading(true);
 
     try {
@@ -191,11 +188,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
       if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
-      if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
-      } else {
-        walletProps.onModalClose();
-      }
+      walletProps.onModalClose();
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);

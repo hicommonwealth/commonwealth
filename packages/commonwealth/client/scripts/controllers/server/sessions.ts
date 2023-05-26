@@ -199,7 +199,10 @@ class SessionsController {
       address
     );
 
+    // Get a new session signature.
     if (!hasAuthenticatedSession) {
+      // Some login methods may require a single sign-on redirect, and take
+      // the user away from this page, so this promise might never resolve
       const signedWithAddress: string = await new Promise((resolve, reject) => {
         openSessionRevalidation({
           onVerified: (verifiedAddress) => resolve(verifiedAddress),

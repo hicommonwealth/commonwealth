@@ -39,8 +39,8 @@ export type LoginProps = {
   handleSetEmail: (e: any) => void;
   setSidebarType: (sidebarType: string) => void;
   canResetWalletConnect: boolean;
-  onEmailLogin: () => Promise<void>;
-  onSocialLogin: (provider: string) => Promise<void>;
+  onEmailLogin: (onlyRevalidateSessionKey?: boolean) => Promise<void>;
+  onSocialLogin: (provider: string, onlyRevalidateSessionKey?: boolean) => Promise<void>;
   onConnectAnotherWay: () => void;
   onLinkExistingAccount: () => void;
   onCreateNewAccount: () => void;

@@ -35,7 +35,7 @@ const SessionRevalidationModal = ({
   onClose,
 }: SessionRevalidationModalProps) => {
   const [open, setOpen] = useState(true);
-  const { onWalletAddressSelect, onWalletSelect, onResetWalletConnect } =
+  const { onWalletAddressSelect, onWalletSelect, onResetWalletConnect, onEmailLogin, onSocialLogin, setEmail } =
     useWallets({
       useSessionKeyLoginFlow: true,
       onModalClose: () => {
@@ -58,35 +58,7 @@ const SessionRevalidationModal = ({
 
   // magic-related state
   const [connectWithEmail, setConnectWithEmail] = useState(false);
-  const [email, setEmail] = useState();
   const [isMagicLoading, setIsMagicLoading] = useState(false);
-
-  const handleSetEmail = (e) => setEmail(e.target.value);
-  const onEmailLogin = async () => {
-    setIsMagicLoading(true);
-
-    if (!email) {
-      notifyError('Please enter a valid email address.');
-      setIsMagicLoading(false);
-      return;
-    }
-
-    try {
-      const isCosmos = app.chain?.meta?.base === ChainBase.CosmosSDK;
-      const { bearer, address } = await startLoginWithMagicLink({
-        email,
-        isCosmos,
-      });
-      const newlyVerifiedMagicAddress = await handleSocialLoginCallback(bearer);
-      // TODO: compare and verify these are the same
-      setIsMagicLoading(false);
-      onVerified(newlyVerifiedMagicAddress);
-    } catch (e) {
-      notifyError("Couldn't send magic link");
-      setIsMagicLoading(false);
-      console.error(e);
-    }
-  };
 
   return (
     <Modal
@@ -118,8 +90,8 @@ const SessionRevalidationModal = ({
                       autoFocus={true}
                       label="email address"
                       placeholder="your-email@email.com"
-                      onInput={handleSetEmail}
-                      onenterkey={onEmailLogin}
+                      onInput={(e) => setEmail(e.target.value)}
+                      onenterkey={onEmailLogin.bind(this, true)}
                     />
                   ) : (
                     <CWSpinner />
@@ -130,7 +102,7 @@ const SessionRevalidationModal = ({
                       buttonType="secondary-blue"
                       onClick={() => setConnectWithEmail(false)}
                     />
-                    <CWButton label="Connect" onClick={onEmailLogin} />
+                  <CWButton label="Connect" onClick={onEmailLogin.bind(this, true)} />
                   </div>
                 </div>
               ) : (
@@ -139,9 +111,10 @@ const SessionRevalidationModal = ({
                   onResetWalletConnect={onResetWalletConnect}
                   onWalletAddressSelect={onWalletAddressSelect}
                   onWalletSelect={onWalletSelect}
+                  handleSetEmail={setEmail}
                   onConnectAnotherWay={() => setConnectWithEmail(true)}
-                  // eslint-disable-next-line @typescript-eslint/no-empty-function
-                  onSocialLogin={() => null}
+                  onEmailLogin={onEmailLogin.bind(this, true)}
+                  onSocialLogin={(provider) => onSocialLogin(provider, true)}
                   darkMode={false}
                   wallets={wallets}
                   hasNoWalletsLink={false}

@@ -127,7 +127,8 @@ type WalletsListProps = {
   onResetWalletConnect: () => void;
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
-    type: 'google' | 'twitter' | 'discord' | 'github'
+    type: 'google' | 'twitter' | 'discord' | 'github',
+    useSessionKeyRevalidationFlow: boolean
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
@@ -209,7 +210,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="google"
             label="Sign in with Google"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin('google')}
+            onClick={async () => onSocialLogin('google', useSessionKeyRevalidationFlow)}
           />
 
           <CWText
@@ -236,19 +237,19 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="discord"
             label="Discord"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin('discord')}
+            onClick={async () => onSocialLogin('discord', useSessionKeyRevalidationFlow)}
           />
           <CWAuthButton
             type="github"
             label="Github"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('github')}
+            onClick={() => onSocialLogin('github', useSessionKeyRevalidationFlow)}
           />
           <CWAuthButton
             type="twitter"
             label="Twitter"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('twitter')}
+            onClick={() => onSocialLogin('twitter', useSessionKeyRevalidationFlow)}
           />
 
           {wallets.length === 0 && (
