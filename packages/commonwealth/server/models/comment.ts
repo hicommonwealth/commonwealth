@@ -47,7 +47,7 @@ export default (
         type: dataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'Thread',
+          model: 'Threads',
           key: 'id',
         },
       },
