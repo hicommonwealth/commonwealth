@@ -28,6 +28,8 @@ import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
+const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
+
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -40,8 +42,23 @@ export const Errors = {
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to comment",
   BalanceCheckFailed: 'Could not verify user token balance',
-  NestingTooDeep: 'Comments can only be nested 2 levels deep',
+  NestingTooDeep: 'Comments can only be nested 8 levels deep',
   RuleCheckFailed: 'Rule check failed',
+};
+
+// Get depth of the comment
+const getCommentDepth = async (models: DB, comment) => {
+  if (!comment.parent_id) {
+    return 0;
+  } else {
+    const parentComment = await models.Comment.findOne({
+      where: {
+        id: comment.parent_id,
+        chain: comment.chain,
+      },
+    });
+    return getCommentDepth(models, parentComment) + 1;
+  }
 };
 
 const createComment = async (
@@ -96,18 +113,10 @@ const createComment = async (
     });
     if (!parentComment) return next(new AppError(Errors.InvalidParent));
 
-    // Backend check to ensure comments are never nested more than three levels deep:
-    // top-level, child, and grandchild
-    if (parentComment.parent_id) {
-      const grandparentComment = await models.Comment.findOne({
-        where: {
-          id: parentComment.parent_id,
-          chain: chain.id,
-        },
-      });
-      if (grandparentComment?.parent_id) {
-        return next(new AppError(Errors.NestingTooDeep));
-      }
+    // Backend check to ensure comments are never nested more than eight levels deep:
+    const commentDepth = await getCommentDepth(models, parentComment);
+    if (commentDepth >= MAX_COMMENT_DEPTH) {
+      return next(new AppError(Errors.NestingTooDeep));
     }
   }
 
