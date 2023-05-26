@@ -5,7 +5,11 @@ import { success } from '../types';
 import * as Sequelize from 'sequelize';
 
 import type { Action, Session } from '@canvas-js/interfaces';
-import { verifyThread, verifyComment, verifyReaction } from '../../shared/canvas/serverVerify';
+import {
+  verifyThread,
+  verifyComment,
+  verifyReaction,
+} from '../../shared/canvas/serverVerify';
 
 type CanvasGetReq = {
   query: {
@@ -54,14 +58,13 @@ ORDER BY updated_at DESC LIMIT 50;
     })
     .filter((value) => value !== null);
 
-
   return success(res, result);
 };
 
 type CanvasPostReq = {
-  canvas_action: Action,
-  canvas_session: Session,
-  canvas_hash: string
+  canvas_action: Action;
+  canvas_session: Session;
+  canvas_hash: string;
 };
 type CanvasPostResp = {};
 
@@ -75,11 +78,11 @@ export const postCanvasData = async (
 
   // TODO: Implement verification and call the create
   // thread/comment/reaction server method with POST data pre-filled.
-  if (canvas_action.payload.call === "thread") {
+  if (canvas_action.payload.call === 'thread') {
     await verifyThread(canvas_action, canvas_session, canvas_hash, {});
-  } else if (canvas_action.payload.call === "comment") {
+  } else if (canvas_action.payload.call === 'comment') {
     await verifyComment(canvas_action, canvas_session, canvas_hash, {});
-  } else if (canvas_action.payload.call === "reaction") {
+  } else if (canvas_action.payload.call === 'reaction') {
     await verifyReaction(canvas_action, canvas_session, canvas_hash, {});
   }
 

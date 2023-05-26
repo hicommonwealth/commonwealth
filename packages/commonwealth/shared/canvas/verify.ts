@@ -191,16 +191,24 @@ export const verify = async ({
       //   and chain_id needs to be stripped and attached to signDoc instead
       // - stargate sessions (ADR-036) have signature of format { pubkey, signature }
       const canvas = await importCanvas();
-      const { pub_key, signature: predecodedSignature, chain_id } = JSON.parse(signature)
+      const {
+        pub_key,
+        signature: predecodedSignature,
+        chain_id,
+      } = JSON.parse(signature);
       const signDoc = await getADR036SignableSession(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
         payload.from,
-        chain_id, // if undefined, signDoc produces an ADR-036 signature
+        chain_id // if undefined, signDoc produces an ADR-036 signature
       );
-      const signDocDigest = new cosmCrypto.Sha256(cosmAmino.serializeSignDoc(signDoc)).digest();
+      const signDocDigest = new cosmCrypto.Sha256(
+        cosmAmino.serializeSignDoc(signDoc)
+      ).digest();
       const prefix = cosmEncoding.Bech32.decode(payload.from).prefix;
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
-      const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature({ pub_key, signature: predecodedSignature });
+      const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature(
+        { pub_key, signature: predecodedSignature }
+      );
       if (
         payload.from !==
         cosmEncoding.Bech32.encode(

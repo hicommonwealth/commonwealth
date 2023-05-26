@@ -8,7 +8,9 @@ import app from 'state';
 
 const validate = async (setRoute) => {
   if (window.location.search === '') {
-    console.warn("Unexpected: magic login redirect should return some URL parameters")
+    console.warn(
+      'Unexpected: magic login redirect should return some URL parameters'
+    );
   }
   await handleSocialLoginCallback(); // TODO: pass whether we're just revalidating the current user login into state, and pass it here
   await initAppState();
@@ -32,7 +34,7 @@ const FinishSocialLogin = () => {
       } else if (error && typeof error.message === 'string') {
         setValidationError(error.message);
       } else {
-        setValidationError("Error logging in, please try again");
+        setValidationError('Error logging in, please try again');
       }
     });
   }, []);

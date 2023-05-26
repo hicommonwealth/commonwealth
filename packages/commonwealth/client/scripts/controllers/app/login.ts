@@ -318,29 +318,34 @@ async function constructMagic(isCosmos) {
   const { CosmosExtension } = await import('@magic-ext/cosmos');
 
   if (!app.chain && isCosmos) {
-    throw new Error("Must be in a community to login with Cosmos magic link");
+    throw new Error('Must be in a community to login with Cosmos magic link');
   }
 
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: (!isCosmos) ? [
-      new OAuthExtension(),
-    ] : [
-      new OAuthExtension(),
-      new CosmosExtension({
-        // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
-        // so we can't use app.chain.meta?.node?.url
-        rpcUrl: `${document.location.origin}/magicCosmosAPI/${app.chain.id}`
-      }),
-    ]
+    extensions: !isCosmos
+      ? [new OAuthExtension()]
+      : [
+          new OAuthExtension(),
+          new CosmosExtension({
+            // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
+            // so we can't use app.chain.meta?.node?.url
+            rpcUrl: `${document.location.origin}/magicCosmosAPI/${app.chain.id}`,
+          }),
+        ],
   });
 }
 
-export async function startLoginWithMagicLink({ email, provider, isCosmos }: {
-  email?: string,
-  provider?: string,
-  isCosmos: boolean
+export async function startLoginWithMagicLink({
+  email,
+  provider,
+  isCosmos,
+}: {
+  email?: string;
+  provider?: string;
+  isCosmos: boolean;
 }) {
-  if (!email && !provider) throw new Error('Must provide email or SSO provider');
+  if (!email && !provider)
+    throw new Error('Must provide email or SSO provider');
   const magic = await constructMagic(isCosmos);
 
   if (email) {
@@ -360,12 +365,16 @@ export async function startLoginWithMagicLink({ email, provider, isCosmos }: {
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({ provider, userInfo }): { username?: string, avatarUrl?: string } {
+function getProfileMetadata({ provider, userInfo }): {
+  username?: string;
+  avatarUrl?: string;
+} {
   // provider: result.oauth.provider (twitter, discord, github)
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } = userInfo.sources['https://discord.com/api/users/@me'];
+    const { avatar, id, username } =
+      userInfo.sources['https://discord.com/api/users/@me'];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
@@ -385,8 +394,11 @@ function getProfileMetadata({ provider, userInfo }): { username?: string, avatar
 }
 
 // Given a magic bearer token, generate a session key for the user, and (optionally) also log them in
-export async function handleSocialLoginCallback(bearer?: string | undefined, onlyRevalidateSession?: boolean): Promise<string> {
-  let profileMetadata: { username?: string, avatarUrl?: string } = {};
+export async function handleSocialLoginCallback(
+  bearer?: string | undefined,
+  onlyRevalidateSession?: boolean
+): Promise<string> {
+  let profileMetadata: { username?: string; avatarUrl?: string } = {};
 
   const isCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK; // TODO: This won't work for SSO
   const magic = await constructMagic(isCosmos);
@@ -417,13 +429,20 @@ export async function handleSocialLoginCallback(bearer?: string | undefined, onl
     // Request the cosmos chain ID, since this is used by Magic to generate
     // the signed message. The API is already used by the Magic iframe,
     // but they don't expose the results.
-    const nodeInfo = await $.get(`${document.location.origin}/magicCosmosAPI/${app.chain.id}/node_info`);
+    const nodeInfo = await $.get(
+      `${document.location.origin}/magicCosmosAPI/${app.chain.id}/node_info`
+    );
     const chainId = nodeInfo.node_info.network;
 
     const timestamp = +new Date();
 
-    const signer = { signMessage: magic.cosmos.sign }
-    const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.CosmosSDK, signer, chainAddress, timestamp);
+    const signer = { signMessage: magic.cosmos.sign };
+    const { signed, sessionPayload } = await signSessionWithMagic(
+      ChainBase.CosmosSDK,
+      signer,
+      chainAddress,
+      timestamp
+    );
     // TODO: provide blockhash as last argument to signSessionWithMagic
     const signature = signed.signatures[0];
     signature.chain_id = chainId;
@@ -432,7 +451,7 @@ export async function handleSocialLoginCallback(bearer?: string | undefined, onl
       chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
       chainAddress,
       sessionPayload,
-      JSON.stringify(signature),
+      JSON.stringify(signature)
     );
     if (onlyRevalidateSession) {
       return chainAddress;
@@ -446,7 +465,12 @@ export async function handleSocialLoginCallback(bearer?: string | undefined, onl
     const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
 
     const timestamp = +new Date();
-    const { signed, sessionPayload } = await signSessionWithMagic(ChainBase.Ethereum, signer, checksumAddress, timestamp);
+    const { signed, sessionPayload } = await signSessionWithMagic(
+      ChainBase.Ethereum,
+      signer,
+      checksumAddress,
+      timestamp
+    );
     // TODO: provide blockhash as last argument to signSessionWithMagic
 
     await app.sessions.authSession(

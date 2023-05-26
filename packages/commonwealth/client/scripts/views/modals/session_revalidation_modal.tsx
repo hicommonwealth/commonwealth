@@ -20,28 +20,31 @@ import { CWSpinner } from '../components/component_kit/cw_spinner';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
-import { startLoginWithMagicLink, handleSocialLoginCallback } from 'controllers/app/login';
+import {
+  startLoginWithMagicLink,
+  handleSocialLoginCallback,
+} from 'controllers/app/login';
 
 type SessionRevalidationModalProps = {
   onClose: () => void;
   onVerified: (address: string | undefined) => void;
 };
 
-const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationModalProps) => {
+const SessionRevalidationModal = ({
+  onVerified,
+  onClose,
+}: SessionRevalidationModalProps) => {
   const [open, setOpen] = useState(true);
-  const {
-    onWalletAddressSelect,
-    onWalletSelect,
-    onResetWalletConnect,
-  } = useWallets({
-    useSessionKeyLoginFlow: true,
-    onModalClose: () => {
-      // do nothing, let the user close out of session revalidation
-    },
-    onSuccess: (address: string | undefined) => {
-      onVerified(address);
-    }
-  });
+  const { onWalletAddressSelect, onWalletSelect, onResetWalletConnect } =
+    useWallets({
+      useSessionKeyLoginFlow: true,
+      onModalClose: () => {
+        // do nothing, let the user close out of session revalidation
+      },
+      onSuccess: (address: string | undefined) => {
+        onVerified(address);
+      },
+    });
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
 
@@ -70,7 +73,10 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
 
     try {
       const isCosmos = app.chain?.meta?.base === ChainBase.CosmosSDK;
-      const { bearer, address } = await startLoginWithMagicLink({ email, isCosmos });
+      const { bearer, address } = await startLoginWithMagicLink({
+        email,
+        isCosmos,
+      });
       const newlyVerifiedMagicAddress = await handleSocialLoginCallback(bearer);
       debugger;
       // TODO
@@ -81,7 +87,7 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
       setIsMagicLoading(false);
       console.error(e);
     }
-  }
+  };
 
   return (
     <Modal
@@ -106,53 +112,57 @@ const SessionRevalidationModal = ({ onVerified, onClose }: SessionRevalidationMo
           </div>
           <div className="compact-modal-actions">
             <div>
-          {connectWithEmail ?
-            <div>
-              {!isMagicLoading ? (
-                <CWTextInput
-                  autoFocus={true}
-                  label="email address"
-                  placeholder="your-email@email.com"
-                  onInput={handleSetEmail}
-                  onenterkey={onEmailLogin}
-                />
+              {connectWithEmail ? (
+                <div>
+                  {!isMagicLoading ? (
+                    <CWTextInput
+                      autoFocus={true}
+                      label="email address"
+                      placeholder="your-email@email.com"
+                      onInput={handleSetEmail}
+                      onenterkey={onEmailLogin}
+                    />
+                  ) : (
+                    <CWSpinner />
+                  )}
+                  <div className="buttons-row">
+                    <CWButton
+                      label="Back"
+                      buttonType="secondary-blue"
+                      onClick={() => setConnectWithEmail(false)}
+                    />
+                    <CWButton label="Connect" onClick={onEmailLogin} />
+                  </div>
+                </div>
               ) : (
-                <CWSpinner />
-              )}
-              <div className="buttons-row">
-                <CWButton
-                  label="Back"
-                  buttonType="secondary-blue"
-                  onClick={() => setConnectWithEmail(false)}
+                <CWWalletsList
+                  useSessionKeyRevalidationFlow={true}
+                  onResetWalletConnect={onResetWalletConnect}
+                  onWalletAddressSelect={onWalletAddressSelect}
+                  onWalletSelect={onWalletSelect}
+                  onConnectAnotherWay={() => setConnectWithEmail(true)}
+                  // eslint-disable-next-line @typescript-eslint/no-empty-function
+                  onSocialLogin={() => null}
+                  darkMode={false}
+                  wallets={wallets}
+                  hasNoWalletsLink={false}
+                  canResetWalletConnect={wcEnabled}
                 />
-                <CWButton label="Connect" onClick={onEmailLogin} />
-              </div>
-            </div>
-            :
-              <CWWalletsList
-                useSessionKeyRevalidationFlow={true}
-                onResetWalletConnect={onResetWalletConnect}
-                onWalletAddressSelect={onWalletAddressSelect}
-                onWalletSelect={onWalletSelect}
-                onConnectAnotherWay={() => setConnectWithEmail(true)}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                onSocialLogin={() => null}
-                darkMode={false}
-                wallets={wallets}
-                hasNoWalletsLink={false}
-                canResetWalletConnect={wcEnabled}
-            />}
+              )}
             </div>
           </div>
         </div>
       }
-    onClose={onClose}
-    open={open}
-      />
+      onClose={onClose}
+      open={open}
+    />
   );
 };
 
-export const openSessionRevalidation = ({ onVerified, onClose }: SessionRevalidationModalProps) => {
+export const openSessionRevalidation = ({
+  onVerified,
+  onClose,
+}: SessionRevalidationModalProps) => {
   const id = uuidv4();
   const target = document.createElement('div');
   let root: Root = null;
@@ -160,16 +170,18 @@ export const openSessionRevalidation = ({ onVerified, onClose }: SessionRevalida
   target.id = id;
 
   root = createRoot(target);
-  root.render(<SessionRevalidationModal
-    onVerified={(address: string) => {
-      root.unmount();
-      target.remove();
-      onVerified(address);
-    }}
-    onClose={() => {
-      root.unmount();
-      target.remove();
-      onClose();
-    }}
-  />);
+  root.render(
+    <SessionRevalidationModal
+      onVerified={(address: string) => {
+        root.unmount();
+        target.remove();
+        onVerified(address);
+      }}
+      onClose={() => {
+        root.unmount();
+        target.remove();
+        onClose();
+      }}
+    />
+  );
 };

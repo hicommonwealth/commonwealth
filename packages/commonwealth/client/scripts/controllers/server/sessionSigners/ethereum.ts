@@ -148,7 +148,8 @@ export class EthereumSessionController implements ISessionController {
     const sessionSignature = this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
 
-    if (!sessionPayload || !sessionSignature || !actionSigner) throw new InvalidSession();
+    if (!sessionPayload || !sessionSignature || !actionSigner)
+      throw new InvalidSession();
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,

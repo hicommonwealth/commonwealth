@@ -47,7 +47,7 @@ export const getADR036SignableAction = async (
 export const getADR036SignableSession = async (
   token: Uint8Array,
   address: string,
-  chainId = "",
+  chainId = ''
 ): Promise<StdSignDoc> => {
   const accountNumber = 0;
   const sequence = 0;

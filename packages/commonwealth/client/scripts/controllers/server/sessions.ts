@@ -57,10 +57,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
       : null
   );
 
-  const signature = await wallet.signCanvasMessage(
-    account,
-    sessionPayload
-  );
+  const signature = await wallet.signCanvasMessage(account, sessionPayload);
   return {
     signature,
     chainId: canvasChainId,
@@ -98,13 +95,16 @@ export async function signSessionWithMagic(
       : signerAddress,
     sessionPublicAddress,
     timestamp,
-    blockhash,
+    blockhash
   );
 
   // skip wallet.signCanvasMessage(), do the logic here instead
   if (walletChain === ChainBase.CosmosSDK) {
     const canvas = await import('@canvas-js/interfaces');
-    const { msgs, fee } = await getADR036SignableSession(Buffer.from(canvas.serializeSessionPayload(sessionPayload)), signerAddress);
+    const { msgs, fee } = await getADR036SignableSession(
+      Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
+      signerAddress
+    );
     const signed = await signer.signMessage(msgs, fee); // this is a cosmos tx
     return { signed, sessionPayload };
   } else {
@@ -207,19 +207,21 @@ class SessionsController {
             const err = new Error();
             (err as any).responseJSON = { error: 'Login canceled' };
             reject(err);
-          }
-        })
+          },
+        });
       });
 
       // The user may have signed using a different account
       const sessionReauthed = await controller.hasAuthenticatedSession(
         canvasChainId,
-        address,
+        address
       );
       if (!sessionReauthed) {
         const err = new Error();
         (err as any).responseJSON = {
-          error: `Expected signature from ${formatAddress(address)}, got signature from ${formatAddress(signedWithAddress)}.`,
+          error: `Expected signature from ${formatAddress(
+            address
+          )}, got signature from ${formatAddress(signedWithAddress)}.`,
         };
         throw err;
       }

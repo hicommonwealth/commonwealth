@@ -54,7 +54,8 @@ function setupCosmosProxy(app: Express, models: DB) {
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
-    });
+    }
+  );
 
   // for gov v1 queries
   app.use(
@@ -90,10 +91,10 @@ function setupCosmosProxy(app: Express, models: DB) {
         });
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
-             response.data,
-             null,
-             2
-           )}`
+            response.data,
+            null,
+            2
+          )}`
         );
         return res.send(response.data);
       } catch (err) {
