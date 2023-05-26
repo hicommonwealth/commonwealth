@@ -38,16 +38,13 @@ const ManageCommunityPage = () => {
     const memberMods = [];
 
     try {
-      const res = await axios.get(
-        `${app.serverUrl()}/roles`.replace('/api', '/external'),
-        {
-          params: {
-            community_id: app.activeChainId(),
-            permissions: ['admin', 'moderator'],
-          },
-        }
-      );
-      const roles = res.data.result?.roles || [];
+      const res = await axios.get(`${app.serverUrl()}/roles`, {
+        params: {
+          chain_id: app.activeChainId(),
+          permissions: ['moderator', 'admin'],
+        },
+      });
+      const roles = res.data.result || [];
       roles.forEach((role) => {
         if (role.permission === AccessLevel.Admin) {
           memberAdmins.push(role);

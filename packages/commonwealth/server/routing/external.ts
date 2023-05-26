@@ -151,7 +151,6 @@ export function addExternalRoutes(
     deleteEntities.bind(this, 'chain_id', models, models.Topic)
   );
 
-  router.get('/roles', getRolesValidation, getRoles.bind(this, models));
   router.post(
     '/roles',
     passport.authenticate('jwt', { session: false }),
