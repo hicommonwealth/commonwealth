@@ -42,8 +42,8 @@ const createPoll = async (
     custom_duration === 'Infinite'
       ? null
       : custom_duration
-      ? moment().add(custom_duration, 'days')
-      : moment().add(5, 'days');
+      ? moment().add(custom_duration, 'days').toDate()
+      : moment().add(5, 'days').toDate();
 
   try {
     const thread = await models.Thread.findOne({
