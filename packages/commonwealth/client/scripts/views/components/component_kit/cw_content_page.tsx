@@ -71,7 +71,9 @@ export const CWContentPage = (props: ContentPageProps) => {
   } = props;
 
   const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
-    isWindowMediumSmallInclusive(window.innerWidth) || !showSidebar
+    isWindowMediumSmallInclusive(window.innerWidth)
+      ? 'tabsView'
+      : !showSidebar
       ? 'tabsView'
       : 'sidebarView'
   );
@@ -83,7 +85,9 @@ export const CWContentPage = (props: ContentPageProps) => {
   React.useEffect(() => {
     const onResize = () => {
       setViewType(
-        isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+        isWindowMediumSmallInclusive(window.innerWidth)
+          ? 'tabsView'
+          : !showSidebar
           ? 'tabsView'
           : 'sidebarView'
       );
@@ -117,7 +121,9 @@ export const CWContentPage = (props: ContentPageProps) => {
                   {moment(createdOrEditedDate).format('l')} &nbsp; •
                 </CWText>
               ))}
-          {!!displayNewTag && <NewThreadTag threadCreatedAt={moment(createdAt)}/>}
+          {!!displayNewTag && (
+            <NewThreadTag threadCreatedAt={moment(createdAt)} />
+          )}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
               {pluralize(viewCount, 'view')}
