@@ -22,9 +22,9 @@ export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEnti
         const newLink = {
           source: 'proposal',
           title,
-          identifier: type === 'proposal' ? `${typeId}` : `${type}/${typeId}}`
+          identifier: type === 'proposal' ? `${typeId}` : `${type}/${typeId}`
         };
-
+        
         // 3. redirect
         navigate(`/proposal/${newLink.identifier}`, { replace: true });
       } catch (e) {
