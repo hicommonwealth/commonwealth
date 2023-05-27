@@ -44,7 +44,6 @@ import {
   getTokenBalance,
   getTokenBalanceValidation,
 } from '../routes/getTokenBalance';
-import { getRoles, getRolesValidation } from '../routes/roles/getRoles';
 import { getRules, getRulesValidation } from '../routes/rulesext/getRules';
 import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
 import type { TypedRequest } from '../types';
@@ -151,7 +150,6 @@ export function addExternalRoutes(
     deleteEntities.bind(this, 'chain_id', models, models.Topic)
   );
 
-  router.get('/roles', getRolesValidation, getRoles.bind(this, models));
   router.post(
     '/roles',
     passport.authenticate('jwt', { session: false }),

@@ -69,7 +69,7 @@ const getAddressProfile = async (
       return next(new AppError(Errors.InvalidAddress));
     }
 
-    const profile = await address.getProfile();
+    const profile = await address.Profile;
 
     return res.json({
       status: 'Success',
@@ -116,9 +116,7 @@ const getAddressProfile = async (
       addrObjs = addrObjs.flat();
     }
 
-    const profiles = await Promise.all(
-      addrObjs.map((addr) => addr.getProfile())
-    );
+    const profiles = addrObjs.map((addr) => addr?.Profile);
 
     return res.json({
       status: 'Success',
