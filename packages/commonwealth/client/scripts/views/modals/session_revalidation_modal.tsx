@@ -5,13 +5,11 @@ import _ from 'underscore';
 import { uuidv4 } from 'lib/util';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import { ChainBase } from 'common-common/src/types';
 
 import 'modals/session_signin_modal.scss';
 
 import app from 'state';
 import useWallets from '../../hooks/useWallets';
-import type Account from '../../models/Account';
 import WebWalletController from '../../controllers/app/web_wallets';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
@@ -19,7 +17,6 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { notifyError } from 'controllers/app/notifications';
 
 type SessionRevalidationModalProps = {
   onClose: () => void;
@@ -30,8 +27,7 @@ const SessionRevalidationModal = ({
   onVerified,
   onClose,
 }: SessionRevalidationModalProps) => {
-  const [open, setOpen] = useState(true);
-  const { onWalletAddressSelect, onWalletSelect, onResetWalletConnect, onEmailLogin, onSocialLogin, setEmail } =
+  const { onWalletAddressSelect, onWalletSelect, onResetWalletConnect, onEmailLogin, onSocialLogin, setEmail, isMagicLoading } =
     useWallets({
       useSessionKeyLoginFlow: true,
       onModalClose: () => {
@@ -54,7 +50,6 @@ const SessionRevalidationModal = ({
 
   // magic-related state
   const [connectWithEmail, setConnectWithEmail] = useState(false);
-  const [isMagicLoading, setIsMagicLoading] = useState(false);
 
   return (
     <Modal
@@ -122,7 +117,7 @@ const SessionRevalidationModal = ({
         </div>
       }
       onClose={onClose}
-      open={open}
+      open={true}
     />
   );
 };

@@ -17,7 +17,6 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
-import { utils } from 'ethers';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -425,9 +424,13 @@ export async function handleSocialLoginCallback({
 
   // Get magic metadata
   const profileMetadata = getProfileMetadata(result.oauth);
-  let magicAddress = isCosmos
-    ? result.magic.userMetadata.publicAddress
-    : utils.getAddress(result.magic.userMetadata.publicAddress);
+  let magicAddress;
+  if (isCosmos) {
+    magicAddress = result.magic.userMetadata.publicAddress
+  } else {
+    const { utils } = await import('ethers');
+    magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+  }
   if (!bearer) {
     bearer = result.magic.idToken;
   }

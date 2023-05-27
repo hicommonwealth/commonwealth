@@ -146,7 +146,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   }, []);
 
   // Handles Magic Link Login
-  const onEmailLogin = async (onlyRevalidateSessionKey?: boolean) => {
+  const onEmailLogin = async () => {
     setIsMagicLoading(true);
 
     if (!email) {
@@ -157,7 +157,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
-      const { bearer, address: magicAddress } = await startLoginWithMagicLink({
+      const { address: magicAddress } = await startLoginWithMagicLink({
         email,
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
@@ -176,12 +176,12 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 
   // New callback for handling social login
-  const onSocialLogin = async (provider: string, onlyRevalidateSessionKey?: boolean) => {
+  const onSocialLogin = async (provider: string) => {
     setIsMagicLoading(true);
 
     try {
       const isCosmos = app?.chain?.base === ChainBase.CosmosSDK;
-      const { bearer, address: magicAddress } = await startLoginWithMagicLink({
+      const { address: magicAddress } = await startLoginWithMagicLink({
         provider,
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,

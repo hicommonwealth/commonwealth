@@ -61,7 +61,7 @@ export const verify = async ({
     // verify ethereum signature
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
-      const canvasEthereum = await importChainEthereum();
+      // const canvasEthereum = await importChainEthereum();
       const { domain, types, message } = getEIP712SignableAction(actionPayload);
       delete types.EIP712Domain;
       const recoveredAddr = ethersUtils.verifyTypedData(

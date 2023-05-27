@@ -1,5 +1,4 @@
 import { Op } from 'sequelize';
-import { configure as configureStableStringify } from 'safe-stable-stringify';
 
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';

@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
-import { handleSocialLoginCallback, setActiveAccount } from 'controllers/app/login';
+import { handleSocialLoginCallback } from 'controllers/app/login';
 import { initAppState } from 'state';
 import app from 'state';
-import Account from 'models/Account';
-
-const hasExecutedFinishSocialLogin = {};
 
 const validate = async (setRoute) => {
   const params = new URLSearchParams(window.location.search);
@@ -15,7 +12,7 @@ const validate = async (setRoute) => {
   let redirectTo = params.get('redirectTo');
   if (redirectTo?.startsWith("/finishsociallogin")) redirectTo = null;
 
-  const magicAddress = await handleSocialLoginCallback({ chain });
+  await handleSocialLoginCallback({ chain });
   await initAppState();
 
   setRoute(redirectTo || (app.activeChainId() ? `/account/${app.activeChainId()}` : '/dashboard'));
