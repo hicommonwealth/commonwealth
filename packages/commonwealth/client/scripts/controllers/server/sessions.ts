@@ -203,7 +203,7 @@ class SessionsController {
     if (!hasAuthenticatedSession) {
       // Some login methods may require a single sign-on redirect, and take
       // the user away from this page, so this promise might never resolve
-      const signedWithAddress: string = await new Promise((resolve, reject) => {
+      const signerAddress: string = await new Promise((resolve, reject) => {
         openSessionRevalidation({
           onVerified: (verifiedAddress) => resolve(verifiedAddress),
           onClose: () => {
@@ -224,7 +224,7 @@ class SessionsController {
         (err as any).responseJSON = {
           error: `Expected signature from ${formatAddress(
             address
-          )}, got signature from ${formatAddress(signedWithAddress)}.`,
+          )}, but this wallet has address ${formatAddress(signerAddress)}.`,
         };
         throw err;
       }
