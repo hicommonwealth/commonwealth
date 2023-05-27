@@ -426,9 +426,8 @@ export async function handleSocialLoginCallback({ bearer, chain }: {
   if (isCosmos) {
     // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
     const bech32Prefix = desiredChain.bech32Prefix;
-    let chainAddress;
     try {
-      chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
+      magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
     } catch (err) {
       console.error(
         `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
@@ -449,7 +448,7 @@ export async function handleSocialLoginCallback({ bearer, chain }: {
     const { signed, sessionPayload } = await signSessionWithMagic(
       ChainBase.CosmosSDK,
       signer,
-      chainAddress,
+      magicAddress,
       timestamp
     );
     // TODO: provide blockhash as last argument to signSessionWithMagic
@@ -458,7 +457,7 @@ export async function handleSocialLoginCallback({ bearer, chain }: {
     await app.sessions.authSession(
       ChainBase.CosmosSDK, // could be desiredChain.base in the future?
       chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
-      chainAddress,
+      magicAddress,
       sessionPayload,
       JSON.stringify(signature)
     );
