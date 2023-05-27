@@ -52,13 +52,25 @@ export const renderQuillDelta = (
     return ['div'];
   };
 
-  const getParentTag = (parent): ['span' | 'li' | 'div', string?] => {
+  const getParentTag = (
+    parent
+  ): ['span' | 'li' | 'div', ('checked' | 'unchecked')?] => {
     if (collapse) return ['span'];
     if (parent.attributes?.list === 'bullet') return ['li'];
     if (parent.attributes?.list === 'ordered') return ['li'];
     if (parent.attributes?.list === 'checked') return ['li', 'checked'];
     if (parent.attributes?.list === 'unchecked') return ['li', 'unchecked'];
     return ['div'];
+  };
+
+  // TODO remove
+  const getGroupTag2 = (group) => {
+    if (collapse) return 'span';
+    if (group.listtype === 'bullet') return 'ul';
+    if (group.listtype === 'ordered') return 'ol';
+    if (group.listtype === 'checked' || group.listtype === 'unchecked')
+      return 'ul.checklist';
+    return 'div';
   };
 
   // multiple list groups should be consolidated, so numbering is preserved even when ordered lists are broken
@@ -159,265 +171,253 @@ export const renderQuillDelta = (
           })
         );
       })
-    : null;
-  // consolidateOrderedLists(groups).map((group) => {
-  //   console.log('✅✅✅@@@@ formatting ON @@@@✅✅✅');
-  //   // TODO REMOVE null
-  //   return null;
-  //
-  //   const renderChild = (child, ii) => {
-  //     // handle images
-  //     if (child.insert?.image) {
-  //       return render('img', {
-  //         key: ii,
-  //         src: child.insert?.image,
-  //       });
-  //     }
-  //     // handle video
-  //     if (child.insert?.video) {
-  //       return render(
-  //         'div',
-  //         {
-  //           key: ii,
-  //         },
-  //         [
-  //           render('iframe', {
-  //             frameBorder: 0,
-  //             allowFullscreen: true,
-  //             src: child.insert?.video,
-  //             key: 1,
-  //           }),
-  //           render('br', { key: 2 }),
-  //         ]
-  //       );
-  //     }
-  //     // handle tweets
-  //     if (child.insert?.twitter) {
-  //       const id = child.insert.twitter.id;
-  //       if (!window.twttr) {
-  //         loadScript('//platform.twitter.com/widgets.js').then(() => {
-  //           setTimeout(() => {
-  //             // eslint-disable-next-line
-  //             window.twttr?.widgets?.load();
-  //           }, 1);
-  //         });
-  //       } else {
-  //         setTimeout(() => {
-  //           // eslint-disable-next-line
-  //           window.twttr?.widgets?.load();
-  //         }, 1);
-  //       }
-  //       const url = `https://twitter.com/user/status/${id}`;
-  //       return render(
-  //         'blockquote',
-  //         {
-  //           key: ii,
-  //           className: 'twitter-tweet',
-  //         },
-  //         render('a', {
-  //           tabIndex: -1,
-  //           href: url,
-  //         })
-  //       );
-  //     }
-  //     // handle text nodes
-  //     let result;
-  //     if (child.insert?.mention) {
-  //       result = render(
-  //         'span.mention',
-  //         {
-  //           key: ii,
-  //           onClick: () => {
-  //             // alert(child.insert.mention.id)
-  //           },
-  //         },
-  //         child.insert.mention.denotationChar + child.insert.mention.value
-  //       );
-  //     } else if (child.attributes?.link) {
-  //       result = render(
-  //         'a',
-  //         {
-  //           key: ii,
-  //           href: child.attributes.link,
-  //           target: '_blank',
-  //           noreferrer: 'noreferrer',
-  //           noopener: 'noopener',
-  //           onClick: (e) => {
-  //             if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-  //             if (
-  //               child.attributes.link.startsWith(
-  //                 `${document.location.origin}/`
-  //               )
-  //             ) {
-  //               // don't open a new window if the link is on Commonwealth
-  //               e.preventDefault();
-  //               e.stopPropagation();
-  //               navigate(child.attributes.link);
-  //             }
-  //           },
-  //         },
-  //         `${child.insert}`
-  //       );
-  //     } else {
-  //       result = render('span', { key: ii }, `${child.insert}`);
-  //     }
-  //     Object.entries(child.attributes || {}).forEach(([k, v]) => {
-  //       if (k !== 'color' && k !== 'background' && v !== true) return;
-  //       switch (k) {
-  //         case 'bold':
-  //           result = render('strong', { key: ii }, result);
-  //           return;
-  //         case 'italic':
-  //           result = render('em', { key: ii }, result);
-  //           return;
-  //         case 'strike':
-  //           result = render('s', { key: ii }, result);
-  //           return;
-  //         case 'underline':
-  //           result = render('u', { key: ii }, result);
-  //           return;
-  //         case 'code':
-  //           result = render('code', { key: ii }, result);
-  //           return;
-  //         case 'added':
-  //           result = render('span.added', { key: ii }, result);
-  //           return;
-  //         case 'deleted':
-  //           result = render('span.deleted', { key: ii }, result);
-  //           return;
-  //         default:
-  //           result = render('span', { key: ii }, result);
-  //       }
-  //     });
-  //     return result;
-  //   };
-  //   const renderParent = (parent, ii) => {
-  //     // render empty parent nodes as .between-paragraphs
-  //     if (
-  //       !parent.attributes &&
-  //       parent.children.length === 1 &&
-  //       parent.children[0].insert === '\n'
-  //     ) {
-  //       return render('.between-paragraphs', { key: ii });
-  //     }
-  //     // render normal parent nodes with content
-  //     return render(
-  //       parent.attributes && parent.attributes.blockquote
-  //         ? 'blockquote'
-  //         : parent.attributes && parent.attributes['code-block']
-  //         ? 'pre'
-  //         : parent.attributes && parent.attributes.header === 1
-  //         ? 'h1'
-  //         : parent.attributes && parent.attributes.header === 2
-  //         ? 'h2'
-  //         : parent.attributes && parent.attributes.header === 3
-  //         ? 'h3'
-  //         : parent.attributes && parent.attributes.header === 4
-  //         ? 'h4'
-  //         : parent.attributes && parent.attributes.header === 5
-  //         ? 'h5'
-  //         : parent.attributes && parent.attributes.header === 6
-  //         ? 'h6'
-  //         : parent.attributes && parent.attributes.list === 'bullet'
-  //         ? 'li'
-  //         : parent.attributes && parent.attributes.list === 'ordered'
-  //         ? 'li'
-  //         : parent.attributes && parent.attributes.list === 'checked'
-  //         ? `li.checked`
-  //         : parent.attributes && parent.attributes.list === 'unchecked'
-  //         ? `li.unchecked`
-  //         : 'div',
-  //       { key: ii },
-  //       parent.children.map(renderChild)
-  //     );
-  //   };
-  //   // special handler for lists, which need to be un-flattened and turned into a tree
-  //   const renderListGroup = (_group, ii) => {
-  //     const temp = []; // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
-  //     _group.parents.forEach((parent, iii) => {
-  //       const tag = getParentTag(parent);
-  //       const content = parent.children.map(renderChild);
-  //       if (tag === 'li.checked') {
-  //         content.unshift(
-  //           render(
-  //             `input`,
-  //             {
-  //               key: `input-${iii}`,
-  //               type: 'checkbox',
-  //               disabled: true,
-  //               checked: true,
-  //             },
-  //             null
-  //           )
-  //         );
-  //       } else if (tag === 'li.unchecked') {
-  //         content.unshift(
-  //           render(
-  //             `input`,
-  //             {
-  //               key: `input-${iii}`,
-  //               type: 'checkbox',
-  //               disabled: true,
-  //               checked: false,
-  //             },
-  //             null
-  //           )
-  //         );
-  //       }
-  //       const indent = parent.attributes.indent || 0;
-  //
-  //       if (indent >= temp.length) {
-  //         // indent
-  //         temp.push([]);
-  //         temp[temp.length - 1].push({ tag, content, indent, key: ii });
-  //       } else if (indent === temp.length - 1) {
-  //         // keep same
-  //         temp[indent].push({ tag, content, indent, key: ii });
-  //       } else if (indent < temp.length - 1) {
-  //         // outdent and unwind
-  //         while (indent < temp.length - 1) {
-  //           let iiii = 0;
-  //           const outdentBuffer = temp[temp.length - 2];
-  //           outdentBuffer[outdentBuffer.length - 1].content.push(
-  //             render(
-  //               getGroupTag(_group)[0],
-  //               { key: `outdent-${iiii}` },
-  //               temp.pop().map((data, index) => {
-  //                 return render(data.tag, { key: index }, data.content);
-  //               })
-  //             )
-  //           );
-  //           iiii++;
-  //         }
-  //         temp[temp.length - 1].push({ tag, content, indent, key: ii });
-  //       }
-  //     });
-  //
-  //     // fully unwind and collect stray children
-  //     while (temp.length > 1) {
-  //       let iii = 0;
-  //       const outdentBuffer = temp[temp.length - 2];
-  //       outdentBuffer[outdentBuffer.length - 1].content.push(
-  //         render(
-  //           getGroupTag(_group)[0],
-  //           { key: `extra-${iii}` },
-  //           temp.pop().map(({ tag, content }, index) => {
-  //             return render(tag, { key: index }, content);
-  //           })
-  //         )
-  //       );
-  //       iii++;
-  //     }
-  //     return render(
-  //       getGroupTag(_group)[0],
-  //       { key: ii },
-  //       temp[0].map(({ tag, content }, index) => {
-  //         return render(tag, { key: index }, content);
-  //       })
-  //     );
-  //   };
-  //
-  //   if (group.length) return group.map(renderListGroup);
-  //   else return group.parents.map(renderParent);
-  // });
+    : consolidateOrderedLists(groups).map((group) => {
+        console.log('✅✅✅@@@@ formatting ON @@@@✅✅✅');
+
+        const renderChild = (child, ii) => {
+          // handle images
+          if (child.insert?.image) {
+            return <img key={ii} src={child.insert?.image} alt="image" />;
+          }
+          // handle video
+          if (child.insert?.video) {
+            return (
+              <div key={ii}>
+                <iframe
+                  frameBorder={0}
+                  allowFullScreen={true}
+                  src={child.insert?.video}
+                  key={1}
+                />
+                <br key={2} />
+              </div>
+            );
+          }
+          // handle tweets
+          if (child.insert?.twitter) {
+            const id = child.insert.twitter.id;
+            if (!(window as any).twttr) {
+              loadScript('//platform.twitter.com/widgets.js').then(() => {
+                setTimeout(() => {
+                  // eslint-disable-next-line
+                  (window as any).twttr?.widgets?.load();
+                }, 1);
+              });
+            } else {
+              setTimeout(() => {
+                // eslint-disable-next-line
+                (window as any).twttr?.widgets?.load();
+              }, 1);
+            }
+            const url = `https://twitter.com/user/status/${id}`;
+            return (
+              <blockquote key={ii} className="twitter-tweet">
+                <a tabIndex={-1} href={url} />
+              </blockquote>
+            );
+          }
+          // handle text nodes
+          let result;
+          if (child.insert?.mention) {
+            result = (
+              <span className="mention" key={ii}>
+                {child.insert.mention.denotationChar +
+                  child.insert.mention.value}
+              </span>
+            );
+          } else if (child.attributes?.link) {
+            result = (
+              <a
+                key={ii}
+                href={child.attributes.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+                  if (
+                    child.attributes.link.startsWith(
+                      `${document.location.origin}/`
+                    )
+                  ) {
+                    // don't open a new window if the link is on Commonwealth
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navigate(child.attributes.link);
+                  }
+                }}
+              >
+                {child.insert}
+              </a>
+            );
+          } else {
+            result = <span key={ii}>{child.insert}</span>;
+          }
+          Object.entries(child.attributes || {}).forEach(([k, v]) => {
+            if (k !== 'color' && k !== 'background' && v !== true) return;
+            switch (k) {
+              case 'bold':
+                result = <strong key={ii}>{result}</strong>;
+                return;
+              case 'italic':
+                result = <em key={ii}>{result}</em>;
+                return;
+              case 'strike':
+                result = <s key={ii}>{result}</s>;
+                return;
+              case 'underline':
+                result = <u key={ii}>{result}</u>;
+                return;
+              case 'code':
+                result = <code key={ii}>{result}</code>;
+                return;
+              case 'added':
+                result = (
+                  <span key={ii} className="added">
+                    {result}
+                  </span>
+                );
+                return;
+              case 'deleted':
+                result = (
+                  <span key={ii} className="deleted">
+                    {result}
+                  </span>
+                );
+                return;
+              default:
+                result = <span key={ii}>{result}</span>;
+            }
+          });
+          return result;
+        };
+        const renderParent = (parent, ii) => {
+          // render empty parent nodes as .between-paragraphs
+          if (
+            !parent.attributes &&
+            parent.children.length === 1 &&
+            parent.children[0].insert === '\n'
+          ) {
+            return <div className="between-paragraphs" key={ii} />;
+          }
+          // render normal parent nodes with content
+          const Tag = parent.attributes?.blockquote
+            ? 'blockquote'
+            : parent.attributes?.['code-block']
+            ? 'pre'
+            : parent.attributes?.header === 1
+            ? 'h1'
+            : parent.attributes?.header === 2
+            ? 'h2'
+            : parent.attributes?.header === 3
+            ? 'h3'
+            : parent.attributes?.header === 4
+            ? 'h4'
+            : parent.attributes?.header === 5
+            ? 'h5'
+            : parent.attributes?.header === 6
+            ? 'h6'
+            : parent.attributes?.list === 'bullet'
+            ? 'li'
+            : parent.attributes?.list === 'ordered'
+            ? 'li'
+            : parent.attributes?.list === 'checked'
+            ? 'li'
+            : parent.attributes?.list === 'unchecked'
+            ? 'li'
+            : 'div';
+
+          const className =
+            parent.attributes?.list === 'checked'
+              ? 'checked'
+              : parent.attributes?.list === 'unchecked'
+              ? 'unchecked'
+              : '';
+
+          return (
+            <Tag key={ii} className={className}>
+              {parent.children.map(renderChild)}
+            </Tag>
+          );
+        };
+        // special handler for lists, which need to be un-flattened and turned into a tree
+        const renderListGroup = (_group, ii) => {
+          const temp = []; // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
+          _group.parents.forEach((parent, iii) => {
+            const [tag, tagClass] = getParentTag(parent);
+            const isChecked = tagClass === 'checked';
+            const content = parent.children.map(renderChild);
+
+            if (tag === 'li' && tagClass) {
+              content.unshift(
+                render(
+                  `input`,
+                  {
+                    key: `input-${iii}`,
+                    type: 'checkbox',
+                    disabled: true,
+                    checked: isChecked,
+                  },
+                  null
+                )
+              );
+            }
+
+            const indent = parent.attributes.indent || 0;
+
+            if (indent >= temp.length) {
+              // indent
+              temp.push([]);
+              temp[temp.length - 1].push({ tag, content, indent, key: ii });
+            } else if (indent === temp.length - 1) {
+              // keep same
+              temp[indent].push({ tag, content, indent, key: ii });
+            } else if (indent < temp.length - 1) {
+              // outdent and unwind
+              while (indent < temp.length - 1) {
+                let iiii = 0;
+                const outdentBuffer = temp[temp.length - 2];
+                outdentBuffer[outdentBuffer.length - 1].content.push(
+                  render(
+                    getGroupTag2(_group),
+                    {
+                      key: `outdent-${iiii}`,
+                    },
+                    temp.pop().map((data, index) => {
+                      return render(data.tag, { key: index }, data.content);
+                    })
+                  )
+                );
+                iiii++;
+              }
+              temp[temp.length - 1].push({ tag, content, indent, key: ii });
+            }
+          });
+
+          // fully unwind and collect stray children
+          while (temp.length > 1) {
+            let iii = 0;
+            const outdentBuffer = temp[temp.length - 2];
+            outdentBuffer[outdentBuffer.length - 1].content.push(
+              render(
+                getGroupTag2(_group),
+                { key: `extra-${iii}` },
+                temp.pop().map(({ tag, content }, index) => {
+                  return render(tag, { key: index }, content);
+                })
+              )
+            );
+            iii++;
+          }
+          return render(
+            getGroupTag2(_group),
+            { key: ii },
+            temp[0].map(({ tag, content }, index) => {
+              return render(tag, { key: index }, content);
+            })
+          );
+        };
+
+        if (group.length) return group.map(renderListGroup);
+        else return group.parents.map(renderParent);
+      });
 };
