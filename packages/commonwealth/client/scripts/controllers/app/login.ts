@@ -17,6 +17,7 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
+import { utils } from 'ethers';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -401,20 +402,15 @@ export async function handleSocialLoginCallback(
   bearer?: string | undefined,
   onlyRevalidateSession?: boolean
 ): Promise<string> {
-  let profileMetadata: { username?: string; avatarUrl?: string } = {};
-
   const isCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK; // TODO: This won't work for SSO
   const magic = await constructMagic(isCosmos);
 
+  const result = await magic.oauth.getRedirectResult();
+  const profileMetadata = getProfileMetadata(result.oauth);
+  const magicAddress = isCosmos ? result.magic.userMetadata.publicAddress : utils.getAddress(result.magic.userMetadata.publicAddress);
   if (!bearer) {
-    const result = await magic.oauth.getRedirectResult();
-    profileMetadata = getProfileMetadata(result.oauth);
     bearer = result.magic.idToken;
-    // console.log('Magic redirect result:', result);
   }
-
-  const info = await magic.user.getInfo();
-  const magicAddress = info.publicAddress;
 
   // Sign a session
   if (isCosmos) {

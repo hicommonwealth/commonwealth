@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
-import { handleSocialLoginCallback } from 'controllers/app/login';
+import { handleSocialLoginCallback, setActiveAccount } from 'controllers/app/login';
 import { initAppState } from 'state';
 import app from 'state';
+import Account from 'models/Account';
 
 const hasExecutedFinishSocialLogin = {};
 
@@ -14,14 +15,24 @@ const validate = async (setRoute) => {
     redirectTo = null;
   }
 
-  await handleSocialLoginCallback();
+  const magicAddress = await handleSocialLoginCallback();
   await initAppState();
 
-  if (app.activeChainId()) {
-    setRoute(redirectTo || `/account/${app.activeChainId()}`);
-  } else {
-    setRoute(redirectTo || '/dashboard');
-  }
+  setRoute(redirectTo || (app.activeChainId() ? `/account/${app.activeChainId()}` : '/dashboard'));
+  setTimeout(() => {
+    // If we've redirected back into a community, link the new address
+    if (app.chain && !app.user.activeAccounts.find((a) => a.address === magicAddress)) {
+      const address = app.user.addresses.find((a) => a.address === magicAddress); // & a.chain = magic login'ed chain?
+      const newAccount = new Account({
+        addressId: address.id,
+        address: address.address,
+        chain: app.chain.meta,
+        // sessionPublicAddress = ?
+        // validationBlockInfo = ?
+      });
+      setActiveAccount(newAccount)
+    }
+  }, 100);
 };
 
 const FinishSocialLogin = () => {
