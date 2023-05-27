@@ -126,7 +126,6 @@ function setupCosmosProxy(app: Express, models: DB) {
         }
         let targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
-          throw new AppError('No LCD endpoint found');
           const fallback = await models.Chain.findOne({
             where: { id: "osmosis" },
             include: models.ChainNode,
@@ -148,8 +147,7 @@ function setupCosmosProxy(app: Express, models: DB) {
           )}`
         );
 
-        // special case: support magic iframe + commonwealth clients (including custom domains)
-        // this is a single route and should be easy to cache
+        // magicCosmosAPI is CORS-approved for the magic iframe
         res.setHeader('Access-Control-Allow-Origin', '*');
         return res.send(response.data);
       } catch (err) {
@@ -177,7 +175,6 @@ function setupCosmosProxy(app: Express, models: DB) {
         }
         let targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
-          throw new AppError('No LCD endpoint found');
           const fallback = await models.Chain.findOne({
             where: { id: "osmosis" },
             include: models.ChainNode,
@@ -186,8 +183,10 @@ function setupCosmosProxy(app: Express, models: DB) {
         }
         log.trace(`Found cosmos endpoint: ${targetUrl}`);
         // special case: rewrite cosmos- prefix to chain specific prefix
+        // either the requested chain or osmo, if we're using the fallback
         const { words } = bech32.decode(req.params.address);
-        const rewrittenAddress = bech32.encode(chain.bech32_prefix, words);
+        const rewrittenAddress = bech32.encode(
+          chain.ChainNode?.alt_wallet_url ? chain.bech32_prefix : "osmo", words);
         const rewrite = req.originalUrl
           .replace(req.baseUrl, targetUrl)
           .replace(req.params.address, rewrittenAddress)
@@ -205,8 +204,7 @@ function setupCosmosProxy(app: Express, models: DB) {
             2
           )}`
         );
-        // magic expects a cosmos-sdk/Account, while lcd endpoints usually return
-        // cosmos-sdk/BaseAccount. this seems to be a launchpad vs stargate issue:
+        // magic expects a cosmos-sdk/Account, because their signer is still on launchpad:
         // https://github.com/cosmos/cosmjs/issues/702
         if (response?.data?.result?.type === 'cosmos-sdk/BaseAccount') {
           response.data.result.type = 'cosmos-sdk/Account';
@@ -218,8 +216,8 @@ function setupCosmosProxy(app: Express, models: DB) {
           };
         }
 
-        // special case: magicCosmosAPI is CORS-approved for the magic iframe
-        res.setHeader('Access-Control-Allow-Origin', 'https://auth.magic.link');
+        // magicCosmosAPI is CORS-approved for the magic iframe
+        res.setHeader('Access-Control-Allow-Origin', '*');
         return res.send(response.data);
       } catch (err) {
         res.status(500).json({ message: err.message });
