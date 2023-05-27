@@ -340,11 +340,13 @@ export async function startLoginWithMagicLink({
   email,
   provider,
   redirectTo,
+  chain,
   isCosmos,
 }: {
   email?: string;
   provider?: string;
   redirectTo?: string;
+  chain?: string;
   isCosmos: boolean;
 }) {
   if (!email && !provider)
@@ -354,15 +356,18 @@ export async function startLoginWithMagicLink({
   if (email) {
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback(bearer);
+    const address = await handleSocialLoginCallback({ bearer });
     return { bearer, address };
   } else {
     // provider-based login
-    const redirectToParams = redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : '';
+    const params = `?redirectTo=${redirectTo ? encodeURIComponent(redirectTo) : ''}&chain=${chain || ''}`;
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
-      redirectURI: new URL('/finishsociallogin' + redirectToParams, window.location.origin).href,
+      redirectURI: new URL('/finishsociallogin' + params, window.location.origin).href,
     });
+
+    // magic should redirect away from this page, but we return after 5 sec if it hasn't
+    await new Promise((resolve) => setTimeout(() => resolve(), 5000));
     const info = await magic.user.getInfo();
     return { address: info.publicAddress };
   }
@@ -398,11 +403,12 @@ function getProfileMetadata({ provider, userInfo }): {
 }
 
 // Given a magic bearer token, generate a session key for the user, and (optionally) also log them in
-export async function handleSocialLoginCallback(
-  bearer?: string | undefined,
-  onlyRevalidateSession?: boolean
-): Promise<string> {
-  const isCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK; // TODO: This won't work for SSO
+export async function handleSocialLoginCallback({ bearer, chain }: {
+  bearer?: string,
+  chain?: string,
+}): Promise<string> {
+  const desiredChain = app.chain || app.config.chains.getById(chain);
+  const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos);
 
   const result = await magic.oauth.getRedirectResult();
@@ -415,7 +421,7 @@ export async function handleSocialLoginCallback(
   // Sign a session
   if (isCosmos) {
     // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-    const bech32Prefix = app.chain.meta.bech32Prefix;
+    const bech32Prefix = desiredChain.meta.bech32Prefix;
     let chainAddress;
     try {
       chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
@@ -429,7 +435,7 @@ export async function handleSocialLoginCallback(
     // the signed message. The API is already used by the Magic iframe,
     // but they don't expose the results.
     const nodeInfo = await $.get(
-      `${document.location.origin}/magicCosmosAPI/${app.chain.id}/node_info`
+      `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`
     );
     const chainId = nodeInfo.node_info.network;
 
@@ -446,15 +452,12 @@ export async function handleSocialLoginCallback(
     const signature = signed.signatures[0];
     signature.chain_id = chainId;
     await app.sessions.authSession(
-      ChainBase.CosmosSDK, // not app.chain.base, since we don't know where the user is logging in
+      ChainBase.CosmosSDK, // could be desiredChain.base in the future?
       chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
       chainAddress,
       sessionPayload,
       JSON.stringify(signature)
     );
-    if (onlyRevalidateSession) {
-      return chainAddress;
-    }
   } else {
     const { Web3Provider } = await import('@ethersproject/providers');
     const { utils } = await import('ethers');
@@ -473,15 +476,12 @@ export async function handleSocialLoginCallback(
     // TODO: provide blockhash as last argument to signSessionWithMagic
 
     await app.sessions.authSession(
-      ChainBase.Ethereum, // not app.chain.base, since we don't know where the user is logging in
+      ChainBase.Ethereum, // could be desiredChain.base in the future?
       chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
       checksumAddress,
       sessionPayload,
       signed
     );
-    if (onlyRevalidateSession) {
-      return magicAddress;
-    }
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login
@@ -494,7 +494,7 @@ export async function handleSocialLoginCallback(
       withCredentials: true,
     },
     data: {
-      chain: app.activeChainId(),
+      chain: desiredChain.id,
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,

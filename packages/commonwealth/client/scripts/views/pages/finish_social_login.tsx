@@ -10,29 +10,15 @@ import Account from 'models/Account';
 const hasExecutedFinishSocialLogin = {};
 
 const validate = async (setRoute) => {
-  let redirectTo = (new URLSearchParams(window.location.search)).get('redirectTo');
-  if (redirectTo?.startsWith("/finishsociallogin")) {
-    redirectTo = null;
-  }
+  const params = new URLSearchParams(window.location.search);
+  const chain = params.get('chain');
+  let redirectTo = params.get('redirectTo');
+  if (redirectTo?.startsWith("/finishsociallogin")) redirectTo = null;
 
-  const magicAddress = await handleSocialLoginCallback();
+  const magicAddress = await handleSocialLoginCallback({ chain });
   await initAppState();
 
   setRoute(redirectTo || (app.activeChainId() ? `/account/${app.activeChainId()}` : '/dashboard'));
-  setTimeout(() => {
-    // If we've redirected back into a community, link the new address
-    if (app.chain && !app.user.activeAccounts.find((a) => a.address === magicAddress)) {
-      const address = app.user.addresses.find((a) => a.address === magicAddress); // & a.chain = magic login'ed chain?
-      const newAccount = new Account({
-        addressId: address.id,
-        address: address.address,
-        chain: app.chain.meta,
-        // sessionPublicAddress = ?
-        // validationBlockInfo = ?
-      });
-      setActiveAccount(newAccount)
-    }
-  }, 100);
 };
 
 const FinishSocialLogin = () => {

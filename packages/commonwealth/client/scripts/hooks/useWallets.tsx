@@ -161,6 +161,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         email,
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
+        chain: app.chain?.id,
       });
       setIsMagicLoading(false);
 
@@ -184,6 +185,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         provider,
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
+        chain: app.chain?.id
       });
       setIsMagicLoading(false);
 
