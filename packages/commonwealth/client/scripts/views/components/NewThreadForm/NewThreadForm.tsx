@@ -111,6 +111,7 @@ export const NewThreadForm = () => {
       updateTopicList(result.topic, app.chain);
     } catch (err) {
       console.error(err);
+      notifyError(typeof err === "string" ? err : (err.responseText || err.responseJSON?.error));
     } finally {
       setIsSaving(false);
     }
