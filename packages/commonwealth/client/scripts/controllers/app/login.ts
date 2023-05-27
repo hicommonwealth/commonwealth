@@ -312,12 +312,12 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-async function constructMagic(isCosmos) {
+async function constructMagic(isCosmos: boolean, chain?: string) {
   const { Magic } = await import('magic-sdk');
   const { OAuthExtension } = await import('@magic-ext/oauth');
   const { CosmosExtension } = await import('@magic-ext/cosmos');
 
-  if (!app.chain && isCosmos) {
+  if (isCosmos && !chain) {
     throw new Error('Must be in a community to login with Cosmos magic link');
   }
 
@@ -329,8 +329,8 @@ async function constructMagic(isCosmos) {
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
             // so we can't use app.chain.meta?.node?.url
-            // rpcUrl: `${document.location.origin}/magicCosmosAPI/${app.chain.id}`,
-            rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
+            rpcUrl: `${document.location.origin}/magicCosmosAPI/${chain}`,
+            // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
           }),
         ],
   });
@@ -351,7 +351,7 @@ export async function startLoginWithMagicLink({
 }) {
   if (!email && !provider)
     throw new Error('Must provide email or SSO provider');
-  const magic = await constructMagic(isCosmos);
+  const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
     // email-based login
@@ -367,7 +367,7 @@ export async function startLoginWithMagicLink({
     });
 
     // magic should redirect away from this page, but we return after 5 sec if it hasn't
-    await new Promise((resolve) => setTimeout(() => resolve(), 5000));
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
     const info = await magic.user.getInfo();
     return { address: info.publicAddress };
   }
@@ -407,11 +407,15 @@ export async function handleSocialLoginCallback({ bearer, chain }: {
   bearer?: string,
   chain?: string,
 }): Promise<string> {
-  const desiredChain = app.chain || app.config.chains.getById(chain);
+  const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
-  const magic = await constructMagic(isCosmos);
+  const magic = await constructMagic(isCosmos, desiredChain?.id);
 
+  // Code up to this line might run multiple times because of extra calls to useEffect().
+  // Those runs will be rejected because getRedirectResult purges the browser search param.
   const result = await magic.oauth.getRedirectResult();
+
+  // Get magic metadata
   const profileMetadata = getProfileMetadata(result.oauth);
   const magicAddress = isCosmos ? result.magic.userMetadata.publicAddress : utils.getAddress(result.magic.userMetadata.publicAddress);
   if (!bearer) {
@@ -421,7 +425,7 @@ export async function handleSocialLoginCallback({ bearer, chain }: {
   // Sign a session
   if (isCosmos) {
     // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-    const bech32Prefix = desiredChain.meta.bech32Prefix;
+    const bech32Prefix = desiredChain.bech32Prefix;
     let chainAddress;
     try {
       chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
