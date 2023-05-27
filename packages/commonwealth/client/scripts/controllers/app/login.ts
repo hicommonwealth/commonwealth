@@ -360,10 +360,15 @@ export async function startLoginWithMagicLink({
     return { bearer, address };
   } else {
     // provider-based login
-    const params = `?redirectTo=${redirectTo ? encodeURIComponent(redirectTo) : ''}&chain=${chain || ''}`;
+    const params = `?redirectTo=${
+      redirectTo ? encodeURIComponent(redirectTo) : ''
+    }&chain=${chain || ''}`;
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
-      redirectURI: new URL('/finishsociallogin' + params, window.location.origin).href,
+      redirectURI: new URL(
+        '/finishsociallogin' + params,
+        window.location.origin
+      ).href,
     });
 
     // magic should redirect away from this page, but we return after 5 sec if it hasn't
@@ -403,9 +408,12 @@ function getProfileMetadata({ provider, userInfo }): {
 }
 
 // Given a magic bearer token, generate a session key for the user, and (optionally) also log them in
-export async function handleSocialLoginCallback({ bearer, chain }: {
-  bearer?: string,
-  chain?: string,
+export async function handleSocialLoginCallback({
+  bearer,
+  chain,
+}: {
+  bearer?: string;
+  chain?: string;
 }): Promise<string> {
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
@@ -417,7 +425,9 @@ export async function handleSocialLoginCallback({ bearer, chain }: {
 
   // Get magic metadata
   const profileMetadata = getProfileMetadata(result.oauth);
-  const magicAddress = isCosmos ? result.magic.userMetadata.publicAddress : utils.getAddress(result.magic.userMetadata.publicAddress);
+  let magicAddress = isCosmos
+    ? result.magic.userMetadata.publicAddress
+    : utils.getAddress(result.magic.userMetadata.publicAddress);
   if (!bearer) {
     bearer = result.magic.idToken;
   }
