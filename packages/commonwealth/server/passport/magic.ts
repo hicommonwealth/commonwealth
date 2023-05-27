@@ -430,8 +430,10 @@ async function magicLoginRoute(
   log.trace(`EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`);
 
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
-    // already logged in as existing user, do nothing
+    // already logged in as existing user, just ensure generated addresses are all linked
+    // we don't need to setup a canonical address/SsoToken, that should already be done
     log.trace('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
+    await createMagicAddressInstances(models, generatedAddresses, loggedInUser);
     return cb(null, existingUserInstance);
   }
 
