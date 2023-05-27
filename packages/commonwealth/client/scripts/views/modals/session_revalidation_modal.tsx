@@ -82,7 +82,7 @@ const SessionRevalidationModal = ({
                       label="email address"
                       placeholder="your-email@email.com"
                       onInput={(e) => setEmail(e.target.value)}
-                      onenterkey={onEmailLogin.bind(this, true)}
+                      onenterkey={onEmailLogin}
                     />
                   ) : (
                     <CWSpinner />
@@ -93,7 +93,7 @@ const SessionRevalidationModal = ({
                       buttonType="secondary-blue"
                       onClick={() => setConnectWithEmail(false)}
                     />
-                  <CWButton label="Connect" onClick={onEmailLogin.bind(this, true)} />
+                  <CWButton label="Connect" onClick={onEmailLogin} />
                   </div>
                 </div>
               ) : (
@@ -102,10 +102,8 @@ const SessionRevalidationModal = ({
                   onResetWalletConnect={onResetWalletConnect}
                   onWalletAddressSelect={onWalletAddressSelect}
                   onWalletSelect={onWalletSelect}
-                  handleSetEmail={setEmail}
                   onConnectAnotherWay={() => setConnectWithEmail(true)}
-                  onEmailLogin={onEmailLogin.bind(this, true)}
-                  onSocialLogin={(provider) => onSocialLogin(provider, true)}
+                  onSocialLogin={(provider) => onSocialLogin(provider)}
                   darkMode={false}
                   wallets={wallets}
                   hasNoWalletsLink={false}
