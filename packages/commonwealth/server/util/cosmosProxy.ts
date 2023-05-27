@@ -124,11 +124,14 @@ function setupCosmosProxy(app: Express, models: DB) {
         if (!chain) {
           throw new AppError('Invalid chain');
         }
-        // TODO: test for other chains
-        // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
-        const targetUrl = chain.ChainNode?.alt_wallet_url;
+        let targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
           throw new AppError('No LCD endpoint found');
+          const fallback = await models.Chain.findOne({
+            where: { id: "osmosis" },
+            include: models.ChainNode,
+          });
+          targetUrl = fallback.ChainNode.alt_wallet_url;
         }
         log.trace(`Found cosmos endpoint: ${targetUrl}`);
 
@@ -172,11 +175,14 @@ function setupCosmosProxy(app: Express, models: DB) {
         if (!chain) {
           throw new AppError('Invalid chain');
         }
-        // TODO: test for other chains
-        // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
-        const targetUrl = chain.ChainNode?.alt_wallet_url;
+        let targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
           throw new AppError('No LCD endpoint found');
+          const fallback = await models.Chain.findOne({
+            where: { id: "osmosis" },
+            include: models.ChainNode,
+          });
+          targetUrl = fallback.ChainNode.alt_wallet_url;
         }
         log.trace(`Found cosmos endpoint: ${targetUrl}`);
         // special case: rewrite cosmos- prefix to chain specific prefix
