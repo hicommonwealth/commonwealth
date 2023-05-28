@@ -1,10 +1,69 @@
-import React from 'react';
-import { render } from 'helpers/DEPRECATED_ReactRender';
+import React, { ReactElement } from 'react';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 import app from 'state';
 import { Browser } from '@capacitor/browser';
+
+type TempList = Array<
+  Array<{
+    key: number;
+    indent: number;
+    tag: keyof JSX.IntrinsicElements;
+    tagClass: string | undefined;
+    content: Array<ReactElement>;
+  }>
+>;
+
+const getGroupTag = (
+  group: { listtype: string },
+  collapse: boolean
+): ['span' | 'ul' | 'ol' | 'div', string?] => {
+  if (collapse) return ['span'];
+  if (group.listtype === 'bullet') return ['ul'];
+  if (group.listtype === 'ordered') return ['ol'];
+  if (group.listtype === 'checked' || group.listtype === 'unchecked')
+    return ['ul', 'checklist'];
+  return ['div'];
+};
+
+const getParentTag = (
+  parent: {
+    attributes: { list?: string };
+  },
+  collapse: boolean
+): ['span' | 'li' | 'div', ('checked' | 'unchecked')?] => {
+  if (collapse) return ['span'];
+  if (parent.attributes?.list === 'bullet') return ['li'];
+  if (parent.attributes?.list === 'ordered') return ['li'];
+  if (parent.attributes?.list === 'checked') return ['li', 'checked'];
+  if (parent.attributes?.list === 'unchecked') return ['li', 'unchecked'];
+  return ['div'];
+};
+
+// multiple list groups should be consolidated, so numbering is preserved even when ordered lists are broken
+const consolidateOrderedLists = (_groups) => {
+  const result = [];
+
+  let run = [];
+
+  for (let i = 0; i < _groups.length; i++) {
+    if (_groups[i].listtype) {
+      run.push(_groups[i]);
+    } else {
+      if (run.length > 0) {
+        result.push(run);
+        run = [];
+      }
+      result.push(_groups[i]);
+    }
+  }
+  if (run.length > 0) {
+    result.push(run);
+  }
+
+  return result;
+};
 
 export const renderQuillDelta = (
   delta,
@@ -42,65 +101,10 @@ export const renderQuillDelta = (
     }
   });
 
-  // then, render each group
-  const getGroupTag = (group): ['span' | 'ul' | 'ol' | 'div', string?] => {
-    if (collapse) return ['span'];
-    if (group.listtype === 'bullet') return ['ul'];
-    if (group.listtype === 'ordered') return ['ol'];
-    if (group.listtype === 'checked' || group.listtype === 'unchecked')
-      return ['ul', 'checklist'];
-    return ['div'];
-  };
-
-  const getParentTag = (
-    parent
-  ): ['span' | 'li' | 'div', ('checked' | 'unchecked')?] => {
-    if (collapse) return ['span'];
-    if (parent.attributes?.list === 'bullet') return ['li'];
-    if (parent.attributes?.list === 'ordered') return ['li'];
-    if (parent.attributes?.list === 'checked') return ['li', 'checked'];
-    if (parent.attributes?.list === 'unchecked') return ['li', 'unchecked'];
-    return ['div'];
-  };
-
-  // TODO remove
-  const getGroupTag2 = (group) => {
-    if (collapse) return 'span';
-    if (group.listtype === 'bullet') return 'ul';
-    if (group.listtype === 'ordered') return 'ol';
-    if (group.listtype === 'checked' || group.listtype === 'unchecked')
-      return 'ul.checklist';
-    return 'div';
-  };
-
-  // multiple list groups should be consolidated, so numbering is preserved even when ordered lists are broken
-  const consolidateOrderedLists = (_groups) => {
-    const result = [];
-
-    let run = [];
-
-    for (let i = 0; i < _groups.length; i++) {
-      if (_groups[i].listtype) {
-        run.push(_groups[i]);
-      } else {
-        if (run.length > 0) {
-          result.push(run);
-          run = [];
-        }
-        result.push(_groups[i]);
-      }
-    }
-    if (run.length > 0) {
-      result.push(run);
-    }
-
-    return result;
-  };
-
   return hideFormatting || collapse
     ? groups.map((group, i) => {
         const wrapGroupForHiddenFormatting = (content) => {
-          const [GroupTag, groupTagClass] = getGroupTag(group);
+          const [GroupTag, groupTagClass] = getGroupTag(group, collapse);
           const className = `hidden-formatting ${groupTagClass || ''}`;
 
           return (
@@ -112,7 +116,7 @@ export const renderQuillDelta = (
 
         return wrapGroupForHiddenFormatting(
           group.parents.map((parent, ii) => {
-            const [ParentTag, parentTagClass] = getParentTag(parent);
+            const [ParentTag, parentTagClass] = getParentTag(parent, collapse);
             const className = `hidden-formatting-inner ${parentTagClass || ''}`;
 
             return (
@@ -172,8 +176,6 @@ export const renderQuillDelta = (
         );
       })
     : consolidateOrderedLists(groups).map((group) => {
-        console.log('✅✅✅@@@@ formatting ON @@@@✅✅✅');
-
         const renderChild = (child, ii) => {
           // handle images
           if (child.insert?.image) {
@@ -341,24 +343,23 @@ export const renderQuillDelta = (
         };
         // special handler for lists, which need to be un-flattened and turned into a tree
         const renderListGroup = (_group, ii) => {
-          const temp = []; // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
+          const [GroupTag, groupTagClass] = getGroupTag(_group, collapse);
+
+          // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
+          const temp: TempList = [];
           _group.parents.forEach((parent, iii) => {
-            const [tag, tagClass] = getParentTag(parent);
+            const [tag, tagClass] = getParentTag(parent, collapse);
             const isChecked = tagClass === 'checked';
             const content = parent.children.map(renderChild);
 
             if (tag === 'li' && tagClass) {
               content.unshift(
-                render(
-                  `input`,
-                  {
-                    key: `input-${iii}`,
-                    type: 'checkbox',
-                    disabled: true,
-                    checked: isChecked,
-                  },
-                  null
-                )
+                <input
+                  key={`input-${iii}`}
+                  type="checkbox"
+                  disabled
+                  checked={isChecked}
+                />
               );
             }
 
@@ -367,29 +368,41 @@ export const renderQuillDelta = (
             if (indent >= temp.length) {
               // indent
               temp.push([]);
-              temp[temp.length - 1].push({ tag, content, indent, key: ii });
+              temp[temp.length - 1].push({
+                tag,
+                tagClass,
+                content,
+                indent,
+                key: ii,
+              });
             } else if (indent === temp.length - 1) {
               // keep same
-              temp[indent].push({ tag, content, indent, key: ii });
+              temp[indent].push({ tag, tagClass, content, indent, key: ii });
             } else if (indent < temp.length - 1) {
               // outdent and unwind
               while (indent < temp.length - 1) {
                 let iiii = 0;
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
-                  render(
-                    getGroupTag2(_group),
-                    {
-                      key: `outdent-${iiii}`,
-                    },
-                    temp.pop().map((data, index) => {
-                      return render(data.tag, { key: index }, data.content);
-                    })
-                  )
+                  <GroupTag key={`outdent-${iiii}`} className={groupTagClass}>
+                    {temp.pop().map((data, index) => {
+                      return (
+                        <data.tag key={index} className={data.tagClass}>
+                          {data.content}
+                        </data.tag>
+                      );
+                    })}
+                  </GroupTag>
                 );
                 iiii++;
               }
-              temp[temp.length - 1].push({ tag, content, indent, key: ii });
+              temp[temp.length - 1].push({
+                tag,
+                tagClass,
+                content,
+                indent,
+                key: ii,
+              });
             }
           });
 
@@ -398,22 +411,29 @@ export const renderQuillDelta = (
             let iii = 0;
             const outdentBuffer = temp[temp.length - 2];
             outdentBuffer[outdentBuffer.length - 1].content.push(
-              render(
-                getGroupTag2(_group),
-                { key: `extra-${iii}` },
-                temp.pop().map(({ tag, content }, index) => {
-                  return render(tag, { key: index }, content);
-                })
-              )
+              <GroupTag key={`extra-${iii}`} className={groupTagClass}>
+                {temp.pop().map((data, index) => {
+                  return (
+                    <data.tag key={index} className={data.tagClass}>
+                      {data.content}
+                    </data.tag>
+                  );
+                })}
+              </GroupTag>
             );
             iii++;
           }
-          return render(
-            getGroupTag2(_group),
-            { key: ii },
-            temp[0].map(({ tag, content }, index) => {
-              return render(tag, { key: index }, content);
-            })
+
+          return (
+            <GroupTag key={ii} className={groupTagClass}>
+              {temp[0].map((data, index) => {
+                return (
+                  <data.tag key={index} className={data.tagClass}>
+                    {data.content}
+                  </data.tag>
+                );
+              })}
+            </GroupTag>
           );
         };
 
