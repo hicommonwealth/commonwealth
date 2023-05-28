@@ -414,6 +414,8 @@ export async function handleSocialLoginCallback({
   bearer?: string;
   chain?: string;
 }): Promise<string> {
+  // desiredChain may be empty if social login was initialized from
+  // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
@@ -436,7 +438,7 @@ export async function handleSocialLoginCallback({
   }
 
   // Sign a session
-  if (isCosmos) {
+  if (isCosmos && desiredChain) {
     // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
     const bech32Prefix = desiredChain.bech32Prefix;
     try {
@@ -510,7 +512,7 @@ export async function handleSocialLoginCallback({
       withCredentials: true,
     },
     data: {
-      chain: desiredChain.id,
+      chain: desiredChain?.id,
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
@@ -519,6 +521,8 @@ export async function handleSocialLoginCallback({
 
   if (response.status === 'Success') {
     await initAppState(false);
+    // This is code from before desiredChain was implemented, and
+    // may not be necessary anymore:
     if (app.chain) {
       const c = app.user.selectedChain
         ? app.user.selectedChain
