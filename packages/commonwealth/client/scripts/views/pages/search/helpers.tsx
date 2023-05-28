@@ -62,6 +62,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
         </div>
         <CWText>
           <QuillRenderer
+            containerClass="SearchQuillRenderer"
             hideFormatting={true}
             doc={thread.body}
             searchTerm={searchTerm}
@@ -112,6 +113,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
         </div>
         <CWText>
           <QuillRenderer
+            containerClass="SearchQuillRenderer"
             hideFormatting={true}
             doc={comment.text}
             searchTerm={searchTerm}
@@ -156,7 +158,10 @@ const getCommunityResult = (community, setRoute) => {
 };
 
 const getMemberResult = (addr, setRoute) => {
-  const profile: MinimumProfile = app.newProfiles.getProfile(addr.chain, addr.address);
+  const profile: MinimumProfile = app.newProfiles.getProfile(
+    addr.chain,
+    addr.address
+  );
 
   const handleClick = () => {
     setRoute(`/profile/id/${profile.id}`, {}, null);
