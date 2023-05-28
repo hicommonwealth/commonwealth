@@ -91,8 +91,8 @@ describe('User Dashboard API', () => {
       readOnly: false,
       kind,
       topicName,
-      session: userSession.session,
-      sign: userSession.sign,
+      session: userSession2.session,
+      sign: userSession2.sign,
     };
     threadOne = await modelUtils.createThread(threadOneArgs);
     expect(threadOne.status).to.equal('Success');
