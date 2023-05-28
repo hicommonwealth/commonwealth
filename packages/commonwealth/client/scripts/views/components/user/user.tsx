@@ -38,6 +38,7 @@ type UserAttrs = {
   showAsDeleted?: boolean;
   showRole?: boolean;
   user: Account | AddressInfo | MinimumProfile | undefined;
+  role?: { permission: string };
 };
 
 export const User = ({
@@ -52,6 +53,7 @@ export const User = ({
   showAsDeleted = false,
   addressDisplayOptions,
   avatarSize: size,
+  role,
 }: UserAttrs) => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
@@ -82,7 +84,6 @@ export const User = ({
   let loggedInUserIsAdmin = false;
   let friendlyChainName: string | undefined;
   let adminsAndMods = [];
-  let role;
 
   if (user) {
     loggedInUserIsAdmin =
@@ -123,9 +124,11 @@ export const User = ({
 
       profile = app.newProfiles.getProfile(chainId.id, address);
 
-      role = adminsAndMods.find(
-        (r) => r.address === address && r.address_chain === chainId.id
-      );
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) => r.address === address && r.address_chain === chainId.id
+        );
+      }
     } else if (user instanceof MinimumProfile) {
       profile = user;
 
@@ -139,10 +142,12 @@ export const User = ({
         }
       }
 
-      role = adminsAndMods.find(
-        (r) =>
-          r.address === profile.address && r.address_chain === profile.chain
-      );
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) =>
+            r.address === profile.address && r.address_chain === profile.chain
+        );
+      }
     } else {
       account = user;
       // TODO: we should remove this, since account should always be of type Account,
@@ -151,9 +156,11 @@ export const User = ({
 
       profile = app.newProfiles.getProfile(chainId, account.address);
 
-      role = adminsAndMods.find(
-        (r) => r.address === account.address && r.address_chain === chainId
-      );
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) => r.address === account.address && r.address_chain === chainId
+        );
+      }
     }
   }
 
