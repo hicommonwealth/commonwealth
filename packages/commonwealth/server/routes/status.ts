@@ -58,16 +58,6 @@ const getChainStatus = async (models: DB) => {
   const [chains, nodes, notificationCategories] = await Promise.all([
     models.Chain.findAll({
       where: { active: true },
-      include: [
-        {
-          model: models.Topic,
-          as: 'topics',
-        },
-        {
-          model: models.ChainNode,
-          required: true,
-        },
-      ],
     }),
     models.ChainNode.findAll(),
     models.NotificationCategory.findAll(),
