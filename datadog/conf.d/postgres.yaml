@@ -8,3 +8,156 @@ instances:
     password: <YOUR PASSWORD>
     dbname: <YOUR DBNAME>
     ssl: True
+    ignore_databases:
+      - rdsadmin
+      - postgres
+      - template%%
+    
+    relations:
+      - relation_regex: '.*'
+        relkind:
+        - r
+    max_relations: 500
+    
+    collect_count_metrics: true
+    collect_activity_metrics: true
+    collect_database_size_metrics: true
+    collect_default_database: false
+    collect_bloat_metrics: true
+
+    query_metrics:
+      enabled: true
+      collection_interval: 10
+
+    query_activity:
+      enabled: true
+      collection_interval: 10
+
+    custom_queries:
+      - metric_prefix: postgresql.pg_stat_statements_total
+        query: SELECT t2.datname, sum(calls) as total_calls, sum(round(total_exec_time::numeric, 2)) AS total_time FROM pg_stat_statements t1 JOIN pg_database t2 ON (t1.dbid=t2.oid) GROUP BY t2.datname
+        columns:
+          - name: datname
+            type: tag
+          - name: total_calls
+            type: count
+          - name: total_time
+            type: count
+      
+      - metric_prefix: postgresql.pg_stat_statements
+        query: SELECT t2.rolname, t3.datname, query, calls, round(total_exec_time::numeric, 2) AS total_time, rows, round(total_exec_time::numeric / calls, 2) AS avg_time, round(max_exec_time::numeric, 2) AS max_time, round((100 * total_exec_time / sum(total_exec_time::numeric) OVER ())::numeric, 2) AS percentage_cpu FROM pg_stat_statements t1 JOIN pg_roles t2 ON (t1.userid = t2.oid) JOIN pg_database t3 ON (t1.dbid = t3.oid) JOIN pg_auth_members t4 ON (t2.oid = t4.member) WHERE t4.roleid IN (SELECT oid FROM pg_roles WHERE rolname = 'apps') ORDER BY percentage_cpu DESC LIMIT 20
+        columns:
+          - name: rolname
+            type: tag
+          - name: datname
+            type: tag
+          - name: query
+            type: tag
+          - name: calls
+            type: count
+          - name: total_time
+            type: count
+          - name: rows
+            type: count
+          - name: avg_time
+            type: count
+          - name: max_time
+            type: count
+          - name: percentage_cpu
+            type: count
+      
+      - metric_prefix: postgresql.pg_stat_activity
+        query: SELECT datname, state, count(*) as count FROM pg_stat_activity WHERE state != '' GROUP BY 1, 2 ORDER BY 3 DESC;
+        columns:
+          - name: datname
+            type: tag
+          - name: state
+            type: tag
+          - name: count
+            type: gauge
+      
+      - metric_prefix: postgresql.pg_slow_debug
+        query: SELECT pid, datname, usename, query, floor(extract(epoch FROM (now() - query_start))) AS duration FROM pg_stat_activity WHERE usename != 'log_rep' AND usename != 'rdsrepladmin' AND state = 'active' AND (now() - query_start) > '10 minutes'::interval
+        columns:
+          - name: pid
+            type: tag
+          - name: datname
+            type: tag
+          - name: usename
+            type: tag
+          - name: query
+            type: tag
+          - name: duration
+            type: count
+      
+      - metric_prefix: postgresql.pg_locks_debug
+        query: SELECT blocked_locks.pid AS blocked_pid, blocked_activity.usename AS blocked_user, blocked_activity.query AS blocked_query, blocked_activity.wait_event AS blocked_wait_event, floor(extract(epoch FROM (now() - blocked_activity.query_start))) AS blocked_duration, blocking_locks.pid AS blocking_pid, blocking_activity.usename AS blocking_user, blocking_activity.query AS blocking_query, blocking_activity.wait_event AS blocking_wait_event, floor(extract(epoch FROM (now() - blocking_activity.query_start))) AS blocking_duration FROM pg_catalog.pg_locks blocked_locks JOIN pg_catalog.pg_stat_activity blocked_activity ON blocked_activity.pid = blocked_locks.pid JOIN pg_catalog.pg_locks blocking_locks ON blocking_locks.locktype = blocked_locks.locktype AND blocking_locks.database IS NOT DISTINCT FROM blocked_locks.database AND blocking_locks.relation IS NOT DISTINCT FROM blocked_locks.relation AND blocking_locks.page IS NOT DISTINCT FROM blocked_locks.page AND blocking_locks.tuple IS NOT DISTINCT FROM blocked_locks.tuple AND blocking_locks.virtualxid IS NOT DISTINCT FROM blocked_locks.virtualxid AND blocking_locks.transactionid IS NOT DISTINCT FROM blocked_locks.transactionid AND blocking_locks.classid IS NOT DISTINCT FROM blocked_locks.classid AND blocking_locks.objid IS NOT DISTINCT FROM blocked_locks.objid AND blocking_locks.objsubid IS NOT DISTINCT FROM blocked_locks.objsubid AND blocking_locks.pid != blocked_locks.pid JOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid WHERE NOT blocked_locks.granted;
+        columns:
+          - name: blocked_pid
+            type: tag
+          - name: blocked_user
+            type: tag
+          - name: blocked_query
+            type: tag
+          - name: blocked_wait_event
+            type: tag
+          - name: blocked_duration
+            type: count
+          - name: blocking_pid
+            type: tag
+          - name: blocking_user
+            type: tag
+          - name: blocking_query
+            type: tag
+          - name: blocking_wait_event
+            type: tag
+          - name: blocking_duration
+            type: count
+
+      - metric_prefix: postgresql.pg_locks
+        query: WITH q_locks AS (select * from pg_locks where pid != pg_backend_pid() and database = (select oid from pg_database where datname = current_database())) SELECT (select current_database()) as datname, lockmodes AS lock_mode, coalesce((select count(*) FROM q_locks WHERE mode = lockmodes), 0) AS lock_count FROM unnest('{AccessShareLock, ExclusiveLock, RowShareLock, RowExclusiveLock, ShareLock, ShareRowExclusiveLock, AccessExclusiveLock, ShareUpdateExclusiveLock}'::text[]) lockmodes
+        columns:
+          - name: datname
+            type: tag
+          - name: lock_mode
+            type: tag
+          - name: lock_count
+            type: gauge
+
+      - metric_prefix: postgresql.pg_idle_in_transaction_debug
+        query: SELECT pid, datname, usename, client_addr, query, wait_event, floor(extract(epoch FROM (now() - query_start))) AS duration FROM pg_stat_activity WHERE state = 'idle in transaction' AND (now() - query_start) > '10 minutes'::interval;
+        columns:
+          - name: pid
+            type: tag
+          - name: datname
+            type: tag
+          - name: usename
+            type: tag
+          - name: client_addr
+            type: tag
+          - name: query
+            type: tag
+          - name: wait_event
+            type: tag
+          - name: duration
+            type: count
+
+      - metric_prefix: postgresql.pg_cache
+        query: WITH all_tables AS (SELECT * FROM (SELECT 'all'::text AS TABLE_NAME, sum((coalesce(heap_blks_read, 0) + coalesce(idx_blks_read, 0) + coalesce(toast_blks_read, 0) + coalesce(tidx_blks_read, 0))) AS from_disk, sum((coalesce(heap_blks_hit, 0) + coalesce(idx_blks_hit, 0) + coalesce(toast_blks_hit, 0) + coalesce(tidx_blks_hit, 0))) AS from_cache FROM pg_statio_USER_tables) a WHERE (from_disk + from_cache) > 0 ), TABLES AS (SELECT * FROM (SELECT relname AS TABLE_NAME, ((coalesce(heap_blks_read, 0) + coalesce(idx_blks_read, 0) + coalesce(toast_blks_read, 0) + coalesce(tidx_blks_read, 0))) AS from_disk, ((coalesce(heap_blks_hit, 0) + coalesce(idx_blks_hit, 0) + coalesce(toast_blks_hit, 0) + coalesce(tidx_blks_hit, 0))) AS from_cache FROM pg_statio_USER_tables) a WHERE (from_disk + from_cache) > 0 ) SELECT TABLE_NAME AS "table", from_disk AS "disk_hits", round((from_disk::numeric / (from_disk + from_cache)::numeric)*100.0, 2) AS "disk_hits_ratio", round((from_cache::numeric / (from_disk + from_cache)::numeric)*100.0, 2) AS "cache_hits_ratio", (from_disk + from_cache) AS "total_hits" FROM (SELECT * FROM all_tables UNION ALL SELECT * FROM TABLES) a ORDER BY (CASE WHEN TABLE_NAME = 'all' THEN 0 ELSE 1 END), from_disk DESC
+        columns:
+          - name: table
+            type: tag
+          - name: disk_hits
+            type: count
+          - name: disk_hits_ratio
+            type: gauge
+          - name: cache_hits_ratio
+            type: gauge
+          - name: total_hits
+            type: count
+
+      - metric_prefix: postgresql.pg_wal
+        query: SELECT sum(SIZE) as wal_size FROM pg_ls_waldir()
+        columns:
+          - name: wal_size
+            type: gauge
