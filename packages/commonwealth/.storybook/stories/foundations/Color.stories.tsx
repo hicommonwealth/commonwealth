@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWCard, CardElevation } from "../../../client/scripts/views/components/component_kit/cw_card";
+import { CWCard } from "../../../client/scripts/views/components/component_kit/cw_card";
 import { CWText } from "../../../client/scripts/views/components/component_kit/cw_text";
 
 import "../styles/color.scss";
@@ -132,12 +132,11 @@ const hex = (colorsArr: any[], color: string) => {
 const Card: FC<ColorCardProps> = ({ color, colorsArr }) => {
   return (
     <div className="Card">
-      <CWText
-        className={`Swatch ${color}`}
-        isCentered
-      >
-        AAA 21.1
-      </CWText>
+      <div className={`Swatch ${color}`}>
+        <CWText className="font" isCentered>
+          AAA 1.75
+        </CWText>
+      </div>
       <div className="Text">
         <CWText className="variation" fontWeight="bold">
           {variation(color)}
@@ -156,7 +155,7 @@ const BaseStory = (colorsArr: any[]) => {
     argTypes: {
       color: {
         control: { type: "radio" },
-        options: [ ...variations(colorsArr) ],
+        options: variations(colorsArr),
       },
     },
     parameters: {
