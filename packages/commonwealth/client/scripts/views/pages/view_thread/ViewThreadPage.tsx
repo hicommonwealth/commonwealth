@@ -39,6 +39,7 @@ import {
   getReactionSubscription,
   handleToggleSubscription,
 } from '../discussions/helpers';
+import { NewThreadTag } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -747,6 +748,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
+        displayNewTag={true}
         headerComponents={
           !isStageDefault && <ThreadStageComponent stage={thread.stage} />
         }
@@ -856,6 +858,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              showDeleteButton={isAuthor || isAdmin}
+                              onDelete={() => {
+                                setInitializedPolls(false);
+                              }}
                             />
                           );
                         })}

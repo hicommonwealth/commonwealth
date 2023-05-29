@@ -38,7 +38,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         )}
       </div>
       <div className="profile-image">
-        {profile.avatarUrl ? (
+        {profile?.avatarUrl ? (
           <img src={profile.avatarUrl} />
         ) : (
           <img
