@@ -80,7 +80,11 @@ export const CreateComment = ({
       setErrorMsg(null);
       setContentDelta(createDeltaFromText(''));
       clearDraft();
-      jumpHighlightComment(res.id);
+
+      setTimeout(() => {
+        // Wait for dom to be updated before scrolling to comment
+        jumpHighlightComment(res.id);
+      }, 100);
 
       // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
       // once we are receiving notifications from the websocket

@@ -6,6 +6,7 @@ export const jumpHighlightComment = (commentId: number) => {
   const commentEle = document.getElementsByClassName(`comment-${commentId}`)[0];
 
   if (commentEle) {
+    console.log('O should be highlighin');
     // clear any previous animation
     commentEle.classList.remove('highlighted');
     commentEle.classList.remove('highlightAnimationComplete');
