@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import type * as solanaWeb3 from '@solana/web3.js';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
 
 import app from 'state';
@@ -151,13 +148,6 @@ export const SplTokenForm = () => {
         disabled={chainFormState.saving || !chainFormState.loaded}
         onClick={async () => {
           chainFormState.setSaving(true);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: null,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
 
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
