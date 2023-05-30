@@ -14,7 +14,7 @@ import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
 import { CWButton } from './component_kit/cw_button';
 import { CWTextInput } from './component_kit/cw_text_input';
-import { AvatarUpload } from './avatar_upload';
+import { AvatarUpload } from './Avatar';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { CWText } from './component_kit/cw_text';
 import { CWDivider } from './component_kit/cw_divider';

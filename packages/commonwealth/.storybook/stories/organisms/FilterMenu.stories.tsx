@@ -1,8 +1,13 @@
 import React, { FC, useState } from 'react';
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta } from "@storybook/react";
 
 import { CWFilterMenu } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_filter_menu';
 import type { CheckboxType } from '../../../client/scripts/views/components/component_kit/cw_checkbox';
+import { argsToOptions, objectArrayToArgs } from '../helpers';
+
+interface FilterMenuProps {
+  header: string;
+};
 
 const filter = {
   title: 'Organisms/Filter Menu',
@@ -10,7 +15,6 @@ const filter = {
 } satisfies Meta<typeof CWFilterMenu>;
 
 export default filter;
-// type Story = StoryObj<typeof filter>;
 
 const checkboxGroupOptions: Array<CheckboxType> = [
   {
@@ -35,13 +39,9 @@ const checkboxGroupOptions: Array<CheckboxType> = [
   },
 ];
 
-interface FilterMenuProps {
-  header: string;
-  groupOptions: Array<CheckboxType>;
-};
-
 const FilterMenu: FC<FilterMenuProps> = (props) => {
-  const { header, groupOptions } = props;
+  const { header } = props;
+  const options = (({ header, ...o }) => o)(props);
   const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
     Array<string>
   >([]);
@@ -49,7 +49,9 @@ const FilterMenu: FC<FilterMenuProps> = (props) => {
   return (
     <CWFilterMenu
       header={header}
-      filterMenuItems={groupOptions}
+      filterMenuItems={
+        argsToOptions<CheckboxType>(options, "label", "value")
+      }
       selectedItems={checkboxGroupSelected}
       onChange={(e) => {
         const itemValue = e.target.value;
@@ -63,21 +65,27 @@ const FilterMenu: FC<FilterMenuProps> = (props) => {
       }}
     />
   )
-}
+};
 
-// export const FilterMenuStory: Story = {
 export const FilterMenuStory = {
   name: 'Filter Menu',
   args: {
     header: "Stages",
-    options: checkboxGroupOptions,
+    ...objectArrayToArgs(checkboxGroupOptions, "label", "Filter")
   },
   argTypes: {
     header: {
       control: { type: "text" },
     }
   },
-  render: ({...args}) => (
-    <FilterMenu header={args.header} groupOptions={args.options} />
-  )
-}
+  parameters: {
+    controls: {
+      exclude: [
+        "filterMenuItems",
+        "onChange",
+        "selectedItems",
+      ],
+    }
+  },
+  render: ({...args}) => <FilterMenu {...args} header={args.header} />,
+};

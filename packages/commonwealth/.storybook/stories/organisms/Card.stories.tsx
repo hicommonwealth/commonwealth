@@ -7,6 +7,13 @@ import { notifySuccess } from '../../../client/scripts/controllers/app/notificat
 
 import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
+interface CardProps {
+  elevation: CardElevation | undefined,
+  interactive?: boolean,
+  fullWidth?: boolean,
+  children: any,
+};
+
 const card = {
   title: 'Organisms/Card',
   component: CWCard,
@@ -14,13 +21,6 @@ const card = {
 
 export default card;
 type Story = StoryObj<any>;
-
-interface CardProps {
-  elevation: CardElevation | undefined,
-  interactive?: boolean,
-  fullWidth?: boolean,
-  children: any,
-}
 
 const Card: FC<CardProps> = (props) => {
   const { elevation, interactive = false, fullWidth } = props;
@@ -34,7 +34,7 @@ const Card: FC<CardProps> = (props) => {
       {props.children}
     </CWCard>
   )
-}
+};
 
 export const CardStory: Story = {
   name: "Card",
@@ -47,7 +47,7 @@ export const CardStory: Story = {
   },
   argTypes: {
     elevation: {
-      control: { type: "select" },
+      control: { type: "radio" },
       options: [ "elevation-1", "elevation-2", "elevation-3" ],
     },
     fullWidth: {
@@ -65,10 +65,21 @@ export const CardStory: Story = {
       control: { type: "text" }
     },
   },
+  parameters: {
+    controls: {
+      exclude: [
+        "onClick",
+        "onmouseover",
+        "onMouseEnter",
+        "onMouseLeave",
+        "className",
+      ],
+    }
+  },
   render: ({...args}) => (
     <Card elevation={args.elevation} {...args}>
       <CWText fontWeight="semiBold">{args.title}</CWText>
       <CWText>{args.content}</CWText>
     </Card>
   )
-}
+};

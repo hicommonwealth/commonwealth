@@ -4,6 +4,8 @@ import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Link, LinkSource, ThreadInstance } from '../../models/thread';
 import type { DB } from '../../models';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
+import { serverAnalyticsTrack } from '../../../shared/analytics/server-track';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 
 type AddThreadLinkReq = {
   thread_id: number;
@@ -70,6 +72,10 @@ const addThreadLink = async (
         as: 'topic',
       },
     ],
+  });
+
+  serverAnalyticsTrack({
+    event: MixpanelCommunityInteractionEvent.LINKED_PROPOSAL,
   });
 
   return success(res, finalThread.toJSON());
