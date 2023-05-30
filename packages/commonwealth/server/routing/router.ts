@@ -630,6 +630,11 @@ function setupRouter(
   );
 
   // roles
+  router.get(
+    '/roles',
+    databaseValidationService.validateChain,
+    controllers.listRoles.bind(this, models)
+  );
   router.get('/roles', controllers.getRoles.bind(this, models));
   router.post('/roles', controllers.createRole.bind(this, models));
   router.patch('/roles', controllers.updateRole.bind(this, models));
@@ -1004,12 +1009,9 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post(
-    '/auth/magic',
-    passport.authenticate('magic'), (req, res) => {
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
     return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
-  );
+  });
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
