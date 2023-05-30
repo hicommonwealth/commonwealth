@@ -114,10 +114,9 @@ export const CommentsTree = ({
               threadLevel={threadLevel}
               threadId={thread.id}
               updatedCommentsCallback={updatedCommentsCallback}
+              isReplying={isReplying}
+              parentCommentId={parentCommentId}
             />
-            {!!children.length &&
-              canContinueThreading &&
-              recursivelyGatherComments(children, comment, threadLevel + 1)}
             {isReplying && parentCommentId === comment.id && (
               <CreateComment
                 handleIsReplying={handleIsReplying}
@@ -126,6 +125,9 @@ export const CommentsTree = ({
                 updatedCommentsCallback={updatedCommentsCallback}
               />
             )}
+            {!!children.length &&
+              canContinueThreading &&
+              recursivelyGatherComments(children, comment, threadLevel + 1)}
           </React.Fragment>
         );
       } else {
