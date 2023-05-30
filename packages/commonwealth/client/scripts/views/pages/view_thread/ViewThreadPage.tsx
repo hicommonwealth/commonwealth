@@ -39,22 +39,20 @@ import {
   getReactionSubscription,
   handleToggleSubscription,
 } from '../discussions/helpers';
-import { NewThreadTag } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import {
-  ExternalLink,
-  ThreadAuthor,
-  ThreadStageComponent,
-} from './thread_components';
+import { ThreadAuthor, ThreadStageComponent } from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { filterLinks } from 'helpers/threads';
-import { isDefaultStage } from 'helpers';
+import { extractDomain, isDefaultStage } from 'helpers';
+import ExternalLink from 'views/components/ExternalLink';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -101,6 +99,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+  });
 
   const threadUpdatedCallback = (newTitle: string, body: string) => {
     setThread(
@@ -719,7 +721,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         headerComponents={
           !isStageDefault && <ThreadStageComponent stage={thread.stage} />
         }
-        subHeader={!!thread.url && <ExternalLink url={thread.url} />}
+        subHeader={
+          !!thread.url && (
+            <ExternalLink url={thread.url}>
+              {extractDomain(thread.url)}
+            </ExternalLink>
+          )
+        }
         actions={
           app.user.activeAccount && !isGloballyEditing && getActionMenuItems()
         }

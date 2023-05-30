@@ -14,10 +14,10 @@ import type { UserAttributes } from '../models/user';
 
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { createRole } from '../util/roles';
 
 import { redirectWithLoginError } from './finishEmailLogin';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -253,12 +253,10 @@ const finishSsoLogin = async (
               res,
               `Could not log in with ronin wallet`
             );
-          if (process.env.NODE_ENV !== 'test') {
-            mixpanelTrack({
-              event: MixpanelLoginEvent.LOGIN,
-              isCustomDomain: null,
-            });
-          }
+          serverAnalyticsTrack({
+            event: MixpanelLoginEvent.LOGIN,
+            isCustomDomain: null,
+          });
         });
         return success(res, { user: existingUser });
       } else {
@@ -274,12 +272,10 @@ const finishSsoLogin = async (
               res,
               `Could not log in with ronin wallet`
             );
-          if (process.env.NODE_ENV !== 'test') {
-            mixpanelTrack({
-              event: MixpanelLoginEvent.LOGIN,
-              isCustomDomain: null,
-            });
-          }
+          serverAnalyticsTrack({
+            event: MixpanelLoginEvent.LOGIN,
+            isCustomDomain: null,
+          });
         });
         return success(res, { user: newUser });
       }
@@ -380,6 +376,10 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.findOne({
         where: { address: checksumAddress },
       });
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
+      });
       return success(res, { address: newAddress });
     } else {
       // re-fetch user to include address object, if freshly created
@@ -396,12 +396,10 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        if (process.env.NODE_ENV !== 'test') {
-          mixpanelTrack({
-            event: MixpanelLoginEvent.LOGIN,
-            isCustomDomain: null,
-          });
-        }
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
       });
       return success(res, { user: newUser });
     }

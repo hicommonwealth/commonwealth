@@ -29,6 +29,8 @@ type CommentProps = {
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
   updatedCommentsCallback?: () => void;
+  isReplying?: boolean;
+  parentCommentId?: number;
 };
 
 export const CommentComponent = ({
@@ -39,6 +41,8 @@ export const CommentComponent = ({
   setIsGloballyEditing,
   threadLevel,
   updatedCommentsCallback,
+  isReplying,
+  parentCommentId,
 }: CommentProps) => {
   const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>(false);
@@ -101,7 +105,16 @@ export const CommentComponent = ({
           {Array(threadLevel)
             .fill(undefined)
             .map((_, i) => (
-              <div key={i} className="thread-connector" />
+              <div
+                key={i}
+                className={`thread-connector ${
+                  isReplying &&
+                  i === threadLevel - 1 &&
+                  parentCommentId === comment.id
+                    ? 'replying'
+                    : ''
+                }`}
+              />
             ))}
         </div>
       )}

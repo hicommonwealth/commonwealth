@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
 
 import app from 'state';
@@ -19,6 +16,8 @@ import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
 import { useEthChainFormState } from './hooks';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -45,6 +44,12 @@ const CreateCommunity = () => {
   );
   const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
     useEthChainFormState();
+
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
+    },
+  });
 
   useEffect(() => {
     const fetchEthChains = async () => {
@@ -131,14 +136,6 @@ const CreateCommunity = () => {
                   isSelected={currentForm === t}
                   onClick={() => {
                     setCurrentForm(t);
-
-                    // mixpanelBrowserTrack({
-                    //   event:
-                    //     MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
-                    //   chainBase: null,
-                    //   isCustomDomain: app.isCustomDomain(),
-                    //   communityType: t,
-                    // });
                   }}
                 />
               );
