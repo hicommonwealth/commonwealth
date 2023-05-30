@@ -57,15 +57,23 @@ module.exports = {
         { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t },
       );
 
-      // create a javascript map representing the values
-      const communityMap = new Map(communityRoles.map(c => [c.chain_id, stringToBitmask(c.concatenated_names)]));
+      // create a map representing the values we will insert into the db
+      const communityMap = new Map(communityRoles.map(c => {
+        const bitmask = stringToBitmask(c.concatenated_names)
+        if (bitmask === 7) { // filter out full permissions, they are made by default
+          return [undefined, undefined]
+        }
+        return [c.chain_id, stringToBitmask(c.concatenated_names)]
+      }));
+
+      communityMap.delete(undefined);
 
       // can have types 0 = member, 2 = moderator, 4 = admin, others = mix
       await queryInterface.addColumn(
         'Chains',
         'allowed_roles',
         {
-          type: DataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 7,
           validate: {
@@ -81,15 +89,15 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
         UPDATE "Chains"
-        SET role = CASE 
+        SET allowed_roles = CASE 
             ${communityKeys
           .map(
             (chain) =>
-              `WHEN id = ${chain} THEN '${communityMap[chain]}'`
+              `WHEN id = '${chain}' THEN ${communityMap.get(chain)}`
           )
           .join(' ')}
         END
-        WHERE id IN (${communityKeys.join(', ')})
+        WHERE id IN (${communityKeys.map(key => `'${key}'`).join(', ')})
       `,
         { transaction: t }
       );
