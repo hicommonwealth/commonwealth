@@ -226,24 +226,6 @@ class ChainInfo {
     });
   }
 
-  // TODO: get operation should not have side effects, and either way this shouldn't be here
-  public async getMembers(id: string) {
-    try {
-      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id });
-      this.setMembers(res.result);
-      const roles = res.result.filter((r) => {
-        return (
-          r.permission === AccessLevel.Admin ||
-          r.permission === AccessLevel.Moderator
-        );
-      });
-      this.setAdmins(roles);
-      return this.adminsAndMods;
-    } catch {
-      console.log('Failed to fetch admins/mods');
-    }
-  }
-
   public setMembers(roles) {
     this.members = [];
     roles.forEach((r) => {
