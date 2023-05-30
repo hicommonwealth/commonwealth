@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/component_kit/cw_button.scss';
+import 'components/component_kit/new_designs/cw_button.scss';
 
 import type { IconName } from '../cw_icons/cw_icon_lookup';
 import { CWIcon } from '../cw_icons/cw_icon';
@@ -62,7 +62,7 @@ export const CWButton = (props: ButtonProps) => {
   } = props;
 
   return (
-    <div className={`btn-border ${buttonType}`}>
+    <div className={`btn-border ${buttonType} ${disabled ? 'disabled' : ''}`}>
       <button
         className={getClasses<ButtonStyleProps>(
           {

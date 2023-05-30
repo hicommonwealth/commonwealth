@@ -3,39 +3,53 @@
 
 .btn-border {
   &.primary {
-    border: 2px solid $transparent;
     &:focus-within {
       border: 2px solid $neutral-700;
     }
   }
 
   &.destructive {
-    border: 2px solid $transparent;
     &:focus-within {
       border: 2px solid $rorange-600;
     }
   }
 
   &.primary, &.destructive {
+    border: 2px solid $transparent;
     padding: 2px;
     border-radius: 10px;
     width: fit-content;
   }
 
-  &.secondary, &.tertiary {
+  &.tertiary {
     border: 2px solid $transparent;
-    margin: 2px;
-    border-radius: 8px;
+    padding: 2px;
+    border-radius: 10px;
     width: fit-content;
   }
 
   &.secondary {
+    border: 1px solid $neutral-700;
+    width: fit-content;
+    border-radius: 6px;
+    margin: 3px;
+
+    &:hover {
+      border: 1px solid $neutral-800;
+    }
+
+    &:active {
+      border: 1px solid $neutral-700;
+    }
+
     &:focus-within {
       border: 2px solid $neutral-800;
+      padding: 2px;
+      margin: 0px;
+    }
 
-      .Button {
-        border: 1px solid $transparent;
-      }
+    &.disabled {
+      border: 1px solid $neutral-200;
     }
   }
 
@@ -146,7 +160,6 @@
 
     &.secondary {
       background-color: $white;
-      border: 1px solid $neutral-700;
       @include iconAndTextColors($neutral-800, $neutral-700);
 
       &:hover {
@@ -156,7 +169,6 @@
 
       &:active {
         background-color: $white;
-        border: 1px solid $neutral-800;
         @include iconAndTextColors($neutral-800, $neutral-700);
       }
 
@@ -167,13 +179,11 @@
 
       &.disabled {
         background-color: $neutral-50;
-        border: 1px solid $neutral-200;
         @include iconAndTextColors($neutral-400, $neutral-400);
       }
     }
 
     &.tertiary {
-      border: 4px solid $transparent;
       @include iconAndTextColors($blue-500, $blue-500);
 
       &:hover {
