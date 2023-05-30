@@ -4,15 +4,13 @@
   align-items: center;
   cursor: pointer;
   display: flex;
-  gap: 4px;
+  gap: 8px;
   padding: 8px 16px;
   user-select: none;
-
-  .menu-item-icon.Icon {
-    color: $neutral-600;
-  }
+  border-radius: $border-radius-md  !important;
 
   .menu-item-text.Text {
+    font-size: 14px !important;
     color: $neutral-600;
   }
 
@@ -43,6 +41,7 @@
     }
 
     .menu-item-text.Text {
+      font-size: 14px !important;
       color: $neutral-500;
     }
   }
@@ -50,14 +49,19 @@
 
 .PopoverMenu {
   background-color: $white;
-  border-radius: $border-radius-corners;
-  box-shadow: $elevation-3;
+  border-radius: $border-radius-md  !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: $neutral-200-new  !important;
+  box-shadow: $elevation-6  !important;
   overflow: hidden;
+  padding: 8px;
 
   .menu-section-header-text.Text {
     color: $neutral-500;
     padding: 8px 16px;
     user-select: none;
+    font-size: 14px !important;
   }
 
   .menu-section-divider {

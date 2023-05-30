@@ -4,7 +4,7 @@ import React from 'react';
 import type Thread from '../../../models/Thread';
 import app from 'state';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { notifySuccess } from '../../../controllers/app/notifications';
 import { ThreadActionType } from '../../../../../shared/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -67,6 +67,48 @@ export const ThreadPreviewMenu = ({
     });
   };
 
+  const handleFlagMarkAsSpam = () => {
+    openConfirmation({
+      title: 'Confirm flag as spam',
+      description: (
+        <>
+          <p>Are you sure you want to flag this post as spam?</p>
+          <br />
+          <p>
+            Flagging as spam will help filter out unwanted content. Posts
+            flagged as spam are hidden from the main feed and can't be
+            interacted with. For transparency, spam can still be viewed by
+            community members if they choose to "Include posts flagged as spam."
+          </p>
+          <br />
+          <p>Note that you can always unflag a post as spam.</p>
+        </>
+      ),
+      buttons: [
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+        {
+          label: 'Confirm',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              app.threads.delete(thread).then(() => {
+                app.threadUpdateEmitter.emit('threadUpdated', {
+                  threadId: thread.id,
+                  action: ThreadActionType.Deletion,
+                });
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+      ],
+    });
+  };
+
   return (
     <React.Fragment>
       <div
@@ -111,7 +153,9 @@ export const ThreadPreviewMenu = ({
                         });
                     },
                     label: isReadOnly ? 'Unlock thread' : 'Lock thread',
-                    iconLeft: 'lock' as const,
+                    iconLeft: isReadOnly
+                      ? ('keyLockClosed' as const)
+                      : ('keyLockOpened' as const),
                   },
                 ]
               : []),
@@ -138,6 +182,15 @@ export const ThreadPreviewMenu = ({
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
+                    onClick: handleFlagMarkAsSpam,
+                    label: 'Flag as spam',
+                    iconLeft: 'flag' as const,
+                  },
+                ]
+              : []),
+            ...(isAuthor || hasAdminPermissions
+              ? [
+                  {
                     onClick: handleDeleteThread,
                     label: 'Delete',
                     iconLeft: 'trash' as const,
@@ -146,11 +199,9 @@ export const ThreadPreviewMenu = ({
               : []),
           ]}
           renderTrigger={(onclick) => (
-            <CWIconButton
-              iconName="dotsVertical"
-              iconSize="small"
-              onClick={onclick}
-            />
+            <button onClick={onclick} className="content-footer-btn">
+              <CWIcon iconName="dots" iconSize="small" />
+            </button>
           )}
         />
       </div>

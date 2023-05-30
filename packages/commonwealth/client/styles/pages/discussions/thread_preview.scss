@@ -4,20 +4,12 @@
   cursor: pointer;
   display: flex;
   width: 100%;
-
-  // 0 padding on top for sticky header
-  padding: 16px 56px;
-
-  @include medium {
-    padding: 16px 40px;
-  }
-
-  @include mediumSmall {
-    padding: 16px 32px;
-  }
+  border-radius: 6px;
+  padding: 16px;
+  gap: 16px;
 
   @include smallInclusive {
-    padding: 16px 24px;
+    padding: 12px;
   }
 
   &.isPinned {
@@ -32,13 +24,13 @@
     background: $neutral-50;
   }
 
-  .main-content {
+  .content-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
     width: 100%;
 
-    .top-row {
+    .content-header {
       align-items: center;
       display: flex;
       gap: 4px;
@@ -52,9 +44,11 @@
         .User {
           align-items: center;
           display: flex;
+          gap: 8px;
 
           .user-avatar {
             position: unset;
+            margin-right: 0px !important;
           }
 
           .username {
@@ -69,7 +63,7 @@
         }
       }
 
-      .top-row-icons {
+      .content-header-icons {
         display: flex;
         gap: 8px;
 
@@ -83,20 +77,33 @@
       }
     }
 
-    .thread-preview {
-      @include multiline-text-ellipsis($max-lines: 2);
-      word-break: break-word;
+
+    .content-body-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .content-body {
+        @include multiline-text-ellipsis($max-lines: 2);
+        word-break: break-word;
+      }
+
+      .content-title {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-right: 72px; // hack to be removed on completion of discussion listings
+      }
     }
 
-    .title-row,
-    .tags-row {
+    .content-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       padding-right: 72px; // hack to be removed on completion of discussion listings
     }
 
-    .row-bottom {
+    .content-footer {
       display: flex;
       justify-content: space-between;
 
@@ -107,11 +114,27 @@
 
         .Icon,
         .Text {
-          color: $neutral-500;
+          // color: $neutral-500;
         }
       }
 
-      .row-bottom-menu {
+      .content-footer-btn {
+        outline: 0;
+        border: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: $border-radius-corners-wider;
+
+        &:hover {
+          background-color: $neutral-200;
+        }
+      }
+
+      .content-footer-menu {
         display: flex;
         gap: 16px;
       }

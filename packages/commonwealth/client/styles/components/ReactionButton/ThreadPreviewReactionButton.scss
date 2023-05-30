@@ -2,17 +2,17 @@
 
 .ThreadPreviewReactionButton {
   align-items: center;
-  border-radius: $border-radius-corners;
+  border-radius: $border-radius-corners-wider;
   border: 1px solid $neutral-300;
   color: $neutral-500;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   font-weight: 500;
-  height: 48px;
+  padding: 4px 12px;
+  width: fit-content;
+  height: fit-content;
   justify-content: center;
-  margin-right: 24px;
-  min-width: 48px;
 
   &.has-reacted {
     border-color: $primary-500;

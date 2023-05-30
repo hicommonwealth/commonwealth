@@ -99,7 +99,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     <Sublayout hideFooter={true}>
       <div className="DiscussionsPage">
         <Virtuoso
-          style={{ height: '100%', width: '100%' }}
+          className="thread-list"
+          style={{ height: '100%', width: '100%', position: 'inherit' }}
           data={threads}
           itemContent={(i, thread) => {
             return <ThreadPreview thread={thread} key={thread.id} />;

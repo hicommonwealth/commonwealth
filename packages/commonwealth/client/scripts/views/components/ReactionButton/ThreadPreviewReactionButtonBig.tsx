@@ -42,7 +42,7 @@ export const ThreadPreviewReactionButtonBig = ({
             onReactionClick(e, hasReacted, dislike, like);
           }
         }}
-        className={`ThreadPreviewReactionButton${
+        className={`ThreadPreviewReactionButton ${
           isLoading || isUserForbidden ? ' disabled' : ''
         }${hasReacted ? ' has-reacted' : ''}`}
       >
@@ -61,10 +61,7 @@ export const ThreadPreviewReactionButtonBig = ({
                 onMouseLeave={handleInteraction}
               >
                 <div className="reactions-container">
-                  <CWIcon
-                    iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
-                    iconSize="small"
-                  />
+                  <CWIcon iconName="upvote" iconSize="small" />
                   <div className="reactions-count">{reactors.length}</div>
                 </div>
               </div>
@@ -72,10 +69,7 @@ export const ThreadPreviewReactionButtonBig = ({
           />
         ) : (
           <div className="reactions-container">
-            <CWIcon
-              iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
-              iconSize="small"
-            />
+            <CWIcon iconName="upvote" iconSize="small" />
             <div className="reactions-count">{reactors.length}</div>
           </div>
         )}
