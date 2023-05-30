@@ -9,14 +9,14 @@ import { UpgradeRolesForm } from './upgrade_roles_form';
 import { WebhooksForm } from './webhooks_form';
 
 type AdminPanelTabsProps = {
-  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: Array<RoleInfo>;
   searchTerm: string;
   setSearchTerm: (v: string) => void;
 };
 
 export const AdminPanelTabs = ({
-  onRoleUpgrade,
+  onRoleUpdate,
   roleData,
   searchTerm,
   setSearchTerm,
@@ -44,7 +44,7 @@ export const AdminPanelTabs = ({
       {currentTab === 1 && (
         <UpgradeRolesForm
           roleData={roleData}
-          onRoleUpgrade={(x, y) => onRoleUpgrade(x, y)}
+          onRoleUpdate={(x, y) => onRoleUpdate(x, y)}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
