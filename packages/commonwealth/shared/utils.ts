@@ -12,28 +12,6 @@ import {
 } from './permissions';
 import type { RoleObject } from './types';
 
-export const getNextPollEndingTime = (now) => {
-  // Offchain polls should be open until 1st or 15th of the month,
-  // and should always be open for at least 5 days.
-  //
-  // TODO: Allow the user to customize their poll ending time from
-  // the frontend. (This requires adding a datepicker component)
-
-  const t1 = now.clone().utc().startOf('month').add(15, 'days');
-  const t2 = now.clone().utc().endOf('month').add(1, 'days');
-  const t3 = now.clone().utc().endOf('month').add(15, 'days');
-
-  const earliestPossible = now.clone().utc().add(5, 'days');
-  if (t1.isAfter(earliestPossible)) return t1;
-  if (t2.isAfter(earliestPossible)) return t2;
-  return t3;
-};
-
-export const getNextPollEndingTimeIsDangerouslyClose = (now, endingTime) => {
-  now.utc().add(5, 'days');
-  endingTime.utc();
-};
-
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes.
