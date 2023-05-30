@@ -33,7 +33,6 @@ export const NewThreadForm = () => {
 
   const chainId = app.chain.id;
   const hasTopics = !!app.topics.getByCommunity(chainId).length;
-  const author = app.user.activeAccount;
   const { authorName } = useAuthorName();
   const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
@@ -92,7 +91,7 @@ export const NewThreadForm = () => {
 
     try {
       const result = await app.threads.create(
-        author.address,
+        app.user.activeAccount.address,
         threadKind,
         app.chain.meta.customStages
           ? parseCustomStages(app.chain.meta.customStages)[0]

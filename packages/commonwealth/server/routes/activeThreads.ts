@@ -12,77 +12,70 @@ const activeThreads = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  let { threads_per_topic } = req.query;
-  if (
-    !threads_per_topic ||
-    Number.isNaN(threads_per_topic) ||
-    threads_per_topic < MIN_THREADS_PER_TOPIC ||
-    threads_per_topic > MAX_THREADS_PER_TOPIC
-  ) {
-    threads_per_topic = 3;
-  }
-
-  const chain = req.chain;
-
   const allThreads = [];
-  const communityWhere = { chain_id: chain.id };
-  const communityTopics = await models.Topic.findAll({
-    where: communityWhere,
-  });
+  try {
+    let { threads_per_topic } = req.query;
+    if (
+      !threads_per_topic ||
+      Number.isNaN(threads_per_topic) ||
+      threads_per_topic < MIN_THREADS_PER_TOPIC ||
+      threads_per_topic > MAX_THREADS_PER_TOPIC
+    ) {
+      threads_per_topic = 3;
+    }
 
-  const threadInclude = [
-    { model: models.Address, as: 'Address' },
-    { model: models.Address, as: 'collaborators' },
-    { model: models.Topic, as: 'topic', required: true },
-  ];
+    const chain = req.chain;
 
-  await Promise.all(
+    const communityWhere = { chain_id: chain.id };
+    const communityTopics = await models.Topic.findAll({
+      where: communityWhere,
+    });
+
+    const threadInclude = [
+      { model: models.Address, as: 'Address' },
+      { model: models.Address, as: 'collaborators' },
+      { model: models.Topic, as: 'topic', required: true },
+    ];
+
+    let allRecentTopicThreadsRaw = [];
+    allRecentTopicThreadsRaw = await Promise.all(
+      communityTopics.map(async (topic) => {
+        return await models.Thread.findAll({
+          where: {
+            topic_id: topic.id,
+          },
+          include: threadInclude,
+          limit: threads_per_topic,
+          order: [
+            ['created_at', 'DESC'],
+            ['last_commented_on', 'DESC'],
+          ],
+        });
+      })
+    );
+
+    allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
+
+    const allRecentTopicThreads = allRecentTopicThreadsRaw.map((t) => {
+      return t.toJSON();
+    });
+
+    const allThreadsWithCommentsCount = await getThreadsWithCommentCount({
+      threads: allRecentTopicThreads,
+      models,
+      chainId: chain.id,
+    });
+
     communityTopics.map(async (topic) => {
-      const recentTopicThreadsRaw = await models.Thread.findAll({
-        where: {
-          topic_id: topic.id,
-        },
-        include: threadInclude,
-        limit: threads_per_topic,
-        order: [
-          ['created_at', 'DESC'],
-          ['last_commented_on', 'DESC'],
-        ],
-      });
-
-      const recentTopicThreads = recentTopicThreadsRaw.map((t) => {
-        return t.toJSON();
-      });
-
-      const threadsWithCommentsCount = await getThreadsWithCommentCount({
-        threads: recentTopicThreads,
-        models,
-        chainId: chain.id,
-      });
-
-      // In absence of X threads with recent activity (comments),
-      // commentless threads are fetched and included as active
-      // if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
-      //   const commentlessTopicThreads = await models.OffchainThread.findAll({
-      //     where: {
-      //       topic_id: topic.id,
-      //       last_commented_on: {
-      //         [Op.is]: null,
-      //       }
-      //     },
-      //     include: threadInclude,
-      //     limit: threads_per_topic - (recentTopicThreads || []).length,
-      //     order: [['created_at', 'DESC']]
-      //   });
-
-      //   recentTopicThreads.push(...(commentlessTopicThreads || []));
-      // }
+      const threadsWithCommentsCount = allThreadsWithCommentsCount.filter(
+        (thread) => thread.topic_id === topic.id
+      );
 
       allThreads.push(...(threadsWithCommentsCount || []));
-    })
-  ).catch((err) => {
+    });
+  } catch (err) {
     return next(new ServerError(err));
-  });
+  }
 
   return res.json({
     status: 'Success',

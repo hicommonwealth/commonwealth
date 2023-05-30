@@ -66,6 +66,7 @@ export const getComments = async (
     }));
   } else {
     count = await models.Comment.count({
+      logging: console.log,
       where,
       include,
       attributes: { exclude: ['address_id'] },
@@ -73,7 +74,9 @@ export const getComments = async (
     });
   }
 
-  flattenIncludedAddresses(comments);
+  if (comments) {
+    flattenIncludedAddresses(comments);
+  }
 
   return success(res, { comments, count });
 };

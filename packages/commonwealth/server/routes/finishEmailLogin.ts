@@ -3,7 +3,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import type { DB } from '../models';
-import { mixpanelTrack } from '../util/mixpanelUtil';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 export const redirectWithLoginSuccess = (
   res,
@@ -93,12 +93,11 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
         existingUser.emailVerified = true;
         await existingUser.save();
       }
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
-      }
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
+      });
+
       return redirectWithLoginSuccess(
         res,
         email,
@@ -117,12 +116,11 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
           res,
           `Could not log in with user at ${email}`
         );
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
-      }
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
+      });
+
       return redirectWithLoginSuccess(
         res,
         email,
@@ -166,12 +164,11 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
           res,
           `Could not log in with user at ${email}`
         );
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
-      }
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
+      });
+
       return redirectWithLoginSuccess(
         res,
         email,
