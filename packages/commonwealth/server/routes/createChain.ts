@@ -23,6 +23,7 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 import type { RoleInstanceWithPermission } from '../util/roles';
+import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
@@ -449,6 +450,14 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
+    role = await createRole(
+      models,
+      addressToBeAdmin.id,
+      chain.id,
+      'admin',
+      true
+    );
+
     await models.Subscription.findOrCreate({
       where: {
         subscriber_id: req.user.id,

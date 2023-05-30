@@ -104,6 +104,26 @@ export async function completeClientLogin(account: Account) {
       app.user.addresses.push(addressInfo);
     }
 
+    // link the address to the community
+    if (app.chain) {
+      try {
+        if (
+          !app.roles.getRoleInCommunity({
+            account,
+            chain: app.activeChainId(),
+          })
+        ) {
+          await app.roles.createRole({
+            address: addressInfo,
+            chain: app.activeChainId(),
+          });
+        }
+      } catch (e) {
+        // this may fail if the role already exists, e.g. if the address is being migrated from another user
+        console.error('Failed to create role');
+      }
+    }
+
     // set the address as active
     await setActiveAccount(account);
     if (

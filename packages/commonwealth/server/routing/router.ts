@@ -64,6 +64,7 @@ import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
 
+import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
 import setDefaultRole from '../routes/setDefaultRole';
 
@@ -690,6 +691,13 @@ function setupRouter(
     getWebhooks.bind(this, models)
   );
 
+  // roles
+  router.post(
+    '/createRole',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
+    createRole.bind(this, models)
+  );
   router.post(
     '/deleteRole',
     passport.authenticate('jwt', { session: false }),

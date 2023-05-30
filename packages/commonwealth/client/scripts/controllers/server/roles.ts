@@ -54,6 +54,25 @@ export class RolesController {
     if (index !== -1) this._roles.splice(index, 1);
   }
 
+  public createRole(options: {
+    address: AddressInfo | Omit<AddressInfo, 'chain'>;
+    chain?: string;
+    community?: string;
+  }): JQueryPromise<void> {
+    // TODO: Change to POST /role
+    return $.post('/api/createRole', {
+      jwt: this.User.jwt,
+      address_id: options.address.id,
+      chain:
+        options.chain ||
+        options.community ||
+        (options.address as AddressInfo).chain?.id,
+    }).then((result) => {
+      // handle state updates
+      this.addRole(result.result.role);
+    });
+  }
+
   public deleteRole(options: {
     address: AddressInfo;
     chain?: string;

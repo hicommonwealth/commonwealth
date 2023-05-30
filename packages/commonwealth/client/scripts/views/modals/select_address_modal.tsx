@@ -44,24 +44,30 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
       (a) => a.address === account.address && a.chain.id === account.chain.id
     );
 
-    try {
-      setIsLoading(false);
-      setSelectedIndex(null);
-      // select the address, and close the form
-      notifySuccess(
-        `Joined with ${formatAddressShort(
-          addressInfo.address,
-          addressInfo.chain.id,
-          true
-        )}`
-      );
-      setActiveAccount(account).then(() => {
-        $(e.target).trigger('modalexit');
+    app.roles
+      .createRole({
+        address: addressInfo,
+        chain: app.activeChainId(),
+      })
+      .then(() => {
+        setIsLoading(false);
+        setSelectedIndex(null);
+        // select the address, and close the form
+        notifySuccess(
+          `Joined with ${formatAddressShort(
+            addressInfo.address,
+            addressInfo.chain.id,
+            true
+          )}`
+        );
+        setActiveAccount(account).then(() => {
+          $(e.target).trigger('modalexit');
+        });
+      })
+      .catch((err: any) => {
+        setIsLoading(false);
+        notifyError(err.responseJSON.error);
       });
-    } catch (err) {
-      setIsLoading(false);
-      notifyError(err.responseJSON.error);
-    }
   };
 
   const deleteRole = async (index) => {
