@@ -3,9 +3,6 @@ import { isAddress } from 'web3-utils';
 import { providers } from 'ethers';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
 
 import app from 'state';
@@ -205,12 +202,6 @@ export const ERC721Form = (props: EthChainFormState) => {
         }
         onClick={async () => {
           chainFormState.setSaving(true);
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: null,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
 
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {

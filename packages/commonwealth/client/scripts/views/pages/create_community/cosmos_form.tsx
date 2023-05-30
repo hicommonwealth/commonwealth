@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
 
 import { initAppState } from 'state';
@@ -89,16 +86,11 @@ export const CosmosForm = () => {
         onClick={async () => {
           setSaving(true);
 
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: null,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
-
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               alt_wallet_url: altWalletUrl,
+              id: id,
+              name: name,
               base: ChainBase.CosmosSDK,
               bech32_prefix: bech32Prefix,
               chain_string: chainString,

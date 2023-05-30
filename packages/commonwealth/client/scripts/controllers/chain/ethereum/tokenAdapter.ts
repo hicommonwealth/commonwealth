@@ -17,7 +17,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
 
     if (!this.contractAddress) {
       // iterate through selectedChain.Contracts for the erc20 type and return the address
-      const tokenContracts = this.app.contracts.getByType(ContractType.ERC20);
+      const tokenContracts = this.app.contracts.getCommunityContracts();
       if (tokenContracts?.length > 0) {
         const tokenContract = tokenContracts[0];
         this.contractAddress = tokenContract.address;

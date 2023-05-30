@@ -17,9 +17,9 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
 
   private balanceSelectors = { erc20: '0x70a08231', erc1155: '0x8f32d59b' };
 
-  public getCacheKey(node: IChainNode, address: string): string {
-    return this.opts.contractType
-      ? `${node.id}-${address}-${this.opts.tokenAddress}`
+  public getCacheKey(node: IChainNode, address: string, opts: any): string {
+    return opts.contractType
+      ? `${node.id}-${address}-${opts.tokenAddress}`
       : `${node.id}-${address}-${'native'}`;
   }
 
