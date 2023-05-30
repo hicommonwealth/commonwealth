@@ -11,15 +11,17 @@ export const Errors = {
 };
 
 export async function listRoles(models: DB, req: Request, res: Response) {
+  const { permissions } = req.query;
   if (!req.chain) {
     throw new AppError(Errors.InvalidChain);
   }
-  if (!Array.isArray(req.query.permissions)) {
+  if (typeof permissions !== 'undefined' && !Array.isArray(permissions)) {
     throw new AppError(Errors.InvalidPermissions);
   }
-  const permissions = req.query.permissions.filter((p) =>
-    ['member', 'moderator', 'admin'].includes(p)
-  );
+  const filteredPermissions =
+    permissions?.length > 0
+      ? permissions.filter((p) => ['member', 'moderator', 'admin'].includes(p))
+      : undefined;
 
   const roles = await findAllRoles(
     models,
@@ -27,7 +29,7 @@ export async function listRoles(models: DB, req: Request, res: Response) {
       include: [models.Address],
     },
     req.chain.id,
-    permissions
+    filteredPermissions
   );
 
   return res.json({ status: 'Success', result: roles });
