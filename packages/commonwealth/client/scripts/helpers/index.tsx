@@ -1,3 +1,4 @@
+import React from 'react';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
@@ -6,8 +7,6 @@ import type { Coin } from 'adapters/currency';
 import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
-import { render } from 'helpers/DEPRECATED_ReactRender';
-import { NavigateOptions, To } from 'react-router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -56,79 +55,6 @@ export function parseCustomStages(str) {
   return arr
     .map((s) => s?.toString())
     .filter((s) => s) as unknown as ThreadStage[];
-}
-
-/*
- * mithril link helper
- */
-export function externalLink(selector, target, children, setRouteCb) {
-  return render(
-    selector,
-    {
-      href: target,
-      target: '_blank',
-      rel: 'noopener noreferrer',
-      onClick: (e) => {
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-        if (target.startsWith(`${document.location.origin}/`)) {
-          // don't open a new window if the link is on Commonwealth
-          e.preventDefault();
-          e.stopPropagation();
-          setRouteCb?.(target);
-        }
-      },
-    },
-    children
-  );
-}
-
-// This function should not be used anymore for links.
-// Instead, <Link/> component from react-router is advised.
-// It is adjusted, not rewritten, as there are non-jsx components
-// that still use this method.
-export function link(
-  selector: string,
-  target: string,
-  children,
-  setRoute: (
-    url: To,
-    options?: NavigateOptions,
-    prefix?: null | string
-  ) => void,
-  extraAttrs?: object,
-  saveScrollPositionAs?: string,
-  beforeRouteSet?: () => void,
-  afterRouteSet?: () => void
-) {
-  const attrs = {
-    href: target,
-    onClick: (e) => {
-      if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-      if (e.target.target === '_blank') return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (saveScrollPositionAs) {
-        localStorage[saveScrollPositionAs] = window.scrollY;
-      }
-      if (beforeRouteSet) beforeRouteSet();
-      const routeArgs: [string, any?] =
-        window.location.href.split('?')[0] === target.split('?')[0]
-          ? [target, { replace: true }]
-          : [target];
-      if (afterRouteSet) {
-        (async () => {
-          await setRoute(...routeArgs);
-          afterRouteSet();
-        })();
-      } else {
-        setRoute(...routeArgs);
-      }
-    },
-  };
-  if (extraAttrs) Object.assign(attrs, extraAttrs);
-  return render(selector, attrs, children);
 }
 
 /*
@@ -308,7 +234,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p, index) => render('p', { key: index }, p));
+  return paragraphs.map((p, index) => <p key={index}>{p}</p>);
 }
 
 /*
