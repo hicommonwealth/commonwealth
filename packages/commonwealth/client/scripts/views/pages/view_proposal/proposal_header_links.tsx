@@ -1,68 +1,19 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
 import { ProposalType } from 'common-common/src/types';
-import { externalLink, extractDomain, link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ProposalHeaderLinkProps = {
   proposal: AnyProposal;
 };
 
-// "View in Subscan"
-export const BlockExplorerLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
-  return (
-    <div className="HeaderLink">
-      {externalLink(
-        'a',
-        proposal['blockExplorerLink'],
-        [
-          proposal['blockExplorerLinkLabel'] ||
-            extractDomain(proposal['blockExplorerLink']),
-        ],
-        navigate
-      )}
-      <CWIcon iconName="externalLink" iconSize="small" />
-    </div>
-  );
-};
-
-// "Vote on polkadot-js"
-export const VotingInterfaceLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
-  return (
-    <div className="HeaderLink">
-      {externalLink(
-        'a',
-        proposal['votingInterfaceLink'],
-        [
-          proposal['votingInterfaceLinkLabel'] ||
-            extractDomain(proposal['votingInterfaceLink']),
-        ],
-        navigate
-      )}
-      <CWIcon iconName="externalLink" iconSize="small" />
-    </div>
-  );
-};
-
 // "Go to discussion"
-export const ThreadLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
+export const ThreadLink = ({ proposal }: ProposalHeaderLinkProps) => {
   const path = getProposalUrlPath(
     ProposalType.Thread,
     `${proposal.threadId}`,
@@ -72,7 +23,7 @@ export const ThreadLink = (props: ProposalHeaderLinkProps) => {
 
   return (
     <div className="HeaderLink">
-      {link('a', path, ['Go to discussion'], navigate)}
+      <Link to={path}>Go to discussion</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
@@ -83,13 +34,11 @@ type SnapshotThreadLinkProps = {
 };
 
 export const SnapshotThreadLink = ({ thread }: SnapshotThreadLinkProps) => {
-  const navigate = useCommonNavigate();
-
   const proposalLink = getProposalUrlPath(ProposalType.Thread, thread.id, true);
 
   return (
     <div className="HeaderLink">
-      {link('a', proposalLink, [decodeURIComponent(thread.title)], navigate)}
+      <Link to={proposalLink}>{decodeURIComponent(thread.title)}</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
