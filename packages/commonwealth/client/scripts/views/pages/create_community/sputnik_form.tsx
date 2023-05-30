@@ -4,9 +4,6 @@ import React, { useState } from 'react';
 // import type { CodeResult } from 'near-api-js/lib/providers/provider';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
 
 import app from 'state';
@@ -51,13 +48,6 @@ export const SputnikForm = () => {
         defaultValue={isMainnet}
         onToggle={(checked) => {
           setIsMainnet(checked);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
-          //   chainBase: ChainBase.CosmosSDK,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: CommunityType.SputnikDao,
-          // });
         }}
         caption={(checked) => {
           if (checked !== isMainnet) {
@@ -101,13 +91,6 @@ export const SputnikForm = () => {
             type: ChainType.DAO,
             // ...form, <-- not typed so I don't know what's needed
           };
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: null,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
 
           try {
             // verify the DAO exists
