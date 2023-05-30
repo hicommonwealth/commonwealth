@@ -38,6 +38,12 @@ const argTypesObj = (options: string[]) => {
   }
 }
 
+const commonParameters = {
+  parameters: {
+    controls: { exclude: ["className"] },
+  },
+};
+
 /** Primary buttons */
 export const Primary: Story = {
   args: {
@@ -48,6 +54,7 @@ export const Primary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "primary-red", "primary-blue", "primary-blue-dark", "primary-black" ]),
+  ...commonParameters,
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!')} />
   ),
@@ -62,6 +69,7 @@ export const Secondary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "secondary-red", "secondary-blue", "secondary-blue-dark", "secondary-black" ]),
+  ...commonParameters,
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
@@ -76,6 +84,7 @@ export const Tertiary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "tertiary-blue", "tertiary-black" ]),
+  ...commonParameters,
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
@@ -90,6 +99,7 @@ export const LargePrimary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "lg-primary-red", "lg-primary-blue" ]),
+  ...commonParameters,
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
@@ -104,6 +114,7 @@ export const LargeSecondary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "lg-secondary-red", "lg-secondary-blue" ]),
+  ...commonParameters,
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
@@ -118,6 +129,7 @@ export const LargeTertiary: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "lg-tertiary-red", "lg-tertiary-blue" ]),
+  ...commonParameters,
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
@@ -132,6 +144,7 @@ export const Mini: Story = {
     disabled: false,
   },
   argTypes: argTypesObj([ "mini-black", "mini-red", "mini-white" ]),
+  ...commonParameters,
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
