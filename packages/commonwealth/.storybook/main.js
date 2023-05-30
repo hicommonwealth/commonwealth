@@ -2,6 +2,7 @@
 
 // Custom Webpack configuration being imported.
 import custom from '../webpack/webpack.dev.config';
+import path from 'path';
 
 module.exports = {
   stories: ['./stories/**/*.mdx', './stories/**/*.stories.@(js|jsx|ts|tsx)'],
@@ -27,6 +28,19 @@ module.exports = {
     autodocs: 'tag',
   },
   webpackFinal: async (config, { configType }) => {
+    const fontLoaderRule = {
+      test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+          },
+        },
+      ],
+      include: path.resolve(__dirname, '../static/fonts/'),
+    };
+
     return {
       ...config,
       output: { ...config.output, pathinfo: true },
@@ -34,11 +48,13 @@ module.exports = {
       context: __dirname,
       module: {
         ...config.module,
-        rules: [...config.module.rules, ...custom.module.rules].filter(
-          (rule) => {
-            return !rule.use || !rule.use.includes('fast-sass-loader');
-          }
-        ),
+        rules: [
+          ...config.module.rules,
+          ...custom.module.rules,
+          fontLoaderRule,
+        ].filter((rule) => {
+          return !rule.use || !rule.use.includes('fast-sass-loader');
+        }),
       },
       resolve: {
         ...config.resolve,
