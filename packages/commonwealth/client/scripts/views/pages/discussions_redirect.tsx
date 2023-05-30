@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { NavigateOptions } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavigateOptions, useParams } from 'react-router-dom';
 
 import app from 'state';
 import { PageLoading } from './loading';
@@ -8,10 +8,17 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
 
 export default function DiscussionsRedirect() {
+  const routerParams = useParams();
   const navigate = useCommonNavigate();
+  const [isRedirected, setIsRedirected] = useState(false);
 
   useEffect(() => {
-    if (!app.chain) return;
+    if (!isRedirected) {
+      navigate('/', { replace: true }, routerParams.scope);
+      setIsRedirected(true);
+    }
+
+    if (!app.chain || isRedirected) return;
 
     const { defaultPage, defaultOverview, hasHomepage } = app.chain.meta;
     let view;
@@ -39,7 +46,7 @@ export default function DiscussionsRedirect() {
       default:
         navigate('/discussions', dontAddHistory);
     }
-  }, [navigate]);
+  }, [navigate, isRedirected, app.chain, routerParams.scope]);
 
   return <PageLoading />;
 }

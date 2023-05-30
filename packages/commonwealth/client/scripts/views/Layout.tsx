@@ -12,7 +12,7 @@ import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import withRouter from 'navigation/helpers';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { ChainType } from 'common-common/src/types';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorPage from 'views/pages/error';
@@ -79,12 +79,21 @@ const LayoutComponent = ({
   //   selectedScope &&
   //   selectedScope.startsWith('0x') &&
   //   selectedScope.length === 42;
-
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isChainDeferred, setIsChainDeferred] = useState<boolean>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const scopeMatchesChain = app.config.chains.getById(selectedScope);
+
+  const routerParams = useParams();
+  const location = useLocation();
+  const pathname = location.pathname.replaceAll('/', ''); // if it is community home page, it will match the chain id.
+  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
+  // isCommunityHomePathBeforeRedirect catches a case where the community home page is loaded before it gets
+  // redirected to the expected page (usually /discussions).
+  // We want to avoid chain loading until the redirect is complete, and we have access to the deferChain flag.
+  // This is mainly observable with the quick-switcher.
+  const isCommunityHomePathBeforeRedirect = pathname === pathScope;
 
   // IFB 3: If the user has navigated to an ethereum address directly,
   // init a new token chain immediately
@@ -107,7 +116,10 @@ const LayoutComponent = ({
   // have loaded with isChainDeferred=true (previously from step 5),
   // then call initChain and render a LoadingLayout immediately.
   const shouldLoadDeferredChain =
-    selectedScope && isChainDeferred && !shouldDeferChain;
+    !!selectedScope &&
+    isChainDeferred &&
+    !shouldDeferChain &&
+    !isCommunityHomePathBeforeRedirect;
 
   // IFB 7: If scope is not defined (and we are not on a custom domain),
   // deinitialize whatever chain is loaded by calling deinitChainOrCommunity,
@@ -130,7 +142,11 @@ const LayoutComponent = ({
         setScopeToLoad(selectedScope);
         setIsChainDeferred(true);
         const response = await selectChain(scopeMatchesChain, shouldDeferChain);
-        if (!shouldDeferChain && response) {
+        if (
+          !shouldDeferChain &&
+          response &&
+          !isCommunityHomePathBeforeRedirect
+        ) {
           await initChain();
         }
         setIsLoading(false);
