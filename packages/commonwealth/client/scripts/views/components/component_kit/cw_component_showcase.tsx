@@ -39,7 +39,7 @@ import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
-import { AvatarUpload } from '../avatar_upload';
+import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 const displayIcons = (icons) => {
