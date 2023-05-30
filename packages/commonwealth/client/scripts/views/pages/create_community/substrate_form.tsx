@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
 
 import app from 'state';
@@ -126,13 +123,6 @@ export const SubstrateForm = () => {
         label="Save changes"
         disabled={chainFormState.saving}
         onClick={async () => {
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: null,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
-
           try {
             JSON.parse(substrateSpec);
           } catch (err) {
