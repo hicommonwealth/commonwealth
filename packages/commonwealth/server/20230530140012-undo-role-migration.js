@@ -26,7 +26,7 @@ module.exports = {
 
       const roles = await queryInterface.sequelize.query(
         `SELECT address_id, permission FROM "Roles"`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT }
+        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t },
       );
 
       const ids = roles.map((r) => r.address_id);
@@ -49,6 +49,51 @@ module.exports = {
         { transaction: t }
       );
 
+      // query chain to a string containing allowed roles, example 1inch -> admin, moderator, member
+      const communityRoles = await queryInterface.sequelize.query(
+        `SELECT chain_id, array_to_string(array_agg(name), ', ') AS concatenated_names
+         FROM "CommunityRoles"
+         GROUP BY chain_id;`,
+        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t },
+      );
+
+      // create a javascript map representing the values
+      const communityMap = new Map(communityRoles.map(c => [c.chain_id, stringToBitmask(c.concatenated_names)]));
+
+      // can have types 0 = member, 2 = moderator, 4 = admin, others = mix
+      await queryInterface.addColumn(
+        'Chains',
+        'allowed_roles',
+        {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 7,
+          validate: {
+            min: 0,
+            max: 7
+          },
+        },
+        { transaction: t }
+      );
+
+      const communityKeys = [...communityMap.keys()];
+      // insert this data into the chains table
+      await queryInterface.sequelize.query(
+        `
+        UPDATE "Chains"
+        SET role = CASE 
+            ${communityKeys
+          .map(
+            (chain) =>
+              `WHEN id = ${chain} THEN '${communityMap[chain]}'`
+          )
+          .join(' ')}
+        END
+        WHERE id IN (${communityKeys.join(', ')})
+      `,
+        { transaction: t }
+      );
+
       // drop unused tables
       await queryInterface.dropTable('RoleAssignments', { transaction: t });
       await queryInterface.dropTable('CommunityRoles', { transaction: t });
@@ -65,3 +110,20 @@ module.exports = {
      */
   },
 };
+
+function stringToBitmask(permission) {
+  let bitmask = 0;
+  if (permission.includes('member')) {
+    bitmask += 1;
+  }
+
+  if (permission.includes('moderator')) {
+    bitmask += 2;
+  }
+
+  if (permission.includes('admin')) {
+    bitmask += 4;
+  }
+
+  return bitmask;
+}
