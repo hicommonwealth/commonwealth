@@ -24,15 +24,15 @@ const importCanvas = async () => {
   }
 };
 
-const importChainEthereum = async () => {
-  try {
-    const canvas = await import('@canvas-js/chain-ethereum');
-    return canvas;
-  } catch (err) {
-    const canvas = await import_('@canvas-js/chain-ethereum');
-    return canvas;
-  }
-};
+// const importChainEthereum = async () => {
+//   try {
+//     const canvas = await import('@canvas-js/chain-ethereum');
+//     return canvas;
+//   } catch (err) {
+//     const canvas = await import_('@canvas-js/chain-ethereum');
+//     return canvas;
+//   }
+// };
 
 // TODO: verify payload is not expired
 export const verify = async ({

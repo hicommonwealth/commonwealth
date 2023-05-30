@@ -8,7 +8,6 @@ import { signSessionWithMagic } from 'controllers/server/sessions';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
-import { CosmosExtension } from '@magic-ext/cosmos';
 
 import moment from 'moment';
 import app from 'state';

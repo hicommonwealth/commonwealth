@@ -27,7 +27,15 @@ const SessionRevalidationModal = ({
   onVerified,
   onClose,
 }: SessionRevalidationModalProps) => {
-  const { onWalletAddressSelect, onWalletSelect, onResetWalletConnect, onEmailLogin, onSocialLogin, setEmail, isMagicLoading } =
+  const {
+    onWalletAddressSelect,
+    onWalletSelect,
+    onResetWalletConnect,
+    onEmailLogin,
+    onSocialLogin,
+    setEmail,
+    isMagicLoading
+  } =
     useWallets({
       useSessionKeyLoginFlow: true,
       onModalClose: () => {
