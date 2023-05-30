@@ -1,20 +1,5 @@
 import { ChainBase } from 'common-common/src/types';
 
-export function chainBaseToCanvasChain(chainBase: ChainBase): string {
-  // Translate Commonwealth ChainBase names to Canvas Chain names.
-  if (chainBase === ChainBase.CosmosSDK) {
-    return 'cosmos';
-  } else if (chainBase === ChainBase.Ethereum) {
-    return 'ethereum';
-  } else if (chainBase === ChainBase.NEAR) {
-    return 'near';
-  } else if (chainBase === ChainBase.Solana) {
-    return 'solana';
-  } else if (chainBase === ChainBase.Substrate) {
-    return 'substrate';
-  }
-}
-
 export function chainBaseToCaip2(chainBase: ChainBase): string {
   // Translate Commonwealth ChainBase names to CAIP-2 Chain names.
   if (chainBase === ChainBase.CosmosSDK) {
