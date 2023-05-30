@@ -1,7 +1,6 @@
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
 import { findOneRole } from '../util/roles';
 
