@@ -13,12 +13,10 @@ import {
   getStatusText,
 } from '../../components/ProposalCard/helpers';
 import { cancelProposal } from '../../components/proposals/helpers';
-import {
-  BlockExplorerLink,
-  ThreadLink,
-  VotingInterfaceLink,
-} from './proposal_header_links';
+import { ThreadLink } from './proposal_header_links';
 import useForceRerender from 'hooks/useForceRerender';
+import ExternalLink from 'views/components/ExternalLink';
+import { extractDomain } from 'helpers';
 
 type BaseCancelButtonProps = {
   onModalClose?: () => void;
@@ -93,10 +91,16 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
         <div className="proposal-links">
           {proposal.threadId && <ThreadLink proposal={proposal} />}
           {proposal['blockExplorerLink'] && (
-            <BlockExplorerLink proposal={proposal} />
+            <ExternalLink url={proposal['blockExplorerLink']}>
+              {proposal['blockExplorerLinkLabel'] ||
+                extractDomain(proposal['blockExplorerLink'])}
+            </ExternalLink>
           )}
           {proposal['votingInterfaceLink'] && (
-            <VotingInterfaceLink proposal={proposal} />
+            <ExternalLink url={proposal['votingInterfaceLink']}>
+              {proposal['votingInterfaceLinkLabel'] ||
+                extractDomain(proposal['votingInterfaceLink'])}
+            </ExternalLink>
           )}
         </div>
       )}

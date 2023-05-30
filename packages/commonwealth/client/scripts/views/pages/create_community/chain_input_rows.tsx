@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 import app from 'state';
-import { AvatarUpload } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/Avatar';
 import { InputRow } from 'views/components/metadata_rows';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
