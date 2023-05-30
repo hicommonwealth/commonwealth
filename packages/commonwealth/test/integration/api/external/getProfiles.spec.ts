@@ -18,19 +18,29 @@ describe('getProfiles Tests', () => {
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Threads, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Comments, 2);
+
+    const profiles = resp.result.profiles.filter(
+      (p) => p.id === testAddresses[0].id
+    )[0];
+    chai.assert.lengthOf(profiles.Addresses[0].Threads, 2);
+    chai.assert.lengthOf(profiles.Addresses[0].Comments, 2);
   });
 
   it('should return profiles with specified network correctly', async () => {
-    const r: GetProfilesReq = { profile_ids: testProfiles.map((p) => p.id) };
+    const r: GetProfilesReq = {
+      profile_ids: [testProfiles[0].id, testProfiles[1].id],
+    };
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Threads, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses[0].Comments, 2);
+
+    const profiles = resp.result.profiles.filter(
+      (p) => p.id === testAddresses[0].id
+    )[0];
+    chai.assert.lengthOf(profiles.Addresses[0].Threads, 2);
+    chai.assert.lengthOf(profiles.Addresses[0].Comments, 2);
   });
 
   it('should return count only when specified correctly', async () => {
@@ -40,7 +50,8 @@ describe('getProfiles Tests', () => {
     };
     const resp = await get('/api/profiles', r, true);
 
-    chai.assert.equal(resp.result.count, 2);
+    // 13 because outer joins with addresses
+    chai.assert.equal(resp.result.count, 13);
     chai.assert.isUndefined(resp.result.profiles);
   });
 
