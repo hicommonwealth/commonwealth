@@ -39,7 +39,6 @@ import {
   getReactionSubscription,
   handleToggleSubscription,
 } from '../discussions/helpers';
-import { NewThreadTag } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -52,6 +51,8 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { filterLinks } from 'helpers/threads';
 import { extractDomain, isDefaultStage } from 'helpers';
 import ExternalLink from 'views/components/ExternalLink';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -98,6 +99,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+  });
 
   const threadUpdatedCallback = (newTitle: string, body: string) => {
     setThread(
