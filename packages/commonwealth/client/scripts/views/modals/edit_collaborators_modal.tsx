@@ -17,7 +17,6 @@ import { CWText } from '../components/component_kit/cw_text';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { useDebounce } from 'usehooks-ts';
-import MinimumProfile from 'client/scripts/models/MinimumProfile';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;

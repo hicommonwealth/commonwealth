@@ -2,7 +2,6 @@ import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import RoleInfo from './RoleInfo';
-import { AccessLevel } from '../../../shared/permissions';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
