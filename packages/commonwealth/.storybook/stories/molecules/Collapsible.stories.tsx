@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 
 import { CWCollapsible } from '../../../client/scripts/views/components/component_kit/cw_collapsible';
 import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
@@ -10,9 +10,7 @@ const collapsible = {
 } satisfies Meta<typeof CWCollapsible>;
 
 export default collapsible;
-// type Story = StoryObj<typeof collapsible>;
 
-// export const Collapsible: Story = {
 export const Collapsible = {
   args: {
     headerContent: "Header content",

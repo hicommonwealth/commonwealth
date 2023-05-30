@@ -8,10 +8,11 @@ import {
   testAddresses,
   testChains,
   testComments,
+  testThreads,
   testUsers,
 } from './dbEntityHooks.spec';
 
-describe('putComments Tests', () => {
+describe('deleteComments Tests', () => {
   let jwtToken;
   let jwtTokenUser2;
 
@@ -43,12 +44,14 @@ describe('putComments Tests', () => {
           id: smallestId - 1,
           address_id: testAddresses[0].id,
           community_id: testChains[0].id,
+          thread_id: testThreads[0].id,
           text: 'test',
         },
         {
           id: smallestId - 2,
           address_id: testAddresses[0].id,
           community_id: testChains[0].id,
+          thread_id: testThreads[0].id,
           text: 'test',
         },
       ],
@@ -93,12 +96,14 @@ describe('putComments Tests', () => {
           id: smallestId - 3,
           address_id: testAddresses[0].id,
           community_id: testChains[0].id,
+          thread_id: testThreads[0].id,
           text: 'test',
         },
         {
           id: smallestId - 4,
           address: testAddresses[0].address,
           community_id: testChains[0].id,
+          thread_id: testThreads[0].id,
           text: 'test',
         },
       ],

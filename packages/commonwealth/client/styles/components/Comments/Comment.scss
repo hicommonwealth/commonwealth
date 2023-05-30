@@ -15,6 +15,11 @@
       position: relative;
       top: 12px;
       width: 1px;
+
+      &.replying {
+        background-color: $neutral-300;
+        width: 2px;
+      }
     }
   }
 
