@@ -16,6 +16,8 @@ import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 import { CosmosExtension } from '@magic-ext/cosmos';
+import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
+import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -401,6 +403,7 @@ export async function handleSocialLoginCallback(bearer?: string) {
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
+    clientAnalyticsTrack({ event: MixpanelLoginEvent.MAGIC_LOGIN });
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }

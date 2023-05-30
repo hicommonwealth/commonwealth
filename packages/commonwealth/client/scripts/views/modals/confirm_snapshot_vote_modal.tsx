@@ -98,11 +98,6 @@ export const ConfirmSnapshotVoteModal = (
                   onModalClose();
                   successCallback();
                 });
-                // mixpanelBrowserTrack({
-                //   event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
-                //   isCustomDomain: app.isCustomDomain(),
-                //   space: app.snapshot.space.id,
-                // });
               } catch (err) {
                 console.log(err);
                 const errorMessage = err.message;

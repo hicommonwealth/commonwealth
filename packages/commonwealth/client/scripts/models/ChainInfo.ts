@@ -1,4 +1,3 @@
-import { render } from 'helpers/DEPRECATED_ReactRender';
 import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
@@ -8,10 +7,6 @@ import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
 
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
 import type CommunityRole from './CommunityRole';
 
 class ChainInfo {
@@ -377,12 +372,6 @@ class ChainInfo {
     this.defaultAllowPermissions = updatedChain.default_allow_permissions;
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
-  }
-
-  public getAvatar(size: number) {
-    return this.iconUrl
-      ? render(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : render(CWJdenticon, { address: undefined, size });
   }
 }
 
