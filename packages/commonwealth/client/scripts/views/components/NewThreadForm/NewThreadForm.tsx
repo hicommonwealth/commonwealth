@@ -82,7 +82,7 @@ export const NewThreadForm = () => {
     setIsSaving(true);
 
     try {
-      await app.sessions.signThread(author.address, {
+      await app.sessions.signThread(app.user.activeAccount.address, {
         community: app.activeChainId(),
         title: threadTitle,
         body: deltaString,
