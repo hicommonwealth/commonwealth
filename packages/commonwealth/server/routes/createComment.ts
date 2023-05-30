@@ -11,6 +11,7 @@ import moment from 'moment';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { verifyComment } from '../../shared/canvas/serverVerify';
 
 import {
   getThreadUrl,
@@ -21,13 +22,12 @@ import { SENDGRID_API_KEY } from '../config';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { verifyComment } from '../../shared/canvas/serverVerify';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 
@@ -424,13 +424,11 @@ const createComment = async (
   thread.last_commented_on = new Date();
   thread.save();
 
-  if (process.env.NODE_ENV !== 'test') {
-    mixpanelTrack({
-      event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-      community: chain.id,
-      isCustomDomain: null,
-    });
-  }
+  serverAnalyticsTrack({
+    event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
+    community: chain.id,
+    isCustomDomain: null,
+  });
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };

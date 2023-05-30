@@ -13,17 +13,17 @@ import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getThreadUrl, renderQuillDeltaToText } from '../../shared/utils';
+import { verifyThread } from '../../shared/canvas/serverVerify';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { parseUserMentions } from '../util/parseUserMentions';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { verifyThread } from '../../shared/canvas/serverVerify';
 
 export const Errors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
@@ -448,13 +448,12 @@ const createThread = async (
   // TODO: this blocks the event loop -- need to dispatch to a worker so we can continue listening to web queries
   dispatchHooks(models, req, finalThread);
 
-  if (process.env.NODE_ENV !== 'test') {
-    mixpanelTrack({
-      event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
-      community: chain.id,
-      isCustomDomain: null,
-    });
-  }
+  serverAnalyticsTrack({
+    event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
+    community: chain.id,
+    isCustomDomain: null,
+  });
+
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };
 

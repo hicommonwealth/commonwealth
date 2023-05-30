@@ -14,11 +14,11 @@ import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 import { verifyReaction } from '../../shared/canvas/serverVerify';
 
@@ -257,13 +257,11 @@ const createReaction = async (
   author.last_active = new Date();
   author.save();
 
-  if (process.env.NODE_ENV !== 'test') {
-    mixpanelTrack({
-      event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-      community: chain.id,
-      isCustomDomain: null,
-    });
-  }
+  serverAnalyticsTrack({
+    event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
+    community: chain.id,
+    isCustomDomain: null,
+  });
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });
 };

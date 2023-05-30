@@ -1,8 +1,16 @@
 import { Op } from 'sequelize';
+import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+import { configure as configureStableStringify } from 'safe-stable-stringify';
+
+import type { KeyringOptions } from '@polkadot/keyring/types';
+import { hexToU8a, stringToHex } from '@polkadot/util';
+import type { KeypairType } from '@polkadot/util-crypto/types';
+import * as ethUtil from 'ethereumjs-util';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-
 import {
   ChainBase,
   NotificationCategories,
@@ -15,8 +23,8 @@ import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
@@ -251,13 +259,11 @@ const verifyAddress = async (
     });
     req.login(user, (err) => {
       if (err) return next(err);
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
-      }
-      // mixpanelPeopleSet(req.user.id.toString());
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
+      });
+
       return res.json({
         status: 'Success',
         result: {

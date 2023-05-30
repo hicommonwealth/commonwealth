@@ -8,6 +8,7 @@ import { signSessionWithMagic } from 'controllers/server/sessions';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 import moment from 'moment';
 import app from 'state';
@@ -17,6 +18,8 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
+import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
+import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -529,6 +532,7 @@ export async function handleSocialLoginCallback({
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
+    clientAnalyticsTrack({ event: MixpanelLoginEvent.MAGIC_LOGIN });
     return magicAddress;
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
