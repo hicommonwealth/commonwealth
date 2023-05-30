@@ -81,17 +81,6 @@ test.describe('Commonwealth Homepage - Links', () => {
     await newPage.waitForURL(`https://blog.commonwealth.im`);
   });
 
-  test('Check Jobs button', async ({ page, context }) => {
-    const jobs = await page.locator('.footer-link', { hasText: 'Jobs' });
-
-    const pagePromise = context.waitForEvent('page');
-
-    await jobs.click();
-
-    const newPage = await pagePromise;
-    await newPage.waitForURL(`https://angel.co/company/commonwealth-labs/jobs`);
-  });
-
   test('Check Terms button', async ({ page }) => {
     const terms = await page.locator('.footer-link', { hasText: 'Terms' });
     expect(terms).toBeTruthy();

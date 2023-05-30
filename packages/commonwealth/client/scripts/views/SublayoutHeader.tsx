@@ -7,13 +7,14 @@ import { CWCommunityAvatar } from './components/component_kit/cw_community_avata
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
-import { LoginSelector } from './components/header/login_selector';
+import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 import { useCommonNavigate } from 'navigation/helpers';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import useSidebarStore from 'state/ui/sidebar';
 
 type SublayoutHeaderProps = {
   hideSearch?: boolean;
@@ -25,6 +26,8 @@ export const SublayoutHeader = ({
   onMobile,
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
+  const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
+    useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
 
   return (
@@ -43,7 +46,7 @@ export const SublayoutHeader = ({
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) &&
+        {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
           app.activeChainId() && (
             <CWCommunityAvatar
               size="large"
@@ -56,10 +59,9 @@ export const SublayoutHeader = ({
         {onMobile && app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"
-            iconName={app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
+            iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
-              app.sidebarToggled = !app.sidebarToggled;
-              app.sidebarRedraw.emit('redraw');
+              setMenu({ name: menuName, isVisible: !menuVisible });
             }}
           />
         )}
@@ -71,9 +73,8 @@ export const SublayoutHeader = ({
             iconName="dotsVertical"
             iconButtonTheme="black"
             onClick={() => {
-              app.sidebarToggled = false;
-              app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-              app.sidebarRedraw.emit('redraw');
+              setMenu({ name: menuName, isVisible: false });
+              setMobileMenuName(mobileMenuName ? null : 'MainMenu');
             }}
           />
         </div>

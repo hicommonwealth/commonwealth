@@ -1,54 +1,54 @@
-import type { LoginBodyType } from './types';
+import type { LoginActiveStep } from './types';
 
-export const getLoginText = (bodyType: LoginBodyType) => {
-  if (bodyType === 'walletList') {
+export const getLoginText = (activeStep: LoginActiveStep) => {
+  if (activeStep === 'walletList') {
     return {
-      headerText: 'Connect Your Wallet',
+      headerText: 'Login to Commonwealth',
       bodyText: `Many communities require different wallets 
       based on the chain they are built on and 
       the types of tokens members hold.`,
     };
-  } else if (bodyType === 'selectAccountType') {
+  } else if (activeStep === 'selectAccountType') {
     return {
       headerText: 'New or Returning?',
       bodyText: 'Looks like this address hasn’t been connected before.',
     };
-  } else if (bodyType === 'selectPrevious') {
+  } else if (activeStep === 'selectPrevious') {
     return {
       headerText: 'Select a Previously Linked Address',
       bodyText:
         'Manage your profiles, addresses and communities under one account.',
     };
-  } else if (bodyType === 'welcome') {
+  } else if (activeStep === 'welcome') {
     return {
       headerText: 'Welcome to Common!',
       bodyText:
         'Manage your profiles, addresses and communities under one account.',
     };
-  } else if (bodyType === 'allSet') {
+  } else if (activeStep === 'allSet') {
     return {
       headerText: `You're all set!`,
       bodyText: `By linking a new address, you are able to switch with ease \
         and manage all of your communities, addresses and profiles under one account.`,
     };
-  } else if (bodyType === 'selectProfile') {
+  } else if (activeStep === 'selectProfile') {
     return {
       headerText: `Select Profile`,
       bodyText: `By linking a new address, you are able to switch with ease  \
         and manage all of your communities, addresses and profiles under one account.`,
     };
-  } else if (bodyType === 'connectWithEmail') {
+  } else if (activeStep === 'connectWithEmail') {
     return {
-      headerText: 'Connect with email?',
-      bodyText: `Use Magic Link to connect with email and generate an address.`,
+      headerText: 'Enter your email',
+      bodyText: `Follow the instructions provided to login to Commonwealth with your email.`,
     };
-  } else if (bodyType === 'ethWalletList') {
+  } else if (activeStep === 'ethWalletList') {
     return {
       headerText: 'Connect an ETH Wallet',
       bodyText:
         'An Ethereum based wallet is needed to connect to this community.',
     };
-  } else if (bodyType === 'redirectToSign') {
+  } else if (activeStep === 'redirectToSign') {
     return {
       headerText: 'Redirect for Signature',
       bodyText: 'You must sign with your mobile wallet to continue.',

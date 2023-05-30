@@ -1,4 +1,3 @@
-import { render } from 'helpers/DEPRECATED_ReactRender';
 import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
@@ -8,10 +7,6 @@ import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
 
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
 import type CommunityRole from './CommunityRole';
 
 class ChainInfo {
@@ -311,10 +306,31 @@ class ChainInfo {
     hasHomepage,
     default_allow_permissions,
     default_deny_permissions,
+    chain_node_id,
+  }: {
+    name?: string;
+    description?: string;
+    website?: string;
+    discord?: string;
+    element?: string;
+    telegram?: string;
+    github?: string;
+    stagesEnabled?: boolean;
+    customStages?: string;
+    customDomain?: string;
+    terms?: string;
+    snapshot?: string[];
+    iconUrl?: string;
+    defaultOverview?: boolean;
+    defaultPage?: DefaultPage;
+    hasHomepage?: boolean;
+    default_allow_permissions?: bigint;
+    default_deny_permissions?: bigint;
+    chain_node_id?: string;
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
-      id: app.activeChainId(),
+      id: app.activeChainId() ?? this.id,
       name,
       description,
       website,
@@ -333,6 +349,7 @@ class ChainInfo {
       default_summary_view: defaultOverview,
       default_page: defaultPage,
       has_homepage: hasHomepage,
+      chain_node_id,
       jwt: app.user.jwt,
     });
     const updatedChain = r.result;
@@ -355,12 +372,6 @@ class ChainInfo {
     this.defaultAllowPermissions = updatedChain.default_allow_permissions;
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
-  }
-
-  public getAvatar(size: number) {
-    return this.iconUrl
-      ? render(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : render(CWJdenticon, { address: undefined, size });
   }
 }
 

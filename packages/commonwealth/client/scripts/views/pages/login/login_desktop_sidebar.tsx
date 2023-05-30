@@ -1,14 +1,11 @@
-import React from 'react';
-
-import 'pages/login/login_desktop_sidebar.scss';
-
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-
-import type IWebWallet from '../../../models/IWebWallet';
+import 'pages/login/login_desktop_sidebar.scss';
+import React from 'react';
 import app from 'state';
 import { CWAccountCreationButton } from 'views/components/component_kit/cw_account_creation_button';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
+import type IWebWallet from '../../../models/IWebWallet';
 import { LoginText } from './login_text';
 import type { LoginSidebarType } from './types';
 
@@ -39,15 +36,15 @@ const generateText = (wallets: Array<IWebWallet<any>>) => {
 
 type LoginDesktopSidebarProps = {
   sidebarType: LoginSidebarType;
-  createNewAccountCallback: () => void;
-  linkExistingAccountCallback: () => void;
+  onCreateNewAccount: () => void;
+  onLinkExistingAccount: () => void;
   wallets: Array<IWebWallet<any>>;
 };
 
 export const LoginDesktopSidebar = ({
   sidebarType,
-  createNewAccountCallback,
-  linkExistingAccountCallback,
+  onCreateNewAccount,
+  onLinkExistingAccount,
   wallets,
 }: LoginDesktopSidebarProps) => {
   return (
@@ -58,11 +55,22 @@ export const LoginDesktopSidebar = ({
             <LoginText
               headerText={
                 wallets.length > 0
-                  ? 'Connect Your Wallet'
+                  ? 'Login to Commonwealth'
                   : 'Please Install a Wallet to Login'
               }
               bodyText="Many communities require different wallets based
-              on the chain they are built on and the types of tokens members hold."
+            on the chain they are built on and the types of tokens members hold."
+            />
+          </div>
+        </div>
+      )}
+
+      {sidebarType === 'emailLogin' && (
+        <div className="connect-wallet">
+          <div className="sidebar-content">
+            <LoginText
+              headerText="Enter your email"
+              bodyText="Follow the instructions provided to login to Commonwealth with your email."
             />
           </div>
         </div>
@@ -73,10 +81,10 @@ export const LoginDesktopSidebar = ({
           <CWText type="h4" fontWeight="semiBold" className="header-text">
             New or Returning?
           </CWText>
-          <CWAccountCreationButton onClick={createNewAccountCallback} />
+          <CWAccountCreationButton onClick={onCreateNewAccount} />
           <CWAccountCreationButton
             creationType="linkAccount"
-            onClick={linkExistingAccountCallback}
+            onClick={onLinkExistingAccount}
           />
         </div>
       )}

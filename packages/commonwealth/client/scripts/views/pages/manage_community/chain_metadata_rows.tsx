@@ -10,7 +10,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import type ChainInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
-import { AvatarUpload } from '../../components/avatar_upload';
+import { AvatarUpload } from '../../components/Avatar';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -156,6 +156,7 @@ export const ChainMetadataRows = ({
         hasHomepage,
         default_allow_permissions: chain.defaultAllowPermissions,
         default_deny_permissions: chain.defaultDenyPermissions,
+        chain_node_id: null,
       });
       onSave();
       notifySuccess('Chain updated');

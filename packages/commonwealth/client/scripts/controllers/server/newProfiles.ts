@@ -43,7 +43,7 @@ class NewProfilesController {
     return profile;
   }
 
-  public async updateProfileForAccount(address, data) {
+  public async updateProfileForAccount(address, data, shouldRedraw = true) {
     try {
       const response = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
         ...data,
@@ -52,72 +52,80 @@ class NewProfilesController {
 
       if (response?.result?.status === 'Success') {
         const profile = this._store.getByAddress(address);
-        this._refreshProfiles([profile]);
+        this._refreshProfiles([profile], shouldRedraw);
       }
     } catch (err) {
       console.error(err);
     }
   }
 
-  private async _refreshProfiles(profiles: MinimumProfile[]): Promise<void> {
+  private async _refreshProfiles(
+    profiles: MinimumProfile[],
+    shouldRedraw = true
+  ): Promise<void> {
     if (profiles.length === 0) return;
     const chunkedProfiles = _.chunk(profiles, 20);
     await Promise.all(
-      chunkedProfiles.map(async (chunk): Promise<MinimumProfile | MinimumProfile[]> => {
-        const requestData =
-          chunk.length === 1
-            ? {
-                address: chunk[0].address,
-                chain: chunk[0].chain,
-                jwt: app.user.jwt,
-              }
-            : {
-                'address[]': chunk.map((profile) => profile.address),
-                'chain[]': chunk.map((profile) => profile.chain),
-                jwt: app.user.jwt,
-              };
-        try {
-          const { result } = await $.post(
-            `${app.serverUrl()}/getAddressProfile`,
-            requestData
-          );
-
-          // single profile
-          if (chunk.length === 1) {
-            const profile = chunk[0];
-            profile.initialize(
-              result.name,
-              result.address,
-              result.avatarUrl,
-              result.profileId,
-              profile.chain,
-              result.lastActive
+      chunkedProfiles.map(
+        async (chunk): Promise<MinimumProfile | MinimumProfile[]> => {
+          const requestData =
+            chunk.length === 1
+              ? {
+                  address: chunk[0].address,
+                  chain: chunk[0].chain,
+                  jwt: app.user.jwt,
+                }
+              : {
+                  'address[]': chunk.map((profile) => profile.address),
+                  'chain[]': chunk.map((profile) => profile.chain),
+                  jwt: app.user.jwt,
+                };
+          try {
+            const { result } = await $.post(
+              `${app.serverUrl()}/getAddressProfile`,
+              requestData
             );
-            return profile;
+
+            // single profile
+            if (chunk.length === 1) {
+              const profile = chunk[0];
+              profile.initialize(
+                result.name,
+                result.address,
+                result.avatarUrl,
+                result.profileId,
+                profile.chain,
+                result.lastActive
+              );
+              return profile;
+            }
+
+            // multiple profiles
+            return chunk.map((profile) => {
+              const currentProfile = result.find(
+                (r) => r.address === profile.address
+              );
+              profile.initialize(
+                currentProfile.name,
+                currentProfile.address,
+                currentProfile.avatarUrl,
+                currentProfile.profileId,
+                profile.chain,
+                currentProfile.lastActive
+              );
+
+              return profile;
+            });
+          } catch (e) {
+            console.error(e);
           }
-
-          // multiple profiles
-          return chunk.map((profile) => {
-            const currentProfile = result.find(
-              (r) => r.address === profile.address
-            );
-            profile.initialize(
-              currentProfile.name,
-              currentProfile.address,
-              currentProfile.avatarUrl,
-              currentProfile.profileId,
-              profile.chain,
-              currentProfile.lastActive
-            );
-
-            return profile;
-          });
-        } catch (e) {
-          console.error(e);
         }
-      })
+      )
     );
-    this.isFetched.emit('redraw');
+
+    if (shouldRedraw) {
+      this.isFetched.emit('redraw');
+    }
   }
 }
 

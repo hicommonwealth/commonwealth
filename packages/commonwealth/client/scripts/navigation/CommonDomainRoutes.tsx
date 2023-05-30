@@ -17,6 +17,7 @@ const MembersPage = lazy(() => import('views/pages/members'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
+const FinishSocialLoginPage = lazy(() => import('views/pages/finish_social_login'))
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
@@ -74,6 +75,7 @@ const ViewSnapshotsProposalPage = lazy(
 const NewSnapshotProposalPage = lazy(
   () => import('views/pages/new_snapshot_proposal')
 );
+const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
@@ -163,6 +165,10 @@ const CommonDomainRoutes = () => [
   <Route
     path="/finishaxielogin"
     element={withLayout(FinishAxieLoginPage, {})}
+  />,
+  <Route
+    path="/finishsociallogin"
+    element={withLayout(FinishSocialLoginPage, {})}
   />,
   // NOTIFICATIONS
   <Route
@@ -356,6 +362,14 @@ const CommonDomainRoutes = () => [
     })}
   />,
   // TREASURY END
+
+  // SITE ADMIN
+  <Route
+    path="/admin-panel"
+    element={withLayout(AdminPanelPage, {
+      deferChain: true,
+    })}
+  />,
 
   // ADMIN
   <Route

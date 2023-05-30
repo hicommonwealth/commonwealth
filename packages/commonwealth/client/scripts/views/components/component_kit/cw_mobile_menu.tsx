@@ -2,15 +2,17 @@ import React from 'react';
 
 import 'components/component_kit/cw_mobile_menu.scss';
 
-import app from 'state';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
+import useSidebarStore from 'state/ui/sidebar';
 
 const CWMobileMenuItem = (props: MenuItem) => {
+  const { setMobileMenuName } = useSidebarStore();
+
   if (props.type === 'default') {
     const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
       props;
@@ -22,9 +24,7 @@ const CWMobileMenuItem = (props: MenuItem) => {
           'MobileMenuItem'
         )}
         onClick={(e) => {
-          // Graham TODO 22.10.06: Temporary solution as we transition Notifications
-          app.mobileMenu = null;
-          app.sidebarRedraw.emit('redraw');
+          setMobileMenuName(null);
           onClick(e);
         }}
       >
@@ -48,9 +48,7 @@ const CWMobileMenuItem = (props: MenuItem) => {
       <div
         className="MobileMenuItem"
         onClick={(e) => {
-          // Graham TODO 22.10.06: Temporary solution as we transition Notifications
-          app.mobileMenu = null;
-          app.sidebarRedraw.emit('redraw');
+          setMobileMenuName(null);
           onClick(e);
         }}
       >

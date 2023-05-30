@@ -11,7 +11,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
-import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
+import { CommentReactionButton } from '../ReactionButton/CommentReactionButton';
 import { SharePopover } from '../share_popover';
 import { EditComment } from './EditComment';
 import { clearEditingLocalStorage } from './helpers';
@@ -29,6 +29,8 @@ type CommentProps = {
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
   updatedCommentsCallback?: () => void;
+  isReplying?: boolean;
+  parentCommentId?: number;
 };
 
 export const CommentComponent = ({
@@ -39,6 +41,8 @@ export const CommentComponent = ({
   setIsGloballyEditing,
   threadLevel,
   updatedCommentsCallback,
+  isReplying,
+  parentCommentId,
 }: CommentProps) => {
   const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>(false);
@@ -101,7 +105,16 @@ export const CommentComponent = ({
           {Array(threadLevel)
             .fill(undefined)
             .map((_, i) => (
-              <div key={i} className="thread-connector" />
+              <div
+                key={i}
+                className={`thread-connector ${
+                  isReplying &&
+                  i === threadLevel - 1 &&
+                  parentCommentId === comment.id
+                    ? 'replying'
+                    : ''
+                }`}
+              />
             ))}
         </div>
       )}

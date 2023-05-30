@@ -19,11 +19,11 @@ import { User } from '../../components/user/user';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWTag } from 'views/components/component_kit/cw_tag';
+import { NewThreadTag } from '../discussions/NewThreadTag';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
   pinnedThreads: Array<Thread>;
-  allThreadsCount: number;
   topic: Topic;
 };
 
@@ -31,7 +31,6 @@ export const TopicSummaryRow = ({
   monthlyThreads,
   pinnedThreads,
   topic,
-  allThreadsCount,
 }: TopicSummaryRowProps) => {
   const navigate = useCommonNavigate();
 
@@ -65,7 +64,7 @@ export const TopicSummaryRow = ({
             fontWeight="medium"
             className="threads-count-text"
           >
-            {allThreadsCount} Threads
+            {topic.totalThreads || 0} Threads
           </CWText>
         </div>
         {topic.description && <CWText type="b2">{topic.description}</CWText>}
@@ -110,6 +109,7 @@ export const TopicSummaryRow = ({
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
+                    <NewThreadTag threadCreatedAt={thread.createdAt}/>
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}

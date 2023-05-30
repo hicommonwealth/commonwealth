@@ -131,7 +131,7 @@ const FinishNearLogin = () => {
 
       if (!app.isLoggedIn()) {
         await initAppState();
-        await updateActiveAddresses(chain);
+        await updateActiveAddresses({ chain });
       }
 
       await setActiveAccount(acct);

@@ -5,6 +5,7 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
+import { NewThreadTag } from '../../pages/discussions/NewThreadTag';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
@@ -33,6 +34,7 @@ type ContentPageProps = {
   title: string | React.ReactNode;
 
   // optional
+  lastEdited?: moment.Moment | number;
   author?: React.ReactNode;
   actions?: Array<PopoverMenuItem>;
   body?: React.ReactNode;
@@ -45,6 +47,7 @@ type ContentPageProps = {
   subBody?: React.ReactNode;
   subHeader?: React.ReactNode;
   viewCount?: number;
+  displayNewTag?: boolean;
 };
 
 export const CWContentPage = (props: ContentPageProps) => {
@@ -55,6 +58,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     comments,
     contentBodyLabel,
     createdAt,
+    lastEdited,
     headerComponents,
     readOnly,
     showSidebar,
@@ -63,19 +67,27 @@ export const CWContentPage = (props: ContentPageProps) => {
     subHeader,
     title,
     viewCount,
+    displayNewTag,
   } = props;
 
   const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
-    isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+    isWindowMediumSmallInclusive(window.innerWidth)
+      ? 'tabsView'
+      : !showSidebar
       ? 'tabsView'
       : 'sidebarView'
   );
   const [tabSelected, setTabSelected] = React.useState<number>(0);
 
+  const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
+  const createdOrEditedText = lastEdited ? 'Edited' : 'Published';
+
   React.useEffect(() => {
     const onResize = () => {
       setViewType(
-        isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+        isWindowMediumSmallInclusive(window.innerWidth)
+          ? 'tabsView'
+          : !showSidebar
           ? 'tabsView'
           : 'sidebarView'
       );
@@ -101,12 +113,17 @@ export const CWContentPage = (props: ContentPageProps) => {
         )}
         <div className="header-info-row">
           {author}
-          {typeof createdAt === 'number' ||
-            (moment.isMoment(createdAt) && createdAt.isValid() && (
-              <CWText type="caption" className="header-text">
-                published on {moment(createdAt).format('l')}
-              </CWText>
-            ))}
+          {typeof createdOrEditedDate === 'number' ||
+            (moment.isMoment(createdOrEditedDate) &&
+              createdOrEditedDate.isValid() && (
+                <CWText type="caption" className="header-text">
+                  • &nbsp; {createdOrEditedText} on{' '}
+                  {moment(createdOrEditedDate).format('l')} &nbsp; •
+                </CWText>
+              ))}
+          {!!displayNewTag && (
+            <NewThreadTag threadCreatedAt={moment(createdAt)} />
+          )}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
               {pluralize(viewCount, 'view')}
