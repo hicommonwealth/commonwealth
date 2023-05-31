@@ -182,14 +182,14 @@ export const ComponentShowcase = () => {
             buttons: [
               {
                 label: 'Delete',
-                buttonType: 'destructive',
+                buttonType: 'mini-black',
                 onClick: () => {
                   notifySuccess('Deleted');
                 },
               },
               {
                 label: 'Cancel',
-                buttonType: 'secondary',
+                buttonType: 'mini-white',
                 onClick: () => {
                   console.log('cancelled');
                 },
