@@ -3,6 +3,7 @@ import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
+import type { Session } from '@canvas-js/interfaces';
 
 import { ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -18,6 +19,7 @@ import { SsoTokenInstance } from '../models/sso_token';
 import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
+import { verify as verifyCanvas } from "../../shared/canvas/verify";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -314,6 +316,9 @@ async function magicLoginRoute(
     jwt?: string,
     username?: string,
     avatarUrl?: string,
+    signature: string,
+    sessionPayload: string,
+    magicAddress: string,
   }>,
   decodedMagicToken: MagicUser,
   cb: DoneFunc
@@ -356,10 +361,42 @@ async function magicLoginRoute(
     }
   }
 
-  // fetch user data from magic backend
+  // the user should have signed a sessionPayload with the client-side
+  // magic address. validate the signature and add that address
+  try {
+    const session: Session = {
+      type: "session",
+      signature: req.body.signature,
+      payload: JSON.parse(req.body.sessionPayload)
+    };
+    if (req.body.magicAddress !== session.payload.from) {
+      throw new Error("sessionPayload address did not match user-provided magicAddress");
+    }
+    const valid = await verifyCanvas({ session });
+    if (!valid) {
+      throw new Error("sessionPayload signed with invalid signature")
+    }
+    if (chainToJoin) {
+      if (chainToJoin.base === ChainBase.CosmosSDK && session.payload.chain.startsWith("cosmos:")) {
+        generatedAddresses.push({ address: req.body.magicAddress, chain: chainToJoin.id });
+      } else if (chainToJoin.base === ChainBase.Ethereum && session.payload.chain.startsWith("eip155:")) {
+        generatedAddresses.push({ address: req.body.magicAddress, chain: chainToJoin.id });
+      } else {
+        // ignore invalid chain base
+      }
+    }
+  } catch (err) {
+    log.warn(`Could not set up a valid client-side magic address ${req.body.magicAddress}`);
+  }
+
+  // grab cosmos address for registration:
+  //
+  // magic also generates a cosmos address server-side, which is derived
+  // differently than the client-side address. we may be able to
+  // remove this in the future; it's just used to identify the user.
   let magicUserMetadata: MagicUserMetadata;
   try {
-    // grab cosmos address for registration
+    // fetch user data from magic backend
     magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
       decodedMagicToken.issuer,
       WalletType.COSMOS
@@ -371,6 +408,16 @@ async function magicLoginRoute(
       throw new Error('No cosmos address found!');
     }
     generatedAddresses.push({ address: cosmosAddress, chain: DEFAULT_COSMOS_CHAIN });
+
+    if (chainToJoin) {
+      if (chainToJoin.base === ChainBase.CosmosSDK) {
+        // ignore invalid chain base
+      } else if (chainToJoin.base === ChainBase.Ethereum) {
+        generatedAddresses.push({ address: canonicalAddress, chain: chainToJoin.id });
+      } else {
+        // ignore invalid chain base
+      }
+    }
 
     // if joining a new chain (by logging in on a community), add to list of addresses
     if (chainToJoin) {
