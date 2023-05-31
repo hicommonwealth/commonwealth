@@ -1,7 +1,7 @@
 module.exports = {
   up: async (queryInterface) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.removeColumn('OffchainTopics', 'rule_id', {
+      await queryInterface.removeColumn('Topics', 'rule_id', {
         transaction,
       });
       await queryInterface.removeColumn('ChatChannels', 'rule_id', {
