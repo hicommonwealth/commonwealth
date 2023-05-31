@@ -4,7 +4,6 @@ import type {
   ChatMessageAttributes,
   ChatMessageInstance,
 } from './chat_message';
-import type { RuleAttributes } from './rule';
 import type { ModelStatic } from './types';
 
 export interface ChatChannelAttributes {
@@ -12,10 +11,8 @@ export interface ChatChannelAttributes {
   name: string;
   chain_id: string;
   category: string;
-  rule_id?: number;
 
   chat_messages?: ChatMessageAttributes[] | ChatMessageAttributes['id'][];
-  Rule?: RuleAttributes;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -24,7 +21,6 @@ export interface ChatChannelInstance
   extends Model<ChatChannelAttributes>,
     ChatChannelAttributes {
   getChatMessages: Sequelize.HasManyGetAssociationsMixin<ChatMessageInstance>;
-  getRule: Sequelize.BelongsToGetAssociationMixin<RuleAttributes>;
 }
 
 export type ChatChannelModelStatic = ModelStatic<ChatChannelInstance>;
@@ -59,10 +55,6 @@ export default (
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      rule_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -87,9 +79,6 @@ export default (
     });
     models.ChatChannel.belongsTo(models.Chain, {
       onDelete: 'CASCADE',
-    });
-    models.ChatChannel.belongsTo(models.Rule, {
-      foreignKey: 'rule_id',
     });
   };
   return ChatChannel;

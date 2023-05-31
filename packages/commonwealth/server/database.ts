@@ -29,7 +29,6 @@ import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
 import RoleFactory from './models/role';
 import RoleAssignmentFactory from './models/role_assignment';
-import RuleFactory from './models/rule';
 import SnapshotProposalFactory from './models/snapshot_proposal';
 import SnapshotSpaceFactory from './models/snapshot_spaces';
 import SocialAccountFactory from './models/social_account';
@@ -114,7 +113,6 @@ const models: Models = {
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   RoleAssignment: RoleAssignmentFactory(sequelize, DataTypes),
-  Rule: RuleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),

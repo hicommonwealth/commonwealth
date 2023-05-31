@@ -13,7 +13,6 @@ import type { ChatChannelInstance } from '../models/chat_channel';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
 import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
-import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';
 import type { RoleInstanceWithPermission } from '../util/roles';
@@ -36,7 +35,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     threadsInVoting,
     totalThreads,
     chatChannels,
-    rules,
     communityBanner,
     contractsWithTemplatesData,
     communityRoles,
@@ -49,7 +47,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         ThreadInstance[],
         [{ count: string }],
         ChatChannelInstance[],
-        RuleInstance[],
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
@@ -173,11 +170,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         required: false, // should return channels with no chat messages
       },
     }),
-    models.Rule.findAll({
-      where: {
-        chain_id: chain.id,
-      },
-    }),
     models.CommunityBanner.findOne({
       where: {
         chain_id: chain.id,
@@ -250,7 +242,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels),
-      rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
         return {

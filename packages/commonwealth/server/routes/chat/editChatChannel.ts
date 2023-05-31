@@ -10,14 +10,12 @@ export const Errors = {
   NotAdmin: 'Must be an admin to edit a chat channel',
   NoChainId: 'No chain id given',
   NoChannelId: 'No channel id given',
-  RuleNotFound: 'Rule not found',
 };
 
 type EditChatChannelReq = {
   chain_id: string;
   channel_id: string;
   name?: string;
-  rule_id?: number;
 };
 
 export default async (
@@ -50,11 +48,6 @@ export default async (
   });
   if (req.body.name) {
     channel.name = req.body.name;
-  }
-  if (req.body.rule_id) {
-    const rule = await models.Rule.findOne({ where: { id: req.body.rule_id } });
-    if (!rule) return next(new AppError(Errors.RuleNotFound));
-    channel.rule_id = req.body.rule_id;
   }
   await channel.save();
 

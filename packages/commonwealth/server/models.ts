@@ -27,7 +27,6 @@ import type { ProfileModelStatic } from './models/profile';
 import type { ReactionModelStatic } from './models/reaction';
 import type { RoleModelStatic } from './models/role';
 import type { RoleAssignmentModelStatic } from './models/role_assignment';
-import type { RuleModelStatic } from './models/rule';
 import type { SnapshotProposalModelStatic } from './models/snapshot_proposal';
 import type { SnapshotSpaceModelStatic } from './models/snapshot_spaces';
 import type { SocialAccountModelStatic } from './models/social_account';
@@ -79,7 +78,6 @@ export type Models = {
   Profile: ProfileModelStatic;
   RoleAssignment: RoleAssignmentModelStatic;
   Role: RoleModelStatic;
-  Rule: RuleModelStatic;
   SocialAccount: SocialAccountModelStatic;
   SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
