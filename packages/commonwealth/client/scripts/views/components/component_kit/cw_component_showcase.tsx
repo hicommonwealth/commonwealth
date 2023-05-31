@@ -543,6 +543,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             iconLeft='person'
+            buttonType='secondary'
             label="Secondary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}

@@ -65,7 +65,7 @@ export const CommunityCard = (props: CommunityCardProps) => {
           {prettyDescription}
         </CWText>
         <CWButton
-          buttonType="secondary-black"
+          buttonType="secondary"
           label="See More"
           onClick={redirectFunction}
         />

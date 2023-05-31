@@ -74,7 +74,7 @@ export const LoginSelector = () => {
       <>
         <div className="LoginSelector">
           <CWButton
-            buttonType="tertiary-black"
+            buttonType="tertiary"
             iconLeft="person"
             label="Log in"
             onClick={() => setIsLoginModalOpen(true)}
@@ -259,7 +259,7 @@ export const LoginSelector = () => {
         {app.chain && !app.chainPreloading && profileLoadComplete && !isJoined && (
           <div className="join-button-container">
             <CWButton
-              buttonType="tertiary-black"
+              buttonType="tertiary"
               onClick={async () => {
                 if (
                   sameBaseAddressesRemoveDuplicates.length === 0 ||

@@ -32,8 +32,8 @@ export const SubscriptionButton = () => {
             .then(() => setNotificationsOn(true));
         }
       }}
-      label={notificationsOn ? 'Notifications on' : 'Notifications off'}
-      buttonType={notificationsOn ? 'primary-blue' : 'secondary-blue'}
+      label={notificationsOn ? 'Turn Notifications Off' : 'Turn Notifications On'}
+      buttonType={notificationsOn ? 'destructive' : 'tertiary'}
     />
   );
 };

@@ -173,12 +173,13 @@ export const CreateComment = ({
         <div className="form-buttons">
           {editorValue.length > 0 && (
             <CWButton
-              buttonType="secondary-blue"
+              buttonType="secondary"
               onClick={cancel}
               label="Cancel"
             />
           )}
           <CWButton
+            buttonType='primary'
             disabled={disabled}
             onClick={handleSubmitComment}
             label="Submit"

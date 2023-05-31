@@ -31,7 +31,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         {isCurrentUser && (
           <CWButton
             label="Edit"
-            buttonType="mini-white"
+            buttonType="secondary"
             iconLeft="write"
             onClick={() => navigate(`/profile/edit`)}
           />

@@ -235,13 +235,13 @@ const EditProfileComponent = () => {
                     }, 1000);
                   }}
                   className="save-button"
-                  buttonType="secondary-black"
+                  buttonType="secondary"
                 />
                 <CWButton
                   label="Save"
                   onClick={() => handleSaveProfile()}
                   className="save-button"
-                  buttonType="primary-black"
+                  buttonType="primary"
                 />
               </div>
             </div>

@@ -37,12 +37,12 @@ const UserSurveyView = (props: UserSurveyViewProps) => {
         </CWText>
         <div className="button-wrapper">
           <CWButton
-            buttonType="secondary-black"
+            buttonType="secondary"
             label="No Thanks"
             onClick={onClose}
           />
           <CWButton
-            buttonType="primary-black"
+            buttonType="primary"
             label="Sure Thing!"
             onClick={onRedirectClick}
           />

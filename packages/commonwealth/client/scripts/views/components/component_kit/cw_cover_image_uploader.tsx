@@ -257,7 +257,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
         {uploadStatus === 'success' && enableGenerativeAI && (
           <CWButton
             label="retry"
-            buttonType="mini-black"
+            buttonType="primary"
             className="retry-button"
             onClick={(e) => {
               e.stopPropagation();
@@ -303,7 +303,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
                 />
                 <CWButton
                   label="Generate"
-                  buttonType="mini-black"
+                  buttonType="primary"
                   className="generate-btn"
                   onClick={async () => {
                     if (prompt.length < 1) return;
@@ -333,7 +333,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           </CWText>
           {enableGenerativeAI && !isUploading && (
             <CWButton
-              buttonType="mini-white"
+              buttonType="secondary"
               label="Generate Image"
               className="generate-btn"
               onClick={(e) => {

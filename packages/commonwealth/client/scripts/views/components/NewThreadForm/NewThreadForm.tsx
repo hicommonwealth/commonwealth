@@ -179,7 +179,7 @@ export const NewThreadForm = () => {
                   label={'Cancel'}
                   onClick={handleCancel}
                   tabIndex={3}
-                  buttonType="secondary-blue"
+                  buttonType="secondary"
                 />
               )}
               <CWButton

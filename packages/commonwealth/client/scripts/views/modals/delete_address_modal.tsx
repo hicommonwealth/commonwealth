@@ -91,12 +91,12 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         <div className="actions">
           <CWButton
             label="Delete"
-            buttonType="secondary-red"
+            buttonType="destructive"
             onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
           />
           <CWButton
             label="Cancel"
-            buttonType="primary-black"
+            buttonType="primary"
             onClick={closeModal}
           />
         </div>

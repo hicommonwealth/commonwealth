@@ -56,7 +56,7 @@ export const NotificationsMenu = () => {
       <div className="footer">
         <CWButton
           label="See all"
-          buttonType="tertiary-black"
+          buttonType="tertiaryy"
           onClick={() => {
             navigate('/notifications');
           }}
@@ -64,7 +64,7 @@ export const NotificationsMenu = () => {
         <CWDivider isVertical />
         <CWButton
           label="Mark all read"
-          buttonType="tertiary-black"
+          buttonType="tertiaryy"
           onClick={(e) => {
             e.preventDefault();
 

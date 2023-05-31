@@ -146,7 +146,7 @@ const CommunitiesPage = () => {
                   key={i}
                   label={cat}
                   buttonType={
-                    filterMap[cat] ? 'primary-black' : 'secondary-black'
+                    filterMap[cat] ? 'primary' : 'secondary'
                   }
                   onClick={() => {
                     handleSetFilterMap(cat);
@@ -160,7 +160,7 @@ const CommunitiesPage = () => {
                   key={i}
                   label={network}
                   buttonType={
-                    filterMap[network] ? 'primary-black' : 'secondary-black'
+                    filterMap[network] ? 'primary' : 'secondary'
                   }
                   onClick={() => {
                     handleSetFilterMap(network);
@@ -174,7 +174,7 @@ const CommunitiesPage = () => {
                   key={i}
                   label={base}
                   buttonType={
-                    filterMap[base] ? 'primary-black' : 'secondary-black'
+                    filterMap[base] ? 'primary' : 'secondary'
                   }
                   onClick={() => {
                     handleSetFilterMap(base);

@@ -101,7 +101,7 @@ export const EditTopicModal = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
           onClick: async () => {
             const topicInfo = {
               id,
@@ -116,7 +116,7 @@ export const EditTopicModal = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
         },
       ],
     });
@@ -191,7 +191,7 @@ export const EditTopicModal = ({
         <div className="buttons-row">
           <CWButton onClick={handleSaveChanges} label="Save changes" />
           <CWButton
-            buttonType="primary-red"
+            buttonType="destructive"
             disabled={isSaving}
             onClick={handleDeleteTopic}
             label="Delete topic"

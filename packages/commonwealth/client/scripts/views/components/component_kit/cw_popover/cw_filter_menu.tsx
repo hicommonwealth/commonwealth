@@ -29,7 +29,7 @@ export const CWFilterMenu = (props: FilterMenuProps) => {
       <div>
         <CWButton
           label="Filter"
-          buttonType="mini-white"
+          buttonType="secondary"
           iconRight="chevronDown"
           className={getClasses<{ someChecked: boolean }>({
             someChecked: selectedItems.length > 0,

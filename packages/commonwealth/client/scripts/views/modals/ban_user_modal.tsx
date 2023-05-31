@@ -29,7 +29,7 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
         <div className="ban-modal-content">
           <CWButton
             label="Ban Address (just click once and wait)"
-            buttonType="primary-red"
+            buttonType="destructive"
             onClick={async () => {
               try {
                 // ZAK TODO: Update Banned User Table with userProfile

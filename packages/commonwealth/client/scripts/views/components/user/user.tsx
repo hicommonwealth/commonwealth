@@ -338,7 +338,7 @@ export const User = ({
                   setIsModalOpen(true);
                 }}
                 label="Ban User"
-                buttonType="primary-red"
+                buttonType="destructive"
               />
             </div>
           )}

@@ -71,7 +71,7 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
       ]}
       statAction={
         <CWButton
-          buttonType="primary-blue"
+          buttonType="primary"
           onClick={() => navigate('/new/proposal')}
           label="New proposal"
         />

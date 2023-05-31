@@ -276,7 +276,7 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   const noButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedNo || votingModalOpen}
       onClick={voteNo}
       label={hasVotedNo ? 'Voted no' : 'Vote no'}
@@ -295,7 +295,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   // cosmos: abstain
   const abstainButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedAbstain || votingModalOpen}
       onClick={voteAbstain}
       label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
@@ -305,7 +305,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   // cosmos: veto
   const noWithVetoButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedVeto || votingModalOpen}
       onClick={voteVeto}
       label={hasVotedVeto ? 'Vetoed' : 'Veto'}

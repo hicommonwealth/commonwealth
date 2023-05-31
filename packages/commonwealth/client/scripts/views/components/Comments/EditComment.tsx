@@ -47,7 +47,7 @@ export const EditComment = ({
         buttons: [
           {
             label: 'Yes',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
             onClick: () => {
               setIsEditing(false);
               clearEditingLocalStorage(comment.id, ContentType.Comment);
@@ -55,7 +55,7 @@ export const EditComment = ({
           },
           {
             label: 'No',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
           },
         ],
       });
@@ -91,10 +91,15 @@ export const EditComment = ({
         <CWButton
           label="Cancel"
           disabled={saving}
-          buttonType="secondary-blue"
+          buttonType="secondary"
           onClick={cancel}
         />
-        <CWButton label="Save" disabled={saving} onClick={save} />
+        <CWButton 
+          buttonType="primary"
+          label="Save"
+          disabled={saving}
+          onClick={save}
+        />
       </div>
     </div>
   );

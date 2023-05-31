@@ -155,7 +155,7 @@ export const EditCollaboratorsModal = ({
         <div className="buttons-row">
           <CWButton
             label="Cancel"
-            buttonType="secondary-blue"
+            buttonType="secondary"
             onClick={onModalClose}
           />
           <CWButton
