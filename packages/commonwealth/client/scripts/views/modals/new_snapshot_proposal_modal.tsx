@@ -58,7 +58,6 @@ export const NewSnapshotProposalModal = ({
                 snapshotId={selectedSnapshotId}
                 thread={thread}
                 onSave={onSave}
-                onModalClose={onModalClose}
               />
             )}
           </>
@@ -67,7 +66,6 @@ export const NewSnapshotProposalModal = ({
             snapshotId={selectedSnapshotId}
             thread={thread}
             onSave={onSave}
-            onModalClose={onModalClose}
           />
         )}
       </div>
