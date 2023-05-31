@@ -50,7 +50,7 @@ const getFilteredContent = (content, address) => {
     return { title, fulltext, chainEventLink };
   } else {
     const community = `${content.chain || content.community}`;
-    const actor = `${address?.profile?.profile_name || content.user}`;
+    const actor = `${address?.Profile?.profile_name || content.user}`;
     const action =
       content.notificationCategory === NotificationCategories.NewComment
         ? 'commented on'
@@ -169,11 +169,11 @@ const send = async (models, content: WebhookContent) => {
 
   let actorAvatarUrl = null;
   const actorAccountLink = address
-    ? `${SERVER_URL}/profile/id/${address?.profile?.id}`
+    ? `${SERVER_URL}/profile/id/${address?.Profile?.id}`
     : null;
 
-  if (address?.profile) {
-    actorAvatarUrl = address?.profile?.avatar_url;
+  if (address?.Profile) {
+    actorAvatarUrl = address?.Profile?.avatar_url;
   }
 
   let previewImageUrl = null; // image url of webhook preview
