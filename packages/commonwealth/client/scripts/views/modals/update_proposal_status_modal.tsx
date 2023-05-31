@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import {
-  getProposal,
-  getSpace,
   loadMultipleSpacesData,
   SnapshotProposal,
 } from 'helpers/snapshot_utils';
