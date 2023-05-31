@@ -725,9 +725,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           !(
             showLinkedProposalOptions ||
             showLinkedThreadOptions ||
-            isAuthor ||
-            polls?.length > 0 ||
-            isAdminOrMod
+            polls?.length > 0
           )
         }
         contentBodyLabel="Thread"
