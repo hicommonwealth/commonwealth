@@ -28,7 +28,6 @@ export const ManageRoles = ({
   const navigate = useCommonNavigate();
 
   const chainOrCommObj = { chain: app.activeChainId() };
-  const communityMeta = app.chain.meta;
 
   const removeRole = async (role: RoleInfo) => {
     try {
@@ -60,7 +59,13 @@ export const ManageRoles = ({
       (addr_) => addr_.id === (role.address_id || role.Address.id)
     ).length;
 
-    const adminsAndMods = await communityMeta.getMembers(app.activeChainId());
+    const res = await axios.get(`${app.serverUrl()}/roles`, {
+      params: {
+        chain_id: app.activeChainId(),
+        permissions: ['moderator', 'admin'],
+      },
+    });
+    const adminsAndMods = res.data.result;
 
     const userAdminsAndMods = adminsAndMods.filter((role_) => {
       const belongsToUser = !!app.user.addresses.filter(

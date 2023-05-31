@@ -75,7 +75,9 @@ export const CWContentPage = (props: ContentPageProps) => {
   } = props;
 
   const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
-    isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+    isWindowMediumSmallInclusive(window.innerWidth)
+      ? 'tabsView'
+      : !showSidebar
       ? 'tabsView'
       : 'sidebarView'
   );
@@ -87,7 +89,9 @@ export const CWContentPage = (props: ContentPageProps) => {
   React.useEffect(() => {
     const onResize = () => {
       setViewType(
-        isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+        isWindowMediumSmallInclusive(window.innerWidth)
+          ? 'tabsView'
+          : !showSidebar
           ? 'tabsView'
           : 'sidebarView'
       );

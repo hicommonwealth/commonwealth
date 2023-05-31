@@ -58,7 +58,6 @@ import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
-import bulkMembers from '../routes/bulkMembers';
 import searchProfiles from '../routes/searchProfiles';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
@@ -630,6 +629,11 @@ function setupRouter(
   );
 
   // roles
+  router.get(
+    '/roles',
+    databaseValidationService.validateChain,
+    controllers.listRoles.bind(this, models)
+  );
   router.get('/roles', controllers.getRoles.bind(this, models));
   router.post('/roles', controllers.createRole.bind(this, models));
   router.patch('/roles', controllers.updateRole.bind(this, models));
@@ -638,11 +642,6 @@ function setupRouter(
   router.post('/permissions', controllers.createPermission.bind(this, models));
   router.patch('/permissions', controllers.updatePermission.bind(this, models));
 
-  router.get(
-    '/bulkMembers',
-    databaseValidationService.validateChain,
-    bulkMembers.bind(this, models)
-  );
   router.post(
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
@@ -1004,12 +1003,9 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post(
-    '/auth/magic',
-    passport.authenticate('magic'), (req, res) => {
-      return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
-  );
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
+    return res.json({ status: 'Success', result: req.user.toJSON() });
+  });
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
