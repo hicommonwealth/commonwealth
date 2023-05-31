@@ -106,16 +106,16 @@ export async function signSessionWithMagic(
       Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
       signerAddress
     );
-    const signed = await signer.signMessage(msgs, fee); // this is a cosmos tx
-    return { signed, sessionPayload };
+    const signature = await signer.signMessage(msgs, fee); // this is a cosmos tx
+    return { signature, sessionPayload };
   } else {
     // signature format: https://docs.canvas.xyz/docs/formats#ethereum
     const siwe = await require('siwe');
     const nonce = siwe.generateNonce();
     const domain = document.location.origin;
     const message = createSiweMessage(sessionPayload, domain, nonce);
-    const signature = await signer.signMessage(message);
-    return { signed: `${domain}/${nonce}/${signature}`, sessionPayload };
+    const signatureData = await signer.signMessage(message);
+    return { signature: `${domain}/${nonce}/${signatureData}`, sessionPayload };
   }
 }
 

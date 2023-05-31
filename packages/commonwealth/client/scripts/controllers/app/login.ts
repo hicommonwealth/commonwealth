@@ -428,7 +428,7 @@ export async function handleSocialLoginCallback({
 
   // Get magic metadata
   const profileMetadata = getProfileMetadata(result.oauth);
-  let magicAddress;
+  let magicAddress, authedSessionPayload, authedSignature;
   if (isCosmos) {
     magicAddress = result.magic.userMetadata.publicAddress
   } else {
@@ -462,22 +462,23 @@ export async function handleSocialLoginCallback({
     const timestamp = +new Date();
 
     const signer = { signMessage: magic.cosmos.sign };
-    const { signed, sessionPayload } = await signSessionWithMagic(
+    const { signature, sessionPayload } = await signSessionWithMagic(
       ChainBase.CosmosSDK,
       signer,
       magicAddress,
       timestamp
     );
     // TODO: provide blockhash as last argument to signSessionWithMagic
-    const signature = signed.signatures[0];
-    signature.chain_id = chainId;
+    signature.signatures[0].chain_id = chainId;
     await app.sessions.authSession(
       ChainBase.CosmosSDK, // could be desiredChain.base in the future?
       chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
       magicAddress,
       sessionPayload,
-      JSON.stringify(signature)
+      JSON.stringify(signature.signatures[0])
     );
+    authedSessionPayload = JSON.stringify(sessionPayload);
+    authedSignature = JSON.stringify(signature.signatures[0]);
     console.log("Reauthenticated Cosmos session from magic address:", magicAddress);
   } else {
     const { Web3Provider } = await import('@ethersproject/providers');
@@ -488,7 +489,7 @@ export async function handleSocialLoginCallback({
     const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
 
     const timestamp = +new Date();
-    const { signed, sessionPayload } = await signSessionWithMagic(
+    const { signature, sessionPayload } = await signSessionWithMagic(
       ChainBase.Ethereum,
       signer,
       checksumAddress,
@@ -501,8 +502,10 @@ export async function handleSocialLoginCallback({
       chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
       checksumAddress,
       sessionPayload,
-      signed
+      signature
     );
+    authedSessionPayload = JSON.stringify(sessionPayload);
+    authedSignature = signature;
     console.log("Reauthenticated Ethereum session from magic address:", checksumAddress);
   }
 
@@ -520,6 +523,9 @@ export async function handleSocialLoginCallback({
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
+      magicAddress,
+      sessionPayload: authedSessionPayload,
+      signature: authedSignature,
     },
   });
 
