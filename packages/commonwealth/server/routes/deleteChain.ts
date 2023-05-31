@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { findOneRole } from '../util/roles';
+import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -56,14 +56,21 @@ const deleteChain = async (
     return next(new AppError(Errors.NoChain));
   }
 
-  const admin = await findOneRole(models, {}, chain.id, ['admin']);
-  if (admin) {
-    return next(new AppError(Errors.AdminPresent));
-  }
-
   // eslint-disable-next-line no-new
   new Promise(async () => {
     await models.sequelize.transaction(async (t) => {
+      const admins = await findAllRoles(models, {}, chain.id, ['admin']);
+      if (admins) {
+        // delete admin role assignments
+        await models.RoleAssignment.destroy({
+          where: {
+            community_role_id:
+              admins[0]._roleAssignmentAttributes.community_role_id,
+          },
+          transaction: t,
+        });
+      }
+
       await models.User.update(
         {
           selected_chain_id: null,

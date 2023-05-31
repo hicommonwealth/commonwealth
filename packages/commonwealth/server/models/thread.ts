@@ -156,6 +156,10 @@ export default (
       constraints: false,
       scope: { attachable: 'thread' },
     });
+    models.Thread.hasMany(models.Comment, {
+      foreignKey: 'thread_id',
+      constraints: false,
+    });
     models.Thread.belongsTo(models.Topic, {
       as: 'topic',
       foreignKey: 'topic_id',

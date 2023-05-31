@@ -10,6 +10,12 @@ if [[ -z "$HEROKU_APP_NAME" ]]; then
   exit 1
 fi
 
+DD_HEROKU_CONF_FOLDER=$2
+if [[ -z "$DD_HEROKU_CONF_FOLDER" ]]; then
+  echo "Must provide DD_HEROKU_CONF_FOLDER as second argument" 1>&2
+  exit 1
+fi
+
 # heroku DATABASE_URL Add-on name
 HEROKU_APP_DATABASE=$(heroku pg:info DATABASE_URL -a ${HEROKU_APP_NAME}| grep -i 'Add-on:' | awk '{print $2}')
 
@@ -40,8 +46,16 @@ else
 fi
 
 # add new config restart(s) app
-enable_heroku_postgres=$(heroku config:get ENABLE_HEROKU_POSTGRES -a ${HEROKU_APP_NAME})
+enable_heroku_postgres=$(heroku config:get DD_ENABLE_HEROKU_POSTGRES -a ${HEROKU_APP_NAME})
 if [ -z "$enable_heroku_postgres" ]; then
-  echo "Set ENABLE_HEROKU_POSTGRES to true"
-  heroku config:set ENABLE_HEROKU_POSTGRES=true -a ${HEROKU_APP_NAME}
+  echo "Set DD_ENABLE_HEROKU_POSTGRES to true"
+  heroku config:set DD_ENABLE_HEROKU_POSTGRES=true -a ${HEROKU_APP_NAME}
 fi
+
+# add new config restart(s) app
+enable_heroku_conf_folder=$(heroku config:get DD_HEROKU_CONF_FOLDER -a ${HEROKU_APP_NAME})
+if [ -z "$enable_heroku_conf_folder" ]; then
+  echo "Set DD_HEROKU_CONF_FOLDER to ${DD_HEROKU_CONF_FOLDER}"
+  heroku config:set DD_HEROKU_CONF_FOLDER=${DD_HEROKU_CONF_FOLDER} -a ${HEROKU_APP_NAME}
+fi
+
