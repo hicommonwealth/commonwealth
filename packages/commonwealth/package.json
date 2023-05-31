@@ -68,7 +68,7 @@
     "gen-e2e": "npx playwright codegen",
     "test-e2e": "npx playwright test ./test/e2e/*",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
-    "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-staging2 --confirm commonwealth-staging2",
+    "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
