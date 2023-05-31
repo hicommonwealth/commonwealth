@@ -31,7 +31,7 @@ const REGEX_IMAGE =
 const REGEX_EMOJI =
   /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g;
 
-const getFilteredContent = (content, address) => {
+const getFilteredContent = (content, address, profile) => {
   if (content.chainEvent && content.chainEventType) {
     // construct compatible CW event from DB by inserting network from type
     const evt = {
@@ -50,7 +50,7 @@ const getFilteredContent = (content, address) => {
     return { title, fulltext, chainEventLink };
   } else {
     const community = `${content.chain || content.community}`;
-    const actor = `${address?.name || content.user}`;
+    const actor = `${profile?.profile_name || content.user}`;
     const action =
       content.notificationCategory === NotificationCategories.NewComment
         ? 'commented on'
@@ -166,12 +166,12 @@ const send = async (models, content: WebhookContent) => {
     title,
     chainEventLink,
     fulltext, // chain events
-  } = getFilteredContent(content, address);
+  } = getFilteredContent(content, address, profile);
   const isChainEvent = !!chainEventLink;
 
   let actorAvatarUrl = null;
   const actorAccountLink = address
-    ? `${SERVER_URL}/${address.chain}/account/${address.address}`
+    ? `${SERVER_URL}/profile/id/${profile.id}`
     : null;
 
   if (profile) {
