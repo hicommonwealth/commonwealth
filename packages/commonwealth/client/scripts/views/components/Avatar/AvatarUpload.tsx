@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 
-import 'components/avatar_upload.scss';
+import 'components/Avatar/AvatarUpload.scss';
 
 import app from 'state';
-import Account from '../../models/Account';
-import { CWIconButton } from './component_kit/cw_icon_button';
-import { getClasses } from './component_kit/helpers';
-import { ComponentType } from './component_kit/types';
+import Account from '../../../models/Account';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { getClasses } from '../component_kit/helpers';
+import { ComponentType } from '../component_kit/types';
 import { notifyError } from 'controllers/app/notifications';
+import { Avatar } from 'views/components/Avatar/Avatar';
 
 const uploadToS3 = async (file: File, signedUrl: string) => {
   const options = {
@@ -100,13 +101,11 @@ export const AvatarUpload = ({
 
   const avatarSize = size === 'small' ? 60 : 108;
   const forUser = scope === 'user';
-  const forCommunity = scope === 'community';
-
-  const avatar = forUser
-    ? account?.profile?.getAvatar(avatarSize)
-    : forCommunity
-    ? app.chain?.meta.getAvatar(avatarSize)
-    : undefined;
+  const avatarUrl = forUser
+    ? account?.profile?.avatarUrl
+    : app.chain?.meta?.iconUrl;
+  const address = forUser ? account?.profile?.id : undefined;
+  const showAvatar = avatarUrl || address;
 
   return (
     <div
@@ -131,16 +130,19 @@ export const AvatarUpload = ({
       </div>
       <div className="inner-container">
         <input {...getInputProps()} />
-        {avatar ? (
-          avatar
-        ) : files.length === 1 ? (
+
+        {files.length === 1 ? (
           <img
             src={files[0].preview}
             onLoad={() => {
               URL.revokeObjectURL(files[0].preview);
             }}
           />
-        ) : null}
+        ) : (
+          showAvatar && (
+            <Avatar address={address} url={avatarUrl} size={avatarSize} />
+          )
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,9 @@
-import React from 'react';
-import type { Meta, StoryObj } from "@storybook/react";
+import React, { FC } from 'react';
+import type { Meta } from "@storybook/react";
 
 import { CWBreadcrumbs } from '../../../client/scripts/views/components/component_kit/cw_breadcrumbs';
+import type { BreadcrumbsType } from '../../../client/scripts/views/components/component_kit/cw_breadcrumbs';
+import { argsObj } from '../helpers';
 
 const breadcrumbs = {
   title: 'Molecules/Breadcrumbs',
@@ -9,19 +11,32 @@ const breadcrumbs = {
 } satisfies Meta<typeof CWBreadcrumbs>;
 
 export default breadcrumbs;
-type Story = StoryObj<typeof breadcrumbs>;
 
-export const Breadcrumbs: Story = {
-  args: {
-    breadcrumbs: [
-      { label: "Page" },
-      { label: "Page" },
-      { label: "Page" },
-      { label: "Current" },
-    ],
+const labels: string[] = [
+  "Page",
+  "Page",
+  "Page",
+  "Current",
+];
+
+const argsObjToArr = (argsObj: any) => {
+  let breadcrumbsArr: BreadcrumbsType[] = [];
+
+  Object.values(argsObj).map((value: any) => {
+    let breadcrumb: BreadcrumbsType = { label: value };
+    breadcrumbsArr.push(breadcrumb);
+  });
+
+  return breadcrumbsArr;
+}
+
+export const BreadcrumbsStory = {
+  name: 'Breadcrumbs',
+  args: argsObj("Breadcrumb", labels),
+  parameters: {
+    controls: { exclude: [ "breadcrumbs" ] },
   },
-  argTypes: {},
   render: ({...args}) => (
-    <CWBreadcrumbs {...args} />
-  )
+    <CWBreadcrumbs breadcrumbs={argsObjToArr(args)} />
+  ),
 }

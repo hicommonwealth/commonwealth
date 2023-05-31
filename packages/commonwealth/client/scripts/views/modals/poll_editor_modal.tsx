@@ -9,7 +9,6 @@ import type Thread from '../../models/Thread';
 import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
-import { getNextPollEndingTime } from 'utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
@@ -30,9 +29,8 @@ const getPollDurationCopy = (
       .local()
       .format('lll')}.`;
   } else {
-    return `By default, polls run for at least 5 days, ending on the 1st
-        and 15th of each month. If started now, this poll would stay open until
-        ${getNextPollEndingTime(moment()).local().format('lll')}. Override?`;
+    return `By default, polls run for 5 days. If started now, this poll would stay open until
+        ${moment().add(5, 'days').local().format('lll')}. Override?`;
   }
 };
 

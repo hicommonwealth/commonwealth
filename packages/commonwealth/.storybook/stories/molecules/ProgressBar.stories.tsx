@@ -18,12 +18,17 @@ export const ProgressBar: Story = {
     progress: 75,
 		label: "Progress Bar",
 		progressStatus: "selected",
-		iconName: undefined,
-		subtext: undefined,
+		iconName: "check",
+		subtext: "",
   },
   argTypes: {
     progress: {
-      control: { type: "number" },
+      control: {
+        type: "range",
+        min: 1,
+        max: 100,
+        step: 1,
+      },
     },
 		label: {
       control: { type: "text" },
@@ -35,6 +40,10 @@ export const ProgressBar: Story = {
 		iconName: {
       control: { type: "select" },
       options: [ undefined, "check" ],
+      if: {
+        arg: "progress",
+        eq: 100,
+      }
     },
 		subtext: {
       control: { type: "text" },
