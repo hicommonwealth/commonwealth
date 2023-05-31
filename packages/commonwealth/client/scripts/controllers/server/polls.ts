@@ -2,6 +2,7 @@
 import $ from 'jquery';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
+import Thread from '../../models/Thread';
 import moment from 'moment';
 import app from 'state';
 
@@ -100,6 +101,9 @@ class PollsController {
       },
       success: (response) => {
         const modeledPoll = modelFromServer(response.result);
+        const thread = app.threads.getById(threadId);
+        const updatedThread = new Thread({ ...thread, hasPoll: true });
+        app.threads.updateThreadInStore(updatedThread);
         this._store.add(modeledPoll);
       },
       error: (err) => {

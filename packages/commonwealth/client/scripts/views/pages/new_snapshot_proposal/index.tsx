@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -10,14 +10,11 @@ import 'pages/new_snapshot_proposal.scss';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
 import Sublayout from '../../Sublayout';
-import { PageLoading } from '../loading';
 import type { ThreadForm } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useLocation } from 'react-router';
@@ -27,7 +24,9 @@ import {
 } from '../../components/react_quill_editor';
 import { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
-import Thread from 'client/scripts/models/Thread';
+import Thread from 'models/Thread';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -37,25 +36,25 @@ type NewSnapshotProposalFormProps = {
   snapshotId: string;
   thread?: Thread;
   onSave?: (snapshotInfo: { id: string; snapshot_title: string }) => void;
-  onModalClose?: () => void;
 };
 
 export const NewSnapshotProposalForm = ({
   snapshotId,
   thread,
   onSave,
-  onModalClose,
 }: NewSnapshotProposalFormProps) => {
   const navigate = useCommonNavigate();
 
   const [loading, setLoading] = useState<boolean>(true);
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
+
   const [form, setForm] = useState<ThreadForm | null>(null);
   const [members, setMembers] = useState<string[]>([]);
   const [contentDelta, setContentDelta] = useState<DeltaStatic>(
     createDeltaFromText('')
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [snapshotScoresFetched, setSnapshotScoresFetched] =
+  const [, setSnapshotScoresFetched] =
     useState<boolean>(false);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [userScore, setUserScore] = useState<number>(0);
@@ -84,6 +83,9 @@ export const NewSnapshotProposalForm = ({
       const response = await createNewProposal(form, content, author, space);
 
       clearLocalStorage();
+      trackAnalytics({
+        event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_CREATED,
+      });
       notifySuccess('Snapshot Created!');
       navigate(`/snapshot/${space.id}`);
 
