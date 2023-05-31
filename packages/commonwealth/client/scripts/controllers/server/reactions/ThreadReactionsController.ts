@@ -75,12 +75,13 @@ class ThreadReactionsController {
       thread_id: thread.id,
     });
 
-    await axios.post(`${app.serverUrl()}/deleteReaction`, {
-      jwt: app.user.jwt,
-      reaction_id,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+    await axios.delete(`${app.serverUrl()}/reactions/${reaction_id}`, {
+      data: {
+        jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
+      },
     });
 
     this._threadIdToReactions.set(

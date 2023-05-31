@@ -24,8 +24,6 @@ import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
 import bulkComments from '../routes/bulkComments';
 import createReaction from '../routes/createReaction';
-import deleteReaction from '../routes/deleteReaction';
-import viewReactions from '../routes/viewReactions';
 import bulkReactions from '../routes/bulkReactions';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
@@ -181,6 +179,9 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+
+import { deleteReactionHandler } from '../routes/reactions/deleteReactionHandler';
+import { createThreadReactionHandler } from 'server/routes/threads/createThreadReactionHandler';
 
 function setupRouter(
   endpoint: string,
@@ -605,21 +606,22 @@ function setupRouter(
 
   // reactions
   router.post(
-    '/createReaction',
+    '/threads/:id/reactions',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createThreadReactionHandler.bind(
+      this,
+      models,
+      tokenBalanceCache,
+      ruleCache,
+      banCache
+    )
   );
-  router.post(
-    '/deleteReaction',
+  router.delete(
+    '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
-    deleteReaction.bind(this, models, banCache)
-  );
-  router.get(
-    '/viewReactions',
-    databaseValidationService.validateChain,
-    viewReactions.bind(this, models)
+    deleteReactionHandler.bind(this, models, banCache)
   );
   router.get('/bulkReactions', bulkReactions.bind(this, models));
   router.post('/reactionsCounts', reactionsCounts.bind(this, models));
