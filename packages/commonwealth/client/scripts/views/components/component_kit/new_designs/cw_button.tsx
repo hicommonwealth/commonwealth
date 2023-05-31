@@ -81,7 +81,7 @@ export const CWButton = (props: ButtonProps) => {
         {!!iconLeft && (
           <CWIcon iconName={iconLeft} className="button-icon" />
         )}
-        <CWText type={getTextType(buttonType)} className="button-text" noWrap>
+        <CWText type={"buttonMini"} className="button-text" noWrap>
           {label}
         </CWText>
         {!!iconRight && (
