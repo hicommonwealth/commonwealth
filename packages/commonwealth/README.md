@@ -345,7 +345,7 @@ https://github.com/DataDog/heroku-buildpack-datadog.git
 cd packages/commonwealth
 yarn datadog-db-setup <app-name> <dd-conf-folder>
 #example
-yarn datadog-db-setup commonwealth-staging packages/commonwealth/datadog
+yarn datadog-db-setup commonwealth-frick packages/commonwealth/datadog
 ```
 
 **Datadog Postgres Config**
