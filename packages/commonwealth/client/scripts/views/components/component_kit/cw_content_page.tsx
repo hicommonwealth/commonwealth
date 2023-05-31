@@ -48,7 +48,7 @@ type ContentPageProps = {
   subHeader?: React.ReactNode;
   viewCount?: number;
   displayNewTag?: boolean;
-  hideTabs?: boolean;
+  showTabs?: boolean;
 };
 
 export const CWContentPage = (props: ContentPageProps) => {
@@ -69,7 +69,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     title,
     viewCount,
     displayNewTag,
-    hideTabs = false,
+    showTabs = false,
   } = props;
 
   const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
@@ -170,7 +170,7 @@ export const CWContentPage = (props: ContentPageProps) => {
         )}
       </div>
       <div className={`tabs-view ${viewType !== 'tabsView' ? 'hidden' : ''}`}>
-        {!hideTabs && (
+        {showTabs && (
           <CWTabBar>
             <CWTab
               label={contentBodyLabel}
