@@ -78,15 +78,17 @@ export const CreateComment = ({
 
       updatedCommentsCallback();
       setErrorMsg(null);
+      setContentDelta(createDeltaFromText(''));
+      clearDraft();
+
+      setTimeout(() => {
+        // Wait for dom to be updated before scrolling to comment
+        jumpHighlightComment(res.id);
+      }, 100);
 
       // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
-
-      setContentDelta(createDeltaFromText(''));
-      clearDraft();
-
-      jumpHighlightComment(res.id);
     } catch (err) {
       console.error(err);
       notifyError(err.message || 'Comment submission failed.');
@@ -104,9 +106,8 @@ export const CreateComment = ({
     rootThread instanceof Thread ? rootThread?.topic?.name : null;
 
   // token balance check if needed
-  const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(
-    activeTopicName
-  );
+  const tokenPostingThreshold: BN =
+    TopicGateCheck.getTopicThreshold(activeTopicName);
 
   const userBalance: BN = TopicGateCheck.getUserBalance();
   const userFailsThreshold =

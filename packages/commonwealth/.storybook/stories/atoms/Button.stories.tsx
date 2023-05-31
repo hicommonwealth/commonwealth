@@ -46,6 +46,12 @@ const argTypesObj = () => {
   }
 }
 
+const commonParameters = {
+  parameters: {
+    controls: { exclude: ["className"] },
+  },
+};
+
 /** Primary buttons */
 export const Primary: Story = {
   args: {
