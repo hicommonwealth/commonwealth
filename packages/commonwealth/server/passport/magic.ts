@@ -12,7 +12,7 @@ import { sequelize } from '../database';
 import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
 import { AddressAttributes, AddressInstance } from '../models/address';
-import { ChainInstance } from '../models/chain';
+import { CommunityInstance } from '../models/communities';
 import type { ProfileAttributes, ProfileInstance } from '../models/profile';
 import { SsoTokenInstance } from '../models/sso_token';
 import { UserAttributes, UserInstance } from '../models/user';
@@ -319,7 +319,7 @@ async function magicLoginRoute(
   cb: DoneFunc
 ) {
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
-  let chainToJoin: ChainInstance, error, loggedInUser: UserInstance;
+  let chainToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
   const generatedAddresses = [{
     address: decodedMagicToken.publicAddress,
