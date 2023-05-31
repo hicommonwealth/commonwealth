@@ -107,7 +107,9 @@ const NewProposalPage = (props: NewProposalPageProps) => {
       return <CWText>Must be logged in</CWText>;
     } else if (
       app.chain?.network === ChainNetwork.Plasm ||
-      app.chain?.id === 'evmos' // TODO: remove this once evmos is supported. See https://github.com/hicommonwealth/commonwealth/issues/3986
+      // TODO: remove this once evmos is supported.
+      // See https://github.com/hicommonwealth/commonwealth/issues/3986
+      app.chain?.id === 'evmos'
     ) {
       return <CWText>Feature not supported yet for this community</CWText>;
     } else {

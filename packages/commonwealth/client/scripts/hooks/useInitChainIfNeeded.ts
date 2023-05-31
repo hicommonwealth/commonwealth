@@ -15,18 +15,14 @@ export const useInitChainIfNeeded = (app: IApp) => {
 
   useEffect(() => {
     const chainInit = async () => {
-      if (!hasFetchedRef.current && !app.chainPreloading) {
+      if (!hasFetchedRef.current) {
         hasFetchedRef.current = true;
         await initChain();
       }
     };
 
-    if (!app.chain?.apiInitialized || !app.chain?.loaded) {
+    if (!app.chain?.apiInitialized) {
       chainInit();
     }
-
-    return () => {
-      hasFetchedRef.current = false;
-    };
-  }, [app.chain?.apiInitialized, app.chain?.loaded, app.chainPreloading]);
+  }, [app.chain?.apiInitialized]);
 };
