@@ -236,7 +236,7 @@ class CommentsController {
     }
   }
 
-  public async delete(comment) {
+  public async delete(comment, threadId) {
     const { session, action, hash } = await app.sessions.signDeleteComment(
       app.user.activeAccount.address,
       {
