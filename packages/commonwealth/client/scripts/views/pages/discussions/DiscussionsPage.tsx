@@ -1,23 +1,22 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
-import { useSearchParams } from 'react-router-dom';
-
 import 'pages/discussions/index.scss';
-
+import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Virtuoso } from 'react-virtuoso';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { ThreadActionType } from '../../../../../shared/types';
+import Thread from '../../../models/Thread';
 import app from '../../../state';
 import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
-import { ThreadPreview } from './thread_preview';
-import { ThreadActionType } from '../../../../../shared/types';
-import { CWText } from 'views/components/component_kit/cw_text';
+import { ThreadCard } from './ThreadCard';
 
 type DiscussionsPageProps = {
   topicName?: string;
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const [threads, setThreads] = useState([]);
+  const [threads, setThreads] = useState<Thread[]>([]);
   const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
@@ -103,7 +102,30 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           style={{ height: '100%', width: '100%', position: 'inherit' }}
           data={threads}
           itemContent={(i, thread) => {
-            return <ThreadPreview thread={thread} key={thread.id} />;
+            return (
+              <ThreadCard
+                key={thread.id + '-' + thread.readOnly}
+                thread={thread}
+                onLockToggle={(isLocked) => {
+                  const tempThreads = [...threads];
+                  const foundThread = tempThreads.find(
+                    (t) => t.id === thread.id
+                  );
+                  foundThread.readOnly = isLocked;
+                  setThreads(tempThreads);
+                }}
+                onPinToggle={(isPinned) => {
+                  const tempThreads = [...threads];
+                  const foundThread = tempThreads.find(
+                    (t) => t.id === thread.id
+                  );
+                  foundThread.pinned = isPinned;
+                  setThreads(tempThreads);
+                }}
+                // onDelete
+                // onSpamToggle
+              />
+            );
           }}
           endReached={loadMore}
           overscan={200}

@@ -1,6 +1,6 @@
-@import '../../shared';
+@import '../../../../../styles/shared';
 
-.ThreadPreview {
+.ThreadCard {
   cursor: pointer;
   display: flex;
   width: 100%;
@@ -35,33 +35,6 @@
       display: flex;
       gap: 4px;
       justify-content: space-between;
-
-      .user-and-date {
-        align-items: center;
-        display: flex;
-        gap: 8px;
-
-        .User {
-          align-items: center;
-          display: flex;
-          gap: 8px;
-
-          .user-avatar {
-            position: unset;
-            margin-right: 0px !important;
-          }
-
-          .username {
-            @include caption;
-
-            font-weight: 500;
-          }
-        }
-
-        .last-updated-text.Text {
-          color: $neutral-500;
-        }
-      }
 
       .content-header-icons {
         display: flex;

@@ -40,11 +40,11 @@ export class Thread implements IUniqueId {
   public readonly title: string;
   public readonly body: string;
   public readonly plaintext: string;
-  public readonly pinned: boolean;
+  public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
   public readonly attachments: Attachment[];
-  public readonly readOnly: boolean;
+  public readOnly: boolean;
 
   public readonly canvasAction: string;
   public readonly canvasSession: string;
@@ -67,6 +67,7 @@ export class Thread implements IUniqueId {
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
+  public isSpam?: boolean;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -103,6 +104,7 @@ export class Thread implements IUniqueId {
     canvasSession,
     canvasHash,
     links,
+    isSpam,
   }: {
     author: string;
     title: string;
@@ -134,6 +136,7 @@ export class Thread implements IUniqueId {
     canvasSession?: string;
     canvasHash?: string;
     links?: Link[];
+    isSpam?: boolean;
   }) {
     this.author = author;
     this.title = title;
@@ -183,6 +186,7 @@ export class Thread implements IUniqueId {
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
     this.links = links || [];
+    this.isSpam = isSpam;
   }
 }
 

@@ -61,6 +61,8 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                         isSecondary?: boolean;
                       }>({ disabled, isSecondary }, 'PopoverMenuItem')}
                       onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
                         onClick(e);
                         popoverProps.handleInteraction(e);
                       }}

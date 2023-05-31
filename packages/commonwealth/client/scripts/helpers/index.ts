@@ -1,13 +1,13 @@
+import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { render } from 'helpers/DEPRECATED_ReactRender';
 import moment from 'moment';
+import { NavigateOptions, To } from 'react-router';
 import app from 'state';
-import type { Coin } from 'adapters/currency';
 import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
-import { render } from 'helpers/DEPRECATED_ReactRender';
-import { NavigateOptions, To } from 'react-router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
