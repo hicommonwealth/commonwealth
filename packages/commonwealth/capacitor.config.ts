@@ -38,7 +38,7 @@ switch (process.env.NODE_ENV) {
     config = {
       ...baseConfig,
       server: {
-        url: 'https://commonwealth-staging.herokuapp.com',
+        url: 'https://commonwealth-frick.herokuapp.com',
         cleartext: true,
         allowNavigation: ['*'],
       },
