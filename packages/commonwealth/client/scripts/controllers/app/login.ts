@@ -478,6 +478,7 @@ export async function handleSocialLoginCallback({
       sessionPayload,
       JSON.stringify(signature)
     );
+    console.log("Reauthenticated Cosmos session from magic address:", magicAddress);
   } else {
     const { Web3Provider } = await import('@ethersproject/providers');
     const { utils } = await import('ethers');
@@ -502,6 +503,7 @@ export async function handleSocialLoginCallback({
       sessionPayload,
       signed
     );
+    console.log("Reauthenticated Ethereum session from magic address:", checksumAddress);
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login

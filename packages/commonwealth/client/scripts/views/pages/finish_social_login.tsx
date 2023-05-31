@@ -24,6 +24,11 @@ const FinishSocialLogin = () => {
 
   useEffect(() => {
     validate(navigate).catch((error) => {
+      // useEffect will be called twice in development because of React strict mode,
+      // causing an error to be displayed until validate() finishes
+      if (document.location.host === "localhost:8080") {
+        return;
+      }
       if (typeof error === 'string') {
         setValidationError(error);
       } else if (error && typeof error.message === 'string') {
