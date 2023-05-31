@@ -31,7 +31,7 @@ const REGEX_IMAGE =
 const REGEX_EMOJI =
   /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g;
 
-const getFilteredContent = (content, address, profile) => {
+const getFilteredContent = (content, address) => {
   if (content.chainEvent && content.chainEventType) {
     // construct compatible CW event from DB by inserting network from type
     const evt = {
@@ -50,7 +50,7 @@ const getFilteredContent = (content, address, profile) => {
     return { title, fulltext, chainEventLink };
   } else {
     const community = `${content.chain || content.community}`;
-    const actor = `${profile?.profile_name || content.user}`;
+    const actor = `${address.profile?.profile_name || content.user}`;
     const action =
       content.notificationCategory === NotificationCategories.NewComment
         ? 'commented on'
@@ -121,7 +121,6 @@ const getFilteredContent = (content, address, profile) => {
 
 const send = async (models, content: WebhookContent) => {
   let address;
-  let profile;
   try {
     address = await models.Address.findOne({
       where: {
@@ -130,7 +129,6 @@ const send = async (models, content: WebhookContent) => {
       },
       include: [models.Profile],
     });
-    profile = await address.getProfile();
   } catch (err) {
     // pass nothing if no matching address is found
   }
@@ -166,16 +164,16 @@ const send = async (models, content: WebhookContent) => {
     title,
     chainEventLink,
     fulltext, // chain events
-  } = getFilteredContent(content, address, profile);
+  } = getFilteredContent(content, address);
   const isChainEvent = !!chainEventLink;
 
   let actorAvatarUrl = null;
   const actorAccountLink = address
-    ? `${SERVER_URL}/profile/id/${profile.id}`
+    ? `${SERVER_URL}/profile/id/${address.profile.id}`
     : null;
 
-  if (profile) {
-    actorAvatarUrl = profile.avatar_url;
+  if (address.profile) {
+    actorAvatarUrl = address.profile.avatar_url;
   }
 
   let previewImageUrl = null; // image url of webhook preview
