@@ -14,7 +14,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
-import { isWindowMediumSmallInclusive } from './helpers';
 import { ComponentType } from './types';
 
 export type ContentPageSidebarItem = {
@@ -72,36 +71,9 @@ export const CWContentPage = (props: ContentPageProps) => {
     showTabs = false,
   } = props;
 
-  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
-    isWindowMediumSmallInclusive(window.innerWidth)
-      ? 'tabsView'
-      : !showSidebar
-      ? 'tabsView'
-      : 'sidebarView'
-  );
   const [tabSelected, setTabSelected] = React.useState<number>(0);
-
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
   const createdOrEditedText = lastEdited ? 'Edited' : 'Published';
-
-  React.useEffect(() => {
-    const onResize = () => {
-      setViewType(
-        isWindowMediumSmallInclusive(window.innerWidth)
-          ? 'tabsView'
-          : !showSidebar
-          ? 'tabsView'
-          : 'sidebarView'
-      );
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const mainBody = (
     <div className="main-body-container">
@@ -157,20 +129,19 @@ export const CWContentPage = (props: ContentPageProps) => {
 
   return (
     <div className={ComponentType.ContentPage}>
-      <div
-        className={`sidebar-view ${viewType !== 'sidebarView' ? 'hidden' : ''}`}
-      >
-        {mainBody}
-        {showSidebar && (
-          <div className="sidebar">
-            {sidebarComponents?.map((c) => (
-              <React.Fragment key={c.label}>{c.item}</React.Fragment>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className={`tabs-view ${viewType !== 'tabsView' ? 'hidden' : ''}`}>
-        {showTabs && (
+      {!showTabs ? (
+        <div className="sidebar-view">
+          {mainBody}
+          {showSidebar && (
+            <div className="sidebar">
+              {sidebarComponents?.map((c) => (
+                <React.Fragment key={c.label}>{c.item}</React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="tabs-view">
           <CWTabBar>
             <CWTab
               label={contentBodyLabel}
@@ -190,19 +161,18 @@ export const CWContentPage = (props: ContentPageProps) => {
               />
             ))}
           </CWTabBar>
-        )}
-
-        {tabSelected === 0 && mainBody}
-        {sidebarComponents?.length >= 1 &&
-          tabSelected === 1 &&
-          sidebarComponents[0].item}
-        {sidebarComponents?.length >= 2 &&
-          tabSelected === 2 &&
-          sidebarComponents[1].item}
-        {sidebarComponents?.length === 3 &&
-          tabSelected === 3 &&
-          sidebarComponents[2].item}
-      </div>
+          {tabSelected === 0 && mainBody}
+          {sidebarComponents?.length >= 1 &&
+            tabSelected === 1 &&
+            sidebarComponents[0].item}
+          {sidebarComponents?.length >= 2 &&
+            tabSelected === 2 &&
+            sidebarComponents[1].item}
+          {sidebarComponents?.length === 3 &&
+            tabSelected === 3 &&
+            sidebarComponents[2].item}
+        </div>
+      )}
     </div>
   );
 };
