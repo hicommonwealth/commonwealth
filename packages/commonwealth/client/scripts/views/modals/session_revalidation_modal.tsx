@@ -15,15 +15,20 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { formatAddress } from '../components/user/user_block';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 type SessionRevalidationModalProps = {
+  walletName: string,
+  walletAddress: string,
   onClose: () => void;
   onVerified: (address: string | undefined) => void;
 };
 
 const SessionRevalidationModal = ({
+  walletName,
+  walletAddress,
   onVerified,
   onClose,
 }: SessionRevalidationModalProps) => {
@@ -76,8 +81,9 @@ const SessionRevalidationModal = ({
           <div className="compact-modal-body">
             <h3>Re-connect wallet</h3>
             <p>
-              Your previous login was awhile ago. Re-connect your wallet to
-              continue:
+              Your previous login was a while ago.
+              Re-connect {walletName ?? "your wallet"} with the
+              address <strong>{formatAddress(walletAddress)}</strong> to continue:
             </p>
           </div>
           <div className="compact-modal-actions">
@@ -129,6 +135,8 @@ const SessionRevalidationModal = ({
 };
 
 export const openSessionRevalidation = ({
+  walletName,
+  walletAddress,
   onVerified,
   onClose,
 }: SessionRevalidationModalProps) => {
@@ -141,6 +149,8 @@ export const openSessionRevalidation = ({
   root = createRoot(target);
   root.render(
     <SessionRevalidationModal
+      walletName={walletName}
+      walletAddress={walletAddress}
       onVerified={(address: string) => {
         root.unmount();
         target.remove();

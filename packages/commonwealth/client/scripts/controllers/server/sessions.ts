@@ -8,7 +8,7 @@ import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
-import { ChainBase } from '../../../../../common-common/src/types';
+import { ChainBase, WalletId } from '../../../../../common-common/src/types';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import {
@@ -19,6 +19,7 @@ import {
   SolanaSessionController,
   NEARSessionController,
 } from './sessionSigners';
+import { getWalletName } from '../../helpers/wallet';
 
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,
@@ -201,10 +202,15 @@ class SessionsController {
 
     // Get a new session signature.
     if (!hasAuthenticatedSession) {
+      const matchingAccount = app.user.addresses.find((a) => a.address === address);
+      const walletName = getWalletName(matchingAccount!.walletId);
+
       // Some login methods may require a single sign-on redirect, and take
       // the user away from this page, so this promise might never resolve
       const signerAddress: string = await new Promise((resolve, reject) => {
         openSessionRevalidation({
+          walletAddress: address,
+          walletName,
           onVerified: (verifiedAddress) => resolve(verifiedAddress),
           onClose: () => {
             const err = new Error();
@@ -222,7 +228,7 @@ class SessionsController {
       if (!sessionReauthed) {
         const err = new Error();
         (err as any).responseJSON = {
-          error: `Expected signature from ${formatAddress(
+          error: `Expected the address ${formatAddress(
             address
           )}, but this wallet has address ${formatAddress(signerAddress)}.`,
         };

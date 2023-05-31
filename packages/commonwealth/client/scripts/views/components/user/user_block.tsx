@@ -13,7 +13,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
 
-export const formatAddress = (address: string) => {
+ export const formatAddress = (address: string) => {
   return `${address.slice(0, 8)}...${address.slice(-5)}`;
 };
 
