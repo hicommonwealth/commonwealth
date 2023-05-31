@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MagicUrl from 'quill-magic-url';
 import ImageUploader from 'quill-image-uploader';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
@@ -55,6 +56,7 @@ const ReactQuillEditor = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isMarkdownEnabled, setIsMarkdownEnabled] = useState<boolean>(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   // ref is used to prevent rerenders when selection
   // is changed, since rerenders bug out the editor
@@ -188,6 +190,10 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
+  const handleDragStart = () => setIsDraggingOver(true);
+
+  const handleDragStop = () => setIsDraggingOver(false);
+
   return (
     <div className="QuillEditorWrapper">
       {isUploading && <LoadingIndicator />}
@@ -241,44 +247,58 @@ const ReactQuillEditor = ({
       {isVisible && (
         <>
           <CustomQuillToolbar toolbarId={toolbarId} />
-          <ReactQuill
-            ref={editorRef}
-            className={`QuillEditor ${className}`}
-            placeholder={placeholder}
-            tabIndex={tabIndex}
-            theme="snow"
-            value={contentDelta}
-            onChange={handleChange}
-            onChangeSelection={(selection: RangeStatic) => {
-              if (!selection) {
-                return;
-              }
-              lastSelectionRef.current = selection;
-            }}
-            formats={isMarkdownEnabled ? [] : undefined}
-            modules={{
-              toolbar: {
-                container: `#${toolbarId}`,
-                handlers: isMarkdownEnabled
-                  ? markdownToolbarHandlers
-                  : undefined,
-              },
-              imageDropAndPaste: {
-                handler: handleImageDropAndPaste,
-              },
-              clipboard: {
-                matchers: clipboardMatchers,
-              },
-              mention,
-              magicUrl: !isMarkdownEnabled,
-              keyboard: isMarkdownEnabled
-                ? markdownKeyboardShortcuts
-                : undefined,
-              imageUploader: {
-                upload: handleImageUploader,
-              },
-            }}
-          />
+          <DragDropContext onDragEnd={handleDragStop}>
+            <Droppable droppableId="quillEditor">
+              {(provided) => (
+                <div
+                  className={`${isDraggingOver ? 'ondragover' : ''}`}
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  onDragOver={handleDragStart}
+                  onDragLeave={handleDragStop}
+                >
+                  <ReactQuill
+                    ref={editorRef}
+                    className={`QuillEditor ${className}`}
+                    placeholder={placeholder}
+                    tabIndex={tabIndex}
+                    theme="snow"
+                    value={contentDelta}
+                    onChange={handleChange}
+                    onChangeSelection={(selection: RangeStatic) => {
+                      if (!selection) {
+                        return;
+                      }
+                      lastSelectionRef.current = selection;
+                    }}
+                    formats={isMarkdownEnabled ? [] : undefined}
+                    modules={{
+                      toolbar: {
+                        container: `#${toolbarId}`,
+                        handlers: isMarkdownEnabled
+                          ? markdownToolbarHandlers
+                          : undefined,
+                      },
+                      imageDropAndPaste: {
+                        handler: handleImageDropAndPaste,
+                      },
+                      clipboard: {
+                        matchers: clipboardMatchers,
+                      },
+                      mention,
+                      magicUrl: !isMarkdownEnabled,
+                      keyboard: isMarkdownEnabled
+                        ? markdownKeyboardShortcuts
+                        : undefined,
+                      imageUploader: {
+                        upload: handleImageUploader,
+                      },
+                    }}
+                  />
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </>
       )}
     </div>

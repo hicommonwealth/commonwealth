@@ -11,6 +11,10 @@
     min-height: 212px;
   }
 
+  .ondragover {
+    border: 2px dashed $primary-500;
+  }
+
   .custom-buttons {
     position: relative;
     float: right;
