@@ -48,6 +48,7 @@ type ContentPageProps = {
   subHeader?: React.ReactNode;
   viewCount?: number;
   displayNewTag?: boolean;
+  hideTabs?: boolean;
 };
 
 export const CWContentPage = (props: ContentPageProps) => {
@@ -68,6 +69,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     title,
     viewCount,
     displayNewTag,
+    hideTabs = false,
   } = props;
 
   const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
@@ -168,25 +170,28 @@ export const CWContentPage = (props: ContentPageProps) => {
         )}
       </div>
       <div className={`tabs-view ${viewType !== 'tabsView' ? 'hidden' : ''}`}>
-        <CWTabBar>
-          <CWTab
-            label={contentBodyLabel}
-            onClick={() => {
-              setTabSelected(0);
-            }}
-            isSelected={tabSelected === 0}
-          />
-          {sidebarComponents?.map((item, i) => (
+        {!hideTabs && (
+          <CWTabBar>
             <CWTab
-              key={item.label}
-              label={item.label}
+              label={contentBodyLabel}
               onClick={() => {
-                setTabSelected(i + 1);
+                setTabSelected(0);
               }}
-              isSelected={tabSelected === i + 1}
+              isSelected={tabSelected === 0}
             />
-          ))}
-        </CWTabBar>
+            {sidebarComponents?.map((item, i) => (
+              <CWTab
+                key={item.label}
+                label={item.label}
+                onClick={() => {
+                  setTabSelected(i + 1);
+                }}
+                isSelected={tabSelected === i + 1}
+              />
+            ))}
+          </CWTabBar>
+        )}
+
         {tabSelected === 0 && mainBody}
         {sidebarComponents?.length >= 1 &&
           tabSelected === 1 &&

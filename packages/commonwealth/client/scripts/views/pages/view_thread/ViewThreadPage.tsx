@@ -721,6 +721,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   return (
     <Sublayout>
       <CWContentPage
+        hideTabs={
+          !(
+            showLinkedProposalOptions ||
+            showLinkedThreadOptions ||
+            isAuthor ||
+            polls?.length > 0 ||
+            isAdminOrMod
+          )
+        }
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||
