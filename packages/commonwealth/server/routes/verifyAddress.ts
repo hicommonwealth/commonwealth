@@ -8,11 +8,6 @@ import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
 
-import {
-  recoverTypedSignature,
-  SignTypedDataVersion,
-} from '@metamask/eth-sig-util';
-
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 
@@ -23,24 +18,17 @@ import {
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 
-import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
 import type { CommunityInstance } from '../models/communities';
 import type { ProfileAttributes } from '../models/profile';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySignature from '../util/verifySignature';
-import {
-  chainBaseToCanvasChain,
-  chainBaseToCanvasChainId,
-  constructCanvasMessage,
-} from '../../shared/adapters/shared';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -281,13 +269,11 @@ const verifyAddress = async (
     });
     req.login(user, (err) => {
       if (err) return next(err);
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
-      }
-      // mixpanelPeopleSet(req.user.id.toString());
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
+      });
+
       return res.json({
         status: 'Success',
         result: {

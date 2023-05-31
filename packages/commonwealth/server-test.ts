@@ -347,6 +347,10 @@ const resetServer = (debug = false): Promise<void> => {
         name: NotificationCategories.NewChatMention,
         description: 'someone mentions a user in chat',
       });
+      await models.NotificationCategory.create({
+        name: NotificationCategories.SnapshotProposal,
+        description: 'Snapshot proposal notifications',
+      });
 
       // Admins need to be subscribed to mentions and collaborations
       await models.Subscription.create({

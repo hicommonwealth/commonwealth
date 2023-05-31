@@ -139,6 +139,7 @@ export type GetRolesReq = {
   community_id: string;
   addresses?: string[];
   count_only?: boolean;
+  permissions?: string[];
 } & IPagination;
 
 export type GetRolesResp = { roles?: RoleAttributes[]; count: number };

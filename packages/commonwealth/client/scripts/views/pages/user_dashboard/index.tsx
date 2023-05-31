@@ -11,6 +11,8 @@ import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Feed } from '../../components/feed';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -28,6 +30,12 @@ const UserDashboard = (props: UserDashboardProps) => {
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global
   );
+
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: MixpanelPageViewEvent.DASHBOARD_VIEW,
+    },
+  });
 
   const navigate = useCommonNavigate();
 

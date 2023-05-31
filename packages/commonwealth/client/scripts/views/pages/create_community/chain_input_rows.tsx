@@ -1,12 +1,7 @@
-import React from 'react';
-
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-// import { ChainBase } from 'common-common/src/types';
-// import { CommunityType } from '.';
+import React, { useEffect } from 'react';
 
 import app from 'state';
-import { AvatarUpload } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/Avatar';
 import { InputRow } from 'views/components/metadata_rows';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -81,13 +76,6 @@ export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
         placeholder="https://example.com"
         onChangeHandler={(v) => {
           state.setWebsite(v);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.WEBSITE_ADDED,
-          //   chainBase: this.state.form.base,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null, // TODO: Find a way for this to be accessed?
-          // });
         }}
       />
       <InputRow
@@ -147,38 +135,18 @@ export const ethChainRows = (
     app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
   ] as Array<DropdownItemType>;
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    onSelectHandler(options[0]);
+  }, [onSelectHandler, options]);
+
   return (
     <>
       <CWDropdown
         label="Chain"
         options={options}
-        onSelect={(o) => {
-          state.setChainString(o.value);
-
-          if (o.value !== 'Custom') {
-            const [id] =
-              Object.entries(props.ethChainNames).find(
-                ([, name]) => name === o.value
-              ) ||
-              Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
-
-            state.setEthChainId(id);
-            state.setNodeUrl(props.ethChains[id].url);
-            state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
-          } else {
-            state.setEthChainId('');
-            state.setNodeUrl('');
-            state.setAltWalletUrl('');
-          }
-          state.setLoaded(false);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
-          //   chainBase: o.value,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: CommunityType.Erc20Community,
-          // });
-        }}
+        initialValue={options[0]}
+        onSelect={(o) => onSelectHandler(o)}
       />
       {state.chainString === 'Custom' && (
         <InputRow
@@ -220,15 +188,27 @@ export const ethChainRows = (
         onChangeHandler={(v) => {
           state.setAddress(v);
           state.setLoaded(false);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.ADDRESS_ADDED,
-          //   chainBase: ChainBase.Ethereum,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
         }}
       />
     </>
   );
+
+  function onSelectHandler(o) {
+    state.setChainString(o.value);
+
+    if (o.value !== 'Custom') {
+      const [id] =
+        Object.entries(props.ethChainNames).find(
+          ([, name]) => name === o.value
+        ) || Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
+
+      state.setEthChainId(id);
+      state.setNodeUrl(props.ethChains[id].url);
+      state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
+    } else {
+      state.setEthChainId('');
+      state.setNodeUrl('');
+      state.setAltWalletUrl('');
+    }
+  }
 };

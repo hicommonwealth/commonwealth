@@ -27,7 +27,7 @@ describe('putCommunities Tests', () => {
       await models.Community.count({
         where: { id: { [Op.in]: ['testChain1', 'testChain2'] } },
       }),
-      2
+      1
     );
   });
 

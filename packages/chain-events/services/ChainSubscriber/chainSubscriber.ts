@@ -260,7 +260,7 @@ export async function getSubscriberChainData(
         return cachedChainsAndTokens;
       } else {
         log.info(`No cached chains. Retrying in ${REPEAT_TIME} minute(s)`);
-        return;
+        return [];
       }
     }
   }
@@ -287,13 +287,11 @@ export async function runSubscriberAsServer() {
   let producer, pool, rollbar;
   try {
     ({ producer, pool, rollbar } = await initSubscriberTools());
-    setInterval(
-      runSubscriberAsFunction,
-      REPEAT_TIME * 60000,
-      producer,
-      pool,
-      rollbar
-    );
+    const main = async () => {
+      const chains = await getSubscriberChainData(pool, rollbar, null);
+      return await processChains(producer, chains, rollbar);
+    };
+    setInterval(main, REPEAT_TIME * 60000);
   } catch (e) {
     log.error('Fatal error occurred', e);
     rollbar.critical('Fatal error occurred', e);

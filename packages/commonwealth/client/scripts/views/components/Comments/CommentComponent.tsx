@@ -11,7 +11,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
-import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
+import { CommentReactionButton } from '../ReactionButton/CommentReactionButton';
 import { SharePopover } from '../share_popover';
 import { EditComment } from './EditComment';
 import { clearEditingLocalStorage } from './helpers';
@@ -28,27 +28,25 @@ type CommentProps = {
   isLocked: boolean;
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
-  threadId: number;
   updatedCommentsCallback?: () => void;
+  isReplying?: boolean;
+  parentCommentId?: number;
 };
 
-export const CommentComponent = (props: CommentProps) => {
-  const {
-    comment,
-    handleIsReplying,
-    isLast,
-    isLocked,
-    setIsGloballyEditing,
-    threadLevel,
-    updatedCommentsCallback,
-    threadId,
-  } = props;
-
-  const [isEditingComment, setIsEditingComment] =
-    React.useState<boolean>(false);
-  const [shouldRestoreEdits, setShouldRestoreEdits] =
-    React.useState<boolean>(false);
-  const [savedEdits, setSavedEdits] = React.useState<string>('');
+export const CommentComponent = ({
+  comment,
+  handleIsReplying,
+  isLast,
+  isLocked,
+  setIsGloballyEditing,
+  threadLevel,
+  updatedCommentsCallback,
+  isReplying,
+  parentCommentId,
+}: CommentProps) => {
+  const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
+  const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>(false);
+  const [savedEdits, setSavedEdits] = useState<string>('');
 
   const { isLoggedIn } = useUserLoggedIn();
 
@@ -84,7 +82,7 @@ export const CommentComponent = (props: CommentProps) => {
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              await app.comments.delete(comment, threadId);
+              await app.comments.delete(comment);
               updatedCommentsCallback();
             } catch (e) {
               console.log(e);
@@ -107,7 +105,16 @@ export const CommentComponent = (props: CommentProps) => {
           {Array(threadLevel)
             .fill(undefined)
             .map((_, i) => (
-              <div key={i} className="thread-connector" />
+              <div
+                key={i}
+                className={`thread-connector ${
+                  isReplying &&
+                  i === threadLevel - 1 &&
+                  parentCommentId === comment.id
+                    ? 'replying'
+                    : ''
+                }`}
+              />
             ))}
         </div>
       )}

@@ -43,7 +43,14 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false },
+      thread_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Threads',
+          key: 'id',
+        },
+      },
       parent_id: { type: dataTypes.STRING, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       text: { type: dataTypes.TEXT, allowNull: false },

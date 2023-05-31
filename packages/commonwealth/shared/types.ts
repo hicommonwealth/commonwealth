@@ -110,7 +110,6 @@ export enum ThreadActionType {
   Pinning = 'pinning',
   Subscription = 'subscription',
   TopicChange = 'topicchange',
-  StageChange = 'stagechange',
 }
 
 export interface IChatNotification {

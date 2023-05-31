@@ -4,34 +4,26 @@ import Store from './Store';
 class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
   private _storeId: { [hash: string]: ProposalT } = {};
 
-  public add(
-    proposal: ProposalT,
-    options?: { eqFn?: (a: ProposalT) => boolean; pushToIndex?: number }
-  ) {
-    super.add(proposal, {
-      eqFn: (x) => x.identifier === proposal.identifier,
-      ...(options &&
-        options.pushToIndex >= 0 && { pushToIndex: options.pushToIndex }),
-    });
-    this._storeId[proposal.identifier] = proposal;
+  public add(proposal: ProposalT) {
+    const existingProposal = this.getByIdentifier(proposal.identifier);
+    if (!existingProposal) {
+      super.add(proposal);
+      this._storeId[proposal.identifier] = proposal;
+    }
     return this;
   }
 
   public update(newProposal: ProposalT) {
     const oldProposal = this.getByIdentifier(newProposal.identifier);
-    super.add(newProposal, {
-      eqFn: (x) => x.identifier === newProposal.identifier,
-    });
     if (oldProposal) {
-      this._storeId[oldProposal.identifier] = newProposal;
-    } else {
-      this._storeId[newProposal.identifier] = newProposal;
+      this.remove(oldProposal);
     }
+    this.add(newProposal);
     return this;
   }
 
   public remove(proposal: ProposalT) {
-    super.remove(proposal, (x) => x.identifier === proposal.identifier);
+    super.remove(proposal);
     delete this._storeId[proposal.identifier];
     return this;
   }
