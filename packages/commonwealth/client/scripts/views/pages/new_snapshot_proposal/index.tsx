@@ -54,8 +54,7 @@ export const NewSnapshotProposalForm = ({
     createDeltaFromText('')
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [, setSnapshotScoresFetched] =
-    useState<boolean>(false);
+  const [, setSnapshotScoresFetched] = useState<boolean>(false);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [userScore, setUserScore] = useState<number>(0);
 
@@ -188,7 +187,12 @@ export const NewSnapshotProposalForm = ({
     };
   }, []);
 
-  if (loading) return <CWSpinner />;
+  if (loading)
+    return (
+      <div className="loading-state">
+        <CWSpinner />
+      </div>
+    );
 
   const author = app.user.activeAccount;
 

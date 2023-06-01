@@ -1,6 +1,9 @@
 @import '../shared';
 
 .NewSnapshotProposalModal {
+  max-height: 95vh;
+  min-height: 95vh;
+
   .compact-modal-title {
     display: flex;
     justify-content: space-between;
