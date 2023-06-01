@@ -140,12 +140,11 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       {authorInfo.length === 1 ? (
         <User
           user={
-            new AddressInfo(
-              null,
-              (authorInfo[0] as [string, string])[1],
-              (authorInfo[0] as [string, string])[0],
-              null
-            )
+            new AddressInfo({
+              id: null,
+              address: (authorInfo[0] as [string, string])[1],
+              chainId: (authorInfo[0] as [string, string])[0],
+            })
           }
           avatarOnly
           avatarSize={26}
@@ -153,7 +152,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       ) : (
         <UserGallery
           users={authorInfo.map(
-            (auth) => new AddressInfo(null, auth[1], auth[0], null)
+            (auth) => new AddressInfo({ id: null, address: auth[1], chainId: auth[0] })
           )}
           avatarSize={26}
         />

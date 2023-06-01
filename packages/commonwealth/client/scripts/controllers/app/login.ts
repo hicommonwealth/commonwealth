@@ -98,12 +98,13 @@ export async function completeClientLogin(account: Account) {
     );
 
     if (!addressInfo && account.addressId) {
-      addressInfo = new AddressInfo(
-        account.addressId,
-        account.address,
-        account.chain.id,
-        account.walletId
-      );
+      addressInfo = new AddressInfo({
+        id: account.addressId,
+        address: account.address,
+        chainId: account.chain.id,
+        walletId: account.walletId,
+        walletSsoSource: account.walletSsoSource,
+      });
       app.user.addresses.push(addressInfo);
     }
 
@@ -234,14 +235,15 @@ export function updateActiveUser(data) {
     app.user.setAddresses(
       data.addresses.map(
         (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          )
+          new AddressInfo({
+            id: a.id,
+            address: a.address,
+            chainId: a.chain,
+            keytype: a.keytype,
+            walletId: a.wallet_id,
+            walletSsoSource: a.wallet_sso_source,
+            ghostAddress: a.ghost_address
+          })
       )
     );
     app.user.setSocialAccounts(

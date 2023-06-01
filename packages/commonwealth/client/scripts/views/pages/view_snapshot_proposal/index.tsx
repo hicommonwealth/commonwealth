@@ -66,7 +66,7 @@ export const ViewProposalPage = ({
     if (!proposal || !activeChainId) {
       return null;
     }
-    return new AddressInfo(null, proposal.author, activeChainId, null);
+    return new AddressInfo({ id: null, address: proposal.author, chainId: activeChainId });
   }, [proposal, activeChainId]);
 
   const loadVotes = useCallback(

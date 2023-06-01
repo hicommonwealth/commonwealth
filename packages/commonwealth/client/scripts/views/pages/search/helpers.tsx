@@ -48,12 +48,11 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
         <div className="search-results-thread-subtitle">
           <User
             user={
-              new AddressInfo(
-                thread.address_id,
-                thread.address,
-                thread.address_chain,
-                null
-              )
+              new AddressInfo({
+                id: thread.address_id,
+                address: thread.address,
+                chainId: thread.address_chain,
+              })
             }
           />
           <CWText className="created-at">
@@ -99,12 +98,11 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
         <div className="search-results-thread-subtitle">
           <User
             user={
-              new AddressInfo(
-                comment.address_id,
-                comment.address,
-                comment.address_chain,
-                null
-              )
+              new AddressInfo({
+                id: comment.address_id,
+                address: comment.address,
+                chainId: comment.address_chain,
+              })
             }
           />
           <CWText className="created-at">

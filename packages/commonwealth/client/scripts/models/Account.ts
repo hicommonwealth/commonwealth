@@ -1,4 +1,4 @@
-import type { WalletId } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
 import app from 'state';
@@ -31,6 +31,7 @@ class Account {
     ghostAddress,
     addressId,
     walletId,
+    walletSsoSource,
     validationToken,
     sessionPublicAddress,
     validationBlockInfo,
@@ -44,6 +45,7 @@ class Account {
     // optional args
     addressId?: number;
     walletId?: WalletId;
+    walletSsoSource?: WalletSsoSource;
     validationToken?: string;
     sessionPublicAddress?: string;
     validationBlockInfo?: string;
@@ -59,6 +61,7 @@ class Account {
     this.address = address;
     this._addressId = addressId;
     this._walletId = walletId;
+    this._walletSsoSource = walletSsoSource;
     this._validationToken = validationToken;
     this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
@@ -86,6 +89,13 @@ class Account {
     this._walletId = walletId;
   }
 
+  get walletSsoSource() {
+    return this._walletSsoSource;
+  }
+
+  public setWalletSsoSource(walletSsoSource: WalletSsoSource) {
+    this._walletSsoSource = walletSsoSource;
+  }
   get validationToken() {
     return this._validationToken;
   }

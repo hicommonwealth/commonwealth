@@ -49,7 +49,7 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
                       <User
                         linkify
                         key={address}
-                        user={new AddressInfo(null, address, chain, null)}
+                        user={new AddressInfo({ id: null, address, chainId: chain })}
                       />
                     );
                   })}

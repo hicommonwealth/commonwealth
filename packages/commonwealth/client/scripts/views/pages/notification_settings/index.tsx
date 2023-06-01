@@ -428,12 +428,11 @@ const NotificationSettingsPage = () => {
                             return (
                               <User
                                 user={
-                                  new AddressInfo(
-                                    null,
-                                    sub.Thread.author,
-                                    sub.Thread.chain,
-                                    null
-                                  )
+                                  new AddressInfo({
+                                    id: null,
+                                    address: sub.Thread.author,
+                                    chainId: sub.Thread.chain,
+                                  })
                                 }
                               />
                             );
@@ -441,12 +440,11 @@ const NotificationSettingsPage = () => {
                             return (
                               <User
                                 user={
-                                  new AddressInfo(
-                                    null,
-                                    sub.Comment.author,
-                                    sub.Comment.chain,
-                                    null
-                                  )
+                                  new AddressInfo({
+                                    id: null,
+                                    address: sub.Comment.author,
+                                    chainId: sub.Comment.chain,
+                                  })
                                 }
                               />
                             );

@@ -179,13 +179,14 @@ export const LoginSelector = () => {
           const { verification_token, addresses, encodedAddress } = res.result;
           app.user.setAddresses(
             addresses.map((a) => {
-              return new AddressInfo(
-                a.id,
-                a.address,
-                a.chain,
-                a.keytype,
-                a.wallet_id
-              );
+              return new AddressInfo({
+                id: a.id,
+                address: a.address,
+                chainId: a.chain,
+                keytype: a.keytype,
+                walletId: a.wallet_id,
+                walletSsoSource: a.wallet_sso_source
+              });
             })
           );
           const addressInfo = app.user.addresses.find(

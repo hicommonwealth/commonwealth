@@ -60,14 +60,15 @@ const Profile = ({ profileId }: ProfileProps) => {
       setAddresses(
         result.addresses.map((a) => {
           try {
-            return new AddressInfo(
-              a.id,
-              a.address,
-              a.chain,
-              a.keytype,
-              a.wallet_id,
-              a.ghost_address
-            );
+            return new AddressInfo({
+              id: a.id,
+              address: a.address,
+              chainId: a.chain,
+              keytype: a.keytype,
+              walletId: a.wallet_id,
+              walletSsoSource: a.wallet_sso_source,
+              ghostAddress: a.ghost_address
+            });
           } catch (err) {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;

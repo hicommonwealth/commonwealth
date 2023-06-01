@@ -135,13 +135,13 @@ export const ManageRoles = ({
             <div className="role-row" key={role.id}>
               <User
                 user={
-                  new AddressInfo(
-                    addr.id,
-                    addr.address,
-                    role.chain_id,
-                    null,
-                    addr.walletId
-                  )
+                  new AddressInfo({
+                    id: addr.id,
+                    address: addr.address,
+                    chainId: role.chain_id,
+                    walletId: addr.wallet_id,
+                    walletSsoSource: addr.wallet_sso_source
+                  })
                 } // role.Address, // make AddressInfo?
                 popover
                 linkify

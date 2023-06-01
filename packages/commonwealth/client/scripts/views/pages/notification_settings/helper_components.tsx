@@ -77,12 +77,11 @@ const getTextRows = (
             <User
               hideAvatar
               user={
-                new AddressInfo(
-                  null,
-                  subscription.Comment.author,
-                  subscription.Comment.chain,
-                  null
-                )
+                new AddressInfo({
+                  id: null,
+                  address: subscription.Comment.author,
+                  chainId: subscription.Comment.chain,
+                })
               }
             />
             's

@@ -51,7 +51,7 @@ const LinkAccountItem = (props: {
         <div className="account-user">
           <User
             user={
-              new AddressInfo(null, address, app.chain?.id || walletNetwork)
+              new AddressInfo({ id: null, address, chainId: app.chain?.id || walletNetwork })
             }
             avatarOnly
             avatarSize={40}
@@ -64,7 +64,7 @@ const LinkAccountItem = (props: {
           <div className="account-user">
             <User
               user={
-                new AddressInfo(null, address, app.chain?.id || walletNetwork)
+                new AddressInfo({ id: null, address, chainId: app.chain?.id || walletNetwork })
               }
               hideAvatar
             />

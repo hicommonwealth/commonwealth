@@ -77,12 +77,11 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               avatarSize={18}
               avatarOnly
               user={
-                new AddressInfo(
-                  roles[0].address_id,
-                  roles[0].address,
-                  roles[0].address_chain || roles[0].chain_id,
-                  null
-                )
+                new AddressInfo({
+                  id: roles[0].address_id,
+                  address: roles[0].address,
+                  chainId: roles[0].address_chain || roles[0].chain_id,
+                })
               }
             />
             <div

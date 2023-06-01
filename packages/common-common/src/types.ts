@@ -73,6 +73,14 @@ export enum WalletId {
   Ronin = 'ronin',
 }
 
+export enum WalletSsoSource {
+  Email = 'email',
+  Google = 'Google',
+  Github = 'Github',
+  Discord = 'discord',
+  Twitter = 'twitter',
+}
+
 export enum ChainCategoryType {
   DeFi = 'DeFi',
   DAO = 'DAO',

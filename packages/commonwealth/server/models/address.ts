@@ -30,6 +30,7 @@ export type AddressAttributes = {
   ghost_address?: boolean;
   profile_id?: number;
   wallet_id?: WalletId;
+  wallet_sso_source?: WalletId;
   // associations
   Chain?: ChainAttributes;
   Profile?: ProfileAttributes;
@@ -84,6 +85,7 @@ export default (
       },
       profile_id: { type: dataTypes.INTEGER, allowNull: true },
       wallet_id: { type: dataTypes.STRING, allowNull: true },
+      wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
     },
     {

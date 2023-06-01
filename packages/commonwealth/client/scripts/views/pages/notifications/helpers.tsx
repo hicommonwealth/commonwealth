@@ -81,7 +81,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 
   const actorName = (
     <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
+      user={new AddressInfo({ id: null, address: author_address, chainId: author_chain })}
       hideAvatar
     />
   );
@@ -191,7 +191,7 @@ export const getBatchNotificationFields = (
 
   const actorName = (
     <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
+      user={new AddressInfo({ id: null, address: author_address, chainId: author_chain })}
       hideAvatar
     />
   );

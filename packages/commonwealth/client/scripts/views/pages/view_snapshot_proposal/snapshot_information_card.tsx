@@ -77,12 +77,11 @@ export const SnapshotInformationCard = ({
                 app.chain ? (
                   <User
                     user={
-                      new AddressInfo(
-                        null,
-                        proposal.author,
-                        app.activeChainId(),
-                        null
-                      )
+                      new AddressInfo({
+                        id: null,
+                        address: proposal.author,
+                        chainId: app.activeChainId(),
+                      })
                     }
                     hideAvatar
                     linkify

@@ -75,12 +75,11 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
       <div className="header-row">
         <User
           user={
-            new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            )
+            new AddressInfo({
+              id: searchResult.address_id,
+              address: searchResult.address,
+              chainId: searchResult.address_chain,
+            })
           }
         />
         <CWText className="last-updated-text">•</CWText>

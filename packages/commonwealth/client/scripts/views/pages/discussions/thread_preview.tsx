@@ -146,7 +146,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               <User
                 avatarSize={24}
                 user={
-                  new AddressInfo(null, thread.author, thread.authorChain, null)
+                  new AddressInfo({ id: null, address: thread.author, chainId: thread.authorChain })
                 }
                 linkify
                 showAddressWithDisplayName
@@ -213,7 +213,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                     type="proposal"
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
-                    )} 
+                    )}
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''

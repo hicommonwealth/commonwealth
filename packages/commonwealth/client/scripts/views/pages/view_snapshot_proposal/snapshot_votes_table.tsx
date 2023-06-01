@@ -65,7 +65,7 @@ export const SnapshotVotesTable = (props: SnapshotVotesTableProps) => {
             {app.chain ? (
               <User
                 user={
-                  new AddressInfo(null, vote.voter, app.activeChainId(), null)
+                  new AddressInfo({ id: null, address: vote.voter, chainId: app.activeChainId() })
                 }
                 linkify
                 popover

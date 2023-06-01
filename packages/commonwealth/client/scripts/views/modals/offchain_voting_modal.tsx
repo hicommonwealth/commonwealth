@@ -50,13 +50,11 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
                 popover
                 linkify
                 user={
-                  new AddressInfo(
-                    null,
-                    vote.address,
-                    vote.authorChain,
-                    null,
-                    null
-                  )
+                  new AddressInfo({
+                    id: null,
+                    address: vote.address,
+                    chainId: vote.authorChain,
+                  })
                 }
               />
             </div>
