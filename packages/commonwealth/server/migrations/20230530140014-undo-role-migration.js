@@ -26,7 +26,7 @@ module.exports = {
 
       const roles = await queryInterface.sequelize.query(
         `SELECT address_id, permission FROM "Roles"`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t },
+        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
       );
 
       const ids = roles.map((r) => r.address_id);
@@ -54,17 +54,20 @@ module.exports = {
         `SELECT chain_id, array_to_string(array_agg(name), ', ') AS concatenated_names
          FROM "CommunityRoles"
          GROUP BY chain_id;`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t },
+        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
       );
 
       // create a map representing the values we will insert into the db
-      const communityMap = new Map(communityRoles.map(c => {
-        const bitmask = stringToBitmask(c.concatenated_names)
-        if (bitmask === 7) { // filter out full permissions, they are made by default
-          return [undefined, undefined]
-        }
-        return [c.chain_id, stringToBitmask(c.concatenated_names)]
-      }));
+      const communityMap = new Map(
+        communityRoles.map((c) => {
+          const bitmask = stringToBitmask(c.concatenated_names);
+          if (bitmask === 7) {
+            // filter out full permissions, they are made by default
+            return [undefined, undefined];
+          }
+          return [c.chain_id, stringToBitmask(c.concatenated_names)];
+        })
+      );
 
       communityMap.delete(undefined);
 
@@ -78,29 +81,31 @@ module.exports = {
           defaultValue: 7,
           validate: {
             min: 0,
-            max: 7
+            max: 7,
           },
         },
         { transaction: t }
       );
 
       const communityKeys = [...communityMap.keys()];
-      // insert this data into the chains table
-      await queryInterface.sequelize.query(
-        `
+      if (communityKeys.length > 0) {
+        // insert this data into the chains table
+        await queryInterface.sequelize.query(
+          `
         UPDATE "Chains"
         SET allowed_roles = CASE 
             ${communityKeys
-          .map(
-            (chain) =>
-              `WHEN id = '${chain}' THEN ${communityMap.get(chain)}`
-          )
-          .join(' ')}
+              .map(
+                (chain) =>
+                  `WHEN id = '${chain}' THEN ${communityMap.get(chain)}`
+              )
+              .join(' ')}
         END
-        WHERE id IN (${communityKeys.map(key => `'${key}'`).join(', ')})
+        WHERE id IN (${communityKeys.map((key) => `'${key}'`).join(', ')})
       `,
-        { transaction: t }
-      );
+          { transaction: t }
+        );
+      }
 
       // drop unused tables
       await queryInterface.dropTable('RoleAssignments', { transaction: t });
