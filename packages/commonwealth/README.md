@@ -328,7 +328,8 @@ https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle)
   DD_DYNO_HOST=true
   DD_LOG_LEVEL=WARN
   DD_SITE=us5.datadoghq.com
-  ENABLE_HEROKU_POSTGRES=true #postgres specific
+  DD_ENABLE_HEROKU_POSTGRES=true #postgres specific
+  DD_HEROKU_CONF_FOLDER=packages/commonwealth/datadog
 ```
 
 **Install Datadog Buildpack**   
@@ -342,7 +343,9 @@ https://github.com/DataDog/heroku-buildpack-datadog.git
 
 ```bash
 cd packages/commonwealth
-yarn datadog-db-setup <app-name>
+yarn datadog-db-setup <app-name> <dd-conf-folder>
+#example
+yarn datadog-db-setup commonwealth-frick packages/commonwealth/datadog
 ```
 
 **Datadog Postgres Config**
