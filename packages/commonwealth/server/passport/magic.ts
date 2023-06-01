@@ -373,6 +373,9 @@ async function magicLoginRoute(
     }
   }
 
+  const magicUserMetadata = await magic.users.getMetadataByIssuer(decodedMagicToken.issuer);
+  log.trace(`MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`);
+
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
@@ -401,7 +404,7 @@ async function magicLoginRoute(
     log.warn(`Could not set up a valid client-side magic address ${req.body.magicAddress}`);
   }
 
-  // first, attempt to locate an existing magic user by canonical address.
+  // attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
   let existingUserInstance = await models.User.scope('withPrivateData').findOne(
