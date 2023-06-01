@@ -89,12 +89,14 @@ const LayoutComponent = ({
   const location = useLocation();
   const pathname = location.pathname.replaceAll('/', ''); // if it is community home page, it will match the chain id.
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
+
+  // isChainSelectDone makes sure the selected chain matches the chain in the URL scope or custom domain.
+  const isChainSelectDone = !!app.chain?.id && pathScope === app.chain.id;
+
   // isCommunityHomePathBeforeRedirect catches a case where the community home URL is loaded before it gets
   // redirected to the expected page (usually /discussions).
   // We want to avoid chain loading until the redirect is complete, and we have access to the deferChain flag.
   // This is mainly observable with the quick-switcher.
-
-  const isChainSelectDone = !!app.chain?.id && pathScope === app.chain.id;
   const isCommunityHomePathBeforeRedirect =
     isChainSelectDone && !app.isCustomDomain() && pathname === pathScope;
 
@@ -152,7 +154,6 @@ const LayoutComponent = ({
           isChainSelectDone &&
           !isCommunityHomePathBeforeRedirect
         ) {
-          console.log('IFB 5');
           await initChain();
         }
         setIsLoading(false);
@@ -168,7 +169,6 @@ const LayoutComponent = ({
     (async () => {
       // IFB 6
       if (shouldLoadDeferredChain) {
-        console.log('IFB 6');
         setIsLoading(true);
         setIsChainDeferred(false);
         await initChain();
