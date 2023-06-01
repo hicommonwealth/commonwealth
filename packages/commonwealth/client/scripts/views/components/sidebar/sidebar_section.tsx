@@ -40,7 +40,13 @@ const SubSection = (props: SubSectionAttrs) => {
     >
       {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
       <div className={titleTextClass} title={title}>
-        {title}
+        <CWText
+          type="b2"
+          className={`title-text ${titleTextClass}`}
+          onClick={(e) => clickHandler(e)}
+        >
+          {title}
+        </CWText>
       </div>
       {isNotUndefined(rightIcon) && (
         <div className="right-icon">{rightIcon}</div>
