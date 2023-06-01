@@ -11,11 +11,12 @@
     cursor: pointer;
     height: auto !important;
     background-color: $white;
-    font-size: 14px !important;
+    font-size: 16px !important;
     border-width: 2px !important;
     border-style: solid !important;
     border-color: $neutral-200-new  !important;
     line-height: 20px;
+    color: $neutral-800-new  !important;
 
     &:hover {
         border-color: $primary-600-new  !important;
@@ -27,6 +28,10 @@
 
     .button-text {
         margin-right: auto;
+        color: $neutral-800-new  !important;
+        // font-size: 16px !important;
+        // line-height: 24px;
+        // font-weight: 400px;
     }
 
     &.active {
