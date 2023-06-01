@@ -85,10 +85,10 @@ const SessionRevalidationModal = ({
             <h3>Re-connect wallet</h3>
             <p>
               Your previous login was a while ago.
-              Re-connect {walletName ?? "your wallet"}{" "}
-              {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown ? <>({walletSsoSource})</> : ""}
-              {" "}with the
-              address <strong>{formatAddress(walletAddress)}</strong> to continue:
+              Re-connect {walletName ?? "your wallet"} with the
+              address <strong>{formatAddress(walletAddress)}</strong>{" "}
+              {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown ? <>via {walletSsoSource}</> : ""}
+              {" "}to continue:
             </p>
           </div>
           <div className="compact-modal-actions">
