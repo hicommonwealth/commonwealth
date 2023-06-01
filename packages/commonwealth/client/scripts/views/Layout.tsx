@@ -89,11 +89,23 @@ const LayoutComponent = ({
   const location = useLocation();
   const pathname = location.pathname.replaceAll('/', ''); // if it is community home page, it will match the chain id.
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
-  // isCommunityHomePathBeforeRedirect catches a case where the community home page is loaded before it gets
+  // isCommunityHomePathBeforeRedirect catches a case where the community home URL is loaded before it gets
   // redirected to the expected page (usually /discussions).
   // We want to avoid chain loading until the redirect is complete, and we have access to the deferChain flag.
   // This is mainly observable with the quick-switcher.
-  const isCommunityHomePathBeforeRedirect = pathname === pathScope;
+  console.log('* app.chain.id', app.chain?.id);
+  console.log('* app.isCustomDomain()', app.isCustomDomain());
+  console.log('* app.customDomainId()', app.customDomainId());
+  console.log('* pathname', pathname);
+  console.log('* pathScope', pathScope);
+  const isChainSelectDone = !!app.chain?.id && pathScope === app.chain.id;
+  const isCommunityHomePathBeforeRedirect =
+    isChainSelectDone && !app.isCustomDomain() && pathname === pathScope;
+  console.log('* isChainSelectDone', isChainSelectDone);
+  console.log(
+    '* isCommunityHomePathBeforeRedirect',
+    isCommunityHomePathBeforeRedirect
+  );
 
   // IFB 3: If the user has navigated to an ethereum address directly,
   // init a new token chain immediately
@@ -119,6 +131,7 @@ const LayoutComponent = ({
     !!selectedScope &&
     isChainDeferred &&
     !shouldDeferChain &&
+    isChainSelectDone &&
     !isCommunityHomePathBeforeRedirect;
 
   // IFB 7: If scope is not defined (and we are not on a custom domain),
@@ -145,8 +158,10 @@ const LayoutComponent = ({
         if (
           !shouldDeferChain &&
           response &&
+          isChainSelectDone &&
           !isCommunityHomePathBeforeRedirect
         ) {
+          console.log('IFB 5');
           await initChain();
         }
         setIsLoading(false);
@@ -162,6 +177,7 @@ const LayoutComponent = ({
     (async () => {
       // IFB 6
       if (shouldLoadDeferredChain) {
+        console.log('IFB 6');
         setIsLoading(true);
         setIsChainDeferred(false);
         await initChain();

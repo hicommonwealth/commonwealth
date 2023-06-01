@@ -46,7 +46,7 @@ export default function DiscussionsRedirect() {
       default:
         navigate('/discussions', dontAddHistory);
     }
-  }, [navigate, isRedirected, app.chain, routerParams.scope]);
+  }, [navigate, isRedirected, app?.chain, routerParams.scope]);
 
   return <PageLoading />;
 }
