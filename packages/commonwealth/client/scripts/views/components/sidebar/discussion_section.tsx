@@ -38,11 +38,10 @@ function setStageToggleState(
   stageName: string,
   toggle: boolean
 ) {
-  let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-stage-toggle-tree`]
-  );
+  const toggleTreeKey = `${app.activeChainId()}-discussions-toggle-tree`;
+  let currentTree = JSON.parse(localStorage[toggleTreeKey]);
 
-  const path = `children.${topicName}.${stageName}.toggledState`;
+  const path = `children.${topicName}.children.${stageName}.toggledState`;
   const split = path.split('.');
 
   for (const field of split.slice(0, split.length - 1)) {
@@ -54,8 +53,7 @@ function setStageToggleState(
   }
   currentTree[split[split.length - 1]] = !toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-stage-toggle-tree`] =
-    JSON.stringify(newTree);
+  localStorage[toggleTreeKey] = JSON.stringify(newTree);
 }
 
 export const DiscussionSection = () => {
