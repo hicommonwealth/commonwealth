@@ -135,15 +135,13 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
           hoverOn ? 'background' : backgroundColorClass
         }`}
       >
-        <div className="carat" onClick={(e) => onClickCaratHandler(e)}>
-          {carat}
-        </div>{' '}
-        {/**/}
-        {/* {containsChildren ? (
-          <div className="carat" onClick={(e) => onClickCaratHandler(e)}>{carat}</div>
+        {containsChildren ? (
+          <div className="carat" onClick={(e) => onClickCaratHandler(e)}>
+            {carat}
+          </div>
         ) : (
           <div className="no-carat" />
-        )} */}
+        )}
         <CWText
           type="b2"
           className={`title-text ${titleTextClass}`}

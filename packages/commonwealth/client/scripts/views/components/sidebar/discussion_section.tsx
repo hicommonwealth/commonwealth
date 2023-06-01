@@ -2,16 +2,18 @@ import React from 'react';
 
 import 'components/sidebar/index.scss';
 import app from 'state';
-import { handleRedirectClicks } from '../../../helpers';
+import { handleRedirectClicks, parseCustomStages } from '../../../helpers';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
   SectionGroupAttrs,
   SidebarSectionAttrs,
+  SubSectionAttrs,
   ToggleTree,
 } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useLocation, matchRoutes } from 'react-router-dom';
+import { ThreadStage } from 'models/types';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -27,9 +29,33 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = !toggle;
   const newTree = currentTree;
-  localStorage[
-    `${app.activeChainId()}-discussions-toggle-tree`
-  ] = JSON.stringify(newTree);
+  localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
+    JSON.stringify(newTree);
+}
+
+function setStageToggleState(
+  topicName: string,
+  stageName: string,
+  toggle: boolean
+) {
+  let currentTree = JSON.parse(
+    localStorage[`${app.activeChainId()}-stage-toggle-tree`]
+  );
+
+  const path = `children.${topicName}.${stageName}.toggledState`;
+  const split = path.split('.');
+
+  for (const field of split.slice(0, split.length - 1)) {
+    if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
+      currentTree = currentTree[field];
+    } else {
+      return;
+    }
+  }
+  currentTree[split[split.length - 1]] = !toggle;
+  const newTree = currentTree;
+  localStorage[`${app.activeChainId()}-stage-toggle-tree`] =
+    JSON.stringify(newTree);
 }
 
 export const DiscussionSection = () => {
@@ -57,6 +83,26 @@ export const DiscussionSection = () => {
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     .sort((a, b) => a.order - b.order);
+
+  const getStages = () => {
+    const { stagesEnabled, customStages } = app.chain?.meta || {};
+    if (stagesEnabled) {
+      if (!customStages) {
+        return [
+          ThreadStage.Discussion,
+          ThreadStage.ProposalInReview,
+          ThreadStage.Voting,
+          ThreadStage.Passed,
+          ThreadStage.Failed,
+        ];
+      } else {
+        return parseCustomStages(customStages);
+      }
+    }
+    return [];
+  };
+
+  const stages = getStages();
 
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
     ? 'Forum'
@@ -88,15 +134,13 @@ export const DiscussionSection = () => {
 
   // Check if an existing toggle tree is stored
   if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
-    localStorage[
-      `${app.activeChainId()}-discussions-toggle-tree`
-    ] = JSON.stringify(discussionsDefaultToggleTree);
+    localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
+      JSON.stringify(discussionsDefaultToggleTree);
   } else if (
     !verifyCachedToggleTree('discussions', discussionsDefaultToggleTree)
   ) {
-    localStorage[
-      `${app.activeChainId()}-discussions-toggle-tree`
-    ] = JSON.stringify(discussionsDefaultToggleTree);
+    localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
+      JSON.stringify(discussionsDefaultToggleTree);
   }
   const toggleTreeState = JSON.parse(
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
@@ -175,9 +219,30 @@ export const DiscussionSection = () => {
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
+      const subSections = stages.map((stage) => {
+        return {
+          title: stage,
+          isVisible: true,
+          isUpdated: true,
+          isActive: matchesDiscussionsTopicRoute?.[0]?.params?.stage === stage,
+          onClick: (e) => {
+            e.preventDefault();
+            handleRedirectClicks(
+              navigate,
+              e,
+              `/discussions/${encodeURI(topic.name)}?stage=${encodeURI(stage)}`,
+              app.activeChainId(),
+              () => {
+                setStageToggleState(topic.name, stage, false);
+              }
+            );
+          },
+        } as SubSectionAttrs;
+      });
+
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
-        containsChildren: false,
+        containsChildren: true,
         hasDefaultToggle: false,
         isVisible: true,
         isUpdated: true,
@@ -199,7 +264,7 @@ export const DiscussionSection = () => {
             }
           );
         },
-        displayData: null,
+        displayData: subSections,
       };
       discussionsGroupData.push(discussionSectionGroup);
     }
