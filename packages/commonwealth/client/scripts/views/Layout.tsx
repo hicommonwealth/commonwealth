@@ -93,19 +93,10 @@ const LayoutComponent = ({
   // redirected to the expected page (usually /discussions).
   // We want to avoid chain loading until the redirect is complete, and we have access to the deferChain flag.
   // This is mainly observable with the quick-switcher.
-  console.log('* app.chain.id', app.chain?.id);
-  console.log('* app.isCustomDomain()', app.isCustomDomain());
-  console.log('* app.customDomainId()', app.customDomainId());
-  console.log('* pathname', pathname);
-  console.log('* pathScope', pathScope);
+
   const isChainSelectDone = !!app.chain?.id && pathScope === app.chain.id;
   const isCommunityHomePathBeforeRedirect =
     isChainSelectDone && !app.isCustomDomain() && pathname === pathScope;
-  console.log('* isChainSelectDone', isChainSelectDone);
-  console.log(
-    '* isCommunityHomePathBeforeRedirect',
-    isCommunityHomePathBeforeRedirect
-  );
 
   // IFB 3: If the user has navigated to an ethereum address directly,
   // init a new token chain immediately

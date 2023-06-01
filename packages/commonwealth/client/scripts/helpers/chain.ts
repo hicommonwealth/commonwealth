@@ -220,7 +220,6 @@ export const selectChain = async (
 // Initializes a selected chain. Requires `app.chain` to be defined and valid
 // and not already initialized.
 export const initChain = async (): Promise<void> => {
-  console.log('* INITCHAIN!!!');
   if (!app.chain || !app.chain.meta || app.chain.loaded) {
     return;
   }
