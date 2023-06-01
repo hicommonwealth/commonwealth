@@ -44,6 +44,7 @@ class ChainInfo {
   public decimals: number;
   public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
+  public displayStagesInSidebar: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
   public communityRoles: CommunityRole[];
@@ -87,6 +88,7 @@ class ChainInfo {
     ChainNode,
     tokenName,
     adminOnlyPolling,
+    displayStagesInSidebar,
     discord_config_id,
     communityRoles,
     cosmosGovernanceVersion,
@@ -124,6 +126,7 @@ class ChainInfo {
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
+    this.displayStagesInSidebar = displayStagesInSidebar;
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
     this.communityRoles = communityRoles;
@@ -164,6 +167,7 @@ class ChainInfo {
     Contracts,
     ChainNode,
     admin_only_polling,
+    display_stages_in_sidebar,
     discord_config_id,
     community_roles,
   }) {
@@ -219,6 +223,7 @@ class ChainInfo {
       tokenName: token_name,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
+      displayStagesInSidebar: display_stages_in_sidebar,
       discord_config_id,
       communityRoles: community_roles,
       cosmosGovernanceVersion: cosmos_governance_version,
@@ -285,6 +290,7 @@ class ChainInfo {
     defaultOverview,
     defaultPage,
     hasHomepage,
+    display_stages_in_sidebar,
     default_allow_permissions,
     default_deny_permissions,
     chain_node_id,
@@ -305,6 +311,7 @@ class ChainInfo {
     defaultOverview?: boolean;
     defaultPage?: DefaultPage;
     hasHomepage?: boolean;
+    display_stages_in_sidebar?: boolean;
     default_allow_permissions?: bigint;
     default_deny_permissions?: bigint;
     chain_node_id?: string;
@@ -329,6 +336,7 @@ class ChainInfo {
       icon_url: iconUrl,
       default_summary_view: defaultOverview,
       default_page: defaultPage,
+      display_stages_in_sidebar: display_stages_in_sidebar,
       has_homepage: hasHomepage,
       chain_node_id,
       jwt: app.user.jwt,
@@ -350,6 +358,7 @@ class ChainInfo {
     this.defaultOverview = updatedChain.default_summary_view;
     this.defaultPage = updatedChain.default_page;
     this.hasHomepage = updatedChain.has_homepage;
+    this.displayStagesInSidebar = updatedChain.display_stages_in_sidebar;
     this.defaultAllowPermissions = updatedChain.default_allow_permissions;
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;

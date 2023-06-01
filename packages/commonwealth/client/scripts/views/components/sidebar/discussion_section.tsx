@@ -240,7 +240,7 @@ export const DiscussionSection = () => {
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
-        containsChildren: true,
+        containsChildren: app.chain?.meta.displayStagesInSidebar ? true : false,
         hasDefaultToggle: false,
         isVisible: true,
         isUpdated: true,
@@ -262,7 +262,9 @@ export const DiscussionSection = () => {
             }
           );
         },
-        displayData: subSections,
+        displayData: app.chain?.meta.displayStagesInSidebar
+          ? subSections
+          : null,
       };
       discussionsGroupData.push(discussionSectionGroup);
     }

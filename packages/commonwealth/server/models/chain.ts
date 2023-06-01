@@ -51,6 +51,7 @@ export type ChainAttributes = {
   token_name?: string;
   ce_verbose?: boolean;
   discord_config_id?: number;
+  display_stages_in_sidebar?: boolean;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
   category?: any;
@@ -141,6 +142,7 @@ export default (
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
+      display_stages_in_sidebar: { type: dataTypes.BOOLEAN, allowNull: true },
       default_allow_permissions: {
         type: dataTypes.BIGINT,
         allowNull: false,
