@@ -85,6 +85,7 @@ export const LoginSelectorMenuLeft = ({
                   user={account}
                   selected={isSameAccount(account, app.user.activeAccount)}
                   showRole={false}
+                  showLoginMethod={true}
                   compact
                   hideAvatar
                 />

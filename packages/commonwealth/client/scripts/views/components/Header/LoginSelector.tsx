@@ -310,6 +310,7 @@ export const LoginSelector = () => {
                     nAccountsWithoutRole={nAccountsWithoutRole}
                   />
                 }
+                placement="bottom-end"
                 {...leftMenuProps}
               />
             </div>

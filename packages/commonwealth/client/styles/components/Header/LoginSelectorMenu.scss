@@ -5,10 +5,10 @@
   border-radius: $border-radius-corners;
   box-shadow: $elevation-3;
   position: relative;
+  padding-top: 1px;
+  padding-bottom: 1px;
 
   &.left {
-    right: 16px;
-
     .UserBlock {
       gap: 24px;
     }
@@ -27,8 +27,15 @@
     cursor: pointer;
     display: flex;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 8px 16px 9px;
     width: 100%;
+
+    .UserBlock.compact .user-block-center .user-block-address {
+      font-size: 0.9em;
+    }
+    .Text.caption {
+      font-size: 0.9em;
+    }
 
     &:not(.selected) {
       svg {

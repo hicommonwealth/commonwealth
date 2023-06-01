@@ -5,6 +5,7 @@ import { capitalize } from 'lodash';
 
 import 'components/user/user.scss';
 
+import { WalletId, WalletSsoSource } from 'common-common/src/types';
 import app from 'state';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
@@ -28,10 +29,11 @@ export const UserBlock = (props: {
   showAddressWithDisplayName?: boolean;
   showChainName?: boolean;
   showRole?: boolean;
+  showLoginMethod?: boolean;
   user: Account | AddressInfo | MinimumProfile;
   hideAvatar?: boolean;
 }) => {
-  const { compact, searchTerm, showChainName, user } = props;
+  const { compact, searchTerm, showChainName, showLoginMethod, user } = props;
 
   let profile;
 
@@ -90,6 +92,7 @@ export const UserBlock = (props: {
             </div>
           )}
         </div>
+        {showLoginMethod && !(user instanceof MinimumProfile) && <UserLoginBadge user={user} />}
       </div>
       <div className="user-block-right">
         <div className="user-block-selected">
@@ -105,5 +108,23 @@ export const UserBlock = (props: {
     >
       {children}
     </div>
+  );
+};
+
+const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
+  const [address, setAddress] = React.useState<AddressInfo>();
+
+  React.useEffect(() => {
+    const matchingAddress = app.user.addresses.find((a) => a.chain.id === user.chain?.id && a.address === user.address);
+    if (matchingAddress) {
+      setAddress(matchingAddress);
+    }
+  }, [user.address, user.chain?.id]);
+
+  return (
+    <>
+      {address?.walletId === WalletId.Magic &&
+        <div className="user-block-via">via {address.walletSsoSource}</div>}
+    </>
   );
 };
