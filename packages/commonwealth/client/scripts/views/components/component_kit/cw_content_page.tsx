@@ -1,8 +1,7 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/cw_content_page.scss';
 import moment from 'moment';
-import React, { Fragment, ReactNode, useState } from 'react';
-import useBrowserWindow from '../../../hooks/useBrowserWindow';
+import React, { ReactNode, useState } from 'react';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
@@ -14,7 +13,6 @@ import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions'
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
-import { isWindowMediumSmallInclusive } from './helpers';
 import { ComponentType } from './types';
 
 export type ContentPageSidebarItem = {
@@ -60,6 +58,7 @@ type ContentPageProps = {
   onEditCancel?: () => any;
   hasPendingEdits?: boolean;
   canUpdateThread?: boolean;
+  showTabs?: boolean;
 };
 
 export const CWContentPage = ({
@@ -90,26 +89,10 @@ export const CWContentPage = ({
   onEditStart,
   hasPendingEdits,
   canUpdateThread,
+  showTabs = false,
 }: ContentPageProps) => {
-  const [viewType, setViewType] = useState<'sidebarView' | 'tabsView'>(
-    isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
-      ? 'tabsView'
-      : 'sidebarView'
-  );
   const [tabSelected, setTabSelected] = useState<number>(0);
-
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
-
-  useBrowserWindow({
-    onResize: () => {
-      setViewType(
-        isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
-          ? 'tabsView'
-          : 'sidebarView'
-      );
-    },
-    resizeListenerUpdateDeps: [],
-  });
 
   const mainBody = (
     <div className="main-body-container">
@@ -178,49 +161,50 @@ export const CWContentPage = ({
 
   return (
     <div className={ComponentType.ContentPage}>
-      <div
-        className={`sidebar-view ${viewType !== 'sidebarView' ? 'hidden' : ''}`}
-      >
-        {mainBody}
-        {showSidebar && (
-          <div className="sidebar">
-            {sidebarComponents?.map((c) => (
-              <Fragment key={c.label}>{c.item}</Fragment>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className={`tabs-view ${viewType !== 'tabsView' ? 'hidden' : ''}`}>
-        <CWTabBar>
-          <CWTab
-            label={contentBodyLabel}
-            onClick={() => {
-              setTabSelected(0);
-            }}
-            isSelected={tabSelected === 0}
-          />
-          {sidebarComponents?.map((item, i) => (
+      {!showTabs ? (
+        <div className="sidebar-view">
+          {mainBody}
+          {showSidebar && (
+            <div className="sidebar">
+              {sidebarComponents?.map((c) => (
+                <React.Fragment key={c.label}>{c.item}</React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="tabs-view">
+          <CWTabBar>
             <CWTab
-              key={item.label}
-              label={item.label}
+              label={contentBodyLabel}
               onClick={() => {
-                setTabSelected(i + 1);
+                setTabSelected(0);
               }}
-              isSelected={tabSelected === i + 1}
+              isSelected={tabSelected === 0}
             />
-          ))}
-        </CWTabBar>
-        {tabSelected === 0 && mainBody}
-        {sidebarComponents?.length >= 1 &&
-          tabSelected === 1 &&
-          sidebarComponents[0].item}
-        {sidebarComponents?.length >= 2 &&
-          tabSelected === 2 &&
-          sidebarComponents[1].item}
-        {sidebarComponents?.length === 3 &&
-          tabSelected === 3 &&
-          sidebarComponents[2].item}
-      </div>
+            {sidebarComponents?.map((item, i) => (
+              <CWTab
+                key={item.label}
+                label={item.label}
+                onClick={() => {
+                  setTabSelected(i + 1);
+                }}
+                isSelected={tabSelected === i + 1}
+              />
+            ))}
+          </CWTabBar>
+          {tabSelected === 0 && mainBody}
+          {sidebarComponents?.length >= 1 &&
+            tabSelected === 1 &&
+            sidebarComponents[0].item}
+          {sidebarComponents?.length >= 2 &&
+            tabSelected === 2 &&
+            sidebarComponents[1].item}
+          {sidebarComponents?.length === 3 &&
+            tabSelected === 3 &&
+            sidebarComponents[2].item}
+        </div>
+      )}
     </div>
   );
 };

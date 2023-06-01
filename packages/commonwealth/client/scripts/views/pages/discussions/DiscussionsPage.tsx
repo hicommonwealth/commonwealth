@@ -1,4 +1,5 @@
 import { getProposalUrlPath } from 'identifiers';
+import { ThreadStage } from 'models/types';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -30,12 +31,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;
+    stage: ThreadStage;
   }) => {
     const { action } = data;
 
     if (
       action === ThreadActionType.TopicChange ||
-      action === ThreadActionType.Deletion
+      action === ThreadActionType.Deletion ||
+      action === ThreadActionType.StageChange
     ) {
       return;
     }
@@ -53,6 +56,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
     setThreads([...pinnedThreads, ...unpinnedThreads]);
+  };
+
+  const sortPinned = (t: Thread[]) => {
+    return [...t].sort((a, b) =>
+      a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
+    );
   };
 
   // [CLEANUP]: We should remove this handler
@@ -73,15 +82,56 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
-    app.threads.resetPagination();
-    app.threads
-      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
-      .then((t) => {
-        // Fetch first 20 + unpinned threads
-        setThreads(t);
-        // !totalThreads && setTotalThreads(totalResults);
-        setInitializing(false);
-      });
+    const timerId = setTimeout(() => {
+      // always reset pagination on page change
+      app.threads.resetPagination();
+
+      // check if store already has atleast 20 threads for this community -> topic/stage,
+      // if so dont fetch more for now (scrolling will fetch more)
+      const chain = app.activeChainId();
+      const foundThreadsForChain = app.threads.store
+        .getAll()
+        .filter((x) => x.chain === chain);
+      if (foundThreadsForChain.length >= 20) {
+        if (topicName || stageName) {
+          let finalThreads = foundThreadsForChain;
+
+          // get threads for current topic
+          const topicId = app.topics.getByName(topicName, chain)?.id;
+          if (topicId) {
+            finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
+          }
+
+          // get threads for current stage
+          if (stageName) {
+            finalThreads = finalThreads.filter((x) => x.stage === stageName);
+          }
+
+          if (finalThreads.length >= 20) {
+            setThreads(sortPinned(finalThreads));
+            setInitializing(false);
+            return;
+          }
+        }
+        // else show all threads
+        else {
+          setThreads(sortPinned(foundThreadsForChain));
+          setInitializing(false);
+          return;
+        }
+      }
+
+      // if the store has <= 20 threads then fetch more
+      app.threads
+        .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+        .then((t) => {
+          // Fetch first 20 + unpinned threads
+          setThreads(sortPinned(t));
+          setInitializing(false);
+        });
+    });
+
+    return () => clearTimeout(timerId);
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
@@ -91,15 +141,29 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       return;
     }
 
-    // !totalThreads && setTotalThreads(response.totalResults);
-    return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
-  }, [stageName, topicName, totalThreads]);
+    return setThreads((oldThreads) => {
+      const finalThreads = [...oldThreads];
+      newThreads.map((x) => {
+        const foundIndex = finalThreads.findIndex(
+          (y) => y.identifier === x.identifier
+        );
+        if (foundIndex === -1) {
+          finalThreads.push(x);
+        } else {
+          finalThreads[foundIndex] = x;
+        }
+        return null;
+      });
+      return sortPinned(finalThreads);
+    });
+  }, [stageName, topicName]);
 
   if (initializing) {
-    return <PageLoading />;
+    return <PageLoading hideSearch={false} />;
   }
+
   return (
-    <Sublayout hideFooter={true}>
+    <Sublayout hideFooter={true} hideSearch={false}>
       <div className="DiscussionsPage">
         <Virtuoso
           className="thread-list"
@@ -156,6 +220,20 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
                     setThreads(tempThreads);
                   }
+                }}
+                onProposalStageChange={(stage) => {
+                  setThreads((oldThreads) => {
+                    const updatedThreads = [...oldThreads].filter(
+                      // make sure that if we have an active stage filter (from the dropdown)
+                      // then we also filter the current list for the current stage only
+                      (x) => x.stage === stageName
+                    );
+                    const foundThread = updatedThreads.find(
+                      (x) => x.id === thread.id
+                    );
+                    if (foundThread) foundThread.stage = stage;
+                    return updatedThreads;
+                  });
                 }}
                 // onSpamToggle
               />

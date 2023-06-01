@@ -58,7 +58,6 @@ import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
-import bulkMembers from '../routes/bulkMembers';
 import searchProfiles from '../routes/searchProfiles';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
@@ -107,17 +106,6 @@ import deleteTopic from '../routes/deleteTopic';
 import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
-import getChatMessages from '../routes/chat/getChatMessages';
-import getChatChannel from '../routes/chat/getChatChannel';
-import createChatChannel from '../routes/chat/createChatChannel';
-import deleteChatChannel from '../routes/chat/deleteChatChannel';
-import deleteChatCategory from '../routes/chat/deleteChatCategory';
-import editChatChannel from '../routes/chat/editChatChannel';
-import editChatCategory from '../routes/chat/editChatCategory';
-
-import createRule from '../routes/rules/createRule';
-import deleteRule from '../routes/rules/deleteRule';
-import getRuleTypes from '../routes/rules/getRuleTypes';
 
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
@@ -142,7 +130,6 @@ import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
-import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import type BanCache from '../util/banCheckCache';
@@ -189,7 +176,6 @@ function setupRouter(
   models: DB,
   viewCountCache: ViewCountCache,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService
@@ -321,7 +307,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
-    createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createThread.bind(this, models, tokenBalanceCache, banCache)
   );
   router.put(
     '/editThread',
@@ -368,7 +354,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    updateVote.bind(this, models, tokenBalanceCache, ruleCache)
+    updateVote.bind(this, models, tokenBalanceCache)
   );
   router.get(
     '/viewVotes',
@@ -538,7 +524,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createComment.bind(this, models, tokenBalanceCache, banCache)
   );
   router.post(
     '/editComment',
@@ -610,7 +596,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createReaction.bind(this, models, tokenBalanceCache, banCache)
   );
   router.post(
     '/deleteReaction',
@@ -643,11 +629,6 @@ function setupRouter(
   router.post('/permissions', controllers.createPermission.bind(this, models));
   router.patch('/permissions', controllers.updatePermission.bind(this, models));
 
-  router.get(
-    '/bulkMembers',
-    databaseValidationService.validateChain,
-    bulkMembers.bind(this, models)
-  );
   router.post(
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
@@ -833,63 +814,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateChainCategory.bind(this, models)
   );
-
-  // chat
-  router.get(
-    '/getChatMessages',
-    passport.authenticate('jwt', { session: false }),
-    getChatMessages.bind(this, models)
-  );
-
-  router.get(
-    '/getChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    getChatChannel.bind(this, models)
-  );
-
-  router.post(
-    '/createChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    createChatChannel.bind(this, models)
-  );
-
-  router.delete(
-    '/deleteChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    deleteChatChannel.bind(this, models)
-  );
-
-  router.delete(
-    '/deleteChatCategory',
-    passport.authenticate('jwt', { session: false }),
-    deleteChatCategory.bind(this, models)
-  );
-
-  router.put(
-    '/editChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    editChatChannel.bind(this, models)
-  );
-
-  router.put(
-    '/editChatCategory',
-    passport.authenticate('jwt', { session: false }),
-    editChatCategory.bind(this, models)
-  );
-
-  // rules
-  router.post(
-    '/createRule',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createRule.bind(this, models)
-  );
-  router.post(
-    '/deleteRule',
-    passport.authenticate('jwt', { session: false }),
-    deleteRule.bind(this, models)
-  );
-  router.get('/getRuleTypes', getRuleTypes.bind(this, models));
 
   // settings
   router.post(

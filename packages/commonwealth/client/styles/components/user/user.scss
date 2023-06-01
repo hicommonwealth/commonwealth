@@ -70,6 +70,7 @@
 .User {
   display: flex;
   white-space: nowrap;
+  align-items: center;
 
   >a {
     // reset link styles
