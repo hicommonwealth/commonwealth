@@ -162,9 +162,6 @@ export class ServerThreadsController implements IServerThreadsController {
         include: [this.models.Address],
       });
 
-    console.log('foundOrCreatedReaction: ', foundOrCreatedReaction);
-    console.log('created: ', created);
-
     const finalReaction = created
       ? await this.models.Reaction.findOne({
           where: reactionData,
