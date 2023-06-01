@@ -13,8 +13,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.sequelize.query(
-      'UPDATE "Threads" SET "has_poll" = FALSE'
-    );
+    // Do nothing
   },
 };
