@@ -26,8 +26,14 @@ export const SublayoutHeader = ({
   onMobile,
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
-  const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
-    useSidebarStore();
+  const {
+    menuVisible,
+    setMenu,
+    menuName,
+    setMobileMenuName,
+    mobileMenuName,
+    setUserToggledVisibility,
+  } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
 
   return (
@@ -56,12 +62,13 @@ export const SublayoutHeader = ({
               }}
             />
           )}
-        {onMobile && app.activeChainId() && (
+        {app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"
             iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
               setMenu({ name: menuName, isVisible: !menuVisible });
+              setUserToggledVisibility(!menuVisible ? 'closed' : 'open');
             }}
           />
         )}
