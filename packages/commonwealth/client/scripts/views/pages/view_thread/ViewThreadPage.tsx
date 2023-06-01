@@ -21,7 +21,7 @@ import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/Sublayout';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import Permissions from '../../../lib/Permissions';
+import Permissions from '../../../utils/Permissions';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource, Thread } from '../../../models/Thread';
@@ -460,24 +460,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   // Original posters have full editorial control, while added collaborators
   // merely have access to the body and title
-  const { activeAccount } = app.user;
-
-  const isAuthor =
-    activeAccount?.address === thread.author &&
-    activeAccount?.chain.id === thread.authorChain;
-
-  const isAdmin =
-    app.roles.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-    }) || app.user.isSiteAdmin;
-
-  const isAdminOrMod =
-    isAdmin ||
-    app.roles.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-    });
+  const isAuthor = Permissions.isThreadAuthor(thread);
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);

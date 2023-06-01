@@ -7,7 +7,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import { ThreadActionType } from '../../../../../../shared/types';
 import { notifySuccess } from '../../../../controllers/app/notifications';
-import Permissions from '../../../../lib/Permissions';
+import Permissions from '../../../../utils/Permissions';
 import type Thread from '../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../models/Thread';
 import Topic from '../../../../models/Topic';

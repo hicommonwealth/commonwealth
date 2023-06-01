@@ -27,6 +27,7 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import Permissions from '../../../utils/Permissions';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -34,7 +35,7 @@ export const NewThreadForm = () => {
   const chainId = app.chain.id;
   const hasTopics = !!app.topics.getByCommunity(chainId).length;
   const { authorName } = useAuthorName();
-  const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
+  const isAdmin = Permissions.isCommunityAdmin();
 
   const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
     return (

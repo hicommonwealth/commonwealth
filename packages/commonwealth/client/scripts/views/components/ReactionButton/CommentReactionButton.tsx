@@ -20,6 +20,7 @@ import {
 } from './helpers';
 import { LoginModal } from '../../modals/login_modal';
 import { Modal } from '../component_kit/cw_modal';
+import Permissions from '../../../utils/Permissions';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
@@ -36,9 +37,7 @@ export const CommentReactionButton = ({
   const { likes = 0, hasReacted } = reactionCounts || {};
 
   // token balance check if needed
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const parentThread = app.threads.getById(comment.threadId);
 

@@ -11,6 +11,7 @@ import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import Permissions from '../../utils/Permissions';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -73,10 +74,7 @@ type EditTopicThresholdsModalProps = {
 export const EditTopicThresholdsModal = (
   props: EditTopicThresholdsModalProps
 ) => {
-  if (
-    !app.user.isSiteAdmin &&
-    !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
-  ) {
+  if (!(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())) {
     return null;
   }
 

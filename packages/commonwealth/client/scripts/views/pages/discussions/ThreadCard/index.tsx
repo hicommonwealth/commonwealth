@@ -12,7 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
-import Permissions from '../../../../lib/Permissions';
+import Permissions from '../../../../utils/Permissions';
 import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import { CWTag } from '../../../components/component_kit/cw_tag';

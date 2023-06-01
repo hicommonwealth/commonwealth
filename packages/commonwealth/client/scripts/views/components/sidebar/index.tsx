@@ -18,6 +18,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { featureFlags } from 'helpers/feature-flags';
 import useSidebarStore from 'state/ui/sidebar';
+import Permissions from '../../../utils/Permissions';
 
 export type SidebarMenuName =
   | 'default'
@@ -32,17 +33,8 @@ export const Sidebar = () => {
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({
-      chain: app.activeChainId(),
-    });
-
-  const isMod = app.roles.isRoleOfCommunity({
-    role: 'moderator',
-    chain: app.activeChainId(),
-  });
-
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
 
   return (
@@ -85,9 +77,7 @@ export const Sidebar = () => {
         </div>
       )}
       {menuName === 'createContent' && <CreateContentSidebar />}
-      {menuName === 'exploreCommunities' && (
-        <ExploreCommunitiesSidebar />
-      )}
+      {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
     </div>
   );
 };

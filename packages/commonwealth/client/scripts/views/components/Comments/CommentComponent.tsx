@@ -19,6 +19,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommentAuthor from 'views/components/Comments/CommentAuthor';
+import Permissions from '../../../utils/Permissions';
 
 type CommentProps = {
   comment: Comment<any>;
@@ -58,15 +59,9 @@ export const CommentComponent = ({
   };
 
   const isAdminOrMod =
-    app.user.isSiteAdmin ||
-    app.roles.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-    }) ||
-    app.roles.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-    });
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
 
   const canReply = !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
 

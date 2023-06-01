@@ -1,3 +1,4 @@
+import Permissions from '../../../utils/Permissions';
 import { useEffect, useState } from 'react';
 import TopicGateCheck from '../../../controllers/chain/ethereum/gatedTopic';
 import type ChainInfo from '../../../models/ChainInfo';
@@ -36,9 +37,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
   }, [activeAddress, setReactors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // token balance check if needed
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   let topicName = '';
 
