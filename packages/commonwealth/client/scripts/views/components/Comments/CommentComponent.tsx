@@ -28,6 +28,7 @@ type CommentProps = {
   isLocked: boolean;
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
+  threadId: number;
   updatedCommentsCallback?: () => void;
   isReplying?: boolean;
   parentCommentId?: number;
@@ -43,6 +44,7 @@ export const CommentComponent = ({
   updatedCommentsCallback,
   isReplying,
   parentCommentId,
+  threadId,
 }: CommentProps) => {
   const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>(false);
@@ -82,7 +84,7 @@ export const CommentComponent = ({
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              await app.comments.delete(comment);
+              await app.comments.delete(comment, threadId);
               updatedCommentsCallback();
             } catch (e) {
               console.log(e);

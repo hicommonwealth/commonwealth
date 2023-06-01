@@ -1,4 +1,5 @@
 import Thread from 'models/Thread';
+import { ThreadStage } from 'models/types';
 import moment from 'moment';
 import 'pages/discussions/index.scss';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -37,8 +38,23 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;
+    stage: ThreadStage;
   }) => {
-    const { threadId, action } = data;
+    const { threadId, action, stage } = data;
+
+    if (action === ThreadActionType.StageChange) {
+      setThreads((oldThreads) => {
+        const updatedThreads = [...oldThreads].filter(
+          // make sure that if we have an active stage filter (from the dropdown)
+          // then we also filter the current list for the current stage only
+          (x) => x.stage === stageName
+        );
+        const foundThread = updatedThreads.find((x) => x.id === threadId);
+        if (foundThread) foundThread.stage = stage;
+        return updatedThreads;
+      });
+      return;
+    }
 
     if (
       action === ThreadActionType.TopicChange ||
@@ -125,21 +141,64 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
-    app.threads.resetPagination();
-    app.threads
-      .loadNextPage({
-        topicName,
-        stageName,
-        includePinnedThreads: true,
-        featuredFilter,
-        dateRange,
-        page: pageNumber.current,
-      })
-      .then((t) => {
-        // Fetch first 20 + unpinned threads
-        setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
-        setInitializing(false);
-      });
+    const timerId = setTimeout(() => {
+      // always reset pagination on page change
+      app.threads.resetPagination();
+
+      // check if store already has atleast 20 threads for this community -> topic/stage,
+      // if so dont fetch more for now (scrolling will fetch more)
+      const chain = app.activeChainId();
+      const foundThreadsForChain = app.threads.store
+        .getAll()
+        .filter((x) => x.chain === chain);
+      if (foundThreadsForChain.length >= 20) {
+        if (topicName || stageName) {
+          let finalThreads = foundThreadsForChain;
+
+          // get threads for current topic
+          const topicId = app.topics.getByName(topicName, chain)?.id;
+          if (topicId) {
+            finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
+          }
+
+          // get threads for current stage
+          if (stageName) {
+            finalThreads = finalThreads.filter((x) => x.stage === stageName);
+          }
+
+          if (finalThreads.length >= 20) {
+            setThreads(sortPinned(finalThreads));
+            setInitializing(false);
+            return;
+          }
+        }
+        // else show all threads
+        else {
+          setThreads(sortPinned(foundThreadsForChain));
+          setInitializing(false);
+          return;
+        }
+      }
+
+      // if the store has <= 20 threads then fetch more
+      app.threads
+        .loadNextPage({
+          topicName,
+          stageName,
+          includePinnedThreads: true,
+          featuredFilter,
+          dateRange,
+          page: pageNumber.current,
+        })
+        .then((t) => {
+          // Fetch first 20 + unpinned threads
+
+          setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
+          setInitializing(false);
+        });
+    });
+
+    return () => clearTimeout(timerId);
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
@@ -169,21 +228,25 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         }
         return null;
       });
+
       return sortPinned(sortByFeaturedFilter(finalThreads));
     });
   }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
   if (initializing) {
-    return <PageLoading />;
+    return <PageLoading hideSearch={false} />;
   }
+
   return (
-    <Sublayout hideFooter={true}>
+    <Sublayout hideFooter={true} hideSearch={false}>
       <div className="DiscussionsPage">
         <Virtuoso
           style={{ height: '100%', width: '100%' }}
           data={threads}
           itemContent={(i, thread) => {
-            return <ThreadPreview thread={thread} key={thread.id} />;
+            return (
+              <ThreadPreview thread={thread} key={thread.id + thread.stage} />
+            );
           }}
           endReached={loadMore}
           overscan={200}
