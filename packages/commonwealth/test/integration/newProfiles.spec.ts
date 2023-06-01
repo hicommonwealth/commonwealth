@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { expect } from 'chai';
 import 'chai/register-should';
+import app from 'client/scripts/state';
 import sinon from 'sinon';
 import {
   testAddresses,
@@ -8,9 +9,8 @@ import {
 } from 'test/integration/api/external/dbEntityHooks.spec';
 import NewProfilesController, {
   newProfilesChunkSize,
-} from '../../../client/scripts/controllers/server/newProfiles';
-import MinimumProfile from '../../../client/scripts/models/MinimumProfile';
-import app from '../../../client/scripts/state';
+} from '../../client/scripts/controllers/server/newProfiles';
+import MinimumProfile from '../../client/scripts/models/MinimumProfile';
 
 app.serverUrl = () => '/api';
 
