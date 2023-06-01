@@ -12,7 +12,6 @@ import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
 import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
-import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';
 import type { RoleInstanceWithPermission } from '../util/roles';
@@ -34,7 +33,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     mostActiveUsers,
     threadsInVoting,
     totalThreads,
-    rules,
     communityBanner,
     contractsWithTemplatesData,
     communityRoles,
@@ -46,7 +44,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         unknown,
         ThreadInstance[],
         [{ count: string }],
-        RuleInstance[],
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
@@ -161,11 +158,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         type: QueryTypes.SELECT,
       }
     ),
-    models.Rule.findAll({
-      where: {
-        chain_id: chain.id,
-      },
-    }),
     models.CommunityBanner.findOne({
       where: {
         chain_id: chain.id,
@@ -237,7 +229,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       numTotalThreads,
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
-      rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
         return {

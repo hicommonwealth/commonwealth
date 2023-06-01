@@ -3,14 +3,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      // irreversible delete
-      await queryInterface.bulkDelete(
-        'Subscriptions',
-        {
-          category_id: 'new-chat-mention',
-        },
-        { transaction: t }
-      );
       await queryInterface.dropTable('ChatMessages', { transaction: t });
       await queryInterface.dropTable('ChatChannels', { transaction: t });
     });

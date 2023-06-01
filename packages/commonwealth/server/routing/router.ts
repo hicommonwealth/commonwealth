@@ -107,10 +107,6 @@ import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
 
-import createRule from '../routes/rules/createRule';
-import deleteRule from '../routes/rules/deleteRule';
-import getRuleTypes from '../routes/rules/getRuleTypes';
-
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
@@ -134,7 +130,6 @@ import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
-import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import type BanCache from '../util/banCheckCache';
@@ -181,7 +176,6 @@ function setupRouter(
   models: DB,
   viewCountCache: ViewCountCache,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService
@@ -313,7 +307,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
-    createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createThread.bind(this, models, tokenBalanceCache, banCache)
   );
   router.put(
     '/editThread',
@@ -360,7 +354,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    updateVote.bind(this, models, tokenBalanceCache, ruleCache)
+    updateVote.bind(this, models, tokenBalanceCache)
   );
   router.get(
     '/viewVotes',
@@ -530,7 +524,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createComment.bind(this, models, tokenBalanceCache, banCache)
   );
   router.post(
     '/editComment',
@@ -602,7 +596,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createReaction.bind(this, models, tokenBalanceCache, banCache)
   );
   router.post(
     '/deleteReaction',
@@ -820,20 +814,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateChainCategory.bind(this, models)
   );
-
-  // rules
-  router.post(
-    '/createRule',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createRule.bind(this, models)
-  );
-  router.post(
-    '/deleteRule',
-    passport.authenticate('jwt', { session: false }),
-    deleteRule.bind(this, models)
-  );
-  router.get('/getRuleTypes', getRuleTypes.bind(this, models));
 
   // settings
   router.post(
