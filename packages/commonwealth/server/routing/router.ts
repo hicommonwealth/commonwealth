@@ -181,6 +181,7 @@ import getLinks from '../routes/linking/getLinks';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
+import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 
 function setupRouter(
   endpoint: string,
@@ -610,6 +611,19 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createThreadReactionHandler.bind(
+      this,
+      models,
+      tokenBalanceCache,
+      ruleCache,
+      banCache
+    )
+  );
+  router.post(
+    '/comments/:id/reactions',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createCommentReactionHandler.bind(
       this,
       models,
       tokenBalanceCache,

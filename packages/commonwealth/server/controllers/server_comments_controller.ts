@@ -21,36 +21,37 @@ import { AnalyticsOptions } from './server_analytics_controller';
 import { FindOrCreateOptions } from 'sequelize';
 
 const Errors = {
-  ThreadNotFound: 'Thread not found',
+  CommentNotFound: 'Comment not found',
+  ThreadNotFoundForComment: 'Thread not found for comment',
   RuleCheckFailed: 'Rule check failed',
   BanError: 'Ban error',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 /**
- * An interface that describes the methods related to threads
+ * An interface that describes the methods related to comments
  */
-interface IServerThreadsController {
+interface IServerCommentsController {
   /**
-   * Creates a reaction for a thread, returns reaction
+   * Creates a reaction for a comment, returns reaction
    *
    * @param user - Current user
    * @param address - Address of the user
    * @param chain - Chain of thread
    * @param reaction - Type of reaction
-   * @param threadId - ID of the thread
+   * @param commentId - ID of the comment
    * @param canvasAction - Canvas metadata
    * @param canvasSession - Canvas metadata
    * @param canvasHash - Canvas metadata
-   * @throws `ThreadNotFound`, `RuleCheckFailed`, `BanError`, `BalanceCheckFailed`
+   * @throws `CommentNotFound`, `RuleCheckFailed`, `BanError`, `BalanceCheckFailed`
    * @returns Promise that resolves to [Reaction, NotificationOptions, AnalyticsOptions]
    */
-  createThreadReaction(
+  createCommentReaction(
     user: UserInstance,
     address: AddressInstance,
     chain: ChainInstance,
     reaction: string,
-    threadId: number,
+    commentId: number,
     canvasAction?: any,
     canvasSession?: any,
     canvasHash?: any
@@ -58,9 +59,9 @@ interface IServerThreadsController {
 }
 
 /**
- * Implements methods related to threads
+ * Implements methods related to comments
  */
-export class ServerThreadsController implements IServerThreadsController {
+export class ServerCommentsController implements IServerCommentsController {
   constructor(
     private models: DB,
     private tokenBalanceCache: TokenBalanceCache,
@@ -68,22 +69,29 @@ export class ServerThreadsController implements IServerThreadsController {
     private banCache: BanCache
   ) {}
 
-  async createThreadReaction(
+  async createCommentReaction(
     user: UserInstance,
     address: AddressInstance,
     chain: ChainInstance,
     reaction: string,
-    threadId: number,
+    commentId: number,
     canvasAction?: any,
     canvasSession?: any,
     canvasHash?: any
   ): Promise<[ReactionAttributes, NotificationOptions, AnalyticsOptions]> {
+    const comment = await this.models.Comment.findOne({
+      where: { id: commentId },
+    });
+    if (!comment) {
+      throw new Error(`${Errors.CommentNotFound}: ${commentId}`);
+    }
+
     const thread = await this.models.Thread.findOne({
-      where: { id: threadId },
+      where: { id: comment.thread_id },
     });
 
     if (!thread) {
-      throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+      throw new Error(`${Errors.ThreadNotFoundForComment}: ${commentId}`);
     }
 
     // check topic ban
@@ -151,7 +159,7 @@ export class ServerThreadsController implements IServerThreadsController {
       reaction,
       address_id: address.id,
       chain: chain.id,
-      thread_id: thread.id,
+      comment_id: comment.id,
       canvas_action: canvasAction,
       canvas_session: canvasSession,
       canvas_hash: canvasHash,
@@ -173,12 +181,14 @@ export class ServerThreadsController implements IServerThreadsController {
     // build notification options
     const notificationOptions: NotificationOptions = {
       categoryId: NotificationCategories.NewReaction,
-      objectId: `discussion_${thread.id}`,
+      objectId: `comment-${comment.id}`,
       notificationData: {
         created_at: new Date(),
         thread_id: thread.id,
+        comment_id: comment.id,
+        comment_text: comment.text,
         root_title: thread.title,
-        root_type: 'discussion',
+        root_type: null,
         chain_id: finalReaction.chain,
         author_address: finalReaction.Address.address,
         author_chain: finalReaction.Address.chain,
@@ -189,7 +199,7 @@ export class ServerThreadsController implements IServerThreadsController {
         url: getThreadUrl(thread),
         title: thread.title,
         chain: finalReaction.chain,
-        body: '',
+        body: comment.text,
       },
       excludeAddresses: [finalReaction.Address.address],
     };

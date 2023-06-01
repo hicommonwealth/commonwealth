@@ -3,38 +3,38 @@ import { DB } from '../../models';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import BanCache from '../../util/banCheckCache';
-import { ServerThreadsController } from '../../controllers/server_threads_controller';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import RuleCache from '../../util/rules/ruleCache';
 import { ServerNotificationsController } from '../../controllers/server_notifications_controller';
 import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
+import { ServerCommentsController } from '../../controllers/server_comments_controller';
 import { ReactionAttributes } from 'server/models/reaction';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
-  InvalidThreadId: 'Invalid thread ID',
+  InvalidCommentId: 'Invalid comment ID',
 };
 
-type CreateThreadReactionRequestParams = { id: string };
-type CreateThreadReactionRequestBody = {
+type CreateCommentReactionRequestParams = { id: string };
+type CreateCommentReactionRequestBody = {
   reaction: string;
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
 };
-type CreateThreadReactionResponse = ReactionAttributes;
+type CreateCommentReactionResponse = ReactionAttributes;
 
-export const createThreadReactionHandler = async (
+export const createCommentReactionHandler = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
   banCache: BanCache,
   req: TypedRequest<
-    CreateThreadReactionRequestBody,
+    CreateCommentReactionRequestBody,
     any,
-    CreateThreadReactionRequestParams
+    CreateCommentReactionRequestParams
   >,
-  res: TypedResponse<CreateThreadReactionResponse>,
+  res: TypedResponse<CreateCommentReactionResponse>,
   next: NextFunction
 ) => {
   const { user, address, chain } = req;
@@ -49,12 +49,12 @@ export const createThreadReactionHandler = async (
     return next(new AppError(Errors.InvalidReaction));
   }
 
-  const threadId = parseInt(req.params.id, 10);
-  if (!threadId) {
-    return next(new AppError(Errors.InvalidThreadId));
+  const commentId = parseInt(req.params.id, 10);
+  if (!commentId) {
+    return next(new AppError(Errors.InvalidCommentId));
   }
 
-  const serverThreadsController = new ServerThreadsController(
+  const serverCommentsController = new ServerCommentsController(
     models,
     tokenBalanceCache,
     ruleCache,
@@ -65,14 +65,14 @@ export const createThreadReactionHandler = async (
   );
   const serverAnalyticsController = new ServerAnalyticsController();
 
-  // create thread reaction
+  // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await serverThreadsController.createThreadReaction(
+    await serverCommentsController.createCommentReaction(
       user,
       address,
       chain,
       reaction,
-      threadId,
+      commentId,
       canvasAction,
       canvasSession,
       canvasHash

@@ -74,7 +74,7 @@ export const CommentReactionButton = ({
     setIsLoading(true);
 
     app.reactionCounts
-      .create(userAddress, comment, 'like', chainId)
+      .createCommentReaction(userAddress, comment, 'like', chainId)
       .then(() => {
         setReactors([
           ...reactors,
