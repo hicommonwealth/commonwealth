@@ -4,15 +4,6 @@ import type { AddressInstance } from './models/address';
 import type { ChainInstance } from './models/chain';
 import type { UserInstance } from './models/user';
 
-export type TypedRequestParams<
-  P extends Record<string, unknown> = Record<string, unknown>
-> = Express.Request & {
-  user?: Express.User & UserInstance;
-  address?: AddressInstance;
-  chain?: ChainInstance;
-  params: P;
-};
-
 export type TypedRequestQuery<
   Q extends Record<string, unknown> = Record<string, unknown>
 > = Express.Request & {
@@ -31,15 +22,26 @@ export type TypedRequestBody<
   body: B;
 };
 
+export type TypedRequestParams<
+  P extends Record<string, unknown> = Record<string, unknown>
+> = Express.Request & {
+  user?: Express.User & UserInstance;
+  address?: AddressInstance;
+  chain?: ChainInstance;
+  params: P;
+};
+
 export type TypedRequest<
   B extends Record<string, unknown> = Record<string, unknown>,
-  Q extends Record<string, unknown> = Record<string, unknown>
+  Q extends Record<string, unknown> = Record<string, unknown>,
+  P extends Record<string, unknown> = Record<string, unknown>
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
   chain?: ChainInstance;
   body?: B;
   query?: Q;
+  params?: P;
 };
 
 export type TypedResponse<T> = Response<

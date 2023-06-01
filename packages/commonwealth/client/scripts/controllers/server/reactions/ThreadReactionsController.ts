@@ -47,7 +47,10 @@ class ThreadReactionsController {
     };
 
     const response = (
-      await axios.post(`${app.serverUrl()}/createReaction`, options)
+      await axios.post(
+        `${app.serverUrl()}/threads/${thread.id}/reactions`,
+        options
+      )
     ).data;
 
     const existingReactions = this._threadIdToReactions.get(thread.id);

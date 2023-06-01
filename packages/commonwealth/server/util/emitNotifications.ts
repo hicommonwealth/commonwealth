@@ -25,16 +25,18 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
+export type NotificationDataTypes =
+  | IPostNotificationData
+  | ICommunityNotificationData
+  | IChainEventNotificationData
+  | IChatNotification
+  | (SnapshotNotification & { eventType: SnapshotEventType });
+
 export default async function emitNotifications(
   models: DB,
   category_id: string,
   object_id: string,
-  notification_data:
-    | IPostNotificationData
-    | ICommunityNotificationData
-    | IChainEventNotificationData
-    | IChatNotification
-    | (SnapshotNotification & { eventType: SnapshotEventType }),
+  notification_data: NotificationDataTypes,
   webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]

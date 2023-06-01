@@ -1,28 +1,64 @@
-import { DB } from 'server/models';
-import BanCache from 'server/util/banCheckCache';
-import { UserInstance } from '../models/user';
-import { ReactionAttributes } from 'server/models/reaction';
+import { DB } from '../models';
+import BanCache from '../util/banCheckCache';
+import { ReactionAttributes } from '../models/reaction';
 import { TokenBalanceCache } from '../../../token-balance-cache/src';
-import RuleCache from 'server/util/rules/ruleCache';
-import { ChainInstance } from 'server/models/chain';
-import { AddressInstance } from 'server/models/address';
-import checkRule from 'server/util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
+import { ChainInstance } from '../models/chain';
+import { AddressInstance } from '../models/address';
+import checkRule from '../util/rules/checkRule';
+import {
+  ChainNetwork,
+  ChainType,
+  NotificationCategories,
+} from '../../../common-common/src/types';
+import { findAllRoles } from '../util/roles';
+import { UserInstance } from '../models/user';
+import validateTopicThreshold from '../util/validateTopicThreshold';
+import { NotificationOptions } from './server_notifications_controller';
+import { getThreadUrl } from '../../shared/utils';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { AnalyticsOptions } from './server_analytics_controller';
 
+const Errors = {
+  ThreadNotFound: 'Thread not found',
+  RuleCheckFailed: 'Rule check failed',
+  BanError: 'Ban error',
+  BalanceCheckFailed: 'Could not verify user token balance',
+};
+
+/**
+ * An interface that describes the methods related to threads
+ */
 interface IServerThreadsController {
   /**
    * Creates a reaction for a thread, returns reaction
    *
-   * @param user - Logged in user
+   * @param user - Current user
+   * @param address - Address of the user
+   * @param chain - Chain of thread
+   * @param reaction - Type of reaction
    * @param threadId - ID of the thread
-   * @returns Promise that resolves to a reaction
+   * @param canvasAction - Canvas metadata
+   * @param canvasSession - Canvas metadata
+   * @param canvasHash - Canvas metadata
+   * @throws `ThreadNotFound`, `RuleCheckFailed`, `BanError`, `BalanceCheckFailed`
+   * @returns Promise that resolves to [Reaction, NotificationOptions, AnalyticsOptions]
    */
   createThreadReaction(
+    user: UserInstance,
+    address: AddressInstance,
     chain: ChainInstance,
-    authorAddress: AddressInstance,
-    threadId: number
-  ): Promise<ReactionAttributes>;
+    reaction: string,
+    threadId: number,
+    canvasAction?: any,
+    canvasSession?: any,
+    canvasHash?: any
+  ): Promise<[ReactionAttributes, NotificationOptions, AnalyticsOptions]>;
 }
 
+/**
+ * Implements methods related to threads
+ */
 export class ServerThreadsController implements IServerThreadsController {
   constructor(
     private models: DB,
@@ -32,47 +68,141 @@ export class ServerThreadsController implements IServerThreadsController {
   ) {}
 
   async createThreadReaction(
+    user: UserInstance,
+    address: AddressInstance,
     chain: ChainInstance,
-    authorAddress: AddressInstance,
-    threadId: number
-  ): Promise<ReactionAttributes> {
+    reaction: string,
+    threadId: number,
+    canvasAction?: any,
+    canvasSession?: any,
+    canvasHash?: any
+  ): Promise<[ReactionAttributes, NotificationOptions, AnalyticsOptions]> {
     const thread = await this.models.Thread.findOne({
       where: { id: threadId },
     });
 
+    if (!thread) {
+      throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+    }
+
     // check topic ban
-    if (thread) {
-      const topic = await this.models.Topic.findOne({
-        include: {
-          model: this.models.Thread,
-          where: { id: thread.id },
-          required: true,
-          as: 'threads',
-        },
-        attributes: ['rule_id'],
+    const topic = await this.models.Topic.findOne({
+      include: {
+        model: this.models.Thread,
+        where: { id: thread.id },
+        required: true,
+        as: 'threads',
+      },
+      attributes: ['rule_id'],
+    });
+    if (topic?.rule_id) {
+      const passesRules = await checkRule(
+        this.ruleCache,
+        this.models,
+        topic.rule_id,
+        address.address
+      );
+      if (!passesRules) {
+        throw new Error(Errors.RuleCheckFailed);
+      }
+    }
+
+    // check address ban
+    if (chain) {
+      const [canInteract, banError] = await this.banCache.checkBan({
+        chain: chain.id,
+        address: address.address,
       });
-      if (topic?.rule_id) {
-        const passesRules = await checkRule(
-          this.ruleCache,
+      if (!canInteract) {
+        throw new Error(`${Errors.BanError}: ${banError}`);
+      }
+    }
+
+    // check permissions (bypass for admin)
+    if (
+      chain &&
+      (chain.type === ChainType.Token ||
+        chain.network === ChainNetwork.Ethereum)
+    ) {
+      const addressAdminRoles = await findAllRoles(
+        this.models,
+        { where: { address_id: address.id } },
+        chain.id,
+        ['admin']
+      );
+      const isGodMode = user.isAdmin;
+      const hasAdminRole = addressAdminRoles.length > 0;
+      if (!isGodMode && !hasAdminRole) {
+        const canReact = await validateTopicThreshold(
+          this.tokenBalanceCache,
           this.models,
-          topic.rule_id,
-          authorAddress.address
+          thread.topic_id,
+          address.address
         );
-        if (!passesRules) {
-          throw new Error('Rule check failed');
+        if (!canReact) {
+          throw new Error(Errors.BalanceCheckFailed);
         }
       }
     }
 
-    // check author ban
-    if (chain) {
-      const [canInteract, banError] = await this.banCache.checkBan({
-        chain: chain.id,
-        address: authorAddress.address,
+    // create the reaction
+    const reactionData = {
+      reaction,
+      address_id: address.id,
+      chain: chain.id,
+      thread_id: thread.id,
+      canvas_action: canvasAction,
+      canvas_session: canvasSession,
+      canvas_hash: canvasHash,
+    };
+    const [foundOrCreatedReaction, created] =
+      await this.models.Reaction.findOrCreate({
+        where: reactionData,
+        defaults: reactionData,
+        include: [this.models.Address],
       });
-      if (!canInteract) {
-        throw new Error(banError);
-      }
-    }
+
+    console.log('foundOrCreatedReaction: ', foundOrCreatedReaction);
+    console.log('created: ', created);
+
+    const finalReaction = created
+      ? await this.models.Reaction.findOne({
+          where: reactionData,
+          include: [this.models.Address],
+        })
+      : foundOrCreatedReaction;
+
+    // build notification options
+    const notificationOptions: NotificationOptions = {
+      categoryId: NotificationCategories.NewReaction,
+      objectId: `discussion_${thread.id}`,
+      notificationData: {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_title: thread.title,
+        root_type: 'discussion',
+        chain_id: finalReaction.chain,
+        author_address: finalReaction.Address.address,
+        author_chain: finalReaction.Address.chain,
+      },
+      webhookData: {
+        user: finalReaction.Address.address,
+        author_chain: finalReaction.Address.chain,
+        url: getThreadUrl(thread),
+        title: thread.title,
+        chain: finalReaction.chain,
+        body: '',
+      },
+      excludeAddresses: [finalReaction.Address.address],
+    };
+
+    // build analytics options
+    const analyticsOptions = {
+      event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
+      community: chain.id,
+      isCustomDomain: null,
+    };
+
+    return [finalReaction.toJSON(), notificationOptions, analyticsOptions];
   }
 }

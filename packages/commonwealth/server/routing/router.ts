@@ -23,7 +23,6 @@ import editComment from '../routes/editComment';
 import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
 import bulkComments from '../routes/bulkComments';
-import createReaction from '../routes/createReaction';
 import bulkReactions from '../routes/bulkReactions';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
@@ -181,7 +180,7 @@ import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
 import { deleteReactionHandler } from '../routes/reactions/deleteReactionHandler';
-import { createThreadReactionHandler } from 'server/routes/threads/createThreadReactionHandler';
+import { createThreadReactionHandler } from '../routes/threads/createThreadReactionHandler';
 
 function setupRouter(
   endpoint: string,
