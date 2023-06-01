@@ -211,6 +211,7 @@ class SessionsController {
         openSessionRevalidation({
           walletAddress: address,
           walletName,
+          walletSsoSource: matchingAccount.walletSsoSource,
           onVerified: (verifiedAddress) => resolve(verifiedAddress),
           onClose: () => {
             const err = new Error();

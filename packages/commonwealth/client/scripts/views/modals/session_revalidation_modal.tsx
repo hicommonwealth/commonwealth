@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { WalletSsoSource } from 'common-common/src/types';
+import { WalletSsoSource } from 'common-common/src/types';
 
 import { Modal } from '../components/component_kit/cw_modal';
 import _ from 'underscore';
@@ -23,6 +23,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 type SessionRevalidationModalProps = {
   walletName: string,
   walletAddress: string,
+  walletSsoSource: WalletSsoSource,
   onClose: () => void;
   onVerified: (address: string | undefined) => void;
 };
@@ -30,6 +31,7 @@ type SessionRevalidationModalProps = {
 const SessionRevalidationModal = ({
   walletName,
   walletAddress,
+  walletSsoSource,
   onVerified,
   onClose,
 }: SessionRevalidationModalProps) => {
@@ -83,7 +85,9 @@ const SessionRevalidationModal = ({
             <h3>Re-connect wallet</h3>
             <p>
               Your previous login was a while ago.
-              Re-connect {walletName ?? "your wallet"} with the
+              Re-connect {walletName ?? "your wallet"}{" "}
+              {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown ? <>({walletSsoSource})</> : ""}
+              {" "}with the
               address <strong>{formatAddress(walletAddress)}</strong> to continue:
             </p>
           </div>
@@ -138,6 +142,7 @@ const SessionRevalidationModal = ({
 export const openSessionRevalidation = ({
   walletName,
   walletAddress,
+  walletSsoSource,
   onVerified,
   onClose,
 }: SessionRevalidationModalProps) => {
@@ -152,6 +157,7 @@ export const openSessionRevalidation = ({
     <SessionRevalidationModal
       walletName={walletName}
       walletAddress={walletAddress}
+      walletSsoSource={walletSsoSource}
       onVerified={(address: string) => {
         root.unmount();
         target.remove();
