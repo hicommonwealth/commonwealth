@@ -106,13 +106,6 @@ import deleteTopic from '../routes/deleteTopic';
 import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
-import getChatMessages from '../routes/chat/getChatMessages';
-import getChatChannel from '../routes/chat/getChatChannel';
-import createChatChannel from '../routes/chat/createChatChannel';
-import deleteChatChannel from '../routes/chat/deleteChatChannel';
-import deleteChatCategory from '../routes/chat/deleteChatCategory';
-import editChatChannel from '../routes/chat/editChatChannel';
-import editChatCategory from '../routes/chat/editChatCategory';
 
 import createRule from '../routes/rules/createRule';
 import deleteRule from '../routes/rules/deleteRule';
@@ -826,49 +819,6 @@ function setupRouter(
     '/updateChainCategory',
     passport.authenticate('jwt', { session: false }),
     updateChainCategory.bind(this, models)
-  );
-
-  // chat
-  router.get(
-    '/getChatMessages',
-    passport.authenticate('jwt', { session: false }),
-    getChatMessages.bind(this, models)
-  );
-
-  router.get(
-    '/getChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    getChatChannel.bind(this, models)
-  );
-
-  router.post(
-    '/createChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    createChatChannel.bind(this, models)
-  );
-
-  router.delete(
-    '/deleteChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    deleteChatChannel.bind(this, models)
-  );
-
-  router.delete(
-    '/deleteChatCategory',
-    passport.authenticate('jwt', { session: false }),
-    deleteChatCategory.bind(this, models)
-  );
-
-  router.put(
-    '/editChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    editChatChannel.bind(this, models)
-  );
-
-  router.put(
-    '/editChatCategory',
-    passport.authenticate('jwt', { session: false }),
-    editChatCategory.bind(this, models)
   );
 
   // rules

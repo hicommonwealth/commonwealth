@@ -182,12 +182,6 @@ async function authenticateSocialAccount(
       object_id: `user-${newUser.id}`,
       is_active: true,
     });
-    await models.Subscription.create({
-      subscriber_id: newUser.id,
-      category_id: NotificationCategories.NewChatMention,
-      object_id: `user-${newUser.id}`,
-      is_active: true,
-    });
     await newAccount.setUser(newUser);
     return cb(null, newUser);
   }

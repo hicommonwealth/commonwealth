@@ -18,7 +18,6 @@ module.exports = merge(common, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
-      CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com'),
     }),
     new WebpackDeduplicationPlugin({
       cacheDir: './cache',
