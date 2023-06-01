@@ -24,7 +24,7 @@ const threadLinkButton = (threadId: string, title: string, chain: string) => {
 
   return (
     <div className="HeaderLink">
-      <Link to={path}>Go to Thread: {title}</Link>
+      <Link to={path}>{title ? decodeURIComponent(title) : 'Go to thread'}</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
