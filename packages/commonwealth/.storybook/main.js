@@ -24,6 +24,7 @@ module.exports = {
     name: '@storybook/react-webpack5',
     options: {},
   },
+  staticDirs: ['../static/fonts'],
   docs: {
     autodocs: 'tag',
   },
@@ -38,7 +39,7 @@ module.exports = {
           },
         },
       ],
-      include: path.resolve(__dirname, '../static/fonts/'),
+      include: path.resolve(__dirname, './'),
     };
 
     return {
