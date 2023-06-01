@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
-import type { RuleAttributes } from './rule';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -19,18 +18,14 @@ export type TopicAttributes = {
   deleted_at?: Date;
   token_threshold: string;
   default_offchain_template?: string;
-  rule_id?: number;
 
   // associations
   chain?: ChainAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
-  Rule?: RuleAttributes;
 };
 
 export type TopicInstance = ModelInstance<TopicAttributes> & {
   // no mixins used
-  // TODO: do we need to implement the "as" stuff here?
-  getRule: Sequelize.BelongsToGetAssociationMixin<RuleAttributes>;
 };
 
 export type TopicModelStatic = ModelStatic<TopicInstance>;
@@ -67,7 +62,6 @@ export default (
         allowNull: false,
         defaultValue: '',
       },
-      rule_id: { type: dataTypes.INTEGER, allowNull: true },
     },
     {
       timestamps: true,
@@ -94,9 +88,6 @@ export default (
     models.Topic.hasMany(models.Thread, {
       as: 'threads',
       foreignKey: 'topic_id',
-    });
-    models.Topic.belongsTo(models.Rule, {
-      foreignKey: 'rule_id',
     });
   };
 
