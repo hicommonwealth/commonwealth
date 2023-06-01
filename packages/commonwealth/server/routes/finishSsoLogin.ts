@@ -351,17 +351,6 @@ const finishSsoLogin = async (
         { transaction: t }
       );
 
-      // Automatically create subscription to chat mentions
-      await models.Subscription.create(
-        {
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewChatMention,
-          object_id: `user-${user.id}`,
-          is_active: true,
-        },
-        { transaction: t }
-      );
-
       // populate token
       emptyTokenInstance.issuer = jwtPayload.iss;
       emptyTokenInstance.issued_at = jwtPayload.iat;
