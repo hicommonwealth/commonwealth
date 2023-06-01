@@ -12,6 +12,7 @@ import 'modals/session_signin_modal.scss';
 import app from 'state';
 import useWallets from '../../hooks/useWallets';
 import WebWalletController from '../../controllers/app/web_wallets';
+import { CWAuthButton } from '../components/component_kit/cw_auth_button';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -93,7 +94,27 @@ const SessionRevalidationModal = ({
           </div>
           <div className="compact-modal-actions">
             <div>
-              {connectWithEmail ? (
+              {walletSsoSource === WalletSsoSource.Google ? <CWAuthButton
+               type="google"
+               label="Sign in with Google"
+               onClick={async () => onSocialLogin(WalletSsoSource.Google)}
+                /> :
+               walletSsoSource === WalletSsoSource.Discord ? <CWAuthButton
+               type="discord"
+               label="Discord"
+               onClick={async () => onSocialLogin(WalletSsoSource.Discord)}
+                /> :
+               walletSsoSource === WalletSsoSource.Github ? <CWAuthButton
+               type="github"
+               label="Github"
+               onClick={() => onSocialLogin(WalletSsoSource.Github)}
+                /> :
+               walletSsoSource === WalletSsoSource.Twitter ? <CWAuthButton
+               type="twitter"
+               label="Twitter"
+               onClick={() => onSocialLogin(WalletSsoSource.Twitter)}
+                /> :
+               connectWithEmail ? (
                 <div>
                   {!isMagicLoading ? (
                     <CWTextInput
