@@ -130,6 +130,7 @@ const ViewProposalPage = ({
           )
         }
         createdAt={proposal.createdAt}
+        updatedAt={null}
         subHeader={
           <ProposalSubheader
             proposal={proposal as SubheaderProposalType}

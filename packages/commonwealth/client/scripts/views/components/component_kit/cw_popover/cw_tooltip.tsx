@@ -7,14 +7,16 @@ import type { PopoverTriggerProps } from './cw_popover';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
+import { Placement } from '@popperjs/core/lib';
 
 type TooltipProps = {
   content: string | React.ReactNode;
   hasBackground?: boolean;
+  placement?: Placement;
 } & PopoverTriggerProps;
 
 export const CWTooltip = (props: TooltipProps) => {
-  const { content, hasBackground, renderTrigger } = props;
+  const { content, hasBackground, renderTrigger, placement } = props;
 
   const popoverProps = usePopover();
 
@@ -22,6 +24,7 @@ export const CWTooltip = (props: TooltipProps) => {
     <>
       {renderTrigger(popoverProps.handleInteraction)}
       <Popover
+        placement={placement}
         content={
           typeof content === 'string' ? (
             <div
