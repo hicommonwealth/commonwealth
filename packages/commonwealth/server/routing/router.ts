@@ -179,8 +179,8 @@ import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
-import { deleteReactionHandler } from '../routes/reactions/deleteReactionHandler';
-import { createThreadReactionHandler } from '../routes/threads/createThreadReactionHandler';
+import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 
 function setupRouter(
   endpoint: string,
