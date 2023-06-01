@@ -401,55 +401,6 @@ async function magicLoginRoute(
     log.warn(`Could not set up a valid client-side magic address ${req.body.magicAddress}`);
   }
 
-  // grab cosmos address for registration:
-  //
-  // magic also generates a cosmos address server-side, which is derived
-  // differently than the client-side address. we may be able to
-  // remove this in the future; it's just used to identify the user.
-  let magicUserMetadata: MagicUserMetadata;
-  try {
-    // fetch user data from magic backend
-    magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
-      decodedMagicToken.issuer,
-      WalletType.COSMOS
-    );
-    log.trace(`MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`);
-
-    const cosmosAddress = (magicUserMetadata?.wallets[0] as any)?.public_address;
-    if (!cosmosAddress) {
-      throw new Error('No cosmos address found!');
-    }
-    generatedAddresses.push({ address: cosmosAddress, chain: DEFAULT_COSMOS_CHAIN });
-
-    if (chainToJoin) {
-      if (chainToJoin.base === ChainBase.CosmosSDK) {
-        // ignore invalid chain base
-      } else if (chainToJoin.base === ChainBase.Ethereum) {
-        generatedAddresses.push({ address: canonicalAddress, chain: chainToJoin.id });
-      } else {
-        // ignore invalid chain base
-      }
-    }
-
-    // if joining a new chain (by logging in on a community), add to list of addresses
-    if (chainToJoin) {
-      if (chainToJoin.base === ChainBase.CosmosSDK) {
-        generatedAddresses.push({ address: cosmosAddress, chain: chainToJoin.id });
-      } else if (chainToJoin.base === ChainBase.Ethereum) {
-        generatedAddresses.push({ address: canonicalAddress, chain: chainToJoin.id });
-      } else {
-        // ignore invalid chain base
-        log.warn(`Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`);
-      }
-    }
-  } catch (e) {
-    return cb(
-      new ServerError(
-        `Magic fetch failed: ${e.message} - ${JSON.stringify(e.data)}`
-      )
-    );
-  }
-
   // first, attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
