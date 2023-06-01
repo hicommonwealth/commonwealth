@@ -172,22 +172,6 @@ const deleteChain = async (
         transaction: t,
       });
 
-      const communityRoles = await models.CommunityRole.findAll({
-        where: { chain_id: chain.id },
-        transaction: t,
-      });
-
-      await models.RoleAssignment.destroy({
-        where: {
-          community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
-        },
-        transaction: t,
-      });
-
-      await Promise.all(
-        communityRoles.map((r) => r.destroy({ transaction: t }))
-      );
-
       await models.Chain.destroy({
         where: { id: chain.id },
         transaction: t,

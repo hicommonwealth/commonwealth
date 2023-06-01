@@ -60,16 +60,6 @@ export const postTopicsValidation = [
   body('comments.*.deleted_at').not().exists(),
 ];
 
-export const postRolesValidation = [
-  body('roles').exists().isArray(),
-  body('roles.*.id').exists().toInt(),
-  ...optionalAddress('roles'),
-  body('roles.*.permission').not().exists(),
-  body('roles.*.created_at').not().exists(),
-  body('roles.*.updated_at').not().exists(),
-  body('roles.*.deleted_at').not().exists(),
-];
-
 export const postRulesValidation = [
   body('rules').exists().isArray(),
   body('rules.*.community_id').exists().isString().trim(),

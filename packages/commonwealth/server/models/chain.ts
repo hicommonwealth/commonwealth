@@ -54,6 +54,7 @@ export type ChainAttributes = {
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
   category?: any;
+  allowed_roles?: number;
 
   // associations
   ChainNode?: ChainNodeAttributes;

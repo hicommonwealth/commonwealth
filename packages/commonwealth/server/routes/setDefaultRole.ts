@@ -21,60 +21,30 @@ const setDefaultRole = async (
   if (!req.body.address || !req.body.author_chain)
     return next(new AppError(Errors.InvalidAddress));
 
-  const validAddress = await models.Address.findOne({
-    where: {
-      address: req.body.address,
-      chain: req.body.author_chain,
-      user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null },
-    },
-  });
-  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
-
   const existingRole = await findOneRole(
     models,
-    { where: { address_id: validAddress.id } },
+    { where: { address: req.body.address } },
     chain.id
   );
   if (!existingRole) return next(new AppError(Errors.RoleDNE));
 
-  const existingRoleInstanceToUpdate = await models.RoleAssignment.findOne({
-    where: {
-      address_id: validAddress.id,
-      community_role_id: existingRole.toJSON().community_role_id,
-    },
-  });
-
-  validAddress.last_active = new Date();
-  await validAddress.save();
-
-  const otherAddresses = await models.Address.findAll({
-    where: {
-      id: { [Sequelize.Op.ne]: validAddress.id },
-      user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null },
-    },
-  });
-
-  const communityRolesToUpdate = await models.CommunityRole.findAll({
-    where: {
-      chain_id: chain.id,
-    },
-  });
-
-  await models.RoleAssignment.update(
-    { is_user_default: false },
+  const [affectedRows] = await models.Address.update(
+    { is_user_default: true },
     {
       where: {
-        address_id: { [Op.in]: otherAddresses.map((a) => a.id) },
-        community_role_id: { [Op.in]: communityRolesToUpdate.map((r) => r.id) },
+        address: req.body.address,
+        chain: req.body.author_chain,
+        user_id: req.user.id,
+        verified: { [Sequelize.Op.ne]: null },
+        is_user_default: false,
       },
+      returning: true,
     }
   );
 
-  existingRoleInstanceToUpdate.is_user_default = true;
-
-  await existingRoleInstanceToUpdate.save();
+  if (affectedRows === 0) {
+    return next(new AppError(Errors.InvalidAddress));
+  }
 
   return res.json({ status: 'Success' });
 };

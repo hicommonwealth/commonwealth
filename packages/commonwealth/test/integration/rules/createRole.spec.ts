@@ -35,10 +35,10 @@ describe('createRole tests', () => {
   });
 
   it('should create a proper role assignment', async () => {
-    const oldRole = await models.Role.create({
-      address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'member',
+    const oldRole = await models.Address.create({
+      id: loggedInAddrId,
+      chain: chain,
+      role: 'member',
     });
 
     const roleInstanceWithPermission = await createRole(
@@ -49,15 +49,15 @@ describe('createRole tests', () => {
     );
 
     assert.deepEqual(
-      oldRole.toJSON().chain_id,
+      oldRole.toJSON().chain,
       roleInstanceWithPermission.toJSON().chain_id
     );
     assert.deepEqual(
-      oldRole.toJSON().address_id,
+      oldRole.toJSON().id,
       roleInstanceWithPermission.toJSON().address_id
     );
     assert.deepEqual(
-      oldRole.toJSON().permission,
+      oldRole.toJSON().role,
       roleInstanceWithPermission.toJSON().permission
     );
   });
@@ -68,7 +68,7 @@ describe('createRole tests', () => {
     } catch (error) {
       assert.deepEqual(
         error.message,
-        'insert or update on table "RoleAssignments" violates foreign key constraint "RoleAssignments_address_id_fkey"'
+        'insert or update on table "RoleAssignments" violates foreign key constraint "RoleAssignments_id_fkey"'
       );
     }
   });
@@ -79,7 +79,7 @@ describe('createRole tests', () => {
     } catch (error) {
       assert.deepEqual(
         error.message,
-        'insert or update on table "CommunityRoles" violates foreign key constraint "CommunityRoles_chain_id_fkey"'
+        'insert or update on table "CommunityRoles" violates foreign key constraint "CommunityRoles_chain_fkey"'
       );
     }
   });
@@ -100,12 +100,10 @@ describe('createRole tests', () => {
       default_deny_permissions: BigInt(2048),
     });
 
-    const roles = await models.CommunityRole.findAll({
-      where: { chain_id: chainObj.id },
+    const roles = await models.Chain.findAll({
+      where: { id: chainObj.id },
     });
-    assert.deepEqual(roles.length, 3);
-    assert.deepEqual(roles[0].name, 'member');
-    assert.deepEqual(roles[1].name, 'moderator');
-    assert.deepEqual(roles[2].name, 'admin');
+    assert.deepEqual(roles.length, 1);
+    assert.deepEqual(roles[0].allowed_roles, 7);
   });
 });

@@ -47,7 +47,6 @@ class ChainInfo {
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
-  public communityRoles: CommunityRole[];
   public cosmosGovernanceVersion?: string;
 
   public get node() {
@@ -89,7 +88,6 @@ class ChainInfo {
     tokenName,
     adminOnlyPolling,
     discord_config_id,
-    communityRoles,
     cosmosGovernanceVersion,
   }) {
     this.id = id;
@@ -127,7 +125,6 @@ class ChainInfo {
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
-    this.communityRoles = communityRoles;
     this.cosmosGovernanceVersion = cosmosGovernanceVersion;
   }
 
@@ -166,7 +163,6 @@ class ChainInfo {
     ChainNode,
     admin_only_polling,
     discord_config_id,
-    community_roles,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -221,7 +217,6 @@ class ChainInfo {
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
-      communityRoles: community_roles,
       cosmosGovernanceVersion: cosmos_governance_version,
     });
   }

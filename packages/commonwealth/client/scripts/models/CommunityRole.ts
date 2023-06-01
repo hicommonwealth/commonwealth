@@ -1,10 +1,10 @@
-import { Permission } from 'server/models/role';
+import { Role } from 'server/models/role';
 
 // DEPRECATED. This class is currently obtained by getting Address information.
 // If you can, just query for address instead.
 class CommunityRole {
   public readonly id: number;
-  public readonly name: Permission;
+  public readonly name: Role;
   public readonly chain_id: string;
   public readonly allow: bigint;
   public readonly deny: bigint;

@@ -1,9 +1,9 @@
-import { Role } from 'common-common/src/roles';
 import type { WalletId } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes, ChainInstance } from './chain';
 import type { ProfileAttributes, ProfileInstance } from './profile';
+import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes, UserInstance } from './user';
