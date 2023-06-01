@@ -29,6 +29,9 @@ interface IServerNotificationsController {
   emit(options: NotificationOptions): Promise<void>;
 }
 
+/**
+ * Implements methods related to notifications
+ */
 export class ServerNotificationsController
   implements IServerNotificationsController
 {

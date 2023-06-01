@@ -16,6 +16,9 @@ interface IServerAnalyticsController {
   track(options: AnalyticsOptions);
 }
 
+/**
+ * Implements methods related to analytics
+ */
 export class ServerAnalyticsController implements IServerAnalyticsController {
   async track(options: AnalyticsOptions) {
     await serverAnalyticsTrack(options);
