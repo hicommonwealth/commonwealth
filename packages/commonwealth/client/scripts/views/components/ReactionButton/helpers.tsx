@@ -51,21 +51,10 @@ export const getDisplayedReactorsForPopup = ({
   );
 };
 
-export const fetchReactionsByPost = async (post: Post) => {
-  let thread_id, proposal_id, comment_id;
-
-  if (post instanceof Thread) {
-    thread_id = (post as Thread).id;
-  } else {
-    comment_id = (post as Comment<any>).id;
-  }
-
-  const { result = [] } = await $.get(`${app.serverUrl()}/bulkReactions`, {
-    thread_id,
-    comment_id,
-    proposal_id,
-  });
-
+export const fetchReactionsByComment = async (commentId: number) => {
+  const { result = [] } = await $.get(
+    `${app.serverUrl()}/comments/${commentId}/reactions`
+  );
   return result;
 };
 

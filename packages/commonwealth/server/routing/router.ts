@@ -23,7 +23,6 @@ import editComment from '../routes/editComment';
 import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
 import bulkComments from '../routes/bulkComments';
-import bulkReactions from '../routes/bulkReactions';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
@@ -182,6 +181,21 @@ import getLinks from '../routes/linking/getLinks';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
+import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
+
+import { ServerThreadsController } from '../controllers/server_threads_controller';
+import { ServerCommentsController } from '../controllers/server_comments_controller';
+import { ServerReactionsController } from '../controllers/server_reactions_controller';
+import { ServerNotificationsController } from '../controllers/server_notifications_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+
+export type ServerControllers = {
+  threads: ServerThreadsController;
+  comments: ServerCommentsController;
+  reactions: ServerReactionsController;
+  notifications: ServerNotificationsController;
+  analytics: ServerAnalyticsController;
+};
 
 function setupRouter(
   endpoint: string,
@@ -194,6 +208,33 @@ function setupRouter(
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService
 ) {
+  // controllers
+
+  const serverControllers: ServerControllers = {
+    threads: new ServerThreadsController(
+      models,
+      tokenBalanceCache,
+      ruleCache,
+      banCache
+    ),
+    comments: new ServerCommentsController(
+      models,
+      tokenBalanceCache,
+      ruleCache,
+      banCache
+    ),
+    reactions: new ServerReactionsController(
+      models,
+      tokenBalanceCache,
+      ruleCache,
+      banCache
+    ),
+    notifications: new ServerNotificationsController(models),
+    analytics: new ServerAnalyticsController(),
+  };
+
+  // ---
+
   const router = express.Router();
 
   router.use((req, res, next) => {
@@ -610,33 +651,24 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createThreadReactionHandler.bind(
-      this,
-      models,
-      tokenBalanceCache,
-      ruleCache,
-      banCache
-    )
+    createThreadReactionHandler.bind(this, serverControllers)
   );
   router.post(
     '/comments/:id/reactions',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createCommentReactionHandler.bind(
-      this,
-      models,
-      tokenBalanceCache,
-      ruleCache,
-      banCache
-    )
+    createCommentReactionHandler.bind(this, serverControllers)
   );
   router.delete(
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
-    deleteReactionHandler.bind(this, models, banCache)
+    deleteReactionHandler.bind(this, serverControllers)
   );
-  router.get('/bulkReactions', bulkReactions.bind(this, models));
+  router.get(
+    '/comments/:id/reactions',
+    getCommentReactionsHandler.bind(this, serverControllers)
+  );
   router.post('/reactionsCounts', reactionsCounts.bind(this, models));
   router.post(
     '/threadsUsersCountAndAvatars',

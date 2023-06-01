@@ -18,6 +18,7 @@ import { NotificationOptions } from './server_notifications_controller';
 import { getThreadUrl } from '../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { AnalyticsOptions } from './server_analytics_controller';
+import { uniqBy } from 'lodash';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -55,6 +56,14 @@ interface IServerCommentsController {
     canvasSession?: any,
     canvasHash?: any
   ): Promise<[ReactionAttributes, NotificationOptions, AnalyticsOptions]>;
+
+  /**
+   * Returns an array of reactions for a comment
+   *
+   * @param commentId - ID of the comment
+   * @returns Promise that resolves to array of reactions
+   */
+  getCommentReactions(commentId: number): Promise<ReactionAttributes[]>;
 }
 
 /**
@@ -211,5 +220,19 @@ export class ServerCommentsController implements IServerCommentsController {
     };
 
     return [finalReaction.toJSON(), notificationOptions, analyticsOptions];
+  }
+
+  async getCommentReactions(commentId: number): Promise<ReactionAttributes[]> {
+    const reactions = await this.models.Reaction.findAll({
+      where: {
+        comment_id: commentId,
+      },
+      include: [this.models.Address],
+      order: [['created_at', 'DESC']],
+    });
+    return uniqBy(
+      reactions.map((c) => c.toJSON()),
+      'id'
+    );
   }
 }

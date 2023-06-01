@@ -27,7 +27,12 @@ interface IServerReactionsController {
  * Implements methods related to reactions
  */
 export class ServerReactionsController implements IServerReactionsController {
-  constructor(private models: DB, private banCache: BanCache) {}
+  constructor(
+    private models: DB,
+    private tokenBalanceCache: TokenBalanceCache,
+    private ruleCache: RuleCache,
+    private banCache: BanCache
+  ) {}
 
   async deleteReaction(user: UserInstance, reactionId: any) {
     const userOwnedAddressIds = (await user.getAddresses())

@@ -1,14 +1,11 @@
 import { NextFunction } from 'express';
-import { DB } from '../../models';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
-import BanCache from '../../util/banCheckCache';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import RuleCache from '../../util/rules/ruleCache';
 import { ServerNotificationsController } from '../../controllers/server_notifications_controller';
 import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
 import { ServerCommentsController } from '../../controllers/server_comments_controller';
-import { ReactionAttributes } from 'server/models/reaction';
+import { ReactionAttributes } from '../../models/reaction';
+import { ServerControllers } from '../../routing/router';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -25,10 +22,7 @@ type CreateCommentReactionRequestBody = {
 type CreateCommentReactionResponse = ReactionAttributes;
 
 export const createCommentReactionHandler = async (
-  models: DB,
-  tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
-  banCache: BanCache,
+  controllers: ServerControllers,
   req: TypedRequest<
     CreateCommentReactionRequestBody,
     any,
@@ -54,20 +48,9 @@ export const createCommentReactionHandler = async (
     return next(new AppError(Errors.InvalidCommentId));
   }
 
-  const serverCommentsController = new ServerCommentsController(
-    models,
-    tokenBalanceCache,
-    ruleCache,
-    banCache
-  );
-  const serverNotificationsController = new ServerNotificationsController(
-    models
-  );
-  const serverAnalyticsController = new ServerAnalyticsController();
-
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await serverCommentsController.createCommentReaction(
+    await controllers.comments.createCommentReaction(
       user,
       address,
       chain,
@@ -83,10 +66,10 @@ export const createCommentReactionHandler = async (
   address.save().catch(console.error);
 
   // emit notification
-  serverNotificationsController.emit(notificationOptions).catch(console.error);
+  controllers.notifications.emit(notificationOptions).catch(console.error);
 
   // track analytics event
-  serverAnalyticsController.track(analyticsOptions).catch(console.error);
+  controllers.analytics.track(analyticsOptions).catch(console.error);
 
   return success(res, newReaction);
 };
