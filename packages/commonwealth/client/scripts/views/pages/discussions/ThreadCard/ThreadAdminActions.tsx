@@ -72,14 +72,7 @@ export const ThreadAdminActions = ({
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              app.threads.delete(thread).then(() => {
-                // navigate('/discussions'); - was in view threads page
-                app.threadUpdateEmitter.emit('threadUpdated', {
-                  threadId: thread.id,
-                  action: ThreadActionType.Deletion,
-                });
-                onDelete && onDelete();
-              });
+              app.threads.delete(thread).then(() => onDelete && onDelete());
             } catch (err) {
               console.log(err);
             }
@@ -120,13 +113,9 @@ export const ThreadAdminActions = ({
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              app.threads.delete(thread).then(() => {
-                app.threadUpdateEmitter.emit('threadUpdated', {
-                  threadId: thread.id,
-                  action: ThreadActionType.Deletion,
-                });
-                onSpamToggle && onSpamToggle(!thread.isSpam);
-              });
+              app.threads
+                .delete(thread)
+                .then(() => onSpamToggle && onSpamToggle(!thread.isSpam));
             } catch (err) {
               console.log(err);
             }
@@ -149,13 +138,9 @@ export const ThreadAdminActions = ({
   };
 
   const handleThreadPinToggle = () => {
-    app.threads.pin({ proposal: thread }).then(() => {
-      app.threadUpdateEmitter.emit('threadUpdated', {
-        threadId: thread.id,
-        action: ThreadActionType.Pinning,
-      });
-      onPinToggle(!thread.pinned);
-    });
+    app.threads
+      .pin({ proposal: thread })
+      .then(() => onPinToggle && onPinToggle(!thread.pinned));
   };
 
   const handleEditThread = async (e) => {
@@ -246,7 +231,7 @@ export const ThreadAdminActions = ({
               : []),
             ...(isThreadAuthor || hasAdminPermissions
               ? [
-                  ...(!!app.chain?.meta.snapshot.length
+                  ...(app.chain?.meta.snapshot.length
                     ? [
                         {
                           label: 'Snapshot proposal from thread',
@@ -255,7 +240,7 @@ export const ThreadAdminActions = ({
                         },
                       ]
                     : []),
-                  ...(!!thread.readOnly
+                  ...(thread.readOnly
                     ? [
                         {
                           label: 'Snapshot proposal from thread',

@@ -445,11 +445,6 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
-        app.threadUpdateEmitter.emit('threadUpdated', {
-          action: ThreadActionType.StageChange,
-          stage: args.stage,
-          threadId: args.threadId,
-        });
         return result;
       },
       error: (err) => {
@@ -544,7 +539,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
@@ -580,7 +574,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {

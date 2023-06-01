@@ -1,5 +1,4 @@
 import { getProposalUrlPath } from 'identifiers';
-import { ThreadStage } from 'models/types';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -7,7 +6,6 @@ import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { slugify } from 'utils';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ThreadActionType } from '../../../../../shared/types';
 import Thread from '../../../models/Thread';
 import app from '../../../state';
 import Sublayout from '../../Sublayout';
@@ -27,54 +25,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
 
-  // [CLEANUP]: We should remove this handler
-  const handleThreadUpdate = (data: {
-    threadId: number;
-    action: ThreadActionType;
-    stage: ThreadStage;
-  }) => {
-    const { action } = data;
-
-    if (
-      action === ThreadActionType.TopicChange ||
-      action === ThreadActionType.Deletion ||
-      action === ThreadActionType.StageChange
-    ) {
-      return;
-    }
-
-    const pinnedThreads = app.threads.listingStore.getThreads({
-      topicName,
-      stageName,
-      pinned: true,
-    });
-
-    const unpinnedThreads = app.threads.listingStore.getThreads({
-      topicName,
-      stageName,
-      pinned: false,
-    });
-
-    setThreads([...pinnedThreads, ...unpinnedThreads]);
-  };
-
   const sortPinned = (t: Thread[]) => {
     return [...t].sort((a, b) =>
       a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
     );
   };
-
-  // [CLEANUP]: We should remove this handler
-  // Event binding for actions that trigger a thread update (e.g. topic or stage change)
-  useEffect(() => {
-    app.threadUpdateEmitter.on('threadUpdated', (data) =>
-      handleThreadUpdate(data)
-    );
-
-    return () => {
-      app.threadUpdateEmitter.off('threadUpdated', handleThreadUpdate);
-    };
-  }, [threads]);
 
   useEffect(() => {
     setTotalThreads(app.threads.numTotalThreads);

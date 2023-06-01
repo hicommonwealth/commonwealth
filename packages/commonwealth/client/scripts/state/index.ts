@@ -63,7 +63,6 @@ export interface IApp {
   threadReactions: ThreadReactionsController;
   reactionCounts: ReactionCountsController;
   polls: PollsController;
-  threadUpdateEmitter: EventEmitter;
 
   // Proposals
   proposalEmitter: EventEmitter;
@@ -157,7 +156,6 @@ const app: IApp = {
   threadReactions: new ThreadReactionsController(),
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
-  threadUpdateEmitter: new EventEmitter(),
 
   // Proposals
   proposalEmitter: new EventEmitter(),
