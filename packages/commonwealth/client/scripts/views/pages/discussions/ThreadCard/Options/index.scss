@@ -13,11 +13,16 @@
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    padding: 4px;
+    padding: 4px 8px;
     border-radius: $border-radius-corners-wider;
+    color: $neutral-600;
 
     &:hover {
-      background-color: $neutral-200;
+      background-color: $neutral-200-new;
+    }
+
+    .Text {
+      color: $neutral-600;
     }
   }
 }

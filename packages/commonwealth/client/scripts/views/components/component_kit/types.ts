@@ -61,7 +61,9 @@ export type HeaderMenuItem = { type: 'header'; label?: string };
 export type DefaultMenuItem = {
   disabled?: boolean;
   iconLeft?: IconName;
+  iconLeftWeight?: 'fill' | 'bold';
   iconRight?: IconName;
+  iconRightWeight?: 'fill' | 'bold';
   isSecondary?: boolean;
   label?: string;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;

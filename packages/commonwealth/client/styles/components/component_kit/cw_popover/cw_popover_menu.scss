@@ -11,7 +11,11 @@
 
   .menu-item-text.Text {
     font-size: 14px !important;
-    color: $neutral-600;
+    color: $neutral-800-new;
+  }
+
+  .menu-item-icon.Icon {
+    color: $neutral-800-new;
   }
 
   &:hover {

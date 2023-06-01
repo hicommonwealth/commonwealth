@@ -150,7 +150,7 @@ export const AuthorAndPublishInfo = ({
       {isThreadLocked && (
         <>
           {dotIndicator}
-          <CWIcon iconName="lock" iconSize="small" />
+          <CWIcon iconName={'keyLockClosed'} iconSize="small" weight="bold" />
         </>
       )}
     </div>

@@ -70,7 +70,7 @@ export const fetchReactionsByPost = async (post: Post) => {
 };
 
 export const onReactionClick = (
-  e: React.MouseEvent<HTMLDivElement>,
+  e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
   hasReacted: boolean,
   dislike: (userAddress: string) => void,
   like: (chain: ChainInfo, chainId: string, userAddress: string) => void

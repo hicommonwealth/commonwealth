@@ -52,8 +52,14 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                 } else if (item.type === 'divider') {
                   return <div className="menu-section-divider" key={i} />;
                 } else {
-                  const { disabled, isSecondary, iconLeft, label, onClick } =
-                    item;
+                  const {
+                    disabled,
+                    isSecondary,
+                    iconLeft,
+                    iconLeftWeight,
+                    label,
+                    onClick,
+                  } = item;
                   return (
                     <div
                       className={getClasses<{
@@ -73,6 +79,7 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                           className="menu-item-icon"
                           iconName={iconLeft}
                           iconSize="small"
+                          weight={iconLeftWeight}
                         />
                       )}
                       <CWText type="b2" className="menu-item-text">

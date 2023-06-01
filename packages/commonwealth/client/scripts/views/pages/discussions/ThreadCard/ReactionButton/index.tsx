@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import app from 'state';
 import type Thread from '../../../../../models/Thread';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../../../components/component_kit/cw_icon_button';
 import { Modal } from '../../../../components/component_kit/cw_modal';
 import { CWTooltip } from '../../../../components/component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../../../../components/component_kit/cw_text';
@@ -33,29 +32,31 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
   return (
     <>
       {size === 'small' ? (
-        <div
+        <button
           className={getClasses<{ disabled?: boolean }>(
             { disabled: isLoading || isUserForbidden },
-            'CommentReactionButton'
+            `CommentReactionButton ${hasReacted ? ' has-reacted' : ''}`
           )}
           onMouseEnter={async () => {
             if (reactors.length === 0) {
               setReactors(thread.associatedReactions.map((addr) => addr));
             }
           }}
+          onClick={async (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (!app.isLoggedIn() || !app.user.activeAccount) {
+              setIsModalOpen(true);
+            } else {
+              onReactionClick(e, hasReacted, dislike, like);
+            }
+          }}
         >
-          <CWIconButton
+          <CWIcon
             iconName="upvote"
+            {...(hasReacted && { weight: 'fill' })}
             iconSize="small"
             selected={hasReacted}
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (!app.isLoggedIn() || !app.user.activeAccount) {
-                setIsModalOpen(true);
-              } else {
-                onReactionClick(e, hasReacted, dislike, like);
-              }
-            }}
           />
           {reactors.length > 0 ? (
             <CWTooltip
@@ -70,7 +71,9 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
                 <CWText
                   onMouseEnter={handleInteraction}
                   onMouseLeave={handleInteraction}
-                  className="menu-buttons-text"
+                  className={`menu-buttons-text ${
+                    hasReacted ? ' has-reacted' : ''
+                  }`}
                   type="caption"
                   fontWeight="medium"
                 >
@@ -80,16 +83,18 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
             />
           ) : (
             <CWText
-              className="menu-buttons-text"
+              className={`menu-buttons-text ${
+                hasReacted ? ' has-reacted' : ''
+              }`}
               type="caption"
               fontWeight="medium"
             >
               {reactors.length}
             </CWText>
           )}
-        </div>
+        </button>
       ) : (
-        <div
+        <button
           onMouseEnter={async () => {
             if (reactors.length === 0) {
               setReactors(thread.associatedReactions.map((a) => a.address));
@@ -97,6 +102,8 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
           }}
           onClick={async (e) => {
             e.stopPropagation();
+            e.preventDefault();
+
             if (!app.isLoggedIn() || !app.user.activeAccount) {
               setIsModalOpen(true);
             } else {
@@ -122,8 +129,18 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
                   onMouseLeave={handleInteraction}
                 >
                   <div className="reactions-container">
-                    <CWIcon iconName="upvote" iconSize="small" />
-                    <div className="reactions-count">{reactors.length}</div>
+                    <CWIcon
+                      iconName="upvote"
+                      iconSize="small"
+                      {...(hasReacted && { weight: 'fill' })}
+                    />
+                    <div
+                      className={`reactions-count ${
+                        hasReacted ? ' has-reacted' : ''
+                      }`}
+                    >
+                      {reactors.length}
+                    </div>
                   </div>
                 </div>
               )}
@@ -131,10 +148,16 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
           ) : (
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
-              <div className="reactions-count">{reactors.length}</div>
+              <div
+                className={`reactions-count ${
+                  hasReacted ? ' has-reacted' : ''
+                }`}
+              >
+                {reactors.length}
+              </div>
             </div>
           )}
-        </div>
+        </button>
       )}
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}

@@ -195,7 +195,8 @@ export const User = ({
       key={profile?.address || '-'}
     >
       {showAvatar && (
-        <div
+        <Link
+          to={profile ? `/profile/id/${profile.id}` : undefined}
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
@@ -204,7 +205,7 @@ export const User = ({
             size={avatarSize}
             address={profile?.id}
           />
-        </div>
+        </Link>
       )}
       {
         <>

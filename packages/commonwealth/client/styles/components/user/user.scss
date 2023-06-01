@@ -91,20 +91,22 @@
   }
 
   a.user-display-name {
+    color: $neutral-800;
     cursor: inherit;
     text-decoration: initial;
   }
 
   .id-short {
-    color: $neutral-500;
+    color: $neutral-600-new;
     display: inline-block;
-    font-size: 75%;
+    font-size: 10px;
+    line-height: 16px;
     font-weight: 500;
-    margin-left: 4px;
-    background: $neutral-100;
+    margin-left: 8px;
+    background: $neutral-200-new;
     border-radius: $border-radius-corners-wider;
     text-decoration: none !important;
-    padding: 4px 8px;
+    padding: 2px 8px;
   }
 
   &.linkified a.user-display-name {

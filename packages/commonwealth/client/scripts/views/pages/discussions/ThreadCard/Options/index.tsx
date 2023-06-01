@@ -71,7 +71,12 @@ export const Options = ({
               }}
               className="thread-option-btn"
             >
-              <CWIcon color="black" iconName="share" iconSize="small" />
+              <CWIcon
+                color="black"
+                iconName="share"
+                iconSize="small"
+                weight="fill"
+              />
               <CWText type="caption">Share</CWText>
             </button>
           )}
