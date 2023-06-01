@@ -30,7 +30,6 @@
     "test-emit-notif":"NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
     "test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/api/**/*.spec.ts",
-    "test-rules": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/rules/*.spec.ts",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts",
     "test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
     "test-scripts": "ts-mocha --project tsconfig.json test/integration/enforceDataConsistency.spec.ts",

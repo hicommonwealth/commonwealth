@@ -55,6 +55,11 @@ import { extractDomain, isDefaultStage } from 'helpers';
 import ExternalLink from 'views/components/ExternalLink';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../../components/component_kit/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -92,6 +97,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);
+  const [isCollapsedSize, setIsCollapsedSize] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -101,6 +107,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
+
+  useBrowserWindow({
+    onResize: () =>
+      breakpointFnValidator(
+        isCollapsedSize,
+        (state: boolean) => {
+          setIsCollapsedSize(state);
+        },
+        isWindowMediumSmallInclusive
+      ),
+    resizeListenerUpdateDeps: [isCollapsedSize],
+  });
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
@@ -719,9 +737,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
+  const tabsShouldBePresent =
+    showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
+
   return (
     <Sublayout>
       <CWContentPage
+        showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||

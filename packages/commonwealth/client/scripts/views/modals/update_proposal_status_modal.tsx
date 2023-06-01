@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import {
-  getProposal,
-  getSpace,
   loadMultipleSpacesData,
   SnapshotProposal,
 } from 'helpers/snapshot_utils';
@@ -107,12 +105,12 @@ export const UpdateProposalStatusModal = ({
       if (toAdd.length > 0) {
         let enrichedSnapshot;
         if (app.chain.meta.snapshot?.length === 1) {
-          enrichedSnapshot = toAdd.map((sn) => ({
-            id: `${app.chain.meta.snapshot[0]}/${sn.id}`,
-            title: sn.title,
-          }));
+          enrichedSnapshot = {
+            id: `${app.chain.meta.snapshot[0]}/${toAdd[0].id}`,
+            title: toAdd[0].title,
+          };
         } else {
-          loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+          await loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
             for (const { space: _space, proposals } of data) {
               const matchingSnapshot = proposals.find(
                 (sn) => sn.id === toAdd[0].id
@@ -120,6 +118,7 @@ export const UpdateProposalStatusModal = ({
               if (matchingSnapshot) {
                 enrichedSnapshot = {
                   id: `${_space.id}/${toAdd[0].id}`,
+                  title: toAdd[0].title,
                 };
                 break;
               }
@@ -128,11 +127,13 @@ export const UpdateProposalStatusModal = ({
         }
         const updatedThread = await app.threads.addLinks({
           threadId: thread.id,
-          links: enrichedSnapshot.map((sn) => ({
-            source: LinkSource.Snapshot,
-            identifier: String(sn.id),
-            title: sn.title,
-          })),
+          links: [
+            {
+              source: LinkSource.Snapshot,
+              identifier: String(enrichedSnapshot.id),
+              title: enrichedSnapshot.title,
+            },
+          ],
         });
 
         links = updatedThread.links;
