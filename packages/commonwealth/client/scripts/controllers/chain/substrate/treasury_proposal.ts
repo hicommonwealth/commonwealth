@@ -160,7 +160,6 @@ export class SubstrateTreasuryProposal extends Proposal<
 
     this.title = this.generateTitle();
     this.createdAt = entity.createdAt;
-    this.threadTitle = entity.threadTitle;
 
     entity.chainEvents.forEach((e) => this.update(e));
 

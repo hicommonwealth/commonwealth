@@ -168,7 +168,6 @@ class SubstrateDemocracyProposal extends Proposal<
     );
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
-    this.threadTitle = entity.threadTitle;
 
     // see if preimage exists and populate data if it does
     const preimage = this._Proposals.app.chainEntities.getPreimage(

@@ -7,8 +7,6 @@ class ChainEntity {
   public readonly type: IChainEntityKind;
   public readonly typeId: string;
 
-  // TODO: remove threadTitle?
-  public readonly threadTitle?: string;
   public readonly createdAt?: moment.Moment;
   public readonly completed?: boolean;
   public readonly author?: string;
@@ -45,7 +43,6 @@ class ChainEntity {
     createdAt,
     updatedAt,
     id,
-    threadTitle,
     author,
     completed,
   }: {
@@ -55,7 +52,6 @@ class ChainEntity {
     chainEvents: any[];
     createdAt: moment.MomentInput;
     updatedAt: moment.MomentInput;
-    threadTitle: string;
     author: string;
     id?: number;
     completed?: boolean;
@@ -64,7 +60,6 @@ class ChainEntity {
     this.chain = chain;
     this.type = type;
     this.typeId = typeId;
-    this.threadTitle = decodeURIComponent(threadTitle);
     this.author = author;
     this.createdAt = moment(createdAt);
     this.completed = completed;
@@ -88,8 +83,6 @@ class ChainEntity {
       created_at,
       updated_at,
       id,
-      Thread,
-      title,
       author,
       completed,
     } = json;
@@ -102,7 +95,6 @@ class ChainEntity {
       createdAt: created_at,
       updatedAt: updated_at,
       id,
-      threadTitle: Thread?.title,
       author,
       completed,
     });
