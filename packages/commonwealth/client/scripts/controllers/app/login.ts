@@ -2,7 +2,7 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
@@ -262,6 +262,7 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
+  walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo
@@ -271,6 +272,7 @@ export async function createUserWithAddress(
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
+    wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
       ? JSON.stringify(validationBlockInfo)
       : null,
@@ -347,7 +349,7 @@ export async function startLoginWithMagicLink({
   isCosmos,
 }: {
   email?: string;
-  provider?: string;
+  provider?: WalletSsoSource;
   redirectTo?: string;
   chain?: string;
   isCosmos: boolean;
@@ -365,7 +367,7 @@ export async function startLoginWithMagicLink({
     // provider-based login
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
-    }&chain=${chain || ''}`;
+    }&chain=${chain || ''}&sso=${provider}`;
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
       redirectURI: new URL(
@@ -414,9 +416,11 @@ function getProfileMetadata({ provider, userInfo }): {
 export async function handleSocialLoginCallback({
   bearer,
   chain,
+  walletSsoSource,
 }: {
   bearer?: string;
   chain?: string;
+  walletSsoSource?: string;
 }): Promise<string> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -528,6 +532,7 @@ export async function handleSocialLoginCallback({
       magicAddress,
       sessionPayload: authedSessionPayload,
       signature: authedSignature,
+      walletSsoSource,
     },
   });
 

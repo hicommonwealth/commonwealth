@@ -316,6 +316,7 @@ const finishSsoLogin = async (
           user_id: user.id,
           profile_id: profile.id,
           wallet_id: WalletId.Ronin,
+          // wallet_sso_source: null,
         },
         { transaction: t }
       );

@@ -6,6 +6,7 @@ import {
   ChainBase,
   NotificationCategories,
   WalletId,
+  WalletSsoSource,
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -43,6 +44,7 @@ const processAddress = async (
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,
+  wallet_sso_source: WalletSsoSource,
   signature: string,
   user: Express.User,
   sessionAddress: string | null,
@@ -218,6 +220,7 @@ const verifyAddress = async (
     chain_id,
     address,
     req.body.wallet_id,
+    req.body.wallet_sso_source,
     req.body.signature,
     req.user,
     req.body.session_public_address,

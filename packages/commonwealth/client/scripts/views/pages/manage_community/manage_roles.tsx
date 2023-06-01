@@ -139,8 +139,8 @@ export const ManageRoles = ({
                     id: addr.id,
                     address: addr.address,
                     chainId: role.chain_id,
-                    walletId: addr.wallet_id,
-                    walletSsoSource: addr.wallet_sso_source
+                    walletId: addr.walletId,
+                    walletSsoSource: addr.walletSsoSource,
                   })
                 } // role.Address, // make AddressInfo?
                 popover

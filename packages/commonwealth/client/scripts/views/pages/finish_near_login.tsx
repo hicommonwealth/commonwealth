@@ -96,6 +96,7 @@ const FinishNearLogin = () => {
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
+        null, // no wallet sso source
         chain.id,
         sessionPublicAddress,
         null

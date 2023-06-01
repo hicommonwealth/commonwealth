@@ -1,4 +1,4 @@
-import type { ChainNetwork } from 'common-common/src/types';
+import { ChainNetwork, WalletSsoSource } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import 'components/component_kit/cw_wallets_list.scss';
 import type Substrate from 'controllers/chain/substrate/adapter';
@@ -127,7 +127,7 @@ type WalletsListProps = {
   onResetWalletConnect: () => void;
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
-    type: 'google' | 'twitter' | 'discord' | 'github',
+    type: WalletSsoSource,
     useSessionKeyRevalidationFlow: boolean
   ) => Promise<void>;
   onWalletAddressSelect: (
@@ -210,7 +210,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="google"
             label="Sign in with Google"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin('google', useSessionKeyRevalidationFlow)}
+            onClick={async () => onSocialLogin(WalletSsoSource.Google, useSessionKeyRevalidationFlow)}
           />
 
           <CWText
@@ -237,19 +237,19 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="discord"
             label="Discord"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin('discord', useSessionKeyRevalidationFlow)}
+            onClick={async () => onSocialLogin(WalletSsoSource.Discord, useSessionKeyRevalidationFlow)}
           />
           <CWAuthButton
             type="github"
             label="Github"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('github', useSessionKeyRevalidationFlow)}
+            onClick={() => onSocialLogin(WalletSsoSource.Github, useSessionKeyRevalidationFlow)}
           />
           <CWAuthButton
             type="twitter"
             label="Twitter"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('twitter', useSessionKeyRevalidationFlow)}
+            onClick={() => onSocialLogin(WalletSsoSource.Twitter, useSessionKeyRevalidationFlow)}
           />
 
           {wallets.length === 0 && (

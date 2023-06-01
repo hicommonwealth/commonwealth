@@ -9,10 +9,11 @@ import app from 'state';
 const validate = async (setRoute) => {
   const params = new URLSearchParams(window.location.search);
   const chain = params.get('chain');
+  const walletSsoSource = params.get('sso');
   let redirectTo = params.get('redirectTo');
   if (redirectTo?.startsWith("/finishsociallogin")) redirectTo = null;
 
-  await handleSocialLoginCallback({ chain });
+  await handleSocialLoginCallback({ chain, walletSsoSource });
   await initAppState();
 
   setRoute(redirectTo || (app.activeChainId() ? `/account/${app.activeChainId()}` : '/dashboard'));

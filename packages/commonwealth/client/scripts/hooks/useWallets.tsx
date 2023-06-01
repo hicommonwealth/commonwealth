@@ -1,4 +1,4 @@
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, WalletSsoSource } from 'common-common/src/types';
 import type { SessionPayload } from '@canvas-js/interfaces';
 import 'components/component_kit/cw_wallets_list.scss';
 import {
@@ -176,7 +176,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 
   // New callback for handling social login
-  const onSocialLogin = async (provider: string) => {
+  const onSocialLogin = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
 
     try {
@@ -520,6 +520,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         await createUserWithAddress(
           selectedAddress,
           wallet.name,
+          null, // no sso source
           chainIdentifier,
           sessionPublicAddress,
           validationBlockInfo
@@ -567,6 +568,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const { account } = await createUserWithAddress(
       selectedAddress,
       wallet.name,
+      null, // no sso source?
       chainIdentifier,
       sessionAddress,
       validationBlockInfo

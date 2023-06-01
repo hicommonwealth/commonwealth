@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { WalletSsoSource } from 'common-common/src/types';
 
 import { Modal } from '../components/component_kit/cw_modal';
 import _ from 'underscore';
@@ -117,7 +118,7 @@ const SessionRevalidationModal = ({
                   onWalletAddressSelect={onWalletAddressSelect}
                   onWalletSelect={onWalletSelect}
                   onConnectAnotherWay={() => setConnectWithEmail(true)}
-                  onSocialLogin={(provider) => onSocialLogin(provider)}
+                  onSocialLogin={(provider: WalletSsoSource) => onSocialLogin(provider)}
                   darkMode={false}
                   wallets={wallets}
                   hasNoWalletsLink={false}

@@ -66,6 +66,7 @@ export default class WebWalletController {
         address: account.address,
         author_chain: account.chain.id,
         wallet_id: wallet,
+        wallet_sso_source: null,
         jwt: app.user.jwt,
       });
     } catch (e) {

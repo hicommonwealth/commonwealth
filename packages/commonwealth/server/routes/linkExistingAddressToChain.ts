@@ -149,6 +149,7 @@ const linkExistingAddressToChain = async (
         keytype: originalAddress.keytype,
         name: originalAddress.name,
         wallet_id: originalAddress.wallet_id,
+        wallet_sso_source: originalAddress.wallet_sso_source,
         last_active: new Date(),
       });
 

@@ -19,6 +19,7 @@ class Account {
 
   private _addressId?: number;
   private _walletId?: WalletId;
+  private _walletSsoSource?: WalletSsoSource;
 
   private _profile?: MinimumProfile;
   public get profile() {
@@ -138,6 +139,7 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
+      wallet_sso_source: this.walletSsoSource,
       session_public_address: await app.sessions.getOrCreateAddress(
         this.chain.base,
         chainId.toString(),
