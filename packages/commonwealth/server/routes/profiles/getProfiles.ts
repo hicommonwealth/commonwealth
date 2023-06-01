@@ -71,7 +71,6 @@ const getProfiles = async (
   let profiles, count;
   if (!count_only) {
     ({ rows: profiles, count } = await models.Profile.findAndCountAll({
-      logging: console.log,
       where,
       include,
       attributes: { exclude: ['user_id', 'address_id'] },

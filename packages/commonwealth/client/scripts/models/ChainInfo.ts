@@ -1,17 +1,11 @@
-import { render } from 'helpers/DEPRECATED_ReactRender';
 import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import RoleInfo from './RoleInfo';
-import { AccessLevel } from '../../../shared/permissions';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
 
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
 import type CommunityRole from './CommunityRole';
 
 class ChainInfo {
@@ -229,24 +223,6 @@ class ChainInfo {
       communityRoles: community_roles,
       cosmosGovernanceVersion: cosmos_governance_version,
     });
-  }
-
-  // TODO: get operation should not have side effects, and either way this shouldn't be here
-  public async getMembers(id: string) {
-    try {
-      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id });
-      this.setMembers(res.result);
-      const roles = res.result.filter((r) => {
-        return (
-          r.permission === AccessLevel.Admin ||
-          r.permission === AccessLevel.Moderator
-        );
-      });
-      this.setAdmins(roles);
-      return this.adminsAndMods;
-    } catch {
-      console.log('Failed to fetch admins/mods');
-    }
   }
 
   public setMembers(roles) {

@@ -44,7 +44,7 @@ class NewProfilesController {
     return profile;
   }
 
-  public async updateProfileForAccount(address, data) {
+  public async updateProfileForAccount(address, data, shouldRedraw = true) {
     try {
       const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
         ...data,
@@ -53,14 +53,17 @@ class NewProfilesController {
 
       if (response?.data.result?.status === 'Success') {
         const profile = this._store.getByAddress(address);
-        this._refreshProfiles([profile]);
+        this._refreshProfiles([profile], shouldRedraw);
       }
     } catch (err) {
       console.error(err);
     }
   }
 
-  private async _refreshProfiles(profiles: MinimumProfile[]): Promise<void> {
+  private async _refreshProfiles(
+    profiles: MinimumProfile[],
+    shouldRedraw = true
+  ): Promise<void> {
     if (profiles.length === 0) {
       return;
     }
@@ -101,7 +104,9 @@ class NewProfilesController {
       console.error(e);
     }
 
-    this.isFetched.emit('redraw');
+    if (shouldRedraw) {
+      this.isFetched.emit('redraw');
+    }
   }
 }
 

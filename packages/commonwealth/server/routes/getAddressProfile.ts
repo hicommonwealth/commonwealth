@@ -53,7 +53,8 @@ const getAddressProfiles = async (
 
   const profiles: GetAddressProfileResp[] = await Promise.all(
     addressEntities.map(async address => {
-      const profile = await address.getProfile();
+      const profile = await address.Profile;
+
       return {
         profileId: address.profile_id,
         name: profile?.profile_name,

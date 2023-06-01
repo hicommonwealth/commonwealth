@@ -1,8 +1,6 @@
 import React from 'react';
 
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -174,12 +172,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'people',
       onClick: (e) => {
         e?.preventDefault();
-        // mixpanelBrowserTrack({
-        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-        //   chainBase: null,
-        //   isCustomDomain: app.isCustomDomain(),
-        //   communityType: null,
-        // });
         sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
         navigate('/createCommunity', {}, null);
       },
@@ -189,12 +181,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'discord',
       onClick: (e) => {
         e?.preventDefault();
-        // mixpanelBrowserTrack({
-        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-        //   chainBase: null,
-        //   isCustomDomain: app.isCustomDomain(),
-        //   communityType: null,
-        // });
         sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
 
         window.open(

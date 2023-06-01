@@ -52,10 +52,7 @@ export default (
       updatedAt: 'updated_at',
       underscored: true,
       paranoid: false,
-      indexes: [
-        { fields: ['id'] },
-        { fields: ['block_number', 'chain_event_type_id'] },
-      ],
+      indexes: [{ fields: ['id'] }, { fields: ['block_number'] }],
     }
   );
 

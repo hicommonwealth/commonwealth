@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'pages/view_thread/poll_cards.scss';
 
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { PollCard } from '../../components/poll_card';
@@ -135,7 +135,8 @@ export const ThreadPollCard = ({
               threadId: poll.threadId,
               pollId: poll.id,
             });
-            onDelete();
+            if (onDelete) onDelete();
+            notifySuccess('Poll deleted');
           } catch (e) {
             console.error(e);
             notifyError('Failed to delete poll');
