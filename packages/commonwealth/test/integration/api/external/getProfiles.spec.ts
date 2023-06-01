@@ -39,8 +39,9 @@ describe('getProfiles Tests', () => {
     const profiles = resp.result.profiles.filter(
       (p) => p.id === testAddresses[0].id
     )[0];
-    chai.assert.lengthOf(profiles.Addresses[0].Threads, 2);
-    chai.assert.lengthOf(profiles.Addresses[0].Comments, 2);
+    const profileAddresses = profiles.Addresses.sort((a) => a.Threads.length);
+    chai.assert.lengthOf(profileAddresses[0].Threads, 2);
+    chai.assert.lengthOf(profileAddresses[0].Comments, 2);
   });
 
   it('should return count only when specified correctly', async () => {
