@@ -117,6 +117,7 @@ const ViewProposalPage = ({
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
   return (
     <Sublayout
     //  title={headerTitle}

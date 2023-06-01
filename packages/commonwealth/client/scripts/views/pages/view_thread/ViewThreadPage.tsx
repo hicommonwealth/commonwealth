@@ -48,11 +48,17 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { ThreadActionType } from '../../../../../shared/types';
 import { filterLinks } from 'helpers/threads';
 import { extractDomain, isDefaultStage } from 'helpers';
 import ExternalLink from 'views/components/ExternalLink';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../../components/component_kit/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -90,6 +96,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);
+  const [isCollapsedSize, setIsCollapsedSize] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -99,6 +106,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
+
+  useBrowserWindow({
+    onResize: () =>
+      breakpointFnValidator(
+        isCollapsedSize,
+        (state: boolean) => {
+          setIsCollapsedSize(state);
+        },
+        isWindowMediumSmallInclusive
+      ),
+    resizeListenerUpdateDeps: [isCollapsedSize],
+  });
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
@@ -148,123 +167,139 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [recentlyEdited]);
 
   useEffect(() => {
-    app.threads
-      .fetchThreadsFromId([+threadId])
-      .then((res) => {
-        const t = res[0];
-        if (t) {
-          const reactions = app.reactions.getByPost(t);
-          t.associatedReactions = reactions
-            .filter((r) => r.reaction === 'like')
-            .map((r) => {
-              return {
-                id: r.id,
-                type: 'like',
-                address: r.author,
-              };
-            });
+    const timerId = setTimeout(() => {
+      app.threads
+        .fetchThreadsFromId([+threadId])
+        .then((res) => {
+          const t = res[0];
+          if (t) {
+            const reactions = app.reactions.getByPost(t);
+            t.associatedReactions = reactions
+              .filter((r) => r.reaction === 'like')
+              .map((r) => {
+                return {
+                  id: r.id,
+                  type: 'like',
+                  address: r.author,
+                };
+              });
 
-          setThread(t);
-        }
-      })
-      .catch(() => {
-        notifyError('Thread not found');
-        setThreadFetchFailed(true);
-      });
-  }, [threadId]);
-
-  useEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    // load proposal
-    if (!prefetch[threadId]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([thread]).then(() => {
-        setThread(thread);
-      });
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          threadReactionsStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, threadId]);
-
-  useEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
-      const url = getProposalUrlPath(
-        thread.slug,
-        `${threadId}-${slugify(thread?.title)}${window.location.search}`,
-        true
-      );
-      navigate(url, { replace: true });
-    }
-  }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
-
-  useEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    if (!prefetch[threadId]['commentsStarted']) {
-      app.comments
-        .refresh(thread, app.activeChainId())
-        .then(async () => {
-          // fetch comments
-          const _comments = app.comments
-            .getByThread(thread)
-            .filter((c) => c.parentComment === null);
-          setComments(_comments);
-
-          // fetch reactions
-          const { result: reactionCounts } = await $.ajax({
-            type: 'POST',
-            url: `${app.serverUrl()}/reactionsCounts`,
-            headers: {
-              'content-type': 'application/json',
-            },
-            data: JSON.stringify({
-              proposal_ids: [threadId],
-              comment_ids: app.comments
-                .getByThread(thread)
-                .map((comment) => comment.id),
-              active_address: app.user.activeAccount?.address,
-            }),
-          });
-
-          // app.reactionCounts.deinit()
-          for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier({
-              threadId: rc.thread_id,
-              proposalId: rc.proposal_id,
-              commentId: rc.comment_id,
-            });
-
-            app.reactionCounts.store.add(
-              modelReactionCountFromServer({ ...rc, id })
-            );
+            setThread(t);
           }
         })
         .catch(() => {
-          notifyError('Failed to load comments');
-          setComments([]);
+          notifyError('Thread not found');
+          setThreadFetchFailed(true);
         });
+    });
 
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          commentsStarted: true,
-        },
-      }));
-    }
+    return () => clearTimeout(timerId);
+  }, [threadId]);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!thread) {
+        return;
+      }
+
+      // load proposal
+      if (!prefetch[threadId]['threadReactionsStarted']) {
+        app.threads.fetchReactionsCount([thread]).then(() => {
+          setThread(thread);
+        });
+        setPrefetch((prevState) => ({
+          ...prevState,
+          [threadId]: {
+            ...prevState[threadId],
+            threadReactionsStarted: true,
+          },
+        }));
+      }
+    });
+
+    return () => clearTimeout(timerId);
+  }, [prefetch, thread, threadId]);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!thread) {
+        return;
+      }
+
+      if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
+        const url = getProposalUrlPath(
+          thread.slug,
+          `${threadId}-${slugify(thread?.title)}${window.location.search}`,
+          true
+        );
+        navigate(url, { replace: true });
+      }
+    });
+
+    return () => clearTimeout(timerId);
+  }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (!thread) {
+        return;
+      }
+
+      if (!prefetch[threadId]['commentsStarted']) {
+        app.comments
+          .refresh(thread, app.activeChainId())
+          .then(async () => {
+            // fetch comments
+            const _comments = app.comments
+              .getByThread(thread)
+              .filter((c) => c.parentComment === null);
+            setComments(_comments);
+
+            // fetch reactions
+            const { result: reactionCounts } = await $.ajax({
+              type: 'POST',
+              url: `${app.serverUrl()}/reactionsCounts`,
+              headers: {
+                'content-type': 'application/json',
+              },
+              data: JSON.stringify({
+                proposal_ids: [threadId],
+                comment_ids: app.comments
+                  .getByThread(thread)
+                  .map((comment) => comment.id),
+                active_address: app.user.activeAccount?.address,
+              }),
+            });
+
+            // app.reactionCounts.deinit()
+            for (const rc of reactionCounts) {
+              const id = app.reactionCounts.store.getIdentifier({
+                threadId: rc.thread_id,
+                proposalId: rc.proposal_id,
+                commentId: rc.comment_id,
+              });
+
+              app.reactionCounts.store.add(
+                modelReactionCountFromServer({ ...rc, id })
+              );
+            }
+          })
+          .catch(() => {
+            notifyError('Failed to load comments');
+            setComments([]);
+          });
+
+        setPrefetch((prevState) => ({
+          ...prevState,
+          [threadId]: {
+            ...prevState[threadId],
+            commentsStarted: true,
+          },
+        }));
+      }
+    });
+
+    return () => clearTimeout(timerId);
   }, [prefetch, thread, threadId]);
 
   useEffect(() => {
@@ -282,99 +317,111 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [initializedPolls, thread?.id]);
 
   useEffect(() => {
-    if (!thread) {
-      return;
-    }
+    const timerId = setTimeout(() => {
+      if (!thread) {
+        return;
+      }
 
-    // load polls
-    if (!prefetch[threadId]['pollsStarted']) {
-      app.polls
-        .fetchPolls(app.activeChainId(), thread?.id)
-        .then(() => {
-          setPolls(app.polls.getByThreadId(thread.id));
-        })
-        .catch(() => {
-          notifyError('Failed to load polls');
-          setPolls([]);
-        });
+      // load polls
+      if (!prefetch[threadId]['pollsStarted']) {
+        app.polls
+          .fetchPolls(app.activeChainId(), thread?.id)
+          .then(() => {
+            setPolls(app.polls.getByThreadId(thread.id));
+          })
+          .catch(() => {
+            notifyError('Failed to load polls');
+            setPolls([]);
+          });
 
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          pollsStarted: true,
-        },
-      }));
-    }
+        setPrefetch((prevState) => ({
+          ...prevState,
+          [threadId]: {
+            ...prevState[threadId],
+            pollsStarted: true,
+          },
+        }));
+      }
+    });
+
+    return () => clearTimeout(timerId);
   }, [prefetch, thread, thread?.id, threadId]);
 
   useEffect(() => {
-    if (!thread) {
-      return;
-    }
+    const timerId = setTimeout(() => {
+      if (!thread) {
+        return;
+      }
 
-    // load view count
-    if (!prefetch[threadId]['viewCountStarted']) {
-      $.post(`${app.serverUrl()}/viewCount`, {
-        chain: app.activeChainId(),
-        object_id: thread.id,
-      })
-        .then((response) => {
-          if (response.status !== 'Success') {
+      // load view count
+      if (!prefetch[threadId]['viewCountStarted']) {
+        $.post(`${app.serverUrl()}/viewCount`, {
+          chain: app.activeChainId(),
+          object_id: thread.id,
+        })
+          .then((response) => {
+            if (response.status !== 'Success') {
+              setViewCount(0);
+              throw new Error(`got unsuccessful status: ${response.status}`);
+            } else {
+              setViewCount(response.result.view_count);
+            }
+          })
+          .catch(() => {
             setViewCount(0);
-            throw new Error(`got unsuccessful status: ${response.status}`);
-          } else {
-            setViewCount(response.result.view_count);
-          }
-        })
-        .catch(() => {
-          setViewCount(0);
-          throw new Error('could not load view count');
-        });
+            throw new Error('could not load view count');
+          });
 
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          viewCountStarted: true,
-        },
-      }));
-    }
+        setPrefetch((prevState) => ({
+          ...prevState,
+          [threadId]: {
+            ...prevState[threadId],
+            viewCountStarted: true,
+          },
+        }));
+      }
+    });
+
+    return () => clearTimeout(timerId);
   }, [prefetch, thread, thread?.id, threadId]);
 
   useEffect(() => {
-    if (!thread) {
-      return;
-    }
+    const timerId = setTimeout(() => {
+      if (!thread) {
+        return;
+      }
 
-    // load profiles
-    if (!prefetch[threadId]['profilesStarted']) {
-      app.newProfiles.getProfile(thread.authorChain, thread.author);
+      // load profiles
+      if (!prefetch[threadId]['profilesStarted']) {
+        app.newProfiles.getProfile(thread.authorChain, thread.author);
 
-      comments.forEach((comment) => {
-        app.newProfiles.getProfile(comment.authorChain, comment.author);
-      });
+        comments.forEach((comment) => {
+          app.newProfiles.getProfile(comment.authorChain, comment.author);
+        });
 
-      app.newProfiles.isFetched.on('redraw', () => {
-        if (!prefetch[threadId]?.['profilesFinished']) {
-          setPrefetch((prevState) => ({
-            ...prevState,
-            [threadId]: {
-              ...prevState[threadId],
-              profilesFinished: true,
-            },
-          }));
-        }
-      });
+        app.newProfiles.isFetched.on('redraw', () => {
+          if (!prefetch[threadId]?.['profilesFinished']) {
+            setPrefetch((prevState) => ({
+              ...prevState,
+              [threadId]: {
+                ...prevState[threadId],
+                profilesFinished: true,
+              },
+            }));
+          }
+        });
 
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          profilesStarted: true,
-        },
-      }));
-    }
+        setPrefetch((prevState) => ({
+          ...prevState,
+          [threadId]: {
+            ...prevState[threadId],
+            profilesStarted: true,
+          },
+        }));
+      }
+    });
+
+    return () => clearTimeout(timerId);
   }, [
     comments,
     prefetch,
@@ -527,6 +574,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           onClick: async () => {
             try {
               app.threads.delete(thread).then(() => {
+                app.threadUpdateEmitter.emit('threadUpdated', {
+                  threadId: thread.id,
+                  action: ThreadActionType.Deletion,
+                });
                 navigate('/discussions');
               });
             } catch (err) {
@@ -685,9 +736,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
+  const tabsShouldBePresent =
+    showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
+
   return (
     <Sublayout>
       <CWContentPage
+        showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||
