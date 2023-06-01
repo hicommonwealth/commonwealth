@@ -116,12 +116,6 @@ const processAddress = async (
         object_id: `user-${newUser.id}`,
         is_active: true,
       });
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewChatMention,
-        object_id: `user-${newUser.id}`,
-        is_active: true,
-      });
       addressInstance.user_id = newUser.id;
     }
   } else {

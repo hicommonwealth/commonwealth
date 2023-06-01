@@ -15,8 +15,6 @@ import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { findAllRoles } from '../util/roles';
-import checkRule from '../util/rules/checkRule';
-import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
@@ -32,13 +30,11 @@ export const Errors = {
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to react",
   BalanceCheckFailed: 'Could not verify user token balance',
-  RuleCheckFailed: 'Rule check failed',
 };
 
 const createReaction = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -87,29 +83,6 @@ const createReaction = async (
     thread = await models.Thread.findOne({
       where: { id: threadId },
     });
-  }
-
-  if (thread) {
-    const topic = await models.Topic.findOne({
-      include: {
-        model: models.Thread,
-        where: { id: thread.id },
-        required: true,
-        as: 'threads',
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
-      }
-    }
   }
 
   // check if author can react

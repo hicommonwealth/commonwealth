@@ -346,13 +346,6 @@ const verifySessionSignature = async (
         object_id: `user-${user.id}`,
         is_active: true,
       });
-      // Automatically create subscription to chat mentions
-      await models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewChatMention,
-        object_id: `user-${user.id}`,
-        is_active: true,
-      });
       addressModel.user_id = user.id;
     }
   } else if (isValid) {

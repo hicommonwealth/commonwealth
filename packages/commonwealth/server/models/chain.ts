@@ -175,7 +175,6 @@ export default (
     models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.ChatChannel);
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
