@@ -4,9 +4,6 @@ module.exports = {
       await queryInterface.removeColumn('Topics', 'rule_id', {
         transaction,
       });
-      await queryInterface.removeColumn('ChatChannels', 'rule_id', {
-        transaction,
-      });
       await queryInterface.dropTable('Rules', { transaction });
     });
   },
@@ -47,19 +44,6 @@ module.exports = {
 
       await queryInterface.addColumn(
         'Topics',
-        'rule_id',
-        {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-          references: {
-            model: 'Rules',
-            key: 'id',
-          },
-        },
-        { transaction }
-      );
-      await queryInterface.addColumn(
-        'ChatChannels',
         'rule_id',
         {
           type: Sequelize.INTEGER,
