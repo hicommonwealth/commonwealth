@@ -16,7 +16,7 @@ describe('getProfiles Tests', () => {
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
 
     const profiles = resp.result.profiles.filter(
@@ -33,7 +33,7 @@ describe('getProfiles Tests', () => {
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
 
     const profiles = resp.result.profiles.filter(
@@ -51,7 +51,7 @@ describe('getProfiles Tests', () => {
     const resp = await get('/api/profiles', r, true);
 
     // 13 because outer joins with addresses
-    chai.assert.equal(resp.result.count, 13);
+    chai.assert.equal(resp.result.count, 15);
     chai.assert.isUndefined(resp.result.profiles);
   });
 
