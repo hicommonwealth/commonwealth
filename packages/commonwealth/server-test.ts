@@ -342,10 +342,6 @@ const resetServer = (debug = false): Promise<void> => {
         description: 'an entity-event as occurred',
       });
       await models.NotificationCategory.create({
-        name: NotificationCategories.NewChatMention,
-        description: 'someone mentions a user in chat',
-      });
-      await models.NotificationCategory.create({
         name: NotificationCategories.SnapshotProposal,
         description: 'Snapshot proposal notifications',
       });

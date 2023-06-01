@@ -6,8 +6,6 @@ import type { BanModelStatic } from './models/ban';
 import type { ChainModelStatic } from './models/chain';
 import type { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
 import type { ChainNodeModelStatic } from './models/chain_node';
-import type { ChatChannelModelStatic } from './models/chat_channel';
-import type { ChatMessageModelStatic } from './models/chat_message';
 import type { CollaborationModelStatic } from './models/collaboration';
 import type { CommentModelStatic } from './models/comment';
 import type { CommunityBannerModelStatic } from './models/community_banner';
@@ -50,8 +48,6 @@ export type Models = {
   Chain: ChainModelStatic;
   ChainEntityMeta: ChainEntityMetaModelStatic;
   ChainNode: ChainNodeModelStatic;
-  ChatChannel: ChatChannelModelStatic;
-  ChatMessage: ChatMessageModelStatic;
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
