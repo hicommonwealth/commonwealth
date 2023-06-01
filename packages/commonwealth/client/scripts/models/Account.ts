@@ -2,6 +2,7 @@ import type { WalletId } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
 import app from 'state';
+import NewProfilesController from '../controllers/server/newProfiles';
 
 import type MinimumProfile from './MinimumProfile';
 import type ChainInfo from './ChainInfo';
@@ -66,7 +67,10 @@ class Account {
     if (profile) {
       this._profile = profile;
     } else if (!ignoreProfile && chain?.id) {
-      this._profile = app.newProfiles.getProfile(chain.id, address);
+      this._profile = NewProfilesController.Instance.getProfile(
+        chain.id,
+        address
+      );
     }
   }
 

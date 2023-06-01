@@ -86,7 +86,6 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  newProfiles: NewProfilesController;
   sessions: SessionsController;
 
   // Web3
@@ -183,7 +182,6 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),

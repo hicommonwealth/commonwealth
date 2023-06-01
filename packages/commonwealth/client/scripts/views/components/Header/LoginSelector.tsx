@@ -16,6 +16,7 @@ import { isSameAccount } from 'helpers';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import AddressInfo from '../../../models/AddressInfo';
 import ITokenAdapter from '../../../models/ITokenAdapter';
 import { CWButton } from '../component_kit/cw_button';
@@ -98,7 +99,7 @@ export const LoginSelector = () => {
     ([role]) => !role
   ).length;
 
-  if (!profileLoadComplete && app.newProfiles.allLoaded()) {
+  if (!profileLoadComplete && NewProfilesController.Instance.allLoaded()) {
     setProfileLoadComplete(true);
   }
 

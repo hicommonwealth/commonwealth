@@ -39,11 +39,11 @@ describe('NewProfilesController tests', async () => {
   });
 
   beforeEach(() => {
-    newProfilesController = new NewProfilesController();
+    newProfilesController = NewProfilesController.Instance;
   });
 
   it('should return the correct profile', async () => {
-    const controller = new NewProfilesController();
+    const controller = NewProfilesController.Instance;
     const expectedProfile = testProfiles[0];
     const expectedAddress = testAddresses.filter(
       (a) => a.profile_id === expectedProfile.id
@@ -79,7 +79,7 @@ describe('NewProfilesController tests', async () => {
   });
 
   it('Update profile should work correctly', async () => {
-    const controller = new NewProfilesController();
+    const controller = NewProfilesController.Instance;
     const expectedProfile = testProfiles[0];
     const expectedAddress = testAddresses.filter(
       (a) => a.profile_id === expectedProfile.id
@@ -97,7 +97,7 @@ describe('NewProfilesController tests', async () => {
   });
 
   it('assert chunking works correctly', async () => {
-    const controller = new NewProfilesController();
+    const controller = NewProfilesController.Instance;
     const expectedProfile = testProfiles[0];
     const expectedAddress = testAddresses.filter(
       (a) => a.profile_id === expectedProfile.id

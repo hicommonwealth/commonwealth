@@ -9,6 +9,12 @@ import { NewProfileStore } from 'stores';
 export const newProfilesChunkSize = 20000;
 
 class NewProfilesController {
+  private static _instance: NewProfilesController;
+
+  public static get Instance(): NewProfilesController {
+    return this._instance || (this._instance = new this());
+  }
+
   private _store: NewProfileStore = new NewProfileStore();
 
   public get store() {
@@ -73,19 +79,20 @@ class NewProfilesController {
     const profileChunks = _.chunk(profiles, newProfilesChunkSize);
 
     try {
-      const responses = await Promise.all(profileChunks.map(async profileChunk => {
-        return axios.post(
-          `${app.serverUrl()}/getAddressProfile`,
-          {
-            addresses: profileChunk.map(p => p.address),
-            chains: [...new Set(profileChunk.map(p => p.chain))], // filter out unique chains
+      const responses = await Promise.all(
+        profileChunks.map(async (profileChunk) => {
+          return axios.post(`${app.serverUrl()}/getAddressProfile`, {
+            addresses: profileChunk.map((p) => p.address),
+            chains: [...new Set(profileChunk.map((p) => p.chain))], // filter out unique chains
             jwt: app.user.jwt,
-          }
-        );
-      }));
+          });
+        })
+      );
 
-      responses.forEach(response => {
-        const resultMap = new Map(response.data.result.map(r => [r.address, r]));
+      responses.forEach((response) => {
+        const resultMap = new Map(
+          response.data.result.map((r) => [r.address, r])
+        );
         // multiple profiles
         profiles.forEach((profile) => {
           const currentProfile = resultMap.get(profile.address) as any;
@@ -99,7 +106,7 @@ class NewProfilesController {
           );
           this._unfetched.delete(profile.address);
         });
-      })
+      });
     } catch (e) {
       console.error(e);
     }
