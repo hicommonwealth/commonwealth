@@ -1,21 +1,20 @@
 import { IChainEntityKind } from 'chain-events/src';
-import { isCommandClick, isDefaultStage, threadStageToLabel } from 'helpers';
+import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import {
   chainEntityTypeToProposalShortName,
   getProposalUrlPath,
 } from 'identifiers';
-import Thread, { LinkSource } from 'models/Thread';
+import { LinkSource } from 'models/Thread';
 import moment from 'moment';
-import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import Permissions from '../../../../lib/Permissions';
 import AddressInfo from '../../../../models/AddressInfo';
+import { ThreadStage } from '../../../../models/types';
 import { CWTag } from '../../../components/component_kit/cw_tag';
 import { CWText } from '../../../components/component_kit/cw_text';
 import {
@@ -26,11 +25,15 @@ import { ThreadPreviewReactionButtonBig } from '../../../components/ReactionButt
 import { isHot } from '../helpers';
 import { isNewThread } from '../NewThreadTag';
 import './index.scss';
+import { ThreadAdminActionsProps } from './ThreadAdminActions';
 import { ThreadAuthorAndPublishInfo } from './ThreadAuthorAndPublishInfo';
 import { ThreadOptions } from './ThreadOptions';
-import { ThreadAdminActionsProps } from './ThreadAdminActions';
 
-type ThreadCardProps = ThreadAdminActionsProps;
+type ThreadCardProps = ThreadAdminActionsProps & {
+  onBodyClick?: () => any;
+  onStageTagClick?: (stage: ThreadStage) => any;
+  threadHref: string;
+};
 
 export const ThreadCard = ({
   thread,
@@ -38,19 +41,22 @@ export const ThreadCard = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onChangeTopic,
+  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
+  onEditStart,
   onEditCancel,
   onEditConfirm,
   hasPendingEdits,
+  onBodyClick,
+  onStageTagClick,
+  threadHref,
 }: ThreadCardProps) => {
   const [windowIsSmall, setWindowIsSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
 
-  const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
 
   useBrowserWindow({
@@ -83,32 +89,20 @@ export const ThreadCard = ({
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals.length > 0;
 
-  const handleStageTagClick = (e) => {
-    e.stopPropagation();
-    navigate(`/discussions?stage=${thread.stage}`);
-  };
-
   return (
     <>
-      <div
+      <a
+        href={threadHref}
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
           'ThreadCard'
         )}
         onClick={(e) => {
-          if (isCommandClick(e)) {
-            window.open(`${getScopePrefix()}${discussionLink}`, '_blank');
-            return;
+          if (e.target !== e.currentTarget) {
+            e.preventDefault();
+            e.stopPropagation();
           }
-
-          e.preventDefault();
-
-          const scrollEle = document.getElementsByClassName('Body')[0];
-
-          localStorage[`${app.activeChainId()}-discussions-scrollY`] =
-            scrollEle.scrollTop;
-
-          navigate(discussionLink);
+          onBodyClick && onBodyClick();
         }}
         key={thread.id}
       >
@@ -160,7 +154,11 @@ export const ThreadCard = ({
                   label={threadStageToLabel(thread.stage)}
                   trimAt={20}
                   type="stage"
-                  onClick={handleStageTagClick}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await onStageTagClick(thread.stage);
+                  }}
                 />
               )}
               {linkedProposals
@@ -198,10 +196,11 @@ export const ThreadCard = ({
                 onSpamToggle={onSpamToggle}
                 onLockToggle={onLockToggle}
                 onPinToggle={onPinToggle}
-                onChangeTopic={onChangeTopic}
+                onTopicChange={onTopicChange}
                 onProposalStageChange={onProposalStageChange}
                 onSnapshotProposalFromThread={onSnapshotProposalFromThread}
                 onCollaboratorsEdit={onCollaboratorsEdit}
+                onEditStart={onEditStart}
                 onEditCancel={onEditCancel}
                 onEditConfirm={onEditConfirm}
                 hasPendingEdits={hasPendingEdits}
@@ -209,7 +208,7 @@ export const ThreadCard = ({
             </div>
           )}
         </div>
-      </div>
+      </a>
     </>
   );
 };

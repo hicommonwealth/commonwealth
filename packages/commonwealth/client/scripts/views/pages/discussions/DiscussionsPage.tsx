@@ -1,7 +1,10 @@
+import { getProposalUrlPath } from 'identifiers';
+import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
+import { slugify } from 'utils';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ThreadActionType } from '../../../../../shared/types';
 import Thread from '../../../models/Thread';
@@ -16,42 +19,43 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const navigate = useCommonNavigate();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
 
+  // [CLEANUP]: We should remove this handler
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;
   }) => {
-    const { threadId, action } = data;
+    const { action } = data;
 
     if (
       action === ThreadActionType.TopicChange ||
       action === ThreadActionType.Deletion
     ) {
-      const updatedThreadList = threads.filter((t) => t.id !== threadId);
-
-      setThreads(updatedThreadList);
-    } else {
-      const pinnedThreads = app.threads.listingStore.getThreads({
-        topicName,
-        stageName,
-        pinned: true,
-      });
-
-      const unpinnedThreads = app.threads.listingStore.getThreads({
-        topicName,
-        stageName,
-        pinned: false,
-      });
-
-      setThreads([...pinnedThreads, ...unpinnedThreads]);
+      return;
     }
+
+    const pinnedThreads = app.threads.listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: true,
+    });
+
+    const unpinnedThreads = app.threads.listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: false,
+    });
+
+    setThreads([...pinnedThreads, ...unpinnedThreads]);
   };
 
+  // [CLEANUP]: We should remove this handler
   // Event binding for actions that trigger a thread update (e.g. topic or stage change)
   useEffect(() => {
     app.threadUpdateEmitter.on('threadUpdated', (data) =>
@@ -102,6 +106,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           style={{ height: '100%', width: '100%', position: 'inherit' }}
           data={threads}
           itemContent={(i, thread) => {
+            const discussionLink = getProposalUrlPath(
+              thread.slug,
+              `${thread.identifier}-${slugify(thread.title)}`
+            );
+
             return (
               <ThreadCard
                 key={thread.id + '-' + thread.readOnly}
@@ -122,7 +131,32 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   foundThread.pinned = isPinned;
                   setThreads(tempThreads);
                 }}
-                // onDelete
+                onEditStart={() => navigate(`${discussionLink}`)}
+                onStageTagClick={() => {
+                  navigate(`/discussions?stage=${thread.stage}`);
+                }}
+                threadHref={`${getScopePrefix()}${discussionLink}`}
+                onBodyClick={() => {
+                  const scrollEle = document.getElementsByClassName('Body')[0];
+
+                  localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+                    scrollEle.scrollTop;
+                }}
+                onDelete={() => {
+                  const tempThreads = [...threads].filter(
+                    (t) => t.id !== thread.id
+                  );
+                  setThreads(tempThreads);
+                }}
+                onTopicChange={(topic) => {
+                  if (topic.id !== thread.topic.id) {
+                    const tempThreads = [...threads].filter(
+                      (t) => t.id !== thread.id
+                    );
+
+                    setThreads(tempThreads);
+                  }
+                }}
                 // onSpamToggle
               />
             );

@@ -30,9 +30,10 @@ export const ThreadOptions = ({
   canUpdateThread,
   totalComments,
   onLockToggle,
-  onChangeTopic,
+  onTopicChange,
   onCollaboratorsEdit,
   onDelete,
+  onEditStart,
   onEditCancel,
   onEditConfirm,
   onPinToggle,
@@ -111,9 +112,10 @@ export const ThreadOptions = ({
           <ThreadAdminActions
             thread={thread}
             onLockToggle={onLockToggle}
-            onChangeTopic={onChangeTopic}
+            onTopicChange={onTopicChange}
             onCollaboratorsEdit={onCollaboratorsEdit}
             onDelete={onDelete}
+            onEditStart={onEditStart}
             onEditCancel={onEditCancel}
             onEditConfirm={onEditConfirm}
             onPinToggle={onPinToggle}

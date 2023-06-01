@@ -22,10 +22,11 @@ export type ThreadAdminActionsProps = {
   onSpamToggle?: (isSpam: boolean) => any;
   onLockToggle?: (isLocked: boolean) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onChangeTopic?: (newTopic: Topic) => any;
+  onTopicChange?: (newTopic: Topic) => any;
   onProposalStageChange?: (newStage: ThreadStage) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
+  onEditStart?: () => any;
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
   hasPendingEdits?: boolean;
@@ -37,10 +38,11 @@ export const ThreadAdminActions = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onChangeTopic,
+  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
+  onEditStart,
   onEditCancel,
   onEditConfirm,
   hasPendingEdits,
@@ -158,6 +160,7 @@ export const ThreadAdminActions = ({
 
   const handleEditThread = async (e) => {
     e.preventDefault();
+    onEditStart && onEditStart();
 
     if (!hasPendingEdits) {
       onEditCancel();
@@ -303,7 +306,7 @@ export const ThreadAdminActions = ({
       <Modal
         content={
           <ChangeTopicModal
-            onChangeHandler={onChangeTopic}
+            onChangeHandler={onTopicChange}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
           />

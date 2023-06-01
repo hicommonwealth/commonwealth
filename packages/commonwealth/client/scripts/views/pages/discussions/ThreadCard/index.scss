@@ -7,6 +7,8 @@
   border-radius: 6px;
   padding: 16px;
   gap: 16px;
+  text-decoration: none;
+  color: unset;
 
   @include smallInclusive {
     padding: 12px;
@@ -22,6 +24,8 @@
 
   &:hover {
     background: $neutral-50;
+    text-decoration: none;
+    color: unset;
   }
 
   .content-wrapper {
