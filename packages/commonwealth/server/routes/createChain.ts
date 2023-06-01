@@ -384,12 +384,6 @@ const createChain = async (
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
-  await models.ChatChannel.create({
-    name: 'General',
-    chain_id: chain.id,
-    category: 'General',
-  });
-
   await models.Topic.create({
     chain_id: chain.id,
     name: 'General',

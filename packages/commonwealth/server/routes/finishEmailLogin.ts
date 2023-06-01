@@ -151,13 +151,6 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       is_active: true,
     });
 
-    // Automatically create subscription to chat mentions
-    await models.Subscription.create({
-      subscriber_id: newUser.id,
-      category_id: NotificationCategories.NewChatMention,
-      object_id: `user-${newUser.id}`,
-      is_active: true,
-    });
     req.login(newUser, (err) => {
       if (err)
         return redirectWithLoginError(

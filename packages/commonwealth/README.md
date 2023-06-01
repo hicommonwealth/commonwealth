@@ -296,19 +296,6 @@ npm install -g local-ssl-proxy
 local-ssl-proxy --source 443 --target 8080
 ```
 
-## Chat Server
-
-In order to use chat functionality, you will also need to check out and
-build the `commonwealth-chat` server and run it in the background.
-
-https://github.com/hicommonwealth/commonwealth-chat
-
-The chat server talks to the same database as the main server. It only
-makes a couple of simple queries, to read/write to message history and
-check that Users are sending messages from valid Addresses.
-
-By default it runs on port 3001.
-
 ## Datadog Monitoring on Heroku
 
 `Warning:` Following steps below may lead your app to restart several times, please choose appropriate maintainance window.
