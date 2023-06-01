@@ -18,7 +18,6 @@ import { NotificationOptions } from './server_notifications_controller';
 import { getThreadUrl } from '../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { AnalyticsOptions } from './server_analytics_controller';
-import { FindOrCreateOptions } from 'sequelize';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
