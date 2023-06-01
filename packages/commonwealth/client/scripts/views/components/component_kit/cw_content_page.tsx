@@ -1,17 +1,17 @@
-import React from 'react';
-
-import moment from 'moment';
-
+import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/cw_content_page.scss';
-
-import { pluralize } from 'helpers';
-import { NewThreadTag } from '../../pages/discussions/NewThreadTag';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { SharePopover } from '../share_popover';
+import moment from 'moment';
+import React, { Fragment, ReactNode, useState } from 'react';
+import useBrowserWindow from '../../../hooks/useBrowserWindow';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import MinimumProfile from '../../../models/MinimumProfile';
+import { Thread } from '../../../models/Thread';
+import Topic from '../../../models/Topic';
+import { ThreadStage } from '../../../models/types';
+import { ThreadAuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/ThreadAuthorAndPublishInfo';
+import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from './cw_card';
-import { CWIconButton } from './cw_icon_button';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { isWindowMediumSmallInclusive } from './helpers';
@@ -19,7 +19,7 @@ import { ComponentType } from './types';
 
 export type ContentPageSidebarItem = {
   label: string;
-  item: React.ReactNode;
+  item: ReactNode;
 };
 
 // tuple
@@ -30,72 +30,86 @@ export type SidebarComponents = [
 ];
 
 type ContentPageProps = {
+  thread?: Thread;
   createdAt: moment.Moment | number;
-  title: string | React.ReactNode;
-
-  // optional
+  title: string | ReactNode;
   lastEdited?: moment.Moment | number;
-  author?: React.ReactNode;
-  actions?: Array<PopoverMenuItem>;
-  body?: React.ReactNode;
-  comments?: React.ReactNode;
+  author?: Account | AddressInfo | MinimumProfile | undefined;
+  collaborators?: IThreadCollaborator[];
+  body?: (children: ReactNode) => ReactNode;
+  comments?: ReactNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
-  headerComponents?: React.ReactNode;
-  readOnly?: boolean;
+  stageLabel?: ThreadStage;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
-  subBody?: React.ReactNode;
-  subHeader?: React.ReactNode;
+  subBody?: ReactNode;
+  subHeader?: ReactNode;
   viewCount?: number;
   displayNewTag?: boolean;
+  isSpamThread?: boolean;
+  onLockToggle?: (isLocked: boolean) => any;
+  onDelete?: () => any;
+  onSpamToggle?: (isSpam: boolean) => any;
+  onPinToggle?: (isPinned: boolean) => any;
+  onTopicChange?: (newTopic: Topic) => any;
+  onProposalStageChange?: (newStage: ThreadStage) => any;
+  onSnapshotProposalFromThread?: () => any;
+  onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
+  onEditStart?: () => any;
+  onEditConfirm?: () => any;
+  onEditCancel?: () => any;
+  hasPendingEdits?: boolean;
+  canUpdateThread?: boolean;
 };
 
-export const CWContentPage = (props: ContentPageProps) => {
-  const {
-    actions,
-    author,
-    body,
-    comments,
-    contentBodyLabel,
-    createdAt,
-    lastEdited,
-    headerComponents,
-    readOnly,
-    showSidebar,
-    sidebarComponents,
-    subBody,
-    subHeader,
-    title,
-    viewCount,
-    displayNewTag,
-  } = props;
-
-  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
+export const CWContentPage = ({
+  thread,
+  author,
+  body,
+  comments,
+  contentBodyLabel,
+  createdAt,
+  lastEdited,
+  stageLabel,
+  showSidebar,
+  sidebarComponents,
+  subBody,
+  subHeader,
+  title,
+  viewCount,
+  displayNewTag,
+  isSpamThread,
+  collaborators,
+  onLockToggle,
+  onPinToggle,
+  onDelete,
+  onTopicChange,
+  onCollaboratorsEdit,
+  onEditCancel,
+  onEditConfirm,
+  onEditStart,
+  hasPendingEdits,
+  canUpdateThread,
+}: ContentPageProps) => {
+  const [viewType, setViewType] = useState<'sidebarView' | 'tabsView'>(
     isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
       ? 'tabsView'
       : 'sidebarView'
   );
-  const [tabSelected, setTabSelected] = React.useState<number>(0);
+  const [tabSelected, setTabSelected] = useState<number>(0);
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
-  const createdOrEditedText = lastEdited ? 'Edited' : 'Published'
 
-  React.useEffect(() => {
-    const onResize = () => {
+  useBrowserWindow({
+    onResize: () => {
       setViewType(
         isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
           ? 'tabsView'
           : 'sidebarView'
       );
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    },
+    resizeListenerUpdateDeps: [],
+  });
 
   const mainBody = (
     <div className="main-body-container">
@@ -108,38 +122,55 @@ export const CWContentPage = (props: ContentPageProps) => {
           title
         )}
         <div className="header-info-row">
-          {author}
-          {typeof createdOrEditedDate === 'number' ||
-            (moment.isMoment(createdOrEditedDate) && createdOrEditedDate.isValid() && (
-              <CWText type="caption" className="header-text">
-                • &nbsp; {createdOrEditedText} on {moment(createdOrEditedDate).format('l')} &nbsp; •
-              </CWText>
-            ))}
-          {!!displayNewTag && <NewThreadTag threadCreatedAt={moment(createdAt)}/>}
-          {!!viewCount && (
-            <CWText type="caption" className="header-text">
-            {pluralize(viewCount, 'view')}
-            </CWText>
-          )}
-          {headerComponents}
-          {readOnly && <CWIcon iconName="lock" iconSize="small" />}
-          {actions && (
-            <PopoverMenu
-              renderTrigger={(onclick) => (
-                <CWIconButton
-                  iconName="dotsVertical"
-                  iconSize="small"
-                  onClick={onclick}
-                />
-              )}
-              menuItems={actions}
-            />
-          )}
-          <SharePopover />
+          <ThreadAuthorAndPublishInfo
+            showSplitDotIndicator={true}
+            isNewThread={!!displayNewTag}
+            isThreadLocked={thread.readOnly}
+            authorInfo={
+              new AddressInfo(
+                null,
+                author.address,
+                typeof author.chain === 'string'
+                  ? author.chain
+                  : author.chain.id,
+                null
+              )
+            }
+            collaboratorsInfo={collaborators}
+            threadPublishDate={
+              createdOrEditedDate
+                ? moment(createdOrEditedDate).format('l')
+                : null
+            }
+            viewsCount={viewCount}
+            showPublishLabelWithDate={!lastEdited}
+            showEditedLabelWithDate={!!lastEdited}
+            isSpamThread={isSpamThread}
+            threadStage={stageLabel}
+          />
         </div>
       </div>
       {subHeader}
-      {body}
+
+      {body &&
+        body(
+          <ThreadOptions
+            canVote={true}
+            thread={thread}
+            totalComments={thread.numberOfComments}
+            onLockToggle={onLockToggle}
+            onDelete={onDelete}
+            onPinToggle={onPinToggle}
+            onTopicChange={onTopicChange}
+            onCollaboratorsEdit={onCollaboratorsEdit}
+            onEditCancel={onEditCancel}
+            onEditConfirm={onEditConfirm}
+            onEditStart={onEditStart}
+            canUpdateThread={canUpdateThread}
+            hasPendingEdits={hasPendingEdits}
+          />
+        )}
+
       {subBody}
       {comments}
     </div>
@@ -154,7 +185,7 @@ export const CWContentPage = (props: ContentPageProps) => {
         {showSidebar && (
           <div className="sidebar">
             {sidebarComponents?.map((c) => (
-              <React.Fragment key={c.label}>{c.item}</React.Fragment>
+              <Fragment key={c.label}>{c.item}</Fragment>
             ))}
           </div>
         )}
@@ -195,7 +226,7 @@ export const CWContentPage = (props: ContentPageProps) => {
 };
 
 type ContentPageCardProps = {
-  content: React.ReactNode;
+  content: ReactNode;
   header: string;
 };
 

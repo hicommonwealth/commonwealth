@@ -162,27 +162,37 @@ export const ThreadAdminActions = ({
     e.preventDefault();
     onEditStart && onEditStart();
 
-    if (!hasPendingEdits) {
-      onEditCancel();
+    if (hasPendingEdits) {
+      openConfirmation({
+        title: 'Info',
+        description: <>Previous changes found. Restore edits?</>,
+        buttons: [
+          {
+            label: 'Restore',
+            buttonType: 'mini-black',
+            onClick: onEditConfirm,
+          },
+          {
+            label: 'Cancel',
+            buttonType: 'mini-white',
+            onClick: onEditCancel,
+          },
+        ],
+      });
       return;
     }
 
-    openConfirmation({
-      title: 'Info',
-      description: <>Previous changes found. Restore edits?</>,
-      buttons: [
-        {
-          label: 'Restore',
-          buttonType: 'mini-black',
-          onClick: onEditConfirm,
-        },
-        {
-          label: 'Cancel',
-          buttonType: 'mini-white',
-          onClick: onEditCancel,
-        },
-      ],
-    });
+    onEditConfirm && onEditConfirm();
+  };
+
+  const handleSnapshotProposalClick = () => {
+    const snapshotSpaces = app.chain.meta.snapshot;
+    onSnapshotProposalFromThread();
+    navigate(
+      snapshotSpaces.length > 1
+        ? '/multiple-snapshots'
+        : `/snapshot/${snapshotSpaces}`
+    );
   };
 
   return (
@@ -241,15 +251,7 @@ export const ThreadAdminActions = ({
                         {
                           label: 'Snapshot proposal from thread',
                           iconLeft: 'democraticProposal' as const,
-                          onClick: () => {
-                            const snapshotSpaces = app.chain.meta.snapshot;
-                            onSnapshotProposalFromThread();
-                            navigate(
-                              snapshotSpaces.length > 1
-                                ? '/multiple-snapshots'
-                                : `/snapshot/${snapshotSpaces}`
-                            );
-                          },
+                          onClick: handleSnapshotProposalClick,
                         },
                       ]
                     : []),

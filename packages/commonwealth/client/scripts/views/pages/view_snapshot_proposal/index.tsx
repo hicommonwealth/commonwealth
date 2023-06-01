@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
 import {
+  getPower,
+  getResults,
   Power,
   SnapshotProposal,
   SnapshotProposalVote,
@@ -8,24 +8,21 @@ import {
   VoteResults,
   VoteResultsData,
 } from 'helpers/snapshot_utils';
-import { getPower, getResults } from 'helpers/snapshot_utils';
-
+import { LinkSource } from 'models/Thread';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import Sublayout from 'views/Sublayout';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
-import { User } from '../../components/user/user';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { LinkSource } from 'models/Thread';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -124,18 +121,7 @@ export const ViewProposalPage = ({
       <CWContentPage
         showSidebar
         title={proposal.title}
-        author={
-          <CWText>
-            {!!proposalAuthor && (
-              <User
-                user={proposalAuthor}
-                showAddressWithDisplayName
-                linkify
-                popover
-              />
-            )}
-          </CWText>
-        }
+        author={proposalAuthor}
         createdAt={proposal.created}
         contentBodyLabel="Snapshot"
         subHeader={
@@ -145,7 +131,7 @@ export const ViewProposalPage = ({
             <ClosedProposalPill proposalState={proposal.state} />
           )
         }
-        body={<QuillRenderer doc={proposal.body} />}
+        body={() => <QuillRenderer doc={proposal.body} />}
         subBody={
           votes.length > 0 && (
             <SnapshotVotesTable

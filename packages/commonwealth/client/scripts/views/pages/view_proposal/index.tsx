@@ -1,34 +1,31 @@
-import React, { useState, useEffect } from 'react';
-
-import app from 'state';
-import Sublayout from 'views/Sublayout';
 import { ChainBase } from 'common-common/src/types';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
+import useForceRerender from 'hooks/useForceRerender';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
-import type { AnyProposal } from '../../../models/types';
-
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/Sublayout';
+import type { AnyProposal } from '../../../models/types';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { User } from '../../components/user/user';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import useForceRerender from 'hooks/useForceRerender';
-import { useCommonNavigate } from 'navigation/helpers';
-import Cosmos from 'controllers/chain/cosmos/adapter';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -123,11 +120,7 @@ const ViewProposalPage = ({
     >
       <CWContentPage
         title={proposal.title}
-        author={
-          !!proposal.author && (
-            <User avatarSize={24} user={proposal.author} popover linkify />
-          )
-        }
+        author={proposal.author}
         createdAt={proposal.createdAt}
         subHeader={
           <ProposalSubheader
@@ -136,7 +129,7 @@ const ViewProposalPage = ({
             votingModalOpen={votingModalOpen}
           />
         }
-        body={
+        body={() =>
           !!proposal.description && (
             <CollapsibleProposalBody proposal={proposal} />
           )
