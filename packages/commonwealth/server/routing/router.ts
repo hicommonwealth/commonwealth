@@ -106,13 +106,6 @@ import deleteTopic from '../routes/deleteTopic';
 import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
-<<<<<<< HEAD
-=======
-
-import createRule from '../routes/rules/createRule';
-import deleteRule from '../routes/rules/deleteRule';
-import getRuleTypes from '../routes/rules/getRuleTypes';
->>>>>>> master
 
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
