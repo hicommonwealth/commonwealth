@@ -1,22 +1,22 @@
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { threadStageToLabel } from '../../../../helpers/index';
-import type Account from '../../../../models/Account';
-import AddressInfo from '../../../../models/AddressInfo';
-import MinimumProfile from '../../../../models/MinimumProfile';
-import { IThreadCollaborator } from '../../../../models/Thread';
-import { ThreadStage } from '../../../../models/types';
+import { threadStageToLabel } from '../../../../../helpers/index';
+import type Account from '../../../../../models/Account';
+import AddressInfo from '../../../../../models/AddressInfo';
+import MinimumProfile from '../../../../../models/MinimumProfile';
+import { IThreadCollaborator } from '../../../../../models/Thread';
+import { ThreadStage } from '../../../../../models/types';
 import {
   Popover,
   usePopover,
-} from '../../../components/component_kit/cw_popover/cw_popover';
-import { CWTag } from '../../../components/component_kit/cw_tag';
-import { CWText } from '../../../components/component_kit/cw_text';
-import { getClasses } from '../../../components/component_kit/helpers';
-import { User } from '../../../components/user/user';
-import './ThreadAuthorAndPublishInfo.scss';
+} from '../../../../components/component_kit/cw_popover/cw_popover';
+import { CWTag } from '../../../../components/component_kit/cw_tag';
+import { CWText } from '../../../../components/component_kit/cw_text';
+import { getClasses } from '../../../../components/component_kit/helpers';
+import { User } from '../../../../components/user/user';
+import './index.scss';
 
-export type ThreadAuthorAndPublishInfoProps = {
+export type AuthorAndPublishInfoProps = {
   isNewThread?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
   collaboratorsInfo?: IThreadCollaborator[];
@@ -32,7 +32,7 @@ export type ThreadAuthorAndPublishInfoProps = {
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
 };
 
-export const ThreadAuthorAndPublishInfo = ({
+export const AuthorAndPublishInfo = ({
   isNewThread,
   authorInfo,
   isThreadLocked,
@@ -46,15 +46,15 @@ export const ThreadAuthorAndPublishInfo = ({
   threadStage,
   onThreadStageLabelClick,
   collaboratorsInfo,
-}: ThreadAuthorAndPublishInfoProps) => {
+}: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
 
   const dotIndicator = showSplitDotIndicator && (
-    <CWText className="last-updated-text">•</CWText>
+    <CWText className="dot-indicator">•</CWText>
   );
 
   return (
-    <div className="ThreadAuthorAndPublishInfo">
+    <div className="AuthorAndPublishInfo">
       <User
         avatarSize={24}
         user={authorInfo}
@@ -67,7 +67,7 @@ export const ThreadAuthorAndPublishInfo = ({
           <CWText type="caption">and</CWText>
           <CWText
             type="caption"
-            className="trigger-text"
+            className="section-text cursor-pointer"
             onMouseEnter={popoverProps.handleInteraction}
             onMouseLeave={popoverProps.handleInteraction}
           >
@@ -97,11 +97,7 @@ export const ThreadAuthorAndPublishInfo = ({
       {threadPublishDate && (
         <>
           {dotIndicator}
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className="last-updated-text"
-          >
+          <CWText type="caption" fontWeight="medium" className="section-text">
             {showPublishLabelWithDate ? 'Published on ' : ''}
             {showEditedLabelWithDate ? 'Edited on ' : ''}
             {threadPublishDate}
@@ -112,7 +108,7 @@ export const ThreadAuthorAndPublishInfo = ({
       {viewsCount >= 0 && (
         <>
           {dotIndicator}
-          <CWText type="caption" className="header-text">
+          <CWText type="caption" className="section-text">
             {`${viewsCount} view${viewsCount > 1 ? 's' : ''}`}
           </CWText>
         </>

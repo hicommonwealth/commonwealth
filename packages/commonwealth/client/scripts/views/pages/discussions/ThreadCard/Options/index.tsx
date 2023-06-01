@@ -1,21 +1,18 @@
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../../../components/component_kit/cw_text';
-import { ThreadReactionPreviewButtonSmall } from '../../../components/ReactionButton/ThreadPreviewReactionButtonSmall';
-import { SharePopover } from '../../../components/share_popover';
+import { CWText } from '../../../../components/component_kit/cw_text';
+import { ReactionButton } from '../ReactionButton';
+import { SharePopover } from '../../../../components/share_popover';
 import {
   getCommentSubscription,
   getReactionSubscription,
   handleToggleSubscription,
-} from '../helpers';
-import {
-  ThreadAdminActions,
-  ThreadAdminActionsProps,
-} from './ThreadAdminActions';
-import './ThreadOptions.scss';
+} from '../../helpers';
+import { AdminActions, AdminActionsProps } from './AdminActions';
+import './index.scss';
 
-type ThreadOptionsProps = ThreadAdminActionsProps & {
+type OptionsProps = AdminActionsProps & {
   thread?: Thread;
   canVote?: boolean;
   shareEndpoint?: string;
@@ -23,7 +20,7 @@ type ThreadOptionsProps = ThreadAdminActionsProps & {
   totalComments?: number;
 };
 
-export const ThreadOptions = ({
+export const Options = ({
   thread,
   canVote = false,
   shareEndpoint,
@@ -41,7 +38,7 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
-}: ThreadOptionsProps) => {
+}: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
       getCommentSubscription(thread)?.isActive &&
@@ -50,10 +47,8 @@ export const ThreadOptions = ({
 
   return (
     <>
-      <div className="ThreadOptions">
-        {canVote && thread && (
-          <ThreadReactionPreviewButtonSmall thread={thread} />
-        )}
+      <div className="Options">
+        {canVote && thread && <ReactionButton thread={thread} size="small" />}
 
         {totalComments >= 0 && (
           <button className="thread-option-btn">
@@ -109,7 +104,7 @@ export const ThreadOptions = ({
         </button>
 
         {canUpdateThread && thread && (
-          <ThreadAdminActions
+          <AdminActions
             thread={thread}
             onLockToggle={onLockToggle}
             onTopicChange={onTopicChange}

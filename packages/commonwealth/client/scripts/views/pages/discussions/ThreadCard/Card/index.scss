@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../../../styles/shared';
 
 .ThreadCard {
   cursor: pointer;
@@ -15,15 +15,17 @@
   }
 
   &.isPinned {
-    background: $neutral-50;
+    background: $neutral-50-new;
 
     &:hover {
-      background: $neutral-100;
+      background: $neutral-50-new;
+      text-decoration: none;
+      color: unset;
     }
   }
 
   &:hover {
-    background: $neutral-50;
+    background: $neutral-100-new;
     text-decoration: none;
     color: unset;
   }

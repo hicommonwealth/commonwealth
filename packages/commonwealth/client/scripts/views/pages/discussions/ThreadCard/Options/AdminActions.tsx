@@ -5,18 +5,18 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { ThreadActionType } from '../../../../../../shared/types';
-import { notifySuccess } from '../../../../controllers/app/notifications';
-import Permissions from '../../../../utils/Permissions';
-import type Thread from '../../../../models/Thread';
-import type { IThreadCollaborator } from '../../../../models/Thread';
-import Topic from '../../../../models/Topic';
-import { ThreadStage } from '../../../../models/types';
-import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
-import { EditCollaboratorsModal } from '../../../modals/edit_collaborators_modal';
+import { ThreadActionType } from '../../../../../../../shared/types';
+import { notifySuccess } from '../../../../../controllers/app/notifications';
+import Permissions from '../../../../../utils/Permissions';
+import type Thread from '../../../../../models/Thread';
+import type { IThreadCollaborator } from '../../../../../models/Thread';
+import Topic from '../../../../../models/Topic';
+import { ThreadStage } from '../../../../../models/types';
+import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
+import { PopoverMenu } from '../../../../components/component_kit/cw_popover/cw_popover_menu';
+import { EditCollaboratorsModal } from '../../../../modals/edit_collaborators_modal';
 
-export type ThreadAdminActionsProps = {
+export type AdminActionsProps = {
   thread: Thread;
   onDelete?: () => any;
   onSpamToggle?: (isSpam: boolean) => any;
@@ -32,7 +32,7 @@ export type ThreadAdminActionsProps = {
   hasPendingEdits?: boolean;
 };
 
-export const ThreadAdminActions = ({
+export const AdminActions = ({
   thread,
   onDelete,
   onSpamToggle,
@@ -46,7 +46,7 @@ export const ThreadAdminActions = ({
   onEditCancel,
   onEditConfirm,
   hasPendingEdits,
-}: ThreadAdminActionsProps) => {
+}: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);

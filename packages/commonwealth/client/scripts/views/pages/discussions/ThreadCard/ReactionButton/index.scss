@@ -1,6 +1,6 @@
-@import '../../shared';
+@import '../../../../../../styles/shared';
 
-.ThreadPreviewReactionButton {
+.ThreadReactionButton {
   align-items: center;
   border-radius: $border-radius-corners-wider;
   border: 1px solid $neutral-300;
@@ -38,4 +38,23 @@
       margin: 2px auto 4px;
     }
   }
+}
+
+.CommentReactionButton {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+
+  &.disabled {
+    pointer-events: none;
+  }
+
+  .menu-buttons-text.Text {
+    color: $neutral-500;
+  }
+}
+
+.reaction-button-tooltip-contents {
+  display: flex;
+  flex-direction: column;
 }

@@ -1,8 +1,9 @@
-@import '../../../../../styles/shared';
+@import '../../../../../../styles/shared';
 
-.ThreadAuthorAndPublishInfo {
+.AuthorAndPublishInfo {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 
   .User {
@@ -22,7 +23,7 @@
     }
   }
 
-  .trigger-text.Text {
+  .cursor-pointer {
     cursor: pointer;
   }
 
@@ -36,14 +37,16 @@
     gap: 4px;
   }
 
-  .last-updated-text.Text {
-    color: $neutral-500;
+  .dot-indicator.Text {
+    color: $neutral-500-new;
+  }
+
+  .section-text.Text {
+    color: $neutral-600;
   }
 
   .proposal-stage-text.Text {
-    &:hover {
-      text-decoration: underline;
-    }
+    font-weight: 500;
 
     &.positive {
       color: $green-500;

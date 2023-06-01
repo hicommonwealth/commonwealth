@@ -1,9 +1,9 @@
-import Permissions from '../../../utils/Permissions';
 import { useEffect, useState } from 'react';
-import TopicGateCheck from '../../../controllers/chain/ethereum/gatedTopic';
-import type ChainInfo from '../../../models/ChainInfo';
-import Thread from '../../../models/Thread';
-import app from '../../../state';
+import TopicGateCheck from '../../../../../controllers/chain/ethereum/gatedTopic';
+import type ChainInfo from '../../../../../models/ChainInfo';
+import Thread from '../../../../../models/Thread';
+import app from '../../../../../state';
+import Permissions from '../../../../../utils/Permissions';
 
 export const useReactionButton = (thread: Thread, setReactors) => {
   const activeAddress = app.user.activeAccount?.address;
