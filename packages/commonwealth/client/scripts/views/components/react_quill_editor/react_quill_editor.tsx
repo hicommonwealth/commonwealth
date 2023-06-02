@@ -256,6 +256,7 @@ const ReactQuillEditor = ({
                   ref={provided.innerRef}
                   onDragOver={handleDragStart}
                   onDragLeave={handleDragStop}
+                  onDragEnd={handleDragStop}
                 >
                   <ReactQuill
                     ref={editorRef}
