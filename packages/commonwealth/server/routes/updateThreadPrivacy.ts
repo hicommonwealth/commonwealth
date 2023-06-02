@@ -1,6 +1,6 @@
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
@@ -45,7 +45,8 @@ const updateThreadPrivacy = async (
       if (!role) return next(new AppError(Errors.NotAdmin));
     }
 
-    await thread.update({ read_only });
+    const lockedAt = read_only ? Sequelize.literal('CURRENT_TIMESTAMP') : null;
+    await thread.update({ read_only, locked_at: lockedAt });
 
     const finalThread = await models.Thread.findOne({
       where: { id: thread_id },

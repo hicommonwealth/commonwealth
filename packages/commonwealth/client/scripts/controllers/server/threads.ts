@@ -115,9 +115,11 @@ class ThreadsController {
       title,
       body,
       last_edited,
+      locked_at,
       version_history,
       Attachments,
       created_at,
+      updated_at,
       topic,
       kind,
       stage,
@@ -194,6 +196,8 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
+    const lockedAt = locked_at ? moment(locked_at) : null;
+
     let topicFromStore = null;
     if (topic?.id) {
       topicFromStore = app.topics.store.getById(topic.id);
@@ -222,6 +226,7 @@ class ThreadsController {
       title: decodedTitle,
       body: decodedBody,
       createdAt: moment(created_at),
+      updatedAt: moment(updated_at),
       attachments,
       topic: topicFromStore,
       kind,
@@ -235,6 +240,7 @@ class ThreadsController {
       chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
+      lockedAt,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
