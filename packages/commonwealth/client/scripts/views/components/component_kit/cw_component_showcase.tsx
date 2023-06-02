@@ -40,6 +40,7 @@ import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import NewButton from './new_cw_button';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -303,6 +304,9 @@ export const ComponentShowcase = () => {
           <CWText>Disabled Large</CWText>
           <CWIcon iconName="views" iconSize="large" disabled />
         </div>
+      </div>
+      <div>
+       <NewButton disabled={false} children={'hello'} color={undefined} onClick={undefined} />
       </div>
       <div className="icon-button-gallery">
         <CWText type="h3">Icon Buttons</CWText>

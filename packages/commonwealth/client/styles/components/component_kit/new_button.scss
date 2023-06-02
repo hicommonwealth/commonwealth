@@ -1,0 +1,33 @@
+@import '../../shared';
+
+.NewButton {
+
+  color: #FBFBFB;
+  box-sizing: border-box;
+
+  display: block;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+
+  position: relative;
+
+  background: #3D3A3E;
+  border-radius: 6px;
+
+  &:hover {
+    background: #282729;
+    border-radius: 6px;
+  }
+
+  &:active {
+    background: #3D3A3E;
+    border-radius: 6px;
+  }
+
+  &:disabled {
+    background: #E0DFE1;
+    border-radius: 6px;
+  }
+}
