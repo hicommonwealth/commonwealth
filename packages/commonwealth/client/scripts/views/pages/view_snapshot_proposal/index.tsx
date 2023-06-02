@@ -137,6 +137,7 @@ export const ViewProposalPage = ({
           </CWText>
         }
         createdAt={proposal.created}
+        updatedAt={null}
         contentBodyLabel="Snapshot"
         subHeader={
           proposal.state === 'active' ? (
