@@ -3,13 +3,13 @@ name: 'Chromatic'
 
 # Event for the workflow
 on:
-  push:
-    tags:
-      - 'design_system_update'
+  pull_request:
+    types: [ labeled ]
 
 # List of jobs
 jobs:
   chromatic-deployment:
+    if: ${{ github.event.label.name == 'Design System Update' }}
     # Operating System
     runs-on: ubuntu-latest
     # Job steps
