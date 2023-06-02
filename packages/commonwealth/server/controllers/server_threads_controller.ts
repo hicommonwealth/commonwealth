@@ -61,7 +61,6 @@ export class ServerThreadsController implements IServerThreadsController {
   constructor(
     private models: DB,
     private tokenBalanceCache: TokenBalanceCache,
-    private ruleCache: RuleCache,
     private banCache: BanCache
   ) {}
 

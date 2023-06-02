@@ -71,7 +71,6 @@ export class ServerCommentsController implements IServerCommentsController {
   constructor(
     private models: DB,
     private tokenBalanceCache: TokenBalanceCache,
-    private ruleCache: RuleCache,
     private banCache: BanCache
   ) {}
 
