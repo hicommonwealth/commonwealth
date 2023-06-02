@@ -19,7 +19,6 @@ import { AnalyticsOptions } from './server_analytics_controller';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
-  RuleCheckFailed: 'Rule check failed',
   BanError: 'Ban error',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
@@ -39,7 +38,7 @@ interface IServerThreadsController {
    * @param canvasAction - Canvas metadata
    * @param canvasSession - Canvas metadata
    * @param canvasHash - Canvas metadata
-   * @throws `ThreadNotFound`, `RuleCheckFailed`, `BanError`, `BalanceCheckFailed`
+   * @throws `ThreadNotFound`, `BanError`, `BalanceCheckFailed`
    * @returns Promise that resolves to [Reaction, NotificationOptions, AnalyticsOptions]
    */
   createThreadReaction(
@@ -93,7 +92,7 @@ export class ServerThreadsController implements IServerThreadsController {
       }
     }
 
-    // check permissions (bypass for admin)
+    // check balance (bypass for admin)
     if (
       chain &&
       (chain.type === ChainType.Token ||

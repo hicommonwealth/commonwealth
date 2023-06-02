@@ -108,7 +108,7 @@ export class ServerCommentsController implements IServerCommentsController {
       }
     }
 
-    // check permissions (bypass for admin)
+    // check balance (bypass for admin)
     if (
       chain &&
       (chain.type === ChainType.Token ||
