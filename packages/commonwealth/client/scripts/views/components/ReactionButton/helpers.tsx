@@ -5,8 +5,6 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
 import ChainInfo from '../../../models/ChainInfo';
-import Comment from '../../../models/Comment';
-import Thread from '../../../models/Thread';
 import { CWText } from '../component_kit/cw_text';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -14,8 +12,6 @@ const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 type ReactorProps = {
   reactors: string[];
 };
-
-type Post = Thread | Comment<any>;
 
 export const getDisplayedReactorsForPopup = ({
   reactors = [],

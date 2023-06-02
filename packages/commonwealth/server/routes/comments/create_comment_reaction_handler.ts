@@ -1,9 +1,6 @@
 import { NextFunction } from 'express';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
-import { ServerNotificationsController } from '../../controllers/server_notifications_controller';
-import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
-import { ServerCommentsController } from '../../controllers/server_comments_controller';
 import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
 

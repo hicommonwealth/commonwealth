@@ -1,5 +1,4 @@
 import { NextFunction } from 'express';
-import { DB } from '../../models';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ServerControllers } from 'server/routing/router';
