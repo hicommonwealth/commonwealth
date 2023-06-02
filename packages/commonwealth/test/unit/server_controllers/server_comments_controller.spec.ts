@@ -260,7 +260,7 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Thread not found for comment: 123');
     });
 
-    it('should create a comment reaction (new reaction)', async () => {
+    it('should throw error (banned)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -334,7 +334,7 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    it('should create a comment reaction (new reaction)', async () => {
+    it('should throw error (token balance)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -438,7 +438,7 @@ describe('ServerCommentsController', () => {
   });
 
   describe('#getCommentReactions', () => {
-    it('should return reactions', async () => {
+    it('should return comment reactions', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
