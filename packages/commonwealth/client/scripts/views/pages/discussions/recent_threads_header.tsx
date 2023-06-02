@@ -117,6 +117,20 @@ export const RecentThreadsHeader = ({
     filterKey = '',
     filterVal = '',
   }) => {
+    if (
+      filterKey === 'featured' &&
+      filterVal !== (featuredFilter || ThreadFeaturedFilterTypes.Newest)
+    ) {
+      // Remove threads from state whenever the featured filter changes
+      // This prevents the situation when we have less data in state and
+      // we use that to show the applied featured filter data which would
+      // not be accurate - whenever "featured" filter changes we have to
+      // refetch fresh threads data from api.
+      app.threads.store.clear();
+      app.threads.listingStore.clear();
+      app.threads.numTotalThreads = 0;
+    }
+
     const urlParams = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
