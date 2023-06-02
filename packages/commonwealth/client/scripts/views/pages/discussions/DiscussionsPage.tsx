@@ -152,7 +152,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         .getAll()
         .filter((x) => x.chain === chain);
       if (foundThreadsForChain.length >= 20) {
-        if (topicName || stageName) {
+        if (topicName || stageName || dateRange) {
           let finalThreads = foundThreadsForChain;
 
           // get threads for current topic
@@ -166,15 +166,35 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             finalThreads = finalThreads.filter((x) => x.stage === stageName);
           }
 
+          // get threads for current timeline
+          if (
+            dateRange &&
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            const today = moment();
+            const timeline = dateRange.toLowerCase().replace('this', '') as any;
+            const fromDate = today.startOf(timeline).toISOString();
+            const toDate = today.endOf(timeline).toISOString();
+
+            finalThreads = finalThreads.filter(
+              (x) =>
+                moment(x.createdAt).isSameOrAfter(fromDate) &&
+                moment(x.createdAt).isSameOrBefore(toDate)
+            );
+          }
+
           if (finalThreads.length >= 20) {
-            setThreads(sortPinned(finalThreads));
+            setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
             setInitializing(false);
             return;
           }
         }
         // else show all threads
         else {
-          setThreads(sortPinned(foundThreadsForChain));
+          setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
           setInitializing(false);
           return;
         }
