@@ -76,7 +76,7 @@ const bulkThreads = async (
       `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.chain AS addr_chain, threads.thread_id, thread_title,
-        thread_chain, thread_created, threads.kind,
+        thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
         threads.read_only, threads.body, threads.stage,
         threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
@@ -90,6 +90,8 @@ const bulkThreads = async (
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
+          t.updated_at AS thread_updated,
+          t.locked_at AS thread_locked,
           t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes,
           t.has_poll,
@@ -183,6 +185,8 @@ const bulkThreads = async (
       pinned: t.pinned,
       chain: t.thread_chain,
       created_at: t.thread_created,
+      updated_at: t.thread_updated,
+      locked_at: t.thread_locked,
       links: t.links,
       collaborators,
       chain_entity_meta,
