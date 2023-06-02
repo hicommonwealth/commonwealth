@@ -51,6 +51,7 @@ import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_po
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { ThreadActionType } from '../../../../../shared/types';
 import { filterLinks } from 'helpers/threads';
+import { LockMessage } from './lock_message';
 import { extractDomain, isDefaultStage } from 'helpers';
 import ExternalLink from 'views/components/ExternalLink';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -802,9 +803,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           />
         }
         createdAt={thread.createdAt}
+        updatedAt={thread.updatedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
+        lockedAt={thread.lockedAt}
         displayNewTag={true}
         headerComponents={
           !isStageDefault && <ThreadStageComponent stage={thread.stage} />
@@ -837,9 +840,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
-                  <CWText type="h5" className="callout-text">
-                    Commenting is disabled because this post has been locked.
-                  </CWText>
+                  <LockMessage
+                    lockedAt={thread.lockedAt}
+                    updatedAt={thread.updatedAt}
+                  />
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}
