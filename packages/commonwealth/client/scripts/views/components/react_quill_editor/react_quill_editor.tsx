@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import type { RangeStatic } from 'quill';
 import ReactQuill, { Quill } from 'react-quill';
 import MagicUrl from 'quill-magic-url';
 import ImageUploader from 'quill-image-uploader';
@@ -24,6 +23,8 @@ import { useImageDropAndPaste } from './use_image_drop_and_paste';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useImageUploader } from './use_image_uploader';
+import { RangeStatic } from 'quill';
+import { convertTwitterLinksToEmbeds } from './twitter_embed';
 
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register('modules/imageUploader', ImageUploader);
@@ -106,8 +107,9 @@ const ReactQuillEditor = ({
   };
 
   const handleChange = (value, delta, source, editor) => {
+    const newContent = convertTwitterLinksToEmbeds(editor.getContents());
     setContentDelta({
-      ...editor.getContents(),
+      ...newContent,
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
   };

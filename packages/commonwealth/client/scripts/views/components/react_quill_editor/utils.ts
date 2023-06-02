@@ -35,10 +35,18 @@ export const getTextFromDelta = (delta: DeltaStatic): string => {
       if (op.insert?.image) {
         return true;
       }
+      if (op.insert?.twitter) {
+        return true;
+      }
       return false;
     })
     .reduce((acc, op) => {
-      const text = typeof op.insert === 'string' ? op.insert : '(image)\n';
+      const text =
+        typeof op.insert === 'string'
+          ? op.insert
+          : op.insert.twitter
+          ? '(tweet)'
+          : '(image)\n';
       return acc + text;
     }, '');
 };
@@ -151,4 +159,19 @@ export const countLinesQuill = (delta: DeltaStatic): number => {
 // countLinesMarkdown returns the number of lines for the text
 export const countLinesMarkdown = (text: string): number => {
   return text.split('\n').length - 1;
+};
+
+// fetchTwitterEmbedInfo fetches and returns the embed info (including HTML) for a tweet
+export const fetchTwitterEmbedInfo = async (url: string) => {
+  // this will not work locally due to CORS
+  const embedInfoUrl = 'https://publish.twitter.com/oembed';
+  const res = await axios.get(embedInfoUrl, {
+    params: {
+      url,
+    },
+  });
+  if (res.status >= 300) {
+    throw new Error(res.data);
+  }
+  return res.data;
 };

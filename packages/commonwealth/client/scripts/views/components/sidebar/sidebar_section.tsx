@@ -76,7 +76,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     if (containsChildren) {
       setToggled(!toggled);
     }
-    setMenu({ name: menuName, isVisible: !menuVisible });
+    setMenu({ name: menuName, isVisible: menuVisible });
 
     onClick(e, toggled);
   };

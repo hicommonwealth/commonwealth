@@ -11,7 +11,6 @@ import type {
 } from 'token-balance-cache/src';
 import type { TopicAttributes } from 'commonwealth/server/models/topic';
 import type { RoleAttributes } from 'commonwealth/server/models/role';
-import type { RuleAttributes } from 'commonwealth/server/models/rule';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -139,24 +138,13 @@ export type GetRolesReq = {
   community_id: string;
   addresses?: string[];
   count_only?: boolean;
+  permissions?: string[];
 } & IPagination;
 
 export type GetRolesResp = { roles?: RoleAttributes[]; count: number };
 
 export type PostRolesReq = {
   roles: (RoleAttributes & { community_id: string })[];
-};
-
-export type GetRulesReq = {
-  community_id?: string;
-  ids?: number[];
-  count_only?: boolean;
-} & IPagination;
-
-export type GetRulesResp = { rules?: RuleAttributes[]; count: number };
-
-export type PostRulesReq = {
-  rules: (RuleAttributes & { community_id: string })[];
 };
 
 export type OnlyErrorResp = { error?: string | object };

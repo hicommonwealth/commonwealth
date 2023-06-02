@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { CWAuthButton } from './cw_auth_button';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
@@ -38,7 +38,7 @@ import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
-import { AvatarUpload } from '../avatar_upload';
+import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 const displayIcons = (icons) => {
@@ -787,13 +787,13 @@ export const ComponentShowcase = () => {
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Wallet Row Card</CWText>
-        <CWWalletOptionRow
-          walletName="metamask"
+        <CWAuthButton
+          type="metamask"
           onClick={() => notifySuccess('MetaMask clicked!')}
         />
-        <CWWalletOptionRow
+        <CWAuthButton
           darkMode
-          walletName="metamask"
+          type="metamask"
           onClick={() => notifySuccess('MetaMask clicked!')}
         />
       </div>

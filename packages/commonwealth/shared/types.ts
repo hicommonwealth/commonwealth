@@ -8,9 +8,6 @@ export enum WebsocketMessageNames {
   SnapshotListener = 'snapshot-listener',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
-  ChatMessage = 'chat-message',
-  JoinChatChannel = 'join-chat-channel',
-  LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
 
@@ -58,7 +55,6 @@ export enum WebsocketNamespaces {
   SnapshotProposals = 'snapshot-proposals',
   ChainEvents = 'chain-events',
   SnapshotListener = 'snapshot-listener',
-  Chat = 'chat',
 }
 
 export enum WebsocketEngineEvents {
@@ -110,14 +106,7 @@ export enum ThreadActionType {
   Pinning = 'pinning',
   Subscription = 'subscription',
   TopicChange = 'topicchange',
-}
-
-export interface IChatNotification {
-  message_id: string | number;
-  channel_id: string | number;
-  chain_id: string;
-  author_address: string;
-  created_at: any;
+  StageChange = 'stagechange',
 }
 
 export enum SearchContentType {

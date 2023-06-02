@@ -8,18 +8,15 @@ import type Webhook from '../../../models/Webhook';
 
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { link, pluralize } from 'helpers';
+import { pluralize } from 'helpers';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { Modal } from '../../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
 
 export const WebhooksForm = () => {
-  const navigate = useCommonNavigate();
-
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [webhooks, setWebhooks] = useState<Array<Webhook>>([]);

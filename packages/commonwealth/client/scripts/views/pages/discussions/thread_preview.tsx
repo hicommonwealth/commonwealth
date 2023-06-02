@@ -22,8 +22,8 @@ import {
   getClasses,
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { ThreadPreviewReactionButtonBig } from '../../components/reaction_button/ThreadPreviewReactionButtonBig';
-import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
+import { ThreadPreviewReactionButtonBig } from '../../components/ReactionButton/ThreadPreviewReactionButtonBig';
+import { ThreadReactionPreviewButtonSmall } from '../../components/ReactionButton/ThreadPreviewReactionButtonSmall';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import {
@@ -32,6 +32,7 @@ import {
   getThreadSubScriptionMenuItem,
   isHot,
 } from './helpers';
+import { NewThreadTag } from './NewThreadTag';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -44,6 +45,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Thread, { LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
 import { filterLinks } from 'helpers/threads';
+import { LockWithTooltip } from '../../components/lock_with_tooltip';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -51,10 +53,8 @@ type ThreadPreviewProps = {
 
 export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
-  const [
-    isUpdateProposalStatusModalOpen,
-    setIsUpdateProposalStatusModalOpen,
-  ] = useState(false);
+  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
+    useState(false);
 
   const [windowIsSmall, setWindowIsSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
@@ -162,7 +162,13 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              {isLocked && <CWIcon iconName="lock" iconSize="small" />}
+              <NewThreadTag threadCreatedAt={thread.createdAt} />
+              {isLocked && (
+                <LockWithTooltip
+                  lockedAt={thread.lockedAt}
+                  updatedAt={thread.updatedAt}
+                />
+              )}
             </div>
             <div className="top-row-icons">
               {isHot(thread) && <div className="flame" />}
@@ -183,7 +189,10 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
             {linkedSnapshots.length > 0 && (
               <CWTag
                 type="active"
-                label={`Snap ${linkedSnapshots[0].identifier
+                label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
+                  ? linkedSnapshots[0].identifier.split('/')[1]
+                  : linkedSnapshots[0].identifier
+                )
                   .toString()
                   .slice(0, 4)}…`}
               />
@@ -210,7 +219,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                     type="proposal"
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
-                    )} 
+                    )}
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''

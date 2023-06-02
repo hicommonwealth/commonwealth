@@ -4,12 +4,7 @@ import 'pages/view_proposal/proposal_header_links.scss';
 import 'pages/view_thread/thread_components.scss';
 
 import app from 'state';
-import {
-  externalLink,
-  extractDomain,
-  pluralize,
-  threadStageToLabel,
-} from '../../../helpers/index';
+import { pluralize, threadStageToLabel } from '../../../helpers/index';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import type Thread from '../../../models/Thread';
@@ -18,7 +13,6 @@ import {
   Popover,
   usePopover,
 } from '../../components/component_kit/cw_popover/cw_popover';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
@@ -102,20 +96,5 @@ export const ThreadStageComponent = ({ stage }: ThreadStageComponentProps) => {
     >
       {threadStageToLabel(stage)}
     </CWText>
-  );
-};
-
-interface ExternalLinkProps {
-  url: Thread['url'];
-}
-
-export const ExternalLink = ({ url }: ExternalLinkProps) => {
-  const navigate = useCommonNavigate();
-
-  return (
-    <div className="HeaderLink">
-      {externalLink('a', url, [extractDomain(url)], navigate)}
-      <CWIcon iconName="externalLink" iconSize="small" />
-    </div>
   );
 };

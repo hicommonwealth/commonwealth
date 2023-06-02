@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
   chainEntityTypeToProposalName,
@@ -41,15 +40,20 @@ const LinkedProposal = ({
 }: LinkedProposalProps) => {
   const slug = chainEntityTypeToProposalSlug(ceType);
 
-  const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
-  }${getProposalUrlPath(slug, ceTypeId, true)}`;
+  const threadLink =
+    thread.chain === 'edgeware' && !ceType.includes('/')
+      ? `/${thread.chain}/link/chain-entity/${ceTypeId}`
+      : `${app.isCustomDomain() ? '' : `/${thread.chain}`}${getProposalUrlPath(
+          slug,
+          ceTypeId,
+          true
+        )}`;
 
   return (
     <a href={threadLink}>
-      {`${title ?? chainEntityTypeToProposalName(ceType)} #${ceTypeId} ${
-        ceCompleted ? ' (Completed)' : ''
-      }`}
+      {`${
+        title ?? chainEntityTypeToProposalName(ceType) ?? 'Proposal'
+      } #${ceTypeId} ${ceCompleted ? ' (Completed)' : ''}`}
     </a>
   );
 };
@@ -65,10 +69,9 @@ export const LinkedProposalsCard = ({
   thread,
   showAddProposalButton,
 }: LinkedProposalsCardProps) => {
-  const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
   const [snapshotUrl, setSnapshotUrl] = useState('');
-  const [space, setSpace] = useState<SnapshotSpace>(null);
+  const [snapshotTitle, setSnapshotTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const initialSnapshotLinks = useMemo(
@@ -84,33 +87,31 @@ export const LinkedProposalsCard = ({
   useEffect(() => {
     if (initialSnapshotLinks.length > 0) {
       const proposal = initialSnapshotLinks[0];
-      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-        for (const { space: _space, proposals } of data) {
-          const matchingSnapshot = proposals.find(
-            (sn) => sn.id === proposal.identifier
-          );
-
-          if (matchingSnapshot) {
-            setSnapshot(matchingSnapshot);
-            setSpace(_space);
-            break;
+      if (proposal.identifier.includes('/')) {
+        setSnapshotUrl(
+          `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+            proposal.identifier
+          }`
+        );
+      } else {
+        loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+          for (const { space: _space, proposals } of data) {
+            const matchingSnapshot = proposals.find(
+              (sn) => sn.id === proposal.identifier
+            );
+            if (matchingSnapshot) {
+              setSnapshotTitle(matchingSnapshot.title);
+              setSnapshotUrl(
+                `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+                  _space.id
+                }/${matchingSnapshot.id}`
+              );
+              break;
+            }
           }
-        }
-        if (proposal.identifier.includes('/')) {
-          setSnapshotUrl(
-            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-              proposal.identifier
-            }`
-          );
-        } else if (space && snapshot) {
-          setSnapshotUrl(
-            `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-              space.id
-            }/${snapshot.id}`
-          );
-        }
-        setSnapshotProposalsLoaded(true);
-      });
+        });
+      }
+      setSnapshotProposalsLoaded(true);
     }
   }, [initialSnapshotLinks]);
 
@@ -147,8 +148,7 @@ export const LinkedProposalsCard = ({
                   )}
                   {showSnapshot && (
                     <a href={snapshotUrl}>
-                      Snapshot:{' '}
-                      {initialSnapshotLinks[0].title ?? snapshot.title}
+                      Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
                     </a>
                   )}
                 </div>
