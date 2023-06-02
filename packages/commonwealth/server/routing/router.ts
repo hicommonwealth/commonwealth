@@ -820,13 +820,6 @@ function setupRouter(
 
   registerRoute(
     router,
-    'get',
-    '/bulkMembers',
-    databaseValidationService.validateChain,
-    bulkMembers.bind(this, models)
-  );
-  registerRoute(
-    router,
     'post',
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),

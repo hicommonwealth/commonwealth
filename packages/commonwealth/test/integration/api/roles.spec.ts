@@ -354,44 +354,4 @@ describe('Roles Test', () => {
       expect(res.body.error).to.be.equal(deleteErrors.RoleDNE);
     });
   });
-
-  describe('/bulkMembers route test', () => {
-    it('should grab bulk members for a public community', async () => {
-      const res = await chai.request
-        .agent(app)
-        .get('/api/bulkMembers')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: jwtToken,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
-    });
-
-    it.skip('should fail to grab bulk members if community is not visible to user', async () => {
-      const communityArgs: modelUtils.CommunityArgs = {
-        jwt: jwtToken,
-        isAuthenticatedForum: 'false',
-        privacyEnabled: 'true',
-        id: 'test',
-        name: 'test community',
-        creator_address: loggedInAddr,
-        creator_chain: chain,
-        description: 'test enabled community',
-        default_chain: chain,
-      };
-      const testCommunity = await modelUtils.createCommunity(communityArgs);
-      const res = await chai.request
-        .agent(app)
-        .get('/api/bulkMembers')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: jwtToken,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
-    });
-  });
 });
