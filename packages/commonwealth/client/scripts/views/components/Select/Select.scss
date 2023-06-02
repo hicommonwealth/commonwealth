@@ -12,9 +12,9 @@
     height: auto !important;
     background-color: $white;
     font-size: 14px !important;
-    border-width: 2px !important;
-    border-style: solid !important;
-    border-color: $neutral-200-new  !important;
+    border: 0px !important;
+    box-shadow: 0 0 0 1px $neutral-200-new inset;
+    margin: 0;
     line-height: 20px;
     color: $neutral-800-new  !important;
 
