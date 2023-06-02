@@ -23,8 +23,6 @@ import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { findAllRoles } from '../util/roles';
-import checkRule from '../util/rules/checkRule';
-import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
@@ -43,7 +41,6 @@ export const Errors = {
     "Users need to hold some of the community's tokens to comment",
   BalanceCheckFailed: 'Could not verify user token balance',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
-  RuleCheckFailed: 'Rule check failed',
 };
 
 // Get depth of the comment
@@ -64,7 +61,6 @@ const getCommentDepth = async (models: DB, comment) => {
 const createComment = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -126,27 +122,6 @@ const createComment = async (
 
   if (!thread) {
     return next(new AppError(Errors.MissingRootId));
-  }
-
-  const topic = await models.Topic.findOne({
-    include: {
-      model: models.Thread,
-      where: { id: thread.id },
-      required: true,
-      as: 'threads',
-    },
-    attributes: ['rule_id'],
-  });
-  if (topic?.rule_id) {
-    const passesRules = await checkRule(
-      ruleCache,
-      models,
-      topic.rule_id,
-      author.address
-    );
-    if (!passesRules) {
-      return next(new AppError(Errors.RuleCheckFailed));
-    }
   }
 
   if (

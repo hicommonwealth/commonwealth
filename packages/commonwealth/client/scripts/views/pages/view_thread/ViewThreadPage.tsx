@@ -50,10 +50,16 @@ import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_po
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { ThreadActionType } from '../../../../../shared/types';
 import { filterLinks } from 'helpers/threads';
+import { LockMessage } from './lock_message';
 import { extractDomain, isDefaultStage } from 'helpers';
 import ExternalLink from 'views/components/ExternalLink';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../../components/component_kit/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -91,6 +97,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);
+  const [isCollapsedSize, setIsCollapsedSize] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -100,6 +107,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
+
+  useBrowserWindow({
+    onResize: () =>
+      breakpointFnValidator(
+        isCollapsedSize,
+        (state: boolean) => {
+          setIsCollapsedSize(state);
+        },
+        isWindowMediumSmallInclusive
+      ),
+    resizeListenerUpdateDeps: [isCollapsedSize],
+  });
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
@@ -718,9 +737,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
+  const tabsShouldBePresent =
+    showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
+
   return (
     <Sublayout>
       <CWContentPage
+        showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||
@@ -747,9 +770,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           />
         }
         createdAt={thread.createdAt}
+        updatedAt={thread.updatedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
+        lockedAt={thread.lockedAt}
         displayNewTag={true}
         headerComponents={
           !isStageDefault && <ThreadStageComponent stage={thread.stage} />
@@ -782,9 +807,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
-                  <CWText type="h5" className="callout-text">
-                    Commenting is disabled because this post has been locked.
-                  </CWText>
+                  <LockMessage
+                    lockedAt={thread.lockedAt}
+                    updatedAt={thread.updatedAt}
+                  />
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}

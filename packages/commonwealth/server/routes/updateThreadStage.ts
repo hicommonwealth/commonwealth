@@ -36,7 +36,7 @@ const updateThreadStage = async (
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
-    if (!userOwnedAddressIds.includes(thread.address_id)) {
+    if (!userOwnedAddressIds.includes(thread.address_id) && !req.user.isAdmin) {
       // is not author
       const roles = await findAllRoles(
         models,
