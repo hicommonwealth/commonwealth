@@ -5,7 +5,7 @@ import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
 
-type BreadcrumbsType = {
+export type BreadcrumbsType = {
   label: string;
   path?: string;
   navigate?: (url: string) => void;

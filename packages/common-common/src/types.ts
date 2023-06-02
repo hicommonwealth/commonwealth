@@ -14,7 +14,6 @@ export const NotificationCategories = {
   CommentEdit: 'comment-edit',
   ChainEvent: 'chain-event',
   EntityEvent: 'entity-event',
-  NewChatMention: 'new-chat-mention',
   NewSnapshot: 'new-snapshot',
   SnapshotProposal: 'snapshot-proposal',
 };
@@ -133,7 +132,6 @@ export enum BalanceType {
 }
 
 export enum RedisNamespaces {
-  Chat_Socket = 'chat_socket',
   Route_Response = 'route_response',
   Function_Response = 'function_response',
   Global_Response = 'global_response',

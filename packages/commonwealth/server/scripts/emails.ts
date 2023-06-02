@@ -9,7 +9,6 @@ import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import type {
   IPostNotificationData,
   IChainEventNotificationData,
-  IChatNotification,
   ICommunityNotificationData,
   SnapshotEventType,
   SnapshotNotification,
@@ -29,7 +28,6 @@ export const createImmediateNotificationEmailObject = async (
     | IPostNotificationData
     | ICommunityNotificationData
     | IChainEventNotificationData
-    | IChatNotification
     | (SnapshotNotification & { eventType: SnapshotEventType }),
   category_id,
   models

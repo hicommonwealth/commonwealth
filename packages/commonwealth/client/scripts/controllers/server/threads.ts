@@ -115,9 +115,11 @@ class ThreadsController {
       title,
       body,
       last_edited,
+      locked_at,
       version_history,
       Attachments,
       created_at,
+      updated_at,
       topic,
       kind,
       stage,
@@ -194,6 +196,8 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
+    const lockedAt = locked_at ? moment(locked_at) : null;
+
     let topicFromStore = null;
     if (topic?.id) {
       topicFromStore = app.topics.store.getById(topic.id);
@@ -222,6 +226,7 @@ class ThreadsController {
       title: decodedTitle,
       body: decodedBody,
       createdAt: moment(created_at),
+      updatedAt: moment(updated_at),
       attachments,
       topic: topicFromStore,
       kind,
@@ -235,6 +240,7 @@ class ThreadsController {
       chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
+      lockedAt,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
@@ -305,9 +311,9 @@ class ThreadsController {
         .getAll()
         .slice()
         .reverse()
-        .findIndex((x) => x.pinned);
+        .findIndex((x) => x.pinned === true);
       this.store.add(result, {
-        pushToIndex: this.store.getAll().length - lastPinnedThreadIndex,
+        pushToIndex: lastPinnedThreadIndex || 0,
       });
       this.numTotalThreads += 1;
       this._listingStore.add(result);
@@ -656,6 +662,7 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.result.map((rawThread) => {
+      console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
        * here we will find if thread is in store and if so use most keys
@@ -673,7 +680,7 @@ class ThreadsController {
           ? thread.associatedReactions
           : foundThread?.associatedReactions || [];
       finalThread.numberOfComments =
-        rawThread?.comments?.length || foundThread?.numberOfComments || 0;
+        rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
       this._store.update(finalThread);
       if (foundThread) {
         this.numTotalThreads += 1;

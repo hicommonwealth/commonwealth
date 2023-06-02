@@ -88,7 +88,7 @@ class SearchController {
       }
 
       if (scope.includes(SearchScope.Members)) {
-        const profiles = await this.searchMentionableProfiles(
+        const { profiles } = await this.searchMentionableProfiles(
           searchTerm,
           chainScope
         );
@@ -272,12 +272,18 @@ class SearchController {
 
   public searchMentionableProfiles = async (
     searchTerm: string,
-    chainScope: string
+    chainScope: string,
+    pageSize?: number,
+    page?: number,
+    includeRoles?: boolean
   ) => {
     try {
       const response = await $.get(`${app.serverUrl()}/searchProfiles`, {
         chain: chainScope,
         search: searchTerm,
+        page_size: pageSize,
+        page,
+        include_roles: includeRoles,
       });
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
@@ -285,7 +291,7 @@ class SearchController {
       return response.result;
     } catch (e) {
       console.error(e);
-      return [];
+      return { profiles: [] };
     }
   };
 

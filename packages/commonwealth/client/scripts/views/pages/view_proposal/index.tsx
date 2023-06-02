@@ -117,6 +117,7 @@ const ViewProposalPage = ({
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
   return (
     <Sublayout
     //  title={headerTitle}
@@ -129,6 +130,7 @@ const ViewProposalPage = ({
           )
         }
         createdAt={proposal.createdAt}
+        updatedAt={null}
         subHeader={
           <ProposalSubheader
             proposal={proposal as SubheaderProposalType}

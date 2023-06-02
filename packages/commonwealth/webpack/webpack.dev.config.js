@@ -27,7 +27,6 @@ module.exports = merge(common, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development'),
-      CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
   ],
   optimization: {

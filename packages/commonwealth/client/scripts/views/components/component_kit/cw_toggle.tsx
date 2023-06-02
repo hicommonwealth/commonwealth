@@ -13,7 +13,7 @@ export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
   stateFn(on);
 };
 
-type ToggleStyleProps = {
+export type ToggleStyleProps = {
   checked?: boolean;
 } & BaseStyleProps;
 

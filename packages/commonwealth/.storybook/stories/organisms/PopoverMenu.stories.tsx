@@ -5,15 +5,6 @@ import { PopoverMenu, PopoverMenuItem } from '../../../client/scripts/views/comp
 import { CWIconButton } from '../../../client/scripts/views/components/component_kit/cw_icon_button';
 import { iconLookup, IconName } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
-const iconOptions = [ ...Object.keys(iconLookup) ];
-
-const popoverMenu = {
-  title: 'Organisms/Popover Menu',
-  component: PopoverMenu,
-} satisfies Meta<typeof PopoverMenu>;
-
-export default popoverMenu;
-
 interface PopoverProps {
   header1: string;
   header2: string;
@@ -26,6 +17,15 @@ interface PopoverProps {
   iconLabel3: IconName;
   iconBottom: IconName;
 };
+
+const iconOptions = [ ...Object.keys(iconLookup) ];
+
+const popoverMenu = {
+  title: 'Organisms/Popover Menu',
+  component: PopoverMenu,
+} satisfies Meta<typeof PopoverMenu>;
+
+export default popoverMenu;
 
 const popoverMenuOptions = (options: PopoverProps): Array<PopoverMenuItem> => {
   return [
@@ -68,17 +68,17 @@ const Popover: FC<PopoverProps> = (props) => {
       )}
     />
   );
-}
+};
 
 export const PopoverMenuStory = {
   name: 'Popover Menu',
   args: {
     header1: "Community",
-    header2: "Universal",
     label1: "Create Thread",
     iconLabel1: "write",
     label2: "Create Snapshot",
     iconLabel2: "write",
+    header2: "Universal",
     label3: "Create Community",
     iconLabel3: "people",
     bottom: "Report",
@@ -94,19 +94,19 @@ export const PopoverMenuStory = {
     label1: {
       control: { type: "text" }
     },
+    label2: {
+      control: { type: "text" }
+    },
+    label3: {
+      control: { type: "text" }
+    },
     iconLabel1: {
       control: { type: "select" },
       options: iconOptions,
     },
-    label2: {
-      control: { type: "text" }
-    },
     iconLabel2: {
       control: { type: "select" },
       options: iconOptions,
-    },
-    label3: {
-      control: { type: "text" }
     },
     iconLabel3: {
       control: { type: "select" },
@@ -119,6 +119,14 @@ export const PopoverMenuStory = {
       control: { type: "select" },
       options: iconOptions,
     },
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        "menuItems",
+        "renderTrigger",
+      ],
+    }
   },
   render: ({...args}) => (
     <Popover
@@ -134,4 +142,4 @@ export const PopoverMenuStory = {
       iconBottom={args.iconBottom}
     />
   )
-}
+};
