@@ -19,8 +19,6 @@ import type { ThreadInstance } from '../models/thread';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { parseUserMentions } from '../util/parseUserMentions';
-import checkRule from '../util/rules/checkRule';
-import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
@@ -32,7 +30,6 @@ export const Errors = {
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to post",
   BalanceCheckFailed: 'Could not verify user token balance',
-  RuleCheckFailed: 'Rule check failed',
 };
 
 const dispatchHooks = async (
@@ -192,7 +189,6 @@ const dispatchHooks = async (
 const createThread = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -349,25 +345,6 @@ const createThread = async (
         if (!canReact) {
           return next(new AppError(Errors.BalanceCheckFailed));
         }
-      }
-    }
-
-    const topic = await models.Topic.findOne({
-      where: {
-        id: topic_id,
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address,
-        transaction
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
       }
     }
 
