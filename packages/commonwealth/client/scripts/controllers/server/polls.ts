@@ -128,7 +128,10 @@ class PollsController {
         chain_id: app.activeChainId(),
         jwt: app.user.jwt,
       },
-      success: () => {
+      success: (response) => {
+        const thread = app.threads.getById(threadId);
+        const updatedThread = new Thread({ ...thread, hasPoll: false });
+        app.threads.updateThreadInStore(updatedThread);
         this._store.remove(this._store.getById(pollId));
       },
       error: (err) => {
