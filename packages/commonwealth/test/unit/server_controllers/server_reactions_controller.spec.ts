@@ -6,9 +6,6 @@ describe('ServerReactionsController', () => {
   describe('#deleteReaction', () => {
     it('should delete a reaction', async () => {
       const sandbox = Sinon.createSandbox();
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
       const db = {
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -25,6 +22,9 @@ describe('ServerReactionsController', () => {
         checkBan: sandbox.stub().resolves([true, null]),
       };
 
+      const user = {
+        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
+      };
       const serverReactionsController = new ServerReactionsController(
         db as any,
         banCache as any
@@ -34,9 +34,6 @@ describe('ServerReactionsController', () => {
 
     it('should throw error (reaction not found)', async () => {
       const sandbox = Sinon.createSandbox();
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
       const db = {
         Reaction: {
           findOne: sandbox.stub().resolves(null),
@@ -46,6 +43,9 @@ describe('ServerReactionsController', () => {
         checkBan: sandbox.stub().resolves([true, null]),
       };
 
+      const user = {
+        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
+      };
       const serverReactionsController = new ServerReactionsController(
         db as any,
         banCache as any
@@ -57,9 +57,6 @@ describe('ServerReactionsController', () => {
 
     it('should throw error (banned)', async () => {
       const sandbox = Sinon.createSandbox();
-      const user = {
-        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
-      };
       const db = {
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -76,6 +73,9 @@ describe('ServerReactionsController', () => {
         checkBan: sandbox.stub().resolves([false, 'big ban err']),
       };
 
+      const user = {
+        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
+      };
       const serverReactionsController = new ServerReactionsController(
         db as any,
         banCache as any

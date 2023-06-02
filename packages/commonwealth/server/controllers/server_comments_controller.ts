@@ -21,7 +21,6 @@ import { uniqBy } from 'lodash';
 const Errors = {
   CommentNotFound: 'Comment not found',
   ThreadNotFoundForComment: 'Thread not found for comment',
-  RuleCheckFailed: 'Rule check failed',
   BanError: 'Ban error',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
@@ -41,7 +40,7 @@ interface IServerCommentsController {
    * @param canvasAction - Canvas metadata
    * @param canvasSession - Canvas metadata
    * @param canvasHash - Canvas metadata
-   * @throws `CommentNotFound`, `RuleCheckFailed`, `BanError`, `BalanceCheckFailed`
+   * @throws `CommentNotFound`, `ThreadNotFoundForComment`, `BanError`, `BalanceCheckFailed`
    * @returns Promise that resolves to [Reaction, NotificationOptions, AnalyticsOptions]
    */
   createCommentReaction(
@@ -94,7 +93,6 @@ export class ServerCommentsController implements IServerCommentsController {
     const thread = await this.models.Thread.findOne({
       where: { id: comment.thread_id },
     });
-
     if (!thread) {
       throw new Error(`${Errors.ThreadNotFoundForComment}: ${commentId}`);
     }
@@ -171,7 +169,7 @@ export class ServerCommentsController implements IServerCommentsController {
         comment_id: comment.id,
         comment_text: comment.text,
         root_title: thread.title,
-        root_type: null,
+        root_type: null, // What is this for?
         chain_id: finalReaction.chain,
         author_address: finalReaction.Address.address,
         author_chain: finalReaction.Address.chain,
