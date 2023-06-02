@@ -349,6 +349,7 @@ const ViewTemplatePage = () => {
                 fn: functionAbi,
                 inputArgs: functionArgs,
                 tx_options: txParams,
+                senderERC4337: "0x6c4e3a465848e0B7104F9970Ca40E3FC480584b3"
               });
 
               if (res.status) {

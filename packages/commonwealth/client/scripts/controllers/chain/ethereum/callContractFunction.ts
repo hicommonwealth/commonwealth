@@ -8,7 +8,7 @@ import type Contract from 'models/Contract';
 import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
 import WebWalletController from '../../app/web_wallets';
-import { sendUserOp } from 'client/scripts/helpers/aa_op_builder';
+import { sendUserOp } from 'helpers/aa_op_builder';
 
 async function sendFunctionCall({
   fn,
@@ -81,6 +81,7 @@ export async function callContractFunction({
   senderERC4337?: string
 }): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
+  console.log(sender)
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
     sender,

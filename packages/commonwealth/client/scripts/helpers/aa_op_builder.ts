@@ -1,13 +1,16 @@
 
 import { UserOperationBuilder, Client } from 'userop';
 import Web3 from 'web3';
-import { BigNumberish } from "ethers"
+import { BigNumberish, ethers } from "ethers"
 import { OpToJSON } from 'userop/dist/utils';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { EntryPoint, EntryPoint__factory } from 'userop/dist/typechain';
+import { sign } from 'jsonwebtoken';
+import { keccak256 } from 'web3-utils';
 
 const bundlerRPC = 'https://api.stackup.sh/v1/node/9fb29d028cc0f052af8136f1f9d68cf8a07db8ebf22869398dd82bc859eb703b';
 const entrypointAddr = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
+const bundlerProvider: JsonRpcProvider = new JsonRpcProvider(bundlerRPC);
 interface GasEstimate {
     preVerificationGas: BigNumberish;
     verificationGas: BigNumberish;
@@ -16,21 +19,24 @@ interface GasEstimate {
 
 class DelegationAccount extends UserOperationBuilder{
     private provider: Web3
-    private bundlerProvider: JsonRpcProvider = new JsonRpcProvider(bundlerRPC);
+    private ;
     private entryPoint: EntryPoint;
 
     constructor(provider: Web3){
         super()
         this.provider = provider;
-        this.entryPoint = EntryPoint__factory.connect(entrypointAddr, this.bundlerProvider)
+        this.entryPoint = EntryPoint__factory.connect(entrypointAddr, bundlerProvider)
         this.useMiddleware(this.resolveAccount);
         this.useMiddleware(this.fetchGasConfig);
-        this.useMiddleware(this.signUserOperation);
+        this.useMiddleware(this.signUserOperation(provider));
     }
 
-    async signUserOperation(ctx) {
-        const requestId = ctx.getRequestId()
-        ctx.op.signature = (await this.provider.eth.sign(requestId, (await this.provider.eth.getAccounts())[0]));
+    signUserOperation =
+    (signer: Web3) =>
+    async (ctx) => {
+        console.log(ctx.getUserOpHash())
+        const hash = ctx.getUserOpHash()
+        ctx.op.signature = (await signer.eth.sign(keccak256("\x19Ethereum Signed Message:\n" + hash.length + hash), (await signer.eth.getAccounts())[0]));
     };
 
     private resolveAccount = async (ctx) => {
@@ -43,35 +49,23 @@ class DelegationAccount extends UserOperationBuilder{
         // Fetch the latest gas prices.
         // Gas Prices
         const [fee, block] = await Promise.all([
-            this.provider.givenProvider.send(
-            {
-                jsonrpc: '2.0',
-                method: 'eth_maxPriorityFeePerGas',
-                params: [],
-                id: 1
-            }
-            ),
-            this.provider.givenProvider.send(
-            {
-                jsonrpc: '2.0',
-                method: 'eth_blockNumber',
-                params: [],
-                id: 1
-            }
-            )
+            bundlerProvider.send('eth_maxPriorityFeePerGas', []),
+            bundlerProvider.getBlock("latest"),
           ]);
-        const tip = fee;
-        const buffer = tip.div(100).mul(13);
+        
+        const tip = Web3.utils.toBN(fee);
+        const buffer = tip.div(Web3.utils.toBN(100)).mul(Web3.utils.toBN(13));
         const maxPriorityFeePerGas = tip.add(buffer);
         
         ctx.op.maxFeePerGas = block.baseFeePerGas
-        ? block.baseFeePerGas.mul(2).add(maxPriorityFeePerGas)
-        : maxPriorityFeePerGas;
-        ctx.op.maxPriorityFeePerGas = maxPriorityFeePerGas;
+        ? parseInt(Web3.utils.toBN(block.baseFeePerGas.toString()).mul(Web3.utils.toBN(2)).add(maxPriorityFeePerGas).toString())
+        : parseInt(maxPriorityFeePerGas.toString());
+        ctx.op.maxPriorityFeePerGas = parseInt(maxPriorityFeePerGas.toString());
         
         //Gas limits
         //TODO: this should be a bundler provider not w3
-        const est = (await this.bundlerProvider.send("eth_estimateUserOperationGas", [
+        ctx.op.signature = '0x5fcccb21aded062666e151e23c5fe20b2e0de3642d4821710bbb860f0acc90213c4c52ffdfed2df79f0376d9984441b783438f1406608de9a92786669ee0bc511b'
+        const est = (await bundlerProvider.send("eth_estimateUserOperationGas", [
             OpToJSON(ctx.op),
             ctx.entryPoint,
           ])) as GasEstimate;
