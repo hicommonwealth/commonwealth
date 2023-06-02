@@ -53,6 +53,12 @@ export const LoginSelector = () => {
   const [isJoined, setIsJoined] = useState(false);
 
   useEffect(() => {
+    NewProfilesController.Instance.isFetched.on('redraw', () => {
+      setProfileLoadComplete(true);
+    });
+  });
+
+  useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
   }, [app.user.activeAccount]);
 
