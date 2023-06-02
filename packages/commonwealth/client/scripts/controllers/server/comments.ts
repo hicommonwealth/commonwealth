@@ -153,7 +153,7 @@ class CommentsController {
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         author_chain: app.user.activeAccount.chain.id,
         chain,
-        address,
+        address: app.user.activeAccount.address,
         parent_id: parentCommentId,
         chain_entity_id: chainEntity?.id,
         thread_id: threadId,

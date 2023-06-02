@@ -45,6 +45,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Thread, { LinkSource } from 'models/Thread';
 import { IChainEntityKind } from 'chain-events/src';
 import { filterLinks } from 'helpers/threads';
+import { LockWithTooltip } from '../../components/lock_with_tooltip';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -161,8 +162,13 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              <NewThreadTag threadCreatedAt={thread.createdAt}/>
-              {isLocked && <CWIcon iconName="lock" iconSize="small" />}
+              <NewThreadTag threadCreatedAt={thread.createdAt} />
+              {isLocked && (
+                <LockWithTooltip
+                  lockedAt={thread.lockedAt}
+                  updatedAt={thread.updatedAt}
+                />
+              )}
             </div>
             <div className="top-row-icons">
               {isHot(thread) && <div className="flame" />}

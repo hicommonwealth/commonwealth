@@ -23,10 +23,17 @@
     }
   }
 
-  .callout-text.Text {
-    background-color: $neutral-200;
+  .callout-text {
+    display: flex;
+    align-items: center;
+    background-color: #F7F6F7;
+    color: #656167;
+    padding: 16px 24px 16px 24px;
     border-radius: $border-radius-corners;
-    padding: 16px;
+
+    .Text {
+      margin-left: 10px;
+    }
   }
 }
 
