@@ -113,7 +113,7 @@ describe('ServerThreadsController', () => {
       });
     });
 
-    it('should throw error (comment not found)', async () => {
+    it('should throw error (thread not found)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
