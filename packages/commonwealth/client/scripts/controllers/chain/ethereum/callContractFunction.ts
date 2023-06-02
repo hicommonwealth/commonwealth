@@ -8,6 +8,7 @@ import type Contract from 'models/Contract';
 import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
 import WebWalletController from '../../app/web_wallets';
+import { sendUserOp } from 'client/scripts/helpers/aa_op_builder';
 
 async function sendFunctionCall({
   fn,
@@ -71,11 +72,13 @@ export async function callContractFunction({
   fn,
   inputArgs,
   tx_options,
+  senderERC4337
 }: {
   contract: Contract;
   fn: AbiItem;
   inputArgs: string[];
   tx_options?: any;
+  senderERC4337?: string
 }): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
   // get querying wallet
@@ -92,25 +95,36 @@ export async function callContractFunction({
   const processedArgs = processAbiInputsToDataTypes(fn.inputs, inputArgs);
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
-  const functionConfig: {
-    fn: AbiItem;
-    signingWallet: IWebWallet<any>;
-    contract: Contract;
-    functionTx: any;
-    web3: Web3;
-    tx_options?: any;
-  } = {
-    fn,
-    signingWallet,
-    contract,
-    functionTx,
-    web3,
-    tx_options,
-  };
-  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
-    functionConfig
-  );
-  return txReceipt;
+  if(!senderERC4337){
+    const functionConfig: {
+      fn: AbiItem;
+      signingWallet: IWebWallet<any>;
+      contract: Contract;
+      functionTx: any;
+      web3: Web3;
+      tx_options?: any;
+    } = {
+      fn,
+      signingWallet,
+      contract,
+      functionTx,
+      web3,
+      tx_options,
+    };
+    const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+      functionConfig
+    );
+    return txReceipt;
+  }else{
+    const userOpEvent = await sendUserOp(
+      web3,
+      senderERC4337,
+      contract.address,
+      tx_options?.value ?? "0",
+      functionTx 
+      )
+    return await userOpEvent.getTransactionReceipt()
+  }
 }
 
 export function encodeParameters(types, values) {

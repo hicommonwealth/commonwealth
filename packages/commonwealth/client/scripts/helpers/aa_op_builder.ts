@@ -1,21 +1,30 @@
 
-import { UserOperationBuilder } from 'userop';
+import { UserOperationBuilder, Client } from 'userop';
 import Web3 from 'web3';
 import { BigNumberish } from "ethers"
+import { OpToJSON } from 'userop/dist/utils';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { EntryPoint, EntryPoint__factory } from 'userop/dist/typechain';
 
+const bundlerRPC = 'https://api.stackup.sh/v1/node/9fb29d028cc0f052af8136f1f9d68cf8a07db8ebf22869398dd82bc859eb703b';
+const entrypointAddr = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 interface GasEstimate {
     preVerificationGas: BigNumberish;
     verificationGas: BigNumberish;
     callGasLimit: BigNumberish;
   }
 
-export class DelegationAccount extends UserOperationBuilder{
+class DelegationAccount extends UserOperationBuilder{
     private provider: Web3
+    private bundlerProvider: JsonRpcProvider = new JsonRpcProvider(bundlerRPC);
+    private entryPoint: EntryPoint;
 
     constructor(provider: Web3){
         super()
-        provider = provider;
-        this.useMiddleware(this.fetchGasConfig)
+        this.provider = provider;
+        this.entryPoint = EntryPoint__factory.connect(entrypointAddr, this.bundlerProvider)
+        this.useMiddleware(this.resolveAccount);
+        this.useMiddleware(this.fetchGasConfig);
         this.useMiddleware(this.signUserOperation);
     }
 
@@ -24,7 +33,12 @@ export class DelegationAccount extends UserOperationBuilder{
         ctx.op.signature = (await this.provider.eth.sign(requestId, (await this.provider.eth.getAccounts())[0]));
     };
 
-    //TODO: build out
+    private resolveAccount = async (ctx) => {
+        ctx.op.nonce = await this.entryPoint.getNonce(ctx.op.sender, 0);
+        ctx.op.initCode = "0x";
+      
+    };
+
     async fetchGasConfig(ctx){
         // Fetch the latest gas prices.
         // Gas Prices
@@ -57,7 +71,7 @@ export class DelegationAccount extends UserOperationBuilder{
         
         //Gas limits
         //TODO: this should be a bundler provider not w3
-        const est = (await provider.send("eth_estimateUserOperationGas", [
+        const est = (await this.bundlerProvider.send("eth_estimateUserOperationGas", [
             OpToJSON(ctx.op),
             ctx.entryPoint,
           ])) as GasEstimate;
@@ -67,8 +81,9 @@ export class DelegationAccount extends UserOperationBuilder{
         ctx.op.callGasLimit = est.callGasLimit;
     };
 
-    execute(to: string, value: string, data: string, senderWallet: string) {
-        this.setCallData(
+    public execute(to: string, value: string, data: string, senderWallet: string) {
+        this.setSender(senderWallet);
+        return this.setCallData(
             this.provider.eth.abi.encodeFunctionCall({
                 "inputs": [
                     {
@@ -92,9 +107,22 @@ export class DelegationAccount extends UserOperationBuilder{
                 "stateMutability": "nonpayable",
                 "type": "function"
             },  [to, value, data])
-        );
-        this.setSender(senderWallet);
-        this.setNonce("GetFromEntrypoit for sender")
+        ); 
       }
-    
+}
+
+export const sendUserOp = async (signer: Web3, senderWallet: string, to: string, value: string, data: string) => {
+    const delegationAccount = new DelegationAccount(signer);
+    const client = await Client.init(bundlerRPC, entrypointAddr);
+
+    const res = await client.sendUserOperation(
+    delegationAccount.execute(to, value, data, senderWallet),
+    { onBuild: (op) => console.log("Signed UserOperation:", op) }
+    );
+    console.log(`UserOpHash: ${res.userOpHash}`);
+
+    console.log("Waiting for transaction...");
+    const ev = await res.wait();
+    console.log(`Transaction hash: ${ev?.transactionHash ?? null}`);
+    return ev
 }
