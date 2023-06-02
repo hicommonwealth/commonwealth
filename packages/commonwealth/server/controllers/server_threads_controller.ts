@@ -2,10 +2,8 @@ import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { ReactionAttributes } from '../models/reaction';
 import { TokenBalanceCache } from '../../../token-balance-cache/src';
-import RuleCache from '../util/rules/ruleCache';
 import { ChainInstance } from '../models/chain';
 import { AddressInstance } from '../models/address';
-import checkRule from '../util/rules/checkRule';
 import {
   ChainNetwork,
   ChainType,
@@ -18,7 +16,6 @@ import { NotificationOptions } from './server_notifications_controller';
 import { getThreadUrl } from '../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { AnalyticsOptions } from './server_analytics_controller';
-import { FindOrCreateOptions } from 'sequelize';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -84,28 +81,6 @@ export class ServerThreadsController implements IServerThreadsController {
 
     if (!thread) {
       throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
-    }
-
-    // check topic ban
-    const topic = await this.models.Topic.findOne({
-      include: {
-        model: this.models.Thread,
-        where: { id: thread.id },
-        required: true,
-        as: 'threads',
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        this.ruleCache,
-        this.models,
-        topic.rule_id,
-        address.address
-      );
-      if (!passesRules) {
-        throw new Error(Errors.RuleCheckFailed);
-      }
     }
 
     // check address ban

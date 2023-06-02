@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 
 import 'pages/view_proposal/proposal_header_links.scss';
@@ -9,24 +9,32 @@ import type { AnyProposal } from '../../../models/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ProposalHeaderLinkProps = {
-  proposal: AnyProposal;
+  threads: any[];
+  chain: string;
 };
 
 // "Go to discussion"
-export const ThreadLink = ({ proposal }: ProposalHeaderLinkProps) => {
+const threadLinkButton = (threadId: string, title: string, chain: string) => {
   const path = getProposalUrlPath(
     ProposalType.Thread,
-    `${proposal.threadId}`,
+    `${threadId}`,
     false,
-    proposal['chain']
+    chain
   );
 
   return (
     <div className="HeaderLink">
-      <Link to={path}>Go to discussion</Link>
+      <Link to={path}>{title ? decodeURIComponent(title) : 'Go to thread'}</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
+};
+export const ThreadLink = ({ threads, chain }: ProposalHeaderLinkProps) => {
+  const components: JSX.Element[] = [];
+  threads.forEach((t) =>
+    components.push(threadLinkButton(t.id, t.title, chain))
+  );
+  return <React.Fragment>{components}</React.Fragment>;
 };
 
 type SnapshotThreadLinkProps = {

@@ -3,7 +3,6 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
-  IChatNotification,
   ICommunityNotificationData,
   IPostNotificationData,
   SnapshotEventType,
@@ -29,7 +28,6 @@ export type NotificationDataTypes =
   | IPostNotificationData
   | ICommunityNotificationData
   | IChainEventNotificationData
-  | IChatNotification
   | (SnapshotNotification & { eventType: SnapshotEventType });
 
 export default async function emitNotifications(
@@ -144,8 +142,7 @@ export default async function emitNotifications(
         category_id,
         chain_id:
           (<IPostNotificationData>notification_data).chain_id ||
-          (<ICommunityNotificationData>notification_data).chain ||
-          (<IChatNotification>notification_data).chain_id,
+          (<ICommunityNotificationData>notification_data).chain,
         thread_id:
           Number((<IPostNotificationData>notification_data).thread_id) ||
           undefined,
