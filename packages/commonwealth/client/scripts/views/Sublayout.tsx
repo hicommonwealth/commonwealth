@@ -25,10 +25,12 @@ const Sublayout = ({
   onScroll,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName } = useSidebarStore();
+  const { menuVisible, mobileMenuName, userToggledVisibility } =
+    useSidebarStore();
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
+  const { setMenu } = useSidebarStore();
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -47,7 +49,11 @@ const Sublayout = ({
     }
 
     const onResize = () => {
-      setIsWindowSmall(isWindowSmallInclusive(window.innerWidth));
+      const isSmall = isWindowSmallInclusive(window.innerWidth);
+      setIsWindowSmall(isSmall);
+      if (userToggledVisibility === null) {
+        setMenu({ name: 'default', isVisible: !isSmall });
+      }
     };
 
     window.addEventListener('resize', onResize);
@@ -60,7 +66,7 @@ const Sublayout = ({
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = menuVisible || !isWindowSmall;
+  const showSidebar = menuVisible;
 
   return (
     <div className="Sublayout">

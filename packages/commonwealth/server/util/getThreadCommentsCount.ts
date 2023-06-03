@@ -5,7 +5,7 @@ import type { ThreadAttributes } from '../models/thread';
 interface GetThreadsWithCommentCount {
   threads: ThreadAttributes[];
   models: DB;
-  chainId: string;
+  chainId?: string;
 }
 
 const getThreadsWithCommentCount = async ({
@@ -18,7 +18,7 @@ const getThreadsWithCommentCount = async ({
   const commentsCount = await models.Comment.count({
     attributes: ['thread_id'],
     where: {
-      chain: chainId,
+      ...(chainId && { chain: chainId }),
       thread_id: { [Op.in]: rootIds },
       deleted_at: null,
     },

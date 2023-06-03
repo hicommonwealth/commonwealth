@@ -16,9 +16,6 @@ import useForceRerender from 'hooks/useForceRerender';
 import { CWText } from '../../components/component_kit/cw_text';
 import { Carousel } from './carousel';
 
-// import { MixpanelPageViewEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 export type Chain = {
   chainInfo: ChainInfo;
   id: string;
@@ -55,14 +52,6 @@ const chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
 
 const LandingPage = () => {
   const forceRerender = useForceRerender();
-
-  //   if (!app.isLoggedIn()) {
-  //     mixpanelBrowserTrack({
-  //       event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
-  //       isCustomDomain: app.isCustomDomain(),
-  //     });
-  //   }
-  // }
 
   if (app.loginState !== LoginState.LoggedIn) {
     return (

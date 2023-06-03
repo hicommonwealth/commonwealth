@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
   chainEntityTypeToProposalName,
@@ -42,15 +41,20 @@ const LinkedProposal = ({
 }: LinkedProposalProps) => {
   const slug = chainEntityTypeToProposalSlug(ceType);
 
-  const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
-  }${getProposalUrlPath(slug, ceTypeId, true)}`;
+  const threadLink =
+    thread.chain === 'edgeware' && !ceType.includes('/')
+      ? `/${thread.chain}/link/chain-entity/${ceTypeId}`
+      : `${app.isCustomDomain() ? '' : `/${thread.chain}`}${getProposalUrlPath(
+          slug,
+          ceTypeId,
+          true
+        )}`;
 
   return (
     <a href={threadLink}>
-      {`${title ?? chainEntityTypeToProposalName(ceType)} #${ceTypeId} ${
-        ceCompleted ? ' (Completed)' : ''
-      }`}
+      {`${
+        title ?? chainEntityTypeToProposalName(ceType) ?? 'Proposal'
+      } #${ceTypeId} ${ceCompleted ? ' (Completed)' : ''}`}
     </a>
   );
 };
@@ -91,10 +95,9 @@ export const LinkedProposalsCard = ({
   thread,
   showAddProposalButton,
 }: LinkedProposalsCardProps) => {
-  const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
   const [snapshotUrl, setSnapshotUrl] = useState('');
-  const [space, setSpace] = useState<SnapshotSpace>(null);
+  const [snapshotTitle, setSnapshotTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const initialSnapshotLinks = useMemo(
@@ -128,8 +131,7 @@ export const LinkedProposalsCard = ({
               (sn) => sn.id === proposal.identifier
             );
             if (matchingSnapshot) {
-              setSnapshot(matchingSnapshot);
-              setSpace(_space);
+              setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
                 `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
                   _space.id
@@ -145,7 +147,7 @@ export const LinkedProposalsCard = ({
   }, [initialSnapshotLinks]);
 
   const showSnapshot =
-    snapshot && initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
+    initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
 
   return (
     <>
@@ -179,8 +181,7 @@ export const LinkedProposalsCard = ({
                   )}
                   {showSnapshot && (
                     <a href={snapshotUrl}>
-                      Snapshot:{' '}
-                      {initialSnapshotLinks[0].title ?? snapshot.title}
+                      Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
                     </a>
                   )}
                   {initialTemplateLinks.length > 0 && (

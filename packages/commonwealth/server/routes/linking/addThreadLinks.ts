@@ -4,6 +4,8 @@ import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Link, LinkSource, ThreadInstance } from '../../models/thread';
 import type { DB } from '../../models';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
+import { serverAnalyticsTrack } from '../../../shared/analytics/server-track';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 
 type AddThreadLinkReq = {
   thread_id: number;
@@ -34,7 +36,7 @@ const addThreadLink = async (
     thread.address_id,
     thread.chain
   );
-  if (!isAuth) return next(new AppError(Errors.NotAdminOrOwner));
+  if (!isAuth && !req.user.isAdmin) return next(new AppError(Errors.NotAdminOrOwner));
 
   if (thread.links) {
     const filteredLinks = links.filter((link) => {
@@ -70,6 +72,10 @@ const addThreadLink = async (
         as: 'topic',
       },
     ],
+  });
+
+  serverAnalyticsTrack({
+    event: MixpanelCommunityInteractionEvent.LINKED_PROPOSAL,
   });
 
   return success(res, finalThread.toJSON());

@@ -5,16 +5,17 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
+import { NewThreadTag } from '../../pages/discussions/NewThreadTag';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
-import { isWindowMediumSmallInclusive } from './helpers';
 import { ComponentType } from './types';
+import { LockWithTooltip } from '../lock_with_tooltip';
+import { isWindowMediumSmallInclusive } from './helpers';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -31,6 +32,7 @@ export type SidebarComponents = [
 
 type ContentPageProps = {
   createdAt: moment.Moment | number;
+  updatedAt?: moment.Moment;
   title: string | React.ReactNode;
 
   // optional
@@ -42,11 +44,14 @@ type ContentPageProps = {
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   headerComponents?: React.ReactNode;
   readOnly?: boolean;
+  lockedAt?: moment.Moment;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: React.ReactNode;
   subHeader?: React.ReactNode;
   viewCount?: number;
+  displayNewTag?: boolean;
+  showTabs?: boolean;
 };
 
 export const CWContentPage = (props: ContentPageProps) => {
@@ -57,24 +62,22 @@ export const CWContentPage = (props: ContentPageProps) => {
     comments,
     contentBodyLabel,
     createdAt,
+    updatedAt,
     lastEdited,
     headerComponents,
     readOnly,
+    lockedAt,
     showSidebar,
     sidebarComponents,
     subBody,
     subHeader,
     title,
     viewCount,
+    displayNewTag,
+    showTabs = false,
   } = props;
 
-  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
-    isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
-      ? 'tabsView'
-      : 'sidebarView'
-  );
   const [tabSelected, setTabSelected] = React.useState<number>(0);
-
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
   const createdOrEditedText = lastEdited ? 'Edited' : 'Published';
 
@@ -121,7 +124,9 @@ export const CWContentPage = (props: ContentPageProps) => {
             </CWText>
           )}
           {headerComponents}
-          {readOnly && <CWIcon iconName="lock" iconSize="small" />}
+          {readOnly && (
+            <LockWithTooltip lockedAt={lockedAt} updatedAt={updatedAt} />
+          )}
           {actions && (
             <PopoverMenu
               renderTrigger={(onclick) => (
@@ -146,49 +151,50 @@ export const CWContentPage = (props: ContentPageProps) => {
 
   return (
     <div className={ComponentType.ContentPage}>
-      <div
-        className={`sidebar-view ${viewType !== 'sidebarView' ? 'hidden' : ''}`}
-      >
-        {mainBody}
-        {showSidebar && (
-          <div className="sidebar">
-            {sidebarComponents?.map((c) => (
-              <React.Fragment key={c.label}>{c.item}</React.Fragment>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className={`tabs-view ${viewType !== 'tabsView' ? 'hidden' : ''}`}>
-        <CWTabBar>
-          <CWTab
-            label={contentBodyLabel}
-            onClick={() => {
-              setTabSelected(0);
-            }}
-            isSelected={tabSelected === 0}
-          />
-          {sidebarComponents?.map((item, i) => (
+      {!showTabs ? (
+        <div className="sidebar-view">
+          {mainBody}
+          {showSidebar && (
+            <div className="sidebar">
+              {sidebarComponents?.map((c) => (
+                <React.Fragment key={c.label}>{c.item}</React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="tabs-view">
+          <CWTabBar>
             <CWTab
-              key={item.label}
-              label={item.label}
+              label={contentBodyLabel}
               onClick={() => {
-                setTabSelected(i + 1);
+                setTabSelected(0);
               }}
-              isSelected={tabSelected === i + 1}
+              isSelected={tabSelected === 0}
             />
-          ))}
-        </CWTabBar>
-        {tabSelected === 0 && mainBody}
-        {sidebarComponents?.length >= 1 &&
-          tabSelected === 1 &&
-          sidebarComponents[0].item}
-        {sidebarComponents?.length >= 2 &&
-          tabSelected === 2 &&
-          sidebarComponents[1].item}
-        {sidebarComponents?.length === 3 &&
-          tabSelected === 3 &&
-          sidebarComponents[2].item}
-      </div>
+            {sidebarComponents?.map((item, i) => (
+              <CWTab
+                key={item.label}
+                label={item.label}
+                onClick={() => {
+                  setTabSelected(i + 1);
+                }}
+                isSelected={tabSelected === i + 1}
+              />
+            ))}
+          </CWTabBar>
+          {tabSelected === 0 && mainBody}
+          {sidebarComponents?.length >= 1 &&
+            tabSelected === 1 &&
+            sidebarComponents[0].item}
+          {sidebarComponents?.length >= 2 &&
+            tabSelected === 2 &&
+            sidebarComponents[1].item}
+          {sidebarComponents?.length === 3 &&
+            tabSelected === 3 &&
+            sidebarComponents[2].item}
+        </div>
+      )}
     </div>
   );
 };
@@ -212,3 +218,7 @@ export const CWContentPageCard = (props: ContentPageCardProps) => {
     </CWCard>
   );
 };
+function setViewType(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+

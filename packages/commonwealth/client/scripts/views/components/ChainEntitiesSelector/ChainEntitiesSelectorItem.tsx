@@ -25,11 +25,6 @@ const ChainEntitiesSelectorItem = ({
               ? ` ${chainEntity.typeId.slice(0, 6)}...`
               : ` #${chainEntity.typeId}`)}
         </CWText>
-        <CWText type="caption" truncate>
-          {chainEntity.threadTitle !== 'undefined'
-            ? decodeURIComponent(chainEntity.threadTitle)
-            : 'No thread title'}
-        </CWText>
       </div>
     </div>
   );

@@ -20,7 +20,9 @@ export enum XCACHE_VALUES {
 }
 
 type seconds = number;
-export type KeyFunction<T extends (...args: any[]) => any> = ((...args: Parameters<T>) => string | CacheKeyDuration) | string;
+export type KeyFunction<T extends (...args: any[]) => any> =
+  | ((...args: Parameters<T>) => string | CacheKeyDuration)
+  | string;
 
 export class FuncExecError extends Error {
   constructor(message) {
@@ -45,10 +47,10 @@ export class CacheDecorator {
   }
 
   /**
-  * Method to wrap a function with caching mechanism
-  * The keyGenerator should be a function returning a unique key for each unique combination of arguments
-  * The ttl is the time to live for the cache in seconds
-  */
+   * Method to wrap a function with caching mechanism
+   * The keyGenerator should be a function returning a unique key for each unique combination of arguments
+   * The ttl is the time to live for the cache in seconds
+   */
   public cacheWrap<T extends (...args: any[]) => any>(
     override: boolean,
     fn: T,
@@ -63,26 +65,40 @@ export class CacheDecorator {
           log.trace(`Cache disabled, skipping cache`);
           return this.callFunction(fn, ...args);
         }
-  
+
         // compute key and duration
-        const { cacheKey, cacheDuration } = this.computeCacheKeyAndDuration(key, duration, ...args);
-  
-        // If cache key is null 
-        if (!cacheKey || cacheDuration === undefined || cacheDuration === null) {
+        const { cacheKey, cacheDuration } = this.computeCacheKeyAndDuration(
+          key,
+          duration,
+          ...args
+        );
+
+        // If cache key is null
+        if (
+          !cacheKey ||
+          cacheDuration === undefined ||
+          cacheDuration === null
+        ) {
           log.trace(`Cache key not found for ${fn.name}`);
           return this.callFunction(fn, ...args);
         }
-  
+
         // Check cache and return cached value if it exists and override is not set
-        if(!override) {
+        if (!override) {
           const cachedValue = await this.getCachedValue(cacheKey, namespace);
-          if (cachedValue!==null && cachedValue!==undefined) {
+          if (cachedValue !== null && cachedValue !== undefined) {
             return cachedValue;
           }
         }
-  
+
         // Call function, cache its result and return it
-        const result = await this.callFunctionAndCacheResult(fn, cacheKey, cacheDuration, namespace, ...args);
+        const result = await this.callFunctionAndCacheResult(
+          fn,
+          cacheKey,
+          cacheDuration,
+          namespace,
+          ...args
+        );
         return result;
       } catch (error) {
         log.error(`Error in cacheWrap for ${fn.name}: ${error}`);
@@ -99,7 +115,7 @@ export class CacheDecorator {
     key: KeyFunction<T>,
     duration: seconds,
     ...args: Parameters<T>
-  ): { cacheKey: string, cacheDuration: seconds } {
+  ): { cacheKey: string; cacheDuration: seconds } {
     let cacheDuration = duration;
     let cacheKey = null;
     if (typeof key === 'function') {
@@ -118,8 +134,11 @@ export class CacheDecorator {
     }
     return { cacheKey, cacheDuration };
   }
-  
-  private async getCachedValue(cacheKey: string, namespace: RedisNamespaces): Promise<any> {
+
+  private async getCachedValue(
+    cacheKey: string,
+    namespace: RedisNamespaces
+  ): Promise<any> {
     let cachedValue;
     try {
       cachedValue = await this.checkCache(cacheKey, namespace);
@@ -129,23 +148,27 @@ export class CacheDecorator {
           return JSON.parse(cachedValue);
         } catch (error) {
           // If parsing fails, return the raw cached value
-          log.warn(`Failed to parse cached value for ${cacheKey} as JSON, returning raw value. Error: ${error}`);
+          log.warn(
+            `Failed to parse cached value for ${cacheKey} as JSON, returning raw value. Error: ${error}`
+          );
         }
       }
     } catch (error) {
       // If parsing fails, return the raw cached value
-      log.error(`Failed to fetch cached value for ${cacheKey} as JSON, ${error}`);
+      log.error(
+        `Failed to fetch cached value for ${cacheKey} as JSON, ${error}`
+      );
     }
     return null;
   }
-  
+
   private async callFunction<T extends (...args: any[]) => any>(
     fn: T,
     ...args: Parameters<T>
   ): Promise<ReturnType<T>> {
     try {
       const result = await fn(...args);
-      if(result === undefined || result === null) {
+      if (result === undefined || result === null) {
         log.warn(`Function ${fn.name} returned undefined, not caching result`);
       }
       return result;
@@ -154,7 +177,7 @@ export class CacheDecorator {
       throw new FuncExecError(error);
     }
   }
-  
+
   private async callFunctionAndCacheResult<T extends (...args: any[]) => any>(
     fn: T,
     cacheKey: string,
@@ -165,7 +188,12 @@ export class CacheDecorator {
     const result = await this.callFunction(fn, ...args);
     if (result !== undefined && result !== null) {
       try {
-        const ret = await this.cacheResponse(cacheKey, JSON.stringify(result), cacheDuration, namespace);
+        const ret = await this.cacheResponse(
+          cacheKey,
+          JSON.stringify(result),
+          cacheDuration,
+          namespace
+        );
         //log.debug(`cacheWrap: SET ${cacheKey}`);
         if (!ret) throw new Error('Unable to set redis key returned false');
       } catch (error) {
@@ -321,7 +349,7 @@ export class CacheDecorator {
         res.send = originalSend;
         res.send(body);
         try {
-          if (res.statusCode == 200) {
+          if (res.statusCode == 200 || res.statusCode == 304) {
             const ret = await this.cacheResponse(
               cacheKey,
               body,
@@ -337,7 +365,7 @@ export class CacheDecorator {
             }
           } else {
             log.warn(
-              `NOSET: Response status code is not 200 ${cacheKey}, skip writing cache`
+              `NOSET: ${cacheKey} Response status code is not 200 but ${res.statusCode}, skip writing cache`
             );
           }
         } catch (error) {

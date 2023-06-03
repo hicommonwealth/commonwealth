@@ -20,6 +20,11 @@ import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { addressSwapper } from 'utils';
 import { setDarkMode } from '../helpers/darkMode';
+import {
+  getAddressFromWallet,
+  loginToAxie,
+  loginToNear,
+} from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
 import type { ProfileRowProps } from '../views/components/component_kit/cw_profiles_list';
@@ -31,11 +36,6 @@ import type {
   LoginActiveStep,
   LoginSidebarType,
 } from '../views/pages/login/types';
-import {
-  getAddressFromWallet,
-  loginToAxie,
-  loginToNear,
-} from '../helpers/wallet';
 import useBrowserWindow from './useBrowserWindow';
 
 type IuseWalletProps = {
@@ -153,7 +153,29 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      await loginWithMagicLink(email);
+      await loginWithMagicLink({ email });
+      setIsMagicLoading(false);
+
+      if (walletProps.onSuccess) walletProps.onSuccess();
+
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        walletProps.onModalClose();
+      } else {
+        walletProps.onModalClose();
+      }
+    } catch (e) {
+      notifyError("Couldn't send magic link");
+      setIsMagicLoading(false);
+      console.error(e);
+    }
+  };
+
+  // New callback for handling social login
+  const onSocialLogin = async (provider: string) => {
+    setIsMagicLoading(true);
+
+    try {
+      await loginWithMagicLink({ provider });
       setIsMagicLoading(false);
 
       if (walletProps.onSuccess) walletProps.onSuccess();
@@ -195,7 +217,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         const chain =
           app.user.selectedChain ||
           app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses(chain);
+        await updateActiveAddresses({ chain, shouldRedraw: shouldRedrawApp });
       }
     }
 
@@ -300,7 +322,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
         await primaryAccount.validate(
           cachedWalletSignature,
           cachedTimestamp,
-          cachedChainId
+          cachedChainId,
+          false
         );
       }
       await onLogInWithAccount(primaryAccount, false, false);
@@ -309,7 +332,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // it we need to get the id from api
       await app.newProfiles.updateProfileForAccount(
         primaryAccount.profile.address,
-        {}
+        {},
+        false
       );
     } catch (e) {
       console.log(e);
@@ -563,6 +587,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     onResetWalletConnect,
     onPerformLinking,
     onEmailLogin,
+    onSocialLogin,
     onLinkExistingAccount,
     setAvatarUrl,
     setEmail,

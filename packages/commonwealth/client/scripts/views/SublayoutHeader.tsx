@@ -7,7 +7,7 @@ import { CWCommunityAvatar } from './components/component_kit/cw_community_avata
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
-import { LoginSelector } from './components/header/login_selector';
+import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
@@ -26,8 +26,14 @@ export const SublayoutHeader = ({
   onMobile,
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
-  const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
-    useSidebarStore();
+  const {
+    menuVisible,
+    setMenu,
+    menuName,
+    setMobileMenuName,
+    mobileMenuName,
+    setUserToggledVisibility,
+  } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
 
   return (
@@ -56,12 +62,13 @@ export const SublayoutHeader = ({
               }}
             />
           )}
-        {onMobile && app.activeChainId() && (
+        {app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"
             iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
               setMenu({ name: menuName, isVisible: !menuVisible });
+              setUserToggledVisibility(!menuVisible ? 'closed' : 'open');
             }}
           />
         )}
