@@ -70,6 +70,7 @@ export const ChainMetadataRows = ({
   const [snapshotChannels, setSnapshotChannels] = useState([]);
   const [snapshotNotificationsEnabled, setSnapshotNotificationsEnabled] =
     useState(false);
+  const [displayStagesInSidebar, setDisplayStagesInSidebar] = useState(false);
   const [selectedSnapshotChannel, setSelectedSnapshotChannel] = useState<{
     id: string;
     name: string;
@@ -154,6 +155,7 @@ export const ChainMetadataRows = ({
         defaultOverview,
         defaultPage,
         hasHomepage,
+        display_stages_in_sidebar: displayStagesInSidebar,
         default_allow_permissions: chain.defaultAllowPermissions,
         default_deny_permissions: chain.defaultDenyPermissions,
         chain_node_id: null,
@@ -298,6 +300,16 @@ export const ChainMetadataRows = ({
           stagesEnabled
             ? 'Show proposal progress on threads'
             : "Don't show progress on threads"
+        }
+      />
+      <ToggleRow
+        title="Show Stages in Sidebar"
+        defaultValue={false}
+        onToggle={() => setDisplayStagesInSidebar((prevState) => !prevState)}
+        caption={() =>
+          displayStagesInSidebar
+            ? 'Show stages in sidebar'
+            : "Don't show stages in sidebar"
         }
       />
 

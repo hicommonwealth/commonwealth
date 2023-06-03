@@ -89,6 +89,7 @@ const updateChain = async (
     default_summary_view,
     default_page,
     has_homepage,
+    display_stages_in_sidebar,
     terms,
     chain_node_id,
   } = req.body;
@@ -189,6 +190,8 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (has_homepage) chain.has_homepage = has_homepage;
+  if (display_stages_in_sidebar)
+    chain.display_stages_in_sidebar = display_stages_in_sidebar;
   if (default_page) {
     if (!has_homepage) {
       return next(new AppError(Errors.InvalidDefaultPage));

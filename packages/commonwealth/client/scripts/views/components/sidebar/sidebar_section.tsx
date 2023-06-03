@@ -40,7 +40,13 @@ const SubSection = (props: SubSectionAttrs) => {
     >
       {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
       <div className={titleTextClass} title={title}>
-        {title}
+        <CWText
+          type="b2"
+          className={`title-text ${titleTextClass}`}
+          onClick={(e) => clickHandler(e)}
+        >
+          {title}
+        </CWText>
       </div>
       {isNotUndefined(rightIcon) && (
         <div className="right-icon">{rightIcon}</div>
@@ -79,6 +85,12 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     setMenu({ name: menuName, isVisible: menuVisible });
 
     onClick(e, toggled);
+  };
+
+  const onClickCaratHandler = (e) => {
+    e.stopPropagation();
+    setToggled(!toggled);
+    localStorage.setItem(`${title}-toggled`, (!toggled).toString());
   };
 
   const carat = toggled ? (
@@ -128,14 +140,19 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
         className={`sub-section-group-title ${
           hoverOn ? 'background' : backgroundColorClass
         }`}
-        onClick={(e) => clickHandler(e)}
       >
         {containsChildren ? (
-          <div className="carat">{carat}</div>
+          <div className="carat" onClick={(e) => onClickCaratHandler(e)}>
+            {carat}
+          </div>
         ) : (
           <div className="no-carat" />
         )}
-        <CWText type="b2" className={`title-text ${titleTextClass}`}>
+        <CWText
+          type="b2"
+          className={`title-text ${titleTextClass}`}
+          onClick={(e) => clickHandler(e)}
+        >
           {title}
         </CWText>
         {rightIcon && <div className="right-icon">{rightIcon}</div>}
