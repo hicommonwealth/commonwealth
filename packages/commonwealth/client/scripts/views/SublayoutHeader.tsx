@@ -62,16 +62,14 @@ export const SublayoutHeader = ({
               }}
             />
           )}
-        {app.activeChainId() && (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-            onClick={() => {
-              setMenu({ name: menuName, isVisible: !menuVisible });
-              setUserToggledVisibility(!menuVisible ? 'closed' : 'open');
-            }}
-          />
-        )}
+        <CWIconButton
+          iconButtonTheme="black"
+          iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
+          onClick={() => {
+            setMenu({ name: menuName, isVisible: !menuVisible });
+            setUserToggledVisibility(menuVisible ? 'closed' : 'open');
+          }}
+        />
       </div>
       {!hideSearch && <SearchBar />}
       <div className="header-right">
