@@ -857,7 +857,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         sidebarComponents={
           [
             {
-              label: 'Button',
+              label: 'Actions',
               item: (
                 <CWButton
                   className="add-action-button"
