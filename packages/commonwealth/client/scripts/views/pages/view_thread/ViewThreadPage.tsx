@@ -56,6 +56,7 @@ import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_po
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { filterLinks } from 'helpers/threads';
 import { isDefaultStage } from 'helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -703,6 +704,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
+  function setIsModalOpen(arg0: boolean): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <Sublayout>
       <CWContentPage
@@ -786,6 +791,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }
         sidebarComponents={
           [
+            {
+              label: 'Button',
+              item: (
+                <CWButton
+                  className="add-action-button"
+                  buttonType="mini-black"
+                  label="Add Action"
+                  onClick={() => setIsModalOpen(true)}
+                />
+              ),
+            },
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
                   {

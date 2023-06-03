@@ -25,7 +25,8 @@ export type ContentPageSidebarItem = {
 export type SidebarComponents = [
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
-  item?: ContentPageSidebarItem
+  item?: ContentPageSidebarItem,
+  ...ContentPageSidebarItem[]
 ];
 
 type ContentPageProps = {
@@ -75,7 +76,7 @@ export const CWContentPage = (props: ContentPageProps) => {
   const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
-  const createdOrEditedText = lastEdited ? 'Edited' : 'Published'
+  const createdOrEditedText = lastEdited ? 'Edited' : 'Published';
 
   React.useEffect(() => {
     const onResize = () => {
@@ -98,7 +99,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     <div className="main-body-container">
       <div className="header">
         {typeof title === 'string' ? (
-          <CWText type="h3" fontWeight="semiBold">
+          <CWText className="title" type="h3" fontWeight="semiBold">
             {title}
           </CWText>
         ) : (
@@ -107,14 +108,16 @@ export const CWContentPage = (props: ContentPageProps) => {
         <div className="header-info-row">
           {author}
           {typeof createdOrEditedDate === 'number' ||
-            (moment.isMoment(createdOrEditedDate) && createdOrEditedDate.isValid() && (
-              <CWText type="caption" className="header-text">
-                • &nbsp; {createdOrEditedText} on {moment(createdOrEditedDate).format('l')} &nbsp; •
-              </CWText>
-            ))}
+            (moment.isMoment(createdOrEditedDate) &&
+              createdOrEditedDate.isValid() && (
+                <CWText type="caption" className="header-text">
+                  • &nbsp; {createdOrEditedText} on{' '}
+                  {moment(createdOrEditedDate).format('l')} &nbsp; •
+                </CWText>
+              ))}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
-            {pluralize(viewCount, 'view')}
+              {pluralize(viewCount, 'view')}
             </CWText>
           )}
           {headerComponents}
