@@ -83,11 +83,9 @@ export const CWContentPage = (props: ContentPageProps) => {
 
   React.useEffect(() => {
     const onResize = () => {
-      setViewType(
-        isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
-          ? 'tabsView'
-          : 'sidebarView'
-      );
+      isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+        ? 'tabsView'
+        : 'sidebarView';
     };
 
     window.addEventListener('resize', onResize);
@@ -218,7 +216,3 @@ export const CWContentPageCard = (props: ContentPageCardProps) => {
     </CWCard>
   );
 };
-function setViewType(arg0: string) {
-  throw new Error('Function not implemented.');
-}
-

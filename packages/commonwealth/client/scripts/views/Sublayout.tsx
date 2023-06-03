@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import 'Sublayout.scss';
 
 import app from 'state';
 import { Sidebar } from 'views/components/sidebar';
+import RightSidebar from 'views/components/right_sidebar';
 import { AppMobileMenus } from './AppMobileMenus';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './Footer';
@@ -25,12 +27,25 @@ const Sublayout = ({
   onScroll,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName, userToggledVisibility } =
-    useSidebarStore();
+  const {
+    menuVisible,
+    mobileMenuName,
+    userToggledVisibility,
+    rightSidebarVisible,
+    setRightMenu,
+    setMenu,
+  } = useSidebarStore();
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
-  const { setMenu } = useSidebarStore();
+
+  const navigate = useNavigate(); // Get the navigate function from the router
+  const location = useLocation(); // Get the location object from the router
+
+  useEffect(() => {
+    // Close the right sidebar when the route changes
+    setRightMenu({ name: 'actionMenu', isVisible: false });
+  }, [location, setRightMenu]);
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -67,6 +82,7 @@ const Sublayout = ({
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
   const showSidebar = menuVisible;
+  const showRightSidebar = rightSidebarVisible;
 
   return (
     <div className="Sublayout">
@@ -86,6 +102,7 @@ const Sublayout = ({
               </div>
             )}
           </div>
+          {showRightSidebar && <RightSidebar />}
         </div>
       </div>
     </div>

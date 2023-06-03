@@ -13,6 +13,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
+import useSidebarStore from 'state/ui/sidebar';
 
 import app from 'state';
 import { ContentType } from 'types';
@@ -106,6 +107,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
+
+  const { rightSidebarVisible, setRightMenu } = useSidebarStore();
 
   const cancelEditing = () => {
     setIsGloballyEditing(false);
@@ -756,9 +759,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
-  function setIsModalOpen(arg0: boolean): void {
-    throw new Error('Function not implemented.');
-  }
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
@@ -863,7 +863,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   className="add-action-button"
                   buttonType="mini-black"
                   label="Add Action"
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => {
+                    setRightMenu({ isVisible: !rightSidebarVisible });
+                  }}
                 />
               ),
             },

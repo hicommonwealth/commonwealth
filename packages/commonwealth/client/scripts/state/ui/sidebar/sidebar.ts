@@ -19,6 +19,8 @@ interface SidebarStore {
     name: SidebarMenuName;
     isVisible?: boolean;
   }) => void;
+  rightSidebarVisible: boolean;
+  setRightMenu: ({ isVisible }: { isVisible?: boolean }) => void;
 }
 
 const setUserSidebarVisibility = (state: 'open' | 'closed' | null) => {
@@ -54,6 +56,14 @@ export const sidebarStore = createStore<SidebarStore>()(
         menuName: name,
         menuVisible:
           typeof isVisible === 'boolean' ? isVisible : state.menuVisible,
+      })),
+    rightSidebarVisible: false,
+    setRightMenu: ({ isVisible }) =>
+      set((state) => ({
+        rightSidebarVisible:
+          typeof isVisible === 'boolean'
+            ? isVisible
+            : state.rightSidebarVisible,
       })),
   }))
 );
