@@ -14,6 +14,9 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { ThreadStage } from 'models/types';
 import Thread from 'models/Thread';
 
+import { NewThreadForm } from 'views/components/NewThreadForm';
+import { ReactQuillEditor } from 'views/components/react_quill_editor';
+
 type DiscussionsPageProps = {
   topicName?: string;
 };
@@ -24,6 +27,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
+
+  const [newThreadContentDelta, setNewThreadContentDelta] = useState(null);
 
   const handleThreadUpdate = (data: {
     threadId: number;
@@ -194,11 +199,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             ),
             Header: () => {
               return (
-                <RecentThreadsHeader
-                  topic={topicName}
-                  stage={stageName}
-                  totalThreadCount={threads ? totalThreads : 0}
-                />
+                <div className="discussion-header">
+                  <RecentThreadsHeader
+                    topic={topicName}
+                    stage={stageName}
+                    totalThreadCount={threads ? totalThreads : 0}
+                  />
+                  <NewThreadForm />
+                </div>
               );
             },
           }}

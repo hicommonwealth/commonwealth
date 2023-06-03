@@ -18,6 +18,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import useForceRerender from 'hooks/useForceRerender';
+import useSidebarStore from 'state/ui/sidebar';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -33,6 +34,7 @@ export const RecentThreadsHeader = ({
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
   const forceRerender = useForceRerender();
+  const { rightSidebarVisible, setRightMenu } = useSidebarStore();
 
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
     isWindowExtraSmall(window.innerWidth)
@@ -122,17 +124,17 @@ export const RecentThreadsHeader = ({
                   iconName="plusCircle"
                   iconButtonTheme="black"
                   onClick={() => {
-                    navigate('/new/discussion');
+                    setRightMenu({ isVisible: !rightSidebarVisible });
                   }}
                   disabled={!app.user.activeAccount}
                 />
               ) : (
                 <CWButton
                   buttonType="mini-black"
-                  label="Create Thread"
+                  label="Add Action"
                   iconLeft="plus"
                   onClick={() => {
-                    navigate('/new/discussion');
+                    setRightMenu({ isVisible: !rightSidebarVisible });
                   }}
                   disabled={!app.user.activeAccount}
                 />
@@ -147,25 +149,36 @@ export const RecentThreadsHeader = ({
         </>
       )}
       {app.chain?.meta && (
-        <div className="buttons-row">
-          {topics.length > 0 && (
-            <TopicsMenu
-              featuredTopics={featuredTopics}
-              otherTopics={otherTopics}
-              selectedTopic={selectedTopic}
-              topic={topic}
-              onEditClick={(editTopic) => setTopicSelectedToEdit(editTopic)}
-              onTopicChange={onTopicChange}
-            />
-          )}
-          {stagesEnabled && (
-            <StagesMenu
-              selectedStage={selectedStage}
-              stage={stage}
-              stages={stages}
-              onStageChange={onStageChange}
-            />
-          )}
+        <div className="header-row">
+          <div className="buttons-row">
+            {topics.length > 0 && (
+              <TopicsMenu
+                featuredTopics={featuredTopics}
+                otherTopics={otherTopics}
+                selectedTopic={selectedTopic}
+                topic={topic}
+                onEditClick={(editTopic) => setTopicSelectedToEdit(editTopic)}
+                onTopicChange={onTopicChange}
+              />
+            )}
+            {stagesEnabled && (
+              <StagesMenu
+                selectedStage={selectedStage}
+                stage={stage}
+                stages={stages}
+                onStageChange={onStageChange}
+              />
+            )}
+          </div>
+          <CWButton
+            buttonType="mini-black"
+            label="Add Action"
+            iconLeft="plus"
+            onClick={() => {
+              setRightMenu({ isVisible: !rightSidebarVisible });
+            }}
+            disabled={!app.user.activeAccount}
+          />
         </div>
       )}
 
