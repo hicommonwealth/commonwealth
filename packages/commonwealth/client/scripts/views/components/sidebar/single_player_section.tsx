@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { SidebarSectionGroup } from './sidebar_section';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -8,10 +8,23 @@ import app from 'state';
 
 const SinglePlayerSectionComponent = () => {
   const navigate = useCommonNavigate();
+  const [profileId, setProfileId] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  useEffect(() => {
+    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+    const chain =
+      typeof activeAccount.chain === 'string'
+        ? activeAccount.chain
+        : activeAccount.chain?.id;
+    const profile = app.newProfiles.getProfile(chain, activeAccount.address);
+    setProfileId(profile.id);
+    setSelectedAddress(activeAccount.address);
+  }, []);
 
   const singlePlayerGroupData: SectionGroupAttrs[] = [
     {
-      title: 'Create Something',
+      title: 'Create',
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
@@ -20,12 +33,54 @@ const SinglePlayerSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigate(`/new/discussion`);
+        navigate('/new/discussion');
       },
       icon: <CWIcon name="add-circle" iconName="plusCircle" />,
     },
     {
-      title: 'Inbox',
+      title: 'Profile',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: false,
+      isVisible: true,
+      isUpdated: false,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        navigate(`/profile/id/${profileId}`);
+      },
+      icon: <CWIcon name="add-circle" iconName="plusCircle" />,
+    },
+    {
+      title: 'Assets',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: false,
+      isVisible: true,
+      isUpdated: false,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        navigate(`/profile/id/${profileId}`);
+      },
+      icon: <CWIcon name="add-circle" iconName="plusCircle" />,
+    },
+    {
+      title: 'Address Book',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: false,
+      isVisible: true,
+      isUpdated: false,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        navigate(`/profile/id/${profileId}`);
+      },
+      icon: <CWIcon name="add-circle" iconName="plusCircle" />,
+    },
+    {
+      title: 'Inbox and Transactions',
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
