@@ -36,7 +36,7 @@ class Account {
     sessionPublicAddress,
     validationBlockInfo,
     profile,
-    ignoreProfile = true,
+    ignoreProfile,
   }: {
     // required args
     chain: ChainInfo;
