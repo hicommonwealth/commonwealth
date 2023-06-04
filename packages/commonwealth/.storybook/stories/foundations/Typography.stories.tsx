@@ -12,7 +12,7 @@ export default text;
 
 export const Typography = {
   args: {
-    text: "Display1 semi bold",
+    text: "Commonwealth Labs",
     type: "d1",
     fontWeight: "semiBold",
     fontStyle: undefined,
@@ -36,7 +36,23 @@ export const Typography = {
     },
     type: {
       control: { type: "inline-radio" },
-      options: [ "d1", "d2", "h1", "h2", "h3", "h4", "h5", "b1", "b2", "caption", "buttonSm", "buttonLg", "buttonMini" ],
+      options: [
+        "d1",
+        "d2",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "b1",
+        "b2",
+        "caption",
+        "buttonSm",
+        "buttonLg",
+        "buttonMini",
+        "monospace1",
+        "monospace2",
+      ],
     },
   },
   parameters: {

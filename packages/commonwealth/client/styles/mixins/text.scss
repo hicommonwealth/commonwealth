@@ -8,13 +8,13 @@
   font-family: $font-family-neue-haas-unica;
   font-size: 16px;
   letter-spacing: 0.01em;
-  line-height: 1.45;
+  line-height: 24px;
 }
 
 @mixin b2 {
   font-family: $font-family-neue-haas-unica;
-  font-size: 15.25px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 20px;
 
   &.bold,
   &.italic {

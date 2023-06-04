@@ -29,7 +29,9 @@ type FontType =
   | 'caption'
   | 'buttonSm'
   | 'buttonLg'
-  | 'buttonMini';
+  | 'buttonMini'
+  | 'monospace1'
+  | 'monospace2';
 
 type TextStyleProps = {
   className?: string;
