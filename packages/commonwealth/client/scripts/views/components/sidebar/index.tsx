@@ -20,7 +20,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { featureFlags } from 'helpers/feature-flags';
 import useSidebarStore from 'state/ui/sidebar';
 import { ExploreSection } from './explore_section';
-import { CreateSection } from './create_section';
 
 export type SidebarMenuName =
   | 'default'
