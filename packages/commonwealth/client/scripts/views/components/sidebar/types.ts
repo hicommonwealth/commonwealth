@@ -17,6 +17,7 @@ export type SectionGroupAttrs = {
   containsChildren: boolean;
   displayData: SubSectionAttrs[] | null;
   hasDefaultToggle: boolean;
+  icon?: React.ReactNode;
 } & BaseSidebarAttrs;
 
 export type SidebarSectionAttrs = {
@@ -24,7 +25,9 @@ export type SidebarSectionAttrs = {
   displayData?: SectionGroupAttrs[];
   extraComponents?: React.ReactNode;
   toggleDisabled?: boolean;
-} & BaseSidebarAttrs;
+} & BaseSidebarAttrs & {
+    toggleDisabled?: boolean;
+  };
 
 export type ToggleTree = {
   toggledState: boolean;

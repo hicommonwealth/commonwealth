@@ -12,12 +12,15 @@ import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { SinglePlayerSection } from './single_player_section';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { featureFlags } from 'helpers/feature-flags';
 import useSidebarStore from 'state/ui/sidebar';
+import { ExploreSection } from './explore_section';
+import { CreateSection } from './create_section';
 
 export type SidebarMenuName =
   | 'default'
@@ -50,7 +53,7 @@ export const Sidebar = () => {
       {menuName === 'default' && (
         <div className="sidebar-default-menu">
           <SidebarQuickSwitcher />
-          {app.chain && (
+          {app.chain ? (
             <div className="community-menu">
               {showAdmin && <AdminSection />}
               {featureFlags.communityHomepage && app.chain.meta.hasHomepage && (
@@ -81,13 +84,17 @@ export const Sidebar = () => {
                 )}
               </div>
             </div>
+          ) : (
+            <div className="community-menu">
+              <SinglePlayerSection />
+              <ExploreSection />
+              {/* <CreateSection /> */}
+            </div>
           )}
         </div>
       )}
       {menuName === 'createContent' && <CreateContentSidebar />}
-      {menuName === 'exploreCommunities' && (
-        <ExploreCommunitiesSidebar />
-      )}
+      {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
     </div>
   );
 };
