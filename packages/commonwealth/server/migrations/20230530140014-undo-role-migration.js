@@ -24,8 +24,9 @@ module.exports = {
         { transaction: t }
       );
 
+      // Add roles to Addresses from Roles table
       const roles = await queryInterface.sequelize.query(
-        `SELECT address_id, permission FROM "Roles"`,
+        `SELECT address_id, permission FROM "Roles" WHERE permission != 'member'`,
         { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
       );
 
@@ -50,6 +51,25 @@ module.exports = {
           { transaction: t }
         );
       }
+
+      // Add is_user_default to Addresses from RoleAssignments table
+      const isUserDefault = await queryInterface.sequelize.query(
+        `SELECT address_id, is_user_default FROM "RoleAssignments" WHERE is_user_default = true`,
+        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
+      );
+
+      const userDefaultIds = isUserDefault.map((r) => r.address_id);
+
+      await queryInterface.sequelize.query(
+        `
+        UPDATE "Addresses"
+        SET is_user_default = CASE 
+            ${userDefaultIds.map((id) => `WHEN id = ${id} THEN true`).join(' ')}
+        END
+        WHERE id IN (${userDefaultIds.join(', ')})
+      `,
+        { transaction: t }
+      );
 
       // query chain to a string containing allowed roles, example 1inch -> admin, moderator, member
       const communityRoles = await queryInterface.sequelize.query(
@@ -110,9 +130,9 @@ module.exports = {
       }
 
       // drop unused tables
-      await queryInterface.dropTable('RoleAssignments', { transaction: t });
-      await queryInterface.dropTable('CommunityRoles', { transaction: t });
-      await queryInterface.dropTable('Roles', { transaction: t });
+      // await queryInterface.dropTable('RoleAssignments', { transaction: t });
+      // await queryInterface.dropTable('CommunityRoles', { transaction: t });
+      // await queryInterface.dropTable('Roles', { transaction: t });
     });
   },
 
