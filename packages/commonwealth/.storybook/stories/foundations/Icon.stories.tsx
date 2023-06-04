@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import type { Meta } from '@storybook/react';
 import * as Icons from "@phosphor-icons/react";
 
+import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
 import { phosphorIconLookup } from '../phosphor_icon_lookup';
 
 import "../styles/icon.scss";
@@ -9,24 +10,27 @@ import "../styles/icon.scss";
 interface PhosphorIconProps {
   size: number;
   weight: Icons.IconWeight | undefined;
-  component?: any;
 };
 
 const weightOptions = ["thin", "light", "regular", "bold", "fill", "duotone" ];
 
-// const PhosphorIcon: FC<PhosphorIconProps> = ({ size, weight, component }) => {
 const PhosphorIcon: FC<PhosphorIconProps> = ({ size, weight }) => {
   return (
-    <>
-      {Object.values(phosphorIconLookup).map(i => {
-        const IconComponent = i;
+    <div className="gallery">
+      {Object.entries(phosphorIconLookup).map(([key, icon], index) => {
+        const IconComponent = icon;
         return (
-          <div className="icon">
-            <IconComponent size={size} weight={weight} />
+          <div key={index} className="item">
+            <div className="icon">
+              <IconComponent size={size} weight={weight} />
+            </div>
+            <CWText className="name" type="caption">
+              {key.charAt(0).toUpperCase() + key.slice(1)}
+            </CWText>
           </div>
         )
       })}
-    </>
+    </div>
   )
 }
 
