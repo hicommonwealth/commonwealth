@@ -170,15 +170,17 @@ export const RecentThreadsHeader = ({
               />
             )}
           </div>
-          <CWButton
-            buttonType="mini-black"
-            label="Add Action"
-            iconLeft="plus"
-            onClick={() => {
-              setRightMenu({ isVisible: !rightSidebarVisible });
-            }}
-            disabled={!app.user.activeAccount}
-          />
+          {!isUndefined(topic) && (
+            <CWButton
+              buttonType="mini-black"
+              label="Add Action"
+              iconLeft="plus"
+              onClick={() => {
+                setRightMenu({ isVisible: !rightSidebarVisible });
+              }}
+              disabled={!app.user.activeAccount}
+            />
+          )}
         </div>
       )}
 
