@@ -22,6 +22,10 @@ const SinglePlayerSectionComponent = () => {
     setSelectedAddress(activeAccount.address);
   }, []);
 
+  /*
+    // Hack for demonstration purposes, should go to a default creation page (which is unscoped)
+    // Should go to a Creation Page Which is instant
+  */
   const singlePlayerGroupData: SectionGroupAttrs[] = [
     {
       title: 'Create',
@@ -33,7 +37,7 @@ const SinglePlayerSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigate('/new/discussion');
+        navigate(`/LilNoun/new/discussion`);
       },
       icon: <CWIcon name="add-circle" iconName="plusCircle" />,
     },
@@ -110,6 +114,7 @@ const SinglePlayerSectionComponent = () => {
     hasDefaultToggle: toggleTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
+      navigate(`/dashboard/for-you`);
       localStorage[`${app.activeChainId()}-single-player-toggle-tree`] =
         JSON.stringify({
           toggledState: toggle,

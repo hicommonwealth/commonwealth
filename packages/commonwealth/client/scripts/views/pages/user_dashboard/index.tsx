@@ -13,6 +13,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Feed } from '../../components/feed';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import { NewThreadForm } from '../../components/NewThreadForm';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -71,6 +72,7 @@ const UserDashboard = (props: UserDashboardProps) => {
       <div ref={setScrollElement} className="UserDashboard">
         <div className="dashboard-column">
           <div className="dashboard-header">
+            {/* <NewThreadForm /> For Demonstration Purposes*/}
             <CWTabBar>
               <CWTab
                 label={DashboardViews.ForYou}
