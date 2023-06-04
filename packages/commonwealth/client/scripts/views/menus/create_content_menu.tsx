@@ -194,13 +194,54 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     },
   ];
 
+  const getContractItems = (): PopoverMenuItem[] =>
+    app.chain?.base === ChainBase.Ethereum
+      ? [
+          {
+            label: 'New Contract',
+            onClick: () => navigate('/:scope/new/contract'),
+            iconLeft: 'star',
+          },
+          {
+            label: 'New Template',
+            onClick: () =>
+              navigate('/:scope/new/contract_template/:contract_id', {
+                state: { scoped: true, deferChain: true },
+              }),
+            iconLeft: 'star',
+          },
+        ]
+      : [];
+
+  const getDummyItems = (): PopoverMenuItem[] =>
+    app.chain?.base === ChainBase.Ethereum
+      ? [
+          {
+            label: 'Add Bounty to Page',
+            onClick: () => navigate('/:scope/new/contract'),
+            iconLeft: 'star',
+            description: `Adds a bounty for completing a specific action on a page. 
+              Like posting the highest upvoted comment.`,
+          },
+          {
+            label: 'Allow Collects',
+            onClick: () =>
+              navigate('/:scope/new/contract_template/:contract_id', {
+                state: { scoped: true, deferChain: true },
+              }),
+            iconLeft: 'star',
+            description: `Allows your post to be collected as an NFT!`,
+          },
+        ]
+      : [];
+
   return [
     ...(app.activeChainId()
       ? [
-          {
-            type: 'header',
-            label: 'Create Within Community',
-          } as PopoverMenuItem,
+          // {
+          //   type: 'header',
+          //   label: 'Create Within Community',
+          // } as PopoverMenuItem,
           {
             label: 'New Thread',
             onClick: () => {
@@ -216,9 +257,44 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           ...getSputnikProposalItem(),
           ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
-          ...getTemplateItems(),
         ]
       : []),
+    {
+      type: 'header',
+      label: 'Add Contract',
+    } as PopoverMenuItem,
+    ...getTemplateItems(),
+    ...getContractItems(),
+    {
+      type: 'header',
+      label: 'Add Bounty',
+    } as PopoverMenuItem,
+    ...getDummyItems(),
+    // {
+    //   type: 'header',
+    //   label: 'Add Bounty',
+    // } as PopoverMenuItem,
+    // ...getDummyItems(),
+    // {
+    //   type: 'header',
+    //   label: 'Add Bounty',
+    // } as PopoverMenuItem,
+    // ...getDummyItems(),
+    // {
+    //   type: 'header',
+    //   label: 'Add Bounty',
+    // } as PopoverMenuItem,
+    // ...getDummyItems(),
+    // {
+    //   type: 'header',
+    //   label: 'Add Bounty',
+    // } as PopoverMenuItem,
+    // ...getDummyItems(),
+    // {
+    //   type: 'header',
+    //   label: 'Add Bounty',
+    // } as PopoverMenuItem,
+    // ...getDummyItems(),
     {
       type: 'header',
       label: 'Universal Create',

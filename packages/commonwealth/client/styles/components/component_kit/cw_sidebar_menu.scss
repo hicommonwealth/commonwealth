@@ -5,13 +5,28 @@
   color: $neutral-800;
   cursor: pointer;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 6px 16px;
 
-  .sidebar-menu-item-left {
-    align-items: center;
+  .sidebar-menu-item-top {
     display: flex;
+    align-items: left;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .sidebar-menu-item-left {
+    display: flex;
+    align-items: center;
     gap: 6px;
+  }
+
+  .sidebar-menu-item-right {
+    flex: 0;
+  }
+
+  .sidebar-menu-item-description {
+    margin-top: 6px;
   }
 
   &.default {
@@ -22,6 +37,7 @@
 
   &.header {
     margin: 16px 0 8px;
+    align-items: left;
   }
 }
 

@@ -63,6 +63,7 @@ export type DefaultMenuItem = {
   iconLeft?: IconName;
   iconRight?: IconName;
   isSecondary?: boolean;
+  description?: string;
   label?: string;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'default';

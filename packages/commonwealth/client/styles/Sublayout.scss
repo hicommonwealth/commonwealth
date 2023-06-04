@@ -16,6 +16,7 @@
   .create-content-sidebar-container {
     width: 300px;
     border-left: 1px solid $neutral-200;
+    overflow-y: auto;
   }
 
   .sidebar-and-body-container {

@@ -24,8 +24,15 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
 
   if (props.type === 'default') {
-    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
-      props;
+    const {
+      description,
+      disabled,
+      iconLeft,
+      iconRight,
+      isSecondary,
+      label,
+      onClick,
+    } = props;
 
     return (
       <div
@@ -37,17 +44,30 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           if (onClick) onClick(e);
         }}
       >
-        <div className="sidebar-menu-item-left">
-          {iconLeft && <CWIcon iconName={iconLeft} />}
-          <CWText type="b2">{label}</CWText>
+        <div className="sidebar-menu-item-top">
+          <div className="sidebar-menu-item-left">
+            {iconLeft && <CWIcon iconName={iconLeft} />}
+            <CWText type="b2" className="menu-item-label">
+              {label}
+            </CWText>
+          </div>
+          <div className="sidebar-menu-item-right">
+            {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
+          </div>
         </div>
-        {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
+        <div className="sidebar-menu-item-description">
+          {description && (
+            <CWText type="caption" className="menu-item-description">
+              {description}
+            </CWText>
+          )}
+        </div>
       </div>
     );
   } else if (props.type === 'header') {
     return (
       <div className="SidebarMenuItem header">
-        <CWText type="caption">{props.label}</CWText>
+        <CWText type="buttonSm">{props.label}</CWText>
       </div>
     );
   } else if (props.type === 'community') {
