@@ -84,7 +84,7 @@ export const SublayoutHeader = ({
           />
         </div>
         <div className="DesktopMenuContainer">
-          <CreateContentPopover />
+          {/* <CreateContentPopover /> */}
           <HelpMenuPopover />
           {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>

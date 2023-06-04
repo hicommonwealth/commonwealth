@@ -5,7 +5,6 @@ import 'Sublayout.scss';
 
 import app from 'state';
 import { Sidebar } from 'views/components/sidebar';
-import RightSidebar from 'views/components/right_sidebar';
 import { AppMobileMenus } from './AppMobileMenus';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './Footer';
@@ -13,6 +12,7 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import useForceRerender from 'hooks/useForceRerender';
 import useSidebarStore from 'state/ui/sidebar';
+import { CreateContentRightSidebar } from './menus/create_content_menu';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -44,7 +44,7 @@ const Sublayout = ({
 
   useEffect(() => {
     // Close the right sidebar when the route changes
-    setRightMenu({ name: 'actionMenu', isVisible: false });
+    setRightMenu({ isVisible: false });
   }, [location, setRightMenu]);
 
   useEffect(() => {
@@ -102,7 +102,11 @@ const Sublayout = ({
               </div>
             )}
           </div>
-          {showRightSidebar && <RightSidebar />}
+          {showRightSidebar && (
+            <div className="create-content-sidebar-container">
+              <CreateContentRightSidebar />
+            </div>
+          )}
         </div>
       </div>
     </div>

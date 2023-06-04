@@ -13,6 +13,11 @@
     width: 100%;
   }
 
+  .create-content-sidebar-container {
+    width: 300px;
+    border-left: 1px solid $neutral-200;
+  }
+
   .sidebar-and-body-container {
     display: flex;
     height: 100%;

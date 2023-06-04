@@ -205,7 +205,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     stage={stageName}
                     totalThreadCount={threads ? totalThreads : 0}
                   />
-                  <NewThreadForm />
                 </div>
               );
             },

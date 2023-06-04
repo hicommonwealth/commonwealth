@@ -19,6 +19,7 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import useForceRerender from 'hooks/useForceRerender';
 import useSidebarStore from 'state/ui/sidebar';
+import { NewThreadForm } from '../../components/NewThreadForm';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -146,6 +147,7 @@ export const RecentThreadsHeader = ({
             community treasury and spending on contributor grants, community
             initiatives, liquidity mining and other programs.
           </CWText>
+          <NewThreadForm />
         </>
       )}
       {app.chain?.meta && (
@@ -170,6 +172,7 @@ export const RecentThreadsHeader = ({
               />
             )}
           </div>
+          {!isUndefined(topic) && <NewThreadForm />}
           {!isUndefined(topic) && (
             <CWButton
               buttonType="mini-black"

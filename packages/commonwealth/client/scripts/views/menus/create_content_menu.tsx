@@ -13,7 +13,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 
-const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
+export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
@@ -243,6 +243,30 @@ export const CreateContentSidebar = () => {
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
             setMenu({ name: 'default', isVisible: false });
+          }, 200);
+        },
+      }}
+      menuItems={getCreateContentMenuItems(navigate)}
+    />
+  );
+};
+
+export const CreateContentRightSidebar = () => {
+  const navigate = useCommonNavigate();
+  const { setRightMenu } = useSidebarStore();
+
+  return (
+    <CWSidebarMenu
+      className="CreateContentRightSidebar"
+      menuHeader={{
+        label: 'Create',
+        onClick: async () => {
+          const sidebar = document.getElementsByClassName(
+            'CreateContentRightSidebar'
+          );
+          sidebar[0].classList.add('onremove');
+          setTimeout(() => {
+            setRightMenu({ isVisible: false });
           }, 200);
         },
       }}
