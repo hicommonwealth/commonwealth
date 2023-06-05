@@ -42,6 +42,7 @@ import {
 } from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
+import adminAnalytics from '../routes/adminAnalytics';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -300,6 +301,8 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createChainNode.bind(this, models)
   );
+
+  router.get('/adminAnalytics', adminAnalytics.bind(this, models));
 
   // threads
   router.post(
