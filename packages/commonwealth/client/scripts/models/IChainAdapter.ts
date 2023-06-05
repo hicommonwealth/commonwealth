@@ -35,7 +35,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract accounts: IAccountsModule<C, A>;
   public readonly communityBanner?: string;
 
-  public deferred: boolean;
+  public useChain: boolean;
 
   protected _serverLoaded: boolean;
   public get serverLoaded() {

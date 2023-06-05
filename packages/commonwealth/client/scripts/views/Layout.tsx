@@ -43,20 +43,8 @@ const ApplicationError = () => {
   );
 };
 
-interface ShouldDeferChainAttrs {
-  deferChain: boolean;
-}
-
-const shouldDeferChainLoading = ({ deferChain }: ShouldDeferChainAttrs) => {
-  if (app.chain?.meta.type === ChainType.Token) {
-    return false;
-  }
-
-  return deferChain;
-};
-
 type LayoutAttrs = {
-  deferChain?: boolean;
+  useChain?: boolean;
   scope?: string;
   children: React.ReactNode;
 };
@@ -73,7 +61,7 @@ const LayoutComponent = ({
   // router,
   children,
   scope: selectedScope,
-  deferChain: shouldDeferChain,
+  useChain: shouldUseChain,
 }: LayoutAttrs) => {
   // const scopeIsEthereumAddress =
   //   selectedScope &&
@@ -81,7 +69,7 @@ const LayoutComponent = ({
   //   selectedScope.length === 42;
 
   const [scopeToLoad, setScopeToLoad] = useState<string>();
-  const [isChainDeferred, setIsChainDeferred] = useState<boolean>();
+  const [isChainRequired, setIsChainRequired] = useState<boolean>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const scopeMatchesChain = app.config.chains.getById(selectedScope);
@@ -106,8 +94,7 @@ const LayoutComponent = ({
   // IFB 6: If deferChain is false on the page we’re routing to, but we
   // have loaded with isChainDeferred=true (previously from step 5),
   // then call initChain and render a LoadingLayout immediately.
-  const shouldLoadDeferredChain =
-    selectedScope && isChainDeferred && !shouldDeferChain;
+  const shouldLoadChain = selectedScope && !isChainRequired && shouldUseChain;
 
   // IFB 7: If scope is not defined (and we are not on a custom domain),
   // deinitialize whatever chain is loaded by calling deinitChainOrCommunity,
@@ -128,9 +115,10 @@ const LayoutComponent = ({
         // IFB 5
         setIsLoading(true);
         setScopeToLoad(selectedScope);
-        setIsChainDeferred(true);
-        const response = await selectChain(scopeMatchesChain, shouldDeferChain);
-        if (!shouldDeferChain && response) {
+        setIsChainRequired(false);
+        const response = await selectChain(scopeMatchesChain, shouldUseChain);
+        if (shouldUseChain && response) {
+          setIsChainRequired(true);
           await initChain();
         }
         setIsLoading(false);
@@ -139,20 +127,20 @@ const LayoutComponent = ({
   }, [
     // shouldInitNewTokenChain,
     shouldSelectChain,
-    shouldDeferChain,
+    shouldUseChain,
   ]);
 
   useNecessaryEffect(() => {
     (async () => {
       // IFB 6
-      if (shouldLoadDeferredChain) {
+      if (shouldLoadChain) {
         setIsLoading(true);
-        setIsChainDeferred(false);
+        setIsChainRequired(true);
         await initChain();
         setIsLoading(false);
       }
     })();
-  }, [shouldLoadDeferredChain]);
+  }, [shouldLoadChain]);
 
   useNecessaryEffect(() => {
     (async () => {
@@ -189,7 +177,7 @@ const LayoutComponent = ({
     // Important: render loading state immediately for IFB 5, 6 and 7, general
     // loading will take over later
     shouldSelectChain || // IFB 5
-    shouldLoadDeferredChain || // IFB 6
+    shouldLoadChain || // IFB 6
     shouldDeInitChain // IFB 7
   ) {
     return <LoadingLayout />;
@@ -219,12 +207,9 @@ export const LayoutWrapper = ({ Component, params }) => {
 
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
   const scope = params.scoped ? pathScope : null;
-  const deferChain = shouldDeferChainLoading({
-    deferChain: params.deferChain,
-  });
 
   return (
-    <LayoutComp scope={scope} deferChain={deferChain}>
+    <LayoutComp scope={scope} useChain={params.useChain ?? false}>
       <Component {...routerParams} />
     </LayoutComp>
   );
