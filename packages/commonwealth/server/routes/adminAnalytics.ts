@@ -1,4 +1,4 @@
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from 'common-common/src/errors';
@@ -12,16 +12,6 @@ type AdminAnalyticsReq = {};
 
 type AdminAnalyticsResp = {
   lastMonthNewCommunties: Array<string>;
-  communityStats: Array<{
-    communityName: string;
-    chain: string;
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-  }>;
   totalStats: {
     numCommentsLastMonth: number;
     numThreadsLastMonth: number;
@@ -41,78 +31,195 @@ const adminAnalytics = async (
     throw new AppError(Errors.NotAdmin);
   }
 
-  // New Communities
-  const newCommunites: Array<{ id: string }> = await models.sequelize.query(
-    `SELECT id FROM "Chains" WHERE created_at >= NOW() - INTERVAL '30 days'`,
-    { type: QueryTypes.SELECT }
-  );
+  try {
+    // New Communities
+    const newCommunites: Array<{ id: string }> = await models.sequelize.query(
+      `SELECT id FROM "Chains" WHERE created_at >= NOW() - INTERVAL '30 days'`,
+      { type: QueryTypes.SELECT }
+    );
 
-  // Community Stats
-  const communityStats: Array<{
-    communityName: string;
-    chain: string;
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-  }> = await models.sequelize.query(
-    `SELECT 
-    Chains.name as "communityName",
-    Chains.id as chain,
-    COUNT(DISTINCT Comments.id)::integer AS "numCommentsLastMonth",
-    COUNT(DISTINCT Threads.id)::integer AS "numThreadsLastMonth",
-    COUNT(DISTINCT Reactions.id)::integer AS "numMembersLastMonth",
-    COUNT(DISTINCT Votes.id)::integer AS "numProposalVotesLastMonth",
-    COUNT(DISTINCT Polls.id)::integer AS "numPollsLastMonth",
-    COUNT(DISTINCT RoleAssignments.id)::integer AS "numMembersLastMonth"
-    FROM 
-        "Chains" Chains
-    LEFT JOIN 
-        "Comments" Comments ON Chains.id = Comments.chain AND Comments.created_at >= NOW() - INTERVAL '30 days'
-    LEFT JOIN 
-        "Threads" Threads ON Chains.id = Threads.chain AND Threads.created_at >= NOW() - INTERVAL '30 days'
-    LEFT JOIN 
-        "Reactions" Reactions ON Chains.id = Reactions.chain AND Reactions.created_at >= NOW() - INTERVAL '30 days'
-    LEFT JOIN 
-        "Votes" Votes ON Chains.id = Votes.chain_id AND Votes.created_at >= NOW() - INTERVAL '30 days'
-    LEFT JOIN 
-        "Polls" Polls ON Chains.id = Polls.chain_id AND Polls.created_at >= NOW() - INTERVAL '30 days'
-    LEFT JOIN 
-        "CommunityRoles" CommunityRoles ON Chains.id = CommunityRoles.chain_id
-    LEFT JOIN 
-        "RoleAssignments" RoleAssignments ON CommunityRoles.id = RoleAssignments.community_role_id AND RoleAssignments.created_at >= NOW() - INTERVAL '30 days'
-    GROUP BY 
-        Chains.id;
-    `,
-    { type: QueryTypes.SELECT }
-  );
+    console.log('starting at', new Date().toISOString());
 
-  // Sum across all communities via communityStats
-  const totalStats = communityStats.reduce(
-    (acc, curr) => {
-      acc.numCommentsLastMonth += curr.numCommentsLastMonth;
-      acc.numThreadsLastMonth += curr.numThreadsLastMonth;
-      acc.numMembersLastMonth += curr.numMembersLastMonth;
-      acc.numReactionsLastMonth += curr.numReactionsLastMonth;
-      acc.numProposalVotesLastMonth += curr.numProposalVotesLastMonth;
-      return acc;
-    },
-    {
-      numCommentsLastMonth: 0,
-      numThreadsLastMonth: 0,
-      numMembersLastMonth: 0,
-      numReactionsLastMonth: 0,
-      numProposalVotesLastMonth: 0,
-    }
-  );
+    // Community Stats
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-  return success(res, {
-    lastMonthNewCommunties: newCommunites.map((c) => c.id),
-    communityStats: communityStats,
-    totalStats: totalStats,
-  });
+    // Count for Comments
+    const numCommentsLastMonth = await models.Comment.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+      },
+    });
+
+    // Count for Threads
+    const numThreadsLastMonth = await models.Thread.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+      },
+    });
+
+    // Count for Reactions
+    const numReactionsLastMonth = await models.Reaction.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+      },
+    });
+
+    // Count for Votes
+    const numProposalVotesLastMonth = await models.Vote.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+      },
+    });
+
+    // Count for Polls
+    const numPollsLastMonth = await models.Poll.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+      },
+    });
+
+    const numMembersLastMonth = await models.User.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+      },
+    });
+
+    // Aggregate results
+    const totalStats = {
+      numCommentsLastMonth,
+      numThreadsLastMonth,
+      numReactionsLastMonth,
+      numProposalVotesLastMonth,
+      numPollsLastMonth,
+      numMembersLastMonth,
+    };
+
+    return success(res, {
+      lastMonthNewCommunties: newCommunites.map((c) => c.id),
+      totalStats: totalStats,
+    });
+  } catch (e) {
+    console.log(e);
+    throw new AppError(e);
+  }
+};
+
+type CommunitySpecificAnalyticsReq = {
+  chain: string;
+};
+
+type CommunitySpecificAnalyticsResp = {
+  numCommentsLastMonth: number;
+  numThreadsLastMonth: number;
+  numPollsLastMonth: number;
+  numReactionsLastMonth: number;
+  numProposalVotesLastMonth: number;
+  numMembersLastMonth: number;
+};
+
+export const communitySpecificAnalytics = async (
+  models: DB,
+  req: TypedRequestBody<CommunitySpecificAnalyticsReq>,
+  res: TypedResponse<CommunitySpecificAnalyticsResp>
+) => {
+  if (!req.user.isAdmin) {
+    throw new AppError(Errors.NotAdmin);
+  }
+
+  const chainId = req.chain.id;
+
+  try {
+    // Community Stats
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    // Count for Comments
+    const numCommentsLastMonth = await models.Comment.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+        chain: chainId,
+      },
+    });
+
+    // Count for Threads
+    const numThreadsLastMonth = await models.Thread.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+        chain: chainId,
+      },
+    });
+
+    // Count for Reactions
+    const numReactionsLastMonth = await models.Reaction.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+        chain: chainId,
+      },
+    });
+
+    // Count for Votes
+    const numProposalVotesLastMonth = await models.Vote.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+        chain_id: chainId,
+      },
+    });
+
+    // Count for Polls
+    const numPollsLastMonth = await models.Poll.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+        chain_id: chainId,
+      },
+    });
+
+    const numMembersLastMonth = await models.Address.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+        chain: chainId,
+      },
+    });
+
+    // Aggregate results
+    const communityStats = {
+      numCommentsLastMonth,
+      numThreadsLastMonth,
+      numReactionsLastMonth,
+      numProposalVotesLastMonth,
+      numPollsLastMonth,
+      numMembersLastMonth,
+    };
+
+    return success(res, { ...communityStats });
+  } catch (e) {
+    console.log(e);
+    throw new AppError(e);
+  }
 };
 
 export default adminAnalytics;
