@@ -37,6 +37,10 @@ async function clearTestEntities() {
   await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Notification.destroy({
+    where: { thread_id: { [Op.lt]: 0 } },
+    force: true,
+  });
   await models.Chain.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,

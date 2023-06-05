@@ -87,7 +87,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
     };
   } else {
     roleFindOptions = {
-      where: chain_id,
+      where: { chain: chain_id },
     };
   }
 
@@ -112,7 +112,10 @@ export async function findAllCommunityRolesWithRoleAssignments(
   }
 
   if (addressWhere) {
-    roleFindOptions.where = { ...addressWhere['where'], ...findOptions.where };
+    roleFindOptions.where = {
+      ...addressWhere['where'],
+      ...roleFindOptions.where,
+    };
   }
 
   if (includeList['include'] && includeList['include'].length !== 0) {
@@ -135,8 +138,8 @@ export async function findAllCommunityRolesWithRoleAssignments(
       id: a.id,
       name: a.role,
       chain_id: a.chain,
-      allow: BigInt(0),
-      deny: BigInt(0),
+      allow: 0 as any,
+      deny: 0 as any,
       created_at: a.created_at,
       updated_at: a.updated_at,
       RoleAssignments: roleAssignments,
