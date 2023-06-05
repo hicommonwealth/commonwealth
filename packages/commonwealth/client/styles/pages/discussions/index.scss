@@ -5,8 +5,56 @@ $size: 48px;
 .DiscussionsPage {
   display: flex;
   flex: 1;
-  flex-direction: column;
+  flex-direction: row;
   width: 100%;
+
+  .discussions-left {
+    flex-basis: 70%;
+    max-width: 768px;
+    margin-right: 40px;
+  }
+  
+  .discussions-right-column {
+    flex-basis: 30%;
+    display: flex;
+    justify-content: center;
+    padding-top: 2rem;
+  
+    .discussions-card {
+      max-width: 400px;
+      width: 100%;
+  
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .add-action-button {
+        margin-top: 24px;
+        width: 100%;
+      }
+  
+      .header-text {
+        margin: 0;
+        margin-right: 10px;
+      }
+  
+      .count-and-button {
+        display: flex;
+        align-items: center;
+      }
+  
+      .thread-count-text {
+        margin-right: 10px;
+      }
+  
+      .subheader-text {
+        margin-bottom: 20px;
+      }
+    }
+  }
 
   .no-threads-text {
     color: $neutral-500;
