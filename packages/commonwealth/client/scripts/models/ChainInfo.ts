@@ -6,8 +6,6 @@ import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
 
-import type CommunityRole from './CommunityRole';
-
 class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;

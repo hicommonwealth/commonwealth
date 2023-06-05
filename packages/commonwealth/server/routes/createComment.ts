@@ -289,7 +289,7 @@ const createComment = async (
               chain: mention[0] || null,
               address: mention[1],
             },
-            include: [models.User, models.RoleAssignment],
+            include: [models.User],
           });
           return user;
         })

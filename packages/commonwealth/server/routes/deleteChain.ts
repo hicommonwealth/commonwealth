@@ -59,17 +59,6 @@ const deleteChain = async (
   // eslint-disable-next-line no-new
   new Promise(async () => {
     await models.sequelize.transaction(async (t) => {
-      const admins = await findAllRoles(models, {}, chain.id, ['admin']);
-      if (admins) {
-        // delete admin role assignments
-        await models.RoleAssignment.destroy({
-          where: {
-            community_role_id:
-              admins[0]._roleAssignmentAttributes.community_role_id,
-          },
-          transaction: t,
-        });
-      }
       // TODO: need a parallel API call to chain-events to destroy chain-entities there too
       await models.ChainEntityMeta.destroy({
         where: { chain: chain.id },
@@ -99,11 +88,6 @@ const deleteChain = async (
       });
 
       await models.Topic.destroy({
-        where: { chain_id: chain.id },
-        transaction: t,
-      });
-
-      await models.Role.destroy({
         where: { chain_id: chain.id },
         transaction: t,
       });
@@ -147,7 +131,7 @@ const deleteChain = async (
         transaction: t,
       });
 
-      const addresses = await models.Address.findAll({
+      await models.Address.findAll({
         where: { chain: chain.id },
       });
 
@@ -159,11 +143,6 @@ const deleteChain = async (
       // notifications + notifications_read (cascade)
       await models.Notification.destroy({
         where: { chain_id: chain.id },
-        transaction: t,
-      });
-
-      await models.RoleAssignment.destroy({
-        where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
         transaction: t,
       });
 
