@@ -40,7 +40,7 @@ const adminAnalytics = async (
 
     // Community Stats
     const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
 
     // Count for Comments
     const numCommentsLastMonth = await models.Comment.count({
@@ -142,7 +142,7 @@ export const communitySpecificAnalytics = async (
   try {
     // Community Stats
     const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
 
     // Count for Comments
     const numCommentsLastMonth = await models.Comment.count({
