@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-
 import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-
+import React, { useState } from 'react';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import Permissions from '../../../utils/Permissions';
+import { LoginModal } from '../../modals/login_modal';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import { Modal } from '../component_kit/cw_modal';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import {
   getClasses,
   isWindowMediumSmallInclusive,
@@ -18,9 +19,6 @@ import {
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
-import { LoginModal } from '../../modals/login_modal';
-import { Modal } from '../component_kit/cw_modal';
-import Permissions from '../../../utils/Permissions';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
@@ -94,27 +92,25 @@ export const CommentReactionButton = ({
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-      <div
+      <button
         className={getClasses<{ disabled?: boolean }>(
           { disabled: isLoading || isUserForbidden },
-          'CommentReactionButton'
+          `CommentReactionButton ${hasReacted ? ' has-reacted' : ''}`
         )}
         onMouseEnter={async () => {
           setReactors(await fetchReactionsByPost(comment));
         }}
+        onClick={async (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (!app.isLoggedIn() || !app.user.activeAccount) {
+            setIsModalOpen(true);
+          } else {
+            onReactionClick(e, hasReacted, dislike, like);
+          }
+        }}
       >
-        <CWIconButton
-          iconName="upvote"
-          iconSize="small"
-          selected={hasReacted}
-          onClick={async (e) => {
-            if (!app.isLoggedIn() || !app.user.activeAccount) {
-              setIsModalOpen(true);
-            } else {
-              onReactionClick(e, hasReacted, dislike, like);
-            }
-          }}
-        />
         {likes > 0 ? (
           <CWTooltip
             content={
@@ -125,27 +121,37 @@ export const CommentReactionButton = ({
               </div>
             }
             renderTrigger={(handleInteraction) => (
-              <CWText
+              <div
                 onMouseEnter={handleInteraction}
                 onMouseLeave={handleInteraction}
-                className="menu-buttons-text"
-                type="caption"
-                fontWeight="medium"
+                className="btn-container"
               >
-                {likes}
-              </CWText>
+                <CWIcon
+                  iconName="upvote"
+                  iconSize="small"
+                  {...(hasReacted && { weight: 'fill' })}
+                />
+                <div
+                  className={`reactions-count ${
+                    hasReacted ? ' has-reacted' : ''
+                  }`}
+                >
+                  {likes}
+                </div>
+              </div>
             )}
           />
         ) : (
-          <CWText
-            className="menu-buttons-text"
-            type="caption"
-            fontWeight="medium"
-          >
-            {likes}
-          </CWText>
+          <>
+            <CWIcon iconName="upvote" iconSize="small" />
+            <div
+              className={`reactions-count ${hasReacted ? ' has-reacted' : ''}`}
+            >
+              {likes}
+            </div>
+          </>
         )}
-      </div>
+      </button>
     </>
   );
 };

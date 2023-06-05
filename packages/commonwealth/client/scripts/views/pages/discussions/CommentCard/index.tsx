@@ -5,7 +5,6 @@ import app from 'state';
 import type Comment from '../../../../models/Comment';
 import { CWButton } from '../../../components/component_kit/cw_button';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../../components/component_kit/cw_icon_button';
 import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommentReactionButton } from '../../../components/ReactionButton/CommentReactionButton';
@@ -105,23 +104,59 @@ export const CommentCard = ({
           {!comment.deleted && (
             <div className="comment-footer">
               <CommentReactionButton comment={comment} />
+
+              <SharePopover
+                commentId={comment.id}
+                renderTrigger={(onClick) => (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      onClick(e);
+                    }}
+                    className="comment-option-btn"
+                  >
+                    <CWIcon
+                      color="black"
+                      iconName="share"
+                      iconSize="small"
+                      weight="fill"
+                    />
+                    <CWText type="caption">Share</CWText>
+                  </button>
+                )}
+              />
+
               {canReply && (
-                <div className="reply-button" onClick={onReply}>
+                <button
+                  onClick={async (e) => {
+                    // prevent clicks from propagating to discussion row
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await onReply();
+                  }}
+                  className="comment-option-btn"
+                >
                   <CWIcon iconName="comment" iconSize="small" />
                   <CWText type="caption" className="menu-buttons-text">
                     Reply
                   </CWText>
-                </div>
+                </button>
               )}
-              <SharePopover commentId={comment.id} />
+
               {(canEdit || canDelete) && (
                 <PopoverMenu
                   renderTrigger={(onclick) => (
-                    <CWIconButton
-                      iconName="dotsVertical"
-                      iconSize="small"
-                      onClick={onclick}
-                    />
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onclick(e);
+                      }}
+                      className="comment-option-btn"
+                    >
+                      <CWIcon iconName="dots" iconSize="small" />
+                    </button>
                   )}
                   menuItems={[
                     canEdit && {
