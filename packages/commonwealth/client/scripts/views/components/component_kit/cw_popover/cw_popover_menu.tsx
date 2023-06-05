@@ -23,6 +23,7 @@ export type PopoverMenuItem =
 
 type PopoverMenuProps = {
   menuItems: Array<PopoverMenuItem>;
+  className?: string;
 } & PopoverTriggerProps;
 
 export const PopoverMenu = (props: PopoverMenuProps) => {
@@ -37,12 +38,12 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
         {renderTrigger(popoverProps.handleInteraction)}
         <Popover
           content={
-            <div className={ComponentType.PopoverMenu}>
+            <div className={`${ComponentType.PopoverMenu} ${props.className}`}>
               {menuItems.map((item, i) => {
                 if (item.type === 'header') {
                   return (
                     <CWText
-                      className="menu-section-header-text"
+                      className={`menu-section-header-text ${item.className}`}
                       type="caption"
                       key={i}
                     >
@@ -50,7 +51,12 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                     </CWText>
                   );
                 } else if (item.type === 'divider') {
-                  return <div className="menu-section-divider" key={i} />;
+                  return (
+                    <div
+                      className={`menu-section-divider ${item.className}`}
+                      key={i}
+                    />
+                  );
                 } else {
                   const {
                     disabled,
@@ -65,7 +71,10 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                       className={getClasses<{
                         disabled?: boolean;
                         isSecondary?: boolean;
-                      }>({ disabled, isSecondary }, 'PopoverMenuItem')}
+                      }>(
+                        { disabled, isSecondary },
+                        `PopoverMenuItem ${item.className}`
+                      )}
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();

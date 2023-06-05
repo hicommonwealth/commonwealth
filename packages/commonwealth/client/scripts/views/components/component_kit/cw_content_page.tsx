@@ -107,8 +107,8 @@ export const CWContentPage = ({
         <div className="header-info-row">
           <ThreadAuthorAndPublishInfo
             showSplitDotIndicator={true}
-            isNewThread={!!displayNewTag}
-            isThreadLocked={thread.readOnly}
+            isNew={!!displayNewTag}
+            isLocked={thread.readOnly}
             authorInfo={
               new AddressInfo(
                 null,
@@ -120,7 +120,7 @@ export const CWContentPage = ({
               )
             }
             collaboratorsInfo={collaborators}
-            threadPublishDate={
+            publishDate={
               createdOrEditedDate
                 ? moment(createdOrEditedDate).format('l')
                 : null
@@ -138,7 +138,8 @@ export const CWContentPage = ({
       {body &&
         body(
           <ThreadOptions
-            canVote={true}
+            canVote={!thread.readOnly}
+            canComment={!thread.readOnly}
             thread={thread}
             totalComments={thread.numberOfComments}
             onLockToggle={onLockToggle}

@@ -33,7 +33,9 @@ import { clearEditingLocalStorage } from '../../components/Comments/helpers';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
@@ -43,6 +45,7 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
+import moment from 'moment';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -620,9 +623,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
-                  <CWText type="h5" className="callout-text">
-                    Commenting is disabled because this post has been locked.
+                  <>
+                    {threadOptionsComp}
+                    <div className="callout-text">
+                      <CWIcon iconName="flag" weight="fill" iconSize="small" />
+                      <CWText type="h5">
+                        This thread was flagged as spam on{' '}
+                        {moment(thread.createdAt).format('DD/MM/YYYY')}, meaning
+                        it can no longer be edited or commented on.
                   </CWText>
+                    </div>
+                  </>
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {threadOptionsComp}
@@ -637,12 +648,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           </div>
         )}
         comments={
+          <>
+            <CWCheckbox
+              className="ml-auto"
+              label="Include comments flagged as spam"
+            />
           <CommentsTree
             comments={comments}
             thread={thread}
             setIsGloballyEditing={setIsGloballyEditing}
             updatedCommentsCallback={updatedCommentsCallback}
           />
+          </>
         }
         sidebarComponents={
           [

@@ -18,6 +18,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import useForceRerender from 'hooks/useForceRerender';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -168,6 +169,8 @@ export const RecentThreadsHeader = ({
           )}
         </div>
       )}
+
+      <CWCheckbox label="Include posts flagged as spam" className="ml-auto" />
 
       <Modal
         content={

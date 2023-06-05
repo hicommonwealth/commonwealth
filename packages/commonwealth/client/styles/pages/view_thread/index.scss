@@ -23,10 +23,24 @@
     }
   }
 
-  .callout-text.Text {
-    background-color: $neutral-200;
+  .callout-text {
+    background: #F7F6F7;
+    display: flex;
+    gap: 10px;
+    color: #656167;
+    padding: 16px 24px;
     border-radius: $border-radius-corners;
-    padding: 16px;
+
+    .Text {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      /* identical to box height, or 143% */
+      /* Neutrals/600 */
+
+      color: #656167;
+    }
   }
 }
 
