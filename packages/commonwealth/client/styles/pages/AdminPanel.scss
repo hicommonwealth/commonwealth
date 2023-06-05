@@ -17,10 +17,7 @@
       flex-direction: row;
       gap: 44px;
       align-items: flex-end;
-
-      .TaskButton {
-        margin-bottom: 3px;
-      }
+      max-width: 600px;
     }
   }
 
@@ -33,19 +30,26 @@
   .Analytics {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 24px;
 
     .AnalyticsSection {
       display: flex;
       flex-direction: column;
       gap: 8px;
 
+      .Row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        max-width: 600px;
+      }
+
       .AnalyticsList {
         display: flex;
         gap: 4px;
         overflow-y: scroll;
         max-height: 200px;
-        max-width: 400px;
+        max-width: 600px;
         flex-direction: column;
         border: 1px solid $neutral-300;
         border-radius: 4px;
@@ -57,6 +61,24 @@
 
           &:hover {
             background-color: $neutral-100;
+          }
+        }
+      }
+
+      .Stats {
+        display: flex;
+        max-width: 600px;
+        flex-wrap: wrap;
+        border: 1px solid $neutral-300;
+        border-radius: 4px;
+        gap: 8px;
+        padding: 8px;
+
+        .Stat {
+          flex: 1 0 200px; /* Adjust to your preference */
+
+          .StatValue {
+            color: $neutral-500;
           }
         }
       }
