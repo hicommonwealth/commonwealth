@@ -27,9 +27,9 @@ import Poll from '../../../models/Poll';
 import { Link, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import { CommentsTree } from '../../components/Comments/CommentsTree';
+import { CommentsTree } from '../discussions/CommentTree';
 import { CreateComment } from '../../components/Comments/CreateComment';
-import { clearEditingLocalStorage } from '../../components/Comments/helpers';
+import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -631,7 +631,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         This thread was flagged as spam on{' '}
                         {moment(thread.createdAt).format('DD/MM/YYYY')}, meaning
                         it can no longer be edited or commented on.
-                  </CWText>
+                      </CWText>
                     </div>
                   </>
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
@@ -653,12 +653,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               className="ml-auto"
               label="Include comments flagged as spam"
             />
-          <CommentsTree
-            comments={comments}
-            thread={thread}
-            setIsGloballyEditing={setIsGloballyEditing}
-            updatedCommentsCallback={updatedCommentsCallback}
-          />
+            <CommentsTree
+              comments={comments}
+              thread={thread}
+              setIsGloballyEditing={setIsGloballyEditing}
+              updatedCommentsCallback={updatedCommentsCallback}
+            />
           </>
         }
         sidebarComponents={
