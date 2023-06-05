@@ -198,7 +198,7 @@ export async function findOneRole(
       permissions
     );
   let communityRole: CommunityRoleAttributes;
-  if (communityRoles) {
+  if (communityRoles && communityRoles.length > 0) {
     // find the highest role
     communityRole = await getHighestRoleFromCommunityRoles(communityRoles);
   } else {
