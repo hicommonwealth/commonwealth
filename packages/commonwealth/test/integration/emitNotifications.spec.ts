@@ -79,7 +79,7 @@ describe.only('emitNotifications tests', () => {
     expect(res).to.equal(true);
 
     // sets user-2 to be admin of the alex community
-    let isAdmin = await modelUtils.updateRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: userAddressId2,
       chainOrCommObj: { chain_id: chain2 },
       role: 'admin',

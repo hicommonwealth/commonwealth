@@ -124,6 +124,13 @@ export async function findAllCommunityRolesWithRoleAssignments(
 
   const addresses = await models.Address.findAll(roleFindOptions);
   return addresses.map((a) => {
+    const roleAssignments: RoleAssignmentAttributes[] = [
+      {
+        community_role_id: a.id,
+        address_id: a.id,
+        is_user_default: a.is_user_default,
+      },
+    ];
     const communityRole: CommunityRoleAttributes = {
       id: a.id,
       name: a.role,
@@ -132,6 +139,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
       deny: BigInt(0),
       created_at: a.created_at,
       updated_at: a.updated_at,
+      RoleAssignments: roleAssignments,
     };
     return communityRole;
   });
