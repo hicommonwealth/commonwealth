@@ -47,29 +47,29 @@ module.exports = {
               .join(' ')}
         END
         WHERE id IN (${ids.join(', ')})
-      `,
+        `,
           { transaction: t }
         );
-      }
 
-      // Add is_user_default to Addresses from RoleAssignments table
-      const isUserDefault = await queryInterface.sequelize.query(
-        `SELECT address_id, is_user_default FROM "RoleAssignments" WHERE is_user_default = true`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
-      );
+        // Add is_user_default to Addresses from RoleAssignments table
+        const isUserDefault = await queryInterface.sequelize.query(
+          `SELECT address_id, is_user_default FROM "RoleAssignments" WHERE is_user_default = true`,
+          { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
+        );
 
-      const userDefaultIds = isUserDefault.map((r) => r.address_id);
+        const userDefaultIds = isUserDefault.map((r) => r.address_id);
 
-      await queryInterface.sequelize.query(
-        `
+        await queryInterface.sequelize.query(
+          `
         UPDATE "Addresses"
         SET is_user_default = CASE 
             ${userDefaultIds.map((id) => `WHEN id = ${id} THEN true`).join(' ')}
         END
         WHERE id IN (${userDefaultIds.join(', ')})
-      `,
-        { transaction: t }
-      );
+        `,
+          { transaction: t }
+        );
+      }
 
       // drop unused tables
       await queryInterface.dropTable('RoleAssignments', { transaction: t });
