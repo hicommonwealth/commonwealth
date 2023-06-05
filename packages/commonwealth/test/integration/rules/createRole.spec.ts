@@ -83,27 +83,4 @@ describe('createRole tests', () => {
       );
     }
   });
-
-  it('create default community roles should properly create all permission roles for a new chain', async () => {
-    const newChain = `newtestChain${Math.random()}`;
-    const chainObj = await models.Chain.create({
-      id: newChain,
-      name: newChain,
-      chain_node_id: 1,
-      default_symbol: '',
-      network: ChainNetwork.ERC20,
-      base: ChainBase.Ethereum,
-      icon_url: 'https://commonwealth.im/static/media/eth.5b2b1b1f.svg',
-      active: false,
-      type: ChainType.Token,
-      default_allow_permissions: BigInt(0),
-      default_deny_permissions: BigInt(2048),
-    });
-
-    const roles = await models.Chain.findAll({
-      where: { id: chainObj.id },
-    });
-    assert.deepEqual(roles.length, 1);
-    assert.deepEqual(roles[0].allowed_roles, 7);
-  });
 });

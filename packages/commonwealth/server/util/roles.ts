@@ -1,6 +1,5 @@
 import type { FindOptions, Transaction } from 'sequelize';
 import { Op } from 'sequelize';
-import CommunityRole from '../../client/scripts/models/CommunityRole';
 import type { Action } from '../../shared/permissions';
 import { PermissionManager, ToCheck } from '../../shared/permissions';
 import type { RoleObject } from '../../shared/types';
@@ -8,7 +7,6 @@ import { aggregatePermissions } from '../../shared/utils';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { CommunityRoleAttributes } from '../models/community_role';
-import { permissionAllowed } from '../models/role';
 import type { Role } from '../models/role';
 import type { RoleAssignmentAttributes } from '../models/role_assignment';
 
@@ -125,10 +123,18 @@ export async function findAllCommunityRolesWithRoleAssignments(
   roleFindOptions.order = findOptions.order;
 
   const addresses = await models.Address.findAll(roleFindOptions);
-  return addresses.map(
-    (a) =>
-      new CommunityRole(a.id, a.role, a.chain, 0, 0, a.created_at, a.updated_at)
-  );
+  return addresses.map((a) => {
+    const communityRole: CommunityRoleAttributes = {
+      id: a.id,
+      name: a.role,
+      chain_id: a.chain,
+      allow: BigInt(0),
+      deny: BigInt(0),
+      created_at: a.created_at,
+      updated_at: a.updated_at,
+    };
+    return communityRole;
+  });
 }
 
 export async function findAllRoles(
@@ -215,18 +221,7 @@ export async function createRole(
   transaction?: Transaction
 ): Promise<RoleInstanceWithPermission> {
   is_user_default = !!is_user_default;
-  if (!role_name) return; // all users are default member, so they cannot be changed
-  // check if role is allowed for the community
-  const allowedRolesBitmask = await models.Chain.findOne({
-    where: { id: chain_id },
-    attributes: ['allowed_roles'],
-  });
-
-  if (
-    !permissionAllowed(allowedRolesBitmask.dataValues.allowed_roles, role_name)
-  ) {
-    throw new Error('No role found');
-  }
+  if (!role_name) return; // Member is the lowest role, so return early.
 
   // update the role to be either the highest role either assigned or called on the address.
   await models.sequelize.query(

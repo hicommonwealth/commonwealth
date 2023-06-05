@@ -10,16 +10,6 @@ export function isRole(role): boolean {
   return role === 'admin' || role === 'moderator' || role === 'member';
 }
 
-export function permissionAllowed(bitmask: number, permission: Role): boolean {
-  if (permission === 'admin') {
-    return (bitmask & 1) === 1;
-  } else if (permission === 'moderator') {
-    return (bitmask & 0b10) >> 1 === 1;
-  }
-
-  return (bitmask & 0b10) >> 1 === 1;
-}
-
 export type RoleAttributes = {
   address_id: number;
   permission: Role;
