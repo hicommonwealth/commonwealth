@@ -172,7 +172,6 @@ export const RecentThreadsHeader = ({
               />
             )}
           </div>
-          {!isUndefined(topic) && <NewThreadForm />}
           {!isUndefined(topic) && (
             <CWButton
               buttonType="mini-black"

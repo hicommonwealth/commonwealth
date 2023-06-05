@@ -15,7 +15,7 @@ import { ThreadStage } from 'models/types';
 import Thread from 'models/Thread';
 
 import { NewThreadForm } from 'views/components/NewThreadForm';
-import { ReactQuillEditor } from 'views/components/react_quill_editor';
+import { isUndefined } from 'lodash';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -26,6 +26,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
+  const [customScrollParent, setCustomScrollParent] = useState(null);
   const stageName: string = searchParams.get('stage');
 
   const [newThreadContentDelta, setNewThreadContentDelta] = useState(null);
@@ -180,10 +181,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   return (
     <Sublayout hideFooter={true} hideSearch={false}>
-      <div className="DiscussionsPage">
+      <div className="DiscussionsPage" ref={setCustomScrollParent}>
         <Virtuoso
-          style={{ height: '100%', width: '100%' }}
+          style={{
+            height: '100%',
+            maxWidth: '768px',
+            width: '100%',
+            padding: '24px',
+          }}
           data={threads}
+          customScrollParent={customScrollParent}
           itemContent={(i, thread) => {
             return (
               <ThreadPreview thread={thread} key={thread.id + thread.stage} />
@@ -205,6 +212,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     stage={stageName}
                     totalThreadCount={threads ? totalThreads : 0}
                   />
+                  {/* {!isUndefined(topicName) && <NewThreadForm />} */}
                 </div>
               );
             },
