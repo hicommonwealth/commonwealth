@@ -5,16 +5,17 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { ThreadActionType } from '../../../../../../../shared/types';
-import { notifySuccess } from '../../../../../controllers/app/notifications';
-import Permissions from '../../../../../utils/Permissions';
-import type Thread from '../../../../../models/Thread';
-import type { IThreadCollaborator } from '../../../../../models/Thread';
-import Topic from '../../../../../models/Topic';
-import { ThreadStage } from '../../../../../models/types';
-import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from '../../../../components/component_kit/cw_popover/cw_popover_menu';
-import { EditCollaboratorsModal } from '../../../../modals/edit_collaborators_modal';
+import { ThreadActionType } from '../../../../../../../../shared/types';
+import { notifySuccess } from '../../../../../../controllers/app/notifications';
+import Permissions from '../../../../../../utils/Permissions';
+import type Thread from '../../../../../../models/Thread';
+import type { IThreadCollaborator } from '../../../../../../models/Thread';
+import Topic from '../../../../../../models/Topic';
+import { ThreadStage } from '../../../../../../models/types';
+import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
+import { PopoverMenu } from '../../../../../components/component_kit/cw_popover/cw_popover_menu';
+import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
+import './index.scss';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -65,7 +66,7 @@ export const AdminActions = ({
   const handleDeleteThread = () => {
     openConfirmation({
       title: 'Delete Thread',
-      description: <>Delete this entire thread?</>,
+      description: <p>Delete this entire thread?</p>,
       buttons: [
         {
           label: 'Delete',
@@ -189,6 +190,7 @@ export const AdminActions = ({
         }}
       >
         <PopoverMenu
+          className="AdminActions"
           menuItems={[
             ...(hasAdminPermissions ||
             isThreadAuthor ||
@@ -214,13 +216,13 @@ export const AdminActions = ({
               ? [
                   {
                     onClick: handleThreadPinToggle,
-                    label: thread.pinned ? 'Unpin thread' : 'Pin thread',
+                    label: thread.pinned ? 'Unpin' : 'Pin',
                     iconLeft: 'pin' as const,
                     iconLeftWeight: 'bold',
                   },
                   {
                     onClick: handleThreadLockToggle,
-                    label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+                    label: thread.readOnly ? 'Unlock' : 'Lock',
                     iconLeft: thread.readOnly
                       ? ('keyLockClosed' as const)
                       : ('keyLockOpened' as const),
@@ -281,6 +283,7 @@ export const AdminActions = ({
                     label: 'Delete',
                     iconLeft: 'trash' as const,
                     iconLeftWeight: 'bold',
+                    className: 'danger',
                   },
                 ]
               : []),
@@ -292,7 +295,7 @@ export const AdminActions = ({
                 e.preventDefault();
                 onclick(e);
               }}
-              className="thread-option-btn"
+              className="action-btn"
             >
               <CWIcon iconName="dots" iconSize="small" />
             </button>

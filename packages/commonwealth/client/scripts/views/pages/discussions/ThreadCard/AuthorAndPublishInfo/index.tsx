@@ -17,13 +17,13 @@ import { User } from '../../../../components/user/user';
 import './index.scss';
 
 export type AuthorAndPublishInfoProps = {
-  isNewThread?: boolean;
+  isNew?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
   collaboratorsInfo?: IThreadCollaborator[];
-  isThreadLocked?: boolean;
-  threadPublishDate?: string;
+  isLocked?: boolean;
+  publishDate?: string;
   viewsCount?: number;
-  showSplitDotIndicator: boolean;
+  showSplitDotIndicator?: boolean;
   showPublishLabelWithDate?: boolean;
   showEditedLabelWithDate?: boolean;
   showUserAddressWithInfo?: boolean;
@@ -33,12 +33,12 @@ export type AuthorAndPublishInfoProps = {
 };
 
 export const AuthorAndPublishInfo = ({
-  isNewThread,
+  isNew,
   authorInfo,
-  isThreadLocked,
+  isLocked,
   viewsCount,
-  threadPublishDate,
-  showSplitDotIndicator,
+  publishDate,
+  showSplitDotIndicator = true,
   showPublishLabelWithDate,
   showEditedLabelWithDate,
   isSpamThread,
@@ -58,6 +58,7 @@ export const AuthorAndPublishInfo = ({
       <User
         avatarSize={24}
         user={authorInfo}
+        popover
         linkify
         showAddressWithDisplayName={showUserAddressWithInfo}
       />
@@ -94,13 +95,13 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {threadPublishDate && (
+      {publishDate && (
         <>
           {dotIndicator}
           <CWText type="caption" fontWeight="medium" className="section-text">
             {showPublishLabelWithDate ? 'Published on ' : ''}
             {showEditedLabelWithDate ? 'Edited on ' : ''}
-            {threadPublishDate}
+            {publishDate}
           </CWText>
         </>
       )}
@@ -133,7 +134,7 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {isNewThread && (
+      {isNew && (
         <>
           {dotIndicator}
           <CWTag label={'NEW'} type={'new'} iconName={'newStar'} />
@@ -147,7 +148,7 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {isThreadLocked && (
+      {isLocked && (
         <>
           {dotIndicator}
           <CWIcon iconName={'keyLockClosed'} iconSize="small" weight="bold" />

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import app from 'state';
-import type Thread from '../../../../../models/Thread';
-import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
-import { Modal } from '../../../../components/component_kit/cw_modal';
-import { CWTooltip } from '../../../../components/component_kit/cw_popover/cw_tooltip';
-import { CWText } from '../../../../components/component_kit/cw_text';
+import type Thread from '../../../../../../models/Thread';
+import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
+import { Modal } from '../../../../../components/component_kit/cw_modal';
+import { CWTooltip } from '../../../../../components/component_kit/cw_popover/cw_tooltip';
+import { CWText } from '../../../../../components/component_kit/cw_text';
 import {
   getClasses,
   isWindowMediumSmallInclusive,
-} from '../../../../components/component_kit/helpers';
+} from '../../../../../components/component_kit/helpers';
 import {
   getDisplayedReactorsForPopup,
   onReactionClick,
-} from '../../../../components/ReactionButton/helpers';
-import { LoginModal } from '../../../../modals/login_modal';
+} from '../../../../../components/ReactionButton/helpers';
+import { LoginModal } from '../../../../../modals/login_modal';
 import './index.scss';
 import { useReactionButton } from './useReactionButton';
 

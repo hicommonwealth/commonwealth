@@ -8,7 +8,7 @@
   padding: 16px;
   gap: 16px;
   text-decoration: none;
-  color: unset;
+  color: unset !important;
 
   @include smallInclusive {
     padding: 12px;

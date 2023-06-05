@@ -2,7 +2,7 @@ import Thread from 'models/Thread';
 import React, { useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
-import { ReactionButton } from '../ReactionButton';
+import { ReactionButton } from './ReactionButton';
 import { SharePopover } from '../../../../components/share_popover';
 import {
   getCommentSubscription,
@@ -15,6 +15,7 @@ import './index.scss';
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
   canVote?: boolean;
+  canComment?: boolean;
   shareEndpoint?: string;
   canUpdateThread?: boolean;
   totalComments?: number;
@@ -23,6 +24,7 @@ type OptionsProps = AdminActionsProps & {
 export const Options = ({
   thread,
   canVote = false,
+  canComment = true,
   shareEndpoint,
   canUpdateThread,
   totalComments,
@@ -50,7 +52,7 @@ export const Options = ({
       <div className="Options">
         {canVote && thread && <ReactionButton thread={thread} size="small" />}
 
-        {totalComments >= 0 && (
+        {canComment && totalComments >= 0 && (
           <button className="thread-option-btn">
             <CWIcon color="black" iconName="comment" iconSize="small" />
             <CWText type="caption">

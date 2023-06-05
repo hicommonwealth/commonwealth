@@ -21,7 +21,7 @@ import {
   getClasses,
   isWindowSmallInclusive,
 } from '../../../../components/component_kit/helpers';
-import { ReactionButton } from '../ReactionButton';
+import { ReactionButton } from '../Options/ReactionButton';
 import { isHot } from '../../helpers';
 import { isNewThread } from '../../NewThreadTag';
 import './index.scss';
@@ -114,38 +114,14 @@ export const Card = ({
               authorInfo={
                 new AddressInfo(null, thread.author, thread.authorChain, null)
               }
-              threadPublishDate={moment(thread.createdAt).format('l')}
-              isNewThread={isNewThread(thread.createdAt)}
-              isThreadLocked={thread.readOnly}
+              publishDate={moment(thread.createdAt).format('l')}
+              isNew={isNewThread(thread.createdAt)}
+              isLocked={thread.readOnly}
             />
             <div className="content-header-icons">
               {isHot(thread) && <div className="flame" />}
               {thread.pinned && <CWIcon iconName="pin" />}
             </div>
-          </div>
-          <div className="content-body-wrapper">
-            {thread.isSpam && <CWTag label="SPAM" type="disabled" />}
-            <div className="content-title">
-              <CWText type="h5" fontWeight="semiBold">
-                {thread.title}
-              </CWText>
-              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
-
-              {linkedSnapshots.length > 0 && (
-                <CWTag
-                  type="active"
-                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
-                    ? linkedSnapshots[0].identifier.split('/')[1]
-                    : linkedSnapshots[0].identifier
-                  )
-                    .toString()
-                    .slice(0, 4)}…`}
-                />
-              )}
-            </div>
-            <CWText type="caption" className="content-body">
-              {thread.plaintext}
-            </CWText>
           </div>
           {isTagsRowVisible && (
             <div className="content-tags">
@@ -179,6 +155,30 @@ export const Card = ({
                 ))}
             </div>
           )}
+          <div className="content-body-wrapper">
+            {thread.isSpam && <CWTag label="SPAM" type="disabled" />}
+            <div className="content-title">
+              <CWText type="h5" fontWeight="semiBold">
+                {thread.title}
+              </CWText>
+              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+              {linkedSnapshots.length > 0 && (
+                <CWTag
+                  type="active"
+                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
+                    ? linkedSnapshots[0].identifier.split('/')[1]
+                    : linkedSnapshots[0].identifier
+                  )
+                    .toString()
+                    .slice(0, 4)}…`}
+                />
+              )}
+            </div>
+            <CWText type="caption" className="content-body">
+              {thread.plaintext}
+            </CWText>
+          </div>
           {!thread.isSpam && (
             <div className="content-footer">
               <Options
@@ -186,6 +186,7 @@ export const Card = ({
                 shareEndpoint={discussionLink}
                 thread={thread}
                 canVote={windowIsSmall}
+                canComment={!thread.readOnly}
                 canUpdateThread={
                   isLoggedIn &&
                   (isThreadAuthor ||
