@@ -54,7 +54,7 @@ const PhosphorIcon: FC<PhosphorIconProps> = ({ size, weight }) => {
         })}
       </div>
     </>
-  )
+  );
 }
 
 const icon = {
@@ -67,7 +67,7 @@ export default icon;
 export const PhosphorIconStory = {
   name: "Icon",
   args: {
-    size: 16,
+    size: 24,
     weight: "regular",
   },
   argTypes: {
