@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { EventEmitter } from 'events';
 import _ from 'lodash';
-import getAddressProfile from '../../../../server/routes/getAddressProfile';
 import MinimumProfile from '../../models/MinimumProfile';
 
 import app from 'state';

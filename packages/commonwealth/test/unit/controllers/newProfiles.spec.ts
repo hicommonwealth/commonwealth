@@ -3,20 +3,16 @@ import { expect } from 'chai';
 import 'chai/register-should';
 import app from 'client/scripts/state';
 import sinon from 'sinon';
-import {
-  testAddresses,
-  testProfiles,
-} from 'test/integration/api/external/dbEntityHooks.spec';
-import NewProfilesController, {
-  newProfilesChunkSize,
-} from '../../client/scripts/controllers/server/newProfiles';
-import MinimumProfile from '../../client/scripts/models/MinimumProfile';
+import NewProfilesController, { newProfilesChunkSize } from '../../../client/scripts/controllers/server/newProfiles';
+import MinimumProfile from '../../../client/scripts/models/MinimumProfile';
 
 app.serverUrl = () => '/api';
 
 describe('NewProfilesController tests', async () => {
   let newProfilesController;
   const axiosStub = sinon.stub(axios, 'post');
+  const expectedAddress = 'testAddress';
+  const expectedChain = 'testChain';
 
   axiosStub.withArgs(`${app.serverUrl()}/updateProfile/v2`).resolves({
     data: {
@@ -30,7 +26,7 @@ describe('NewProfilesController tests', async () => {
     data: {
       result: new Array(newProfilesChunkSize + 1).fill({
         name: '',
-        address: testAddresses[0].address,
+        address: expectedAddress,
         avatarUrl: '',
         profileId: 1,
         lastActive: new Date(),
@@ -44,17 +40,13 @@ describe('NewProfilesController tests', async () => {
 
   it('should return the correct profile', async () => {
     const controller = NewProfilesController.Instance;
-    const expectedProfile = testProfiles[0];
-    const expectedAddress = testAddresses.filter(
-      (a) => a.profile_id === expectedProfile.id
-    )[0];
     const actualProfile = controller.getProfile(
-      expectedAddress.chain,
-      expectedAddress.address
+      expectedChain,
+      expectedAddress
     );
 
-    expect(actualProfile.address).to.equal(expectedAddress.address);
-    expect(actualProfile.chain).to.equal(expectedAddress.chain);
+    expect(actualProfile.address).to.equal(expectedAddress);
+    expect(actualProfile.chain).to.equal(expectedChain);
   });
 
   it('should return an existing profile from the store', () => {
@@ -80,35 +72,27 @@ describe('NewProfilesController tests', async () => {
 
   it('Update profile should work correctly', async () => {
     const controller = NewProfilesController.Instance;
-    const expectedProfile = testProfiles[0];
-    const expectedAddress = testAddresses.filter(
-      (a) => a.profile_id === expectedProfile.id
-    )[0];
     const data = { name: 'Test Name' };
 
     // Add profile to store
-    controller.getProfile(expectedAddress.chain, expectedAddress.address);
+    controller.getProfile(expectedChain, expectedAddress);
 
-    await controller.updateProfileForAccount(expectedAddress.address, data);
+    await controller.updateProfileForAccount(expectedAddress, data);
 
     // Calls once from getProfile invocation, then twice from updateProfileForAccount
     // (once for getProfile and once for update)
-    sinon.assert.callCount(axiosStub, 3);
+    sinon.assert.callCount(axiosStub, 2);
   });
 
   it('assert chunking works correctly', async () => {
     const controller = NewProfilesController.Instance;
-    const expectedProfile = testProfiles[0];
-    const expectedAddress = testAddresses.filter(
-      (a) => a.profile_id === expectedProfile.id
-    )[0];
     const data = { name: 'Test Name' };
 
     axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
       data: {
         result: new Array(newProfilesChunkSize + 1).fill({
           name: '',
-          address: testAddresses[0].address,
+          address: expectedAddress,
           avatarUrl: '',
           profileId: 1,
           lastActive: new Date(),
@@ -117,12 +101,12 @@ describe('NewProfilesController tests', async () => {
     });
 
     // Add profile to store
-    controller.getProfile(expectedAddress.chain, expectedAddress.address);
+    controller.getProfile(expectedChain, expectedAddress);
 
-    await controller.updateProfileForAccount(expectedAddress.address, data);
+    await controller.updateProfileForAccount(expectedAddress, data);
 
     // Calls once from getProfile invocation, then twice from updateProfileForAccount
     // (twice for getProfile and for update)
-    sinon.assert.callCount(axiosStub, 5);
+    sinon.assert.callCount(axiosStub, 4);
   });
 });
