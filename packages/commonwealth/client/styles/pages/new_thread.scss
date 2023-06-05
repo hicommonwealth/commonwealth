@@ -1,0 +1,21 @@
+.new-thread-page {
+  display: flex;
+  flex-direction: row;
+  
+  .new-thread-form {
+    flex-basis: 70%;
+    padding-right: 20px;
+  }
+  
+  .add-action-column {
+    flex-basis: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: left;
+    padding-top: 2rem;
+    
+    .add-action-button {
+    }
+  }
+}
