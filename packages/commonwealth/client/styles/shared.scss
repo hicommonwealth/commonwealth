@@ -18,7 +18,7 @@ $sidebar-community-header-height: 56px;
 
 // base fonts
 
-$fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
+$fonts: NeueHaasUnica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
   'Segoe UI Emoji', 'Segoe UI Symbol';
 
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
@@ -26,7 +26,7 @@ $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
 
 $font-family-silka: Silka, sans-serif;
 
-$font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
+$font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 
 @mixin visibleScrollbar($theme) {
