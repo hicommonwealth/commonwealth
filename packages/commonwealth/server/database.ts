@@ -8,8 +8,6 @@ import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
 import ChainEntityMetaFactory from './models/chain_entity_meta';
 import ChainNodeFactory from './models/chain_node';
-import ChatChannelFactory from './models/chat_channel';
-import ChatMessageFactory from './models/chat_message';
 import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
 import CommunityBannerFactory from './models/community_banner';
@@ -26,7 +24,6 @@ import NotificationsReadFactory from './models/notifications_read';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
-import RuleFactory from './models/rule';
 import SnapshotProposalFactory from './models/snapshot_proposal';
 import SnapshotSpaceFactory from './models/snapshot_spaces';
 import SocialAccountFactory from './models/social_account';
@@ -76,9 +73,7 @@ const models: Models = {
   Ban: BanFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
-  ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
-  ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
@@ -108,7 +103,6 @@ const models: Models = {
   Topic: TopicFactory(sequelize, DataTypes),
   Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
-  Rule: RuleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),

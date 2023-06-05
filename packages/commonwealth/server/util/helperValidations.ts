@@ -60,11 +60,3 @@ export const postTopicsValidation = [
   body('comments.*.deleted_at').not().exists(),
 ];
 
-export const postRulesValidation = [
-  body('rules').exists().isArray(),
-  body('rules.*.community_id').exists().isString().trim(),
-  body('rules.*.rule').exists().isString().trim(),
-  body('rules.*.created_at').not().exists(),
-  body('rules.*.updated_at').not().exists(),
-  body('rules.*.deleted_at').not().exists(),
-];

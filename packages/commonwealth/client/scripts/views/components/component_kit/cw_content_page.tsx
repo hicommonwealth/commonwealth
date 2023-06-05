@@ -11,10 +11,10 @@ import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
+import { LockWithTooltip } from '../lock_with_tooltip';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -30,6 +30,7 @@ export type SidebarComponents = [
 
 type ContentPageProps = {
   createdAt: moment.Moment | number;
+  updatedAt?: moment.Moment;
   title: string | React.ReactNode;
 
   // optional
@@ -41,6 +42,7 @@ type ContentPageProps = {
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   headerComponents?: React.ReactNode;
   readOnly?: boolean;
+  lockedAt?: moment.Moment;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: React.ReactNode;
@@ -58,9 +60,11 @@ export const CWContentPage = (props: ContentPageProps) => {
     comments,
     contentBodyLabel,
     createdAt,
+    updatedAt,
     lastEdited,
     headerComponents,
     readOnly,
+    lockedAt,
     showSidebar,
     sidebarComponents,
     subBody,
@@ -104,7 +108,9 @@ export const CWContentPage = (props: ContentPageProps) => {
             </CWText>
           )}
           {headerComponents}
-          {readOnly && <CWIcon iconName="lock" iconSize="small" />}
+          {readOnly && (
+            <LockWithTooltip lockedAt={lockedAt} updatedAt={updatedAt} />
+          )}
           {actions && (
             <PopoverMenu
               renderTrigger={(onclick) => (

@@ -12,7 +12,6 @@ import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { TopicAttributes } from 'server/models/topic';
 import type { ProfileAttributes } from '../../../../server/models/profile';
 import type { RoleAttributes } from '../../../../server/models/role';
-import type { RuleAttributes } from '../../../../server/models/rule';
 
 const Op = Sequelize.Op;
 
@@ -26,7 +25,6 @@ export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
-export let testRules: RuleAttributes[];
 
 async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
@@ -39,7 +37,6 @@ async function clearTestEntities() {
   await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Rule.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Chain.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,
@@ -172,21 +169,6 @@ beforeEach(async () => {
               verification_token: '',
               profile_id: -i - 1,
               verified: moment.now(),
-            },
-          })
-        )[0]
-    )
-  );
-
-  testRules = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Rule.findOrCreate({
-            where: {
-              id: -i - 1,
-              chain_id: 'cmntest',
-              rule: '',
             },
           })
         )[0]

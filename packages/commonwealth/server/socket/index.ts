@@ -21,7 +21,6 @@ import type { ExtendedError } from 'socket.io/dist/namespace';
 import { WebsocketNamespaces } from '../../shared/types';
 import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import type { DB } from '../models';
-import { createChatNamespace } from './createChatNamespace';
 import {
   createNamespace,
   publishToChainEventsRoom,
@@ -210,8 +209,6 @@ export async function setupWebSocketServer(
     io,
     WebsocketNamespaces.SnapshotProposals
   );
-
-  createChatNamespace(io, models, redisCache);
 
   try {
     await rabbitMQController.startSubscription(
