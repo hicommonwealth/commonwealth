@@ -18,7 +18,7 @@ $size: 48px;
     flex-basis: 30%;
     display: flex;
     justify-content: center;
-    padding-top: 2rem;
+    padding: 56px 56px 24px;
   
     .discussions-card {
       max-width: 400px;
@@ -32,7 +32,7 @@ $size: 48px;
       }
 
       .add-action-button {
-        margin-top: 24px;
+        padding: 24px;
         width: 100%;
       }
   

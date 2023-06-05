@@ -243,29 +243,31 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             }}
           />
         </div>
-        <div className="discussions-right">
-          {windowIsExtraSmall ? (
-            <CWIconButton
-              className="add-action-button"
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onClick={() => {
-                setRightMenu({ isVisible: !rightSidebarVisible });
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          ) : (
-            <CWButton
-              className="add-action-button"
-              buttonType="mini-black"
-              label="Add Action"
-              iconLeft="plus"
-              onClick={() => {
-                setRightMenu({ isVisible: !rightSidebarVisible });
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          )}
+        <div className="discussions-right" style={{ padding: '24px' }}>
+          <div className="add-action-card" style={{ paddingBottom: '24px' }}>
+            {windowIsExtraSmall ? (
+              <CWIconButton
+                className="add-action-button"
+                iconName="plusCircle"
+                iconButtonTheme="black"
+                onClick={() => {
+                  setRightMenu({ isVisible: !rightSidebarVisible });
+                }}
+                disabled={!app.user.activeAccount}
+              />
+            ) : (
+              <CWButton
+                className="add-action-button"
+                buttonType="mini-black"
+                label="Add Action"
+                iconLeft="plus"
+                onClick={() => {
+                  setRightMenu({ isVisible: !rightSidebarVisible });
+                }}
+                disabled={!app.user.activeAccount}
+              />
+            )}
+          </div>
           <DiscussionsCard totalThreadCount={totalThreads} />
         </div>
       </div>
