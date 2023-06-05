@@ -1,17 +1,16 @@
 import moment from 'moment';
-import models from 'server/database';
 import Sequelize from 'sequelize';
-import type { ThreadInstance } from 'server/models/thread';
-import type { CommentInstance } from 'server/models/comment';
-import type { UserInstance } from 'server/models/user';
+import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
-import type { CollaborationAttributes } from 'server/models/collaboration';
-import type { ReactionAttributes } from 'server/models/reaction';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
+import type { CollaborationAttributes } from 'server/models/collaboration';
+import type { CommentInstance } from 'server/models/comment';
+import type { ReactionAttributes } from 'server/models/reaction';
+import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
+import type { UserInstance } from 'server/models/user';
 import type { ProfileAttributes } from '../../../../server/models/profile';
-import type { RoleAttributes } from '../../../../server/models/role';
 
 const Op = Sequelize.Op;
 
@@ -33,9 +32,16 @@ async function clearTestEntities() {
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
   });
-  await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Comment.destroy({
+    where: { [Op.or]: [{ id: { [Op.lt]: 0 } }, { thread_id: { [Op.lt]: 0 } }] },
+    force: true,
+  });
   await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Subscription.destroy({
+    where: { subscriber_id: { [Op.lt]: 0 } },
+    force: true,
+  });
   await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Notification.destroy({
     where: { thread_id: { [Op.lt]: 0 } },
