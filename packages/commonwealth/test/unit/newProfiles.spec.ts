@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import 'chai/register-should';
 import app from 'client/scripts/state';
 import sinon from 'sinon';
-import NewProfilesController, { newProfilesChunkSize } from '../../../client/scripts/controllers/server/newProfiles';
-import MinimumProfile from '../../../client/scripts/models/MinimumProfile';
+import NewProfilesController, { newProfilesChunkSize } from '../../client/scripts/controllers/server/newProfiles';
+import MinimumProfile from '../../client/scripts/models/MinimumProfile';
 
 app.serverUrl = () => '/api';
 
@@ -13,6 +13,10 @@ describe('NewProfilesController tests', async () => {
   const axiosStub = sinon.stub(axios, 'post');
   const expectedAddress = 'testAddress';
   const expectedChain = 'testChain';
+
+  afterEach(() => {
+    sinon.restore();
+  });
 
   axiosStub.withArgs(`${app.serverUrl()}/updateProfile/v2`).resolves({
     data: {
