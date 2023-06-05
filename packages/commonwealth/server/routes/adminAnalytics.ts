@@ -11,7 +11,7 @@ export const Errors = {
 type AdminAnalyticsReq = {};
 
 type AdminAnalyticsResp = {
-  lastMonthNewCommunties: Array<string>;
+  lastMonthNewCommunities: Array<string>;
   totalStats: {
     numCommentsLastMonth: number;
     numThreadsLastMonth: number;
@@ -37,8 +37,6 @@ const adminAnalytics = async (
       `SELECT id FROM "Chains" WHERE created_at >= NOW() - INTERVAL '30 days'`,
       { type: QueryTypes.SELECT }
     );
-
-    console.log('starting at', new Date().toISOString());
 
     // Community Stats
     const oneMonthAgo = new Date();
@@ -108,7 +106,7 @@ const adminAnalytics = async (
     };
 
     return success(res, {
-      lastMonthNewCommunties: newCommunites.map((c) => c.id),
+      lastMonthNewCommunities: newCommunites.map((c) => c.id),
       totalStats: totalStats,
     });
   } catch (e) {

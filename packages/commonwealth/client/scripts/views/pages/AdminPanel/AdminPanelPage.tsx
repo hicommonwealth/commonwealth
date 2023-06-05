@@ -24,6 +24,7 @@ const AdminPanelPage = () => {
     // title={title}
     >
       <div className="AdminPanel">
+        <CWText type="h2">Site Analytics</CWText>
         <Analytics />
         <CWText type="h2">Site Admin Tasks</CWText>
         <DeleteChainTask />

@@ -4,9 +4,14 @@ import app from 'state';
 import $ from 'jquery';
 
 import 'pages/AdminPanel.scss';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
 
 const Analytics = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
+  const [lastMonthNewCommunties, setLastMonthNewCommunities] = useState<
+    string[]
+  >([]);
 
   const getCommunityAnalytics = async (chainId: string) => {
     await $.ajax({
@@ -31,22 +36,54 @@ const Analytics = () => {
           'content-type': 'application/json',
         },
         success: (response) => {
-          console.log({ response });
+          console.log('what', response.result);
+          setLastMonthNewCommunities(response.result.lastMonthNewCommunities);
         },
       });
     };
 
     const timerId = setTimeout(() => {
       if (!initialized) {
-        fetchAnalytics();
-        setInitialized(true);
+        fetchAnalytics().then(() => {
+          setInitialized(true);
+        });
       }
     });
 
     return () => clearTimeout(timerId);
   }, [initialized]);
 
-  return <div className="Analytics"></div>;
+  console.log({ lastMonthNewCommunties });
+
+  return (
+    <div className="Analytics">
+      {!initialized ? (
+        <CWSpinner />
+      ) : (
+        <div className="AnalyticsSection">
+          <CWText type="h4">New Communities (Last Month)</CWText>
+          <CWText type="caption">
+            The chainIds of all communities created in the last month
+          </CWText>
+          <div className="AnalyticsList">
+            {lastMonthNewCommunties &&
+              lastMonthNewCommunties?.map((community) => {
+                return (
+                  <CWText
+                    onClick={() => {
+                      window.open(`/${community}`, '_blank');
+                    }}
+                    className="CommunityName"
+                  >
+                    {community}
+                  </CWText>
+                );
+              })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Analytics;

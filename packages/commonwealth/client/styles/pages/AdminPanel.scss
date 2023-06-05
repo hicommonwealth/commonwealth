@@ -29,4 +29,37 @@
     flex-direction: column;
     gap: 8px;
   }
+
+  .Analytics {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .AnalyticsSection {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .AnalyticsList {
+        display: flex;
+        gap: 4px;
+        overflow-y: scroll;
+        max-height: 200px;
+        max-width: 400px;
+        flex-direction: column;
+        border: 1px solid $neutral-300;
+        border-radius: 4px;
+
+        .CommunityName {
+          width: 100%;
+          cursor: pointer;
+          padding: 4px;
+
+          &:hover {
+            background-color: $neutral-100;
+          }
+        }
+      }
+    }
+  }
 }
