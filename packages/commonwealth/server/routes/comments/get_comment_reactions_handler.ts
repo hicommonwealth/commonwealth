@@ -1,4 +1,3 @@
-import { NextFunction } from 'express';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ReactionAttributes } from 'server/models/reaction';
@@ -24,12 +23,11 @@ export const getCommentReactionsHandler = async (
     any,
     GetCommentReactionsRequestParams
   >,
-  res: TypedResponse<GetCommentReactionsResponse>,
-  next: NextFunction
+  res: TypedResponse<GetCommentReactionsResponse>
 ) => {
   const commentId = parseInt(req.params.id, 10);
   if (!commentId) {
-    return next(new AppError(Errors.InvalidCommentId));
+    throw new AppError(Errors.InvalidCommentId);
   }
 
   const reactions = await controllers.comments.getCommentReactions(commentId);

@@ -1,4 +1,3 @@
-import { NextFunction } from 'express';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ReactionAttributes } from '../../models/reaction';
@@ -25,8 +24,7 @@ export const createCommentReactionHandler = async (
     any,
     CreateCommentReactionRequestParams
   >,
-  res: TypedResponse<CreateCommentReactionResponse>,
-  next: NextFunction
+  res: TypedResponse<CreateCommentReactionResponse>
 ) => {
   const { user, address, chain } = req;
   const {
@@ -37,12 +35,12 @@ export const createCommentReactionHandler = async (
   } = req.body;
 
   if (!reaction) {
-    return next(new AppError(Errors.InvalidReaction));
+    throw new AppError(Errors.InvalidReaction);
   }
 
   const commentId = parseInt(req.params.id, 10);
   if (!commentId) {
-    return next(new AppError(Errors.InvalidCommentId));
+    throw new AppError(Errors.InvalidCommentId);
   }
 
   // create comment reaction

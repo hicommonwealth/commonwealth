@@ -1,4 +1,3 @@
-import { NextFunction } from 'express';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ReactionAttributes } from '../../models/reaction';
@@ -25,8 +24,7 @@ export const createThreadReactionHandler = async (
     any,
     CreateThreadReactionRequestParams
   >,
-  res: TypedResponse<CreateThreadReactionResponse>,
-  next: NextFunction
+  res: TypedResponse<CreateThreadReactionResponse>
 ) => {
   const { user, address, chain } = req;
   const {
@@ -37,12 +35,12 @@ export const createThreadReactionHandler = async (
   } = req.body;
 
   if (!reaction) {
-    return next(new AppError(Errors.InvalidReaction));
+    throw new AppError(Errors.InvalidReaction);
   }
 
   const threadId = parseInt(req.params.id, 10);
   if (!threadId) {
-    return next(new AppError(Errors.InvalidThreadId));
+    throw new AppError(Errors.InvalidThreadId);
   }
 
   // create thread reaction
