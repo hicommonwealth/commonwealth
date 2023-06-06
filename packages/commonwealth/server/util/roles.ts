@@ -124,6 +124,13 @@ export async function findAllCommunityRolesWithRoleAssignments(
   roleFindOptions.attributes = findOptions.attributes;
   roleFindOptions.order = findOptions.order;
 
+  if (
+    'address_id' in findOptions['where'] &&
+    findOptions['where']['address_id'] === undefined
+  ) {
+    return [];
+  }
+
   const addresses = await models.Address.findAll(roleFindOptions);
   return addresses.map((a) => {
     const roleAssignments: RoleAssignmentAttributes[] = [
