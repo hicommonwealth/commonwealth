@@ -262,9 +262,15 @@ const verifyAddress = async (
       where: { id: newAddress.user_id },
     });
     req.login(user, (err) => {
-      if (err) return next(err);
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
+          isCustomDomain: null,
+        });
+        return next(err);
+      }
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
 

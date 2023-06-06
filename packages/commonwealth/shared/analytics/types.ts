@@ -15,8 +15,9 @@ export const enum MixpanelCommunityInteractionEvent {
 }
 
 export const enum MixpanelLoginEvent {
-  MAGIC_LOGIN = 'Login with Magic',
-  LOGIN = 'Login to Commonwealth',
+  LOGIN = 'Login',
+  LOGIN_COMPLETED = 'Login Completed',
+  LOGIN_FAILED = 'Login Failed',
 }
 
 export const enum MixpanelUserSignupEvent {
@@ -64,6 +65,13 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   userAddress?: string;
   community?: string;
   communityType?: string;
+}
+
+export interface MixpanelLoginPayload extends BaseMixpanelPayload {
+  loginOption: string;
+  isSocialLogin: boolean;
+  loginPageLocation: string;
+  isMobile: boolean;
 }
 
 export const providers = ['mixpanel']; // add other providers here

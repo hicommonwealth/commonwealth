@@ -19,8 +19,12 @@ export interface ListenerOptions {
   tokenNames?: string[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RawEvent = TypedEvent<any>;
+export interface RawEvent {
+  address: string;
+  args: any;
+  name: string;
+  blockNumber: number;
+}
 
 // eslint-disable-next-line no-shadow
 export enum EventKind {
