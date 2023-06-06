@@ -55,6 +55,7 @@ export class Thread implements IUniqueId {
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
+  public readonly updatedAt: moment.Moment;
   public readonly lastCommentedOn: moment.Moment;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
@@ -63,6 +64,7 @@ export class Thread implements IUniqueId {
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
   public markedAsSpamAt: moment.Moment;
+  public readonly lockedAt: moment.Moment;
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
   public numberOfComments: number;
@@ -79,6 +81,7 @@ export class Thread implements IUniqueId {
     attachments,
     id,
     createdAt,
+    updatedAt,
     topic,
     kind,
     stage,
@@ -95,6 +98,7 @@ export class Thread implements IUniqueId {
     chainEntities,
     lastEdited,
     markedAsSpamAt,
+    lockedAt,
     hasPoll,
     lastCommentedOn,
     numberOfComments,
@@ -111,6 +115,7 @@ export class Thread implements IUniqueId {
     attachments: Attachment[];
     id: number;
     createdAt: moment.Moment;
+    updatedAt: moment.Moment;
     lastCommentedOn: moment.Moment;
     topic: Topic;
     kind: ThreadKind;
@@ -127,6 +132,7 @@ export class Thread implements IUniqueId {
     chainEntities?: any[];
     lastEdited?: moment.Moment;
     markedAsSpamAt?: moment.Moment;
+    lockedAt?: moment.Moment;
     hasPoll: boolean;
     polls?: Poll[];
     numberOfComments?: number;
@@ -146,6 +152,7 @@ export class Thread implements IUniqueId {
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
     this.topic = topic;
     this.kind = kind;
     this.stage = stage;
@@ -172,6 +179,7 @@ export class Thread implements IUniqueId {
     this.hasPoll = hasPoll;
     this.lastEdited = lastEdited;
     this.markedAsSpamAt = markedAsSpamAt;
+    this.lockedAt = lockedAt;
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];
     if (reactionIds) {

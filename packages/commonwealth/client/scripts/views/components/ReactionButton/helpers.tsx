@@ -5,8 +5,6 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
 import ChainInfo from '../../../models/ChainInfo';
-import Comment from '../../../models/Comment';
-import Thread from '../../../models/Thread';
 import { CWText } from '../component_kit/cw_text';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -14,8 +12,6 @@ const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 type ReactorProps = {
   reactors: string[];
 };
-
-type Post = Thread | Comment<any>;
 
 export const getDisplayedReactorsForPopup = ({
   reactors = [],
@@ -51,21 +47,10 @@ export const getDisplayedReactorsForPopup = ({
   );
 };
 
-export const fetchReactionsByPost = async (post: Post) => {
-  let thread_id, proposal_id, comment_id;
-
-  if (post instanceof Thread) {
-    thread_id = (post as Thread).id;
-  } else {
-    comment_id = (post as Comment<any>).id;
-  }
-
-  const { result = [] } = await $.get(`${app.serverUrl()}/bulkReactions`, {
-    thread_id,
-    comment_id,
-    proposal_id,
-  });
-
+export const fetchReactionsByComment = async (commentId: number) => {
+  const { result = [] } = await $.get(
+    `${app.serverUrl()}/comments/${commentId}/reactions`
+  );
   return result;
 };
 

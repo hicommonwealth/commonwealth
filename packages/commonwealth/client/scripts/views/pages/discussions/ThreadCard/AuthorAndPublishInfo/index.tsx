@@ -15,12 +15,16 @@ import { CWText } from '../../../../components/component_kit/cw_text';
 import { getClasses } from '../../../../components/component_kit/helpers';
 import { User } from '../../../../components/user/user';
 import './index.scss';
+import { LockWithTooltip } from '../../../../components/lock_with_tooltip';
+import moment from 'moment';
 
 export type AuthorAndPublishInfoProps = {
   isNew?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
   collaboratorsInfo?: IThreadCollaborator[];
   isLocked?: boolean;
+  lockedAt?: string;
+  lastUpdated?: string;
   publishDate?: string;
   viewsCount?: number;
   showSplitDotIndicator?: boolean;
@@ -36,6 +40,8 @@ export const AuthorAndPublishInfo = ({
   isNew,
   authorInfo,
   isLocked,
+  lockedAt,
+  lastUpdated,
   viewsCount,
   publishDate,
   showSplitDotIndicator = true,
@@ -148,10 +154,13 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {isLocked && (
+      {isLocked && lockedAt && lastUpdated && (
         <>
           {dotIndicator}
-          <CWIcon iconName={'keyLockClosed'} iconSize="small" weight="bold" />
+          <LockWithTooltip
+            lockedAt={moment(lockedAt)}
+            updatedAt={moment(lastUpdated)}
+          />
         </>
       )}
     </div>

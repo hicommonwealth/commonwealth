@@ -11,9 +11,11 @@ import { ThreadStage } from '../../../models/types';
 import { AuthorAndPublishInfo as ThreadAuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
 import { CWCard } from './cw_card';
+import { CWIconButton } from './cw_icon_button';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
+import { LockWithTooltip } from '../lock_with_tooltip';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -31,6 +33,9 @@ type ContentPageProps = {
   thread?: Thread;
   createdAt: moment.Moment | number;
   title: string | ReactNode;
+  //
+  updatedAt?: moment.Moment;
+  //
   lastEdited?: moment.Moment | number;
   author?: Account | AddressInfo | MinimumProfile | undefined;
   collaborators?: IThreadCollaborator[];
@@ -38,6 +43,11 @@ type ContentPageProps = {
   comments?: ReactNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   stageLabel?: ThreadStage;
+  //
+  headerComponents?: React.ReactNode;
+  readOnly?: boolean;
+  lockedAt?: moment.Moment;
+  //
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: ReactNode;
@@ -110,6 +120,12 @@ export const CWContentPage = ({
             showSplitDotIndicator={true}
             isNew={!!displayNewTag}
             isLocked={thread.readOnly}
+            {...(thread.lockedAt && {
+              lockedAt: thread.lockedAt.toISOString(),
+            })}
+            {...(thread.updatedAt && {
+              lastUpdated: thread.updatedAt.toISOString(),
+            })}
             authorInfo={
               new AddressInfo(
                 null,

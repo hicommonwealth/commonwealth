@@ -123,6 +123,7 @@ export const ViewProposalPage = ({
         title={proposal.title}
         author={proposalAuthor}
         createdAt={proposal.created}
+        updatedAt={null}
         contentBodyLabel="Snapshot"
         subHeader={
           proposal.state === 'active' ? (

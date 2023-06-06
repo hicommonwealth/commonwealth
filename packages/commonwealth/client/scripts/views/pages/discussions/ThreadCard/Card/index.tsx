@@ -117,6 +117,12 @@ export const Card = ({
               publishDate={moment(thread.createdAt).format('l')}
               isNew={isNewThread(thread.createdAt)}
               isLocked={thread.readOnly}
+              {...(thread.lockedAt && {
+                lockedAt: thread.lockedAt.toISOString(),
+              })}
+              {...(thread.updatedAt && {
+                lastUpdated: thread.updatedAt.toISOString(),
+              })}
             />
             <div className="content-header-icons">
               {isHot(thread) && <div className="flame" />}

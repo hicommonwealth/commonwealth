@@ -1,12 +1,17 @@
 import { getProposalUrlPath } from 'identifiers';
+import Thread from 'models/Thread';
+import moment from 'moment';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { slugify } from 'utils';
 import { CWText } from 'views/components/component_kit/cw_text';
-import Thread from '../../../models/Thread';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadTimelineFilterTypes,
+} from '../../../models/types';
 import app from '../../../state';
 import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
@@ -23,8 +28,53 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
+  const pageNumber = useRef<number>(0);
   const stageName: string = searchParams.get('stage');
+  const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
+    'featured'
+  ) as ThreadFeaturedFilterTypes;
+  const dateRange: ThreadTimelineFilterTypes = searchParams.get(
+    'dateRange'
+  ) as ThreadTimelineFilterTypes;
 
+  /**
+   * the api will return sorted results and those are stored in state, when user
+   * changes the filter we dont make a new api call, and use the state. New data is
+   * fetched from api when user has reached the end of page.
+   * ---
+   * This function is responsible for sorting threads in state that were earlier
+   * sorted by another featured flag
+   */
+  const sortByFeaturedFilter = (t: Thread[]) => {
+    if (featuredFilter === ThreadFeaturedFilterTypes.Oldest) {
+      return [...t].sort((a, b) =>
+        moment(a.createdAt).diff(moment(b.createdAt))
+      );
+    }
+
+    if (featuredFilter === ThreadFeaturedFilterTypes.MostComments) {
+      return [...t].sort((a, b) => b.numberOfComments - a.numberOfComments);
+    }
+
+    if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
+      return [...t].sort(
+        (a, b) => b.associatedReactions.length - a.associatedReactions.length
+      );
+    }
+
+    // Default: Assuming featuredFilter === 'newest'
+    return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
+  };
+
+  /**
+   * the api will return sorted results and those are stored in state, when user
+   * changes the filter we dont make a new api call, and use the state. New data is
+   * fetched from api when user has reached the end of page.
+   * ---
+   * This function is responsible for sorting threads in state. Maybe the user pins a
+   * thread, this thread is still in a lower position in the state object/arrary. This
+   * function will sort those correctly.
+   */
   const sortPinned = (t: Thread[]) => {
     return [...t].sort((a, b) =>
       a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
@@ -48,7 +98,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         .getAll()
         .filter((x) => x.chain === chain);
       if (foundThreadsForChain.length >= 20) {
-        if (topicName || stageName) {
+        if (topicName || stageName || dateRange) {
           let finalThreads = foundThreadsForChain;
 
           // get threads for current topic
@@ -62,15 +112,35 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             finalThreads = finalThreads.filter((x) => x.stage === stageName);
           }
 
+          // get threads for current timeline
+          if (
+            dateRange &&
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            const today = moment();
+            const timeline = dateRange.toLowerCase().replace('this', '') as any;
+            const fromDate = today.startOf(timeline).toISOString();
+            const toDate = today.endOf(timeline).toISOString();
+
+            finalThreads = finalThreads.filter(
+              (x) =>
+                moment(x.createdAt).isSameOrAfter(fromDate) &&
+                moment(x.createdAt).isSameOrBefore(toDate)
+            );
+          }
+
           if (finalThreads.length >= 20) {
-            setThreads(sortPinned(finalThreads));
+            setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
             setInitializing(false);
             return;
           }
         }
         // else show all threads
         else {
-          setThreads(sortPinned(foundThreadsForChain));
+          setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
           setInitializing(false);
           return;
         }
@@ -78,10 +148,18 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
       // if the store has <= 20 threads then fetch more
       app.threads
-        .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+        .loadNextPage({
+          topicName,
+          stageName,
+          includePinnedThreads: true,
+          featuredFilter,
+          dateRange,
+          page: pageNumber.current,
+        })
         .then((t) => {
           // Fetch first 20 + unpinned threads
-          setThreads(sortPinned(t));
+
+          setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
           setInitializing(false);
         });
     });
@@ -90,15 +168,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
-    const newThreads = await app.threads.loadNextPage({ topicName, stageName });
+    const response = await app.threads.loadNextPage({
+      topicName,
+      stageName,
+      featuredFilter,
+      dateRange,
+      page: pageNumber.current + 1,
+    });
     // If no new threads (we reached the end)
-    if (!newThreads) {
+    if (!response.threads) {
       return;
     }
 
+    pageNumber.current = response.page;
     return setThreads((oldThreads) => {
       const finalThreads = [...oldThreads];
-      newThreads.map((x) => {
+      response.threads.map((x) => {
         const foundIndex = finalThreads.findIndex(
           (y) => y.identifier === x.identifier
         );
@@ -109,9 +194,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         }
         return null;
       });
-      return sortPinned(finalThreads);
+
+      return sortPinned(sortByFeaturedFilter(finalThreads));
     });
-  }, [stageName, topicName]);
+  }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
   if (initializing) {
     return <PageLoading hideSearch={false} />;
@@ -218,6 +304,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 <RecentThreadsHeader
                   topic={topicName}
                   stage={stageName}
+                  featuredFilter={featuredFilter}
+                  dateRange={dateRange}
                   totalThreadCount={threads ? totalThreads : 0}
                 />
               );

@@ -10,6 +10,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
 import type { IThreadCollaborator } from 'models/Thread';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -21,31 +22,31 @@ import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/Sublayout';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import Permissions from '../../../utils/Permissions';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import { CommentsTree } from '../discussions/CommentTree';
+import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
-import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { CommentsTree } from '../discussions/CommentTree';
+import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
+import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import moment from 'moment';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -541,6 +542,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         author={app.chain.accounts.get(thread.author)}
         collaborators={thread.collaborators}
         createdAt={thread.createdAt}
+        updatedAt={thread.updatedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         canUpdateThread={
@@ -635,14 +637,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 {thread.readOnly ? (
                   <>
                     {threadOptionsComp}
-                    <div className="callout-text">
-                      <CWIcon iconName="flag" weight="fill" iconSize="small" />
-                      <CWText type="h5">
-                        This thread was flagged as spam on{' '}
-                        {moment(thread.createdAt).format('DD/MM/YYYY')}, meaning
-                        it can no longer be edited or commented on.
-                      </CWText>
-                    </div>
+                    {!thread.readOnly && thread.markedAsSpamAt && (
+                      <div className="callout-text">
+                        <CWIcon
+                          iconName="flag"
+                          weight="fill"
+                          iconSize="small"
+                        />
+                        <CWText type="h5">
+                          This thread was flagged as spam on{' '}
+                          {moment(thread.createdAt).format('DD/MM/YYYY')},
+                          meaning it can no longer be edited or commented on.
+                        </CWText>
+                      </div>
+                    )}
+                    {thread.readOnly && !thread.markedAsSpamAt && (
+                      <LockMessage
+                        lockedAt={thread.lockedAt}
+                        updatedAt={thread.updatedAt}
+                      />
+                    )}
                   </>
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
