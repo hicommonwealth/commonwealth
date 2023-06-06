@@ -2,27 +2,27 @@ import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/discussions/recent_threads_header.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
-import useBrowserWindow from '../../../hooks/useBrowserWindow';
-import type Topic from '../../../models/Topic';
+import useBrowserWindow from '../../../../hooks/useBrowserWindow';
+import type Topic from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
   ThreadTimelineFilterTypes,
-} from '../../../models/types';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import { Select } from '../../components/Select';
+} from '../../../../models/types';
+import { CWButton } from '../../../components/component_kit/cw_button';
+import { CWCheckbox } from '../../../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../../../components/component_kit/cw_icon_button';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { isWindowExtraSmall } from '../../../components/component_kit/helpers';
+import { Select } from '../../../components/Select';
+import './index.scss';
 
-type RecentThreadsHeaderProps = {
+type HeaderWithFiltersProps = {
   stage: string;
   topic: string;
   featuredFilter: ThreadFeaturedFilterTypes;
@@ -32,7 +32,7 @@ type RecentThreadsHeaderProps = {
   onIncludeSpamThreads: (includeSpams: boolean) => any;
 };
 
-export const RecentThreadsHeader = ({
+export const HeaderWithFilters = ({
   stage,
   topic,
   featuredFilter,
@@ -40,7 +40,7 @@ export const RecentThreadsHeader = ({
   totalThreadCount,
   isIncludingSpamThreads,
   onIncludeSpamThreads,
-}: RecentThreadsHeaderProps) => {
+}: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
   const forceRerender = useForceRerender();
@@ -154,7 +154,7 @@ export const RecentThreadsHeader = ({
   };
 
   return (
-    <div className="RecentThreadsHeader">
+    <div className="HeaderWithFilters">
       {isUndefined(topic) && (
         <>
           <div className="header-row">

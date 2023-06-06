@@ -1,6 +1,6 @@
-@import '../../shared';
+@import '../../../../../styles/shared';
 
-.RecentThreadsHeader {
+.HeaderWithFilters {
   background-color: $white;
   display: flex;
   flex-direction: column;

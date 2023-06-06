@@ -15,7 +15,7 @@ import {
 import app from '../../../state';
 import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
-import { RecentThreadsHeader } from './recent_threads_header';
+import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 
 type DiscussionsPageProps = {
@@ -302,7 +302,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             ),
             Header: () => {
               return (
-                <RecentThreadsHeader
+                <HeaderWithFilters
                   topic={topicName}
                   stage={stageName}
                   featuredFilter={featuredFilter}
