@@ -26,7 +26,7 @@ describe('Compound Event Processor Tests', () => {
     const event = constructEvent([id, eta]);
 
     event.blockNumber = blockNumber;
-    event.event = 'ProposalQueued';
+    event.name = 'ProposalQueued';
 
     const result = await processor.process(event);
     assert.deepEqual(result, [
