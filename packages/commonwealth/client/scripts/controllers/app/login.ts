@@ -16,8 +16,6 @@ import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 import { CosmosExtension } from '@magic-ext/cosmos';
-import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
-import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -320,15 +318,21 @@ async function constructMagic() {
       new OAuthExtension(),
       new CosmosExtension({
         // default to Osmosis URL
-        rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
+        rpcUrl:
+          app.chain?.meta?.node?.url ||
+          app.config.chains.getById('osmosis').node.url,
       }),
-    ]
+    ],
   });
 }
 
 export async function loginWithMagicLink({
-  email, provider
-}: { email?: string, provider?: string }) {
+  email,
+  provider,
+}: {
+  email?: string;
+  provider?: string;
+}) {
   if (!email && !provider) throw new Error('Must provider email or provider');
   const magic = await constructMagic();
 
@@ -345,12 +349,16 @@ export async function loginWithMagicLink({
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({ provider, userInfo }): { username?: string, avatarUrl?: string } {
+function getProfileMetadata({ provider, userInfo }): {
+  username?: string;
+  avatarUrl?: string;
+} {
   // provider: result.oauth.provider (twitter, discord, github)
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } = userInfo.sources['https://discord.com/api/users/@me'];
+    const { avatar, id, username } =
+      userInfo.sources['https://discord.com/api/users/@me'];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
@@ -370,7 +378,7 @@ function getProfileMetadata({ provider, userInfo }): { username?: string, avatar
 }
 
 export async function handleSocialLoginCallback(bearer?: string) {
-  let profileMetadata: { username?: string, avatarUrl?: string } = {};
+  let profileMetadata: { username?: string; avatarUrl?: string } = {};
   if (!bearer) {
     const magic = await constructMagic();
     const result = await magic.oauth.getRedirectResult();
@@ -403,7 +411,6 @@ export async function handleSocialLoginCallback(bearer?: string) {
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
-    clientAnalyticsTrack({ event: MixpanelLoginEvent.MAGIC_LOGIN });
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }
