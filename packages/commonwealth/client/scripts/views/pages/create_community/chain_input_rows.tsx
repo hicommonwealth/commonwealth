@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 import app from 'state';
-import { AvatarUpload } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/Avatar';
 import { InputRow } from 'views/components/metadata_rows';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -135,10 +135,30 @@ export const ethChainRows = (
     app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
   ] as Array<DropdownItemType>;
 
+  function onSelectHandler(o) {
+    state.setChainString(o.value);
+
+    if (o.value !== 'Custom') {
+      const [id] =
+        Object.entries(props.ethChainNames).find(
+          ([, name]) => name === o.value
+        ) || Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
+
+      state.setEthChainId(id);
+      state.setNodeUrl(props.ethChains[id].url);
+      state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
+    } else {
+      state.setEthChainId('');
+      state.setNodeUrl('');
+      state.setAltWalletUrl('');
+    }
+  }
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     onSelectHandler(options[0]);
-  }, [onSelectHandler, options]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -192,23 +212,4 @@ export const ethChainRows = (
       />
     </>
   );
-
-  function onSelectHandler(o) {
-    state.setChainString(o.value);
-
-    if (o.value !== 'Custom') {
-      const [id] =
-        Object.entries(props.ethChainNames).find(
-          ([, name]) => name === o.value
-        ) || Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
-
-      state.setEthChainId(id);
-      state.setNodeUrl(props.ethChains[id].url);
-      state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
-    } else {
-      state.setEthChainId('');
-      state.setNodeUrl('');
-      state.setAltWalletUrl('');
-    }
-  }
 };

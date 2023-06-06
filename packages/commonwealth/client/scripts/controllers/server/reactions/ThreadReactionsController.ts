@@ -47,7 +47,10 @@ class ThreadReactionsController {
     };
 
     const response = (
-      await axios.post(`${app.serverUrl()}/createReaction`, options)
+      await axios.post(
+        `${app.serverUrl()}/threads/${thread.id}/reactions`,
+        options
+      )
     ).data;
 
     const existingReactions = this._threadIdToReactions.get(thread.id);
@@ -75,12 +78,13 @@ class ThreadReactionsController {
       thread_id: thread.id,
     });
 
-    await axios.post(`${app.serverUrl()}/deleteReaction`, {
-      jwt: app.user.jwt,
-      reaction_id,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+    await axios.delete(`${app.serverUrl()}/reactions/${reaction_id}`, {
+      data: {
+        jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
+      },
     });
 
     this._threadIdToReactions.set(

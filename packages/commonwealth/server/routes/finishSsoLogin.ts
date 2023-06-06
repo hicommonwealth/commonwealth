@@ -254,7 +254,7 @@ const finishSsoLogin = async (
               `Could not log in with ronin wallet`
             );
           serverAnalyticsTrack({
-            event: MixpanelLoginEvent.LOGIN,
+            event: MixpanelLoginEvent.LOGIN_COMPLETED,
             isCustomDomain: null,
           });
         });
@@ -267,13 +267,19 @@ const finishSsoLogin = async (
         existingAddress.user_id = newUser.id;
         await existingAddress.save();
         req.login(newUser, (err) => {
-          if (err)
+          if (err) {
+            serverAnalyticsTrack({
+              event: MixpanelLoginEvent.LOGIN_FAILED,
+              isCustomDomain: null,
+            });
             return redirectWithLoginError(
               res,
               `Could not log in with ronin wallet`
             );
+          }
+
           serverAnalyticsTrack({
-            event: MixpanelLoginEvent.LOGIN,
+            event: MixpanelLoginEvent.LOGIN_COMPLETED,
             isCustomDomain: null,
           });
         });
@@ -351,17 +357,6 @@ const finishSsoLogin = async (
         { transaction: t }
       );
 
-      // Automatically create subscription to chat mentions
-      await models.Subscription.create(
-        {
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewChatMention,
-          object_id: `user-${user.id}`,
-          is_active: true,
-        },
-        { transaction: t }
-      );
-
       // populate token
       emptyTokenInstance.issuer = jwtPayload.iss;
       emptyTokenInstance.issued_at = jwtPayload.iat;
@@ -377,7 +372,7 @@ const finishSsoLogin = async (
         where: { address: checksumAddress },
       });
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
       return success(res, { address: newAddress });
@@ -397,7 +392,7 @@ const finishSsoLogin = async (
             `Could not log in with ronin wallet`
           );
         serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN,
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
           isCustomDomain: null,
         });
       });

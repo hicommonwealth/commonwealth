@@ -1,81 +1,40 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
+import { Link } from 'react-router-dom';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
 import { ProposalType } from 'common-common/src/types';
-import { externalLink, extractDomain, link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ProposalHeaderLinkProps = {
-  proposal: AnyProposal;
-};
-
-// "View in Subscan"
-export const BlockExplorerLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
-  return (
-    <div className="HeaderLink">
-      {externalLink(
-        'a',
-        proposal['blockExplorerLink'],
-        [
-          proposal['blockExplorerLinkLabel'] ||
-            extractDomain(proposal['blockExplorerLink']),
-        ],
-        navigate
-      )}
-      <CWIcon iconName="externalLink" iconSize="small" />
-    </div>
-  );
-};
-
-// "Vote on polkadot-js"
-export const VotingInterfaceLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
-  return (
-    <div className="HeaderLink">
-      {externalLink(
-        'a',
-        proposal['votingInterfaceLink'],
-        [
-          proposal['votingInterfaceLinkLabel'] ||
-            extractDomain(proposal['votingInterfaceLink']),
-        ],
-        navigate
-      )}
-      <CWIcon iconName="externalLink" iconSize="small" />
-    </div>
-  );
+  threads: any[];
+  chain: string;
 };
 
 // "Go to discussion"
-export const ThreadLink = (props: ProposalHeaderLinkProps) => {
-  const { proposal } = props;
-
-  const navigate = useCommonNavigate();
-
+const threadLinkButton = (threadId: string, title: string, chain: string) => {
   const path = getProposalUrlPath(
     ProposalType.Thread,
-    `${proposal.threadId}`,
+    `${threadId}`,
     false,
-    proposal['chain']
+    chain
   );
 
   return (
     <div className="HeaderLink">
-      {link('a', path, ['Go to discussion'], navigate)}
+      <Link to={path}>{title ? decodeURIComponent(title) : 'Go to thread'}</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
+};
+export const ThreadLink = ({ threads, chain }: ProposalHeaderLinkProps) => {
+  const components: JSX.Element[] = [];
+  threads.forEach((t) =>
+    components.push(threadLinkButton(t.id, t.title, chain))
+  );
+  return <React.Fragment>{components}</React.Fragment>;
 };
 
 type SnapshotThreadLinkProps = {
@@ -83,13 +42,11 @@ type SnapshotThreadLinkProps = {
 };
 
 export const SnapshotThreadLink = ({ thread }: SnapshotThreadLinkProps) => {
-  const navigate = useCommonNavigate();
-
   const proposalLink = getProposalUrlPath(ProposalType.Thread, thread.id, true);
 
   return (
     <div className="HeaderLink">
-      {link('a', proposalLink, [decodeURIComponent(thread.title)], navigate)}
+      <Link to={proposalLink}>{decodeURIComponent(thread.title)}</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
