@@ -7,8 +7,8 @@
   &::after {
     color: $color;
     content: '';
-    width: 6px;
-    height: 6px;
+    width: 10.5px;
+    height: 10.5px;
     box-shadow: inset 12px 12px;
     clip-path: circle(50%);
   }
@@ -32,32 +32,50 @@
   }
 
   &:hover .radio-control {
-    @include radioCore($primary-200);
-    @include hoverColors;
+    border-color: $primary-600;
   }
 
   &.checked .radio-control {
-    @include radioCore($primary-500);
-    @include checkedColors;
+    border-color: $primary-500;
+    background-color: inherit;
+
+    display: grid;
+    place-content: center;
+
+    &::after {
+      color: $primary-500;
+      content: '';
+      width: 10.5px;
+      height: 10.5px;
+      box-shadow: inset 12px 12px;
+      clip-path: circle(50%);
+    }
   }
 
   &.checked:hover .radio-control {
-    @include radioCore($primary-600);
-    @include checkedHoverColors;
+    border-color: $primary-600;
+    &::after {
+      color: $primary-600;
+    }
+    background-color: inherit;
   }
 
   &.checked.disabled .radio-control {
-    @include radioCore($neutral-300);
-    @include disabledColors;
+    &::after {
+      color: $neutral-200;
+      width: 10.5px;
+      height: 10.5px;
+    }
+    background-color: $neutral-100;
+    border-color: $neutral-200;
   }
 
   &.disabled {
     pointer-events: none;
 
     .radio-control {
-      // same color as background, so it's invisble on hover
-      @include radioCore($neutral-200);
-      @include disabledColors;
+      background-color: $neutral-100;
+      border-color: $neutral-200;
     }
   }
 }
