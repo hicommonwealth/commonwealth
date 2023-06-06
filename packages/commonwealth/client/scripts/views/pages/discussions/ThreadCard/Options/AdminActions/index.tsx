@@ -20,7 +20,7 @@ import './index.scss';
 export type AdminActionsProps = {
   thread: Thread;
   onDelete?: () => any;
-  onSpamToggle?: (isSpam: boolean) => any;
+  onSpamToggle?: (thread: Thread) => any;
   onLockToggle?: (isLocked: boolean) => any;
   onPinToggle?: (isPinned: boolean) => any;
   onTopicChange?: (newTopic: Topic) => any;
@@ -114,9 +114,9 @@ export const AdminActions = ({
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              app.threads
-                .delete(thread)
-                .then(() => onSpamToggle && onSpamToggle(!thread.isSpam));
+              app.threads.toggleSpam(thread.id).then((t: Thread) => {
+                onSpamToggle && onSpamToggle(t);
+              });
             } catch (err) {
               console.log(err);
             }
@@ -272,12 +272,18 @@ export const AdminActions = ({
                     iconLeft: 'democraticProposal' as const,
                     iconLeftWeight: 'bold',
                   },
-                  {
-                    onClick: handleFlagMarkAsSpam,
-                    label: 'Flag as spam',
-                    iconLeft: 'flag' as const,
-                    iconLeftWeight: 'bold',
-                  },
+                  ...(!thread.markedAsSpamAt
+                    ? [
+                        {
+                          onClick: handleFlagMarkAsSpam,
+                          label: !thread.markedAsSpamAt
+                            ? 'Flag as spam'
+                            : 'Unflag as spam',
+                          iconLeft: 'flag' as const,
+                          iconLeftWeight: 'bold',
+                        },
+                      ]
+                    : []),
                   {
                     onClick: handleDeleteThread,
                     label: 'Delete',

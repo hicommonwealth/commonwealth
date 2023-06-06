@@ -431,6 +431,26 @@ class ThreadsController {
     });
   }
 
+  public async toggleSpam(threadId: number) {
+    return new Promise((resolve, reject) => {
+      $.post(`${app.serverUrl()}/threads/${threadId}/mark-as-spam`, {
+        jwt: app.user.jwt,
+        chain_id: app.activeChainId(),
+      })
+        .then((response) => {
+          const foundThread = this.store.getByIdentifier(threadId);
+          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
+          this.updateThreadInStore(new Thread({ ...foundThread }));
+          resolve(foundThread);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError('Could not mark thread as spam');
+          reject(e);
+        });
+    });
+  }
+
   public async setStage(args: { threadId: number; stage: ThreadStage }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadStage`,

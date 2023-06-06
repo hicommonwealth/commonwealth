@@ -62,13 +62,12 @@ export class Thread implements IUniqueId {
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
-  public readonly markedAsSpamAt: moment.Moment;
+  public markedAsSpamAt: moment.Moment;
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
-  public isSpam?: boolean;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -106,7 +105,6 @@ export class Thread implements IUniqueId {
     canvasSession,
     canvasHash,
     links,
-    isSpam,
   }: {
     author: string;
     title: string;
@@ -139,7 +137,6 @@ export class Thread implements IUniqueId {
     canvasSession?: string;
     canvasHash?: string;
     links?: Link[];
-    isSpam?: boolean;
   }) {
     this.author = author;
     this.title = title;
@@ -190,7 +187,6 @@ export class Thread implements IUniqueId {
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
     this.links = links || [];
-    this.isSpam = isSpam;
   }
 }
 

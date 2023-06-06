@@ -47,7 +47,7 @@ type ContentPageProps = {
   isSpamThread?: boolean;
   onLockToggle?: (isLocked: boolean) => any;
   onDelete?: () => any;
-  onSpamToggle?: (isSpam: boolean) => any;
+  onSpamToggle?: (thread: Thread) => any;
   onPinToggle?: (isPinned: boolean) => any;
   onTopicChange?: (newTopic: Topic) => any;
   onProposalStageChange?: (newStage: ThreadStage) => any;
@@ -87,6 +87,7 @@ export const CWContentPage = ({
   onEditCancel,
   onEditConfirm,
   onEditStart,
+  onSpamToggle,
   hasPendingEdits,
   canUpdateThread,
   showTabs = false,
@@ -143,6 +144,7 @@ export const CWContentPage = ({
             thread={thread}
             totalComments={thread.numberOfComments}
             onLockToggle={onLockToggle}
+            onSpamToggle={onSpamToggle}
             onDelete={onDelete}
             onPinToggle={onPinToggle}
             onTopicChange={onTopicChange}

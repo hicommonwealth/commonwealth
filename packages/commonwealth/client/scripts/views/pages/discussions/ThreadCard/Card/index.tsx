@@ -156,7 +156,7 @@ export const Card = ({
             </div>
           )}
           <div className="content-body-wrapper">
-            {thread.isSpam && <CWTag label="SPAM" type="disabled" />}
+            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
             <div className="content-title">
               <CWText type="h5" fontWeight="semiBold">
                 {thread.title}
@@ -179,7 +179,7 @@ export const Card = ({
               {thread.plaintext}
             </CWText>
           </div>
-          {!thread.isSpam && (
+          {!thread.markedAsSpamAt && (
             <div className="content-footer">
               <Options
                 totalComments={thread.numberOfComments}

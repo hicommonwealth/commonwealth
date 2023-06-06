@@ -525,7 +525,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           polls?.length > 0 ||
           isAuthor
         }
-        isSpamThread={thread.isSpam}
+        isSpamThread={!!thread.markedAsSpamAt}
         title={
           isEditingBody ? (
             <CWTextInput
@@ -603,6 +603,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
           setIsGloballyEditing(true);
           setIsEditingBody(true);
+        }}
+        onSpamToggle={(updatedThread) => {
+          setIsGloballyEditing(false);
+          setIsEditingBody(false);
+          setRecentlyEdited(true);
+          setThread((t) => ({
+            ...t,
+            markedAsSpamAt: updatedThread.markedAsSpamAt,
+            uniqueIdentifier: t.uniqueIdentifier,
+          }));
         }}
         hasPendingEdits={!!editsToSave}
         body={(threadOptionsComp) => (

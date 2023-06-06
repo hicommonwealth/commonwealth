@@ -161,6 +161,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   localStorage[`${app.activeChainId()}-discussions-scrollY`] =
                     scrollEle.scrollTop;
                 }}
+                onSpamToggle={(updatedThread) => {
+                  setThreads((oldThreads) => {
+                    const updatedThreads = [...oldThreads];
+                    const foundThread = updatedThreads.find(
+                      (x) => x.id === thread.id
+                    );
+                    if (foundThread)
+                      foundThread.markedAsSpamAt = updatedThread.markedAsSpamAt;
+                    return updatedThreads;
+                  });
+                }}
                 onDelete={() => {
                   const tempThreads = [...threads].filter(
                     (t) => t.id !== thread.id
