@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import app from 'state';
 import Sublayout from 'views/Sublayout';
@@ -49,6 +49,7 @@ const ViewProposalPage = ({
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
+  const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
     const afterAdapterLoaded = async () => {
@@ -77,9 +78,15 @@ const ViewProposalPage = ({
         }
       }
     };
+    const chainInit = async () => {
+      if (!hasFetchedApiRef.current) {
+        hasFetchedApiRef.current = true;
+        await initChain();
+      }
+    };
 
     if (!isAdapterLoaded) {
-      initChain()
+      chainInit()
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
         afterAdapterLoaded();
