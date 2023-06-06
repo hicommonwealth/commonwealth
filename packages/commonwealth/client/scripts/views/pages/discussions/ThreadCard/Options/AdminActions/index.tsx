@@ -199,13 +199,13 @@ export const AdminActions = ({
                   {
                     label: 'Edit',
                     iconLeft: 'write' as const,
-                    iconLeftWeight: 'bold',
+                    iconLeftWeight: 'bold' as const,
                     onClick: handleEditThread,
                   },
                   {
                     label: 'Edit collaborators',
                     iconLeft: 'write' as const,
-                    iconLeftWeight: 'bold',
+                    iconLeftWeight: 'bold' as const,
                     onClick: () => {
                       setIsEditCollaboratorsModalOpen(true);
                     },
@@ -218,7 +218,7 @@ export const AdminActions = ({
                     onClick: handleThreadPinToggle,
                     label: thread.pinned ? 'Unpin' : 'Pin',
                     iconLeft: 'pin' as const,
-                    iconLeftWeight: 'bold',
+                    iconLeftWeight: 'bold' as const,
                   },
                   {
                     onClick: handleThreadLockToggle,
@@ -226,13 +226,13 @@ export const AdminActions = ({
                     iconLeft: thread.readOnly
                       ? ('keyLockClosed' as const)
                       : ('keyLockOpened' as const),
-                    iconLeftWeight: 'bold',
+                    iconLeftWeight: 'bold' as const,
                   },
                   {
                     onClick: () => setIsChangeTopicModalOpen(true),
                     label: 'Change topic',
                     iconLeft: 'filter' as const,
-                    iconLeftWeight: 'bold',
+                    iconLeftWeight: 'bold' as const,
                   },
                 ]
               : []),
@@ -243,7 +243,7 @@ export const AdminActions = ({
                         {
                           label: 'Snapshot proposal from thread',
                           iconLeft: 'democraticProposal' as const,
-                          iconLeftWeight: 'bold',
+                          iconLeftWeight: 'bold' as const,
                           onClick: handleSnapshotProposalClick,
                         },
                       ]
@@ -253,7 +253,7 @@ export const AdminActions = ({
                         {
                           label: 'Snapshot proposal from thread',
                           iconLeft: 'democraticProposal' as const,
-                          iconLeftWeight: 'bold',
+                          iconLeftWeight: 'bold' as const,
                           onClick: () => {
                             const snapshotSpaces = app.chain.meta.snapshot;
                             onSnapshotProposalFromThread();
@@ -270,7 +270,7 @@ export const AdminActions = ({
                     onClick: () => setIsUpdateProposalStatusModalOpen(true),
                     label: 'Update status',
                     iconLeft: 'democraticProposal' as const,
-                    iconLeftWeight: 'bold',
+                    iconLeftWeight: 'bold' as const,
                   },
                   ...(!thread.markedAsSpamAt
                     ? [
@@ -278,7 +278,7 @@ export const AdminActions = ({
                           onClick: handleFlagMarkAsSpam,
                           label: 'Flag as spam',
                           iconLeft: 'flag' as const,
-                          iconLeftWeight: 'bold',
+                          iconLeftWeight: 'bold' as const,
                         },
                       ]
                     : []),
@@ -286,7 +286,7 @@ export const AdminActions = ({
                     onClick: handleDeleteThread,
                     label: 'Delete',
                     iconLeft: 'trash' as const,
-                    iconLeftWeight: 'bold',
+                    iconLeftWeight: 'bold' as const,
                     className: 'danger',
                   },
                 ]

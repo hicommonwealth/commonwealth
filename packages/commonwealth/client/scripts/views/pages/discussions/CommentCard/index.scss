@@ -156,6 +156,20 @@
   }
 }
 
+.CommentActions {
+  .danger {
+    color: $rorange-600  !important;
+
+    .Icon {
+      color: $rorange-600  !important;
+    }
+
+    .Text {
+      color: $rorange-600  !important;
+    }
+  }
+}
+
 .EditComment {
   display: flex;
   flex-direction: column;

@@ -6,8 +6,8 @@ import type Comment from '../../../../models/Comment';
 import { CWButton } from '../../../components/component_kit/cw_button';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWText } from '../../../components/component_kit/cw_text';
 import { CWTag } from '../../../components/component_kit/cw_tag';
+import { CWText } from '../../../components/component_kit/cw_text';
 import { CommentReactionButton } from '../../../components/ReactionButton/CommentReactionButton';
 import { ReactQuillEditor } from '../../../components/react_quill_editor';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
@@ -156,6 +156,7 @@ export const CommentCard = ({
 
               {(canEdit || canDelete) && (
                 <PopoverMenu
+                  className="CommentActions"
                   renderTrigger={(onclick) => (
                     <button
                       onClick={async (e) => {
@@ -171,20 +172,23 @@ export const CommentCard = ({
                   menuItems={[
                     canEdit && {
                       label: 'Edit',
-                      iconLeft: 'write' as any,
+                      iconLeft: 'write' as const,
                       onClick: onEditStart,
+                      iconLeftWeight: 'bold' as const,
                     },
                     canToggleSpam &&
                       !isSpam && {
                         onClick: onSpamToggle,
                         label: 'Flag as spam',
                         iconLeft: 'flag' as const,
-                        iconLeftWeight: 'bold',
+                        iconLeftWeight: 'bold' as const,
                       },
                     canDelete && {
                       label: 'Delete',
-                      iconLeft: 'trash' as any,
+                      iconLeft: 'trash' as const,
                       onClick: onDelete,
+                      className: 'danger',
+                      iconLeftWeight: 'bold' as const,
                     },
                   ].filter(Boolean)}
                 />
