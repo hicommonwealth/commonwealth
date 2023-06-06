@@ -149,7 +149,7 @@ export const NewSnapshotProposalForm = ({
           const chainId = app.activeChainId();
           const threadId = thread.id;
 
-          const linkText = `\n\nThis conversation was started on Commonwealth. Any attached images have been removed. See more discussion: `;
+          const linkText = `\n\nThis conversation was started on Commonwealth, see more discussion: `;
           const linkUrl = `\n${domain}/${chainId}/discussion/${threadId}`;
 
           const linkMarkdown = `${linkText}[here](${linkUrl})`;
