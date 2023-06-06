@@ -15,7 +15,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 type generateTextReq = {
-  description: string;
+  content: string;
 };
 
 type generateTextResp = {
@@ -27,7 +27,7 @@ const generateText = async (
   req: TypedRequestBody<generateTextReq>,
   res: TypedResponse<generateTextResp>
 ) => {
-  const { content } = req;
+  const { content } = req.body;
 
   if (!content) {
     throw new AppError('No content provided');
