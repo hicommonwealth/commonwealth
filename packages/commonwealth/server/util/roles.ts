@@ -81,14 +81,17 @@ export async function findAllCommunityRolesWithRoleAssignments(
   if (permissions) {
     roleFindOptions = {
       where: {
-        chain: chain_id,
         role: { [Op.in]: permissions },
       },
     };
   } else {
     roleFindOptions = {
-      where: { chain: chain_id },
+      where: {},
     };
+  }
+
+  if (chain_id) {
+    roleFindOptions['where']['chain'] = chain_id;
   }
 
   // if where exists, replace address_id with id, append it to our where
@@ -126,6 +129,26 @@ export async function findAllCommunityRolesWithRoleAssignments(
   roleFindOptions.order = findOptions.order;
 
   const addresses = await models.Address.findAll(roleFindOptions);
+  const t = addresses.map((a) => {
+    const roleAssignments: RoleAssignmentAttributes[] = [
+      {
+        community_role_id: a.id,
+        address_id: a.id,
+        is_user_default: a.is_user_default,
+      },
+    ];
+    const communityRole: CommunityRoleAttributes = {
+      id: a.id,
+      name: a.role,
+      chain_id: a.chain,
+      allow: 0 as any,
+      deny: 0 as any,
+      created_at: a.created_at,
+      updated_at: a.updated_at,
+      RoleAssignments: roleAssignments,
+    };
+    return communityRole;
+  });
   return addresses.map((a) => {
     const roleAssignments: RoleAssignmentAttributes[] = [
       {
@@ -291,8 +314,8 @@ export async function isAddressPermitted(
     });
 
     const permission = aggregatePermissions(rolesWithPermission, {
-      allow: chain.default_allow_permissions,
-      deny: chain.default_deny_permissions,
+      allow: BigInt(0),
+      deny: BigInt(0),
     });
 
     const permitted = permissionsManager.hasPermission(

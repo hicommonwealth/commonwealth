@@ -71,6 +71,14 @@ module.exports = {
         );
       }
 
+      // drop unused columns
+      await queryInterface.removeColumn('Chains', 'default_allow_permissions', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('Chains', 'default_deny_permissions', {
+        transaction: t,
+      });
+
       // drop unused tables
       await queryInterface.dropTable('RoleAssignments', { transaction: t });
       await queryInterface.dropTable('CommunityRoles', { transaction: t });
