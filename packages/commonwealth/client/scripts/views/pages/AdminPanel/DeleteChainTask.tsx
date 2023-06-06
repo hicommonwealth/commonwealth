@@ -65,7 +65,6 @@ const DeleteChainTask = () => {
       </CWText>
       <div className="TaskRow">
         <CWTextInput
-          label="Community Id"
           value={deleteChainValue}
           onInput={onInput}
           inputValidationFn={validationFn}
