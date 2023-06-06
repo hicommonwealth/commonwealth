@@ -29,6 +29,7 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import Cosmos from 'controllers/chain/cosmos/adapter';
+import { initChain } from 'helpers/chain';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -78,6 +79,7 @@ const ViewProposalPage = ({
     };
 
     if (!isAdapterLoaded) {
+      initChain()
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
         afterAdapterLoaded();

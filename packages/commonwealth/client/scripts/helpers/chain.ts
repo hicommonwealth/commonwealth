@@ -28,7 +28,6 @@ export const deinitChainOrCommunity = async () => {
 // initChain fn ought to proceed or abort
 export const selectChain = async (
   chain?: ChainInfo,
-  useChain = false
 ): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
@@ -202,7 +201,6 @@ export const selectChain = async (
   }
 
   app.chainPreloading = false;
-  app.chain.useChain = useChain;
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses({ chain });
