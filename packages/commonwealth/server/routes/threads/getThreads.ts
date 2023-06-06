@@ -75,7 +75,7 @@ export const getThreads = async (
   if (address_ids) where['address_id'] = { [Op.in]: address_ids };
   if (include_comments)
     include.push({
-      model: models.Comment.scope('excludeAttributes'),
+      model: models.Comment.scope('readOnly'),
       required: false,
     });
 

@@ -63,10 +63,10 @@ const getProfiles = async (
       required: true,
       include: [
         { model: models.Chain, required: true, where: { active: true } },
-        { model: models.Thread.scope('excludeAttributes') },
+        { model: models.Thread.scope('readOnly') },
         {
-          model: models.Comment.scope('excludeAttributes'),
-          include: [{ model: models.Thread.scope('excludeAttributes') }],
+          model: models.Comment.scope('readOnly'),
+          include: [{ model: models.Thread.scope('readOnly') }],
         },
       ],
     },

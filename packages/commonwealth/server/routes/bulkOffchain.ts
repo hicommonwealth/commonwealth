@@ -70,17 +70,15 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           chain: chain.id,
         };
 
-        const monthlyComments = await models.Comment.scope(
-          'excludeAttributes'
-        ).findAll({
+        const monthlyComments = await models.Comment.findAll({
           where,
           include: [models.Address],
+          attributes: ['id', 'address_id'],
         });
-        const monthlyThreads = await models.Thread.scope(
-          'excludeAttributes'
-        ).findAll({
+        const monthlyThreads = await models.Thread.findAll({
           where,
           include: [{ model: models.Address, as: 'Address' }],
+          attributes: ['id', 'address_id'],
         });
 
         (monthlyComments as any).concat(monthlyThreads).forEach((post) => {

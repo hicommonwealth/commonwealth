@@ -61,7 +61,7 @@ const getNewProfile = async (
   });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
-  const threads = await models.Thread.scope('excludeAttributes').findAll({
+  const threads = await models.Thread.findAll({
     where: {
       address_id: {
         [Op.in]: addressIds,
@@ -71,9 +71,18 @@ const getNewProfile = async (
       { model: models.Address, as: 'Address' },
       { model: models.Chain, required: true, where: { active: true } },
     ],
+    attributes: {
+      exclude: [
+        'canvas_action',
+        'canvas_session',
+        'canvas_hash',
+        'plaintext',
+        'version_history',
+      ],
+    },
   });
 
-  const comments = await models.Comment.scope('excludeAttributes').findAll({
+  const comments = await models.Comment.findAll({
     where: {
       address_id: {
         [Op.in]: addressIds,
@@ -83,6 +92,15 @@ const getNewProfile = async (
       { model: models.Address, as: 'Address' },
       { model: models.Chain, required: true, where: { active: true } },
     ],
+    attributes: {
+      exclude: [
+        'canvas_action',
+        'canvas_session',
+        'canvas_hash',
+        'plaintext',
+        'version_history',
+      ],
+    },
   });
 
   const commentThreadIds = [

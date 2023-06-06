@@ -50,10 +50,11 @@ export default async function queryGlobalActivity(
     raw: true,
   });
 
-  const comments = await models.Comment.scope('excludeAttributes').findAll({
+  const comments = await models.Comment.findAll({
     where: {
       thread_id: notifications.map((n) => n.thread_id),
     },
+    attributes: ['id', 'thread_id', 'address_id'],
   });
 
   const addresses = await models.Address.findAll({

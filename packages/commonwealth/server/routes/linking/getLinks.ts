@@ -33,10 +33,11 @@ const getLinks = async (
     return next(new AppError(Errors.InvalidParameter));
   }
   if (thread_id) {
-    const thread = await models.Thread.scope('excludeAttributes').findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },
+      attributes: ['id', 'title', 'links'],
     });
     if (!thread) return next(new AppError(Errors.NoThread));
     links = linkType
@@ -46,17 +47,14 @@ const getLinks = async (
       : thread.links;
   }
   if (link) {
-    const matchThreads = await models.Thread.scope('excludeAttributes').findAll(
-      {
-        where: {
-          links: {
-            [Op.contains]: [
-              { source: link.source, identifier: link.identifier },
-            ],
-          },
+    const matchThreads = await models.Thread.findAll({
+      where: {
+        links: {
+          [Op.contains]: [{ source: link.source, identifier: link.identifier }],
         },
-      }
-    );
+      },
+      attributes: ['id', 'title'],
+    });
     threads =
       matchThreads.length > 0
         ? matchThreads.map((thr) => {

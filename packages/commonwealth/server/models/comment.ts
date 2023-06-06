@@ -99,8 +99,15 @@ export default (
             ],
           },
         }),
-        withAddress: () => ({
-          include: [{ model: sequelize.models.Address, as: 'Address' }],
+        readOnly: () => ({
+          attributes: {
+            exclude: [
+              'canvas_action',
+              'canvas_session',
+              'canvas_hash',
+              'version_history',
+            ],
+          },
         }),
       },
     }

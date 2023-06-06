@@ -156,6 +156,16 @@ export default (
             ],
           },
         }),
+        readOnly: () => ({
+          attributes: {
+            exclude: [
+              'canvas_action',
+              'canvas_session',
+              'canvas_hash',
+              'version_history',
+            ],
+          },
+        }),
       },
     }
   );
