@@ -28,6 +28,8 @@ type RecentThreadsHeaderProps = {
   featuredFilter: ThreadFeaturedFilterTypes;
   dateRange: ThreadTimelineFilterTypes;
   totalThreadCount: number;
+  isIncludingSpamThreads: boolean;
+  onIncludeSpamThreads: (includeSpams: boolean) => any;
 };
 
 export const RecentThreadsHeader = ({
@@ -36,6 +38,8 @@ export const RecentThreadsHeader = ({
   featuredFilter,
   dateRange,
   totalThreadCount,
+  isIncludingSpamThreads,
+  onIncludeSpamThreads,
 }: RecentThreadsHeaderProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
@@ -334,7 +338,14 @@ export const RecentThreadsHeader = ({
         </div>
       )}
 
-      <CWCheckbox label="Include posts flagged as spam" className="ml-auto" />
+      <CWCheckbox
+        checked={isIncludingSpamThreads}
+        label="Include posts flagged as spam"
+        className="ml-auto"
+        onChange={(e) => {
+          onIncludeSpamThreads(e.target.checked);
+        }}
+      />
 
       <Modal
         content={

@@ -27,6 +27,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
+  const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const pageNumber = useRef<number>(0);
   const stageName: string = searchParams.get('stage');
@@ -133,7 +134,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           }
 
           if (finalThreads.length >= 20) {
-            setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
+            setThreads(sortPinned(sortByFeaturedFilter(finalThreads)));
             setInitializing(false);
             return;
           }
@@ -157,15 +158,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           page: pageNumber.current,
         })
         .then((t) => {
-          // Fetch first 20 + unpinned threads
-
           setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
           setInitializing(false);
         });
     });
 
     return () => clearTimeout(timerId);
-  }, [stageName, topicName]);
+  }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
   const loadMore = useCallback(async () => {
     const response = await app.threads.loadNextPage({
@@ -215,6 +214,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               thread.slug,
               `${thread.identifier}-${slugify(thread.title)}`
             );
+
+            if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
             return (
               <ThreadCard
@@ -307,6 +308,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   featuredFilter={featuredFilter}
                   dateRange={dateRange}
                   totalThreadCount={threads ? totalThreads : 0}
+                  isIncludingSpamThreads={includeSpamThreads}
+                  onIncludeSpamThreads={setIncludeSpamThreads}
                 />
               );
             },
