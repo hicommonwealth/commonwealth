@@ -76,6 +76,7 @@ describe('Integration tests for ERC20', () => {
         Subscriber,
         EventKind
       >
+      await new Promise<void>((resolve) => setTimeout(resolve, 12000));
     });
 
     it('Should capture transfer events', async () => {
