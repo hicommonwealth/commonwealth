@@ -7,7 +7,7 @@ import type { DB } from '../models';
 import type { Link, ThreadInstance } from '../models/thread';
 import { getLastEdited } from '../util/getLastEdited';
 
-const processLinks = async (thread) => {
+const processLinks = (thread) => {
   let chain_entity_meta = [];
   if (thread.links) {
     const ces = thread.links.filter((item) => item.source === 'proposal');
@@ -20,60 +20,36 @@ const processLinks = async (thread) => {
   return { chain_entity_meta };
 };
 
-// bulkThreads takes a date param and fetches the most recent 20 threads before that date
-const bulkThreads = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const {
-    // endpoint specific filters
-    stage,
-    topic_id,
-    includePinnedThreads,
-    // pagination params
-    limit,
-    page,
-    orderBy,
-    to_date,
-    from_date,
-  } = req.query;
+const makeSelectQuery = async (models, query, bind) => {
+  return await models.sequelize.query(query, {
+    bind,
+    type: QueryTypes.SELECT,
+  });
+};
 
-  // query params that bind to sql query
-  const bind = (() => {
-    const _limit = parseInt(limit ? (limit > 500 ? 500 : limit) : 20) || 20;
-    const _page = parseInt(page) || 1;
-    const _offset = _limit * (_page - 1) || 0;
-    const _to_date = to_date || moment().toISOString();
+const countsQuery = `
+SELECT id, title, stage FROM "Threads"
+WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-    return {
-      from_date,
-      to_date: _to_date,
-      page: _page,
-      limit: _limit,
-      offset: _offset,
-      chain: req.chain.id,
-      ...(stage && { stage }),
-      ...(topic_id && { topic_id }),
-    };
-  })();
+// sql query parts that order results by provided query param
+const orderByClause = {
+  'createdAt:asc': 'threads.thread_created ASC',
+  'createdAt:desc': 'threads.thread_created DESC',
+  'numberOfComments:asc': 'threads_number_of_comments ASC',
+  'numberOfComments:desc': 'threads_number_of_comments DESC',
+  'numberOfLikes:asc': 'threads_total_likes ASC',
+  'numberOfLikes:desc': 'threads_total_likes DESC',
+};
 
-  // sql query parts that order results by provided query param
-  const orderByQueries = {
-    'createdAt:asc': 'threads.thread_created ASC',
-    'createdAt:desc': 'threads.thread_created DESC',
-    'numberOfComments:asc': 'threads_number_of_comments ASC',
-    'numberOfComments:desc': 'threads_number_of_comments DESC',
-    'numberOfLikes:asc': 'threads_total_likes ASC',
-    'numberOfLikes:desc': 'threads_total_likes DESC',
-  };
-
-  // get response threads from query
-  let responseThreads;
-  try {
-    responseThreads = await models.sequelize.query(
-      `
+const getBulkThreadsQuery = (
+  topic_id,
+  stage,
+  includePinnedThreads,
+  from_date,
+  to_date,
+  orderByQueries,
+  orderBy
+) => `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.chain AS addr_chain, threads.thread_id, thread_title,
         thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
@@ -153,86 +129,122 @@ const bulkThreads = async (
           : ''
       }
       LIMIT $limit OFFSET $offset
-    `,
-      {
-        bind,
-        type: QueryTypes.SELECT,
-      }
-    );
+    `;
+
+const processThread = (t) => {
+  const collaborators = JSON.parse(t.collaborators[0]).address?.length
+    ? t.collaborators.map((c) => JSON.parse(c))
+    : [];
+  const { chain_entity_meta } = processLinks(t);
+  const last_edited = getLastEdited(t);
+
+  const data = {
+    id: t.thread_id,
+    title: t.thread_title,
+    url: t.url,
+    body: t.body,
+    last_edited,
+    kind: t.kind,
+    stage: t.stage,
+    read_only: t.read_only,
+    pinned: t.pinned,
+    chain: t.thread_chain,
+    created_at: t.thread_created,
+    updated_at: t.thread_updated,
+    locked_at: t.thread_locked,
+    links: t.links,
+    collaborators,
+    chain_entity_meta,
+    has_poll: t.has_poll,
+    last_commented_on: t.last_commented_on,
+    plaintext: t.plaintext,
+    Address: {
+      id: t.addr_id,
+      address: t.addr_address,
+      chain: t.addr_chain,
+    },
+    numberOfComments: t.threads_number_of_comments,
+    reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
+    addressesReacted: t.addresses_reacted ? t.addresses_reacted.split(',') : [],
+    reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
+  };
+  if (t.topic_id) {
+    data['topic'] = {
+      id: t.topic_id,
+      name: t.topic_name,
+      description: t.topic_description,
+      chainId: t.topic_chain,
+      telegram: t.telegram,
+    };
+  }
+  return data;
+};
+
+// bulkThreads takes a date param and fetches the most recent 20 threads before that date
+const bulkThreads = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const {
+    // endpoint specific filters
+    stage,
+    topic_id,
+    includePinnedThreads,
+    // pagination params
+    limit,
+    page,
+    orderBy,
+    to_date,
+    from_date,
+  } = req.query;
+
+  // query params that bind to sql query
+  const bind = (() => {
+    const _limit = parseInt(limit ? (limit > 500 ? 500 : limit) : 20) || 20;
+    const _page = parseInt(page) || 1;
+    const _offset = _limit * (_page - 1) || 0;
+    const _to_date = to_date || moment().toISOString();
+
+    return {
+      from_date,
+      to_date: _to_date,
+      page: _page,
+      limit: _limit,
+      offset: _offset,
+      chain: req.chain.id,
+      ...(stage && { stage }),
+      ...(topic_id && { topic_id }),
+    };
+  })();
+
+  const bulkThreadsQuery = getBulkThreadsQuery(
+    topic_id,
+    stage,
+    includePinnedThreads,
+    from_date,
+    to_date,
+    orderByClause,
+    orderBy
+  );
+  // get response threads from query
+  let threads;
+  let numVotingThreads;
+  try {
+    [threads, numVotingThreads] = await Promise.all([
+      makeSelectQuery(models, bulkThreadsQuery, bind).then((rawThreads) =>
+        rawThreads.map(processThread)
+      ),
+      makeSelectQuery(models, countsQuery, bind).then(
+        (threadInstances: ThreadInstance[]) =>
+          threadInstances.filter((t) => t.stage === 'voting').length
+      ),
+    ]);
   } catch (e) {
     console.log(e);
     return next(new ServerError('Could not fetch threads'));
   }
-
-  // transform thread response
-  let threads = responseThreads.map(async (t) => {
-    const collaborators = JSON.parse(t.collaborators[0]).address?.length
-      ? t.collaborators.map((c) => JSON.parse(c))
-      : [];
-    const { chain_entity_meta } = await processLinks(t);
-
-    const last_edited = getLastEdited(t);
-
-    const data = {
-      id: t.thread_id,
-      title: t.thread_title,
-      url: t.url,
-      body: t.body,
-      last_edited,
-      kind: t.kind,
-      stage: t.stage,
-      read_only: t.read_only,
-      pinned: t.pinned,
-      chain: t.thread_chain,
-      created_at: t.thread_created,
-      updated_at: t.thread_updated,
-      locked_at: t.thread_locked,
-      links: t.links,
-      collaborators,
-      chain_entity_meta,
-      has_poll: t.has_poll,
-      last_commented_on: t.last_commented_on,
-      plaintext: t.plaintext,
-      Address: {
-        id: t.addr_id,
-        address: t.addr_address,
-        chain: t.addr_chain,
-      },
-      numberOfComments: t.threads_number_of_comments,
-      reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
-      addressesReacted: t.addresses_reacted
-        ? t.addresses_reacted.split(',')
-        : [],
-      reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
-    };
-    if (t.topic_id) {
-      data['topic'] = {
-        id: t.topic_id,
-        name: t.topic_name,
-        description: t.topic_description,
-        chainId: t.topic_chain,
-        telegram: t.telegram,
-      };
-    }
-    return data;
-  });
-
-  const countsQuery = `
-     SELECT id, title, stage FROM "Threads"
-     WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
-
-  const threadsInVoting: ThreadInstance[] = await models.sequelize.query(
-    countsQuery,
-    {
-      bind,
-      type: QueryTypes.SELECT,
-    }
-  );
-  const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
-  ).length;
-
-  threads = await Promise.all(threads);
 
   return res.json({
     status: 'Success',
