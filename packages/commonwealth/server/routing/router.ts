@@ -169,6 +169,8 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
+import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
 
 function setupRouter(
   endpoint: string,
@@ -884,6 +886,19 @@ function setupRouter(
     '/linking/getLinks',
     passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models)
+  );
+
+  // spam
+  router.post(
+    '/threads/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markThreadAsSpam.bind(this, models)
+  );
+
+  router.post(
+    '/comments/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markCommentAsSpam.bind(this, models)
   );
 
   // login

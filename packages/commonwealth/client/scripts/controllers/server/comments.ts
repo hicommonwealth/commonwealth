@@ -52,6 +52,10 @@ export const modelFromServer = (comment) => {
     ? versionHistory[0].timestamp
     : null;
 
+  const markedAsSpamAt = comment.marked_as_spam_at
+    ? moment(comment.marked_as_spam_at)
+    : null;
+
   const commentParams =
     comment.deleted_at?.length > 0
       ? {
@@ -68,6 +72,7 @@ export const modelFromServer = (comment) => {
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
+          markedAsSpamAt,
           deleted: true,
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
@@ -87,6 +92,7 @@ export const modelFromServer = (comment) => {
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
+          markedAsSpamAt,
           deleted: false,
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
