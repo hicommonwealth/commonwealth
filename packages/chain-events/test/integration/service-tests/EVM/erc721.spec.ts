@@ -76,13 +76,13 @@ describe('Integration tests for ERC721', () => {
         Subscriber,
         EventKind
       >;
+      await new Promise<void>((resolve) => setTimeout(resolve, 12000));
     });
 
     it('Should capture transfer events', async () => {
       await nft.mint(token_id, 1);
       const { block } = await nft.transferERC721(token_id, 2, accounts[1]);
       await waitUntilBlock(block, listener);
-
       const msg = rmq.queuedMessages[RascalSubscriptions.ChainEvents].find(
         (e) =>
           e.data.kind === 'transfer' &&
