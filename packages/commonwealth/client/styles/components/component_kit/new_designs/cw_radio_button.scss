@@ -68,8 +68,16 @@
   }
 
   &.checked.disabled .radio-control {
-    @include radioCore($neutral-200);
+    // @include radioCore($neutral-200);
     // @include disabledColors;
+    &::after {
+      color: $neutral-200;
+      // content: '';
+      width: 10.5px;
+      height: 10.5px;
+      // box-shadow: inset 12px 12px;
+      // clip-path: circle(50%);
+    }
     background-color: $neutral-100;
     border-color: $neutral-200;
   }
