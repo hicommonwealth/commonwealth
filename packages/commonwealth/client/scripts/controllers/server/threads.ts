@@ -1,13 +1,19 @@
 /* eslint-disable no-restricted-globals */
+import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
-
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { EventEmitter } from 'events';
 import $ from 'jquery';
+import moment from 'moment';
+import { Link, LinkSource } from 'server/models/thread';
+import app from 'state';
+import { ProposalStore, RecentListingStore } from 'stores';
+import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+import { ThreadActionType } from '../../../../shared/types';
 /* eslint-disable no-restricted-syntax */
-
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
@@ -15,16 +21,11 @@ import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
 import Topic from '../../models/Topic';
-import { ThreadStage } from '../../models/types';
-import moment from 'moment';
-
-import app from 'state';
-import { ProposalStore, RecentListingStore } from 'stores';
-import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { EventEmitter } from 'events';
-import { ThreadActionType } from '../../../../shared/types';
-import { Link, LinkSource } from 'server/models/thread';
-import axios from 'axios';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadStage,
+  ThreadTimelineFilterTypes,
+} from '../../models/types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -732,6 +733,9 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
     includePinnedThreads?: boolean;
+    featuredFilter: ThreadFeaturedFilterTypes;
+    dateRange: ThreadTimelineFilterTypes;
+    page: number;
   }) {
     // Used to reset pagination when switching between topics
     if (this._resetPagination) {
@@ -739,22 +743,84 @@ class ThreadsController {
       this._resetPagination = false;
     }
 
-    if (this.listingStore.isDepleted(options)) {
-      return;
-    }
-    const { topicName, stageName, includePinnedThreads } = options;
-    const chain = app.activeChainId();
-    const params = {
-      chain,
-      cutoff_date: this.listingStore.isInitialized(options)
-        ? this.listingStore.getCutoffDate(options).toISOString()
-        : moment().toISOString(),
-    };
-    const topicId = app.topics.getByName(topicName, chain)?.id;
+    const {
+      topicName,
+      stageName,
+      includePinnedThreads,
+      featuredFilter,
+      dateRange,
+      page,
+    } = options;
 
-    if (topicId) params['topic_id'] = topicId;
-    if (stageName) params['stage'] = stageName;
-    if (includePinnedThreads) params['includePinnedThreads'] = true;
+    const chain = app.activeChainId();
+    const params = (() => {
+      // find topic id (if any)
+      const topicId = app.topics.getByName(topicName, chain)?.id;
+
+      // calculate 'from' and 'to' dates
+      const today = moment();
+      const fromDate = (() => {
+        if (dateRange) {
+          if (
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            return today
+              .startOf(dateRange.toLowerCase().replace('this', '') as any)
+              .toISOString();
+          }
+
+          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
+            return new Date(0).toISOString();
+          }
+        }
+
+        return null;
+      })();
+      const toDate = (() => {
+        if (dateRange) {
+          if (
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            return today
+              .endOf(dateRange.toLowerCase().replace('this', '') as any)
+              .toISOString();
+          }
+
+          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
+            return moment().toISOString();
+          }
+        }
+
+        return moment().toISOString();
+      })();
+
+      const featuredFilterQueryMap = {
+        newest: 'createdAt:desc',
+        oldest: 'createdAt:asc',
+        mostLikes: 'numberOfLikes:desc',
+        mostComments: 'numberOfComments:desc',
+      };
+
+      return {
+        limit: 20,
+        page: page,
+        chain,
+        ...(topicId && { topic_id: topicId }),
+        ...(stageName && { stage: stageName }),
+        ...(includePinnedThreads && { includePinnedThreads: true }),
+        ...(fromDate && { from_date: fromDate }),
+        to_date: toDate,
+        orderBy:
+          featuredFilterQueryMap[featuredFilter] ||
+          featuredFilterQueryMap.newest,
+      };
+    })();
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
@@ -812,7 +878,11 @@ class ThreadsController {
       this.listingStore.depleteListing(options);
     }
 
-    return modeledThreads;
+    return {
+      threads: modeledThreads,
+      limit: response.result.limit,
+      page: response.result.page,
+    };
   }
 
   public async getThreadCommunityId(threadId: string) {

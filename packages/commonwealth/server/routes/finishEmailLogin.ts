@@ -94,7 +94,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
         await existingUser.save();
       }
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
 
@@ -117,7 +117,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
           `Could not log in with user at ${email}`
         );
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
 
@@ -152,13 +152,19 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     });
 
     req.login(newUser, (err) => {
-      if (err)
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
+          isCustomDomain: null,
+        });
         return redirectWithLoginError(
           res,
           `Could not log in with user at ${email}`
         );
+      }
+
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
 

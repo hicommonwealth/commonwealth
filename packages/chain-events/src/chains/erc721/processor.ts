@@ -21,14 +21,14 @@ export class Processor extends IEventProcessor<IErc721Contracts, RawEvent> {
    * @param tokenName
    * @returns an array of processed events
    */
-  public async process(
-    event: RawEvent,
-    tokenName?: string
-  ): Promise<CWEvent<IEventData>[]> {
+  public async process(event: RawEvent): Promise<CWEvent<IEventData>[]> {
+    const tokenName = this._api.tokens.find(
+      (t) => t.contract.address.toLowerCase() == event.address.toLowerCase()
+    ).tokenName;
     const log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.ERC721, tokenName])
     );
-    const kind = ParseType(event.event);
+    const kind = ParseType(event.name);
     if (!kind) return [];
     try {
       const cwEvent = await Enrich(this._api, event.blockNumber, kind, event);
@@ -36,7 +36,7 @@ export class Processor extends IEventProcessor<IErc721Contracts, RawEvent> {
       return cwEvent ? [cwEvent] : [];
     } catch (e) {
       log.error(
-        `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.event}, Error Message: ${e.message}`
+        `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.name}, Error Message: ${e.message}`
       );
       return [];
     }
