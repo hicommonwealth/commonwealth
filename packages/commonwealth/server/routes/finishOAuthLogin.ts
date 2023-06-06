@@ -52,8 +52,13 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
-      if (err)
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
+          isCustomDomain: null,
+        });
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
+      }
       serverAnalyticsTrack({
         event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
