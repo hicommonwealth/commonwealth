@@ -82,6 +82,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
+  const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -515,6 +516,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
+  console.log('comments => ', comments);
+
   return (
     <Sublayout>
       <CWContentPage
@@ -675,10 +678,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <>
             <CWCheckbox
               className="ml-auto"
+              checked={includeSpamThreads}
               label="Include comments flagged as spam"
+              onChange={(e) => setIncludeSpamThreads(e.target.checked)}
             />
             <CommentsTree
               comments={comments}
+              includeSpams={includeSpamThreads}
               thread={thread}
               setIsGloballyEditing={setIsGloballyEditing}
               updatedCommentsCallback={updatedCommentsCallback}
