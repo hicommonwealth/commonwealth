@@ -5,7 +5,7 @@ import { PermissionManager, ToCheck } from '../../shared/permissions';
 import type { RoleObject } from '../../shared/types';
 import { aggregatePermissions } from '../../shared/utils';
 import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
+import type { AddressAttributes, AddressInstance } from '../models/address';
 import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Role } from '../models/role';
 import type { RoleAssignmentAttributes } from '../models/role_assignment';
@@ -129,32 +129,13 @@ export async function findAllCommunityRolesWithRoleAssignments(
   roleFindOptions.order = findOptions.order;
 
   const addresses = await models.Address.findAll(roleFindOptions);
-  const t = addresses.map((a) => {
-    const roleAssignments: RoleAssignmentAttributes[] = [
-      {
-        community_role_id: a.id,
-        address_id: a.id,
-        is_user_default: a.is_user_default,
-      },
-    ];
-    const communityRole: CommunityRoleAttributes = {
-      id: a.id,
-      name: a.role,
-      chain_id: a.chain,
-      allow: 0 as any,
-      deny: 0 as any,
-      created_at: a.created_at,
-      updated_at: a.updated_at,
-      RoleAssignments: roleAssignments,
-    };
-    return communityRole;
-  });
   return addresses.map((a) => {
     const roleAssignments: RoleAssignmentAttributes[] = [
       {
         community_role_id: a.id,
         address_id: a.id,
         is_user_default: a.is_user_default,
+        Address: a,
       },
     ];
     const communityRole: CommunityRoleAttributes = {
