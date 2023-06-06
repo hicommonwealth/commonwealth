@@ -1,8 +1,6 @@
-import { QueryTypes } from 'sequelize';
 import type { Request, Response } from 'express';
 import type { DB } from '../models';
-import { Action } from '../../shared/permissions';
-import { findAllRoles, isAddressPermitted } from '../util/roles';
+import { findAllRoles } from '../util/roles';
 import { AppError } from '../../../common-common/src/errors';
 
 export const Errors = {

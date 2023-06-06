@@ -1,15 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 
-import { aggregatePermissions } from 'utils';
-import type { Action } from 'permissions';
-import {
-  AccessLevel,
-  PermissionManager,
-  ToCheck,
-  everyonePermissions,
-} from 'permissions';
-import type { RoleObject } from 'types';
+import { AccessLevel } from 'permissions';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
@@ -24,8 +16,6 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
 };
 
 export class RolesController {
-  private permissionManager = new PermissionManager();
-
   constructor(public readonly User: UserController) {}
 
   private _roles: RoleInfo[] = [];

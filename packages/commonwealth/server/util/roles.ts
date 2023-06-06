@@ -1,11 +1,7 @@
 import type { FindOptions, Transaction } from 'sequelize';
 import { Op } from 'sequelize';
-import type { Action } from '../../shared/permissions';
-import { PermissionManager, ToCheck } from '../../shared/permissions';
-import type { RoleObject } from '../../shared/types';
-import { aggregatePermissions } from '../../shared/utils';
 import type { DB } from '../models';
-import type { AddressAttributes, AddressInstance } from '../models/address';
+import type { AddressInstance } from '../models/address';
 import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Role } from '../models/role';
 import type { RoleAssignmentAttributes } from '../models/role_assignment';
@@ -260,48 +256,4 @@ export async function createRole(
   };
 
   return new RoleInstanceWithPermission(assignment, chain_id, role_name, 0, 0);
-}
-
-// Permissions Helpers for Roles
-
-export async function isAddressPermitted(
-  models: DB,
-  address_id: number,
-  chain_id: string,
-  action: Action
-): Promise<boolean> {
-  const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
-
-  const permissionsManager = new PermissionManager();
-
-  const chain = await models.Chain.findOne({ where: { id: chain_id } });
-  if (!chain) {
-    throw new Error('Chain not found');
-  }
-
-  if (roles.length > 0) {
-    const rolesWithPermission = roles.map((role) => {
-      return {
-        permission: role.permission,
-        allow: role.allow,
-        deny: role.deny,
-      } as RoleObject;
-    });
-
-    const permission = aggregatePermissions(rolesWithPermission, {
-      allow: 0,
-      deny: 0,
-    });
-
-    const permitted = permissionsManager.hasPermission(
-      permission,
-      action,
-      ToCheck.Deny
-    );
-    if (!permitted) {
-      throw new Error('Not permitted');
-    } else {
-      return true;
-    }
-  }
 }
