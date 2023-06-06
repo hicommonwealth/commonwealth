@@ -49,12 +49,15 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getThreadUrl = (thread: {
-  chain: string;
-  type_id?: string | number;
-  id?: string | number;
-  title?: string;
-}, comment?: string | number): string => {
+export const getThreadUrl = (
+  thread: {
+    chain: string;
+    type_id?: string | number;
+    id?: string | number;
+    title?: string;
+  },
+  comment?: string | number
+): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
@@ -257,7 +260,7 @@ export const addressSwapper = (options: {
 
 export function aggregatePermissions(
   roles: RoleObject[],
-  chain_permissions: { allow: bigint; deny: bigint }
+  chain_permissions: { allow: number; deny: number }
 ) {
   const permissionsManager = new PermissionManager();
 
@@ -274,8 +277,8 @@ export function aggregatePermissions(
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{
-    allow: bigint;
-    deny: bigint;
+    allow: number;
+    deny: number;
   }> = roles.map(({ allow, deny }) => ({ allow, deny }));
 
   // add chain default permissions to beginning of permissions array

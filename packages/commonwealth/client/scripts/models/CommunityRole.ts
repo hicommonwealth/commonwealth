@@ -6,8 +6,8 @@ class CommunityRole {
   public readonly id: number;
   public readonly name: Role;
   public readonly chain_id: string;
-  public readonly allow: bigint;
-  public readonly deny: bigint;
+  public readonly allow: number;
+  public readonly deny: number;
   public readonly createdAt: moment.Moment;
   public readonly updatedAt: moment.Moment;
 

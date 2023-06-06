@@ -11,8 +11,8 @@ export type CommunityRoleAttributes = {
   name: Role;
   id?: number;
   chain_id: string;
-  allow: bigint;
-  deny: bigint;
+  allow: number;
+  deny: number;
   created_at?: Date;
   updated_at?: Date;
 

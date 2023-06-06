@@ -13,23 +13,23 @@ import type { RoleAssignmentAttributes } from '../models/role_assignment';
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;
   permission: Role;
-  allow: bigint;
-  deny: bigint;
+  allow: number;
+  deny: number;
 };
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
   chain_id: string;
   permission: Role;
-  allow: bigint;
-  deny: bigint;
+  allow: number;
+  deny: number;
 
   constructor(
     _roleAssignmentInstance: RoleAssignmentAttributes,
     chain_id: string,
     permission: Role,
-    allow: bigint,
-    deny: bigint
+    allow: number,
+    deny: number
   ) {
     this._roleAssignmentAttributes = _roleAssignmentInstance;
     this.chain_id = chain_id;
@@ -259,13 +259,7 @@ export async function createRole(
     address_id: address_id,
   };
 
-  return new RoleInstanceWithPermission(
-    assignment,
-    chain_id,
-    role_name,
-    BigInt(0),
-    BigInt(0)
-  );
+  return new RoleInstanceWithPermission(assignment, chain_id, role_name, 0, 0);
 }
 
 // Permissions Helpers for Roles
@@ -295,8 +289,8 @@ export async function isAddressPermitted(
     });
 
     const permission = aggregatePermissions(rolesWithPermission, {
-      allow: BigInt(0),
-      deny: BigInt(0),
+      allow: 0,
+      deny: 0,
     });
 
     const permitted = permissionsManager.hasPermission(

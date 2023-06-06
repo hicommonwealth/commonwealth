@@ -1,3 +1,4 @@
+// TODO: This class is deprecated, do not use. Will be removed in future
 /* eslint-disable */
 
 export enum AccessLevel {
@@ -5,10 +6,6 @@ export enum AccessLevel {
   Moderator = 'moderator',
   Member = 'member',
   Everyone = 'everyone',
-}
-
-export enum PermissionError {
-  NOT_PERMITTED = 'Action not permitted',
 }
 
 export enum Action {
@@ -44,16 +41,6 @@ export enum Action {
 }
 
 export type Permissions = { [key: number]: Array<Action> | Action };
-
-export const everyonePermissions: Permissions = {
-  [Action.DELETE_REACTION]: [
-    Action.DELETE_REACTION,
-    Action.CREATE_REACTION,
-    Action.VIEW_REACTIONS,
-  ],
-  [Action.CREATE_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
-  [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
-};
 
 export const impliedAllowPermissionsByAction: Permissions = {
   [Action.CREATE_CHAT]: [Action.CREATE_CHAT, Action.VIEW_CHAT_CHANNELS],
@@ -133,16 +120,6 @@ export const impliedDenyPermissionsByAction: Permissions = {
     Action.EDIT_COMMENT,
   ],
 };
-
-type allowDenyBigInt = {
-  allow: bigint;
-  deny: bigint;
-};
-
-export enum ToCheck {
-  Allow = 'allow',
-  Deny = 'deny',
-}
 
 export class PermissionManager {
   private action: Action;
@@ -226,67 +203,5 @@ export class PermissionManager {
       denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermissions);
     }
     return denyPermission;
-  }
-
-  mapPermissionsToBigint(permissions: Permissions): bigint {
-    let permission = BigInt(0);
-    for (const key in permissions) {
-      const action = permissions[key];
-      if (Array.isArray(action)) {
-        for (const a of action) {
-          permission |= BigInt(1) << BigInt(a);
-        }
-      } else {
-        permission |= BigInt(1) << BigInt(action);
-      }
-    }
-    return permission;
-  }
-
-  convertStringToBigInt(
-    allowPermission: string,
-    denyPermission: string
-  ): allowDenyBigInt {
-    const allowPermissionAsBigInt: bigint = BigInt(allowPermission);
-    const denyPermissionAsBigInt: bigint = BigInt(denyPermission);
-    return { allow: allowPermissionAsBigInt, deny: denyPermissionAsBigInt };
-  }
-
-  public computePermissions(
-    base: Permissions,
-    assignments: Array<{ allow: bigint; deny: bigint }>
-  ): bigint {
-    let permissionsBigInt = this.mapPermissionsToBigint(base);
-
-    for (const assignment of assignments) {
-      const { allow, deny } = assignment;
-      if (allow === deny) {
-        permissionsBigInt = allow;
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-      if (typeof allow === 'string' && typeof deny === 'string') {
-        const converted = this.convertStringToBigInt(allow, deny);
-        permissionsBigInt &= ~converted.deny;
-        permissionsBigInt |= converted.allow;
-      } else {
-        permissionsBigInt &= ~deny;
-        permissionsBigInt |= allow;
-      }
-    }
-    return permissionsBigInt;
-  }
-
-  hasPermission(permission: bigint, action: number, type: ToCheck): boolean {
-    const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
-    const hasAction: boolean =
-      (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
-    if (type === 'allow') {
-      return hasAction;
-    } else if (type === 'deny') {
-      return !hasAction;
-    } else {
-      return false;
-    }
   }
 }

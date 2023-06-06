@@ -127,11 +127,6 @@ export const impliedDenyPermissionsByAction: Permissions = {
   ],
 };
 
-type allowDenyBigInt = {
-  allow: bigint;
-  deny: bigint;
-};
-
 export enum ToCheck {
   Allow = 'allow',
   Deny = 'deny',
@@ -224,53 +219,11 @@ export class PermissionManager {
     return denyPermission;
   }
 
-  mapPermissionsToBigint(permissions: Permissions): bigint {
-    let permission = BigInt(0);
-    for (const key in permissions) {
-      const action = permissions[key];
-      if (Array.isArray(action)) {
-        for (const a of action) {
-          permission |= BigInt(1) << BigInt(a);
-        }
-      } else {
-        permission |= BigInt(1) << BigInt(action);
-      }
-    }
-    return permission;
-  }
-
-  convertStringToBigInt(
-    allowPermission: string,
-    denyPermission: string
-  ): allowDenyBigInt {
-    const allowPermissionAsBigInt = BigInt(allowPermission);
-    const denyPermissionAsBigInt = BigInt(denyPermission);
-    return { allow: allowPermissionAsBigInt, deny: denyPermissionAsBigInt };
-  }
-
   public computePermissions(
     base: Permissions,
-    assignments: Array<{ allow: bigint; deny: bigint }>
+    assignments: Array<{ allow: number; deny: number }>
   ): bigint {
-    let permissionsBigInt = this.mapPermissionsToBigint(base);
-
-    for (const assignment of assignments) {
-      const { allow, deny } = assignment;
-      if (allow === deny) {
-        permissionsBigInt = allow;
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-      if (typeof allow === 'string' && typeof deny === 'string') {
-        const converted = this.convertStringToBigInt(allow, deny);
-        permissionsBigInt &= ~converted.deny;
-        permissionsBigInt |= converted.allow;
-      } else {
-        permissionsBigInt &= ~deny;
-        permissionsBigInt |= allow;
-      }
-    }
-    return permissionsBigInt;
+    return BigInt(0); //allow all permissions
   }
 
   hasPermission(permission: bigint, action: number, type: ToCheck): boolean {

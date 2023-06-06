@@ -4,6 +4,10 @@ import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors } from '../../../server/routes/addEditors';
+import {
+  everyonePermissions,
+  PermissionManager,
+} from '../../../shared/permissions';
 import { post } from './external/appHook.spec';
 import {
   testAddresses,
