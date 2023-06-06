@@ -200,6 +200,7 @@ const EditProfileComponent = () => {
           chain: addresses[0].chain,
           address: addresses[0].address,
           profile: oldProfile,
+          ignoreProfile: false,
         })
       );
     } else {
