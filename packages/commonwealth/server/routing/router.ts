@@ -171,6 +171,15 @@ import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
+import {
+  getPersona,
+  createPersona,
+  updatePersona,
+  deletePersona,
+} from '../routes/personas/personas';
+
+// ... other routes
+
 function setupRouter(
   endpoint: string,
   app: Express,
@@ -893,6 +902,30 @@ function setupRouter(
     getLinks.bind(this, models)
   );
 
+  // Personas routes
+  router.get(
+    '/personas/get',
+    passport.authenticate('jwt', { session: false }),
+    getPersona.bind(this, models)
+  );
+
+  router.post(
+    '/personas/create',
+    passport.authenticate('jwt', { session: false }),
+    createPersona.bind(this, models)
+  );
+
+  router.put(
+    '/personas/update',
+    passport.authenticate('jwt', { session: false }),
+    updatePersona.bind(this, models)
+  );
+
+  router.delete(
+    '/personas/delete',
+    passport.authenticate('jwt', { session: false }),
+    deletePersona.bind(this, models)
+  );
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));

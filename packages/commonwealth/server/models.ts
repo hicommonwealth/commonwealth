@@ -41,6 +41,7 @@ import type { WebhookModelStatic } from './models/webhook';
 import type { CommunityContractTemplateStatic } from './models/community_contract_template';
 import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
 import type { TemplateModelStatic } from './models/template';
+import type { PersonaModelStatic } from './models/persona';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -84,6 +85,7 @@ export type Models = {
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;
   Webhook: WebhookModelStatic;
+  Persona: PersonaModelStatic;
 };
 
 export interface DB extends Models {

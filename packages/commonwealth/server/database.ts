@@ -43,6 +43,7 @@ import WebhookFactory from './models/webhook';
 import CommunityContractTemplateFactory from './models/community_contract_template';
 import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
 import TemplateFactory from './models/template';
+import PersonaFactory from './models/persona';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -106,6 +107,7 @@ const models: Models = {
   Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),
   Vote: VoteFactory(sequelize, DataTypes),
+  Persona: PersonaFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   RoleAssignment: RoleAssignmentFactory(sequelize, DataTypes),

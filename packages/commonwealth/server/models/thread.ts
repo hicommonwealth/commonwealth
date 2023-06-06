@@ -21,6 +21,12 @@ export type Link = {
   title?: string;
 };
 
+export type PersonaAttributes = {
+  id: number;
+  name: string;
+  personality: string;
+};
+
 export type ThreadAttributes = {
   address_id: number;
   title: string;
