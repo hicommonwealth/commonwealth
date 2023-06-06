@@ -226,7 +226,6 @@ export const initChain = async (): Promise<void> => {
     await app.chain.initApi();
   }
 
-  app.chain.useChain = true;
   const chain = app.chain.meta;
   await app.chain.initData();
 
