@@ -23,10 +23,6 @@ import editComment from '../routes/editComment';
 import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
 import bulkComments from '../routes/bulkComments';
-import createReaction from '../routes/createReaction';
-import deleteReaction from '../routes/deleteReaction';
-import viewReactions from '../routes/viewReactions';
-import bulkReactions from '../routes/bulkReactions';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
@@ -42,6 +38,9 @@ import {
 } from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
+import adminAnalytics, {
+  communitySpecificAnalytics,
+} from '../routes/adminAnalytics';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -170,6 +169,25 @@ import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
+import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
+import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
+import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
+
+import { ServerThreadsController } from '../controllers/server_threads_controller';
+import { ServerCommentsController } from '../controllers/server_comments_controller';
+import { ServerReactionsController } from '../controllers/server_reactions_controller';
+import { ServerNotificationsController } from '../controllers/server_notifications_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+
+export type ServerControllers = {
+  threads: ServerThreadsController;
+  comments: ServerCommentsController;
+  reactions: ServerReactionsController;
+  notifications: ServerNotificationsController;
+  analytics: ServerAnalyticsController;
+};
+
 function setupRouter(
   endpoint: string,
   app: Express,
@@ -180,6 +198,18 @@ function setupRouter(
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService
 ) {
+  // controllers
+
+  const serverControllers: ServerControllers = {
+    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
+    comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
+    reactions: new ServerReactionsController(models, banCache),
+    notifications: new ServerNotificationsController(models),
+    analytics: new ServerAnalyticsController(),
+  };
+
+  // ---
+
   const router = express.Router();
 
   router.use((req, res, next) => {
@@ -299,6 +329,13 @@ function setupRouter(
     '/createChainNode',
     passport.authenticate('jwt', { session: false }),
     createChainNode.bind(this, models)
+  );
+
+  router.get('/adminAnalytics', adminAnalytics.bind(this, models));
+  router.post(
+    '/communitySpecificAnalytics',
+    databaseValidationService.validateChain,
+    communitySpecificAnalytics.bind(this, models)
   );
 
   // threads
@@ -592,23 +629,28 @@ function setupRouter(
 
   // reactions
   router.post(
-    '/createReaction',
+    '/threads/:id/reactions',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createReaction.bind(this, models, tokenBalanceCache, banCache)
+    createThreadReactionHandler.bind(this, serverControllers)
   );
   router.post(
-    '/deleteReaction',
+    '/comments/:id/reactions',
     passport.authenticate('jwt', { session: false }),
-    deleteReaction.bind(this, models, banCache)
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createCommentReactionHandler.bind(this, serverControllers)
+  );
+  router.delete(
+    '/reactions/:id',
+    passport.authenticate('jwt', { session: false }),
+    deleteReactionHandler.bind(this, serverControllers)
   );
   router.get(
-    '/viewReactions',
-    databaseValidationService.validateChain,
-    viewReactions.bind(this, models)
+    '/comments/:id/reactions',
+    getCommentReactionsHandler.bind(this, serverControllers)
   );
-  router.get('/bulkReactions', bulkReactions.bind(this, models));
   router.post('/reactionsCounts', reactionsCounts.bind(this, models));
   router.post(
     '/threadsUsersCountAndAvatars',

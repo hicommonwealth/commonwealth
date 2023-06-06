@@ -7,6 +7,8 @@ import DeleteChainTask from './DeleteChainTask';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
 import 'pages/AdminPanel.scss';
+import Analytics from './Analytics';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -23,6 +25,9 @@ const AdminPanelPage = () => {
     // title={title}
     >
       <div className="AdminPanel">
+        <CWText type="h2">Site Analytics</CWText>
+        <Analytics />
+        <CWDivider />
         <CWText type="h2">Site Admin Tasks</CWText>
         <DeleteChainTask />
         <RPCEndpointTask />
