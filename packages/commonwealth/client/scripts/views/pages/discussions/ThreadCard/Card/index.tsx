@@ -21,13 +21,13 @@ import {
   getClasses,
   isWindowSmallInclusive,
 } from '../../../../components/component_kit/helpers';
-import { ReactionButton } from '../Options/ReactionButton';
 import { isHot } from '../../helpers';
 import { isNewThread } from '../../NewThreadTag';
-import './index.scss';
-import { AdminActionsProps } from '../Options/AdminActions';
 import { AuthorAndPublishInfo } from '../AuthorAndPublishInfo';
 import { Options } from '../Options';
+import { AdminActionsProps } from '../Options/AdminActions';
+import { ReactionButton } from '../Options/ReactionButton';
+import './index.scss';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
@@ -97,13 +97,7 @@ export const Card = ({
           { isPinned: thread.pinned },
           'ThreadCard'
         )}
-        onClick={(e) => {
-          if (e.target !== e.currentTarget) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-          onBodyClick && onBodyClick();
-        }}
+        onClick={() => onBodyClick && onBodyClick()}
         key={thread.id}
       >
         {!windowIsSmall && <ReactionButton thread={thread} size="big" />}
@@ -185,31 +179,37 @@ export const Card = ({
               {thread.plaintext}
             </CWText>
           </div>
-            <div className="content-footer">
-              <Options
-                totalComments={thread.numberOfComments}
-                shareEndpoint={discussionLink}
-                thread={thread}
-                canVote={windowIsSmall}
-                canComment={!thread.readOnly}
-                canUpdateThread={
-                  isLoggedIn &&
+          <div
+            className="content-footer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <Options
+              totalComments={thread.numberOfComments}
+              shareEndpoint={discussionLink}
+              thread={thread}
+              canVote={windowIsSmall}
+              canComment={!thread.readOnly}
+              canUpdateThread={
+                isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
-                }
-                onDelete={onDelete}
-                onSpamToggle={onSpamToggle}
-                onLockToggle={onLockToggle}
-                onPinToggle={onPinToggle}
-                onTopicChange={onTopicChange}
-                onProposalStageChange={onProposalStageChange}
-                onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-                onCollaboratorsEdit={onCollaboratorsEdit}
-                onEditStart={onEditStart}
-                onEditCancel={onEditCancel}
-                onEditConfirm={onEditConfirm}
-                hasPendingEdits={hasPendingEdits}
-              />
-            </div>
+              }
+              onDelete={onDelete}
+              onSpamToggle={onSpamToggle}
+              onLockToggle={onLockToggle}
+              onPinToggle={onPinToggle}
+              onTopicChange={onTopicChange}
+              onProposalStageChange={onProposalStageChange}
+              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+              onCollaboratorsEdit={onCollaboratorsEdit}
+              onEditStart={onEditStart}
+              onEditCancel={onEditCancel}
+              onEditConfirm={onEditConfirm}
+              hasPendingEdits={hasPendingEdits}
+            />
+          </div>
         </div>
       </a>
     </>
