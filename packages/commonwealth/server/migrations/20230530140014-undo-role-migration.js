@@ -62,9 +62,7 @@ module.exports = {
         await queryInterface.sequelize.query(
           `
         UPDATE "Addresses"
-        SET is_user_default = CASE 
-            ${userDefaultIds.map((id) => `WHEN id = ${id} THEN true`).join(' ')}
-        END
+        SET is_user_default = true
         WHERE id IN (${userDefaultIds.join(', ')})
         `,
           { transaction: t }
