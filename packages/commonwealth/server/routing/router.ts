@@ -38,6 +38,9 @@ import {
 } from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
+import adminAnalytics, {
+  communitySpecificAnalytics,
+} from '../routes/adminAnalytics';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -326,6 +329,13 @@ function setupRouter(
     '/createChainNode',
     passport.authenticate('jwt', { session: false }),
     createChainNode.bind(this, models)
+  );
+
+  router.get('/adminAnalytics', adminAnalytics.bind(this, models));
+  router.post(
+    '/communitySpecificAnalytics',
+    databaseValidationService.validateChain,
+    communitySpecificAnalytics.bind(this, models)
   );
 
   // threads
