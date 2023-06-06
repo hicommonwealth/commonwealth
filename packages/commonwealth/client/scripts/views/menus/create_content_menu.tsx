@@ -235,6 +235,46 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         ]
       : [];
 
+  const getPostItems = (): PopoverMenuItem[] =>
+    app.chain?.base === ChainBase.Ethereum
+      ? [
+          {
+            label: 'Add Thread Link',
+            onClick: () => navigate('/:scope/new/contract'),
+            iconLeft: 'star',
+            description: `Adds a bounty for completing a specific action on a page. 
+              Like posting the highest upvoted comment.`,
+          },
+          {
+            label: 'Add Proposal Link',
+            onClick: () =>
+              navigate('/:scope/new/contract_template/:contract_id', {
+                state: { scoped: true, deferChain: true },
+              }),
+            iconLeft: 'star',
+            description: `Allows your post to be collected as an NFT!`,
+          },
+          {
+            label: 'Add Poll',
+            onClick: () =>
+              navigate('/:scope/new/contract_template/:contract_id', {
+                state: { scoped: true, deferChain: true },
+              }),
+            iconLeft: 'star',
+            description: `Add a poll directly from here!`,
+          },
+          {
+            label: 'Create Snapshot',
+            onClick: () =>
+              navigate('/:scope/new/contract_template/:contract_id', {
+                state: { scoped: true, deferChain: true },
+              }),
+            iconLeft: 'star',
+            description: `Create an Snapshot Proposal!`,
+          },
+        ]
+      : [];
+
   return [
     ...(app.activeChainId()
       ? [
@@ -270,6 +310,7 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       label: 'Add Bounty',
     } as PopoverMenuItem,
     ...getDummyItems(),
+    ...getPostItems(),
     // {
     //   type: 'header',
     //   label: 'Add Bounty',

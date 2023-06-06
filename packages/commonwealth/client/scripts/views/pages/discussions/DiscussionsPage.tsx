@@ -16,6 +16,12 @@ import Thread from 'models/Thread';
 
 import { NewThreadForm } from 'views/components/NewThreadForm';
 import { isUndefined } from 'lodash';
+import { CWButton } from '../../components/component_kit/cw_button';
+import useSidebarStore from 'state/ui/sidebar';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import useForceRerender from 'hooks/useForceRerender';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -28,9 +34,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   const [customScrollParent, setCustomScrollParent] = useState(null);
   const stageName: string = searchParams.get('stage');
-
+  const forceRerender = useForceRerender();
+  const { rightSidebarVisible, setRightMenu } = useSidebarStore();
   const [newThreadContentDelta, setNewThreadContentDelta] = useState(null);
-
+  const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
+    isWindowExtraSmall(window.innerWidth)
+  );
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;
@@ -81,6 +90,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
     );
   };
+
+  useEffect(() => {
+    const onResize = () => {
+      setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
+    };
+
+    window.addEventListener('resize', onResize);
+    app.loginStateEmitter.on('redraw', forceRerender);
+    app.user.isFetched.on('redraw', forceRerender);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      app.loginStateEmitter.off('redraw', forceRerender);
+      app.user.isFetched.off('redraw', forceRerender);
+    };
+  }, [forceRerender]);
 
   // Event binding for actions that trigger a thread update (e.g. topic or stage change)
   useEffect(() => {
@@ -182,44 +207,97 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   return (
     <Sublayout hideFooter={true} hideSearch={false}>
       <div className="DiscussionsPage" ref={setCustomScrollParent}>
-        <Virtuoso
-          style={{
-            height: '100%',
-            maxWidth: '768px',
-            width: '100%',
-            padding: '24px',
-          }}
-          data={threads}
-          customScrollParent={customScrollParent}
-          itemContent={(i, thread) => {
-            return (
-              <ThreadPreview thread={thread} key={thread.id + thread.stage} />
-            );
-          }}
-          endReached={loadMore}
-          overscan={200}
-          components={{
-            EmptyPlaceholder: () => (
-              <CWText type="b1" className="no-threads-text">
-                There are no threads matching your filter.
-              </CWText>
-            ),
-            Header: () => {
+        <div className="discussions-left">
+          <Virtuoso
+            style={{
+              height: '100%',
+              padding: '24px',
+            }}
+            data={threads}
+            customScrollParent={customScrollParent}
+            itemContent={(i, thread) => {
               return (
-                <div className="discussion-header">
-                  <RecentThreadsHeader
-                    topic={topicName}
-                    stage={stageName}
-                    totalThreadCount={threads ? totalThreads : 0}
-                  />
-                  {/* {!isUndefined(topicName) && <NewThreadForm />} */}
-                </div>
+                <ThreadPreview thread={thread} key={thread.id + thread.stage} />
               );
-            },
-          }}
-        />
+            }}
+            endReached={loadMore}
+            overscan={200}
+            components={{
+              EmptyPlaceholder: () => (
+                <CWText type="b1" className="no-threads-text">
+                  There are no threads matching your filter.
+                </CWText>
+              ),
+              Header: () => {
+                return (
+                  <div className="discussion-header">
+                    {!isUndefined(topicName) && <NewThreadForm />}
+                    <RecentThreadsHeader
+                      topic={topicName}
+                      stage={stageName}
+                      totalThreadCount={threads ? totalThreads : 0}
+                    />
+                  </div>
+                );
+              },
+            }}
+          />
+        </div>
+        <div className="discussions-right" style={{ padding: '24px' }}>
+          <div className="add-action-card" style={{ paddingBottom: '24px' }}>
+            {windowIsExtraSmall ? (
+              <CWIconButton
+                className="add-action-button"
+                iconName="plusCircle"
+                iconButtonTheme="black"
+                onClick={() => {
+                  setRightMenu({ isVisible: !rightSidebarVisible });
+                }}
+                disabled={!app.user.activeAccount}
+              />
+            ) : (
+              <CWButton
+                className="add-action-button"
+                buttonType="mini-black"
+                label="Add Action"
+                iconLeft="plus"
+                onClick={() => {
+                  setRightMenu({ isVisible: !rightSidebarVisible });
+                }}
+                disabled={!app.user.activeAccount}
+              />
+            )}
+          </div>
+          <DiscussionsCard totalThreadCount={totalThreads} />
+        </div>
       </div>
     </Sublayout>
+  );
+};
+
+const DiscussionsCard = ({ totalThreadCount }) => {
+  return (
+    <CWCard elevation="elevation-1" className="discussions-card">
+      <div className="header-row">
+        <CWText type="h3" fontWeight="semiBold" className="header-text">
+          All Discussions
+        </CWText>
+        <div className="count-and-button">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="thread-count-text"
+          >
+            {totalThreadCount} Threads
+          </CWText>
+        </div>
+      </div>
+      <CWText className="subheader-text">
+        This section is for the community to discuss how to manage the community
+        treasury and spending on contributor grants, community initiatives,
+        liquidity mining and other programs.
+      </CWText>
+    </CWCard>
   );
 };
 
