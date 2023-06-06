@@ -1,7 +1,7 @@
 import { notifyError } from 'controllers/app/notifications';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import $ from 'jquery';
+import axios from 'axios';
 
 import 'pages/AdminPanel.scss';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
@@ -38,37 +38,46 @@ const Analytics = () => {
   }>();
 
   const getCommunityAnalytics = async (chainId: string) => {
-    await $.ajax({
-      type: 'POST',
-      url: `${app.serverUrl()}/communitySpecificAnalytics`,
-      data: {
-        chain: chainId,
-      },
-      success: (response) => {
+    axios
+      .post(
+        `${app.serverUrl()}/communitySpecificAnalytics`,
+        {
+          chain: chainId,
+        },
+        {
+          headers: {
+            'content-type': 'application/json',
+          },
+        }
+      )
+      .then((response) => {
         setChainLookupCompleted(true);
-        setCommunityAnalytics(response.result);
-      },
-      error: (e) => {
-        console.log(e);
+        setCommunityAnalytics(response.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
         notifyError('Error fetching community analytics');
-      },
-    });
+      });
   };
 
   useEffect(() => {
     // Fetch global analytics on load
     const fetchAnalytics = async () => {
-      await $.ajax({
-        type: 'GET',
-        url: `${app.serverUrl()}/adminAnalytics`,
-        headers: {
-          'content-type': 'application/json',
-        },
-        success: (response) => {
-          setLastMonthNewCommunities(response.result.lastMonthNewCommunities);
-          setGlobalStats(response.result.totalStats);
-        },
-      });
+      axios
+        .get(`${app.serverUrl()}/adminAnalytics`, {
+          headers: {
+            'content-type': 'application/json',
+          },
+        })
+        .then((response) => {
+          setLastMonthNewCommunities(
+            response.data.result.lastMonthNewCommunities
+          );
+          setGlobalStats(response.data.result.totalStats);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     };
 
     const timerId = setTimeout(() => {
