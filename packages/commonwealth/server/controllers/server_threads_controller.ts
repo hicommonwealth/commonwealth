@@ -242,7 +242,7 @@ export class ServerThreadsController implements IServerThreadsController {
     }
 
     // check if thread exists
-    let thread = await this.models.Thread.findOne({
+    const thread = await this.models.Thread.findOne({
       where: { id: threadId },
     });
     if (!thread) {
@@ -336,9 +336,9 @@ export class ServerThreadsController implements IServerThreadsController {
 
     const transaction = await this.models.sequelize.transaction();
 
-    let finalComment: CommentInstance | null = null;
+    let comment: CommentInstance | null = null;
     try {
-      const comment = await this.models.Comment.create(commentContent, {
+      comment = await this.models.Comment.create(commentContent, {
         transaction,
       });
 
@@ -370,36 +370,51 @@ export class ServerThreadsController implements IServerThreadsController {
           );
         }
       }
-      // fetch attached objects to return to user
-      finalComment = await this.models.Comment.findOne({
-        where: { id: comment.id },
-        include: [this.models.Address, this.models.Attachment],
-      });
+
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
       throw err;
     }
 
+    // fetch attached objects to return to user
+    const finalComment = await this.models.Comment.findOne({
+      where: { id: comment.id },
+      include: [this.models.Address, this.models.Attachment],
+    });
+
+    const subsTransaction = await this.models.sequelize.transaction();
     try {
       // auto-subscribe comment author to reactions & child comments
-      await this.models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewReaction,
-        object_id: `comment-${finalComment.id}`,
-        chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
-        is_active: true,
-      });
-      await this.models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewComment,
-        object_id: `comment-${finalComment.id}`,
-        chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
-        is_active: true,
-      });
-    } catch (err) {}
+      await this.models.Subscription.create(
+        {
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewReaction,
+          object_id: `comment-${finalComment.id}`,
+          chain_id: finalComment.chain || null,
+          offchain_comment_id: finalComment.id,
+          is_active: true,
+        },
+        { transaction: subsTransaction }
+      );
+      await this.models.Subscription.create(
+        {
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewComment,
+          object_id: `comment-${finalComment.id}`,
+          chain_id: finalComment.chain || null,
+          offchain_comment_id: finalComment.id,
+          is_active: true,
+        },
+        { transaction: subsTransaction }
+      );
+
+      await subsTransaction.commit();
+    } catch (err) {
+      await subsTransaction.rollback();
+      await finalComment.destroy();
+      throw err;
+    }
 
     // grab mentions to notify tagged users
     const bodyText = decodeURIComponent(text);
@@ -489,7 +504,6 @@ export class ServerThreadsController implements IServerThreadsController {
           if (!mentionedAddress.User) {
             return; // some Addresses may be missing users, e.g. if the user removed the address
           }
-
           const shouldNotifyMentionedUser = true;
           if (shouldNotifyMentionedUser) {
             allNotifications.push({
@@ -512,22 +526,22 @@ export class ServerThreadsController implements IServerThreadsController {
           }
         });
       }
-
-      // update author last saved (in background)
-      address.last_active = new Date();
-      address.save();
-
-      // update proposal updated_at timestamp
-      thread.last_commented_on = new Date();
-      thread.save();
-
-      const analyticsOptions = {
-        event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-        community: chain.id,
-        isCustomDomain: null,
-      };
-
-      return [finalComment.toJSON(), allNotifications, analyticsOptions];
     }
+
+    // update author last saved (in background)
+    address.last_active = new Date();
+    address.save();
+
+    // update proposal updated_at timestamp
+    thread.last_commented_on = new Date();
+    thread.save();
+
+    const analyticsOptions = {
+      event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
+      community: chain.id,
+      isCustomDomain: null,
+    };
+
+    return [finalComment.toJSON(), allNotifications, analyticsOptions];
   }
 }
