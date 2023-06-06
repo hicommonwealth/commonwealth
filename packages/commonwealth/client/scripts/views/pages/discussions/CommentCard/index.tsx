@@ -7,6 +7,7 @@ import { CWButton } from '../../../components/component_kit/cw_button';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../../components/component_kit/cw_text';
+import { CWTag } from '../../../components/component_kit/cw_tag';
 import { CommentReactionButton } from '../../../components/ReactionButton/CommentReactionButton';
 import { ReactQuillEditor } from '../../../components/react_quill_editor';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
@@ -19,7 +20,7 @@ type CommentCardProps = {
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
-  onEditConfirm?: () => any;
+  onEditConfirm?: (comment: DeltaStatic) => any;
   onEditCancel?: (hasContentChanged: boolean) => any;
   isEditing?: boolean;
   isSavingEdit?: boolean;
@@ -30,6 +31,10 @@ type CommentCardProps = {
   // Reply
   canReply?: boolean;
   onReply?: () => any;
+  // Spam
+  isSpam?: boolean;
+  onSpamToggle?: () => any;
+  canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
 };
@@ -49,6 +54,10 @@ export const CommentCard = ({
   // reply
   canReply,
   onReply,
+  // spam
+  isSpam,
+  onSpamToggle,
+  canToggleSpam,
   // actual comment
   comment,
 }: CommentCardProps) => {
@@ -91,13 +100,14 @@ export const CommentCard = ({
               onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                await onEditConfirm();
+                await onEditConfirm(commentDelta);
               }}
             />
           </div>
         </div>
       ) : (
-        <>
+        <div className="comment-content">
+          {isSpam && <CWTag label="SPAM" type="disabled" />}
           <CWText className="comment-text">
             <QuillRenderer doc={comment.text} />
           </CWText>
@@ -164,6 +174,13 @@ export const CommentCard = ({
                       iconLeft: 'write' as any,
                       onClick: onEditStart,
                     },
+                    canToggleSpam &&
+                      !isSpam && {
+                        onClick: onSpamToggle,
+                        label: 'Flag as spam',
+                        iconLeft: 'flag' as const,
+                        iconLeftWeight: 'bold',
+                      },
                     canDelete && {
                       label: 'Delete',
                       iconLeft: 'trash' as any,
@@ -174,7 +191,7 @@ export const CommentCard = ({
               )}
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

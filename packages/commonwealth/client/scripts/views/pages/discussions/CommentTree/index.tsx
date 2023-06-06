@@ -246,7 +246,10 @@ export const CommentsTree = ({
     }
   };
 
-  const handleEditConfirm = async (comment: CommentType<any>) => {
+  const handleEditConfirm = async (
+    comment: CommentType<any>,
+    newDelta: DeltaStatic
+  ) => {
     {
       setEdits((p) => ({
         ...p,
@@ -257,10 +260,7 @@ export const CommentsTree = ({
       }));
 
       try {
-        await app.comments.edit(
-          comment,
-          serializeDelta(edits?.[comment.id]?.contentDelta)
-        );
+        await app.comments.edit(comment, serializeDelta(newDelta));
         setEdits((p) => ({
           ...p,
           [comment.id]: {
@@ -283,6 +283,46 @@ export const CommentsTree = ({
         }));
       }
     }
+  };
+
+  const handleFlagMarkAsSpam = (comment: CommentType<any>) => {
+    openConfirmation({
+      title: 'Confirm flag as spam',
+      description: (
+        <>
+          <p>Are you sure you want to flag this comment as spam?</p>
+          <br />
+          <p>
+            Flagging as spam will help filter out unwanted content. Comments
+            flagged as spam are hidden from the main feed and can't be
+            interacted with. For transparency, spam can still be viewed by
+            community members if they choose to "Include comments flagged as
+            spam."
+          </p>
+          <br />
+          <p>Note that you can always unflag a post as spam.</p>
+        </>
+      ),
+      buttons: [
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+        {
+          label: 'Confirm',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              app.comments.toggleSpam(comment.id).then(() => {
+                updatedCommentsCallback && updatedCommentsCallback();
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+      ],
+    });
   };
 
   const recursivelyGatherComments = (
@@ -311,7 +351,7 @@ export const CommentsTree = ({
         );
 
         return (
-          <React.Fragment key={comment.id}>
+          <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
             <div className={`Comment comment-${comment.id}`}>
               {threadLevel > 0 && (
                 <div className="thread-connectors-container">
@@ -338,7 +378,9 @@ export const CommentsTree = ({
                 onEditCancel={async (hasContentChanged: boolean) =>
                   await handleEditCancel(comment, hasContentChanged)
                 }
-                onEditConfirm={async () => await handleEditConfirm(comment)}
+                onEditConfirm={async (newDelta) =>
+                  await handleEditConfirm(comment, newDelta)
+                }
                 isSavingEdit={edits?.[comment.id]?.isSavingEdit || false}
                 isEditing={edits?.[comment.id]?.isEditing || false}
                 canDelete={!isLocked && (isCommentAuthor || isAdminOrMod)}
@@ -348,6 +390,13 @@ export const CommentsTree = ({
                   setIsReplying(true);
                 }}
                 onDelete={async () => await handleDeleteComment(comment)}
+                isSpam={!!comment.markedAsSpamAt}
+                onSpamToggle={async () => await handleFlagMarkAsSpam(comment)}
+                canToggleSpam={
+                  !isLocked &&
+                  !comment.markedAsSpamAt &&
+                  (isCommentAuthor || isAdminOrMod)
+                }
                 comment={comment}
               />
             </div>

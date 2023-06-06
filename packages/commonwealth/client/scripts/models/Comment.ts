@@ -19,7 +19,7 @@ export class Comment<T extends IUniqueId> {
   public readonly threadId: number;
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;
-  public readonly markedAsSpamAt: moment.Moment;
+  public markedAsSpamAt: moment.Moment;
   public readonly deleted: boolean;
 
   public readonly canvasAction: string;

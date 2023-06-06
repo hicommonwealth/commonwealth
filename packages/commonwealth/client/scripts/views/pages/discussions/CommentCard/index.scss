@@ -40,7 +40,7 @@
     max-width: 600px;
     width: 100%;
     padding: 0px;
-    gap: 16px;
+    gap: 12px;
 
     .comment-text {
 
@@ -57,9 +57,11 @@
       }
     }
 
-    .comment-text,
-    .comment-footer {
+    .comment-content {
       padding-left: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .comment-header {

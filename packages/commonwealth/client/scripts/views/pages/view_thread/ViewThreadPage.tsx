@@ -127,7 +127,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       app.comments
         .getByThread(thread)
         .filter((c) => c.parentComment === null) || [];
-    setComments(_comments);
+    setComments([..._comments]);
   }, [thread]);
 
   // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything

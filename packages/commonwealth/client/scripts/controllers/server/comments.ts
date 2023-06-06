@@ -3,14 +3,13 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
-
 import app from 'state';
 import { CommentsStore } from 'stores';
-import Thread from '../../models/Thread';
 import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
 import type { IUniqueId } from '../../models/interfaces';
+import Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
 
 export const modelFromServer = (comment) => {
@@ -277,6 +276,27 @@ class CommentsController {
         .catch((e) => {
           console.error(e);
           notifyError('Could not delete comment');
+          reject(e);
+        });
+    });
+  }
+
+  public async toggleSpam(commentId: number) {
+    return new Promise((resolve, reject) => {
+      $.post(`${app.serverUrl()}/comments/${commentId}/mark-as-spam`, {
+        jwt: app.user.jwt,
+        chain_id: app.activeChainId(),
+      })
+        .then((response) => {
+          const comment = this._store.getById(commentId);
+          const result = modelFromServer({ ...comment, ...response.result });
+          if (comment) this._store.remove(comment);
+          this._store.add(result);
+          resolve(result);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError('Could not mark comment as spam');
           reject(e);
         });
     });
