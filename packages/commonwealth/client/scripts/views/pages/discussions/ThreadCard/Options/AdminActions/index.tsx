@@ -276,9 +276,7 @@ export const AdminActions = ({
                     ? [
                         {
                           onClick: handleFlagMarkAsSpam,
-                          label: !thread.markedAsSpamAt
-                            ? 'Flag as spam'
-                            : 'Unflag as spam',
+                          label: 'Flag as spam',
                           iconLeft: 'flag' as const,
                           iconLeftWeight: 'bold',
                         },

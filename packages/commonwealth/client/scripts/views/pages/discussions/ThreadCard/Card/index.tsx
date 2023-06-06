@@ -185,7 +185,6 @@ export const Card = ({
               {thread.plaintext}
             </CWText>
           </div>
-          {!thread.markedAsSpamAt && (
             <div className="content-footer">
               <Options
                 totalComments={thread.numberOfComments}
@@ -195,9 +194,7 @@ export const Card = ({
                 canComment={!thread.readOnly}
                 canUpdateThread={
                   isLoggedIn &&
-                  (isThreadAuthor ||
-                    isThreadCollaborator ||
-                    hasAdminPermissions)
+                (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
                 }
                 onDelete={onDelete}
                 onSpamToggle={onSpamToggle}
@@ -213,7 +210,6 @@ export const Card = ({
                 hasPendingEdits={hasPendingEdits}
               />
             </div>
-          )}
         </div>
       </a>
     </>
