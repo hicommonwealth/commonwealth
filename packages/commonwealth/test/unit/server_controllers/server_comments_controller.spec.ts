@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
+import { ChainInstance } from 'server/models/chain';
 import Sinon from 'sinon';
 
 describe('ServerCommentsController', () => {
@@ -461,6 +462,49 @@ describe('ServerCommentsController', () => {
 
       const reactions = await serverCommentsController.getCommentReactions(777);
       expect(reactions).to.have.length(2);
+    });
+  });
+
+  describe('#searchComments', () => {
+    it('should return comment search results', async () => {
+      const sandbox = Sinon.createSandbox();
+      const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([{ id: 1 }, { id: 2 }]),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {};
+
+      const serverCommentsController = new ServerCommentsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      const chain = { id: 'ethereum' };
+      const searchOptions = {
+        search: 'hello',
+        chain: 'ethereum',
+        sort: 'blah',
+        page: 7,
+        pageSize: 5,
+      };
+      const comments = await serverCommentsController.searchComments(
+        chain as ChainInstance,
+        searchOptions
+      );
+      const sqlArgs = db.sequelize.query.args[0];
+      expect(sqlArgs).to.have.length(2);
+      expect(sqlArgs[1].bind).to.include({
+        searchTerm: 'hello',
+        limit: 5,
+        offset: 30,
+        chain: 'ethereum',
+      });
+      expect(comments).to.have.length(2);
+      expect(comments[0].id).to.equal(1);
+      expect(comments[1].id).to.equal(2);
     });
   });
 });

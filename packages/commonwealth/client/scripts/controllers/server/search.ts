@@ -231,10 +231,7 @@ class SearchController {
       if (page) {
         queryParams['page'] = page;
       }
-      const response = await $.get(
-        `${app.serverUrl()}/searchComments`,
-        queryParams
-      );
+      const response = await $.get(`${app.serverUrl()}/comments`, queryParams);
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }

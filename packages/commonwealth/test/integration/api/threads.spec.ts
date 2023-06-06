@@ -332,7 +332,7 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/createComment', () => {
+  describe('/thread/:id/comments', () => {
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
         address: userAddress,

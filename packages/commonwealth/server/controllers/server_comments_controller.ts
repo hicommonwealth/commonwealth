@@ -1,3 +1,6 @@
+import { uniqBy } from 'lodash';
+import { QueryTypes } from 'sequelize';
+
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { ReactionAttributes } from '../models/reaction';
@@ -16,13 +19,43 @@ import { NotificationOptions } from './server_notifications_controller';
 import { getThreadUrl } from '../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { AnalyticsOptions } from './server_analytics_controller';
-import { uniqBy } from 'lodash';
+import { buildPaginationSql } from '../util/queries';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
   BalanceCheckFailed: 'Could not verify user token balance',
+};
+
+export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
+
+/**
+ * Options for searching comments
+ */
+type SearchCommentOptions = {
+  search: string;
+  chain?: string;
+  sort?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+/**
+ * Data representing a comment search result
+ */
+export type SearchCommentResult = {
+  id: number;
+  title: string;
+  text: string;
+  proposalid: number;
+  type: 'comment';
+  address_id: number;
+  address: string;
+  address_chain: string;
+  created_at: string;
+  chain: string;
+  rank: number;
 };
 
 /**
@@ -61,6 +94,18 @@ interface IServerCommentsController {
    * @returns Promise that resolves to array of reactions
    */
   getCommentReactions(commentId: number): Promise<ReactionAttributes[]>;
+
+  /**
+   * Returns an array of comment search results
+   *
+   * @param chain - Chain object
+   * @param options - Options for searching comments
+   * @returns Promise that resolves to array of search comment results
+   */
+  searchComments(
+    chain: ChainInstance,
+    options: SearchCommentOptions
+  ): Promise<SearchCommentResult[]>;
 }
 
 /**
@@ -207,5 +252,80 @@ export class ServerCommentsController implements IServerCommentsController {
       reactions.map((c) => c.toJSON()),
       'id'
     );
+  }
+
+  async searchComments(
+    chain: ChainInstance,
+    options: SearchCommentOptions
+  ): Promise<SearchCommentResult[]> {
+    // sort by rank by default
+    let sortOptions: {
+      column: string;
+      direction: 'ASC' | 'DESC';
+    } = {
+      column: 'rank',
+      direction: 'DESC',
+    };
+    switch ((options.sort || '').toLowerCase()) {
+      case 'newest':
+        sortOptions = { column: '"Comments".created_at', direction: 'DESC' };
+        break;
+      case 'oldest':
+        sortOptions = { column: '"Comments".created_at', direction: 'ASC' };
+        break;
+    }
+
+    const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
+      limit: options.pageSize || 10,
+      page: options.page || 1,
+      orderBy: sortOptions.column,
+      orderDirection: sortOptions.direction,
+    });
+
+    const bind: {
+      searchTerm?: string;
+      chain?: string;
+      limit?: number;
+    } = {
+      searchTerm: options.search,
+      ...paginationBind,
+    };
+    if (chain) {
+      bind.chain = chain.id;
+    }
+
+    const chainWhere = bind.chain ? '"Comments".chain = $chain AND' : '';
+
+    const comments = await this.models.sequelize.query(
+      `
+    SELECT
+        "Comments".id,
+        "Threads".title,
+        "Comments".text,
+        "Comments".thread_id as proposalId,
+        'comment' as type,
+        "Addresses".id as address_id,
+        "Addresses".address,
+        "Addresses".chain as address_chain,
+        "Comments".created_at,
+        "Threads".chain,
+        ts_rank_cd("Comments"._search, query) as rank
+      FROM "Comments"
+      JOIN "Threads" ON "Comments".thread_id = "Threads".id
+      JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
+      websearch_to_tsquery('english', $searchTerm) as query
+      WHERE
+        ${chainWhere}
+        "Comments".deleted_at IS NULL AND
+        query @@ "Comments"._search
+      ${paginationSort}
+    `,
+      {
+        bind,
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    return comments as SearchCommentResult[];
   }
 }

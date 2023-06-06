@@ -18,7 +18,6 @@ import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
 import finishOAuthLogin from '../routes/finishOAuthLogin';
 import startOAuthLogin from '../routes/startOAuthLogin';
-import createComment from '../routes/createComment';
 import editComment from '../routes/editComment';
 import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
@@ -83,7 +82,6 @@ import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
 import getThreadsOld from '../routes/getThreads';
 import searchDiscussions from '../routes/searchDiscussions';
-import searchComments from '../routes/searchComments';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
@@ -166,16 +164,18 @@ import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
-import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
-import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
-import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
-
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerReactionsController } from '../controllers/server_reactions_controller';
 import { ServerNotificationsController } from '../controllers/server_notifications_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+
+import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
+import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
+import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
+import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
+import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -503,11 +503,6 @@ function setupRouter(
     searchDiscussions.bind(this, models)
   );
   router.get(
-    '/searchComments',
-    databaseValidationService.validateChain,
-    searchComments.bind(this, models)
-  );
-  router.get(
     '/searchProfiles',
     databaseValidationService.validateChain,
     searchProfiles.bind(this, models)
@@ -547,11 +542,11 @@ function setupRouter(
 
   // comments
   router.post(
-    '/createComment',
+    '/threads/:id/comments',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createComment.bind(this, models, tokenBalanceCache, banCache)
+    createThreadCommentHandler.bind(this, serverControllers)
   );
   router.post(
     '/editComment',
@@ -574,6 +569,11 @@ function setupRouter(
     '/bulkComments',
     databaseValidationService.validateChain,
     bulkComments.bind(this, models)
+  );
+  router.get(
+    '/comments',
+    databaseValidationService.validateChain,
+    searchCommentsHandler.bind(this, serverControllers)
   );
 
   // topics

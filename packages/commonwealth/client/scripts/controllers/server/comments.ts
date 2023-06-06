@@ -146,21 +146,22 @@ class CommentsController {
         parent_comment_id: parentCommentId,
       });
 
-      // TODO: Change to POST /comment
-      const res = await $.post(`${app.serverUrl()}/createComment`, {
-        author_chain: app.user.activeAccount.chain.id,
-        chain,
-        address: app.user.activeAccount.address,
-        parent_id: parentCommentId,
-        chain_entity_id: chainEntity?.id,
-        thread_id: threadId,
-        'attachments[]': attachments,
-        text: encodeURIComponent(unescapedText),
-        jwt: app.user.jwt,
-        canvas_action: action,
-        canvas_session: session,
-        canvas_hash: hash,
-      });
+      const res = await $.post(
+        `${app.serverUrl()}/threads/${threadId}/comments`,
+        {
+          author_chain: app.user.activeAccount.chain.id,
+          chain,
+          address: app.user.activeAccount.address,
+          parent_id: parentCommentId,
+          chain_entity_id: chainEntity?.id,
+          'attachments[]': attachments,
+          text: encodeURIComponent(unescapedText),
+          jwt: app.user.jwt,
+          canvas_action: action,
+          canvas_session: session,
+          canvas_hash: hash,
+        }
+      );
       const { result } = res;
       const newComment = modelFromServer(result);
       this._store.add(newComment);
