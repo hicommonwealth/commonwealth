@@ -48,6 +48,7 @@ const bulkThreads = async (
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.chain AS addr_chain, threads.thread_id, thread_title,
+        threads.marked_as_spam_at,
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage,
         threads.has_poll, threads.plaintext,
@@ -62,6 +63,7 @@ const bulkThreads = async (
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
+          t.marked_as_spam_at,
           t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted,
           t.has_poll,
@@ -155,6 +157,7 @@ const bulkThreads = async (
           ? t.addresses_reacted.split(',')
           : [],
         reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
+        marked_as_spam_at: t.marked_as_spam_at,
       };
       if (t.topic_id) {
         data['topic'] = {
@@ -211,8 +214,9 @@ const bulkThreads = async (
       type: QueryTypes.SELECT,
     }
   );
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
-    .length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   threads = await Promise.all(threads);
 
