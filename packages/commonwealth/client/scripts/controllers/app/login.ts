@@ -171,7 +171,7 @@ export async function updateActiveAddresses({
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
       .filter((addr) => addr),
     shouldRedraw
   );
@@ -280,6 +280,7 @@ export async function createUserWithAddress(
     walletId,
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
+    ignoreProfile: false,
   });
   return { account, newlyCreated: response.result.newly_created };
 }

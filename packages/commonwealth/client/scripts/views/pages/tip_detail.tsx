@@ -5,6 +5,7 @@ import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_
 import 'pages/tip_detail.scss';
 
 import app from 'state';
+import NewProfilesController from '../../controllers/server/newProfiles';
 import { User } from '../components/user/user';
 import Sublayout from '../Sublayout';
 import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
@@ -36,7 +37,10 @@ export const TipDetail = (props: TipDetailProps) => {
           <div className="proposal-page-row">
             <div className="label">Beneficiary</div>
             <User
-              user={app.newProfiles.getProfile(proposal.author.chain.id, who)}
+              user={NewProfilesController.Instance.getProfile(
+                proposal.author.chain.id,
+                who
+              )}
               linkify
               popover
               showAddressWithDisplayName

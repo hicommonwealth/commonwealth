@@ -4,6 +4,7 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import { ThreadStage } from '../../../models/types';
 
 import { Link, LinkSource, Thread } from '../../../models/Thread';
@@ -394,13 +395,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       // load profiles
       if (!prefetch[threadId]['profilesStarted']) {
-        app.newProfiles.getProfile(thread.authorChain, thread.author);
+        NewProfilesController.Instance.getProfile(
+          thread.authorChain,
+          thread.author
+        );
 
         comments.forEach((comment) => {
-          app.newProfiles.getProfile(comment.authorChain, comment.author);
+          NewProfilesController.Instance.getProfile(
+            comment.authorChain,
+            comment.author
+          );
         });
 
-        app.newProfiles.isFetched.on('redraw', () => {
+        NewProfilesController.Instance.isFetched.on('redraw', () => {
           if (!prefetch[threadId]?.['profilesFinished']) {
             setPrefetch((prevState) => ({
               ...prevState,
