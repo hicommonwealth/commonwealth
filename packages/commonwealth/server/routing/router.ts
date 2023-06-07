@@ -170,6 +170,8 @@ import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
+import unmarkThreadAsSpam from '../routes/spam/unmarkThreadAsSpam';
+import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -936,11 +938,21 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     markThreadAsSpam.bind(this, models)
   );
+  router.post(
+    '/threads/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkThreadAsSpam.bind(this, models)
+  );
 
   router.post(
     '/comments/:id/mark-as-spam',
     passport.authenticate('jwt', { session: false }),
     markCommentAsSpam.bind(this, models)
+  );
+  router.post(
+    '/comments/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkCommentAsSpam.bind(this, models)
   );
 
   // login
