@@ -125,6 +125,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
   roleFindOptions.order = findOptions.order;
 
   if (
+    findOptions['where'] &&
     'address_id' in findOptions['where'] &&
     findOptions['where']['address_id'] === undefined
   ) {
