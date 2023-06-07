@@ -162,7 +162,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // get threads for current topic
           const topicId = topics.find(({ name }) => name === topicName)?.id;
           if (topicId) {
-            finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
+            finalThreads = finalThreads.filter((x) => x?.topic?.id && x.topic.id === topicId);
           }
 
           // get threads for current stage
