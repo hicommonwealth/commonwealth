@@ -1,4 +1,8 @@
-import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import type {
+  CWEvent,
+  EvmEventSourceMapType,
+  IDisconnectedRange,
+} from '../../interfaces';
 import { SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
@@ -14,6 +18,7 @@ import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { Subscriber } from './subscriber';
+import { ethers } from 'ethers';
 
 export class Listener extends BaseListener<
   Api,
@@ -103,12 +108,26 @@ export class Listener extends BaseListener<
       this.log.info(
         `Subscribing to Compound contract: ${this._chain}, on url ${this._options.url}`
       );
-      await this._subscriber.subscribe(this.processBlock.bind(this));
+      await this._subscriber.subscribe(
+        this.processBlock.bind(this),
+        this.getEventSourceMap()
+      );
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
       throw error;
     }
+  }
+
+  private getEventSourceMap(): EvmEventSourceMapType {
+    return {
+      [this._api.address.toLowerCase()]: {
+        eventSignatures: Object.keys(this._api.interface.events).map((x) =>
+          ethers.utils.id(x)
+        ),
+        api: this._api.interface,
+      },
+    };
   }
 
   public async updateContractAddress(address: string): Promise<void> {
@@ -191,12 +210,6 @@ export class Listener extends BaseListener<
     // force type to any because the Ethers Provider interface does not include the original
     // Web3 provider, yet it exists under provider.provider
     const provider = <any>this._api.provider;
-
-    // WebSocket ReadyState - more info: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
-    const readyState = provider.provider.connection._readyState === 1;
-    const socketConnected = provider.provider.connected;
-    const polling = provider.polling;
-
-    return readyState && socketConnected && polling;
+    return provider.provider ? true : false;
   }
 }
