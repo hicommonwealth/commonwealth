@@ -17,7 +17,9 @@ const MembersPage = lazy(() => import('views/pages/members'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
-const FinishSocialLoginPage = lazy(() => import('views/pages/finish_social_login'))
+const FinishSocialLoginPage = lazy(
+  () => import('views/pages/finish_social_login')
+);
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
@@ -97,63 +99,39 @@ const CommonDomainRoutes = () => [
     path="/whyCommonwealth"
     element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
   />,
-  <Route
-    path="/dashboard"
-    element={withLayout(DashboardPage, {
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/dashboard/:type"
-    element={withLayout(DashboardPage, {
-      deferChain: true,
-    })}
-  />,
+  <Route path="/dashboard" element={withLayout(DashboardPage, {})} />,
+  <Route path="/dashboard/:type" element={withLayout(DashboardPage, {})} />,
   <Route
     path="/communities"
     element={withLayout(CommunitiesPage, {
       hideSidebar: false,
     })}
   />,
-  <Route
-    path="/search"
-    element={withLayout(SearchPage, {
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/web3login"
-    element={withLayout(Web3LoginPage, {
-      deferChain: true,
-    })}
-  />,
+  <Route path="/search" element={withLayout(SearchPage, {})} />,
+  <Route path="/web3login" element={withLayout(Web3LoginPage, {})} />,
   // scoped
   <Route
     path="/:scope/overview"
     element={withLayout(OverviewPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/search"
     element={withLayout(SearchPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/members"
     element={withLayout(MembersPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/sputnik-daos"
     element={withLayout(SputnikDaosPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
@@ -175,21 +153,17 @@ const CommonDomainRoutes = () => [
     path="/:scope/notifications"
     element={withLayout(NotificationsPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/notifications"
     element={withLayout(NotificationsPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/notification-settings"
-    element={withLayout(NotificationSettingsPage, {
-      deferChain: true,
-    })}
+    element={withLayout(NotificationSettingsPage, {})}
   />,
   <Route
     path="/:scope/notification-settings"
@@ -232,7 +206,6 @@ const CommonDomainRoutes = () => [
     path="/:scope/new/proposal"
     element={withLayout(NewProposalPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
@@ -248,21 +221,18 @@ const CommonDomainRoutes = () => [
     path="/:scope/discussions"
     element={withLayout(DiscussionsPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/discussions/:topicName"
     element={withLayout(DiscussionsPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
@@ -275,7 +245,6 @@ const CommonDomainRoutes = () => [
     path="/:scope/new/discussion"
     element={withLayout(NewThreadPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
@@ -292,7 +261,6 @@ const CommonDomainRoutes = () => [
     path="/:scope"
     element={withLayout(DiscussionsRedirectPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   ...(featureFlags.communityHomepage
@@ -301,7 +269,6 @@ const CommonDomainRoutes = () => [
           path="/:scope/feed"
           element={withLayout(FeedPage, {
             scoped: true,
-            deferChain: true,
           })}
         />,
       ]
@@ -315,21 +282,18 @@ const CommonDomainRoutes = () => [
           path="/:scope/contracts"
           element={withLayout(ContractsPage, {
             scoped: true,
-            deferChain: true,
           })}
         />,
         <Route
           path="/:scope/new/contract"
           element={withLayout(NewContractPage, {
             scoped: true,
-            deferChain: true,
           })}
         />,
         <Route
           path="/:scope/new/contract_template/:contract_id"
           element={withLayout(NewContractTemplatePage, {
             scoped: true,
-            deferChain: true,
           })}
         />,
         <Route
@@ -364,19 +328,13 @@ const CommonDomainRoutes = () => [
   // TREASURY END
 
   // SITE ADMIN
-  <Route
-    path="/admin-panel"
-    element={withLayout(AdminPanelPage, {
-      deferChain: true,
-    })}
-  />,
+  <Route path="/admin-panel" element={withLayout(AdminPanelPage, {})} />,
 
   // ADMIN
   <Route
     path="/:scope/manage"
     element={withLayout(ManageCommunityPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,
@@ -384,35 +342,30 @@ const CommonDomainRoutes = () => [
     path="/:scope/analytics"
     element={withLayout(AnalyticsPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/snapshot/:snapshotId"
     element={withLayout(SnapshotProposalPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/multiple-snapshots"
     element={withLayout(ViewMultipleSnapshotsPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/snapshot/:snapshotId/:identifier"
     element={withLayout(ViewSnapshotsProposalPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/new/snapshot/:snapshotId"
     element={withLayout(NewSnapshotProposalPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   // snapshot proposals redirects
@@ -478,28 +431,24 @@ const CommonDomainRoutes = () => [
     path="/:scope/account/:address"
     element={withLayout(ProfilePageRedirect, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/account"
     element={withLayout(ProfilePageRedirect, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/profile/id/:profileId"
     element={withLayout(NewProfilePage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/profile/edit"
     element={withLayout(EditNewProfilePage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   // PROFILES END
@@ -515,14 +464,12 @@ const CommonDomainRoutes = () => [
     path="/:scope/link/chain-entity/:identifier"
     element={withLayout(ChainEntityLinkRedirectPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
   <Route
     path="/:scope/link/snapshot-proposal/:identifier"
     element={withLayout(SnapshotProposalLinkRedirectPage, {
       scoped: true,
-      deferChain: true,
     })}
   />,
 
