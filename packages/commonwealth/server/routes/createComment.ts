@@ -401,13 +401,13 @@ const createComment = async (
     const personaId = mentionedPersonas[0][1];
     try {
       const generatedTextCompletion = await generateText(models, {
-        thread: thread.id,
-        content: finalComment.text,
+        parent_id: finalComment.id,
+        thread_id: thread_id,
+        content: finalComment.plaintext,
+        is_comment: true,
       });
 
       const generatedTextResponse = `Response to ${finalComment.Address.address}, ${generatedTextCompletion}`;
-
-      console.log('generatedTextResponse', generatedTextResponse);
 
       // create a new comment with the generated text and persona as the author
       const personaComment = await models.Comment.create({
@@ -422,8 +422,6 @@ const createComment = async (
         canvas_session,
         canvas_hash,
       });
-
-      console.log('personaComment', personaComment);
 
       // ... additional logic for handling attachments, subscriptions, etc. for the new comment
     } catch (e) {
