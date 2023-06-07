@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const getAddressFromWallet = (wallet: IWebWallet<any>) => {
   const selectedAddress = (() => {
+    console.log(wallet.accounts);
     if (wallet.chain === 'ethereum' || wallet.chain === 'solana') {
       return wallet.accounts[0];
     }
@@ -12,7 +13,7 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
       return wallet.accounts[0].address;
     }
 
-    if (wallet.chain === 'cosmos') {
+    if (wallet.chain === 'cosmos' || wallet.chain === 'substrate') {
       if (wallet.defaultNetwork === 'injective') {
         return wallet.accounts[0];
       }
