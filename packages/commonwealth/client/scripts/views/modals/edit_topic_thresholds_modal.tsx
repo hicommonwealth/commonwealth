@@ -60,7 +60,11 @@ const EditTopicThresholdsRow = ({
               onClose();
               notifySuccess('Successfully updated threshold value');
             } catch (err) {
-              notifyError(`Invalid threshold value: ${err.message}`);
+              notifyError(
+                err?.response?.data?.error ||
+                  err?.message ||
+                  'Invalid threshold value'
+              );
             }
           }}
         />
