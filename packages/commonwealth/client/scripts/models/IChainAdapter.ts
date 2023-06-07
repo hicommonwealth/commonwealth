@@ -79,6 +79,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numTotalThreads,
       true
     );
+    this.app.personas.init(); // To remove later
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
