@@ -10,9 +10,9 @@ import $ from 'jquery';
 import moment from 'moment';
 import { Link, LinkSource } from 'server/models/thread';
 import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { ThreadActionType } from '../../../../shared/types';
 /* eslint-disable no-restricted-syntax */
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
@@ -199,11 +199,10 @@ class ThreadsController {
       : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;
-
-    let topicFromStore = null;
     if (topic?.id) {
-      topicFromStore = app.topics.store.getById(topic.id);
+      topicModel = new Topic(topic);
     }
 
     let decodedTitle;
@@ -231,7 +230,7 @@ class ThreadsController {
       createdAt: moment(created_at),
       updatedAt: moment(updated_at),
       attachments,
-      topic: topicFromStore,
+      topic: topicModel,
       kind,
       stage,
       chain,
@@ -411,6 +410,35 @@ class ThreadsController {
         );
       },
     });
+  }
+
+  public async updateTopic(
+    threadId: number,
+    topicName: string,
+    topicId?: number
+  ): Promise<Topic> {
+    try {
+      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+        jwt: app.user.jwt,
+        thread_id: threadId,
+        topic_id: topicId,
+        topic_name: topicName,
+        address: app.user.activeAccount.address,
+      });
+      const result = new Topic(response.result);
+      const thread = app.threads.getById(threadId);
+      thread.topic = result;
+      app.threads.updateThreadInStore(thread);
+
+      return result;
+    } catch (err) {
+      console.log('Failed to update thread topic');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update thread topic'
+      );
+    }
   }
 
   public async delete(proposal) {
@@ -775,10 +803,16 @@ class ThreadsController {
       page,
     } = options;
 
+    const topics =
+      (await queryClient.ensureQueryData<Topic[]>([
+        ApiEndpoints.BULK_TOPICS,
+        app.chain.id,
+      ])) || [];
+
     const chain = app.activeChainId();
     const params = (() => {
       // find topic id (if any)
-      const topicId = app.topics.getByName(topicName, chain)?.id;
+      const topicId = topics.find(({ name }) => name === topicName)?.id;
 
       // calculate 'from' and 'to' dates
       const today = moment();
@@ -933,6 +967,7 @@ class ThreadsController {
       this._store.clear();
       this._listingStore.clear();
     }
+
     for (const thread of initialThreads) {
       const modeledThread = this.modelFromServer(thread);
       if (!thread.Address) {

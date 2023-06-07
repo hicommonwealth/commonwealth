@@ -13,6 +13,7 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../models/types';
 import app from '../../../state';
+import { useFetchTopicsQuery } from '../../../state/api/topics';
 import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { HeaderWithFilters } from './HeaderWithFilters';
@@ -37,6 +38,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
     'dateRange'
   ) as ThreadTimelineFilterTypes;
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   /**
    * the api will return sorted results and those are stored in state, when user
@@ -103,9 +107,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           let finalThreads = foundThreadsForChain;
 
           // get threads for current topic
-          const topicId = app.topics.getByName(topicName, chain)?.id;
+          const topicId = topics.find(({ name }) => name === topicName)?.id;
           if (topicId) {
-            finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
+            finalThreads = finalThreads.filter((x) => x?.topic?.id && x.topic.id === topicId);
           }
 
           // get threads for current stage

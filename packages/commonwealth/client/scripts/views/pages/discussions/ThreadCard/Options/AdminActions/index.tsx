@@ -2,7 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { ChangeTopicModal } from 'views/modals/change_topic_modal';
+import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import { notifySuccess } from '../../../../../../controllers/app/notifications';
@@ -323,7 +323,7 @@ export const AdminActions = ({
 
       <Modal
         content={
-          <ChangeTopicModal
+          <ChangeThreadTopicModal
             onChangeHandler={onTopicChange}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
