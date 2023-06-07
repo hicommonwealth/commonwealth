@@ -180,7 +180,9 @@ export const RecentThreadsHeader = ({
               label="Create Thread"
               iconLeft="plus"
               onClick={() => {
-                navigate('/new/discussion');
+                navigate(
+                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
+                );
               }}
               disabled={!app.user.activeAccount}
             />
