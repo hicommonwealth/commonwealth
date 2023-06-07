@@ -20,7 +20,6 @@ import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types'
 import { AnalyticsOptions } from './server_analytics_controller';
 import { CommentAttributes, CommentInstance } from '../models/comment';
 import { getCommentDepth } from '../util/getCommentDepth';
-import { sequelize } from '../../../chain-events/services/database/database';
 import { parseUserMentions } from '../util/parseUserMentions';
 
 const Errors = {

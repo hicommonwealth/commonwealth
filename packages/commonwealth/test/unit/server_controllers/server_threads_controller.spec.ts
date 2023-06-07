@@ -1,6 +1,9 @@
 import BN from 'bn.js';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
+import { AddressInstance } from 'server/models/address';
+import { ChainInstance } from 'server/models/chain';
+import { UserInstance } from 'server/models/user';
 import Sinon from 'sinon';
 
 describe('ServerThreadsController', () => {
@@ -338,6 +341,85 @@ describe('ServerThreadsController', () => {
           commentId
         )
       ).to.be.rejectedWith('Could not verify user token balance');
+    });
+  });
+  describe('#createThreadComment', () => {
+    it('should create a comment on thread', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            save: async () => ({}),
+          }),
+        },
+        // for findAllRoles
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        sequelize: {
+          transaction: async () => ({
+            rollback: async () => ({}),
+            commit: async () => ({}),
+          }),
+        },
+        Comment: {
+          create: async () => ({}),
+          findOne: async () => ({
+            Address: {
+              id: 1,
+              address: '0x123',
+            },
+            destroy: async () => ({}),
+            toJSON: () => ({}),
+          }),
+        },
+        Subscription: {
+          create: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      const user = {};
+      const address = {
+        id: 1,
+        address: '0x123',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+        network: 'ethereum',
+      };
+      const parentId = null;
+      const threadId = 'abc';
+      const text = 'hello';
+      const attachments = null;
+      const canvasAction = null;
+      const canvasHash = null;
+      const canvasSession = null;
+      await serverThreadsController.createThreadComment(
+        user as any,
+        address as any,
+        chain as any,
+        parentId,
+        threadId,
+        text,
+        attachments,
+        canvasAction,
+        canvasSession,
+        canvasHash
+      );
     });
   });
 });
