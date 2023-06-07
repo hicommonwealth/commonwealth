@@ -304,18 +304,18 @@ export const CommentsTree = ({
             spam."
           </p>
           <br />
-          <p>Note that you can always unflag a post as spam.</p>
+          <p>Note that you can always unflag a comment as spam.</p>
         </>
       ) : (
         <>
           <p>
-            Are you sure you want to unflag this post as spam? Flagging as spam
-            will help filter out unwanted content.
+            Are you sure you want to unflag this comment as spam? Flagging as
+            spam will help filter out unwanted content.
           </p>
           <br />
           <p>
             For transparency, spam can still be viewed by community members if
-            they choose to “Include posts flagged as spam.”
+            they choose to “Include comments flagged as spam.”
             <br />
           </p>
         </>
