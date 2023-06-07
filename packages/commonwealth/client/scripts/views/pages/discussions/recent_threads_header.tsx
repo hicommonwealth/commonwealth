@@ -6,6 +6,7 @@ import 'pages/discussions/recent_threads_header.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import useBrowserWindow from '../../../hooks/useBrowserWindow';
@@ -82,7 +83,9 @@ export const RecentThreadsHeader = ({
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const featuredTopics = topics
     .filter((t) => t.featuredInSidebar)

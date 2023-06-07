@@ -1,9 +1,9 @@
 @import '../shared';
 
-.Modal:has(.ChangeTopicModal) {
+.Modal:has(.ChangeThreadTopicModal) {
   overflow: unset;
 
-  .ChangeTopicModal {
+  .ChangeThreadTopicModal {
     width: 320px;
 
     .compact-modal-body {
