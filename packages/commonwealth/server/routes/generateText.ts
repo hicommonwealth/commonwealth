@@ -15,20 +15,14 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 type generateTextReq = {
+  thread: number;
   content: string;
-};
-
-type generateTextResp = {
-  completion: string;
 };
 
 const generateText = async (
   models: DB,
-  req: TypedRequestBody<generateTextReq>,
-  res: TypedResponse<generateTextResp>
-) => {
-  const { content } = req.body;
-
+  { thread, content }: generateTextReq
+): Promise<string> => {
   if (!content) {
     throw new AppError('No content provided');
   }
@@ -55,7 +49,7 @@ const generateText = async (
     throw new AppError('Problem generating text');
   }
 
-  return success(res, { completion });
+  return completion;
 };
 
 export default generateText;

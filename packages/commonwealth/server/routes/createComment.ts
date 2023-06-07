@@ -21,10 +21,14 @@ import { SENDGRID_API_KEY } from '../config';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-import { parseUserMentions } from '../util/parseUserMentions';
+import {
+  parsePersonaMentions,
+  parseUserMentions,
+} from '../util/parseUserMentions';
 import { findAllRoles } from '../util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import generateText from './generateText';
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 
@@ -380,6 +384,51 @@ const createComment = async (
           [finalComment.Address.address]
         );
     });
+  }
+
+  let mentionedPersonas;
+  try {
+    const mentions = parsePersonaMentions(bodyText);
+    if (mentions && mentions.length > 0) {
+      mentionedPersonas = mentions;
+    }
+  } catch (e) {
+    return next(new AppError('Failed to parse persona mentions'));
+  }
+
+  // if there is a specific persona mentioned, trigger generateText
+  if (mentionedPersonas && mentionedPersonas.length === 1) {
+    const personaId = mentionedPersonas[0][1];
+    try {
+      const generatedTextCompletion = await generateText(models, {
+        thread: thread.id,
+        content: finalComment.text,
+      });
+
+      const generatedTextResponse = `Response to ${finalComment.Address.address}, ${generatedTextCompletion}`;
+
+      console.log('generatedTextResponse', generatedTextResponse);
+
+      // create a new comment with the generated text and persona as the author
+      const personaComment = await models.Comment.create({
+        thread_id,
+        text: generatedTextResponse,
+        plaintext: generatedTextResponse,
+        version_history,
+        address_id: author.id,
+        chain: chain.id,
+        parent_id: comment.id,
+        canvas_action,
+        canvas_session,
+        canvas_hash,
+      });
+
+      console.log('personaComment', personaComment);
+
+      // ... additional logic for handling attachments, subscriptions, etc. for the new comment
+    } catch (e) {
+      console.error('Error generating text from persona:', e);
+    }
   }
 
   // update author.last_active (no await)
