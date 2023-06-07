@@ -78,6 +78,12 @@ const useNewThreadForm = (
     saveDraft(draft);
   }, [saveDraft, threadTopic, threadTitle, threadContentDelta]);
 
+  useEffect(() => {
+    if (!threadTopic && defaultTopic) {
+      setThreadTopic(defaultTopic);
+    }
+  }, [defaultTopic, threadTopic]);
+
   return {
     threadKind,
     setThreadKind,

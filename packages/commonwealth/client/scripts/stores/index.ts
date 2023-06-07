@@ -11,7 +11,6 @@ export { default as ReactionStore } from './ReactionStore';
 export { default as ReactionCountsStore } from './ReactionCountsStore';
 export { default as ThreadUniqueAddressesCountStore } from './ThreadUniqueAddressesCountStore';
 export { default as Store } from './Store';
-export { default as TopicStore } from './TopicStore';
 export { default as RecentListingStore } from './RecentListingStore';
 export { default as PersistentStore } from './PersistentStore';
 
