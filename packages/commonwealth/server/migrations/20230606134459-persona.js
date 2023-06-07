@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('personas', {
+    await queryInterface.createTable('Personas', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -45,7 +45,7 @@ module.exports = {
     });
 
     // Insert default Dillbot persona
-    await queryInterface.bulkInsert('personas', [
+    await queryInterface.bulkInsert('Personas', [
       {
         name: 'Dillbot',
         personality:
@@ -57,10 +57,10 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // Remove the default Dillbot persona
-    await queryInterface.bulkDelete('personas', {
+    await queryInterface.bulkDelete('Personas', {
       name: 'Dillbot',
     });
 
-    await queryInterface.dropTable('personas');
+    await queryInterface.dropTable('Personas');
   },
 };
