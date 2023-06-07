@@ -19,7 +19,7 @@ type OrderTopicsModalProps = {
   onModalClose: () => void;
 };
 
-const getSortedTopics = (rawTopics: Topic[]): Topic[] => {
+const getFilteredTopics = (rawTopics: Topic[]): Topic[] => {
   const topics = rawTopics
     .filter((topic) => topic.featuredInSidebar)
     .map((topic) => ({ ...topic } as Topic));
@@ -46,7 +46,7 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
     useUpdateFeaturedTopicsOrderMutation();
 
   const [topics, setTopics] = useState<Topic[]>(() =>
-    getSortedTopics(rawTopics)
+    getFilteredTopics(rawTopics)
   );
 
   const handleSave = async () => {
