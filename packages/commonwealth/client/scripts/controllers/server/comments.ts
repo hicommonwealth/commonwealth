@@ -283,10 +283,15 @@ class CommentsController {
 
   public async toggleSpam(commentId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
-      $.post(`${app.serverUrl()}/comments/${commentId}/mark-as-spam`, {
-        jwt: app.user.jwt,
-        chain_id: app.activeChainId(),
-      })
+      $.post(
+        `${app.serverUrl()}/comments/${commentId}/${
+          !isSpam ? 'mark' : 'unmark'
+        }-as-spam`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
         .then((response) => {
           const comment = this._store.getById(commentId);
           const result = modelFromServer({ ...comment, ...response.result });
@@ -296,7 +301,9 @@ class CommentsController {
         })
         .catch((e) => {
           console.error(e);
-          notifyError('Could not mark comment as spam');
+          notifyError(
+            `Could not ${!isSpam ? 'mark' : 'unmark'} comment as spam`
+          );
           reject(e);
         });
     });
