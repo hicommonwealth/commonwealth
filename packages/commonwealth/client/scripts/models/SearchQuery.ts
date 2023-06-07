@@ -5,6 +5,7 @@ export enum SearchScope {
   'Threads' = 'Threads',
   'Replies' = 'Replies',
   'All' = 'All',
+  'Personas' = 'Personas',
 }
 
 export enum SearchSort {
@@ -111,6 +112,7 @@ export default class SearchQuery implements SearchParams {
       SearchScope.Replies,
       SearchScope.Communities,
       SearchScope.Members,
+      SearchScope.Personas,
     ];
   }
 }

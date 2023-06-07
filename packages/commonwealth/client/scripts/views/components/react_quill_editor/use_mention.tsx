@@ -37,15 +37,34 @@ export const useMention = ({
       if (!lastSelection) {
         return;
       }
+
+      /* This is a lazy implementation */
       const cursorIdx = lastSelection.index;
-      const mentionLength =
+      const atIndex =
         text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
+      const slashIndex =
+        text.slice(0, cursorIdx).split('').reverse().indexOf('/') + 1;
+      console.log(atIndex, slashIndex, 'atIndex, slashIndex');
+
+      // Updated calculations for mentionLength and mentionChar
+      let mentionLength, mentionChar;
+      if (atIndex === 0) {
+        mentionLength = slashIndex;
+        mentionChar = '/';
+      } else if (slashIndex === 0) {
+        mentionLength = atIndex;
+        mentionChar = '@';
+      } else {
+        mentionLength = Math.min(atIndex, slashIndex);
+        mentionChar = atIndex < slashIndex ? '@' : '/';
+      }
+
       const beforeText = text.slice(0, cursorIdx - mentionLength);
       const afterText = text.slice(cursorIdx).replace(/\n$/, '');
       const delta = new Delta()
         .retain(beforeText.length)
         .delete(mentionLength)
-        .insert(`@${item.name}`, { link: item.link });
+        .insert(`${mentionChar}${item.name}`, { link: item.link }); // Updated to use mentionChar
       if (!afterText.startsWith(' ')) delta.insert(' ');
       editor.updateContents(delta);
       editor.setSelection(
@@ -61,7 +80,7 @@ export const useMention = ({
   const mention = useMemo(() => {
     return {
       allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
-      mentionDenotationChars: ['@'],
+      mentionDenotationChars: ['@', '/'],
       dataAttributes: ['name', 'link', 'component'],
       renderItem: (item) => item.component,
       onSelect: selectMention,
@@ -74,13 +93,15 @@ export const useMention = ({
           ) => null,
           mentionChar: string
         ) => {
-          if (mentionChar !== '@') return;
+          if (mentionChar !== '@' && mentionChar !== '/') return;
 
           let formattedMatches = [];
           if (searchTerm.length === 0) {
             const node = document.createElement('div');
             const tip = document.createElement('span');
-            tip.innerText = 'Type to tag a member';
+            if (mentionChar === '@') tip.innerText = 'Type to tag a member';
+            else if (mentionChar === '/')
+              tip.innerText = 'Type to tag a persona';
             node.appendChild(tip);
             formattedMatches = [
               {
@@ -92,82 +113,108 @@ export const useMention = ({
           } else {
             // try to get results from cache
             let { profiles } = mentionCache.get(searchTerm) || {};
-            if (!profiles) {
-              const res = await app.search.searchMentionableProfiles(
-                searchTerm,
-                app.activeChainId()
-              );
-              if (!res.profiles?.length) {
-                return;
-              }
-              profiles = res.profiles;
-              mentionCache.set(searchTerm, res);
-            }
-            formattedMatches = profiles.map((p: any) => {
-              const profileId = p.id;
-              const profileAddress = p.addresses[0]?.address;
-              const profileName = p.profile_name;
-              const profileChain = p.addresses[0]?.chain;
-              const avatarUrl = p.avatar_url;
 
-              const profile = new MinimumProfile(profileAddress, profileChain);
-              profile.initialize(
-                profileName,
-                profileAddress,
-                avatarUrl,
-                profileId,
-                profileChain,
-                null
+            if (mentionChar === '/') {
+              console.log('searching personas');
+              console.log(searchTerm);
+              const { totalCount, personas } = await app.search.searchPersonas(
+                searchTerm
               );
-              const node = document.createElement('div');
 
-              let avatar;
-              if (profile.avatarUrl) {
-                avatar = document.createElement('img');
-                (avatar as HTMLImageElement).src = profile.avatarUrl;
-                avatar.className = 'ql-mention-avatar';
-                node.appendChild(avatar);
-              } else {
-                avatar = document.createElement('div');
-                avatar.className = 'ql-mention-avatar';
-                avatar.innerHTML = MinimumProfile.getSVGAvatar(
-                  profileAddress,
-                  20
+              formattedMatches = personas.map((persona) => {
+                const node = document.createElement('div');
+                const nameSpan = document.createElement('span');
+                nameSpan.innerText = persona.name;
+                nameSpan.className = 'ql-mention-name';
+                node.appendChild(nameSpan);
+
+                return {
+                  link: `/personas/${persona.id}`,
+                  name: persona.name,
+                  component: node.outerHTML,
+                };
+              });
+            } else if (mentionChar === '@') {
+              if (!profiles) {
+                const res = await app.search.searchMentionableProfiles(
+                  searchTerm,
+                  app.activeChainId()
                 );
+                if (!res.profiles?.length) {
+                  return;
+                }
+                profiles = res.profiles;
+                mentionCache.set(searchTerm, res);
               }
+              formattedMatches = profiles.map((p: any) => {
+                const profileId = p.id;
+                const profileAddress = p.addresses[0]?.address;
+                const profileName = p.profile_name;
+                const profileChain = p.addresses[0]?.chain;
+                const avatarUrl = p.avatar_url;
 
-              const nameSpan = document.createElement('span');
-              nameSpan.innerText = p.profile_name;
-              nameSpan.className = 'ql-mention-name';
+                const profile = new MinimumProfile(
+                  profileAddress,
+                  profileChain
+                );
+                profile.initialize(
+                  profileName,
+                  profileAddress,
+                  avatarUrl,
+                  profileId,
+                  profileChain,
+                  null
+                );
+                const node = document.createElement('div');
 
-              const addrSpan = document.createElement('span');
-              addrSpan.innerText =
-                profileChain === 'near'
-                  ? profileAddress
-                  : `${profileAddress.slice(0, 6)}...`;
-              addrSpan.className = 'ql-mention-addr';
+                let avatar;
+                if (profile.avatarUrl) {
+                  avatar = document.createElement('img');
+                  (avatar as HTMLImageElement).src = profile.avatarUrl;
+                  avatar.className = 'ql-mention-avatar';
+                  node.appendChild(avatar);
+                } else {
+                  avatar = document.createElement('div');
+                  avatar.className = 'ql-mention-avatar';
+                  avatar.innerHTML = MinimumProfile.getSVGAvatar(
+                    profileAddress,
+                    20
+                  );
+                }
 
-              const lastActiveSpan = document.createElement('span');
-              lastActiveSpan.innerText = profile.lastActive
-                ? `Last active ${moment(profile.lastActive).fromNow()}`
-                : null;
-              lastActiveSpan.className = 'ql-mention-la';
+                const nameSpan = document.createElement('span');
+                nameSpan.innerText = p.profile_name;
+                nameSpan.className = 'ql-mention-name';
 
-              const textWrap = document.createElement('div');
-              textWrap.className = 'ql-mention-text-wrap';
+                const addrSpan = document.createElement('span');
+                addrSpan.innerText =
+                  profileChain === 'near'
+                    ? profileAddress
+                    : `${profileAddress.slice(0, 6)}...`;
+                addrSpan.className = 'ql-mention-addr';
 
-              node.appendChild(avatar);
-              textWrap.appendChild(nameSpan);
-              textWrap.appendChild(addrSpan);
-              textWrap.appendChild(lastActiveSpan);
-              node.appendChild(textWrap);
+                const lastActiveSpan = document.createElement('span');
+                lastActiveSpan.innerText = profile.lastActive
+                  ? `Last active ${moment(profile.lastActive).fromNow()}`
+                  : null;
+                lastActiveSpan.className = 'ql-mention-la';
 
-              return {
-                link: `/profile/id/${profileId}`,
-                name: profileName,
-                component: node.outerHTML,
-              };
-            });
+                const textWrap = document.createElement('div');
+                textWrap.className = 'ql-mention-text-wrap';
+
+                node.appendChild(avatar);
+                textWrap.appendChild(nameSpan);
+                textWrap.appendChild(addrSpan);
+                textWrap.appendChild(lastActiveSpan);
+                node.appendChild(textWrap);
+
+                return {
+                  link: `/profile/id/${profileId}`,
+                  name: profileName,
+                  component: node.outerHTML,
+                };
+              });
+            }
           }
           renderList(formattedMatches, searchTerm);
         },

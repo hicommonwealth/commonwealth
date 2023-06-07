@@ -115,6 +115,7 @@ export enum SearchContentType {
   Chain = 'chain',
   Token = 'token',
   Member = 'member',
+  Persona = 'persona',
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;

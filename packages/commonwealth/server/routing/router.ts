@@ -59,6 +59,7 @@ import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import searchProfiles from '../routes/searchProfiles';
+import searchPersonas from '../routes/searchPersonas';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
@@ -495,6 +496,7 @@ function setupRouter(
     databaseValidationService.validateChain,
     searchProfiles.bind(this, models)
   );
+  router.get('/searchPersonas', searchPersonas.bind(this, models));
 
   router.get('/profile/v2', getProfileNew.bind(this, models));
 

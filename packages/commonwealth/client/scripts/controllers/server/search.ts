@@ -130,6 +130,19 @@ class SearchController {
           })
           .sort(this.sortResults);
       }
+
+      // Add this block after searching for members
+      if (scope.includes(SearchScope.Personas)) {
+        const { totalCount, personas } = await this.searchPersonas(searchTerm);
+
+        searchCache.results[SearchScope.Personas] = personas
+          .map((persona) => {
+            persona.SearchContentType = SearchContentType.Persona;
+            persona.searchType = SearchScope.Personas;
+            return persona;
+          })
+          .sort(this.sortResults);
+      }
     } finally {
       searchCache.loaded = true;
       this._store.update(searchCache);
@@ -292,6 +305,21 @@ class SearchController {
     } catch (e) {
       console.error(e);
       return { profiles: [] };
+    }
+  };
+
+  public searchPersonas = async (searchTerm: string) => {
+    try {
+      const response = await $.get(`${app.serverUrl()}/searchPersonas`, {
+        search: searchTerm,
+      });
+      if (response.status !== 'Success') {
+        throw new Error(`Got unsuccessful status: ${response.status}`);
+      }
+      return response.result;
+    } catch (e) {
+      console.error(e);
+      return { totalCount: 0, personas: [] };
     }
   };
 
