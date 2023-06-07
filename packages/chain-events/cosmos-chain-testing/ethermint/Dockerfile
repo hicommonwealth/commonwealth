@@ -18,18 +18,18 @@ ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3 py3
 RUN apk add --no-cache $PACKAGES && apk add --update ca-certificates
 
 # Set working directory for the build
-WORKDIR /go/src/github.com/cosmos
+WORKDIR /go/src/github.com/evmos
 
 ENV ENABLE_PROXY 1
 # Add source files
-RUN curl -sSL https://github.com/cosmos/cosmos-sdk/archive/refs/tags/v0.46.11.tar.gz | tar -xz \
-&& mv cosmos-sdk-0.46.11 cosmos-sdk
+RUN curl -sSL https://github.com/evmos/evmos/archive/refs/tags/v12.1.4.tar.gz | tar -xz \
+&& mv evmos-12.1.4 evmos
 
-WORKDIR /go/src/github.com/cosmos/cosmos-sdk
+WORKDIR /go/src/github.com/evmos/evmos
 # Build the binary
 # Copy over binaries from the build-env
 RUN make build \
-    && cp /go/src/github.com/cosmos/cosmos-sdk/build/simd /usr/bin/simd
+    && cp /go/src/github.com/evmos/evmos/build/evmosd /usr/bin/evmosd
 
 WORKDIR /root
 
@@ -42,5 +42,5 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY bootstrap.sh  bootstrap.sh
 RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd && mkdir -p /run/nginx
 
-# Run simd by default, omit entrypoint to ease using container with simcli
+# Run evmosd by default, omit entrypoint to ease using container with simcli
 CMD ["sh", "-c", "sh ./bootstrap.sh"]

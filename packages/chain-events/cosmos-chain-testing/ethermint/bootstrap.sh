@@ -1,4 +1,5 @@
 #!/bin/bash
+# Recommended local_node script with some modifications from https://github.com/evmos/evmos/blob/main/local_node.sh
 
 KEYS[0]="dev0"
 KEYS[1]="dev1"
