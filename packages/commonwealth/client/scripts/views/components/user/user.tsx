@@ -181,6 +181,10 @@ export const User = ({
     }
   };
 
+  const isSelfSelected = app.user.addresses
+    .map((a) => a.address)
+    .includes(account?.address);
+
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
       <Avatar
@@ -330,7 +334,7 @@ export const User = ({
           )}
           {getRoleTags()}
           {/* If Admin Allow Banning */}
-          {loggedInUserIsAdmin && (
+          {loggedInUserIsAdmin && !isSelfSelected && (
             <div className="ban-wrapper">
               <CWButton
                 onClick={() => {
