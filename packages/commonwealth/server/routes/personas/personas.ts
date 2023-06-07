@@ -30,16 +30,12 @@ export const getPersona = async (
     where: { name: name },
   });
 
-  console.log('personas: ', personas);
-
   // Map over the personas array and extract the required properties
   const filteredPersonas = personas.map((persona) => ({
     id: persona.dataValues.id,
     name: persona.dataValues.name,
     personality: persona.dataValues.personality,
   }));
-
-  console.log('filteredPersonas: ', filteredPersonas);
 
   if (!personas) {
     throw new AppError(Errors.PersonaNotFound);
