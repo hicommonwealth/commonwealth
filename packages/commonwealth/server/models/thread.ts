@@ -49,6 +49,7 @@ export type ThreadAttributes = {
   last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
+  locked_at?: Date;
 
   // associations
   Chain?: ChainAttributes;
@@ -120,6 +121,10 @@ export default (
       last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
+      locked_at: {
+        type: dataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -155,6 +160,10 @@ export default (
       foreignKey: 'attachment_id',
       constraints: false,
       scope: { attachable: 'thread' },
+    });
+    models.Thread.hasMany(models.Comment, {
+      foreignKey: 'thread_id',
+      constraints: false,
     });
     models.Thread.belongsTo(models.Topic, {
       as: 'topic',

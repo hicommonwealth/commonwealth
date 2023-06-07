@@ -25,7 +25,7 @@ describe('Aave Event Processor Tests', () => {
     const event = constructEvent({ id, executionTime });
 
     event.blockNumber = blockNumber;
-    event.event = 'ProposalQueued';
+    event.name = 'ProposalQueued';
 
     const result = await processor.process(event);
     assert.deepEqual(result, [

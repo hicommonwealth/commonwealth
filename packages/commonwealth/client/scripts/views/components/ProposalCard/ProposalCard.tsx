@@ -106,33 +106,6 @@ export const ProposalCard = ({
           {getStatusText(proposal)}
         </CWText>
       ) : null}
-      {proposal.threadId && (
-        <CWText type="caption" className="proposal-thread-link-text">
-          <a
-            href={getProposalUrlPath(
-              ProposalType.Thread,
-              `${proposal.threadId}`
-            )}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-
-              localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-                window.scrollY;
-
-              navigate(
-                getProposalUrlPath(
-                  ProposalType.Thread,
-                  `${proposal.threadId}`,
-                  true
-                )
-              );
-            }}
-          >
-            {proposal.threadTitle ? proposal.threadTitle : 'Go to thread'}
-          </a>
-        </CWText>
-      )}
     </CWCard>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import app from 'state';
 import Sublayout from 'views/Sublayout';
@@ -29,6 +29,7 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import Cosmos from 'controllers/chain/cosmos/adapter';
+import { initChain } from 'helpers/chain';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -48,6 +49,7 @@ const ViewProposalPage = ({
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
+  const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
     const afterAdapterLoaded = async () => {
@@ -76,8 +78,15 @@ const ViewProposalPage = ({
         }
       }
     };
+    const chainInit = async () => {
+      if (!hasFetchedApiRef.current) {
+        hasFetchedApiRef.current = true;
+        await initChain();
+      }
+    };
 
     if (!isAdapterLoaded) {
+      chainInit()
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
         afterAdapterLoaded();
@@ -117,6 +126,7 @@ const ViewProposalPage = ({
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
   return (
     <Sublayout
     //  title={headerTitle}
@@ -129,6 +139,7 @@ const ViewProposalPage = ({
           )
         }
         createdAt={proposal.createdAt}
+        updatedAt={null}
         subHeader={
           <ProposalSubheader
             proposal={proposal as SubheaderProposalType}

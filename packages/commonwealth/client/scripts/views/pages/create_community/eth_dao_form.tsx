@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { isAddress } from 'web3-utils';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
 
 import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
@@ -79,10 +76,10 @@ export const EthDaoForm = (props: EthChainFormState) => {
     try {
       if (network === ChainNetwork.Compound) {
         const Web3 = (await import('web3')).default;
-
-        const provider = new Web3.providers.WebsocketProvider(
-          ethChainFormFields.nodeUrl
-        );
+        const provider =
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
+            : new Web3.providers.WebsocketProvider(ethChainFormFields.nodeUrl);
 
         const compoundApi = new CompoundAPI(
           null,
@@ -107,10 +104,10 @@ export const EthDaoForm = (props: EthChainFormState) => {
         );
       } else if (network === ChainNetwork.Aave) {
         const Web3 = (await import('web3')).default;
-
-        const provider = new Web3.providers.WebsocketProvider(
-          ethChainFormFields.nodeUrl
-        );
+        const provider =
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
+            : new Web3.providers.WebsocketProvider(ethChainFormFields.nodeUrl);
 
         const aaveApi = new AaveApi(
           IAaveGovernanceV2__factory.connect,
@@ -207,13 +204,6 @@ export const EthDaoForm = (props: EthChainFormState) => {
         }
         onClick={async () => {
           chainFormState.setSaving(true);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: null,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
 
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {

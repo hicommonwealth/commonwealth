@@ -21,12 +21,10 @@ import { SENDGRID_API_KEY } from '../config';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { findAllRoles } from '../util/roles';
-import checkRule from '../util/rules/checkRule';
-import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 
@@ -43,7 +41,6 @@ export const Errors = {
     "Users need to hold some of the community's tokens to comment",
   BalanceCheckFailed: 'Could not verify user token balance',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
-  RuleCheckFailed: 'Rule check failed',
 };
 
 // Get depth of the comment
@@ -64,7 +61,6 @@ const getCommentDepth = async (models: DB, comment) => {
 const createComment = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -126,27 +122,6 @@ const createComment = async (
 
   if (!thread) {
     return next(new AppError(Errors.MissingRootId));
-  }
-
-  const topic = await models.Topic.findOne({
-    include: {
-      model: models.Thread,
-      where: { id: thread.id },
-      required: true,
-      as: 'threads',
-    },
-    attributes: ['rule_id'],
-  });
-  if (topic?.rule_id) {
-    const passesRules = await checkRule(
-      ruleCache,
-      models,
-      topic.rule_id,
-      author.address
-    );
-    if (!passesRules) {
-      return next(new AppError(Errors.RuleCheckFailed));
-    }
   }
 
   if (
@@ -415,13 +390,11 @@ const createComment = async (
   thread.last_commented_on = new Date();
   thread.save();
 
-  if (process.env.NODE_ENV !== 'test') {
-    mixpanelTrack({
-      event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-      community: chain.id,
-      isCustomDomain: null,
-    });
-  }
+  serverAnalyticsTrack({
+    event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
+    community: chain.id,
+    isCustomDomain: null,
+  });
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };

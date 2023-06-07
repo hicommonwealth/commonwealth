@@ -3,9 +3,6 @@ import { isAddress } from 'web3-utils';
 import { providers } from 'ethers';
 import $ from 'jquery';
 
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-
 import 'pages/create_community.scss';
 
 import app from 'state';
@@ -101,8 +98,10 @@ export const ERC20Form = (props: EthChainFormState) => {
           console.log('Querying chain for ERC info');
 
           const Web3 = (await import('web3')).default;
-
-          const provider = new Web3.providers.WebsocketProvider(args.url);
+          const provider =
+            args.url.slice(0, 4) == 'http'
+              ? new Web3.providers.HttpProvider(args.url)
+              : new Web3.providers.WebsocketProvider(args.url);
 
           try {
             const ethersProvider = new providers.Web3Provider(provider);
@@ -139,8 +138,8 @@ export const ERC20Form = (props: EthChainFormState) => {
           chainFormDefaultFields.setElement('');
           chainFormDefaultFields.setTelegram('');
           chainFormDefaultFields.setGithub('');
-
-          provider.disconnect(1000, 'finished');
+          if (provider instanceof Web3.providers.WebsocketProvider)
+            provider.disconnect(1000, 'finished');
         }
 
         chainFormState.setLoaded(true);
@@ -210,13 +209,6 @@ export const ERC20Form = (props: EthChainFormState) => {
         }
         onClick={async () => {
           chainFormState.setSaving(true);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: null,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: null,
-          // });
 
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {

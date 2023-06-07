@@ -34,8 +34,13 @@ export interface ListenerOptions {
   contractAddress: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RawEvent = TypedEvent<any>;
+export interface RawEvent {
+  address: string;
+  args: any;
+  name: string;
+  blockNumber: number;
+  data: any;
+}
 
 // eslint-disable-next-line no-shadow
 export enum EntityKind {

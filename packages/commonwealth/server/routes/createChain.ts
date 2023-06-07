@@ -21,12 +21,12 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-// import { mixpanelTrack } from '../util/mixpanelUtil';
-
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -190,10 +190,16 @@ const createChain = async (
       privateUrl = node.private_url;
     }
 
-    const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
+    const node_url = privateUrl || url;
+    const provider =
+      node_url.slice(0, 4) == 'http'
+        ? new Web3.providers.HttpProvider(node_url)
+        : new Web3.providers.WebsocketProvider(node_url);
+
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
-    provider.disconnect(1000, 'finished');
+    if (provider instanceof Web3.providers.WebsocketProvider)
+      provider.disconnect(1000, 'finished');
     if (code === '0x') {
       return next(new AppError(Errors.InvalidAddress));
     }
@@ -384,12 +390,6 @@ const createChain = async (
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
-  await models.ChatChannel.create({
-    name: 'General',
-    chain_id: chain.id,
-    category: 'General',
-  });
-
   await models.Topic.create({
     chain_id: chain.id,
     name: 'General',
@@ -472,14 +472,12 @@ const createChain = async (
     });
   }
 
-  if (process.env.NODE_ENV !== 'test') {
-    // mixpanelTrack({
-    //   chainBase: req.body.base,
-    //   isCustomDomain: null,
-    //   communityType: null,
-    //   event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-    // });
-  }
+  serverAnalyticsTrack({
+    chainBase: req.body.base,
+    isCustomDomain: null,
+    communityType: null,
+    event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+  });
 
   return success(res, {
     chain: chain.toJSON(),
