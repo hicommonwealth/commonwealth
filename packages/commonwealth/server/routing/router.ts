@@ -138,7 +138,6 @@ import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
 import generateImage from '../routes/generateImage';
-import generateText from '../routes/generateText';
 import { getChainEventServiceData } from '../routes/getChainEventServiceData';
 import { getChain } from '../routes/getChain';
 import { getChainNode } from '../routes/getChainNode';
@@ -877,12 +876,6 @@ function setupRouter(
     '/generateImage',
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models)
-  );
-
-  router.post(
-    '/generateText',
-    passport.authenticate('jwt', { session: false }),
-    generateText.bind(this, models)
   );
 
   //linking
