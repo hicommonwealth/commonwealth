@@ -32,7 +32,7 @@ const useEditTopicMutation = () => {
     mutationFn: editTopic,
     onSuccess: async (data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BulkTopics, variables.topic.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.chainId],
       });
     },
   });

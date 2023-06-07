@@ -83,7 +83,7 @@ describe('Topic Tests', () => {
     it('Should pass /bulkTopics', async () => {
       const res = await chai.request
         .agent(app)
-        .get(`/api${ApiEndpoints.BulkTopics}`)
+        .get(`/api${ApiEndpoints.BULK_TOPICS}`)
         .set('Accept', 'application/json')
         .query({
           chain,

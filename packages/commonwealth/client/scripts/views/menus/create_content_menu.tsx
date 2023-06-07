@@ -21,7 +21,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
   const topics =
     queryClient.getQueryData<Topic[]>([
-      ApiEndpoints.BulkTopics,
+      ApiEndpoints.BULK_TOPICS,
       app.chain.id,
     ]) ||
     []

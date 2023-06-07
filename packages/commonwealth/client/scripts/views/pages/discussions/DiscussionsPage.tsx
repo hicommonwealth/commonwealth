@@ -39,8 +39,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     chainId: app.activeChainId(),
   });
 
-  console.log('topics => ', topics);
-
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;

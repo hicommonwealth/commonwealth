@@ -9,5 +9,7 @@ export const queryClient = new QueryClient({
 });
 
 export const ApiEndpoints = {
-  BulkTopics: '/bulkTopics',
+  // endpoint builder functions like getEndpoint(id) => /endpoint/:id should have camel cased keys
+  // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
+  BULK_TOPICS: '/bulkTopics',
 };

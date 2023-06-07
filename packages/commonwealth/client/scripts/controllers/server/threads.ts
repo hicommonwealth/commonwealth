@@ -788,7 +788,7 @@ class ThreadsController {
 
     const topics =
       (await queryClient.ensureQueryData<Topic[]>([
-        ApiEndpoints.BulkTopics,
+        ApiEndpoints.BULK_TOPICS,
         app.chain.id,
       ])) || [];
 

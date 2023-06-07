@@ -25,7 +25,7 @@ const useSetTopicThresholdMutation = () => {
     mutationFn: setTopicThreshold,
     onSuccess: async (data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BulkTopics, variables.topic.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.chainId],
       });
     },
   });

@@ -9,7 +9,7 @@ export default class TopicGateCheck {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
       const topics =
         queryClient.getQueryData<Topic[]>([
-          ApiEndpoints.BulkTopics,
+          ApiEndpoints.BULK_TOPICS,
           app.chain.id,
         ]) || [];
 
@@ -29,7 +29,7 @@ export default class TopicGateCheck {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
       const topics =
         queryClient.getQueryData<Topic[]>([
-          ApiEndpoints.BulkTopics,
+          ApiEndpoints.BULK_TOPICS,
           app.chain.id,
         ]) || [];
 

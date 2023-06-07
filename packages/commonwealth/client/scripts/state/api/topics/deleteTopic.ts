@@ -22,7 +22,7 @@ const useDeleteTopicMutation = () => {
     mutationFn: deleteTopic,
     onSuccess: async (data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BulkTopics, variables.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, variables.chainId],
       });
       await app.threads.listingStore.removeTopic(variables.topicName);
     },

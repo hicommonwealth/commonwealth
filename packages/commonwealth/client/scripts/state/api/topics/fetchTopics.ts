@@ -12,7 +12,7 @@ interface FetchTopicsProps {
 
 const fetchTopics = async ({ chainId }: FetchTopicsProps) => {
   const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.BulkTopics}`,
+    `${app.serverUrl()}${ApiEndpoints.BULK_TOPICS}`,
     {
       params: {
         chain: chainId || app.activeChainId(),
@@ -25,7 +25,7 @@ const fetchTopics = async ({ chainId }: FetchTopicsProps) => {
 
 const useFetchTopicsQuery = ({ chainId }: FetchTopicsProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.BulkTopics, chainId],
+    queryKey: [ApiEndpoints.BULK_TOPICS, chainId],
     queryFn: () => fetchTopics({ chainId }),
     staleTime: TOPICS_STALE_TIME,
   });
