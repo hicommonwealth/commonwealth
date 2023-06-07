@@ -70,6 +70,9 @@ const generateText = async (
   let commentTree;
   if (is_comment) {
     commentTree = await getCommentTree(models, parent_id, thread_id);
+    commentTree.push({ role: 'user', content: content });
+  } else {
+    commentTree = [{ role: 'user', content: content }];
   }
 
   let completion;
@@ -77,7 +80,6 @@ const generateText = async (
     Follow the user's instructions carefully. Respond using markdown.`;
 
   // Append the input content to the comment tree
-  commentTree.push({ role: 'user', content: content });
 
   try {
     const response = await openai.createChatCompletion({

@@ -18,9 +18,13 @@ import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-import { parseUserMentions } from '../util/parseUserMentions';
+import {
+  parsePersonaMentions,
+  parseUserMentions,
+} from '../util/parseUserMentions';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import generateText from './generateText';
 
 export const Errors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
@@ -184,6 +188,45 @@ const dispatchHooks = async (
         [finalThread.Address.address]
       );
     });
+
+  let mentionedPersonas;
+  try {
+    const mentions = parsePersonaMentions(bodyText);
+    if (mentions && mentions.length > 0) {
+      mentionedPersonas = mentions;
+    }
+  } catch (e) {
+    throw new ServerError('Failed to parse persona mentions');
+  }
+
+  // if there is a specific persona mentioned, trigger generateText
+  if (mentionedPersonas && mentionedPersonas.length === 1) {
+    const personaId = mentionedPersonas[0][1];
+    try {
+      const generatedTextCompletion = await generateText(models, {
+        parent_id: finalThread.id,
+        thread_id: finalThread.id,
+        content: finalThread.plaintext,
+        is_comment: false,
+      });
+
+      const generatedTextResponse = `Response to ${finalThread.Address.address}, ${generatedTextCompletion}`;
+
+      // create a new comment with the generated text and persona as the author
+      const personaComment = await models.Comment.create({
+        thread_id: finalThread.id.toString(),
+        text: generatedTextResponse,
+        plaintext: generatedTextResponse,
+        address_id: finalThread.Address.id,
+        chain: finalThread.chain,
+        parent_id: finalThread.id.toString(),
+      });
+
+      // ... additional logic for handling attachments, subscriptions, etc. for the new comment
+    } catch (e) {
+      console.error('Error generating text from persona:', e);
+    }
+  }
 };
 
 const createThread = async (
