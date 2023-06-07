@@ -15,37 +15,82 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 type generateTextReq = {
-  thread: number;
+  parent_id: number;
+  thread_id?: number;
   content: string;
+  is_comment?: boolean;
+};
+
+const getCommentTree = async (models, parentId, threadId) => {
+  // Check if parentId is the thread
+  if (parseInt(parentId) === threadId) {
+    const thread = await models.Thread.findOne({
+      where: { id: threadId },
+    });
+
+    return thread
+      ? [
+          {
+            role: 'user',
+            content: thread.plaintext, // assuming you want to include the thread's title
+          },
+        ]
+      : [];
+  }
+
+  const comment = await models.Comment.findOne({
+    where: { id: parentId, thread_id: threadId },
+  });
+
+  if (!comment) return [];
+
+  const parentComments = await getCommentTree(
+    models,
+    comment.parent_id,
+    threadId
+  );
+  return [
+    ...parentComments,
+    {
+      role: 'user',
+      content: comment.plaintext,
+    },
+  ];
 };
 
 const generateText = async (
   models: DB,
-  { thread, content }: generateTextReq
+  { parent_id, thread_id, content, is_comment }: generateTextReq
 ): Promise<string> => {
   if (!content) {
     throw new AppError('No content provided');
   }
 
+  // Fetch the comment tree for the given parent_id
+  let commentTree;
+  if (is_comment) {
+    commentTree = await getCommentTree(models, parent_id, thread_id);
+  }
+
   let completion;
   const SYSTEM_PROMPT = `You are ChatGPT, a large language model trained by OpenAI. 
     Follow the user's instructions carefully. Respond using markdown.`;
+
+  // Append the input content to the comment tree
+  commentTree.push({ role: 'user', content: content });
+
   try {
     const response = await openai.createChatCompletion({
       model: 'gpt-4',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: content },
-      ],
-      max_tokens: 1500,
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...commentTree],
+      max_tokens: 2500,
       temperature: 0.7,
-      stop: ['\n'],
     });
 
     completion = response.data.choices[0].message.content;
     console.log(completion);
   } catch (e) {
-    console.log(e);
+    console.error('Error in generateText:', e.response?.data || e.message);
     throw new AppError('Problem generating text');
   }
 
