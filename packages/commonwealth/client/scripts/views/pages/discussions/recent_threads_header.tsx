@@ -190,11 +190,13 @@ export const RecentThreadsHeader = ({
         </div>
       </div>
 
-      {isUndefined(topic) && (
+      {(isUndefined(topic) || selectedTopic?.description) && (
         <CWText className="subheader-text">
-          This section is for the community to discuss how to manage the
+          {isUndefined(topic)
+            ? `This section is for the community to discuss how to manage the
           community treasury and spending on contributor grants, community
-          initiatives, liquidity mining and other programs.
+          initiatives, liquidity mining and other programs.`
+            : selectedTopic?.description}
         </CWText>
       )}
 
