@@ -22,6 +22,7 @@ import TopicsController from 'controllers/server/topics';
 import { UserController } from 'controllers/server/user';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
+import PersonasController from '../controllers/server/persona';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
 import $ from 'jquery';
@@ -88,6 +89,9 @@ export interface IApp {
   recentActivity: RecentActivityController;
   newProfiles: NewProfilesController;
   sessions: SessionsController;
+
+  // AI
+  personas: PersonasController;
 
   // Web3
   snapshot: SnapshotController;
@@ -178,6 +182,9 @@ const app: IApp = {
 
   // Web3
   snapshot: new SnapshotController(),
+
+  // AI
+  personas: new PersonasController(),
 
   // User
   user,

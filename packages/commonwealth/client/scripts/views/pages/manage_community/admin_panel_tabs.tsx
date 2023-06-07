@@ -7,6 +7,7 @@ import 'pages/manage_community/admin_panel_tabs.scss';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { UpgradeRolesForm } from './upgrade_roles_form';
 import { WebhooksForm } from './webhooks_form';
+import { AddPersona } from './add_persona';
 
 type AdminPanelTabsProps = {
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
@@ -40,6 +41,13 @@ export const AdminPanelTabs = ({
             setCurrentTab(2);
           }}
         />
+        <CWTab
+          label="Personas"
+          isSelected={currentTab === 3}
+          onClick={() => {
+            setCurrentTab(3);
+          }}
+        />
       </CWTabBar>
       {currentTab === 1 && (
         <UpgradeRolesForm
@@ -50,6 +58,7 @@ export const AdminPanelTabs = ({
         />
       )}
       {currentTab === 2 && <WebhooksForm />}
+      {currentTab === 3 && <AddPersona />}
     </div>
   );
 };

@@ -1,0 +1,23 @@
+@import '../../shared';
+
+.PersonaForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .text-input {
+      border: 1px solid $neutral-300;
+      border-radius: $border-radius-corners;
+      padding: 8px;
+    }
+  }
+
+  .create-persona-button {
+    align-self: flex-start;
+  }
+}
