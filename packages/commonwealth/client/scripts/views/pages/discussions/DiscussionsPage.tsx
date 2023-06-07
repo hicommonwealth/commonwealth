@@ -12,6 +12,7 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../models/types';
 import app from '../../../state';
+import { useFetchTopicsQuery } from '../../../state/api/topics';
 import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
@@ -34,6 +35,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
     'dateRange'
   ) as ThreadTimelineFilterTypes;
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+
+  console.log('topics => ', topics);
 
   const handleThreadUpdate = (data: {
     threadId: number;
@@ -156,7 +162,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           let finalThreads = foundThreadsForChain;
 
           // get threads for current topic
-          const topicId = app.topics.getByName(topicName, chain)?.id;
+          const topicId = topics.find(({ name }) => name === topicName)?.id;
           if (topicId) {
             finalThreads = finalThreads.filter((x) => x.topic.id === topicId);
           }
