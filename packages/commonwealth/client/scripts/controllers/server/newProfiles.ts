@@ -96,14 +96,16 @@ class NewProfilesController {
         // multiple profiles
         profiles.forEach((profile) => {
           const currentProfile = resultMap.get(profile.address) as any;
-          profile.initialize(
-            currentProfile.name,
-            currentProfile.address,
-            currentProfile.avatarUrl,
-            currentProfile.profileId,
-            profile.chain,
-            currentProfile.lastActive
-          );
+          if (currentProfile) {
+            profile.initialize(
+              currentProfile.name,
+              currentProfile.address,
+              currentProfile.avatarUrl,
+              currentProfile.profileId,
+              profile.chain,
+              currentProfile.lastActive
+            );
+          }
           this._unfetched.delete(profile.address);
         });
       });

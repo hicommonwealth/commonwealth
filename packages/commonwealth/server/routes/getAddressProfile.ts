@@ -1,14 +1,8 @@
-import { AppError } from 'common-common/src/errors';
-import type { NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure } from '../types';
-
-export const Errors = {
-  InvalidAddress: 'Invalid address',
-};
 
 export const getAddressProfileValidation = [
   body('chains').exists().toArray(),
@@ -32,7 +26,6 @@ const getAddressProfiles = async (
   models: DB,
   req: TypedRequestBody<GetAddressProfileReq>,
   res: TypedResponse<GetAddressProfileResp[]>,
-  next: NextFunction
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -44,26 +37,21 @@ const getAddressProfiles = async (
       chain: { [Op.in]: req.body.chains },
       address: { [Op.in]: req.body.addresses },
     },
-    include: [models.Profile],
+    include: [{
+      model: models.Profile,
+      required: true,
+    }],
   });
 
-  if (addressEntities.length === 0) {
-    return next(new AppError(Errors.InvalidAddress));
-  }
-
-  const profiles: GetAddressProfileResp[] = await Promise.all(
-    addressEntities.map(async address => {
-      const profile = await address.Profile;
-
-      return {
-        profileId: address.profile_id,
-        name: profile?.profile_name,
-        address: address.address,
-        lastActive: address.last_active,
-        avatarUrl: profile?.avatar_url,
-      };
-    })
-  );
+  const profiles = addressEntities.map((address) => {
+    return {
+      profileId: address.profile_id,
+      name: address.Profile.profile_name,
+      address: address.address,
+      lastActive: address.last_active,
+      avatarUrl: address.Profile.avatar_url,
+    };
+  })
 
   return res.json({
     status: 'Success',
