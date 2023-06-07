@@ -35,9 +35,6 @@ export const FilteredPersonas = () => {
       })();
     }
   }, [name]);
-
-  console.log('personas', personas);
-
   return (
     <div>
       <input
