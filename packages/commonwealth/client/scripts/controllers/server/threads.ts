@@ -437,7 +437,7 @@ class ThreadsController {
     });
   }
 
-  public async toggleSpam(threadId: number) {
+  public async toggleSpam(threadId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
       $.post(`${app.serverUrl()}/threads/${threadId}/mark-as-spam`, {
         jwt: app.user.jwt,

@@ -289,8 +289,10 @@ export const CommentsTree = ({
 
   const handleFlagMarkAsSpam = (comment: CommentType<any>) => {
     openConfirmation({
-      title: 'Confirm flag as spam',
-      description: (
+      title: !comment.markedAsSpamAt
+        ? 'Confirm flag as spam'
+        : 'Unflag as spam?',
+      description: !comment.markedAsSpamAt ? (
         <>
           <p>Are you sure you want to flag this comment as spam?</p>
           <br />
@@ -304,6 +306,19 @@ export const CommentsTree = ({
           <br />
           <p>Note that you can always unflag a post as spam.</p>
         </>
+      ) : (
+        <>
+          <p>
+            Are you sure you want to unflag this post as spam? Flagging as spam
+            will help filter out unwanted content.
+          </p>
+          <br />
+          <p>
+            For transparency, spam can still be viewed by community members if
+            they choose to “Include posts flagged as spam.”
+            <br />
+          </p>
+        </>
       ),
       buttons: [
         {
@@ -311,13 +326,15 @@ export const CommentsTree = ({
           buttonType: 'mini-black',
         },
         {
-          label: 'Confirm',
+          label: !comment.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              app.comments.toggleSpam(comment.id).then(() => {
-                updatedCommentsCallback && updatedCommentsCallback();
-              });
+              app.comments
+                .toggleSpam(comment.id, !!comment.markedAsSpamAt)
+                .then(() => {
+                  updatedCommentsCallback && updatedCommentsCallback();
+                });
             } catch (err) {
               console.log(err);
             }
@@ -396,11 +413,7 @@ export const CommentsTree = ({
                   onDelete={async () => await handleDeleteComment(comment)}
                   isSpam={!!comment.markedAsSpamAt}
                   onSpamToggle={async () => await handleFlagMarkAsSpam(comment)}
-                  canToggleSpam={
-                    !isLocked &&
-                    !comment.markedAsSpamAt &&
-                    (isCommentAuthor || isAdminOrMod)
-                  }
+                  canToggleSpam={!isLocked && (isCommentAuthor || isAdminOrMod)}
                   comment={comment}
                 />
               </div>

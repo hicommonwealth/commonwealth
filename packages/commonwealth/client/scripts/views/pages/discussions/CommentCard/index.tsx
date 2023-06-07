@@ -176,13 +176,12 @@ export const CommentCard = ({
                       onClick: onEditStart,
                       iconLeftWeight: 'bold' as const,
                     },
-                    canToggleSpam &&
-                      !isSpam && {
-                        onClick: onSpamToggle,
-                        label: 'Flag as spam',
-                        iconLeft: 'flag' as const,
-                        iconLeftWeight: 'bold' as const,
-                      },
+                    canToggleSpam && {
+                      onClick: onSpamToggle,
+                      label: !isSpam ? 'Flag as spam' : 'Unflag as spam',
+                      iconLeft: 'flag' as const,
+                      iconLeftWeight: 'bold' as const,
+                    },
                     canDelete && {
                       label: 'Delete',
                       iconLeft: 'trash' as const,

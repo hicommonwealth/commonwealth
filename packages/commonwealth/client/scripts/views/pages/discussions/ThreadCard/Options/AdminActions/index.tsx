@@ -5,13 +5,12 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { ThreadActionType } from '../../../../../../../../shared/types';
 import { notifySuccess } from '../../../../../../controllers/app/notifications';
-import Permissions from '../../../../../../utils/Permissions';
 import type Thread from '../../../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../../../models/Thread';
 import Topic from '../../../../../../models/Topic';
 import { ThreadStage } from '../../../../../../models/types';
+import Permissions from '../../../../../../utils/Permissions';
 import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../../../../components/component_kit/cw_popover/cw_popover_menu';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
@@ -89,8 +88,10 @@ export const AdminActions = ({
 
   const handleFlagMarkAsSpam = () => {
     openConfirmation({
-      title: 'Confirm flag as spam',
-      description: (
+      title: !thread.markedAsSpamAt
+        ? 'Confirm flag as spam'
+        : 'Unflag as spam?',
+      description: !thread.markedAsSpamAt ? (
         <>
           <p>Are you sure you want to flag this post as spam?</p>
           <br />
@@ -103,6 +104,19 @@ export const AdminActions = ({
           <br />
           <p>Note that you can always unflag a post as spam.</p>
         </>
+      ) : (
+        <>
+          <p>
+            Are you sure you want to unflag this post as spam? Flagging as spam
+            will help filter out unwanted content.
+          </p>
+          <br />
+          <p>
+            For transparency, spam can still be viewed by community members if
+            they choose to “Include posts flagged as spam.”
+            <br />
+          </p>
+        </>
       ),
       buttons: [
         {
@@ -110,13 +124,15 @@ export const AdminActions = ({
           buttonType: 'mini-black',
         },
         {
-          label: 'Confirm',
+          label: !thread.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              app.threads.toggleSpam(thread.id).then((t: Thread) => {
-                onSpamToggle && onSpamToggle(t);
-              });
+              app.threads
+                .toggleSpam(thread.id, !!thread.markedAsSpamAt)
+                .then((t: Thread) => {
+                  onSpamToggle && onSpamToggle(t);
+                });
             } catch (err) {
               console.log(err);
             }
@@ -272,16 +288,14 @@ export const AdminActions = ({
                     iconLeft: 'democraticProposal' as const,
                     iconLeftWeight: 'bold' as const,
                   },
-                  ...(!thread.markedAsSpamAt
-                    ? [
-                        {
-                          onClick: handleFlagMarkAsSpam,
-                          label: 'Flag as spam',
-                          iconLeft: 'flag' as const,
-                          iconLeftWeight: 'bold' as const,
-                        },
-                      ]
-                    : []),
+                  {
+                    onClick: handleFlagMarkAsSpam,
+                    label: !thread.markedAsSpamAt
+                      ? 'Flag as spam'
+                      : 'Unflag as spam',
+                    iconLeft: 'flag' as const,
+                    iconLeftWeight: 'bold' as const,
+                  },
                   {
                     onClick: handleDeleteThread,
                     label: 'Delete',

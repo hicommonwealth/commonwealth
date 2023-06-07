@@ -281,7 +281,7 @@ class CommentsController {
     });
   }
 
-  public async toggleSpam(commentId: number) {
+  public async toggleSpam(commentId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
       $.post(`${app.serverUrl()}/comments/${commentId}/mark-as-spam`, {
         jwt: app.user.jwt,
