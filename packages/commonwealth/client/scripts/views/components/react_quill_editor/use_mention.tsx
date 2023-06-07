@@ -44,7 +44,6 @@ export const useMention = ({
         text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
       const slashIndex =
         text.slice(0, cursorIdx).split('').reverse().indexOf('/') + 1;
-      console.log(atIndex, slashIndex, 'atIndex, slashIndex');
 
       // Updated calculations for mentionLength and mentionChar
       let mentionLength, mentionChar;
@@ -115,8 +114,6 @@ export const useMention = ({
             let { profiles } = mentionCache.get(searchTerm) || {};
 
             if (mentionChar === '/') {
-              console.log('searching personas');
-              console.log(searchTerm);
               const { totalCount, personas } = await app.search.searchPersonas(
                 searchTerm
               );
