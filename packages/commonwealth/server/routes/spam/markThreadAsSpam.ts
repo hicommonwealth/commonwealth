@@ -38,8 +38,8 @@ export default async (
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  if (!userOwnedAddressIds.includes(thread.address_id)) {
-    // is not author
+  if (!userOwnedAddressIds.includes(thread.address_id) && !req.user.isAdmin) {
+    // is not author or site admin
     const roles = await findAllRoles(
       models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
