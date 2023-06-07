@@ -17,9 +17,6 @@ describe('getAddressProfile tests', () => {
       models,
       postReq(r),
       res(),
-      (e) => {
-        error = e;
-      }
     );
 
     chai.assert.equal(error['status'], 400);
@@ -38,9 +35,6 @@ describe('getAddressProfile tests', () => {
       models,
       postReq(r),
       res(),
-      (e) => {
-        error = e;
-      }
     );
 
     const matchingProfile = testProfiles.filter(p => p.id === resp['result'][0]['profileId'])[0];
@@ -66,9 +60,6 @@ describe('getAddressProfile tests', () => {
       models,
       postReq(r),
       res(),
-      (e) => {
-        error = e;
-      }
     );
 
     const matchingProfile = testProfiles.filter(p => p.id === resp['result'][0]['profileId'])[0];
@@ -99,9 +90,6 @@ describe('getAddressProfile tests', () => {
       models,
       postReq(r),
       res(),
-      (e) => {
-        error = e;
-      }
     );
 
     const matchingProfile = testProfiles.filter(p => p.id === resp['result'][0]['profileId'])[0];
