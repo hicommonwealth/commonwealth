@@ -439,10 +439,15 @@ class ThreadsController {
 
   public async toggleSpam(threadId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
-      $.post(`${app.serverUrl()}/threads/${threadId}/mark-as-spam`, {
-        jwt: app.user.jwt,
-        chain_id: app.activeChainId(),
-      })
+      $.post(
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isSpam ? 'mark' : 'unmark'
+        }-as-spam`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
         .then((response) => {
           const foundThread = this.store.getByIdentifier(threadId);
           foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
@@ -451,7 +456,9 @@ class ThreadsController {
         })
         .catch((e) => {
           console.error(e);
-          notifyError('Could not mark thread as spam');
+          notifyError(
+            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+          );
           reject(e);
         });
     });
