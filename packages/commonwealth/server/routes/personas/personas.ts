@@ -1,6 +1,10 @@
 import { AppError } from 'common-common/src/errors';
 import type { DB } from '../../models';
-import type { TypedRequestBody, TypedResponse } from '../../types';
+import type {
+  TypedRequestQuery,
+  TypedRequestBody,
+  TypedResponse,
+} from '../../types';
 import { success } from '../../types';
 
 // Error messages
@@ -13,10 +17,10 @@ export const Errors = {
 // Get persona
 export const getPersona = async (
   models: DB,
-  req: TypedRequestBody<any>,
+  req: TypedRequestQuery<any>,
   res: TypedResponse<any>
 ) => {
-  const { name } = req.body;
+  const { name } = req.query;
 
   if (!name) {
     throw new AppError(Errors.PersonaNotFound);
@@ -26,12 +30,16 @@ export const getPersona = async (
     where: { name: name },
   });
 
+  console.log('personas: ', personas);
+
   // Map over the personas array and extract the required properties
   const filteredPersonas = personas.map((persona) => ({
     id: persona.dataValues.id,
     name: persona.dataValues.name,
     personality: persona.dataValues.personality,
   }));
+
+  console.log('filteredPersonas: ', filteredPersonas);
 
   if (!personas) {
     throw new AppError(Errors.PersonaNotFound);

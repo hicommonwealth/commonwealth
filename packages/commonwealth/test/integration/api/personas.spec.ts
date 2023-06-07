@@ -67,9 +67,12 @@ describe('Persona API Tests', () => {
     it('should get personas', async () => {
       const res = await chai.request
         .agent(app)
-        .get('/api/personas/get')
-        .set('Accept', 'application/json')
-        .send({ name: testPersonas[0].name, jwt: jwtToken });
+        .get(
+          `/api/personas/get?name=${encodeURIComponent(
+            testPersonas[0].name
+          )}&jwt=${encodeURIComponent(jwtToken)}`
+        )
+        .set('Accept', 'application/json');
 
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;

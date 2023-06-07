@@ -42,6 +42,8 @@ module.exports = {
         defaultValue: 0,
         allowNull: true,
       },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     });
 
     // Insert default Dillbot persona
@@ -51,6 +53,8 @@ module.exports = {
         personality:
           'Dillbot is a startup founder who has built some companies from the ground up. He is interested in exploring areas like crypto, AI, and more. He is pretty dry in terms of his sense of humor.',
         karma: 0,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     ]);
   },
