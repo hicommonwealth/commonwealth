@@ -1,8 +1,7 @@
-import React, { FC } from "react";
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { CWCard } from "../../../client/scripts/views/components/component_kit/cw_card";
-import { CWText } from "../../../client/scripts/views/components/component_kit/cw_text";
 
 import "../styles/elevation.scss";
 import "../styles/border.scss";
@@ -15,40 +14,8 @@ const card = {
 export default card;
 type Story = StoryObj<any>;
 
-interface BorderCardProps {
-  border: string,
-}
-
-const options = {
-  "Regular": {
-    text: "Widgets",
-    elevation: "elevation-1",
-  },
-  "With shadow": {
-    text: "Dropdown, modals, menus",
-    elevation: "elevation-3",
-  },
-}
-
-const BorderCard: FC<BorderCardProps> = ({ border }) => {
-  return (
-    <div className="container">
-      <CWCard className="card border" elevation={options[border].elevation} />
-      <CWText className="text" isCentered>{options[border].text}</CWText>
-    </div>
-  )
-}
-
 export const Border: Story = {
-  args: {
-    border: "Regular",
-  },
-  argTypes: {
-    border: {
-      control: { type: "radio" },
-      options: [ ...Object.keys(options) ],
-    },
-  },
+  args: {},
   parameters: {
     controls: {
       exclude: [
@@ -63,5 +30,5 @@ export const Border: Story = {
       ],
     },
   },
-  render: ({...args}) => <BorderCard border={args.border} />
+  render: ({...args}) => <CWCard {...args} className="card border" />,
 }

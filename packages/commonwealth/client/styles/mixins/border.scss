@@ -1,1 +1,3 @@
-$border: 2px solid #E0DFE1;
+@import './colors.scss';
+
+$border: 1px solid $neutral-200;
