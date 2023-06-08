@@ -3,6 +3,7 @@ import axios from 'axios';
 import { isEqual } from 'lodash';
 
 import 'modals/edit_collaborators_modal.scss';
+import NewProfilesController from '../../controllers/server/newProfiles';
 
 import type { IThreadCollaborator } from '../../models/Thread';
 import type Thread from '../../models/Thread';
@@ -113,7 +114,7 @@ export const EditCollaboratorsModal = ({
                   }
                 >
                   <User
-                    user={app.newProfiles.getProfile(
+                    user={NewProfilesController.Instance.getProfile(
                       c.chain_id,
                       c.Address.address
                     )}
@@ -135,7 +136,12 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User user={app.newProfiles.getProfile(c.chain, c.address)} />
+                  <User
+                    user={NewProfilesController.Instance.getProfile(
+                      c.chain,
+                      c.address
+                    )}
+                  />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"
