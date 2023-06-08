@@ -2,6 +2,9 @@ import { TypedRequestParams, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { CommentAttributes } from '../../models/comment';
 
+type DeleteCommentRequestParams = {
+  id: string;
+};
 type DeleteCommentResponse = CommentAttributes;
 
 export const deleteCommentHandler = async (
@@ -12,7 +15,12 @@ export const deleteCommentHandler = async (
   const { user, address, chain } = req;
   const { id: commentId } = req.params;
 
-  await controllers.comments.deleteComment(user, address, chain, commentId);
+  await controllers.comments.deleteComment(
+    user,
+    address,
+    chain,
+    parseInt(commentId, 10)
+  );
 
   return success(res, undefined);
 };

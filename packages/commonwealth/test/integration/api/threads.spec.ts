@@ -6,7 +6,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-import { Errors as CreateCommentErrors } from 'server/routes/createComment';
+import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
 import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';

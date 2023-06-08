@@ -1,9 +1,4 @@
-import {
-  TypedRequest,
-  TypedRequestBody,
-  TypedResponse,
-  success,
-} from '../../types';
+import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { CommentInstance } from '../../models/comment';
 import { AppError } from '../../../../common-common/src/errors';
@@ -11,6 +6,15 @@ import { AppError } from '../../../../common-common/src/errors';
 export const Errors = {
   MissingThreadId: 'Must provide valid thread_id',
   MissingTextOrAttachment: 'Must provide text or attachment',
+
+  MissingRootId: 'Must provide valid thread_id',
+  InvalidParent: 'Invalid parent',
+  ThreadNotFound: 'Cannot comment; thread not found',
+  CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
+  InsufficientTokenBalance:
+    "Users need to hold some of the community's tokens to comment",
+  BalanceCheckFailed: 'Could not verify user token balance',
+  NestingTooDeep: 'Comments can only be nested 8 levels deep',
 };
 
 type CreateThreadCommentRequestBody = {
