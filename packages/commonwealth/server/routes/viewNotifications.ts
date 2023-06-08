@@ -66,11 +66,12 @@ export default async (
   //  (increment the counters in emitNotifications)
   // TODO: or better yet create onUpdate and onDelete triggers to update the counters
   // TODO: should this always run so we can return number of unread or things like that?
-  const numNr = (<any>await models.NotificationsRead.findOne({
-    attributes: [<any>models.sequelize.fn('MAX', models.sequelize.col('id'))],
-    where: { user_id: req.user.id },
-    raw: true,
-  })).max;
+  const nmrObj = await models.NotificationsReadMax.findOne({
+    where: {user_id: req.user.id},
+    attributes: ['max_id']
+  })
+  const numNr = nmrObj? nmrObj.max_id : 0
+  maxId = numNr
 
   if (!req.body.maxId || req.body.maxId === 0) maxId = numNr;
   else maxId = req.body.maxId;
@@ -83,7 +84,7 @@ export default async (
   if (req.body.unread_only) whereAndOptions.push({ is_read: false });
 
   // TODO: write raw query so that all subscriptions are included
-  const notificationsReadPromise = models.NotificationsRead.findAll({
+  const notificationsRead = await models.NotificationsRead.findAll({
     include: [
       {
         model: models.Subscription,
@@ -107,40 +108,8 @@ export default async (
     nest: true,
   });
 
-  // NOTE: Zak commenting this out (and promise below). getting more enriched subscriptions in /viewSubscriptions
-  // const subscriptionsPromise = models.Subscription.findAll({
-  //   where: {
-  //     subscriber_id: req.user.id,
-  //   },
-  // });
-
-  const [
-    notificationsRead,
-    // allSubscriptions
-  ] = await Promise.all([
-    notificationsReadPromise,
-    // subscriptionsPromise,
-  ]);
-
   const subscriptionsObj = {};
 
-  /*
-     iterate through the notification read instances which contain a Notification instance as well as a Chain
-     Event instance embedded in the notification data if the Notification is a chain-event notification. The
-     NotificationsRead instance also contains the associated subscription instance
-
-      NotificationsRead instance:
-      {
-         notification_id,
-         subscription_id,
-         is_read,
-         Notification: {
-           notification_data
-           ...
-         }
-         Subscription: {...}
-      }
-   */
   for (const nr of notificationsRead) {
     let chainEvent;
     // if the Notification instance defines a chain_event_id then this is a chain-event notification so parse it
@@ -170,18 +139,6 @@ export default async (
       },
     });
   }
-
-  // The front-end expects to receive ALL of a users subscriptions regardless if there exist any associated
-  // NotificationsRead instances so here we add all of those subscriptions that don't have NRs
-  // NOTE: ZAK commenting this out as it's unnecessary, we're removing the "all subscriptions" from this route
-  // NOTE: see /viewSubscription to return more enriched subscriptions for the user
-  // for (const sub of allSubscriptions) {
-  //   if (!subscriptionsObj[sub.id]) {
-  //     const subObj = sub.toJSON();
-  //     subObj['NotificationsReads'] = [];
-  //     subscriptionsObj[sub.id] = subObj;
-  //   }
-  // }
 
   // convert the object to an array which is what the front-end expects
   const subscriptions = [];
