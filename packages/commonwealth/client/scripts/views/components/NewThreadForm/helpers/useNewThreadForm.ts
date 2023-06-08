@@ -6,6 +6,7 @@ import { ThreadKind } from '../../../../models/types';
 import { getTextFromDelta } from '../../react_quill_editor';
 import { useDraft } from 'hooks/useDraft';
 import { useSearchParams } from 'react-router-dom';
+import app from 'state';
 
 type NewThreadDraft = {
   topicId: number;
@@ -13,11 +14,7 @@ type NewThreadDraft = {
   body: DeltaStatic;
 };
 
-const useNewThreadForm = (
-  chainId: string,
-  authorName: string,
-  topicsForSelector: Topic[]
-) => {
+const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
   const [searchParams] = useSearchParams();
   const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
 
@@ -59,7 +56,7 @@ const useNewThreadForm = (
   const editorText = getTextFromDelta(threadContentDelta);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
-  const disableSave = !authorName || isSaving;
+  const disableSave = isSaving;
   const hasTopics = !!topicsForSelector?.length;
   const topicMissing = hasTopics && !threadTopic;
   const titleMissing = !threadTitle;
