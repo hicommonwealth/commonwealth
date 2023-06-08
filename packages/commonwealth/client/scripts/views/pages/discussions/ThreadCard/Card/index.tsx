@@ -28,6 +28,7 @@ import { Options } from '../Options';
 import { AdminActionsProps } from '../Options/AdminActions';
 import { ReactionButton } from '../Options/ReactionButton';
 import './index.scss';
+import { Link } from 'react-router-dom';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
@@ -91,8 +92,8 @@ export const Card = ({
 
   return (
     <>
-      <a
-        href={threadHref}
+      <Link
+        to={threadHref}
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
           'ThreadCard'
@@ -211,7 +212,7 @@ export const Card = ({
             />
           </div>
         </div>
-      </a>
+      </Link>
     </>
   );
 };
