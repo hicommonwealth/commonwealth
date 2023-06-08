@@ -62,7 +62,7 @@ export const ThreadPreviewReactionButtonBig = ({
               >
                 <div className="reactions-container">
                   <CWIcon
-                    iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
+                    iconName='arrowFatUp'
                     iconSize="small"
                   />
                   <div className="reactions-count">{reactors.length}</div>
@@ -73,7 +73,7 @@ export const ThreadPreviewReactionButtonBig = ({
         ) : (
           <div className="reactions-container">
             <CWIcon
-              iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
+              iconName='arrowFatUp'
               iconSize="small"
             />
             <div className="reactions-count">{reactors.length}</div>

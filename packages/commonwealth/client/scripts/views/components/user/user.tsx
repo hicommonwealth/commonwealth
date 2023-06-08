@@ -223,7 +223,9 @@ export const User = ({
                   profile.name
                 ) : (
                   <>
-                    {profile.name}
+                    <div>
+                      {profile.name}
+                    </div>
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>

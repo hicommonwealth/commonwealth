@@ -9,10 +9,10 @@
   display: flex;
   flex-direction: column;
   font-weight: 500;
-  height: 48px;
+  height: 54px;
+  width: 40px;
   justify-content: center;
-  margin-right: 24px;
-  min-width: 48px;
+  margin-right: 1em;
 
   &.has-reacted {
     border-color: $primary-500;
@@ -31,6 +31,7 @@
 
     svg {
       margin: 4px auto 2px;
+      fill:transparent;
     }
 
     .reactions-count {
