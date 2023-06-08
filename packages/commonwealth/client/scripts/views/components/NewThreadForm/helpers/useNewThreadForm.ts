@@ -6,7 +6,6 @@ import { ThreadKind } from '../../../../models/types';
 import { getTextFromDelta } from '../../react_quill_editor';
 import { useDraft } from 'hooks/useDraft';
 import { useSearchParams } from 'react-router-dom';
-import app from 'state';
 
 type NewThreadDraft = {
   topicId: number;
