@@ -39,7 +39,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { ChangeTopicModal } from 'views/modals/change_topic_modal';
+import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import Thread, { LinkSource } from 'models/Thread';
@@ -293,7 +293,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
       </div>
       <Modal
         content={
-          <ChangeTopicModal
+          <ChangeThreadTopicModal
             onChangeHandler={() => {
               // TODO update store and rerender
             }}

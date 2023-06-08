@@ -29,8 +29,8 @@ type EditTopicReq = {
   description?: string;
   telegram?: string;
   featured_order: number;
-  featured_in_sidebar: string; // boolean
-  featured_in_new_post: string; // boolean
+  featured_in_sidebar: boolean;
+  featured_in_new_post: boolean;
   default_offchain_template: string;
 };
 
@@ -53,8 +53,8 @@ const editTopic = async (
     return next(new AppError(Errors.InvalidTopicName));
   }
 
-  const featured_in_sidebar = req.body.featured_in_sidebar === 'true';
-  const featured_in_new_post = req.body.featured_in_new_post === 'true';
+  const featured_in_sidebar = req.body.featured_in_sidebar;
+  const featured_in_new_post = req.body.featured_in_new_post;
   const default_offchain_template = req.body.default_offchain_template?.trim();
   if (featured_in_new_post && !default_offchain_template) {
     return next(new AppError(Errors.DefaultTemplateRequired));
