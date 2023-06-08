@@ -19,7 +19,6 @@ import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
 import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
-import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
