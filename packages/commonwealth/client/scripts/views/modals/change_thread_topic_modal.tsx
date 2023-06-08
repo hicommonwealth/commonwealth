@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'modals/change_topic_modal.scss';
+import 'modals/change_thread_topic_modal.scss';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 
@@ -8,24 +8,27 @@ import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { TopicSelector } from '../components/topic_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useFetchTopicsQuery } from 'state/api/topics';
 
-type ChangeTopicModalProps = {
+type ChangeThreadTopicModalProps = {
   onChangeHandler: (topic: Topic) => void;
   onModalClose: () => void;
   thread: Thread;
 };
 
-export const ChangeTopicModal = ({
+export const ChangeThreadTopicModal = ({
   onChangeHandler,
   onModalClose,
   thread,
-}: ChangeTopicModalProps) => {
+}: ChangeThreadTopicModalProps) => {
   const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const handleSaveChanges = async () => {
     try {
-      const topic: Topic = await app.topics.update(
+      const topic: Topic = await app.threads.updateTopic(
         thread.id,
         activeTopic.name,
         activeTopic.id
@@ -45,7 +48,7 @@ export const ChangeTopicModal = ({
   };
 
   return (
-    <div className="ChangeTopicModal">
+    <div className="ChangeThreadTopicModal">
       <div className="compact-modal-title">
         <h3>Change topic</h3>
         <CWIconButton iconName="close" onClick={onModalClose} />

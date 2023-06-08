@@ -1,24 +1,17 @@
-import { AppError } from 'common-common/src/errors';
-import type { NextFunction } from 'express';
-import _ from 'lodash';
-import type { TypedRequestBody, TypedResponse } from '../types';
+import { body, validationResult } from 'express-validator';
+import { Op } from 'sequelize';
 import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { failure } from '../types';
 
-export const Errors = {
-  NeedAddress: 'Must provide address',
-  NeedChain: 'Must provide chain',
-  InvalidChain: 'Invalid chain',
-  InvalidAddress: 'Invalid address',
-};
+export const getAddressProfileValidation = [
+  body('chains').exists().toArray(),
+  body('addresses').exists().toArray()
+];
 
-type GetAddressProfileReq = {
-  address: string;
-  chain: string;
-};
-
-type GetAddressProfilesReq = {
-  'address[]': string;
-  'chain[]': string;
+export type GetAddressProfileReq = {
+  addresses: string[];
+  chains: string[];
 };
 
 type GetAddressProfileResp = {
@@ -29,108 +22,41 @@ type GetAddressProfileResp = {
   avatarUrl: string;
 };
 
-const getAddressProfile = async (
+const getAddressProfiles = async (
   models: DB,
-  req: TypedRequestBody<GetAddressProfileReq | GetAddressProfilesReq>,
-  res: TypedResponse<GetAddressProfileResp | GetAddressProfileResp[]>,
-  next: NextFunction
+  req: TypedRequestBody<GetAddressProfileReq>,
+  res: TypedResponse<GetAddressProfileResp[]>,
 ) => {
-  if (!(req.body as GetAddressProfileReq).address && !req.body['address[]']) {
-    return next(new AppError(Errors.NeedAddress));
-  }
-  if (!(req.body as GetAddressProfileReq).chain && !req.body['chain[]']) {
-    return next(new AppError(Errors.NeedChain));
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
   }
 
-  // single profile
-  if (
-    (req.body as GetAddressProfileReq).address &&
-    (req.body as GetAddressProfileReq).chain
-  ) {
-    const reqChain = (req.body as GetAddressProfileReq).chain;
-    const reqAddr = (req.body as GetAddressProfileReq).address;
+  const addressEntities = await models.Address.findAll({
+    where: {
+      chain: { [Op.in]: req.body.chains },
+      address: { [Op.in]: req.body.addresses },
+    },
+    include: [{
+      model: models.Profile,
+      required: true,
+    }],
+  });
 
-    const chain = await models.Chain.findOne({
-      where: { id: reqChain },
-    });
-    if (!chain) {
-      return next(new AppError(Errors.InvalidChain));
-    }
+  const profiles = addressEntities.map((address) => {
+    return {
+      profileId: address.profile_id,
+      name: address.Profile.profile_name,
+      address: address.address,
+      lastActive: address.last_active,
+      avatarUrl: address.Profile.avatar_url,
+    };
+  })
 
-    const address = await models.Address.findOne({
-      where: {
-        chain: reqChain,
-        address: reqAddr,
-      },
-      include: [models.Profile],
-    });
-
-    if (!address) {
-      return next(new AppError(Errors.InvalidAddress));
-    }
-
-    const profile = await address.Profile;
-
-    return res.json({
-      status: 'Success',
-      result: {
-        profileId: address.profile_id,
-        name: profile?.profile_name,
-        address: address.address,
-        lastActive: address.last_active,
-        avatarUrl: profile?.avatar_url,
-      },
-    });
-  }
-
-  // multiple profiles
-  if (req.body['address[]'] && req.body['chain[]']) {
-    const addrs = req.body['address[]'];
-    const chains = req.body['chain[]'];
-    let addrObjs;
-
-    // if all profiles are on the same chain, make a fast query, otherwise, make multiple queries
-    if (_.uniq(chains).length === 1) {
-      addrObjs = await models.Address.findAll({
-        where: {
-          chain: chains[0],
-          address: addrs,
-        },
-        include: [models.Profile],
-      });
-    } else {
-      let query;
-      addrObjs = [];
-      for (const chain in chains) {
-        if (chains[chain]) {
-          query = await models.Address.findAll({
-            where: {
-              chain: chains[chain],
-              address: addrs,
-            },
-            include: [models.Profile],
-          });
-          addrObjs.push(query);
-        }
-      }
-      addrObjs = addrObjs.flat();
-    }
-
-    const profiles = addrObjs.map((addr) => addr?.Profile);
-
-    return res.json({
-      status: 'Success',
-      result: profiles.map((profile, i) => {
-        return {
-          profileId: addrObjs[i].profile_id,
-          name: profile?.profile_name,
-          address: addrObjs[i].address,
-          lastActive: addrObjs[i].last_active,
-          avatarUrl: profile?.avatar_url,
-        };
-      }),
-    });
-  }
+  return res.json({
+    status: 'Success',
+    result: profiles
+  });
 };
 
-export default getAddressProfile;
+export default getAddressProfiles;

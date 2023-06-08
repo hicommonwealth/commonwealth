@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import app from 'state';
+import NewProfilesController from '../../../../controllers/server/newProfiles';
 
 const useAuthorName = () => {
   const [authorName, setAuthorName] = useState(
@@ -7,7 +8,7 @@ const useAuthorName = () => {
   );
 
   useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => {
+    NewProfilesController.Instance.isFetched.on('redraw', () => {
       setAuthorName(app.user.activeAccount?.profile?.name);
     });
   }, []);
