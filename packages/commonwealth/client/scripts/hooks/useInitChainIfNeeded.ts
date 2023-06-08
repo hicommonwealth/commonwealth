@@ -15,14 +15,12 @@ export const useInitChainIfNeeded = (app: IApp) => {
 
   useEffect(() => {
     const chainInit = async () => {
-      if (!hasFetchedRef.current) {
+      if (!hasFetchedRef.current && !app.isAdapterReady) {
         hasFetchedRef.current = true;
         await initChain();
       }
     };
 
-    if (!app.chain?.apiInitialized) {
-      chainInit();
-    }
-  }, [app.chain?.apiInitialized]);
+    chainInit();
+  }, [app?.isAdapterReady]);
 };
