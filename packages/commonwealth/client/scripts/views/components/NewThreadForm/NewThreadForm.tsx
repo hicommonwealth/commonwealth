@@ -110,6 +110,7 @@ export const NewThreadForm = () => {
 
       navigate(`/discussion/${result.id}`);
     } catch (err) {
+      if (err.responseJSON.error === "Login canceled") return;
       console.error(err);
       notifyError(typeof err === "string" ? err : (err.responseText || err.responseJSON?.error));
     } finally {

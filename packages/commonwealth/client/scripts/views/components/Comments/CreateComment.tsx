@@ -90,6 +90,7 @@ export const CreateComment = ({
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
+      if (err.message === "Login canceled") return;
       console.error(err);
       notifyError(err.message || 'Comment submission failed.');
       setErrorMsg(err.message);
