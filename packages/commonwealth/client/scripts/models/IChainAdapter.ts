@@ -61,7 +61,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     const {
       pinnedThreads,
-      topics,
       admins,
       activeUsers,
       numVotingThreads,
@@ -69,7 +68,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       communityBanner,
       contractsWithTemplatesData,
     } = response.result;
-    this.app.topics.initialize(topics, true);
     this.app.threads.initialize(
       pinnedThreads,
       numVotingThreads,
