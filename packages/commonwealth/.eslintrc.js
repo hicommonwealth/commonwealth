@@ -4,10 +4,11 @@ module.exports = {
   settings: {
     'import/resolver': {
       webpack: {
-        config: path.resolve(__dirname, 'webpack/webpack.common.js')
-      }
-    }
+        config: path.resolve(__dirname, 'webpack/webpack.common.js'),
+      },
+    },
   },
+  plugins: ['@tanstack/query'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -47,27 +48,22 @@ module.exports = {
     'one-var-declaration-per-line': 0,
     'one-var': 0,
     'lines-between-class-members': 0,
-    'max-classes-per-file': [
-      'error',
-      5
-    ],
+    'max-classes-per-file': ['error', 5],
     'max-len': [
       1,
       {
-        'code': 120,
-        'tabWidth': 2
-      }
+        code: 120,
+        tabWidth: 2,
+      },
     ],
     'no-constant-condition': [
       'error',
       {
-        'checkLoops': false
-      }
+        checkLoops: false,
+      },
     ],
     'no-restricted-syntax': 0,
-    'no-trailing-spaces': [
-      'error'
-    ],
+    'no-trailing-spaces': ['error'],
     'no-useless-constructor': 0,
     'no-empty-function': 0,
     'import/prefer-default-export': 0,
@@ -83,11 +79,12 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': [
       'error',
       {
-        'allowSingleExtends': true
-      }
-    ]
+        allowSingleExtends: true,
+      },
+    ],
+    '@tanstack/query/exhaustive-deps': 'error',
+    '@tanstack/query/prefer-query-object-syntax': 'error',
   },
-  ignorePatterns: [
-    'server/scripts/setupPrerenderService.ts'
-  ]
+  ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
+  extends: ['plugin:@tanstack/eslint-plugin-query/recommended'],
 };
