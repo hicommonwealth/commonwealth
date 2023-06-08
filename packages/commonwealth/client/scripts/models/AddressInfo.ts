@@ -26,6 +26,7 @@ class AddressInfo extends Account {
       walletId,
       walletSsoSource,
       ghostAddress,
+      ignoreProfile: false,
     });
     this.id = id;
     this.keytype = keytype;

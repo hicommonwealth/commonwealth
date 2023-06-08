@@ -1,6 +1,15 @@
+import {
+  CaretDown,
+  CaretUp,
+  ChatDots,
+  ClockCounterClockwise,
+  Heart,
+  Sparkle,
+} from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import { CWNewStar } from './cw_icons';
 import * as Icons from './cw_icons';
+import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
   arrowLeft: Icons.CWArrowLeft,
@@ -10,11 +19,14 @@ export const iconLookup = {
   bell: Icons.CWBell,
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
+  chatDots: withPhosphorIcon(ChatDots),
   check: Icons.CWCheck,
   chevronDown: Icons.CWChevronDown,
   chevronLeft: Icons.CWChevronLeft,
   chevronRight: Icons.CWChevronRight,
   chevronUp: Icons.CWChevronUp,
+  carotUp: withPhosphorIcon(CaretUp),
+  carotDown: withPhosphorIcon(CaretDown),
   clock: Icons.CWClock,
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
@@ -22,6 +34,7 @@ export const iconLookup = {
   commonLogo: Icons.CWCommonLogo,
   compass: Icons.CWCompass,
   copy: Icons.CWCopy,
+  clockCounterClockwise: withPhosphorIcon(ClockCounterClockwise),
   cow: Icons.CWCow,
   curator: Icons.CWCurator,
   delegate: Icons.CWDelegate,
@@ -43,6 +56,7 @@ export const iconLookup = {
   google: Icons.CWGoogle,
   hamburger: Icons.CWHamburger,
   hash: Icons.CWHash,
+  heart: withPhosphorIcon(Heart),
   heartEmpty: Icons.CWHeartEmpty,
   heartFilled: Icons.CWHeartFilled,
   help: Icons.CWHelp,
@@ -68,6 +82,7 @@ export const iconLookup = {
   share2: Icons.CWShare2,
   sidebarCollapse: Icons.CWSidebarCollapse,
   sidebarExpand: Icons.CWSidebarExpand,
+  sparkle: withPhosphorIcon(Sparkle),
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,

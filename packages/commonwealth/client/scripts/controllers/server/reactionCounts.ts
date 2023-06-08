@@ -12,6 +12,7 @@ import Comment from '../../models/Comment';
 import Proposal from '../../models/Proposal';
 import Thread from '../../models/Thread';
 import type { AnyProposal } from '../../models/types';
+import axios from 'axios';
 
 export const modelFromServer = (reactionCount) => {
   const { id, thread_id, comment_id, proposal_id, has_reacted, like } =
@@ -34,7 +35,7 @@ class ReactionCountController {
     return this._store;
   }
 
-  public async create(
+  public async createCommentReaction(
     address: string,
     post: any,
     reaction: string,
@@ -87,7 +88,7 @@ class ReactionCountController {
     }
     try {
       const response = await $.post(
-        `${app.serverUrl()}/createReaction`,
+        `${app.serverUrl()}/comments/${post.id}/reactions`,
         options
       );
       const { result } = response;
@@ -149,12 +150,13 @@ class ReactionCountController {
     // TODO Graham 4/24/22: Investigate necessity of this duplication
     const _this = this; // eslint-disable-line
     try {
-      await $.post(`${app.serverUrl()}/deleteReaction`, {
-        jwt: app.user.jwt,
-        reaction_id: reaction.id,
-        canvas_action: action,
-        canvas_session: session,
-        canvas_hash: hash,
+      await axios.delete(`${app.serverUrl()}/reactions/${reaction.id}`, {
+        data: {
+          jwt: app.user.jwt,
+          canvas_action: action,
+          canvas_session: session,
+          canvas_hash: hash,
+        },
       });
       _this.store.update(reactionCount);
       if (reactionCount.likes === 0 && reactionCount.dislikes === 0) {

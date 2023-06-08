@@ -26,9 +26,10 @@ export default class EthereumAccount extends Account {
     app: IApp,
     ChainInfo: EthereumChain,
     Accounts: EthereumAccounts,
-    address: string
+    address: string,
+    ignoreProfile = true
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: app.chain.meta, address, ignoreProfile });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

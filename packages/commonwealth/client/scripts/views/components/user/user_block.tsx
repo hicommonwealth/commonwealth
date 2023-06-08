@@ -7,6 +7,7 @@ import 'components/user/user.scss';
 
 import { WalletId, WalletSsoSource } from 'common-common/src/types';
 import app from 'state';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
@@ -39,11 +40,17 @@ export const UserBlock = (props: {
 
   if (user instanceof AddressInfo) {
     if (!user.chain || !user.address) return;
-    profile = app.newProfiles.getProfile(user.chain.id, user.address);
+    profile = NewProfilesController.Instance.getProfile(
+      user.chain.id,
+      user.address
+    );
   } else if (user instanceof MinimumProfile) {
     profile = user;
   } else {
-    profile = app.newProfiles.getProfile(user.chain.id, user.address);
+    profile = NewProfilesController.Instance.getProfile(
+      user.chain.id,
+      user.address
+    );
   }
 
   const highlightSearchTerm =

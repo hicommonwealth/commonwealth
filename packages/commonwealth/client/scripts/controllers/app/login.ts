@@ -19,6 +19,7 @@ import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
 import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
+import { CosmosExtension } from '@magic-ext/cosmos';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -175,7 +176,7 @@ export async function updateActiveAddresses({
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
       .filter((addr) => addr),
     shouldRedraw
   );
@@ -287,6 +288,7 @@ export async function createUserWithAddress(
     walletId,
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
+    ignoreProfile: false,
   });
   return { account, newlyCreated: response.result.newly_created };
 }
@@ -430,7 +432,11 @@ export async function handleSocialLoginCallback({
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
+
   const result = await magic.oauth.getRedirectResult();
+  if (!bearer) {
+    bearer = result.magic.idToken;
+  }
 
   // Get magic metadata
   const profileMetadata = getProfileMetadata(result.oauth);
@@ -440,9 +446,6 @@ export async function handleSocialLoginCallback({
   } else {
     const { utils } = await import('ethers');
     magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
-  }
-  if (!bearer) {
-    bearer = result.magic.idToken;
   }
 
   // Sign a session

@@ -76,10 +76,10 @@ export const EthDaoForm = (props: EthChainFormState) => {
     try {
       if (network === ChainNetwork.Compound) {
         const Web3 = (await import('web3')).default;
-
-        const provider = new Web3.providers.WebsocketProvider(
-          ethChainFormFields.nodeUrl
-        );
+        const provider =
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
+            : new Web3.providers.WebsocketProvider(ethChainFormFields.nodeUrl);
 
         const compoundApi = new CompoundAPI(
           null,
@@ -104,10 +104,10 @@ export const EthDaoForm = (props: EthChainFormState) => {
         );
       } else if (network === ChainNetwork.Aave) {
         const Web3 = (await import('web3')).default;
-
-        const provider = new Web3.providers.WebsocketProvider(
-          ethChainFormFields.nodeUrl
-        );
+        const provider =
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
+            : new Web3.providers.WebsocketProvider(ethChainFormFields.nodeUrl);
 
         const aaveApi = new AaveApi(
           IAaveGovernanceV2__factory.connect,

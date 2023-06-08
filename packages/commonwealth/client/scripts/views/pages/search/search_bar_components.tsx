@@ -5,6 +5,7 @@ import moment from 'moment';
 import 'pages/search/search_bar_components.scss';
 
 import app from 'state';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import AddressInfo from '../../../models/AddressInfo';
 import ChainInfo from '../../../models/ChainInfo';
 import { CommunityLabel } from '../../components/community_label';
@@ -168,7 +169,7 @@ export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
       <User
-        user={app.newProfiles.getProfile(
+        user={NewProfilesController.Instance.getProfile(
           searchResult.chain,
           searchResult.address
         )}

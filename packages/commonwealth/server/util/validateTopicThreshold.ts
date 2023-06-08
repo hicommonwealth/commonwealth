@@ -35,7 +35,6 @@ const validateTopicThreshold = async (
       // if we have no node, always approve
       return true;
     }
-
     // skip query if no threshold
     const threshold = new BN(topic.token_threshold || '0');
     if (threshold.isZero()) {
@@ -66,9 +65,7 @@ const validateTopicThreshold = async (
       }
     }
   } catch (err) {
-    log.warn(
-      `Could not validate topic threshold for ${topicId}: ${err.message}`
-    );
+    log.warn(`Could not validate topic threshold for ${topicId}:`, err);
     return false;
   }
 };

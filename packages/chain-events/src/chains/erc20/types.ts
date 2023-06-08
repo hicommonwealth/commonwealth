@@ -1,12 +1,12 @@
 import type { Web3Provider } from '@ethersproject/providers';
 import type BN from 'bn.js';
 
-import type { TypedEvent } from '../../contractTypes/commons';
 import type { ERC20 } from '../../contractTypes';
 
 import type { EnricherConfig } from './filters/enricher';
+import {TypedEventFilter} from "../../contractTypes/commons";
 
-interface IErc20Contract {
+export interface IErc20Contract {
   contract: ERC20;
   totalSupply: BN;
   tokenName?: string;
@@ -24,14 +24,23 @@ export interface ListenerOptions {
   enricherConfig: EnricherConfig;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RawEvent = TypedEvent<any>;
-
 // eslint-disable-next-line no-shadow
 export enum EventKind {
   // Erc20 Events
   Approval = 'approval',
   Transfer = 'transfer',
+}
+
+export type GetEventArgs<T> = T extends TypedEventFilter<unknown, infer Y> ? Y : never;
+export type GetArgType<Name extends keyof ERC20['filters']> = GetEventArgs<
+  ReturnType<ERC20['filters'][Name]>
+>;
+
+export interface RawEvent {
+  address: string,
+  args: GetArgType<'Approval'> | GetArgType<'Transfer'>,
+  name: string,
+  blockNumber: number
 }
 
 interface IEvent {

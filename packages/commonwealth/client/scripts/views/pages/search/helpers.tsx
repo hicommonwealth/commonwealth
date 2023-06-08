@@ -4,6 +4,7 @@ import moment from 'moment';
 import 'pages/search/index.scss';
 
 import type { SearchSort } from 'models/SearchQuery';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import app from 'state';
 import { SearchContentType } from 'types';
@@ -156,7 +157,7 @@ const getCommunityResult = (community, setRoute) => {
 };
 
 const getMemberResult = (addr, setRoute) => {
-  const profile: MinimumProfile = app.newProfiles.getProfile(
+  const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
     addr.chain,
     addr.address
   );
