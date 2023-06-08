@@ -18,10 +18,8 @@ import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
 import finishOAuthLogin from '../routes/finishOAuthLogin';
 import startOAuthLogin from '../routes/startOAuthLogin';
-import editComment from '../routes/editComment';
 import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
-import bulkComments from '../routes/bulkComments';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
@@ -176,6 +174,8 @@ import { createCommentReactionHandler } from '../routes/comments/create_comment_
 import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
+import { updateCommentHandler } from '../routes/comments/update_comment_handler';
+import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -548,27 +548,24 @@ function setupRouter(
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
   );
-  router.post(
-    '/editComment',
+  router.patch(
+    '/comments/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    editComment.bind(this, models, banCache)
+    updateCommentHandler.bind(this, serverControllers)
   );
-  router.post(
-    '/deleteComment',
+  router.delete(
+    '/comments/:id',
     passport.authenticate('jwt', { session: false }),
-    deleteComment.bind(this, models, banCache)
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteCommentHandler.bind(this, models, banCache)
   );
   router.get(
     '/viewComments',
     databaseValidationService.validateChain,
     viewComments.bind(this, models)
-  );
-  router.get(
-    '/bulkComments',
-    databaseValidationService.validateChain,
-    bulkComments.bind(this, models)
   );
   router.get(
     '/comments',

@@ -1,5 +1,6 @@
 import { uniqBy } from 'lodash';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
+import moment from 'moment';
 
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
@@ -11,35 +12,29 @@ import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
+  ProposalType,
 } from '../../../common-common/src/types';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, findOneRole } from '../util/roles';
 import { UserInstance } from '../models/user';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { NotificationOptions } from './server_notifications_controller';
-import { getThreadUrl } from '../../shared/utils';
+import { getThreadUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { AnalyticsOptions } from './server_analytics_controller';
 import { buildPaginationSql } from '../util/queries';
+import { CommentAttributes } from '../models/comment';
+import { parseUserMentions } from '../util/parseUserMentions';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
   BalanceCheckFailed: 'Could not verify user token balance',
+  ParseMentionsFailed: 'Failed to parse mentions',
+  NotOwned: 'Not owned by this user',
 };
 
 export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
-
-/**
- * Options for searching comments
- */
-type SearchCommentOptions = {
-  search: string;
-  chain?: string;
-  sort?: string;
-  page?: number;
-  pageSize?: number;
-};
 
 /**
  * Data representing a comment search result
@@ -67,14 +62,14 @@ interface IServerCommentsController {
    *
    * @param user - Current user
    * @param address - Address of the user
-   * @param chain - Chain of thread
+   * @param chain - Chain of comment
    * @param reaction - Type of reaction
    * @param commentId - ID of the comment
-   * @param canvasAction - Canvas metadata
-   * @param canvasSession - Canvas metadata
-   * @param canvasHash - Canvas metadata
+   * @param canvasAction - Canvas metadata (optional)
+   * @param canvasSession - Canvas metadata (optional)
+   * @param canvasHash - Canvas metadata (optional)
    * @throws `CommentNotFound`, `ThreadNotFoundForComment`, `BanError`, `BalanceCheckFailed`
-   * @returns Promise that resolves to [Reaction, NotificationOptions, AnalyticsOptions]
+   * @returns Promise that resolves to `[ReactionAttributes, NotificationOptions[], AnalyticsOptions[]]`
    */
   createCommentReaction(
     user: UserInstance,
@@ -85,7 +80,7 @@ interface IServerCommentsController {
     canvasAction?: any,
     canvasSession?: any,
     canvasHash?: any
-  ): Promise<[ReactionAttributes, NotificationOptions, AnalyticsOptions]>;
+  ): Promise<[ReactionAttributes, NotificationOptions[], AnalyticsOptions[]]>;
 
   /**
    * Returns an array of reactions for a comment
@@ -99,13 +94,55 @@ interface IServerCommentsController {
    * Returns an array of comment search results
    *
    * @param chain - Chain object
-   * @param options - Options for searching comments
+   * @param search - Search term
+   * @param sort - Sort option (optional)
+   * @param page - Page number (optional)
+   * @param pageSize - Number of items per page (optional)
    * @returns Promise that resolves to array of search comment results
    */
   searchComments(
     chain: ChainInstance,
-    options: SearchCommentOptions
+    search: string,
+    sort?: string,
+    page?: number,
+    pageSize?: number
   ): Promise<SearchCommentResult[]>;
+
+  /**
+   * Updates a comment, returns the comment
+   *
+   * @param user - Current user
+   * @param address - Address of the user
+   * @param chain - Chain of comment
+   * @param commentId - ID of the comment to update
+   * @param commentBody - Text body of the comment, markdown or richtext
+   * @param attachments - File attachments (optional)
+   * @returns Promise that resolves to `[CommentAttributes, NotificationOptions[]]`
+   */
+  updateComment(
+    user: UserInstance,
+    address: AddressInstance,
+    chain: ChainInstance,
+    commentId: number,
+    commentBody: string,
+    attachments: any
+  ): Promise<[CommentAttributes, NotificationOptions[]]>;
+
+  /**
+   * Deletes a comment, returns nothing
+   *
+   * @param user - Current user
+   * @param address - Address of the user
+   * @param chain - Chain of comment
+   * @param address - Address of the user
+   * @param commentId - ID of the comment to delete
+   */
+  deleteComment(
+    user: UserInstance,
+    address: AddressInstance,
+    chain: ChainInstance,
+    commentId: number
+  ): Promise<void>;
 }
 
 /**
@@ -127,7 +164,7 @@ export class ServerCommentsController implements IServerCommentsController {
     canvasAction?: any,
     canvasSession?: any,
     canvasHash?: any
-  ): Promise<[ReactionAttributes, NotificationOptions, AnalyticsOptions]> {
+  ): Promise<[ReactionAttributes, NotificationOptions[], AnalyticsOptions[]]> {
     const comment = await this.models.Comment.findOne({
       where: { id: commentId },
     });
@@ -205,7 +242,9 @@ export class ServerCommentsController implements IServerCommentsController {
       : foundOrCreatedReaction;
 
     // build notification options
-    const notificationOptions: NotificationOptions = {
+    const allNotificationOptions: NotificationOptions[] = [];
+
+    allNotificationOptions.push({
       categoryId: NotificationCategories.NewReaction,
       objectId: `comment-${comment.id}`,
       notificationData: {
@@ -228,16 +267,22 @@ export class ServerCommentsController implements IServerCommentsController {
         body: comment.text,
       },
       excludeAddresses: [finalReaction.Address.address],
-    };
+    });
 
     // build analytics options
-    const analyticsOptions = {
+    const allAnalyticsOptions: AnalyticsOptions[] = [];
+
+    allAnalyticsOptions.push({
       event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
       community: chain.id,
       isCustomDomain: null,
-    };
+    });
 
-    return [finalReaction.toJSON(), notificationOptions, analyticsOptions];
+    return [
+      finalReaction.toJSON(),
+      allNotificationOptions,
+      allAnalyticsOptions,
+    ];
   }
 
   async getCommentReactions(commentId: number): Promise<ReactionAttributes[]> {
@@ -256,7 +301,10 @@ export class ServerCommentsController implements IServerCommentsController {
 
   async searchComments(
     chain: ChainInstance,
-    options: SearchCommentOptions
+    search: string,
+    sort?: string,
+    page?: number,
+    pageSize?: number
   ): Promise<SearchCommentResult[]> {
     // sort by rank by default
     let sortOptions: {
@@ -266,7 +314,7 @@ export class ServerCommentsController implements IServerCommentsController {
       column: 'rank',
       direction: 'DESC',
     };
-    switch ((options.sort || '').toLowerCase()) {
+    switch ((sort || '').toLowerCase()) {
       case 'newest':
         sortOptions = { column: '"Comments".created_at', direction: 'DESC' };
         break;
@@ -276,8 +324,8 @@ export class ServerCommentsController implements IServerCommentsController {
     }
 
     const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
-      limit: options.pageSize || 10,
-      page: options.page || 1,
+      limit: pageSize || 10,
+      page: page || 1,
       orderBy: sortOptions.column,
       orderDirection: sortOptions.direction,
     });
@@ -287,7 +335,7 @@ export class ServerCommentsController implements IServerCommentsController {
       chain?: string;
       limit?: number;
     } = {
-      searchTerm: options.search,
+      searchTerm: search,
       ...paginationBind,
     };
     if (chain) {
@@ -327,5 +375,257 @@ export class ServerCommentsController implements IServerCommentsController {
     );
 
     return comments as SearchCommentResult[];
+  }
+
+  async updateComment(
+    user: UserInstance,
+    address: AddressInstance,
+    chain: ChainInstance,
+    commentId: number,
+    commentBody: string,
+    attachments?: any
+  ): Promise<[CommentAttributes, NotificationOptions[]]> {
+    // check if banned
+    const [canInteract, banError] = await this.banCache.checkBan({
+      chain: chain.id,
+      address: address.address,
+    });
+    if (!canInteract) {
+      throw new Error(`Ban error: ${banError}`);
+    }
+
+    const attachFiles = async () => {
+      if (attachments && typeof attachments === 'string') {
+        await this.models.Attachment.create({
+          attachable: 'comment',
+          attachment_id: commentId,
+          url: attachments,
+          description: 'image',
+        });
+      } else if (attachments) {
+        await Promise.all(
+          attachments.map((u) =>
+            this.models.Attachment.create({
+              attachable: 'comment',
+              attachment_id: commentId,
+              url: u,
+              description: 'image',
+            })
+          )
+        );
+      }
+    };
+
+    const userOwnedAddressIds = (await user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
+    const comment = await this.models.Comment.findOne({
+      where: {
+        id: commentId,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
+    });
+
+    const thread = await this.models.Thread.findOne({
+      where: { id: comment.thread_id },
+    });
+    if (!thread) {
+      throw new Error(Errors.ThreadNotFoundForComment);
+    }
+
+    let latestVersion;
+    try {
+      latestVersion = JSON.parse(comment.version_history[0]).body;
+    } catch (e) {
+      console.log(e);
+    }
+    // If new comment body text has been submitted, create another version history entry
+    if (decodeURIComponent(commentBody) !== latestVersion) {
+      const recentEdit = {
+        timestamp: moment(),
+        body: decodeURIComponent(commentBody),
+      };
+      const arr = comment.version_history;
+      arr.unshift(JSON.stringify(recentEdit));
+      comment.version_history = arr;
+    }
+    comment.text = commentBody;
+    comment.plaintext = (() => {
+      try {
+        return renderQuillDeltaToText(
+          JSON.parse(decodeURIComponent(commentBody))
+        );
+      } catch (e) {
+        return decodeURIComponent(commentBody);
+      }
+    })();
+    await comment.save();
+    await attachFiles();
+    const finalComment = await this.models.Comment.findOne({
+      where: { id: comment.id },
+      include: [this.models.Address, this.models.Attachment],
+    });
+
+    const cwUrl = getThreadUrl(thread, comment?.id);
+    const root_title = thread.title || '';
+
+    const allNotificationOptions: NotificationOptions[] = [];
+
+    allNotificationOptions.push({
+      categoryId: NotificationCategories.CommentEdit,
+      objectId: '',
+      notificationData: {
+        created_at: new Date(),
+        thread_id: comment.thread_id,
+        root_title,
+        root_type: ProposalType.Thread,
+        comment_id: +finalComment.id,
+        comment_text: finalComment.text,
+        chain_id: finalComment.chain,
+        author_address: finalComment.Address.address,
+        author_chain: finalComment.Address.chain,
+      },
+      webhookData: {
+        user: finalComment.Address.address,
+        url: cwUrl,
+        title: thread.title || '',
+        chain: finalComment.chain,
+      },
+      excludeAddresses: [finalComment.Address.address],
+    });
+
+    let mentions;
+    try {
+      const previousDraftMentions = parseUserMentions(latestVersion);
+      const currentDraftMentions = parseUserMentions(
+        decodeURIComponent(commentBody)
+      );
+      mentions = currentDraftMentions.filter((addrArray) => {
+        let alreadyExists = false;
+        previousDraftMentions.forEach((addrArray_) => {
+          if (
+            addrArray[0] === addrArray_[0] &&
+            addrArray[1] === addrArray_[1]
+          ) {
+            alreadyExists = true;
+          }
+        });
+        return !alreadyExists;
+      });
+    } catch (e) {
+      throw new Error(Errors.ParseMentionsFailed);
+    }
+
+    // grab mentions to notify tagged users
+    let mentionedAddresses;
+    if (mentions?.length > 0) {
+      mentionedAddresses = await Promise.all(
+        mentions.map(async (mention) => {
+          const mentionedUser = await this.models.Address.findOne({
+            where: {
+              chain: mention[0],
+              address: mention[1],
+            },
+            include: [this.models.User, this.models.RoleAssignment],
+          });
+          return mentionedUser;
+        })
+      );
+      // filter null results
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+    }
+
+    // notify mentioned users, given permissions are in place
+    if (mentionedAddresses?.length > 0) {
+      mentionedAddresses.forEach((mentionedAddress) => {
+        if (!mentionedAddress.User) {
+          return; // some Addresses may be missing users, e.g. if the user removed the address
+        }
+        allNotificationOptions.push({
+          categoryId: NotificationCategories.NewMention,
+          objectId: `user-${mentionedAddress.User.id}`,
+          notificationData: {
+            created_at: new Date(),
+            thread_id: +comment.thread_id,
+            root_title,
+            root_type: ProposalType.Thread,
+            comment_id: +finalComment.id,
+            comment_text: finalComment.text,
+            chain_id: finalComment.chain,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+          },
+          webhookData: null,
+          excludeAddresses: [finalComment.Address.address],
+        });
+      });
+    }
+
+    // update address last active
+    address.last_active = new Date();
+    address.save();
+
+    return [finalComment.toJSON(), allNotificationOptions];
+  }
+
+  async deleteComment(
+    user: UserInstance,
+    address: AddressInstance,
+    chain: ChainInstance,
+    commentId: number
+  ): Promise<void> {
+    // check if author can delete post
+    const [canInteract, error] = await this.banCache.checkBan({
+      chain: chain.id,
+      address: address.address,
+    });
+    if (!canInteract) {
+      throw new Error(`Ban error; ${error}`);
+    }
+
+    const userOwnedAddressIds = (await user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
+
+    // find comment, if owned by user
+    let comment = await this.models.Comment.findOne({
+      where: {
+        id: commentId,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
+      include: [this.models.Address],
+    });
+
+    // if not owned by user, check if is admin/mod
+    if (!comment) {
+      comment = await this.models.Comment.findOne({
+        where: {
+          id: commentId,
+        },
+        include: [this.models.Chain],
+      });
+      if (!comment) {
+        throw new Error(Errors.CommentNotFound);
+      }
+      const requesterIsAdminOrMod = await findOneRole(
+        this.models,
+        { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+        comment?.Chain?.id,
+        ['admin', 'moderator']
+      );
+      if (!requesterIsAdminOrMod) {
+        throw new Error(Errors.NotOwned);
+      }
+    }
+
+    // find and delete all associated subscriptions
+    await this.models.Subscription.destroy({
+      where: {
+        offchain_comment_id: comment.id,
+      },
+    });
+
+    // actually delete
+    await comment.destroy();
   }
 }

@@ -46,13 +46,10 @@ export const searchCommentsHandler = async (
 
   const commentSearchResults = await controllers.comments.searchComments(
     req.chain,
-    {
-      search: options.search,
-      chain: options.chain,
-      sort: options.sort,
-      page: parseInt(options.page, 10) || 0,
-      pageSize: parseInt(options.page_size, 10) || 0,
-    }
+    options.search,
+    options.sort,
+    parseInt(options.page, 10) || 0,
+    parseInt(options.page_size, 10) || 0
   );
 
   return success(res, commentSearchResults);

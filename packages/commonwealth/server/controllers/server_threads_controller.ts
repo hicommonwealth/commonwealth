@@ -29,8 +29,6 @@ const Errors = {
 
   InvalidParent: 'Invalid parent',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
-  InsufficientTokenBalance:
-    "Users need to hold some of the community's tokens to comment",
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
 };
 
@@ -86,7 +84,7 @@ interface IServerThreadsController {
     author: AddressInstance,
     chain: ChainInstance,
     parentId: number,
-    threadId: string,
+    threadId: number,
     text: string,
     attachments: any,
     canvasAction?: any,
@@ -224,7 +222,7 @@ export class ServerThreadsController implements IServerThreadsController {
     address: AddressInstance,
     chain: ChainInstance,
     parentId: number,
-    threadId: string,
+    threadId: number,
     text: string,
     attachments: any,
     canvasAction?: any,
@@ -237,7 +235,7 @@ export class ServerThreadsController implements IServerThreadsController {
       address: address.address,
     });
     if (!canInteract) {
-      throw new Error(banError);
+      throw new Error(`${Errors.BanError}: ${banError}`);
     }
 
     // check if thread exists
@@ -266,9 +264,13 @@ export class ServerThreadsController implements IServerThreadsController {
       if (!parentComment) {
         throw new Error(Errors.InvalidParent);
       }
-      // check to ensure comments are never nested more than eight levels deep:
-      const commentDepth = await getCommentDepth(this.models, parentComment);
-      if (commentDepth >= MAX_COMMENT_DEPTH) {
+      // check to ensure comments are never nested more than max depth:
+      const [commentDepthExceeded] = await getCommentDepth(
+        this.models,
+        parentComment,
+        MAX_COMMENT_DEPTH
+      );
+      if (commentDepthExceeded) {
         throw new Error(Errors.NestingTooDeep);
       }
     }
@@ -316,7 +318,7 @@ export class ServerThreadsController implements IServerThreadsController {
     };
     const version_history: string[] = [JSON.stringify(firstVersion)];
     const commentContent = {
-      thread_id: threadId,
+      thread_id: `${threadId}`,
       text,
       plaintext,
       version_history,

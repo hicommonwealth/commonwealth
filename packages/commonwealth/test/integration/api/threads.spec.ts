@@ -730,7 +730,7 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/editComment', () => {
+  describe('/comments/:id', () => {
     it('should edit a comment', async () => {
       const text = 'tes text';
       const tRes = await modelUtils.createThread({

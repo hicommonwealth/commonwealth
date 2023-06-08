@@ -69,7 +69,7 @@ describe('ServerCommentsController', () => {
         banCache as any
       );
 
-      const [newReaction, notificationOptions, analyticsOptions] =
+      const [newReaction, allNotificationOptions, allAnalyticsOptions] =
         await serverCommentsController.createCommentReaction(
           user as any,
           address as any,
@@ -80,14 +80,17 @@ describe('ServerCommentsController', () => {
 
       expect(newReaction).to.be.ok;
 
-      expect(notificationOptions).to.have.property(
+      expect(allNotificationOptions[0]).to.have.property(
         'categoryId',
         'new-reaction'
       );
-      expect(notificationOptions).to.have.property('objectId', 'comment-3');
+      expect(allNotificationOptions[0]).to.have.property(
+        'objectId',
+        'comment-3'
+      );
 
-      expect(notificationOptions).to.have.property('notificationData');
-      const { notificationData } = notificationOptions;
+      expect(allNotificationOptions[0]).to.have.property('notificationData');
+      const { notificationData } = allNotificationOptions[0];
       expect(notificationData).to.have.property('created_at');
       expect(notificationData).to.include({
         thread_id: 4,
@@ -100,8 +103,8 @@ describe('ServerCommentsController', () => {
         author_chain: 'ethereum',
       });
 
-      expect(notificationOptions).to.have.property('webhookData');
-      const { webhookData } = notificationOptions;
+      expect(allNotificationOptions[0]).to.have.property('webhookData');
+      const { webhookData } = allNotificationOptions[0];
       expect(webhookData).to.include({
         user: '0x123',
         author_chain: 'ethereum',
@@ -111,11 +114,11 @@ describe('ServerCommentsController', () => {
         body: 'my comment body',
       });
 
-      expect(notificationOptions).to.have.property('excludeAddresses');
-      const { excludeAddresses } = notificationOptions;
+      expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
+      const { excludeAddresses } = allNotificationOptions[0];
       expect(excludeAddresses[0]).to.equal('0x123');
 
-      expect(analyticsOptions).to.include({
+      expect(allAnalyticsOptions[0]).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
         isCustomDomain: null,
@@ -485,14 +488,16 @@ describe('ServerCommentsController', () => {
       const chain = { id: 'ethereum' };
       const searchOptions = {
         search: 'hello',
-        chain: 'ethereum',
         sort: 'blah',
         page: 7,
         pageSize: 5,
       };
       const comments = await serverCommentsController.searchComments(
         chain as ChainInstance,
-        searchOptions
+        searchOptions.search,
+        searchOptions.sort,
+        searchOptions.page,
+        searchOptions.pageSize
       );
       const sqlArgs = db.sequelize.query.args[0];
       expect(sqlArgs).to.have.length(2);
@@ -505,6 +510,236 @@ describe('ServerCommentsController', () => {
       expect(comments).to.have.length(2);
       expect(comments[0].id).to.equal(1);
       expect(comments[1].id).to.equal(2);
+    });
+  });
+
+  describe('#updateComment', () => {
+    it('should update a comment', async () => {
+      let data;
+      data = {
+        id: 123,
+        thread_id: 2,
+        text: 'Wasup',
+        version_history: ['{"body":""}'],
+        chain: 'ethereum',
+        Address: {
+          address: '0x123',
+          chain: 'ethereum',
+          save: async () => ({}),
+        },
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+
+      const db = {
+        Comment: {
+          findOne: async () => data,
+        },
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            address: '0x123',
+            chain: 'ethereum',
+            title: 'Big Thread!',
+          }),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+
+      const serverCommentsController = new ServerCommentsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      const user = {
+        getAddresses: async () => [{ id: 1, verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const commentId = 123;
+      const commentBody = 'Hello';
+      const [updatedComment, allNotificationOptions] =
+        await serverCommentsController.updateComment(
+          user as any,
+          address as any,
+          chain as any,
+          commentId,
+          commentBody
+        );
+
+      expect(updatedComment).to.include({
+        id: 123,
+        text: 'Hello',
+      });
+
+      expect(allNotificationOptions[0]).to.have.property(
+        'categoryId',
+        'comment-edit'
+      );
+
+      expect(allNotificationOptions[0]).to.have.property('notificationData');
+      const { notificationData } = allNotificationOptions[0];
+      expect(notificationData).to.have.property('created_at');
+      expect(notificationData).to.include({
+        thread_id: 2,
+        comment_id: 123,
+        comment_text: 'Hello',
+        root_title: 'Big Thread!',
+        chain_id: 'ethereum',
+        author_address: '0x123',
+        author_chain: 'ethereum',
+      });
+
+      expect(allNotificationOptions[0]).to.have.property('webhookData');
+      const { webhookData } = allNotificationOptions[0];
+      expect(webhookData).to.include({
+        user: '0x123',
+        url: 'http://localhost:8080/ethereum/discussion/1-big-thread?comment=123',
+        title: 'Big Thread!',
+        chain: 'ethereum',
+      });
+
+      expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
+      const { excludeAddresses } = allNotificationOptions[0];
+      expect(excludeAddresses[0]).to.equal('0x123');
+    });
+
+    it('should throw error (banned)', async () => {
+      let data;
+      data = {
+        id: 123,
+        thread_id: 2,
+        text: 'Wasup',
+        version_history: ['{"body":""}'],
+        chain: 'ethereum',
+        Address: {
+          address: '0x123',
+          chain: 'ethereum',
+          save: async () => ({}),
+        },
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+
+      const db = {
+        Comment: {
+          findOne: async () => data,
+        },
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            address: '0x123',
+            chain: 'ethereum',
+            title: 'Big Thread!',
+          }),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [false, 'banned'],
+      };
+
+      const serverCommentsController = new ServerCommentsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      const user = {
+        getAddresses: async () => [{ id: 1, verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const commentId = 123;
+      const commentBody = 'Hello';
+      expect(
+        serverCommentsController.updateComment(
+          user as any,
+          address as any,
+          chain as any,
+          commentId,
+          commentBody
+        )
+      ).to.be.rejectedWith('Ban error: banned');
+    });
+
+    it('should throw error (thread not found)', async () => {
+      let data;
+      data = {
+        id: 123,
+        thread_id: 2,
+        text: 'Wasup',
+        version_history: ['{"body":""}'],
+        chain: 'ethereum',
+        Address: {
+          address: '0x123',
+          chain: 'ethereum',
+          save: async () => ({}),
+        },
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+
+      const db = {
+        Comment: {
+          findOne: async () => data,
+        },
+        Thread: {
+          findOne: async () => null,
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+
+      const serverCommentsController = new ServerCommentsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      const user = {
+        getAddresses: async () => [{ id: 1, verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const commentId = 123;
+      const commentBody = 'Hello';
+      expect(
+        serverCommentsController.updateComment(
+          user as any,
+          address as any,
+          chain as any,
+          commentId,
+          commentBody
+        )
+      ).to.be.rejectedWith('Thread not found for comment');
     });
   });
 });

@@ -311,10 +311,9 @@ export const editComment = async (args: EditCommentArgs) => {
   const { jwt, text, comment_id, chain, community, address } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/editComment')
+    .patch(`/api/comments/${comment_id}`)
     .set('Accept', 'application/json')
     .send({
-      id: comment_id,
       author_chain: chain,
       address,
       body: encodeURIComponent(text),

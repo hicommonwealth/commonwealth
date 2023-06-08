@@ -197,23 +197,26 @@ class CommentsController {
   ) {
     const newBody = body || comment.text;
     try {
-      // TODO: Change to PUT /comment
       const { session, action, hash } = await app.sessions.signComment({
         thread_id: comment.threadId,
         body,
         parent_comment_id: comment.parentComment,
       });
-      const response = await $.post(`${app.serverUrl()}/editComment`, {
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
-        id: comment.id,
-        chain: comment.chain,
-        body: encodeURIComponent(newBody),
-        'attachments[]': attachments,
-        jwt: app.user.jwt,
-        canvas_action: action,
-        canvas_session: session,
-        canvas_hash: hash,
+      const response = await $.ajax({
+        url: `${app.serverUrl()}/comments/${comment.id}`,
+        type: 'PATCH',
+        data: {
+          address: app.user.activeAccount.address,
+          author_chain: app.user.activeAccount.chain.id,
+          id: comment.id,
+          chain: comment.chain,
+          body: encodeURIComponent(newBody),
+          'attachments[]': attachments,
+          jwt: app.user.jwt,
+          canvas_action: action,
+          canvas_session: session,
+          canvas_hash: hash,
+        },
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -236,10 +239,12 @@ class CommentsController {
       comment_id: comment.canvasHash,
     });
     return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /comment
-      $.post(`${app.serverUrl()}/deleteComment`, {
-        jwt: app.user.jwt,
-        comment_id: comment.id,
+      $.ajax({
+        url: `${app.serverUrl()}/comments/${comment.id}`,
+        type: 'DELETE',
+        data: {
+          jwt: app.user.jwt,
+        },
       })
         .then((result) => {
           const existing = this._store.getById(comment.id);
