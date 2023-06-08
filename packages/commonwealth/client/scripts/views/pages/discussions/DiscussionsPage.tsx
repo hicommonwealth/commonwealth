@@ -18,6 +18,7 @@ import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
+import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -91,83 +92,81 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [app.threads.numTotalThreads]);
 
   // setup initial threads
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      // always reset pagination on page change
-      app.threads.resetPagination();
+  useNecessaryEffect(() => {
+    // always reset pagination on page change
+    app.threads.resetPagination();
 
-      // check if store already has atleast 20 threads for this community -> topic/stage,
-      // if so dont fetch more for now (scrolling will fetch more)
-      const chain = app.activeChainId();
-      const foundThreadsForChain = app.threads.store
-        .getAll()
-        .filter((x) => x.chain === chain);
-      if (foundThreadsForChain.length >= 20) {
-        if (topicName || stageName || dateRange) {
-          let finalThreads = foundThreadsForChain;
+    // check if store already has atleast 20 threads for this community -> topic/stage,
+    // if so dont fetch more for now (scrolling will fetch more)
+    const chain = app.activeChainId();
+    const foundThreadsForChain = app.threads.store
+      .getAll()
+      .filter((x) => x.chain === chain);
+    if (foundThreadsForChain.length >= 20) {
+      if (topicName || stageName || dateRange) {
+        let finalThreads = foundThreadsForChain;
 
-          // get threads for current topic
-          const topicId = topics.find(({ name }) => name === topicName)?.id;
-          if (topicId) {
-            finalThreads = finalThreads.filter((x) => x?.topic?.id && x.topic.id === topicId);
-          }
-
-          // get threads for current stage
-          if (stageName) {
-            finalThreads = finalThreads.filter((x) => x.stage === stageName);
-          }
-
-          // get threads for current timeline
-          if (
-            dateRange &&
-            [
-              ThreadTimelineFilterTypes.ThisMonth,
-              ThreadTimelineFilterTypes.ThisWeek,
-            ].includes(dateRange)
-          ) {
-            const today = moment();
-            const timeline = dateRange.toLowerCase().replace('this', '') as any;
-            const fromDate = today.startOf(timeline).toISOString();
-            const toDate = today.endOf(timeline).toISOString();
-
-            finalThreads = finalThreads.filter(
-              (x) =>
-                moment(x.createdAt).isSameOrAfter(fromDate) &&
-                moment(x.createdAt).isSameOrBefore(toDate)
-            );
-          }
-
-          if (finalThreads.length >= 20) {
-            setThreads(sortPinned(sortByFeaturedFilter(finalThreads)));
-            setInitializing(false);
-            return;
-          }
+        // get threads for current topic
+        const topicId = topics.find(({ name }) => name === topicName)?.id;
+        if (topicId) {
+          finalThreads = finalThreads.filter(
+            (x) => x?.topic?.id && x.topic.id === topicId
+          );
         }
-        // else show all threads
-        else {
-          setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
+
+        // get threads for current stage
+        if (stageName) {
+          finalThreads = finalThreads.filter((x) => x.stage === stageName);
+        }
+
+        // get threads for current timeline
+        if (
+          dateRange &&
+          [
+            ThreadTimelineFilterTypes.ThisMonth,
+            ThreadTimelineFilterTypes.ThisWeek,
+          ].includes(dateRange)
+        ) {
+          const today = moment();
+          const timeline = dateRange.toLowerCase().replace('this', '') as any;
+          const fromDate = today.startOf(timeline).toISOString();
+          const toDate = today.endOf(timeline).toISOString();
+
+          finalThreads = finalThreads.filter(
+            (x) =>
+              moment(x.createdAt).isSameOrAfter(fromDate) &&
+              moment(x.createdAt).isSameOrBefore(toDate)
+          );
+        }
+
+        if (finalThreads.length >= 20) {
+          setThreads(sortPinned(sortByFeaturedFilter(finalThreads)));
           setInitializing(false);
           return;
         }
       }
+      // else show all threads
+      else {
+        setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
+        setInitializing(false);
+        return;
+      }
+    }
 
-      // if the store has <= 20 threads then fetch more
-      app.threads
-        .loadNextPage({
-          topicName,
-          stageName,
-          includePinnedThreads: true,
-          featuredFilter,
-          dateRange,
-          page: pageNumber.current,
-        })
-        .then((t) => {
-          setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
-          setInitializing(false);
-        });
-    });
-
-    return () => clearTimeout(timerId);
+    // if the store has <= 20 threads then fetch more
+    app.threads
+      .loadNextPage({
+        topicName,
+        stageName,
+        includePinnedThreads: true,
+        featuredFilter,
+        dateRange,
+        page: pageNumber.current,
+      })
+      .then((t) => {
+        setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
+        setInitializing(false);
+      });
   }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
   const loadMore = useCallback(async () => {
@@ -292,7 +291,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     return updatedThreads;
                   });
                 }}
-                // onSpamToggle
               />
             );
           }}
