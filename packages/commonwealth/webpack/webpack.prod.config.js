@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { WebpackDeduplicationPlugin } = require('webpack-deduplication-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -21,6 +22,10 @@ module.exports = merge(common, {
     }),
     new WebpackDeduplicationPlugin({
       cacheDir: './cache',
+    }),
+    new LodashModuleReplacementPlugin({
+      caching: true,
+      flattening: true,
     }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
@@ -42,6 +47,9 @@ module.exports = merge(common, {
         exclude: /\/node_modules\//,
         use: {
           loader: 'babel-loader',
+          options: {
+            'plugins': ['lodash'],
+          }
         },
       },
     ],

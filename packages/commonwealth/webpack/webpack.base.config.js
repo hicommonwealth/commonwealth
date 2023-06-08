@@ -76,6 +76,7 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
+    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
   ],
   optimization: {
     splitChunks: {
