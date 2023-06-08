@@ -57,8 +57,6 @@ export const CreateComment = ({
 
   const editorValue = getTextFromDelta(contentDelta);
 
-  const author = app.user.activeAccount;
-
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
   const handleSubmitComment = async () => {
@@ -69,7 +67,7 @@ export const CreateComment = ({
 
     try {
       const res = await app.comments.create(
-        author.address,
+        app.user.activeAccount.address,
         rootThread.id,
         chainId,
         serializeDelta(contentDelta),
@@ -147,7 +145,7 @@ export const CreateComment = ({
             {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
           </CWText>
           <CWText type="caption" fontWeight="medium" className="user-link-text">
-            <User user={author} hideAvatar linkify />
+            <User user={app.user.activeAccount} hideAvatar linkify />
           </CWText>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
