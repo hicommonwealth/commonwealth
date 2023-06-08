@@ -60,7 +60,7 @@ export const createThreadCommentHandler = async (
       address,
       chain,
       parentId,
-      threadId,
+      parseInt(threadId, 10),
       text,
       attachments,
       canvasAction,
