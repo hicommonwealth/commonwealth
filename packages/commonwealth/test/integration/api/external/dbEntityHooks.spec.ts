@@ -1,4 +1,5 @@
 import moment from 'moment';
+import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
@@ -25,7 +26,7 @@ export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
 
-async function clearTestEntities() {
+export async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Collaboration.destroy({
@@ -58,9 +59,7 @@ async function clearTestEntities() {
   await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
 }
 
-beforeEach(async () => {
-  await clearTestEntities();
-
+export async function createTestEntities() {
   testUsers = await Promise.all(
     [...Array(4).keys()].map(
       async (i) =>
@@ -116,34 +115,47 @@ beforeEach(async () => {
     )[0],
   ];
 
-  testChains = [
-    (
-      await models.Chain.findOrCreate({
-        where: {
-          id: 'cmntest',
-          chain_node_id: -1,
-          name: 'cmntest',
-          network: 'cmntest',
-          type: 'offchain',
-          active: true,
-          default_symbol: 'cmntest',
-        },
-      })
-    )[0],
-    (
-      await models.Chain.findOrCreate({
-        where: {
-          id: 'cmntest2',
-          chain_node_id: -2,
-          name: 'cmntest2',
-          network: 'cmntest',
-          type: 'offchain',
-          active: true,
-          default_symbol: 'cmntest2',
-        },
-      }).catch((e) => console.log(e))
-    )[0],
-  ];
+  try {
+    testChains = [
+      (
+        await models.Chain.findOrCreate({
+          where: {
+            id: 'cmntest',
+            chain_node_id: -1,
+            name: 'cmntest',
+            network: 'ethereum',
+            type: 'offchain',
+            base: 'ethereum',
+            // collapsed_on_homepage: true,
+            // custom_stages: true,
+            // stages_enabled: true,
+            // has_chain_events_listener: false,
+            icon_url:
+              'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
+            active: true,
+            default_symbol: 'cmn',
+          },
+        })
+      )[0],
+      (
+        await models.Chain.findOrCreate({
+          where: {
+            id: 'cmntest2',
+            chain_node_id: -2,
+            name: 'cmntest2',
+            network: 'cmntest',
+            type: 'offchain',
+            icon_url:
+              'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
+            active: true,
+            default_symbol: 'cmntest2',
+          },
+        }).catch((e) => console.log(e))
+      )[0],
+    ];
+  } catch (e) {
+    console.log(e);
+  }
 
   testTopics = [
     (
@@ -312,8 +324,16 @@ beforeEach(async () => {
       )
     ))
   );
-});
+}
 
-afterEach(async () => {
-  await clearTestEntities();
-});
+if (process.env.TEST_ENV !== 'playwright') {
+  beforeEach(async () => {
+    await clearTestEntities();
+
+    await createTestEntities();
+  });
+
+  afterEach(async () => {
+    await clearTestEntities();
+  });
+}

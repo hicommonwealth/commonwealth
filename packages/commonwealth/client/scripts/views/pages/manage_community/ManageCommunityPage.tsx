@@ -133,9 +133,9 @@ const ManageCommunityPage = () => {
     return <PageLoading />;
   }
 
-  if (!isAdmin) {
-    return <ErrorPage message={'Must be admin'} />;
-  }
+  // if (!isAdmin) {
+  //   return <ErrorPage message={'Must be admin'} />;
+  // }
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
