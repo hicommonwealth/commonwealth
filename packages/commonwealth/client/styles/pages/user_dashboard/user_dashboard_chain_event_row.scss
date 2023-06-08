@@ -5,6 +5,25 @@
   @include userDashboardRowStyles;
   gap: 24px;
   width: 100%;
+  color: unset !important;
+  text-decoration: none;
+
+  a {
+    color: unset !important;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: unset !important;
+    }
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: unset !important;
+    text-decoration: none;
+  }
 
   &.isLink {
     cursor: pointer;

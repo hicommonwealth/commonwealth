@@ -12,7 +12,7 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
-import getAddressProfile from '../routes/getAddressProfile';
+import getAddressProfile, { getAddressProfileValidation } from '../routes/getAddressProfile';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
@@ -34,6 +34,9 @@ import {
 } from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
+import adminAnalytics, {
+  communitySpecificAnalytics,
+} from '../routes/adminAnalytics';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -260,7 +263,7 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
-  router.post('/getAddressProfile', getAddressProfile.bind(this, models));
+  router.post('/getAddressProfile', getAddressProfileValidation, getAddressProfile.bind(this, models));
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
@@ -325,6 +328,13 @@ function setupRouter(
     '/createChainNode',
     passport.authenticate('jwt', { session: false }),
     createChainNode.bind(this, models)
+  );
+
+  router.get('/adminAnalytics', adminAnalytics.bind(this, models));
+  router.post(
+    '/communitySpecificAnalytics',
+    databaseValidationService.validateChain,
+    communitySpecificAnalytics.bind(this, models)
   );
 
   // threads

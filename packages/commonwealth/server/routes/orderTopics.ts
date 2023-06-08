@@ -32,7 +32,8 @@ const OrderTopics = async (
   );
   if (!isAdminOrMod) return next(new AppError(OrderTopicsErrors.NoPermission));
 
-  const newTopicOrder: string[] = req.body['order[]'];
+  const newTopicOrder: string[] = req.body.orderedIds;
+
   if (!newTopicOrder?.length) {
     return res.json({
       status: 'Success',

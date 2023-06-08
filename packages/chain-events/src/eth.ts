@@ -10,18 +10,22 @@ export async function createProvider(
   const log = factory.getLogger(addPrefix(__filename, [network, chain]));
   try {
     const Web3 = (await import('web3')).default;
-    const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl, {
-      clientConfig: {
-        maxReceivedFrameSize: 2000000, // bytes - default: 1MiB, current: 2MiB
-        maxReceivedMessageSize: 10000000, // bytes - default: 8MiB, current: 10Mib
-      },
-      reconnect: {
-        auto: true,
-        delay: 5000,
-        maxAttempts: 10,
-        onTimeout: true,
-      },
-    });
+    const web3Provider =
+      ethNetworkUrl.slice(0, 4) == 'http'
+        ? new Web3.providers.HttpProvider(ethNetworkUrl)
+        : new Web3.providers.WebsocketProvider(ethNetworkUrl, {
+            clientConfig: {
+              maxReceivedFrameSize: 2000000, // bytes - default: 1MiB, current: 2MiB
+              maxReceivedMessageSize: 10000000, // bytes - default: 8MiB, current: 10Mib
+            },
+            reconnect: {
+              auto: true,
+              delay: 5000,
+              maxAttempts: 10,
+              onTimeout: true,
+            },
+          });
+
     const provider = new providers.Web3Provider(web3Provider);
     // 12s minute polling interval (default is 4s)
     provider.pollingInterval = 12000;

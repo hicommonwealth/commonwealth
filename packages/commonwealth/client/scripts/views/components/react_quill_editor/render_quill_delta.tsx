@@ -154,7 +154,10 @@ export const renderQuillDelta = (
                             // don't open a new window if the link is on Commonwealth
                             e.preventDefault();
                             e.stopPropagation();
-                            navigate(child.attributes.link);
+                            const navigateTo = child.attributes.link.split(
+                              `${document.location.origin}`
+                            )[1];
+                            navigate(navigateTo, {}, null);
                           }
                         }}
                       >
@@ -244,7 +247,10 @@ export const renderQuillDelta = (
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
-                    navigate(child.attributes.link);
+                    const navigateTo = child.attributes.link.split(
+                      `${document.location.origin}`
+                    )[1];
+                    navigate(navigateTo, {}, null);
                   }
                 }}
               >
