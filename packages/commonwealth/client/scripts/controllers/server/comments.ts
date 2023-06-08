@@ -244,6 +244,9 @@ class CommentsController {
         type: 'DELETE',
         data: {
           jwt: app.user.jwt,
+          address: app.user.activeAccount.address,
+          author_chain: app.user.activeAccount.chain.id,
+          chain: comment.chain,
         },
       })
         .then((result) => {

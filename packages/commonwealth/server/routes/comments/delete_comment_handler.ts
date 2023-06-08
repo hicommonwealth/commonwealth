@@ -14,5 +14,5 @@ export const deleteCommentHandler = async (
 
   await controllers.comments.deleteComment(user, address, chain, commentId);
 
-  return success(res, null);
+  return success(res, undefined);
 };

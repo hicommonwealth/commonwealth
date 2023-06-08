@@ -560,7 +560,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    deleteCommentHandler.bind(this, models, banCache)
+    deleteCommentHandler.bind(this, serverControllers)
   );
   router.get(
     '/viewComments',

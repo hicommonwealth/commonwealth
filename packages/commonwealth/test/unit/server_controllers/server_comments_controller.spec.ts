@@ -742,4 +742,42 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Thread not found for comment');
     });
   });
+
+  describe('#deleteComment', () => {
+    it('should delete a comment', async () => {
+      const db = {
+        Comment: {
+          findOne: async () => ({
+            destroy: async () => ({}),
+          }),
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+
+      const serverCommentsController = new ServerCommentsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      const user = {
+        getAddresses: async () => [{ id: 1, verified: true }],
+      };
+      const address = {};
+      const chain = {};
+      const commentId = 1;
+      await serverCommentsController.deleteComment(
+        user as any,
+        address as any,
+        chain as any,
+        commentId
+      );
+    });
+  });
 });
