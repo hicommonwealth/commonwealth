@@ -1,14 +1,22 @@
 import BN from 'bn.js';
 import ITokenAdapter from '../../../models/ITokenAdapter';
 import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
+import Topic from 'models/Topic';
 
 export default class TopicGateCheck {
   public static isGatedTopic(topicName: string): boolean {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
-      const tokenPostingThreshold: BN = app.topics.getByName(
-        topicName,
-        app.activeChainId()
+      const topics =
+        queryClient.getQueryData<Topic[]>([
+          ApiEndpoints.BULK_TOPICS,
+          app.chain.id,
+        ]) || [];
+
+      const tokenPostingThreshold = topics.find(
+        ({ name }) => name === topicName
       )?.tokenThreshold;
+
       return (
         tokenPostingThreshold &&
         tokenPostingThreshold.gt(app.chain.tokenBalance)
@@ -19,8 +27,13 @@ export default class TopicGateCheck {
 
   public static getTopicThreshold(topicName: string): BN {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
-      return app.topics.getByName(topicName, app.activeChainId())
-        ?.tokenThreshold;
+      const topics =
+        queryClient.getQueryData<Topic[]>([
+          ApiEndpoints.BULK_TOPICS,
+          app.chain.id,
+        ]) || [];
+
+      return topics.find(({ name }) => name === topicName)?.tokenThreshold;
     }
     return new BN('0', 10);
   }

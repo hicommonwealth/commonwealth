@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import 'components/thread_selector.scss';
 import { notifyError } from 'controllers/app/notifications';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Thread from '../../../models/Thread';
 import type { SearchParams } from 'models/SearchQuery';
 import app from 'state';
@@ -60,7 +61,10 @@ export const ThreadSelector = ({
             setSearchResults(results);
             setLoading(false);
             results.forEach((thread) => {
-              app.newProfiles.getProfile(thread.authorChain, thread.author);
+              NewProfilesController.Instance.getProfile(
+                thread.authorChain,
+                thread.author
+              );
             });
           })
           .catch(() => {
