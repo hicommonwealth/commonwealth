@@ -1,22 +1,21 @@
 import Web3 from 'web3';
-import { Account, HttpProvider } from 'web3-core';
 import { SignTypedDataVersion, signTypedData } from '@metamask/eth-sig-util';
+import { Account, HttpProvider } from 'web3-core';
 
-class MockMetaMaskProvider extends HttpProvider {
-    public w3_temp: Web3;
-    private pAccount: Account;
+class MockMetaMaskProvider extends Web3 {
+    private privateKey;
 
-    constructor(rpcUrl: string, pkey: string) {
-      super(rpcUrl);
-      this.w3_temp = new Web3(this)
-      this.pAccount = this.w3_temp.eth.accounts.privateKeyToAccount(pkey);
-      this.w3_temp.defaultAccount = this.pAccount.address;
+    constructor(host: string, pkey: string) {
+      super(new Web3.providers.HttpProvider(host));
+      this.privateKey = pkey;
+      this.defaultAccount = this.eth.accounts.privateKeyToAccount(pkey).address;
+      this.givenProvider.request = this.request;
     }
 
     private async signTypedData(data: string[]){
-        if(data[0] == this.w3_temp.defaultAccount){
+        if(data[0] == this.defaultAccount){
             return signTypedData({
-                privateKey: Buffer.from(this.pAccount.privateKey.substring(2), 'hex'),
+                privateKey: Buffer.from(this.privateKey.substring(2), 'hex'),
                 data: JSON.parse(data[1]),
                 version: 'V4' as SignTypedDataVersion
             })
@@ -25,11 +24,11 @@ class MockMetaMaskProvider extends HttpProvider {
     public async request(payload: {method: string, params: string[]}) {
         switch(payload.method){
             case 'eth_getBlockByNumber':
-                return (await this.w3_temp.eth.getBlock('latest'))
+                return (await this.eth.getBlock('latest'))
             case 'eth_requestAccounts':
-                return (await this.w3_temp.eth.getAccounts())
+                return (await this.eth.getAccounts())
             case 'wallet_switchEthereumChain':
-                return this.w3_temp.eth.getChainId();
+                return this.eth.getChainId();
             case 'eth_signTypedData_v4':
                 return this.signTypedData(payload.params)
             default:
@@ -39,6 +38,5 @@ class MockMetaMaskProvider extends HttpProvider {
 }
 
 export const getMetaMaskMock = (rpc: string, pkey: string) => {
-    const provider = new MockMetaMaskProvider(rpc, pkey);
-    return provider.w3_temp;
+    return new MockMetaMaskProvider(rpc, pkey)
 }

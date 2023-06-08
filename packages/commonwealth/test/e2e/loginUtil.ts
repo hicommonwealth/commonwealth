@@ -10,6 +10,7 @@ export const login = async (page: Page) => {
             )
     })
     await page.goto('http://localhost:8080/');
-    await page.getByLabel('Login').click()
-    await page.getByLabel('MetaMask').click()
+    await page.getByText('Login').click();
+    await page.waitForSelector('.LoginDesktop');
+    console.log(page.getByText('Metamask'));
 }
