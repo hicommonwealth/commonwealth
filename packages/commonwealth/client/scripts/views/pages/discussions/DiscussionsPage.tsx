@@ -167,7 +167,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
         setInitializing(false);
       });
-  }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
+  }, [stageName, topicName, featuredFilter, dateRange]);
 
   const loadMore = useCallback(async () => {
     const response = await app.threads.loadNextPage({
@@ -177,10 +177,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       dateRange,
       page: pageNumber.current + 1,
     });
+
     // If no new threads (we reached the end)
-    if (!response.threads) {
-      return;
-    }
+    if (!response.threads) return;
 
     pageNumber.current = response.page;
     return setThreads((oldThreads) => {
@@ -199,7 +198,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
       return sortPinned(sortByFeaturedFilter(finalThreads));
     });
-  }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
+  }, [stageName, topicName, featuredFilter, dateRange]);
 
   if (initializing) {
     return <PageLoading hideSearch={false} />;
@@ -210,7 +209,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       <div className="DiscussionsPage">
         <Virtuoso
           className="thread-list"
-          style={{ height: '100%', width: '100%', position: 'inherit' }}
+          style={{ height: '100%', width: '100%' }}
           data={threads}
           itemContent={(i, thread) => {
             const discussionLink = getProposalUrlPath(
