@@ -9,6 +9,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -379,13 +380,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       // load profiles
       if (!prefetch[threadId]['profilesStarted']) {
-        app.newProfiles.getProfile(thread.authorChain, thread.author);
+        NewProfilesController.Instance.getProfile(
+          thread.authorChain,
+          thread.author
+        );
 
         comments.forEach((comment) => {
-          app.newProfiles.getProfile(comment.authorChain, comment.author);
+          NewProfilesController.Instance.getProfile(
+            comment.authorChain,
+            comment.author
+          );
         });
 
-        app.newProfiles.isFetched.on('redraw', () => {
+        NewProfilesController.Instance.isFetched.on('redraw', () => {
           if (!prefetch[threadId]?.['profilesFinished']) {
             setPrefetch((prevState) => ({
               ...prevState,

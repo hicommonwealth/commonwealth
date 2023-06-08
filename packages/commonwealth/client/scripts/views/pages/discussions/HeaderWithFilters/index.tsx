@@ -158,49 +158,47 @@ export const HeaderWithFilters = ({
 
   return (
     <div className="HeaderWithFilters">
-      {isUndefined(topic) && (
-        <>
-          <div className="header-row">
-            <CWText type="h3" fontWeight="semiBold" className="header-text">
-              All Discussions
-            </CWText>
-            <div className="count-and-button">
-              <CWText
-                type="caption"
-                fontWeight="medium"
-                className="thread-count-text"
-              >
-                {totalThreadCount} Threads
-              </CWText>
-              {windowIsExtraSmall ? (
-                <CWIconButton
-                  iconName="plusCircle"
-                  iconButtonTheme="black"
-                  onClick={() => {
-                    navigate('/new/discussion');
-                  }}
-                  disabled={!app.user.activeAccount}
-                />
-              ) : (
-                <CWButton
-                  buttonType="mini-black"
-                  label="Create Thread"
-                  iconLeft="plus"
-                  onClick={() => {
-                    navigate('/new/discussion');
-                  }}
-                  disabled={!app.user.activeAccount}
-                />
-              )}
-            </div>
-          </div>
-          <CWText className="subheader-text">
-            This section is for the community to discuss how to manage the
-            community treasury and spending on contributor grants, community
-            initiatives, liquidity mining and other programs.
+      <div className="header-row">
+        <CWText type="h3" fontWeight="semiBold" className="header-text">
+          {isUndefined(topic) ? 'All Discussions' : topic}
+        </CWText>
+        <div className="count-and-button">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="thread-count-text"
+          >
+            {totalThreadCount} Threads
           </CWText>
-        </>
+          {windowIsExtraSmall ? (
+            <CWIconButton
+              iconName="plusCircle"
+              iconButtonTheme="black"
+              onClick={() => {
+                navigate('/new/discussion');
+              }}
+              disabled={!app.user.activeAccount}
+            />
+          ) : (
+            <CWButton
+              buttonType="mini-black"
+              label="Create Thread"
+              iconLeft="plus"
+              onClick={() => {
+                navigate(
+                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
+                );
+              }}
+              disabled={!app.user.activeAccount}
+            />
+          )}
+        </div>
+      </div>
+
+      {selectedTopic?.description && (
+        <CWText className="subheader-text">{selectedTopic.description}</CWText>
       )}
+
       {app.chain?.meta && (
         <div className="filter-row" ref={filterRowRef}>
           <div className="filter-section">

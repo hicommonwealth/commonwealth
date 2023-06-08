@@ -5,6 +5,7 @@ import 'pages/manage_community/index.scss';
 
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import RoleInfo from '../../../models/RoleInfo';
 import Sublayout from '../../Sublayout';
 import ErrorPage from '../error';
@@ -104,9 +105,11 @@ const ManageCommunityPage = () => {
   };
 
   useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => forceRerender());
+    NewProfilesController.Instance.isFetched.on('redraw', () =>
+      forceRerender()
+    );
 
-    app.newProfiles.isFetched.off('redraw', forceRerender);
+    NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
   }, [forceRerender]);
 
   // on update debounced search term, fetch

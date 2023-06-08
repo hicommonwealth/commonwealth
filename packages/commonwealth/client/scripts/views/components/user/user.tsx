@@ -6,6 +6,7 @@ import 'components/user/user.scss';
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import { formatAddressShort } from '../../../../../shared/utils';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
@@ -60,11 +61,11 @@ export const User = ({
   const forceRerender = useForceRerender();
 
   useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => {
+    NewProfilesController.Instance.isFetched.on('redraw', () => {
       forceRerender();
     });
 
-    app.newProfiles.isFetched.off('redraw', () => {
+    NewProfilesController.Instance.isFetched.off('redraw', () => {
       forceRerender();
     });
   }, [forceRerender]);
@@ -120,7 +121,7 @@ export const User = ({
         }
       }
 
-      profile = app.newProfiles.getProfile(chainId.id, address);
+      profile = NewProfilesController.Instance.getProfile(chainId.id, address);
 
       if (!role) {
         role = adminsAndMods.find(
@@ -152,7 +153,10 @@ export const User = ({
       // but we currently inject objects of type 'any' on the profile page
       const chainId = account.chain.id;
 
-      profile = app.newProfiles.getProfile(chainId, account.address);
+      profile = NewProfilesController.Instance.getProfile(
+        chainId,
+        account.address
+      );
 
       if (!role) {
         role = adminsAndMods.find(
