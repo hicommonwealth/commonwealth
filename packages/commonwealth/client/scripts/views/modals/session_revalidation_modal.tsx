@@ -99,14 +99,13 @@ const SessionRevalidationModal = ({
               <div className="compact-modal-body">
                 <CWText type="h4">Proceed with current address</CWText>
                 <CWText>
-                  It looks like your session for the address{' '}
-                  <strong>{formatAddress(walletAddress)}</strong> has expired.
-                  Log in with{' '}
+                  To renew your session for the address{' '}
+                  <strong>{formatAddress(walletAddress)}</strong>, log in with{' '}
                   {walletSsoSource &&
                   walletSsoSource !== WalletSsoSource.Unknown
                     ? walletSsoSource
-                    : 'your wallet'}{' '}
-                  to continue what you were doing before:
+                    : 'the wallet that you used'}{' '}
+                  again:
                 </CWText>
               </div>
               <div>
@@ -212,13 +211,13 @@ const SessionRevalidationModal = ({
                 </CWText>
                 <CWText>
                   Oops! It looks like the session for your current address has
-                  expired. Just a fancy way of saying it’s time to log in again.
+                  expired. Just a fancy way of saying you may need to log in again.
                 </CWText>
                 <CWText>
-                  To create threads, comment, or upvote, log in to the address
-                  associated with {app.chain?.meta.name || 'this community'}{' '}
-                  again. Or, you can switch to a different address that you’ve
-                  logged in with recently.
+                  To create threads, comment, or upvote, you will need access to
+                  the original wallet or login method you used for{' '}
+                  <strong>{formatAddress(walletAddress)}</strong>. Or, you can
+                  switch to another recently used address if you have one.
                 </CWText>
                 <CWText>
                   Either way, your Common display name will remain the same.
@@ -226,7 +225,7 @@ const SessionRevalidationModal = ({
               </div>
               <div className="compact-modal-actions">
                 <CWButton
-                  label="Proceed to log in again"
+                  label="Proceed with current address"
                   buttonType="primary-black"
                   onClick={() => setLoginAgain(true)}
                 />
@@ -297,6 +296,7 @@ const SessionRevalidationAddress = ({ account, onClose, canvasChainId }) => {
         hideAvatar
         selected={false}
       />
+      {skUnavailable ? '(login expired)' : ''}
     </div>
   );
 };
