@@ -57,7 +57,7 @@ const deleteChain = async (
   }
 
   // eslint-disable-next-line no-new
-  new Promise(async () => {
+  await new Promise(async () => {
     await models.sequelize.transaction(async (t) => {
       const admins = await findAllRoles(models, {}, chain.id, ['admin']);
       if (admins) {
@@ -113,6 +113,13 @@ const deleteChain = async (
         transaction: t,
       });
 
+      await models.CommunityContract.destroy({
+        where: {
+          chain_id: chain.id,
+        },
+        transaction: t,
+      });
+
       await models.Webhook.destroy({
         where: { chain_id: chain.id },
         transaction: t,
@@ -120,6 +127,7 @@ const deleteChain = async (
 
       const threads = await models.Thread.findAll({
         where: { chain: chain.id },
+        attributes: ['id'],
       });
 
       await models.Collaboration.destroy({
@@ -193,6 +201,8 @@ const deleteChain = async (
         transaction: t,
       });
     });
+  }).catch((err) => {
+    console.log(err);
   });
 
   return success(res, { result: 'success' });
