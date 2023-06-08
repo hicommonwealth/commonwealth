@@ -152,9 +152,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 linkify
                 showAddressWithDisplayName
               />
-              {!windowIsSmall && (
-                <CWText className="last-updated-text">•</CWText>
-              )}
+              <CWText className="last-updated-text">•</CWText>
               <CWText
                 type="caption"
                 fontWeight="medium"
