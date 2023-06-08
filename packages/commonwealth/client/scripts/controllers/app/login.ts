@@ -549,7 +549,6 @@ export async function handleSocialLoginCallback({
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
-    clientAnalyticsTrack({ event: MixpanelLoginEvent.MAGIC_LOGIN });
     return magicAddress;
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);

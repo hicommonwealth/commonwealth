@@ -15,7 +15,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
 
- export const formatAddress = (address: string) => {
+export const formatAddress = (address: string) => {
   return `${address.slice(0, 8)}...${address.slice(-5)}`;
 };
 
@@ -34,7 +34,14 @@ export const UserBlock = (props: {
   user: Account | AddressInfo | MinimumProfile;
   hideAvatar?: boolean;
 }) => {
-  const { compact, searchTerm, showChainName, showLoginMethod, user } = props;
+  const {
+    compact,
+    searchTerm,
+    showChainName,
+    showLoginMethod,
+    user,
+    selected,
+  } = props;
 
   let profile;
 
@@ -99,12 +106,16 @@ export const UserBlock = (props: {
             </div>
           )}
         </div>
-        {showLoginMethod && !(user instanceof MinimumProfile) && <UserLoginBadge user={user} />}
+        {showLoginMethod && !(user instanceof MinimumProfile) && (
+          <UserLoginBadge user={user} />
+        )}
       </div>
       <div className="user-block-right">
-        <div className="user-block-selected">
-          <CWIcon iconName="check" iconSize="small" />
-        </div>
+        {selected && (
+          <div className="user-block-selected">
+            <CWIcon iconName="check" iconSize="small" />
+          </div>
+        )}
       </div>
     </>
   );
@@ -122,7 +133,9 @@ const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
   const [address, setAddress] = React.useState<AddressInfo>();
 
   React.useEffect(() => {
-    const matchingAddress = app.user.addresses.find((a) => a.chain.id === user.chain?.id && a.address === user.address);
+    const matchingAddress = app.user.addresses.find(
+      (a) => a.chain.id === user.chain?.id && a.address === user.address
+    );
     if (matchingAddress) {
       setAddress(matchingAddress);
     }
@@ -130,8 +143,9 @@ const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
 
   return (
     <>
-      {address?.walletId === WalletId.Magic &&
-        <div className="user-block-via">via {address.walletSsoSource}</div>}
+      {address?.walletId === WalletId.Magic && (
+        <div className="user-block-via">via {address.walletSsoSource}</div>
+      )}
     </>
   );
 };

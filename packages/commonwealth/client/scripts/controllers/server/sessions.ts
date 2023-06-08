@@ -202,7 +202,9 @@ class SessionsController {
 
     // Get a new session signature.
     if (!hasAuthenticatedSession) {
-      const matchingAccount = app.user.addresses.find((a) => a.address === address);
+      const matchingAccount = app.user.addresses.find(
+        (a) => a.address === address
+      );
       const walletName = getWalletName(matchingAccount!.walletId);
 
       // Some login methods may require a single sign-on redirect, and take
@@ -212,6 +214,7 @@ class SessionsController {
           walletAddress: address,
           walletName,
           walletSsoSource: matchingAccount.walletSsoSource,
+          canvasChainId,
           onVerified: (verifiedAddress) => resolve(verifiedAddress),
           onClose: () => {
             const err = new Error();

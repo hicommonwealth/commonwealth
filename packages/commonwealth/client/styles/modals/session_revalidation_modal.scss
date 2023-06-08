@@ -1,0 +1,61 @@
+@import '../shared';
+
+.SessionRevalidationModal {
+  max-width: 540px;
+
+  .compact-modal-body {
+    .Text.h4 {
+      font-size: 19px;
+      font-weight: 600;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+    .Text {
+      font-size: 15px;
+      margin: 10px 0;
+      display: block;
+    }
+  }
+
+  .WalletsList .wallets-and-link-container {
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+
+  .Button {
+    display: inline-block;
+    min-height: 39px;
+    margin-right: 10px;
+    box-shadow: none !important;
+    float: right;
+  }
+  .compact-modal-actions {
+    min-height: 74px;
+  }
+  .Spinner {
+    margin: 0 auto 10px;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.SessionRevalidationAddressSelector {
+  margin: -4px -8px;
+  .UserBlock.compact .user-block-center .user-block-address {
+    font-size: 0.94em;
+  }
+  .revalidate-address {
+    cursor: pointer;
+  }
+  .revalidate-address:hover {
+    background-color: $neutral-50;
+  }
+  .revalidate-address,
+  .revalidate-address-unavailable {
+    padding: 9px 12px;
+  }
+  .revalidate-address-unavailable {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
