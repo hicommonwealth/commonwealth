@@ -1,81 +1,49 @@
 @import '../../shared';
 
-@mixin radioCore($color) {
-  display: grid;
-  place-content: center;
-
-  &::after {
-    color: $color;
-    content: '';
-    width: 10.5px;
-    height: 10.5px;
-    box-shadow: inset 12px 12px;
-    clip-path: circle(50%);
-  }
-}
-
-.RadioButton {
-  align-items: center;
-  cursor: pointer;
+.container {
+  position: absolute;
   display: flex;
   flex-direction: row;
-  position: relative;
+  align-items: center;
+  justify-content: center;
+}
 
-  .radio-input {
-    @include hideInput;
+.radio-button {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  color: $neutral-400;
+  clip-path: circle(50%);
+  z-index: 1;
+
+  &:hover {
+    color: $primary-600;
   }
 
-  .radio-control {
-    @include controlStyles;
-
-    border-radius: $border-radius-round;
+  &.checked {
+    color: $primary-500;
   }
 
-  &:hover .radio-control {
-    border-color: $primary-600;
-  }
-
-  &.checked .radio-control {
-    border-color: $primary-500;
-    background-color: inherit;
-
-    display: grid;
-    place-content: center;
-
-    &::after {
-      color: $primary-500;
-      content: '';
-      width: 10.5px;
-      height: 10.5px;
-      box-shadow: inset 12px 12px;
-      clip-path: circle(50%);
-    }
-  }
-
-  &.checked:hover .radio-control {
-    border-color: $primary-600;
-    &::after {
-      color: $primary-600;
-    }
-    background-color: inherit;
-  }
-
-  &.checked.disabled .radio-control {
-    &::after {
-      color: $neutral-200;
-      width: 10.5px;
-      height: 10.5px;
-    }
-    background-color: $neutral-100;
-    border-color: $neutral-200;
+  &.checked:hover {
+    color: $primary-600;
   }
 
   &.disabled {
     pointer-events: none;
-
-    .radio-control {
-      background-color: $neutral-100;
-      border-color: $neutral-200;
-    }
+    color: $neutral-200;
   }
+}
+
+.background {
+  position: absolute;
+  top: 4px;
+  left: 3px;
+  background: $neutral-100;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.label {
+  margin-left: 4px;
 }

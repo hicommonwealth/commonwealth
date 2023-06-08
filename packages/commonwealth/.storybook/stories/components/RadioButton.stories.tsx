@@ -14,10 +14,11 @@ interface RadioButtonProps {
   checked: boolean;
   disabled: boolean;
   value: string;
+  onChange?: (e?: any) => void;
 };
 
 const RadioButton: FC<RadioButtonProps> = (props) => {
-  const { checked, disabled, value } = props;
+  const { checked, disabled, value, onChange } = props;
   const [isChecked, setIsChecked] = useState<boolean | undefined>(checked);
   const [isDisabled, setIsDisabled] = useState<boolean | undefined>(disabled);
 
@@ -29,10 +30,7 @@ const RadioButton: FC<RadioButtonProps> = (props) => {
       checked={isChecked}
       disabled={isDisabled}
       value={value}
-      onChange={(e) => {
-        setIsChecked(!isChecked);
-        e.stopPropagation();
-      }}
+      onChange={onChange}
     />
   );
 }
@@ -43,6 +41,7 @@ export const RadioButtonStory = {
     value: "Yes",
     disabled: false,
     checked: false,
+    onChange: (e?: any) => console.log('Testing onChange as props', e),
   },
   argTypes: {
     value: {
@@ -65,6 +64,7 @@ export const RadioButtonStory = {
       value={args.value}
       disabled={args.disabled}
       checked={args.checked}
+      onChange={args.onChange}
     />
   ),
 }
