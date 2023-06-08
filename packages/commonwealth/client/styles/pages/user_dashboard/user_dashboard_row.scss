@@ -44,6 +44,15 @@
   flex-direction: column;
   min-width: 100%;
   max-width: 0;
+  color: unset !important;
+  text-decoration: none;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: unset !important;
+    text-decoration: none;
+  }
 
   &.isLink {
     cursor: pointer;
