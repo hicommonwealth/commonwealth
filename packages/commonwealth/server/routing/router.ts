@@ -18,7 +18,6 @@ import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
 import finishOAuthLogin from '../routes/finishOAuthLogin';
 import startOAuthLogin from '../routes/startOAuthLogin';
-import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
