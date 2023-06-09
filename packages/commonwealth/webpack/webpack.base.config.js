@@ -208,10 +208,6 @@ module.exports = {
           fullySpecified: false,
         },
       },
-      {
-        test: /\.pdf$/,
-        use: 'url-loader',
-      },
     ],
   },
 };
