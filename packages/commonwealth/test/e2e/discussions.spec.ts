@@ -20,24 +20,35 @@ test.afterEach(async () => {
 });
 
 test.describe('DiscussionsPage Homepage', () => {
-  test('Check Discussion page loads', async ({ page }) => {
+  test('Discussion page loads and can navigate to first thread', async ({
+    page,
+  }) => {
     await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
 
     await page.waitForSelector('div.RecentThreadsHeader');
 
     // Assert Thread header exists on discussions page
-    const divExists = (await page.$('div.RecentThreadsHeader')) !== null;
+    const headerExists = (await page.$('div.RecentThreadsHeader')) !== null;
 
-    expect(divExists).to.be.true;
+    expect(headerExists).to.be.true;
 
     // Assert Threads are loaded into page
     await page.waitForSelector('div[data-test-id]');
 
     // Perform the assertion
-    const childDivCount = await page.$$eval(
+    const numberOfThreads = await page.$$eval(
       'div[data-test-id] > div',
       (divs) => divs.length
     );
-    expect(childDivCount).to.equal(Math.min(20, testThreads.length + 1));
+    expect(numberOfThreads).to.equal(Math.min(20, testThreads.length + 1));
+
+    const firstThread = await page.$(
+      'div[data-test-id="virtuoso-item-list"] > div:first-child'
+    );
+
+    // navigate to first link
+    await firstThread.click();
+
+    expect(page.url()).to.include('discussion').and.not.include('discussions');
   });
 });
