@@ -13,6 +13,7 @@ import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 
 import 'components/Header/LoginSelectorMenu.scss';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 
 type LoginSelectorMenuLeftAttrs = {
   nAccountsWithoutRole: number;
@@ -55,7 +56,10 @@ export const LoginSelectorMenuLeft = ({
       typeof activeAccount.chain === 'string'
         ? activeAccount.chain
         : activeAccount.chain?.id;
-    const profile = app.newProfiles.getProfile(chain, activeAccount.address);
+    const profile = NewProfilesController.Instance.getProfile(
+      chain,
+      activeAccount.address
+    );
     setProfileId(profile.id);
     setSelectedAddress(activeAccount.address);
   }, []);
