@@ -87,16 +87,16 @@ export const RecentThreadsHeader = ({
     chainId: app.activeChainId(),
   });
 
-  const featuredTopics = topics
+  const featuredTopics = (topics || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     .sort((a, b) => a.order - b.order);
 
-  const otherTopics = topics
+  const otherTopics = (topics || [])
     .filter((t) => !t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const selectedTopic = topics.find((t) => topic && topic === t.name);
+  const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
 
   const stages = !customStages
     ? [
@@ -191,9 +191,7 @@ export const RecentThreadsHeader = ({
       </div>
 
       {selectedTopic?.description && (
-        <CWText className="subheader-text">
-          {selectedTopic.description}
-        </CWText>
+        <CWText className="subheader-text">{selectedTopic.description}</CWText>
       )}
 
       {app.chain?.meta && (
@@ -240,7 +238,7 @@ export const RecentThreadsHeader = ({
           <div className="filter-section filter-section-top">
             <p className="filter-label">Filter</p>
             <div className="filter-section filter-section-right">
-              {topics.length > 0 && (
+              {(topics || []).length > 0 && (
                 <Select
                   selected={
                     matchesDiscussionsTopicRoute?.[0]?.params?.topic ||
