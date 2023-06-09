@@ -51,4 +51,17 @@ test.describe('DiscussionsPage Homepage', () => {
 
     expect(page.url()).to.include('discussion').and.not.include('discussions');
   });
+
+  test('Check navigation to first profile', async ({ page }) => {
+    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
+
+    const userProfileLinks = await page.locator('a.user-display-name.username');
+
+    console.log(userProfileLinks.first());
+
+    // navigate to first link
+    await userProfileLinks.first().click();
+
+    expect(page.url()).to.include('/profile/id/');
+  });
 });
