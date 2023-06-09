@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import moment from 'moment';
 import app from 'state';
 import SearchStore from 'stores/SearchStore';
@@ -6,6 +5,7 @@ import { SearchContentType } from 'types';
 import type Thread from '../../models/Thread';
 import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 import type { SearchParams } from '../../models/SearchQuery';
+import axios from 'axios';
 
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 10;
@@ -200,14 +200,13 @@ class SearchController {
       if (page) {
         queryParams['page'] = page;
       }
-      const response = await $.get(
-        `${app.serverUrl()}/searchDiscussions`,
-        queryParams
-      );
-      if (response.status !== 'Success') {
+      const response = await axios.get(`${app.serverUrl()}/searchDiscussions`, {
+        params: queryParams,
+      });
+      if (response.data.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
-      return response.result;
+      return response.data.result;
     } catch (e) {
       console.error(e);
       return [];
@@ -231,11 +230,13 @@ class SearchController {
       if (page) {
         queryParams['page'] = page;
       }
-      const response = await $.get(`${app.serverUrl()}/comments`, queryParams);
-      if (response.status !== 'Success') {
+      const response = await axios.get(`${app.serverUrl()}/comments`, {
+        params: queryParams,
+      });
+      if (response.data.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
-      return response.result;
+      return response.data.result;
     } catch (e) {
       console.error(e);
       return [];
@@ -248,17 +249,19 @@ class SearchController {
   ): Promise<Thread[]> => {
     const { pageSize, chainScope, communityScope } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
-        chain: chainScope,
-        community: communityScope,
-        search: searchTerm,
-        results_size: pageSize,
-        thread_title_only: true,
+      const response = await axios.get(`${app.serverUrl()}/searchDiscussions`, {
+        params: {
+          chain: chainScope,
+          community: communityScope,
+          search: searchTerm,
+          results_size: pageSize,
+          thread_title_only: true,
+        },
       });
-      if (response.status !== 'Success') {
+      if (response.data.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
-      return response.result.map((rawThread) => {
+      return response.data.result.map((rawThread) => {
         return app.threads.modelFromServer(rawThread);
       });
     } catch (e) {
@@ -275,17 +278,19 @@ class SearchController {
     includeRoles?: boolean
   ) => {
     try {
-      const response = await $.get(`${app.serverUrl()}/searchProfiles`, {
-        chain: chainScope,
-        search: searchTerm,
-        page_size: pageSize,
-        page,
-        include_roles: includeRoles,
+      const response = await axios.get(`${app.serverUrl()}/searchProfiles`, {
+        params: {
+          chain: chainScope,
+          search: searchTerm,
+          page_size: pageSize,
+          page,
+          include_roles: includeRoles,
+        },
       });
-      if (response.status !== 'Success') {
+      if (response.data.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
-      return response.result;
+      return response.data.result;
     } catch (e) {
       console.error(e);
       return { profiles: [] };
