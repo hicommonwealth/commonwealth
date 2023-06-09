@@ -60,11 +60,15 @@ export const createCommentReactionHandler = async (
   address.last_active = new Date();
   address.save().catch(console.error);
 
-  // emit notification
-  controllers.notifications.emit(notificationOptions).catch(console.error);
+  // emit notifications
+  for (const n of notificationOptions) {
+    controllers.notifications.emit(n).catch(console.error);
+  }
 
-  // track analytics event
-  controllers.analytics.track(analyticsOptions).catch(console.error);
+  // track analytics events
+  for (const a of analyticsOptions) {
+    controllers.analytics.track(a).catch(console.error);
+  }
 
   return success(res, newReaction);
 };
