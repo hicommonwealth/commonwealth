@@ -13,7 +13,7 @@ import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
 
-const LoadingLayout = () => {
+const LoadingLayout = ({ isAppLoading }) => {
   const Bobber = () => (
     <div className="Layout">
       <div className="spinner-container">
@@ -27,7 +27,7 @@ const LoadingLayout = () => {
   if (isLanding && !isLoggedIn) return <Bobber />;
 
   return (
-    <SubLayout>
+    <SubLayout isLoadingProfileData={isAppLoading}>
       <Bobber />
     </SubLayout>
   );
@@ -162,7 +162,7 @@ const LayoutComponent = ({
     shouldDeInitChain || // IFB 7
     isAppLoading // NON IFB - a bool to indicate if app is loading
   ) {
-    return <LoadingLayout />;
+    return <LoadingLayout isAppLoading />;
   }
 
   // IFB 4: If the user has attempted to a community page that was not
