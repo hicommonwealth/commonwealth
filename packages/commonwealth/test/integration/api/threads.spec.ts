@@ -6,7 +6,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-import { Errors as CreateCommentErrors } from 'server/routes/createComment';
+import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
 import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
@@ -332,7 +332,7 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/createComment', () => {
+  describe('/thread/:id/comments', () => {
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
         address: userAddress,
@@ -730,7 +730,7 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/editComment', () => {
+  describe('/comments/:id', () => {
     it('should edit a comment', async () => {
       const text = 'tes text';
       const tRes = await modelUtils.createThread({

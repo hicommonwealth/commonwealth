@@ -284,14 +284,13 @@ export const createComment = async (args: CommentArgs) => {
   const { chain, address, jwt, text, parentCommentId, thread_id } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/createComment')
+    .post(`/api/threads/${thread_id}/comments`)
     .set('Accept', 'application/json')
     .send({
       author_chain: chain,
       chain,
       address,
       parent_id: parentCommentId,
-      thread_id,
       'attachments[]': undefined,
       text,
       jwt,
@@ -312,10 +311,9 @@ export const editComment = async (args: EditCommentArgs) => {
   const { jwt, text, comment_id, chain, community, address } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/editComment')
+    .patch(`/api/comments/${comment_id}`)
     .set('Accept', 'application/json')
     .send({
-      id: comment_id,
       author_chain: chain,
       address,
       body: encodeURIComponent(text),
@@ -560,10 +558,10 @@ export const joinCommunity = async (args: JoinCommunityArgs) => {
         address,
         chain,
         originChain,
-        jwt
+        jwt,
       });
   } catch (e) {
-    console.error("Failed to link an existing address to a chain");
+    console.error('Failed to link an existing address to a chain');
     console.error(e);
     return false;
   }
@@ -571,7 +569,7 @@ export const joinCommunity = async (args: JoinCommunityArgs) => {
   try {
     await createRole(models, address_id, chain, 'member', false);
   } catch (e) {
-    console.error("Failed to create a role for a new member");
+    console.error('Failed to create a role for a new member');
     console.error(e);
     return false;
   }
@@ -586,10 +584,10 @@ export const joinCommunity = async (args: JoinCommunityArgs) => {
         author_chain: chain,
         chain,
         jwt,
-        auth: 'true'
+        auth: 'true',
       });
   } catch (e) {
-    console.error("Failed to set default role");
+    console.error('Failed to set default role');
     console.error(e);
     return false;
   }
