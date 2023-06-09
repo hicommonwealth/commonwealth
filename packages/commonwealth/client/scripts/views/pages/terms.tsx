@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-import app from 'state';
 import 'pages/privacy_and_terms.scss';
 
 import { CWText } from '../components/component_kit/cw_text';
