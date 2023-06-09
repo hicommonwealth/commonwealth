@@ -23,13 +23,13 @@ const LoadingLayout = () => {
   );
 
   const isLoggedIn = app.loginState === LoginState.LoggedIn;
+  const isLanding = window.location.pathname === '/';
+  if (isLanding && !isLoggedIn) return <Bobber />;
 
-  return isLoggedIn ? (
+  return (
     <SubLayout>
       <Bobber />
     </SubLayout>
-  ) : (
-    <Bobber />
   );
 };
 
