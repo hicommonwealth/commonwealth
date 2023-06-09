@@ -29,7 +29,7 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import Cosmos from 'controllers/chain/cosmos/adapter';
-import { initChain } from 'helpers/chain';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -41,15 +41,14 @@ const ViewProposalPage = ({
   type: typeProp,
 }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
-  const forceRender = useForceRerender();
   const navigate = useCommonNavigate();
+  useInitChainIfNeeded(app);
 
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [type, setType] = useState(typeProp);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
-  const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
     const afterAdapterLoaded = async () => {
@@ -78,15 +77,8 @@ const ViewProposalPage = ({
         }
       }
     };
-    const chainInit = async () => {
-      if (!hasFetchedApiRef.current) {
-        hasFetchedApiRef.current = true;
-        await initChain();
-      }
-    };
 
     if (!isAdapterLoaded) {
-      chainInit()
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
         afterAdapterLoaded();
