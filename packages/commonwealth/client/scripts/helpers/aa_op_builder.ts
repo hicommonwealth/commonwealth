@@ -5,8 +5,6 @@ import { BigNumberish, ethers } from "ethers"
 import { OpToJSON } from 'userop/dist/utils';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { EntryPoint, EntryPoint__factory } from 'userop/dist/typechain';
-import { sign } from 'jsonwebtoken';
-import { keccak256 } from 'web3-utils';
 
 const bundlerRPC = 'https://api.stackup.sh/v1/node/9fb29d028cc0f052af8136f1f9d68cf8a07db8ebf22869398dd82bc859eb703b';
 const entrypointAddr = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -36,7 +34,7 @@ class DelegationAccount extends UserOperationBuilder{
     async (ctx) => {
         console.log(ctx.getUserOpHash())
         const hash = ctx.getUserOpHash()
-        ctx.op.signature = (await signer.eth.sign(keccak256("\x19Ethereum Signed Message:\n" + hash.length + hash), (await signer.eth.getAccounts())[0]));
+        ctx.op.signature = (await signer.eth.sign(hash, (await signer.eth.getAccounts())[0]));
     };
 
     private resolveAccount = async (ctx) => {
