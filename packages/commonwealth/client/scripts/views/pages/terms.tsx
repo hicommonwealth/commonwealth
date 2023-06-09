@@ -11,10 +11,10 @@ import '../../../../static/brand_assets/tos-6-9-2023.pdf';
 import { Link } from 'react-router-dom';
 
 const TermsPage = () => {
-  const [numPages, setNumPages] = useState(null);
+  const [totalPages, setTotalPages] = useState(null);
 
   function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
+    setTotalPages(numPages);
   }
 
   return (
@@ -27,7 +27,7 @@ const TermsPage = () => {
             file="static/brand_assets/tos-6-9-2023.pdf"
             onLoadSuccess={onDocumentLoadSuccess}
           >
-            {Array.from(new Array(numPages), (el, index) => (
+            {Array.from(new Array(totalPages), (el, index) => (
               <Page
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
