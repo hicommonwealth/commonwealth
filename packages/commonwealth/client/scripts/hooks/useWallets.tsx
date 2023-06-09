@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { addressSwapper } from 'utils';
+import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
 import {
   getAddressFromWallet,
@@ -357,7 +358,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      await app.newProfiles.updateProfileForAccount(
+      await NewProfilesController.Instance.updateProfileForAccount(
         primaryAccount.profile.address,
         {},
         false
@@ -412,7 +413,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     };
     try {
       if (username || avatarUrl) {
-        await app.newProfiles.updateProfileForAccount(
+        await NewProfilesController.Instance.updateProfileForAccount(
           primaryAccount.profile.address,
           data
         );

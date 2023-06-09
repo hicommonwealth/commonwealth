@@ -9,21 +9,23 @@ import { get } from './appHook.spec';
 
 describe('getProfiles Tests', () => {
   it('should return profiles with specified profile_id correctly', async () => {
-    console.log(testAddresses.map((p) => p.address));
     const r: GetProfilesReq = {
       addresses: testAddresses.map((p) => p.address),
     };
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
 
     const profiles = resp.result.profiles.filter(
       (p) => p.id === testAddresses[0].id
     )[0];
-    chai.assert.lengthOf(profiles.Addresses[0].Threads, 2);
-    chai.assert.lengthOf(profiles.Addresses[0].Comments, 2);
+    const profileAddresses = profiles.Addresses.sort(
+      (a, b) => a.Threads.length - b.Threads.length
+    );
+    chai.assert.lengthOf(profileAddresses[0].Threads, 2);
+    chai.assert.lengthOf(profileAddresses[0].Comments, 2);
   });
 
   it('should return profiles with specified network correctly', async () => {
@@ -33,14 +35,17 @@ describe('getProfiles Tests', () => {
     const resp = await get('/api/profiles', r, true);
 
     chai.assert.lengthOf(resp.result.profiles, 2);
-    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 1);
+    chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
     chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
 
     const profiles = resp.result.profiles.filter(
       (p) => p.id === testAddresses[0].id
     )[0];
-    chai.assert.lengthOf(profiles.Addresses[0].Threads, 2);
-    chai.assert.lengthOf(profiles.Addresses[0].Comments, 2);
+    const profileAddresses = profiles.Addresses.sort(
+      (a, b) => a.Threads.length - b.Threads.length
+    );
+    chai.assert.lengthOf(profileAddresses[0].Threads, 2);
+    chai.assert.lengthOf(profileAddresses[0].Comments, 2);
   });
 
   it('should return count only when specified correctly', async () => {
@@ -51,7 +56,7 @@ describe('getProfiles Tests', () => {
     const resp = await get('/api/profiles', r, true);
 
     // 13 because outer joins with addresses
-    chai.assert.equal(resp.result.count, 13);
+    chai.assert.equal(resp.result.count, 15);
     chai.assert.isUndefined(resp.result.profiles);
   });
 

@@ -21,6 +21,7 @@ import {
   ReactQuillEditor,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
+import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -28,8 +29,11 @@ type NewTopicModalProps = {
 
 export const NewTopicModal = (props: NewTopicModalProps) => {
   const { onModalClose } = props;
-
+  const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
@@ -80,9 +84,9 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setName(e.target.value);
           }}
           inputValidationFn={(text: string) => {
-            const currentCommunityTopicNames = app.topics
-              .getByCommunity(app.activeChainId())
-              .map((t) => t.name.toLowerCase());
+            const currentCommunityTopicNames = topics.map((t) =>
+              t.name.toLowerCase()
+            );
 
             if (currentCommunityTopicNames.includes(text.toLowerCase())) {
               const err = 'Topic name already used within community.';
@@ -164,15 +168,14 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             e.preventDefault();
 
             try {
-              await app.topics.add(
+              await createTopic({
                 name,
                 description,
-                null,
                 featuredInSidebar,
                 featuredInNewPost,
-                tokenThreshold || '0',
-                serializeDelta(contentDelta)
-              );
+                tokenThreshold,
+                defaultOffchainTemplate: serializeDelta(contentDelta),
+              });
 
               navigate(`/discussions/${encodeURI(name.toString().trim())}`);
 

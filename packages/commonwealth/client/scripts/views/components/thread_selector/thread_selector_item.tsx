@@ -1,4 +1,5 @@
 import React from 'react';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Thread from '../../../models/Thread';
 import app from 'state';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
@@ -16,7 +17,10 @@ export const ThreadSelectorItem = ({
   onClick,
   isSelected,
 }: ThreadSelectorItemProps) => {
-  const author = app.newProfiles.getProfile(thread.authorChain, thread.author);
+  const author = NewProfilesController.Instance.getProfile(
+    thread.authorChain,
+    thread.author
+  );
 
   return (
     <div className="thread-selector-item-row" onClick={() => onClick(thread)}>
