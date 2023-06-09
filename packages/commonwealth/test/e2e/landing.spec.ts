@@ -2,6 +2,12 @@ import { test, expect } from '@playwright/test';
 import { PORT } from '../../server/config';
 
 test.describe('Commonwealth Homepage', () => {
+  test.beforeEach(async ({ page }) => {
+    page.addScriptTag({url: 'https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7/web3.min.js'})
+    page.addScriptTag({url: 'https://cdn.jsdelivr.net/npm/eth-sig-util@3.0.1/dist/index.min.js'})
+    await page.addInitScript({path: '/Users/ianrowan/commonwealth/packages/commonwealth/test/e2e/mockMetaMask.js'})
+  });
+
   test('Check Login Modal', async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/`);
 
@@ -14,6 +20,13 @@ test.describe('Commonwealth Homepage', () => {
     expect(exit).toBeTruthy();
     await exit.click();
   });
+
+  test('test Login', async ({page})=> {
+    await page.goto('http://localhost:8080/');
+    await page.getByText('Login').click();
+    await page.waitForSelector('.LoginDesktop');
+    await page.getByText('Metamask').click();
+  })
 
   test('Check Find your community input', async ({ page }) => {
     const input = await page.getByPlaceholder('Find your community');

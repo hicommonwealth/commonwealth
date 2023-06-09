@@ -1,19 +1,21 @@
 import Web3 from 'web3';
 import { SignTypedDataVersion, signTypedData } from '@metamask/eth-sig-util';
-import { Account, HttpProvider } from 'web3-core';
 
-class MockMetaMaskProvider extends Web3 {
+class MockMetaMaskProvider {
     private privateKey;
+    private web3: Web3;
+    public eth;
 
     constructor(host: string, pkey: string) {
-      super(new Web3.providers.HttpProvider(host));
       this.privateKey = pkey;
-      this.defaultAccount = this.eth.accounts.privateKeyToAccount(pkey).address;
-      this.givenProvider.request = this.request;
+      this.web3 = new Web3(new Web3.providers.HttpProvider(host))
+      this.web3.defaultAccount = this.web3.eth.accounts.privateKeyToAccount(pkey).address;
+      const getAccounts = async () => {return [this.web3.defaultAccount]} 
+      this.eth = {getAccounts: getAccounts()}
     }
 
     private async signTypedData(data: string[]){
-        if(data[0] == this.defaultAccount){
+        if(data[0] == this.web3.defaultAccount){
             return signTypedData({
                 privateKey: Buffer.from(this.privateKey.substring(2), 'hex'),
                 data: JSON.parse(data[1]),
@@ -21,22 +23,19 @@ class MockMetaMaskProvider extends Web3 {
             })
         }
     }
+
     public async request(payload: {method: string, params: string[]}) {
         switch(payload.method){
             case 'eth_getBlockByNumber':
-                return (await this.eth.getBlock('latest'))
+                return (await this.web3.eth.getBlock('latest'))
             case 'eth_requestAccounts':
-                return (await this.eth.getAccounts())
+                return [this.web3.defaultAccount]
             case 'wallet_switchEthereumChain':
-                return this.eth.getChainId();
+                return this.web3.eth.getChainId();
             case 'eth_signTypedData_v4':
                 return this.signTypedData(payload.params)
             default:
                 throw Error("method not supported by mock provider")
         }
     }     
-}
-
-export const getMetaMaskMock = (rpc: string, pkey: string) => {
-    return new MockMetaMaskProvider(rpc, pkey)
 }
