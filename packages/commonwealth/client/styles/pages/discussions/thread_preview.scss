@@ -66,6 +66,10 @@
           }
         }
 
+        .dot-separator {
+          height: 20px; 
+        }
+
         .last-updated-text.Text {
           color: $neutral-500;
         }
@@ -127,6 +131,10 @@
         display: flex;
         align-items: center;
         gap: 4px;
+
+        div:first-child {
+          height: 19px;
+        }
 
         .Text {
           line-height: 24px;

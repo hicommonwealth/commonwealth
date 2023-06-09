@@ -152,7 +152,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 linkify
                 showAddressWithDisplayName
               />
-              <CWText className="last-updated-text">•</CWText>
+              <CWText className="dot-separator last-updated-text">•</CWText>
               <CWText
                 type="caption"
                 fontWeight="medium"
