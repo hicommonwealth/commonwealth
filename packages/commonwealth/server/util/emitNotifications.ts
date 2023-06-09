@@ -226,7 +226,7 @@ async function createNotificationPerUser(models, notification, category_id, obje
   );
 
   INSERT INTO "NotificationsRead"(notification_id, subscription_id, is_read, user_id, id)
-  SELECT notification_id, subscription_id, is_read, user_id, id
+  SELECT DISTINCT notification_id, subscription_id, is_read, user_id, id
   FROM "TempNotificationRead";
 
   UPDATE "NotificationsReadMax" 
@@ -234,7 +234,7 @@ async function createNotificationPerUser(models, notification, category_id, obje
   FROM "TempNotificationRead" tr 
   where tr.user_id="NotificationsReadMax".user_id;
   
-  SELECT * FROM "TempNotificationRead";
+  SELECT DISTINCT * FROM "TempNotificationRead";
   COMMIT;
   `
 
