@@ -8,7 +8,6 @@ import app from '../state';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
-import { CWSpinner } from './components/component_kit/cw_spinner';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
@@ -70,9 +69,7 @@ export const SublayoutHeader = ({
       {!hideSearch && <SearchBar />}
       <div className="header-right">
         {isLoadingProfileData ? (
-          <div className="header-loader">
-            <CWSpinner size="large" />
-          </div>
+          <></>
         ) : (
           <>
             <div className="MobileMenuContainer">
