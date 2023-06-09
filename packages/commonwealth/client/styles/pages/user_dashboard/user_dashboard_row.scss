@@ -47,6 +47,16 @@
   color: unset !important;
   text-decoration: none;
 
+  a {
+    color: unset !important;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: unset !important;
+    }
+  }
+
   &:hover,
   &:focus,
   &:active {
