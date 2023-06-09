@@ -10,59 +10,74 @@ const text = {
 
 export default text;
 
-export const Typography = {
-  args: {
-    text: "Commonwealth Labs",
-    type: "d1",
-    fontWeight: "semiBold",
-    fontStyle: undefined,
-    isCentered: false,
-    disabled: false,
+const options = {
+  "Display": {
+    type: [ "d1", "d2", ],
+    fontWeight: [ "medium", "semiBold", "bold" ],
   },
-  argTypes: {
-    disabled: {
-      options: [ true, false ],
-    },
-    fontStyle: {
-      control: { type: "inline-radio" },
-      options: [ undefined, 'italic', 'uppercase' ],
-    },
-    fontWeight: {
-      control: { type: "inline-radio" },
-      options: [ "regular", "medium", "semiBold", "bold", "black", "italic", "uppercase" ],
-    },
-    isCentered: {
-      options: [ true, false ],
-    },
-    type: {
-      control: { type: "inline-radio" },
-      options: [
-        "d1",
-        "d2",
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "b1",
-        "b2",
-        "caption",
-        "buttonSm",
-        "buttonLg",
-        "buttonMini",
-        "monospace1",
-        "monospace2",
-      ],
-    },
+  "Heading": {
+    type: [ "h1", "h2", "h3", "h4", "h5" ],
+    fontWeight: [ "medium", "semiBold", "bold" ],
   },
-  parameters: {
-    controls: {
-      exclude: [ "className", "noWrap", "truncate" ],
-    },
+  "Body": {
+    type: [ "b1", "b2", ],
+    fontWeight: [ "regular", "medium", "bold", "italic" ],
   },
-  render: ({...args}) => (
-    <CWText {...args}>
-      {args.text}
-    </CWText>
-  ),
+  "Caption": {
+    type: [ "caption" ],
+    fontWeight: [ "regular", "medium", "uppercase" ],
+  },
+  "Button": {
+    type: [ "buttonLg", "buttonSm" ],
+    fontWeight: [ "medium" ],
+  },
+  "Monospace": {
+    type: [ "monospace1", "monospace2" ],
+    fontWeight: [ "regular", "medium" ],
+  },
 };
+
+const BaseStory = (type: string) => {
+  return {
+    args: {
+      text: "Commonwealth",
+      type: options[type].type[0],
+      fontWeight: options[type].fontWeight[0],
+      isCentered: false,
+      disabled: false,
+    },
+    argTypes: {
+      disabled: {
+        options: [ true, false ],
+      },
+      fontWeight: {
+        control: { type: "inline-radio" },
+        options: options[type].fontWeight,
+      },
+      isCentered: {
+        options: [ true, false ],
+      },
+      type: {
+        control: { type: "inline-radio" },
+        options: options[type].type,
+      },
+    },
+    parameters: {
+      controls: {
+        exclude: [ "className", "noWrap", "truncate", "fontStyle" ],
+      },
+    },
+    render: ({...args}) => (
+      <CWText {...args}>
+        {args.text}
+      </CWText>
+    ),
+  };
+};
+
+export const Display = { ...BaseStory("Display") };
+export const Heading = { ...BaseStory("Heading") };
+export const Body = { ...BaseStory("Body") };
+export const Caption = { ...BaseStory("Caption") };
+export const Button = { ...BaseStory("Button") };
+export const Monospace = { ...BaseStory("Monospace") };
