@@ -85,7 +85,20 @@ const upgradeMember = async (
   targetAddress.role = new_role;
   await targetAddress.save();
 
-  return res.json({ status: 'Success', result: targetAddress.toJSON() });
+  return res.json({
+    status: 'Success',
+    result: {
+      is_user_default: targetAddress.is_user_default,
+      id: targetAddress.id,
+      address_id: targetAddress.id,
+      updated_at: targetAddress.updated_at,
+      created_at: targetAddress.created_at,
+      chain_id: targetAddress.chain,
+      permission: targetAddress.role,
+      allow: '0',
+      deny: '0',
+    },
+  });
 };
 
 export default upgradeMember;
