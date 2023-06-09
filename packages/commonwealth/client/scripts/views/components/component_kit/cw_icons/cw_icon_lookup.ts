@@ -18,6 +18,7 @@ export const iconLookup = {
   backer: Icons.CWBacker,
   badge: Icons.CWBadge,
   bell: Icons.CWBell,
+  bellNew: Icons.CWBellNew,
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
   chatDots: withPhosphorIcon(ChatDots),

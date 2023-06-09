@@ -267,7 +267,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   renderTrigger={(onclick) => (
                     <div className='btn-txt-container'>
                       <CWIconButton
-                        iconName={isSubscribed ? 'unsubscribe' : 'bell'}
+                        iconName={isSubscribed ? 'unsubscribe' : 'bellNew'}
                         iconSize="small"
                         onClick={onclick}
                       />
