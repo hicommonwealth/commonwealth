@@ -4,7 +4,7 @@ import withRouter from 'navigation/helpers';
 import React, { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
-import app from 'state';
+import app, { LoginState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
@@ -14,14 +14,22 @@ import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
 
 const LoadingLayout = () => {
-  return (
-    <SubLayout>
-      <div className="Layout">
-        <div className="spinner-container">
-          <CWSpinner size="xl" />
-        </div>
+  const Bobber = () => (
+    <div className="Layout">
+      <div className="spinner-container">
+        <CWSpinner size="xl" />
       </div>
+    </div>
+  );
+
+  const isLoggedIn = app.loginState === LoginState.LoggedIn;
+
+  return isLoggedIn ? (
+    <SubLayout>
+      <Bobber />
     </SubLayout>
+  ) : (
+    <Bobber />
   );
 };
 
