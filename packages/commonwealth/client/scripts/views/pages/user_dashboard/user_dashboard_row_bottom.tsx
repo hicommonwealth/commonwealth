@@ -74,7 +74,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           <CWAvatarGroup profiles={commenters} chainId={chainId} />
         </div>
       </div>
-      <div className="actions" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="actions"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
         <PopoverMenu
           menuItems={[
             {
