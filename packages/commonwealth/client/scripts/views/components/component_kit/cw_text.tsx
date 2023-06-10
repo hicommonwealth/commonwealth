@@ -12,6 +12,7 @@ type FontWeight =
   | 'bold'
   | 'black'
   | 'italic'
+  | 'link'
   | 'uppercase';
 
 type FontStyle = 'italic' | 'uppercase';

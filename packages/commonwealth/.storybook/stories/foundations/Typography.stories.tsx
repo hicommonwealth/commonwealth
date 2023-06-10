@@ -21,7 +21,7 @@ const options = {
   },
   "Body": {
     type: [ "b1", "b2", ],
-    fontWeight: [ "regular", "medium", "bold", "italic" ],
+    fontWeight: [ "regular", "medium", "bold", "italic", "link" ],
   },
   "Caption": {
     type: [ "caption" ],
