@@ -1,29 +1,35 @@
-import React, { Suspense, useState } from 'react';
-
-import useNecessaryEffect from '../hooks/useNecessaryEffect';
-
+import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
 import 'Layout.scss';
-
-import { deinitChainOrCommunity, initChain, selectChain } from 'helpers/chain';
-
-import app from 'state';
+import withRouter from 'navigation/helpers';
+import React, { Suspense, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useParams } from 'react-router-dom';
+import app, { LoginState } from 'state';
 import { PageNotFound } from 'views/pages/404';
+import ErrorPage from 'views/pages/error';
+import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
-import withRouter from 'navigation/helpers';
-import { useParams } from 'react-router-dom';
-import { ChainType } from 'common-common/src/types';
-import { ErrorBoundary } from 'react-error-boundary';
-import ErrorPage from 'views/pages/error';
+import SubLayout from './Sublayout';
 
-const LoadingLayout = () => {
-  return (
+const LoadingLayout = ({ isAppLoading }) => {
+  const Bobber = () => (
     <div className="Layout">
       <div className="spinner-container">
         <CWSpinner size="xl" />
       </div>
     </div>
+  );
+
+  const isLoggedIn = app.loginState === LoginState.LoggedIn;
+  const isLanding = window.location.pathname === '/';
+  if (isLanding && !isLoggedIn) return <Bobber />;
+
+  return (
+    <SubLayout isLoadingProfileData={isAppLoading}>
+      <Bobber />
+    </SubLayout>
   );
 };
 
@@ -46,6 +52,7 @@ const ApplicationError = () => {
 type LayoutAttrs = {
   scope?: string;
   children: React.ReactNode;
+  isAppLoading?: boolean;
 };
 
 /**
@@ -60,6 +67,7 @@ const LayoutComponent = ({
   // router,
   children,
   scope: selectedScope,
+  isAppLoading,
 }: LayoutAttrs) => {
   // const scopeIsEthereumAddress =
   //   selectedScope &&
@@ -151,9 +159,10 @@ const LayoutComponent = ({
     // Important: render loading state immediately for IFB 5, 6 and 7, general
     // loading will take over later
     shouldSelectChain || // IFB 5
-    shouldDeInitChain // IFB 7
+    shouldDeInitChain || // IFB 7
+    isAppLoading // NON IFB - a bool to indicate if app is loading
   ) {
-    return <LoadingLayout />;
+    return <LoadingLayout isAppLoading />;
   }
 
   // IFB 4: If the user has attempted to a community page that was not
@@ -182,7 +191,7 @@ export const LayoutWrapper = ({ Component, params }) => {
   const scope = params.scoped ? pathScope : null;
 
   return (
-    <LayoutComp scope={scope}>
+    <LayoutComp scope={scope} isAppLoading={params?.isAppLoading}>
       <Component {...routerParams} />
     </LayoutComp>
   );
