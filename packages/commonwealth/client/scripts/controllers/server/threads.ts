@@ -789,7 +789,7 @@ class ThreadsController {
     const topics =
       (await queryClient.ensureQueryData<Topic[]>([
         ApiEndpoints.BULK_TOPICS,
-        app.chain.id,
+        app.activeChainId(),
       ])) || [];
 
     const chain = app.activeChainId();

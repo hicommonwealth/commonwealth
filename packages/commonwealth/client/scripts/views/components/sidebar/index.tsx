@@ -50,10 +50,10 @@ export const Sidebar = () => {
       {menuName === 'default' && (
         <div className="sidebar-default-menu">
           <SidebarQuickSwitcher />
-          {app.chain && (
+          {app.activeChainId() && (
             <div className="community-menu">
               {showAdmin && <AdminSection />}
-              {featureFlags.communityHomepage && app.chain.meta.hasHomepage && (
+              {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
                 <div
                   className={onHomeRoute ? 'home-button active' : 'home-button'}
                   onClick={() => navigate('/feed')}
@@ -85,9 +85,7 @@ export const Sidebar = () => {
         </div>
       )}
       {menuName === 'createContent' && <CreateContentSidebar />}
-      {menuName === 'exploreCommunities' && (
-        <ExploreCommunitiesSidebar />
-      )}
+      {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
     </div>
   );
 };

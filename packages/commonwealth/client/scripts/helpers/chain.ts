@@ -40,6 +40,10 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     }
   }
 
+  const chainname = chain.name;
+
+  app.activeChainId = () => chainname.toLowerCase();
+
   // Check for valid chain selection, and that we need to switch
   if (app.chain && chain === app.chain.meta) {
     return;
