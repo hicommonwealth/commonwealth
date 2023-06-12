@@ -105,7 +105,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   });
 
   useEffect(() => {
-    if (app.config.evmTestEnv === 'e2e-test') {
+    if (process.env.ETH_RPC === 'e2e-test') {
       window['ethereum'] = new MockMetaMaskProvider(
         'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_',
         '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
