@@ -223,9 +223,6 @@ export const User = ({
             <Link
               className="user-display-name username"
               to={profile ? `/profile/id/${profile.id}` : undefined}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
             >
               <>
                 {!profile ? (

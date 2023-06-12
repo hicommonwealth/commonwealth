@@ -92,7 +92,6 @@ const ManageCommunityPage = () => {
           return {
             ...(profile.roles[0] || {}),
             Address: profile.addresses[0],
-            id: profile.addresses[0].id,
           };
         });
       }
@@ -137,9 +136,9 @@ const ManageCommunityPage = () => {
     return <PageLoading />;
   }
 
-  // if (!isAdmin) {
-  //   return <ErrorPage message={'Must be admin'} />;
-  // }
+  if (!isAdmin) {
+    return <ErrorPage message={'Must be admin'} />;
+  }
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
@@ -147,7 +146,7 @@ const ManageCommunityPage = () => {
     newRole.Address = oldRole.Address;
 
     const predicate = (r) => {
-      return r.address_id === oldRole.address_id;
+      return r.id === oldRole.id;
     };
 
     app.roles.addRole(newRole);
@@ -162,16 +161,16 @@ const ManageCommunityPage = () => {
         adminsAndMods.splice(idx, 1);
       }
       if (oldRole.permission === 'admin') {
-        setAdmins(admins.filter((a) => a.address_id !== oldRole.address_id));
+        setAdmins(admins.filter((a) => a.id !== oldRole.id));
       }
       if (oldRole.permission === 'moderator') {
-        setMods(mods.filter((a) => a.address_id !== oldRole.address_id));
+        setMods(mods.filter((a) => a.id !== oldRole.id));
       }
     }
 
     if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
       const roleInfo = new RoleInfo(
-        newRole.address_id,
+        newRole.id,
         newRole.Address?.id || newRole.address_id,
         newRole.Address.address,
         newRole.Address.chain,

@@ -1,9 +1,9 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import { isRole } from '../models/role';
+import type { RoleInstanceWithPermission } from '../util/roles';
+import { createRole, findAllRoles, findOneRole } from '../util/roles';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
@@ -14,12 +14,7 @@ export const Errors = {
   MustHaveAdmin: 'Communities must have at least one admin',
 };
 
-export const upgradeMemberValidation = [
-  body('new_role').custom(async (new_role) => {
-    if (!new_role || !isRole(new_role)) throw new AppError(Errors.InvalidRole);
-  }),
-  body('address').isString().withMessage(Errors.InvalidAddress),
-];
+const ValidRoles = ['admin', 'moderator', 'member'];
 
 const upgradeMember = async (
   models: DB,
@@ -27,78 +22,112 @@ const upgradeMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  const errors = validationResult(req).array();
-  if (errors.length !== 0) {
-    return next(new AppError(errors[0].msg));
-  }
-
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-
   const chain = req.chain;
   const { address, new_role } = req.body;
-
-  // Get address ids of user making request to assert admin status
+  if (!address) return next(new AppError(Errors.InvalidAddress));
+  if (!new_role) return next(new AppError(Errors.InvalidRole));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   const requesterAddresses = await req.user.getAddresses();
   const requesterAddressIds = requesterAddresses
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-
-  const addresses = await models.Address.findAll({
-    where: {
-      chain: chain.id,
-      [Op.or]: {
-        id: { [Op.in]: requesterAddressIds },
-        address: address,
-      },
-    },
-  });
-
-  const targetAddress = addresses.find((a) => address === a.address);
-
-  // check if address provided exists
-  if (!targetAddress) return next(new AppError(Errors.NoMember));
-
-  const allCommunityAdmin = addresses.filter((m) => m.role === 'admin');
-  const requesterAdminRoles = allCommunityAdmin.filter((a) =>
-    requesterAddressIds.includes(a.id)
+  const requesterAdminRoles = await findAllRoles(
+    models,
+    { where: { address_id: { [Op.in]: requesterAddressIds } } },
+    chain.id,
+    ['admin']
   );
 
   if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
     return next(new AppError(Errors.MustBeAdmin));
+  const memberAddress = await models.Address.findOne({
+    where: {
+      address,
+      chain: chain.id,
+    },
+  });
+  if (!memberAddress) return next(new AppError(Errors.NoMember));
+  const roles = await findAllRoles(
+    models,
+    { where: { address_id: memberAddress.id } },
+    chain.id
+  );
+  if (!roles) return next(new AppError(Errors.NoMember));
 
+  // There should only be one role per address per chain/community
+  const member = await findOneRole(
+    models,
+    { where: { address_id: memberAddress.id } },
+    chain.id
+  );
+  if (!member) return next(new AppError(Errors.NoMember));
+
+  const allCommunityAdmin = await findAllRoles(models, {}, chain.id, ['admin']);
   const requesterAdminAddressIds = requesterAdminRoles.map(
-    (r) => r.toJSON().id
+    (r) => r.toJSON().address_id
   );
   const isLastAdmin = allCommunityAdmin.length < 2;
   const adminSelfDemoting =
-    requesterAdminAddressIds.includes(address.id) && new_role !== 'admin';
-
+    requesterAdminAddressIds.includes(memberAddress.id) && new_role !== 'admin';
   if (isLastAdmin && adminSelfDemoting) {
     return next(new AppError(Errors.MustHaveAdmin));
   }
-
-  if (new_role === targetAddress.role) {
+  let newMember: RoleInstanceWithPermission;
+  if (ValidRoles.includes(new_role)) {
+    // “Demotion” should remove all RoleAssignments above the new role.
+    // “Promotion” should create new RoleAssignment above the existing role.
+    const currentRole = member.permission;
+    // give each permissions a integer ranking
+    const roleRanking = {
+      admin: 2,
+      moderator: 1,
+      member: 0,
+    };
+    const rankingToRole = {
+      2: 'admin',
+      1: 'moderator',
+      0: 'member',
+    };
+    const newRoleRanking = roleRanking[new_role];
+    let currentRoleRanking = roleRanking[currentRole];
+    if (newRoleRanking === currentRoleRanking) {
+      return next(new AppError(Errors.InvalidRole));
+    } else if (newRoleRanking > currentRoleRanking) {
+      newMember = await createRole(
+        models,
+        memberAddress.id,
+        chain.id,
+        new_role
+      );
+    } else {
+      // handle demotions
+      while (newRoleRanking < currentRoleRanking) {
+        const roleToRemove = rankingToRole[currentRoleRanking];
+        const communityRole = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: roleToRemove,
+          },
+        });
+        await models.RoleAssignment.destroy({
+          where: {
+            address_id: memberAddress.id,
+            community_role_id: communityRole.id,
+          },
+        });
+        currentRoleRanking -= 1;
+      }
+      newMember = await createRole(
+        models,
+        memberAddress.id,
+        chain.id,
+        rankingToRole[newRoleRanking]
+      );
+    }
+  } else {
     return next(new AppError(Errors.InvalidRole));
   }
-
-  // If all validations pass, update role;
-  targetAddress.role = new_role;
-  await targetAddress.save();
-
-  return res.json({
-    status: 'Success',
-    result: {
-      is_user_default: targetAddress.is_user_default,
-      id: targetAddress.id,
-      address_id: targetAddress.id,
-      updated_at: targetAddress.updated_at,
-      created_at: targetAddress.created_at,
-      chain_id: targetAddress.chain,
-      permission: targetAddress.role,
-      allow: '0',
-      deny: '0',
-    },
-  });
+  return res.json({ status: 'Success', result: newMember.toJSON() });
 };
 
 export default upgradeMember;

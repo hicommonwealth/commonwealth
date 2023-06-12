@@ -21,9 +21,8 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-
 import type { RoleInstanceWithPermission } from '../util/roles';
-import { createRole } from '../util/roles';
+import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
@@ -354,6 +353,8 @@ const createChain = async (
     default_page: DefaultPage.Homepage,
     has_homepage: true,
   });
+
+  await createDefaultCommunityRoles(models, chain.id);
 
   if (req.body.address) {
     const erc20Abi = await models.ContractAbi.findOne({

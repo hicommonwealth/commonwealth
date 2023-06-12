@@ -1,15 +1,15 @@
-import bodyParser from 'body-parser';
-import chai, { assert } from 'chai';
-import chaiHttp from 'chai-http';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import cookieParser from 'cookie-parser';
 import express from 'express';
-import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import passport from 'passport';
+import session from 'express-session';
 import { SESSION_SECRET } from 'server/config';
 import models from 'server/database';
+import SessionSequelizeStore from 'connect-session-sequelize';
 import { addExternalRoutes } from 'server/routing/external';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
+import chai, { assert } from 'chai';
+import chaiHttp from 'chai-http';
 import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
@@ -48,12 +48,11 @@ before(async () => {
 export async function get(
   path: string,
   val: Record<string, unknown> = null,
-  expectError = false,
-  passedApp = app
+  expectError = false
 ) {
   const res = <any>(
     await chai
-      .request(passedApp)
+      .request(app)
       .get(path)
       .set('Accept', 'application/json')
       .query(val)
@@ -71,12 +70,11 @@ export async function get(
 export async function put(
   path: string,
   val: Record<string, unknown>,
-  expectError = false,
-  passedApp = app
+  expectError = false
 ) {
   const res = <any>(
     await chai
-      .request(passedApp)
+      .request(app)
       .put(path)
       .set('Accept', 'application/json')
       .send(val)
@@ -94,12 +92,11 @@ export async function put(
 export async function post(
   path: string,
   val: Record<string, unknown>,
-  expectError = false,
-  expectedApp = app
+  expectError = false
 ) {
   const res = <any>(
     await chai
-      .request(expectedApp)
+      .request(app)
       .post(path)
       .set('Accept', 'application/json')
       .send(val)

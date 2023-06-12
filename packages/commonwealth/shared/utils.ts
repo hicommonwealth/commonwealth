@@ -5,7 +5,11 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 import { ProposalType } from 'common-common/src/types';
-import { AccessLevel } from './permissions';
+import {
+  AccessLevel,
+  everyonePermissions,
+  PermissionManager,
+} from './permissions';
 import type { RoleObject } from './types';
 
 export const slugify = (str: string): string => {
@@ -258,8 +262,10 @@ export const addressSwapper = (options: {
 
 export function aggregatePermissions(
   roles: RoleObject[],
-  chain_permissions: { allow: number; deny: number }
+  chain_permissions: { allow: bigint; deny: bigint }
 ) {
+  const permissionsManager = new PermissionManager();
+
   const ORDER: AccessLevel[] = [
     AccessLevel.Member,
     AccessLevel.Moderator,
@@ -273,13 +279,17 @@ export function aggregatePermissions(
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{
-    allow: number;
-    deny: number;
+    allow: bigint;
+    deny: bigint;
   }> = roles.map(({ allow, deny }) => ({ allow, deny }));
 
   // add chain default permissions to beginning of permissions array
   permissionsAllowDeny.unshift(chain_permissions);
 
   // compute permissions
-  return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
+  const permission: bigint = permissionsManager.computePermissions(
+    everyonePermissions,
+    permissionsAllowDeny
+  );
+  return permission;
 }
