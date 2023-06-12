@@ -1,3 +1,5 @@
+import { makeTimeObject, diffMilliseconds } from 'common-common/src/logTime';
+import { promiseAllSettled } from 'common-common/src/promiseUtils';
 import { StatsDController } from 'common-common/src/statsd';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
@@ -30,13 +32,25 @@ export type NotificationDataTypes =
   | IChainEventNotificationData
   | (SnapshotNotification & { eventType: SnapshotEventType });
 
-function incrementStatsDController(notification_data, category_id, object_id) {
-  StatsDController.get().increment('cw.notifications.created', {
-    category_id,
-    object_id,
-    chain:
-      (notification_data as any).chain || (notification_data as any).chain_id,
-  });
+export const metricIds = {
+  eventCreatedCount: 'cw.notifications.created',
+  eventLatencyMs: 'cw.notifications.latency_ms',
+  eventEmittedCount: 'cw.notifications.emitted',
+  eventEmittedLatencyMs: 'cw.notifications.emitted.latency_ms',
+  eventEmailCount: 'cw.notifications.email',
+  eventEmailSuccessCount: 'cw.notifications.email.success',
+  eventEmailErrorCount: 'cw.notifications.email.error',
+  eventEmailLatencyMs: 'cw.notifications.email.latency_ms',
+  eventWebhookLatencyMs: 'cw.notifications.webhook.latency_ms',
+  eventErrorCount: 'cw.notifications.error',
+};
+
+function incrementStatsDController(metric_id, tags, value = 1) {
+  StatsDController.get().increment(metric_id, value, tags);
+}
+
+function histogramStatsDController(metric_id, tags, start) {
+  StatsDController.get().histogram(metric_id, diffMilliseconds(start), tags);
 }
 
 function checkIsChainEventData(notification_data) {
@@ -134,60 +148,127 @@ async function sendEmails(
   chainEvent,
   category_id,
   notification_data,
-  notification
+  notification,
+  tags,
+  order
 ) {
+  const logEmailTime = makeTimeObject(
+    log,
+    metricIds.eventEmailLatencyMs,
+    tags,
+    order
+  );
   let msg;
   try {
-    if (category_id !== 'snapshot-proposal') {
-      msg = await createImmediateNotificationEmailObject(
-        notification_data,
-        category_id,
-        models
+    try {
+      if (category_id !== 'snapshot-proposal') {
+        msg = await createImmediateNotificationEmailObject(
+          notification_data,
+          category_id,
+          models
+        );
+      }
+    } catch (e) {
+      log.warn(
+        `Error generating immediate notification email: ${JSON.stringify(
+          tags,
+          order
+        )}`
+      );
+      log.warn(e);
+      logEmailTime.error();
+    }
+
+    if (!msg) return;
+
+    const subscriptions = await models.Subscription.findAll({
+      where: { id: { [Op.in]: subIds } },
+      include: models.User,
+    });
+
+    // send emails
+    const emailPromises = [];
+    for (const subscription of subscriptions) {
+      if (msg && isChainEventData && chainEvent.chain) {
+        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+      }
+      if (msg && subscription?.immediate_email && subscription?.User) {
+        // kick off async call and immediately return
+        emailPromises.push(
+          sendImmediateNotificationEmail(subscription.User, msg)
+        );
+      }
+    }
+
+    const result = await promiseAllSettled(emailPromises);
+    if (result) {
+      incrementStatsDController(
+        metricIds.eventEmailSuccessCount,
+        tags,
+        result.successCount
+      );
+      incrementStatsDController(
+        metricIds.eventEmailErrorCount,
+        tags,
+        result.errorCount
       );
     }
-  } catch (e) {
-    log.warn('Error generating immediate notification email!');
-    log.warn(e);
-  }
 
-  const subscriptions = await models.Subscription.findAll({
-    where: { id: { [Op.in]: subIds } },
-    include: models.User,
-  });
-
-  // send emails
-  for (const subscription of subscriptions) {
-    if (msg && isChainEventData && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
-    }
-    if (msg && subscription?.immediate_email && subscription?.User) {
-      // kick off async call and immediately return
-      sendImmediateNotificationEmail(subscription.User, msg);
-    }
+    incrementStatsDController(
+      metricIds.eventEmailCount,
+      tags,
+      emailPromises.length
+    );
+    histogramStatsDController(
+      metricIds.eventEmailLatencyMs,
+      tags,
+      logEmailTime.start
+    );
+    logEmailTime.end();
+  } catch (err) {
+    log.warn(`Error sending emails: ${JSON.stringify(tags, order)}`);
+    logEmailTime.error();
   }
 }
 
-async function sendToWebhooks(models, webhook_data, category_id) {
-  const erc20Tokens = (
-    await models.Chain.findAll({
-      where: {
-        base: ChainBase.Ethereum,
-        type: ChainType.Token,
-      },
-    })
-  ).map((o) => o.id);
+async function sendToWebhooks(models, webhook_data, category_id, tags, order) {
+  const logWebhooktime = makeTimeObject(
+    log,
+    metricIds.eventWebhookLatencyMs,
+    tags,
+    order
+  );
+  try {
+    const erc20Tokens = (
+      await models.Chain.findAll({
+        where: {
+          base: ChainBase.Ethereum,
+          type: ChainType.Token,
+        },
+      })
+    ).map((o) => o.id);
 
-  // send data to relevant webhooks
-  if (
-    webhook_data &&
-    // TODO: this OR clause seems redundant?
-    (webhook_data.chainEventType?.chain ||
-      !erc20Tokens.includes(webhook_data.chainEventType?.chain))
-  ) {
-    await send(models, {
-      notificationCategory: category_id,
-      ...(webhook_data as Required<WebhookContent>),
-    });
+    // send data to relevant webhooks
+    if (
+      webhook_data &&
+      // TODO: this OR clause seems redundant?
+      (webhook_data.chainEventType?.chain ||
+        !erc20Tokens.includes(webhook_data.chainEventType?.chain))
+    ) {
+      await send(models, {
+        notificationCategory: category_id,
+        ...(webhook_data as Required<WebhookContent>),
+      });
+    }
+    histogramStatsDController(
+      metricIds.eventWebhookLatencyMs,
+      tags,
+      logWebhooktime.start
+    );
+    logWebhooktime.end();
+  } catch (err) {
+    log.warn(`webhook error: ${JSON.stringify(tags, order)}`);
+    logWebhooktime.error();
   }
 }
 
@@ -235,7 +316,7 @@ async function createNotificationPerUser(
   const rawQuery = `
   BEGIN;
 
-  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  SELECT pg_advisory_xact_lock(111);
 
   CREATE TEMP TABLE "TempNotificationRead" AS 
   SELECT ${notification.id} as notification_id, "Subscription"."id" as subscription_id, false as is_read, "Subscription"."subscriber_id" as user_id, 
@@ -259,7 +340,7 @@ async function createNotificationPerUser(
   FROM "TempNotificationRead" tr 
   where tr.user_id="Users".id;
   
-  SELECT DISTINCT * FROM "TempNotificationRead";
+  SELECT DISTINCT notification_id, subscription_id, is_read, user_id, id FROM "TempNotificationRead";
   COMMIT;
   `;
 
@@ -276,42 +357,86 @@ export default async function emitNotifications(
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
-  // send notification created event to datadog
-  incrementStatsDController(notification_data, category_id, object_id);
+  const chain =
+    (notification_data as any).chain || (notification_data as any).chain_id;
+  const tags = { chain, category_id, object_id };
+  const order = ['category_id', 'chain', 'object_id'];
+  const processEventTime = makeTimeObject(
+    log,
+    metricIds.eventLatencyMs,
+    tags,
+    order
+  );
 
-  // typeguard function to differentiate between chain event notifications as needed
-  let chainEvent: IChainEventNotificationData;
-  const isChainEventData = checkIsChainEventData(notification_data);
-  if (isChainEventData) {
-    chainEvent = <IChainEventNotificationData>notification_data;
-  }
-  const notification = await createNotification(
-    models,
-    isChainEventData,
-    chainEvent,
-    category_id,
-    notification_data
-  );
-  const rowsAdded = await createNotificationPerUser(
-    models,
-    notification,
-    category_id,
-    object_id,
-    excludeAddresses,
-    includeAddresses
-  );
-  const subscriptions = rowsAdded.map((r) => r.subscription_id);
-  Promise.allSettled([
-    sendEmails(
+  try {
+    // send notification created event to datadog
+    // typeguard function to differentiate between chain event notifications as needed
+    let chainEvent: IChainEventNotificationData;
+    const isChainEventData = checkIsChainEventData(notification_data);
+    if (isChainEventData) {
+      chainEvent = <IChainEventNotificationData>notification_data;
+    }
+
+    const notification = await createNotification(
       models,
-      subscriptions,
       isChainEventData,
       chainEvent,
       category_id,
-      notification_data,
-      notification
-    ),
-    sendToWebhooks(models, webhook_data, category_id),
-  ]);
-  return notification;
+      notification_data
+    );
+    incrementStatsDController(metricIds.eventCreatedCount, tags);
+
+    const generateNotificationsTime = makeTimeObject(
+      log,
+      metricIds.eventEmittedLatencyMs,
+      tags,
+      order
+    );
+    const rowsAdded = await createNotificationPerUser(
+      models,
+      notification,
+      category_id,
+      object_id,
+      excludeAddresses,
+      includeAddresses
+    );
+    histogramStatsDController(
+      metricIds.eventEmittedLatencyMs,
+      tags,
+      generateNotificationsTime.start
+    );
+    incrementStatsDController(
+      metricIds.eventEmittedCount,
+      tags,
+      rowsAdded.length
+    );
+    generateNotificationsTime.end();
+
+    const subscriptions = rowsAdded.map((r) => r.subscription_id);
+    promiseAllSettled([
+      sendEmails(
+        models,
+        subscriptions,
+        isChainEventData,
+        chainEvent,
+        category_id,
+        notification_data,
+        notification,
+        tags,
+        order
+      ),
+      sendToWebhooks(models, webhook_data, category_id, tags, order),
+    ]);
+    processEventTime.end();
+    histogramStatsDController(
+      metricIds.eventLatencyMs,
+      tags,
+      processEventTime.start
+    );
+    return notification;
+  } catch (err) {
+    log.error(err);
+    incrementStatsDController(metricIds.eventErrorCount, tags);
+    processEventTime.error();
+  }
 }
