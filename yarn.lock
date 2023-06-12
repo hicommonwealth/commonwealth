@@ -3966,7 +3966,7 @@
 
 "@magic-ext/oauth@^11.1.1":
   version "11.2.0"
-  resolved "https://registry.yarnpkg.com/@magic-ext/oauth/-/oauth-11.2.0.tgz#21b5d8f7a58463f324db2d7315f065fcec3c2046"
+  resolved "https://registry.npmjs.org/@magic-ext/oauth/-/oauth-11.2.0.tgz"
   integrity sha512-F308JC5+dVOutsLtBJBdPshDGPOlchAlcedJoqcBie/NBr8VRq0eI3+cRWcvz6LFHnn6nD83g5FIOYS1C8X4KA==
   dependencies:
     "@magic-sdk/types" "^15.2.0"
@@ -4012,7 +4012,7 @@
 
 "@magic-sdk/types@^15.2.0":
   version "15.2.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-15.2.0.tgz#b0f1fa352b2cdbd4b1ba2a3666407900e41fc311"
+  resolved "https://registry.npmjs.org/@magic-sdk/types/-/types-15.2.0.tgz"
   integrity sha512-oS6yShBsBWWhTsEZtEPqJ2cY+b/7iQlqh36eeySKlWFPXQXbakTx20Tbr6CI0svFWQNDgX240hfHbyF2PRClxQ==
 
 "@mapbox/node-pre-gyp@^1.0.0":
@@ -5734,6 +5734,20 @@
   integrity sha512-+PmQX0PiAYPMeVYe237LJAYvOMYW1j2rH5YROyS3b4CTVJum34HfRvKvAzozHAQG0TnHNdUfY9nCeUyRAs//cw==
   dependencies:
     defer-to-connect "^2.0.1"
+
+"@tanstack/match-sorter-utils@^8.7.0":
+  version "8.8.4"
+  dependencies:
+    remove-accents "0.4.2"
+
+"@tanstack/query-core@4.29.7":
+  version "4.29.7"
+
+"@tanstack/react-query@4.29.7":
+  version "4.29.7"
+  dependencies:
+    "@tanstack/query-core" "4.29.7"
+    use-sync-external-store "^1.2.0"
 
 "@terra-money/legacy.proto@npm:@terra-money/terra.proto@^0.1.7":
   version "0.1.7"
@@ -10479,6 +10493,7 @@ commondir@^1.0.1:
     "@glidejs/glide" "^3.6.0"
     "@keplr-wallet/types" "^0.10.19"
     "@magic-ext/cosmos" "^12.1.3"
+    "@magic-ext/oauth" "^11.1.1"
     "@magic-sdk/admin" "^1.10.0"
     "@metamask/detect-provider" "^2.0.0"
     "@metamask/eth-sig-util" "^4.0.0"
@@ -10859,6 +10874,11 @@ cookiejar@^2.1.3:
   version "2.1.3"
   resolved "https://registry.npmjs.org/cookiejar/-/cookiejar-2.1.3.tgz"
   integrity sha512-JxbCBUdrfr6AQjOXrxoTvAMJO4HBTUIlBzslcJPAz+/KT8yk53fXun51u+RenNYvad/+Vc2DIz5o9UxlCDymFQ==
+
+copy-anything@^3.0.2:
+  version "3.0.4"
+  dependencies:
+    is-what "^4.1.8"
 
 copy-concurrently@^1.0.0:
   version "1.0.5"
@@ -17136,6 +17156,9 @@ is-weakset@^2.0.1:
   resolved "https://registry.npmjs.org/is-weakset/-/is-weakset-2.0.1.tgz"
   integrity sha512-pi4vhbhVHGLxohUw7PhGsueT4vRGFoXhP7+RGN0jKIv9+8PWYCQTqtADngrxOm2g46hoH0+g8uZZBzMrvVGDmw==
 
+is-what@^4.1.8:
+  version "4.1.9"
+
 is-windows@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/is-windows/-/is-windows-1.0.2.tgz"
@@ -23339,6 +23362,9 @@ remark-slug@^6.0.0:
     mdast-util-to-string "^1.0.0"
     unist-util-visit "^2.0.0"
 
+remove-accents@0.4.2:
+  version "0.4.2"
+
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
   resolved "https://registry.npmjs.org/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz"
@@ -25462,6 +25488,11 @@ superagent@^7.1.3:
     readable-stream "^3.6.0"
     semver "^7.3.7"
 
+superjson@^1.10.0:
+  version "1.12.3"
+  dependencies:
+    copy-anything "^3.0.2"
+
 superstruct@^0.14.2:
   version "0.14.2"
   resolved "https://registry.npmjs.org/superstruct/-/superstruct-0.14.2.tgz"
@@ -26954,7 +26985,7 @@ use-resize-observer@^9.1.0:
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
 
-use-sync-external-store@1.2.0:
+use-sync-external-store@^1.2.0, use-sync-external-store@1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
