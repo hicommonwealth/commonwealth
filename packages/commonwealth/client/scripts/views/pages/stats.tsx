@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/stats.scss';
-
+import React, { useState } from 'react';
 import app from 'state';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
@@ -93,7 +92,7 @@ const StatsPage = () => {
   const [totalData, setTotalData] = useState<TotalDataType>();
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetch = async () => {
       try {
         const response = await axios.get(`${app.serverUrl()}/communityStats`, {
