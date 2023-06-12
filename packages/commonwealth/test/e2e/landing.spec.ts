@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import { PORT } from '../../server/config';
 
 test.describe('Commonwealth Homepage', () => {
-
   test('Check Login Modal', async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/`);
 
@@ -15,13 +14,6 @@ test.describe('Commonwealth Homepage', () => {
     expect(exit).toBeTruthy();
     await exit.click();
   });
-
-  test('test Login', async ({page})=> {
-    await page.goto('http://localhost:8080/');
-    await page.getByText('Login').click();
-    await page.waitForSelector('.LoginDesktop');
-    await page.getByText('Metamask').click();
-  })
 
   test('Check Find your community input', async ({ page }) => {
     const input = await page.getByPlaceholder('Find your community');
@@ -101,5 +93,18 @@ test.describe('Commonwealth Homepage - Links', () => {
     expect(privacy).toBeTruthy();
     await privacy.click();
     await page.waitForURL(`http://localhost:${PORT}/privacy`);
+  });
+
+  test('Test Login', async ({ page }) => {
+    await page.goto('http://localhost:8080/');
+    await page.getByText('Login').click();
+    await page.waitForSelector('.LoginDesktop');
+    await page.getByText('Metamask').click();
+    await page.waitForSelector('.new-or-returning');
+    await page.getByText('New Account').click();
+    await page.getByText('Finish').click();
+    await page.waitForSelector('.username');
+    const element = await page.$('.username');
+    expect(await element.textContent()).toEqual('Anonymous');
   });
 });
