@@ -857,4 +857,159 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Comments can only be nested 8 levels deep');
     });
   });
+
+  describe('#deleteThread', () => {
+    it('should delete a thread', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            Address: {
+              id: 1,
+              address: '0x123',
+            },
+          }),
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const threadId = 1;
+      await serverThreadsController.deleteThread(user as any, threadId);
+    });
+
+    it('should should throw error (thread not found)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => null,
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const threadId = 1;
+      expect(
+        serverThreadsController.deleteThread(user as any, threadId)
+      ).to.be.rejectedWith('Thread not found: 1');
+    });
+
+    it('should throw error (banned)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            Address: {
+              id: 1,
+              address: '0x123',
+            },
+          }),
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [false, 'bad'],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const threadId = 1;
+      expect(
+        serverThreadsController.deleteThread(user as any, threadId)
+      ).to.be.rejectedWith('Ban error: bad');
+    });
+
+    it('should throw error (not owned)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            Address: {
+              id: 1,
+              address: '0x123',
+            },
+          }),
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [], // no mod/admin roles
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        // address is different from thread author
+        getAddresses: async () => [{ id: 2, address: '0x124', verified: true }],
+      };
+      const threadId = 1;
+      expect(
+        serverThreadsController.deleteThread(user as any, threadId)
+      ).to.be.rejectedWith('Not owned by this user');
+    });
+  });
 });

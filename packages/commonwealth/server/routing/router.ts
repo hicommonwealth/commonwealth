@@ -12,7 +12,9 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
-import getAddressProfile, { getAddressProfileValidation } from '../routes/getAddressProfile';
+import getAddressProfile, {
+  getAddressProfileValidation,
+} from '../routes/getAddressProfile';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
@@ -76,7 +78,6 @@ import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
 import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
-import deleteThread from '../routes/deleteThread';
 import addEditors from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
@@ -178,6 +179,7 @@ import { searchCommentsHandler } from '../routes/comments/search_comments_handle
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
+import { deleteThreadHandler } from 'server/routes/threads/delete_thread_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -263,7 +265,11 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
-  router.post('/getAddressProfile', getAddressProfileValidation, getAddressProfile.bind(this, models));
+  router.post(
+    '/getAddressProfile',
+    getAddressProfileValidation,
+    getAddressProfile.bind(this, models)
+  );
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
@@ -486,10 +492,11 @@ function setupRouter(
     databaseValidationService.validateChain,
     deleteEditors.bind(this, models)
   );
-  router.post(
-    '/deleteThread',
+  router.delete(
+    '/threads/:id',
     passport.authenticate('jwt', { session: false }),
-    deleteThread.bind(this, models, banCache)
+    databaseValidationService.validateChain,
+    deleteThreadHandler.bind(this, serverControllers)
   );
   router.get(
     '/bulkThreads',

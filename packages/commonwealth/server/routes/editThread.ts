@@ -3,11 +3,7 @@ import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import {
-  getThreadUrl,
-  renderQuillDeltaToText,
-  validURL,
-} from '../../shared/utils';
+import { renderQuillDeltaToText, validURL } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
