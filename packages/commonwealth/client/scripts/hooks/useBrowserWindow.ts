@@ -16,6 +16,7 @@ type IuseBrowserWindow = {
 };
 
 const useBrowserWindow = ({
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onResize = () => {},
   resizeListenerUpdateDeps = [],
 }: IuseBrowserWindow) => {
@@ -34,11 +35,11 @@ const useBrowserWindow = ({
     isWindowSmall: isWindowSmall(windowSize),
   };
   useEffect(() => {
-    const onResize = () => setWindowSize(window.innerWidth);
-    window.addEventListener('resize', onResize);
+    const _onResize = () => setWindowSize(window.innerWidth);
+    window.addEventListener('resize', _onResize);
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', _onResize);
     };
   }, []);
 
