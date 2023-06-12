@@ -1,14 +1,14 @@
-import { notifyError } from 'controllers/app/notifications';
-import React, { useEffect, useState } from 'react';
-import app from 'state';
 import axios from 'axios';
-
+import { notifyError } from 'controllers/app/notifications';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/AdminPanel.scss';
+import React, { useState } from 'react';
+import app from 'state';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
-import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWButton } from '../../components/component_kit/cw_button';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 const Analytics = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -60,7 +60,7 @@ const Analytics = () => {
       });
   };
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     // Fetch global analytics on load
     const fetchAnalytics = async () => {
       axios
@@ -80,15 +80,11 @@ const Analytics = () => {
         });
     };
 
-    const timerId = setTimeout(() => {
-      if (!initialized) {
-        fetchAnalytics().then(() => {
-          setInitialized(true);
-        });
-      }
-    });
-
-    return () => clearTimeout(timerId);
+    if (!initialized) {
+      fetchAnalytics().then(() => {
+        setInitialized(true);
+      });
+    }
   }, [initialized]);
 
   const validationFn = (value: string): [ValidationStatus, string] | [] => {
