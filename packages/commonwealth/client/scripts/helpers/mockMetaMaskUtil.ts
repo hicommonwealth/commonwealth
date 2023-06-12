@@ -1,17 +1,14 @@
 import Web3 from 'web3';
 import { SignTypedDataVersion, signTypedData } from '@metamask/eth-sig-util';
 
-class MockMetaMaskProvider {
-    private privateKey;
+export class MockMetaMaskProvider {
+    private privateKey: string;
     private web3: Web3;
-    public eth;
 
     constructor(host: string, pkey: string) {
       this.privateKey = pkey;
       this.web3 = new Web3(new Web3.providers.HttpProvider(host))
       this.web3.defaultAccount = this.web3.eth.accounts.privateKeyToAccount(pkey).address;
-      const getAccounts = async () => {return [this.web3.defaultAccount]} 
-      this.eth = {getAccounts: getAccounts()}
     }
 
     private async signTypedData(data: string[]){
@@ -37,5 +34,9 @@ class MockMetaMaskProvider {
             default:
                 throw Error("method not supported by mock provider")
         }
-    }     
+    }  
+    
+    public async on(action: string, cb: any){
+        return true
+    }
 }

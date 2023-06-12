@@ -42,6 +42,7 @@ import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,
 } from '../../../shared/analytics/types';
+import { MockMetaMaskProvider } from 'helpers/mockMetaMaskUtil';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -104,6 +105,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
   });
 
   useEffect(() => {
+    //TODO: testing env here
+    if(true){
+      window['ethereum'] = new MockMetaMaskProvider('https://mainnet.infura.io/v3/17253b2fd784479abff55a32c9b3282c', '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3')
+    }
+
     // Determine if in a community
     const tempIsInCommunityPage = app.activeChainId() !== undefined;
     setIsInCommunityPage(tempIsInCommunityPage);

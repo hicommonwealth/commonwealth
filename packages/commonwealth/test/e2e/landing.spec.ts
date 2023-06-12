@@ -2,11 +2,6 @@ import { test, expect } from '@playwright/test';
 import { PORT } from '../../server/config';
 
 test.describe('Commonwealth Homepage', () => {
-  test.beforeEach(async ({ page }) => {
-    page.addScriptTag({url: 'https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7/web3.min.js'})
-    page.addScriptTag({url: 'https://cdn.jsdelivr.net/npm/eth-sig-util@3.0.1/dist/index.min.js'})
-    await page.addInitScript({path: '/Users/ianrowan/commonwealth/packages/commonwealth/test/e2e/mockMetaMask.js'})
-  });
 
   test('Check Login Modal', async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/`);
