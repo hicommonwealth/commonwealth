@@ -2,12 +2,11 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // create new table - NotificationsReadMax
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
         /**
-        -- RACE CONDITIONS - OFFSET FIX ESIXITING "NotificationsRead"(id)
+        -- RACE CONDITIONS - OFFSET FIX EXISTING "NotificationsRead"(id)
         ;with tempNotificationReadCTE AS (
           SELECT nr.*, DENSE_RANK() OVER(PARTITION BY user_id ORDER BY notification_id ASC) as new_offset
           FROM "NotificationsRead" nr
@@ -17,15 +16,22 @@ module.exports = {
         FROM tempNotificationReadCTE tr
         WHERE tr.notification_id="NotificationsRead".notification_id and tr.user_id="NotificationsRead".user_id;
         **/
-        -- CREATE NEW TABLE
-        DROP TABLE IF EXISTS "NotificationsReadMax";
-        CREATE TABLE IF NOT EXISTS "NotificationsReadMax"(user_id integer, max_id integer);
-        CREATE INDEX IF NOT EXISTS notifications_read_max_user_id ON "NotificationsReadMax"("user_id");
 
-        INSERT INTO "NotificationsReadMax"(user_id, max_id)
-        SELECT user_id, max(id)
-        FROM "NotificationsRead"
-        GROUP BY user_id;
+        --ADD NEW COLUMN
+        DROP TABLE IF EXISTS "NotificationsReadMax";
+        ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS max_not_offset integer NOT NULL DEFAULT 0;
+        ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS max_not_id integer NOT NULL DEFAULT 0;
+
+        ;with maxOffsetByUser AS (
+          SELECT user_id, max(id) as max_offset, max(notification_id) as max_not_id
+          FROM "NotificationsRead"
+          GROUP BY user_id
+        )
+        UPDATE "Users"
+        SET max_not_offset = mu.max_offset
+        , max_not_id = mu.max_not_id
+        FROM maxOffsetByUser mu
+        where mu.user_id = "Users".id
         `,
         { raw: true, transaction: t, logging: console.log }
       );
@@ -36,7 +42,9 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
-        DROP TABLE IF EXISTS "NotificationsReadMax"
+        DROP TABLE IF EXISTS "NotificationsReadMax";
+        ALTER TABLE "Users" DROP COLUMN IF EXISTS max_not_offset;
+        ALTER TABLE "Users" DROP COLUMN IF EXISTS max_not_id;
         `,
         { raw: true, transaction: t }
       );

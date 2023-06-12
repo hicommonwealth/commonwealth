@@ -66,12 +66,12 @@ export default async (
   //  (increment the counters in emitNotifications)
   // TODO: or better yet create onUpdate and onDelete triggers to update the counters
   // TODO: should this always run so we can return number of unread or things like that?
-  const nmrObj = await models.NotificationsReadMax.findOne({
-    where: {user_id: req.user.id},
-    attributes: ['max_id']
-  })
-  const numNr = nmrObj? nmrObj.max_id : 0
-  maxId = numNr
+  const nmrObj = await models.User.findOne({
+    where: { id: req.user.id },
+    attributes: ['max_not_offset'],
+  });
+  const numNr = nmrObj ? nmrObj.max_not_offset : 0;
+  maxId = numNr;
 
   if (!req.body.maxId || req.body.maxId === 0) maxId = numNr;
   else maxId = req.body.maxId;

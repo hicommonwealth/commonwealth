@@ -19,7 +19,6 @@ import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
 import type { NotificationCategoryModelStatic } from './models/notification_category';
 import type { NotificationsReadModelStatic } from './models/notifications_read';
-import type { NotificationsReadMaxModelStatic } from './models/notifications_read_max';
 import type { PollModelStatic } from './models/poll';
 import type { ProfileModelStatic } from './models/profile';
 import type { ReactionModelStatic } from './models/reaction';
@@ -61,7 +60,6 @@ export type Models = {
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
-  NotificationsReadMax: NotificationsReadMaxModelStatic;
   Attachment: AttachmentModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;

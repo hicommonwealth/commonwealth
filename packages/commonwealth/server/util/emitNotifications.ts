@@ -30,15 +30,14 @@ export type NotificationDataTypes =
   | IChainEventNotificationData
   | (SnapshotNotification & { eventType: SnapshotEventType });
 
-
 function incrementStatsDController(notification_data, category_id, object_id) {
   StatsDController.get().increment('cw.notifications.created', {
     category_id,
     object_id,
-    chain: (notification_data as any).chain || (notification_data as any).chain_id,
+    chain:
+      (notification_data as any).chain || (notification_data as any).chain_id,
   });
 }
-
 
 function checkIsChainEventData(notification_data) {
   return !!(
@@ -55,30 +54,36 @@ function checkIsChainEventData(notification_data) {
 }
 
 // retrieve distinct user ids given a set of addresses
-const fetchUsersFromAddresses = async ( models,
-    addresses: string[]
-  ): Promise<number[]> => {
-    // fetch user ids from address models
-    const addressModels = await models.Address.findAll({
-      where: {
-        address: {
-          [Op.in]: addresses,
-        },
+const fetchUsersFromAddresses = async (
+  models,
+  addresses: string[]
+): Promise<number[]> => {
+  // fetch user ids from address models
+  const addressModels = await models.Address.findAll({
+    where: {
+      address: {
+        [Op.in]: addresses,
       },
-    });
-    if (addressModels && addressModels.length > 0) {
-      const userIds = addressModels.map((a) => a.user_id);
+    },
+  });
+  if (addressModels && addressModels.length > 0) {
+    const userIds = addressModels.map((a) => a.user_id);
 
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
-      return userIdsDedup;
-    } else {
-      return [];
-    }
-  };
+    // remove duplicates
+    const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+    return userIdsDedup;
+  } else {
+    return [];
+  }
+};
 
-
-async function createNotification(models, isChainEventData, chainEvent, category_id, notification_data) {
+async function createNotification(
+  models,
+  isChainEventData,
+  chainEvent,
+  category_id,
+  notification_data
+) {
   // get notification if it already exists
   let notification: NotificationInstance;
   notification = await models.Notification.findOne(
@@ -119,10 +124,18 @@ async function createNotification(models, isChainEventData, chainEvent, category
     }
   }
 
-  return notification
+  return notification;
 }
 
-async function sendEmails(models, subIds, isChainEventData, chainEvent, category_id, notification_data, notification) {
+async function sendEmails(
+  models,
+  subIds,
+  isChainEventData,
+  chainEvent,
+  category_id,
+  notification_data,
+  notification
+) {
   let msg;
   try {
     if (category_id !== 'snapshot-proposal') {
@@ -179,32 +192,43 @@ async function sendToWebhooks(models, webhook_data, category_id) {
 }
 
 async function runNotificationReadTransaction(models, rawQuery) {
-  let rowsAdded
+  let rowsAdded;
   try {
     await models.sequelize.transaction(async (transaction) => {
-      rowsAdded = await models.sequelize.query(
-        rawQuery,
-        { raw: true, transaction, type: QueryTypes.SELECT }
-      );
-    })
-    return rowsAdded
-  } catch(err) {
-    log.warn('Error generating notification read')
-    log.warn(err)
-    return []
+      rowsAdded = await models.sequelize.query(rawQuery, {
+        raw: true,
+        transaction,
+        type: QueryTypes.SELECT,
+      });
+    });
+    return rowsAdded;
+  } catch (err) {
+    log.warn('Error generating notification read');
+    log.warn(err);
+    return [];
   }
 }
 
-async function createNotificationPerUser(models, notification, category_id, object_id, excludeAddresses, includeAddresses) {
-
+async function createNotificationPerUser(
+  models,
+  notification,
+  category_id,
+  object_id,
+  excludeAddresses,
+  includeAddresses
+) {
   let address_include_exclude = '';
   if (excludeAddresses && excludeAddresses.length > 0) {
     const ids = await fetchUsersFromAddresses(models, excludeAddresses);
-    address_include_exclude = `and "Subscription"."subscriber_id" NOT IN (${ids.join(',')})`
+    address_include_exclude = `and "Subscription"."subscriber_id" NOT IN (${ids.join(
+      ','
+    )})`;
   } else if (includeAddresses && includeAddresses.length > 0) {
     const ids = await fetchUsersFromAddresses(models, includeAddresses);
     if (ids && ids.length > 0) {
-      address_include_exclude = `and "Subscription"."subscriber_id" NOT IN (${ids.join(',')})`
+      address_include_exclude = `and "Subscription"."subscriber_id" NOT IN (${ids.join(
+        ','
+      )})`;
     }
   }
 
@@ -215,9 +239,9 @@ async function createNotificationPerUser(models, notification, category_id, obje
 
   CREATE TEMP TABLE "TempNotificationRead" AS 
   SELECT ${notification.id} as notification_id, "Subscription"."id" as subscription_id, false as is_read, "Subscription"."subscriber_id" as user_id, 
-  COALESCE(nrm.max_id, 0) + 1 as id
+  COALESCE(nrm.max_not_offset, 0) + 1 as id
   FROM "Subscriptions" AS "Subscription"
-  LEFT JOIN "NotificationsReadMax" nrm on nrm.user_id = "Subscription"."subscriber_id"
+  LEFT JOIN "Users" nrm on nrm.id = "Subscription"."subscriber_id"
   WHERE (
           "Subscription"."category_id" = '${category_id}'
           AND "Subscription"."object_id" = '${object_id}'
@@ -229,19 +253,19 @@ async function createNotificationPerUser(models, notification, category_id, obje
   SELECT DISTINCT notification_id, subscription_id, is_read, user_id, id
   FROM "TempNotificationRead";
 
-  UPDATE "NotificationsReadMax" 
-  SET max_id = tr.id
+  UPDATE "Users" 
+  SET max_not_offset = tr.id
+  , max_not_id = tr.notification_id
   FROM "TempNotificationRead" tr 
-  where tr.user_id="NotificationsReadMax".user_id;
+  where tr.user_id="Users".id;
   
   SELECT DISTINCT * FROM "TempNotificationRead";
   COMMIT;
-  `
+  `;
 
-  const rows = await runNotificationReadTransaction(models, rawQuery)
-  return rows
+  const rows = await runNotificationReadTransaction(models, rawQuery);
+  return rows;
 }
-
 
 export default async function emitNotifications(
   models: DB,
@@ -252,20 +276,42 @@ export default async function emitNotifications(
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
-
   // send notification created event to datadog
-  incrementStatsDController(notification_data, category_id, object_id)
+  incrementStatsDController(notification_data, category_id, object_id);
 
   // typeguard function to differentiate between chain event notifications as needed
   let chainEvent: IChainEventNotificationData;
-  const isChainEventData = checkIsChainEventData(notification_data)
+  const isChainEventData = checkIsChainEventData(notification_data);
   if (isChainEventData) {
     chainEvent = <IChainEventNotificationData>notification_data;
   }
-  const notification = await createNotification(models, isChainEventData, chainEvent, category_id, notification_data)
-  const rowsAdded = await createNotificationPerUser(models, notification, category_id, object_id, excludeAddresses, includeAddresses)
-  const subscriptions = rowsAdded.map(r=>r.subscription_id)
-  Promise.all([sendEmails(models, subscriptions, isChainEventData, chainEvent, category_id, notification_data, notification),
-  sendToWebhooks(models, webhook_data, category_id)])
+  const notification = await createNotification(
+    models,
+    isChainEventData,
+    chainEvent,
+    category_id,
+    notification_data
+  );
+  const rowsAdded = await createNotificationPerUser(
+    models,
+    notification,
+    category_id,
+    object_id,
+    excludeAddresses,
+    includeAddresses
+  );
+  const subscriptions = rowsAdded.map((r) => r.subscription_id);
+  Promise.allSettled([
+    sendEmails(
+      models,
+      subscriptions,
+      isChainEventData,
+      chainEvent,
+      category_id,
+      notification_data,
+      notification
+    ),
+    sendToWebhooks(models, webhook_data, category_id),
+  ]);
   return notification;
 }
