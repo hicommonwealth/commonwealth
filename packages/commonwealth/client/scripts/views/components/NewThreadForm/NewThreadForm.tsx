@@ -1,48 +1,47 @@
-import React, { useMemo } from 'react';
-import { capitalize } from 'lodash';
-
 import 'components/NewThreadForm.scss';
-
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { notifyError } from 'controllers/app/notifications';
-import { ThreadKind, ThreadStage } from '../../../models/types';
-import app from 'state';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
+import { capitalize } from 'lodash';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useMemo } from 'react';
+import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
-import { useCommonNavigate } from 'navigation/helpers';
-
-import {
-  useNewThreadForm,
-  useAuthorName,
-  checkNewThreadErrors,
-  updateTopicList,
-} from './helpers';
+import { ThreadKind, ThreadStage } from '../../../models/types';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import {
+  checkNewThreadErrors,
+  useNewThreadForm,
+} from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
-
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
   const chainId = app.chain.id;
-  const hasTopics = !!app.topics.getByCommunity(chainId).length;
-  const { authorName } = useAuthorName();
+  const hasTopics = topics?.length;
   const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
-  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
-    return (
-      isAdmin ||
-      t.tokenThreshold.isZero() ||
-      !TopicGateCheck.isGatedTopic(t.name)
-    );
-  });
+  const topicsForSelector =
+    topics ||
+    [].filter((t) => {
+      return (
+        isAdmin ||
+        t.tokenThreshold.isZero() ||
+        !TopicGateCheck.isGatedTopic(t.name)
+      );
+    });
 
   const {
     threadTitle,
@@ -58,7 +57,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, authorName, topicsForSelector);
+  } = useNewThreadForm(chainId, topicsForSelector);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -76,7 +75,8 @@ export const NewThreadForm = () => {
 
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
-      deltaString
+      deltaString,
+      !!hasTopics
     );
 
     setIsSaving(true);
@@ -107,7 +107,6 @@ export const NewThreadForm = () => {
       clearDraft();
 
       navigate(`/discussion/${result.id}`);
-      updateTopicList(result.topic, app.chain);
     } catch (err) {
       console.error(err);
     } finally {

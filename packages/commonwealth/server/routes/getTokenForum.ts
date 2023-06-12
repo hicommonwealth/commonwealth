@@ -2,7 +2,6 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import { createDefaultCommunityRoles } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -82,11 +81,6 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
           has_chain_events_listener: false,
         },
       });
-
-      // Create default roles if chain created successfully
-      if (success) {
-        await createDefaultCommunityRoles(models, chain.id);
-      }
 
       // Create Contract + Association
       const [contract] = await models.Contract.findOrCreate({

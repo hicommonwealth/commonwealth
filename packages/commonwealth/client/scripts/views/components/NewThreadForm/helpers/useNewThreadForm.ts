@@ -5,6 +5,7 @@ import type Topic from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 import { getTextFromDelta } from '../../react_quill_editor';
 import { useDraft } from 'hooks/useDraft';
+import { useSearchParams } from 'react-router-dom';
 
 type NewThreadDraft = {
   topicId: number;
@@ -12,11 +13,10 @@ type NewThreadDraft = {
   body: DeltaStatic;
 };
 
-const useNewThreadForm = (
-  chainId: string,
-  authorName: string,
-  topicsForSelector: Topic[]
-) => {
+const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
+  const [searchParams] = useSearchParams();
+  const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
+
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
     `new-thread-${chainId}-info`
   );
@@ -31,7 +31,11 @@ const useNewThreadForm = (
 
   const defaultTopic = useMemo(() => {
     return (
-      topicsForSelector.find((t) => t.id === restoredDraft?.topicId) ||
+      topicsForSelector.find(
+        (t) =>
+          t.id === restoredDraft?.topicId ||
+          (topicIdFromUrl && t.id === topicIdFromUrl)
+      ) ||
       topicsForSelector.find((t) => t.name.includes('General')) ||
       null
     );
@@ -51,7 +55,7 @@ const useNewThreadForm = (
   const editorText = getTextFromDelta(threadContentDelta);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
-  const disableSave = !authorName || isSaving;
+  const disableSave = isSaving;
   const hasTopics = !!topicsForSelector?.length;
   const topicMissing = hasTopics && !threadTopic;
   const titleMissing = !threadTitle;
@@ -77,6 +81,12 @@ const useNewThreadForm = (
     }
     saveDraft(draft);
   }, [saveDraft, threadTopic, threadTitle, threadContentDelta]);
+
+  useEffect(() => {
+    if (!threadTopic && defaultTopic) {
+      setThreadTopic(defaultTopic);
+    }
+  }, [defaultTopic, threadTopic]);
 
   return {
     threadKind,
