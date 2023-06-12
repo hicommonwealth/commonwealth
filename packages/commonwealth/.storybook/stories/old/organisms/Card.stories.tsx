@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWCard, CardElevation } from '../../../client/scripts/views/components/component_kit/cw_card';
-import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
-import { notifySuccess } from '../../../client/scripts/controllers/app/notifications';
+import { CWCard, CardElevation } from '../../../../client/scripts/views/components/component_kit/cw_card';
+import { CWText } from '../../../../client/scripts/views/components/component_kit/cw_text';
+import { notifySuccess } from '../../../../client/scripts/controllers/app/notifications';
 
-import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
+import '../../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
 interface CardProps {
   elevation: CardElevation | undefined,
@@ -15,7 +15,7 @@ interface CardProps {
 };
 
 const card = {
-  title: 'Organisms/Card',
+  title: 'Old/Organisms/Card',
   component: CWCard,
 } satisfies Meta<typeof CWCard>;
 

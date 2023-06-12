@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWCheckbox } from '../../../client/scripts/views/components/component_kit/cw_checkbox';
+import { CWCheckbox } from '../../../../client/scripts/views/components/component_kit/cw_checkbox';
 
 const checkbox = {
-  title: 'Molecules/Checkbox',
+  title: 'Old/Molecules/Checkbox',
   component: CWCheckbox,
 } satisfies Meta<typeof CWCheckbox>;
 
