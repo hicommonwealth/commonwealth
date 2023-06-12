@@ -101,9 +101,9 @@ export async function putCommunities(
             req.user,
             next
           );
-          await models.Address.update(
-            { role: 'admin' },
-            { where: { id: (newAddress as any).id } }
+          await models.Role.update(
+            { permission: 'admin' },
+            { where: { address_id: (newAddress as any).id } }
           );
         })
       );

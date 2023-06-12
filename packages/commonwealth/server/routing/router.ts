@@ -54,9 +54,7 @@ import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import searchProfiles from '../routes/searchProfiles';
-import upgradeMember, {
-  upgradeMemberValidation,
-} from '../routes/upgradeMember';
+import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
 
@@ -79,7 +77,7 @@ import viewVotes from '../routes/viewVotes';
 import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import deleteThread from '../routes/deleteThread';
-import addEditors, { addEditorValidation } from '../routes/addEditors';
+import addEditors from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
 import getThreadsOld from '../routes/getThreads';
@@ -479,7 +477,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    addEditorValidation,
     addEditors.bind(this, models)
   );
   router.post(
@@ -662,12 +659,18 @@ function setupRouter(
     databaseValidationService.validateChain,
     controllers.listRoles.bind(this, models)
   );
+  router.get('/roles', controllers.getRoles.bind(this, models));
+  router.post('/roles', controllers.createRole.bind(this, models));
+  router.patch('/roles', controllers.updateRole.bind(this, models));
+  // permissions
+  router.get('/permissions', controllers.getPermissions.bind(this, models));
+  router.post('/permissions', controllers.createPermission.bind(this, models));
+  router.patch('/permissions', controllers.updatePermission.bind(this, models));
 
   router.post(
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
-    upgradeMemberValidation,
     upgradeMember.bind(this, models)
   );
 

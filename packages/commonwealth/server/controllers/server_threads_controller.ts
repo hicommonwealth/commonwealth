@@ -430,7 +430,7 @@ export class ServerThreadsController implements IServerThreadsController {
                 chain: mention[0] || null,
                 address: mention[1],
               },
-              include: [this.models.User],
+              include: [this.models.User, this.models.RoleAssignment],
             });
             return mentionedUser;
           })
