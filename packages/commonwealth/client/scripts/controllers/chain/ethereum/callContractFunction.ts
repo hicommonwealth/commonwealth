@@ -78,7 +78,7 @@ export async function callContractFunction({
   fn: AbiItem;
   inputArgs: string[];
   tx_options?: any;
-  senderERC4337?: string
+  senderERC4337?: boolean
 }): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
   console.log(sender)
@@ -117,9 +117,32 @@ export async function callContractFunction({
     );
     return txReceipt;
   }else{
+    const abi = [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          }
+        ],
+        "name": "getAccount",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+    const factory = new web3.eth.Contract(abi as AbiItem[], '0xb28A7002bC67e61b31dCe32C079D7146Bf43ae60')
+    const accountAddr = await factory.methods.getAccount(signingWallet.accounts[0]).call()
     const userOpEvent = await sendUserOp(
       web3,
-      senderERC4337,
+      accountAddr,
       contract.address,
       tx_options?.value ?? "0",
       functionTx 

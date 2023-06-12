@@ -47,6 +47,7 @@ type Json = {
       gas: string;
       gasPrice: string;
     };
+    is4337?: boolean;
   };
 };
 
@@ -59,7 +60,7 @@ const ViewTemplatePage = () => {
   const [templateNickname, setTemplateNickname] = useState('');
   const [templateError, setTemplateError] = useState(false);
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
-
+  
   const loadData = useCallback(() => {
     const { contract_address, slug } = params;
 
@@ -349,7 +350,7 @@ const ViewTemplatePage = () => {
                 fn: functionAbi,
                 inputArgs: functionArgs,
                 tx_options: txParams,
-                senderERC4337: "0xE9AFa679cC787c9fFADfF36634c36a2d5f56BD37"
+                senderERC4337: json.tx_template.is4337 ?? false
               });
 
               if (res.status) {
