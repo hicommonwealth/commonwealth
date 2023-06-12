@@ -13,6 +13,7 @@ interface PhosphorIconProps {
 };
 
 interface GalleryProps {
+  itemsPerRow: number;
   size: number;
   weight: Icons.IconWeight | undefined;
   searchTerm: string;
@@ -20,49 +21,17 @@ interface GalleryProps {
 
 const weightOptions = ["thin", "regular", "fill" ];
 
-const Gallery: FC<GalleryProps> = ({ searchTerm, size, weight }) => {
-  const itemsPerRow: number = 6;
+const Gallery: FC<GalleryProps> = ({
+  itemsPerRow,
+  searchTerm,
+  size,
+  weight,
+}) => {
+  const [gallery, setGallery] = useState<any[]>([]);
+  const [iconsFound, setIconsFound] = useState<number>(0);
 
-  // const [iconsFound, setIconsFound] = useState<number>(0);
-  // const [gallery, setGallery] = useState<any[]>([]);
-
-  // useEffect(() => {
-  //   let iconGrid: any[] = [];
-  //   let filteredIcons = Object.entries(phosphorIconLookup)
-  //     // .slice(30, 70)
-  //     .filter((key: any) => {
-  //       let lowercaseKey: string = String(key).toLowerCase();
-  //       return lowercaseKey.includes(searchTerm.toLowerCase());
-  //     })
-  //     .map(([key, icon], index) => {
-  //       const IconComponent = icon;
-  //       return (
-  //         <div key={index} className="item">
-  //           <div className="icon">
-  //             <IconComponent size={size} weight={weight} />
-  //           </div>
-  //           <CWText className="name" type="caption">
-  //             {key.charAt(0).toUpperCase() + key.slice(1)}
-  //           </CWText>
-  //         </div>
-  //       );
-  //     });
-  //   console.log('filtered icons:', filteredIcons);
-      
-  //   for (let i: number = 0; i < filteredIcons.length; i++) {
-  //     let rowIcons: any[] = [];
-  //     for (let j: number = i % itemsPerRow; j < itemsPerRow; j++) {
-  //       rowIcons.push(filteredIcons[j + (i % itemsPerRow)]);
-  //     }
-  //     iconGrid.push(rowIcons);
-  //   }
-      
-  //   setIconsFound(filteredIcons.length);
-  //   setGallery(iconGrid);
-  // }, [searchTerm]);
-
-  const showGallery = () => {
-    let gallery: any[] = [];
+  useEffect(() => {
+    let grid: any[] = [];
     let filteredIcons = Object.entries(phosphorIconLookup)
       .filter((key: any) => {
         let lowercaseKey: string = String(key).toLowerCase();
@@ -85,28 +54,25 @@ const Gallery: FC<GalleryProps> = ({ searchTerm, size, weight }) => {
       for (let j: number = 0; j < itemsPerRow; j++) {
         rowIcons.push(filteredIcons[j + i]);
       }
-      gallery.push(rowIcons);
+      grid.push(rowIcons);
     }
     
-    return (
-      <>
-        <CWText className="results" type="caption">
-          {`${filteredIcons.length} results found`}
-        </CWText>
-        {gallery.map((row: any, i: number) => (
-          <div key={i} className="row">
-            {row.map((item: any, j: number) => (
-              <div key={j}>{item}</div>
-            ))}
-          </div>
-        ))}
-      </>
-    );
-  }
+    setGallery(grid);
+    setIconsFound(filteredIcons.length);
+  }, [searchTerm]);
 
   return (
     <>
-      {showGallery()}
+      <CWText className="results" type="caption">
+        {`${iconsFound} results found`}
+      </CWText>
+      {gallery.map((row: any, i: number) => (
+        <div key={i} className="row">
+          {row.map((item: any, j: number) => (
+            <div key={j}>{item}</div>
+          ))}
+        </div>
+      ))}
     </>
   );
 };
@@ -134,7 +100,12 @@ const PhosphorIcon: FC<PhosphorIconProps> = ({ size, weight }) => {
           placeholder="Search icons..."
         />
       </form>
-      <Gallery size={size} weight={weight} searchTerm={searchTerm} />
+      <Gallery
+        itemsPerRow={6}
+        size={size}
+        weight={weight}
+        searchTerm={searchTerm}
+      />
     </>
   );
 }
