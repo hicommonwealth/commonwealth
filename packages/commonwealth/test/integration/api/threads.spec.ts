@@ -16,7 +16,6 @@ import sleep from 'sleep-promise';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from 'test/util/modelUtils';
-import { Action } from 'shared/permissions';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
@@ -323,23 +322,23 @@ describe('Thread Tests', () => {
       });
     });
 
-  describe('/thread/:id/comments', () => {
-    beforeEach(async () => {
-      const res2 = await modelUtils.createThread({
-        address: userAddress,
-        kind,
-        stage,
-        chainId: chain,
-        title,
-        topicName,
-        topicId,
-        body,
-        jwt: userJWT,
+    describe('/thread/:id/comments', () => {
+      beforeEach(async () => {
+        const res2 = await modelUtils.createThread({
+          address: userAddress,
+          kind,
+          stage,
+          chainId: chain,
+          title,
+          topicName,
+          topicId,
+          body,
+          jwt: userJWT,
+        });
+        expect(res2.status).to.be.equal('Success');
+        expect(res2.result).to.not.be.null;
+        thread = res2.result;
       });
-      expect(res2.status).to.be.equal('Success');
-      expect(res2.result).to.not.be.null;
-      thread = res2.result;
-    });
 
       it('should create a comment for a thread', async () => {
         const cRes = await modelUtils.createComment({
@@ -727,41 +726,41 @@ describe('Thread Tests', () => {
       });
     });
 
-  describe('/comments/:id', () => {
-    it('should edit a comment', async () => {
-      const text = 'tes text';
-      const tRes = await modelUtils.createThread({
-        chainId: chain,
-        address: userAddress,
-        jwt: userJWT,
-        title,
-        body,
-        topicName,
-        topicId,
-        kind,
-        stage,
+    describe('/comments/:id', () => {
+      it('should edit a comment', async () => {
+        const text = 'tes text';
+        const tRes = await modelUtils.createThread({
+          chainId: chain,
+          address: userAddress,
+          jwt: userJWT,
+          title,
+          body,
+          topicName,
+          topicId,
+          kind,
+          stage,
+        });
+        const cRes = await modelUtils.createComment({
+          chain,
+          address: userAddress,
+          jwt: userJWT,
+          text: markdownComment.text,
+          thread_id: tRes.result.id,
+        });
+        const eRes = await modelUtils.editComment({
+          text,
+          jwt: userJWT,
+          comment_id: cRes.result.id,
+          address: userAddress,
+          chain,
+        });
+        expect(eRes).not.to.be.null;
+        expect(eRes.status).to.be.equal('Success');
+        expect(eRes.result).not.to.be.null;
+        expect(eRes.result.chain).to.be.equal(chain);
+        expect(eRes.result.thread_id).to.be.equal(tRes.result.id);
       });
-      const cRes = await modelUtils.createComment({
-        chain,
-        address: userAddress,
-        jwt: userJWT,
-        text: markdownComment.text,
-        thread_id: tRes.result.id,
-      });
-      const eRes = await modelUtils.editComment({
-        text,
-        jwt: userJWT,
-        comment_id: cRes.result.id,
-        address: userAddress,
-        chain,
-      });
-      expect(eRes).not.to.be.null;
-      expect(eRes.status).to.be.equal('Success');
-      expect(eRes.result).not.to.be.null;
-      expect(eRes.result.chain).to.be.equal(chain);
-      expect(eRes.result.thread_id).to.be.equal(tRes.result.id);
     });
-  });
 
     describe('/viewCount', () => {
       it('should track views on chain', async () => {

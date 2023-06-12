@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
-import { Errors } from '../../../server/routes/createComment';
+import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
 import { post } from './external/appHook.spec';
 import {
   testAddresses,
@@ -24,26 +24,6 @@ describe('createComment Integration Tests', () => {
     );
   });
 
-  it('should return an error response if there is an invalid threadId specified', async () => {
-    const invalidRequest = {
-      jwt: jwtTokenUser1,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
-      address: testAddresses[0].address,
-      thread_id: false,
-    };
-
-    const response = await post(
-      '/api/createComment',
-      invalidRequest,
-      true,
-      app
-    );
-
-    response.should.have.status(400);
-    chai.assert.equal(response.error, Errors.MissingRootId);
-  });
-
   it('should return an error response if no text is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
@@ -54,7 +34,7 @@ describe('createComment Integration Tests', () => {
     };
 
     const response = await post(
-      '/api/createComment',
+      `/api/threads/${testThreads[0].id}/comments`,
       invalidRequest,
       true,
       app
@@ -76,13 +56,12 @@ describe('createComment Integration Tests', () => {
     };
 
     const response = await post(
-      '/api/createComment',
+      `/api/threads/${testThreads[0].id}/comments`,
       invalidRequest,
       true,
       app
     );
 
-    response.should.have.status(400);
     chai.assert.equal(response.error, Errors.InvalidParent);
   });
 
@@ -105,7 +84,12 @@ describe('createComment Integration Tests', () => {
 
     chai.assert.isNull(actualComment);
 
-    const response = await post('/api/createComment', validRequest, true, app);
+    const response = await post(
+      `/api/threads/${testThreads[0].id}/comments`,
+      validRequest,
+      true,
+      app
+    );
 
     actualComment = await models.Comment.findOne({
       where: { text },
