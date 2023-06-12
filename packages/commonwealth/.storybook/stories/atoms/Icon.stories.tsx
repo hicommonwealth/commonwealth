@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWIcon } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
@@ -19,6 +19,8 @@ type Story = StoryObj<typeof icons>;
 const IconButton: FC<IconComponentProps> = (props) => {
   const { selected = false } = props;
   const [isSelected, setIsSelected] = useState<boolean>(selected);
+
+  useEffect(() => setIsSelected(!isSelected), [selected]);
 
   return (
     <CWIconButton
@@ -42,6 +44,13 @@ const commonArgTypes = {
   },
 };
 
+const commonExcludedControls = [
+  "argTypes",
+  "className",
+  "componentType",
+  "onClick",
+];
+
 export const IconStory: Story = {
   name: "Overview",
   args: {
@@ -53,6 +62,15 @@ export const IconStory: Story = {
     ...commonArgTypes,
     disabled: {
       options: [ true, false ],
+    },
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        ...commonExcludedControls,
+        "iconButtonTheme",
+        "selected",
+      ],
     },
   },
   render: ({...args}) => <CWIcon {...args} />
@@ -70,7 +88,7 @@ export const IconButtonStory: Story = {
   argTypes: {
     ...commonArgTypes,
     iconButtonTheme: {
-      control: { type: "select" },
+      control: { type: "radio" },
       options: ["black", "neutral", "primary", "hasBackground"],
     },
     disabled: {
@@ -79,7 +97,11 @@ export const IconButtonStory: Story = {
     selected: {
       options: [ true, false ],
     },
-    // TODO handle selected
+  },
+  parameters: {
+    controls: {
+      exclude: [ ...commonExcludedControls ],
+    },
   },
   render: ({...args}) => <IconButton {...args} />
 }

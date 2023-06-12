@@ -26,10 +26,7 @@ export const deinitChainOrCommunity = async () => {
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export const selectChain = async (
-  chain?: ChainInfo,
-  deferred = false
-): Promise<boolean> => {
+export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
     if (app.user.selectedChain) {
@@ -202,10 +199,9 @@ export const selectChain = async (
   }
 
   app.chainPreloading = false;
-  app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
-  await updateActiveAddresses(chain);
+  await updateActiveAddresses({ chain });
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
@@ -228,7 +224,6 @@ export const initChain = async (): Promise<void> => {
     await app.chain.initApi();
   }
 
-  app.chain.deferred = false;
   const chain = app.chain.meta;
   await app.chain.initData();
 
@@ -238,7 +233,7 @@ export const initChain = async (): Promise<void> => {
   console.log(`${chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses(chain);
+  await updateActiveAddresses({ chain });
 };
 
 export const initNewTokenChain = async (

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { isEqual } from 'lodash';
 
 import 'modals/edit_collaborators_modal.scss';
+import NewProfilesController from '../../controllers/server/newProfiles';
 
 import type { IThreadCollaborator } from '../../models/Thread';
 import type Thread from '../../models/Thread';
@@ -16,6 +17,7 @@ import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { useDebounce } from 'usehooks-ts';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -29,6 +31,8 @@ export const EditCollaboratorsModal = ({
   onCollaboratorsUpdated,
 }: EditCollaboratorsModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+
   const [searchResults, setSearchResults] = useState<
     Array<RoleInstanceWithPermissionAttributes>
   >([]);
@@ -39,35 +43,36 @@ export const EditCollaboratorsModal = ({
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await axios.get(`${app.serverUrl()}/bulkMembers`, {
-          params: {
-            chain: app.activeChainId(),
-            searchTerm,
-          },
-        });
+        const response = await app.search.searchMentionableProfiles(
+          debouncedSearchTerm,
+          app.activeChainId(),
+          30,
+          1,
+          true
+        );
 
-        if (response.data.status !== 'Success') {
-          throw new Error('Could not fetch members');
-        } else {
-          const results: Array<RoleInstanceWithPermissionAttributes> =
-            response.data.result.filter(
-              (role: RoleInstanceWithPermissionAttributes) =>
-                role.Address.address !== app.user.activeAccount?.address
+        const results: Array<RoleInstanceWithPermissionAttributes> =
+          response.profiles
+            .map((profile) => ({
+              ...profile.roles[0],
+              Address: profile.addresses[0],
+            }))
+            .filter(
+              (role) => role.Address.address !== app.user.activeAccount?.address
             );
 
-          setSearchResults(results);
-        }
+        setSearchResults(results);
       } catch (err) {
         console.error(err);
       }
     };
 
-    if (searchTerm.length >= 3) {
+    if (debouncedSearchTerm.length >= 3) {
       fetchMembers();
-    } else if (searchTerm.length === 0) {
+    } else if (debouncedSearchTerm.length === 0) {
       setSearchResults([]);
     }
-  }, [searchTerm]);
+  }, [debouncedSearchTerm]);
 
   const handleUpdateCollaborators = (c: IThreadCollaborator) => {
     const updated = collaborators.find((_c) => _c.address === c.address)
@@ -109,7 +114,7 @@ export const EditCollaboratorsModal = ({
                   }
                 >
                   <User
-                    user={app.newProfiles.getProfile(
+                    user={NewProfilesController.Instance.getProfile(
                       c.chain_id,
                       c.Address.address
                     )}
@@ -131,7 +136,12 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User user={app.newProfiles.getProfile(c.chain, c.address)} />
+                  <User
+                    user={NewProfilesController.Instance.getProfile(
+                      c.chain,
+                      c.address
+                    )}
+                  />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"

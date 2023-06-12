@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
-import 'components/header/notifications_menu.scss';
+import 'menus/notifications_menu.scss';
 
 import app from 'state';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';

@@ -9,13 +9,10 @@ import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import type { CommunityRoleInstance } from 'server/models/community_role';
 import type { DB } from '../models';
-import type { ChatChannelInstance } from '../models/chat_channel';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
 import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
-import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
-import type { TopicInstance } from '../models/topic';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
@@ -30,26 +27,20 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
 
   // parallelized queries
   const [
-    topics,
     admins,
     mostActiveUsers,
     threadsInVoting,
     totalThreads,
-    chatChannels,
-    rules,
     communityBanner,
     contractsWithTemplatesData,
     communityRoles,
   ] = await (<
     Promise<
       [
-        TopicInstance[],
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
         [{ count: string }],
-        ChatChannelInstance[],
-        RuleInstance[],
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
@@ -60,21 +51,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       ]
     >
   >Promise.all([
-    // topics
-    models.sequelize.query(
-      `SELECT 
-        *,
-        (
-          SELECT COUNT(*)::int FROM "Threads" 
-          WHERE chain = :chain_id AND topic_id = t.id AND deleted_at IS NULL 
-        ) as total_threads
-      FROM "Topics" t WHERE chain_id = :chain_id AND deleted_at IS NULL`,
-      {
-        replacements: { chain_id: chain.id },
-        type: QueryTypes.SELECT,
-      }
-    ),
-
     // admins
     findAllRoles(
       models,
@@ -164,20 +140,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         type: QueryTypes.SELECT,
       }
     ),
-    models.ChatChannel.findAll({
-      where: {
-        chain_id: chain.id,
-      },
-      include: {
-        model: models.ChatMessage,
-        required: false, // should return channels with no chat messages
-      },
-    }),
-    models.Rule.findAll({
-      where: {
-        chain_id: chain.id,
-      },
-    }),
     models.CommunityBanner.findOne({
       where: {
         chain_id: chain.id,
@@ -244,13 +206,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   return res.json({
     status: 'Success',
     result: {
-      topics: topics,
       numVotingThreads,
       numTotalThreads,
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
-      chatChannels: JSON.stringify(chatChannels),
-      rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
         return {

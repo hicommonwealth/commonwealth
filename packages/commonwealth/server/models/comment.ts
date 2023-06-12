@@ -43,7 +43,14 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       chain: { type: dataTypes.STRING, allowNull: false },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false },
+      thread_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Threads',
+          key: 'id',
+        },
+      },
       parent_id: { type: dataTypes.STRING, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       text: { type: dataTypes.TEXT, allowNull: false },
@@ -85,10 +92,6 @@ export default (
   Comment.associate = (models) => {
     models.Comment.belongsTo(models.Chain, {
       foreignKey: 'chain',
-      targetKey: 'id',
-    });
-    models.Comment.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
       targetKey: 'id',
     });
     models.Comment.belongsTo(models.Address, {

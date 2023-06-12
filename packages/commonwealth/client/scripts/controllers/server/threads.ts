@@ -1,13 +1,20 @@
 /* eslint-disable no-restricted-globals */
+import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
-
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { EventEmitter } from 'events';
 import $ from 'jquery';
+import moment from 'moment';
+import { Link, LinkSource } from 'server/models/thread';
+import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ProposalStore, RecentListingStore } from 'stores';
+import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+import { ThreadActionType } from '../../../../shared/types';
 /* eslint-disable no-restricted-syntax */
-
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
@@ -15,16 +22,11 @@ import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
 import Topic from '../../models/Topic';
-import { ThreadStage } from '../../models/types';
-import moment from 'moment';
-
-import app from 'state';
-import { ProposalStore, RecentListingStore } from 'stores';
-import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { EventEmitter } from 'events';
-import { ThreadActionType } from '../../../../shared/types';
-import { Link, LinkSource } from 'server/models/thread';
-import axios from 'axios';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadStage,
+  ThreadTimelineFilterTypes,
+} from '../../models/types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -115,9 +117,11 @@ class ThreadsController {
       title,
       body,
       last_edited,
+      locked_at,
       version_history,
       Attachments,
       created_at,
+      updated_at,
       topic,
       kind,
       stage,
@@ -194,9 +198,10 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
-    let topicFromStore = null;
+    let topicModel = null;
+    const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
-      topicFromStore = app.topics.store.getById(topic.id);
+      topicModel = new Topic(topic);
     }
 
     let decodedTitle;
@@ -222,8 +227,9 @@ class ThreadsController {
       title: decodedTitle,
       body: decodedBody,
       createdAt: moment(created_at),
+      updatedAt: moment(updated_at),
       attachments,
-      topic: topicFromStore,
+      topic: topicModel,
       kind,
       stage,
       chain,
@@ -235,6 +241,7 @@ class ThreadsController {
       chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
+      lockedAt,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
@@ -305,9 +312,9 @@ class ThreadsController {
         .getAll()
         .slice()
         .reverse()
-        .findIndex((x) => x.pinned);
+        .findIndex((x) => x.pinned === true);
       this.store.add(result, {
-        pushToIndex: this.store.getAll().length - lastPinnedThreadIndex,
+        pushToIndex: lastPinnedThreadIndex || 0,
       });
       this.numTotalThreads += 1;
       this._listingStore.add(result);
@@ -401,6 +408,40 @@ class ThreadsController {
         );
       },
     });
+  }
+
+  public async updateTopic(
+    threadId: number,
+    topicName: string,
+    topicId?: number
+  ): Promise<Topic> {
+    try {
+      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+        jwt: app.user.jwt,
+        thread_id: threadId,
+        topic_id: topicId,
+        topic_name: topicName,
+        address: app.user.activeAccount.address,
+      });
+      const result = new Topic(response.result);
+
+      app.threadUpdateEmitter.emit('threadUpdated', {
+        threadId,
+        action: ThreadActionType.TopicChange,
+      });
+      const thread = app.threads.getById(threadId);
+      thread.topic = result;
+      app.threads.updateThreadInStore(thread);
+
+      return result;
+    } catch (err) {
+      console.log('Failed to update thread topic');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update thread topic'
+      );
+    }
   }
 
   public async delete(proposal) {
@@ -656,6 +697,7 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.result.map((rawThread) => {
+      console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
        * here we will find if thread is in store and if so use most keys
@@ -673,7 +715,7 @@ class ThreadsController {
           ? thread.associatedReactions
           : foundThread?.associatedReactions || [];
       finalThread.numberOfComments =
-        rawThread?.comments?.length || foundThread?.numberOfComments || 0;
+        rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
       this._store.update(finalThread);
       if (foundThread) {
         this.numTotalThreads += 1;
@@ -725,6 +767,9 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
     includePinnedThreads?: boolean;
+    featuredFilter: ThreadFeaturedFilterTypes;
+    dateRange: ThreadTimelineFilterTypes;
+    page: number;
   }) {
     // Used to reset pagination when switching between topics
     if (this._resetPagination) {
@@ -732,22 +777,90 @@ class ThreadsController {
       this._resetPagination = false;
     }
 
-    if (this.listingStore.isDepleted(options)) {
-      return;
-    }
-    const { topicName, stageName, includePinnedThreads } = options;
-    const chain = app.activeChainId();
-    const params = {
-      chain,
-      cutoff_date: this.listingStore.isInitialized(options)
-        ? this.listingStore.getCutoffDate(options).toISOString()
-        : moment().toISOString(),
-    };
-    const topicId = app.topics.getByName(topicName, chain)?.id;
+    const {
+      topicName,
+      stageName,
+      includePinnedThreads,
+      featuredFilter,
+      dateRange,
+      page,
+    } = options;
 
-    if (topicId) params['topic_id'] = topicId;
-    if (stageName) params['stage'] = stageName;
-    if (includePinnedThreads) params['includePinnedThreads'] = true;
+    const topics =
+      (await queryClient.ensureQueryData<Topic[]>([
+        ApiEndpoints.BULK_TOPICS,
+        app.chain.id,
+      ])) || [];
+
+    const chain = app.activeChainId();
+    const params = (() => {
+      // find topic id (if any)
+      const topicId = topics.find(({ name }) => name === topicName)?.id;
+
+      // calculate 'from' and 'to' dates
+      const today = moment();
+      const fromDate = (() => {
+        if (dateRange) {
+          if (
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            return today
+              .startOf(dateRange.toLowerCase().replace('this', '') as any)
+              .toISOString();
+          }
+
+          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
+            return new Date(0).toISOString();
+          }
+        }
+
+        return null;
+      })();
+      const toDate = (() => {
+        if (dateRange) {
+          if (
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            return today
+              .endOf(dateRange.toLowerCase().replace('this', '') as any)
+              .toISOString();
+          }
+
+          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
+            return moment().toISOString();
+          }
+        }
+
+        return moment().toISOString();
+      })();
+
+      const featuredFilterQueryMap = {
+        newest: 'createdAt:desc',
+        oldest: 'createdAt:asc',
+        mostLikes: 'numberOfLikes:desc',
+        mostComments: 'numberOfComments:desc',
+      };
+
+      return {
+        limit: 20,
+        page: page,
+        chain,
+        ...(topicId && { topic_id: topicId }),
+        ...(stageName && { stage: stageName }),
+        ...(includePinnedThreads && { includePinnedThreads: true }),
+        ...(fromDate && { from_date: fromDate }),
+        to_date: toDate,
+        orderBy:
+          featuredFilterQueryMap[featuredFilter] ||
+          featuredFilterQueryMap.newest,
+      };
+    })();
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
@@ -805,7 +918,11 @@ class ThreadsController {
       this.listingStore.depleteListing(options);
     }
 
-    return modeledThreads;
+    return {
+      threads: modeledThreads,
+      limit: response.result.limit,
+      page: response.result.page,
+    };
   }
 
   public async getThreadCommunityId(threadId: string) {
@@ -833,6 +950,7 @@ class ThreadsController {
       this._store.clear();
       this._listingStore.clear();
     }
+
     for (const thread of initialThreads) {
       const modeledThread = this.modelFromServer(thread);
       if (!thread.Address) {

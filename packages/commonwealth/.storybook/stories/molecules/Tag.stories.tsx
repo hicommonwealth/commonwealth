@@ -19,18 +19,25 @@ export const Tag: Story = {
     label: "Ref #90",
     type: "active",
     iconName: undefined,
+    trimAt: 20,
   },
   argTypes: {
     label: {
       control: { type: "text" },
     },
     type: {
-      control: { type: "select" },
+      control: { type: "radio" },
     },
     iconName: {
       control: { type: "select" },
       options: iconOptions,
     },
+    trimAt: {
+      control: { type: "number" },
+    },
+  },
+  parameters: {
+    controls: { exclude: [ "onClick" ] },
   },
   render: ({...args}) => <CWTag {...args} />
-}
+};

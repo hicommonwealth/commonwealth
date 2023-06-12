@@ -11,7 +11,7 @@ import { CommentComponent } from './CommentComponent';
 import { CreateComment } from './CreateComment';
 import { jumpHighlightComment } from './helpers';
 
-const MAX_THREAD_LEVEL = 2;
+const MAX_THREAD_LEVEL = 8;
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
@@ -108,16 +108,15 @@ export const CommentsTree = ({
             <CommentComponent
               comment={comment}
               handleIsReplying={handleIsReplying}
-              isLast={threadLevel === 2}
+              isLast={threadLevel === 8}
               isLocked={thread instanceof Thread && thread.readOnly}
               setIsGloballyEditing={setIsGloballyEditing}
               threadLevel={threadLevel}
               threadId={thread.id}
               updatedCommentsCallback={updatedCommentsCallback}
+              isReplying={isReplying}
+              parentCommentId={parentCommentId}
             />
-            {!!children.length &&
-              canContinueThreading &&
-              recursivelyGatherComments(children, comment, threadLevel + 1)}
             {isReplying && parentCommentId === comment.id && (
               <CreateComment
                 handleIsReplying={handleIsReplying}
@@ -126,6 +125,9 @@ export const CommentsTree = ({
                 updatedCommentsCallback={updatedCommentsCallback}
               />
             )}
+            {!!children.length &&
+              canContinueThreading &&
+              recursivelyGatherComments(children, comment, threadLevel + 1)}
           </React.Fragment>
         );
       } else {

@@ -43,7 +43,6 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import setupCEProxy from './server/util/entitiesProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
-import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
@@ -71,7 +70,6 @@ async function main() {
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
-  const NO_RULE_CACHE = process.env.NO_RULE_CACHE === 'true';
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
@@ -81,7 +79,6 @@ async function main() {
 
   const tokenBalanceCache = new TokenBalanceCache();
   await tokenBalanceCache.initBalanceProviders();
-  const ruleCache = new RuleCache();
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
@@ -262,7 +259,6 @@ async function main() {
   }
 
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  if (!NO_RULE_CACHE) await ruleCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
@@ -280,7 +276,6 @@ async function main() {
     models,
     viewCountCache,
     tokenBalanceCache,
-    ruleCache,
     banCache,
     globalActivityCache,
     dbValidationService

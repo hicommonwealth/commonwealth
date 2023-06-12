@@ -2,7 +2,6 @@ import type {
   // PostProfilesReq,
   PostReactionsReq,
   PostRolesReq,
-  PostRulesReq,
   PostTopicsReq,
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
@@ -44,15 +43,12 @@ import {
   getTokenBalance,
   getTokenBalanceValidation,
 } from '../routes/getTokenBalance';
-import { getRoles, getRolesValidation } from '../routes/roles/getRoles';
-import { getRules, getRulesValidation } from '../routes/rulesext/getRules';
 import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
 import type { TypedRequest } from '../types';
 import {
   onlyIds,
   postReactionsValidation,
   postRolesValidation,
-  postRulesValidation,
   postTopicsValidation,
   putCommentsValidation,
 } from '../util/helperValidations';
@@ -151,7 +147,6 @@ export function addExternalRoutes(
     deleteEntities.bind(this, 'chain_id', models, models.Topic)
   );
 
-  router.get('/roles', getRolesValidation, getRoles.bind(this, models));
   router.post(
     '/roles',
     passport.authenticate('jwt', { session: false }),
@@ -169,19 +164,6 @@ export function addExternalRoutes(
     passport.authenticate('jwt', { session: false }),
     onlyIds,
     deleteEntities.bind(this, 'chain_id', models, models.Role)
-  );
-
-  router.get('/rules', getRulesValidation, getRules.bind(this, models));
-  router.post(
-    '/rules',
-    postRulesValidation,
-    addEntities.bind(
-      this,
-      'chain_id',
-      models,
-      (a) => models.Rule.bulkCreate(a),
-      (req: TypedRequest<PostRulesReq>) => req.body.rules
-    )
   );
 
   router.get(

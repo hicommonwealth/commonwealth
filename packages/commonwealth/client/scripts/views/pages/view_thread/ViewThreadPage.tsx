@@ -4,6 +4,7 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import { ThreadStage } from '../../../models/types';
 
 import { Link, LinkSource, Thread } from '../../../models/Thread';
@@ -31,8 +32,8 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { Modal } from '../../components/component_kit/cw_modal';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
+import { ThreadReactionPreviewButtonSmall } from '../../components/ReactionButton/ThreadPreviewReactionButtonSmall';
+import { ChangeThreadTopicModal } from '../../modals/change_thread_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import {
   getCommentSubscription,
@@ -43,18 +44,23 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import {
-  ExternalLink,
-  ThreadAuthor,
-  ThreadStageComponent,
-} from './thread_components';
+import { ThreadAuthor, ThreadStageComponent } from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { ThreadActionType } from '../../../../../shared/types';
 import { filterLinks } from 'helpers/threads';
-import { isDefaultStage } from 'helpers';
+import { LockMessage } from './lock_message';
+import { extractDomain, isDefaultStage } from 'helpers';
+import ExternalLink from 'views/components/ExternalLink';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../../components/component_kit/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -92,6 +98,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);
+  const [isCollapsedSize, setIsCollapsedSize] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -101,6 +108,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
+
+  useBrowserWindow({
+    onResize: () =>
+      breakpointFnValidator(
+        isCollapsedSize,
+        (state: boolean) => {
+          setIsCollapsedSize(state);
+        },
+        isWindowMediumSmallInclusive
+      ),
+    resizeListenerUpdateDeps: [isCollapsedSize],
+  });
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+  });
 
   const threadUpdatedCallback = (newTitle: string, body: string) => {
     setThread(
@@ -372,13 +395,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       // load profiles
       if (!prefetch[threadId]['profilesStarted']) {
-        app.newProfiles.getProfile(thread.authorChain, thread.author);
+        NewProfilesController.Instance.getProfile(
+          thread.authorChain,
+          thread.author
+        );
 
         comments.forEach((comment) => {
-          app.newProfiles.getProfile(comment.authorChain, comment.author);
+          NewProfilesController.Instance.getProfile(
+            comment.authorChain,
+            comment.author
+          );
         });
 
-        app.newProfiles.isFetched.on('redraw', () => {
+        NewProfilesController.Instance.isFetched.on('redraw', () => {
           if (!prefetch[threadId]?.['profilesFinished']) {
             setPrefetch((prevState) => ({
               ...prevState,
@@ -715,9 +744,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
+  const tabsShouldBePresent =
+    showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
+
   return (
     <Sublayout>
       <CWContentPage
+        showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||
@@ -744,12 +777,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           />
         }
         createdAt={thread.createdAt}
+        updatedAt={thread.updatedAt}
+        lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
+        lockedAt={thread.lockedAt}
+        displayNewTag={true}
         headerComponents={
           !isStageDefault && <ThreadStageComponent stage={thread.stage} />
         }
-        subHeader={!!thread.url && <ExternalLink url={thread.url} />}
+        subHeader={
+          !!thread.url && (
+            <ExternalLink url={thread.url}>
+              {extractDomain(thread.url)}
+            </ExternalLink>
+          )
+        }
         actions={
           app.user.activeAccount && !isGloballyEditing && getActionMenuItems()
         }
@@ -771,9 +814,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
-                  <CWText type="h5" className="callout-text">
-                    Commenting is disabled because this post has been locked.
-                  </CWText>
+                  <LockMessage
+                    lockedAt={thread.lockedAt}
+                    updatedAt={thread.updatedAt}
+                  />
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}
@@ -839,6 +883,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              showDeleteButton={isAuthor || isAdmin}
+                              onDelete={() => {
+                                setInitializedPolls(false);
+                              }}
                             />
                           );
                         })}
@@ -860,7 +908,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       />
       <Modal
         content={
-          <ChangeTopicModal
+          <ChangeThreadTopicModal
             onChangeHandler={(topic: Topic) => {
               const newThread = new Thread({ ...thread, topic });
               setThread(newThread);

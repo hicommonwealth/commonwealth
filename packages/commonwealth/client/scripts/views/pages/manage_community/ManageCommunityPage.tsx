@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
 import 'pages/manage_community/index.scss';
 
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import RoleInfo from '../../../models/RoleInfo';
 import Sublayout from '../../Sublayout';
 import ErrorPage from '../error';
@@ -13,6 +14,8 @@ import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { sortAdminsAndModsFirst } from './helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { useDebounce } from 'usehooks-ts';
+import { TTLCache } from '../../../helpers/ttl_cache';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -21,52 +24,106 @@ const ManageCommunityPage = () => {
   const [admins, setAdmins] = useState([]);
   const [mods, setMods] = useState([]);
 
-  const fetch = () => {
-    axios
-      .get(`${app.serverUrl()}/bulkMembers`, {
-        params: { chain: app.activeChainId() },
-      })
-      .then((res) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+
+  const membersCache = useMemo(() => {
+    return new TTLCache(
+      1_000 * 60,
+      `manage-community-members-${app.activeChainId()}`
+    );
+  }, []);
+
+  const fetchAdmins = async () => {
+    const memberAdmins = [];
+    const memberMods = [];
+
+    try {
+      const res = await axios.get(`${app.serverUrl()}/roles`, {
+        params: {
+          chain_id: app.activeChainId(),
+          permissions: ['moderator', 'admin'],
+        },
+      });
+      const roles = res.data.result || [];
+      roles.forEach((role) => {
+        if (role.permission === AccessLevel.Admin) {
+          memberAdmins.push(role);
+        } else if (role.permission === AccessLevel.Moderator) {
+          memberMods.push(role);
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
+    setAdmins(memberAdmins);
+    setMods(memberMods);
+  };
+
+  const searchMembers = async (searchQuery?: string) => {
+    try {
+      let profiles = [];
+
+      const cachedResult = membersCache.get(searchQuery);
+      if (cachedResult) {
+        profiles = cachedResult.profiles;
+      } else {
+        const res = await axios.get(`${app.serverUrl()}/searchProfiles`, {
+          params: {
+            chain: app.activeChainId(),
+            search: searchQuery || '',
+            page_size: 100,
+            page: 1,
+            include_roles: true,
+          },
+        });
         if (res.data.status !== 'Success') {
           throw new Error('Could not fetch members');
         }
+        membersCache.set(searchQuery, res.data.result);
+        profiles = res.data.result.profiles;
+      }
 
-        const memberAdmins = [];
-        const memberMods = [];
+      let roles = [];
 
-        if (res.data.result.length > 0) {
-          res.data.result.sort(sortAdminsAndModsFirst).forEach((role) => {
-            if (role.permission === AccessLevel.Admin) {
-              memberAdmins.push(role);
-            } else if (role.permission === AccessLevel.Moderator) {
-              memberMods.push(role);
-            }
-          });
-        }
-
-        setAdmins(memberAdmins);
-        setMods(memberMods);
-        setRoleData(res.data.result);
-        setInitialized(true);
-      })
-      .catch(() => {
-        setRoleData([]);
-        setInitialized(true);
-      });
+      if (profiles.length > 0) {
+        roles = profiles.map((profile) => {
+          return {
+            ...(profile.roles[0] || {}),
+            Address: profile.addresses[0],
+          };
+        });
+      }
+      setRoleData(roles);
+      setInitialized(true);
+    } catch (err) {
+      setRoleData([]);
+      setInitialized(true);
+    }
   };
 
   useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => forceRerender());
+    NewProfilesController.Instance.isFetched.on('redraw', () =>
+      forceRerender()
+    );
 
-    app.newProfiles.isFetched.off('redraw', forceRerender);
+    NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
   }, [forceRerender]);
 
+  // on update debounced search term, fetch
+  useEffect(() => {
+    searchMembers(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
+
+  // on init, fetch
   useEffect(() => {
     if (!app.activeChainId()) {
       return;
     }
 
-    fetch();
+    fetchAdmins();
+    searchMembers();
   }, []);
 
   const isAdmin =
@@ -103,25 +160,37 @@ const ManageCommunityPage = () => {
       if (idx !== -1) {
         adminsAndMods.splice(idx, 1);
       }
+      if (oldRole.permission === 'admin') {
+        setAdmins(admins.filter((a) => a.id !== oldRole.id));
+      }
+      if (oldRole.permission === 'moderator') {
+        setMods(mods.filter((a) => a.id !== oldRole.id));
+      }
     }
 
     if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
-      adminsAndMods.push(
-        new RoleInfo(
-          newRole.id,
-          newRole.Address?.id || newRole.address_id,
-          newRole.Address.address,
-          newRole.Address.chain,
-          newRole.chain_id,
-          newRole.permission,
-          newRole.allow,
-          newRole.deny,
-          newRole.is_user_default
-        )
+      const roleInfo = new RoleInfo(
+        newRole.id,
+        newRole.Address?.id || newRole.address_id,
+        newRole.Address.address,
+        newRole.Address.chain,
+        newRole.chain_id,
+        newRole.permission,
+        newRole.allow,
+        newRole.deny,
+        newRole.is_user_default
       );
+      adminsAndMods.push(roleInfo);
+
+      if (newRole.permission === 'admin') {
+        setAdmins([...admins, newRole]);
+      }
+      if (newRole.permission === 'moderator') {
+        setMods([...mods, newRole]);
+      }
     }
 
-    fetch();
+    searchMembers();
   };
 
   return (
@@ -134,7 +203,12 @@ const ManageCommunityPage = () => {
           onRoleUpdate={handleRoleUpdate}
           onSave={() => forceRerender()}
         />
-        <AdminPanelTabs onRoleUpgrade={handleRoleUpdate} roleData={roleData} />
+        <AdminPanelTabs
+          onRoleUpdate={handleRoleUpdate}
+          roleData={roleData}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
       </div>
     </Sublayout>
   );

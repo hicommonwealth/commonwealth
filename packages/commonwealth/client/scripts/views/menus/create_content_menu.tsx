@@ -1,31 +1,18 @@
-import React from 'react';
-
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import app from 'state';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import { useCommonNavigate } from 'navigation/helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
-
-  const topics = app.topics
-    .getByCommunity(app.activeChainId())
-    .reduce(
-      (acc, current) => (current.featuredInNewPost ? [...acc, current] : acc),
-      []
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
 
   const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
 
@@ -67,27 +54,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
     return items;
   };
-
-  const getTopicTemplateItems = (): PopoverMenuItem[] =>
-    topics.map((t) => ({
-      label: `New ${t.name} Thread`,
-      iconLeft: 'write',
-      onClick: () => {
-        // TODO Graham 7-19-22: Let's find a non-localStorage solution
-        localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
-        if (t.defaultOffchainTemplate) {
-          localStorage.setItem(
-            `${app.activeChainId()}-active-topic-default-template`,
-            t.defaultOffchainTemplate
-          );
-        } else {
-          localStorage.removeItem(
-            `${app.activeChainId()}-active-topic-default-template`
-          );
-        }
-        navigate('/new/discussion');
-      },
-    }));
 
   const getOnChainProposalItem = (): PopoverMenuItem[] =>
     showOnChainProposalItem
@@ -174,12 +140,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'people',
       onClick: (e) => {
         e?.preventDefault();
-        // mixpanelBrowserTrack({
-        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-        //   chainBase: null,
-        //   isCustomDomain: app.isCustomDomain(),
-        //   communityType: null,
-        // });
         sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
         navigate('/createCommunity', {}, null);
       },
@@ -189,12 +149,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'discord',
       onClick: (e) => {
         e?.preventDefault();
-        // mixpanelBrowserTrack({
-        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-        //   chainBase: null,
-        //   isCustomDomain: app.isCustomDomain(),
-        //   communityType: null,
-        // });
         sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
 
         window.open(
@@ -225,7 +179,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             },
             iconLeft: 'write',
           } as PopoverMenuItem,
-          ...getTopicTemplateItems(),
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
           ...getSubstrateProposalItems(),

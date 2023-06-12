@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -9,18 +9,17 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import type ProposalModule from '../../models/ProposalModule';
-import { initChain } from 'helpers/chain';
 import 'pages/proposals.scss';
 
 import app from 'state';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { ProposalCard } from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/ProposalCard';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
-import { getStatusText } from '../components/proposal_card/helpers';
+import { getStatusText } from '../components/ProposalCard/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import {
   CompoundProposalStats,
@@ -28,6 +27,7 @@ import {
 } from '../components/proposals/proposals_explainers';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -58,18 +58,7 @@ const ProposalsPage = () => {
     isCosmosCompletedProposalsLoadingMore,
     setIsCosmosCompletedProposalsLoadingMore,
   ] = useState(false);
-  const hasFetchedApiRef = useRef(false);
-
-  useEffect(() => {
-    const chainInit = async () => {
-      if (!hasFetchedApiRef.current) {
-        hasFetchedApiRef.current = true;
-        await initChain();
-      }
-    };
-
-    if (!app.chain?.apiInitialized || !app.chain?.loaded) chainInit();
-  }, [app.chain, initChain]);
+  useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));

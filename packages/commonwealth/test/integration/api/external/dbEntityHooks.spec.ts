@@ -12,11 +12,9 @@ import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { TopicAttributes } from 'server/models/topic';
 import type { ProfileAttributes } from '../../../../server/models/profile';
 import type { RoleAttributes } from '../../../../server/models/role';
-import type { RuleAttributes } from '../../../../server/models/rule';
 
 const Op = Sequelize.Op;
 
-/* eslint-disable import/no-mutable-exports */
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
@@ -28,7 +26,6 @@ export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
 export let testRoles: RoleAttributes[];
-export let testRules: RuleAttributes[];
 
 async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
@@ -37,11 +34,10 @@ async function clearTestEntities() {
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
   });
-  await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Rule.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Chain.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,
@@ -81,6 +77,8 @@ beforeEach(async () => {
           await models.Profile.findOrCreate({
             where: {
               id: -i - 1,
+              profile_name: `testName${-i - 1}`,
+              avatar_url: `testAvatarUrl${-i - 1}`,
               email: `test${i - 1}@gmail.com`,
               user_id: -i - 1,
             },
@@ -173,7 +171,7 @@ beforeEach(async () => {
               address: `testAddress${-i - 1}`,
               chain: 'cmntest',
               verification_token: '',
-              profile_id: -i - 1,
+              profile_id: i < 2 ? -1 : -2,
               verified: moment.now(),
             },
           })
@@ -190,21 +188,6 @@ beforeEach(async () => {
               id: -i - 1,
               address_id: -i - 1,
               chain_id: 'cmntest',
-            },
-          })
-        )[0]
-    )
-  );
-
-  testRules = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Rule.findOrCreate({
-            where: {
-              id: -i - 1,
-              chain_id: 'cmntest',
-              rule: '',
             },
           })
         )[0]
@@ -275,7 +258,7 @@ beforeEach(async () => {
               chain: 'cmntest',
               address_id: -1,
               text: '',
-              thread_id: '-1',
+              thread_id: -1,
               plaintext: '',
             },
           })
@@ -294,7 +277,7 @@ beforeEach(async () => {
                 chain: 'cmntest',
                 address_id: -2,
                 text: '',
-                thread_id: '-2',
+                thread_id: -2,
                 plaintext: '',
               },
             })
