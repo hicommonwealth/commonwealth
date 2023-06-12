@@ -1,10 +1,5 @@
-import type * as Sequelize from 'sequelize';
-import type { AddressAttributes, AddressInstance } from './address';
-import type {
-  CommunityRoleAttributes,
-  CommunityRoleInstance,
-} from './community_role';
-import type { ModelInstance, ModelStatic } from './types';
+import type { AddressAttributes } from './address';
+import type { CommunityRoleAttributes } from './community_role';
 
 export type RoleAssignmentAttributes = {
   id?: number;
@@ -18,9 +13,4 @@ export type RoleAssignmentAttributes = {
   // associations
   CommunityRole?: CommunityRoleAttributes;
   Address?: AddressAttributes;
-};
-
-export type RoleAssignmentInstance = ModelInstance<RoleAssignmentAttributes> & {
-  getCommunityRole: Sequelize.BelongsToGetAssociationMixin<CommunityRoleInstance>;
-  getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>;
 };

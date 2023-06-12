@@ -23,5 +23,3 @@ export type RoleAttributes = {
   Address?: AddressAttributes;
   Chain?: ChainAttributes;
 };
-
-export type RoleInstance = ModelInstance<RoleAttributes>;

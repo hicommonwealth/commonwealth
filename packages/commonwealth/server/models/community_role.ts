@@ -1,11 +1,6 @@
-import type * as Sequelize from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { Role } from './role';
-import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
-import type { ModelInstance } from './types';
+import type { RoleAssignmentAttributes } from './role_assignment';
 
 export type CommunityRoleAttributes = {
   name: Role;
@@ -19,8 +14,4 @@ export type CommunityRoleAttributes = {
   // associations
   RoleAssignments?: RoleAssignmentAttributes[];
   Chain?: ChainAttributes;
-};
-
-export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
-  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
 };
