@@ -1,4 +1,4 @@
-import type { Permission } from '../models/role';
+import type { Role } from '../models/role';
 import { findOneRole } from './roles';
 
 // Roles hierarchically encompass the roles below them.
@@ -23,7 +23,7 @@ const validateRoles = async (
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
 
-  const allowedRoles: Permission[] =
+  const allowedRoles: Role[] =
     minimum_role === 'member'
       ? ['admin', 'moderator', 'member']
       : minimum_role === 'moderator'

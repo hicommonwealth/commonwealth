@@ -16,6 +16,7 @@ import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { useFetchTopicsQuery } from 'state/api/topics';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
@@ -53,9 +54,10 @@ const OverviewPage = () => {
   const allPinnedThreads = app.threads.listingStore.getThreads({
     pinned: true,
   });
-  const allThreads = app.threads.store.getAll();
 
-  const topics = app.topics.getByCommunity(app.activeChainId());
+  const { data: topics = [] } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
 
