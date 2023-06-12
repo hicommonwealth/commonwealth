@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import $ from 'jquery';
-
 import 'pages/create_community.scss';
-
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import Sublayout from '../../Sublayout';
@@ -11,13 +12,11 @@ import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
 import { EthDaoForm } from './eth_dao_form';
+import { useEthChainFormState } from './hooks';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
-import { useEthChainFormState } from './hooks';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -65,7 +64,7 @@ const CreateCommunity = () => {
     fetchEthChains();
   }, []);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetchEthChainNames = async () => {
       const chains = await $.getJSON('https://chainid.network/chains.json');
 
