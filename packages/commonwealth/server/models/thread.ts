@@ -74,7 +74,8 @@ export default (
     'Thread',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address_id: { type: dataTypes.INTEGER, allowNull: true },
+      created_by: { type: dataTypes.STRING, allowNull: true },
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
