@@ -11,12 +11,14 @@ import CustomDomainRoutes from 'navigation/CustomDomainRoutes';
 import { PageNotFound } from 'views/pages/404';
 import { withLayout } from 'views/Layout';
 
-const Router = (customDomain: string) =>
+const Router = (customDomain: string, isAppLoading: boolean) =>
   createBrowserRouter(
     createRoutesFromElements([
-      ...GeneralRoutes(),
-      ...(customDomain ? CustomDomainRoutes() : CommonDomainRoutes()),
-      <Route path="*" element={withLayout(PageNotFound, {})} />,
+      ...GeneralRoutes(isAppLoading),
+      ...(customDomain
+        ? CustomDomainRoutes(isAppLoading)
+        : CommonDomainRoutes(isAppLoading)),
+      <Route path="*" element={withLayout(PageNotFound, { isAppLoading })} />,
     ])
   );
 export default Router;

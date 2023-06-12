@@ -11,6 +11,8 @@ import type { RoleObject } from './types';
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes.
+  if (!str) return '';
+
   return str
     .toLowerCase()
     .trim()

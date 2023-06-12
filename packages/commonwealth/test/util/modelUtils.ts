@@ -245,14 +245,13 @@ export const createComment = async (args: CommentArgs) => {
   const { chain, address, jwt, text, parentCommentId, thread_id } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/createComment')
+    .post(`/api/threads/${thread_id}/comments`)
     .set('Accept', 'application/json')
     .send({
       author_chain: chain,
       chain,
       address,
       parent_id: parentCommentId,
-      thread_id,
       'attachments[]': undefined,
       text,
       jwt,
@@ -273,10 +272,9 @@ export const editComment = async (args: EditCommentArgs) => {
   const { jwt, text, comment_id, chain, community, address } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/editComment')
+    .patch(`/api/comments/${comment_id}`)
     .set('Accept', 'application/json')
     .send({
-      id: comment_id,
       author_chain: chain,
       address,
       body: encodeURIComponent(text),
