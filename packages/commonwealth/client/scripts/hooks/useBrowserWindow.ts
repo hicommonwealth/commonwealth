@@ -1,22 +1,64 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  isWindowExtraSmall,
+  isWindowLarge,
+  isWindowMedium,
+  isWindowMediumInclusive,
+  isWindowMediumSmall,
+  isWindowMediumSmallInclusive,
+  isWindowSmall,
+  isWindowSmallInclusive,
+} from '../views/components/component_kit/helpers';
 
 type IuseBrowserWindow = {
-  onResize: () => any;
-  resizeListenerUpdateDeps: any[];
+  onResize?: () => any;
+  resizeListenerUpdateDeps?: any[];
 };
 
-const useBrowserWindow = (windowProps: IuseBrowserWindow) => {
+const useBrowserWindow = ({
+  onResize = () => {},
+  resizeListenerUpdateDeps = [],
+}: IuseBrowserWindow) => {
+  /**
+   * Window size
+   */
+  const [windowSize, setWindowSize] = useState(window.innerWidth);
+  const windowSizeBooleans = {
+    isWindowExtraSmall: isWindowExtraSmall(windowSize),
+    isWindowLarge: isWindowLarge(windowSize),
+    isWindowMediumInclusive: isWindowMediumInclusive(windowSize),
+    isWindowMedium: isWindowMedium(windowSize),
+    isWindowMediumSmallInclusive: isWindowMediumSmallInclusive(windowSize),
+    isWindowMediumSmall: isWindowMediumSmall(windowSize),
+    isWindowSmallInclusive: isWindowSmallInclusive(windowSize),
+    isWindowSmall: isWindowSmall(windowSize),
+  };
+  useEffect(() => {
+    const onResize = () => setWindowSize(window.innerWidth);
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  /**
+   * Resize listener
+   */
   useEffect(() => {
     // eslint-disable-next-line no-restricted-globals
-    window.addEventListener('resize', windowProps.onResize);
+    onResize && window.addEventListener('resize', onResize);
 
     return () => {
       // eslint-disable-next-line no-restricted-globals
-      window.removeEventListener('resize', windowProps.onResize);
+      onResize && window.removeEventListener('resize', onResize);
     };
-  }, windowProps.resizeListenerUpdateDeps);
+  }, resizeListenerUpdateDeps);
 
-  return {};
+  return {
+    // window sizes
+    ...windowSizeBooleans,
+  };
 };
 
 export default useBrowserWindow;
