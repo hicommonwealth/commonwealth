@@ -3,6 +3,7 @@ import type { Meta } from '@storybook/react';
 import * as Icons from "@phosphor-icons/react";
 
 import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
+import { CWButton } from '../../../client/scripts/views/components/component_kit/cw_button';
 import { phosphorIconLookup } from '../phosphor_icon_lookup';
 
 import "../styles/icon.scss";
@@ -27,8 +28,11 @@ const Gallery: FC<GalleryProps> = ({
   size,
   weight,
 }) => {
+  const totalOnFirstRender: number = 120;
   const [gallery, setGallery] = useState<any[]>([]);
   const [iconsFound, setIconsFound] = useState<number>(0);
+  const [totalToRender, setTotalToRender] =
+    useState<number>(totalOnFirstRender);
 
   useEffect(() => {
     let grid: any[] = [];
@@ -36,7 +40,11 @@ const Gallery: FC<GalleryProps> = ({
       .filter((key: any) => {
         let lowercaseKey: string = String(key).toLowerCase();
         return lowercaseKey.includes(searchTerm.toLowerCase());
-      })
+      });
+    setIconsFound(filteredIcons.length);
+    
+    let iconsToRender = filteredIcons
+      .slice(0, totalToRender)
       .map(([key, icon], index) => {
         const IconComponent = icon;
         return (
@@ -49,17 +57,24 @@ const Gallery: FC<GalleryProps> = ({
         );
       });
     
-    for (let i: number = 0; i < filteredIcons.length; i += itemsPerRow) {
+    for (let i: number = 0; i < totalToRender; i += itemsPerRow) {
       let rowIcons: any[] = [];
       for (let j: number = 0; j < itemsPerRow; j++) {
-        rowIcons.push(filteredIcons[j + i]);
+        rowIcons.push(iconsToRender[j + i]);
       }
       grid.push(rowIcons);
     }
     
     setGallery(grid);
-    setIconsFound(filteredIcons.length);
-  }, [searchTerm]);
+  }, [searchTerm, totalToRender]);
+
+  const handleLoadMore = () => {
+    setTotalToRender(
+      totalToRender + totalOnFirstRender > iconsFound ?
+        iconsFound :
+        totalToRender + totalOnFirstRender
+    );
+  }
 
   return (
     <>
@@ -73,6 +88,13 @@ const Gallery: FC<GalleryProps> = ({
           ))}
         </div>
       ))}
+      <div className="button">
+        <CWButton
+          label="Load more icons"
+          onClick={() => handleLoadMore()}
+          disabled={iconsFound < totalToRender}
+        />
+      </div>
     </>
   );
 };
@@ -80,11 +102,7 @@ const Gallery: FC<GalleryProps> = ({
 const PhosphorIcon: FC<PhosphorIconProps> = ({ size, weight }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const handleChange = (e: any) => {
-    console.log('current term:', searchTerm);
-    console.log('typed:', e.target.value);
-    setSearchTerm(e.target.value);
-  }
+  const handleChange = (e: any) => setSearchTerm(e.target.value);
 
   const handleSubmit = (e: any) => e.preventDefault();
 

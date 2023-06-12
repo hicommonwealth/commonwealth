@@ -38,3 +38,10 @@
 .input:focus {
   outline: none;
 }
+
+.button {
+  width: 100%;
+  display: grid;
+  justify-content: center;
+  margin-bottom: 16px;
+}
