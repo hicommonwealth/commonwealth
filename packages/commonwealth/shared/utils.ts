@@ -15,6 +15,8 @@ import type { RoleObject } from './types';
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes.
+  if (!str) return '';
+
   return str
     .toLowerCase()
     .trim()
@@ -49,12 +51,15 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getThreadUrl = (thread: {
-  chain: string;
-  type_id?: string | number;
-  id?: string | number;
-  title?: string;
-}, comment?: string | number): string => {
+export const getThreadUrl = (
+  thread: {
+    chain: string;
+    type_id?: string | number;
+    id?: string | number;
+    title?: string;
+  },
+  comment?: string | number
+): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
