@@ -395,12 +395,8 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({}),
         },
         // for findAllRoles
-        CommunityRole: {
-          findAll: sandbox.stub().resolves([
-            {
-              toJSON: () => ({}),
-            },
-          ]),
+        Address: {
+          findAll: sandbox.stub().resolves([]),
         },
       };
       const tokenBalanceCache = {
