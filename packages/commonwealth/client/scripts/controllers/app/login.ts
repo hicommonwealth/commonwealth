@@ -52,6 +52,17 @@ export async function setActiveAccount(
         shouldRedraw
       );
     }
+
+    // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
+    // Emit a force re-render on cosmos chains to make sure
+    // that app.user.activeAccount is set - this is required for many actions
+    // There is a race condition b/w the app accessing app.user.activeAccount
+    // and updating it. A proper solution would be to fix this race condition
+    // for cosmos chains - since the issue happens only on that chain
+    if (app.chain.base === 'cosmos') {
+      app.loginStateEmitter.emit('redraw');
+    }
+
     return;
   }
 

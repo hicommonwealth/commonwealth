@@ -20,11 +20,7 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
-import {
-  checkNewThreadErrors,
-  useAuthorName,
-  useNewThreadForm,
-} from './helpers';
+import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -33,7 +29,6 @@ export const NewThreadForm = () => {
   });
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
-  const { authorName } = useAuthorName();
   const isAdmin = Permissions.isCommunityAdmin();
 
   const topicsForSelector =
@@ -60,7 +55,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, authorName, topicsForSelector);
+  } = useNewThreadForm(chainId, topicsForSelector);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 

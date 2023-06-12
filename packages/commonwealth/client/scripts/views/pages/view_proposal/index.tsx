@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import useForceRerender from 'hooks/useForceRerender';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
@@ -26,7 +26,6 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import { initChain } from 'helpers/chain';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -38,15 +37,14 @@ const ViewProposalPage = ({
   type: typeProp,
 }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
-  const forceRender = useForceRerender();
   const navigate = useCommonNavigate();
+  useInitChainIfNeeded(app);
 
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [type, setType] = useState(typeProp);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
-  const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
     const afterAdapterLoaded = async () => {
@@ -75,15 +73,8 @@ const ViewProposalPage = ({
         }
       }
     };
-    const chainInit = async () => {
-      if (!hasFetchedApiRef.current) {
-        hasFetchedApiRef.current = true;
-        await initChain();
-      }
-    };
 
     if (!isAdapterLoaded) {
-      chainInit()
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
         afterAdapterLoaded();

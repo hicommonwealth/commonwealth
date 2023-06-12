@@ -7,7 +7,9 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { slugify } from 'utils';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
+import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -15,10 +17,8 @@ import {
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
 import Sublayout from '../../Sublayout';
-import { PageLoading } from '../loading';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
-import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -140,7 +140,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         }
 
         if (finalThreads.length >= 20) {
-          setThreads(sortPinned(sortByFeaturedFilter(finalThreads)));
+          setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
           setInitializing(false);
           return;
         }
@@ -200,17 +200,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
   }, [stageName, topicName, featuredFilter, dateRange]);
 
-  if (initializing) {
-    return <PageLoading hideSearch={false} />;
-  }
-
   return (
     <Sublayout hideFooter={true} hideSearch={false}>
       <div className="DiscussionsPage">
         <Virtuoso
           className="thread-list"
           style={{ height: '100%', width: '100%' }}
-          data={threads}
+          data={initializing ? [] : threads}
           itemContent={(i, thread) => {
             const discussionLink = getProposalUrlPath(
               thread.slug,
@@ -296,11 +292,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           endReached={loadMore}
           overscan={200}
           components={{
-            EmptyPlaceholder: () => (
-              <CWText type="b1" className="no-threads-text">
-                There are no threads matching your filter.
-              </CWText>
-            ),
+            EmptyPlaceholder: () =>
+              initializing ? (
+                <div className="thread-loader">
+                  <CWSpinner size="xl" />
+                </div>
+              ) : (
+                <CWText type="b1" className="no-threads-text">
+                  There are no threads matching your filter.
+                </CWText>
+              ),
             Header: () => {
               return (
                 <HeaderWithFilters
