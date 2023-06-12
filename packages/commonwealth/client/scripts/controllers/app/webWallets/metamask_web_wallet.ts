@@ -101,18 +101,19 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       // ensure we're on the correct chain
 
       const Web3 = (await import('web3')).default;
-      //TODO: testing env var here
-      this._web3 = false ? new Web3((window as any).ethereum) : 
-      {
-        givenProvider: window.ethereum,
-        eth: {
-          getAccounts: async () => {
-            return await this._web3.givenProvider.request({
-              method: 'eth_requestAccounts',
-            })
-          }
-        }
-      };
+      this._web3 =
+        app.config.evmTestEnv !== 'e2e-test'
+          ? new Web3((window as any).ethereum)
+          : {
+              givenProvider: window.ethereum,
+              eth: {
+                getAccounts: async () => {
+                  return await this._web3.givenProvider.request({
+                    method: 'eth_requestAccounts',
+                  });
+                },
+              },
+            };
 
       // TODO: does this come after?
       await this._web3.givenProvider.request({

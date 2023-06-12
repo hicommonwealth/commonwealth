@@ -105,9 +105,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
   });
 
   useEffect(() => {
-    //TODO: testing env here
-    if(true){
-      window['ethereum'] = new MockMetaMaskProvider('https://mainnet.infura.io/v3/17253b2fd784479abff55a32c9b3282c', '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3')
+    if (app.config.evmTestEnv === 'e2e-test') {
+      window['ethereum'] = new MockMetaMaskProvider(
+        'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_',
+        '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
+      );
     }
 
     // Determine if in a community
