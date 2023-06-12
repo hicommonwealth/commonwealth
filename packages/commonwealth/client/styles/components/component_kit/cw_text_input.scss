@@ -57,7 +57,7 @@
         font-size: 14px;
         height: 32px;
         line-height: 20px;
-        padding: 8px;
+        padding: 6px 8px;
       }
 
       &.large {
@@ -82,7 +82,8 @@
     }
 
     ::placeholder {
-      color: $neutral-500;
+      // color: $neutral-600;
+      color: $black;
     }
   }
 }

@@ -1,11 +1,13 @@
 @mixin inputStyles {
-  background-color: $neutral-25;
-  border-radius: $border-radius-corners;
-  border: 2px solid $neutral-200;
+  background-color: $white;
+  // border-radius: $border-radius-corners;
+  border-radius: 4px;
+  // border: 2px solid $neutral-200;
+  border: 1px solid #E0DFE1;
   color: $neutral-800;
 
   &::placeholder {
-    color: $neutral-500;
+    color: $neutral-600;
   }
 
   &:focus {
@@ -22,6 +24,8 @@
 
   &.isTyping {
     border-color: $primary-500;
+    box-shadow: 0px 2px 2px -1px rgba(0, 0, 0, 0.12),
+      0px 0px 0px 3px $primary-100;
   }
 
   &.success {
