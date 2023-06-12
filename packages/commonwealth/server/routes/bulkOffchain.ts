@@ -7,7 +7,6 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import type { CommunityRoleInstance } from 'server/models/community_role';
 import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
@@ -33,7 +32,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     totalThreads,
     communityBanner,
     contractsWithTemplatesData,
-    communityRoles,
   ] = await (<
     Promise<
       [
@@ -46,8 +44,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           contract: ContractInstance;
           ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
-        }>,
-        CommunityRoleInstance[]
+        }>
       ]
     >
   >Promise.all([
@@ -194,7 +191,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
-    models.CommunityRole.findAll({ where: { chain_id: chain.id } }),
   ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -218,7 +214,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),
-      communityRoles: communityRoles.map((r) => r.toJSON()),
     },
   });
 };
