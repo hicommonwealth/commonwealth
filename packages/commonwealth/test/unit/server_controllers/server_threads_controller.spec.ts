@@ -298,12 +298,8 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({}),
         },
         // for findAllRoles
-        CommunityRole: {
-          findAll: sandbox.stub().resolves([
-            {
-              toJSON: () => ({}),
-            },
-          ]),
+        Address: {
+          findAll: sandbox.stub().resolves([]),
         },
       };
       const tokenBalanceCache = {
@@ -371,7 +367,7 @@ describe('ServerThreadsController', () => {
           }),
         },
         // for findAllRoles
-        CommunityRole: {
+        Address: {
           findAll: async () => [
             {
               toJSON: () => ({}),

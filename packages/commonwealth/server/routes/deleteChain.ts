@@ -62,17 +62,6 @@ const deleteChain = async (
     await new Promise<void>(async (resolve, reject) => {
       try {
         await models.sequelize.transaction(async (t) => {
-          const admins = await findAllRoles(models, {}, chain.id, ['admin']);
-          if (admins && admins[0]) {
-            // delete admin role assignments
-            await models.RoleAssignment.destroy({
-              where: {
-                community_role_id:
-                  admins[0]._roleAssignmentAttributes.community_role_id,
-              },
-              transaction: t,
-            });
-          }
           // TODO: need a parallel API call to chain-events to destroy chain-entities there too
           await models.ChainEntityMeta.destroy({
             where: { chain: chain.id },
@@ -108,11 +97,6 @@ const deleteChain = async (
           });
 
           await models.Topic.destroy({
-            where: { chain_id: chain.id },
-            transaction: t,
-          });
-
-          await models.Role.destroy({
             where: { chain_id: chain.id },
             transaction: t,
           });
@@ -187,31 +171,10 @@ const deleteChain = async (
             transaction: t,
           });
 
-          await models.RoleAssignment.destroy({
-            where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
-            transaction: t,
-          });
-
           await models.Address.destroy({
             where: { chain: chain.id },
             transaction: t,
           });
-
-          const communityRoles = await models.CommunityRole.findAll({
-            where: { chain_id: chain.id },
-            transaction: t,
-          });
-
-          await models.RoleAssignment.destroy({
-            where: {
-              community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
-            },
-            transaction: t,
-          });
-
-          await Promise.all(
-            communityRoles.map((r) => r.destroy({ transaction: t }))
-          );
 
           await models.Chain.destroy({
             where: { id: chain.id },
