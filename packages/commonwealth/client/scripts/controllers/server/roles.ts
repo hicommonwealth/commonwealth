@@ -1,7 +1,15 @@
 import $ from 'jquery';
 import app from 'state';
 
-import { AccessLevel } from 'permissions';
+import { aggregatePermissions } from 'utils';
+import type { Action } from 'permissions';
+import {
+  AccessLevel,
+  PermissionManager,
+  ToCheck,
+  everyonePermissions,
+} from 'permissions';
+import type { RoleObject } from 'types';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
@@ -16,6 +24,8 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
 };
 
 export class RolesController {
+  private permissionManager = new PermissionManager();
+
   constructor(public readonly User: UserController) {}
 
   private _roles: RoleInfo[] = [];
@@ -270,5 +280,57 @@ export class RolesController {
 
     if (!role) return;
     return this.User.addresses.find((a) => a.id === role.address_id);
+  }
+}
+
+// Client-side helpers
+export function isActiveAddressPermitted(
+  active_address_roles: RoleInfo[],
+  chain_info: ChainInfo,
+  action: Action
+): boolean {
+  const chainRoles = active_address_roles.filter(
+    (r) => r.chain_id === chain_info.id
+  );
+
+  // populate permission assignment array with role allow and deny permissions
+  const roles: Array<RoleObject> = chainRoles.map((r) => {
+    const communityRole = chain_info.communityRoles.find(
+      (cr) => cr.name === r.permission
+    );
+    return {
+      permission: r.permission,
+      allow: communityRole.allow,
+      deny: communityRole.deny,
+    };
+  });
+
+  const permissionsManager = new PermissionManager();
+  if (chainRoles.length > 0) {
+    const permission = aggregatePermissions(roles, {
+      allow: chain_info.defaultAllowPermissions,
+      deny: chain_info.defaultDenyPermissions,
+    });
+    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
+      return false;
+    }
+    return true;
+  }
+  // If no roles are given for the chain, compute permissions with chain default permissions
+  else {
+    // compute permissions with chain default permissions
+    const permission = permissionsManager.computePermissions(
+      everyonePermissions,
+      [
+        {
+          allow: chain_info.defaultAllowPermissions,
+          deny: chain_info.defaultDenyPermissions,
+        },
+      ]
+    );
+    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
+      return false;
+    }
+    return true;
   }
 }

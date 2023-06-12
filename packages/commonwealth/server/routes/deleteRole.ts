@@ -59,10 +59,12 @@ const deleteRole = async (
   }
 
   // Destroy all role assignments associated with the existing role and chain id and address provided
-  await models.Address.update(
-    { role: 'member' },
-    { where: { id: req.body.address_id } }
-  );
+  await models.RoleAssignment.destroy({
+    where: {
+      community_role_id: existingRole.toJSON().community_role_id,
+      address_id: req.body.address_id,
+    },
+  });
 
   return success(res, {});
 };

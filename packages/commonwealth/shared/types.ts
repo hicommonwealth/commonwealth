@@ -170,6 +170,6 @@ export type SnapshotGraphQLResponse = {
 
 export type RoleObject = {
   permission: AccessLevel;
-  allow: number;
-  deny: number;
+  allow: bigint;
+  deny: bigint;
 };
