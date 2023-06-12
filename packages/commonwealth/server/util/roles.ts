@@ -240,7 +240,15 @@ export async function createRole(
   transaction?: Transaction
 ): Promise<RoleInstanceWithPermission> {
   is_user_default = !!is_user_default;
-  if (!role_name) return; // Member is the lowest role, so return early.
+
+  // Member is the lowest role, so return early.
+  if (!role_name) {
+    const attributes: RoleAssignmentAttributes = {
+      community_role_id: 1,
+      address_id: address_id,
+    };
+    return new RoleInstanceWithPermission(attributes, chain_id, 'member', 0, 0);
+  }
 
   // update the role to be either the highest role either assigned or called on the address.
   await models.sequelize.query(
