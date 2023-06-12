@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import { notifyError } from 'controllers/app/notifications';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import Contract from 'models/Contract';
+import Template from 'models/Template';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/contracts/contracts_page.scss';
+import React, { useState } from 'react';
 import app from 'state';
-import { PageLoading } from '../loading';
-import Sublayout from '../../Sublayout';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { ContractCard } from './contract_card';
-import { useCommonNavigate } from 'navigation/helpers';
-import Contract from 'models/Contract';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import Template from 'models/Template';
-
-import { notifyError } from 'controllers/app/notifications';
-import { TemplateDisplayTab } from './template_display_tab';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import Sublayout from '../../Sublayout';
+import { PageLoading } from '../loading';
+import { ContractCard } from './contract_card';
+import { TemplateDisplayTab } from './template_display_tab';
 
 const ContractsPage = () => {
   const navigate = useCommonNavigate();
@@ -47,7 +47,7 @@ const ContractsPage = () => {
     }
   };
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     fetchTemplates();
   }, [contracts, setTemplates]);
 
