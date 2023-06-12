@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import app from 'state';
 import Sublayout from 'views/Sublayout';
@@ -29,6 +29,7 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import Cosmos from 'controllers/chain/cosmos/adapter';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -40,8 +41,8 @@ const ViewProposalPage = ({
   type: typeProp,
 }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
-  const forceRender = useForceRerender();
   const navigate = useCommonNavigate();
+  useInitChainIfNeeded(app);
 
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [type, setType] = useState(typeProp);
