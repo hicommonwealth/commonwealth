@@ -19,7 +19,6 @@ export type AddressAttributes = {
   verified?: Date;
   keytype?: string;
   block_info?: string;
-  name?: string;
   last_active?: Date;
   created_at?: Date;
   updated_at?: Date;
@@ -69,7 +68,6 @@ export default (
       verification_token_expires: { type: dataTypes.DATE, allowNull: true },
       verified: { type: dataTypes.DATE, allowNull: true },
       keytype: { type: dataTypes.STRING, allowNull: true },
-      name: { type: dataTypes.STRING, allowNull: true },
       last_active: { type: dataTypes.DATE, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

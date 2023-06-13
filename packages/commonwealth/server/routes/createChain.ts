@@ -452,9 +452,28 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
+<<<<<<< Updated upstream
     role = await createRole(
       models,
       addressToBeAdmin.id,
+=======
+    const newAddress = await models.Address.create({
+      user_id: req.user.id,
+      profile_id: addressToBeAdmin.id,
+      address: addressToBeAdmin.address,
+      chain: chain.id,
+      verification_token: addressToBeAdmin.verification_token,
+      verification_token_expires: addressToBeAdmin.verification_token_expires,
+      verified: addressToBeAdmin.verified,
+      keytype: addressToBeAdmin.keytype,
+      wallet_id: addressToBeAdmin.wallet_id,
+      role: 'admin',
+      last_active: new Date(),
+    });
+
+    role = new RoleInstanceWithPermission(
+      { community_role_id: 0, address_id: newAddress.id },
+>>>>>>> Stashed changes
       chain.id,
       'admin',
       true
