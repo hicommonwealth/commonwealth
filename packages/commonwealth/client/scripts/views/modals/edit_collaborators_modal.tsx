@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { isEqual } from 'lodash';
-
 import 'modals/edit_collaborators_modal.scss';
-import NewProfilesController from '../../controllers/server/newProfiles';
-
-import type { IThreadCollaborator } from '../../models/Thread';
-import type Thread from '../../models/Thread';
+import React, { useState } from 'react';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
-
 import app from 'state';
-import { User } from '../components/user/user';
+import { useDebounce } from 'usehooks-ts';
+import NewProfilesController from '../../controllers/server/newProfiles';
+import type Thread from '../../models/Thread';
+import type { IThreadCollaborator } from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { useDebounce } from 'usehooks-ts';
+import { User } from '../components/user/user';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -40,7 +38,7 @@ export const EditCollaboratorsModal = ({
     Array<IThreadCollaborator>
   >(thread.collaborators);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetchMembers = async () => {
       try {
         const response = await app.search.searchMentionableProfiles(

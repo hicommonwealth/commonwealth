@@ -8,8 +8,9 @@ import {
   VoteResults,
   VoteResultsData,
 } from 'helpers/snapshot_utils';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import app from 'state';
 import Sublayout from 'views/Sublayout';
 import AddressInfo from '../../../models/AddressInfo';
@@ -108,7 +109,7 @@ export const ViewProposalPage = ({
     [activeUserAddress]
   );
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     loadVotes(snapshotId, identifier).catch(console.error);
   }, [identifier, loadVotes, snapshotId]);
 

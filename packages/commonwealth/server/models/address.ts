@@ -3,10 +3,7 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes, ChainInstance } from './chain';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
+import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes, UserInstance } from './user';
@@ -15,6 +12,8 @@ export type AddressAttributes = {
   address: string;
   chain: string;
   verification_token: string;
+  role: Role;
+  is_user_default: boolean;
   id?: number;
   verification_token_expires?: Date;
   verified?: Date;
@@ -34,7 +33,6 @@ export type AddressAttributes = {
   Chain?: ChainAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  RoleAssignments?: RoleAssignmentAttributes[];
   SsoToken?: SsoTokenAttributes;
 };
 
@@ -42,7 +40,6 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
-  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
@@ -58,6 +55,16 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
       chain: { type: dataTypes.STRING, allowNull: false },
+      role: {
+        type: dataTypes.ENUM('member', 'moderator', 'admin'),
+        defaultValue: 'member',
+        allowNull: false,
+      },
+      is_user_default: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
       verification_token: { type: dataTypes.STRING, allowNull: false },
       verification_token_expires: { type: dataTypes.DATE, allowNull: true },
       verified: { type: dataTypes.DATE, allowNull: true },
@@ -128,7 +135,6 @@ export default (
       targetKey: 'id',
     });
     models.Address.hasOne(models.SsoToken);
-    models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Comment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Thread, {
       foreignKey: 'address_id',

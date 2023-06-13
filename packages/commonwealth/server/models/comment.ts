@@ -53,7 +53,8 @@ export default (
         },
       },
       parent_id: { type: dataTypes.STRING, allowNull: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address_id: { type: dataTypes.INTEGER, allowNull: true },
+      created_by: { type: dataTypes.STRING, allowNull: true },
       text: { type: dataTypes.TEXT, allowNull: false },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
       version_history: {

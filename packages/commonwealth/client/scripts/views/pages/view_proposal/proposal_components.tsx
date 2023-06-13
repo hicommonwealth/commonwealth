@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
-
-import app from 'state';
-
+import axios from 'axios';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-
+import { extractDomain } from 'helpers';
+import useForceRerender from 'hooks/useForceRerender';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { LinkSource } from 'models/Thread';
 import 'pages/view_proposal/proposal_components.scss';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
+import ExternalLink from 'views/components/ExternalLink';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -14,11 +17,6 @@ import {
 } from '../../components/ProposalCard/helpers';
 import { cancelProposal } from '../../components/proposals/helpers';
 import { ThreadLink } from './proposal_header_links';
-import useForceRerender from 'hooks/useForceRerender';
-import ExternalLink from 'views/components/ExternalLink';
-import { extractDomain } from 'helpers';
-import axios from 'axios';
-import { LinkSource } from 'models/Thread';
 
 type BaseCancelButtonProps = {
   onModalClose?: () => void;
@@ -83,7 +81,7 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
     };
   }, [forceRerender]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!linkedThreads) {
       axios
         .post(`${app.serverUrl()}/linking/getLinks`, {

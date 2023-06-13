@@ -3,13 +3,14 @@ import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
@@ -46,7 +47,7 @@ const ViewProposalPage = ({
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
       if (!type) {
         setType(chainToProposalSlug(app.chain.meta));
