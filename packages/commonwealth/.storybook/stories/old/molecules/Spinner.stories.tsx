@@ -1,10 +1,10 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWSpinner } from '../../../client/scripts/views/components/component_kit/cw_spinner';
+import { CWSpinner } from '../../../../client/scripts/views/components/component_kit/cw_spinner';
 
 const spinner = {
-  title: 'Molecules/Spinner',
+  title: 'Old/Molecules/Spinner',
   component: CWSpinner,
 } satisfies Meta<typeof CWSpinner>;
 

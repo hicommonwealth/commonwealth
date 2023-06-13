@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import type { Meta } from '@storybook/react';
 
-import { CWTooltip } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_tooltip';
-import { CWAddressTooltip } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_address_tooltip';
-import { CWIcon } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../../client/scripts/views/components/component_kit/cw_icon_button';
-import { iconLookup, IconName } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+import { CWTooltip } from '../../../../client/scripts/views/components/component_kit/cw_popover/cw_tooltip';
+import { CWAddressTooltip } from '../../../../client/scripts/views/components/component_kit/cw_popover/cw_address_tooltip';
+import { CWIcon } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../../../../client/scripts/views/components/component_kit/cw_icon_button';
+import { iconLookup, IconName } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 interface TooltipProps {
   content: string | React.ReactNode;
@@ -18,7 +18,7 @@ type InteractionType = (e: any) => void;
 const iconOptions = [ ...Object.keys(iconLookup) ];
 
 const tooltip = {
-  title: 'Molecules/Tooltip',
+  title: 'Old/Molecules/Tooltip',
   component: CWTooltip,
 } satisfies Meta<typeof CWTooltip>;
 

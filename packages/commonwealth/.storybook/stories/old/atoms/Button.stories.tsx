@@ -1,14 +1,14 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWButton } from '../../../client/scripts/views/components/component_kit/cw_button';
-import { notifySuccess } from '../../../client/scripts/controllers/app/notifications';
-import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+import { CWButton } from '../../../../client/scripts/views/components/component_kit/cw_button';
+import { notifySuccess } from '../../../../client/scripts/controllers/app/notifications';
+import { iconLookup } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
 const button = {
-  title: 'Atoms/Button',
+  title: 'Old/Atoms/Button',
   component: CWButton,
 } satisfies Meta<typeof CWButton>;
 
