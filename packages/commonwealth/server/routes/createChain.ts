@@ -462,6 +462,7 @@ const createChain = async (
       keytype: addressToBeAdmin.keytype,
       name: addressToBeAdmin.name,
       wallet_id: addressToBeAdmin.wallet_id,
+      is_user_default: true,
       role: 'admin',
       last_active: new Date(),
     });
