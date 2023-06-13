@@ -59,8 +59,11 @@ export const LoginSelector = () => {
   });
 
   useEffect(() => {
-    setIsJoined(!!app.user.activeAccount);
-  }, [app.user.activeAccount]);
+    const activeAccounts = app.user?.activeAccounts?.filter(
+      (a) => a.chain.id === app.chain.id
+    );
+    setIsJoined(!!app.user.activeAccount || activeAccounts.length > 0);
+  }, [app.user.activeAccount, app.user.activeAccounts]);
 
   useEffect(() => {
     if (!isLoginModalOpen && app.chain?.meta?.id == 'injective') {
