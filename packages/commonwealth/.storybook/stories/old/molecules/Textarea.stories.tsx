@@ -1,10 +1,10 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWTextArea } from '../../../client/scripts/views/components/component_kit/cw_text_area';
+import { CWTextArea } from '../../../../client/scripts/views/components/component_kit/cw_text_area';
 
 const textarea = {
-  title: 'Molecules/Textarea',
+  title: 'Old/Molecules/Textarea',
   component: CWTextArea,
 } satisfies Meta<typeof CWTextArea>;
 

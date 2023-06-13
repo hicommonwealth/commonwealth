@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import type { Meta } from "@storybook/react";
 
-import { PopoverMenu, PopoverMenuItem } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../../client/scripts/views/components/component_kit/cw_icon_button';
-import { iconLookup, IconName } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+import { PopoverMenu, PopoverMenuItem } from '../../../../client/scripts/views/components/component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from '../../../../client/scripts/views/components/component_kit/cw_icon_button';
+import { iconLookup, IconName } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 interface PopoverProps {
   header1: string;
@@ -21,7 +21,7 @@ interface PopoverProps {
 const iconOptions = [ ...Object.keys(iconLookup) ];
 
 const popoverMenu = {
-  title: 'Organisms/Popover Menu',
+  title: 'Old/Organisms/Popover Menu',
   component: PopoverMenu,
 } satisfies Meta<typeof PopoverMenu>;
 

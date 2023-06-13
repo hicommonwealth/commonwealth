@@ -1,12 +1,12 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
+import { CWText } from '../../../../client/scripts/views/components/component_kit/cw_text';
 
-import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
+import '../../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
 const text = {
-  title: 'Atoms/Text',
+  title: 'Old/Atoms/Text',
   component: CWText,
 } satisfies Meta<typeof CWText>;
 

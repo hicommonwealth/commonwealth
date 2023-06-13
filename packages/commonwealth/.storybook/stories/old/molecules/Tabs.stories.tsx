@@ -1,11 +1,11 @@
 import React, { FC, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWTab, CWTabBar } from '../../../client/scripts/views/components/component_kit/cw_tabs';
-import { argsObj } from '../helpers';
+import { CWTab, CWTabBar } from '../../../../client/scripts/views/components/component_kit/cw_tabs';
+import { argsObj } from '../../helpers';
 
 const tabs = {
-  title: 'Molecules/Tabs',
+  title: 'Old/Molecules/Tabs',
   component: CWTab,
 } satisfies Meta<typeof CWTab>;
 

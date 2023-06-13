@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 import type { Meta } from "@storybook/react";
 
-import { CWBreadcrumbs } from '../../../client/scripts/views/components/component_kit/cw_breadcrumbs';
-import type { BreadcrumbsType } from '../../../client/scripts/views/components/component_kit/cw_breadcrumbs';
-import { argsObj } from '../helpers';
+import { CWBreadcrumbs } from '../../../../client/scripts/views/components/component_kit/cw_breadcrumbs';
+import type { BreadcrumbsType } from '../../../../client/scripts/views/components/component_kit/cw_breadcrumbs';
+import { argsObj } from '../../helpers';
 
 const breadcrumbs = {
-  title: 'Molecules/Breadcrumbs',
+  title: 'Old/Molecules/Breadcrumbs',
   component: CWBreadcrumbs,
 } satisfies Meta<typeof CWBreadcrumbs>;
 

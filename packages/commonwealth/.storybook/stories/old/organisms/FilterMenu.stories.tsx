@@ -1,16 +1,16 @@
 import React, { FC, useState } from 'react';
 import type { Meta } from "@storybook/react";
 
-import { CWFilterMenu } from '../../../client/scripts/views/components/component_kit/cw_popover/cw_filter_menu';
-import type { CheckboxType } from '../../../client/scripts/views/components/component_kit/cw_checkbox';
-import { argsToOptions, objectArrayToArgs } from '../helpers';
+import { CWFilterMenu } from '../../../../client/scripts/views/components/component_kit/cw_popover/cw_filter_menu';
+import type { CheckboxType } from '../../../../client/scripts/views/components/component_kit/cw_checkbox';
+import { argsToOptions, objectArrayToArgs } from '../../helpers';
 
 interface FilterMenuProps {
   header: string;
 };
 
 const filter = {
-  title: 'Organisms/Filter Menu',
+  title: 'Old/Organisms/Filter Menu',
   component: CWFilterMenu,
 } satisfies Meta<typeof CWFilterMenu>;
 
