@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useState } from 'react';
 import type { Meta } from '@storybook/react';
 
-import { CWThreadVoteButton } from '../../../client/scripts/views/components/component_kit/cw_thread_vote_button';
+import { CWThreadVoteButton } from '../../../../client/scripts/views/components/component_kit/cw_thread_vote_button';
 
 const voteButton = {
-  title: 'Molecules/Vote Button',
+  title: 'Old/Molecules/Vote Button',
   component: CWThreadVoteButton,
 } satisfies Meta<typeof CWThreadVoteButton>;
 

@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWDropdown } from '../../../client/scripts/views/components/component_kit/cw_dropdown';
-import { DropdownItemType } from '../../../client/scripts/views/components/component_kit/cw_dropdown';
-import { argsToOptions, objectArrayToArgs } from '../helpers';
+import { CWDropdown } from '../../../../client/scripts/views/components/component_kit/cw_dropdown';
+import { DropdownItemType } from '../../../../client/scripts/views/components/component_kit/cw_dropdown';
+import { argsToOptions, objectArrayToArgs } from '../../helpers';
 
 const dropdown = {
-  title: 'Organisms/Dropdown',
+  title: 'Old/Organisms/Dropdown',
   component: CWDropdown,
 } satisfies Meta<typeof CWDropdown>;
 

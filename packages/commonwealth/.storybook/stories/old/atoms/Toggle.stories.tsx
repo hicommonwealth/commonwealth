@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWToggle, toggleDarkMode } from '../../../client/scripts/views/components/component_kit/cw_toggle';
-import type { ToggleStyleProps } from '../../../client/scripts/views/components/component_kit/cw_toggle';
+import { CWToggle, toggleDarkMode } from '../../../../client/scripts/views/components/component_kit/cw_toggle';
+import type { ToggleStyleProps } from '../../../../client/scripts/views/components/component_kit/cw_toggle';
 
 const toggle = {
-  title: 'Atoms/Toggle',
+  title: 'Old/Atoms/Toggle',
   component: CWToggle,
 } satisfies Meta<typeof CWToggle>;
 
