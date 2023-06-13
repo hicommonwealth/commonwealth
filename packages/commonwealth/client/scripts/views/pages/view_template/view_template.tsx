@@ -432,7 +432,7 @@ const ViewTemplatePage = () => {
               onClick={handleCreate}
             />
           </div>
-          <CWText>You're acting on behalf of your ERC4337 Account: {erc4337Sender}</CWText>
+          {json.tx_template.is4337 && (<CWText>You're acting on behalf of your ERC4337 Account: {erc4337Sender}</CWText> )}
         </div>
       </div>
     </Sublayout>
