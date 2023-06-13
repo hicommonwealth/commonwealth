@@ -1,13 +1,17 @@
 @import '../../shared';
 
 .Toggle {
-  background-color: $neutral-300;
+  background-color: $neutral-200;
   border-radius: $border-radius-rounded-corners;
   display: inline-block;
   height: 24px;
   position: relative;
   width: 48px;
   cursor: pointer;
+
+  &:hover {
+    background-color: $neutral-300;
+  }
 
   .toggle-input {
     @include hideInput;
@@ -22,11 +26,19 @@
     top: 2px;
     width: 20px;
     transition: all ease-in-out 0.2s;
+
+    &.disabled {
+      background-color: $neutral-200;
+    }
   }
 
   &.checked {
-    background-color: $primary-300;
+    background-color: $primary-500;
     transition: all ease-in-out 0.2s;
+
+    &:hover {
+      background-color: $primary-600;
+    }
 
     .slider {
       transform: translateX(24px);
