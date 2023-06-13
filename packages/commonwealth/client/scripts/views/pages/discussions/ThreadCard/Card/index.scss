@@ -15,17 +15,17 @@
   }
 
   &.isPinned {
-    background: $neutral-50-new;
+    background: $neutral-50;
 
     &:hover {
-      background: $neutral-50-new;
+      background: $neutral-50;
       text-decoration: none;
       color: unset;
     }
   }
 
   &:hover {
-    background: $neutral-100-new;
+    background: $neutral-100;
     text-decoration: none;
     color: unset;
   }

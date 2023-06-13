@@ -11,11 +11,11 @@
 
   .menu-item-text.Text {
     font-size: 14px !important;
-    color: $neutral-800-new;
+    color: $neutral-800;
   }
 
   .menu-item-icon.Icon {
-    color: $neutral-800-new;
+    color: $neutral-800;
   }
 
   &:hover {
@@ -56,7 +56,7 @@
   border-radius: $border-radius-md  !important;
   border-width: 1px !important;
   border-style: solid !important;
-  border-color: $neutral-200-new  !important;
+  border-color: $neutral-200  !important;
   box-shadow: $elevation-6  !important;
   overflow: hidden;
   padding: 8px;

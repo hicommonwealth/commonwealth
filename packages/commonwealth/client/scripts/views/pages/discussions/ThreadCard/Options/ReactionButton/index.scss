@@ -3,7 +3,7 @@
 .ThreadReactionButton {
   align-items: center;
   border-radius: $border-radius-corners-wider;
-  border: 1px solid $neutral-200-new;
+  border: 1px solid $neutral-200;
   color: $neutral-500;
   cursor: pointer;
   display: flex;
@@ -44,7 +44,7 @@
       line-height: 16px;
       font-weight: 400;
       margin: 2px auto 4px;
-      color: $neutral-500-new;
+      color: $neutral-400;
 
       &.has-reacted {
         color: $primary-500;
@@ -68,7 +68,7 @@
   font-weight: 400;
 
   &:hover {
-    background-color: $neutral-200-new;
+    background-color: $neutral-200;
   }
 
   &.has-reacted {
