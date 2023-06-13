@@ -55,9 +55,11 @@ test.describe('DiscussionsPage Homepage', () => {
   test('Check navigation to first profile', async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
 
-    const userProfileLinks = await page.locator('a.user-display-name.username');
+    let userProfileLinks = await page.locator('a.user-display-name.username');
 
-    console.log(userProfileLinks.first());
+    do {
+      userProfileLinks = await page.locator('a.user-display-name.username');
+    } while (!(await userProfileLinks.first().getAttribute('href')));
 
     // navigate to first link
     await userProfileLinks.first().click();

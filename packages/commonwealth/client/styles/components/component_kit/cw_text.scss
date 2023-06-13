@@ -89,7 +89,7 @@
 
   &.buttonSm {
     font-family: $font-family-neue-haas-unica;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.02em;
     line-height: 24px;
@@ -139,6 +139,10 @@
 
   &.italic {
     font-style: italic;
+  }
+
+  &.link {
+    color: $primary-500;
   }
 
   &.uppercase {

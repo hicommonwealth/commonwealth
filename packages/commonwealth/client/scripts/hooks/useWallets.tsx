@@ -43,6 +43,7 @@ import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,
 } from '../../../shared/analytics/types';
+import { MockMetaMaskProvider } from 'helpers/mockMetaMaskUtil';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -105,6 +106,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
   });
 
   useEffect(() => {
+    if (process.env.ETH_RPC === 'e2e-test') {
+      window['ethereum'] = new MockMetaMaskProvider(
+        'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+        '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
+      );
+    }
+
     // Determine if in a community
     const tempIsInCommunityPage = app.activeChainId() !== undefined;
     setIsInCommunityPage(tempIsInCommunityPage);
