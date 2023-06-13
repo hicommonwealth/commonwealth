@@ -18,7 +18,6 @@
     "lint-all": "eslint client/\\**/*.{ts,tsx} server/\\**/*.ts",
     "lint-branch": "./scripts/lint-branch.sh",
     "listen": "RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts",
-    "load-tokens": "ts-node --project tsconfig.json server/scripts/loadDatabaseFromTokenLists.ts",
     "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
     "test-events": "nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts",
     "integration-test": "nyc ts-mocha --project tsconfig.json ./test/integration/**/*.spec.ts",
