@@ -1,17 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { uuidv4 } from 'lib/util';
 import axios from 'axios';
-
-import 'pages/manage_community/chain_metadata_rows.scss';
-
-import app from 'state';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { featureFlags } from 'helpers/feature-flags';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { uuidv4 } from 'lib/util';
+import 'pages/manage_community/chain_metadata_rows.scss';
+import React, { useCallback, useState } from 'react';
+import app from 'state';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import type ChainInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
 import { AvatarUpload } from '../../components/Avatar';
-
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -21,7 +20,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
-import { featureFlags } from 'helpers/feature-flags';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -91,7 +89,7 @@ export const ChainMetadataRows = ({
     }
   }, [chain.id]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (discordBotConnected && !channelsLoaded) {
       getChannels();
     }

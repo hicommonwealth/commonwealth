@@ -11,7 +11,10 @@ module.exports = {
           allowNull: false,
           defaultValue: false,
         },
-        { transaction: t }
+        {
+          transaction: t,
+          isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+        }
       );
       await queryInterface.addColumn(
         'Addresses',
@@ -21,17 +24,29 @@ module.exports = {
           allowNull: false,
           defaultValue: 'member',
         },
-        { transaction: t }
+        {
+          transaction: t,
+          isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+        }
       );
 
       // Add roles to Addresses from Roles table
-      const roles = await queryInterface.sequelize.query(
-        `SELECT address_id, permission FROM "Roles" WHERE permission != 'member'`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
+      // Add is_user_default to Addresses from RoleAssignments table
+      const roleInfo = await queryInterface.sequelize.query(
+        `SELECT address_id, name, is_user_default FROM "RoleAssignments" as r
+         JOIN "CommunityRoles" as c on c.id = r.community_role_id
+         WHERE is_user_default = true OR name != 'member'`,
+        {
+          type: queryInterface.sequelize.QueryTypes.SELECT,
+          transaction: t,
+          isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+        }
       );
 
+      const roles = roleInfo.filter((r) => r.name !== 'member');
+
       const ids = roles.map((r) => r.address_id);
-      const permissions = roles.map((r) => r.permission);
+      const permissions = roles.map((r) => r.name);
 
       if (ids.length > 0) {
         // Make the update in one query, cast the permissions to the enum
@@ -48,14 +63,13 @@ module.exports = {
         END
         WHERE id IN (${ids.join(', ')})
         `,
-          { transaction: t }
+          {
+            transaction: t,
+            isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+          }
         );
 
-        // Add is_user_default to Addresses from RoleAssignments table
-        const isUserDefault = await queryInterface.sequelize.query(
-          `SELECT address_id, is_user_default FROM "RoleAssignments" WHERE is_user_default = true`,
-          { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
-        );
+        const isUserDefault = roleInfo.filter((r) => r.is_user_default);
 
         const userDefaultIds = isUserDefault.map((r) => r.address_id);
 
@@ -65,22 +79,12 @@ module.exports = {
         SET is_user_default = true
         WHERE id IN (${userDefaultIds.join(', ')})
         `,
-          { transaction: t }
+          {
+            transaction: t,
+            isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+          }
         );
       }
-
-      // drop unused columns
-      await queryInterface.removeColumn('Chains', 'default_allow_permissions', {
-        transaction: t,
-      });
-      await queryInterface.removeColumn('Chains', 'default_deny_permissions', {
-        transaction: t,
-      });
-
-      // drop unused tables
-      await queryInterface.dropTable('RoleAssignments', { transaction: t });
-      await queryInterface.dropTable('CommunityRoles', { transaction: t });
-      await queryInterface.dropTable('Roles', { transaction: t });
     });
   },
 
