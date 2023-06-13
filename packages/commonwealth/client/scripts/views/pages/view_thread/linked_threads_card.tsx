@@ -3,6 +3,8 @@ import { getProposalUrlPath } from 'identifiers';
 import 'pages/view_thread/linked_threads_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import 'pages/view_thread/linked_threads_card.scss';
 import app from 'state';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { slugify } from '../../../../../shared/utils';
@@ -37,7 +39,7 @@ export const LinkedThreadsCard = ({
     [thread.links]
   );
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (linkedThreadIds.length > 0) {
       app.threads
         .fetchThreadsFromId(linkedThreadIds)
