@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import 'pages/landing/crowdfunding_gallery.scss';
-
+import React, { useState } from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import { GalleryCard } from './creators_gallery';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 const crowdfundingGalleryText = [
   {
@@ -26,22 +24,8 @@ const crowdfundingGalleryText = [
 
 export const CrowdfundingGallery = () => {
   const [selectedCard, setSelectedCard] = useState(1);
-  const [windowIsMediumSmallInclusive, setWindowIsMediumSmallInclusive] =
-    useState(isWindowMediumSmallInclusive(window.innerWidth));
 
-  useEffect(() => {
-    const onResize = () => {
-      setWindowIsMediumSmallInclusive(
-        isWindowMediumSmallInclusive(window.innerWidth)
-      );
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-  }, []);
+  const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
   return (
     <div className="CrowdfundingGallery">
@@ -52,7 +36,7 @@ export const CrowdfundingGallery = () => {
         </CWText>
       </div>
       <div className="inner-container">
-        {windowIsMediumSmallInclusive ? (
+        {isWindowMediumSmallInclusive ? (
           <>
             <div className="mobile-card">
               <CWText
