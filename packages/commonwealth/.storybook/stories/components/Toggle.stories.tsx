@@ -30,26 +30,36 @@ const Toggle: FC<ToggleStyleProps> = (props) => {
   );
 }
 
-// TODO change name
-export const Overview: Story = {
-  args: {
-    checked: false,
-    disabled: false,
-  },
-  argTypes: {
-    checked: {
-      control: { type: "boolean" },
-      options: [ true, false ],
+const Base = (checked: boolean, disabled: boolean) => {
+  return {
+    args: {
+      checked: checked,
+      disabled: disabled,
     },
-    disabled: {
-      control: { type: "boolean" },
-      options: [ true, false ],
+    argTypes: {
+      checked: {
+        control: { type: "boolean" },
+        options: [ true, false ],
+      },
+      disabled: {
+        control: { type: "boolean" },
+        options: [ true, false ],
+      },
     },
-  },
-  parameters: {
-    controls: {
-      exclude: [ "className", "onChange", ],
+    parameters: {
+      controls: {
+        exclude: [
+          "className",
+          "onChange",
+          disabled ? "checked" : null,
+          "disabled",
+        ],
+      },
     },
-  },
-  render: ({...args}) => <Toggle {...args} />,
-};
+    render: ({...args}) => <Toggle {...args} />,
+  };
+}
+
+export const Overview: Story = { ...Base(false, false) };
+export const DisabledUnchecked: Story = { ...Base(false, true) };
+export const DisabledChecked: Story = { ...Base(true, true) };;
