@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
-enum UpdateTopicErrors {
+export enum UpdateTopicErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
   NoAddr = 'Must provide address',

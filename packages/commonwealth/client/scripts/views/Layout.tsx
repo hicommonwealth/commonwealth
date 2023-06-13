@@ -69,20 +69,10 @@ const LayoutComponent = ({
   scope: selectedScope,
   isAppLoading,
 }: LayoutAttrs) => {
-  // const scopeIsEthereumAddress =
-  //   selectedScope &&
-  //   selectedScope.startsWith('0x') &&
-  //   selectedScope.length === 42;
-
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const scopeMatchesChain = app.config.chains.getById(selectedScope);
-
-  // IFB 3: If the user has navigated to an ethereum address directly,
-  // init a new token chain immediately
-  // const shouldInitNewTokenChain =
-  //   selectedScope && selectedScope !== scopeToLoad && scopeIsEthereumAddress;
 
   // IFB 5: If scope is different from app.activeChainId() at render
   // time (and we are not loading another community at the same time,
@@ -104,13 +94,6 @@ const LayoutComponent = ({
 
   useNecessaryEffect(() => {
     (async () => {
-      // if (shouldInitNewTokenChain) {
-      //   // IFB 3
-      //   setIsLoading(true);
-      //   setScopeToLoad(selectedScope);
-      //   await initNewTokenChain(selectedScope, router.navigate);
-      //   setIsLoading(false);
-      // } else
       if (shouldSelectChain) {
         // IFB 5
         setIsLoading(true);
@@ -120,7 +103,6 @@ const LayoutComponent = ({
       }
     })();
   }, [
-    // shouldInitNewTokenChain,
     shouldSelectChain,
   ]);
 
