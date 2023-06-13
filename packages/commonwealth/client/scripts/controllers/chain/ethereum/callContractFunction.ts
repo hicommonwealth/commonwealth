@@ -57,6 +57,33 @@ async function sendFunctionCall({
   return txReceipt;
 }
 
+export async function get4337Account (web3: Web3, eoaAddress: string){
+  const abi = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "getAccount",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+  const factory = new web3.eth.Contract(abi as AbiItem[], '0xb28A7002bC67e61b31dCe32C079D7146Bf43ae60')
+  const accountAddr = await factory.methods.getAccount(eoaAddress).call();
+  return accountAddr;
+}
+
 /**
  * Uses the current user's ETH wallet to perform a specified contract tx or call.
  *
@@ -117,29 +144,7 @@ export async function callContractFunction({
     );
     return txReceipt;
   }else{
-    const abi = [
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          }
-        ],
-        "name": "getAccount",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ]
-    const factory = new web3.eth.Contract(abi as AbiItem[], '0xb28A7002bC67e61b31dCe32C079D7146Bf43ae60')
-    const accountAddr = await factory.methods.getAccount(signingWallet.accounts[0]).call()
+    const accountAddr = await get4337Account(web3, signingWallet.accounts[0])
     const userOpEvent = await sendUserOp(
       web3,
       accountAddr,
