@@ -460,7 +460,6 @@ const createChain = async (
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
       keytype: addressToBeAdmin.keytype,
-      name: addressToBeAdmin.name,
       wallet_id: addressToBeAdmin.wallet_id,
       is_user_default: true,
       role: 'admin',
