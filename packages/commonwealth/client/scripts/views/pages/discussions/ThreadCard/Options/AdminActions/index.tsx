@@ -240,8 +240,8 @@ export const AdminActions = ({
                     onClick: handleThreadLockToggle,
                     label: thread.readOnly ? 'Unlock' : 'Lock',
                     iconLeft: thread.readOnly
-                      ? ('keyLockClosed' as const)
-                      : ('keyLockOpened' as const),
+                      ? ('keyLockOpened' as const)
+                      : ('keyLockClosed' as const),
                     iconLeftWeight: 'bold' as const,
                   },
                   {
