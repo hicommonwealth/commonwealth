@@ -100,7 +100,6 @@ export default (
       indexes: [
         { fields: ['address', 'chain'], unique: true },
         { fields: ['user_id'] },
-        { fields: ['name'] },
       ],
       defaultScope: {
         attributes: {
