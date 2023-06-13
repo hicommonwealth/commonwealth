@@ -40,7 +40,7 @@ test.describe('DiscussionsPage Homepage', () => {
       'div[data-test-id] > div',
       (divs) => divs.length
     );
-    expect(numberOfThreads).to.equal(Math.min(20, testThreads.length + 1));
+    expect(numberOfThreads).to.equal(Math.min(20, testThreads.length));
 
     const firstThread = await page.$(
       'div[data-test-id="virtuoso-item-list"] > div:first-child'
