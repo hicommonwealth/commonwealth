@@ -1,4 +1,3 @@
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
@@ -6,6 +5,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// TODO: deprecate this by fetching token info on client side vs from DB tokens
 const getTokenForum = async (models: DB, req: Request, res: Response) => {
   const address = req.query.address;
   if (!address) {
@@ -17,10 +17,6 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
 
   // default to mainnet
   const chain_id = +req.query.chain_id || 1;
-  // default to ERC20
-  const chain_network = req.query.chain_network
-    ? req.query.chain_network
-    : ChainNetwork.ERC20;
   const token = await models.Token.findOne({
     where: {
       address: { [Op.iLike]: address },
@@ -36,10 +32,6 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
     if (!url) {
       return res.json({ status: 'Failure', message: 'Unsupported chain' });
     }
-  }
-
-  if (!token && !req.query.allowUncached) {
-    return res.json({ status: 'Failure', message: 'Token does not exist' });
   }
 
   try {
@@ -61,60 +53,10 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
         message: 'Must provide valid contract address',
       });
     }
-    if (req.query.autocreate) {
-      if (!node) {
-        return res.json({
-          status: 'Failure',
-          message: 'Cannot autocreate custom node',
-        });
-      }
-      const [chain, success] = await models.Chain.findOrCreate({
-        where: { id: token.id },
-        defaults: {
-          active: true,
-          network: chain_network,
-          type: ChainType.Token,
-          icon_url: token.icon_url,
-          default_symbol: token.symbol,
-          name: token.name,
-          base: ChainBase.Ethereum,
-          has_chain_events_listener: false,
-        },
-      });
-
-      // Create Contract + Association
-      const [contract] = await models.Contract.findOrCreate({
-        where: {
-          address,
-          chain_node_id: node.id,
-        },
-        defaults: {
-          address,
-          chain_node_id: node.id,
-          decimals: token.decimals,
-          symbol: token.symbol,
-          type: chain.network, // TODO: Make better query param and validation for this
-        },
-      });
-      await models.CommunityContract.create({
-        chain_id: chain.id,
-        contract_id: contract.id,
-      });
-      chain.Contract = contract.toJSON();
-
-      const nodeJSON = node.toJSON();
-      delete nodeJSON.private_url;
-      return res.json({
-        status: 'Success',
-        result: { chain: chain.toJSON(), node: nodeJSON },
-      });
-    } else {
-      // only return token data if we do not autocreate
-      return res.json({
-        status: 'Success',
-        token: token ? token.toJSON() : {},
-      });
-    }
+    return res.json({
+      status: 'Success',
+      token: token ? token.toJSON() : {},
+    });
   } catch (e) {
     log.error(e.message);
     return res.json({
