@@ -25,10 +25,10 @@ test.describe('DiscussionsPage Homepage', () => {
   }) => {
     await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
 
-    await page.waitForSelector('div.RecentThreadsHeader');
+    await page.waitForSelector('div.HeaderWithFilters');
 
     // Assert Thread header exists on discussions page
-    const headerExists = (await page.$('div.RecentThreadsHeader')) !== null;
+    const headerExists = (await page.$('div.HeaderWithFilters')) !== null;
 
     expect(headerExists).to.be.true;
 
