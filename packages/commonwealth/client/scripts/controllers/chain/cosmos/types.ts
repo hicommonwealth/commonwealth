@@ -63,6 +63,7 @@ export interface ICosmosProposal extends IIdentifiable {
   depositEndTime: moment.Moment;
   votingStartTime: moment.Moment;
   votingEndTime: moment.Moment;
+  metadata?: string; // v1 only
 
   // partially populated initial state update -- no depositors or voters
   state: ICosmosProposalState;

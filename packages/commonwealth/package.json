@@ -196,6 +196,7 @@
     "html-webpack-plugin": "^5.5.0",
     "https-browserify": "^1.0.0",
     "ignore-loader": "^0.1.2",
+    "is-ipfs": "^8.0.1",
     "is-my-json-valid": "^2.20.6",
     "jdenticon": "^2.1.1",
     "jquery": "^3.3.1",
