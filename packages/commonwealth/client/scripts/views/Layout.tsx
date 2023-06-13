@@ -4,7 +4,7 @@ import withRouter from 'navigation/helpers';
 import React, { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
-import app, { LoginState } from 'state';
+import app from 'state';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
@@ -12,26 +12,6 @@ import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
-
-const LoadingLayout = () => {
-  const Bobber = () => (
-    <div className="Layout">
-      <div className="spinner-container">
-        <CWSpinner size="xl" />
-      </div>
-    </div>
-  );
-
-  const isLoggedIn = app.loginState === LoginState.LoggedIn;
-  const isLanding = window.location.pathname === '/';
-  if (isLanding && !isLoggedIn) return <Bobber />;
-
-  return (
-    <SubLayout>
-      <Bobber />
-    </SubLayout>
-  );
-};
 
 const ApplicationError = () => {
   return (
@@ -153,26 +133,38 @@ const LayoutComponent = ({
   // IFB 6
   // -
   // IFB 7
-  if (
+  const shouldShowLoadingState =
     isLoading || // general loading
     !app.loginStatusLoaded() || // IFB 2
     // Important: render loading state immediately for IFB 5, 6 and 7, general
     // loading will take over later
     shouldSelectChain || // IFB 5
-    shouldDeInitChain // IFB 7
-  ) {
-    return <LoadingLayout />;
-  }
+    shouldDeInitChain; // IFB 7
 
   // IFB 4: If the user has attempted to a community page that was not
   // found on the list of communities from /status, show a 404 page.
   const pageNotFound = selectedScope && !scopeMatchesChain;
 
   // IFB 8: No pending branch case - Render the inner page as passed by router
-  const child = pageNotFound ? <PageNotFound /> : children;
+  const childToRender = () => {
+    if (shouldShowLoadingState) {
+      return (
+        <div className="spinner-container">
+          <CWSpinner size="xl" />
+        </div>
+      );
+    }
+
+    return pageNotFound ? <PageNotFound /> : children;
+  };
+
   return (
     <div className="Layout">
-      {type === 'blank' ? child : <SubLayout>{child}</SubLayout>}
+      {type === 'blank' ? (
+        childToRender()
+      ) : (
+        <SubLayout>{childToRender()}</SubLayout>
+      )}
     </div>
   );
 };
