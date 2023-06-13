@@ -13,22 +13,6 @@ import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
 
-const ApplicationError = () => {
-  return (
-    <div className="Layout">
-      <CWEmptyState
-        iconName="cautionTriangle"
-        content={
-          <div className="loading-error">
-            <CWText>Application error: {app.loadingError}</CWText>
-            <CWText>Please try again later</CWText>
-          </div>
-        }
-      />
-    </div>
-  );
-};
-
 type LayoutAttrs = {
   scope?: string;
   children: React.ReactNode;
@@ -116,11 +100,6 @@ const LayoutComponent = ({
     })();
   }, [shouldDeInitChain]);
 
-  // IFB 1: If initApp() threw an error, show application error.
-  if (app.loadingError) {
-    return <ApplicationError />;
-  }
-
   // Show loading state for these cases
   // -
   // IFB 2: If initApp() hasn’t finished loading yet
@@ -147,6 +126,21 @@ const LayoutComponent = ({
 
   // IFB 8: No pending branch case - Render the inner page as passed by router
   const childToRender = () => {
+    // IFB 1: If initApp() threw an error, show application error.
+    if (app.loadingError) {
+      return (
+        <CWEmptyState
+          iconName="cautionTriangle"
+          content={
+            <div className="loading-error">
+              <CWText>Application error: {app.loadingError}</CWText>
+              <CWText>Please try again later</CWText>
+            </div>
+          }
+        />
+      );
+    }
+
     if (shouldShowLoadingState) {
       return (
         <div className="spinner-container">
