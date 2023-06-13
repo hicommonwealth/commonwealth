@@ -13,7 +13,7 @@ import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
 
-const LoadingLayout = ({ isAppLoading }) => {
+const LoadingLayout = () => {
   const Bobber = () => (
     <div className="Layout">
       <div className="spinner-container">
@@ -27,7 +27,7 @@ const LoadingLayout = ({ isAppLoading }) => {
   if (isLanding && !isLoggedIn) return <Bobber />;
 
   return (
-    <SubLayout isLoadingProfileData={isAppLoading}>
+    <SubLayout>
       <Bobber />
     </SubLayout>
   );
@@ -52,7 +52,6 @@ const ApplicationError = () => {
 type LayoutAttrs = {
   scope?: string;
   children: React.ReactNode;
-  isAppLoading?: boolean;
   type: 'community' | 'blank';
 };
 
@@ -68,7 +67,6 @@ const LayoutComponent = ({
   // router,
   children,
   scope: selectedScope,
-  isAppLoading,
   type = 'community',
 }: LayoutAttrs) => {
   // const scopeIsEthereumAddress =
@@ -161,10 +159,9 @@ const LayoutComponent = ({
     // Important: render loading state immediately for IFB 5, 6 and 7, general
     // loading will take over later
     shouldSelectChain || // IFB 5
-    shouldDeInitChain || // IFB 7
-    isAppLoading // NON IFB - a bool to indicate if app is loading
+    shouldDeInitChain // IFB 7
   ) {
-    return <LoadingLayout isAppLoading />;
+    return <LoadingLayout />;
   }
 
   // IFB 4: If the user has attempted to a community page that was not
@@ -188,11 +185,7 @@ export const LayoutWrapper = ({ Component, params }) => {
   const scope = params.scoped ? pathScope : null;
 
   return (
-    <LayoutComp
-      scope={scope}
-      isAppLoading={params?.isAppLoading}
-      type={params.type}
-    >
+    <LayoutComp scope={scope} type={params.type}>
       <Component {...routerParams} />
     </LayoutComp>
   );

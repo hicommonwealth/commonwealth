@@ -6,12 +6,12 @@ const TermsPage = lazy(() => import('views/pages/terms'));
 const PrivacyPage = lazy(() => import('views/pages/privacy'));
 const ComponentsPage = lazy(() => import('views/pages/components'));
 
-const GeneralRoutes = (isAppLoading: boolean) => [
-  <Route path="/terms" element={withLayout(TermsPage, { isAppLoading })} />,
-  <Route path="/privacy" element={withLayout(PrivacyPage, { isAppLoading })} />,
+const GeneralRoutes = () => [
+  <Route path="/terms" element={withLayout(TermsPage, {})} />,
+  <Route path="/privacy" element={withLayout(PrivacyPage, {})} />,
   <Route
     path="/components"
-    element={withLayout(ComponentsPage, { hideSidebar: true, isAppLoading })}
+    element={withLayout(ComponentsPage, { hideSidebar: true })}
   />,
 ];
 
