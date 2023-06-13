@@ -526,7 +526,7 @@ export class ServerCommentsController implements IServerCommentsController {
               chain: mention[0],
               address: mention[1],
             },
-            include: [this.models.User, this.models.RoleAssignment],
+            include: [this.models.User],
           });
           return mentionedUser;
         })

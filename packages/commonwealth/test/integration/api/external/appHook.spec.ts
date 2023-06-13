@@ -1,15 +1,15 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import passport from 'passport';
-import session from 'express-session';
-import { SESSION_SECRET } from 'server/config';
-import models from 'server/database';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import { addExternalRoutes } from 'server/routing/external';
-import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
+import SessionSequelizeStore from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import session from 'express-session';
+import passport from 'passport';
+import { SESSION_SECRET } from 'server/config';
+import models from 'server/database';
+import { addExternalRoutes } from 'server/routing/external';
+import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
@@ -48,11 +48,12 @@ before(async () => {
 export async function get(
   path: string,
   val: Record<string, unknown> = null,
-  expectError = false
+  expectError = false,
+  passedApp = app
 ) {
   const res = <any>(
     await chai
-      .request(app)
+      .request(passedApp)
       .get(path)
       .set('Accept', 'application/json')
       .query(val)
@@ -70,11 +71,12 @@ export async function get(
 export async function put(
   path: string,
   val: Record<string, unknown>,
-  expectError = false
+  expectError = false,
+  passedApp = app
 ) {
   const res = <any>(
     await chai
-      .request(app)
+      .request(passedApp)
       .put(path)
       .set('Accept', 'application/json')
       .send(val)
@@ -92,11 +94,12 @@ export async function put(
 export async function post(
   path: string,
   val: Record<string, unknown>,
-  expectError = false
+  expectError = false,
+  expectedApp = app
 ) {
   const res = <any>(
     await chai
-      .request(app)
+      .request(expectedApp)
       .post(path)
       .set('Accept', 'application/json')
       .send(val)

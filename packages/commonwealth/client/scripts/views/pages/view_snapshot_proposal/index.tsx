@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
 import {
+  getPower,
+  getResults,
   Power,
   SnapshotProposal,
   SnapshotProposalVote,
@@ -8,8 +8,9 @@ import {
   VoteResults,
   VoteResultsData,
 } from 'helpers/snapshot_utils';
-import { getPower, getResults } from 'helpers/snapshot_utils';
-
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { LinkSource } from 'models/Thread';
+import React, { useCallback, useMemo, useState } from 'react';
 import app from 'state';
 import Sublayout from 'views/Sublayout';
 import AddressInfo from '../../../models/AddressInfo';
@@ -19,13 +20,12 @@ import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { LinkSource } from 'models/Thread';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -111,7 +111,7 @@ export const ViewProposalPage = ({
     [activeUserAddress]
   );
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     loadVotes(snapshotId, identifier).catch(console.error);
   }, [identifier, loadVotes, snapshotId]);
 
