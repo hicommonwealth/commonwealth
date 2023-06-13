@@ -133,7 +133,6 @@ const linkExistingAddressToChain = async (
       existingAddress.verification_token = verificationToken;
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
-      existingAddress.name = originalAddress.name;
       existingAddress.verified = originalAddress.verified;
       const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
@@ -147,7 +146,6 @@ const linkExistingAddressToChain = async (
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
         keytype: originalAddress.keytype,
-        name: originalAddress.name,
         wallet_id: originalAddress.wallet_id,
         last_active: new Date(),
       });

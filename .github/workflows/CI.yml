@@ -73,7 +73,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run e2e tests
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
+        run: export ETH_RPC=e2e-test && yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true

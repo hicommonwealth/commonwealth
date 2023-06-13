@@ -8,6 +8,12 @@
   flex-direction: column;
   padding: 24px;
 
+  .link {
+    text-decoration: underline;
+    color: $primary-600;
+    cursor: pointer;
+  }
+
   .forum-container {
     align-items: center;
     display: flex;
