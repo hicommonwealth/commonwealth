@@ -91,68 +91,66 @@ const OverviewPage = () => {
   return !topicSummaryRows.length && !app.threads.initialized ? (
     <PageLoading />
   ) : (
-    <Sublayout>
-      <div className="OverviewPage">
-        <div className="header-row">
-          <div className="header-row-left">
-            <CWText type="h3" fontWeight="semiBold">
-              Overview
-            </CWText>
-            <CWButton
-              className="latest-button"
-              buttonType="mini-black"
-              label="Latest Threads"
-              iconLeft="home"
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          </div>
-          {windowIsExtraSmall ? (
-            <CWIconButton
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          ) : (
-            <CWButton
-              buttonType="mini-black"
-              label="Create Thread"
-              iconLeft="plus"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          )}
+    <div className="OverviewPage">
+      <div className="header-row">
+        <div className="header-row-left">
+          <CWText type="h3" fontWeight="semiBold">
+            Overview
+          </CWText>
+          <CWButton
+            className="latest-button"
+            buttonType="mini-black"
+            label="Latest Threads"
+            iconLeft="home"
+            onClick={() => {
+              navigate('/discussions');
+            }}
+          />
         </div>
-        <div className="column-headers-row">
+        {windowIsExtraSmall ? (
+          <CWIconButton
+            iconName="plusCircle"
+            iconButtonTheme="black"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!app.user.activeAccount}
+          />
+        ) : (
+          <CWButton
+            buttonType="mini-black"
+            label="Create Thread"
+            iconLeft="plus"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!app.user.activeAccount}
+          />
+        )}
+      </div>
+      <div className="column-headers-row">
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="threads-header-row-text"
+        >
+          Topic
+        </CWText>
+        <div className="threads-header-container">
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="threads-header-row-text"
           >
-            Topic
+            Recent threads
           </CWText>
-          <div className="threads-header-container">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="threads-header-row-text"
-            >
-              Recent threads
-            </CWText>
-          </div>
         </div>
-        <CWDivider />
-        {topicSummaryRows.map((row, i) => (
-          <TopicSummaryRow {...row} key={i} />
-        ))}
       </div>
-    </Sublayout>
+      <CWDivider />
+      {topicSummaryRows.map((row, i) => (
+        <TopicSummaryRow {...row} key={i} />
+      ))}
+    </div>
   );
 };
 

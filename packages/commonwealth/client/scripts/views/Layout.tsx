@@ -53,6 +53,7 @@ type LayoutAttrs = {
   scope?: string;
   children: React.ReactNode;
   isAppLoading?: boolean;
+  type: 'community' | 'blank';
 };
 
 /**
@@ -68,6 +69,7 @@ const LayoutComponent = ({
   children,
   scope: selectedScope,
   isAppLoading,
+  type = 'community',
 }: LayoutAttrs) => {
   // const scopeIsEthereumAddress =
   //   selectedScope &&
@@ -167,20 +169,15 @@ const LayoutComponent = ({
 
   // IFB 4: If the user has attempted to a community page that was not
   // found on the list of communities from /status, show a 404 page.
-  if (
-    selectedScope &&
-    !scopeMatchesChain
-    // && !scopeIsEthereumAddress
-  ) {
-    return (
-      <div className="Layout">
-        <PageNotFound />
-      </div>
-    );
-  }
+  const pageNotFound = selectedScope && !scopeMatchesChain;
 
   // IFB 8: No pending branch case - Render the inner page as passed by router
-  return <div className="Layout">{children}</div>;
+  const child = pageNotFound ? <PageNotFound /> : children;
+  return (
+    <div className="Layout">
+      {type === 'blank' ? child : <SubLayout>{child}</SubLayout>}
+    </div>
+  );
 };
 
 export const LayoutWrapper = ({ Component, params }) => {
@@ -191,13 +188,18 @@ export const LayoutWrapper = ({ Component, params }) => {
   const scope = params.scoped ? pathScope : null;
 
   return (
-    <LayoutComp scope={scope} isAppLoading={params?.isAppLoading}>
+    <LayoutComp
+      scope={scope}
+      isAppLoading={params?.isAppLoading}
+      type={params.type}
+    >
       <Component {...routerParams} />
     </LayoutComp>
   );
 };
 
 export const withLayout = (Component, params) => {
+  console.log('component => ', Component);
   return (
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}

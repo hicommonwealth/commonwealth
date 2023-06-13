@@ -1,7 +1,5 @@
 import React from 'react';
-
 import app from 'state';
-import Sublayout from 'views/Sublayout';
 import EditProfileComponent from '../components/edit_profile';
 import { PageNotFound } from '../pages/404';
 
@@ -12,11 +10,7 @@ const EditNewProfile = () => {
     );
   }
 
-  return (
-    <Sublayout>
-      <EditProfileComponent />
-    </Sublayout>
-  );
+  return <EditProfileComponent />;
 };
 
 export default EditNewProfile;

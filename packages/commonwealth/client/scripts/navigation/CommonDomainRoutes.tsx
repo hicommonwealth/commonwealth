@@ -90,6 +90,7 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
       scoped: false,
       isAppLoading,
       hideSidebar: false,
+      type: 'blank',
     })}
   />,
   <Route

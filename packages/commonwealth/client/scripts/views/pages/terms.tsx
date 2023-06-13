@@ -1,12 +1,8 @@
-import React from 'react';
 /* eslint-disable max-len */
-
 import { renderMultilineText } from 'helpers';
-
 import 'pages/privacy_and_terms.scss';
-
+import React from 'react';
 import { CWText } from '../components/component_kit/cw_text';
-import Sublayout from '../Sublayout';
 
 const TermsOfService = `
 PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COMMONWEALTH LABS THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:
@@ -125,18 +121,16 @@ const notice = `Notice is hereby given, pursuant to Section 184(1B) of the BVI B
 
 const TermsPage = () => {
   return (
-    <Sublayout>
-      <div className="TermsPage">
-        <div className="forum-container">
-          <CWText>Posted on 1/26/2023</CWText>
+    <div className="TermsPage">
+      <div className="forum-container">
+        <CWText>Posted on 1/26/2023</CWText>
 
-          <CWText type="h3">Notice</CWText>
-          {renderMultilineText(notice)}
-          <CWText type="h3">Terms of Service</CWText>
-          {renderMultilineText(TermsOfService)}
-        </div>
+        <CWText type="h3">Notice</CWText>
+        {renderMultilineText(notice)}
+        <CWText type="h3">Terms of Service</CWText>
+        {renderMultilineText(TermsOfService)}
       </div>
-    </Sublayout>
+    </div>
   );
 };
 
