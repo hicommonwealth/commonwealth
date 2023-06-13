@@ -61,9 +61,7 @@ export const ERC20Form = (props: EthChainFormState) => {
     const args = {
       address: ethChainFormFields.address,
       chain_id: ethChainFormFields.ethChainId,
-      chain_network: ChainNetwork.ERC20,
       url: ethChainFormFields.nodeUrl,
-      allowUncached: true,
     };
 
     try {

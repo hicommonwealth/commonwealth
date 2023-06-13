@@ -115,7 +115,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getEntityMeta from '../routes/getEntityMeta';
-import { getTokensFromLists } from '../routes/getTokensFromLists';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
 import bulkBalances from '../routes/bulkBalances';
@@ -319,7 +318,6 @@ function setupRouter(
     '/bulkBalances',
     bulkBalances.bind(this, models, tokenBalanceCache)
   );
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get(
     '/getSupportedEthChains',
