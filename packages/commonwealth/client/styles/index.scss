@@ -49,6 +49,7 @@ html.invert {
   -ms-filter: invert(90%);
 
   img,
+  svg,
   .user-avatar:not(:has(.Avatar)),
   .Avatar {
     filter: invert(90%);
