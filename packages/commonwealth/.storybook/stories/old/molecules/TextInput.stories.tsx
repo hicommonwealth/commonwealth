@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWTextInput } from '../../../client/scripts/views/components/component_kit/cw_text_input';
-import type { ValidationStatus } from '../../../client/scripts/views/components/component_kit/cw_validation_text';
-import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+import { CWTextInput } from '../../../../client/scripts/views/components/component_kit/cw_text_input';
+import type { ValidationStatus } from '../../../../client/scripts/views/components/component_kit/cw_validation_text';
+import { iconLookup } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
@@ -27,7 +27,7 @@ const commonControlsToExclude = [
 ];
 
 const input = {
-  title: 'Molecules/TextInput',
+  title: 'Old/Molecules/TextInput',
   component: CWTextInput,
 } satisfies Meta<typeof CWTextInput>;
 

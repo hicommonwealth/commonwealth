@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Meta } from '@storybook/react';
 
-import { CWCollapsible } from '../../../client/scripts/views/components/component_kit/cw_collapsible';
-import { CWText } from '../../../client/scripts/views/components/component_kit/cw_text';
+import { CWCollapsible } from '../../../../client/scripts/views/components/component_kit/cw_collapsible';
+import { CWText } from '../../../../client/scripts/views/components/component_kit/cw_text';
 
 const collapsible = {
-  title: 'Molecules/Collapsible',
+  title: 'Old/Molecules/Collapsible',
   component: CWCollapsible,
 } satisfies Meta<typeof CWCollapsible>;
 

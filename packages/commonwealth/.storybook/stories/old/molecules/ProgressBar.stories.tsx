@@ -1,12 +1,12 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWProgressBar } from '../../../client/scripts/views/components/component_kit/cw_progress_bar';
+import { CWProgressBar } from '../../../../client/scripts/views/components/component_kit/cw_progress_bar';
 
-import '../../../client/styles/components/component_kit/cw_component_showcase.scss';
+import '../../../../client/styles/components/component_kit/cw_component_showcase.scss';
 
 const progressBar = {
-  title: 'Molecules/ProgressBar',
+  title: 'Old/Molecules/ProgressBar',
   component: CWProgressBar,
 } satisfies Meta<typeof CWProgressBar>;
 

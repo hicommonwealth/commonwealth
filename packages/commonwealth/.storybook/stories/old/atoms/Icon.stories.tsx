@@ -1,15 +1,15 @@
 import React, { FC, useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWIcon } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../../client/scripts/views/components/component_kit/cw_icon_button';
-import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
-import { IconComponentProps } from '../../../client/scripts/views/components/component_kit/cw_icons/types';
+import { CWIcon } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../../../../client/scripts/views/components/component_kit/cw_icon_button';
+import { iconLookup } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
+import { IconComponentProps } from '../../../../client/scripts/views/components/component_kit/cw_icons/types';
 
 const iconOptions = [ ...Object.keys(iconLookup) ];
 
 const icons = {
-  title: 'Atoms/Icon',
+  title: 'Old/Atoms/Icon',
   component: CWIcon,
 } satisfies Meta<typeof CWIcon>;
 
