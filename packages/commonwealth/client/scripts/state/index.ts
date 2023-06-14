@@ -133,7 +133,7 @@ const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
   chainEntities: new ChainEntityController(),
-  activeChainId: () => null,
+  activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
