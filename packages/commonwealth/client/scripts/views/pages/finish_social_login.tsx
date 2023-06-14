@@ -4,14 +4,17 @@ import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
 import { initAppState } from 'state';
-import app from 'state';
 
 const validate = async (setRoute) => {
+  const params = new URLSearchParams(window.location.search);
+  const chain = params.get('chain');
+
   try {
     await handleSocialLoginCallback();
     await initAppState();
-    if (app.activeChainId()) {
-      setRoute(`/account/${app.activeChainId()}`);
+
+    if (chain) {
+      setRoute(`/${chain}`);
     } else {
       setRoute('/dashboard');
     }
