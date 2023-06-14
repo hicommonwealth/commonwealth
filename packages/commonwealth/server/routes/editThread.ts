@@ -39,6 +39,7 @@ const editThread = async (
     canvas_session,
     canvas_hash,
   } = req.body;
+
   if (!thread_id) {
     return next(new AppError(Errors.NoThreadId));
   }
@@ -147,6 +148,7 @@ const editThread = async (
     }
     thread.body = body;
     thread.stage = stage;
+    thread.last_edited = new Date().toISOString();
     thread.canvas_action = canvas_action;
     thread.canvas_session = canvas_session;
     thread.canvas_hash = canvas_hash;
@@ -235,7 +237,7 @@ const editThread = async (
                 chain: mention[0],
                 address: mention[1],
               },
-              include: [models.User, models.RoleAssignment],
+              include: [models.User],
             });
             return user;
           } catch (err) {

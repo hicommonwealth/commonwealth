@@ -19,7 +19,13 @@ import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { addressSwapper } from 'utils';
+import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
+import {
+  getAddressFromWallet,
+  loginToAxie,
+  loginToNear,
+} from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
 import type { ProfileRowProps } from '../views/components/component_kit/cw_profiles_list';
@@ -31,12 +37,13 @@ import type {
   LoginActiveStep,
   LoginSidebarType,
 } from '../views/pages/login/types';
-import {
-  getAddressFromWallet,
-  loginToAxie,
-  loginToNear,
-} from '../helpers/wallet';
 import useBrowserWindow from './useBrowserWindow';
+import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
+import {
+  MixpanelLoginEvent,
+  MixpanelLoginPayload,
+} from '../../../shared/analytics/types';
+import { MockMetaMaskProvider } from 'helpers/mockMetaMaskUtil';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -82,6 +89,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const isLinkingWallet = activeStep === 'selectPrevious';
 
+  const { trackAnalytics } = useBrowserAnalyticsTrack<MixpanelLoginPayload>({
+    onAction: true,
+  });
+
   useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
@@ -95,6 +106,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
   });
 
   useEffect(() => {
+    if (process.env.ETH_RPC === 'e2e-test') {
+      window['ethereum'] = new MockMetaMaskProvider(
+        'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+        '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
+      );
+    }
+
     // Determine if in a community
     const tempIsInCommunityPage = app.activeChainId() !== undefined;
     setIsInCommunityPage(tempIsInCommunityPage);
@@ -153,7 +171,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      await loginWithMagicLink(email);
+      await loginWithMagicLink({ email });
       setIsMagicLoading(false);
 
       if (walletProps.onSuccess) walletProps.onSuccess();
@@ -163,6 +181,46 @@ const useWallets = (walletProps: IuseWalletProps) => {
       } else {
         walletProps.onModalClose();
       }
+      trackAnalytics({
+        event: MixpanelLoginEvent.LOGIN,
+        community: app?.activeChainId(),
+        communityType: app?.chain?.meta?.base,
+        loginOption: 'email',
+        isSocialLogin: true,
+        loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
+        isMobile,
+      });
+    } catch (e) {
+      notifyError("Couldn't send magic link");
+      setIsMagicLoading(false);
+      console.error(e);
+    }
+  };
+
+  // New callback for handling social login
+  const onSocialLogin = async (provider: string) => {
+    setIsMagicLoading(true);
+
+    try {
+      await loginWithMagicLink({ provider });
+      setIsMagicLoading(false);
+
+      if (walletProps.onSuccess) walletProps.onSuccess();
+
+      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        walletProps.onModalClose();
+      } else {
+        walletProps.onModalClose();
+      }
+      trackAnalytics({
+        event: MixpanelLoginEvent.LOGIN,
+        community: app?.activeChainId(),
+        communityType: app?.chain?.meta?.base,
+        loginOption: provider,
+        isSocialLogin: true,
+        loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
+        isMobile,
+      });
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
@@ -195,7 +253,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         const chain =
           app.user.selectedChain ||
           app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses(chain);
+        await updateActiveAddresses({ chain, shouldRedraw: shouldRedrawApp });
       }
     }
 
@@ -300,16 +358,18 @@ const useWallets = (walletProps: IuseWalletProps) => {
         await primaryAccount.validate(
           cachedWalletSignature,
           cachedTimestamp,
-          cachedChainId
+          cachedChainId,
+          false
         );
       }
       await onLogInWithAccount(primaryAccount, false, false);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      await app.newProfiles.updateProfileForAccount(
+      await NewProfilesController.Instance.updateProfileForAccount(
         primaryAccount.profile.address,
-        {}
+        {},
+        false
       );
     } catch (e) {
       console.log(e);
@@ -361,7 +421,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     };
     try {
       if (username || avatarUrl) {
-        await app.newProfiles.updateProfileForAccount(
+        await NewProfilesController.Instance.updateProfileForAccount(
           primaryAccount.profile.address,
           data
         );
@@ -476,7 +536,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
         setActiveStep('redirectToSign');
-        return;
       } else {
         onAccountVerified(
           signingAccount,
@@ -485,6 +544,17 @@ const useWallets = (walletProps: IuseWalletProps) => {
           wallet
         );
       }
+
+      trackAnalytics({
+        event: MixpanelLoginEvent.LOGIN,
+        community: app?.activeChainId(),
+        communityType: app?.chain?.meta?.base,
+        loginOption: wallet.name,
+        isSocialLogin: true,
+        loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
+        isMobile,
+      });
+      return;
     } catch (err) {
       console.log(err);
     }
@@ -563,6 +633,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     onResetWalletConnect,
     onPerformLinking,
     onEmailLogin,
+    onSocialLogin,
     onLinkExistingAccount,
     setAvatarUrl,
     setEmail,

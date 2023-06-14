@@ -1,16 +1,23 @@
 export const enum MixpanelPageViewEvent {
   LANDING_PAGE_VIEW = 'Landing Page Viewed',
   COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
+  THREAD_PAGE_VIEW = 'Thread Page Viewed',
+  DASHBOARD_VIEW = 'Dashbboard Page Viewed',
 }
 
 export const enum MixpanelCommunityInteractionEvent {
   CREATE_THREAD = 'Create New Thread',
   CREATE_COMMENT = 'Create New Comment',
   CREATE_REACTION = 'Create New Reaction',
+  LINKED_PROPOSAL = 'Linked Proposal',
+  LINKED_THREAD = 'Linked Thread',
+  UPDATE_STAGE = 'Update Stage',
 }
 
 export const enum MixpanelLoginEvent {
-  LOGIN = 'Login to Commonwealth',
+  LOGIN = 'Login',
+  LOGIN_COMPLETED = 'Login Completed',
+  LOGIN_FAILED = 'Login Failed',
 }
 
 export const enum MixpanelUserSignupEvent {
@@ -35,6 +42,7 @@ export const enum MixpanelSnapshotEvents {
   SNAPSHOT_PAGE_VISIT = 'Snapshot Page Visited',
   SNAPSHOT_PROPOSAL_VIEWED = 'Snapshot Proposal Viewed',
   SNAPSHOT_VOTE_OCCURRED = 'Snapshot Vote Occurred',
+  SNAPSHOT_PROPOSAL_CREATED = 'Snapshot Proposal Created',
 }
 
 export type MixpanelEvents =
@@ -46,37 +54,24 @@ export type MixpanelEvents =
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent;
 
-export interface BaseMixpanelPayload {
+export type AnalyticsEvent = MixpanelEvents; // add other providers events here
+
+export interface AnalyticsPayload {
+  event: AnalyticsEvent; // base event type
+}
+
+export interface BaseMixpanelPayload extends AnalyticsPayload {
   event: MixpanelEvents;
-  isCustomDomain: boolean;
-}
-
-export interface MixpanelPageViewPayload extends BaseMixpanelPayload {
-  event: MixpanelPageViewEvent;
-}
-
-export interface MixpanelCommunityInteractionPayload
-  extends BaseMixpanelPayload {
-  event: MixpanelCommunityInteractionEvent;
-  community: string;
+  userAddress?: string;
+  community?: string;
+  communityType?: string;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
-  event: MixpanelLoginEvent;
+  loginOption: string;
+  isSocialLogin: boolean;
+  loginPageLocation: string;
+  isMobile: boolean;
 }
 
-export interface MixpanelUserSignupPayload extends BaseMixpanelPayload {
-  chain: string;
-  event: MixpanelUserSignupEvent;
-}
-
-export interface MixpanelErrorCapturePayload extends BaseMixpanelPayload {
-  message: string;
-  community: string;
-  event: MixpanelErrorCaptureEvent;
-}
-
-export interface MixpanelSnapshotEventsPayload extends BaseMixpanelPayload {
-  event: MixpanelSnapshotEvents;
-  space: string;
-}
+export const providers = ['mixpanel']; // add other providers here

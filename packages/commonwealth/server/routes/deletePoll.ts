@@ -1,6 +1,4 @@
 import { AppError, ServerError } from 'common-common/src/errors';
-import moment from 'moment';
-import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
 import { findOneRole } from '../util/roles';
 import type { ValidateChainParams } from '../middleware/validateChain';
@@ -69,10 +67,16 @@ const deletePoll = async (
     });
     if (!polls) throw new AppError(Errors.NoPoll);
 
-    const poll = polls.find((p) => p.id === poll_id);
+    const poll = polls.find(
+      (p) => p.dataValues.id === parseInt(poll_id.toString())
+    );
     if (!poll) {
       throw new AppError(Errors.NoPoll);
     }
+
+    await models.Vote.destroy({
+      where: { poll_id: poll.id },
+    });
     await poll.destroy();
 
     if (polls.length === 1) {

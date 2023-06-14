@@ -51,8 +51,6 @@ export type ChainAttributes = {
   token_name?: string;
   ce_verbose?: boolean;
   discord_config_id?: number;
-  default_allow_permissions: bigint;
-  default_deny_permissions: bigint;
   category?: any;
 
   // associations
@@ -141,16 +139,6 @@ export default (
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
-      default_allow_permissions: {
-        type: dataTypes.BIGINT,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      default_deny_permissions: {
-        type: dataTypes.BIGINT,
-        allowNull: false,
-        defaultValue: 0,
-      },
       category: { type: dataTypes.JSONB, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
@@ -175,7 +163,6 @@ export default (
     models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.ChatChannel);
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });

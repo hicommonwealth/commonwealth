@@ -81,17 +81,6 @@ test.describe('Commonwealth Homepage - Links', () => {
     await newPage.waitForURL(`https://blog.commonwealth.im`);
   });
 
-  test('Check Jobs button', async ({ page, context }) => {
-    const jobs = await page.locator('.footer-link', { hasText: 'Jobs' });
-
-    const pagePromise = context.waitForEvent('page');
-
-    await jobs.click();
-
-    const newPage = await pagePromise;
-    await newPage.waitForURL(`https://angel.co/company/commonwealth-labs/jobs`);
-  });
-
   test('Check Terms button', async ({ page }) => {
     const terms = await page.locator('.footer-link', { hasText: 'Terms' });
     expect(terms).toBeTruthy();
@@ -104,5 +93,18 @@ test.describe('Commonwealth Homepage - Links', () => {
     expect(privacy).toBeTruthy();
     await privacy.click();
     await page.waitForURL(`http://localhost:${PORT}/privacy`);
+  });
+
+  test('Test Login', async ({ page }) => {
+    await page.goto('http://localhost:8080/');
+    await page.getByText('Login').click();
+    await page.waitForSelector('.LoginDesktop');
+    await page.getByText('Metamask').click();
+    await page.waitForSelector('.new-or-returning');
+    await page.getByText('New Account').click();
+    await page.getByText('Finish').click();
+    await page.waitForSelector('.username');
+    const element = await page.$('.username');
+    expect(element).toBeTruthy();
   });
 });

@@ -3,7 +3,6 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
-  IChatNotification,
   ICommunityNotificationData,
   IPostNotificationData,
   SnapshotEventType,
@@ -25,16 +24,17 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
+export type NotificationDataTypes =
+  | IPostNotificationData
+  | ICommunityNotificationData
+  | IChainEventNotificationData
+  | (SnapshotNotification & { eventType: SnapshotEventType });
+
 export default async function emitNotifications(
   models: DB,
   category_id: string,
   object_id: string,
-  notification_data:
-    | IPostNotificationData
-    | ICommunityNotificationData
-    | IChainEventNotificationData
-    | IChatNotification
-    | (SnapshotNotification & { eventType: SnapshotEventType }),
+  notification_data: NotificationDataTypes,
   webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]
@@ -142,8 +142,10 @@ export default async function emitNotifications(
         category_id,
         chain_id:
           (<IPostNotificationData>notification_data).chain_id ||
-          (<ICommunityNotificationData>notification_data).chain ||
-          (<IChatNotification>notification_data).chain_id,
+          (<ICommunityNotificationData>notification_data).chain,
+        thread_id:
+          Number((<IPostNotificationData>notification_data).thread_id) ||
+          undefined,
       });
     }
   }
@@ -162,7 +164,7 @@ export default async function emitNotifications(
     console.trace(e);
   }
 
-  let query = `INSERT INTO "NotificationsRead" VALUES `;
+  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id, id) VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {

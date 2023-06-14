@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
 import { formatAddressShort } from 'helpers';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type RoleInfo from '../../../models/RoleInfo';
 import { AccessLevel } from '../../../../../shared/permissions';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { MembersSearchBar } from '../../components/members_search_bar';
 
 type UpgradeRolesFormProps = {
-  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
+  searchTerm: string;
+  setSearchTerm: (v: string) => void;
 };
 
 export const UpgradeRolesForm = ({
-  onRoleUpgrade,
+  onRoleUpdate,
   roleData,
+  searchTerm,
+  setSearchTerm,
 }: UpgradeRolesFormProps) => {
   const [role, setRole] = useState('');
   const [user, setUser] = useState('');
@@ -34,7 +40,7 @@ export const UpgradeRolesForm = ({
     // @TODO: @Profiles upgrade, clean this up
     const chainId = _role.chain_id ? _role.chain_id : _role.Address?.chain?.id;
 
-    const displayName = app.newProfiles.getProfile(
+    const displayName = NewProfilesController.Instance.getProfile(
       chainId as string,
       _role.Address.address
     ).name;
@@ -50,12 +56,21 @@ export const UpgradeRolesForm = ({
 
   const chainOrCommObj = { chain: app.activeChainId() };
 
+  const options = useMemo(() => {
+    return nonAdminNames.map((n) => ({ label: n, value: n }));
+  }, [nonAdminNames]);
+
   return (
     <div className="UpgradeRolesForm">
+      <MembersSearchBar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        chainName={app.activeChainId()}
+      />
       <div className="members-container">
         <CWRadioGroup
           name="members/mods"
-          options={nonAdminNames.map((n) => ({ label: n, value: n }))}
+          options={options}
           toggledOption={user}
           onChange={(e) => {
             setUser(e.target.value);
@@ -101,7 +116,7 @@ export const UpgradeRolesForm = ({
                 notifyError('Upgrade failed');
               }
 
-              onRoleUpgrade(_user, r.result);
+              onRoleUpdate(_user, r.result);
             });
           }}
         />

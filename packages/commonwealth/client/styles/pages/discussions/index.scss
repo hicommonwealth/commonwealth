@@ -31,4 +31,11 @@ $size: 48px;
       }
     }
   }
+
+  .thread-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
 }

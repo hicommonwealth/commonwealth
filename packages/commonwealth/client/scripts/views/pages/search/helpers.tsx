@@ -4,6 +4,7 @@ import moment from 'moment';
 import 'pages/search/index.scss';
 
 import type { SearchSort } from 'models/SearchQuery';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import app from 'state';
 import { SearchContentType } from 'types';
@@ -62,6 +63,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
         </div>
         <CWText>
           <QuillRenderer
+            containerClass="SearchQuillRenderer"
             hideFormatting={true}
             doc={thread.body}
             searchTerm={searchTerm}
@@ -112,6 +114,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
         </div>
         <CWText>
           <QuillRenderer
+            containerClass="SearchQuillRenderer"
             hideFormatting={true}
             doc={comment.text}
             searchTerm={searchTerm}
@@ -156,7 +159,10 @@ const getCommunityResult = (community, setRoute) => {
 };
 
 const getMemberResult = (addr, setRoute) => {
-  const profile: MinimumProfile = app.newProfiles.getProfile(addr.chain, addr.address);
+  const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
+    addr.chain,
+    addr.address
+  );
 
   const handleClick = () => {
     setRoute(`/profile/id/${profile.id}`, {}, null);

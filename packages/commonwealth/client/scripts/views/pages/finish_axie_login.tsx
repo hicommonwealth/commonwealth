@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import type { NavigateOptions, To } from 'react-router';
-import $ from 'jquery';
-
-import app from 'state';
-import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import type { NavigateOptions, To } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
+import app, { initAppState } from 'state';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useSearchParams } from 'react-router-dom';
 
 // creates address, initializes account, and redirects to main page
 const validate = async (
@@ -32,7 +31,7 @@ const validate = async (
   if (result.status === 'Success') {
     await initAppState();
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
-    await updateActiveAddresses(selectedChainMeta);
+    await updateActiveAddresses({ chain: selectedChainMeta });
     console.log('Navigating to axie infinite community');
     setRoute('/axie-infinity');
   } else {
@@ -49,7 +48,7 @@ const FinishAxieLogin = () => {
   const token = searchParams.get('token');
   const stateId = searchParams.get('stateId');
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     validate(token, stateId, 'axie-infinity', navigate).then((res) => {
       if (typeof res === 'string') {
         setError(res);

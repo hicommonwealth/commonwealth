@@ -1,17 +1,22 @@
-import React, { useEffect } from 'react';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import app from 'state';
 import { PageLoading } from './loading';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ChainEntityLinkRedirectProps = {
   identifier: string;
   scope: string;
 };
 
-export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEntityLinkRedirectProps) {
+export default function ChainEntityLinkRedirect({
+  identifier,
+  scope,
+}: ChainEntityLinkRedirectProps) {
   const navigate = useCommonNavigate();
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetchChainEntityData = async () => {
       try {
         // 1. make query to chain events to get the specific entity data
@@ -22,7 +27,10 @@ export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEnti
         const newLink = {
           source: 'proposal',
           title,
-          identifier: type === 'proposal' ? `${typeId}` : `${type}/${typeId}}`
+          identifier:
+            type === 'proposal'
+              ? `${typeId}`
+              : `${chainEntityTypeToProposalSlug(type)}/${typeId}`,
         };
 
         // 3. redirect
@@ -31,7 +39,7 @@ export default function ChainEntityLinkRedirect({ identifier, scope }: ChainEnti
         // TODO: show error page
         throw new Error('could not find entity');
       }
-    }
+    };
 
     fetchChainEntityData();
   }, [navigate]);

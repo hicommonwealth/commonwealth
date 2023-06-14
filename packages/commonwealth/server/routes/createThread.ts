@@ -7,8 +7,7 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { Action, PermissionError } from '../../shared/permissions';
-import { findAllRoles, isAddressPermitted } from '../util/roles';
+import { findAllRoles } from '../util/roles';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
@@ -18,11 +17,9 @@ import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { parseUserMentions } from '../util/parseUserMentions';
-import checkRule from '../util/rules/checkRule';
-import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 export const Errors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
@@ -32,7 +29,6 @@ export const Errors = {
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to post",
   BalanceCheckFailed: 'Could not verify user token balance',
-  RuleCheckFailed: 'Rule check failed',
 };
 
 const dispatchHooks = async (
@@ -119,7 +115,7 @@ const dispatchHooks = async (
                 chain: mention[0] || null,
                 address: mention[1] || null,
               },
-              include: [models.User, models.RoleAssignment],
+              include: [models.User],
             });
           } catch (err) {
             throw new ServerError(err);
@@ -192,7 +188,6 @@ const dispatchHooks = async (
 const createThread = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -201,16 +196,6 @@ const createThread = async (
   const chain = req.chain;
 
   const author = req.address;
-
-  const permission_error = await isAddressPermitted(
-    models,
-    author.id,
-    chain.id,
-    Action.CREATE_THREAD
-  );
-  if (!permission_error) {
-    return next(new AppError(PermissionError.NOT_PERMITTED));
-  }
 
   const {
     topic_name,
@@ -352,25 +337,6 @@ const createThread = async (
       }
     }
 
-    const topic = await models.Topic.findOne({
-      where: {
-        id: topic_id,
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address,
-        transaction
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
-      }
-    }
-
     let thread: ThreadInstance;
     try {
       thread = await models.Thread.create(threadContent, {
@@ -438,13 +404,12 @@ const createThread = async (
   // TODO: this blocks the event loop -- need to dispatch to a worker so we can continue listening to web queries
   dispatchHooks(models, req, finalThread);
 
-  if (process.env.NODE_ENV !== 'test') {
-    mixpanelTrack({
-      event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
-      community: chain.id,
-      isCustomDomain: null,
-    });
-  }
+  serverAnalyticsTrack({
+    event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
+    community: chain.id,
+    isCustomDomain: null,
+  });
+
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };
 

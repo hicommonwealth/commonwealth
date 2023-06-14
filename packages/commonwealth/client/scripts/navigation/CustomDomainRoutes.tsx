@@ -13,6 +13,9 @@ const MembersPage = lazy(() => import('views/pages/members'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
+const FinishSocialLoginPage = lazy(
+  () => import('views/pages/finish_social_login')
+);
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
@@ -73,23 +76,24 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const CustomDomainRoutes = () => {
+const CustomDomainRoutes = (isAppLoading: boolean) => {
   return [
     <Route
       path="/"
       element={withLayout(DiscussionsRedirectPage, {
         scoped: true,
         deferChain: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/createCommunity"
-      element={withLayout(CreateCommunityPage, { scoped: true })}
+      element={withLayout(CreateCommunityPage, { scoped: true, isAppLoading })}
     />,
     <Route path="/home" element={<Navigate to="/overview" />} />,
     <Route
       path="/search"
-      element={withLayout(SearchPage, { deferChain: true })}
+      element={withLayout(SearchPage, { deferChain: true, isAppLoading })}
     />,
     <Route path="/web3login" element={<Navigate to="/" />} />,
     <Route
@@ -97,6 +101,7 @@ const CustomDomainRoutes = () => {
       element={withLayout(OverviewPage, {
         scoped: true,
         deferChain: true,
+        isAppLoading,
       })}
     />,
     <Route
@@ -104,6 +109,7 @@ const CustomDomainRoutes = () => {
       element={withLayout(MembersPage, {
         scoped: true,
         deferChain: true,
+        isAppLoading,
       })}
     />,
     <Route
@@ -111,17 +117,23 @@ const CustomDomainRoutes = () => {
       element={withLayout(SputnikDaosPage, {
         scoped: true,
         deferChain: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/finishNearLogin"
       element={withLayout(FinishNearLoginPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/finishaxielogin"
-      element={withLayout(FinishAxieLoginPage, {})}
+      element={withLayout(FinishAxieLoginPage, { isAppLoading })}
+    />,
+    <Route
+      path="/finishsociallogin"
+      element={withLayout(FinishSocialLoginPage, { isAppLoading })}
     />,
 
     // NOTIFICATIONS
@@ -130,6 +142,7 @@ const CustomDomainRoutes = () => {
       element={withLayout(NotificationsPage, {
         scoped: true,
         deferChain: true,
+        isAppLoading,
       })}
     />,
 
@@ -138,6 +151,7 @@ const CustomDomainRoutes = () => {
       element={withLayout(NotificationSettingsPage, {
         deferChain: true,
         scoped: true,
+        isAppLoading,
       })}
     />,
     // NOTIFICATIONS END
@@ -147,36 +161,42 @@ const CustomDomainRoutes = () => {
       path="/referenda"
       element={withLayout(ReferendaPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/proposals"
       element={withLayout(ProposalsPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/proposal/:type/:identifier"
       element={withLayout(ViewProposalPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/proposal/:identifier"
       element={withLayout(ViewProposalPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/new/proposal/:type"
       element={withLayout(NewProposalPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/new/proposal"
       element={withLayout(NewProposalPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -187,6 +207,7 @@ const CustomDomainRoutes = () => {
       path="/discussions"
       element={withLayout(DiscussionsPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -194,6 +215,7 @@ const CustomDomainRoutes = () => {
       path="/discussions/:topicName"
       element={withLayout(DiscussionsPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -201,6 +223,7 @@ const CustomDomainRoutes = () => {
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -208,6 +231,7 @@ const CustomDomainRoutes = () => {
       path="/new/discussion"
       element={withLayout(NewThreadPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -226,6 +250,7 @@ const CustomDomainRoutes = () => {
             path="/contracts"
             element={withLayout(ContractsPage, {
               scoped: true,
+              isAppLoading,
               deferChain: true,
             })}
           />,
@@ -233,6 +258,7 @@ const CustomDomainRoutes = () => {
             path="/new/contract"
             element={withLayout(NewContractPage, {
               scoped: true,
+              isAppLoading,
               deferChain: true,
             })}
           />,
@@ -240,6 +266,7 @@ const CustomDomainRoutes = () => {
             path="/new/contract_template/:contract_id"
             element={withLayout(NewContractTemplatePage, {
               scoped: true,
+              isAppLoading,
               deferChain: true,
             })}
           />,
@@ -247,12 +274,14 @@ const CustomDomainRoutes = () => {
             path="/contract/:contractAddress"
             element={withLayout(GeneralContractPage, {
               scoped: true,
+              isAppLoading,
             })}
           />,
           <Route
             path="/:contract_address/:slug"
             element={withLayout(ViewTemplatePage, {
               scoped: true,
+              isAppLoading,
             })}
           />,
         ]
@@ -264,12 +293,14 @@ const CustomDomainRoutes = () => {
       path="/treasury"
       element={withLayout(TreasuryPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     <Route
       path="/tips"
       element={withLayout(TipsPage, {
         scoped: true,
+        isAppLoading,
       })}
     />,
     // TREASURY END
@@ -279,6 +310,7 @@ const CustomDomainRoutes = () => {
       path="/manage"
       element={withLayout(ManageCommunityPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -286,6 +318,7 @@ const CustomDomainRoutes = () => {
       path="/analytics"
       element={withLayout(AnalyticsPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -293,6 +326,7 @@ const CustomDomainRoutes = () => {
       path="/snapshot/:snapshotId"
       element={withLayout(SnapshotProposalPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -300,6 +334,7 @@ const CustomDomainRoutes = () => {
       path="/multiple-snapshots"
       element={withLayout(ViewMultipleSnapshotsPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -307,6 +342,7 @@ const CustomDomainRoutes = () => {
       path="/snapshot/:snapshotId/:identifier"
       element={withLayout(ViewSnapshotsProposalPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -314,6 +350,7 @@ const CustomDomainRoutes = () => {
       path="/new/snapshot/:snapshotId"
       element={withLayout(NewSnapshotProposalPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -324,6 +361,7 @@ const CustomDomainRoutes = () => {
       path="/account/:address"
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -331,6 +369,7 @@ const CustomDomainRoutes = () => {
       path="/account"
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -338,6 +377,7 @@ const CustomDomainRoutes = () => {
       path="/profile/id/:profileId"
       element={withLayout(NewProfilePage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -345,6 +385,7 @@ const CustomDomainRoutes = () => {
       path="/profile/edit"
       element={withLayout(EditNewProfilePage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -367,6 +408,10 @@ const CustomDomainRoutes = () => {
     <Route
       path="/:scope/finishaxielogin"
       element={<Navigate to="/finishaxielogin" />}
+    />,
+    <Route
+      path="/:scope/finishsociallogin"
+      element={<Navigate to="/finishsociallogin" />}
     />,
 
     // NOTIFICATIONS
@@ -523,6 +568,7 @@ const CustomDomainRoutes = () => {
       path="/link/chain-entity/:identifier"
       element={withLayout(ChainEntityLinkRedirectPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
@@ -530,6 +576,7 @@ const CustomDomainRoutes = () => {
       path="/link/snapshot-proposal/:identifier"
       element={withLayout(SnapshotProposalLinkRedirectPage, {
         scoped: true,
+        isAppLoading,
         deferChain: true,
       })}
     />,
