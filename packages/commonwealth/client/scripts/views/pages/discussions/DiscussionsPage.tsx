@@ -282,7 +282,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     return updatedThreads.filter(
                       // make sure that if we have an active stage filter (from the dropdown)
                       // then we also filter the current list for the current stage only
-                      (x) => x.stage === stageName
+                      (x) => (stageName ? x.stage === stageName : x)
                     );
                   });
                 }}
