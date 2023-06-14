@@ -6,7 +6,6 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
-import reactionCount from '../../../models/ReactionCount';
 import ReactionCount from '../../../models/ReactionCount';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
@@ -36,7 +35,11 @@ export const CommentReactionButton = ({
   const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
 
   useEffect(() => {
-    const redrawFunction = () => {
+    const redrawFunction = (comment_id) => {
+      if (comment_id !== comment.id) {
+        return;
+      }
+
       setReactionCounts(app.reactionCounts.store.getByPost(comment));
     };
 

@@ -280,7 +280,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               modelReactionCountFromServer({ ...rc, id })
             );
 
-            app.reactionCounts.isFetched.emit('redraw');
+            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {
