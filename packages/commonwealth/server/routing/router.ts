@@ -66,7 +66,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 
 import getUploadSignature from '../routes/getUploadSignature';
 import activeThreads from '../routes/activeThreads';
-import createThread from '../routes/createThread';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
@@ -180,6 +179,7 @@ import { updateCommentHandler } from '../routes/comments/update_comment_handler'
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
+import { createThreadHandler } from '../routes/threads/create_thread_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -345,11 +345,11 @@ function setupRouter(
 
   // threads
   router.post(
-    '/createThread',
+    '/threads',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
-    createThread.bind(this, models, tokenBalanceCache, banCache)
+    createThreadHandler.bind(this, serverControllers)
   );
   router.patch(
     '/threads/:id',

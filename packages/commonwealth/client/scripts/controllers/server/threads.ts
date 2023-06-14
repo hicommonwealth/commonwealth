@@ -271,7 +271,6 @@ class ThreadsController {
     readOnly?: boolean
   ) {
     try {
-      // TODO: Change to POST /thread
       const {
         action = null,
         session = null,
@@ -283,7 +282,7 @@ class ThreadsController {
         link: url,
         topic: topic.id,
       });
-      const response = await $.post(`${app.serverUrl()}/createThread`, {
+      const response = await $.post(`${app.serverUrl()}/threads`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,

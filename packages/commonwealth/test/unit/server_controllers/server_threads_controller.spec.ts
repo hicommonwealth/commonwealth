@@ -1394,4 +1394,90 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Invalid thread URL');
     });
   });
+
+  describe('#createThread', () => {
+    it('should create a thread', async () => {
+      const db = {
+        CommunityRole: {
+          findAll: async () => [], // no mod/admin roles
+        },
+        Chain: {
+          findOne: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const threadId = 1;
+      const body = 'hello';
+      const kind = 'discussion';
+      const readOnly = false;
+      const topicId = 1;
+      const topicName = undefined;
+      const title = 'mythread';
+      const stage = 'stage';
+      const url = 'http://blah';
+      const attachments = undefined;
+      const canvasAction = undefined;
+      const canvasSession = undefined;
+      const canvasHash = undefined;
+
+      const [thread, notificationOptions, analyticsOptions] =
+        await serverThreadsController.createThread(
+          user as any,
+          address as any,
+          chain as any,
+          title,
+          body,
+          kind,
+          readOnly,
+          topicId,
+          topicName,
+          stage,
+          url,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash
+        );
+
+      expect(thread.title).to.equal(title);
+      expect(thread.body).to.equal(body);
+      expect(thread.stage).to.equal(stage);
+
+      expect(notificationOptions).to.have.length(1);
+      expect(notificationOptions[0]).to.include({
+        categoryId: 'thread-edit',
+        objectId: '',
+        webhookData: null,
+      });
+      expect(notificationOptions[0].notificationData).to.include({
+        thread_id: 1,
+        root_type: 'discussion',
+        root_title: 'mythread',
+        chain_id: 'ethereum',
+        author_address: '0x123',
+        author_chain: 'ethereum',
+      });
+      expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
+    });
+  });
 });

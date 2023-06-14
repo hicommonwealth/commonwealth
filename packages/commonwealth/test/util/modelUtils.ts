@@ -213,7 +213,7 @@ export const createThread = async (args: ThreadArgs) => {
   } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/createThread')
+    .post('/api/threads')
     .set('Accept', 'application/json')
     .send({
       author_chain: chainId,

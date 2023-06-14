@@ -91,7 +91,7 @@ describe('Thread Tests', () => {
     );
   });
 
-  describe('/createThread', () => {
+  describe('/threads', () => {
     const readOnly = true;
 
     it('should fail to create a thread without a kind', async () => {
