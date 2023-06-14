@@ -10,7 +10,7 @@ export default class TopicGateCheck {
       const topics =
         queryClient.getQueryData<Topic[]>([
           ApiEndpoints.BULK_TOPICS,
-          app.activeChainId(),
+          app.chain.id,
         ]) || [];
 
       const tokenPostingThreshold = topics.find(
@@ -30,7 +30,7 @@ export default class TopicGateCheck {
       const topics =
         queryClient.getQueryData<Topic[]>([
           ApiEndpoints.BULK_TOPICS,
-          app.activeChainId(),
+          app.chain.id,
         ]) || [];
 
       return topics.find(({ name }) => name === topicName)?.tokenThreshold;
