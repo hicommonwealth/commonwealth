@@ -118,6 +118,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     resizeListenerUpdateDeps: [isCollapsedSize],
   });
 
+  useEffect(() => {
+    breakpointFnValidator(
+      isCollapsedSize,
+      (state: boolean) => {
+        setIsCollapsedSize(state);
+      },
+      isWindowMediumSmallInclusive
+    );
+  }, []);
+
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
   });
