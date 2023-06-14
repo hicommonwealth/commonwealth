@@ -87,7 +87,10 @@ const CustomDomainRoutes = () => {
     />,
     <Route
       path="/createCommunity"
-      element={withLayout(CreateCommunityPage, { scoped: true })}
+      element={withLayout(CreateCommunityPage, {
+        scoped: true,
+        type: 'common',
+      })}
     />,
     <Route path="/home" element={<Navigate to="/overview" />} />,
     <Route
