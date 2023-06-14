@@ -120,6 +120,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
     title,
     description,
     messages,
+    metadata: p.metadata,
     submitTime: moment.unix(new Date(p.submit_time).valueOf() / 1000),
     depositEndTime: moment.unix(new Date(p.deposit_end_time).valueOf() / 1000),
     votingEndTime: moment.unix(new Date(p.voting_end_time).valueOf() / 1000),

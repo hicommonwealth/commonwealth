@@ -5,6 +5,7 @@ import 'pages/manage_community/index.scss';
 
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import RoleInfo from '../../../models/RoleInfo';
 import Sublayout from '../../Sublayout';
 import ErrorPage from '../error';
@@ -91,6 +92,7 @@ const ManageCommunityPage = () => {
           return {
             ...(profile.roles[0] || {}),
             Address: profile.addresses[0],
+            id: profile.addresses[0].id,
           };
         });
       }
@@ -103,9 +105,11 @@ const ManageCommunityPage = () => {
   };
 
   useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => forceRerender());
+    NewProfilesController.Instance.isFetched.on('redraw', () =>
+      forceRerender()
+    );
 
-    app.newProfiles.isFetched.off('redraw', forceRerender);
+    NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
   }, [forceRerender]);
 
   // on update debounced search term, fetch
@@ -133,9 +137,9 @@ const ManageCommunityPage = () => {
     return <PageLoading />;
   }
 
-  if (!isAdmin) {
-    return <ErrorPage message={'Must be admin'} />;
-  }
+  // if (!isAdmin) {
+  //   return <ErrorPage message={'Must be admin'} />;
+  // }
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
@@ -143,7 +147,7 @@ const ManageCommunityPage = () => {
     newRole.Address = oldRole.Address;
 
     const predicate = (r) => {
-      return r.id === oldRole.id;
+      return r.address_id === oldRole.address_id;
     };
 
     app.roles.addRole(newRole);
@@ -158,16 +162,16 @@ const ManageCommunityPage = () => {
         adminsAndMods.splice(idx, 1);
       }
       if (oldRole.permission === 'admin') {
-        setAdmins(admins.filter((a) => a.id !== oldRole.id));
+        setAdmins(admins.filter((a) => a.address_id !== oldRole.address_id));
       }
       if (oldRole.permission === 'moderator') {
-        setMods(mods.filter((a) => a.id !== oldRole.id));
+        setMods(mods.filter((a) => a.address_id !== oldRole.address_id));
       }
     }
 
     if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
       const roleInfo = new RoleInfo(
-        newRole.id,
+        newRole.address_id,
         newRole.Address?.id || newRole.address_id,
         newRole.Address.address,
         newRole.Address.chain,

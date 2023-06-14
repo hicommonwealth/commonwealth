@@ -1,5 +1,5 @@
 import type { CWEvent } from '../../interfaces';
-import { SupportedNetwork } from '../../interfaces';
+import { EvmEventSourceMapType, SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
@@ -12,6 +12,7 @@ import type {
 import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { Subscriber } from './subscriber';
+import { ethers } from 'ethers';
 
 export class Listener extends BaseListener<
   IErc721Contracts,
@@ -82,12 +83,30 @@ export class Listener extends BaseListener<
           this.options.tokenNames || '[token names not given!]'
         }, on url ${this._options.url}`
       );
-      await this._subscriber.subscribe(this.processBlock.bind(this));
+      await this._subscriber.subscribe(
+        this.processBlock.bind(this),
+        this.getEventSourceMap()
+      );
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
       throw error;
     }
+  }
+
+  private getEventSourceMap(): EvmEventSourceMapType {
+    // create an object where the keys are contract addresses and the values are arrays containing all the
+    // event signatures from that contract that we want to listen for
+    const tokenHashMap: EvmEventSourceMapType = {};
+    for (const token of this._api.tokens) {
+      tokenHashMap[token.contract.address.toLowerCase()] = {
+        eventSignatures: Object.keys(token.contract.interface.events).map((x) =>
+          ethers.utils.id(x)
+        ),
+        api: token.contract.interface,
+      };
+    }
+    return tokenHashMap;
   }
 
   // override handleEvent to stop the chain from being added to event data
@@ -115,11 +134,8 @@ export class Listener extends BaseListener<
     }
   }
 
-  protected async processBlock(
-    event: RawEvent,
-    tokenName?: string
-  ): Promise<void> {
-    const cwEvents: CWEvent[] = await this._processor.process(event, tokenName);
+  protected async processBlock(event: RawEvent): Promise<void> {
+    const cwEvents: CWEvent[] = await this._processor.process(event);
 
     // process events in sequence
     for (const e of cwEvents) {
@@ -148,11 +164,6 @@ export class Listener extends BaseListener<
     // Web3 provider, yet it exists under provider.provider
     const provider = <any>this._api.provider;
 
-    // WebSocket ReadyState - more info: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
-    const readyState = provider.provider.connection._readyState === 1;
-    const socketConnected = provider.provider.connected;
-    const polling = provider.polling;
-
-    return readyState && socketConnected && polling;
+    return provider.provider ? true : false ;
   }
 }

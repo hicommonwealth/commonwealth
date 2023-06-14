@@ -20,6 +20,7 @@ import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 import { SputnikProposalForm } from './sputnik_proposal_form';
 import useForceRerender from 'hooks/useForceRerender';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 
 type NewProposalPageProps = {
   type: ProposalType;
@@ -30,6 +31,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   const forceRerender = useForceRerender();
   const [internalType, setInternalType] = useState<ProposalType>(type);
   const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
+  useInitChainIfNeeded(app);
 
   useEffect(() => {
     app.runWhenReady(() => {
@@ -103,8 +105,13 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   const getBody = () => {
     if (!app.user.activeAccount) {
       return <CWText>Must be logged in</CWText>;
-    } else if (app.chain?.network === ChainNetwork.Plasm) {
-      return <CWText>Unsupported network</CWText>;
+    } else if (
+      app.chain?.network === ChainNetwork.Plasm ||
+      // TODO: remove this once evmos is supported.
+      // See https://github.com/hicommonwealth/commonwealth/issues/3986
+      app.chain?.id === 'evmos'
+    ) {
+      return <CWText>Feature not supported yet for this community</CWText>;
     } else {
       return getForm(internalType);
     }

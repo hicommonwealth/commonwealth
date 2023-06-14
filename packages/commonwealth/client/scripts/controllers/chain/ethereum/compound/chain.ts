@@ -61,7 +61,10 @@ export default class CompoundChain extends EthereumChain {
       throw new Error('No token found, cannot fetch balance');
     }
     try {
-      const contract = await attachSigner(this.app.user.activeAccount, this.compoundApi.Token);
+      const contract = await attachSigner(
+        this.app.user.activeAccount,
+        this.compoundApi.Token
+      );
       if (this.compoundApi.isTokenMPond(contract)) {
         // automatically delegate all token when using delegation on MPond
         const amount = await this.balanceOf(address);

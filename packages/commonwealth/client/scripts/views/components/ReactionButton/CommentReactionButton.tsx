@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -14,7 +14,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../component_kit/helpers';
 import {
-  fetchReactionsByPost,
+  fetchReactionsByComment,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
@@ -49,7 +49,7 @@ export const CommentReactionButton = ({
   const activeAddress = app.user.activeAccount?.address;
 
   const dislike = async (userAddress: string) => {
-    const reaction = (await fetchReactionsByPost(comment)).find((r) => {
+    const reaction = (await fetchReactionsByComment(comment.id)).find((r) => {
       return r.Address.address === activeAddress;
     });
 
@@ -74,7 +74,7 @@ export const CommentReactionButton = ({
     setIsLoading(true);
 
     app.reactionCounts
-      .create(userAddress, comment, 'like', chainId)
+      .createCommentReaction(userAddress, comment, 'like', chainId)
       .then(() => {
         setReactors([
           ...reactors,
@@ -101,7 +101,7 @@ export const CommentReactionButton = ({
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
-          setReactors(await fetchReactionsByPost(comment));
+          setReactors(await fetchReactionsByComment(comment.id));
         }}
       >
         <CWIconButton

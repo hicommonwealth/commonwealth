@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { addressSwapper } from 'utils';
+import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
 import {
   getAddressFromWallet,
@@ -37,6 +38,12 @@ import type {
   LoginSidebarType,
 } from '../views/pages/login/types';
 import useBrowserWindow from './useBrowserWindow';
+import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
+import {
+  MixpanelLoginEvent,
+  MixpanelLoginPayload,
+} from '../../../shared/analytics/types';
+import { MockMetaMaskProvider } from 'helpers/mockMetaMaskUtil';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -82,6 +89,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const isLinkingWallet = activeStep === 'selectPrevious';
 
+  const { trackAnalytics } = useBrowserAnalyticsTrack<MixpanelLoginPayload>({
+    onAction: true,
+  });
+
   useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
@@ -95,6 +106,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
   });
 
   useEffect(() => {
+    if (process.env.ETH_RPC === 'e2e-test') {
+      window['ethereum'] = new MockMetaMaskProvider(
+        'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+        '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
+      );
+    }
+
     // Determine if in a community
     const tempIsInCommunityPage = app.activeChainId() !== undefined;
     setIsInCommunityPage(tempIsInCommunityPage);
@@ -163,6 +181,15 @@ const useWallets = (walletProps: IuseWalletProps) => {
       } else {
         walletProps.onModalClose();
       }
+      trackAnalytics({
+        event: MixpanelLoginEvent.LOGIN,
+        community: app?.activeChainId(),
+        communityType: app?.chain?.meta?.base,
+        loginOption: 'email',
+        isSocialLogin: true,
+        loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
+        isMobile,
+      });
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
@@ -185,6 +212,15 @@ const useWallets = (walletProps: IuseWalletProps) => {
       } else {
         walletProps.onModalClose();
       }
+      trackAnalytics({
+        event: MixpanelLoginEvent.LOGIN,
+        community: app?.activeChainId(),
+        communityType: app?.chain?.meta?.base,
+        loginOption: provider,
+        isSocialLogin: true,
+        loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
+        isMobile,
+      });
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
@@ -330,7 +366,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      await app.newProfiles.updateProfileForAccount(
+      await NewProfilesController.Instance.updateProfileForAccount(
         primaryAccount.profile.address,
         {},
         false
@@ -385,7 +421,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     };
     try {
       if (username || avatarUrl) {
-        await app.newProfiles.updateProfileForAccount(
+        await NewProfilesController.Instance.updateProfileForAccount(
           primaryAccount.profile.address,
           data
         );
@@ -500,7 +536,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
         setActiveStep('redirectToSign');
-        return;
       } else {
         onAccountVerified(
           signingAccount,
@@ -509,6 +544,17 @@ const useWallets = (walletProps: IuseWalletProps) => {
           wallet
         );
       }
+
+      trackAnalytics({
+        event: MixpanelLoginEvent.LOGIN,
+        community: app?.activeChainId(),
+        communityType: app?.chain?.meta?.base,
+        loginOption: wallet.name,
+        isSocialLogin: true,
+        loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
+        isMobile,
+      });
+      return;
     } catch (err) {
       console.log(err);
     }
