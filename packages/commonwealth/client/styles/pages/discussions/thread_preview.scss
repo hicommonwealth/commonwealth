@@ -29,7 +29,7 @@
   }
 
   &:hover {
-    background: $neutral-50;
+    background: $neutral-100;
   }
 
   .main-content {
@@ -45,8 +45,10 @@
       justify-content: space-between;
 
       .user-and-date {
+        font-family: $font-family-neue-haas-unica;
         align-items: center;
         display: flex;
+        justify-content: space-between;
         gap: 8px;
 
         .User {
@@ -62,6 +64,10 @@
 
             font-weight: 500;
           }
+        }
+
+        .dot-separator {
+          height: 20px; 
         }
 
         .last-updated-text.Text {
@@ -96,24 +102,61 @@
       padding-right: 72px; // hack to be removed on completion of discussion listings
     }
 
+    .top-tags-row {
+      display: flex;
+      gap: 8px;
+    }
+
     .row-bottom {
       display: flex;
-      justify-content: space-between;
+      gap: 20px;
+      font-family: $font-family-neue-haas-unica;
 
-      .comments-count {
+      .Icon,
+      .Text {
+        color: $neutral-500;
+      }
+
+      .comments {
         align-items: center;
         display: flex;
-        gap: 8px;
+        gap: 4px;
 
-        .Icon,
-        .Text {
-          color: $neutral-500;
+        .Icon {
+          fill: transparent;
         }
       }
 
-      .row-bottom-menu {
+      .share {
         display: flex;
-        gap: 16px;
+        align-items: center;
+        gap: 4px;
+
+        div:first-child {
+          height: 19px;
+        }
+
+        .Text {
+          line-height: 24px;
+        }
+      }
+
+      .subscribe {
+        display: flex;
+        align-items: center;
+
+        .IconButton {
+          fill: transparent;
+        }
+
+        .btn-txt-container {
+          display: flex;
+          gap: 4px;
+
+          .Text {
+            line-height: 20px;
+          }
+        }
       }
     }
   }

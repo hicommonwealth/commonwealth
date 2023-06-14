@@ -138,9 +138,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 linkify
                 showAddressWithDisplayName
               />
-              {!isWindowSmallInclusive && (
-                <CWText className="last-updated-text">•</CWText>
-              )}
+              <CWText className="dot-separator last-updated-text">•</CWText>
               <CWText
                 type="caption"
                 fontWeight="medium"
@@ -149,6 +147,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 {moment(thread.createdAt).format('l')}
               </CWText>
               <NewThreadTag threadCreatedAt={thread.createdAt} />
+              {isHot(thread) && <CWTag iconName="trendUp" label="Trending" type="trending"/>}
               {isLocked && (
                 <LockWithTooltip
                   lockedAt={thread.lockedAt}
@@ -157,11 +156,10 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               )}
             </div>
             <div className="top-row-icons">
-              {isHot(thread) && <div className="flame" />}
               {thread.pinned && (
                 <CWIcon
                   iconName="pin"
-                  iconSize={isWindowSmallInclusive ? 'small' : 'medium'}
+                  iconSize='small'
                 />
               )}
             </div>
@@ -170,6 +168,8 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
             <CWText type="h5" fontWeight="semiBold">
               {thread.title}
             </CWText>
+          </div>
+          <div className='top-tags-row'>
             {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
             {linkedSnapshots.length > 0 && (
@@ -216,17 +216,17 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
             </div>
           )}
           <div className="row-bottom">
-            <div className="comments-count">
+            <div className="comments">
               {isWindowSmallInclusive && (
                 <ThreadReactionPreviewButtonSmall thread={thread} />
               )}
-              <CWIcon iconName="feedback" iconSize="small" />
+              <CWIcon iconName="comment" iconSize="small" />
               <CWText type="caption">
-                {pluralize(thread.numberOfComments, 'comment')}
+                {thread.numberOfComments === 0 ? 'Comment' : pluralize(thread.numberOfComments, 'Comment') }
               </CWText>
             </div>
-            <div className="row-bottom-menu">
               <div
+                className="share"
                 onClick={(e) => {
                   // prevent clicks from propagating to discussion row
                   e.preventDefault();
@@ -234,6 +234,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 }}
               >
                 <SharePopover discussionLink={discussionLink} />
+                <CWText type="caption">
+                  Share
+                </CWText>
               </div>
               <div
                 onClick={(e) => {
@@ -241,17 +244,23 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   e.preventDefault();
                   e.stopPropagation();
                 }}
+                className='subscribe'
               >
                 <PopoverMenu
                   menuItems={[
                     getThreadSubScriptionMenuItem(thread, setIsSubscribed),
                   ]}
                   renderTrigger={(onclick) => (
-                    <CWIconButton
-                      iconName={isSubscribed ? 'unsubscribe' : 'bell'}
-                      iconSize="small"
-                      onClick={onclick}
-                    />
+                    <div className='btn-txt-container'>
+                      <CWIconButton
+                        iconName={isSubscribed ? 'unsubscribe' : 'bellNew'}
+                        iconSize="small"
+                        onClick={onclick}
+                      />
+                      <CWText type="caption">
+                        Subscribe
+                      </CWText>
+                    </div>
                   )}
                 />
               </div>
@@ -265,7 +274,6 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   setIsLocked={setIsLocked}
                 />
               )}
-            </div>
           </div>
         </div>
       </div>

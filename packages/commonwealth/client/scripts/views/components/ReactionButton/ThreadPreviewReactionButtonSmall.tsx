@@ -43,7 +43,7 @@ export const ThreadReactionPreviewButtonSmall = ({
         }}
       >
         <CWIconButton
-          iconName="upvote"
+          iconName="arrowFatUp"
           iconSize="small"
           selected={hasReacted}
           onClick={async (e) => {

@@ -12,11 +12,13 @@ import * as Icons from './cw_icons';
 import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
+  arrowFatUp: Icons.CWArrowFatUp,
   arrowLeft: Icons.CWArrowLeft,
   arrowRight: Icons.CWArrowRight,
   backer: Icons.CWBacker,
   badge: Icons.CWBadge,
   bell: Icons.CWBell,
+  bellNew: Icons.CWBellNew,
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
   chatDots: withPhosphorIcon(ChatDots),
@@ -32,6 +34,7 @@ export const iconLookup = {
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
   collapse: Icons.CWCollapse,
+  comment: Icons.CWComment,
   commonLogo: Icons.CWCommonLogo,
   compass: Icons.CWCompass,
   copy: Icons.CWCopy,
@@ -90,6 +93,7 @@ export const iconLookup = {
   transfer: Icons.CWTransfer,
   trash: Icons.CWTrash,
   treasuryProposal: Icons.CWTreasuryProposal,
+  trendUp: Icons.CWTrendUp,
   twitter: Icons.CWTwitter,
   unsubscribe: Icons.CWUnsubscribe,
   upvote: Icons.CWUpvote,

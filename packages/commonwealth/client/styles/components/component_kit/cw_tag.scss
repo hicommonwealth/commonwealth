@@ -2,8 +2,9 @@
 
 .Tag {
   align-items: center;
+  font-family: $font-family-neue-haas-unica;
   background-color: $neutral-100;
-  border-radius: $border-radius-rounded-corners;
+  border-radius: $border-radius-tags;
   display: flex;
   height: fit-content;
   padding: 4px 12px;
@@ -37,20 +38,20 @@
   }
 
   &.active {
-    background-color: $primary-500;
+    background-color: $pink-100;
 
     .tag-text.Text,
     .tag-icon.Icon {
-      color: $white;
+      color: $pink-700;
     }
   }
 
   &.poll {
-    background-color: $purple-400;
+    background-color: $purple-50;
 
     .tag-text.Text,
     .tag-icon.Icon {
-      color: $white;
+      color: $purple-600;
     }
   }
 
@@ -84,10 +85,26 @@
     }
   }
 
+  &.trending {
+    background-color: $green-100;
+    border-radius: $border-radius-corners-wider;
+    border: 1px solid $green-600;
+
+    .tag-text.Text,
+    .tag-icon.Icon {
+      color: $green-600;
+    }
+
+    svg {
+      fill: none;
+    }
+  }
+
   &.new {
     background-color: $yellow-50;
     border-radius: $border-radius-corners-wider;
     padding: 4px 8px;
+    border: 1px solid $yellow-600;
 
     .tag-text.Text {
       color: $yellow-600;
