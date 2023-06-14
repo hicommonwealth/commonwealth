@@ -15,16 +15,10 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 
 type SublayoutHeaderProps = {
-  hideSearch?: boolean;
   onMobile: boolean;
-  isLoadingProfileData?: boolean;
 };
 
-export const SublayoutHeader = ({
-  hideSearch,
-  onMobile,
-  isLoadingProfileData = false,
-}: SublayoutHeaderProps) => {
+export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
   const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
     useSidebarStore();
@@ -66,30 +60,24 @@ export const SublayoutHeader = ({
           />
         )}
       </div>
-      {!hideSearch && <SearchBar />}
+      <SearchBar />
       <div className="header-right">
-        {isLoadingProfileData ? (
-          <></>
-        ) : (
-          <>
-            <div className="MobileMenuContainer">
-              <CWIconButton
-                iconName="dotsVertical"
-                iconButtonTheme="black"
-                onClick={() => {
-                  setMenu({ name: menuName, isVisible: false });
-                  setMobileMenuName(mobileMenuName ? null : 'MainMenu');
-                }}
-              />
-            </div>
-            <div className="DesktopMenuContainer">
-              <CreateContentPopover />
-              <HelpMenuPopover />
-              {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
-            </div>
-            <LoginSelector />
-          </>
-        )}
+        <div className="MobileMenuContainer">
+          <CWIconButton
+            iconName="dotsVertical"
+            iconButtonTheme="black"
+            onClick={() => {
+              setMenu({ name: menuName, isVisible: false });
+              setMobileMenuName(mobileMenuName ? null : 'MainMenu');
+            }}
+          />
+        </div>
+        <div className="DesktopMenuContainer">
+          <CreateContentPopover />
+          <HelpMenuPopover />
+          {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
+        </div>
+        <LoginSelector />
       </div>
     </div>
   );
