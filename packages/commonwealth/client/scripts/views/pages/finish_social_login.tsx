@@ -16,7 +16,7 @@ const validate = async (setRoute) => {
     if (chain) {
       setRoute(`/${chain}`);
     } else {
-      setRoute('/dashboard');
+      setRoute('/');
     }
   } catch (error) {
     return `Error: ${error.message}`;
