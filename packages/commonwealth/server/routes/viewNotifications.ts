@@ -68,9 +68,9 @@ export default async (
   // TODO: should this always run so we can return number of unread or things like that?
   const nmrObj = await models.User.findOne({
     where: { id: req.user.id },
-    attributes: ['max_not_offset'],
+    attributes: ['max_notif_offset'],
   });
-  const numNr = nmrObj ? nmrObj.max_not_offset : 0;
+  const numNr = nmrObj ? nmrObj.max_notif_offset : 0;
   maxId = numNr;
 
   if (!req.body.maxId || req.body.maxId === 0) maxId = numNr;

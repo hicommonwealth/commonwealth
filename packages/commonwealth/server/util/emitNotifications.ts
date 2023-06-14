@@ -272,24 +272,6 @@ async function sendToWebhooks(models, webhook_data, category_id, tags, order) {
   }
 }
 
-async function runNotificationReadTransaction(models, rawQuery) {
-  let rowsAdded;
-  try {
-    await models.sequelize.transaction(async (transaction) => {
-      rowsAdded = await models.sequelize.query(rawQuery, {
-        raw: true,
-        transaction,
-        type: QueryTypes.SELECT,
-      });
-    });
-    return rowsAdded;
-  } catch (err) {
-    log.warn('Error generating notification read');
-    log.warn(err);
-    return [];
-  }
-}
-
 async function createNotificationPerUser(
   models,
   notification,
@@ -307,45 +289,101 @@ async function createNotificationPerUser(
   } else if (includeAddresses && includeAddresses.length > 0) {
     const ids = await fetchUsersFromAddresses(models, includeAddresses);
     if (ids && ids.length > 0) {
-      address_include_exclude = `and "Subscription"."subscriber_id" NOT IN (${ids.join(
+      address_include_exclude = `and "Subscription"."subscriber_id" IN (${ids.join(
         ','
       )})`;
     }
   }
 
-  const rawQuery = `
-  BEGIN;
+  let rowsAdded;
+  try {
+    await models.sequelize.transaction(async (transaction) => {
+      // obtain advisory lock - to serialize access to Users max_notif_offset
+      await models.sequelize.query('SELECT pg_advisory_xact_lock(111)', {
+        transaction,
+      });
 
-  SELECT pg_advisory_xact_lock(111);
+      // DROP TABLE  "TempNotificationRead" clear if exists
+      await models.sequelize.query(
+        'DROP TABLE IF EXISTS "TempNotificationRead"',
+        {
+          transaction,
+        }
+      );
 
-  CREATE TEMP TABLE "TempNotificationRead" AS 
-  SELECT ${notification.id} as notification_id, "Subscription"."id" as subscription_id, false as is_read, "Subscription"."subscriber_id" as user_id, 
-  COALESCE(nrm.max_not_offset, 0) + 1 as id
-  FROM "Subscriptions" AS "Subscription"
-  LEFT JOIN "Users" nrm on nrm.id = "Subscription"."subscriber_id"
-  WHERE (
-          "Subscription"."category_id" = '${category_id}'
-          AND "Subscription"."object_id" = '${object_id}'
-          AND "Subscription"."is_active" = true
-          ${address_include_exclude}
-  );
+      // read user subscriptions to generate one row per user for new notification
+      await models.sequelize.query(
+        `
+          CREATE TEMP TABLE "TempNotificationRead" AS 
+          WITH tempRead AS (
+            SELECT ${notification.id} as notification_id, "Subscription"."id" as subscription_id,
+            false as is_read, "Subscription"."subscriber_id" as user_id, 
+            COALESCE(nrm.max_notif_offset, 0) + 1 as new_offset,
+            dense_rank() over (Partition by subscriber_id ORDER BY "Subscription"."id" DESC) as rk
+            FROM "Subscriptions" AS "Subscription"
+            LEFT JOIN "Users" nrm on nrm.id = "Subscription"."subscriber_id"
+            WHERE (
+                    "Subscription"."category_id" = '${category_id}'
+                    AND "Subscription"."object_id" = '${object_id}'
+                    AND "Subscription"."is_active" = true
+                    ${address_include_exclude}
+          ))
+          SELECT DISTINCT notification_id, subscription_id, is_read, user_id, new_offset
+          FROM tempRead
+          WHERE rk = 1
+        `,
+        { transaction }
+      );
 
-  INSERT INTO "NotificationsRead"(notification_id, subscription_id, is_read, user_id, id)
-  SELECT DISTINCT notification_id, subscription_id, is_read, user_id, id
-  FROM "TempNotificationRead";
+      // Insert into NotificationsRead - generate new notifications per user
+      await models.sequelize.query(
+        `
+        INSERT INTO "NotificationsRead"(notification_id, subscription_id, is_read, user_id, id)
+        SELECT notification_id, subscription_id, is_read, user_id, new_offset
+        FROM "TempNotificationRead"
+        `,
+        { transaction }
+      );
 
-  UPDATE "Users" 
-  SET max_not_offset = tr.id
-  , max_not_id = tr.notification_id
-  FROM "TempNotificationRead" tr 
-  where tr.user_id="Users".id;
-  
-  SELECT DISTINCT notification_id, subscription_id, is_read, user_id, id FROM "TempNotificationRead";
-  COMMIT;
-  `;
+      // update max in users
+      await models.sequelize.query(
+        `
+        UPDATE "Users" 
+        SET max_notif_offset = tr.new_offset
+        FROM "TempNotificationRead" tr 
+        where tr.user_id="Users".id
+        `,
+        { transaction }
+      );
 
-  const rows = await runNotificationReadTransaction(models, rawQuery);
-  return rows;
+      // return new Notifications added to be used for sending emails, webhook notifications etc
+      rowsAdded = await models.sequelize.query(
+        `
+        SELECT notification_id, subscription_id, is_read, user_id, new_offset as id
+        FROM "TempNotificationRead"
+        `,
+        {
+          raw: true,
+          transaction,
+          type: QueryTypes.SELECT,
+        }
+      );
+
+      // DROP TABLE  "TempNotificationRead" clear if exists while exiting
+      await models.sequelize.query(
+        'DROP TABLE IF EXISTS "TempNotificationRead"',
+        {
+          transaction,
+        }
+      );
+    });
+
+    return rowsAdded;
+  } catch (err) {
+    log.error('Error generating notification read');
+    log.error(JSON.stringify(err));
+    return [];
+  }
 }
 
 export default async function emitNotifications(

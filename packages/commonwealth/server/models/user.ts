@@ -30,8 +30,7 @@ export type UserAttributes = {
   Profiles?: ProfileAttributes[];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
-  max_not_id?: number;
-  max_not_offset?: number;
+  max_notif_offset?: number;
 };
 
 // eslint-disable-next-line no-use-before-define
@@ -103,12 +102,7 @@ export default (
         allowNull: false,
       },
       selected_chain_id: { type: dataTypes.STRING, allowNull: true },
-      max_not_offset: {
-        type: dataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      max_not_id: {
+      max_notif_offset: {
         type: dataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
