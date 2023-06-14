@@ -370,14 +370,13 @@ class ThreadsController {
     });
 
     await $.ajax({
-      url: `${app.serverUrl()}/editThread`,
-      type: 'PUT',
+      url: `${app.serverUrl()}/threads/${proposal.id}`,
+      type: 'PATCH',
       data: {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         address: app.user.activeAccount.address,
         chain: app.activeChainId(),
-        thread_id: proposal.id,
         kind: proposal.kind,
         stage: proposal.stage,
         body: encodeURIComponent(newBody),

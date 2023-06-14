@@ -453,7 +453,7 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/editThread', () => {
+  describe('/threads/:id', () => {
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
         address: adminAddress,
@@ -480,7 +480,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const res = await chai
         .request(app)
-        .put('/api/editThread')
+        .patch(`/api/threads/${thread_id}`)
         .set('Accept', 'application/json')
         .send({
           chain,
@@ -497,7 +497,7 @@ describe('Thread Tests', () => {
       expect(res.status).to.be.equal(400);
     });
 
-    it('should fail to edit a thread without passing a thread id', async () => {
+    it('should fail to edit a thread via passing an invalid thread ID', async () => {
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
       const recentEdit: any = { timestamp: moment(), body: thread.body };
@@ -505,13 +505,12 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const res = await chai
         .request(app)
-        .put('/api/editThread')
+        .patch(`/api/threads/badID`)
         .set('Accept', 'application/json')
         .send({
           chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: null,
           kind: thread_kind,
           stage: thread_stage,
           body: thread.body,
@@ -533,7 +532,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const res = await chai
         .request(app)
-        .put('/api/editThread')
+        .patch(`/api/threads/${thread_id}`)
         .set('Accept', 'application/json')
         .send({
           chain,

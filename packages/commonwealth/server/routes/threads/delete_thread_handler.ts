@@ -1,5 +1,5 @@
-import { ServerControllers } from 'server/routing/router';
-import { TypedRequestParams, TypedResponse, success } from 'server/types';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestParams, TypedResponse, success } from '../../types';
 import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {

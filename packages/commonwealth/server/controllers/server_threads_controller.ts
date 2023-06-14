@@ -15,7 +15,11 @@ import { findAllRoles, findOneRole } from '../util/roles';
 import { UserInstance } from '../models/user';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { NotificationOptions } from './server_notifications_controller';
-import { getThreadUrl, renderQuillDeltaToText } from '../../shared/utils';
+import {
+  getThreadUrl,
+  renderQuillDeltaToText,
+  validURL,
+} from '../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { AnalyticsOptions } from './server_analytics_controller';
 import { CommentAttributes, CommentInstance } from '../models/comment';
@@ -35,6 +39,13 @@ const Errors = {
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
 
   NotOwned: 'Not owned by this user',
+
+  NoThreadId: 'Must provide thread_id',
+  NoBodyOrAttachment: 'Must provide body or attachment',
+  IncorrectOwner: 'Not owned by this user',
+  InvalidLink: 'Invalid thread URL',
+
+  ParseMentionsFailed: 'Failed to parse mentions',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -86,7 +97,7 @@ interface IServerThreadsController {
    */
   createThreadComment(
     user: UserInstance,
-    author: AddressInstance,
+    address: AddressInstance,
     chain: ChainInstance,
     parentId: number,
     threadId: number,
@@ -108,34 +119,70 @@ interface IServerThreadsController {
   deleteThread(user: UserInstance, threadId: number): Promise<void>;
 
   /**
-   * Deletes a thread
+   * Updates a thread
    *
    * @param user - Current user
    * @param address - Address of the user
    * @param chain - Chain of thread
    * @param threadId - ID of thread
-   * @param body - Body text of the thread
    * @param title - Title of the thread
-   * @param kind - Kind of thread
+   * @param body - Body text of the thread
    * @param stage - Stage of thread
    * @param url - URL of the thread
+   * @param canvasAction - Canvas metadata (optional)
+   * @param canvasSession - Canvas metadata (optional)
+   * @param canvasHash - Canvas metadata (optional)
    * @throws
    * @returns Promise that resolves to nothing
    */
-  editThread(
+  updateThread(
     user: UserInstance,
-    author: AddressInstance,
+    address: AddressInstance,
     chain: ChainInstance,
-    threadId?: number,
-    body?: string,
+    threadId: number,
     title?: string,
-    kind?: string,
+    body?: string,
     stage?: string,
     url?: string,
+    attachments?: any,
     canvas_action?: any,
     canvas_session?: any,
     canvas_hash?: any
-  ): Promise<ThreadAttributes>;
+  ): Promise<[ThreadAttributes, NotificationOptions[]]>;
+
+  /**
+   * Creates a thread
+   *
+   * @param user - Current user
+   * @param address - Address of the user
+   * @param chain - Chain of thread
+   * @param threadId - ID of thread
+   * @param title - Title of the thread
+   * @param body - Body text of the thread
+   * @param stage - Stage of thread
+   * @param url - URL of the thread
+   * @param kind - Kind the thread
+   * @param readOnly - Kind the thread
+   * @param canvasAction - Canvas metadata (optional)
+   * @param canvasSession - Canvas metadata (optional)
+   * @param canvasHash - Canvas metadata (optional)
+   * @throws
+   * @returns Promise that resolves to nothing
+   */
+  createThread(
+    user: UserInstance,
+    address: AddressInstance,
+    chain: ChainInstance,
+    threadId: number,
+    title?: string,
+    body?: string,
+    stage?: string,
+    url?: string,
+    attachments?: any,
+    canvas_action?: any,
+    canvas_session?: any,
+    canvas_hash?: any
+  ): Promise<[ThreadAttributes, NotificationOptions[], AnalyticsOptions]>;
 }
 
 /**
@@ -632,52 +679,92 @@ export class ServerThreadsController implements IServerThreadsController {
     await deleteThreadFromDb(this.models, thread.id);
   }
 
-  editThread() {
-    const {
-      body,
-      title,
-      kind,
-      stage,
-      thread_id,
-      url,
-      canvas_action,
-      canvas_session,
-      canvas_hash,
-    } = req.body;
+  async updateThread(
+    user: UserInstance,
+    address: AddressInstance,
+    chain: ChainInstance,
+    threadId: number,
+    title?: string,
+    body?: string,
+    stage?: string,
+    url?: string,
+    attachments?: any,
+    canvas_action?: any,
+    canvas_session?: any,
+    canvas_hash?: any
+  ): Promise<[ThreadAttributes, NotificationOptions[]]> {
+    const userOwnedAddresses = await user.getAddresses();
+    const userOwnedAddressIds = userOwnedAddresses
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
+    const collaboration = await this.models.Collaboration.findOne({
+      where: {
+        thread_id: threadId,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
+    });
 
-    if (!thread_id) {
-      return next(new AppError(Errors.NoThreadId));
-    }
+    const admin = await findOneRole(
+      this.models,
+      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+      chain.id,
+      ['admin']
+    );
 
-    if (kind === 'discussion') {
-      if (
-        (!body || !body.trim()) &&
-        (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-      ) {
-        return next(new AppError(Errors.NoBodyOrAttachment));
+    // check if banned
+    if (!admin) {
+      const [canInteract, banError] = await this.banCache.checkBan({
+        chain: chain.id,
+        address: address.address,
+      });
+      if (!canInteract) {
+        throw new Error(`${Errors.BanError}: ${banError}`);
       }
     }
-    const chain = req.chain;
 
-    const author = req.address;
+    let thread;
+    if (collaboration || admin) {
+      thread = await this.models.Thread.findOne({
+        where: {
+          id: threadId,
+        },
+      });
+    } else {
+      thread = await this.models.Thread.findOne({
+        where: {
+          id: threadId,
+          address_id: { [Op.in]: userOwnedAddressIds },
+        },
+      });
+    }
+    if (!thread) {
+      throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+    }
+
+    // check attachments
+    if (thread.kind === 'discussion') {
+      if (
+        (!body || !body.trim()) &&
+        (!attachments || attachments.length === 0)
+      ) {
+        throw new Error(Errors.NoBodyOrAttachment);
+      }
+    }
 
     const attachFiles = async () => {
-      if (
-        req.body['attachments[]'] &&
-        typeof req.body['attachments[]'] === 'string'
-      ) {
-        await models.Attachment.create({
+      if (attachments && typeof attachments === 'string') {
+        await this.models.Attachment.create({
           attachable: 'thread',
-          attachment_id: thread_id,
-          url: req.body['attachments[]'],
+          attachment_id: threadId,
+          url: attachments,
           description: 'image',
         });
-      } else if (req.body['attachments[]']) {
+      } else if (attachments) {
         await Promise.all(
-          req.body['attachments[]'].map((url_) =>
-            models.Attachment.create({
+          attachments.map((url_) =>
+            this.models.Attachment.create({
               attachable: 'thread',
-              attachment_id: thread_id,
+              attachment_id: threadId,
               url: url_,
               description: 'image',
             })
@@ -686,77 +773,31 @@ export class ServerThreadsController implements IServerThreadsController {
       }
     };
 
-    let thread;
-    const userOwnedAddresses = await req.user.getAddresses();
-    const userOwnedAddressIds = userOwnedAddresses
-      .filter((addr) => !!addr.verified)
-      .map((addr) => addr.id);
-    const collaboration = await models.Collaboration.findOne({
-      where: {
-        thread_id,
-        address_id: { [Op.in]: userOwnedAddressIds },
-      },
-    });
-
-    const admin = await findOneRole(
-      models,
-      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-      chain.id,
-      ['admin']
-    );
-
-    // check if banned
-    if (!admin) {
-      const [canInteract, banError] = await banCache.checkBan({
-        chain: chain.id,
-        address: author.address,
-      });
-      if (!canInteract) {
-        return next(new AppError(banError));
-      }
-    }
-
-    if (collaboration || admin) {
-      thread = await models.Thread.findOne({
-        where: {
-          id: thread_id,
-        },
-      });
-    } else {
-      thread = await models.Thread.findOne({
-        where: {
-          id: thread_id,
-          address_id: { [Op.in]: userOwnedAddressIds },
-        },
-      });
-    }
-    if (!thread) return next(new AppError('No thread with that id found'));
-
+    let latestVersion;
     try {
-      let latestVersion;
-      try {
-        latestVersion = JSON.parse(thread.version_history[0]).body;
-      } catch (e) {
-        console.log(e);
-      }
-      // If new comment body text has been submitted, create another version history entry
-      if (decodeURIComponent(req.body.body) !== latestVersion) {
-        const recentEdit: any = {
-          timestamp: moment(),
-          author: req.body.author,
-          body: decodeURIComponent(req.body.body),
-        };
-        const versionHistory: string = JSON.stringify(recentEdit);
-        const arr = thread.version_history;
-        arr.unshift(versionHistory);
-        thread.version_history = arr;
-      }
+      latestVersion = JSON.parse(thread.version_history[0]).body;
+    } catch (e) {
+      console.log(e);
+    }
+    // If new comment body text has been submitted, create another version history entry
+    if (decodeURIComponent(body) !== latestVersion) {
+      const recentEdit: any = {
+        timestamp: moment(),
+        author: address.address,
+        body: decodeURIComponent(body),
+      };
+      const versionHistory: string = JSON.stringify(recentEdit);
+      const arr = thread.version_history;
+      arr.unshift(versionHistory);
+      thread.version_history = arr;
+    }
+
+    // patch thread properties
+    if (title) {
+      thread.title = title;
+    }
+    if (typeof body !== 'undefined') {
       thread.body = body;
-      thread.stage = stage;
-      thread.last_edited = new Date().toISOString();
-      thread.canvas_action = canvas_action;
-      thread.canvas_session = canvas_session;
-      thread.canvas_hash = canvas_hash;
       thread.plaintext = (() => {
         try {
           return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
@@ -764,128 +805,377 @@ export class ServerThreadsController implements IServerThreadsController {
           return decodeURIComponent(body);
         }
       })();
-      if (title) {
-        thread.title = title;
+    }
+    if (typeof stage !== 'undefined') {
+      thread.stage = stage;
+    }
+    if (typeof canvas_session !== 'undefined') {
+      thread.canvas_session = canvas_session;
+      thread.canvas_action = canvas_action;
+      thread.canvas_hash = canvas_hash;
+    }
+    if (typeof url !== 'undefined' && thread.kind === 'link') {
+      if (validURL(url)) {
+        thread.url = url;
+      } else {
+        throw new Error(Errors.InvalidLink);
       }
-      if (url && thread.kind === 'link') {
-        if (validURL(url)) {
-          thread.url = url;
-        } else {
-          return next(new AppError(Errors.InvalidLink));
+    }
+    thread.last_edited = new Date().toISOString();
+
+    await thread.save();
+    await attachFiles();
+
+    const finalThread = await this.models.Thread.findOne({
+      where: { id: thread.id },
+      include: [
+        { model: this.models.Address, as: 'Address' },
+        {
+          model: this.models.Address,
+          // through: models.Collaboration,
+          as: 'collaborators',
+        },
+        this.models.Attachment,
+        { model: this.models.Topic, as: 'topic' },
+      ],
+    });
+
+    // build notifications
+    const allNotifications: NotificationOptions[] = [];
+
+    allNotifications.push({
+      categoryId: NotificationCategories.ThreadEdit,
+      objectId: '',
+      notificationData: {
+        created_at: new Date(),
+        thread_id: +finalThread.id,
+        root_type: ProposalType.Thread,
+        root_title: finalThread.title,
+        chain_id: finalThread.chain,
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.chain,
+      },
+      // don't send webhook notifications for edits
+      webhookData: null,
+      excludeAddresses: [userOwnedAddresses[0].address],
+    });
+
+    let mentions;
+    try {
+      const previousDraftMentions = parseUserMentions(latestVersion);
+      const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
+      mentions = currentDraftMentions.filter((addrArray) => {
+        let alreadyExists = false;
+        previousDraftMentions.forEach((addrArray_) => {
+          if (
+            addrArray[0] === addrArray_[0] &&
+            addrArray[1] === addrArray_[1]
+          ) {
+            alreadyExists = true;
+          }
+        });
+        return !alreadyExists;
+      });
+    } catch (e) {
+      throw new Error(Errors.ParseMentionsFailed);
+    }
+
+    // grab mentions to notify tagged users
+    let mentionedAddresses;
+    if (mentions?.length > 0) {
+      mentionedAddresses = await Promise.all(
+        mentions.map(async (mention) => {
+          try {
+            const mentionedUser = await this.models.Address.findOne({
+              where: {
+                chain: mention[0],
+                address: mention[1],
+              },
+              include: [this.models.User, this.models.RoleAssignment],
+            });
+            return mentionedUser;
+          } catch (err) {
+            return null;
+          }
+        })
+      );
+      // filter null results
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+    }
+
+    // notify mentioned users, given permissions are in place
+    if (mentionedAddresses?.length > 0) {
+      mentionedAddresses.forEach((mentionedAddress) => {
+        if (!mentionedAddress.User) {
+          return; // some Addresses may be missing users, e.g. if the user removed the address
+        }
+        allNotifications.push({
+          categoryId: NotificationCategories.NewMention,
+          objectId: `user-${mentionedAddress.User.id}`,
+          notificationData: {
+            created_at: new Date(),
+            thread_id: +finalThread.id,
+            root_type: ProposalType.Thread,
+            root_title: finalThread.title,
+            comment_text: finalThread.body,
+            chain_id: finalThread.chain,
+            author_address: finalThread.Address.address,
+            author_chain: finalThread.Address.chain,
+          },
+          webhookData: null,
+          excludeAddresses: [finalThread.Address.address],
+        });
+      });
+    }
+
+    // update address last active
+    address.last_active = new Date();
+    address.save();
+
+    return [finalThread.toJSON(), allNotifications];
+  }
+
+  async createThread(
+    user: UserInstance,
+    address: AddressInstance,
+    chain: ChainInstance,
+    threadId: number,
+    title?: string,
+    body?: string,
+    stage?: string,
+    url?: string,
+    attachments?: any,
+    canvas_action?: any,
+    canvas_session?: any,
+    canvas_hash?: any
+  ): Promise<[ThreadAttributes, NotificationOptions[], AnalyticsOptions]> {
+    const chain = req.chain;
+
+    const author = req.address;
+
+    const permission_error = await isAddressPermitted(
+      models,
+      author.id,
+      chain.id,
+      Action.CREATE_THREAD
+    );
+    if (!permission_error) {
+      return next(new AppError(PermissionError.NOT_PERMITTED));
+    }
+
+    const {
+      topic_name,
+      title,
+      body,
+      kind,
+      stage,
+      url,
+      readOnly,
+      canvas_action,
+      canvas_session,
+      canvas_hash,
+    } = req.body;
+    let { topic_id } = req.body;
+
+    if (kind === 'discussion') {
+      if (!title || !title.trim()) {
+        return next(new AppError(Errors.DiscussionMissingTitle));
+      }
+      if (
+        (!body || !body.trim()) &&
+        (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
+      ) {
+        return next(new AppError(Errors.NoBodyOrAttachments));
+      }
+      try {
+        const quillDoc = JSON.parse(decodeURIComponent(body));
+        if (
+          quillDoc.ops.length === 1 &&
+          quillDoc.ops[0].insert.trim() === '' &&
+          (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
+        ) {
+          return next(new AppError(Errors.NoBodyOrAttachments));
+        }
+      } catch (e) {
+        // check always passes if the body isn't a Quill document
+      }
+    } else if (kind === 'link') {
+      if (!title?.trim() || !url?.trim()) {
+        return next(new Error(Errors.LinkMissingTitleOrUrl));
+      }
+    } else {
+      return next(new AppError(Errors.UnsupportedKind));
+    }
+
+    // check if banned
+    const [canInteract, banError] = await banCache.checkBan({
+      chain: chain.id,
+      address: author.address,
+    });
+    if (!canInteract) {
+      return next(new AppError(banError));
+    }
+
+    // Render a copy of the thread to plaintext for the search indexer
+    const plaintext = (() => {
+      try {
+        return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
+      } catch (e) {
+        return decodeURIComponent(body);
+      }
+    })();
+
+    // New threads get an empty version history initialized, which is passed
+    // the thread's first version, formatted on the frontend with timestamps
+    const firstVersion: any = {
+      timestamp: moment(),
+      author: req.body.author,
+      body: decodeURIComponent(req.body.body),
+    };
+    const version_history: string[] = [JSON.stringify(firstVersion)];
+
+    const threadContent = {
+      chain: chain.id,
+      address_id: author.id,
+      title,
+      body,
+      plaintext,
+      version_history,
+      kind,
+      stage,
+      url,
+      read_only: readOnly || false,
+      canvas_action,
+      canvas_session,
+      canvas_hash,
+    };
+
+    // begin essential database changes within transaction
+    const finalThread = await sequelize.transaction(async (transaction) => {
+      // New Topic table entries created
+      if (topic_id) {
+        threadContent['topic_id'] = +topic_id;
+      } else if (topic_name) {
+        let topic;
+        try {
+          [topic] = await models.Topic.findOrCreate({
+            where: {
+              name: topic_name,
+              chain_id: chain?.id || null,
+            },
+            transaction,
+          });
+          threadContent['topic_id'] = topic.id;
+          topic_id = topic.id;
+        } catch (err) {
+          return next(err);
+        }
+      } else {
+        if (chain.topics?.length) {
+          return next(
+            Error('Must pass a topic_name string and/or a numeric topic_id')
+          );
         }
       }
 
-      await thread.save();
-      await attachFiles();
-
-      const finalThread = await models.Thread.findOne({
-        where: { id: thread.id },
-        include: [
-          { model: models.Address, as: 'Address' },
-          {
-            model: models.Address,
-            // through: models.Collaboration,
-            as: 'collaborators',
-          },
-          models.Attachment,
-          { model: models.Topic, as: 'topic' },
-        ],
-      });
-
-      // dispatch notifications to subscribers of the given chain
-      emitNotifications(
-        models,
-        NotificationCategories.ThreadEdit,
-        '',
-        {
-          created_at: new Date(),
-          thread_id: +finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          chain_id: finalThread.chain,
-          author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
-        },
-        // don't send webhook notifications for edits
-        null,
-        [userOwnedAddresses[0].address]
-      );
-
-      let mentions;
-      try {
-        const previousDraftMentions = parseUserMentions(latestVersion);
-        const currentDraftMentions = parseUserMentions(
-          decodeURIComponent(body)
+      if (
+        chain &&
+        (chain.type === ChainType.Token ||
+          chain.network === ChainNetwork.Ethereum)
+      ) {
+        // skip check for admins
+        const isAdmin = await findAllRoles(
+          models,
+          { where: { address_id: author.id } },
+          chain.id,
+          ['admin']
         );
-        mentions = currentDraftMentions.filter((addrArray) => {
-          let alreadyExists = false;
-          previousDraftMentions.forEach((addrArray_) => {
-            if (
-              addrArray[0] === addrArray_[0] &&
-              addrArray[1] === addrArray_[1]
-            ) {
-              alreadyExists = true;
-            }
-          });
-          return !alreadyExists;
-        });
-      } catch (e) {
-        return next(new AppError('Failed to parse mentions'));
-      }
-
-      // grab mentions to notify tagged users
-      let mentionedAddresses;
-      if (mentions?.length > 0) {
-        mentionedAddresses = await Promise.all(
-          mentions.map(async (mention) => {
-            try {
-              const user = await models.Address.findOne({
-                where: {
-                  chain: mention[0],
-                  address: mention[1],
-                },
-                include: [models.User, models.RoleAssignment],
-              });
-              return user;
-            } catch (err) {
-              return null;
-            }
-          })
-        );
-        // filter null results
-        mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-      }
-
-      // notify mentioned users, given permissions are in place
-      if (mentionedAddresses?.length > 0) {
-        mentionedAddresses.map((mentionedAddress) => {
-          if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-
-          emitNotifications(
+        if (!req.user.isAdmin && isAdmin.length === 0) {
+          const canReact = await validateTopicThreshold(
+            tokenBalanceCache,
             models,
-            NotificationCategories.NewMention,
-            `user-${mentionedAddress.User.id}`,
-            {
-              created_at: new Date(),
-              thread_id: +finalThread.id,
-              root_type: ProposalType.Thread,
-              root_title: finalThread.title,
-              comment_text: finalThread.body,
-              chain_id: finalThread.chain,
-              author_address: finalThread.Address.address,
-              author_chain: finalThread.Address.chain,
-            },
-            null,
-            [finalThread.Address.address]
+            topic_id,
+            req.body.address
           );
-        });
+          if (!canReact) {
+            return next(new AppError(Errors.BalanceCheckFailed));
+          }
+        }
       }
 
-      // TODO: update author.last_active
+      let thread: ThreadInstance;
+      try {
+        thread = await models.Thread.create(threadContent, {
+          transaction,
+        });
+      } catch (err) {
+        return next(new ServerError(err));
+      }
+      // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
+      try {
+        if (
+          req.body['attachments[]'] &&
+          typeof req.body['attachments[]'] === 'string'
+        ) {
+          await models.Attachment.create(
+            {
+              attachable: 'thread',
+              attachment_id: thread.id,
+              url: req.body['attachments[]'],
+              description: 'image',
+            },
+            { transaction }
+          );
+        } else if (req.body['attachments[]']) {
+          const data = [];
+          req.body['attachments[]'].map((u) => {
+            data.push({
+              attachable: 'thread',
+              attachment_id: thread.id,
+              url: u,
+              description: 'image',
+            });
+          });
 
-      return res.json({ status: 'Success', result: finalThread.toJSON() });
-    } catch (e) {
-      return next(new ServerError(e));
-    }
+          await models.Attachment.bulkCreate(data, { transaction });
+        }
+      } catch (err) {
+        return next(err);
+      }
+
+      // update author's last activity based on thread creation
+      author.last_active = new Date();
+      await author.save({ transaction });
+
+      try {
+        // re-fetch thread once created
+        return await models.Thread.findOne({
+          where: { id: thread.id },
+          include: [
+            { model: models.Address, as: 'Address' },
+            models.Attachment,
+            { model: models.Topic, as: 'topic' },
+          ],
+          transaction,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    });
+
+    // exit early on error, do not emit notifications
+    if (!finalThread) return;
+
+    // dispatch post-init hooks asynchronously (subscribing etc), then return immediately
+    // TODO: this blocks the event loop -- need to dispatch to a worker so we can continue listening to web queries
+    dispatchHooks(models, req, finalThread);
+
+    serverAnalyticsTrack({
+      event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
+      community: chain.id,
+      isCustomDomain: null,
+    });
+
+    return res.json({ status: 'Success', result: finalThread.toJSON() });
   }
 }

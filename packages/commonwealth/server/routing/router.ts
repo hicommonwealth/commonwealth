@@ -67,7 +67,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 import getUploadSignature from '../routes/getUploadSignature';
 import activeThreads from '../routes/activeThreads';
 import createThread from '../routes/createThread';
-import editThread from '../routes/editThread';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
@@ -179,7 +178,8 @@ import { searchCommentsHandler } from '../routes/comments/search_comments_handle
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
-import { deleteThreadHandler } from 'server/routes/threads/delete_thread_handler';
+import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -351,12 +351,12 @@ function setupRouter(
     databaseValidationService.validateChainWithTopics,
     createThread.bind(this, models, tokenBalanceCache, banCache)
   );
-  router.put(
-    '/editThread',
+  router.patch(
+    '/threads/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    editThread.bind(this, models, banCache)
+    updateThreadHandler.bind(this, serverControllers)
   );
   router.post(
     '/createPoll',
