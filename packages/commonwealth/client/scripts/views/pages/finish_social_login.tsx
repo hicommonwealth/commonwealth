@@ -3,7 +3,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
-import { initAppState } from 'state';
+import app, { initAppState } from 'state';
 
 const validate = async (setRoute) => {
   const params = new URLSearchParams(window.location.search);
@@ -13,7 +13,7 @@ const validate = async (setRoute) => {
     await handleSocialLoginCallback();
     await initAppState();
 
-    if (chain) {
+    if (chain && !app.isCustomDomain()) {
       setRoute(`/${chain}`);
     } else {
       setRoute('/');
