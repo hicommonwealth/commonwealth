@@ -16,7 +16,10 @@ import SubLayout from './Sublayout';
 type LayoutAttrs = {
   scope?: string;
   children: React.ReactNode;
-  type: 'community' | 'blank';
+  type:
+    | 'community' // community specific layout with header, commonwealth sidebar and community sidebar - used for cw community owned pages
+    | 'common' // common wealth layout with header and commonwealth sidebar - used for cw self owned pages
+    | 'blank'; //  a blank layout with just the layout styles
 };
 
 /**
@@ -66,9 +69,7 @@ const LayoutComponent = ({
         setIsLoading(false);
       }
     })();
-  }, [
-    shouldSelectChain,
-  ]);
+  }, [shouldSelectChain]);
 
   useNecessaryEffect(() => {
     (async () => {
@@ -139,7 +140,9 @@ const LayoutComponent = ({
       {type === 'blank' ? (
         childToRender()
       ) : (
-        <SubLayout>{childToRender()}</SubLayout>
+        <SubLayout hasCommunitySidebar={type === 'community'}>
+          {childToRender()}
+        </SubLayout>
       )}
     </div>
   );
@@ -160,7 +163,6 @@ export const LayoutWrapper = ({ Component, params }) => {
 };
 
 export const withLayout = (Component, params) => {
-  console.log('component => ', Component);
   return (
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}

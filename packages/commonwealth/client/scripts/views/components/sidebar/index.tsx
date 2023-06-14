@@ -24,7 +24,7 @@ export type SidebarMenuName =
   | 'createContent'
   | 'exploreCommunities';
 
-export const Sidebar = () => {
+export const Sidebar = ({ isInsideCommunity }) => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
@@ -50,7 +50,7 @@ export const Sidebar = () => {
       {menuName === 'default' && (
         <div className="sidebar-default-menu">
           <SidebarQuickSwitcher />
-          {app.activeChainId() && (
+          {app.activeChainId() && isInsideCommunity && (
             <div className="community-menu">
               {showAdmin && <AdminSection />}
               {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (

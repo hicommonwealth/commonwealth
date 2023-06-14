@@ -15,6 +15,7 @@ type SublayoutProps = {
   hideSearch?: boolean;
   onScroll?: () => void; // lazy loading for page content
   isLoadingProfileData?: boolean;
+  hasCommunitySidebar?: boolean;
 } & React.PropsWithChildren;
 
 const Sublayout = ({
@@ -23,6 +24,7 @@ const Sublayout = ({
   hideSearch,
   onScroll,
   isLoadingProfileData = false,
+  hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName } = useSidebarStore();
@@ -59,7 +61,7 @@ const Sublayout = ({
           isLoadingProfileData={isLoadingProfileData}
         />
         <div className="sidebar-and-body-container">
-          {showSidebar && <Sidebar />}
+          {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
           <div className="body-and-sticky-headers-container">
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 

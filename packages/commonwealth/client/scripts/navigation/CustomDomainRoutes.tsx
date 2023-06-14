@@ -82,6 +82,7 @@ const CustomDomainRoutes = () => {
       element={withLayout(DiscussionsRedirectPage, {
         scoped: true,
         deferChain: true,
+        type: 'blank',
       })}
     />,
     <Route
@@ -91,7 +92,7 @@ const CustomDomainRoutes = () => {
     <Route path="/home" element={<Navigate to="/overview" />} />,
     <Route
       path="/search"
-      element={withLayout(SearchPage, { deferChain: true })}
+      element={withLayout(SearchPage, { deferChain: true, type: 'common' })}
     />,
     <Route path="/web3login" element={<Navigate to="/" />} />,
     <Route
@@ -119,15 +120,16 @@ const CustomDomainRoutes = () => {
       path="/finishNearLogin"
       element={withLayout(FinishNearLoginPage, {
         scoped: true,
+        type: 'common',
       })}
     />,
     <Route
       path="/finishaxielogin"
-      element={withLayout(FinishAxieLoginPage, {})}
+      element={withLayout(FinishAxieLoginPage, { type: 'common' })}
     />,
     <Route
       path="/finishsociallogin"
-      element={withLayout(FinishSocialLoginPage, {})}
+      element={withLayout(FinishSocialLoginPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
@@ -136,6 +138,7 @@ const CustomDomainRoutes = () => {
       element={withLayout(NotificationsPage, {
         scoped: true,
         deferChain: true,
+        type: 'common',
       })}
     />,
 
@@ -144,6 +147,7 @@ const CustomDomainRoutes = () => {
       element={withLayout(NotificationSettingsPage, {
         deferChain: true,
         scoped: true,
+        type: 'common',
       })}
     />,
     // NOTIFICATIONS END
@@ -293,7 +297,6 @@ const CustomDomainRoutes = () => {
       path="/manage"
       element={withLayout(ManageCommunityPage, {
         scoped: true,
-
         deferChain: true,
       })}
     />,
@@ -344,7 +347,7 @@ const CustomDomainRoutes = () => {
       path="/account/:address"
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
-
+        type: 'common',
         deferChain: true,
       })}
     />,
@@ -352,7 +355,7 @@ const CustomDomainRoutes = () => {
       path="/account"
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
-
+        type: 'common',
         deferChain: true,
       })}
     />,
@@ -360,7 +363,7 @@ const CustomDomainRoutes = () => {
       path="/profile/id/:profileId"
       element={withLayout(NewProfilePage, {
         scoped: true,
-
+        type: 'common',
         deferChain: true,
       })}
     />,
@@ -368,7 +371,7 @@ const CustomDomainRoutes = () => {
       path="/profile/edit"
       element={withLayout(EditNewProfilePage, {
         scoped: true,
-
+        type: 'common',
         deferChain: true,
       })}
     />,
