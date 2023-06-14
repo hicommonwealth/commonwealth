@@ -52,6 +52,14 @@ $default-card-height: 100px;
     }
   }
 
+  &.elevation-4 {
+    box-shadow: $elevation-4;
+  }
+
+  &.elevation-5 {
+    box-shadow: $elevation-5;
+  }
+
   &.interactive {
     &:hover {
       box-shadow: $elevation-1;

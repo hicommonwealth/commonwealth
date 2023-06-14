@@ -1,21 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-
+import useForceRerender from 'hooks/useForceRerender';
 import 'pages/manage_community/index.scss';
-
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
+import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
 import NewProfilesController from '../../../controllers/server/newProfiles';
+import { TTLCache } from '../../../helpers/ttl_cache';
 import RoleInfo from '../../../models/RoleInfo';
-import Sublayout from '../../Sublayout';
-import ErrorPage from '../error';
 import { PageLoading } from '../loading';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
-import { sortAdminsAndModsFirst } from './helpers';
-import useForceRerender from 'hooks/useForceRerender';
-import { useDebounce } from 'usehooks-ts';
-import { TTLCache } from '../../../helpers/ttl_cache';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -92,6 +87,7 @@ const ManageCommunityPage = () => {
           return {
             ...(profile.roles[0] || {}),
             Address: profile.addresses[0],
+            id: profile.addresses[0].id,
           };
         });
       }
@@ -136,9 +132,9 @@ const ManageCommunityPage = () => {
     return <PageLoading />;
   }
 
-  if (!isAdmin) {
-    return <ErrorPage message={'Must be admin'} />;
-  }
+  // if (!isAdmin) {
+  //   return <ErrorPage message={'Must be admin'} />;
+  // }
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
@@ -146,7 +142,7 @@ const ManageCommunityPage = () => {
     newRole.Address = oldRole.Address;
 
     const predicate = (r) => {
-      return r.id === oldRole.id;
+      return r.address_id === oldRole.address_id;
     };
 
     app.roles.addRole(newRole);
@@ -161,16 +157,16 @@ const ManageCommunityPage = () => {
         adminsAndMods.splice(idx, 1);
       }
       if (oldRole.permission === 'admin') {
-        setAdmins(admins.filter((a) => a.id !== oldRole.id));
+        setAdmins(admins.filter((a) => a.address_id !== oldRole.address_id));
       }
       if (oldRole.permission === 'moderator') {
-        setMods(mods.filter((a) => a.id !== oldRole.id));
+        setMods(mods.filter((a) => a.address_id !== oldRole.address_id));
       }
     }
 
     if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
       const roleInfo = new RoleInfo(
-        newRole.id,
+        newRole.address_id,
         newRole.Address?.id || newRole.address_id,
         newRole.Address.address,
         newRole.Address.chain,
@@ -194,23 +190,21 @@ const ManageCommunityPage = () => {
   };
 
   return (
-    <Sublayout>
-      <div className="ManageCommunityPage">
-        <ChainMetadataRows
-          admins={admins}
-          chain={app.config.chains.getById(app.activeChainId())}
-          mods={mods}
-          onRoleUpdate={handleRoleUpdate}
-          onSave={() => forceRerender()}
-        />
-        <AdminPanelTabs
-          onRoleUpdate={handleRoleUpdate}
-          roleData={roleData}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-      </div>
-    </Sublayout>
+    <div className="ManageCommunityPage">
+      <ChainMetadataRows
+        admins={admins}
+        chain={app.config.chains.getById(app.activeChainId())}
+        mods={mods}
+        onRoleUpdate={handleRoleUpdate}
+        onSave={() => forceRerender()}
+      />
+      <AdminPanelTabs
+        onRoleUpdate={handleRoleUpdate}
+        roleData={roleData}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
+    </div>
   );
 };
 

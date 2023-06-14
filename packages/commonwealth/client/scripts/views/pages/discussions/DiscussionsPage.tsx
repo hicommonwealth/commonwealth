@@ -5,6 +5,7 @@ import 'pages/discussions/index.scss';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ThreadActionType } from '../../../../../shared/types';
 import {
@@ -13,11 +14,8 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
-import Sublayout from '../../Sublayout';
-import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
-
 type DiscussionsPageProps = {
   topicName?: string;
 };
@@ -162,7 +160,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // get threads for current topic
           const topicId = topics.find(({ name }) => name === topicName)?.id;
           if (topicId) {
-            finalThreads = finalThreads.filter((x) => x?.topic?.id && x.topic.id === topicId);
+            finalThreads = finalThreads.filter(
+              (x) => x?.topic?.id && x.topic.id === topicId
+            );
           }
 
           // get threads for current stage
@@ -257,44 +257,43 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
   }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
-  if (initializing) {
-    return <PageLoading hideSearch={false} />;
-  }
-
   return (
-    <Sublayout hideFooter={true} hideSearch={false}>
-      <div className="DiscussionsPage">
-        <Virtuoso
-          style={{ height: '100%', width: '100%' }}
-          data={threads}
-          itemContent={(i, thread) => {
-            return (
-              <ThreadPreview thread={thread} key={thread.id + thread.stage} />
-            );
-          }}
-          endReached={loadMore}
-          overscan={200}
-          components={{
-            EmptyPlaceholder: () => (
+    <div className="DiscussionsPage">
+      <Virtuoso
+        style={{ height: '100%', width: '100%' }}
+        data={initializing ? [] : threads}
+        itemContent={(i, thread) => {
+          return (
+            <ThreadPreview thread={thread} key={thread.id + thread.stage} />
+          );
+        }}
+        endReached={loadMore}
+        overscan={200}
+        components={{
+          EmptyPlaceholder: () =>
+            initializing ? (
+              <div className="thread-loader">
+                <CWSpinner size="xl" />
+              </div>
+            ) : (
               <CWText type="b1" className="no-threads-text">
                 There are no threads matching your filter.
               </CWText>
             ),
-            Header: () => {
-              return (
-                <RecentThreadsHeader
-                  topic={topicName}
-                  stage={stageName}
-                  featuredFilter={featuredFilter}
-                  dateRange={dateRange}
-                  totalThreadCount={threads ? totalThreads : 0}
-                />
-              );
-            },
-          }}
-        />
-      </div>
-    </Sublayout>
+          Header: () => {
+            return (
+              <RecentThreadsHeader
+                topic={topicName}
+                stage={stageName}
+                featuredFilter={featuredFilter}
+                dateRange={dateRange}
+                totalThreadCount={threads ? totalThreads : 0}
+              />
+            );
+          },
+        }}
+      />
+    </div>
   );
 };
 
