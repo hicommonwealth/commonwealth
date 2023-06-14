@@ -64,7 +64,9 @@ export const CWRadioButton = (props: RadioButtonProps) => {
         />
       )}
       <div className={disabled ? 'background' : ''} />
-      <CWText className="label">{label || value}</CWText>
+      <CWText className="label" type="b2" fontWeight="regular">
+        {label || value}
+      </CWText>
     </div>
   );
 };

@@ -35,36 +35,44 @@ const RadioButton: FC<RadioButtonProps> = (props) => {
   );
 }
 
-export const RadioButtonStory = {
-  name: "RadioButton",
-  args: {
-    value: "Yes",
-    disabled: false,
-    checked: false,
-    onChange: (e?: any) => console.log('Testing onChange as props', e),
-  },
-  argTypes: {
-    value: {
-      control: { type: "text" },
+const Base = (checked: boolean, disabled: boolean) => {
+  return {
+    args: {
+      value: "Yes",
+      checked: checked,
+      onChange: (e?: any) => console.log('Testing onChange as props', e),
     },
-    disabled: {
-      control: { type: "boolean" },
-      options: [ true, false ],
+    argTypes: {
+      value: {
+        control: { type: "text" },
+      },
+      checked: {
+        control: { type: "boolean" },
+        options: [ true, false ],
+      },
     },
-    checked: {
-      control: { type: "boolean" },
-      options: [ true, false ],
+    parameters: {
+      controls: {
+        exclude: [
+          "label",
+          "groupName",
+          "onChange",
+          "disabled",
+          disabled ? "checked" : null,
+        ]
+      }
     },
-  },
-  parameters: {
-    controls: { exclude: ["label", "groupName", "onChange"] }
-  },
-  render: ({...args}) => (
-    <RadioButton
-      value={args.value}
-      disabled={args.disabled}
-      checked={args.checked}
-      onChange={args.onChange}
-    />
-  ),
+    render: ({...args}) => (
+      <RadioButton
+        value={args.value}
+        disabled={disabled}
+        checked={args.checked}
+        onChange={args.onChange}
+      />
+    ),
+  };
 }
+
+export const Overview = { ...Base(false, false) };
+export const DisabledUnchecked = { ...Base(false, true) };
+export const DisabledChecked = { ...Base(true, true) };

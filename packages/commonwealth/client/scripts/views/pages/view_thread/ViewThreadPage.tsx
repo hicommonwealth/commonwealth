@@ -119,6 +119,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     resizeListenerUpdateDeps: [isCollapsedSize],
   });
 
+  useEffect(() => {
+    breakpointFnValidator(
+      isCollapsedSize,
+      (state: boolean) => {
+        setIsCollapsedSize(state);
+      },
+      isWindowMediumSmallInclusive
+    );
+  }, []);
+
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
   });
@@ -269,6 +279,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );
+
+            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {

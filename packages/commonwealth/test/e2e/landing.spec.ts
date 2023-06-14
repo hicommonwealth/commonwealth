@@ -94,4 +94,17 @@ test.describe('Commonwealth Homepage - Links', () => {
     await privacy.click();
     await page.waitForURL(`http://localhost:${PORT}/privacy`);
   });
+
+  test('Test Login', async ({ page }) => {
+    await page.goto('http://localhost:8080/');
+    await page.getByText('Login').click();
+    await page.waitForSelector('.LoginDesktop');
+    await page.getByText('Metamask').click();
+    await page.waitForSelector('.new-or-returning');
+    await page.getByText('New Account').click();
+    await page.getByText('Finish').click();
+    await page.waitForSelector('.username');
+    const element = await page.$('.username');
+    expect(element).toBeTruthy();
+  });
 });
