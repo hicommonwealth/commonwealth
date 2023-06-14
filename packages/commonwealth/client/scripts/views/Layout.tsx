@@ -1,7 +1,7 @@
 import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
 import 'Layout.scss';
 import withRouter from 'navigation/helpers';
-import React, { Suspense, useState } from 'react';
+import React, { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
@@ -167,9 +167,7 @@ export const withLayout = (Component, params) => {
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
     >
-      <Suspense fallback={null}>
-        <LayoutWrapper Component={Component} params={params} />
-      </Suspense>
+      <LayoutWrapper Component={Component} params={params} />
     </ErrorBoundary>
   );
 };
