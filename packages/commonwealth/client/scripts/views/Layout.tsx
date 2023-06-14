@@ -1,7 +1,7 @@
 import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
 import 'Layout.scss';
 import withRouter from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useState, ReactNode, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
@@ -14,8 +14,8 @@ import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
 
 type LayoutAttrs = {
-  scope?: string;
-  children: React.ReactNode;
+  Component: ReactNode | any;
+  scoped?: boolean;
   type:
     | 'community' // community specific layout with header, commonwealth sidebar and community sidebar - used for cw community owned pages
     | 'common' // common wealth layout with header and commonwealth sidebar - used for cw self owned pages
@@ -31,11 +31,14 @@ type LayoutAttrs = {
  * - IBS 3 is omitted
  */
 const LayoutComponent = ({
-  // router,
-  children,
-  scope: selectedScope,
+  Component, // the component to render
+  scoped = false,
   type = 'community',
 }: LayoutAttrs) => {
+  const routerParams = useParams();
+  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
+  const selectedScope = scoped ? pathScope : null;
+
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
@@ -124,50 +127,39 @@ const LayoutComponent = ({
       );
     }
 
-    if (shouldShowLoadingState) {
-      return (
-        <div className="spinner-container">
-          <CWSpinner size="xl" />
-        </div>
-      );
-    }
+    const Bobber = (
+      <div className="spinner-container">
+        <CWSpinner size="xl" />
+      </div>
+    );
 
-    return pageNotFound ? <PageNotFound /> : children;
+    if (shouldShowLoadingState) return Bobber;
+
+    return (
+      <Suspense fallback={Bobber}>
+        {pageNotFound ? <PageNotFound /> : <Component {...routerParams} />}
+      </Suspense>
+    );
   };
 
-  return (
-    <div className="Layout">
-      {type === 'blank' ? (
-        childToRender()
-      ) : (
-        <SubLayout hasCommunitySidebar={type === 'community'}>
-          {childToRender()}
-        </SubLayout>
-      )}
-    </div>
-  );
-};
-
-export const LayoutWrapper = ({ Component, params }) => {
-  const routerParams = useParams();
-  const LayoutComp = withRouter(LayoutComponent);
-
-  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
-  const scope = params.scoped ? pathScope : null;
-
-  return (
-    <LayoutComp scope={scope} type={params.type}>
-      <Component {...routerParams} />
-    </LayoutComp>
-  );
-};
-
-export const withLayout = (Component, params) => {
   return (
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
     >
-      <LayoutWrapper Component={Component} params={params} />
+      <div className="Layout">
+        {type === 'blank' ? (
+          childToRender()
+        ) : (
+          <SubLayout hasCommunitySidebar={type === 'community'}>
+            {childToRender()}
+          </SubLayout>
+        )}
+      </div>
     </ErrorBoundary>
   );
+};
+
+export const withLayout = (Component, params) => {
+  const LayoutWrapper = withRouter(LayoutComponent);
+  return <LayoutWrapper Component={Component} {...params} />;
 };
