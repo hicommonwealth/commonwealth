@@ -1,5 +1,6 @@
 /* eslint-disable dot-notation */
 import { notifyError } from 'controllers/app/notifications';
+import { EventEmitter } from 'events';
 import proposalIdToEntity from 'helpers/proposalIdToEntity';
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
@@ -30,6 +31,7 @@ export const modelFromServer = (reactionCount) => {
 
 // TODO: Graham 4/24/22: File + class needs to be named ReactionCounts (plural) following convention
 class ReactionCountController {
+  public isFetched = new EventEmitter();
   private _store: ReactionCountsStore = new ReactionCountsStore();
   public get store() {
     return this._store;
