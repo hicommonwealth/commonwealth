@@ -24,7 +24,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = ['evmos', 'injective'];
+  public readonly specificChains = ['evmos', 'injective', 'evmos-devnet'];
 
   public get available() {
     return !!window.keplr;
@@ -133,24 +133,24 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           currencies: [
             {
               coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
+              coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
               coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
+              coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           stakeCurrency: {
             coinDenom: app.chain.meta.default_symbol,
-            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
+            coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.decimals || 6,
           },
           gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
-          features: ['stargate'],
+          features: ['stargate', 'eth-address-gen', 'eth-key-sign'],
         };
         await window.keplr.experimentalSuggestChain(info);
         await window.keplr.enable(this._chainId);

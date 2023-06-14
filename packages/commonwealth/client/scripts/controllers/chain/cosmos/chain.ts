@@ -1,5 +1,25 @@
 import type { EncodeObject } from '@cosmjs/proto-signing';
 
+import { EthSignType } from '@keplr-wallet/types';
+import { createTxRaw } from '@evmos/proto';
+import {
+  generateEndpointBroadcast,
+  generatePostBodyBroadcast,
+} from '@evmos/provider';
+
+import {
+  Chain,
+  Sender,
+  Fee,
+  TxContext,
+  MsgSendParams,
+  MsgSubmitProposalParams,
+  createTxMsgSend,
+  createTxMsgVote,
+  createTxMsgSubmitProposal,
+  TxPayload,
+} from '@evmos/transactions';
+
 import type {
   BankExtension,
   GovExtension,
@@ -182,6 +202,71 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       } else {
         throw new Error('Unknown broadcast result');
       }
+    } catch (err) {
+      console.log(err.message);
+      throw err;
+    }
+  }
+
+  public async sendTxEthereum(
+    account: CosmosAccount,
+    tx: TxPayload
+  ): Promise<any]> {
+  // ): Promise<readonly Event[]> {
+    const wallet = WebWalletController.Instance.getByName(
+      WalletId.Keplr
+    ) as KeplrWebWalletController;
+    if (!wallet) throw new Error('Keplr wallet not found');
+    if (!wallet.enabled) {
+      await wallet.enable();
+    }
+    try {
+      // First, populate a TxContext object and create a signable Tx payload.
+      // (See 'Create a Signable Transaction' to learn how to create these).
+
+      const chain = this.app.chain.id; //TODO
+      const sender = account.address;
+
+      const eip712Payload = JSON.stringify(tx.eipToSign);
+      const signature = await window?.keplr?.signEthereum(
+        chain,
+        sender,
+        eip712Payload,
+        EthSignType.TRANSACTION
+      );
+
+      if (!signature) {
+        // Handle signature failure here.
+      }
+
+      const { signDirect } = tx;
+      const bodyBytes = signDirect.body.toBinary();
+      const authInfoBytes = signDirect.authInfo.toBinary();
+
+      const signedTx = createTxRaw(bodyBytes, authInfoBytes, [signature]);
+
+      // broadcast
+
+      // First, sign a transaction using MetaMask or Keplr.
+
+      // Find a node URL from a network endpoint:
+      // https://docs.evmos.org/develop/api/networks.
+      const nodeUrl = this.app.chain.meta.node.url;
+
+      const postOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: generatePostBodyBroadcast(signedTx),
+      };
+
+      const broadcastEndpoint = `${nodeUrl}${generateEndpointBroadcast()}`;
+      const broadcastPost = await fetch(broadcastEndpoint, postOptions);
+
+      const response = await broadcastPost.json();
+
+      console.log('response', response);
+
+      return response;
     } catch (err) {
       console.log(err.message);
       throw err;
