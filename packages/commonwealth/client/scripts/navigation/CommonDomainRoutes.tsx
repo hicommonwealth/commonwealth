@@ -83,108 +83,99 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const CommonDomainRoutes = (isAppLoading: boolean) => [
+const CommonDomainRoutes = () => [
   <Route
     path="/"
     element={withLayout(LandingPage, {
       scoped: false,
-      isAppLoading,
-      hideSidebar: false,
+      type: 'blank',
     })}
   />,
   <Route
     path="/createCommunity"
-    element={withLayout(CreateCommunityPage, { isAppLoading })}
+    element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
   <Route
     path="/whyCommonwealth"
     element={withLayout(WhyCommonwealthPage, {
-      hideSidebar: true,
-      isAppLoading,
+      type: 'common',
     })}
   />,
   <Route
     path="/dashboard"
-    element={withLayout(DashboardPage, { isAppLoading })}
+    element={withLayout(DashboardPage, { type: 'common' })}
   />,
   <Route
     path="/dashboard/:type"
-    element={withLayout(DashboardPage, { isAppLoading })}
+    element={withLayout(DashboardPage, { type: 'common' })}
   />,
   <Route
     path="/communities"
     element={withLayout(CommunitiesPage, {
-      hideSidebar: false,
-      isAppLoading,
+      type: 'common',
     })}
   />,
-  <Route path="/search" element={withLayout(SearchPage, { isAppLoading })} />,
+  <Route path="/search" element={withLayout(SearchPage, { type: 'common' })} />,
   <Route
     path="/web3login"
-    element={withLayout(Web3LoginPage, { isAppLoading })}
+    element={withLayout(Web3LoginPage, { type: 'common' })}
   />,
   // scoped
   <Route
     path="/:scope/overview"
     element={withLayout(OverviewPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/search"
     element={withLayout(SearchPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/members"
     element={withLayout(MembersPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/sputnik-daos"
     element={withLayout(SputnikDaosPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/finishNearLogin"
     element={withLayout(FinishNearLoginPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/finishaxielogin"
-    element={withLayout(FinishAxieLoginPage, { isAppLoading })}
+    element={withLayout(FinishAxieLoginPage, { type: 'common' })}
   />,
   <Route
     path="/finishsociallogin"
-    element={withLayout(FinishSocialLoginPage, { isAppLoading })}
+    element={withLayout(FinishSocialLoginPage, { type: 'common' })}
   />,
   // NOTIFICATIONS
   <Route
     path="/:scope/notifications"
     element={withLayout(NotificationsPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/notifications"
     element={withLayout(NotificationsPage, {
       scoped: true,
-      isAppLoading,
+      type: 'common',
     })}
   />,
   <Route
     path="/notification-settings"
-    element={withLayout(NotificationSettingsPage, { isAppLoading })}
+    element={withLayout(NotificationSettingsPage, { type: 'common' })}
   />,
   <Route
     path="/:scope/notification-settings"
@@ -197,42 +188,36 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
     path="/:scope/referenda"
     element={withLayout(ReferendaPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/proposals"
     element={withLayout(ProposalsPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/proposal/:type/:identifier"
     element={withLayout(ViewProposalPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/proposal/:identifier"
     element={withLayout(ViewProposalPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/new/proposal/:type"
     element={withLayout(NewProposalPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/new/proposal"
     element={withLayout(NewProposalPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
@@ -248,35 +233,30 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
     path="/:scope/discussions"
     element={withLayout(DiscussionsPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/discussions/:topicName"
     element={withLayout(DiscussionsPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
       scope: false,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/new/discussion"
     element={withLayout(NewThreadPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
@@ -293,7 +273,6 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
     path="/:scope"
     element={withLayout(DiscussionsRedirectPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   ...(featureFlags.communityHomepage
@@ -302,7 +281,6 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
           path="/:scope/feed"
           element={withLayout(FeedPage, {
             scoped: true,
-            isAppLoading,
           })}
         />,
       ]
@@ -316,35 +294,30 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
           path="/:scope/contracts"
           element={withLayout(ContractsPage, {
             scoped: true,
-            isAppLoading,
           })}
         />,
         <Route
           path="/:scope/new/contract"
           element={withLayout(NewContractPage, {
             scoped: true,
-            isAppLoading,
           })}
         />,
         <Route
           path="/:scope/new/contract_template/:contract_id"
           element={withLayout(NewContractTemplatePage, {
             scoped: true,
-            isAppLoading,
           })}
         />,
         <Route
           path="/:scope/contract/:contractAddress"
           element={withLayout(GeneralContractPage, {
             scoped: true,
-            isAppLoading,
           })}
         />,
         <Route
           path="/:scope/:contract_address/:slug"
           element={withLayout(ViewTemplatePage, {
             scoped: true,
-            isAppLoading,
           })}
         />,
       ]
@@ -356,14 +329,12 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
     path="/:scope/treasury"
     element={withLayout(TreasuryPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/tips"
     element={withLayout(TipsPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   // TREASURY END
@@ -371,7 +342,7 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
   // SITE ADMIN
   <Route
     path="/admin-panel"
-    element={withLayout(AdminPanelPage, { isAppLoading })}
+    element={withLayout(AdminPanelPage, { type: 'common' })}
   />,
 
   // ADMIN
@@ -379,46 +350,37 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
     path="/:scope/manage"
     element={withLayout(ManageCommunityPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
-  <Route
-    path="/manage"
-    element={withLayout(ManageCommunityPage, { isAppLoading })}
-  />,
+  <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,
   <Route
     path="/:scope/analytics"
     element={withLayout(AnalyticsPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/snapshot/:snapshotId"
     element={withLayout(SnapshotProposalPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/multiple-snapshots"
     element={withLayout(ViewMultipleSnapshotsPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/snapshot/:snapshotId/:identifier"
     element={withLayout(ViewSnapshotsProposalPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/new/snapshot/:snapshotId"
     element={withLayout(NewSnapshotProposalPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   // snapshot proposals redirects
@@ -484,28 +446,26 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
     path="/:scope/account/:address"
     element={withLayout(ProfilePageRedirect, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/account"
     element={withLayout(ProfilePageRedirect, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/profile/id/:profileId"
     element={withLayout(NewProfilePage, {
       scoped: true,
-      isAppLoading,
+      type: 'common',
     })}
   />,
   <Route
     path="/profile/edit"
     element={withLayout(EditNewProfilePage, {
       scoped: true,
-      isAppLoading,
+      type: 'common',
     })}
   />,
   // PROFILES END
@@ -521,14 +481,12 @@ const CommonDomainRoutes = (isAppLoading: boolean) => [
     path="/:scope/link/chain-entity/:identifier"
     element={withLayout(ChainEntityLinkRedirectPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
   <Route
     path="/:scope/link/snapshot-proposal/:identifier"
     element={withLayout(SnapshotProposalLinkRedirectPage, {
       scoped: true,
-      isAppLoading,
     })}
   />,
 

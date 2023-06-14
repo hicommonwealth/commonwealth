@@ -10,6 +10,10 @@ import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 
+const resetSidebarState = () => {
+  sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+};
+
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
@@ -44,8 +48,10 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             items.push({
               label: `New ${cct.cctmd.nickname}`,
               iconLeft: 'star',
-              onClick: () =>
-                navigate(`/${contract.address}/${slugWithSlashRemoved}`),
+              onClick: () => {
+                resetSidebarState();
+                navigate(`/${contract.address}/${slugWithSlashRemoved}`);
+              },
             });
           }
         }
@@ -60,7 +66,10 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New On-Chain Proposal',
-            onClick: () => navigate('/new/proposal'),
+            onClick: () => {
+              resetSidebarState();
+              navigate('/new/proposal');
+            },
             iconLeft: 'star',
           },
         ]
@@ -71,7 +80,10 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New Sputnik proposal',
-            onClick: () => navigate('/new/proposal'),
+            onClick: () => {
+              resetSidebarState();
+              navigate('/new/proposal');
+            },
             iconLeft: 'democraticProposal',
           },
         ]
@@ -82,26 +94,32 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New treasury proposal',
-            onClick: () =>
+            onClick: () => {
+              resetSidebarState();
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
-              }),
+              });
+            },
             iconLeft: 'treasuryProposal',
           },
           {
             label: 'New democracy proposal',
-            onClick: () =>
+            onClick: () => {
+              resetSidebarState();
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
-              }),
+              });
+            },
             iconLeft: 'democraticProposal',
           },
           {
             label: 'New tip',
-            onClick: () =>
+            onClick: () => {
+              resetSidebarState();
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
-              }),
+              });
+            },
             iconLeft: 'jar',
           },
         ]
@@ -114,6 +132,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             label: 'New Snapshot Proposal',
             iconLeft: 'democraticProposal',
             onClick: () => {
+              resetSidebarState();
               const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
                 navigate('/multiple-snapshots', {
@@ -140,7 +159,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'people',
       onClick: (e) => {
         e?.preventDefault();
-        sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+        resetSidebarState();
         navigate('/createCommunity', {}, null);
       },
     },
@@ -149,8 +168,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'discord',
       onClick: (e) => {
         e?.preventDefault();
-        sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
-
+        resetSidebarState();
         window.open(
           `https://discord.com/oauth2/authorize?client_id=${
             process.env.DISCORD_CLIENT_ID
@@ -172,9 +190,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           {
             label: 'New Thread',
             onClick: () => {
-              sidebarStore
-                .getState()
-                .setMenu({ name: 'default', isVisible: false });
+              resetSidebarState();
               navigate('/new/discussion');
             },
             iconLeft: 'write',

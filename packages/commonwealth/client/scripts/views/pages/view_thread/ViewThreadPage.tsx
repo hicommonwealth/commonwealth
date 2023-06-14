@@ -21,7 +21,6 @@ import ExternalLink from 'views/components/ExternalLink';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import { ThreadActionType } from '../../../../../shared/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
@@ -279,6 +278,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );
+
+            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {
@@ -728,7 +729,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
   return (
-    <Sublayout>
+    <>
       <CWContentPage
         showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"
@@ -914,7 +915,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
         open={isEditCollaboratorsModalOpen}
       />
-    </Sublayout>
+    </>
   );
 };
 
