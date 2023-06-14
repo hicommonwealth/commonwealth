@@ -1,3 +1,10 @@
+import { notifyError } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
+import { capitalize, debounce, uniqBy } from 'lodash';
+import SearchQuery, { SearchScope, SearchSort } from 'models/SearchQuery';
+import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/search/index.scss';
+import QueryString from 'qs';
 import React, {
   useCallback,
   useEffect,
@@ -6,25 +13,13 @@ import React, {
   useState,
 } from 'react';
 import { NavigateOptions, useSearchParams } from 'react-router-dom';
-import { capitalize, debounce, uniqBy } from 'lodash';
-
-import 'pages/search/index.scss';
-
-import { SearchScope } from 'models/SearchQuery';
-import SearchQuery, { SearchSort } from 'models/SearchQuery';
-
 import app from 'state';
-import { pluralize } from 'helpers';
-import { notifyError } from 'controllers/app/notifications';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { useCommonNavigate } from 'navigation/helpers';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
 import { getListing } from './helpers';
-import QueryString from 'qs';
 
 const SearchPage = () => {
   const navigate = useCommonNavigate();
@@ -195,57 +190,54 @@ const SearchPage = () => {
   return !app.search.getByQuery(searchQuery)?.loaded ? (
     <PageLoading />
   ) : (
-    <Sublayout onScroll={handleScroll}>
-      <div className="SearchPage">
-        <div className="search-results">
-          <CWTabBar>
-            {searchQuery.getSearchScope().map((s, i) => (
-              <CWTab
-                key={i}
-                label={s}
-                isSelected={activeTab === s}
-                onClick={() => setActiveTab(s)}
+    <div className="SearchPage" onScroll={handleScroll}>
+      <div className="search-results">
+        <CWTabBar>
+          {searchQuery.getSearchScope().map((s, i) => (
+            <CWTab
+              key={i}
+              label={s}
+              isSelected={activeTab === s}
+              onClick={() => setActiveTab(s)}
+            />
+          ))}
+        </CWTabBar>
+        <CWText isCentered className="search-results-caption">
+          {resultCount} matching '{searchQuery.searchTerm}' {getCaptionScope()}
+          {searchQuery.chainScope !== 'all_chains' && !app.isCustomDomain() && (
+            <a
+              href="#"
+              className="search-all-communities"
+              onClick={handleSearchAllCommunities}
+            >
+              Search all communities?
+            </a>
+          )}
+        </CWText>
+        {tabScopedListing.length > 0 &&
+          ['Threads', 'Replies'].includes(activeTab) && (
+            <div className="search-results-filters">
+              <CWText type="h5">Sort By:</CWText>
+              <CWDropdown
+                label=""
+                onSelect={handleSortChange}
+                initialValue={{
+                  label: searchQuery.sort,
+                  value: searchQuery.sort,
+                }}
+                options={Object.keys(SearchSort).map((k) => ({
+                  label: k,
+                  value: k,
+                }))}
               />
-            ))}
-          </CWTabBar>
-          <CWText isCentered className="search-results-caption">
-            {resultCount} matching '{searchQuery.searchTerm}'{' '}
-            {getCaptionScope()}
-            {searchQuery.chainScope !== 'all_chains' && !app.isCustomDomain() && (
-              <a
-                href="#"
-                className="search-all-communities"
-                onClick={handleSearchAllCommunities}
-              >
-                Search all communities?
-              </a>
-            )}
-          </CWText>
-          {tabScopedListing.length > 0 &&
-            ['Threads', 'Replies'].includes(activeTab) && (
-              <div className="search-results-filters">
-                <CWText type="h5">Sort By:</CWText>
-                <CWDropdown
-                  label=""
-                  onSelect={handleSortChange}
-                  initialValue={{
-                    label: searchQuery.sort,
-                    value: searchQuery.sort,
-                  }}
-                  options={Object.keys(SearchSort).map((k) => ({
-                    label: k,
-                    value: k,
-                  }))}
-                />
-              </div>
-            )}
-          <div className="search-results-list">
-            {tabScopedListing}
-            <div ref={bottomEl}></div>
-          </div>
+            </div>
+          )}
+        <div className="search-results-list">
+          {tabScopedListing}
+          <div ref={bottomEl}></div>
         </div>
       </div>
-    </Sublayout>
+    </div>
   );
 };
 
