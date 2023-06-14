@@ -17,10 +17,7 @@ import { ThreadStage } from '../../../../../models/types';
 import Permissions from '../../../../../utils/Permissions';
 import { CWTag } from '../../../../components/component_kit/cw_tag';
 import { CWText } from '../../../../components/component_kit/cw_text';
-import {
-  getClasses,
-  isWindowSmallInclusive,
-} from '../../../../components/component_kit/helpers';
+import { getClasses } from '../../../../components/component_kit/helpers';
 import { isHot } from '../../helpers';
 import { isNewThread } from '../../NewThreadTag';
 import { AuthorAndPublishInfo } from '../AuthorAndPublishInfo';
@@ -54,16 +51,8 @@ export const Card = ({
   onStageTagClick,
   threadHref,
 }: CardProps) => {
-  const [windowIsSmall, setWindowIsSmall] = useState(
-    isWindowSmallInclusive(window.innerWidth)
-  );
-
   const { isLoggedIn } = useUserLoggedIn();
-
-  useBrowserWindow({
-    onResize: () => setWindowIsSmall(isWindowSmallInclusive(window.innerWidth)),
-    resizeListenerUpdateDeps: [],
-  });
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -101,11 +90,13 @@ export const Card = ({
         onClick={() => onBodyClick && onBodyClick()}
         key={thread.id}
       >
-        {!windowIsSmall && <ReactionButton thread={thread} size="big" />}
+        {!isWindowSmallInclusive && (
+          <ReactionButton thread={thread} size="big" />
+        )}
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              showSplitDotIndicator={!windowIsSmall}
+              showSplitDotIndicator={!isWindowSmallInclusive}
               authorInfo={
                 new AddressInfo(null, thread.author, thread.authorChain, null)
               }
@@ -191,7 +182,7 @@ export const Card = ({
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}
               thread={thread}
-              canVote={windowIsSmall}
+              canVote={isWindowSmallInclusive}
               canComment={!thread.readOnly}
               canUpdateThread={
                 isLoggedIn &&

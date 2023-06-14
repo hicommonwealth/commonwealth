@@ -1,5 +1,6 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -8,7 +9,6 @@ import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
-import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import type Topic from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
@@ -19,7 +19,6 @@ import { CWButton } from '../../../components/component_kit/cw_button';
 import { CWCheckbox } from '../../../components/component_kit/cw_checkbox';
 import { CWIconButton } from '../../../components/component_kit/cw_icon_button';
 import { CWText } from '../../../components/component_kit/cw_text';
-import { isWindowExtraSmall } from '../../../components/component_kit/helpers';
 import { Select } from '../../../components/Select';
 import './index.scss';
 
@@ -66,21 +65,13 @@ export const HeaderWithFilters = ({
     onFilterResize();
   }, []);
 
-  const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
-    isWindowExtraSmall(window.innerWidth)
-  );
+  const { isWindowExtraSmall } = useBrowserWindow({});
 
   useEffect(() => {
-    const onResize = () => {
-      setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
-    };
-
-    window.addEventListener('resize', onResize);
     app.loginStateEmitter.on('redraw', forceRerender);
     app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
-      window.removeEventListener('resize', onResize);
       app.loginStateEmitter.off('redraw', forceRerender);
       app.user.isFetched.off('redraw', forceRerender);
     };
@@ -170,7 +161,7 @@ export const HeaderWithFilters = ({
           >
             {totalThreadCount} Threads
           </CWText>
-          {windowIsExtraSmall ? (
+          {isWindowExtraSmall ? (
             <CWIconButton
               iconName="plusCircle"
               iconButtonTheme="black"

@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
-
-import 'pages/landing/header.scss';
-
-import { LoginModal } from 'views/modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
-import { Modal } from '../../components/component_kit/cw_modal';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
+import 'pages/landing/header.scss';
+import React, { useState } from 'react';
+import { LoginModal } from 'views/modals/login_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { Modal } from '../../components/component_kit/cw_modal';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type HeaderProps = {
   onLogin: () => void;
@@ -18,22 +16,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
   const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [windowIsMediumSmallInclusive, setWindowIsMediumSmallInclusive] =
-    useState(isWindowMediumSmallInclusive(window.innerWidth));
-
-  useEffect(() => {
-    const onResize = () => {
-      setWindowIsMediumSmallInclusive(
-        isWindowMediumSmallInclusive(window.innerWidth)
-      );
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-  }, []);
+  const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
   return (
     <>
@@ -43,7 +26,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
           alt="Commonwealth"
           className="logo-with-text"
         />
-        {windowIsMediumSmallInclusive ? (
+        {isWindowMediumSmallInclusive ? (
           <CWIconButton
             iconName="hamburger"
             onClick={() => setIsModalOpen(true)}
@@ -68,7 +51,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
             onModalClose={() => setIsModalOpen(false)}
           />
         }
-        isFullScreen={windowIsMediumSmallInclusive}
+        isFullScreen={isWindowMediumSmallInclusive}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />

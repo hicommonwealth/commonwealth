@@ -11,6 +11,7 @@ import type { IUniqueId } from '../../models/interfaces';
 import Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
 import axios from 'axios';
+import $ from 'jquery';
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
