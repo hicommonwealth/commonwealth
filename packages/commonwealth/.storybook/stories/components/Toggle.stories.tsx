@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CWToggle } from '../../../client/scripts/views/components/component_kit/cw_toggle';
-import type { ToggleStyleProps } from '../../../client/scripts/views/components/component_kit/cw_toggle';
+import type { ToggleProps } from '../../../client/scripts/views/components/component_kit/cw_toggle';
 
 const toggle = {
   title: 'Components/Toggle',
@@ -12,8 +12,8 @@ const toggle = {
 export default toggle;
 type Story = StoryObj<typeof toggle>;
 
-const Toggle: FC<ToggleStyleProps> = (props) => {
-  const { checked, disabled } = props;
+const Toggle: FC<ToggleProps> = (props) => {
+  const { checked, disabled, size } = props;
   const [isChecked, setIsChecked] = useState<boolean | undefined>(checked);
 
   useEffect(() => setIsChecked(checked), [checked]);
@@ -22,6 +22,7 @@ const Toggle: FC<ToggleStyleProps> = (props) => {
     <CWToggle
       checked={isChecked}
       disabled={disabled}
+      size={size}
       onChange={(e) => {
         setIsChecked(!isChecked)
         e.stopPropagation();
@@ -30,18 +31,15 @@ const Toggle: FC<ToggleStyleProps> = (props) => {
   );
 }
 
-const Base = (checked: boolean, disabled: boolean) => {
+const Base = (size: string, checked: boolean, disabled: boolean) => {
   return {
     args: {
       checked: checked,
       disabled: disabled,
+      size: size,
     },
     argTypes: {
       checked: {
-        control: { type: "boolean" },
-        options: [ true, false ],
-      },
-      disabled: {
         control: { type: "boolean" },
         options: [ true, false ],
       },
@@ -53,13 +51,23 @@ const Base = (checked: boolean, disabled: boolean) => {
           "onChange",
           disabled ? "checked" : null,
           "disabled",
+          "size",
         ],
       },
     },
-    render: ({...args}) => <Toggle {...args} />,
+    render: ({...args}) => (
+      <Toggle
+        checked={args.checked}
+        disabled={args.disabled}
+        size={args.size}
+      />
+    ),
   };
 }
 
-export const Overview: Story = { ...Base(false, false) };
-export const DisabledUnchecked: Story = { ...Base(false, true) };
-export const DisabledChecked: Story = { ...Base(true, true) };;
+export const Small: Story = { ...Base("small", false, false) };
+export const SmallDisabledUnchecked: Story = { ...Base("small", false, true) };
+export const SmallDisabledChecked: Story = { ...Base("small", true, true) };;
+export const Large: Story = { ...Base("large", false, false) };
+export const LargeDisabledUnchecked: Story = { ...Base("large", false, true) };
+export const LargeDisabledChecked: Story = { ...Base("large", true, true) };;

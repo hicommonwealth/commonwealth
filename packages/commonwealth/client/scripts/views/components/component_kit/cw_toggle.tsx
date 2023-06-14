@@ -17,12 +17,13 @@ export type ToggleStyleProps = {
   checked?: boolean;
 } & BaseStyleProps;
 
-type ToggleProps = {
+export type ToggleProps = {
   onChange?: (e?: any) => void;
+  size: 'small' | 'large';
 } & ToggleStyleProps;
 
 export const CWToggle = (props: ToggleProps) => {
-  const { className, disabled = false, onChange, checked } = props;
+  const { className, disabled = false, onChange, checked, size } = props;
 
   const params = {
     disabled,
@@ -40,7 +41,7 @@ export const CWToggle = (props: ToggleProps) => {
           className,
         },
         ComponentType.Toggle
-      )}
+      ).concat(` ${size}`)}
     >
       <input className="toggle-input" {...params} />
       <div className="slider" />

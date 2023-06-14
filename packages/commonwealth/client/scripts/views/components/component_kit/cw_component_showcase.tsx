@@ -137,18 +137,21 @@ export const ComponentShowcase = () => {
   const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
     Array<string>
   >([]);
-  const [isToggled, setIsToggled] = useState<boolean>(false);
+  const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
+  const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] =
-    useState<boolean>(false);
+  const [isRadioButtonChecked, setIsRadioButtonChecked] = useState<boolean>(
+    false
+  );
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
-    useState<boolean>(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState<boolean>(
+    false
+  );
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -693,6 +696,7 @@ export const ComponentShowcase = () => {
         <div className="toggle-gallery">
           <CWToggle
             checked={isDarkModeOn}
+            size="small"
             onChange={(e) => {
               isDarkModeOn
                 ? toggleDarkMode(false, setIsDarkModeOn)
@@ -705,13 +709,38 @@ export const ComponentShowcase = () => {
           </div>
         </div>
         <CWToggle
-          checked={isToggled}
+          checked={isSmallToggled}
+          size="small"
           onChange={() => {
-            setIsToggled(!isToggled);
+            setIsSmallToggled(!isSmallToggled);
           }}
         />
-        <CWToggle disabled />
-        <CWToggle checked disabled />
+        <CWToggle size="small" disabled />
+        <CWToggle size="small" checked disabled />
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isDarkModeOn}
+            size="large"
+            onChange={(e) => {
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
+              e.stopPropagation();
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Dark mode</CWText>
+          </div>
+        </div>
+        <CWToggle
+          checked={isLargeToggled}
+          size="large"
+          onChange={() => {
+            setIsLargeToggled(!isLargeToggled);
+          }}
+        />
+        <CWToggle size="large" disabled />
+        <CWToggle size="large" checked disabled />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Vote Button</CWText>
