@@ -189,7 +189,7 @@ export const AdminActions = ({
 
   const handleSnapshotProposalClick = () => {
     const snapshotSpaces = app.chain.meta.snapshot;
-    onSnapshotProposalFromThread();
+    onSnapshotProposalFromThread && onSnapshotProposalFromThread();
     navigate(
       snapshotSpaces.length > 1
         ? '/multiple-snapshots'
@@ -336,7 +336,9 @@ export const AdminActions = ({
       <Modal
         content={
           <UpdateProposalStatusModal
-            onChangeHandler={(s) => onProposalStageChange(s)}
+            onChangeHandler={(s) =>
+              onProposalStageChange && onProposalStageChange(s)
+            }
             thread={thread}
             onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}
           />

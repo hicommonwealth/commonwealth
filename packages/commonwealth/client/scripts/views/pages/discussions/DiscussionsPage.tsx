@@ -274,16 +274,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 }}
                 onProposalStageChange={(stage) => {
                   setThreads((oldThreads) => {
-                    const updatedThreads = [...oldThreads].filter(
-                      // make sure that if we have an active stage filter (from the dropdown)
-                      // then we also filter the current list for the current stage only
-                      (x) => x.stage === stageName
-                    );
+                    const updatedThreads = [...oldThreads];
                     const foundThread = updatedThreads.find(
                       (x) => x.id === thread.id
                     );
                     if (foundThread) foundThread.stage = stage;
-                    return updatedThreads;
+                    return updatedThreads.filter(
+                      // make sure that if we have an active stage filter (from the dropdown)
+                      // then we also filter the current list for the current stage only
+                      (x) => x.stage === stageName
+                    );
                   });
                 }}
               />

@@ -609,6 +609,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             uniqueIdentifier: t.uniqueIdentifier,
           }));
         }}
+        onProposalStageChange={(stage) => {
+          setThread((t) => ({
+            ...t,
+            stage: stage,
+            uniqueIdentifier: t.uniqueIdentifier,
+          }));
+        }}
         hasPendingEdits={!!editsToSave}
         body={(threadOptionsComp) => (
           <div className="thread-content">

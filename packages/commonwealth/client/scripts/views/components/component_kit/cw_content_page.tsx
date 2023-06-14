@@ -11,11 +11,9 @@ import { ThreadStage } from '../../../models/types';
 import { AuthorAndPublishInfo as ThreadAuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
 import { CWCard } from './cw_card';
-import { CWIconButton } from './cw_icon_button';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
-import { LockWithTooltip } from '../lock_with_tooltip';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -93,6 +91,8 @@ export const CWContentPage = ({
   onPinToggle,
   onDelete,
   onTopicChange,
+  onProposalStageChange,
+  onSnapshotProposalFromThread,
   onCollaboratorsEdit,
   onEditCancel,
   onEditConfirm,
@@ -170,6 +170,8 @@ export const CWContentPage = ({
             onEditStart={onEditStart}
             canUpdateThread={canUpdateThread}
             hasPendingEdits={hasPendingEdits}
+            onProposalStageChange={onProposalStageChange}
+            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
           />
         )}
 
