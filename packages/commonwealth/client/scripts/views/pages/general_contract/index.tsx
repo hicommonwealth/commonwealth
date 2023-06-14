@@ -1,27 +1,25 @@
-import React, { useState } from 'react';
-import type { Result } from 'ethers/lib/utils';
-import { ethers } from 'ethers';
-
-import 'pages/general_contract/index.scss';
-
-import app from 'state';
-import type Contract from '../../../models/Contract';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import type { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ChainBase } from 'common-common/src/types';
 import { parseFunctionsFromABI } from 'abi_utils';
+import { ChainBase } from 'common-common/src/types';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
+import { ethers } from 'ethers';
+import type { Result } from 'ethers/lib/utils';
 import {
   handleMappingAbiInputs,
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
+import 'pages/general_contract/index.scss';
+import React, { useState } from 'react';
+import app from 'state';
+import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
+import type Contract from '../../../models/Contract';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../Sublayout';
+
 type GeneralContractPageProps = {
   contractAddress?: string;
 };
@@ -126,105 +124,103 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
   }
 
   return (
-    <Sublayout>
-      <div className="GeneralContractPage">
-        <CWText type="h4">General Contract</CWText>
-        <CWText>Contract Address: {contractAddress}</CWText>
-        <div className="functions-container">
-          <div className="header-row">
-            <CWText>Name</CWText>
-            <CWText>State Mutability</CWText>
-            <CWText>Inputs</CWText>
-            <CWText>Outputs</CWText>
-            <CWText>Call Function</CWText>
-          </div>
-          {loadContractAbi().map((fn: AbiItem) => {
-            return (
-              <div className="function-row">
-                <CWText>{fn.name}</CWText>
-                <CWText>{fn.stateMutability}</CWText>
-                <div className="functions-input-container">
-                  {fn.inputs.map((input: AbiInput, inputIdx: number) => {
-                    return (
-                      <div>
-                        <div className="function-inputs">
-                          <CWText>[{inputIdx}]</CWText>
-                          <CWText>{input.type}</CWText>
-                          <CWText>{input.name}</CWText>
-                        </div>
-                        <div>
-                          <CWTextInput
-                            name="Contract Input Field"
-                            placeholder="Insert Input Here"
-                            onInput={(e) => {
-                              handleMappingAbiInputs(
-                                inputIdx,
-                                e.target.value,
-                                fn.name,
-                                functionNameToFunctionInputArgs
-                              );
-
-                              setLoaded(true);
-                            }}
-                            inputValidationFn={(val) =>
-                              validateAbiInput(val, input.type)
-                            }
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="functions-output-container">
-                  {fn.outputs.map((output: AbiOutput, i) => {
-                    const fnOutputArray = functionNameToFunctionOutput.get(
-                      fn.name
-                    );
-                    return (
-                      <div>
-                        <div className="function-outputs">
-                          <CWText>[{i}]</CWText>
-                          <CWText>{output.type}</CWText>
-                          <CWText>{output.name}</CWText>
-                        </div>
-                        <div>
-                          {loading && <CWSpinner />}
-                          <CWText>
-                            {fnOutputArray && fnOutputArray[i].toString()
-                              ? fnOutputArray[i].toString()
-                              : ''}
-                          </CWText>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="function-call">
-                  <CWButton
-                    label="Submit"
-                    disabled={saving || !loaded}
-                    onClick={() => {
-                      notifySuccess('Submit Call button clicked!');
-                      setSaving(true);
-
-                      try {
-                        callFunction(contractAddress, fn);
-                      } catch (err) {
-                        notifyError(
-                          err.message || 'Submitting Function Call failed'
-                        );
-                      } finally {
-                        setSaving(false);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+    <div className="GeneralContractPage">
+      <CWText type="h4">General Contract</CWText>
+      <CWText>Contract Address: {contractAddress}</CWText>
+      <div className="functions-container">
+        <div className="header-row">
+          <CWText>Name</CWText>
+          <CWText>State Mutability</CWText>
+          <CWText>Inputs</CWText>
+          <CWText>Outputs</CWText>
+          <CWText>Call Function</CWText>
         </div>
+        {loadContractAbi().map((fn: AbiItem) => {
+          return (
+            <div className="function-row">
+              <CWText>{fn.name}</CWText>
+              <CWText>{fn.stateMutability}</CWText>
+              <div className="functions-input-container">
+                {fn.inputs.map((input: AbiInput, inputIdx: number) => {
+                  return (
+                    <div>
+                      <div className="function-inputs">
+                        <CWText>[{inputIdx}]</CWText>
+                        <CWText>{input.type}</CWText>
+                        <CWText>{input.name}</CWText>
+                      </div>
+                      <div>
+                        <CWTextInput
+                          name="Contract Input Field"
+                          placeholder="Insert Input Here"
+                          onInput={(e) => {
+                            handleMappingAbiInputs(
+                              inputIdx,
+                              e.target.value,
+                              fn.name,
+                              functionNameToFunctionInputArgs
+                            );
+
+                            setLoaded(true);
+                          }}
+                          inputValidationFn={(val) =>
+                            validateAbiInput(val, input.type)
+                          }
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="functions-output-container">
+                {fn.outputs.map((output: AbiOutput, i) => {
+                  const fnOutputArray = functionNameToFunctionOutput.get(
+                    fn.name
+                  );
+                  return (
+                    <div>
+                      <div className="function-outputs">
+                        <CWText>[{i}]</CWText>
+                        <CWText>{output.type}</CWText>
+                        <CWText>{output.name}</CWText>
+                      </div>
+                      <div>
+                        {loading && <CWSpinner />}
+                        <CWText>
+                          {fnOutputArray && fnOutputArray[i].toString()
+                            ? fnOutputArray[i].toString()
+                            : ''}
+                        </CWText>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="function-call">
+                <CWButton
+                  label="Submit"
+                  disabled={saving || !loaded}
+                  onClick={() => {
+                    notifySuccess('Submit Call button clicked!');
+                    setSaving(true);
+
+                    try {
+                      callFunction(contractAddress, fn);
+                    } catch (err) {
+                      notifyError(
+                        err.message || 'Submitting Function Call failed'
+                      );
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </Sublayout>
+    </div>
   );
 };
 

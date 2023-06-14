@@ -14,7 +14,6 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
-import Sublayout from '../../Sublayout';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
 type DiscussionsPageProps = {
@@ -259,44 +258,42 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
 
   return (
-    <Sublayout hideFooter={true} hideSearch={false}>
-      <div className="DiscussionsPage">
-        <Virtuoso
-          style={{ height: '100%', width: '100%' }}
-          data={initializing ? [] : threads}
-          itemContent={(i, thread) => {
+    <div className="DiscussionsPage">
+      <Virtuoso
+        style={{ height: '100%', width: '100%' }}
+        data={initializing ? [] : threads}
+        itemContent={(i, thread) => {
+          return (
+            <ThreadPreview thread={thread} key={thread.id + thread.stage} />
+          );
+        }}
+        endReached={loadMore}
+        overscan={200}
+        components={{
+          EmptyPlaceholder: () =>
+            initializing ? (
+              <div className="thread-loader">
+                <CWSpinner size="xl" />
+              </div>
+            ) : (
+              <CWText type="b1" className="no-threads-text">
+                There are no threads matching your filter.
+              </CWText>
+            ),
+          Header: () => {
             return (
-              <ThreadPreview thread={thread} key={thread.id + thread.stage} />
+              <RecentThreadsHeader
+                topic={topicName}
+                stage={stageName}
+                featuredFilter={featuredFilter}
+                dateRange={dateRange}
+                totalThreadCount={threads ? totalThreads : 0}
+              />
             );
-          }}
-          endReached={loadMore}
-          overscan={200}
-          components={{
-            EmptyPlaceholder: () =>
-              initializing ? (
-                <div className="thread-loader">
-                  <CWSpinner size="xl" />
-                </div>
-              ) : (
-                <CWText type="b1" className="no-threads-text">
-                  There are no threads matching your filter.
-                </CWText>
-              ),
-            Header: () => {
-              return (
-                <RecentThreadsHeader
-                  topic={topicName}
-                  stage={stageName}
-                  featuredFilter={featuredFilter}
-                  dateRange={dateRange}
-                  totalThreadCount={threads ? totalThreads : 0}
-                />
-              );
-            },
-          }}
-        />
-      </div>
-    </Sublayout>
+          },
+        }}
+      />
+    </div>
   );
 };
 
