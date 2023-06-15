@@ -14,7 +14,7 @@ import {
   MsgSubmitProposalEncodeObject,
   MsgVoteEncodeObject,
 } from '@cosmjs/stargate';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
+import { longify } from '@cosmjs/stargate/build/queryclient/utils';
 
 import type {
   CosmosProposalState,

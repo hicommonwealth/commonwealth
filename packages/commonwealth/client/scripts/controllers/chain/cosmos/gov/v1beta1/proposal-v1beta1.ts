@@ -15,7 +15,12 @@ import type {
 
 import moment from 'moment';
 import { ITXModalData, IVote } from '../../../../../models/interfaces';
-import { ProposalEndTime, ProposalStatus, VotingType, VotingUnit } from '../../../../../models/types';
+import {
+  ProposalEndTime,
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../../models/types';
 import { DepositVote } from '../../../../../models/votes';
 import Proposal from '../../../../../models/Proposal';
 import CosmosAccount from '../../account';
@@ -291,7 +296,7 @@ export class CosmosProposal extends Proposal<
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
-    const cosm = await import('@cosmjs/stargate/build/queries/utils');
+    const cosm = await import('@cosmjs/stargate/build/queryclient');
     const msg: MsgDepositEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
       value: {

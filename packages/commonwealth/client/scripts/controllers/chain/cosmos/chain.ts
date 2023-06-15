@@ -1,4 +1,4 @@
-import type { EncodeObject } from '@cosmjs/proto-signing';
+import type { EncodeObject, OfflineSigner } from '@cosmjs/proto-signing';
 
 import type {
   BankExtension,
@@ -32,6 +32,7 @@ import {
   getSigningClient,
   getTMClient,
 } from './chain.utils';
+import { getSigningEthermintClient } from 'common-common/src/ethermint/src/codegen/ethermint/client';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -154,6 +155,13 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       wallet.offlineSigner
     );
 
+    // const client = await getSigningEthermintClient({
+    //   rpcEndpoint: this._app.chain.meta.node.url,
+    //   signer: wallet.offlineSigner as OfflineSigner, // OfflineSigner
+    // });
+
+    console.log('client', client);
+
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
     const DEFAULT_FEE: StdFee = {
@@ -171,9 +179,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         DEFAULT_MEMO
       );
       console.log(result);
-      if (cosm.isBroadcastTxFailure(result)) {
+      if (cosm.isDeliverTxFailure(result)) {
         throw new Error('TX execution failed.');
-      } else if (cosm.isBroadcastTxSuccess(result)) {
+      } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({
           hash: Buffer.from(txHash, 'hex'),
