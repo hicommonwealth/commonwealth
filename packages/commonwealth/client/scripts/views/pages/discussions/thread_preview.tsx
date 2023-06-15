@@ -1,27 +1,35 @@
-import React, { useEffect, useState } from 'react';
-
-import 'pages/discussions/thread_preview.scss';
-import {
-  chainEntityTypeToProposalShortName,
-  getProposalUrlPath,
-} from 'identifiers';
-import moment from 'moment';
-
-import app from 'state';
-import { slugify } from 'utils';
+import { IChainEntityKind } from 'chain-events/src';
 import {
   isCommandClick,
   isDefaultStage,
   pluralize,
   threadStageToLabel,
 } from 'helpers';
+import { filterLinks } from 'helpers/threads';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import {
+  chainEntityTypeToProposalShortName,
+  getProposalUrlPath,
+} from 'identifiers';
+import Thread, { LinkSource } from 'models/Thread';
+import moment from 'moment';
+import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
+import 'pages/discussions/thread_preview.scss';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
+import { slugify } from 'utils';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
+import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import AddressInfo from '../../../models/AddressInfo';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
-import {
-  getClasses,
-  isWindowSmallInclusive,
-} from '../../components/component_kit/helpers';
+import { CWText } from '../../components/component_kit/cw_text';
+import { getClasses } from '../../components/component_kit/helpers';
+import { LockWithTooltip } from '../../components/lock_with_tooltip';
 import { ThreadPreviewReactionButtonBig } from '../../components/ReactionButton/ThreadPreviewReactionButtonBig';
 import { ThreadReactionPreviewButtonSmall } from '../../components/ReactionButton/ThreadPreviewReactionButtonSmall';
 import { SharePopover } from '../../components/share_popover';
@@ -34,17 +42,6 @@ import {
 } from './helpers';
 import { NewThreadTag } from './NewThreadTag';
 import { ThreadPreviewMenu } from './thread_preview_menu';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { ChangeTopicModal } from 'views/modals/change_topic_modal';
-import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import Thread, { LinkSource } from 'models/Thread';
-import { IChainEntityKind } from 'chain-events/src';
-import { filterLinks } from 'helpers/threads';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -55,27 +52,15 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
     useState(false);
 
-  const [windowIsSmall, setWindowIsSmall] = useState(
-    isWindowSmallInclusive(window.innerWidth)
-  );
-
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
-
-    const onResize = () => {
-      setWindowIsSmall(isWindowSmallInclusive(window.innerWidth));
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
   }, []);
 
   const [isSubscribed, setIsSubscribed] = useState(
@@ -139,7 +124,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
         }}
         key={thread.id}
       >
-        {!windowIsSmall && <ThreadPreviewReactionButtonBig thread={thread} />}
+        {!isWindowSmallInclusive && (
+          <ThreadPreviewReactionButtonBig thread={thread} />
+        )}
         <div className="main-content">
           <div className="top-row">
             <div className="user-and-date">
@@ -151,7 +138,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 linkify
                 showAddressWithDisplayName
               />
-              {!windowIsSmall && (
+              {!isWindowSmallInclusive && (
                 <CWText className="last-updated-text">•</CWText>
               )}
               <CWText
@@ -161,15 +148,20 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              <NewThreadTag threadCreatedAt={thread.createdAt}/>
-              {isLocked && <CWIcon iconName="lock" iconSize="small" />}
+              <NewThreadTag threadCreatedAt={thread.createdAt} />
+              {isLocked && (
+                <LockWithTooltip
+                  lockedAt={thread.lockedAt}
+                  updatedAt={thread.updatedAt}
+                />
+              )}
             </div>
             <div className="top-row-icons">
               {isHot(thread) && <div className="flame" />}
               {thread.pinned && (
                 <CWIcon
                   iconName="pin"
-                  iconSize={windowIsSmall ? 'small' : 'medium'}
+                  iconSize={isWindowSmallInclusive ? 'small' : 'medium'}
                 />
               )}
             </div>
@@ -213,7 +205,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                     type="proposal"
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
-                    )} 
+                    )}
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
@@ -225,7 +217,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           )}
           <div className="row-bottom">
             <div className="comments-count">
-              {windowIsSmall && (
+              {isWindowSmallInclusive && (
                 <ThreadReactionPreviewButtonSmall thread={thread} />
               )}
               <CWIcon iconName="feedback" iconSize="small" />
@@ -279,7 +271,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
       </div>
       <Modal
         content={
-          <ChangeTopicModal
+          <ChangeThreadTopicModal
             onChangeHandler={() => {
               // TODO update store and rerender
             }}

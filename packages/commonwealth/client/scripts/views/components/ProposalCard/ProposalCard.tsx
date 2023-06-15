@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { ProposalType } from 'common-common/src/types';
-
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
@@ -23,6 +21,7 @@ import {
 } from './helpers';
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -35,8 +34,13 @@ export const ProposalCard = ({
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
   const [title, setTitle] = useState(proposal.title);
+  const { metadata } = useProposalMetadata({ app, proposal });
 
   const secondaryTagText = getSecondaryTagText(proposal);
+
+  useEffect(() => {
+    if (metadata?.title) setTitle(metadata?.title);
+  }, [metadata?.title]);
 
   useEffect(() => {
     if (proposal instanceof AaveProposal) {
@@ -106,33 +110,6 @@ export const ProposalCard = ({
           {getStatusText(proposal)}
         </CWText>
       ) : null}
-      {proposal.threadId && (
-        <CWText type="caption" className="proposal-thread-link-text">
-          <a
-            href={getProposalUrlPath(
-              ProposalType.Thread,
-              `${proposal.threadId}`
-            )}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-
-              localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-                window.scrollY;
-
-              navigate(
-                getProposalUrlPath(
-                  ProposalType.Thread,
-                  `${proposal.threadId}`,
-                  true
-                )
-              );
-            }}
-          >
-            {proposal.threadTitle ? proposal.threadTitle : 'Go to thread'}
-          </a>
-        </CWText>
-      )}
     </CWCard>
   );
 };

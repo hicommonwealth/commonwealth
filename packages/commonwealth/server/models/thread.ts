@@ -49,6 +49,7 @@ export type ThreadAttributes = {
   last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
+  locked_at?: Date;
 
   // associations
   Chain?: ChainAttributes;
@@ -73,7 +74,8 @@ export default (
     'Thread',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address_id: { type: dataTypes.INTEGER, allowNull: true },
+      created_by: { type: dataTypes.STRING, allowNull: true },
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
@@ -120,6 +122,10 @@ export default (
       last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
+      locked_at: {
+        type: dataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

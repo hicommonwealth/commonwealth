@@ -2,26 +2,33 @@ import { ProposalType } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { extractDomain, isDefaultStage } from 'helpers';
+import { filterLinks } from 'helpers/threads';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
-import { ThreadStage } from '../../../models/types';
-
-import { Link, LinkSource, Thread } from '../../../models/Thread';
 import type { IThreadCollaborator } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
-
 import 'pages/view_thread/index.scss';
 import React, { useCallback, useEffect, useState } from 'react';
-
 import app from 'state';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
+import ExternalLink from 'views/components/ExternalLink';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import { ThreadActionType } from '../../../../../shared/types';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
+import { Link, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
+import { ThreadStage } from '../../../models/types';
 import { CommentsTree } from '../../components/Comments/CommentsTree';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import { clearEditingLocalStorage } from '../../components/Comments/helpers';
@@ -29,10 +36,16 @@ import type { SidebarComponents } from '../../components/component_kit/cw_conten
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../../components/component_kit/helpers';
 import { ThreadReactionPreviewButtonSmall } from '../../components/ReactionButton/ThreadPreviewReactionButtonSmall';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { ChangeThreadTopicModal } from '../../modals/change_thread_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import {
   getCommentSubscription,
@@ -42,17 +55,9 @@ import {
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
+import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ThreadAuthor, ThreadStageComponent } from './thread_components';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { filterLinks } from 'helpers/threads';
-import { extractDomain, isDefaultStage } from 'helpers';
-import ExternalLink from 'views/components/ExternalLink';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -90,6 +95,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);
+  const [isCollapsedSize, setIsCollapsedSize] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -99,6 +105,28 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
+
+  useBrowserWindow({
+    onResize: () =>
+      breakpointFnValidator(
+        isCollapsedSize,
+        (state: boolean) => {
+          setIsCollapsedSize(state);
+        },
+        isWindowMediumSmallInclusive
+      ),
+    resizeListenerUpdateDeps: [isCollapsedSize],
+  });
+
+  useEffect(() => {
+    breakpointFnValidator(
+      isCollapsedSize,
+      (state: boolean) => {
+        setIsCollapsedSize(state);
+      },
+      isWindowMediumSmallInclusive
+    );
+  }, []);
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
@@ -147,7 +175,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [recentlyEdited]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     app.threads
       .fetchThreadsFromId([+threadId])
       .then((res) => {
@@ -173,7 +201,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       });
   }, [threadId]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!thread) {
       return;
     }
@@ -193,7 +221,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [prefetch, thread, threadId]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!thread) {
       return;
     }
@@ -208,7 +236,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!thread) {
       return;
     }
@@ -250,6 +278,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );
+
+            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {
@@ -281,7 +311,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [initializedPolls, thread?.id]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!thread) {
       return;
     }
@@ -308,7 +338,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [prefetch, thread, thread?.id, threadId]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!thread) {
       return;
     }
@@ -342,20 +372,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [prefetch, thread, thread?.id, threadId]);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!thread) {
       return;
     }
 
     // load profiles
     if (!prefetch[threadId]['profilesStarted']) {
-      app.newProfiles.getProfile(thread.authorChain, thread.author);
+      NewProfilesController.Instance.getProfile(
+        thread.authorChain,
+        thread.author
+      );
 
       comments.forEach((comment) => {
-        app.newProfiles.getProfile(comment.authorChain, comment.author);
+        NewProfilesController.Instance.getProfile(
+          comment.authorChain,
+          comment.author
+        );
       });
 
-      app.newProfiles.isFetched.on('redraw', () => {
+      NewProfilesController.Instance.isFetched.on('redraw', () => {
         if (!prefetch[threadId]?.['profilesFinished']) {
           setPrefetch((prevState) => ({
             ...prevState,
@@ -527,6 +563,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           onClick: async () => {
             try {
               app.threads.delete(thread).then(() => {
+                app.threadUpdateEmitter.emit('threadUpdated', {
+                  threadId: thread.id,
+                  action: ThreadActionType.Deletion,
+                });
                 navigate('/discussions');
               });
             } catch (err) {
@@ -685,9 +725,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isStageDefault = isDefaultStage(thread.stage);
 
+  const tabsShouldBePresent =
+    showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
+
   return (
-    <Sublayout>
+    <>
       <CWContentPage
+        showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||
@@ -714,9 +758,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           />
         }
         createdAt={thread.createdAt}
+        updatedAt={thread.updatedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}
+        lockedAt={thread.lockedAt}
         displayNewTag={true}
         headerComponents={
           !isStageDefault && <ThreadStageComponent stage={thread.stage} />
@@ -749,9 +795,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
-                  <CWText type="h5" className="callout-text">
-                    Commenting is disabled because this post has been locked.
-                  </CWText>
+                  <LockMessage
+                    lockedAt={thread.lockedAt}
+                    updatedAt={thread.updatedAt}
+                  />
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}
@@ -842,7 +889,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       />
       <Modal
         content={
-          <ChangeTopicModal
+          <ChangeThreadTopicModal
             onChangeHandler={(topic: Topic) => {
               const newThread = new Thread({ ...thread, topic });
               setThread(newThread);
@@ -868,7 +915,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
         open={isEditCollaboratorsModalOpen}
       />
-    </Sublayout>
+    </>
   );
 };
 

@@ -60,6 +60,9 @@ module.exports = {
         process.env.FLAG_PROPOSAL_TEMPLATES
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {
@@ -85,12 +88,6 @@ module.exports = {
         bitcoin: {
           test: /[\\/]node_modules[\\/](bip39)[\\/]/,
           name: 'bitcoin',
-          chunks: 'all',
-        },
-        ethereum: {
-          // this is made into an inital chunk
-          test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
-          name: 'ethereum',
           chunks: 'all',
         },
         ethereumAsync: {
@@ -119,6 +116,11 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
+        // ethereum: {
+        //   test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
+        //   name: 'ethereum',
+        //   chunks: 'all',
+        // },
         // near: {
         //   test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
         //   name: 'near',

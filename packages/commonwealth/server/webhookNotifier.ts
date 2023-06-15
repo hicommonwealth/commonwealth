@@ -50,7 +50,7 @@ const getFilteredContent = (content, address) => {
     return { title, fulltext, chainEventLink };
   } else {
     const community = `${content.chain || content.community}`;
-    const actor = `${address?.name || content.user}`;
+    const actor = `${address?.Profile?.profile_name || content.user}`;
     const action =
       content.notificationCategory === NotificationCategories.NewComment
         ? 'commented on'
@@ -121,7 +121,6 @@ const getFilteredContent = (content, address) => {
 
 const send = async (models, content: WebhookContent) => {
   let address;
-  let profile;
   try {
     address = await models.Address.findOne({
       where: {
@@ -130,7 +129,6 @@ const send = async (models, content: WebhookContent) => {
       },
       include: [models.Profile],
     });
-    profile = await address.getProfile();
   } catch (err) {
     // pass nothing if no matching address is found
   }
@@ -171,11 +169,11 @@ const send = async (models, content: WebhookContent) => {
 
   let actorAvatarUrl = null;
   const actorAccountLink = address
-    ? `${SERVER_URL}/${address.chain}/account/${address.address}`
+    ? `${SERVER_URL}/profile/id/${address?.Profile?.id}`
     : null;
 
-  if (profile) {
-    actorAvatarUrl = profile.avatar_url;
+  if (address?.Profile) {
+    actorAvatarUrl = address?.Profile?.avatar_url;
   }
 
   let previewImageUrl = null; // image url of webhook preview

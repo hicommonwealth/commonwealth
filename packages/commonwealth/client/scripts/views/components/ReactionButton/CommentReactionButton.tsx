@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -6,6 +6,7 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
+import ReactionCount from '../../../models/ReactionCount';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
@@ -14,7 +15,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../component_kit/helpers';
 import {
-  fetchReactionsByPost,
+  fetchReactionsByComment,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
@@ -31,8 +32,24 @@ export const CommentReactionButton = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
 
-  const reactionCounts = app.reactionCounts.store.getByPost(comment);
+  useEffect(() => {
+    const redrawFunction = (comment_id) => {
+      if (comment_id !== comment.id) {
+        return;
+      }
+
+      setReactionCounts(app.reactionCounts.store.getByPost(comment));
+    };
+
+    app.reactionCounts.isFetched.on('redraw', redrawFunction);
+
+    return () => {
+      app.reactionCounts.isFetched.off('redraw', redrawFunction);
+    };
+  });
+
   const { likes = 0, hasReacted } = reactionCounts || {};
 
   // token balance check if needed
@@ -49,7 +66,7 @@ export const CommentReactionButton = ({
   const activeAddress = app.user.activeAccount?.address;
 
   const dislike = async (userAddress: string) => {
-    const reaction = (await fetchReactionsByPost(comment)).find((r) => {
+    const reaction = (await fetchReactionsByComment(comment.id)).find((r) => {
       return r.Address.address === activeAddress;
     });
 
@@ -66,6 +83,7 @@ export const CommentReactionButton = ({
           reactors.filter(({ Address }) => Address.address !== userAddress)
         );
 
+        setReactionCounts(app.reactionCounts.store.getByPost(comment));
         setIsLoading(false);
       });
   };
@@ -74,7 +92,7 @@ export const CommentReactionButton = ({
     setIsLoading(true);
 
     app.reactionCounts
-      .create(userAddress, comment, 'like', chainId)
+      .createCommentReaction(userAddress, comment, 'like', chainId)
       .then(() => {
         setReactors([
           ...reactors,
@@ -83,6 +101,7 @@ export const CommentReactionButton = ({
           },
         ]);
 
+        setReactionCounts(app.reactionCounts.store.getByPost(comment));
         setIsLoading(false);
       });
   };
@@ -101,7 +120,7 @@ export const CommentReactionButton = ({
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
-          setReactors(await fetchReactionsByPost(comment));
+          setReactors(await fetchReactionsByComment(comment.id));
         }}
       >
         <CWIconButton
