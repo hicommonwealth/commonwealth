@@ -17,7 +17,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _chainInfo: ChainInfo;
-  private _provider: EthereumProvider;
+  private _provider;
   private _web3: Web3;
 
   public readonly name = WalletId.WalletConnect;
@@ -103,12 +103,13 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     const chainUrl =
       this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
     const rpc = chainUrl ? { [chainId]: chainUrl } : {};
-
+    
     this._provider = await EthereumProvider.init({
       projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
       chains: [chainId],
       methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData_v4'],
       showQrModal: true,
+      // @ts-ignore
       qrModalOptions: {
         themeVariables: {
           '--w3m-z-index': '10000',
