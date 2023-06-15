@@ -28,7 +28,7 @@ const getUrl = (req) => {
 };
 
 const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
-  if (NO_CLIENT_SERVER) {
+  if (NO_CLIENT_SERVER || DEV) {
     return;
   }
   log.info('setupAppRoutes');
