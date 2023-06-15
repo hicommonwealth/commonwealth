@@ -1,12 +1,14 @@
 import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
 import Permissions from '../../../utils/Permissions';
 import { LoginModal } from '../../modals/login_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import ReactionCount from '../../../models/ReactionCount';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { Modal } from '../component_kit/cw_modal';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
@@ -30,8 +32,24 @@ export const CommentReactionButton = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
 
-  const reactionCounts = app.reactionCounts.store.getByPost(comment);
+  useEffect(() => {
+    const redrawFunction = (comment_id) => {
+      if (comment_id !== comment.id) {
+        return;
+      }
+
+      setReactionCounts(app.reactionCounts.store.getByPost(comment));
+    };
+
+    app.reactionCounts.isFetched.on('redraw', redrawFunction);
+
+    return () => {
+      app.reactionCounts.isFetched.off('redraw', redrawFunction);
+    };
+  });
+
   const { likes = 0, hasReacted } = reactionCounts || {};
 
   // token balance check if needed
@@ -63,6 +81,7 @@ export const CommentReactionButton = ({
           reactors.filter(({ Address }) => Address.address !== userAddress)
         );
 
+        setReactionCounts(app.reactionCounts.store.getByPost(comment));
         setIsLoading(false);
       });
   };
@@ -80,6 +99,7 @@ export const CommentReactionButton = ({
           },
         ]);
 
+        setReactionCounts(app.reactionCounts.store.getByPost(comment));
         setIsLoading(false);
       });
   };

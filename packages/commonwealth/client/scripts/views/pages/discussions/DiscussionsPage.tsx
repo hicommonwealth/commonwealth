@@ -16,7 +16,6 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
-import Sublayout from '../../Sublayout';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 
@@ -201,124 +200,118 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [stageName, topicName, featuredFilter, dateRange]);
 
   return (
-    <Sublayout hideFooter={true} hideSearch={false}>
-      <div className="DiscussionsPage">
-        <Virtuoso
-          className="thread-list"
-          style={{ height: '100%', width: '100%' }}
-          data={initializing ? [] : threads}
-          itemContent={(i, thread) => {
-            const discussionLink = getProposalUrlPath(
-              thread.slug,
-              `${thread.identifier}-${slugify(thread.title)}`
-            );
+    <div className="DiscussionsPage">
+      <Virtuoso
+        className="thread-list"
+        style={{ height: '100%', width: '100%' }}
+        data={initializing ? [] : threads}
+        itemContent={(i, thread) => {
+          const discussionLink = getProposalUrlPath(
+            thread.slug,
+            `${thread.identifier}-${slugify(thread.title)}`
+          );
 
-            if (!includeSpamThreads && thread.markedAsSpamAt) return null;
+          if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
-            return (
-              <ThreadCard
-                key={thread.id + '-' + thread.readOnly}
-                thread={thread}
-                onLockToggle={(isLocked) => {
-                  const tempThreads = [...threads];
-                  const foundThread = tempThreads.find(
-                    (t) => t.id === thread.id
+          return (
+            <ThreadCard
+              key={thread.id + '-' + thread.readOnly}
+              thread={thread}
+              onLockToggle={(isLocked) => {
+                const tempThreads = [...threads];
+                const foundThread = tempThreads.find((t) => t.id === thread.id);
+                foundThread.readOnly = isLocked;
+                setThreads(tempThreads);
+              }}
+              onPinToggle={(isPinned) => {
+                const tempThreads = [...threads];
+                const foundThread = tempThreads.find((t) => t.id === thread.id);
+                foundThread.pinned = isPinned;
+                setThreads(tempThreads);
+              }}
+              onEditStart={() => navigate(`${discussionLink}`)}
+              onStageTagClick={() => {
+                navigate(`/discussions?stage=${thread.stage}`);
+              }}
+              threadHref={`${getScopePrefix()}${discussionLink}`}
+              onBodyClick={() => {
+                const scrollEle = document.getElementsByClassName('Body')[0];
+
+                localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+                  scrollEle.scrollTop;
+              }}
+              onSpamToggle={(updatedThread) => {
+                setThreads((oldThreads) => {
+                  const updatedThreads = [...oldThreads];
+                  const foundThread = updatedThreads.find(
+                    (x) => x.id === thread.id
                   );
-                  foundThread.readOnly = isLocked;
-                  setThreads(tempThreads);
-                }}
-                onPinToggle={(isPinned) => {
-                  const tempThreads = [...threads];
-                  const foundThread = tempThreads.find(
-                    (t) => t.id === thread.id
-                  );
-                  foundThread.pinned = isPinned;
-                  setThreads(tempThreads);
-                }}
-                onEditStart={() => navigate(`${discussionLink}`)}
-                onStageTagClick={() => {
-                  navigate(`/discussions?stage=${thread.stage}`);
-                }}
-                threadHref={`${getScopePrefix()}${discussionLink}`}
-                onBodyClick={() => {
-                  const scrollEle = document.getElementsByClassName('Body')[0];
-
-                  localStorage[`${app.activeChainId()}-discussions-scrollY`] =
-                    scrollEle.scrollTop;
-                }}
-                onSpamToggle={(updatedThread) => {
-                  setThreads((oldThreads) => {
-                    const updatedThreads = [...oldThreads];
-                    const foundThread = updatedThreads.find(
-                      (x) => x.id === thread.id
-                    );
-                    if (foundThread)
-                      foundThread.markedAsSpamAt = updatedThread.markedAsSpamAt;
-                    return updatedThreads;
-                  });
-                }}
-                onDelete={() => {
+                  if (foundThread)
+                    foundThread.markedAsSpamAt = updatedThread.markedAsSpamAt;
+                  return updatedThreads;
+                });
+              }}
+              onDelete={() => {
+                const tempThreads = [...threads].filter(
+                  (t) => t.id !== thread.id
+                );
+                setThreads(tempThreads);
+              }}
+              onTopicChange={(topic) => {
+                if (topic.id !== thread.topic.id) {
                   const tempThreads = [...threads].filter(
                     (t) => t.id !== thread.id
                   );
-                  setThreads(tempThreads);
-                }}
-                onTopicChange={(topic) => {
-                  if (topic.id !== thread.topic.id) {
-                    const tempThreads = [...threads].filter(
-                      (t) => t.id !== thread.id
-                    );
 
-                    setThreads(tempThreads);
-                  }
-                }}
-                onProposalStageChange={(stage) => {
-                  setThreads((oldThreads) => {
-                    const updatedThreads = [...oldThreads];
-                    const foundThread = updatedThreads.find(
-                      (x) => x.id === thread.id
-                    );
-                    if (foundThread) foundThread.stage = stage;
-                    return updatedThreads.filter(
-                      // make sure that if we have an active stage filter (from the dropdown)
-                      // then we also filter the current list for the current stage only
-                      (x) => (stageName ? x.stage === stageName : x)
-                    );
-                  });
-                }}
+                  setThreads(tempThreads);
+                }
+              }}
+              onProposalStageChange={(stage) => {
+                setThreads((oldThreads) => {
+                  const updatedThreads = [...oldThreads];
+                  const foundThread = updatedThreads.find(
+                    (x) => x.id === thread.id
+                  );
+                  if (foundThread) foundThread.stage = stage;
+                  return updatedThreads.filter(
+                    // make sure that if we have an active stage filter (from the dropdown)
+                    // then we also filter the current list for the current stage only
+                    (x) => (stageName ? x.stage === stageName : x)
+                  );
+                });
+              }}
+            />
+          );
+        }}
+        endReached={loadMore}
+        overscan={200}
+        components={{
+          EmptyPlaceholder: () =>
+            initializing ? (
+              <div className="thread-loader">
+                <CWSpinner size="xl" />
+              </div>
+            ) : (
+              <CWText type="b1" className="no-threads-text">
+                There are no threads matching your filter.
+              </CWText>
+            ),
+          Header: () => {
+            return (
+              <HeaderWithFilters
+                topic={topicName}
+                stage={stageName}
+                featuredFilter={featuredFilter}
+                dateRange={dateRange}
+                totalThreadCount={threads ? totalThreads : 0}
+                isIncludingSpamThreads={includeSpamThreads}
+                onIncludeSpamThreads={setIncludeSpamThreads}
               />
             );
-          }}
-          endReached={loadMore}
-          overscan={200}
-          components={{
-            EmptyPlaceholder: () =>
-              initializing ? (
-                <div className="thread-loader">
-                  <CWSpinner size="xl" />
-                </div>
-              ) : (
-                <CWText type="b1" className="no-threads-text">
-                  There are no threads matching your filter.
-                </CWText>
-              ),
-            Header: () => {
-              return (
-                <HeaderWithFilters
-                  topic={topicName}
-                  stage={stageName}
-                  featuredFilter={featuredFilter}
-                  dateRange={dateRange}
-                  totalThreadCount={threads ? totalThreads : 0}
-                  isIncludingSpamThreads={includeSpamThreads}
-                  onIncludeSpamThreads={setIncludeSpamThreads}
-                />
-              );
-            },
-          }}
-        />
-      </div>
-    </Sublayout>
+          },
+        }}
+      />
+    </div>
   );
 };
 

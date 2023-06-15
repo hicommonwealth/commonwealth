@@ -7,7 +7,6 @@ import app from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
-import Sublayout from '../../Sublayout';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
@@ -114,35 +113,33 @@ const CreateCommunity = () => {
   };
 
   return (
-    <Sublayout>
-      <div className="CreateCommunityIndex">
-        <CWText type="h3" fontWeight="semiBold">
-          New Commonwealth Community
-        </CWText>
-        <CWTabBar>
-          {Object.values(CommunityType)
-            .filter((t) => {
-              return (
-                (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-                t !== CommunityType.AbiFactory
-              );
-            })
-            .map((t, i) => {
-              return (
-                <CWTab
-                  key={i}
-                  label={t.toString()}
-                  isSelected={currentForm === t}
-                  onClick={() => {
-                    setCurrentForm(t);
-                  }}
-                />
-              );
-            })}
-        </CWTabBar>
-        {getCurrentForm()}
-      </div>
-    </Sublayout>
+    <div className="CreateCommunityIndex">
+      <CWText type="h3" fontWeight="semiBold">
+        New Commonwealth Community
+      </CWText>
+      <CWTabBar>
+        {Object.values(CommunityType)
+          .filter((t) => {
+            return (
+              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+              t !== CommunityType.AbiFactory
+            );
+          })
+          .map((t, i) => {
+            return (
+              <CWTab
+                key={i}
+                label={t.toString()}
+                isSelected={currentForm === t}
+                onClick={() => {
+                  setCurrentForm(t);
+                }}
+              />
+            );
+          })}
+      </CWTabBar>
+      {getCurrentForm()}
+    </div>
   );
 };
 

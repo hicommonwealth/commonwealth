@@ -12,17 +12,13 @@ import { SublayoutHeader } from './SublayoutHeader';
 
 type SublayoutProps = {
   hideFooter?: boolean;
-  hideSearch?: boolean;
-  onScroll?: () => void; // lazy loading for page content
-  isLoadingProfileData?: boolean;
+  hasCommunitySidebar?: boolean;
 } & React.PropsWithChildren;
 
 const Sublayout = ({
   children,
   hideFooter = true,
-  hideSearch,
-  onScroll,
-  isLoadingProfileData = false,
+  hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName } = useSidebarStore();
@@ -53,20 +49,16 @@ const Sublayout = ({
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
-        <SublayoutHeader
-          hideSearch={hideSearch}
-          onMobile={isWindowSmallInclusive}
-          isLoadingProfileData={isLoadingProfileData}
-        />
+        <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          {showSidebar && <Sidebar />}
+          {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
           <div className="body-and-sticky-headers-container">
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
             {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
-              <div className="Body" onScroll={onScroll}>
+              <div className="Body">
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>

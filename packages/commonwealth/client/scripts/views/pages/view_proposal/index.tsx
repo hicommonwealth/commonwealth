@@ -17,7 +17,6 @@ import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
 import type { AnyProposal } from '../../../models/types';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
@@ -125,45 +124,41 @@ const ViewProposalPage = ({
   };
 
   return (
-    <Sublayout
-    //  title={headerTitle}
-    >
-      <CWContentPage
-        title={proposal.title}
-        author={proposal.author}
-        createdAt={proposal.createdAt}
-        updatedAt={null}
-        subHeader={
-          <ProposalSubheader
-            proposal={proposal as SubheaderProposalType}
+    <CWContentPage
+      title={proposal.title}
+      author={proposal.author}
+      createdAt={proposal.createdAt}
+      updatedAt={null}
+      subHeader={
+        <ProposalSubheader
+          proposal={proposal as SubheaderProposalType}
+          toggleVotingModal={toggleVotingModal}
+          votingModalOpen={votingModalOpen}
+        />
+      }
+      body={() =>
+        !!proposal.description && (
+          <CollapsibleProposalBody proposal={proposal} />
+        )
+      }
+      subBody={
+        <>
+          <LinkedProposalsEmbed
+            proposal={proposal as LinkedSubstrateProposal}
+          />
+          {proposal instanceof AaveProposal && (
+            <AaveViewProposalDetail proposal={proposal} />
+          )}
+          <VotingResults proposal={proposal} />
+          <VotingActions
+            onModalClose={onModalClose}
+            proposal={proposal}
             toggleVotingModal={toggleVotingModal}
             votingModalOpen={votingModalOpen}
           />
-        }
-        body={() =>
-          !!proposal.description && (
-            <CollapsibleProposalBody proposal={proposal} />
-          )
-        }
-        subBody={
-          <>
-            <LinkedProposalsEmbed
-              proposal={proposal as LinkedSubstrateProposal}
-            />
-            {proposal instanceof AaveProposal && (
-              <AaveViewProposalDetail proposal={proposal} />
-            )}
-            <VotingResults proposal={proposal} />
-            <VotingActions
-              onModalClose={onModalClose}
-              proposal={proposal}
-              toggleVotingModal={toggleVotingModal}
-              votingModalOpen={votingModalOpen}
-            />
-          </>
-        }
-      />
-    </Sublayout>
+        </>
+      }
+    />
   );
 };
 
