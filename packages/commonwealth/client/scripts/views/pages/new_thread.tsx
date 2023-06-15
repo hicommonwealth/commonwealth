@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { notifyInfo } from 'controllers/app/notifications';
 
@@ -15,6 +15,8 @@ import 'pages/new_thread.scss';
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
   const { rightSidebarVisible, setRightMenu } = useSidebarStore();
+  const [mainContentComponents, setMainContentComponents] = useState([]);
+  const [cardColumnComponents, setCardColumnComponents] = useState([]);
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
@@ -24,25 +26,51 @@ const NewThreadPage = () => {
     }
   }, [navigate]);
 
+  const addComponent = (component, target) => {
+    if (target === 'mainContent') {
+      setMainContentComponents((prevComponents) => [
+        ...prevComponents,
+        component,
+      ]);
+    } else if (target === 'cardColumn') {
+      setCardColumnComponents((prevComponents) => [
+        ...prevComponents,
+        component,
+      ]);
+    }
+  };
+
   if (!app.chain) return <PageLoading />;
 
   return (
     <Sublayout>
       <div className="new-thread-page">
-        <div className="new-thread-form">
+        {/* Main Content */}
+        <div className="main-content">
           <NewThreadForm />
+          {mainContentComponents.map((component, index) => (
+            <React.Fragment key={index}>{component}</React.Fragment>
+          ))}
         </div>
+        {/* Add Action Column */}
         <div className="add-action-column">
           <CWButton
             buttonType="mini-black"
-            label="Add Action"
+            label="Add Stuff"
             iconLeft="plus"
             className="add-action-button"
             onClick={() => {
-              setRightMenu({ isVisible: !rightSidebarVisible });
+              console.log('clicked add action button');
+              setRightMenu({
+                isVisible: !rightSidebarVisible,
+                addComponent: addComponent,
+              });
             }}
             disabled={!app.user.activeAccount}
           />
+          {cardColumnComponents.map((component, index) => (
+            <React.Fragment key={index}>{component}</React.Fragment>
+          ))}
         </div>
       </div>
     </Sublayout>

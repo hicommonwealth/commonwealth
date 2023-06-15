@@ -5,6 +5,7 @@ import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
+import type { DefaultMenuItem } from '../components/component_kit/types';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
@@ -12,6 +13,31 @@ import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+
+import { CWCard } from '../components/component_kit/cw_card';
+import { CWText } from '../components/component_kit/cw_text';
+
+const CreatorCard = ({ key }) => {
+  return (
+    <CWCard elevation="elevation-1" className="creation-card">
+      <div className="header-row">
+        <CWText type="h3" fontWeight="semiBold" className="header-text">
+          All Discussions
+        </CWText>
+        <div className="count-and-button">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="thread-count-text"
+          >
+            This is the {key}
+          </CWText>
+        </div>
+      </div>
+      <CWText className="subheader-text">This is an example card</CWText>
+    </CWCard>
+  );
+};
 
 export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
@@ -218,7 +244,7 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'Add Bounty to Page',
-            onClick: () => navigate('/:scope/new/contract'),
+            onClick: () => console.log('clicked add bounty to page'),
             iconLeft: 'star',
             description: `Adds a bounty for completing a specific action on a page. 
               Like posting the highest upvoted comment.`,
@@ -368,9 +394,35 @@ export const CreateContentSidebar = () => {
   );
 };
 
-export const CreateContentRightSidebar = () => {
+export const CreateContentRightSidebar = ({ addComponent }) => {
   const navigate = useCommonNavigate();
   const { setRightMenu } = useSidebarStore();
+
+  function isDefaultMenuItem(item: any): item is DefaultMenuItem {
+    return item.type === 'DefaultMenuItem';
+  }
+
+  function hasOnClick(item: PopoverMenuItem): item is DefaultMenuItem {
+    return 'onClick' in item;
+  }
+
+  const updatedMenuItems = getCreateContentMenuItems(navigate).map((item) => {
+    if (!hasOnClick(item) || !addComponent) {
+      return item;
+    }
+
+    const originalOnClick = item.onClick;
+
+    return {
+      ...item,
+      onClick: () => {
+        const newComponent = <CreatorCard key={Date.now()} />;
+        console.log('addComponent in here', addComponent);
+        addComponent(newComponent, 'mainContent');
+        originalOnClick();
+      },
+    };
+  });
 
   return (
     <CWSidebarMenu
@@ -387,7 +439,7 @@ export const CreateContentRightSidebar = () => {
           }, 200);
         },
       }}
-      menuItems={getCreateContentMenuItems(navigate)}
+      menuItems={updatedMenuItems}
     />
   );
 };

@@ -1,21 +1,52 @@
 .new-thread-page {
   display: flex;
   flex-direction: row;
-  
-  .new-thread-form {
+
+  .main-content {
     flex-basis: 70%;
+    max-width: 768px;
     padding-right: 20px;
   }
-  
-  .add-action-column {
-    flex-basis: 100px;
+
+  .card-column {
+    flex-basis: 30%;
     display: flex;
+    justify-content: center;
+    padding: 56px 56px 24px;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: left;
-    padding-top: 2rem;
-    
+
     .add-action-button {
+    }
+
+    .creation-card {
+      max-width: 400px;
+      width: 100%;
+
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .header-text {
+        margin: 0;
+        margin-right: 10px;
+      }
+
+      .count-and-button {
+        display: flex;
+        align-items: center;
+      }
+
+      .thread-count-text {
+        margin-right: 10px;
+      }
+
+      .subheader-text {
+        margin-bottom: 20px;
+      }
     }
   }
 }

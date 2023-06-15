@@ -41,6 +41,7 @@ const Sublayout = ({
 
   const navigate = useNavigate(); // Get the navigate function from the router
   const location = useLocation(); // Get the location object from the router
+  const { addComponent } = useSidebarStore();
 
   useEffect(() => {
     // Close the right sidebar when the route changes
@@ -104,7 +105,7 @@ const Sublayout = ({
           </div>
           {showRightSidebar && (
             <div className="create-content-sidebar-container">
-              <CreateContentRightSidebar />
+              <CreateContentRightSidebar addComponent={addComponent} />
             </div>
           )}
         </div>

@@ -12,6 +12,7 @@ interface SidebarStore {
   menuVisible: boolean;
   setUserToggledVisibility: (toggled: 'open' | 'closed' | null) => void;
   userToggledVisibility: 'open' | 'closed' | null;
+  addComponent?: (componentType: any, target: any) => void;
   setMenu: ({
     name,
     isVisible,
@@ -20,7 +21,13 @@ interface SidebarStore {
     isVisible?: boolean;
   }) => void;
   rightSidebarVisible: boolean;
-  setRightMenu: ({ isVisible }: { isVisible?: boolean }) => void;
+  setRightMenu: ({
+    isVisible,
+    addComponent,
+  }: {
+    isVisible?: boolean;
+    addComponent?: (componentType: any, target: any) => void;
+  }) => void;
 }
 
 const setUserSidebarVisibility = (state: 'open' | 'closed' | null) => {
@@ -58,12 +65,14 @@ export const sidebarStore = createStore<SidebarStore>()(
           typeof isVisible === 'boolean' ? isVisible : state.menuVisible,
       })),
     rightSidebarVisible: false,
-    setRightMenu: ({ isVisible }) =>
+    addComponent: null,
+    setRightMenu: ({ isVisible, addComponent }) =>
       set((state) => ({
         rightSidebarVisible:
           typeof isVisible === 'boolean'
             ? isVisible
             : state.rightSidebarVisible,
+        addComponent: !state.rightSidebarVisible ? addComponent : null,
       })),
   }))
 );
