@@ -194,6 +194,57 @@ const ReactQuillEditor = ({
 
   const handleDragStop = () => setIsDraggingOver(false);
 
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const { source, destination } = result;
+
+    const editor = editorRef.current?.getEditor();
+    if (!editor) {
+      return;
+    }
+
+    const sourceIndex = source.index;
+    const destIndex = destination.index;
+
+    const sourceText = editor.getText(sourceIndex);
+    const destText = editor.getText(destIndex);
+
+    const isAtEnd = sourceText.endsWith('\n');
+    const isAtStart = destText.startsWith('\n');
+
+    const newContent = editor.getContents();
+    const ops = newContent.ops;
+
+    const dragText = ops[sourceIndex].insert;
+
+    ops.splice(sourceIndex, 1);
+    ops.splice(destIndex, 0, {
+      insert: dragText,
+      attributes: ops[sourceIndex].attributes,
+    });
+
+    setContentDelta({
+      ...newContent,
+      ___isMarkdown: isMarkdownEnabled,
+    } as SerializableDeltaStatic);
+
+    // Adjust cursor position after drag and drop
+    let cursorIndex = destIndex;
+    if (isAtEnd) {
+      cursorIndex++;
+    } else if (isAtStart) {
+      cursorIndex--;
+    }
+
+    const cursorLength = ops[cursorIndex]?.insert?.length || 0;
+
+    editor.setSelection(cursorIndex, cursorLength);
+    editor.focus();
+  };
+
   return (
     <div className="QuillEditorWrapper">
       {isUploading && <LoadingIndicator />}
@@ -247,7 +298,7 @@ const ReactQuillEditor = ({
       {isVisible && (
         <>
           <CustomQuillToolbar toolbarId={toolbarId} />
-          <DragDropContext onDragEnd={handleDragStop}>
+          <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="quillEditor">
               {(provided) => (
                 <div
@@ -296,6 +347,7 @@ const ReactQuillEditor = ({
                       },
                     }}
                   />
+                  {provided.placeholder}
                 </div>
               )}
             </Droppable>
