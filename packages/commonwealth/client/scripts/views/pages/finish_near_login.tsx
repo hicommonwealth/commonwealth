@@ -1,5 +1,4 @@
 import { createCanvasSessionPayload } from 'canvas';
-import type { Chain } from '@canvas-js/interfaces';
 
 import BN from 'bn.js';
 import { ChainBase, WalletId } from 'common-common/src/types';

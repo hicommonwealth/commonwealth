@@ -105,6 +105,7 @@ async function createNewMagicUser({
   magicUserMetadata,
   generatedAddresses,
   profileMetadata,
+  walletSsoSource
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
@@ -184,6 +185,7 @@ async function loginExistingMagicUser({
   existingUserInstance,
   decodedMagicToken,
   generatedAddresses,
+  walletSsoSource
 }: MagicLoginContext): Promise<UserInstance> {
   if (!existingUserInstance) {
     throw new Error('No user provided to log in');

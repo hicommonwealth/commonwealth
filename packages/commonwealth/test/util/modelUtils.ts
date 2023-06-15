@@ -25,7 +25,6 @@ import type {
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
 
-import { PermissionManager } from '../../shared/permissions';
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
 import { mnemonicGenerate } from '@polkadot/util-crypto';

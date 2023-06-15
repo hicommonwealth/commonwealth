@@ -376,8 +376,6 @@ export async function startLoginWithMagicLink({
     const address = await handleSocialLoginCallback({ bearer });
     return { bearer, address };
   } else {
-    const params = `?chain=${chain || ''}`;
-    // provider-based login
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
     }&chain=${chain || ''}&sso=${provider}`;
