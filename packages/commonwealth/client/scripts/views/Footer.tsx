@@ -40,7 +40,6 @@ export const Footer = () => {
             <Link
               className="footer-link"
               onClick={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
               }}
               key={item.text}
