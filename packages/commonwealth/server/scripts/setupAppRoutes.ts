@@ -27,25 +27,11 @@ const getUrl = (req) => {
   return req.protocol + '://' + req.get('host') + req.originalUrl;
 };
 
-const setupAppRoutes = (
-  app,
-  models: DB,
-  devMiddleware,
-  templateFile,
-  sendFile
-) => {
+const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
   if (NO_CLIENT_SERVER) {
     return;
   }
   log.info('setupAppRoutes');
-  // Development: serve everything through devMiddleware
-  if (DEV) {
-    app.get('*', (req, res, next) => {
-      req.url = '/build/';
-      devMiddleware(req, res, next);
-    });
-    return;
-  }
 
   // Production: serve SEO-optimized routes where possible
   //

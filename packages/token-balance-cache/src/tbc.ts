@@ -32,7 +32,7 @@ async function queryChainNodesFromDB(
   const db = new Client({
     connectionString: DATABASE_URI,
     ssl:
-      process.env.NODE_ENV !== 'production'
+      process.env.NODE_ENV !== 'production' || process.env.NO_SSL
         ? false
         : {
             rejectUnauthorized: false,
