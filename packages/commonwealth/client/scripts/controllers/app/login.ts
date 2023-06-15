@@ -55,6 +55,17 @@ export async function setActiveAccount(
         shouldRedraw
       );
     }
+
+    // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
+    // Emit a force re-render on cosmos chains to make sure
+    // that app.user.activeAccount is set - this is required for many actions
+    // There is a race condition b/w the app accessing app.user.activeAccount
+    // and updating it. A proper solution would be to fix this race condition
+    // for cosmos chains - since the issue happens only on that chain
+    if (app.chain.base === 'cosmos') {
+      app.loginStateEmitter.emit('redraw');
+    }
+
     return;
   }
 
@@ -365,6 +376,7 @@ export async function startLoginWithMagicLink({
     const address = await handleSocialLoginCallback({ bearer });
     return { bearer, address };
   } else {
+    const params = `?chain=${chain || ''}`;
     // provider-based login
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
@@ -385,7 +397,10 @@ export async function startLoginWithMagicLink({
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({ provider, userInfo }): {
+function getProfileMetadata({
+  provider,
+  userInfo,
+}): {
   username?: string;
   avatarUrl?: string;
 } {
@@ -393,8 +408,9 @@ function getProfileMetadata({ provider, userInfo }): {
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } =
-      userInfo.sources['https://discord.com/api/users/@me'];
+    const { avatar, id, username } = userInfo.sources[
+      'https://discord.com/api/users/@me'
+    ];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
@@ -435,6 +451,7 @@ export async function handleSocialLoginCallback({
   const result = await magic.oauth.getRedirectResult();
   if (!bearer) {
     bearer = result.magic.idToken;
+    console.log('Magic redirect result:', result);
   }
 
   // Get magic metadata

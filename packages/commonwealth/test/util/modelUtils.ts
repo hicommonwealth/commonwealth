@@ -24,6 +24,7 @@ import type {
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
+
 import { PermissionManager } from '../../shared/permissions';
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
@@ -32,7 +33,7 @@ import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type { Permission } from '../../server/models/role';
+import type { Role } from '../../server/models/role';
 
 import {
   getEIP712SignableAction,
@@ -57,44 +58,6 @@ export const generateEthAddress = () => {
   const address = Web3.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
-
-export async function addAllowDenyPermissionsForCommunityRole(
-  role_name: Permission,
-  chain_id: string,
-  allow_permission: number | undefined,
-  deny_permission: number | undefined
-) {
-  try {
-    const permissionsManager = new PermissionManager();
-    // get community role object from the database
-    const communityRole = await models.CommunityRole.findOne({
-      where: {
-        chain_id,
-        name: role_name,
-      },
-    });
-    let denyPermission;
-    let allowPermission;
-    if (deny_permission) {
-      denyPermission = permissionsManager.addDenyPermission(
-        BigInt(communityRole?.deny || 0),
-        deny_permission
-      );
-      communityRole.deny = denyPermission;
-    }
-    if (allow_permission) {
-      allowPermission = permissionsManager.addAllowPermission(
-        BigInt(communityRole?.allow || 0),
-        allow_permission
-      );
-      communityRole.allow = allowPermission;
-    }
-    // save community role object to the database
-    const updatedRole = await communityRole.save();
-  } catch (err) {
-    throw new Error(err);
-  }
-}
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
@@ -416,14 +379,13 @@ export const createComment = async (args: CommentArgs) => {
 
   const res = await chai.request
     .agent(app)
-    .post('/api/createComment')
+    .post(`/api/threads/${thread_id}/comments`)
     .set('Accept', 'application/json')
     .send({
       author_chain: chain,
       chain,
       address,
       parent_id: parentCommentId,
-      thread_id,
       'attachments[]': undefined,
       text,
       jwt,
@@ -447,10 +409,9 @@ export const editComment = async (args: EditCommentArgs) => {
   const { jwt, text, comment_id, chain, community, address } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/editComment')
+    .patch(`/api/comments/${comment_id}`)
     .set('Accept', 'application/json')
     .send({
-      id: comment_id,
       author_chain: chain,
       address,
       body: encodeURIComponent(text),
@@ -576,20 +537,8 @@ export interface AssignRoleArgs {
   chainOrCommObj: {
     chain_id: string;
   };
-  role: Permission;
+  role: Role;
 }
-
-export const assignRole = async (args: AssignRoleArgs) => {
-  const communityRole = await models.CommunityRole.findOne({
-    where: { chain_id: args.chainOrCommObj.chain_id, name: args.role },
-  });
-  const role = await models['RoleAssignment'].create({
-    address_id: args.address_id,
-    community_role_id: communityRole.id,
-  });
-
-  return role;
-};
 
 export const updateRole = async (args: AssignRoleArgs) => {
   const currentRole = await findOneRole(

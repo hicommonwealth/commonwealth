@@ -132,7 +132,7 @@ export const ManageRoles = ({
           const addr = role.Address;
 
           return (
-            <div className="role-row" key={role.id}>
+            <div className="role-row" key={addr.id}>
               <User
                 user={
                   new AddressInfo({

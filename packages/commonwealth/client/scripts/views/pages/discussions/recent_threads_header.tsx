@@ -1,5 +1,6 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/recent_threads_header.scss';
@@ -9,7 +10,6 @@ import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
-import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import type Topic from '../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
@@ -19,7 +19,6 @@ import {
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { Select } from '../../components/Select';
 
 type RecentThreadsHeaderProps = {
@@ -61,21 +60,13 @@ export const RecentThreadsHeader = ({
     onFilterResize();
   }, []);
 
-  const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
-    isWindowExtraSmall(window.innerWidth)
-  );
+  const { isWindowExtraSmall } = useBrowserWindow({});
 
   useEffect(() => {
-    const onResize = () => {
-      setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
-    };
-
-    window.addEventListener('resize', onResize);
     app.loginStateEmitter.on('redraw', forceRerender);
     app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
-      window.removeEventListener('resize', onResize);
       app.loginStateEmitter.off('redraw', forceRerender);
       app.user.isFetched.off('redraw', forceRerender);
     };
@@ -87,16 +78,16 @@ export const RecentThreadsHeader = ({
     chainId: app.activeChainId(),
   });
 
-  const featuredTopics = topics
+  const featuredTopics = (topics || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     .sort((a, b) => a.order - b.order);
 
-  const otherTopics = topics
+  const otherTopics = (topics || [])
     .filter((t) => !t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const selectedTopic = topics.find((t) => topic && topic === t.name);
+  const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
 
   const stages = !customStages
     ? [
@@ -165,7 +156,7 @@ export const RecentThreadsHeader = ({
           >
             {totalThreadCount} Threads
           </CWText>
-          {windowIsExtraSmall ? (
+          {isWindowExtraSmall ? (
             <CWIconButton
               iconName="plusCircle"
               iconButtonTheme="black"
@@ -191,9 +182,7 @@ export const RecentThreadsHeader = ({
       </div>
 
       {selectedTopic?.description && (
-        <CWText className="subheader-text">
-          {selectedTopic.description}
-        </CWText>
+        <CWText className="subheader-text">{selectedTopic.description}</CWText>
       )}
 
       {app.chain?.meta && (
@@ -240,7 +229,7 @@ export const RecentThreadsHeader = ({
           <div className="filter-section filter-section-top">
             <p className="filter-label">Filter</p>
             <div className="filter-section filter-section-right">
-              {topics.length > 0 && (
+              {(topics || []).length > 0 && (
                 <Select
                   selected={
                     matchesDiscussionsTopicRoute?.[0]?.params?.topic ||

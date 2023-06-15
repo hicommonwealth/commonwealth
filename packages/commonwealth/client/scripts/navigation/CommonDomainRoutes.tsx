@@ -1,8 +1,8 @@
+import { featureFlags } from 'helpers/feature-flags';
+import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { Navigate } from 'navigation/helpers';
 import { withLayout } from 'views/Layout';
-import { featureFlags } from 'helpers/feature-flags';
 
 const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
@@ -88,27 +88,38 @@ const CommonDomainRoutes = () => [
     path="/"
     element={withLayout(LandingPage, {
       scoped: false,
-      hideSidebar: false,
+      type: 'blank',
     })}
   />,
   <Route
     path="/createCommunity"
-    element={withLayout(CreateCommunityPage, {})}
+    element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
   <Route
     path="/whyCommonwealth"
-    element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
+    element={withLayout(WhyCommonwealthPage, {
+      type: 'common',
+    })}
   />,
-  <Route path="/dashboard" element={withLayout(DashboardPage, {})} />,
-  <Route path="/dashboard/:type" element={withLayout(DashboardPage, {})} />,
+  <Route
+    path="/dashboard"
+    element={withLayout(DashboardPage, { type: 'common' })}
+  />,
+  <Route
+    path="/dashboard/:type"
+    element={withLayout(DashboardPage, { type: 'common' })}
+  />,
   <Route
     path="/communities"
     element={withLayout(CommunitiesPage, {
-      hideSidebar: false,
+      type: 'common',
     })}
   />,
-  <Route path="/search" element={withLayout(SearchPage, {})} />,
-  <Route path="/web3login" element={withLayout(Web3LoginPage, {})} />,
+  <Route path="/search" element={withLayout(SearchPage, { type: 'common' })} />,
+  <Route
+    path="/web3login"
+    element={withLayout(Web3LoginPage, { type: 'common' })}
+  />,
   // scoped
   <Route
     path="/:scope/overview"
@@ -142,11 +153,11 @@ const CommonDomainRoutes = () => [
   />,
   <Route
     path="/finishaxielogin"
-    element={withLayout(FinishAxieLoginPage, {})}
+    element={withLayout(FinishAxieLoginPage, { type: 'common' })}
   />,
   <Route
     path="/finishsociallogin"
-    element={withLayout(FinishSocialLoginPage, {})}
+    element={withLayout(FinishSocialLoginPage, { type: 'common' })}
   />,
   // NOTIFICATIONS
   <Route
@@ -159,11 +170,12 @@ const CommonDomainRoutes = () => [
     path="/notifications"
     element={withLayout(NotificationsPage, {
       scoped: true,
+      type: 'common',
     })}
   />,
   <Route
     path="/notification-settings"
-    element={withLayout(NotificationSettingsPage, {})}
+    element={withLayout(NotificationSettingsPage, { type: 'common' })}
   />,
   <Route
     path="/:scope/notification-settings"
@@ -328,7 +340,10 @@ const CommonDomainRoutes = () => [
   // TREASURY END
 
   // SITE ADMIN
-  <Route path="/admin-panel" element={withLayout(AdminPanelPage, {})} />,
+  <Route
+    path="/admin-panel"
+    element={withLayout(AdminPanelPage, { type: 'common' })}
+  />,
 
   // ADMIN
   <Route
@@ -443,12 +458,14 @@ const CommonDomainRoutes = () => [
     path="/profile/id/:profileId"
     element={withLayout(NewProfilePage, {
       scoped: true,
+      type: 'common',
     })}
   />,
   <Route
     path="/profile/edit"
     element={withLayout(EditNewProfilePage, {
       scoped: true,
+      type: 'common',
     })}
   />,
   // PROFILES END

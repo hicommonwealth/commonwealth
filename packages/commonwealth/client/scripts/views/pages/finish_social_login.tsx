@@ -3,8 +3,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
-import { initAppState } from 'state';
-import app from 'state';
+import app, { initAppState } from 'state';
 
 const validate = async (setRoute) => {
   const params = new URLSearchParams(window.location.search);
@@ -13,10 +12,20 @@ const validate = async (setRoute) => {
   let redirectTo = params.get('redirectTo');
   if (redirectTo?.startsWith("/finishsociallogin")) redirectTo = null;
 
-  await handleSocialLoginCallback({ chain, walletSsoSource });
-  await initAppState();
+  try {
+    await handleSocialLoginCallback({ chain, walletSsoSource });
+    await initAppState();
 
-  setRoute(redirectTo || (app.activeChainId() ? `/account/${app.activeChainId()}` : '/dashboard'));
+    if (redirectTo) {
+      setRoute(redirectTo);
+    } else if (chain && !app.isCustomDomain()) {
+      setRoute(`/${chain}`);
+    } else {
+      setRoute('/');
+    }
+  } catch (error) {
+    return `Error: ${error.message}`;
+  }
 };
 
 const FinishSocialLogin = () => {

@@ -40,6 +40,33 @@ test.describe('Community proposals page', () => {
     await p.waitFor({ state: 'visible', timeout: 60000 });
   };
 
+  const allProposalCardsHaveTitles = async ({ page }) => {
+    await waitForCompletedProposals({ page });
+    const activeCardsContainer = await page
+      .locator('.CardsCollection .cards')
+      .nth(0);
+    const inactiveCardsContainer = await page
+      .locator('.CardsCollection .cards')
+      .nth(1);
+
+    const activeCardTitles = await activeCardsContainer
+      .locator('.ProposalCard .Text.b1.semiBold.noWrap')
+      .all();
+    const inactiveCardTitles = await inactiveCardsContainer
+      .locator('.ProposalCard .Text.b1.semiBold.noWrap')
+      .all();
+    const cardTitles = [...activeCardTitles, ...inactiveCardTitles];
+
+    expect(cardTitles.length).toBeGreaterThan(0);
+
+    for (const title of cardTitles) {
+      await title.waitFor({ state: 'visible', timeout: 60000 });
+      const titleText = await title.innerText();
+      expect(titleText).toBeTruthy();
+      expect(titleText.length).toBeGreaterThan(0);
+    }
+  };
+
   const inactiveProposalPageTest = async ({ page }) => {
     test.setTimeout(70000);
     await waitForCompletedProposals({ page });
@@ -60,12 +87,23 @@ test.describe('Community proposals page', () => {
     firstCard.click();
 
     await navigationPromise;
+    await inactiveProposalPageAssertions({ page, expectedTitle: title });
+  };
+
+  const inactiveProposalPageAssertions = async ({
+    page,
+    expectedTitle,
+  }: {
+    page: any;
+    expectedTitle?: string;
+  }) => {
     await page.waitForSelector('.ContentPage', {
       timeout: 60000,
     });
     const content = await page.locator('.main-body-container');
 
-    const headerText = await content.locator('.header .h3').first().innerText();
+    const header = await content.locator('.header .h3').first();
+    const headerText = await header.innerText();
     const statusText = await content
       .locator('.onchain-status-text')
       .first()
@@ -79,21 +117,39 @@ test.describe('Community proposals page', () => {
       .first()
       .innerHTML();
 
-    expect(headerText).toEqual(title);
-    expect(statusText).toBeDefined();
-    expect(description).toBeDefined();
-    expect(voteResult).toBeDefined();
+    expect(headerText).toBeTruthy();
+    expect(headerText.length).toBeGreaterThan(0);
+    if (expectedTitle) expect(headerText).toEqual(expectedTitle);
+    expect(statusText).toBeTruthy();
+    expect(description).toBeTruthy();
+    expect(voteResult).toBeTruthy();
   };
 
   // now the test runs:
   test.describe('kyve (gov v1)', () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto(`http://localhost:8080/kyve/proposals`);
+    const proposalsPageUrl = `http://localhost:8080/kyve/proposals`;
+    test('Active header loads', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await headerTest({ page });
     });
-    test('Active header loads', headerTest);
-    test('Inactive proposal cards load', ({ page }) =>
-      inactiveProposalCardsTest({ page }, 2)); // as of commit, should never be less than 2
-    test('Inactive proposal page loads', inactiveProposalPageTest);
+    test('Inactive proposal cards load', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalCardsTest({ page }, 5); // as of commit, should never be less than 5
+    });
+    test('Inactive proposal page loads from Proposal Card click', async ({
+      page,
+    }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalPageTest({ page });
+    });
+    test('Inactive proposal page loads on direct URL', async ({ page }) => {
+      await page.goto(`http://localhost:8080/kyve/proposal/5`);
+      await inactiveProposalPageAssertions({ page });
+    });
+    test('All proposal cards have titles', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await allProposalCardsHaveTitles({ page });
+    });
   });
   test.describe('juno (gov v1beta1)', () => {
     test.beforeEach(async ({ page }) => {
@@ -103,5 +159,6 @@ test.describe('Community proposals page', () => {
     test('Inactive proposal cards load', ({ page }) =>
       inactiveProposalCardsTest({ page }, 79)); // as of commit, should never be less than 79
     test('Inactive proposal page loads', inactiveProposalPageTest);
+    test('All proposal cards have titles', allProposalCardsHaveTitles);
   });
 });

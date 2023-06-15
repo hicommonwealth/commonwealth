@@ -18,11 +18,7 @@ import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
 import finishOAuthLogin from '../routes/finishOAuthLogin';
 import startOAuthLogin from '../routes/startOAuthLogin';
-import createComment from '../routes/createComment';
-import editComment from '../routes/editComment';
-import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
-import bulkComments from '../routes/bulkComments';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
@@ -58,7 +54,9 @@ import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import searchProfiles from '../routes/searchProfiles';
-import upgradeMember from '../routes/upgradeMember';
+import upgradeMember, {
+  upgradeMemberValidation,
+} from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
 
@@ -81,12 +79,11 @@ import viewVotes from '../routes/viewVotes';
 import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import deleteThread from '../routes/deleteThread';
-import addEditors from '../routes/addEditors';
+import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
 import getThreadsOld from '../routes/getThreads';
 import searchDiscussions from '../routes/searchDiscussions';
-import searchComments from '../routes/searchComments';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
@@ -120,7 +117,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getEntityMeta from '../routes/getEntityMeta';
-import { getTokensFromLists } from '../routes/getTokensFromLists';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
 import bulkBalances from '../routes/bulkBalances';
@@ -171,16 +167,20 @@ import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
-import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
-import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
-import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
-
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerReactionsController } from '../controllers/server_reactions_controller';
 import { ServerNotificationsController } from '../controllers/server_notifications_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+
+import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
+import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
+import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
+import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
+import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
+import { updateCommentHandler } from '../routes/comments/update_comment_handler';
+import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -320,7 +320,6 @@ function setupRouter(
     '/bulkBalances',
     bulkBalances.bind(this, models, tokenBalanceCache)
   );
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get(
     '/getSupportedEthChains',
@@ -480,6 +479,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
+    addEditorValidation,
     addEditors.bind(this, models)
   );
   router.post(
@@ -513,11 +513,6 @@ function setupRouter(
     '/searchDiscussions',
     databaseValidationService.validateChain,
     searchDiscussions.bind(this, models)
-  );
-  router.get(
-    '/searchComments',
-    databaseValidationService.validateChain,
-    searchComments.bind(this, models)
   );
   router.get(
     '/searchProfiles',
@@ -559,23 +554,25 @@ function setupRouter(
 
   // comments
   router.post(
-    '/createComment',
+    '/threads/:id/comments',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createComment.bind(this, models, tokenBalanceCache, banCache)
+    createThreadCommentHandler.bind(this, serverControllers)
   );
-  router.post(
-    '/editComment',
+  router.patch(
+    '/comments/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    editComment.bind(this, models, banCache)
+    updateCommentHandler.bind(this, serverControllers)
   );
-  router.post(
-    '/deleteComment',
+  router.delete(
+    '/comments/:id',
     passport.authenticate('jwt', { session: false }),
-    deleteComment.bind(this, models, banCache)
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteCommentHandler.bind(this, serverControllers)
   );
   router.get(
     '/viewComments',
@@ -583,9 +580,9 @@ function setupRouter(
     viewComments.bind(this, models)
   );
   router.get(
-    '/bulkComments',
+    '/comments',
     databaseValidationService.validateChain,
-    bulkComments.bind(this, models)
+    searchCommentsHandler.bind(this, serverControllers)
   );
 
   // topics
@@ -665,18 +662,12 @@ function setupRouter(
     databaseValidationService.validateChain,
     controllers.listRoles.bind(this, models)
   );
-  router.get('/roles', controllers.getRoles.bind(this, models));
-  router.post('/roles', controllers.createRole.bind(this, models));
-  router.patch('/roles', controllers.updateRole.bind(this, models));
-  // permissions
-  router.get('/permissions', controllers.getPermissions.bind(this, models));
-  router.post('/permissions', controllers.createPermission.bind(this, models));
-  router.patch('/permissions', controllers.updatePermission.bind(this, models));
 
   router.post(
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
+    upgradeMemberValidation,
     upgradeMember.bind(this, models)
   );
 

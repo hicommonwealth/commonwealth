@@ -6,7 +6,7 @@ import MinimumProfile from '../../models/MinimumProfile';
 import app from 'state';
 import { NewProfileStore } from 'stores';
 
-export const newProfilesChunkSize = 20000;
+export const newProfilesChunkSize = 5000;
 
 class NewProfilesController {
   private static _instance: NewProfilesController;

@@ -1,6 +1,6 @@
-import React from 'react';
 import { createCanvasSessionPayload } from 'canvas';
-import { initAppState } from 'state';
+import type { Chain } from '@canvas-js/interfaces';
+
 import BN from 'bn.js';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
@@ -12,21 +12,20 @@ import {
 import type { NearAccount } from 'controllers/chain/near/account';
 import type Near from 'controllers/chain/near/adapter';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 import type { WalletConnection } from 'near-api-js';
 import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
-
-import app from 'state';
-import { PageLoading } from 'views/pages/loading';
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
+import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
-import Sublayout from 'views/Sublayout';
+import { PageLoading } from 'views/pages/loading';
 import { CWButton } from '../components/component_kit/cw_button';
+import { Modal } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
-import { Modal } from '../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useSearchParams } from 'react-router-dom';
 
 // TODO:
 //  - figure out how account switching will work
@@ -228,7 +227,7 @@ const FinishNearLogin = () => {
 
   if (validationError) {
     return (
-      <Sublayout>
+      <>
         <CWText>NEAR account log in error: {validationError}</CWText>
         <CWButton
           onClick={(e) => {
@@ -237,7 +236,7 @@ const FinishNearLogin = () => {
           }}
           label="Return Home"
         />
-      </Sublayout>
+      </>
     );
   } else if (validationCompleted) {
     if (validatedAccount.profile.name) {
@@ -257,25 +256,22 @@ const FinishNearLogin = () => {
     }
 
     return (
-      <>
-        <Modal
-          content={
-            <LoginModal
-              onModalClose={() => {
-                setIsModalOpen(false);
-                redirectToNextPage(navigate);
-              }}
-              initialBody="welcome"
-              initialSidebar="newOrReturning"
-              initialAccount={validatedAccount}
-            />
-          }
-          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsModalOpen(false)}
-          open={isModalOpen}
-        />
-        <Sublayout />
-      </>
+      <Modal
+        content={
+          <LoginModal
+            onModalClose={() => {
+              setIsModalOpen(false);
+              redirectToNextPage(navigate);
+            }}
+            initialBody="welcome"
+            initialSidebar="newOrReturning"
+            initialAccount={validatedAccount}
+          />
+        }
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
     );
   } else if (!validating) {
     // chain loaded and on near -- finish login and call lingering txs

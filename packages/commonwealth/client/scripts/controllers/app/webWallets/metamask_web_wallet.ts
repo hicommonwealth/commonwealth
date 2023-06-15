@@ -24,7 +24,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _provider: provider;
-  private _web3: Web3;
+  private _web3: Web3 | any;
 
   public readonly name = WalletId.Metamask;
   public readonly label = 'Metamask';
@@ -106,7 +106,20 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       // ensure we're on the correct chain
 
       const Web3 = (await import('web3')).default;
-      this._web3 = new Web3((window as any).ethereum);
+      this._web3 =
+        process.env.ETH_RPC !== 'e2e-test'
+          ? new Web3((window as any).ethereum)
+          : {
+              givenProvider: window.ethereum,
+              eth: {
+                getAccounts: async () => {
+                  return await this._web3.givenProvider.request({
+                    method: 'eth_requestAccounts',
+                  });
+                },
+              },
+            };
+
       // TODO: does this come after?
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',

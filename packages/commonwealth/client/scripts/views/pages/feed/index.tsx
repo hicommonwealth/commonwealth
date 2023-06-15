@@ -1,15 +1,12 @@
-import React from 'react';
-
 import 'pages/feed/index.scss';
-
+import React from 'react';
 import app from 'state';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
-import Sublayout from '../../Sublayout';
-import { fetchActivity } from '../user_dashboard/helpers';
-import { DashboardViews } from '../user_dashboard';
 import { CWText } from '../../components/component_kit/cw_text';
-import ErrorPage from '../error';
 import { Feed } from '../../components/feed';
+import ErrorPage from '../error';
+import { DashboardViews } from '../user_dashboard';
+import { fetchActivity } from '../user_dashboard/helpers';
 
 const FeedPage = () => {
   const getGlobalFeed = async () => {
@@ -74,14 +71,12 @@ const FeedPage = () => {
   }
 
   return (
-    <Sublayout>
-      <div className="FeedPage">
-        <CWText type="h3" fontWeight="semiBold">
-          Home
-        </CWText>
-        <Feed fetchData={getCombinedFeed} noFeedMessage={'No activity yet'} />
-      </div>
-    </Sublayout>
+    <div className="FeedPage">
+      <CWText type="h3" fontWeight="semiBold">
+        Home
+      </CWText>
+      <Feed fetchData={getCombinedFeed} noFeedMessage="No activity yet" />
+    </div>
   );
 };
 
