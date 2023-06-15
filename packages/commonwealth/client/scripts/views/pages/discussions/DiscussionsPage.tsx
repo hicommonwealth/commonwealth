@@ -144,6 +144,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   // setup initial threads
   useEffect(() => {
     const timerId = setTimeout(() => {
+      setInitializing(true);
       // always reset pagination on page change
       app.threads.resetPagination();
 
@@ -223,7 +224,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
     return () => clearTimeout(timerId);
-  }, [stageName, topicName]);
+  }, [stageName, topicName, featuredFilter, dateRange]);
 
   const loadMore = useCallback(async () => {
     const response = await app.threads.loadNextPage({
@@ -255,7 +256,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
       return sortPinned(sortByFeaturedFilter(finalThreads));
     });
-  }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
+  }, [stageName, topicName, featuredFilter, dateRange]);
 
   return (
     <div className="DiscussionsPage">
