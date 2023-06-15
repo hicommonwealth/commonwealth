@@ -1,14 +1,11 @@
+import 'pages/members.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-
-import 'pages/members.scss';
-
 import app from 'state';
-import MinimumProfile from '../../models/MinimumProfile';
-import { User } from 'views/components/user/user';
-import Sublayout from 'views/Sublayout';
-import { CWText } from '../components/component_kit/cw_text';
 import { useDebounce } from 'usehooks-ts';
+import { User } from 'views/components/user/user';
+import MinimumProfile from '../../models/MinimumProfile';
+import { CWText } from '../components/component_kit/cw_text';
 import { MembersSearchBar } from '../components/members_search_bar';
 
 type MemberInfo = {
@@ -102,36 +99,34 @@ const MembersPage = () => {
   }, []);
 
   return (
-    <Sublayout>
-      <div className="MembersPage">
-        <CWText type="h3" fontWeight="medium">
-          Members ({totalCount})
-        </CWText>
-        <MembersSearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          chainName={app.activeChainId()}
-        />
-        <Virtuoso
-          ref={containerRef}
-          data={membersList}
-          endReached={() => handleLoadNextPage(searchTerm, false)}
-          itemContent={(index, profileInfo) => {
-            return (
-              <div className="member-row" key={index}>
-                <User
-                  user={profileInfo.profile}
-                  role={profileInfo.role}
-                  showRole
-                  hideAvatar={false}
-                  linkify
-                />
-              </div>
-            );
-          }}
-        />
-      </div>
-    </Sublayout>
+    <div className="MembersPage">
+      <CWText type="h3" fontWeight="medium">
+        Members ({totalCount})
+      </CWText>
+      <MembersSearchBar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        chainName={app.activeChainId()}
+      />
+      <Virtuoso
+        ref={containerRef}
+        data={membersList}
+        endReached={() => handleLoadNextPage(searchTerm, false)}
+        itemContent={(index, profileInfo) => {
+          return (
+            <div className="member-row" key={index}>
+              <User
+                user={profileInfo.profile}
+                role={profileInfo.role}
+                showRole
+                hideAvatar={false}
+                linkify
+              />
+            </div>
+          );
+        }}
+      />
+    </div>
   );
 };
 

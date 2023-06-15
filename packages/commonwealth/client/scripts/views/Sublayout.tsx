@@ -1,36 +1,28 @@
-import React, { useState, useEffect } from 'react';
-
-import 'Sublayout.scss';
-
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useForceRerender from 'hooks/useForceRerender';
+import React, { useEffect } from 'react';
 import app from 'state';
+import useSidebarStore from 'state/ui/sidebar';
+import 'Sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
 import { AppMobileMenus } from './AppMobileMenus';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
-import useForceRerender from 'hooks/useForceRerender';
-import useSidebarStore from 'state/ui/sidebar';
 
 type SublayoutProps = {
   hideFooter?: boolean;
-  hideSearch?: boolean;
-  onScroll?: () => void; // lazy loading for page content
-  isLoadingProfileData?: boolean;
+  hasCommunitySidebar?: boolean;
 } & React.PropsWithChildren;
 
 const Sublayout = ({
   children,
   hideFooter = true,
-  hideSearch,
-  onScroll,
-  isLoadingProfileData = false,
+  hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName } = useSidebarStore();
-  const [isWindowSmall, setIsWindowSmall] = useState(
-    isWindowSmallInclusive(window.innerWidth)
-  );
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -47,40 +39,26 @@ const Sublayout = ({
     ) {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
-
-    const onResize = () => {
-      setIsWindowSmall(isWindowSmallInclusive(window.innerWidth));
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
   }, []);
 
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = menuVisible || !isWindowSmall;
+  const showSidebar = menuVisible || !isWindowSmallInclusive;
 
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
-        <SublayoutHeader
-          hideSearch={hideSearch}
-          onMobile={isWindowSmall}
-          isLoadingProfileData={isLoadingProfileData}
-        />
+        <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          {showSidebar && <Sidebar />}
+          {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
           <div className="body-and-sticky-headers-container">
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
             {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
-              <div className="Body" onScroll={onScroll}>
+              <div className="Body">
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>
