@@ -1,4 +1,4 @@
-import type WalletConnectProvider from '@walletconnect/web3-provider';
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
@@ -17,7 +17,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _chainInfo: ChainInfo;
-  private _provider: WalletConnectProvider;
+  private _provider: EthereumProvider;
   private _web3: Web3;
 
   public readonly name = WalletId.WalletConnect;
@@ -71,10 +71,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     sessionPayload: SessionPayload
   ): Promise<string> {
     const typedCanvasMessage = constructTypedCanvasMessage(sessionPayload);
-    const signature = await this._provider.wc.signTypedData([
-      account.address,
-      JSON.stringify(typedCanvasMessage),
-    ]);
+    const signature = await this._provider.request({
+      method: 'eth_signTypedData_v4',
+      params: [account.address, JSON.stringify(typedCanvasMessage)],
+    });
     return signature;
   }
 
@@ -104,16 +104,26 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
     const rpc = chainUrl ? { [chainId]: chainUrl } : {};
 
-    const WalletConnectProvider = (await import('@walletconnect/web3-provider'))
-      .default;
-    this._provider = new WalletConnectProvider({ rpc });
+    this._provider = await EthereumProvider.init({
+      projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
+      chains: [chainId],
+      methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData_v4'],
+      showQrModal: true,
+      qrModalOptions: {
+        themeVariables: {
+          '--w3m-z-index': '10000',
+        },
+      },
+    });
 
+    await this._provider.connect({
+      chains: [chainId], // OPTIONAL chain ids
+    });
     // destroy pre-existing session if exists
     if (this._provider.wc?.connected) {
       await this._provider.wc.killSession();
     }
-    //  Enable session (triggers QR Code modal)
-    await this._provider.enable();
+    console.log(this._provider);
     const Web3 = (await import('web3')).default;
     this._web3 = new Web3(this._provider as any);
     this._accounts = await this._web3.eth.getAccounts();
