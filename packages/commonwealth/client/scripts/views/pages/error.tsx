@@ -1,8 +1,6 @@
 import React from 'react';
-
-import Sublayout from 'views/Sublayout';
-import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 
 type ErrorPageProps = { title?: any; message?: string };
 
@@ -33,15 +31,13 @@ const ErrorPage = ({ message }: ErrorPageProps) => {
   };
 
   return (
-    <Sublayout>
-      <>
-        {isChunkLoadingError()}
-        <CWEmptyState
-          iconName="cautionTriangle"
-          content={message || 'An error occurred while loading this page.'}
-        />
-      </>
-    </Sublayout>
+    <>
+      {isChunkLoadingError()}
+      <CWEmptyState
+        iconName="cautionTriangle"
+        content={message || 'An error occurred while loading this page.'}
+      />
+    </>
   );
 };
 
