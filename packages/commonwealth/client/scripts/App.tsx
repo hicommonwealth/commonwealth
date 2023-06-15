@@ -6,14 +6,28 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
+
+const Splash = () => {
+  return (
+    <div className="Splash">
+      {/* This can be a moving bobber, atm it is still */}
+      <CWIcon iconName="cow" iconSize="xxl" />
+    </div>
+  );
+};
 
 const App = () => {
-  const { customDomain, loading } = useInitApp();
+  const { customDomain, isLoading } = useInitApp();
 
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router(customDomain, loading)} />
+        {isLoading ? (
+          <Splash />
+        ) : (
+          <RouterProvider router={router(customDomain)} />
+        )}
         <ToastContainer />
         <ReactQueryDevtools />
       </QueryClientProvider>
