@@ -39,7 +39,6 @@ export const UserDashboardChainEventRow = (
           <CWCommunityAvatar community={chain} size="small" />
           <Link
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
             }}
             {...(chain?.id && { to: `/${chain?.id}` })}

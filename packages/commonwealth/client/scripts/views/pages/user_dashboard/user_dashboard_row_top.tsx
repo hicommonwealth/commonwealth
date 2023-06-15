@@ -74,7 +74,6 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
         <CWText type="caption" fontWeight="medium">
           <Link
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
             }}
             to={`/${chain_id}`}
