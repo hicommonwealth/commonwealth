@@ -223,7 +223,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
     return () => clearTimeout(timerId);
-  }, [stageName, topicName]);
+  }, [stageName, topicName, featuredFilter, dateRange]);
 
   const loadMore = useCallback(async () => {
     const response = await app.threads.loadNextPage({
