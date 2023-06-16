@@ -19,6 +19,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { SelectList } from '../components/component_kit/cw_select_list';
+import { AaveProposalForm } from '../pages/new_proposal/aave_proposal_form';
 
 const AddDraftERC20Component = () => {
   const tokenOptions = [
@@ -242,8 +243,13 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     showOnChainProposalItem
       ? [
           {
-            label: 'New On-Chain Proposal',
-            onClick: () => navigate('/new/proposal'),
+            label: 'Add New Proposal',
+            location: 'mainContent',
+            component: <AaveProposalForm />,
+            onClick: () => console.log('clicked New Proposal'),
+            // navigate('/:scope/new/contract_template/:contract_id', {
+            //   state: { scoped: true, deferChain: true },
+            // }),
             iconLeft: 'star',
           },
         ]
@@ -452,11 +458,11 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             },
             iconLeft: 'write',
           } as PopoverMenuItem,
-          ...getTopicTemplateItems(),
+          // ...getTopicTemplateItems(),
           ...getOnChainProposalItem(),
-          ...getSputnikProposalItem(),
-          ...getSubstrateProposalItems(),
-          ...getSnapshotProposalItem(),
+          // ...getSputnikProposalItem(),
+          // ...getSubstrateProposalItems(),
+          // ...getSnapshotProposalItem(),
         ]
       : []),
     {
@@ -496,11 +502,11 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     //   label: 'Add Bounty',
     // } as PopoverMenuItem,
     // ...getDummyItems(),
-    {
-      type: 'header',
-      label: 'Universal Create',
-    },
-    ...getUniversalCreateItems(),
+    // {
+    //   type: 'header',
+    //   label: 'Universal Create',
+    // },
+    // ...getUniversalCreateItems(),
   ];
 };
 

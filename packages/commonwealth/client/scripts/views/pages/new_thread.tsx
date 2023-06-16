@@ -11,13 +11,17 @@ import useSidebarStore from 'state/ui/sidebar';
 import { CWButton } from '../components/component_kit/cw_button';
 
 import 'pages/new_thread.scss';
+import { CWDivider } from '../components/component_kit/cw_divider';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
   const { rightSidebarVisible, setRightMenu } = useSidebarStore();
   const [mainContentComponents, setMainContentComponents] = useState([]);
   const [cardColumnComponents, setCardColumnComponents] = useState([]);
-  const [hoveredComponentIndex, setHoveredComponentIndex] = useState(null);
+  const [hoveredComponent, setHoveredComponent] = useState({
+    index: null,
+    target: null,
+  }); // Update this state
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
@@ -56,23 +60,28 @@ const NewThreadPage = () => {
   const renderComponentWithRemoveIcon = (component, index, target) => (
     <div
       key={index}
-      onMouseEnter={() => setHoveredComponentIndex(index)}
-      onMouseLeave={() => setHoveredComponentIndex(null)}
-      style={{ position: 'relative', paddingTop: '14px' }}
+      onMouseEnter={() => setHoveredComponent({ index, target })} // Update this line
+      onMouseLeave={() => setHoveredComponent({ index: null, target: null })} // Update this line
+      style={{
+        position: 'relative',
+        paddingTop: '14px',
+        paddingLeft: target === 'mainContent' ? '16px' : '0', // Add paddingLeft for mainContent components
+      }}
     >
-      {hoveredComponentIndex === index && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '0',
-            right: '0',
-            cursor: 'pointer',
-          }}
-          onClick={() => handleRemoveComponent(index, target)}
-        >
-          x
-        </div>
-      )}
+      {hoveredComponent.index === index &&
+        hoveredComponent.target === target && ( // Update this condition
+          <div
+            style={{
+              position: 'absolute',
+              top: '0',
+              right: '0',
+              cursor: 'pointer',
+            }}
+            onClick={() => handleRemoveComponent(index, target)}
+          >
+            x
+          </div>
+        )}
       {component}
     </div>
   );
@@ -85,9 +94,13 @@ const NewThreadPage = () => {
         {/* Main Content */}
         <div className="main-content">
           <NewThreadForm />
-          {mainContentComponents.map((component, index) =>
-            renderComponentWithRemoveIcon(component, index, 'mainContent')
-          )}
+          {mainContentComponents.map((component, index) => (
+            <>
+              {index !== 0 && <CWDivider />}{' '}
+              {/* Add divider between components */}
+              {renderComponentWithRemoveIcon(component, index, 'mainContent')}
+            </>
+          ))}
         </div>
         {/* Add Action Column */}
         <div className="add-action-column" style={{ padding: '24px' }}>
