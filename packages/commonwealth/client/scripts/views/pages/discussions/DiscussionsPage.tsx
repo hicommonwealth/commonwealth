@@ -140,6 +140,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   // setup initial threads
   useEffect(() => {
     const timerId = setTimeout(() => {
+      setInitializing(true);
       // always reset pagination on page change
       app.threads.resetPagination();
 
