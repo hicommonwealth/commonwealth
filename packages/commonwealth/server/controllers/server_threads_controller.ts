@@ -55,7 +55,6 @@ const Errors = {
     "Users need to hold some of the community's tokens to post",
   FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
-  NoBodyOrAttachments: 'Discussion posts must include body or attachment',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments

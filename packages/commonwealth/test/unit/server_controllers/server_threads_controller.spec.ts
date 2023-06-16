@@ -1397,12 +1397,59 @@ describe('ServerThreadsController', () => {
 
   describe('#createThread', () => {
     it('should create a thread', async () => {
+      let data = {};
+
       const db = {
         CommunityRole: {
-          findAll: async () => [], // no mod/admin roles
+          findAll: async () => [
+            {
+              toJSON: () => ({
+                chain_id: 'ethereum',
+                name: 'member',
+                allow: '0',
+                deny: '0',
+                RoleAssignments: [{}],
+              }),
+            },
+          ],
         },
         Chain: {
           findOne: async () => ({}),
+        },
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
+          query: async () => ({}),
+        },
+        Topic: {
+          findOrCreate: async () => ({}),
+        },
+        Thread: {
+          findOne: async () => ({
+            ...data,
+            Address: {
+              address: '0x123',
+              chain: 'ethereum',
+            },
+            toJSON: () => ({
+              ...data,
+              Address: {
+                address: '0x123',
+                chain: 'ethereum',
+              },
+            }),
+          }),
+          create: async (d) => {
+            data = {
+              id: 1,
+              ...d,
+            };
+            return data;
+          },
+        },
+        Subscription: {
+          create: async () => ({}),
         },
       };
       const tokenBalanceCache = {};
@@ -1426,7 +1473,6 @@ describe('ServerThreadsController', () => {
       const chain = {
         id: 'ethereum',
       };
-      const threadId = 1;
       const body = 'hello';
       const kind = 'discussion';
       const readOnly = false;
@@ -1465,9 +1511,17 @@ describe('ServerThreadsController', () => {
 
       expect(notificationOptions).to.have.length(1);
       expect(notificationOptions[0]).to.include({
-        categoryId: 'thread-edit',
-        objectId: '',
-        webhookData: null,
+        categoryId: 'new-thread-creation',
+        objectId: 'ethereum',
+      });
+      expect(notificationOptions[0].webhookData).to.include({
+        user: '0x123',
+        author_chain: 'ethereum',
+        url: 'http://localhost:8080/ethereum/discussion/1-mythread',
+        title: 'mythread',
+        bodyUrl: 'http://blah',
+        chain: 'ethereum',
+        body: 'hello',
       });
       expect(notificationOptions[0].notificationData).to.include({
         thread_id: 1,
