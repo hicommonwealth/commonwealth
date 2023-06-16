@@ -1,7 +1,41 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { PORT } from '../../server/config';
 
 test.describe('Commonwealth Homepage', () => {
+  test('Amount of bundles has not increased', async ({ page }) => {
+    const loadedJsBundles = [];
+    // Enable network interception
+    await page.route('*/**', (route) => {
+      // Filter requests for JavaScript files
+      if (route.request().resourceType() === 'script') {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const initializerUrl = route.request()._initializer.url;
+        if (initializerUrl.startsWith('http://localhost')) {
+          loadedJsBundles.push(initializerUrl);
+          console.log(`Loaded in bundle: ${initializerUrl}`);
+        }
+      }
+      route.continue();
+    });
+
+    await page.goto(`http://localhost:${PORT}/`);
+
+    while (loadedJsBundles.length < 4) {
+      await page.waitForTimeout(100); // Wait for a short interval before checking again
+    }
+
+    // This is loaded in after all other bundles are loaded in. The landing page should have 2 initial bundles and 2
+    // Loaded in bundles for the page itself. If it is more, then we have accidentally added an extra bundle into the
+    // build.
+    expect(loadedJsBundles[loadedJsBundles.length - 1]).toContain(
+      'client_scripts_views_pages_landing_index_tsx.5d36c013.chunk.js'
+    );
+
+    await page.waitForTimeout(100);
+    expect(loadedJsBundles.length).toEqual(4);
+  });
+
   test('Check Login Modal', async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/`);
 
