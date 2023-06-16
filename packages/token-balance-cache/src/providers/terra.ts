@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import axios from 'axios';
 import { BalanceType } from 'common-common/src/types';
-import { Bech32 } from '@cosmjs/encoding';
+import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 
@@ -80,8 +80,8 @@ export default class TerraBalanceProvider extends BalanceProvider<
     if (!node.bech32) {
       throw new Error('No cosmos prefix found!');
     }
-    const { data } = Bech32.decode(address);
-    const encodedAddress = Bech32.encode(node.bech32, data);
+    const { data } = fromBech32(address);
+    const encodedAddress = toBech32(node.bech32, data);
 
     const [terraBalanceFn, stakedBalanceFn] = await this.getExternalProvider(
       node

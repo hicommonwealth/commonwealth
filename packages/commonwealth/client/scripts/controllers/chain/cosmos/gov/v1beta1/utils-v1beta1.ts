@@ -14,7 +14,7 @@ import {
   MsgSubmitProposalEncodeObject,
   MsgVoteEncodeObject,
 } from '@cosmjs/stargate';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
+import { longify } from '@cosmjs/stargate/build/queryclient';
 
 import type {
   CosmosProposalState,
@@ -149,10 +149,10 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
     type: 'text',
     title,
     description,
-    submitTime: moment.unix(p.submitTime.valueOf() / 1000),
-    depositEndTime: moment.unix(p.depositEndTime.valueOf() / 1000),
-    votingEndTime: moment.unix(p.votingEndTime.valueOf() / 1000),
-    votingStartTime: moment.unix(p.votingStartTime.valueOf() / 1000),
+    submitTime: moment.unix(p.submitTime.seconds.toNumber()),
+    depositEndTime: moment.unix(p.depositEndTime.seconds.toNumber()),
+    votingEndTime: moment.unix(p.votingEndTime.seconds.toNumber()),
+    votingStartTime: moment.unix(p.votingStartTime.seconds.toNumber()),
     proposer: null,
     state: {
       identifier: p.proposalId.toString(),

@@ -120,7 +120,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           // use the RPC url as hack, which will break some querying functionality but not signing.
           rest: app.chain.meta.node.altWalletUrl || url,
           bip44: {
-            coinType: 118,
+            coinType: 60,
           },
           bech32Config: {
             bech32PrefixAccAddr: `${bech32Prefix}`,

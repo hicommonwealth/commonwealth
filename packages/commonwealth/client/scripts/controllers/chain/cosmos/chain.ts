@@ -24,7 +24,7 @@ import {
   ITXModalData,
 } from '../../../models/interfaces';
 import WebWalletController from '../../app/web_wallets';
-import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 import {
   getLCDClient,
@@ -32,6 +32,8 @@ import {
   getSigningClient,
   getTMClient,
 } from './chain.utils';
+import EthSigningClient from './eth_signing_client';
+import EVMKeplrWebWalletController from '../../app/webWallets/keplr_ethereum_web_wallet';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -173,9 +175,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     account: CosmosAccount,
     tx: EncodeObject
   ): Promise<readonly Event[]> {
+    const chain = this._app.chain;
     // TODO: error handling
     // TODO: support multiple wallets
-    if (this._app.chain.network === ChainNetwork.Terra) {
+    if (chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
     const wallet = WebWalletController.Instance.getByName(
@@ -186,10 +189,31 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       await wallet.enable();
     }
     const cosm = await import('@cosmjs/stargate');
-    const client = await getSigningClient(
-      this._app.chain.meta.node.url,
-      wallet.offlineSigner
-    );
+    const network = chain.meta.id;
+    let client;
+
+    const ethermintWallet = WebWalletController.Instance.getByName(
+      WalletId.KeplrEthereum
+    ) as EVMKeplrWebWalletController;
+
+    // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
+    if (ethermintWallet.specificChains.some((c) => c === network)) {
+      const chainId = wallet.getChainId();
+
+      client = await EthSigningClient(
+        {
+          restUrl: chain.meta.node.altWalletUrl,
+          chainId,
+          path: network,
+        },
+        wallet.offlineSigner
+      );
+    } else {
+      client = await getSigningClient(
+        chain.meta.node.url,
+        wallet.offlineSigner
+      );
+    }
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -208,9 +232,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         DEFAULT_MEMO
       );
       console.log(result);
-      if (cosm.isBroadcastTxFailure(result)) {
+      if (cosm.isDeliverTxFailure(result)) {
         throw new Error('TX execution failed.');
-      } else if (cosm.isBroadcastTxSuccess(result)) {
+      } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({
           hash: Buffer.from(txHash, 'hex'),

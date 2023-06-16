@@ -8,11 +8,6 @@ import { addPrefix, factory } from '../../logging';
 import type { IEventData, Api, ISubmitProposal } from './types';
 import { EventKind, coinToCoins } from './types';
 
-const dateToUnix = (d?: Date): number | undefined => {
-  if (d) return Math.floor(d.getTime() / 1000);
-  return undefined;
-};
-
 export class StorageFetcher extends IStorageFetcher<Api> {
   private readonly log;
 
@@ -63,10 +58,10 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           typeUrl: proposal.content.typeUrl,
           value: Buffer.from(proposal.content.value).toString('hex'),
         },
-        submitTime: dateToUnix(proposal.submitTime),
-        depositEndTime: dateToUnix(proposal.depositEndTime),
-        votingStartTime: dateToUnix(proposal.votingStartTime),
-        votingEndTime: dateToUnix(proposal.votingEndTime),
+        submitTime: proposal.submitTime.seconds.toNumber(),
+        depositEndTime: proposal.depositEndTime.seconds.toNumber(),
+        votingStartTime: proposal.votingStartTime.seconds.toNumber(),
+        votingEndTime: proposal.votingEndTime.seconds.toNumber(),
         // TODO: do we need to query the tally separately if it's complete?
         finalTallyResult: proposal.finalTallyResult,
         totalDeposit:

@@ -286,7 +286,9 @@ export class CosmosProposal extends Proposal<
       case 'Rejected':
         return ProposalStatus.Failed;
       case 'VotingPeriod':
-        return +this.support > 0.5 && this.veto <= 1 / 3
+        return typeof this.support === 'number' &&
+          this.support > 0.5 &&
+          this.veto <= 1 / 3
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
@@ -303,7 +305,7 @@ export class CosmosProposal extends Proposal<
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
-    const cosm = await import('@cosmjs/stargate/build/queries/utils');
+    const cosm = await import('@cosmjs/stargate/build/queryclient');
     const msg: MsgDepositEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
       value: {

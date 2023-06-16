@@ -64,7 +64,7 @@ export const verify = async ({
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'
     ) {
       const canvas = await import('@canvas-js/interfaces');
-      const prefix = cosmEncoding.Bech32.decode(sessionPayload.from).prefix;
+      const prefix = cosmEncoding.fromBech32(sessionPayload.from).prefix;
       const signDocDigest = new cosmCrypto.Sha256(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload))
       ).digest();
@@ -81,7 +81,7 @@ export const verify = async ({
       );
       if (
         payload.from !==
-        cosmEncoding.Bech32.encode(
+        cosmEncoding.toBech32(
           prefix,
           cosmAmino.rawSecp256k1PubkeyToRawAddress(pubkey)
         )
@@ -140,7 +140,7 @@ export const verify = async ({
       );
       return (
         actionSignerAddress ===
-        cosmEncoding.Bech32.encode(
+        cosmEncoding.toBech32(
           prefix,
           cosmAmino.rawSecp256k1PubkeyToRawAddress(pubkey)
         )
@@ -154,14 +154,14 @@ export const verify = async ({
       const signDocDigest = new cosmCrypto.Sha256(
         cosmAmino.serializeSignDoc(signDocPayload)
       ).digest();
-      const prefix = cosmEncoding.Bech32.decode(payload.from).prefix;
+      const prefix = cosmEncoding.fromBech32(payload.from).prefix;
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
       const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature(
         JSON.parse(signature)
       );
       if (
         payload.from !==
-        cosmEncoding.Bech32.encode(
+        cosmEncoding.toBech32(
           prefix,
           cosmAmino.rawSecp256k1PubkeyToRawAddress(pubkey)
         )
