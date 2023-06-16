@@ -40,6 +40,68 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
     isWindowExtraSmall(window.innerWidth)
   );
+  const [mainContentComponents, setMainContentComponents] = useState([]);
+  const [cardColumnComponents, setCardColumnComponents] = useState([]);
+  const [hoveredComponent, setHoveredComponent] = useState({
+    index: null,
+    target: null,
+  }); // Update this state
+
+  const addComponent = (component, target) => {
+    if (target === 'mainContent') {
+      setMainContentComponents((prevComponents) => [
+        ...prevComponents,
+        component,
+      ]);
+    } else if (target === 'cardColumn') {
+      setCardColumnComponents((prevComponents) => [
+        ...prevComponents,
+        component,
+      ]);
+    }
+  };
+
+  const handleRemoveComponent = (indexToRemove, target) => {
+    if (target === 'mainContent') {
+      setMainContentComponents((prevComponents) =>
+        prevComponents.filter((_, index) => index !== indexToRemove)
+      );
+    } else if (target === 'cardColumn') {
+      setCardColumnComponents((prevComponents) =>
+        prevComponents.filter((_, index) => index !== indexToRemove)
+      );
+    }
+  };
+
+  const renderComponentWithRemoveIcon = (component, index, target) => (
+    <div
+      key={index}
+      onMouseEnter={() => setHoveredComponent({ index, target })} // Update this line
+      onMouseLeave={() => setHoveredComponent({ index: null, target: null })} // Update this line
+      style={{
+        position: 'relative',
+        paddingTop: '14px',
+        paddingLeft: target === 'mainContent' ? '16px' : '0', // Add paddingLeft for mainContent components
+      }}
+    >
+      {hoveredComponent.index === index &&
+        hoveredComponent.target === target && ( // Update this condition
+          <div
+            style={{
+              position: 'absolute',
+              top: '0',
+              right: '0',
+              cursor: 'pointer',
+            }}
+            onClick={() => handleRemoveComponent(index, target)}
+          >
+            x
+          </div>
+        )}
+      {component}
+    </div>
+  );
+
   const handleThreadUpdate = (data: {
     threadId: number;
     action: ThreadActionType;
@@ -251,7 +313,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 iconName="plusCircle"
                 iconButtonTheme="black"
                 onClick={() => {
-                  setRightMenu({ isVisible: !rightSidebarVisible });
+                  setRightMenu({
+                    isVisible: !rightSidebarVisible,
+                    addComponent: addComponent,
+                  });
                 }}
                 disabled={!app.user.activeAccount}
               />
@@ -262,13 +327,19 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 label="Add Action"
                 iconLeft="plus"
                 onClick={() => {
-                  setRightMenu({ isVisible: !rightSidebarVisible });
+                  setRightMenu({
+                    isVisible: !rightSidebarVisible,
+                    addComponent: addComponent,
+                  });
                 }}
                 disabled={!app.user.activeAccount}
               />
             )}
           </div>
           <DiscussionsCard totalThreadCount={totalThreads} />
+          {cardColumnComponents.map((component, index) =>
+            renderComponentWithRemoveIcon(component, index, 'cardColumn')
+          )}
         </div>
       </div>
     </Sublayout>

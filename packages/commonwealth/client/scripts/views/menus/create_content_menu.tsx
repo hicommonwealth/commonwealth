@@ -71,6 +71,38 @@ const PrefilledComponent = () => {
   );
 };
 
+const ImageRewardCard = ({ key }) => {
+  return (
+    <CWCard elevation="elevation-1" className="image-collect-card">
+      <div className="header-row">
+        <div style={{ width: '100px' }}>
+          <iframe
+            allow="fullscreen"
+            frameBorder="0"
+            height="150"
+            src="https://giphy.com/embed/ILVQK9gcdtIoPJEF4K"
+            width="150"
+          ></iframe>
+        </div>
+      </div>
+      <CWText className="subheader-text">
+        {' '}
+        Rewarded to the Top post of the week, right now you're in 3rd place,
+        you'll need 50 more upvotes{' '}
+      </CWText>
+      <CWButton
+        color="primary"
+        className="collect-post-button"
+        onClick={() => console.log('Collect Post')}
+        label={'collect'}
+        disabled={true}
+      >
+        Claim Reward
+      </CWButton>
+    </CWCard>
+  );
+};
+
 const ImageCollectCard = ({ key }) => {
   return (
     <CWCard elevation="elevation-1" className="image-collect-card">
@@ -385,6 +417,17 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             component: <CreatorCard key={Date.now()} />,
             description: `Adds a bounty for completing a specific action on a page. 
               Like posting the highest upvoted comment.`,
+          },
+          {
+            label: 'Top Post of the Week',
+            location: 'cardColumn',
+            component: <ImageRewardCard key={'collect'} />,
+            onClick: () => console.log('clicked collect to page'),
+            // navigate('/:scope/new/contract_template/:contract_id', {
+            //   state: { scoped: true, deferChain: true },
+            // }),
+            iconLeft: 'star',
+            description: `You can claim this if you got the top post of the week`,
           },
           {
             label: 'Allow Collects',

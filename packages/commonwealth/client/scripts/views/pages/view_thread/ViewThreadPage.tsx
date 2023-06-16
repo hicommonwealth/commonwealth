@@ -65,6 +65,7 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -109,6 +110,67 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
   const { rightSidebarVisible, setRightMenu } = useSidebarStore();
+  const [mainContentComponents, setMainContentComponents] = useState([]);
+  const [cardColumnComponents, setCardColumnComponents] = useState([]);
+  const [hoveredComponent, setHoveredComponent] = useState({
+    index: null,
+    target: null,
+  }); // Update this state
+
+  const addComponent = (component, target) => {
+    if (target === 'mainContent') {
+      setMainContentComponents((prevComponents) => [
+        ...prevComponents,
+        component,
+      ]);
+    } else if (target === 'cardColumn') {
+      setCardColumnComponents((prevComponents) => [
+        ...prevComponents,
+        component,
+      ]);
+    }
+  };
+
+  const handleRemoveComponent = (indexToRemove, target) => {
+    if (target === 'mainContent') {
+      setMainContentComponents((prevComponents) =>
+        prevComponents.filter((_, index) => index !== indexToRemove)
+      );
+    } else if (target === 'cardColumn') {
+      setCardColumnComponents((prevComponents) =>
+        prevComponents.filter((_, index) => index !== indexToRemove)
+      );
+    }
+  };
+
+  const renderComponentWithRemoveIcon = (component, index, target) => (
+    <div
+      key={index}
+      onMouseEnter={() => setHoveredComponent({ index, target })} // Update this line
+      onMouseLeave={() => setHoveredComponent({ index: null, target: null })} // Update this line
+      style={{
+        position: 'relative',
+        paddingTop: '14px',
+        paddingLeft: target === 'mainContent' ? '16px' : '0', // Add paddingLeft for mainContent components
+      }}
+    >
+      {hoveredComponent.index === index &&
+        hoveredComponent.target === target && ( // Update this condition
+          <div
+            style={{
+              position: 'absolute',
+              top: '0',
+              right: '0',
+              cursor: 'pointer',
+            }}
+            onClick={() => handleRemoveComponent(index, target)}
+          >
+            x
+          </div>
+        )}
+      {component}
+    </div>
+  );
 
   const cancelEditing = () => {
     setIsGloballyEditing(false);
@@ -812,38 +874,52 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           app.user.activeAccount && !isGloballyEditing && getActionMenuItems()
         }
         body={
-          <div className="thread-content">
-            {isEditingBody ? (
-              <>
-                {reactionsAndReplyButtons}
-                <EditBody
-                  title={title}
-                  thread={thread}
-                  savedEdits={savedEdits}
-                  shouldRestoreEdits={shouldRestoreEdits}
-                  cancelEditing={cancelEditing}
-                  threadUpdatedCallback={threadUpdatedCallback}
-                />
-              </>
-            ) : (
-              <>
-                <QuillRenderer doc={thread.body} cutoffLines={50} />
-                {thread.readOnly ? (
-                  <LockMessage
-                    lockedAt={thread.lockedAt}
-                    updatedAt={thread.updatedAt}
+          <div className="thread-everything">
+            <div className="thread-content">
+              {isEditingBody ? (
+                <>
+                  {reactionsAndReplyButtons}
+                  <EditBody
+                    title={title}
+                    thread={thread}
+                    savedEdits={savedEdits}
+                    shouldRestoreEdits={shouldRestoreEdits}
+                    cancelEditing={cancelEditing}
+                    threadUpdatedCallback={threadUpdatedCallback}
                   />
-                ) : !isGloballyEditing && canComment && isLoggedIn ? (
-                  <>
-                    {reactionsAndReplyButtons}
-                    <CreateComment
-                      updatedCommentsCallback={updatedCommentsCallback}
-                      rootThread={thread}
+                </>
+              ) : (
+                <>
+                  <QuillRenderer doc={thread.body} cutoffLines={50} />
+                  {thread.readOnly ? (
+                    <LockMessage
+                      lockedAt={thread.lockedAt}
+                      updatedAt={thread.updatedAt}
                     />
-                  </>
-                ) : null}
-              </>
-            )}
+                  ) : !isGloballyEditing && canComment && isLoggedIn ? (
+                    <>
+                      {mainContentComponents.map((component, index) => (
+                        <>
+                          {index !== 0 && <CWDivider />}{' '}
+                          {/* Add divider between components */}
+                          {renderComponentWithRemoveIcon(
+                            component,
+                            index,
+                            'mainContent'
+                          )}
+                        </>
+                      ))}
+                      {reactionsAndReplyButtons}
+                      <CreateComment
+                        updatedCommentsCallback={updatedCommentsCallback}
+                        rootThread={thread}
+                      />
+                    </>
+                  ) : null}
+                </>
+              )}
+            </div>
+            <div className="thread-below"></div>
           </div>
         }
         comments={
@@ -864,7 +940,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   buttonType="mini-black"
                   label="Add Action"
                   onClick={() => {
-                    setRightMenu({ isVisible: !rightSidebarVisible });
+                    setRightMenu({
+                      isVisible: !rightSidebarVisible,
+                      addComponent: addComponent,
+                    });
                   }}
                 />
               ),
