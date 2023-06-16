@@ -105,7 +105,7 @@ class DelegationAccount extends UserOperationBuilder{
 
 export const sendUserOp = async (signer: Web3, senderWallet: string, to: string, value: string, data: string) => {
     const delegationAccount = new DelegationAccount(signer);
-    const client = await Client.init(bundlerRPC, entrypointAddr);
+    const client = await Client.init(bundlerRPC);
 
     const res = await client.sendUserOperation(
     delegationAccount.execute(to, value, data, senderWallet),
