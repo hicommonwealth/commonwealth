@@ -3,17 +3,20 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
-import { initAppState } from 'state';
-import app from 'state';
+import app, { initAppState } from 'state';
 
 const validate = async (setRoute) => {
+  const params = new URLSearchParams(window.location.search);
+  const chain = params.get('chain');
+
   try {
     await handleSocialLoginCallback();
     await initAppState();
-    if (app.activeChainId()) {
-      setRoute(`/account/${app.activeChainId()}`);
+
+    if (chain && !app.isCustomDomain()) {
+      setRoute(`/${chain}`);
     } else {
-      setRoute('/dashboard');
+      setRoute('/');
     }
   } catch (error) {
     return `Error: ${error.message}`;

@@ -1,16 +1,24 @@
-import React from 'react';
-import 'view_template/view_template.scss';
+import { parseFunctionFromABI } from 'abi_utils';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
+import validateType from 'helpers/validateTypes';
+import type Contract from 'models/Contract';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import app from 'state';
-
-import Sublayout from '../../Sublayout';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
-import isValidJson from '../../../../../shared/validateJson';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWTextInput,
   MessageRow,
 } from 'views/components/component_kit/cw_text_input';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import 'view_template/view_template.scss';
+import Web3 from 'web3';
+import isValidJson from '../../../../../shared/validateJson';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
 import type Contract from 'models/Contract';
@@ -397,45 +405,43 @@ const ViewTemplatePage = () => {
   }
 
   return (
-    <Sublayout>
-      <div className="ViewTemplatePage">
-        <CWBreadcrumbs
-          breadcrumbs={[
-            { label: 'Contracts', path: `/contracts`, navigate },
-            { label: templateNickname },
-          ]}
-        />
-        <CWText type="h3" className="header">
-          {templateNickname}
-        </CWText>
+    <div className="ViewTemplatePage">
+      <CWBreadcrumbs
+        breadcrumbs={[
+          { label: 'Contracts', path: `/contracts`, navigate },
+          { label: templateNickname },
+        ]}
+      />
+      <CWText type="h3" className="header">
+        {templateNickname}
+      </CWText>
 
-        <div className="form">
-          <CWDivider className="divider" />
+      <div className="form">
+        <CWDivider className="divider" />
 
-          {!templateError ? (
-            <div className="template">{renderTemplate(json.form_fields)}</div>
-          ) : (
-            <MessageRow
-              label="error"
-              hasFeedback
-              validationStatus="failure"
-              statusMessage="invalid template format"
-            />
-          )}
-          <CWDivider />
-          <div className="bottom-row">
-            <CWButton label="Cancel" buttonType="secondary-black" />
-            <CWButton
-              label="Create"
-              buttonType="primary-black"
-              disabled={!txReady}
-              onClick={handleCreate}
-            />
-          </div>
-          {json.tx_template.is4337 && (<CWText>You're acting on behalf of your ERC4337 Account: {erc4337Sender}</CWText> )}
+        {!templateError ? (
+          <div className="template">{renderTemplate(json.form_fields)}</div>
+        ) : (
+          <MessageRow
+            label="error"
+            hasFeedback
+            validationStatus="failure"
+            statusMessage="invalid template format"
+          />
+        )}
+        <CWDivider />
+        <div className="bottom-row">
+          <CWButton label="Cancel" buttonType="secondary-black" />
+          <CWButton
+            label="Create"
+            buttonType="primary-black"
+            disabled={!txReady}
+            onClick={handleCreate}
+          />
         </div>
+          {json.tx_template.is4337 && (<CWText>You're acting on behalf of your ERC4337 Account: {erc4337Sender}</CWText> )}
       </div>
-    </Sublayout>
+    </div>
   );
 };
 
