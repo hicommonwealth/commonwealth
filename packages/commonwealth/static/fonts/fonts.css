@@ -37,3 +37,13 @@
     url('silka-medium-webfont.woff') format('woff'),
     url('silka-medium-webfont.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: NeueHaasUnica;
+  font-weight: 500;
+  font-style: normal;
+  src: url('neue-haas-unica-medium.eot'),
+    url('neue-haas-unica-medium.woff2') format('woff2'),
+    url('neue-haas-unica-medium.woff') format('woff'),
+    url('neue-haas-unica-medium.ttf') format('truetype');
+}
