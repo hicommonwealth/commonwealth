@@ -52,10 +52,15 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
-      if (err)
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
+          isCustomDomain: null,
+        });
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
+      }
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
 
@@ -82,19 +87,16 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
       is_active: true,
     });
 
-    // Automatically create subscription to chat mentions
-    await models.Subscription.create({
-      subscriber_id: newUser.id,
-      category_id: NotificationCategories.NewChatMention,
-      object_id: `user-${newUser.id}`,
-      is_active: true,
-    });
-
     req.login(newUser, (err) => {
-      if (err)
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
+          isCustomDomain: null,
+        });
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
+      }
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
 

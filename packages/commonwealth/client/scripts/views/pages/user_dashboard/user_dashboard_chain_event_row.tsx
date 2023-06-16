@@ -24,16 +24,12 @@ export const UserDashboardChainEventRow = (
   const navigate = useCommonNavigate();
 
   return (
-    <div
+    <a
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!label.linkUrl },
         'UserDashboardChainEventRow'
       )}
-      onClick={() => {
-        if (label.linkUrl) {
-          navigate(label.linkUrl);
-        }
-      }}
+      {...(label.linkUrl && { href: label.linkUrl })}
     >
       <div className="chain-event-icon-container">
         <CWIcon
@@ -67,6 +63,6 @@ export const UserDashboardChainEventRow = (
           {label.label}
         </CWText>
       </div>
-    </div>
+    </a>
   );
 };

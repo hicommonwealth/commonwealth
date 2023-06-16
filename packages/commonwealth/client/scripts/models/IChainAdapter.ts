@@ -35,8 +35,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract accounts: IAccountsModule<C, A>;
   public readonly communityBanner?: string;
 
-  public deferred: boolean;
-
   protected _serverLoaded: boolean;
   public get serverLoaded() {
     return this._serverLoaded;
@@ -63,16 +61,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     const {
       pinnedThreads,
-      topics,
       admins,
       activeUsers,
       numVotingThreads,
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
-      communityRoles,
     } = response.result;
-    this.app.topics.initialize(topics, true);
     this.app.threads.initialize(
       pinnedThreads,
       numVotingThreads,
@@ -83,9 +78,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
-
-    // add community roles to the chain's roles
-    this.meta.communityRoles = communityRoles;
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
 

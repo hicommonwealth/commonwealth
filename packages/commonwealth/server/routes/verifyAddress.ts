@@ -135,12 +135,6 @@ const processAddress = async (
         object_id: `user-${newUser.id}`,
         is_active: true,
       });
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewChatMention,
-        object_id: `user-${newUser.id}`,
-        is_active: true,
-      });
       addressInstance.user_id = newUser.id;
     }
   } else {
@@ -268,9 +262,15 @@ const verifyAddress = async (
       where: { id: newAddress.user_id },
     });
     req.login(user, (err) => {
-      if (err) return next(err);
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
+          isCustomDomain: null,
+        });
+        return next(err);
+      }
       serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
         isCustomDomain: null,
       });
 

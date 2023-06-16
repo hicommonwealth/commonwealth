@@ -8,9 +8,6 @@ export enum WebsocketMessageNames {
   SnapshotListener = 'snapshot-listener',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
-  ChatMessage = 'chat-message',
-  JoinChatChannel = 'join-chat-channel',
-  LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
 
@@ -58,7 +55,6 @@ export enum WebsocketNamespaces {
   SnapshotProposals = 'snapshot-proposals',
   ChainEvents = 'chain-events',
   SnapshotListener = 'snapshot-listener',
-  Chat = 'chat',
 }
 
 export enum WebsocketEngineEvents {
@@ -113,14 +109,6 @@ export enum ThreadActionType {
   StageChange = 'stagechange',
 }
 
-export interface IChatNotification {
-  message_id: string | number;
-  channel_id: string | number;
-  chain_id: string;
-  author_address: string;
-  created_at: any;
-}
-
 export enum SearchContentType {
   Thread = 'thread',
   Comment = 'comment',
@@ -142,15 +130,6 @@ export const DynamicTemplate = {
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
   EmailDigest: 'd-a4f27421ce5a41d29dca7625d2136cc3',
-};
-
-export type TokenResponse = {
-  chainId: number;
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  logoURI?: string;
 };
 
 export type SnapshotGraphQLResponse = {
@@ -182,6 +161,6 @@ export type SnapshotGraphQLResponse = {
 
 export type RoleObject = {
   permission: AccessLevel;
-  allow: bigint;
-  deny: bigint;
+  allow: number;
+  deny: number;
 };

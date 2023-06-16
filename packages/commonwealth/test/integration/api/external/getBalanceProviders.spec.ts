@@ -3,7 +3,7 @@ import type { GetBalanceProvidersReq } from 'common-common/src/api/extApiTypes';
 import models from 'server/database';
 import { getBalanceProviders } from 'server/routes/getBalanceProviders';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
-import { req, res } from 'test/unit/unitHelpers';
+import { getReq, res } from 'test/unit/unitHelpers';
 
 describe('getTokenBalance Tests', async () => {
   it('returns correct token balance', async () => {
@@ -14,7 +14,7 @@ describe('getTokenBalance Tests', async () => {
     const resp = (await getBalanceProviders(
       models,
       tokenBalanceCache,
-      req(r),
+      getReq(r),
       res()
     )) as any;
 

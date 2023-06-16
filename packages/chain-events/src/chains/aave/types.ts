@@ -1,8 +1,9 @@
-import type { TypedEvent } from '../../contractTypes/commons';
 import type {
   IAaveGovernanceV2,
   IGovernancePowerDelegationToken,
 } from '../../contractTypes';
+import { AaveGovernanceV2 } from '../../contractTypes';
+import { Result } from '@ethersproject/abi';
 
 // Used to unwrap promises returned by contract functions
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
@@ -27,8 +28,26 @@ export interface ListenerOptions {
 
 export type Api = IAaveContracts;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RawEvent = TypedEvent<any>;
+// creates a FilterEventTypes mapped type that iterates over all the keys of the filters object,
+// gets the return type of each function using ReturnType, and then returns an object with the
+// same keys and the corresponding return types
+type FilterEventTypes<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any
+    ? ReturnType<T[K]>
+    : never;
+};
+
+// The union of all Aave event types
+type EventArgs = FilterEventTypes<
+  AaveGovernanceV2['filters']
+>[keyof AaveGovernanceV2['filters']];
+
+export interface RawEvent {
+  address: string;
+  args: any;
+  name: string;
+  blockNumber: number;
+}
 
 // eslint-disable-next-line no-shadow
 export enum EntityKind {

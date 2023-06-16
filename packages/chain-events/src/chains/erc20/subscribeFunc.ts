@@ -142,7 +142,8 @@ export const subscribeEvents: SubscribeFunc<
 
   try {
     log.info(`Subscribing to ERC20 contracts ${chain}...`);
-    await subscriber.subscribe(processEventFn);
+    // TODO: fix or remove
+    // await subscriber.subscribe(processEventFn);
   } catch (e) {
     log.error(`Subscription error: ${e.message}`);
   }

@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import app from 'state';
 import { PageLoading } from './loading';
-import { useCommonNavigate } from 'navigation/helpers';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
 
 type ChainEntityLinkRedirectProps = {
   identifier: string;
@@ -15,7 +16,7 @@ export default function ChainEntityLinkRedirect({
 }: ChainEntityLinkRedirectProps) {
   const navigate = useCommonNavigate();
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetchChainEntityData = async () => {
       try {
         // 1. make query to chain events to get the specific entity data
@@ -25,7 +26,10 @@ export default function ChainEntityLinkRedirect({
         const { type, typeId } = entity;
         const newLink = {
           source: 'proposal',
-          identifier: type === 'proposal' ? `${typeId}` : `${chainEntityTypeToProposalSlug(type)}/${typeId}`
+          identifier:
+            type === 'proposal'
+              ? `${typeId}`
+              : `${chainEntityTypeToProposalSlug(type)}/${typeId}`,
         };
 
         // 3. redirect

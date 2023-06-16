@@ -30,7 +30,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
 import setupCosmosProxy from 'server/util/cosmosProxy';
@@ -56,7 +55,6 @@ const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const tokenBalanceCache = new TokenBalanceCache(0, 0, [
   mockTokenBalanceProvider,
 ]);
-const ruleCache = new RuleCache();
 const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
@@ -344,10 +342,6 @@ const resetServer = (debug = false): Promise<void> => {
         description: 'an entity-event as occurred',
       });
       await models.NotificationCategory.create({
-        name: NotificationCategories.NewChatMention,
-        description: 'someone mentions a user in chat',
-      });
-      await models.NotificationCategory.create({
         name: NotificationCategories.SnapshotProposal,
         description: 'Snapshot proposal notifications',
       });
@@ -509,7 +503,6 @@ setupAPI(
   models,
   viewCountCache,
   tokenBalanceCache,
-  ruleCache,
   banCache,
   globalActivityCache,
   databaseValidationService

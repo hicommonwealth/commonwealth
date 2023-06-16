@@ -1,17 +1,16 @@
-import React from 'react';
+import {
+  ChainBase,
+  ChainCategoryType,
+  ChainNetwork,
+} from 'common-common/src/types';
 import numeral from 'numeral';
-
 import 'pages/communities.scss';
-
-import { ChainCategoryType } from 'common-common/src/types';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import ChainInfo from '../../models/ChainInfo';
-
+import React from 'react';
 import app from 'state';
+import ChainInfo from '../../models/ChainInfo';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import Sublayout from '../Sublayout';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -133,63 +132,61 @@ const CommunitiesPage = () => {
   const sortedChains = sortChains(app.config.chains.getAll());
 
   return (
-    <Sublayout>
-      <div className="CommunitiesPage">
-        <div className="header-section">
-          <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {buildCommunityString(sortedChains.length)}
-          </CWText>
-          <div className="filter-buttons">
-            {chainCategories.map((cat, i) => {
-              return (
-                <CWButton
-                  key={i}
-                  label={cat}
-                  buttonType={
-                    filterMap[cat] ? 'primary-black' : 'secondary-black'
-                  }
-                  onClick={() => {
-                    handleSetFilterMap(cat);
-                  }}
-                />
-              );
-            })}
-            {chainNetworks.map((network, i) => {
-              return (
-                <CWButton
-                  key={i}
-                  label={network}
-                  buttonType={
-                    filterMap[network] ? 'primary-black' : 'secondary-black'
-                  }
-                  onClick={() => {
-                    handleSetFilterMap(network);
-                  }}
-                />
-              );
-            })}
-            {chainBases.map((base, i) => {
-              return (
-                <CWButton
-                  key={i}
-                  label={base}
-                  buttonType={
-                    filterMap[base] ? 'primary-black' : 'secondary-black'
-                  }
-                  onClick={() => {
-                    handleSetFilterMap(base);
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-        <div className="communities-list">
-          {sortedChains}
-          <NewCommunityCard />
+    <div className="CommunitiesPage">
+      <div className="header-section">
+        <CWText type="h3" fontWeight="semiBold" className="communities-count">
+          {buildCommunityString(sortedChains.length)}
+        </CWText>
+        <div className="filter-buttons">
+          {chainCategories.map((cat, i) => {
+            return (
+              <CWButton
+                key={i}
+                label={cat}
+                buttonType={
+                  filterMap[cat] ? 'primary-black' : 'secondary-black'
+                }
+                onClick={() => {
+                  handleSetFilterMap(cat);
+                }}
+              />
+            );
+          })}
+          {chainNetworks.map((network, i) => {
+            return (
+              <CWButton
+                key={i}
+                label={network}
+                buttonType={
+                  filterMap[network] ? 'primary-black' : 'secondary-black'
+                }
+                onClick={() => {
+                  handleSetFilterMap(network);
+                }}
+              />
+            );
+          })}
+          {chainBases.map((base, i) => {
+            return (
+              <CWButton
+                key={i}
+                label={base}
+                buttonType={
+                  filterMap[base] ? 'primary-black' : 'secondary-black'
+                }
+                onClick={() => {
+                  handleSetFilterMap(base);
+                }}
+              />
+            );
+          })}
         </div>
       </div>
-    </Sublayout>
+      <div className="communities-list">
+        {sortedChains}
+        <NewCommunityCard />
+      </div>
+    </div>
   );
 };
 
