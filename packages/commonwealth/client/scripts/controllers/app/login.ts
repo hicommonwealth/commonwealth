@@ -52,6 +52,17 @@ export async function setActiveAccount(
         shouldRedraw
       );
     }
+
+    // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
+    // Emit a force re-render on cosmos chains to make sure
+    // that app.user.activeAccount is set - this is required for many actions
+    // There is a race condition b/w the app accessing app.user.activeAccount
+    // and updating it. A proper solution would be to fix this race condition
+    // for cosmos chains - since the issue happens only on that chain
+    if (app.chain.base === 'cosmos') {
+      app.loginStateEmitter.emit('redraw');
+    }
+
     return;
   }
 
@@ -171,7 +182,7 @@ export async function updateActiveAddresses({
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
       .filter((addr) => addr),
     shouldRedraw
   );
@@ -280,6 +291,7 @@ export async function createUserWithAddress(
     walletId,
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
+    ignoreProfile: false,
   });
   return { account, newlyCreated: response.result.newly_created };
 }
@@ -318,15 +330,23 @@ async function constructMagic() {
       new OAuthExtension(),
       new CosmosExtension({
         // default to Osmosis URL
-        rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
+        rpcUrl:
+          app.chain?.meta?.node?.url ||
+          app.config.chains.getById('osmosis').node.url,
       }),
-    ]
+    ],
   });
 }
 
 export async function loginWithMagicLink({
-  email, provider
-}: { email?: string, provider?: string }) {
+  email,
+  provider,
+  chain,
+}: {
+  email?: string;
+  provider?: string;
+  chain?: string;
+}) {
   if (!email && !provider) throw new Error('Must provider email or provider');
   const magic = await constructMagic();
 
@@ -334,21 +354,33 @@ export async function loginWithMagicLink({
     const bearer = await magic.auth.loginWithMagicLink({ email });
     await handleSocialLoginCallback(bearer);
   } else {
+    const params = `?chain=${chain || ''}`;
     // provider-based login
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
-      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+      redirectURI: new URL(
+        '/finishsociallogin' + params,
+        window.location.origin
+      ).href,
     });
   }
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({ provider, userInfo }): { username?: string, avatarUrl?: string } {
+function getProfileMetadata({
+  provider,
+  userInfo,
+}): {
+  username?: string;
+  avatarUrl?: string;
+} {
   // provider: result.oauth.provider (twitter, discord, github)
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } = userInfo.sources['https://discord.com/api/users/@me'];
+    const { avatar, id, username } = userInfo.sources[
+      'https://discord.com/api/users/@me'
+    ];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
@@ -368,13 +400,13 @@ function getProfileMetadata({ provider, userInfo }): { username?: string, avatar
 }
 
 export async function handleSocialLoginCallback(bearer?: string) {
-  let profileMetadata: { username?: string, avatarUrl?: string } = {};
+  let profileMetadata: { username?: string; avatarUrl?: string } = {};
   if (!bearer) {
     const magic = await constructMagic();
     const result = await magic.oauth.getRedirectResult();
     profileMetadata = getProfileMetadata(result.oauth);
     bearer = result.magic.idToken;
-    // console.log('Magic redirect result:', result);
+    console.log('Magic redirect result:', result);
   }
 
   const response = await $.post({

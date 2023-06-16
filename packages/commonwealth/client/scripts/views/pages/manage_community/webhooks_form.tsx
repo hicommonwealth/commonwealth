@@ -1,25 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import smartTruncate from 'smart-truncate';
-
-import 'pages/manage_community/webhooks_form.scss';
-
-import type Webhook from '../../../models/Webhook';
-
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { link, pluralize } from 'helpers';
+import { pluralize } from 'helpers';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import 'pages/manage_community/webhooks_form.scss';
+import React, { useMemo, useState } from 'react';
+import smartTruncate from 'smart-truncate';
+import app from 'state';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
+import type Webhook from '../../../models/Webhook';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { Modal } from '../../components/component_kit/cw_modal';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { Modal } from '../../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
 
 export const WebhooksForm = () => {
-  const navigate = useCommonNavigate();
-
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [webhooks, setWebhooks] = useState<Array<Webhook>>([]);
@@ -31,7 +26,7 @@ export const WebhooksForm = () => {
     []
   );
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetch = async () => {
       try {
         const response = await axios.get(`${app.serverUrl()}/getWebhooks`, {

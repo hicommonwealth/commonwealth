@@ -2,8 +2,8 @@ import { NotificationCategories } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import type { DB } from '../models';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { redirectWithLoginError } from './finishEmailLogin';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
   const token = req.query.token;
@@ -52,14 +52,18 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
-      if (err)
-        return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
           isCustomDomain: null,
         });
+        return redirectWithLoginError(res, 'Could not log in with OAuth user');
       }
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
+        isCustomDomain: null,
+      });
+
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   } else {
@@ -83,23 +87,19 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
       is_active: true,
     });
 
-    // Automatically create subscription to chat mentions
-    await models.Subscription.create({
-      subscriber_id: newUser.id,
-      category_id: NotificationCategories.NewChatMention,
-      object_id: `user-${newUser.id}`,
-      is_active: true,
-    });
-
     req.login(newUser, (err) => {
-      if (err)
-        return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      if (process.env.NODE_ENV !== 'test') {
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
+      if (err) {
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_FAILED,
           isCustomDomain: null,
         });
+        return redirectWithLoginError(res, 'Could not log in with OAuth user');
       }
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
+        isCustomDomain: null,
+      });
+
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   }

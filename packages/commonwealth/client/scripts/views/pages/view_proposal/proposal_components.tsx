@@ -1,11 +1,14 @@
-import React, { useEffect } from 'react';
-
-import app from 'state';
-
+import axios from 'axios';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-
+import { extractDomain } from 'helpers';
+import useForceRerender from 'hooks/useForceRerender';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { LinkSource } from 'models/Thread';
 import 'pages/view_proposal/proposal_components.scss';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
+import ExternalLink from 'views/components/ExternalLink';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -13,12 +16,7 @@ import {
   getStatusText,
 } from '../../components/ProposalCard/helpers';
 import { cancelProposal } from '../../components/proposals/helpers';
-import {
-  BlockExplorerLink,
-  ThreadLink,
-  VotingInterfaceLink,
-} from './proposal_header_links';
-import useForceRerender from 'hooks/useForceRerender';
+import { ThreadLink } from './proposal_header_links';
 
 type BaseCancelButtonProps = {
   onModalClose?: () => void;
@@ -73,6 +71,7 @@ type ProposalSubheaderProps = {
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
   const forceRerender = useForceRerender();
+  const [linkedThreads, setLinkedThreads] = useState(null);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);
@@ -82,24 +81,48 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
     };
   }, [forceRerender]);
 
+  useNecessaryEffect(() => {
+    if (!linkedThreads) {
+      axios
+        .post(`${app.serverUrl()}/linking/getLinks`, {
+          link: {
+            source: LinkSource.Proposal,
+            identifier: proposal.identifier,
+          },
+          jwt: app.user.jwt,
+        })
+        .then((response) => {
+          setLinkedThreads(response.data.result.threads);
+        });
+    }
+  }, []);
+
   return (
     <div className="ProposalSubheader">
       <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
         {getStatusText(proposal)}
       </CWText>
-      {(proposal['blockExplorerLink'] ||
+      {proposal['blockExplorerLink'] ||
         proposal['votingInterfaceLink'] ||
-        proposal.threadId) && (
-        <div className="proposal-links">
-          {proposal.threadId && <ThreadLink proposal={proposal} />}
-          {proposal['blockExplorerLink'] && (
-            <BlockExplorerLink proposal={proposal} />
-          )}
-          {proposal['votingInterfaceLink'] && (
-            <VotingInterfaceLink proposal={proposal} />
-          )}
-        </div>
-      )}
+        (linkedThreads && (
+          <div className="proposal-links">
+            {linkedThreads && (
+              <ThreadLink threads={linkedThreads} chain={proposal['chain']} />
+            )}
+            {proposal['blockExplorerLink'] && (
+              <ExternalLink url={proposal['blockExplorerLink']}>
+                {proposal['blockExplorerLinkLabel'] ||
+                  extractDomain(proposal['blockExplorerLink'])}
+              </ExternalLink>
+            )}
+            {proposal['votingInterfaceLink'] && (
+              <ExternalLink url={proposal['votingInterfaceLink']}>
+                {proposal['votingInterfaceLinkLabel'] ||
+                  extractDomain(proposal['votingInterfaceLink'])}
+              </ExternalLink>
+            )}
+          </div>
+        ))}
 
       {proposal instanceof AaveProposal && (
         <div className="proposal-buttons">

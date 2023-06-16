@@ -8,13 +8,14 @@ import 'components/edit_profile.scss';
 
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
+import NewProfilesController from '../../controllers/server/newProfiles';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
 import { CWButton } from './component_kit/cw_button';
 import { CWTextInput } from './component_kit/cw_text_input';
-import { AvatarUpload } from './avatar_upload';
+import { AvatarUpload } from './Avatar';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { CWText } from './component_kit/cw_text';
 import { CWDivider } from './component_kit/cw_divider';
@@ -111,7 +112,10 @@ const EditProfileComponent = () => {
         setTimeout(() => {
           // refresh profiles in store
           addresses.forEach((a) => {
-            app.newProfiles.updateProfileForAccount(a.address, profileUpdate);
+            NewProfilesController.Instance.updateProfileForAccount(
+              a.address,
+              profileUpdate
+            );
           });
           setLoading(false);
           navigate(`/profile/id/${profile.id}`);
@@ -196,6 +200,7 @@ const EditProfileComponent = () => {
           chain: addresses[0].chain,
           address: addresses[0].address,
           profile: oldProfile,
+          ignoreProfile: false,
         })
       );
     } else {

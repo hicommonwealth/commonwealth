@@ -4,7 +4,7 @@ import 'components/component_kit/cw_avatar_username_input.scss';
 import { formatAddressShort } from 'helpers';
 import Account from '../../../models/Account';
 
-import { AvatarUpload } from '../avatar_upload';
+import { AvatarUpload } from 'views/components/Avatar';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 import { getClasses } from './helpers';

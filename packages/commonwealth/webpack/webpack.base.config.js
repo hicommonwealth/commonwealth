@@ -23,6 +23,16 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
+      'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(
+        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900'
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.MIXPANEL_DEV_TOKEN': JSON.stringify(
+        process.env.MIXPANEL_DEV_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900'
+      ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.MAGIC_PUBLISHABLE_KEY': JSON.stringify(
         process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4'
       ),
@@ -49,6 +59,9 @@ module.exports = {
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         process.env.FLAG_PROPOSAL_TEMPLATES
       ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
@@ -77,12 +90,6 @@ module.exports = {
           name: 'bitcoin',
           chunks: 'all',
         },
-        ethereum: {
-          // this is made into an inital chunk
-          test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
-          name: 'ethereum',
-          chunks: 'all',
-        },
         ethereumAsync: {
           // this is made into an async chunk (lazy loaded)
           test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
@@ -109,6 +116,11 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
+        // ethereum: {
+        //   test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
+        //   name: 'ethereum',
+        //   chunks: 'all',
+        // },
         // near: {
         //   test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
         //   name: 'near',

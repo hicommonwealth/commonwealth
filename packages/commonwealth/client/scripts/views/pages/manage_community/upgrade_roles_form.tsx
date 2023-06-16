@@ -5,6 +5,7 @@ import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
 import { formatAddressShort } from 'helpers';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type RoleInfo from '../../../models/RoleInfo';
 import { AccessLevel } from '../../../../../shared/permissions';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -13,14 +14,14 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { MembersSearchBar } from '../../components/members_search_bar';
 
 type UpgradeRolesFormProps = {
-  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
   searchTerm: string;
   setSearchTerm: (v: string) => void;
 };
 
 export const UpgradeRolesForm = ({
-  onRoleUpgrade,
+  onRoleUpdate,
   roleData,
   searchTerm,
   setSearchTerm,
@@ -39,7 +40,7 @@ export const UpgradeRolesForm = ({
     // @TODO: @Profiles upgrade, clean this up
     const chainId = _role.chain_id ? _role.chain_id : _role.Address?.chain?.id;
 
-    const displayName = app.newProfiles.getProfile(
+    const displayName = NewProfilesController.Instance.getProfile(
       chainId as string,
       _role.Address.address
     ).name;
@@ -115,7 +116,7 @@ export const UpgradeRolesForm = ({
                 notifyError('Upgrade failed');
               }
 
-              onRoleUpgrade(_user, r.result);
+              onRoleUpdate(_user, r.result);
             });
           }}
         />
