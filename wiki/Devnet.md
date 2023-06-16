@@ -1,4 +1,4 @@
-_Authored by Mark Hedelberg 230727._
+_Authored by Mark Hagelberg 230727._
 
 To develop and test new features for different chains, we use containerized testnet deployments (AKA devnets).
 
@@ -40,6 +40,23 @@ CI community (ephemeral spin-up for automated tests):
 * http://localhost:8080/csdk-beta-ci
 * CI tests reference Docker image at https://hub.docker.com/repository/docker/mhagel1/csdk-beta
 
+### Ethermint / Evmos v13.0.2 (`gov` module v1beta1)
+
+Live Node Endpoints:
+* https://evmos-devnet-81ade29794d4.herokuapp.com/rpc
+* https://evmos-devnet-81ade29794d4.herokuapp.com/lcd/
+
+Deployment:
+* https://dashboard.heroku.com/apps/cosmos-devnet-beta
+
+Sandbox community:
+* http://localhost:8080/evmos-dev
+
+CI community (ephemeral spin-up for automated tests):
+
+* http://localhost:8080/evmos-dev-ci
+* CI tests reference Docker image at https://hub.docker.com/repository/docker/mhagel1/evmos-dev
+
 # How to [deploy updates](https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-container):
 1. In terminal go to packages/chain-events/cosmos-chain-testing/v1 directory
 2. `heroku login`
@@ -49,15 +66,17 @@ CI community (ephemeral spin-up for automated tests):
 Local Dev CSDK:   
 If you ever need to run devnets locally on your machine, there are three helper scripts
 ```
-yarn cosmos:build # build & start first time only
-yarn cosmos:start # start - if you have pre-built images
+yarn cosmos:build # build & start first time only - this takes several minutes
+yarn cosmos:start # start container - if you have pre-built images
 yarn cosmos:stop  # stop container
 ```
-Browse to these
+Browse to these to confirm node is running locally:
 * http://localhost:5050/rpc
 * http://localhost:5050/lcd/
 * http://localhost:5051/rpc
 * http://localhost:5051/lcd/
+* http://localhost:5052/rpc
+* http://localhost:5052/lcd/
 
 
 # How to manually test transactions on the csdk or csdk-beta sandbox community
@@ -71,7 +90,14 @@ a shared address for this purpose.
     - Import an existing wallet
     - Use recover phrase or private key
     - copy/paste this mnemonic:
-`ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought`
+        `ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought`
     - Give the wallet a name you can recognize, like "CW devnet"
 
 - Go to http://localhost:8080/csdk-beta or http://localhost:8080/csdk and join community. You should be able to create proposals and vote.
+
+# Manually testing evmos-dev (ethermint sandbox)
+
+- Add this mnemonic to Keplr:
+    `extra cute enough manage arctic acid ball divide reduce turtle pony duck remind short find feature tooth steak fix assault vote sad cattle roof`
+
+- Go to http://localhost:8080/evmos-dev and join community. You should be able to create proposals and vote.
