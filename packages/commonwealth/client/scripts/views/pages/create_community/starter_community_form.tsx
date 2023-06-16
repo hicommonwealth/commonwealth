@@ -78,6 +78,7 @@ export const StarterCommunityForm = () => {
             alt_wallet_url?: string;
           } = {};
 
+          // TODO: switch to using ChainNode.name instead of URL
           // defaults to be overridden when chain is no longer "starter" type
           switch (base) {
             case ChainBase.CosmosSDK: {
