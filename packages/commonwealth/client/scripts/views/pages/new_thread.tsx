@@ -17,6 +17,7 @@ const NewThreadPage = () => {
   const { rightSidebarVisible, setRightMenu } = useSidebarStore();
   const [mainContentComponents, setMainContentComponents] = useState([]);
   const [cardColumnComponents, setCardColumnComponents] = useState([]);
+  const [hoveredComponentIndex, setHoveredComponentIndex] = useState(null);
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
@@ -40,6 +41,42 @@ const NewThreadPage = () => {
     }
   };
 
+  const handleRemoveComponent = (indexToRemove, target) => {
+    if (target === 'mainContent') {
+      setMainContentComponents((prevComponents) =>
+        prevComponents.filter((_, index) => index !== indexToRemove)
+      );
+    } else if (target === 'cardColumn') {
+      setCardColumnComponents((prevComponents) =>
+        prevComponents.filter((_, index) => index !== indexToRemove)
+      );
+    }
+  };
+
+  const renderComponentWithRemoveIcon = (component, index, target) => (
+    <div
+      key={index}
+      onMouseEnter={() => setHoveredComponentIndex(index)}
+      onMouseLeave={() => setHoveredComponentIndex(null)}
+      style={{ position: 'relative', paddingTop: '14px' }}
+    >
+      {hoveredComponentIndex === index && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '0',
+            right: '0',
+            cursor: 'pointer',
+          }}
+          onClick={() => handleRemoveComponent(index, target)}
+        >
+          x
+        </div>
+      )}
+      {component}
+    </div>
+  );
+
   if (!app.chain) return <PageLoading />;
 
   return (
@@ -48,12 +85,12 @@ const NewThreadPage = () => {
         {/* Main Content */}
         <div className="main-content">
           <NewThreadForm />
-          {mainContentComponents.map((component, index) => (
-            <React.Fragment key={index}>{component}</React.Fragment>
-          ))}
+          {mainContentComponents.map((component, index) =>
+            renderComponentWithRemoveIcon(component, index, 'mainContent')
+          )}
         </div>
         {/* Add Action Column */}
-        <div className="add-action-column">
+        <div className="add-action-column" style={{ padding: '24px' }}>
           <CWButton
             buttonType="mini-black"
             label="Add Stuff"
@@ -68,9 +105,9 @@ const NewThreadPage = () => {
             }}
             disabled={!app.user.activeAccount}
           />
-          {cardColumnComponents.map((component, index) => (
-            <React.Fragment key={index}>{component}</React.Fragment>
-          ))}
+          {cardColumnComponents.map((component, index) =>
+            renderComponentWithRemoveIcon(component, index, 'cardColumn')
+          )}
         </div>
       </div>
     </Sublayout>

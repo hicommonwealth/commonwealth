@@ -16,13 +16,92 @@ import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 
 import { CWCard } from '../components/component_kit/cw_card';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { SelectList } from '../components/component_kit/cw_select_list';
+
+const AddDraftERC20Component = () => {
+  const tokenOptions = [
+    { value: 'USDC', label: 'USDC' },
+    { value: 'WETH', label: 'WETH' },
+    { value: 'UNI', label: 'UNI' },
+    { value: 'COMP', label: 'COMP' },
+    { value: 'OSMO', label: 'OSMO' },
+  ];
+
+  return (
+    <div style={{ width: '100%' }}>
+      <CWText type="h3" fontWeight="semiBold" className="header-text">
+        Add Draft ERC20 Spend Proposal
+      </CWText>
+      <CWText className="explanation-text">
+        Fill out the form below to create a draft ERC20 spend proposal.
+      </CWText>
+      <form>
+        <CWTextInput placeholder="500" className="input-amount" />
+        <SelectList
+          options={tokenOptions}
+          className="input-token"
+          placeholder="Select Token"
+        />
+      </form>
+    </div>
+  );
+};
+
+const PrefilledComponent = () => {
+  return (
+    <div style={{ width: '100%' }}>
+      <CWText type="h3" fontWeight="semiBold" className="header-text">
+        Prefilled ERC20 Spend Proposal
+      </CWText>
+      <CWText className="explanation-text">
+        The proposal has been prefilled with the following values:
+      </CWText>
+      <pre>
+        <code>
+          {`{
+  Amount: 1,000,000,
+  Token: OSMO
+}`}
+        </code>
+      </pre>
+    </div>
+  );
+};
+
+const ImageCollectCard = ({ key }) => {
+  return (
+    <CWCard elevation="elevation-1" className="image-collect-card">
+      <div className="header-row">
+        <div style={{ width: '100px' }}>
+          <iframe
+            allow="fullscreen"
+            frameBorder="0"
+            height="150"
+            src="https://giphy.com/embed/NrF0O24dP5NuYund2x/video"
+            width="150"
+          ></iframe>
+        </div>
+      </div>
+      <CWButton
+        color="primary"
+        className="collect-post-button"
+        onClick={() => console.log('Collect Post')}
+        label={'collect'}
+      >
+        Collect Post
+      </CWButton>
+    </CWCard>
+  );
+};
 
 const CreatorCard = ({ key }) => {
   return (
     <CWCard elevation="elevation-1" className="creation-card">
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
-          All Discussions
+          500 USDC
         </CWText>
         <div className="count-and-button">
           <CWText
@@ -34,8 +113,54 @@ const CreatorCard = ({ key }) => {
           </CWText>
         </div>
       </div>
-      <CWText className="subheader-text">This is an example card</CWText>
+      <CWText className="subheader-text">
+        Rewarded by Dillon, if you find a bug that will cause serious harm to
+        the proposal
+      </CWText>
     </CWCard>
+  );
+};
+
+const DropDownFormCard = () => {
+  return (
+    <CWCard elevation="elevation-1" className="creation-card">
+      <div className="header-row">
+        <CWText type="h3" fontWeight="semiBold" className="header-text">
+          Poll
+        </CWText>
+      </div>
+      <CWText className="subheader-text">
+        This is the proposal: should Vitalik be king?
+      </CWText>
+      <DropDownForm />
+    </CWCard>
+  );
+};
+
+export default DropDownFormCard;
+
+// A form with three drop down inputs that each have 1 2 3 as options
+const DropDownForm = () => {
+  return (
+    <div className="drop-down-form">
+      <select>
+        <option value="1">1</option>
+      </select>
+      <select>
+        <option value="2">2</option>
+      </select>
+      <select>
+        <option value="3">3</option>
+      </select>
+      <CWButton
+        color="primary"
+        className="collect-post-button"
+        onClick={() => console.log('Vote')}
+        label={'vote'}
+      >
+        Submit Vote
+      </CWButton>
+    </div>
   );
 };
 
@@ -224,16 +349,20 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     app.chain?.base === ChainBase.Ethereum
       ? [
           {
-            label: 'New Contract',
-            onClick: () => navigate('/:scope/new/contract'),
+            label: 'Add Template ERC20 Spend Proposal',
+            location: 'mainContent',
+            component: <AddDraftERC20Component />,
+            onClick: () => console.log('clicked add template erc20 spend'),
             iconLeft: 'star',
           },
           {
-            label: 'New Template',
-            onClick: () =>
-              navigate('/:scope/new/contract_template/:contract_id', {
-                state: { scoped: true, deferChain: true },
-              }),
+            label: 'Add Draft ERC20 Spend Proposal',
+            location: 'mainContent',
+            component: <PrefilledComponent />,
+            onClick: () => console.log('clicked add draft erc20 spend'),
+            // navigate('/:scope/new/contract_template/:contract_id', {
+            //   state: { scoped: true, deferChain: true },
+            // }),
             iconLeft: 'star',
           },
         ]
@@ -246,15 +375,19 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             label: 'Add Bounty to Page',
             onClick: () => console.log('clicked add bounty to page'),
             iconLeft: 'star',
+            location: 'cardColumn',
+            component: <CreatorCard key={Date.now()} />,
             description: `Adds a bounty for completing a specific action on a page. 
               Like posting the highest upvoted comment.`,
           },
           {
             label: 'Allow Collects',
-            onClick: () =>
-              navigate('/:scope/new/contract_template/:contract_id', {
-                state: { scoped: true, deferChain: true },
-              }),
+            location: 'cardColumn',
+            component: <ImageCollectCard key={'collect'} />,
+            onClick: () => console.log('clicked collect to page'),
+            // navigate('/:scope/new/contract_template/:contract_id', {
+            //   state: { scoped: true, deferChain: true },
+            // }),
             iconLeft: 'star',
             description: `Allows your post to be collected as an NFT!`,
           },
@@ -265,11 +398,12 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     app.chain?.base === ChainBase.Ethereum
       ? [
           {
-            label: 'Add Thread Link',
-            onClick: () => navigate('/:scope/new/contract'),
+            label: 'Add Poll Link',
+            onClick: () => console.log('clicked add thread link'),
+            location: 'cardColumn',
+            component: <DropDownFormCard />,
             iconLeft: 'star',
-            description: `Adds a bounty for completing a specific action on a page. 
-              Like posting the highest upvoted comment.`,
+            description: `Add a poll directly from here!`,
           },
           {
             label: 'Add Proposal Link',
@@ -281,13 +415,13 @@ export const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             description: `Allows your post to be collected as an NFT!`,
           },
           {
-            label: 'Add Poll',
+            label: 'Add Thread Link',
+            location: 'cardColumn',
             onClick: () =>
               navigate('/:scope/new/contract_template/:contract_id', {
                 state: { scoped: true, deferChain: true },
               }),
             iconLeft: 'star',
-            description: `Add a poll directly from here!`,
           },
           {
             label: 'Create Snapshot',
@@ -412,13 +546,14 @@ export const CreateContentRightSidebar = ({ addComponent }) => {
     }
 
     const originalOnClick = item.onClick;
+    const component = item.component;
+    const location = item.location;
 
     return {
       ...item,
       onClick: () => {
-        const newComponent = <CreatorCard key={Date.now()} />;
         console.log('addComponent in here', addComponent);
-        addComponent(newComponent, 'mainContent');
+        addComponent(component, location);
         originalOnClick();
       },
     };

@@ -67,6 +67,8 @@ export type DefaultMenuItem = {
   label?: string;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'default';
+  component?: React.ReactNode;
+  location?: string;
 };
 
 type NotificationMenuItem = {
