@@ -11,7 +11,7 @@ import {
   NotificationCategories,
   ProposalType,
 } from '../../../common-common/src/types';
-import { findAllRoles, findOneRole, isAddressPermitted } from '../util/roles';
+import { findAllRoles, findOneRole } from '../util/roles';
 import { UserInstance } from '../models/user';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { NotificationOptions } from './server_notifications_controller';
@@ -28,7 +28,6 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import deleteThreadFromDb from '../util/deleteThread';
 import { Op } from 'sequelize';
 import { ThreadAttributes } from '../models/thread';
-import { Action, PermissionError } from '../../shared/permissions';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
