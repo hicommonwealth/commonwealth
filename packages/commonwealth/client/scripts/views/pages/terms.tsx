@@ -1,44 +1,44 @@
-import React, { useState } from 'react';
+import { renderMultilineText } from 'helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 /* eslint-disable max-len */
-import { Document, Page, pdfjs } from 'react-pdf';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
 import 'pages/privacy_and_terms.scss';
-
+import React from 'react';
 import { CWText } from '../components/component_kit/cw_text';
-import Sublayout from '../Sublayout';
-import '../../../../static/brand_assets/tos-6-9-2023.pdf';
-import { Link } from 'react-router-dom';
+
+const TOS = `This “Privacy Policy” describes the privacy practices of Commonwealth Labs, Inc. ( “Commonwealth”, “we”, “us”, or “our”) in connection with the www.commonwealth.im website, the Commonwealth Platform (i.e., the Commonwealth decentralized governance platform), and any other website or mobile application that we own or control and which posts or links to this Privacy Policy (collectively, the “Service”), and the rights and choices available to individuals with respect to their information.   
+Commonwealth may provide additional or supplemental privacy policies to individuals for specific products or services that we offer at the time we collect personal information. These supplemental privacy policies will govern how we may process the information in the context of the specific product or service.
+`;
 
 const TermsPage = () => {
-  const [totalPages, setTotalPages] = useState(null);
-
-  function onDocumentLoadSuccess({ numPages }) {
-    setTotalPages(numPages);
-  }
+  const navigate = useCommonNavigate();
 
   return (
-    <Sublayout>
-      <div className="TermsPage">
-        <div className="forum-container">
-          <CWText>Posted on 6/8/2023</CWText>
-          <Link to="/tos-1-26-2023">Previous privacy policy.</Link>
-          <Document
-            file="static/brand_assets/tos-6-9-2023.pdf"
-            onLoadSuccess={onDocumentLoadSuccess}
-          >
-            {Array.from(new Array(totalPages), (el, index) => (
-              <Page
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                key={`page_${index + 1}`}
-                pageNumber={index + 1}
-              />
-            ))}
-          </Document>
-        </div>
+    <div className="TermsPage">
+      <div className="forum-container">
+        <CWText type="h3">Terms of Service</CWText>
+        <CWText>Posted on 6/13/2023</CWText>
+        {renderMultilineText(TOS)}
+        <CWText
+          onClick={() => {
+            window.open(
+              'https://drive.google.com/file/d/1Sd9dnyOKONc8880QwDiVSB3mrq1Pzb86/view?usp=sharing',
+              '_blank'
+            );
+          }}
+          className="link"
+        >
+          See Full Policy
+        </CWText>
+        <CWText
+          onClick={() => {
+            navigate('/tos-1-26-2023');
+          }}
+          className="link"
+        >
+          Previous Privacy Policy
+        </CWText>
       </div>
-    </Sublayout>
+    </div>
   );
 };
 

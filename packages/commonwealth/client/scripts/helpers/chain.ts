@@ -1,10 +1,7 @@
 import app, { ApiStatus } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
-import $ from 'jquery';
-import type { NavigateFunction } from 'react-router-dom';
 import ChainInfo from '../models/ChainInfo';
-import NodeInfo from '../models/NodeInfo';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;
@@ -234,32 +231,4 @@ export const initChain = async (): Promise<void> => {
 
   // Instantiate (again) to create chain-specific Account<> objects
   await updateActiveAddresses({ chain });
-};
-
-export const initNewTokenChain = async (
-  address: string,
-  navigate: NavigateFunction
-) => {
-  const chain_network = app.chain.network;
-  const response = await $.getJSON('/api/getTokenForum', {
-    address,
-    chain_network,
-    autocreate: true,
-  });
-
-  if (response.status !== 'Success') {
-    // TODO: better custom 404
-    navigate('/404');
-  }
-
-  // TODO: check if this is valid
-  const { chain, node } = response.result;
-  const chainInfo = ChainInfo.fromJSON(chain);
-  const nodeInfo = new NodeInfo(node);
-
-  if (!app.config.chains.getById(chainInfo.id)) {
-    app.config.chains.add(chainInfo);
-    app.config.nodes.add(nodeInfo);
-  }
-  await selectChain(chainInfo);
 };

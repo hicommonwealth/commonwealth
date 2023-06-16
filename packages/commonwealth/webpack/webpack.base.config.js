@@ -60,6 +60,9 @@ module.exports = {
         process.env.FLAG_PROPOSAL_TEMPLATES
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {
@@ -207,10 +210,6 @@ module.exports = {
         resolve: {
           fullySpecified: false,
         },
-      },
-      {
-        test: /\.pdf$/,
-        use: 'url-loader',
       },
     ],
   },

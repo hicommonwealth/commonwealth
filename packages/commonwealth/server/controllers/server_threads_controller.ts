@@ -537,7 +537,7 @@ export class ServerThreadsController implements IServerThreadsController {
                 chain: mention[0] || null,
                 address: mention[1],
               },
-              include: [this.models.User, this.models.RoleAssignment],
+              include: [this.models.User],
             });
             return mentionedUser;
           })
@@ -906,7 +906,7 @@ export class ServerThreadsController implements IServerThreadsController {
                 chain: mention[0],
                 address: mention[1],
               },
-              include: [this.models.User, this.models.RoleAssignment],
+              include: [this.models.User],
             });
             return mentionedUser;
           } catch (err) {
@@ -1005,16 +1005,6 @@ export class ServerThreadsController implements IServerThreadsController {
     });
     if (!canInteract) {
       throw new Error(`Ban error: ${banError}`);
-    }
-
-    const permission_error = await isAddressPermitted(
-      this.models,
-      address.id,
-      chain.id,
-      Action.CREATE_THREAD
-    );
-    if (!permission_error) {
-      throw new Error(PermissionError.NOT_PERMITTED);
     }
 
     // Render a copy of the thread to plaintext for the search indexer
@@ -1224,7 +1214,7 @@ export class ServerThreadsController implements IServerThreadsController {
                 chain: mention[0] || null,
                 address: mention[1] || null,
               },
-              include: [this.models.User, this.models.RoleAssignment],
+              include: [this.models.User],
             });
           })
         );

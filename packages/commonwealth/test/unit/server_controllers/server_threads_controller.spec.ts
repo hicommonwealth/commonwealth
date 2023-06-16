@@ -295,12 +295,8 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({}),
         },
         // for findAllRoles
-        CommunityRole: {
-          findAll: sandbox.stub().resolves([
-            {
-              toJSON: () => ({}),
-            },
-          ]),
+        Address: {
+          findAll: sandbox.stub().resolves([]),
         },
       };
       const tokenBalanceCache = {
@@ -368,7 +364,7 @@ describe('ServerThreadsController', () => {
           }),
         },
         // for findAllRoles
-        CommunityRole: {
+        Address: {
           findAll: async () => [
             {
               toJSON: () => ({}),
@@ -878,6 +874,9 @@ describe('ServerThreadsController', () => {
         Subscription: {
           destroy: async () => ({}),
         },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
       };
       const tokenBalanceCache = {};
       const banCache = {
@@ -984,10 +983,13 @@ describe('ServerThreadsController', () => {
           destroy: async () => ({}),
         },
         CommunityRole: {
-          findAll: async () => [], // no mod/admin roles
+          findAll: async () => [{}], // no mod/admin roles
         },
         Subscription: {
           destroy: async () => ({}),
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
         },
       };
       const tokenBalanceCache = {};
@@ -1039,6 +1041,9 @@ describe('ServerThreadsController', () => {
         },
         CommunityRole: {
           findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
         },
       };
       const tokenBalanceCache = {};
@@ -1123,6 +1128,9 @@ describe('ServerThreadsController', () => {
         CommunityRole: {
           findAll: async () => [], // no mod/admin roles
         },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
       };
       const tokenBalanceCache = {};
       const banCache = {
@@ -1202,6 +1210,9 @@ describe('ServerThreadsController', () => {
         CommunityRole: {
           findAll: async () => [], // no mod/admin roles
         },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
       };
       const tokenBalanceCache = {};
       const banCache = {
@@ -1264,6 +1275,9 @@ describe('ServerThreadsController', () => {
         },
         CommunityRole: {
           findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
         },
       };
       const tokenBalanceCache = {};
@@ -1343,6 +1357,9 @@ describe('ServerThreadsController', () => {
         },
         CommunityRole: {
           findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
         },
       };
       const tokenBalanceCache = {};
@@ -1450,6 +1467,9 @@ describe('ServerThreadsController', () => {
         },
         Subscription: {
           create: async () => ({}),
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
         },
       };
       const tokenBalanceCache = {};
