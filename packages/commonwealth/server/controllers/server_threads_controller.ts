@@ -71,10 +71,10 @@ interface IServerThreadsController {
    * @param chain - Chain of thread
    * @param reaction - Type of reaction
    * @param threadId - ID of the thread
-   * @param canvasAction - Canvas metadata
-   * @param canvasSession - Canvas metadata
-   * @param canvasHash - Canvas metadata
-   * @throws `ThreadNotFound`, `BanError`, `BalanceCheckFailed`
+   * @param canvasAction - Canvas metadata (optional)
+   * @param canvasSession - Canvas metadata (optional)
+   * @param canvasHash - Canvas metadata (optional)
+   * @throws
    * @returns Promise that resolves to [Reaction, NotificationOptions, AnalyticsOptions]
    */
   createThreadReaction(
@@ -134,10 +134,11 @@ interface IServerThreadsController {
    * @param address - Address of the user
    * @param chain - Chain of thread
    * @param threadId - ID of thread
-   * @param title - Title of the thread
-   * @param body - Body text of the thread
-   * @param stage - Stage of thread
-   * @param url - URL of the thread
+   * @param title - Title of the thread (optional)
+   * @param body - Body text of the thread (optional)
+   * @param stage - Stage of thread (optional)
+   * @param url - URL of the thread (optional)
+   * @param attachment - Attachments (optional)
    * @param canvasAction - Canvas metadata (optional)
    * @param canvasSession - Canvas metadata (optional)
    * @param canvasHash - Canvas metadata (optional)
@@ -169,10 +170,11 @@ interface IServerThreadsController {
    * @param body - Body text of the thread
    * @param kind - Kind the thread
    * @param readOnly - Kind the thread
-   * @param topicId - ID of thread topic
-   * @param topicName - Name of thread topic (if topicID not specified)
-   * @param stage - Stage of thread
-   * @param url - URL of the thread
+   * @param topicId - ID of thread topic (optional)
+   * @param topicName - Name of thread topic (if topicID not specified) (optional)
+   * @param stage - Stage of thread (optional)
+   * @param url - URL of the thread (optional)
+   * @param attachments - Attachments (optional)
    * @param canvasAction - Canvas metadata (optional)
    * @param canvasSession - Canvas metadata (optional)
    * @param canvasHash - Canvas metadata (optional)
