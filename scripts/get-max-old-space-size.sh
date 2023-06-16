@@ -8,6 +8,7 @@
   # retrieves a Heroku dyno's total ram
   # https://help.heroku.com/TWBM7DL0/how-do-i-measure-current-memory-use-and-max-available-memory-on-a-dyno-in-a-private-space
   MEMORY_LIMIT=$(echo -n "$(</sys/fs/cgroup/memory/memory.limit_in_bytes)")
+  echo "$MEMORY_LIMIT"
 
   ######## parsing the multiplier - this section will always yield a MULTIPLIER set to 1 or a decimal number ##########
   # if the multiplier is not given set multiplier to 1 (no effect)
@@ -29,6 +30,7 @@
   if [ "$MEMORY_LIMIT" ] && [ "$MEMORY_LIMIT" -gt 400000000 ]; then
     # rounds the MAX_OLD_SPACE_SIZE
     MAX_OLD_SPACE_SIZE=$(awk "BEGIN {print int($MULTIPLIER*$MEMORY_LIMIT*$DEFAULT_PERCENT/100000000); exit}")
+    echo "$MAX_OLD_SPACE_SIZE"
 
     # this if-else section ensures that the money multiplier does not increase memory beyond 95% of what is available
     # or decrease under 400MB
