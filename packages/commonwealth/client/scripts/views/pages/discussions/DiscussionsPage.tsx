@@ -21,8 +21,8 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const totalThreads = app.threads.numTotalThreads;
   const [threads, setThreads] = useState([]);
-  const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const pageNumber = useRef<number>(0);
@@ -90,7 +90,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
    * This function is responsible for sorting threads in state that were earlier
    * sorted by another featured flag
    */
-  const sortByFeaturedFilter = (t: Thread[]) => {
+  const sortByFeaturedFilter = useCallback((t: Thread[]) => {
     if (featuredFilter === ThreadFeaturedFilterTypes.Oldest) {
       return [...t].sort((a, b) =>
         moment(a.createdAt).diff(moment(b.createdAt))
@@ -109,7 +109,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     // Default: Assuming featuredFilter === 'newest'
     return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
-  };
+  }, []);
 
   /**
    * the api will return sorted results and those are stored in state, when user
@@ -120,11 +120,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
    * thread, this thread is still in a lower position in the state object/arrary. This
    * function will sort those correctly.
    */
-  const sortPinned = (t: Thread[]) => {
+  const sortPinned = useCallback((t: Thread[]) => {
     return [...t].sort((a, b) =>
       a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
     );
-  };
+  }, []);
 
   // Event binding for actions that trigger a thread update (e.g. topic or stage change)
   useEffect(() => {
@@ -135,11 +135,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return () => {
       app.threadUpdateEmitter.off('threadUpdated', handleThreadUpdate);
     };
-  }, [threads]);
-
-  useEffect(() => {
-    setTotalThreads(app.threads.numTotalThreads);
-  }, [app.threads.numTotalThreads]);
+  }, [threads, handleThreadUpdate]);
 
   // setup initial threads
   useEffect(() => {
@@ -223,7 +219,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
     return () => clearTimeout(timerId);
-  }, [stageName, topicName, featuredFilter, dateRange]);
+  }, [
+    stageName,
+    topicName,
+    featuredFilter,
+    dateRange,
+    sortPinned,
+    sortByFeaturedFilter,
+  ]);
 
   const loadMore = useCallback(async () => {
     const response = await app.threads.loadNextPage({
@@ -255,7 +258,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
       return sortPinned(sortByFeaturedFilter(finalThreads));
     });
-  }, [stageName, topicName, totalThreads, featuredFilter, dateRange]);
+  }, [
+    stageName,
+    topicName,
+    featuredFilter,
+    dateRange,
+    sortPinned,
+    sortByFeaturedFilter,
+  ]);
 
   return (
     <div className="DiscussionsPage">
