@@ -1,42 +1,23 @@
-import React, { useState, useEffect } from 'react';
-
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/overview/index.scss';
+import React, { useEffect } from 'react';
+import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
-
-import 'pages/overview/index.scss';
-
-import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
-import { useFetchTopicsQuery } from 'state/api/topics';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
-
-  const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
-    isWindowExtraSmall(window.innerWidth)
-  );
-
-  useEffect(() => {
-    const onResize = () => {
-      setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-  }, []);
+  const { isWindowExtraSmall } = useBrowserWindow({});
 
   useEffect(() => {
     app.threads.isFetched.on('redraw', forceRerender);
@@ -91,68 +72,66 @@ const OverviewPage = () => {
   return !topicSummaryRows.length && !app.threads.initialized ? (
     <PageLoading />
   ) : (
-    <Sublayout>
-      <div className="OverviewPage">
-        <div className="header-row">
-          <div className="header-row-left">
-            <CWText type="h3" fontWeight="semiBold">
-              Overview
-            </CWText>
-            <CWButton
-              className="latest-button"
-              buttonType="mini-black"
-              label="Latest Threads"
-              iconLeft="home"
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          </div>
-          {windowIsExtraSmall ? (
-            <CWIconButton
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          ) : (
-            <CWButton
-              buttonType="mini-black"
-              label="Create Thread"
-              iconLeft="plus"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          )}
+    <div className="OverviewPage">
+      <div className="header-row">
+        <div className="header-row-left">
+          <CWText type="h3" fontWeight="semiBold">
+            Overview
+          </CWText>
+          <CWButton
+            className="latest-button"
+            buttonType="mini-black"
+            label="Latest Threads"
+            iconLeft="home"
+            onClick={() => {
+              navigate('/discussions');
+            }}
+          />
         </div>
-        <div className="column-headers-row">
+        {isWindowExtraSmall ? (
+          <CWIconButton
+            iconName="plusCircle"
+            iconButtonTheme="black"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!app.user.activeAccount}
+          />
+        ) : (
+          <CWButton
+            buttonType="mini-black"
+            label="Create Thread"
+            iconLeft="plus"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!app.user.activeAccount}
+          />
+        )}
+      </div>
+      <div className="column-headers-row">
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="threads-header-row-text"
+        >
+          Topic
+        </CWText>
+        <div className="threads-header-container">
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="threads-header-row-text"
           >
-            Topic
+            Recent threads
           </CWText>
-          <div className="threads-header-container">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="threads-header-row-text"
-            >
-              Recent threads
-            </CWText>
-          </div>
         </div>
-        <CWDivider />
-        {topicSummaryRows.map((row, i) => (
-          <TopicSummaryRow {...row} key={i} />
-        ))}
       </div>
-    </Sublayout>
+      <CWDivider />
+      {topicSummaryRows.map((row, i) => (
+        <TopicSummaryRow {...row} key={i} />
+      ))}
+    </div>
   );
 };
 

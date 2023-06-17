@@ -1,32 +1,28 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
-import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
+import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/new_snapshot_proposal.scss';
-
+import { DeltaStatic } from 'quill';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import app from 'state';
+import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-
-import Sublayout from '../../Sublayout';
-import { PageLoading } from '../loading';
-import type { ThreadForm } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useLocation } from 'react-router';
 import {
   createDeltaFromText,
   ReactQuillEditor,
 } from '../../components/react_quill_editor';
-import { DeltaStatic } from 'quill';
+import { PageLoading } from '../loading';
 import { createNewProposal } from './helpers';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
+import type { ThreadForm } from './types';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -171,89 +167,87 @@ export const NewSnapshotProposalPageComponent = ({
       isMember);
 
   return (
-    <Sublayout>
-      <div className="NewSnapshotProposalPage">
-        <CWText type="h3" fontWeight="medium">
-          New Snapshot Proposal
+    <div className="NewSnapshotProposalPage">
+      <CWText type="h3" fontWeight="medium">
+        New Snapshot Proposal
+      </CWText>
+      {space.filters?.onlyMembers && !isMember && (
+        <CWText>
+          You need to be a member of the space in order to submit a proposal.
         </CWText>
-        {space.filters?.onlyMembers && !isMember && (
-          <CWText>
-            You need to be a member of the space in order to submit a proposal.
-          </CWText>
-        )}
-        {showScoreWarning ? (
-          <CWText>
-            You need to have a minimum of {space.filters.minScore}{' '}
-            {space.symbol} in order to submit a proposal.
-          </CWText>
-        ) : (
-          <CWSpinner />
-        )}
-        <CWTextInput
-          label="Question/Proposal"
-          placeholder="Should 0xMaki be our new Mayor?"
-          onInput={(e) => {
-            setForm({
-              ...form,
-              name: e.target.value,
-            });
-            localStorage.setItem(
-              `${app.activeChainId()}-new-snapshot-proposal-name`,
-              form.name
-            );
-          }}
-          defaultValue={form.name}
-        />
-        {form.choices.map((_, idx) => {
-          return (
-            <CWTextInput
-              key={`choice-${idx}`}
-              label={`Choice ${idx + 1}`}
-              placeholder={
-                idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
-              }
-              onInput={(e) => {
-                setForm({
-                  ...form,
-                  choices: form.choices.map((choice, i) =>
-                    i === idx ? e.target.value : choice
-                  ),
-                });
-              }}
-              iconRight={
-                idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined
-              }
-              iconRightonClick={() => {
-                setForm({
-                  ...form,
-                  choices: form.choices.slice(0, -1),
-                });
-              }}
-            />
+      )}
+      {showScoreWarning ? (
+        <CWText>
+          You need to have a minimum of {space.filters.minScore} {space.symbol}{' '}
+          in order to submit a proposal.
+        </CWText>
+      ) : (
+        <CWSpinner />
+      )}
+      <CWTextInput
+        label="Question/Proposal"
+        placeholder="Should 0xMaki be our new Mayor?"
+        onInput={(e) => {
+          setForm({
+            ...form,
+            name: e.target.value,
+          });
+          localStorage.setItem(
+            `${app.activeChainId()}-new-snapshot-proposal-name`,
+            form.name
           );
-        })}
-        <CWButton
-          iconLeft="plus"
-          label="Add voting choice"
-          onClick={() => {
-            setForm({
-              ...form,
-              choices: form.choices.concat(`Option ${form.choices.length + 1}`),
-            });
-          }}
-        />
-        <ReactQuillEditor
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-          placeholder={'What is your proposal?'}
-        />
-        <CWButton
-          label="Publish"
-          disabled={!author || isSaving || !isValid}
-          onClick={handlePublish}
-        />
-      </div>
-    </Sublayout>
+        }}
+        defaultValue={form.name}
+      />
+      {form.choices.map((_, idx) => {
+        return (
+          <CWTextInput
+            key={`choice-${idx}`}
+            label={`Choice ${idx + 1}`}
+            placeholder={
+              idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
+            }
+            onInput={(e) => {
+              setForm({
+                ...form,
+                choices: form.choices.map((choice, i) =>
+                  i === idx ? e.target.value : choice
+                ),
+              });
+            }}
+            iconRight={
+              idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined
+            }
+            iconRightonClick={() => {
+              setForm({
+                ...form,
+                choices: form.choices.slice(0, -1),
+              });
+            }}
+          />
+        );
+      })}
+      <CWButton
+        iconLeft="plus"
+        label="Add voting choice"
+        onClick={() => {
+          setForm({
+            ...form,
+            choices: form.choices.concat(`Option ${form.choices.length + 1}`),
+          });
+        }}
+      />
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+        placeholder={'What is your proposal?'}
+      />
+      <CWButton
+        label="Publish"
+        disabled={!author || isSaving || !isValid}
+        onClick={handlePublish}
+      />
+    </div>
   );
 };
 
