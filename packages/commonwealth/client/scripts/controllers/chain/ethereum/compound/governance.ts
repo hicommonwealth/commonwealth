@@ -1,6 +1,6 @@
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import BN from 'bn.js';
-import { CompoundEvents } from 'chain-events/src';
+import { CompoundEvents, EvmEvents } from 'chain-events/src';
 import { CompoundTypes } from 'chain-events/src/types';
 import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
@@ -201,10 +201,10 @@ export default class CompoundGovernance extends ProposalModule<
     );
 
     // kick off listener
-    const subscriber = new CompoundEvents.Subscriber(
+    const subscriber = new EvmEvents.Subscriber(
       this._api.Contract.provider,
       this.app.chain.id,
-      this._api.Contract.address
+      [this._api.Contract.address]
     );
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
     await this.app.chainEntities.subscribeEntities(

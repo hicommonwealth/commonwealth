@@ -1,5 +1,5 @@
 import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { AaveEvents } from 'chain-events/src';
+import { EvmEvents, AaveEvents } from 'chain-events/src';
 import { AaveTypes } from 'chain-events/src/types';
 import type { Executor } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
@@ -145,7 +145,7 @@ export default class AaveGovernance extends ProposalModule<
     const chainEventsContracts: AaveTypes.Api = {
       governance: this._api.Governance as any,
     };
-    const subscriber = new AaveEvents.Subscriber(
+    const subscriber = new EvmEvents.Subscriber(
       this._api.Governance.provider,
       this.app.chain.id,
       [this._api.Governance.address]
