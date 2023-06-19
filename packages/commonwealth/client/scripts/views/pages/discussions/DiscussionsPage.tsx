@@ -3,7 +3,7 @@ import Thread from 'models/Thread';
 import moment from 'moment';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { slugify } from 'utils';
@@ -26,7 +26,7 @@ type DiscussionsPageProps = {
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const navigate = useCommonNavigate();
   const [threads, setThreads] = useState<Thread[]>([]);
-  const [totalThreads, setTotalThreads] = useState(0);
+  const totalThreads = app.threads.numTotalThreads;
   const [initializing, setInitializing] = useState(true);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
@@ -50,7 +50,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
    * This function is responsible for sorting threads in state that were earlier
    * sorted by another featured flag
    */
-  const sortByFeaturedFilter = (t: Thread[]) => {
+  const sortByFeaturedFilter = useCallback((t: Thread[]) => {
     if (featuredFilter === ThreadFeaturedFilterTypes.Oldest) {
       return [...t].sort((a, b) =>
         moment(a.createdAt).diff(moment(b.createdAt))
@@ -69,7 +69,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     // Default: Assuming featuredFilter === 'newest'
     return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
-  };
+  }, []);
 
   /**
    * the api will return sorted results and those are stored in state, when user
@@ -80,15 +80,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
    * thread, this thread is still in a lower position in the state object/arrary. This
    * function will sort those correctly.
    */
-  const sortPinned = (t: Thread[]) => {
+  const sortPinned = useCallback((t: Thread[]) => {
     return [...t].sort((a, b) =>
       a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
     );
-  };
-
-  useEffect(() => {
-    setTotalThreads(app.threads.numTotalThreads);
-  }, [app.threads.numTotalThreads]);
+  }, []);
 
   // setup initial threads
   useNecessaryEffect(() => {
@@ -166,7 +162,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         setThreads(sortPinned(sortByFeaturedFilter(t.threads)));
         setInitializing(false);
       });
-  }, [stageName, topicName, featuredFilter, dateRange]);
+  }, [
+    stageName,
+    topicName,
+    featuredFilter,
+    dateRange,
+    sortPinned,
+    sortByFeaturedFilter
+  ]);
 
   const loadMore = useCallback(async () => {
     const response = await app.threads.loadNextPage({
@@ -197,7 +200,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
       return sortPinned(sortByFeaturedFilter(finalThreads));
     });
-  }, [stageName, topicName, featuredFilter, dateRange]);
+  }, [
+    stageName,
+    topicName,
+    featuredFilter,
+    dateRange,
+    sortPinned,
+    sortByFeaturedFilter,
+  ]);
 
   return (
     <div className="DiscussionsPage">
