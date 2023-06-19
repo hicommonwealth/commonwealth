@@ -65,8 +65,8 @@ const validateTopicThreshold = async (
       }
     }
   } catch (err) {
-    log.warn(`Could not validate topic threshold for ${topicId}:`, err);
-    return false;
+    // routes will throw thus logging the error and reporting it on Rollbar
+    throw err;
   }
 };
 

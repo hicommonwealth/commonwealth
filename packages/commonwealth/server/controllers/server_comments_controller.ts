@@ -29,7 +29,7 @@ const Errors = {
   CommentNotFound: 'Comment not found',
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
-  BalanceCheckFailed: 'Could not verify user token balance',
+  InsufficientTokenBalance: 'Insufficient token balance',
   ParseMentionsFailed: 'Failed to parse mentions',
   NotOwned: 'Not owned by this user',
 };
@@ -212,7 +212,7 @@ export class ServerCommentsController implements IServerCommentsController {
           address.address
         );
         if (!canReact) {
-          throw new Error(Errors.BalanceCheckFailed);
+          throw new Error(Errors.InsufficientTokenBalance);
         }
       }
     }
@@ -227,14 +227,12 @@ export class ServerCommentsController implements IServerCommentsController {
       canvas_session: canvasSession,
       canvas_hash: canvasHash,
     };
-    const [
-      foundOrCreatedReaction,
-      created,
-    ] = await this.models.Reaction.findOrCreate({
-      where: reactionData,
-      defaults: reactionData,
-      include: [this.models.Address],
-    });
+    const [foundOrCreatedReaction, created] =
+      await this.models.Reaction.findOrCreate({
+        where: reactionData,
+        defaults: reactionData,
+        include: [this.models.Address],
+      });
 
     const finalReaction = created
       ? await this.models.Reaction.findOne({

@@ -26,8 +26,7 @@ export const Errors = {
   NoBodyOrAttachments: 'Discussion posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only discussion and link posts supported',
-  InsufficientTokenBalance:
-    "Users need to hold some of the community's tokens to post",
+  InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
@@ -325,14 +324,18 @@ const createThread = async (
         ['admin']
       );
       if (!req.user.isAdmin && isAdmin.length === 0) {
-        const canReact = await validateTopicThreshold(
-          tokenBalanceCache,
-          models,
-          topic_id,
-          req.body.address
-        );
-        if (!canReact) {
-          return next(new AppError(Errors.BalanceCheckFailed));
+        try {
+          const canReact = await validateTopicThreshold(
+            tokenBalanceCache,
+            models,
+            topic_id,
+            req.body.address
+          );
+          if (!canReact) {
+            return next(new AppError(Errors.InsufficientTokenBalance));
+          }
+        } catch (e) {
+          return next(new ServerError(Errors.BalanceCheckFailed, e));
         }
       }
     }

@@ -25,8 +25,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 const Errors = {
   ThreadNotFound: 'Thread not found',
   BanError: 'Ban error',
-  BalanceCheckFailed: 'Could not verify user token balance',
-
+  InsufficientTokenBalance: 'Insufficient token balance',
   InvalidParent: 'Invalid parent',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
@@ -154,7 +153,7 @@ export class ServerThreadsController implements IServerThreadsController {
           address.address
         );
         if (!canReact) {
-          throw new Error(Errors.BalanceCheckFailed);
+          throw new Error(Errors.InsufficientTokenBalance);
         }
       }
     }
@@ -297,7 +296,7 @@ export class ServerThreadsController implements IServerThreadsController {
           address.address
         );
         if (!canReact) {
-          throw new Error(Errors.BalanceCheckFailed);
+          throw new Error(Errors.InsufficientTokenBalance);
         }
       }
     }
