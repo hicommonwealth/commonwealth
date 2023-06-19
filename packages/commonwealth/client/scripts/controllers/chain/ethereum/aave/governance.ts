@@ -97,7 +97,10 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // send transaction
-    const contract = await attachSigner(this.app.user.activeAccount, this._api.Governance);
+    const contract = await attachSigner(
+      this.app.user.activeAccount,
+      this._api.Governance
+    );
     const tx = await contract.create(
       executorContract.address,
       targets,
@@ -143,14 +146,16 @@ export default class AaveGovernance extends ProposalModule<
       governance: this._api.Governance as any,
     };
     const subscriber = new AaveEvents.Subscriber(
-      chainEventsContracts,
-      this.app.chain.id
+      this._api.Governance.provider,
+      this.app.chain.id,
+      [this._api.Governance.address]
     );
-    const processor = new AaveEvents.Processor(chainEventsContracts);
+    const processor = new AaveEvents.Processor();
     await this.app.chainEntities.subscribeEntities(
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta),
-      subscriber,
+      // TODO: @Timothee - Remove once listeners are merged
+      <any>subscriber,
       processor
     );
 

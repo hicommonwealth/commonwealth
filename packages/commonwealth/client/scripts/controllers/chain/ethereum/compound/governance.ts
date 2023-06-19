@@ -80,7 +80,10 @@ export default class CompoundGovernance extends ProposalModule<
 
   public async propose(args: CompoundProposalArgs): Promise<string> {
     const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.user.activeAccount, this._api.Contract);
+    const contract = await attachSigner(
+      this.app.user.activeAccount,
+      this._api.Contract
+    );
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !calldatas || !description)
@@ -199,14 +202,16 @@ export default class CompoundGovernance extends ProposalModule<
 
     // kick off listener
     const subscriber = new CompoundEvents.Subscriber(
-      this._api.Contract as any,
-      this.app.chain.id
+      this._api.Contract.provider,
+      this.app.chain.id,
+      this._api.Contract.address
     );
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
     await this.app.chainEntities.subscribeEntities(
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta),
-      subscriber,
+      // TODO: @Timothee - Remove once listeners are merged
+      <any>subscriber,
       processor
     );
 
