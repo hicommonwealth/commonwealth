@@ -86,7 +86,8 @@ const bulkThreads = async (
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        collaborators
+        collaborators, 
+        count(*) OVER() AS total_results
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
@@ -166,6 +167,9 @@ const bulkThreads = async (
     return next(new ServerError('Could not fetch threads'));
   }
 
+  const totalResults = parseInt(responseThreads?.[0]?.total_results || '0')
+  const totalPages = Math.ceil((totalResults / bind.limit) || 0)
+
   // transform thread response
   let threads = responseThreads.map(async (t) => {
     const collaborators = JSON.parse(t.collaborators[0]).address?.length
@@ -240,10 +244,14 @@ const bulkThreads = async (
   return res.json({
     status: 'Success',
     result: {
-      numVotingThreads,
-      threads,
+      // pagination params
+      totalResults,
+      totalPages,
       limit: bind.limit,
       page: bind.page,
+      // data params
+      threads,
+      numVotingThreads,
     },
   });
 };
