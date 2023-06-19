@@ -13,6 +13,7 @@ $size: 48px;
     display: flex;
     flex-direction: column;
     width: 100%;
+    padding: 40px;
 
     @include medium {
       padding: 40px;
