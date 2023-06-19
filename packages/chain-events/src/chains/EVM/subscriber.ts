@@ -1,14 +1,21 @@
-/**
- * Fetches events from Aave contract in real time.
- */
-import type { JsonRpcProvider, Log, Provider } from '@ethersproject/providers';
+import type { JsonRpcProvider, Provider } from '@ethersproject/providers';
 
-import { EvmEventSourceMapType, SupportedNetwork } from '../../interfaces';
+import {
+  EvmEventSourceMapType,
+  SupportedNetwork,
+} from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import type { RawEvent } from './types';
 import Timeout = NodeJS.Timeout;
 import { getRawEvents } from 'chain-events/src/eth';
+
+export interface RawEvent {
+  address: string;
+  args: any;
+  name: string;
+  blockNumber: number;
+  data?: any;
+}
 
 export class Subscriber {
   private readonly _name: string;

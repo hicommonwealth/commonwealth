@@ -17,7 +17,7 @@ import type {
 import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-import { Subscriber } from './subscriber';
+import { Subscriber } from '../EVM/subscriber';
 import { ethers } from 'ethers';
 
 export class Listener extends BaseListener<
@@ -73,7 +73,7 @@ export class Listener extends BaseListener<
       this._subscriber = await new Subscriber(
         this._api.provider,
         this._chain,
-        this._api.address,
+        [this._api.address],
         this._verbose
       );
     } catch (error) {

@@ -15,7 +15,6 @@ import {
   GovernancePowerDelegationERC20__factory as GovernancePowerDelegationERC20Factory,
 } from '../../contractTypes';
 
-import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import type { IEventData, RawEvent, Api } from './types';

@@ -2,8 +2,8 @@ import { EventEmitter } from 'events';
 
 import chai from 'chai';
 
-import { Subscriber } from '../../../src/chains/compound/subscriber';
-import type { Api, RawEvent } from '../../../src/chains/compound/types';
+import { Subscriber } from '../../../src/chains/EVM/subscriber';
+import type { RawEvent } from '../../../src/chains/compound/types';
 import { ethers } from 'ethers';
 
 const { assert } = chai;
@@ -15,7 +15,7 @@ const constructEvent = (data): RawEvent => {
 };
 
 describe('Compound Event Subscriber Tests', () => {
-  const randomAddress = '0x1234';
+  const randomAddress = ['0x1234'];
   const compoundApi = {
     event: new EventEmitter(),
     provider: new ethers.providers.JsonRpcProvider('http://127.0.0.1:8545'),

@@ -15,7 +15,7 @@ import type {
   RawEvent,
 } from './types';
 import { createApi } from './subscribeFunc';
-import { Subscriber } from './subscriber';
+import { Subscriber } from '../EVM/subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
 import { ethers } from 'ethers';

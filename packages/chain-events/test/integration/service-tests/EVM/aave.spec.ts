@@ -24,11 +24,8 @@ import { createChainEventsApp } from '../../../../services/app/Server';
 import { Api, EventKind } from '../../../../src/chains/aave/types';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 import { Listener } from '../../../../src';
-import {
-  Processor,
-  StorageFetcher,
-  Subscriber,
-} from '../../../../src/chains/aave';
+import { Processor, StorageFetcher } from '../../../../src/chains/aave';
+import { Subscriber } from '../../../../src/chains/EVM/subscriber';
 
 const { expect } = chai;
 chai.use(chaiHttp);

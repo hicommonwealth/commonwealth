@@ -3,14 +3,10 @@ import * as events from 'events';
 import * as chai from 'chai';
 import dotenv from 'dotenv';
 
-import {
-  Processor,
-  StorageFetcher,
-  Subscriber,
-  Listener,
-} from '../../../src/chains/aave';
+import { Processor, StorageFetcher, Listener } from '../../../src/chains/aave';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
+import { Subscriber } from '../../../src/chains/EVM/subscriber';
 
 dotenv.config();
 

@@ -2,8 +2,8 @@ import { EventEmitter } from 'events';
 
 import chai from 'chai';
 
-import { Subscriber } from '../../../src/chains/aave/subscriber';
-import type { Api, RawEvent } from '../../../src/chains/aave/types';
+import { Subscriber } from '../../../src/chains/EVM/subscriber';
+import type { RawEvent } from '../../../src/chains/aave/types';
 import { ethers } from 'ethers';
 
 const { assert } = chai;

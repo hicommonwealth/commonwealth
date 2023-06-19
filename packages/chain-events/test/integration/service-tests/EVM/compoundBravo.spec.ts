@@ -21,13 +21,10 @@ import {
 } from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
 import { Api, EventKind } from '../../../../src/chains/compound/types';
-import {
-  Processor,
-  StorageFetcher,
-  Subscriber,
-} from '../../../../src/chains/compound';
+import { Processor, StorageFetcher } from '../../../../src/chains/compound';
 import { Listener } from '../../../../src';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
+import { Subscriber } from '../../../../src/chains/EVM/subscriber';
 
 const { expect } = chai;
 chai.use(chaiHttp);

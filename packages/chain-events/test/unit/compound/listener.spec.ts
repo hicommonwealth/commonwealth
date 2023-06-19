@@ -6,11 +6,11 @@ import dotenv from 'dotenv';
 import {
   Processor,
   StorageFetcher,
-  Subscriber,
   Listener,
 } from '../../../src/chains/compound';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
+import { Subscriber } from '../../../src/chains/EVM/subscriber';
 
 dotenv.config();
 
