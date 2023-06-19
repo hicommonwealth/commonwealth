@@ -138,13 +138,16 @@ export async function createListener(
       options.discoverReconnectRange
     );
   } else if (network === SupportedNetwork.Compound) {
-    listener = new CompoundListener(
-      chain,
-      options.address,
-      options.url,
-      !!options.skipCatchup,
-      !!options.verbose,
-      options.discoverReconnectRange
+    // TODO: @Timothee - Remove any type once listeners are combined
+    listener = <any>(
+      new CompoundListener(
+        chain,
+        options.address,
+        options.url,
+        !!options.skipCatchup,
+        !!options.verbose,
+        options.discoverReconnectRange
+      )
     );
   } else if (network === SupportedNetwork.ERC20) {
     listener = new Erc20Listener(
@@ -164,13 +167,15 @@ export async function createListener(
       !!options.verbose
     );
   } else if (network === SupportedNetwork.Aave) {
-    listener = new AaveListener(
-      chain,
-      options.address,
-      options.url,
-      !!options.skipCatchup,
-      !!options.verbose,
-      options.discoverReconnectRange
+    listener = <any>(
+      new AaveListener(
+        chain,
+        options.address,
+        options.url,
+        !!options.skipCatchup,
+        !!options.verbose,
+        options.discoverReconnectRange
+      )
     );
   } else if (network === SupportedNetwork.Cosmos) {
     listener = new CosmosListener(

@@ -18,7 +18,7 @@ const constructEvent = (data): RawEvent => {
 
 describe('Aave Event Processor Tests', () => {
   it('should process a raw event into a CWEvent', async () => {
-    const processor = new Processor({} as unknown as Api);
+    const processor = new Processor();
     const kind = EventKind.ProposalQueued;
     const id = 5;
     const executionTime = 10;
@@ -43,7 +43,7 @@ describe('Aave Event Processor Tests', () => {
   });
 
   it('should gracefully fail to process an event with invalid type', async () => {
-    const processor = new Processor({} as Api);
+    const processor = new Processor();
     const event = {
       event: 'NothingHappened',
       blockNumber,

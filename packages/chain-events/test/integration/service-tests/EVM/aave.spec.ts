@@ -72,7 +72,8 @@ describe('Integration tests for Aave', () => {
         rmq,
         chain
       );
-      listener = listeners[chain_id] as Listener<
+      // TODO: @Timothee - remove unknown conversion once Listeners are combined
+      listener = listeners[chain_id] as unknown as Listener<
         Api,
         StorageFetcher,
         Processor,

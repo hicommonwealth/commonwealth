@@ -42,7 +42,7 @@ describe('Aave Event Enricher Filter Tests', () => {
       strategy: 'strategy',
       ipfsHash,
     });
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: ['sender'],
@@ -70,7 +70,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     const event = constructEvent({
       id: 1,
     });
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
@@ -88,7 +88,7 @@ describe('Aave Event Enricher Filter Tests', () => {
     const event = constructEvent({
       id: 1,
     });
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
@@ -108,7 +108,7 @@ describe('Aave Event Enricher Filter Tests', () => {
       id: 1,
       executionTime,
     });
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
@@ -134,7 +134,7 @@ describe('Aave Event Enricher Filter Tests', () => {
       support,
       votingPower,
     });
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [voter],
@@ -164,7 +164,7 @@ describe('Aave Event Enricher Filter Tests', () => {
       },
       tokenAddress
     );
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [delegator],
@@ -194,7 +194,7 @@ describe('Aave Event Enricher Filter Tests', () => {
       },
       tokenAddress
     );
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [who],
@@ -224,7 +224,7 @@ describe('Aave Event Enricher Filter Tests', () => {
       },
       tokenAddress
     );
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [from],
@@ -254,7 +254,7 @@ describe('Aave Event Enricher Filter Tests', () => {
       },
       tokenAddress
     );
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [owner],

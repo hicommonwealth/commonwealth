@@ -19,7 +19,7 @@ const constructEvent = (data): RawEvent => {
 
 describe('Compound Event Processor Tests', () => {
   it('should process a raw event into a CWEvent', async () => {
-    const processor = new Processor({} as unknown as Api);
+    const processor = new Processor();
     const kind = EventKind.ProposalQueued;
     const id = BigNumber.from(5);
     const eta = 10;
@@ -44,7 +44,7 @@ describe('Compound Event Processor Tests', () => {
   });
 
   it('should gracefully fail to process an event with invalid type', async () => {
-    const processor = new Processor({} as Api);
+    const processor = new Processor();
     const event = {
       event: 'NothingHappened',
       blockNumber,

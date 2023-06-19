@@ -71,7 +71,7 @@ describe('Integration tests for Compound Bravo', () => {
         rmq,
         chain
       );
-      listener = listeners[chain_id] as Listener<
+      listener = listeners[chain_id] as unknown as Listener<
         Api,
         StorageFetcher,
         Processor,

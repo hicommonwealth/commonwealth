@@ -163,7 +163,7 @@ describe('Compound Event Enricher Filter Tests', () => {
       ],
       rawData
     );
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [address],
@@ -187,7 +187,7 @@ describe('Compound Event Enricher Filter Tests', () => {
   it('should enrich ProposalCanceled event', async () => {
     const kind = EventKind.ProposalCanceled;
     const event = constructEvent([BigNumber.from(1)]);
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
@@ -203,7 +203,7 @@ describe('Compound Event Enricher Filter Tests', () => {
   it('should enrich ProposalExecuted event', async () => {
     const kind = EventKind.ProposalExecuted;
     const event = constructEvent([BigNumber.from(1)]);
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
@@ -220,7 +220,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     const kind = EventKind.ProposalQueued;
     const eta = 123;
     const event = constructEvent([BigNumber.from(1), eta]);
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [],
@@ -241,7 +241,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     const support = false;
     const votes = '525600';
     const event = constructEvent([voter, id, support, votes]);
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [voter],
@@ -265,7 +265,7 @@ describe('Compound Event Enricher Filter Tests', () => {
     const votes = '525600';
     const reason = 'for what?';
     const event = constructEvent([voter, id, support, votes, reason]);
-    const result = await Enrich(api, blockNumber, kind, event);
+    const result = await Enrich(blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [voter],

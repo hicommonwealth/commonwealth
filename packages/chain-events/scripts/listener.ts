@@ -165,13 +165,13 @@ if (network === SupportedNetwork.Substrate) {
       console.log(err);
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
-    CompoundEvents.subscribeEvents({
-      chain,
-      api,
-      handlers: [new StandaloneEventHandler()],
-      skipCatchup,
-      verbose: true,
-    });
+    // CompoundEvents.subscribeEvents({
+    //   chain,
+    //   api,
+    //   handlers: [new StandaloneEventHandler()],
+    //   skipCatchup,
+    //   verbose: true,
+    // });
   });
 } else if (network === SupportedNetwork.Aave) {
   AaveEvents.createApi(url, contract).then(async (api) => {
@@ -187,13 +187,13 @@ if (network === SupportedNetwork.Substrate) {
       console.log(err);
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
-    AaveEvents.subscribeEvents({
-      chain,
-      api,
-      handlers: [new StandaloneEventHandler()],
-      skipCatchup,
-      verbose: true,
-    });
+    // AaveEvents.subscribeEvents({
+    //   chain,
+    //   api,
+    //   handlers: [new StandaloneEventHandler()],
+    //   skipCatchup,
+    //   verbose: true,
+    // });
   });
 } else if (network === SupportedNetwork.ERC20) {
   getTokenList(tokenListUrls[0]).then(async (tokens) => {
