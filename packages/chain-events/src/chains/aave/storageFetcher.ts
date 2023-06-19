@@ -95,7 +95,6 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       proposalCreatedEvents.map((evt) => {
         try {
           return Enrich(
-            this._api,
             evt.blockNumber,
             EventKind.ProposalCreated,
             evt
@@ -117,12 +116,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const voteCwEvents = await Promise.all(
       voteEmittedEvents.map((evt) => {
         try {
-          return Enrich(
-            this._api,
-            evt.blockNumber,
-            EventKind.VoteEmitted,
-            evt
-          ) as Promise<CWEvent<IVoteEmitted>>;
+          return Enrich(evt.blockNumber, EventKind.VoteEmitted, evt) as Promise<
+            CWEvent<IVoteEmitted>
+          >;
         } catch (e) {
           this.log.error(
             `Failed to enrich event. Block number: ${evt.blockNumber}, Name/Kind: ${EventKind.VoteEmitted}, Error Message: ${e.message}`
@@ -141,7 +137,6 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       proposalQueuedEvents.map((evt) => {
         try {
           return Enrich(
-            this._api,
             evt.blockNumber,
             EventKind.ProposalQueued,
             evt
@@ -164,7 +159,6 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       proposalCanceledEvents.map((evt) => {
         try {
           return Enrich(
-            this._api,
             evt.blockNumber,
             EventKind.ProposalCanceled,
             evt
@@ -187,7 +181,6 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       proposalExecutedEvents.map((evt) => {
         try {
           return Enrich(
-            this._api,
             evt.blockNumber,
             EventKind.ProposalExecuted,
             evt

@@ -82,12 +82,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const createdCwEvents = await Promise.all(
       proposalCreatedEvents.map(
         (evt) =>
-          Enrich(
-            this._api,
-            evt.blockNumber,
-            EventKind.ProposalCreated,
-            evt
-          ) as Promise<CWEvent<IProposalCreated>>
+          Enrich(evt.blockNumber, EventKind.ProposalCreated, evt) as Promise<
+            CWEvent<IProposalCreated>
+          >
       )
     );
     const voteCastEvents = await this._api.queryFilter(
@@ -100,12 +97,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const voteCwEvents = await Promise.all(
       voteCastEvents.map(
         (evt) =>
-          Enrich(
-            this._api,
-            evt.blockNumber,
-            EventKind.VoteCast,
-            evt
-          ) as Promise<CWEvent<IVoteCast>>
+          Enrich(evt.blockNumber, EventKind.VoteCast, evt) as Promise<
+            CWEvent<IVoteCast>
+          >
       )
     );
 
@@ -119,12 +113,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       queuedCwEvents = await Promise.all(
         proposalQueuedEvents.map(
           (evt) =>
-            Enrich(
-              this._api,
-              evt.blockNumber,
-              EventKind.ProposalQueued,
-              evt
-            ) as Promise<CWEvent<IProposalQueued>>
+            Enrich(evt.blockNumber, EventKind.ProposalQueued, evt) as Promise<
+              CWEvent<IProposalQueued>
+            >
         )
       );
     } catch (e) {
@@ -138,12 +129,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const cancelledCwEvents = await Promise.all(
       proposalCanceledEvents.map(
         (evt) =>
-          Enrich(
-            this._api,
-            evt.blockNumber,
-            EventKind.ProposalCanceled,
-            evt
-          ) as Promise<CWEvent<IProposalCanceled>>
+          Enrich(evt.blockNumber, EventKind.ProposalCanceled, evt) as Promise<
+            CWEvent<IProposalCanceled>
+          >
       )
     );
     const proposalExecutedEvents = await this._api.queryFilter(
@@ -154,12 +142,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const executedCwEvents = await Promise.all(
       proposalExecutedEvents.map(
         (evt) =>
-          Enrich(
-            this._api,
-            evt.blockNumber,
-            EventKind.ProposalExecuted,
-            evt
-          ) as Promise<CWEvent<IProposalExecuted>>
+          Enrich(evt.blockNumber, EventKind.ProposalExecuted, evt) as Promise<
+            CWEvent<IProposalExecuted>
+          >
       )
     );
     return [
