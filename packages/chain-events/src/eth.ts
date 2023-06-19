@@ -1,6 +1,9 @@
 import { ethers, providers } from 'ethers';
 
 import { addPrefix, factory } from './logging';
+import { JsonRpcProvider, Log, Provider } from '@ethersproject/providers';
+import { Interface } from '@ethersproject/abi/src.ts/interface';
+import { EvmEventSourceMapType } from 'chain-events/src/interfaces';
 
 export async function createProvider(
   ethNetworkUrl: string,
@@ -41,13 +44,42 @@ export async function createProvider(
   }
 }
 
-export async function getParser(
-  contractAddress: string,
-  abi: any,
-  retryTimeMs
+export async function getRawEvents(
+  provider: JsonRpcProvider,
+  eventSources: EvmEventSourceMapType,
+  blockRange: { start: number | string; end: number | string }
 ) {
-  switch (contractAddress) {
-    case '':
-      return new ethers.utils.Interface(abi);
+  const logs: Log[] = await provider.send('eth_getLogs', [
+    {
+      fromBlock: ethers.BigNumber.from(blockRange.start).toHexString(),
+      toBlock: ethers.BigNumber.from(blockRange.end).toHexString(),
+      address: Object.keys(eventSources),
+    },
+  ]);
+
+  const rawEvents = [];
+
+  for (const log of logs) {
+    // skip logs for events that we don't care about
+    if (
+      !eventSources[log.address.toLowerCase()].eventSignatures.includes(
+        log.topics[0]
+      )
+    )
+      continue;
+
+    // parse the log
+    const parsedRawEvent =
+      eventSources[log.address.toLowerCase()].api.parseLog(log);
+
+    rawEvents.push({
+      address: log.address.toLowerCase(),
+      args: parsedRawEvent.args as any,
+      name: parsedRawEvent.name,
+      blockNumber: parseInt(log.blockNumber.toString(), 16),
+      data: log.data,
+    });
   }
+
+  return rawEvents;
 }
