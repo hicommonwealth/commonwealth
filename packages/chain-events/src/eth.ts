@@ -50,6 +50,7 @@ export async function getRawEvents(
   blockRange: { start: number | string; end: number | string },
   verbose = false
 ) {
+  // TODO: handle unlimited size range .e.g query the entire chain
   const logs: Log[] = await provider.send('eth_getLogs', [
     {
       fromBlock: ethers.BigNumber.from(blockRange.start).toHexString(),
@@ -96,4 +97,18 @@ export async function getRawEvents(
   }
 
   return rawEvents;
+}
+
+/**
+ * This function replaces all instances of type_parser for EVM chains since the original
+ * type_parser functions simply converted from Pascal case to Kebab case e.g.
+ * ProposalCreated -> proposal-created. This function is used to format the event names (kinds).
+ * @param str
+ */
+export function pascalToKebabCase(str) {
+  if (!str) return null;
+
+  return str
+    .replace(/\.?([A-Z]+)/g, (x, y) => '-' + y.toLowerCase())
+    .replace(/^-/, '');
 }
