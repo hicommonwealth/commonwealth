@@ -70,7 +70,7 @@ export class Listener extends BaseListener<
     }
 
     try {
-      this._processor = new Processor(this._api, this._chain);
+      this._processor = new Processor(this._chain);
       this._subscriber = new Subscriber(this._api, this._chain, this._verbose);
       this.storageFetcher = new StorageFetcher(this._api, this._chain);
     } catch (error) {

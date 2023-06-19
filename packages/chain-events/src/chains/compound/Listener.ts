@@ -69,7 +69,7 @@ export class Listener extends BaseListener<
     }
 
     try {
-      this._processor = new Processor(this._api, this._chain);
+      this._processor = new Processor(this._chain);
       this._subscriber = await new Subscriber(
         this._api,
         this._chain,

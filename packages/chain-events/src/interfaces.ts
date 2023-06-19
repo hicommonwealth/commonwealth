@@ -103,7 +103,7 @@ export abstract class IEventHandler<
 // parses events out of blocks into a standard format and
 // passes them through to the handler
 export abstract class IEventProcessor<Api, RawEvent> {
-  constructor(protected _api: Api) {}
+  constructor(protected _api?: Api) {}
 
   // throws on error
   public abstract process(block: RawEvent): Promise<CWEvent[]>;

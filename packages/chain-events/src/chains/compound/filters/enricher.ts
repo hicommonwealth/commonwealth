@@ -6,7 +6,7 @@ import type { GovernorCompatibilityBravo } from '../../../contractTypes';
 import type { TypedEventFilter } from '../../../contractTypes/commons';
 import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
-import type { RawEvent, IEventData, Api } from '../types';
+import type { RawEvent, IEventData } from '../types';
 import { EventKind } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<infer Y, any> ? Y : never;
@@ -16,7 +16,6 @@ type GetArgType<
 > = GetEventArgs<ReturnType<C['filters'][Name]>>;
 
 export async function Enrich(
-  api: Api,
   blockNumber: number,
   kind: EventKind,
   rawData: RawEvent | Omit<RawEvent, 'name'>

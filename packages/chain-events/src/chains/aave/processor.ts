@@ -10,8 +10,8 @@ import { Enrich } from './filters/enricher';
 import type { IEventData, RawEvent, Api } from './types';
 
 export class Processor extends IEventProcessor<Api, RawEvent> {
-  constructor(protected _api: Api, protected readonly chain?: string) {
-    super(_api);
+  constructor(protected readonly chain?: string) {
+    super();
   }
 
   /**
@@ -28,7 +28,7 @@ export class Processor extends IEventProcessor<Api, RawEvent> {
     const kind = ParseType(event.name, this.chain);
     if (!kind) return [];
     try {
-      const cwEvent = await Enrich(this._api, event.blockNumber, kind, event);
+      const cwEvent = await Enrich(event.blockNumber, kind, event);
       return [cwEvent];
     } catch (e) {
       log.error(

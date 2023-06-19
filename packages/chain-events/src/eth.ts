@@ -1,4 +1,4 @@
-import { providers } from 'ethers';
+import { ethers, providers } from 'ethers';
 
 import { addPrefix, factory } from './logging';
 
@@ -38,5 +38,16 @@ export async function createProvider(
   } catch (error) {
     log.error(`Failed to connect on ${ethNetworkUrl}: ${error.message}`);
     throw error;
+  }
+}
+
+export async function getParser(
+  contractAddress: string,
+  abi: any,
+  retryTimeMs
+) {
+  switch (contractAddress) {
+    case '':
+      return new ethers.utils.Interface(abi);
   }
 }
