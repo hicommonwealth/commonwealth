@@ -1,7 +1,7 @@
 /**
  * Fetches events from Compound contract in real time.
  */
-import type { Listener, Log } from '@ethersproject/providers';
+import type { Listener, Log, Provider } from '@ethersproject/providers';
 
 import {
   EvmEventSourceMapType,
@@ -15,31 +15,37 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import Timeout = NodeJS.Timeout;
 import { ethers } from 'ethers';
 
-export class Subscriber extends IEventSubscriber<Api, RawEvent> {
-  private _name: string;
+export class Subscriber {
+  private readonly _name: string;
+  private readonly _verbose: boolean;
 
+  private eventSourceMap: EvmEventSourceMapType;
   private subIntervalId: Timeout;
 
   protected readonly log;
 
   protected lastBlockNumber: number;
+  protected provider: Provider;
+  protected contractAddress: string;
 
-  private eventSourceMap: EvmEventSourceMapType;
-
-  constructor(api: Api, name: string, verbose = false) {
-    super(api, verbose);
+  constructor(
+    provider: Provider,
+    name: string,
+    contractAddress: string,
+    verbose = false
+  ) {
+    this.provider = provider;
+    this.contractAddress = contractAddress;
     this._name = name;
-
+    this._verbose = verbose;
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.Compound, this._name])
     );
   }
 
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
-    const provider = this._api.provider;
-
     // retrieves the last numEstimateBlocks blocks to estimate block time
-    const currentBlockNum = (await provider.getBlockNumber()) - 100;
+    const currentBlockNum = (await this.provider.getBlockNumber()) - 100;
     this.log.info(`Current Block: ${currentBlockNum}`);
     const blockPromises = [];
     for (
@@ -47,7 +53,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       i > currentBlockNum - numEstimateBlocks;
       i--
     ) {
-      blockPromises.push(provider.getBlock(i));
+      blockPromises.push(this.provider.getBlock(i));
     }
     const blocks = await Promise.all(blockPromises);
     const timestamps = blocks.map((x) => x.timestamp).reverse();
@@ -83,7 +89,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
             this.lastBlockNumber + 1
           ).toHexString(),
           toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
-          address: this._api.address,
+          address: this.contractAddress,
         },
       ]);
       // filter the logs we need
@@ -129,7 +135,6 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     eventSourceMap: EvmEventSourceMapType,
     numEstimateBlocks = 10
   ): Promise<void> {
-    const provider = this._api.provider;
     if (this.subIntervalId) {
       this.log.info('Already subscribed!');
       return;
@@ -143,7 +148,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     this.subIntervalId = setInterval(
       this.fetchLogs.bind(this),
       maxBlockTime * 1000,
-      provider,
+      this.provider,
       cb
     );
   }

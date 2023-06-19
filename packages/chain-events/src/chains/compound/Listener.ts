@@ -71,8 +71,9 @@ export class Listener extends BaseListener<
     try {
       this._processor = new Processor(this._chain);
       this._subscriber = await new Subscriber(
-        this._api,
+        this._api.provider,
         this._chain,
+        this._api.address,
         this._verbose
       );
     } catch (error) {

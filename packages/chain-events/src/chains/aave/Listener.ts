@@ -71,7 +71,16 @@ export class Listener extends BaseListener<
 
     try {
       this._processor = new Processor(this._chain);
-      this._subscriber = new Subscriber(this._api, this._chain, this._verbose);
+      this._subscriber = new Subscriber(
+        this._api.governance.provider,
+        this._chain,
+        [
+          this._api.governance.address,
+          this._api.aaveToken.address,
+          this._api.stkAaveToken.address,
+        ],
+        this._verbose
+      );
       this.storageFetcher = new StorageFetcher(this._api, this._chain);
     } catch (error) {
       this.log.error(

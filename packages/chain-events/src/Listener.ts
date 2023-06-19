@@ -21,7 +21,7 @@ export abstract class Listener<
   Api,
   StorageFetcher extends IStorageFetcher<Api>,
   Processor extends IEventProcessor<Api, any>,
-  Subscriber extends IEventSubscriber<Api, any>,
+  Subscriber extends IEventSubscriber<Api, any> | any,
   EventKind extends IChainEventKind
 > {
   public eventHandlers: {
@@ -81,7 +81,7 @@ export abstract class Listener<
       return;
     }
 
-    this._subscriber.unsubscribe();
+    (<any>this._subscriber).unsubscribe();
     this._subscribed = false;
   }
 
