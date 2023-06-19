@@ -47,7 +47,8 @@ export async function createProvider(
 export async function getRawEvents(
   provider: JsonRpcProvider,
   eventSources: EvmEventSourceMapType,
-  blockRange: { start: number | string; end: number | string }
+  blockRange: { start: number | string; end: number | string },
+  verbose = false
 ) {
   const logs: Log[] = await provider.send('eth_getLogs', [
     {
@@ -72,13 +73,26 @@ export async function getRawEvents(
     const parsedRawEvent =
       eventSources[log.address.toLowerCase()].api.parseLog(log);
 
-    rawEvents.push({
+    const rawEvent = {
       address: log.address.toLowerCase(),
       args: parsedRawEvent.args as any,
       name: parsedRawEvent.name,
       blockNumber: parseInt(log.blockNumber.toString(), 16),
       data: log.data,
-    });
+    };
+
+    if (verbose) {
+      const logStr = `Found the following event log in block ${
+        log.blockNumber
+      }: ${JSON.stringify(rawEvent, null, 2)}.`;
+
+      const logger = factory.getLogger(
+        addPrefix(__filename, [log.address.toLowerCase()])
+      );
+      logger.info(logStr);
+    }
+
+    rawEvents.push(rawEvents);
   }
 
   return rawEvents;
