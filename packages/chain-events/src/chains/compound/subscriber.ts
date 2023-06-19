@@ -14,6 +14,7 @@ import type { RawEvent, Api } from './types';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import Timeout = NodeJS.Timeout;
 import { ethers } from 'ethers';
+import { getRawEvents } from 'chain-events/src/eth';
 
 export class Subscriber {
   private readonly _name: string;
@@ -83,41 +84,12 @@ export class Subscriber {
     const currentBlockNum = await provider.getBlockNumber();
     console.log('New current block number:', currentBlockNum);
     if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
-      const logs: Log[] = await provider.send('eth_getLogs', [
-        {
-          fromBlock: ethers.BigNumber.from(
-            this.lastBlockNumber + 1
-          ).toHexString(),
-          toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
-          address: this.contractAddress,
-        },
-      ]);
-      // filter the logs we need
-      for (const log of logs) {
-        if (
-          !this.eventSourceMap[
-            log.address.toLowerCase()
-          ].eventSignatures.includes(log.topics[0])
-        )
-          continue;
-        console.log(log.blockNumber);
-        const parsedRawEvent =
-          this.eventSourceMap[log.address.toLowerCase()].api.parseLog(log);
+      const rawEvents = await getRawEvents(provider, this.eventSourceMap, {
+        start: this.lastBlockNumber + 1,
+        end: currentBlockNum,
+      });
 
-        const rawEvent: RawEvent = {
-          address: log.address.toLowerCase(),
-          args: parsedRawEvent.args as any,
-          name: parsedRawEvent.name,
-          blockNumber: parseInt(log.blockNumber.toString(), 16),
-          data: log.data,
-        };
-
-        const logStr = `Found the following event log in block ${
-          log.blockNumber
-        }: ${JSON.stringify(rawEvent, null, 2)}.`;
-        // eslint-disable-next-line no-unused-expressions
-        this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
-
+      for (const rawEvent of rawEvents) {
         cb(rawEvent);
       }
     }

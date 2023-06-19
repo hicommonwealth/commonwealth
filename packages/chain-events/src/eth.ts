@@ -92,7 +92,7 @@ export async function getRawEvents(
       logger.info(logStr);
     }
 
-    rawEvents.push(rawEvents);
+    rawEvents.push(rawEvent);
   }
 
   return rawEvents;
