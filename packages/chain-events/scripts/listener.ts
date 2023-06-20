@@ -152,27 +152,27 @@ if (network === SupportedNetwork.Substrate) {
     });
   });
 } else if (network === SupportedNetwork.Compound) {
-  CompoundEvents.createApi(url, contract).then(async (api) => {
-    const fetcher = new CompoundEvents.StorageFetcher(api);
-    try {
-      const fetched = await fetcher.fetch({
-        startBlock: 13353227,
-        maxResults: 1,
-      });
-      // const fetched = await fetcher.fetchOne('2');
-      console.log(fetched.map((f) => f.data));
-    } catch (err) {
-      console.log(err);
-      console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
-    }
-    // CompoundEvents.subscribeEvents({
-    //   chain,
-    //   api,
-    //   handlers: [new StandaloneEventHandler()],
-    //   skipCatchup,
-    //   verbose: true,
-    // });
-  });
+  // CompoundEvents.createApi(url, contract).then(async (api) => {
+  //   // const fetcher = new CompoundEvents.StorageFetcher(api);
+  //   // try {
+  //   //   const fetched = await fetcher.fetch({
+  //   //     startBlock: 13353227,
+  //   //     maxResults: 1,
+  //   //   });
+  //   //   // const fetched = await fetcher.fetchOne('2');
+  //   //   console.log(fetched.map((f) => f.data));
+  //   // } catch (err) {
+  //   //   console.log(err);
+  //   //   console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
+  //   // }
+  //   // CompoundEvents.subscribeEvents({
+  //   //   chain,
+  //   //   api,
+  //   //   handlers: [new StandaloneEventHandler()],
+  //   //   skipCatchup,
+  //   //   verbose: true,
+  //   // });
+  // });
 } else if (network === SupportedNetwork.Aave) {
   // AaveEvents.createApi(url, contract).then(async (api) => {
   //   const fetcher = new AaveEvents.StorageFetcher(api);

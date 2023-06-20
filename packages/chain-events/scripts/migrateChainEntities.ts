@@ -127,7 +127,8 @@ async function migrateChainEntity(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
         contracts[0].address
       );
-      fetcher = new CompoundEvents.StorageFetcher(api);
+      // TODO: @Timothee replace storage fetcher calls with Listener.fetchEvents
+      // fetcher = new CompoundEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else if (chainInstance.network === ChainNetwork.Aave) {
       const contracts = await fetchData(

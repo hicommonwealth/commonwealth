@@ -16,7 +16,6 @@ import {
 } from '../../contractTypes';
 
 import { Processor } from './processor';
-import { StorageFetcher } from './storageFetcher';
 import type { IEventData, RawEvent, Api } from './types';
 
 /**

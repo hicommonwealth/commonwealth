@@ -16,13 +16,15 @@ import type {
 } from './types';
 import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
-import { StorageFetcher } from './storageFetcher';
 import { Subscriber } from '../EVM/subscriber';
 import { ethers } from 'ethers';
+import { getRawEvents, pascalToKebabCase } from 'chain-events/src/eth';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Enrich } from 'chain-events/src/chains/aave';
 
 export class Listener extends BaseListener<
   Api,
-  StorageFetcher,
+  any,
   Processor,
   Subscriber,
   EventKind
@@ -79,15 +81,6 @@ export class Listener extends BaseListener<
     } catch (error) {
       this.log.error(
         `Fatal error occurred while starting the Processor, and Subscriber`
-      );
-      throw error;
-    }
-
-    try {
-      this.storageFetcher = new StorageFetcher(this._api, this._chain);
-    } catch (error) {
-      this.log.error(
-        `Fatal error occurred while starting the Ethereum dater and storage fetcher`
       );
       throw error;
     }
@@ -175,9 +168,9 @@ export class Listener extends BaseListener<
       else endBlock = offlineRange.endBlock;
 
       while (endBlock <= offlineRange.endBlock) {
-        const cwEvents = await this.storageFetcher.fetch({
-          startBlock,
-          endBlock,
+        const cwEvents = await this.fetchEvents({
+          start: startBlock,
+          end: endBlock,
         });
         for (const event of cwEvents) {
           await this.handleEvent(event);
@@ -212,5 +205,32 @@ export class Listener extends BaseListener<
     // Web3 provider, yet it exists under provider.provider
     const provider = <any>this._api.provider;
     return provider.provider ? true : false;
+  }
+
+  public async fetchEvents(blockRange: {
+    start: number | string;
+    end: number | string;
+  }) {
+    const rawEvents = await getRawEvents(
+      <JsonRpcProvider>this._api.governance.provider,
+      this.getEventSourceMap(),
+      blockRange
+    );
+    const enrichedEvents = [];
+    for (const event of rawEvents) {
+      // TODO: This basically the same as the processor functionality
+      const kind = pascalToKebabCase(event.name);
+      if (!kind) continue;
+      try {
+        const cwEvent = await Enrich(event.blockNumber, kind, event);
+        enrichedEvents.push(cwEvent);
+      } catch (e) {
+        this.log.error(
+          `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.name}, Error Message: ${e.message}`
+        );
+      }
+    }
+
+    return enrichedEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber);
   }
 }
