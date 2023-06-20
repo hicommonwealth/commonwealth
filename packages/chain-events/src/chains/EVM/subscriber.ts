@@ -18,12 +18,12 @@ export class Subscriber {
 
   protected lastBlockNumber: number;
   protected provider: Provider;
-  protected contractAddresses: string[];
+  protected contractAddresses: string;
 
   constructor(
     provider: Provider,
     name: string,
-    contractAddresses: string[],
+    contractAddresses: string,
     verbose = false
   ) {
     this.provider = provider;
