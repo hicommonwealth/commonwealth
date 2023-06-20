@@ -99,21 +99,16 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
     const chainId = this._chainInfo.node?.ethChainId || 1;
 
-    // use alt wallet url if available
-    const chainUrl =
-      this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
-    const rpc = chainUrl ? { [chainId]: chainUrl } : {};
-    
     this._provider = await EthereumProvider.init({
       projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
       chains: [chainId],
       methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData_v4'],
       showQrModal: true,
-      // @ts-ignore
       qrModalOptions: {
         themeVariables: {
           '--w3m-z-index': '10000',
         },
+        chainImages: undefined,
       },
     });
 
