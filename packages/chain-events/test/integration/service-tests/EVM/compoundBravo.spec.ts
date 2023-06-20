@@ -36,7 +36,8 @@ describe('Integration tests for Compound Bravo', () => {
   );
 
   // holds event data, so we can verify the integrity of the events across all services
-  const events = {};
+  let events = {};
+  let listeners: IListenerInstances;
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
@@ -64,10 +65,7 @@ describe('Integration tests for Compound Bravo', () => {
   describe('Tests the Bravo event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
-      const listeners: IListenerInstances = await runSubscriberAsFunction(
-        rmq,
-        chain
-      );
+      listeners = await runSubscriberAsFunction(rmq, chain);
       listener = listeners[chain_id] as unknown as Listener<
         Api,
         StorageFetcher,
@@ -191,6 +189,13 @@ describe('Integration tests for Compound Bravo', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(7);
+    });
+
+    after(async () => {
+      await listener.unsubscribe();
+      listener = undefined;
+      // clear the listener created by the subscriber
+      delete listeners[chain_id];
     });
   });
 
@@ -398,6 +403,133 @@ describe('Integration tests for Compound Bravo', () => {
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
+    });
+  });
+
+  describe('Tests the Compound listener catch-up using the cahin subscriber', async () => {
+    let createdBlock;
+    before(async () => {
+      events = {};
+    });
+
+    beforeEach(async () => {
+      // restart the mock rabbitmq controller
+      await rmq.shutdown();
+      await rmq.init();
+    });
+
+    afterEach(async () => {
+      await listener.unsubscribe();
+      listener = undefined;
+      // clear the listener created by the subscriber
+      delete listeners[chain_id];
+    });
+
+    it('Should fetch missed proposal created events', async () => {
+      const result = await sdk.createProposal(1);
+      proposalId = result.proposalId;
+      createdBlock = result.block;
+
+      // set up the chain subscriber
+      listeners = await runSubscriberAsFunction(rmq, chain);
+      listener = listeners[chain_id] as unknown as Listener<
+        Api,
+        StorageFetcher,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
+
+      // verify the event was created and appended to the correct queue
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
+      ).to.equal(1, 'Event not captured');
+      eventMatch(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
+        'proposal-created',
+        chain_id,
+        proposalId
+      );
+    });
+
+    it('Should fetch missed vote events', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.safeAdvanceTime(createdBlock + blocks, createdBlock + 13140);
+      const { block } = await sdk.castVote(proposalId, 1, true);
+
+      // set up the chain subscriber
+      listeners = await runSubscriberAsFunction(rmq, chain);
+      listener = listeners[chain_id] as unknown as Listener<
+        Api,
+        StorageFetcher,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
+
+      // verify the event was created and appended to the correct queue
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
+      ).to.equal(1);
+      eventMatch(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
+        'vote-cast',
+        chain_id,
+        proposalId
+      );
+    });
+
+    it('Should fetch missed proposal queued events', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks);
+      const { block } = await sdk.queueProposal(proposalId);
+
+      // set up the chain subscriber
+      listeners = await runSubscriberAsFunction(rmq, chain);
+      listener = listeners[chain_id] as unknown as Listener<
+        Api,
+        StorageFetcher,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
+
+      // verify the event was created and appended to the correct queue
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
+      ).to.equal(1);
+      eventMatch(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
+        'proposal-queued',
+        chain_id,
+        proposalId
+      );
+    });
+
+    it('Should fetch missed proposal executed events', async () => {
+      const { secs, blocks } = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(secs), blocks);
+      const { block } = await sdk.executeProposal(proposalId);
+
+      // set up the chain subscriber
+      listeners = await runSubscriberAsFunction(rmq, chain);
+      listener = listeners[chain_id] as unknown as Listener<
+        Api,
+        StorageFetcher,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
+      // verify the event was created and appended to the correct queue
+      expect(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
+      ).to.equal(1);
+      eventMatch(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
+        'proposal-executed',
+        chain_id,
+        proposalId
+      );
     });
   });
 
