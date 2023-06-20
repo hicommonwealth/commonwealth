@@ -135,7 +135,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         }
 
         if (finalThreads.length >= 20) {
-          setThreads(sortPinned(sortByFeaturedFilter(foundThreadsForChain)));
+          setThreads(sortPinned(sortByFeaturedFilter(finalThreads)));
           setInitializing(false);
           return;
         }
