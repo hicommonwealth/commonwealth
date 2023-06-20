@@ -9949,7 +9949,7 @@ clone-response@^1.0.2:
   dependencies:
     mimic-response "^1.0.0"
 
-clone@2.x, clone@^2.0.0, clone@^2.1.1:
+clone@2.x, clone@^2.0.0, clone@^2.1.1, clone@^2.1.2:
   version "2.1.2"
   resolved "https://registry.npmjs.org/clone/-/clone-2.1.2.tgz"
   integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
@@ -11130,28 +11130,7 @@ deep-equal@^1.0.1:
     object-keys "^1.1.1"
     regexp.prototype.flags "^1.2.0"
 
-deep-equal@^2.0.3:
-  version "2.0.5"
-  resolved "https://registry.npmjs.org/deep-equal/-/deep-equal-2.0.5.tgz"
-  integrity sha512-nPiRgmbAtm1a3JsnLCf6/SLfXcjyN5v8L1TXzdCmHrXJ4hx+gW/w1YCcn7z8gJtSiDArZCgYtbao3QqLm/N1Sw==
-  dependencies:
-    call-bind "^1.0.0"
-    es-get-iterator "^1.1.1"
-    get-intrinsic "^1.0.1"
-    is-arguments "^1.0.4"
-    is-date-object "^1.0.2"
-    is-regex "^1.1.1"
-    isarray "^2.0.5"
-    object-is "^1.1.4"
-    object-keys "^1.1.1"
-    object.assign "^4.1.2"
-    regexp.prototype.flags "^1.3.0"
-    side-channel "^1.0.3"
-    which-boxed-primitive "^1.0.1"
-    which-collection "^1.0.1"
-    which-typed-array "^1.1.2"
-
-deep-equal@^2.0.5:
+deep-equal@^2.0.2, deep-equal@^2.0.5:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-2.2.1.tgz#c72ab22f3a7d3503a4ca87dde976fe9978816739"
   integrity sha512-lKdkdV6EOGoVn65XaOsPdH4rMxTZOnmFyuIkMjM1i5HHCbfjC97dawgTAy0deYNfuqUqW+Q5VrVaQYtUpSd6yQ==
@@ -11174,6 +11153,27 @@ deep-equal@^2.0.5:
     which-boxed-primitive "^1.0.2"
     which-collection "^1.0.1"
     which-typed-array "^1.1.9"
+
+deep-equal@^2.0.3:
+  version "2.0.5"
+  resolved "https://registry.npmjs.org/deep-equal/-/deep-equal-2.0.5.tgz"
+  integrity sha512-nPiRgmbAtm1a3JsnLCf6/SLfXcjyN5v8L1TXzdCmHrXJ4hx+gW/w1YCcn7z8gJtSiDArZCgYtbao3QqLm/N1Sw==
+  dependencies:
+    call-bind "^1.0.0"
+    es-get-iterator "^1.1.1"
+    get-intrinsic "^1.0.1"
+    is-arguments "^1.0.4"
+    is-date-object "^1.0.2"
+    is-regex "^1.1.1"
+    isarray "^2.0.5"
+    object-is "^1.1.4"
+    object-keys "^1.1.1"
+    object.assign "^4.1.2"
+    regexp.prototype.flags "^1.3.0"
+    side-channel "^1.0.3"
+    which-boxed-primitive "^1.0.1"
+    which-collection "^1.0.1"
+    which-typed-array "^1.1.2"
 
 deep-equal@^2.2.0:
   version "2.2.0"
@@ -15897,6 +15897,13 @@ is-core-module@^2.10.0, is-core-module@^2.5.0, is-core-module@^2.7.0:
   dependencies:
     has "^1.0.3"
 
+is-core-module@^2.11.0, is-core-module@^2.9.0:
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.12.1.tgz#0c0b6885b6f80011c71541ce15c8d66cf5a4f9fd"
+  integrity sha512-Q4ZuBAe2FUsKtyQJoQHlvP8OvBERxO3jEmy1I7hcRXcJBGGHFh/aJBswbXuS9sgrDH2QUO8ilkwNPHvHMd8clg==
+  dependencies:
+    has "^1.0.3"
+
 is-core-module@^2.2.0:
   version "2.3.0"
   resolved "https://registry.npmjs.org/is-core-module/-/is-core-module-2.3.0.tgz"
@@ -16782,7 +16789,12 @@ js-sha256@^0.9.0:
   resolved "https://registry.yarnpkg.com/js-sha256/-/js-sha256-0.9.0.tgz#0b89ac166583e91ef9123644bd3c5334ce9d0966"
   integrity sha512-sga3MHh9sgQN2+pJ9VYZ+1LPwXOxuBJBA5nrR5/ofPfuiJBE2hnjsaN8se8JznOmGLN2p49Pe5U/ttafcs/apA==
 
-js-sha3@0.5.7, js-sha3@0.8.0, js-sha3@^0.5.7, js-sha3@^0.8.0:
+js-sha3@0.5.7, js-sha3@^0.5.7:
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.5.7.tgz#0d4ffd8002d5333aabaf4a23eed2f6374c9f28e7"
+  integrity sha512-GII20kjaPX0zJ8wzkTbNDYMY7msuZcTWk8S5UOh6806Jq/wz1J8/bnr8uGU0DAUmYDjj2Mr4X1cW8v/GLYnR+g==
+
+js-sha3@0.8.0, js-sha3@^0.8.0:
   version "0.8.0"
   resolved "https://registry.npmjs.org/js-sha3/-/js-sha3-0.8.0.tgz"
   integrity sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==
@@ -19825,6 +19837,11 @@ param-case@^3.0.4:
     dot-case "^3.0.4"
     tslib "^2.0.3"
 
+parchment@2.0.0-dev.2:
+  version "2.0.0-dev.2"
+  resolved "https://registry.yarnpkg.com/parchment/-/parchment-2.0.0-dev.2.tgz#9d6fe57b3721317bd1c481ea38ffa9b287d496b8"
+  integrity sha512-4fgRny4pPISoML08Zp7poi52Dff3E2G1ORTi2D/acJ/RiROdDAMDB6VcQNfBcmehrX5Wixp6dxh6JjLyE5yUNQ==
+
 parchment@^1.1.2, parchment@^1.1.4:
   version "1.1.4"
   resolved "https://registry.npmjs.org/parchment/-/parchment-1.1.4.tgz"
@@ -20035,7 +20052,7 @@ path-key@^3.0.0, path-key@^3.1.0:
   resolved "https://registry.npmjs.org/path-key/-/path-key-3.1.1.tgz"
   integrity sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==
 
-path-parse@^1.0.6:
+path-parse@^1.0.6, path-parse@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.7.tgz#fbc114b60ca42b30d9daf5858e4bd68bbedb6735"
   integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
@@ -21572,6 +21589,15 @@ quick-lru@^5.1.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-5.1.1.tgz#366493e6b3e42a3a6885e2e99d18f80fb7a8c932"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
+quill-delta@4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/quill-delta/-/quill-delta-4.2.1.tgz#ad4f191cdf3be5079c5dc3991b9603a5cc0db69a"
+  integrity sha512-Y2nksOj6Q+4hizre8n0dml76vLNGK4/y86EoI1d7rv6EL1bx7DPDYRmqQMPu1UqFQO/uQuVHQ3fOmm4ZSzWrfA==
+  dependencies:
+    deep-equal "^1.0.1"
+    extend "^3.0.2"
+    fast-diff "1.2.0"
+
 quill-delta@^3.6.2:
   version "3.6.3"
   resolved "https://registry.npmjs.org/quill-delta/-/quill-delta-3.6.3.tgz"
@@ -21618,7 +21644,7 @@ quill-mention@^2.2.7:
   dependencies:
     quill "^1.3.4"
 
-quill@^1.3.4, quill@^1.3.6, quill@^1.3.7, quill@^2.0.0-dev.4:
+quill@^1.3.4, quill@^1.3.6, quill@^1.3.7:
   version "1.3.7"
   resolved "https://registry.npmjs.org/quill/-/quill-1.3.7.tgz"
   integrity sha512-hG/DVzh/TiknWtE6QmWAF/pxoZKYxfe3J/d/+ShUWkDvvkZQVTPeVmUJVu1uE6DDooC4fWTiCLh84ul89oNz5g==
@@ -21629,6 +21655,18 @@ quill@^1.3.4, quill@^1.3.6, quill@^1.3.7, quill@^2.0.0-dev.4:
     extend "^3.0.2"
     parchment "^1.1.4"
     quill-delta "^3.6.2"
+
+quill@^2.0.0-dev.4:
+  version "2.0.0-dev.4"
+  resolved "https://registry.yarnpkg.com/quill/-/quill-2.0.0-dev.4.tgz#130e38efe7a16b3766d767d750c8aacc038945e7"
+  integrity sha512-9WmMVCEIhf3lDdhzl+i+GBDeDl0BFi65waC4Im8Y4HudEJ9kEEb1lciAz9A8pcDmLMjiMbvz84lNt/U5OBS8Vg==
+  dependencies:
+    clone "^2.1.2"
+    deep-equal "^2.0.2"
+    eventemitter3 "^4.0.0"
+    extend "^3.0.2"
+    parchment "2.0.0-dev.2"
+    quill-delta "4.2.1"
 
 raf-schd@^4.0.2:
   version "4.0.3"
@@ -21851,6 +21889,11 @@ react-jdenticon@^1.0.0:
   dependencies:
     jdenticon "^3.1.1"
     prop-types "^15.8.1"
+
+react-loading-skeleton@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/react-loading-skeleton/-/react-loading-skeleton-3.3.1.tgz#cd6e3a626ee86c76a46c14e2379243f2f8834e1b"
+  integrity sha512-NilqqwMh2v9omN7LteiDloEVpFyMIa0VGqF+ukqp0ncVlYu1sKYbYGX9JEl+GtOT9TKsh04zCHAbavnQ2USldA==
 
 react-quill@^2.0.0:
   version "2.0.0"
@@ -22392,13 +22435,38 @@ resolve-url@^0.2.1:
   resolved "https://registry.npmjs.org/resolve-url/-/resolve-url-0.2.1.tgz"
   integrity sha1-LGN/53yJOv0qZj/iGqkIAGjiBSo=
 
-resolve@1.17.0, resolve@^1.0.0, resolve@^1.1.6, resolve@^1.10.0, resolve@^1.12.0, resolve@^1.13.1, resolve@^1.14.2, resolve@^1.19.0, resolve@^1.20.0, resolve@^1.22.0, resolve@^1.3.2, resolve@^1.5.0, resolve@^1.8.1, resolve@^1.9.0, resolve@^2.0.0-next.4:
+resolve@1.17.0:
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.17.0.tgz#b25941b54968231cc2d1bb76a79cb7f2c0bf8444"
+  integrity sha512-ic+7JYiV8Vi2yzQGFWOkiZD5Z9z7O2Zhm9XMaTxdJExKasieFCr+yXZ/WmXsckHiKl12ar0y6XiXDx3m4RHn1w==
+  dependencies:
+    path-parse "^1.0.6"
+
+resolve@^1.0.0, resolve@^1.1.6, resolve@^1.10.0, resolve@^1.12.0, resolve@^1.13.1, resolve@^1.14.2, resolve@^1.19.0, resolve@^1.20.0, resolve@^1.3.2, resolve@^1.5.0, resolve@^1.8.1, resolve@^1.9.0:
   version "1.20.0"
   resolved "https://registry.npmjs.org/resolve/-/resolve-1.20.0.tgz"
   integrity sha512-wENBPt4ySzg4ybFQW2TT1zMQucPK95HSh/nq2CFTZVOGut2+pQvSsgtda4d26YrYcr067wjbmzOG8byDPBX63A==
   dependencies:
     is-core-module "^2.2.0"
     path-parse "^1.0.6"
+
+resolve@^1.22.0:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.2.tgz#0ed0943d4e301867955766c9f3e1ae6d01c6845f"
+  integrity sha512-Sb+mjNHOULsBv818T40qSPeRiuWLyaGMa5ewydRLFimneixmVy2zdivRl+AF6jaYPC8ERxGDmFSiqui6SfPd+g==
+  dependencies:
+    is-core-module "^2.11.0"
+    path-parse "^1.0.7"
+    supports-preserve-symlinks-flag "^1.0.0"
+
+resolve@^2.0.0-next.4:
+  version "2.0.0-next.4"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-2.0.0-next.4.tgz#3d37a113d6429f496ec4752d2a2e58efb1fd4660"
+  integrity sha512-iMDbmAWtfU+MHpxt/I5iWI7cY6YVEZUQ3MBgPQ++XD1PELuJHIl82xBmObyP2KyQmkNB2dsqF7seoQQiAn5yDQ==
+  dependencies:
+    is-core-module "^2.9.0"
+    path-parse "^1.0.7"
+    supports-preserve-symlinks-flag "^1.0.0"
 
 responselike@^2.0.0:
   version "2.0.1"
@@ -24274,6 +24342,11 @@ supports-hyperlinks@^2.3.0:
   dependencies:
     has-flag "^4.0.0"
     supports-color "^7.0.0"
+
+supports-preserve-symlinks-flag@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
+  integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
 svg-tags@^1.0.0:
   version "1.0.0"

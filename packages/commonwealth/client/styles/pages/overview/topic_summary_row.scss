@@ -35,10 +35,12 @@
 
       .topic-name-text.Text {
         color: $primary-500;
+        width: 100%;
       }
-
+      
       .threads-count-text.Text {
         color: $neutral-500;
+        width: 100%;
       }
     }
   }
@@ -65,6 +67,12 @@
 
       &:hover {
         background: $neutral-50;
+      }
+
+      &.isLoading {
+        &:hover {
+          background: unset;
+        }
       }
 
       @include mediumSmallInclusive {
