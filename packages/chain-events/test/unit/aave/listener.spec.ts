@@ -3,7 +3,7 @@ import * as events from 'events';
 import * as chai from 'chai';
 import dotenv from 'dotenv';
 
-import { Listener } from '../../../src/chains/aave';
+import { Listener } from '../../../src/chains/EVM';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 import { Subscriber } from '../../../src/chains/EVM/subscriber';
@@ -18,7 +18,7 @@ describe.skip('Aave listener class tests', () => {
   const handlerEmitter = new events.EventEmitter();
 
   it('should create an Aave listener', () => {
-    listener = new Listener('aave', contracts.aave, null, true, false);
+    listener = new Listener('aave', contracts.aave, null, 'aave', true, false);
     assert.equal(listener.chain, 'aave');
     assert.deepEqual(listener.options, {
       url: networkUrls.aave,
@@ -30,7 +30,7 @@ describe.skip('Aave listener class tests', () => {
   });
 
   it('should initialize the Aave listener', async () => {
-    listener = new Listener('aave', contracts.aave, null, true, false);
+    listener = new Listener('aave', contracts.aave, null, 'aave', true, false);
     await listener.init();
     assert(listener._subscriber instanceof Subscriber);
     assert(listener._processor instanceof Processor);

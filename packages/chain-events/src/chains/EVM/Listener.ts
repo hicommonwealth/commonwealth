@@ -7,80 +7,95 @@ import type {
 import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import type {
-  Api,
-  EventKind,
-  IEventData,
-  ListenerOptions as AaveListenerOptions,
-  RawEvent,
-} from './types';
-import { createApi } from './subscribeFunc';
+import {ListenerOptions, RawEvent} from '../EVM/types';
+import { createApi as createAaveApi } from '../aave/subscribeFunc';
+import { createApi as createCompoundApi } from '../compound/subscribeFunc';
 import { Subscriber } from '../EVM/subscriber';
 import { Processor } from '../EVM/processor';
 import { ethers } from 'ethers';
 import { getRawEvents, pascalToKebabCase } from 'chain-events/src/eth';
-import { Enrich } from 'chain-events/src/chains/aave/filters/enricher';
+import { Enrich as AaveEnricher } from '../aave/filters/enricher';
+import { Enrich as CompoundEnricher } from '../compound/filters/enricher';
 import { JsonRpcProvider } from '@ethersproject/providers';
 
 export class Listener extends BaseListener<
-  Api,
   any,
   any,
-  Subscriber,
-  EventKind
+  any,
+  any,
+  any
 > {
-  private readonly _options: AaveListenerOptions;
+  private readonly _options: ListenerOptions;
 
   protected readonly log;
 
+  protected readonly listenerBase: 'aave' | 'compound';
+
   constructor(
     chain: string,
-    govContractAddress: string,
-    url?: string,
+    contractAddress: string,
+    url: string,
+    // TODO: @Timothee - temporary until ABI based CE PR
+    listenerBase: 'aave' | 'compound',
     skipCatchup?: boolean,
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    super(SupportedNetwork.Aave, chain, verbose);
-
-    this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Aave, this._chain])
-    );
+    if (listenerBase === 'aave') {
+      super(SupportedNetwork.Aave, chain, verbose);
+      this.log = factory.getLogger(
+        addPrefix(__filename, [SupportedNetwork.Aave, this._chain])
+      );
+    }
+    else {
+      super(SupportedNetwork.Compound, chain, verbose);
+      this.log = factory.getLogger(
+        addPrefix(__filename, [SupportedNetwork.Compound, this._chain])
+      );
+    }
 
     this._options = {
       url,
-      govContractAddress,
+      contractAddress,
       skipCatchup: !!skipCatchup,
     };
 
     this.discoverReconnectRange = discoverReconnectRange;
 
     this._subscribed = false;
+    this.listenerBase = listenerBase;
   }
 
   public async init(): Promise<void> {
     try {
-      this._api = await createApi(
-        this._options.url,
-        this._options.govContractAddress,
-        10 * 1000,
-        this._chain
-      );
+      if (this.listenerBase === 'aave') {
+        this._api = await createAaveApi(
+          this._options.url,
+          this._options.contractAddress,
+          10 * 1000,
+          this._chain
+        );
+      } else {
+        this._api = await createCompoundApi(
+          this._options.url,
+          this._options.contractAddress,
+          10 * 1000,
+          this._chain
+        )
+      }
     } catch (error) {
       this.log.error(`Fatal error occurred while starting the API`);
       throw error;
     }
 
     try {
-      this._processor = new Processor(Enrich);
+      if (this.listenerBase === 'aave') this._processor = new Processor(AaveEnricher);
+      else this._processor = new Processor(CompoundEnricher);
+
       this._subscriber = new Subscriber(
-        this._api.governance.provider,
+        this.getProvider(),
         this._chain,
-        [
-          this._api.governance.address,
-          this._api.aaveToken.address,
-          this._api.stkAaveToken.address,
-        ],
+        this.getContractAddresses(),
         this._verbose
       );
     } catch (error) {
@@ -118,29 +133,40 @@ export class Listener extends BaseListener<
   }
 
   private getEventSourceMap(): EvmEventSourceMapType {
-    const gov = this._api.governance;
-    const aaveToken = this._api.aaveToken;
-    const stkAaveToken = this._api.stkAaveToken;
-    return {
-      [gov.address.toLowerCase()]: {
-        eventSignatures: Object.keys(gov.interface.events).map((x) =>
-          ethers.utils.id(x)
-        ),
-        api: gov.interface,
-      },
-      [aaveToken.address.toLowerCase()]: {
-        eventSignatures: Object.keys(aaveToken.interface.events).map((x) =>
-          ethers.utils.id(x)
-        ),
-        api: aaveToken.interface,
-      },
-      [stkAaveToken.address.toLowerCase()]: {
-        eventSignatures: Object.keys(stkAaveToken.interface.events).map((x) =>
-          ethers.utils.id(x)
-        ),
-        api: stkAaveToken.interface,
-      },
-    };
+    if (this.listenerBase === 'aave') {
+      const gov = this._api.governance;
+      const aaveToken = this._api.aaveToken;
+      const stkAaveToken = this._api.stkAaveToken;
+      return {
+        [gov.address.toLowerCase()]: {
+          eventSignatures: Object.keys(gov.interface.events).map((x) =>
+            ethers.utils.id(x)
+          ),
+          api: gov.interface,
+        },
+        [aaveToken.address.toLowerCase()]: {
+          eventSignatures: Object.keys(aaveToken.interface.events).map((x) =>
+            ethers.utils.id(x)
+          ),
+          api: aaveToken.interface,
+        },
+        [stkAaveToken.address.toLowerCase()]: {
+          eventSignatures: Object.keys(stkAaveToken.interface.events).map((x) =>
+            ethers.utils.id(x)
+          ),
+          api: stkAaveToken.interface,
+        },
+      };
+    } else {
+      return {
+        [this._api.address.toLowerCase()]: {
+          eventSignatures: Object.keys(this._api.interface.events).map((x) =>
+            ethers.utils.id(x)
+          ),
+          api: this._api.interface,
+        },
+      };
+    }
   }
 
   public async updateAddress(): Promise<void> {
@@ -192,7 +218,8 @@ export class Listener extends BaseListener<
     const cwEvents: CWEvent[] = await this._processor.process(event);
 
     for (const evt of cwEvents) {
-      await this.handleEvent(evt as CWEvent<IEventData>);
+      // TODO: @Timothee - remove <any> in ABI PR
+      await this.handleEvent(evt as CWEvent<any>);
     }
 
     const { blockNumber } = event;
@@ -204,19 +231,18 @@ export class Listener extends BaseListener<
     }
   }
 
-  public get options(): AaveListenerOptions {
+  public get options(): ListenerOptions {
     return this._options;
   }
 
   public async getLatestBlockNumber(): Promise<number> {
-    return this._api.governance.provider.getBlockNumber();
+    return this.getProvider().getBlockNumber();
   }
 
   public async isConnected(): Promise<boolean> {
     // force type to any because the Ethers Provider interface does not include the original
     // Web3 provider, yet it exists under provider.provider
-    const provider = <any>this._api.governance.provider;
-    return provider.provider ? true : false;
+    return this.getProvider().provider ? true : false;
   }
 
   public async fetchEvents(blockRange: {
@@ -224,7 +250,7 @@ export class Listener extends BaseListener<
     end: number | string;
   }) {
     const rawEvents = await getRawEvents(
-      <JsonRpcProvider>this._api.governance.provider,
+      <JsonRpcProvider>this.getProvider(),
       this.getEventSourceMap(),
       blockRange
     );
@@ -234,7 +260,9 @@ export class Listener extends BaseListener<
       const kind = pascalToKebabCase(event.name);
       if (!kind) continue;
       try {
-        const cwEvent = await Enrich(event.blockNumber, kind, event);
+        let cwEvent;
+        if (this.listenerBase === 'aave') cwEvent = await AaveEnricher(event.blockNumber, kind, event);
+        else cwEvent = await CompoundEnricher(event.blockNumber, kind, event);
         enrichedEvents.push(cwEvent);
       } catch (e) {
         this.log.error(
@@ -244,5 +272,27 @@ export class Listener extends BaseListener<
     }
 
     return enrichedEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber);
+  }
+
+  public getProvider() {
+    if (this.listenerBase === 'aave') {
+      return this._api.governance.provider;
+    } else {
+      return this._api.provider;
+    }
+  }
+
+  public getContractAddresses(): string[] {
+    if (this.listenerBase === 'aave') {
+      return [
+        this._api.governance.address,
+        this._api.aaveToken.address,
+        this._api.stkAaveToken.address,
+      ]
+    } else {
+      return [
+        this._api.address
+      ]
+    }
   }
 }

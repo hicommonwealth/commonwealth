@@ -3,7 +3,7 @@ import * as events from 'events';
 import * as chai from 'chai';
 import dotenv from 'dotenv';
 
-import { Listener } from '../../../src/chains/compound';
+import { Listener } from '../../../src/chains/EVM';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 import { Subscriber } from '../../../src/chains/EVM/subscriber';
@@ -18,7 +18,14 @@ describe.skip('Compound listener class tests', () => {
   const handlerEmitter = new events.EventEmitter();
 
   it('should create a Compound listener', () => {
-    listener = new Listener('marlin', contracts.marlin, null, true, false);
+    listener = new Listener(
+      'marlin',
+      contracts.marlin,
+      null,
+      'compound',
+      true,
+      false
+    );
     assert.equal(listener.chain, 'marlin');
     assert.deepEqual(listener.options, {
       url: networkUrls.marlin,

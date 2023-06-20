@@ -1,21 +1,11 @@
 import type { JsonRpcProvider, Provider } from '@ethersproject/providers';
 
-import {
-  EvmEventSourceMapType,
-  SupportedNetwork,
-} from '../../interfaces';
+import { EvmEventSourceMapType, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import Timeout = NodeJS.Timeout;
 import { getRawEvents } from 'chain-events/src/eth';
-
-export interface RawEvent {
-  address: string;
-  args: any;
-  name: string;
-  blockNumber: number;
-  data?: any;
-}
+import { RawEvent } from 'chain-events/src/chains/EVM/types';
 
 export class Subscriber {
   private readonly _name: string;

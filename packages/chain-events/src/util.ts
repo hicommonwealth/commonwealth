@@ -6,23 +6,19 @@ import type {
   IEventSubscriber,
   IStorageFetcher,
   CWEvent,
-  IEventTitle,
   IEventLabel,
-  IChainEventKind,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
 import { Listener as SubstrateListener } from './chains/substrate/Listener';
 import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
-import {
-  Listener as CompoundListener,
-  Label as CompoundLabel,
-} from './chains/compound';
+import { Listener as EvmListener } from './chains/EVM';
+import { Label as CompoundLabel } from './chains/compound';
 import { Listener as Erc20Listener, Label as Erc20Label } from './chains/erc20';
 import {
   Listener as Erc721Listener,
   Label as Erc721Label,
 } from './chains/erc721';
-import { Listener as AaveListener, Label as AaveLabel } from './chains/aave';
+import { Label as AaveLabel } from './chains/aave';
 import {
   Listener as CosmosListener,
   Label as CosmosLabel,
@@ -106,10 +102,11 @@ export async function createListener(
   } else if (network === SupportedNetwork.Compound) {
     // TODO: @Timothee - Remove any type once listeners are combined
     listener = <any>(
-      new CompoundListener(
+      new EvmListener(
         chain,
         options.address,
         options.url,
+        'compound',
         !!options.skipCatchup,
         !!options.verbose,
         options.discoverReconnectRange
@@ -134,10 +131,11 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.Aave) {
     listener = <any>(
-      new AaveListener(
+      new EvmListener(
         chain,
         options.address,
         options.url,
+        'aave',
         !!options.skipCatchup,
         !!options.verbose,
         options.discoverReconnectRange
