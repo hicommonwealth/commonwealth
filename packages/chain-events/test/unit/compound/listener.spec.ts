@@ -3,11 +3,7 @@ import * as events from 'events';
 import * as chai from 'chai';
 import dotenv from 'dotenv';
 
-import {
-  Processor,
-  StorageFetcher,
-  Listener,
-} from '../../../src/chains/compound';
+import { Processor, Listener } from '../../../src/chains/compound';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 import { Subscriber } from '../../../src/chains/EVM/subscriber';
@@ -35,7 +31,6 @@ describe.skip('Compound listener class tests', () => {
   it('should initialize the Compound listener', async () => {
     await listener.init();
     assert(listener._subscriber instanceof Subscriber);
-    assert(listener.storageFetcher instanceof StorageFetcher);
     assert(listener._processor instanceof Processor);
   });
 
