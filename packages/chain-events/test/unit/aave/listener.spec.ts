@@ -3,7 +3,7 @@ import * as events from 'events';
 import * as chai from 'chai';
 import dotenv from 'dotenv';
 
-import { Processor, StorageFetcher, Listener } from '../../../src/chains/aave';
+import { Processor, Listener } from '../../../src/chains/aave';
 import { networkUrls, contracts } from '../../../scripts/listenerUtils';
 import { TestHandler } from '../../util';
 import { Subscriber } from '../../../src/chains/EVM/subscriber';
@@ -32,7 +32,6 @@ describe.skip('Aave listener class tests', () => {
     listener = new Listener('aave', contracts.aave, null, true, false);
     await listener.init();
     assert(listener._subscriber instanceof Subscriber);
-    assert(listener.storageFetcher instanceof StorageFetcher);
     assert(listener._processor instanceof Processor);
   });
 

@@ -138,7 +138,8 @@ async function migrateChainEntity(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
         contracts[0].address
       );
-      fetcher = new AaveEvents.StorageFetcher(api);
+      // TODO: @Timothee replace storage fetcher calls with Listener.fetchEvents
+      // fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else {
       throw new Error('Unsupported migration chain');

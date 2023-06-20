@@ -19,7 +19,7 @@ let log;
 // TODO: subscribe method can be implemented here and override in edge case (or use super.subscribe() in edge cases)
 export abstract class Listener<
   Api,
-  StorageFetcher extends IStorageFetcher<Api>,
+  StorageFetcher extends IStorageFetcher<Api> | any,
   Processor extends IEventProcessor<Api, any>,
   Subscriber extends IEventSubscriber<Api, any> | any,
   EventKind extends IChainEventKind

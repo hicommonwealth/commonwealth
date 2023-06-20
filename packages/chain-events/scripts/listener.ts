@@ -174,27 +174,27 @@ if (network === SupportedNetwork.Substrate) {
     // });
   });
 } else if (network === SupportedNetwork.Aave) {
-  AaveEvents.createApi(url, contract).then(async (api) => {
-    const fetcher = new AaveEvents.StorageFetcher(api);
-    try {
-      const fetched = await fetcher.fetch({
-        startBlock: 13353227,
-        maxResults: 1,
-      });
-      // const fetched = await fetcher.fetchOne('10');
-      console.log(fetched.sort((a, b) => a.blockNumber - b.blockNumber));
-    } catch (err) {
-      console.log(err);
-      console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
-    }
-    // AaveEvents.subscribeEvents({
-    //   chain,
-    //   api,
-    //   handlers: [new StandaloneEventHandler()],
-    //   skipCatchup,
-    //   verbose: true,
-    // });
-  });
+  // AaveEvents.createApi(url, contract).then(async (api) => {
+  //   const fetcher = new AaveEvents.StorageFetcher(api);
+  //   try {
+  //     const fetched = await fetcher.fetch({
+  //       startBlock: 13353227,
+  //       maxResults: 1,
+  //     });
+  //     // const fetched = await fetcher.fetchOne('10');
+  //     console.log(fetched.sort((a, b) => a.blockNumber - b.blockNumber));
+  //   } catch (err) {
+  //     console.log(err);
+  //     console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
+  //   }
+  // AaveEvents.subscribeEvents({
+  //   chain,
+  //   api,
+  //   handlers: [new StandaloneEventHandler()],
+  //   skipCatchup,
+  //   verbose: true,
+  // });
+  // });
 } else if (network === SupportedNetwork.ERC20) {
   getTokenList(tokenListUrls[0]).then(async (tokens) => {
     const validTokens = tokens.filter((t) => t.chainId === 1);
