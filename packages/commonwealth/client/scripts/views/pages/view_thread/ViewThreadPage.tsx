@@ -680,6 +680,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <div className='comments-filter-row'>
             <Select
               key={commentSortType}
+              size='compact'
               selected={commentSortType}
               onSelect={(item: any) => {
                 setCommentSortType(item.value)
