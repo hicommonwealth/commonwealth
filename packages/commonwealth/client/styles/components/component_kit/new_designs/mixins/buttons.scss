@@ -1,0 +1,16 @@
+@mixin iconAndTextColors($icon-color, $text-color) {
+  .Icon.button-icon {
+    color: $icon-color;
+  }
+
+  .Text.button-text {
+    color: $text-color;
+  }
+}
+
+@mixin disabled {
+  box-shadow: none;
+  pointer-events: none;
+
+  @include iconAndText($neutral-300);
+}
