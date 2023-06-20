@@ -7,25 +7,6 @@ import { iconLookup } from '../../../client/scripts/views/components/component_k
 
 const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
-const commonControlsToExclude = [
-  "autoComplete",
-  "containerClassName",
-  "defaultValue",
-  "autoFocus",
-  "value",
-  "iconRightonClick",
-  "maxLength",
-  "name",
-  "onClick",
-  "onInput",
-  "onenterkey",
-  "tabIndex",
-  "inputClassName",
-  "displayOnly",
-  "hasRightIcon",
-  "isTyping",
-];
-
 const input = {
   title: 'Components/TextInput',
   component: CWTextInput,
@@ -36,17 +17,13 @@ type Story = StoryObj<typeof input>;
 
 export const TextInput: Story = {
   args: {
-    label: "Large",
     placeholder: "Placeholder",
     disabled: false,
     size: "large",
+    iconLeft: undefined,
     iconRight: undefined,
-    darkMode: false,
   },
   argTypes: {
-    label: {
-      control: { type: "text" },
-    },
     placeholder: {
       control: { type: "text" },
     },
@@ -58,19 +35,38 @@ export const TextInput: Story = {
       control: { type: "select" },
       options: [ "small", "large" ],
     },
-    iconRight: {
+    iconLeft: {
       control: { type: "select" },
       options: iconOptions,
     },
-    darkMode: {
-      control: { type: "boolean" },
-      options: [ true, false ],
+    iconRight: {
+      control: { type: "select" },
+      options: iconOptions,
     },
   },
   parameters: {
     controls: {
       exclude: [
-        ...commonControlsToExclude,
+        "autoComplete",
+        "containerClassName",
+        "darkMode",
+        "defaultValue",
+        "autoFocus",
+        "value",
+        "iconLeftonClick",
+        "iconRightonClick",
+        "label",
+        "maxLength",
+        "name",
+        "onClick",
+        "onInput",
+        "onenterkey",
+        "tabIndex",
+        "inputClassName",
+        "displayOnly",
+        "hasLeftIcon",
+        "hasRightIcon",
+        "isTyping",
         "autoFocus",
         "inputValidationFn",
         "manualStatusMessage",
@@ -82,68 +78,4 @@ export const TextInput: Story = {
   render: ({...args}) => (
     <CWTextInput name="Text field" {...args} />
   )
-};
-
-/** This input only accepts A-Z */
-export const OnlyLetters = {
-  args: {
-    label: "This input only accepts A-Z",
-    placeholder: "Type here",
-    disabled: false,
-    // size: "large",
-    iconRight: undefined,
-    darkMode: false,
-    validationFailText: "Must enter characters A-Z",
-    validationSuccessText: "Input validated",
-  },
-  argTypes: {
-    // label: {
-    //   control: { type: "text" },
-    // },
-    placeholder: {
-      control: { type: "text" },
-    },
-    disabled: {
-      control: { type: "boolean" },
-      options: [ true, false ],
-    },
-    size: {
-      control: { type: "select" },
-      options: [ "small", "large" ],
-    },
-    iconRight: {
-      control: { type: "select" },
-      options: iconOptions,
-    },
-    darkMode: {
-      control: { type: "boolean" },
-      options: [ true, false ],
-    },
-    validationFailText: {
-      control: { type: "text" },
-    },
-    validationSuccessText: {
-      control: { type: "text" },
-    }
-  },
-  parameters: {
-    controls: {
-      exclude: [ ...commonControlsToExclude ],
-    }
-  },
-  render: ({...args}) => (
-    <CWTextInput
-      {...args}
-      name="Form field"
-      inputValidationFn={(val: string): [ValidationStatus, string] => {
-        if (val.match(/[^A-Za-z]/)) {
-          return ['failure', args.validationFailText];
-        } else {
-          return ['success', args.validationSuccessText];
-        }
-      }}
-      label={args.label}
-      placeholder={args.placeholder}
-    />
-  ),
 };
