@@ -10,19 +10,19 @@ export const useReactionButton = (thread: Thread, setReactors) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const thisUserReaction = thread.associatedReactions.filter(
+  const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress
   );
-  const [hasReacted, setHasReacted] = useState(thisUserReaction.length !== 0);
+  const [hasReacted, setHasReacted] = useState(thisUserReaction?.length !== 0);
   const [reactedId, setReactedId] = useState(
-    thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id
+    thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id
   );
 
   useEffect(() => {
     const fetch = () => {
       if (
         activeAddress &&
-        thread.associatedReactions.filter((r) => r.address === activeAddress)
+        thread?.associatedReactions?.filter((r) => r.address === activeAddress)
           .length > 0
       ) {
         setHasReacted(true);
@@ -30,7 +30,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
         setHasReacted(false);
       }
 
-      setReactors(thread.associatedReactions.map((t) => t.address));
+      setReactors(thread?.associatedReactions?.map((t) => t.address));
     };
 
     fetch();
@@ -40,7 +40,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const isUserForbidden =
-    !isAdmin && TopicGateCheck.isGatedTopic(thread.topic?.name);
+    !isAdmin && TopicGateCheck.isGatedTopic(thread?.topic?.name);
 
   const dislike = async () => {
     if (reactedId === -1 || !hasReacted || isLoading) {
@@ -59,7 +59,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
         setHasReacted(false);
 
         // update in store
-        const foundThread = app.threads.getById(thread.id);
+        const foundThread = app.threads.getById(thread?.id);
         if (foundThread) {
           foundThread.associatedReactions = [
             ...foundThread.associatedReactions,
@@ -80,7 +80,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
     chainId: string,
     userAddress: string
   ) => {
-    const foundThread = app.threads.getById(thread.id);
+    const foundThread = app.threads.getById(thread?.id);
     if (
       (foundThread &&
         foundThread.associatedReactions.find(

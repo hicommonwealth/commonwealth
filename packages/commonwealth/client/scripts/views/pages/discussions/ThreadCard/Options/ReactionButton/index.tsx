@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import app from 'state';
 import type Thread from '../../../../../../models/Thread';
+import {
+  getDisplayedReactorsForPopup,
+  onReactionClick,
+} from '../../../../../components/ReactionButton/helpers';
 import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
 import { Modal } from '../../../../../components/component_kit/cw_modal';
 import { CWTooltip } from '../../../../../components/component_kit/cw_popover/cw_tooltip';
@@ -9,25 +13,37 @@ import {
   getClasses,
   isWindowMediumSmallInclusive,
 } from '../../../../../components/component_kit/helpers';
-import {
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from '../../../../../components/ReactionButton/helpers';
 import { LoginModal } from '../../../../../modals/login_modal';
 import './index.scss';
 import { useReactionButton } from './useReactionButton';
+import { Skeleton } from 'views/components/Skeleton';
 
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
+  showSkeleton?: boolean
 };
 
-export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
+const ReactionButtonSkeleton = () => {
+  return <button
+    onClick={async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    }}
+    className={`ThreadReactionButton showSkeleton`}
+  >
+    <Skeleton height={52} width={40}/>
+  </button>
+}
+
+export const ReactionButton = ({ thread, size, showSkeleton }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
 
   const { dislike, hasReacted, isLoading, isUserForbidden, like } =
     useReactionButton(thread, setReactors);
+
+  if(showSkeleton) return <ReactionButtonSkeleton/>
 
   return (
     <>
@@ -71,9 +87,8 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
                 <CWText
                   onMouseEnter={handleInteraction}
                   onMouseLeave={handleInteraction}
-                  className={`menu-buttons-text ${
-                    hasReacted ? ' has-reacted' : ''
-                  }`}
+                  className={`menu-buttons-text ${hasReacted ? ' has-reacted' : ''
+                    }`}
                   type="caption"
                   fontWeight="medium"
                 >
@@ -83,9 +98,8 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
             />
           ) : (
             <CWText
-              className={`menu-buttons-text ${
-                hasReacted ? ' has-reacted' : ''
-              }`}
+              className={`menu-buttons-text ${hasReacted ? ' has-reacted' : ''
+                }`}
               type="caption"
               fontWeight="medium"
             >
@@ -110,9 +124,8 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
               onReactionClick(e, hasReacted, dislike, like);
             }
           }}
-          className={`ThreadReactionButton ${
-            isLoading || isUserForbidden ? ' disabled' : ''
-          }${hasReacted ? ' has-reacted' : ''}`}
+          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
+            }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (
             <CWTooltip
@@ -135,9 +148,8 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
                       {...(hasReacted && { weight: 'fill' })}
                     />
                     <div
-                      className={`reactions-count ${
-                        hasReacted ? ' has-reacted' : ''
-                      }`}
+                      className={`reactions-count ${hasReacted ? ' has-reacted' : ''
+                        }`}
                     >
                       {reactors.length}
                     </div>
@@ -149,9 +161,8 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
               <div
-                className={`reactions-count ${
-                  hasReacted ? ' has-reacted' : ''
-                }`}
+                className={`reactions-count ${hasReacted ? ' has-reacted' : ''
+                  }`}
               >
                 {reactors.length}
               </div>

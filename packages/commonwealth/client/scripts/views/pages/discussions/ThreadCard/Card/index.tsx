@@ -8,8 +8,10 @@ import {
 } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import useBrowserWindow from '../../../../../hooks/useBrowserWindow';
 import AddressInfo from '../../../../../models/AddressInfo';
@@ -18,20 +20,38 @@ import Permissions from '../../../../../utils/Permissions';
 import { CWTag } from '../../../../components/component_kit/cw_tag';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import { getClasses } from '../../../../components/component_kit/helpers';
-import { isHot } from '../../helpers';
 import { isNewThread } from '../../NewThreadTag';
+import { isHot } from '../../helpers';
 import { AuthorAndPublishInfo } from '../AuthorAndPublishInfo';
 import { Options } from '../Options';
 import { AdminActionsProps } from '../Options/AdminActions';
 import { ReactionButton } from '../Options/ReactionButton';
 import './index.scss';
-import { Link } from 'react-router-dom';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
-  threadHref: string;
+  threadHref?: string;
+  showSkeleton?: boolean;
 };
+
+const CardSkeleton = ({ isWindowSmallInclusive, thread }) => {
+  return <div className={'ThreadCard showSkeleton'}>
+    {!isWindowSmallInclusive && (
+      <ReactionButton thread={thread} size="big" showSkeleton/>
+    )}
+    <div className="content-wrapper">
+      <div className="content-header">
+        <Skeleton width={200} count={1} />
+        <div className="content-header-icons"> <Skeleton width={100} /> </div>
+      </div>
+      <div className="content-body-wrapper">
+        <Skeleton count={3} />
+      </div>
+    </div>
+    <div className="content-footer"><Skeleton /></div>
+  </div>
+}
 
 export const Card = ({
   thread,
@@ -50,6 +70,7 @@ export const Card = ({
   onBodyClick,
   onStageTagClick,
   threadHref,
+  showSkeleton
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -59,6 +80,8 @@ export const Card = ({
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
   }, []);
+
+  if (showSkeleton) return <CardSkeleton thread isWindowSmallInclusive={false} />
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -80,130 +103,127 @@ export const Card = ({
     (thread.stage && !isStageDefault) || linkedProposals.length > 0;
 
   return (
-    <>
-      <Link
-        to={threadHref}
-        className={getClasses<{ isPinned?: boolean }>(
-          { isPinned: thread.pinned },
-          'ThreadCard'
-        )}
-        onClick={() => onBodyClick && onBodyClick()}
-        key={thread.id}
-      >
-        {!isWindowSmallInclusive && (
-          <ReactionButton thread={thread} size="big" />
-        )}
-        <div className="content-wrapper">
-          <div className="content-header">
-            <AuthorAndPublishInfo
-              showSplitDotIndicator={!isWindowSmallInclusive}
-              authorInfo={
-                new AddressInfo(null, thread.author, thread.authorChain, null)
-              }
-              publishDate={moment(thread.createdAt).format('l')}
-              isNew={isNewThread(thread.createdAt)}
-              isLocked={thread.readOnly}
-              {...(thread.lockedAt && {
-                lockedAt: thread.lockedAt.toISOString(),
-              })}
-              {...(thread.updatedAt && {
-                lastUpdated: thread.updatedAt.toISOString(),
-              })}
-            />
-            <div className="content-header-icons">
-              {isHot(thread) && <div className="flame" />}
-              {thread.pinned && <CWIcon iconName="pin" />}
-            </div>
-          </div>
-          {isTagsRowVisible && (
-            <div className="content-tags">
-              {thread.stage && !isStageDefault && (
-                <CWTag
-                  label={threadStageToLabel(thread.stage)}
-                  trimAt={20}
-                  type="stage"
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    await onStageTagClick(thread.stage);
-                  }}
-                />
-              )}
-              {linkedProposals
-                .sort((a, b) => +a.identifier - +b.identifier)
-                .map((link) => (
-                  <CWTag
-                    key={`${link.source}-${link.identifier}`}
-                    type="proposal"
-                    label={`${chainEntityTypeToProposalShortName(
-                      'proposal' as IChainEntityKind
-                    )} 
-                        ${
-                          Number.isNaN(parseInt(link.identifier, 10))
-                            ? ''
-                            : ` #${link.identifier}`
-                        }`}
-                  />
-                ))}
-            </div>
-          )}
-          <div className="content-body-wrapper">
-            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
-            <div className="content-title">
-              <CWText type="h5" fontWeight="semiBold">
-                {thread.title}
-              </CWText>
-              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
-
-              {linkedSnapshots.length > 0 && (
-                <CWTag
-                  type="active"
-                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
-                    ? linkedSnapshots[0].identifier.split('/')[1]
-                    : linkedSnapshots[0].identifier
-                  )
-                    .toString()
-                    .slice(0, 4)}…`}
-                />
-              )}
-            </div>
-            <CWText type="caption" className="content-body">
-              {thread.plaintext}
-            </CWText>
-          </div>
-          <div
-            className="content-footer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            <Options
-              totalComments={thread.numberOfComments}
-              shareEndpoint={discussionLink}
-              thread={thread}
-              canVote={isWindowSmallInclusive}
-              canComment={!thread.readOnly}
-              canUpdateThread={
-                isLoggedIn &&
-                (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
-              }
-              onDelete={onDelete}
-              onSpamToggle={onSpamToggle}
-              onLockToggle={onLockToggle}
-              onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
-              onProposalStageChange={onProposalStageChange}
-              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-              onCollaboratorsEdit={onCollaboratorsEdit}
-              onEditStart={onEditStart}
-              onEditCancel={onEditCancel}
-              onEditConfirm={onEditConfirm}
-              hasPendingEdits={hasPendingEdits}
-            />
+    <Link
+      to={threadHref}
+      className={getClasses<{ isPinned?: boolean }>(
+        { isPinned: thread.pinned },
+        'ThreadCard'
+      )}
+      onClick={() => onBodyClick && onBodyClick()}
+      key={thread.id}
+    >
+      {!isWindowSmallInclusive && (
+        <ReactionButton thread={thread} size="big" />
+      )}
+      <div className="content-wrapper">
+        <div className="content-header">
+          <AuthorAndPublishInfo
+            showSplitDotIndicator={!isWindowSmallInclusive}
+            authorInfo={
+              new AddressInfo(null, thread.author, thread.authorChain, null)
+            }
+            publishDate={moment(thread.createdAt).format('l')}
+            isNew={isNewThread(thread.createdAt)}
+            isLocked={thread.readOnly}
+            {...(thread.lockedAt && {
+              lockedAt: thread.lockedAt.toISOString(),
+            })}
+            {...(thread.updatedAt && {
+              lastUpdated: thread.updatedAt.toISOString(),
+            })}
+          />
+          <div className="content-header-icons">
+            {isHot(thread) && <div className="flame" />}
+            {thread.pinned && <CWIcon iconName="pin" />}
           </div>
         </div>
-      </Link>
-    </>
+        {isTagsRowVisible && (
+          <div className="content-tags">
+            {thread.stage && !isStageDefault && (
+              <CWTag
+                label={threadStageToLabel(thread.stage)}
+                trimAt={20}
+                type="stage"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  await onStageTagClick(thread.stage);
+                }}
+              />
+            )}
+            {linkedProposals
+              .sort((a, b) => +a.identifier - +b.identifier)
+              .map((link) => (
+                <CWTag
+                  key={`${link.source}-${link.identifier}`}
+                  type="proposal"
+                  label={`${chainEntityTypeToProposalShortName(
+                    'proposal' as IChainEntityKind
+                  )} 
+                        ${Number.isNaN(parseInt(link.identifier, 10))
+                      ? ''
+                      : ` #${link.identifier}`
+                    }`}
+                />
+              ))}
+          </div>
+        )}
+        <div className="content-body-wrapper">
+          {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
+          <div className="content-title">
+            <CWText type="h5" fontWeight="semiBold">
+              {thread.title}
+            </CWText>
+            {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+            {linkedSnapshots.length > 0 && (
+              <CWTag
+                type="active"
+                label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
+                  ? linkedSnapshots[0].identifier.split('/')[1]
+                  : linkedSnapshots[0].identifier
+                )
+                  .toString()
+                  .slice(0, 4)}…`}
+              />
+            )}
+          </div>
+          <CWText type="caption" className="content-body">
+            {thread.plaintext}
+          </CWText>
+        </div>
+        <div
+          className="content-footer"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <Options
+            totalComments={thread.numberOfComments}
+            shareEndpoint={discussionLink}
+            thread={thread}
+            canVote={isWindowSmallInclusive}
+            canComment={!thread.readOnly}
+            canUpdateThread={
+              isLoggedIn &&
+              (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
+            }
+            onDelete={onDelete}
+            onSpamToggle={onSpamToggle}
+            onLockToggle={onLockToggle}
+            onPinToggle={onPinToggle}
+            onTopicChange={onTopicChange}
+            onProposalStageChange={onProposalStageChange}
+            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+            onCollaboratorsEdit={onCollaboratorsEdit}
+            onEditStart={onEditStart}
+            onEditCancel={onEditCancel}
+            onEditConfirm={onEditConfirm}
+            hasPendingEdits={hasPendingEdits}
+          />
+        </div>
+      </div>
+    </Link>
   );
 };

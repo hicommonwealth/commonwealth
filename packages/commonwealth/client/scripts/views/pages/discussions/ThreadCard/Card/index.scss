@@ -14,6 +14,12 @@
     padding: 12px;
   }
 
+  &.showSkeleton {
+    &:hover {
+      background: unset;
+    }
+  }
+
   &.isPinned {
     background: $neutral-50;
 
