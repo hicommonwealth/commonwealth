@@ -132,15 +132,6 @@ export const DynamicTemplate = {
   EmailDigest: 'd-a4f27421ce5a41d29dca7625d2136cc3',
 };
 
-export type TokenResponse = {
-  chainId: number;
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  logoURI?: string;
-};
-
 export type SnapshotGraphQLResponse = {
   data?: {
     proposal: {
@@ -170,6 +161,6 @@ export type SnapshotGraphQLResponse = {
 
 export type RoleObject = {
   permission: AccessLevel;
-  allow: bigint;
-  deny: bigint;
+  allow: number;
+  deny: number;
 };

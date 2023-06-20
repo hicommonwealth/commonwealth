@@ -29,26 +29,26 @@
 
   &.h1 {
     font-family: $font-family-silka;
-    font-size: 42px;
-    line-height: 56px;
+    font-size: 36px;
+    line-height: 48px;
   }
 
   &.h2 {
     font-family: $font-family-silka;
-    font-size: 35px;
-    line-height: 48px;
+    font-size: 28px;
+    line-height: 40px;
   }
 
   &.h3 {
     font-family: $font-family-silka;
-    font-size: 29px;
+    font-size: 24px;
     line-height: 36px;
   }
 
   &.h4 {
     font-family: $font-family-silka;
     font-size: 20px;
-    line-height: 24px;
+    line-height: 28px;
   }
 
   &.h5 {
@@ -59,14 +59,14 @@
 
   &.d1 {
     font-family: $font-family-silka;
-    font-size: 67px;
+    font-size: 64px;
     letter-spacing: -0.02em;
     line-height: 80px;
   }
 
   &.d2 {
     font-family: $font-family-silka;
-    font-size: 54px;
+    font-size: 48px;
     letter-spacing: -0.01em;
     line-height: 64px;
   }
@@ -88,19 +88,33 @@
   }
 
   &.buttonSm {
-    font-family: $font-family-silka;
-    font-size: 16px;
+    font-family: $font-family-neue-haas-unica;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.02em;
     line-height: 24px;
   }
 
   &.buttonLg {
-    font-family: $font-family-silka;
-    font-size: 18px;
+    font-family: $font-family-neue-haas-unica;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.04em;
     line-height: 28px;
+  }
+
+  &.monospace1 {
+    font-family: $font-family-monospace;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+  }
+
+  &.monospace2 {
+    font-family: $font-family-monospace;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
   }
 
   &.regular {
@@ -125,6 +139,10 @@
 
   &.italic {
     font-style: italic;
+  }
+
+  &.link {
+    color: $primary-500;
   }
 
   &.uppercase {

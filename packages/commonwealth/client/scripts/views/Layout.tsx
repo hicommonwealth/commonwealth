@@ -1,10 +1,10 @@
 import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
 import 'Layout.scss';
 import withRouter from 'navigation/helpers';
-import React, { Suspense, useState } from 'react';
+import React, { useState, ReactNode, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
-import app, { LoginState } from 'state';
+import app from 'state';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
@@ -13,46 +13,13 @@ import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
 
-const LoadingLayout = ({ isAppLoading }) => {
-  const Bobber = () => (
-    <div className="Layout">
-      <div className="spinner-container">
-        <CWSpinner size="xl" />
-      </div>
-    </div>
-  );
-
-  const isLoggedIn = app.loginState === LoginState.LoggedIn;
-  const isLanding = window.location.pathname === '/';
-  if (isLanding && !isLoggedIn) return <Bobber />;
-
-  return (
-    <SubLayout isLoadingProfileData={isAppLoading}>
-      <Bobber />
-    </SubLayout>
-  );
-};
-
-const ApplicationError = () => {
-  return (
-    <div className="Layout">
-      <CWEmptyState
-        iconName="cautionTriangle"
-        content={
-          <div className="loading-error">
-            <CWText>Application error: {app.loadingError}</CWText>
-            <CWText>Please try again later</CWText>
-          </div>
-        }
-      />
-    </div>
-  );
-};
-
 type LayoutAttrs = {
-  scope?: string;
-  children: React.ReactNode;
-  isAppLoading?: boolean;
+  Component: ReactNode | any;
+  scoped?: boolean;
+  type:
+    | 'community' // community specific layout with header, commonwealth sidebar and community sidebar - used for cw community owned pages
+    | 'common' // common wealth layout with header and commonwealth sidebar - used for cw self owned pages
+    | 'blank'; //  a blank layout with just the layout styles
 };
 
 /**
@@ -64,25 +31,18 @@ type LayoutAttrs = {
  * - IBS 3 is omitted
  */
 const LayoutComponent = ({
-  // router,
-  children,
-  scope: selectedScope,
-  isAppLoading,
+  Component, // the component to render
+  scoped = false,
+  type = 'community',
 }: LayoutAttrs) => {
-  // const scopeIsEthereumAddress =
-  //   selectedScope &&
-  //   selectedScope.startsWith('0x') &&
-  //   selectedScope.length === 42;
+  const routerParams = useParams();
+  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
+  const selectedScope = scoped ? pathScope : null;
 
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const scopeMatchesChain = app.config.chains.getById(selectedScope);
-
-  // IFB 3: If the user has navigated to an ethereum address directly,
-  // init a new token chain immediately
-  // const shouldInitNewTokenChain =
-  //   selectedScope && selectedScope !== scopeToLoad && scopeIsEthereumAddress;
 
   // IFB 5: If scope is different from app.activeChainId() at render
   // time (and we are not loading another community at the same time,
@@ -104,13 +64,6 @@ const LayoutComponent = ({
 
   useNecessaryEffect(() => {
     (async () => {
-      // if (shouldInitNewTokenChain) {
-      //   // IFB 3
-      //   setIsLoading(true);
-      //   setScopeToLoad(selectedScope);
-      //   await initNewTokenChain(selectedScope, router.navigate);
-      //   setIsLoading(false);
-      // } else
       if (shouldSelectChain) {
         // IFB 5
         setIsLoading(true);
@@ -119,10 +72,7 @@ const LayoutComponent = ({
         setIsLoading(false);
       }
     })();
-  }, [
-    // shouldInitNewTokenChain,
-    shouldSelectChain,
-  ]);
+  }, [shouldSelectChain]);
 
   useNecessaryEffect(() => {
     (async () => {
@@ -136,11 +86,6 @@ const LayoutComponent = ({
     })();
   }, [shouldDeInitChain]);
 
-  // IFB 1: If initApp() threw an error, show application error.
-  if (app.loadingError) {
-    return <ApplicationError />;
-  }
-
   // Show loading state for these cases
   // -
   // IFB 2: If initApp() hasn’t finished loading yet
@@ -153,58 +98,68 @@ const LayoutComponent = ({
   // IFB 6
   // -
   // IFB 7
-  if (
+  const shouldShowLoadingState =
     isLoading || // general loading
     !app.loginStatusLoaded() || // IFB 2
     // Important: render loading state immediately for IFB 5, 6 and 7, general
     // loading will take over later
     shouldSelectChain || // IFB 5
-    shouldDeInitChain || // IFB 7
-    isAppLoading // NON IFB - a bool to indicate if app is loading
-  ) {
-    return <LoadingLayout isAppLoading />;
-  }
+    shouldDeInitChain; // IFB 7
 
   // IFB 4: If the user has attempted to a community page that was not
   // found on the list of communities from /status, show a 404 page.
-  if (
-    selectedScope &&
-    !scopeMatchesChain
-    // && !scopeIsEthereumAddress
-  ) {
-    return (
-      <div className="Layout">
-        <PageNotFound />
-      </div>
-    );
-  }
+  const pageNotFound = selectedScope && !scopeMatchesChain;
 
   // IFB 8: No pending branch case - Render the inner page as passed by router
-  return <div className="Layout">{children}</div>;
-};
+  const childToRender = () => {
+    // IFB 1: If initApp() threw an error, show application error.
+    if (app.loadingError) {
+      return (
+        <CWEmptyState
+          iconName="cautionTriangle"
+          content={
+            <div className="loading-error">
+              <CWText>Application error: {app.loadingError}</CWText>
+              <CWText>Please try again later</CWText>
+            </div>
+          }
+        />
+      );
+    }
 
-export const LayoutWrapper = ({ Component, params }) => {
-  const routerParams = useParams();
-  const LayoutComp = withRouter(LayoutComponent);
+    const Bobber = (
+      <div className="spinner-container">
+        <CWSpinner size="xl" />
+      </div>
+    );
 
-  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
-  const scope = params.scoped ? pathScope : null;
+    if (shouldShowLoadingState) return Bobber;
 
-  return (
-    <LayoutComp scope={scope} isAppLoading={params?.isAppLoading}>
-      <Component {...routerParams} />
-    </LayoutComp>
-  );
-};
+    return (
+      <Suspense fallback={Bobber}>
+        {pageNotFound ? <PageNotFound /> : <Component {...routerParams} />}
+      </Suspense>
+    );
+  };
 
-export const withLayout = (Component, params) => {
   return (
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
     >
-      <Suspense fallback={null}>
-        <LayoutWrapper Component={Component} params={params} />
-      </Suspense>
+      <div className="Layout">
+        {type === 'blank' ? (
+          childToRender()
+        ) : (
+          <SubLayout hasCommunitySidebar={type === 'community'}>
+            {childToRender()}
+          </SubLayout>
+        )}
+      </div>
     </ErrorBoundary>
   );
+};
+
+export const withLayout = (Component, params) => {
+  const LayoutWrapper = withRouter(LayoutComponent);
+  return <LayoutWrapper Component={Component} {...params} />;
 };
