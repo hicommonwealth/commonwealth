@@ -702,7 +702,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             />
             {comments.length > 0 && (
               <CWCheckbox
-                className="ml-auto"
                 checked={includeSpamThreads}
                 label="Include comments flagged as spam"
                 onChange={(e) => setIncludeSpamThreads(e.target.checked)}
