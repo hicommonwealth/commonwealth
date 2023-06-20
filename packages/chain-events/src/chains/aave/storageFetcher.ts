@@ -1,5 +1,9 @@
 import { populateRange } from '../../util';
-import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import type {
+  CWEvent,
+  EvmEventSourceMapType,
+  IDisconnectedRange,
+} from '../../interfaces';
 import { IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
@@ -13,6 +17,7 @@ import type {
   IVoteEmitted,
 } from './types';
 import { EventKind } from './types';
+import { getRawEvents, pascalToKebabCase } from 'chain-events/src/eth';
 
 type IEntityEventData =
   | IProposalCanceled
@@ -201,5 +206,32 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       ...cancelledCwEvents,
       ...executedCwEvents,
     ].sort((e1, e2) => e1.blockNumber - e2.blockNumber);
+  }
+
+  public async newFetch(
+    provider,
+    eventSources: EvmEventSourceMapType,
+    blockRange: { start: number | string; end: number | string }
+  ) {
+    const log = factory.getLogger(
+      addPrefix(__filename, [SupportedNetwork.Aave, this.chain])
+    );
+    const rawEvents = await getRawEvents(provider, eventSources, blockRange);
+    const enrichedEvents = [];
+    for (const event of rawEvents) {
+      // TODO: This basically the same as the processor functionality
+      const kind = pascalToKebabCase(event.name);
+      if (!kind) continue;
+      try {
+        const cwEvent = await Enrich(event.blockNumber, kind, event);
+        enrichedEvents.push(cwEvent);
+      } catch (e) {
+        log.error(
+          `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.name}, Error Message: ${e.message}`
+        );
+      }
+    }
+
+    return enrichedEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber);
   }
 }

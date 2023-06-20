@@ -37,11 +37,12 @@ describe('Integration tests for Aave', () => {
   );
 
   // holds event data, so we can verify the integrity of the events across all services
-  const events = {};
+  let events = {};
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
   let listener: Listener<Api, StorageFetcher, Processor, Subscriber, EventKind>;
+  let listeners: IListenerInstances;
   const contract = new aaveGovernor();
   const chain_id = 'ganache-fork-aave';
   const chain = {
@@ -55,7 +56,7 @@ describe('Integration tests for Aave', () => {
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;
-  let proposalCreatedBlockNum: number;
+  let proposalCreatedBlockNum: number, proposalExecutedBlockNum: number;
 
   before(async () => {
     // initialize the mock rabbitmq controller
@@ -65,10 +66,7 @@ describe('Integration tests for Aave', () => {
   describe('Tests the Aave event listener using the chain subscriber', () => {
     before(async () => {
       // set up the chain subscriber
-      const listeners: IListenerInstances = await runSubscriberAsFunction(
-        rmq,
-        chain
-      );
+      listeners = await runSubscriberAsFunction(rmq, chain);
       // TODO: @Timothee - remove unknown conversion once Listeners are combined
       listener = listeners[chain_id] as unknown as Listener<
         Api,
@@ -163,6 +161,7 @@ describe('Integration tests for Aave', () => {
       const { secs, blocks } = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(secs), blocks);
       const { block } = await sdk.executeProposal(proposalId, 'aave');
+      proposalExecutedBlockNum = block;
       await waitUntilBlock(block, listener);
 
       events[EventKind.ProposalExecuted] = findEvent(
@@ -190,6 +189,13 @@ describe('Integration tests for Aave', () => {
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
       ).to.equal(7);
+    });
+
+    after(async () => {
+      await listener.unsubscribe();
+      listener = undefined;
+      // clear the listener created by the subscriber
+      delete listeners[chain_id];
     });
   });
 
@@ -404,11 +410,122 @@ describe('Integration tests for Aave', () => {
     });
   });
 
+  describe('Tests the Aave event listener catch-up using the chain subscriber', async () => {
+    let createdBlock, voteBlock, queueBlock, executedBlock;
+    before(async () => {
+      // advance some blocks to simulate time that the subscriber is offline
+      // await sdk.safeAdvanceTime(proposalExecutedBlockNum + 100);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>Last txn block num',
+        proposalExecutedBlockNum,
+        'Current Block:',
+        await sdk.getBlock()
+      );
+
+      // create proposal
+      const result = await sdk.createProposal(1, 'aave');
+      proposalId = result.proposalId;
+      createdBlock = result.block;
+
+      // vote
+      let res = getEvmSecondsAndBlocks(3);
+      await sdk.safeAdvanceTime(createdBlock + res.blocks);
+      const voteResult = await sdk.castVote(proposalId, 1, true, 'aave');
+      voteBlock = voteResult.block;
+
+      res = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(res.secs), res.blocks);
+      const queueResult = await sdk.queueProposal(proposalId, 'aave');
+      queueBlock = queueResult.block;
+
+      res = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(res.secs), res.blocks);
+      const executeResult = await sdk.executeProposal(proposalId, 'aave');
+      executedBlock = executeResult.block;
+
+      // restart the mock rabbitmq controller
+      await rmq.shutdown();
+      await rmq.init();
+
+      // reset the events
+      events = {};
+    });
+
+    it('Should fetch all missed events', async () => {
+      // set up the chain subscriber
+      listeners = await runSubscriberAsFunction(rmq, chain);
+      // TODO: @Timothee - remove unknown conversion once Listeners are combined
+      listener = listeners[chain_id] as unknown as Listener<
+        Api,
+        StorageFetcher,
+        Processor,
+        Subscriber,
+        EventKind
+      >;
+
+      // check proposal created
+      events[EventKind.ProposalCreated] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        EventKind.ProposalCreated,
+        chain_id,
+        createdBlock
+      );
+      eventMatch(
+        events[EventKind.ProposalCreated],
+        EventKind.ProposalCreated,
+        chain_id,
+        proposalId
+      );
+
+      // check vote on proposal
+      events[EventKind.VoteEmitted] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        EventKind.VoteEmitted,
+        chain_id,
+        voteBlock
+      );
+      eventMatch(
+        events[EventKind.VoteEmitted],
+        EventKind.VoteEmitted,
+        chain_id,
+        proposalId
+      );
+
+      // check proposal queued event
+      events[EventKind.ProposalQueued] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        EventKind.ProposalQueued,
+        chain_id,
+        queueBlock
+      );
+      eventMatch(
+        events[EventKind.ProposalQueued],
+        EventKind.ProposalQueued,
+        chain_id,
+        proposalId
+      );
+
+      // check proposal executed event
+      events[EventKind.ProposalExecuted] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        EventKind.ProposalExecuted,
+        chain_id,
+        executedBlock
+      );
+      eventMatch(
+        events[EventKind.ProposalExecuted],
+        EventKind.ProposalExecuted,
+        chain_id,
+        proposalId
+      );
+    });
+  });
+
   after(async () => {
     await rmq.shutdown();
-    await models.ChainEvent.destroy({
-      where: { chain: chain_id },
-    });
+    // await models.ChainEvent.destroy({
+    //   where: { chain: chain_id },
+    // });
     await models.ChainEntity.destroy({
       where: { chain: chain_id },
     });

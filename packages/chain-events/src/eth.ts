@@ -1,8 +1,7 @@
 import { ethers, providers } from 'ethers';
 
 import { addPrefix, factory } from './logging';
-import { JsonRpcProvider, Log, Provider } from '@ethersproject/providers';
-import { Interface } from '@ethersproject/abi/src.ts/interface';
+import { JsonRpcProvider, Log } from '@ethersproject/providers';
 import { EvmEventSourceMapType } from 'chain-events/src/interfaces';
 
 export async function createProvider(
