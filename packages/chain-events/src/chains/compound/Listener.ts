@@ -15,17 +15,17 @@ import type {
   RawEvent,
 } from './types';
 import { createApi } from './subscribeFunc';
-import { Processor } from './processor';
+import { Processor } from '../EVM/processor';
 import { Subscriber } from '../EVM/subscriber';
 import { ethers } from 'ethers';
 import { getRawEvents, pascalToKebabCase } from 'chain-events/src/eth';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { Enrich } from 'chain-events/src/chains/aave';
+import { Enrich } from 'chain-events/src/chains/compound';
 
 export class Listener extends BaseListener<
   Api,
   any,
-  Processor,
+  any,
   Subscriber,
   EventKind
 > {
@@ -71,7 +71,7 @@ export class Listener extends BaseListener<
     }
 
     try {
-      this._processor = new Processor(this._chain);
+      this._processor = new Processor(Enrich);
       this._subscriber = await new Subscriber(
         this._api.provider,
         this._chain,
@@ -212,7 +212,7 @@ export class Listener extends BaseListener<
     end: number | string;
   }) {
     const rawEvents = await getRawEvents(
-      <JsonRpcProvider>this._api.governance.provider,
+      <JsonRpcProvider>this._api.provider,
       this.getEventSourceMap(),
       blockRange
     );

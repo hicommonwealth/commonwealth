@@ -150,7 +150,7 @@ export default class AaveGovernance extends ProposalModule<
       this.app.chain.id,
       [this._api.Governance.address]
     );
-    const processor = new AaveEvents.Processor();
+    const processor = new EvmEvents.Processor(AaveEvents.Enrich);
     await this.app.chainEntities.subscribeEntities(
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta),

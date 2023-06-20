@@ -5,7 +5,7 @@ export * as Erc20Events from './chains/erc20/index';
 export * as Erc721Events from './chains/erc721/index';
 export * as AaveEvents from './chains/aave/index';
 export * as CosmosEvents from './chains/cosmos/index';
-export * as EvmEvents from './chains/EVM/subscriber';
+export * as EvmEvents from './chains/EVM/index';
 
 export { Listener } from './Listener';
 export * from './handlers';

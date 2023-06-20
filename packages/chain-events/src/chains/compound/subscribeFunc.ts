@@ -2,12 +2,6 @@ import type { providers } from 'ethers';
 import sleep from 'sleep-promise';
 
 import { createProvider } from '../../eth';
-import type {
-  IDisconnectedRange,
-  CWEvent,
-  SubscribeFunc,
-  ISubscribeOptions,
-} from '../../interfaces';
 import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 import {
@@ -15,8 +9,7 @@ import {
   GovernorCompatibilityBravo__factory as GovernorCompatibilityBravoFactory,
 } from '../../contractTypes';
 
-import { Processor } from './processor';
-import type { IEventData, RawEvent, Api } from './types';
+import type { Api } from './types';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

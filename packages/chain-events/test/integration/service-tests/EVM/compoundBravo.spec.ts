@@ -21,7 +21,6 @@ import {
 } from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
 import { Api, EventKind } from '../../../../src/chains/compound/types';
-import { Processor } from '../../../../src/chains/compound';
 import { Listener } from '../../../../src';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
 import { Subscriber } from '../../../../src/chains/EVM/subscriber';
@@ -41,7 +40,7 @@ describe('Integration tests for Compound Bravo', () => {
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
-  let listener: Listener<Api, any, Processor, Subscriber, EventKind>;
+  let listener: Listener<Api, any, any, Subscriber, EventKind>;
   const contract = new compoundGovernor();
   const chain_id = 'ganache-fork-bravo';
   const chain = {
@@ -69,7 +68,7 @@ describe('Integration tests for Compound Bravo', () => {
       listener = listeners[chain_id] as unknown as Listener<
         Api,
         any,
-        Processor,
+        any,
         Subscriber,
         EventKind
       >;
@@ -435,7 +434,7 @@ describe('Integration tests for Compound Bravo', () => {
       listener = listeners[chain_id] as unknown as Listener<
         Api,
         any,
-        Processor,
+        any,
         Subscriber,
         EventKind
       >;
@@ -462,7 +461,7 @@ describe('Integration tests for Compound Bravo', () => {
       listener = listeners[chain_id] as unknown as Listener<
         Api,
         any,
-        Processor,
+        any,
         Subscriber,
         EventKind
       >;
@@ -489,7 +488,7 @@ describe('Integration tests for Compound Bravo', () => {
       listener = listeners[chain_id] as unknown as Listener<
         Api,
         any,
-        Processor,
+        any,
         Subscriber,
         EventKind
       >;
@@ -516,7 +515,7 @@ describe('Integration tests for Compound Bravo', () => {
       listener = listeners[chain_id] as unknown as Listener<
         Api,
         any,
-        Processor,
+        any,
         Subscriber,
         EventKind
       >;
