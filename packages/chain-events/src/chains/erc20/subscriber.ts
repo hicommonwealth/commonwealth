@@ -17,6 +17,7 @@ import type { RawEvent, IErc20Contracts } from './types';
 import Timeout = NodeJS.Timeout;
 import { ethers } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   private _name: string;
@@ -29,14 +30,18 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
 
   private eventSourceMap: EvmEventSourceMapType;
 
-  protected lastBlockNumber: number;
-
-  constructor(api: IErc20Contracts, name: string, verbose = false) {
-    super(api, verbose);
+  constructor(
+    api: IErc20Contracts,
+    name: string,
+    verbose = false,
+    lastCachedBlockNumber: LastCachedBlockNumber
+  ) {
+    super(api, verbose, lastCachedBlockNumber);
     this._name = name;
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.ERC20, this._name])
     );
+    this._lastCachedBlockNumber = lastCachedBlockNumber;
   }
 
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
@@ -81,11 +86,14 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   ) {
     const currentBlockNum = await provider.getBlockNumber();
     console.log('New current block number:', currentBlockNum);
-    if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
+    if (
+      this._lastCachedBlockNumber.get() &&
+      this._lastCachedBlockNumber.get() != currentBlockNum
+    ) {
       const logs: Log[] = await provider.send('eth_getLogs', [
         {
           fromBlock: ethers.BigNumber.from(
-            this.lastBlockNumber + 1
+            this._lastCachedBlockNumber.get() + 1
           ).toHexString(),
           toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
           address: this._api.tokens.map((t) =>
@@ -122,7 +130,6 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
         cb(rawEvent);
       }
     }
-    this.lastBlockNumber = currentBlockNum;
   }
 
   /**

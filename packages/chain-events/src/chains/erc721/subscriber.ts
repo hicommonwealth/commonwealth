@@ -16,6 +16,7 @@ import type { RawEvent, IErc721Contracts } from './types';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import Timeout = NodeJS.Timeout;
 import { ethers } from 'ethers';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
   private _name: string;
@@ -26,8 +27,6 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
 
   protected readonly log;
 
-  protected lastBlockNumber: number;
-
   // This is a crucial object that stores the link between a contracts address (key)
   // and 2 things: 1. an array of signatures of all the events in that contract 2. a
   // function to parse the logs of the associated with the contract. This allows us
@@ -35,8 +34,13 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
   // event types
   private eventSourceMap: EvmEventSourceMapType;
 
-  constructor(api: IErc721Contracts, name: string, verbose = false) {
-    super(api, verbose);
+  constructor(
+    api: IErc721Contracts,
+    name: string,
+    verbose = false,
+    lastCachedBlockNumber: LastCachedBlockNumber
+  ) {
+    super(api, verbose, lastCachedBlockNumber);
     this._name = name;
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.ERC721, this._name])
@@ -85,11 +89,14 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
   ) {
     const currentBlockNum = await provider.getBlockNumber();
     console.log('New current block number:', currentBlockNum);
-    if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
+    if (
+      this._lastCachedBlockNumber.get() &&
+      this._lastCachedBlockNumber.get() != currentBlockNum
+    ) {
       const logs: Log[] = await provider.send('eth_getLogs', [
         {
           fromBlock: ethers.BigNumber.from(
-            this.lastBlockNumber + 1
+            this._lastCachedBlockNumber.get() + 1
           ).toHexString(),
           toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
           address: this._api.tokens.map((t) =>
@@ -126,7 +133,7 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
         cb(rawEvent);
       }
     }
-    this.lastBlockNumber = currentBlockNum;
+    this._lastCachedBlockNumber.set(currentBlockNum);
   }
 
   /**

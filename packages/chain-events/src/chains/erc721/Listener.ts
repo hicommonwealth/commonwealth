@@ -62,7 +62,12 @@ export class Listener extends BaseListener<
 
     try {
       this._processor = new Processor(this._api);
-      this._subscriber = new Subscriber(this._api, this._chain, this._verbose);
+      this._subscriber = new Subscriber(
+        this._api,
+        this._chain,
+        this._verbose,
+        this._lastCachedBlockNumber
+      );
     } catch (error) {
       this.log.error(
         'Fatal error occurred while starting the Processor and Subscriber'
