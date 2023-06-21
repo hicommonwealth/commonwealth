@@ -119,7 +119,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     if (this._provider.wc?.connected) {
       await this._provider.wc.killSession();
     }
-    console.log(this._provider);
+
     const Web3 = (await import('web3')).default;
     this._web3 = new Web3(this._provider as any);
     this._accounts = await this._web3.eth.getAccounts();
