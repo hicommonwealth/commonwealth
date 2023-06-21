@@ -130,6 +130,7 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
         cb(rawEvent);
       }
     }
+    this._lastCachedBlockNumber.set(currentBlockNum);
   }
 
   /**
