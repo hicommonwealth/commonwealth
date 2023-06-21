@@ -60,6 +60,30 @@ export class Listener extends BaseListener<any, any, any, any, any> {
   }
 
   public async init(): Promise<void> {
+    await this.createApi();
+
+    try {
+      if (this.listenerBase === 'aave')
+        this._processor = new Processor(AaveEnricher);
+      else this._processor = new Processor(CompoundEnricher);
+
+      this._subscriber = new Subscriber(
+        this.getProvider(),
+        this._chain,
+        this.getContractAddresses(),
+        this._lastCachedBlockNumber,
+        this._verbose
+      );
+    } catch (error) {
+      this.log.error(
+        `Fatal error occurred while starting the Processor, StorageFetcher and Subscriber`
+      );
+      throw error;
+    }
+  }
+
+  // TODO: @Timothee - Remove in ABI PR
+  public async createApi() {
     try {
       if (this.listenerBase === 'aave') {
         this._api = await createAaveApi(
@@ -78,25 +102,6 @@ export class Listener extends BaseListener<any, any, any, any, any> {
       }
     } catch (error) {
       this.log.error(`Fatal error occurred while starting the API`);
-      throw error;
-    }
-
-    try {
-      if (this.listenerBase === 'aave')
-        this._processor = new Processor(AaveEnricher);
-      else this._processor = new Processor(CompoundEnricher);
-
-      this._subscriber = new Subscriber(
-        this.getProvider(),
-        this._chain,
-        this.getContractAddresses(),
-        this._lastCachedBlockNumber,
-        this._verbose
-      );
-    } catch (error) {
-      this.log.error(
-        `Fatal error occurred while starting the Processor, StorageFetcher and Subscriber`
-      );
       throw error;
     }
   }

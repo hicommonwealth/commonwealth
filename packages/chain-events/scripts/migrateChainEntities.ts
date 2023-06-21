@@ -4,7 +4,11 @@
  * from the chain, writing the results back into the database.
  */
 
-import type { IDisconnectedRange, IStorageFetcher } from 'chain-events/src';
+import type {
+  CWEvent,
+  IDisconnectedRange,
+  IStorageFetcher,
+} from 'chain-events/src';
 import {
   AaveEvents,
   CompoundEvents,
@@ -30,6 +34,7 @@ import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';
 import NotificationsHandler from '../services/ChainEventsConsumer/ChainEventHandlers/notification';
 import models from '../services/database/database';
 import { EventKind } from '../src/chains/substrate/types';
+import { Listener } from 'chain-events/src/chains/EVM';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -37,6 +42,7 @@ const CHAIN_ID = process.env.CHAIN_ID;
 
 class HTTPResponseError extends Error {
   public response: any;
+
   constructor(response) {
     super(`HTTP Error Response: ${response.status} ${response.statusText}`);
     this.response = response;
@@ -106,6 +112,7 @@ async function migrateChainEntity(
     );
 
     let fetcher: IStorageFetcher<any>;
+    let events: CWEvent[];
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
       const nodeUrl = constructSubstrateUrl(node.private_url || node.url);
@@ -115,9 +122,15 @@ async function migrateChainEntity(
         chainInstance.substrate_spec
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
+      log.info('Fetching chain events...');
+      events = await fetcher.fetch(range, true);
+      events.sort((a, b) => a.blockNumber - b.blockNumber);
     } else if (chainInstance.base === ChainBase.CosmosSDK) {
       const api = await CosmosEvents.createApi(node.private_url || node.url);
       fetcher = new CosmosEvents.StorageFetcher(api);
+      log.info('Fetching chain events...');
+      events = await fetcher.fetch(range, true);
+      events.sort((a, b) => a.blockNumber - b.blockNumber);
     } else if (chainInstance.network === ChainNetwork.Compound) {
       const contracts = await fetchData(
         `${CW_SERVER_URL}/api/getChainContracts`,
@@ -127,28 +140,31 @@ async function migrateChainEntity(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
         contracts[0].address
       );
-      // TODO: @Timothee replace storage fetcher calls with Listener.fetchEvents
-      // fetcher = new CompoundEvents.StorageFetcher(api);
-      range.startBlock = 0;
+      const listener = new Listener(
+        chain,
+        contracts[0].address,
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
+        'compound'
+      );
+      await listener.createApi();
+      events = await listener.fetchEvents({ start: 0 });
     } else if (chainInstance.network === ChainNetwork.Aave) {
       const contracts = await fetchData(
         `${CW_SERVER_URL}/api/getChainContracts`,
         { chain_id: chain }
       );
-      const api = await AaveEvents.createApi(
+      const listener = new Listener(
+        chain,
+        contracts[0].address,
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
-        contracts[0].address
+        'compound'
       );
-      // TODO: @Timothee replace storage fetcher calls with Listener.fetchEvents
-      // fetcher = new AaveEvents.StorageFetcher(api);
-      range.startBlock = 0;
+      await listener.createApi();
+      events = await listener.fetchEvents({ start: 0 });
     } else {
       throw new Error('Unsupported migration chain');
     }
 
-    log.info('Fetching chain events...');
-    const events = await fetcher.fetch(range, true);
-    events.sort((a, b) => a.blockNumber - b.blockNumber);
     log.info(`Writing chain events to db... (count: ${events.length})`);
     for (const event of events) {
       try {
