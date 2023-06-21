@@ -1,4 +1,3 @@
-import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
@@ -98,7 +97,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._chainInfo =
       app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
     const chainId = this._chainInfo.node?.ethChainId || 1;
-
+    const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
+      .default;
     this._provider = await EthereumProvider.init({
       projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
       chains: [chainId],
