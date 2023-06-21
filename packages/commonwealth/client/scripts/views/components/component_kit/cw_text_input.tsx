@@ -44,7 +44,6 @@ type InputStyleProps = {
   size?: TextInputSize;
   validationStatus?: ValidationStatus;
   displayOnly?: boolean;
-  fullWidth?: boolean;
 };
 
 type InputInternalStyleProps = {
@@ -134,7 +133,6 @@ export const CWTextInput = (props: TextInputProps) => {
     inputValidationFn,
     label,
     maxLength,
-    fullWidth,
     name,
     onInput,
     onenterkey,
@@ -192,7 +190,6 @@ export const CWTextInput = (props: TextInputProps) => {
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({
             size: isCompact ? 'small' : 'large',
-            fullWidth,
             validationStatus: validationProps.validationStatus,
             disabled,
             displayOnly,

@@ -37,6 +37,7 @@
 .TextInput {
   display: flex;
   flex-direction: column;
+  width: 100%;
 
   .input-and-icon-container {
     display: flex;
@@ -46,10 +47,6 @@
 
     input {
       @include inputStyles;
-
-      &.fullWidth {
-        width: 100%;
-      }
 
       &.darkMode {
         @include darkModeInputStyles;
