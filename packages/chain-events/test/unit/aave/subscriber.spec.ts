@@ -5,6 +5,7 @@ import chai from 'chai';
 import { Subscriber } from '../../../src/chains/EVM/subscriber';
 import type { RawEvent } from '../../../src/chains/aave/types';
 import { ethers } from 'ethers';
+import { LastCachedBlockNumber } from '../../../src/LastCachedBlockNumber';
 
 const { assert } = chai;
 
@@ -22,12 +23,14 @@ describe('Aave Event Subscriber Tests', () => {
     },
   };
   const randomAddress = ['0x1234'];
+  const lastCachedBlockNumber = new LastCachedBlockNumber();
 
   it('should callback with event data', async (done) => {
     const subscriber = new Subscriber(
       aaveApi.governance.provider,
       'aave-test',
-      randomAddress
+      randomAddress,
+      lastCachedBlockNumber
     );
     const id = 5;
     const executionTime = 100;
@@ -47,7 +50,8 @@ describe('Aave Event Subscriber Tests', () => {
     const subscriber = new Subscriber(
       aaveApi.governance.provider,
       'aave-test',
-      randomAddress
+      randomAddress,
+      lastCachedBlockNumber
     );
     subscriber.unsubscribe();
     done();
@@ -57,7 +61,8 @@ describe('Aave Event Subscriber Tests', () => {
     const subscriber = new Subscriber(
       aaveApi.governance.provider,
       'aave-test',
-      randomAddress
+      randomAddress,
+      lastCachedBlockNumber
     );
     const cb = () => {
       assert.fail('should not reach callback');

@@ -8,6 +8,7 @@ import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import type { RawEvent, Api } from './types';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;
@@ -20,8 +21,14 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
 
   protected readonly log;
 
-  constructor(api: Api, name: string, pollTime = 15 * 1000, verbose = false) {
-    super(api, verbose);
+  constructor(
+    api: Api,
+    name: string,
+    pollTime = 15 * 1000,
+    verbose = false,
+    lastCachedBlockNumber?: LastCachedBlockNumber
+  ) {
+    super(api, verbose, lastCachedBlockNumber);
     this._name = name;
     this._pollTime = pollTime;
 
@@ -35,11 +42,13 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     const currentBlock = await this.api.tm.block();
     const currentHeight = currentBlock.block.header.height;
     this._lastBlockHeight = currentHeight;
+    this._lastCachedBlockNumber?.set(currentHeight);
     if (lastBlockHeight === null) {
       // query initial block only when uninitialized
       return [currentBlock.block];
     }
 
+    // TODO: @Timothee - this is incorrect -> we should walk forwards not backwards
     // query all blocks before latest, walking backwards from current
     const results = [currentBlock.block];
     for (let blockN = currentHeight - 1; blockN > lastBlockHeight; blockN--) {

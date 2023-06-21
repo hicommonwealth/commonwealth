@@ -194,9 +194,9 @@ export class Listener extends BaseListener<
     const blockNumber = +block.header.number;
     if (
       !this._lastCachedBlockNumber ||
-      blockNumber > this._lastCachedBlockNumber
+      blockNumber > this.lastCachedBlockNumber
     ) {
-      this._lastCachedBlockNumber = blockNumber;
+      this._lastCachedBlockNumber.set(blockNumber);
     }
 
     const events: CWEvent[] = await this._processor.process(block);

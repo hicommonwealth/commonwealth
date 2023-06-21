@@ -6,6 +6,7 @@ import { addPrefix, factory } from '../../logging';
 import Timeout = NodeJS.Timeout;
 import { getRawEvents } from 'chain-events/src/eth';
 import { RawEvent } from 'chain-events/src/chains/EVM/types';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 export class Subscriber {
   private readonly _name: string;
@@ -16,14 +17,15 @@ export class Subscriber {
 
   protected readonly log;
 
-  protected lastBlockNumber: number;
   protected provider: Provider;
   protected contractAddresses: string[];
+  protected readonly lastCachedBlockNumber: LastCachedBlockNumber;
 
   constructor(
     provider: Provider,
     name: string,
     contractAddresses: string[],
+    lastCachedBlockNumber: LastCachedBlockNumber,
     verbose = false
   ) {
     this.provider = provider;
@@ -33,6 +35,7 @@ export class Subscriber {
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.Aave, this._name])
     );
+    this.lastCachedBlockNumber = lastCachedBlockNumber;
   }
 
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
@@ -75,9 +78,12 @@ export class Subscriber {
   ) {
     const currentBlockNum = await provider.getBlockNumber();
     console.log('New current block number:', currentBlockNum);
-    if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
+    if (
+      this.lastCachedBlockNumber.get() &&
+      this.lastCachedBlockNumber.get() != currentBlockNum
+    ) {
       const rawEvents = await getRawEvents(provider, this.eventSourceMap, {
-        start: this.lastBlockNumber + 1,
+        start: this.lastCachedBlockNumber.get() + 1,
         end: currentBlockNum,
       });
 
@@ -85,7 +91,7 @@ export class Subscriber {
         cb(rawEvent);
       }
     }
-    this.lastBlockNumber = currentBlockNum;
+    this.lastCachedBlockNumber.set(currentBlockNum);
   }
 
   /**

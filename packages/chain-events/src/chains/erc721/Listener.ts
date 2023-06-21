@@ -145,9 +145,9 @@ export class Listener extends BaseListener<
     const { blockNumber } = event;
     if (
       !this._lastCachedBlockNumber ||
-      blockNumber > this._lastCachedBlockNumber
+      blockNumber > this.lastCachedBlockNumber
     ) {
-      this._lastCachedBlockNumber = blockNumber;
+      this._lastCachedBlockNumber.set(blockNumber);
     }
   }
 
@@ -164,6 +164,6 @@ export class Listener extends BaseListener<
     // Web3 provider, yet it exists under provider.provider
     const provider = <any>this._api.provider;
 
-    return provider.provider ? true : false ;
+    return provider.provider ? true : false;
   }
 }

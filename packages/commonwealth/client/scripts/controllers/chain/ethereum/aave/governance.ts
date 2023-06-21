@@ -12,6 +12,7 @@ import type AaveApi from './api';
 import type AaveChain from './chain';
 
 import AaveProposal from './proposal';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 export interface AaveProposalArgs {
   executor: Executor | string;
@@ -142,13 +143,12 @@ export default class AaveGovernance extends ProposalModule<
     );
 
     // kick off listener
-    const chainEventsContracts: AaveTypes.Api = {
-      governance: this._api.Governance as any,
-    };
+    const lastCachedBlockNumber = new LastCachedBlockNumber();
     const subscriber = new EvmEvents.Subscriber(
       this._api.Governance.provider,
       this.app.chain.id,
-      [this._api.Governance.address]
+      [this._api.Governance.address],
+      lastCachedBlockNumber
     );
     const processor = new EvmEvents.Processor(AaveEvents.Enrich);
     await this.app.chainEntities.subscribeEntities(

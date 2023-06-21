@@ -64,7 +64,8 @@ export class Listener extends BaseListener<
         this._api,
         this._chain,
         this._options.pollTime,
-        this._verbose
+        this._verbose,
+        this._lastCachedBlockNumber
       );
     } catch (error) {
       this.log.error(
@@ -125,8 +126,8 @@ export class Listener extends BaseListener<
 
   protected async processBlock(event: RawEvent): Promise<void> {
     const { height } = event;
-    if (!this._lastCachedBlockNumber || height > this._lastCachedBlockNumber) {
-      this._lastCachedBlockNumber = height;
+    if (!this.lastCachedBlockNumber || height > this.lastCachedBlockNumber) {
+      this._lastCachedBlockNumber.set(height);
     }
 
     const cwEvents: CWEvent[] = await this._processor.process(event);

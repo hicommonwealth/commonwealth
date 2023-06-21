@@ -19,6 +19,7 @@ import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { Interface, LogDescription } from '@ethersproject/abi/src.ts/interface';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -111,7 +112,11 @@ export abstract class IEventProcessor<Api, RawEvent> {
 
 // fetches blocks from chain in real-time via subscription for processing
 export abstract class IEventSubscriber<Api, RawEvent> {
-  constructor(protected _api: Api, protected _verbose = false) {}
+  protected constructor(
+    protected _api: Api,
+    protected _verbose = false,
+    protected _lastCachedBlockNumber?: LastCachedBlockNumber
+  ) {}
 
   public get api(): Api {
     return this._api;

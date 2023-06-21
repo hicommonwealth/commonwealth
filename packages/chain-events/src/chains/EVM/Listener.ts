@@ -7,7 +7,7 @@ import type {
 import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import {ListenerOptions, RawEvent} from '../EVM/types';
+import { ListenerOptions, RawEvent } from '../EVM/types';
 import { createApi as createAaveApi } from '../aave/subscribeFunc';
 import { createApi as createCompoundApi } from '../compound/subscribeFunc';
 import { Subscriber } from '../EVM/subscriber';
@@ -18,13 +18,7 @@ import { Enrich as AaveEnricher } from '../aave/filters/enricher';
 import { Enrich as CompoundEnricher } from '../compound/filters/enricher';
 import { JsonRpcProvider } from '@ethersproject/providers';
 
-export class Listener extends BaseListener<
-  any,
-  any,
-  any,
-  any,
-  any
-> {
+export class Listener extends BaseListener<any, any, any, any, any> {
   private readonly _options: ListenerOptions;
 
   protected readonly log;
@@ -46,8 +40,7 @@ export class Listener extends BaseListener<
       this.log = factory.getLogger(
         addPrefix(__filename, [SupportedNetwork.Aave, this._chain])
       );
-    }
-    else {
+    } else {
       super(SupportedNetwork.Compound, chain, verbose);
       this.log = factory.getLogger(
         addPrefix(__filename, [SupportedNetwork.Compound, this._chain])
@@ -81,7 +74,7 @@ export class Listener extends BaseListener<
           this._options.contractAddress,
           10 * 1000,
           this._chain
-        )
+        );
       }
     } catch (error) {
       this.log.error(`Fatal error occurred while starting the API`);
@@ -89,13 +82,15 @@ export class Listener extends BaseListener<
     }
 
     try {
-      if (this.listenerBase === 'aave') this._processor = new Processor(AaveEnricher);
+      if (this.listenerBase === 'aave')
+        this._processor = new Processor(AaveEnricher);
       else this._processor = new Processor(CompoundEnricher);
 
       this._subscriber = new Subscriber(
         this.getProvider(),
         this._chain,
         this.getContractAddresses(),
+        this._lastCachedBlockNumber,
         this._verbose
       );
     } catch (error) {
@@ -169,10 +164,6 @@ export class Listener extends BaseListener<
     }
   }
 
-  public async updateAddress(): Promise<void> {
-    // TODO
-  }
-
   private async processMissedBlocks(): Promise<void> {
     const offlineRange = await this.processOfflineRange(this.log);
     if (!offlineRange) return;
@@ -224,10 +215,10 @@ export class Listener extends BaseListener<
 
     const { blockNumber } = event;
     if (
-      !this._lastCachedBlockNumber ||
-      blockNumber > this._lastCachedBlockNumber
+      !this.lastCachedBlockNumber ||
+      blockNumber > this.lastCachedBlockNumber
     ) {
-      this._lastCachedBlockNumber = blockNumber;
+      this._lastCachedBlockNumber.set(blockNumber);
     }
   }
 
@@ -242,7 +233,7 @@ export class Listener extends BaseListener<
   public async isConnected(): Promise<boolean> {
     // force type to any because the Ethers Provider interface does not include the original
     // Web3 provider, yet it exists under provider.provider
-    return this.getProvider().provider ? true : false;
+    return !!this.getProvider().provider;
   }
 
   public async fetchEvents(blockRange: {
@@ -261,7 +252,8 @@ export class Listener extends BaseListener<
       if (!kind) continue;
       try {
         let cwEvent;
-        if (this.listenerBase === 'aave') cwEvent = await AaveEnricher(event.blockNumber, kind, event);
+        if (this.listenerBase === 'aave')
+          cwEvent = await AaveEnricher(event.blockNumber, kind, event);
         else cwEvent = await CompoundEnricher(event.blockNumber, kind, event);
         enrichedEvents.push(cwEvent);
       } catch (e) {
@@ -288,11 +280,9 @@ export class Listener extends BaseListener<
         this._api.governance.address,
         this._api.aaveToken.address,
         this._api.stkAaveToken.address,
-      ]
+      ];
     } else {
-      return [
-        this._api.address
-      ]
+      return [this._api.address];
     }
   }
 }

@@ -12,6 +12,7 @@ import type {
   SupportedNetwork,
 } from './interfaces';
 import { addPrefix, factory } from './logging';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 let log;
 
@@ -43,11 +44,11 @@ export abstract class Listener<
 
   protected _processor: Processor;
 
+  protected _lastCachedBlockNumber: LastCachedBlockNumber;
+
   protected _api: Api;
 
   protected _subscribed: boolean;
-
-  protected _lastCachedBlockNumber: number;
 
   protected readonly _chain: string;
 
@@ -64,6 +65,7 @@ export abstract class Listener<
     this.globalExcludedEvents = [];
 
     log = factory.getLogger(addPrefix(__filename, [network, chain]));
+    this._lastCachedBlockNumber = new LastCachedBlockNumber();
   }
 
   public abstract init(): Promise<void>;
@@ -121,7 +123,7 @@ export abstract class Listener<
   public abstract get options(): any;
 
   public get lastCachedBlockNumber(): number {
-    return this._lastCachedBlockNumber;
+    return this._lastCachedBlockNumber.get();
   }
 
   public abstract getLatestBlockNumber(): Promise<number>;
@@ -141,12 +143,12 @@ export abstract class Listener<
     let offlineRange = await this.discoverReconnectRange(this._chain);
 
     if (
-      this._lastCachedBlockNumber &&
+      this.lastCachedBlockNumber &&
       (!offlineRange.startBlock ||
-        offlineRange.startBlock < this._lastCachedBlockNumber)
+        offlineRange.startBlock < this.lastCachedBlockNumber)
     ) {
-      log.info(`Using cached block number ${this._lastCachedBlockNumber}`);
-      offlineRange = { startBlock: this._lastCachedBlockNumber };
+      log.info(`Using cached block number ${this.lastCachedBlockNumber}`);
+      offlineRange = { startBlock: this.lastCachedBlockNumber };
     }
 
     // do nothing if we don't have an existing event in the database/cache

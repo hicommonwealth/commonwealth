@@ -14,6 +14,7 @@ import type CompoundAPI from './api';
 import { GovernorType } from './api';
 import type CompoundChain from './chain';
 import CompoundProposal from './proposal';
+import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
 
 export interface CompoundProposalArgs {
   targets: string[];
@@ -201,10 +202,12 @@ export default class CompoundGovernance extends ProposalModule<
     );
 
     // kick off listener
+    const lastCachedBlockNumber = new LastCachedBlockNumber();
     const subscriber = new EvmEvents.Subscriber(
       this._api.Contract.provider,
       this.app.chain.id,
-      [this._api.Contract.address]
+      [this._api.Contract.address],
+      lastCachedBlockNumber
     );
     const processor = new EvmEvents.Processor(CompoundEvents.Enrich);
     await this.app.chainEntities.subscribeEntities(

@@ -147,9 +147,9 @@ export class Listener extends BaseListener<
     const { blockNumber } = event;
     if (
       !this._lastCachedBlockNumber ||
-      blockNumber > this._lastCachedBlockNumber
+      blockNumber > this.lastCachedBlockNumber
     ) {
-      this._lastCachedBlockNumber = blockNumber;
+      this._lastCachedBlockNumber.set(blockNumber);
     }
   }
 

@@ -5,6 +5,7 @@ import chai from 'chai';
 import { Subscriber } from '../../../src/chains/EVM/subscriber';
 import type { RawEvent } from '../../../src/chains/compound/types';
 import { ethers } from 'ethers';
+import { LastCachedBlockNumber } from '../../../src/LastCachedBlockNumber';
 
 const { assert } = chai;
 
@@ -13,6 +14,8 @@ const constructEvent = (data): RawEvent => {
     args: data,
   } as RawEvent;
 };
+
+const lastCachedBlockNumber = new LastCachedBlockNumber();
 
 describe('Compound Event Subscriber Tests', () => {
   const randomAddress = ['0x1234'];
@@ -25,7 +28,8 @@ describe('Compound Event Subscriber Tests', () => {
     const subscriber = new Subscriber(
       compoundApi.provider,
       'compound-test',
-      randomAddress
+      randomAddress,
+      lastCachedBlockNumber
     );
     const id = 5;
     const executionTime = 100;
@@ -45,7 +49,8 @@ describe('Compound Event Subscriber Tests', () => {
     const subscriber = new Subscriber(
       compoundApi.provider,
       'compound-test',
-      randomAddress
+      randomAddress,
+      lastCachedBlockNumber
     );
     subscriber.unsubscribe();
     done();
@@ -55,7 +60,8 @@ describe('Compound Event Subscriber Tests', () => {
     const subscriber = new Subscriber(
       compoundApi.provider,
       'compound-test',
-      randomAddress
+      randomAddress,
+      lastCachedBlockNumber
     );
     const cb = () => {
       assert.fail('should not reach callback');
