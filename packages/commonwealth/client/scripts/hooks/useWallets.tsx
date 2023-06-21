@@ -44,7 +44,6 @@ import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,
 } from '../../../shared/analytics/types';
-import { MockMetaMaskProvider } from 'helpers/mockMetaMaskUtil';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -66,9 +65,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<IWebWallet<any>>>();
   const [selectedWallet, setSelectedWallet] = useState<IWebWallet<any>>();
-  const [selectedLinkingWallet, setSelectedLinkingWallet] = useState<
-    IWebWallet<any>
-  >();
+  const [selectedLinkingWallet, setSelectedLinkingWallet] =
+    useState<IWebWallet<any>>();
   const [cachedWalletSignature, setCachedWalletSignature] = useState<string>();
   const [cachedTimestamp, setCachedTimestamp] = useState<number>();
   const [cachedChainId, setCachedChainId] = useState<string>();
@@ -111,10 +109,12 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
-      window['ethereum'] = new MockMetaMaskProvider(
-        'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
-        '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
-      );
+      import('../helpers/mockMetaMaskUtil').then((f) => {
+        window['ethereum'] = new f.MockMetaMaskProvider(
+          'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+          '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
+        );
+      });
     }
 
     // Determine if in a community
@@ -297,11 +297,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     // Handle Logged in and joining community of different chain base
     if (isInCommunityPage && app.isLoggedIn()) {
       const timestamp = +new Date();
-      const {
-        signature,
-        chainId,
-        sessionPayload,
-      } = await signSessionWithAccount(walletToUse, account, timestamp);
+      const { signature, chainId, sessionPayload } =
+        await signSessionWithAccount(walletToUse, account, timestamp);
       await account.validate(signature, timestamp, chainId);
       app.sessions.authSession(
         app.chain.base,
@@ -338,11 +335,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     if (!newlyCreated && !linking) {
       try {
         const timestamp = +new Date();
-        const {
-          signature,
-          sessionPayload,
-          chainId,
-        } = await signSessionWithAccount(walletToUse, account, timestamp);
+        const { signature, sessionPayload, chainId } =
+          await signSessionWithAccount(walletToUse, account, timestamp);
         await account.validate(signature, timestamp, chainId);
         await app.sessions.authSession(
           app.chain ? app.chain.base : walletToUse.chain,
@@ -424,14 +418,12 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const onPerformLinking = async () => {
     try {
       const secondaryTimestamp = +new Date();
-      const {
-        signature: secondarySignature,
-        chainId: secondaryChainId,
-      } = await signSessionWithAccount(
-        selectedLinkingWallet,
-        secondaryLinkAccount,
-        secondaryTimestamp
-      );
+      const { signature: secondarySignature, chainId: secondaryChainId } =
+        await signSessionWithAccount(
+          selectedLinkingWallet,
+          secondaryLinkAccount,
+          secondaryTimestamp
+        );
       await secondaryLinkAccount.validate(
         secondarySignature,
         secondaryTimestamp,
