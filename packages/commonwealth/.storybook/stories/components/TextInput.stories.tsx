@@ -19,7 +19,8 @@ export const TextInput: Story = {
   args: {
     placeholder: "Placeholder",
     disabled: false,
-    size: "large",
+    isCompact: true,
+    width: 200,
     iconLeft: undefined,
     iconRight: undefined,
   },
@@ -31,9 +32,12 @@ export const TextInput: Story = {
       control: { type: "boolean" },
       options: [ true, false ],
     },
-    size: {
-      control: { type: "select" },
-      options: [ "small", "large" ],
+    isCompact: {
+      control: { type: "boolean" },
+      options: [ true, false ],
+    },
+    width: {
+      control: { type: "number" },
     },
     iconLeft: {
       control: { type: "select" },
@@ -72,6 +76,7 @@ export const TextInput: Story = {
         "manualStatusMessage",
         "manualValidationStatus",
         "validationStatus",
+        "size",
       ],
     }
   },

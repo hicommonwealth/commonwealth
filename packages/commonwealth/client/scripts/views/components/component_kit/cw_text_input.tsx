@@ -26,6 +26,8 @@ export type BaseTextInputProps = {
   inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
   label?: string | React.ReactNode;
   maxLength?: number;
+  isCompact: boolean;
+  width?: number | undefined;
   name?: string;
   onInput?: (e) => void;
   onenterkey?: (e) => void;
@@ -132,12 +134,13 @@ export const CWTextInput = (props: TextInputProps) => {
     inputValidationFn,
     label,
     maxLength,
+    width = 200,
     name,
     onInput,
     onenterkey,
     onClick,
     placeholder,
-    size = 'large',
+    isCompact,
     tabIndex,
     displayOnly,
     manualStatusMessage = '',
@@ -188,7 +191,7 @@ export const CWTextInput = (props: TextInputProps) => {
           autoFocus={autoFocus}
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({
-            size,
+            size: isCompact ? 'small' : 'large',
             validationStatus: validationProps.validationStatus,
             disabled,
             displayOnly,
@@ -201,6 +204,7 @@ export const CWTextInput = (props: TextInputProps) => {
           disabled={disabled || displayOnly}
           tabIndex={tabIndex}
           maxLength={maxLength}
+          size={width}
           name={name}
           placeholder={placeholder}
           onInput={(e) => {
