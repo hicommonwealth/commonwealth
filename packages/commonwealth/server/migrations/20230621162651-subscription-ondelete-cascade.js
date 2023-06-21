@@ -20,7 +20,7 @@ module.exports = {
       console.time(label);
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "NotificationsRead" ADD CONSTRAINT "NotificationsRead_subscription_id_fkey" FOREIGN KEY (subscription_id) REFERENCES "Subscriptions"(id) ON DELETE CASCADE;
+        ALTER TABLE "NotificationsRead" ADD CONSTRAINT "NotificationsRead_subscription_id_fkey" FOREIGN KEY (subscription_id) REFERENCES "Subscriptions"(id) ON DELETE SET NULL;
         `,
         { raw: true, transaction: t, logging: console.log }
       );
