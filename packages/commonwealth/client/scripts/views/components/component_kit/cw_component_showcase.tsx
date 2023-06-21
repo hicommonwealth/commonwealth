@@ -811,15 +811,15 @@ export const ComponentShowcase = () => {
         <CWText type="h5">isCompact = Yes</CWText>
         <CWTextInput
           name="Text field"
-          label="Large"
+          label="Full width"
           placeholder="Type here"
           isCompact
+          fullWidth
         />
         <CWTextInput
           name="Text field"
-          label="Small"
+          label="Field label"
           placeholder="Type here"
-          size="small"
           isCompact
         />
         <CWTextInput
@@ -872,12 +872,16 @@ export const ComponentShowcase = () => {
           isCompact
         />
         <CWText type="h5">isCompact = No</CWText>
-        <CWTextInput name="Text field" label="Large" placeholder="Type here" />
         <CWTextInput
           name="Text field"
-          label="Small"
+          label="Full width"
           placeholder="Type here"
-          size="small"
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Field label"
+          placeholder="Type here"
         />
         <CWTextInput
           name="Form field"

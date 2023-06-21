@@ -20,7 +20,7 @@ export const TextInput: Story = {
     placeholder: "Placeholder",
     disabled: false,
     isCompact: true,
-    width: 200,
+    fullWidth: false,
     iconLeft: undefined,
     iconRight: undefined,
   },
@@ -36,8 +36,9 @@ export const TextInput: Story = {
       control: { type: "boolean" },
       options: [ true, false ],
     },
-    width: {
-      control: { type: "number" },
+    fullWidth: {
+      control: { type: "boolean" },
+      options: [ true, false ],
     },
     iconLeft: {
       control: { type: "select" },
