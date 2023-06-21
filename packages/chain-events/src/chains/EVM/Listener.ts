@@ -169,33 +169,14 @@ export class Listener extends BaseListener<any, any, any, any, any> {
     if (!offlineRange) return;
 
     this.log.info(
-      `Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`
+      `Polling missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`
     );
     try {
-      const maxBlocksPerPoll = 250;
-      let startBlock = offlineRange.startBlock;
-      let endBlock;
-
-      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock)
-        endBlock = startBlock + maxBlocksPerPoll;
-      else endBlock = offlineRange.endBlock;
-
-      while (endBlock <= offlineRange.endBlock) {
-        const cwEvents = await this.fetchEvents({
-          start: startBlock,
-          end: endBlock,
-        });
-        for (const event of cwEvents) {
-          await this.handleEvent(event);
-        }
-
-        // stop loop when we have fetched all blocks
-        if (endBlock === offlineRange.endBlock) break;
-
-        startBlock = endBlock + 1;
-        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock)
-          endBlock += maxBlocksPerPoll;
-        else endBlock = offlineRange.endBlock;
+      const cwEvents = await this.fetchEvents({
+        start: offlineRange.startBlock,
+      });
+      for (const event of cwEvents) {
+        await this.handleEvent(event);
       }
     } catch (error) {
       this.log.error(`Unable to fetch events from storage`, error);
@@ -236,10 +217,7 @@ export class Listener extends BaseListener<any, any, any, any, any> {
     return !!this.getProvider().provider;
   }
 
-  public async fetchEvents(blockRange: {
-    start: number | string;
-    end: number | string;
-  }) {
+  public async fetchEvents(blockRange: { start: number; end?: number }) {
     const rawEvents = await getRawEvents(
       <JsonRpcProvider>this.getProvider(),
       this.getEventSourceMap(),

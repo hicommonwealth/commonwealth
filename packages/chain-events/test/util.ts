@@ -82,6 +82,9 @@ export async function waitUntilBlock(
   while (true) {
     if (waitTime > maxWaitTime) break;
     if (listener.lastCachedBlockNumber >= blockNum) break;
+    console.log(
+      `Listener at block: ${listener.lastCachedBlockNumber}... Waiting for it to reach block ${blockNum}`
+    );
     await new Promise<void>((resolve) => setTimeout(resolve, 1000));
     waitTime += 1;
   }

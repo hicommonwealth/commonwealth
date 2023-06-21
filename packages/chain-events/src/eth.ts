@@ -43,56 +43,77 @@ export async function createProvider(
   }
 }
 
+/**
+ * Fetches logs from the specified block range. Most nodes cap eth_getLogs calls at 10k logs or 2k blocks with 150MB
+ * limit. Given these restrictions, if the block range is larger than 500 (historically this has worked well for us)
+ * this function will make multiple calls to fetch and process 500 blocks at a time.
+ * @param provider A JsonRpcProvider with a valid connection to an RPC node used to fetch logs
+ * @param eventSources An object in which the keys are contract addresses and the values are objects containing
+ * the event signatures we are interested in and the interface used to parse relevant events
+ * @param blockRange The range of blocks to fetch logs from. If end is not defined the function will fetch until the
+ * latest block
+ * @param verbose A boolean indicating whether each raw event should be logged.
+ */
 export async function getRawEvents(
   provider: JsonRpcProvider,
   eventSources: EvmEventSourceMapType,
-  blockRange: { start: number | string; end: number | string },
+  blockRange: { start: number; end?: number },
   verbose = false
 ) {
-  // TODO: handle unlimited size range .e.g query the entire chain
-  const logs: Log[] = await provider.send('eth_getLogs', [
-    {
-      fromBlock: ethers.BigNumber.from(blockRange.start).toHexString(),
-      toBlock: ethers.BigNumber.from(blockRange.end).toHexString(),
-      address: Object.keys(eventSources),
-    },
-  ]);
-
+  const MAX_BLOCK_RANGE = 500;
+  let { start, end } = blockRange;
   const rawEvents = [];
+  if (!end) end = await provider.getBlockNumber();
 
-  for (const log of logs) {
-    // skip logs for events that we don't care about
-    if (
-      !eventSources[log.address.toLowerCase()].eventSignatures.includes(
-        log.topics[0]
+  while (start <= end) {
+    // if end is not given then go until the latest block number
+    if (!end) end = await provider.getBlockNumber();
+    const toBlock = Math.min(start + MAX_BLOCK_RANGE, end);
+
+    const logs: Log[] = await provider.send('eth_getLogs', [
+      {
+        fromBlock: ethers.BigNumber.from(start).toHexString(),
+        toBlock: ethers.BigNumber.from(toBlock).toHexString(),
+        address: Object.keys(eventSources),
+      },
+    ]);
+
+    for (const log of logs) {
+      // skip logs for events that we don't care about
+      if (
+        !eventSources[log.address.toLowerCase()].eventSignatures.includes(
+          log.topics[0]
+        )
       )
-    )
-      continue;
+        continue;
 
-    // parse the log
-    const parsedRawEvent =
-      eventSources[log.address.toLowerCase()].api.parseLog(log);
+      // parse the log
+      const parsedRawEvent =
+        eventSources[log.address.toLowerCase()].api.parseLog(log);
 
-    const rawEvent = {
-      address: log.address.toLowerCase(),
-      args: parsedRawEvent.args as any,
-      name: parsedRawEvent.name,
-      blockNumber: parseInt(log.blockNumber.toString(), 16),
-      data: log.data,
-    };
+      const rawEvent = {
+        address: log.address.toLowerCase(),
+        args: parsedRawEvent.args as any,
+        name: parsedRawEvent.name,
+        blockNumber: parseInt(log.blockNumber.toString(), 16),
+        data: log.data,
+      };
 
-    if (verbose) {
-      const logStr = `Found the following event log in block ${
-        log.blockNumber
-      }: ${JSON.stringify(rawEvent, null, 2)}.`;
+      if (verbose) {
+        const logStr = `Found the following event log in block ${
+          log.blockNumber
+        }: ${JSON.stringify(rawEvent, null, 2)}.`;
 
-      const logger = factory.getLogger(
-        addPrefix(__filename, [log.address.toLowerCase()])
-      );
-      logger.info(logStr);
+        const logger = factory.getLogger(
+          addPrefix(__filename, [log.address.toLowerCase()])
+        );
+        logger.info(logStr);
+      }
+
+      rawEvents.push(rawEvent);
     }
 
-    rawEvents.push(rawEvent);
+    start = toBlock + 1;
   }
 
   return rawEvents;
