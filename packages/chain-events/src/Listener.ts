@@ -163,14 +163,15 @@ export abstract class Listener<
       log.info(`Current endBlock: ${offlineRange.endBlock}`);
     }
 
-    // limit max number of blocks to 500
-    if (offlineRange.endBlock - offlineRange.startBlock > 500) {
+    // limit max number of blocks to 1000
+    const maxRange = 1000;
+    if (offlineRange.endBlock - offlineRange.startBlock > maxRange) {
       log.info(
         `Attempting to poll ${
           offlineRange.endBlock - offlineRange.startBlock
-        } blocks, reducing query size to ${500}.`
+        } blocks, reducing query size to ${maxRange}.`
       );
-      offlineRange.startBlock = offlineRange.endBlock - 500;
+      offlineRange.startBlock = offlineRange.endBlock - maxRange;
     }
 
     return <{ startBlock: number; endBlock: number }>offlineRange;
