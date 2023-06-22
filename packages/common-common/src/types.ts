@@ -154,3 +154,14 @@ export enum DefaultPage {
   Overview = 'default_summary_view',
   Homepage = 'homepage',
 }
+
+export interface IDiscordMessage {
+  user: {
+    id: string,
+    username: string
+  },
+  title?: string,
+  content: string,
+  channel_id: string,
+  parent_channel_id: string
+}
