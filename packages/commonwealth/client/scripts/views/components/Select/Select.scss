@@ -6,7 +6,6 @@
     min-width: 144px;
     max-width: max(24ch, 264px);
     text-overflow: ellipsis;
-    padding: 10px 16px !important;
     border-radius: $border-radius-md  !important;
     cursor: pointer;
     height: auto !important;
@@ -17,6 +16,14 @@
     margin: 0;
     line-height: 20px;
     color: $neutral-800  !important;
+    
+    &.size-default {
+        padding: 10px 16px !important;
+    }
+
+    &.size-compact {
+        padding: 6px 16px !important;
+    }
 
     &:hover {
         border-color: $primary-600  !important;

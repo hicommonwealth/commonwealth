@@ -26,9 +26,10 @@ import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
-import { ThreadStage } from '../../../models/types';
+import { CommentsFeaturedFilterTypes, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { Select } from '../../components/Select';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
@@ -83,6 +84,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
+  const [commentSortType, setCommentSortType] = useState<
+    CommentsFeaturedFilterTypes
+  >(CommentsFeaturedFilterTypes.Newest);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -493,6 +497,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
+  const sortedComments = [...comments].sort((a, b) =>
+    commentSortType === CommentsFeaturedFilterTypes.Oldest ?
+      moment(a.createdAt).diff(moment(b.createdAt)) :
+      moment(b.createdAt).diff(moment(a.createdAt))
+  )
+
   return (
     <CWContentPage
       showTabs={isCollapsedSize && tabsShouldBePresent}
@@ -653,16 +663,39 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       )}
       comments={
         <>
-          {comments.length > 0 && (
-            <CWCheckbox
-              className="ml-auto"
-              checked={includeSpamThreads}
-              label="Include comments flagged as spam"
-              onChange={(e) => setIncludeSpamThreads(e.target.checked)}
+          <div className='comments-filter-row'>
+            <Select
+              key={commentSortType}
+              size='compact'
+              selected={commentSortType}
+              onSelect={(item: any) => {
+                setCommentSortType(item.value)
+              }}
+              options={[
+                {
+                  id: 1,
+                  value: CommentsFeaturedFilterTypes.Newest,
+                  label: 'Newest',
+                  iconLeft: 'sparkle',
+                },
+                {
+                  id: 2,
+                  value: CommentsFeaturedFilterTypes.Oldest,
+                  label: 'Oldest',
+                  iconLeft: 'clockCounterClockwise',
+                },
+              ]}
             />
-          )}
+            {comments.length > 0 && (
+              <CWCheckbox
+                checked={includeSpamThreads}
+                label="Include comments flagged as spam"
+                onChange={(e) => setIncludeSpamThreads(e.target.checked)}
+              />
+            )}
+          </div>
           <CommentsTree
-            comments={comments}
+            comments={sortedComments}
             includeSpams={includeSpamThreads}
             thread={thread}
             setIsGloballyEditing={setIsGloballyEditing}
