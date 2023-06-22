@@ -58,6 +58,7 @@ export const getThreadsHandler = async (
   const { chain } = req;
   const { thread_ids, bulk, active, search } = req.query;
 
+  // get threads by IDs
   if (thread_ids) {
     const threadIds = thread_ids.map((id) => parseInt(id, 10));
     for (const id of threadIds) {
@@ -69,6 +70,7 @@ export const getThreadsHandler = async (
     return success(res, threads);
   }
 
+  // get bulk threads
   if (bulk) {
     const {
       // endpoint specific filters
@@ -96,6 +98,7 @@ export const getThreadsHandler = async (
     return success(res, bulkThreads);
   }
 
+  // get active threads
   if (active) {
     const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
     const activeThreads = await controllers.threads.getActiveThreads(
@@ -105,6 +108,7 @@ export const getThreadsHandler = async (
     return success(res, activeThreads);
   }
 
+  // search for threads
   if (search) {
     const { thread_title_only, sort, page, page_size } =
       req.query as SearchThreadsRequestQuery;

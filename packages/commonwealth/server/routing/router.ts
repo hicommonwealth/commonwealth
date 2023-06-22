@@ -501,26 +501,6 @@ function setupRouter(
     databaseValidationService.validateChain,
     getThreadsHandler.bind(this, serverControllers)
   );
-  // router.get(
-  //   '/bulkThreads',
-  //   databaseValidationService.validateChain,
-  //   bulkThreads.bind(this, models)
-  // );
-  // router.get(
-  //   '/activeThreads',
-  //   databaseValidationService.validateChain,
-  //   activeThreads.bind(this, models)
-  // );
-  // router.get(
-  //   '/getThreads',
-  //   // databaseValidationService.validateChain,
-  //   getThreadsOld.bind(this, models)
-  // );
-  // router.get(
-  //   '/searchDiscussions',
-  //   databaseValidationService.validateChain,
-  //   searchDiscussions.bind(this, models)
-  // );
   router.get(
     '/searchProfiles',
     databaseValidationService.validateChain,
