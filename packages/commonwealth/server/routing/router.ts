@@ -82,7 +82,6 @@ import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import deleteThread from '../routes/deleteThread';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
-import bulkThreads from '../routes/bulkThreads';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
