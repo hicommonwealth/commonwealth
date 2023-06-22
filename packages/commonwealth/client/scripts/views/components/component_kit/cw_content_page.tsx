@@ -18,7 +18,6 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
 
-
 export type ContentPageSidebarItem = {
   label: string;
   item: ReactNode;
@@ -72,9 +71,10 @@ type ContentPageProps = {
   canUpdateThread?: boolean;
   showTabs?: boolean;
   showSkeleton?: boolean
+  isWindowMedium?: boolean
 };
 
-const CWContentPageSkeleton = () => {
+const CWContentPageSkeleton = ({ isWindowMedium }) => {
   const mainBody = <div className="main-body-container">
     {/* thread header */}
     <div className="header">
@@ -117,7 +117,7 @@ const CWContentPageSkeleton = () => {
   return <div className={ComponentType.ContentPage}>
     <div className="sidebar-view">
       {mainBody}
-      <div className="sidebar">
+      {isWindowMedium && <div className="sidebar">
         <div className="cards-column">
           <Skeleton width={'80%'} />
           <Skeleton width={'100%'} />
@@ -136,7 +136,7 @@ const CWContentPageSkeleton = () => {
           <Skeleton width={'50%'} />
           <Skeleton width={'75%'} />
         </div>
-      </div>
+      </div>}
     </div>
   </div>
 }
@@ -173,11 +173,12 @@ export const CWContentPage = ({
   hasPendingEdits,
   canUpdateThread,
   showTabs = false,
-  showSkeleton
+  showSkeleton,
+  isWindowMedium
 }: ContentPageProps) => {
   const [tabSelected, setTabSelected] = useState<number>(0);
 
-  if (showSkeleton) return <CWContentPageSkeleton />
+  if (showSkeleton) return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 

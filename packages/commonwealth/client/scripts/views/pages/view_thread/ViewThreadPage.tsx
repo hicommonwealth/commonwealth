@@ -93,7 +93,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsEditingBody(false);
   };
 
-  useBrowserWindow({
+  const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -437,7 +437,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (!app.chain?.meta || !app.threads.initialized || !thread) {
-    return <CWContentPage showSkeleton />;
+    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
   }
 
   // Original posters have full editorial control, while added collaborators
@@ -492,8 +492,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
-
-  console.log('comments => ', comments);
 
   return (
     <CWContentPage
