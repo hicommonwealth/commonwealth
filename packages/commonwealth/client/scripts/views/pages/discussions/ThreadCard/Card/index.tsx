@@ -38,12 +38,12 @@ type CardProps = AdminActionsProps & {
 const CardSkeleton = ({ isWindowSmallInclusive, thread }) => {
   return <div className={'ThreadCard showSkeleton'}>
     {!isWindowSmallInclusive && (
-      <ReactionButton thread={thread} size="big" showSkeleton/>
+      <ReactionButton thread={thread} size="big" showSkeleton />
     )}
     <div className="content-wrapper">
-      <div className="content-header">
-        <Skeleton width={200} count={1} />
-        <div className="content-header-icons"> <Skeleton width={100} /> </div>
+      <div>
+        <Skeleton count={1} className='content-header-skeleton' />
+        <div> <Skeleton className='content-header-icons-skeleton' /> </div>
       </div>
       <div className="content-body-wrapper">
         <Skeleton count={3} />

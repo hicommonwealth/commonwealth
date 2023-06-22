@@ -48,6 +48,16 @@
       gap: 4px;
       justify-content: space-between;
 
+      .content-header-skeleton {
+        width: 200px;
+        max-width: 100%;
+      }
+
+      .content-header-icons-skeleton {
+        width: 100px;
+        max-width: 100%;
+      }
+
       .content-header-icons {
         display: flex;
         gap: 8px;
