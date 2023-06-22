@@ -20,7 +20,6 @@ import DiscussionDraftFactory from './models/discussion_draft';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
-import NotificationsReadFactory from './models/notifications_read';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
@@ -94,7 +93,6 @@ const models: Models = {
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
-  NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   Attachment: AttachmentFactory(sequelize, DataTypes),
   Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),

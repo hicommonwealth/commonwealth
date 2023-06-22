@@ -12,10 +12,6 @@ import type { ChainAttributes } from './chain';
 import type { CommentAttributes } from './comment';
 import type { NotificationInstance } from './notification';
 import type { NotificationCategoryAttributes } from './notification_category';
-import type {
-  NotificationsReadAttributes,
-  NotificationsReadInstance,
-} from './notifications_read';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
@@ -36,15 +32,12 @@ export type SubscriptionAttributes = {
 
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
-  NotificationsRead?: NotificationsReadAttributes[];
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
 
-export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
-  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
-};
+export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {};
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
   emitNotifications?: (
@@ -113,10 +106,6 @@ export default (
     models.Subscription.belongsTo(models.NotificationCategory, {
       foreignKey: 'category_id',
       targetKey: 'name',
-    });
-    models.Subscription.hasMany(models.NotificationsRead, {
-      foreignKey: 'subscription_id',
-      onDelete: 'cascade',
     });
     models.Subscription.belongsTo(models.Chain, {
       foreignKey: 'chain_id',

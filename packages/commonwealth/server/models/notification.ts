@@ -1,9 +1,5 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type {
-  NotificationsReadAttributes,
-  NotificationsReadInstance,
-} from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationAttributes = {
@@ -16,12 +12,9 @@ export type NotificationAttributes = {
   created_at?: Date;
   updated_at?: Date;
   thread_id?: number;
-  NotificationsRead?: NotificationsReadAttributes[];
 };
 
-export type NotificationInstance = ModelInstance<NotificationAttributes> & {
-  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
-};
+export type NotificationInstance = ModelInstance<NotificationAttributes> & {};
 
 export type NotificationModelStatic = ModelStatic<NotificationInstance>;
 
@@ -50,11 +43,6 @@ export default (
   );
 
   Notification.associate = (models) => {
-    models.Notification.hasMany(models.NotificationsRead, {
-      foreignKey: 'notification_id',
-      onDelete: 'cascade',
-      hooks: true,
-    });
     models.Notification.belongsTo(models.NotificationCategory, {
       foreignKey: 'category_id',
       targetKey: 'name',
