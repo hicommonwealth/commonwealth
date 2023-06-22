@@ -336,7 +336,7 @@ describe('ServerThreadsController', () => {
           reaction as any,
           commentId
         )
-      ).to.be.rejectedWith('Could not verify user token balance');
+      ).to.be.rejectedWith('Insufficient token balance');
     });
   });
 
