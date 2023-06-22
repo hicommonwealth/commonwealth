@@ -11,7 +11,6 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { openConfirmation } from '../../modals/confirmation_modal';
-import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
 import { ContractCard } from './contract_card';
 import { TemplateDisplayTab } from './template_display_tab';
@@ -117,77 +116,75 @@ const ContractsPage = () => {
   };
 
   return (
-    <Sublayout>
-      <div className="ContractsPage">
-        <CWBreadcrumbs
-          breadcrumbs={[{ label: 'Contract action templates', path: '' }]}
+    <div className="ContractsPage">
+      <CWBreadcrumbs
+        breadcrumbs={[{ label: 'Contract action templates', path: '' }]}
+      />
+      <div className="header-container">
+        <CWText type="h3">Contract action templates</CWText>
+        <CWButton
+          buttonType="mini-white"
+          label="Add contract"
+          iconLeft="plus"
+          onClick={handleAddContract}
         />
-        <div className="header-container">
-          <CWText type="h3">Contract action templates</CWText>
-          <CWButton
-            buttonType="mini-white"
-            label="Add contract"
-            iconLeft="plus"
-            onClick={handleAddContract}
-          />
-        </div>
-
-        <CWText className="subheader" type="b1">
-          Add community contracts and associated templates
-        </CWText>
-
-        <div className="Tabs">
-          <CWTabBar>
-            <CWTab
-              label="Contracts and actions"
-              onClick={() => {
-                setTabOn('contracts');
-              }}
-              isSelected={tabOn === 'contracts'}
-            />
-            <CWTab
-              label="Template library"
-              onClick={() => {
-                setTabOn('templates');
-              }}
-              isSelected={tabOn === 'templates'}
-            />
-          </CWTabBar>
-        </div>
-        {tabOn === 'contracts' ? (
-          <>
-            {contracts.length ? (
-              <div className="contracts-container">
-                {contracts.map((contract) => (
-                  <ContractCard
-                    key={contract.id}
-                    id={contract.id}
-                    address={contract.address}
-                    templates={contract.ccts}
-                    onUpdateSuccess={onUpdateSuccess}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="no-contracts-container">
-                <CWText className="no-contracts-info" type="b1">
-                  You currently have no contracts or actions. Add a contract to
-                  enable on-chain actions for your community.
-                </CWText>
-              </div>
-            )}
-          </>
-        ) : (
-          <TemplateDisplayTab
-            templates={templates}
-            handleDeleteTemplate={handleDeleteTemplate}
-            contracts={contracts}
-            setNoContractsAlertDisplayed={setNoContractsAlertDisplayed}
-            noContractsAlertDisplayed={noContractsAlertDisplayed}
-          />
-        )}
       </div>
-    </Sublayout>
+
+      <CWText className="subheader" type="b1">
+        Add community contracts and associated templates
+      </CWText>
+
+      <div className="Tabs">
+        <CWTabBar>
+          <CWTab
+            label="Contracts and actions"
+            onClick={() => {
+              setTabOn('contracts');
+            }}
+            isSelected={tabOn === 'contracts'}
+          />
+          <CWTab
+            label="Template library"
+            onClick={() => {
+              setTabOn('templates');
+            }}
+            isSelected={tabOn === 'templates'}
+          />
+        </CWTabBar>
+      </div>
+      {tabOn === 'contracts' ? (
+        <>
+          {contracts.length ? (
+            <div className="contracts-container">
+              {contracts.map((contract) => (
+                <ContractCard
+                  key={contract.id}
+                  id={contract.id}
+                  address={contract.address}
+                  templates={contract.ccts}
+                  onUpdateSuccess={onUpdateSuccess}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="no-contracts-container">
+              <CWText className="no-contracts-info" type="b1">
+                You currently have no contracts or actions. Add a contract to
+                enable on-chain actions for your community.
+              </CWText>
+            </div>
+          )}
+        </>
+      ) : (
+        <TemplateDisplayTab
+          templates={templates}
+          handleDeleteTemplate={handleDeleteTemplate}
+          contracts={contracts}
+          setNoContractsAlertDisplayed={setNoContractsAlertDisplayed}
+          noContractsAlertDisplayed={noContractsAlertDisplayed}
+        />
+      )}
+    </div>
   );
 };
 
