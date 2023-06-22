@@ -92,7 +92,8 @@ export const getReactionSubscription = (thread: Thread) => {
 
 export const getThreadSubScriptionMenuItem = (
   thread: Thread,
-  setIsSubscribed: Dispatch<SetStateAction<boolean>>
+  setIsSubscribed: Dispatch<SetStateAction<boolean>>,
+  archivedAt: moment.Moment | null
 ): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
@@ -112,5 +113,6 @@ export const getThreadSubScriptionMenuItem = (
     },
     label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
     iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
+    disabled: archivedAt ? true : false
   };
 };

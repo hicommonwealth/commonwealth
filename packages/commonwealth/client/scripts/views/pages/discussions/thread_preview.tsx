@@ -23,11 +23,13 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
+import { ArchiveThreadModal } from 'views/modals/archive_thread_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 import AddressInfo from '../../../models/AddressInfo';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWTooltip } from '../../components/component_kit/cw_popover/cw_tooltip';
 import { getClasses } from '../../components/component_kit/helpers';
 import { LockWithTooltip } from '../../components/lock_with_tooltip';
 import { ThreadPreviewReactionButtonBig } from '../../components/ReactionButton/ThreadPreviewReactionButtonBig';
@@ -51,6 +53,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
     useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
 
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -68,6 +71,8 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
       getReactionSubscription(thread)?.isActive
   );
   const [isLocked, setIsLocked] = useState(thread.readOnly);
+
+  const [archivedAt, setArchivedAt] = useState(thread.archivedAt);
 
   const hasAdminPermissions =
     app.user.activeAccount &&
@@ -125,7 +130,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ThreadPreviewReactionButtonBig thread={thread} />
+          <ThreadPreviewReactionButtonBig thread={thread} archivedAt={archivedAt} />
         )}
         <div className="main-content">
           <div className="top-row">
@@ -146,8 +151,23 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              <NewThreadTag threadCreatedAt={thread.createdAt} />
-              {isHot(thread) && <CWTag iconName="trendUp" label="Trending" type="trending"/>}
+              { archivedAt &&
+                (<CWTooltip
+                  hasBackground={true}
+                  placement="right"
+                  content={`Archived on ${thread.archivedAt.format('MM/DD/YYYY')}`}
+                  renderTrigger={(handleInteraction) => (
+                    <CWIcon
+                      iconName="archiveTrayFilled"
+                      iconSize="small"
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                    />
+                  )}
+                />)
+              }
+              <NewThreadTag threadCreatedAt={thread.createdAt} archivedAt={archivedAt} />
+              {isHot(thread) && !archivedAt && <CWTag iconName="trendUp" label="Trending" type="trending"/>}
               {isLocked && (
                 <LockWithTooltip
                   lockedAt={thread.lockedAt}
@@ -218,7 +238,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           <div className="row-bottom">
             <div className="comments">
               {isWindowSmallInclusive && (
-                <ThreadReactionPreviewButtonSmall thread={thread} />
+                <ThreadReactionPreviewButtonSmall thread={thread} archivedAt={archivedAt} />
               )}
               <CWIcon iconName="comment" iconSize="small" />
               <CWText type="caption">
@@ -248,7 +268,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 <PopoverMenu
                   menuItems={[
-                    getThreadSubScriptionMenuItem(thread, setIsSubscribed),
+                    getThreadSubScriptionMenuItem(thread, setIsSubscribed, archivedAt),
                   ]}
                   renderTrigger={(onclick) => (
                     <div className='btn-txt-container'>
@@ -265,14 +285,20 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 />
               </div>
               {isLoggedIn && (isAuthor || hasAdminPermissions) && (
-                <ThreadPreviewMenu
-                  thread={thread}
-                  setIsChangeTopicModalOpen={setIsChangeTopicModalOpen}
-                  setIsUpdateProposalStatusModalOpen={
-                    setIsUpdateProposalStatusModalOpen
-                  }
-                  setIsLocked={setIsLocked}
-                />
+                <div
+                  className="thread-actions"
+                >                
+                  <ThreadPreviewMenu
+                    thread={thread}
+                    setIsChangeTopicModalOpen={setIsChangeTopicModalOpen}
+                    setIsUpdateProposalStatusModalOpen={
+                      setIsUpdateProposalStatusModalOpen
+                    }
+                    setIsArchiveModalOpen={setIsArchiveModalOpen}
+                    setIsLocked={setIsLocked}
+                    archivedAt={archivedAt}
+                  />
+                </div>
               )}
           </div>
         </div>
@@ -299,6 +325,16 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
         }
         onClose={() => setIsUpdateProposalStatusModalOpen(false)}
         open={isUpdateProposalStatusModalOpen}
+      />
+      <Modal
+        content={
+          <ArchiveThreadModal
+            thread={thread}
+            onModalClose={() => setIsArchiveModalOpen(false)}
+          />
+        }
+        onClose={() => setIsArchiveModalOpen(false)}
+        open={isArchiveModalOpen}
       />
     </>
   );

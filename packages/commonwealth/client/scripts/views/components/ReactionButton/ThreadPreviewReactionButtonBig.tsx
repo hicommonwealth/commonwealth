@@ -12,13 +12,16 @@ import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { Modal } from '../component_kit/cw_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { useReactionButton } from './useReactionButton';
+import moment from 'moment';
 
 type ThreadPreviewReactionButtonProps = {
   thread: Thread;
+  archivedAt: moment.Moment | null;
 };
 
 export const ThreadPreviewReactionButtonBig = ({
   thread,
+  archivedAt,
 }: ThreadPreviewReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
@@ -43,7 +46,7 @@ export const ThreadPreviewReactionButtonBig = ({
           }
         }}
         className={`ThreadPreviewReactionButton${
-          isLoading || isUserForbidden ? ' disabled' : ''
+          isLoading || isUserForbidden || archivedAt ? ' disabled' : ''
         }${hasReacted ? ' has-reacted' : ''}`}
       >
         {reactors.length > 0 ? (

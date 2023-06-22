@@ -122,6 +122,7 @@ class ThreadsController {
       Attachments,
       created_at,
       updated_at,
+      archived_at,
       topic,
       kind,
       stage,
@@ -228,6 +229,7 @@ class ThreadsController {
       body: decodedBody,
       createdAt: moment(created_at),
       updatedAt: moment(updated_at),
+      archivedAt: archived_at && moment(archived_at),
       attachments,
       topic: topicModel,
       kind,
@@ -442,6 +444,60 @@ class ThreadsController {
           : 'Failed to update thread topic'
       );
     }
+  }
+
+  public async archive(
+    threadId: number,
+  ) {
+    await $.ajax({
+      url: `${app.serverUrl()}/threads/${threadId}/archive`,
+      type: 'PATCH',
+      success: (response) => {
+
+        app.threadUpdateEmitter.emit('threadUpdated', {
+          threadId,
+          action: ThreadActionType.Archive,
+        });
+
+        const result = this.modelFromServer(response.result);
+        this._store.update(result);
+        this._listingStore.add(result);
+
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to archive thread');
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Failed to archive thread'
+        );
+      },
+    });
+  }
+
+  public async unarchive(
+    threadId: number,
+  ) {
+    await $.ajax({
+      url: `${app.serverUrl()}/threads/${threadId}/unarchive`,
+      type: 'PATCH',
+      success: (response) => {
+        const result = this.modelFromServer(response.result);
+        this._store.update(result);
+        this._listingStore.add(result);
+
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to unarchive thread');
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Failed to unarchive thread'
+        );
+      },
+    });
   }
 
   public async delete(proposal) {

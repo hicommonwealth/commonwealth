@@ -519,7 +519,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const reactionsAndReplyButtons = (
     <div className="thread-footer-row">
-      <ThreadReactionPreviewButtonSmall thread={thread} />
+      <ThreadReactionPreviewButtonSmall thread={thread} archivedAt={thread.archivedAt} />
       <div className="comments-count">
         <CWIcon iconName="feedback" iconSize="small" />
         <CWText type="caption">{commentCount} Comments</CWText>
@@ -758,6 +758,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }
         createdAt={thread.createdAt}
         updatedAt={thread.updatedAt}
+        archivedAt={thread.archivedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         readOnly={thread.readOnly}

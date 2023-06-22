@@ -138,7 +138,8 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
         <CWText type="b2" className={`title-text ${titleTextClass}`}>
           {title}
         </CWText>
-        {rightIcon && <div className="right-icon">{rightIcon}</div>}
+        {/* {rightIcon && <div className="right-icon">{rightIcon}</div>} */}
+        <div className="right-icon">{rightIcon}</div>
       </div>
       {containsChildren && toggled && (
         <div className="subsections">

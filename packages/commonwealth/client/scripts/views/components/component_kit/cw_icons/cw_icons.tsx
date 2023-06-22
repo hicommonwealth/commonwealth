@@ -52,6 +52,66 @@ import type { IconProps, IconStyleProps } from './types';
 //   }
 // }
 
+export const CWArchiveTray = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={`${getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )} archiveTrayIcon`}
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      fill="none"
+      viewBox="0 0 20 20"
+      {...otherProps}
+    >
+      <path d="M16.25 3.125H3.75C3.40482 3.125 3.125 3.40482 3.125 3.75V16.25C3.125 16.5952 3.40482 16.875 3.75 16.875H16.25C16.5952 16.875 16.875 16.5952 16.875 16.25V3.75C16.875 3.40482 16.5952 3.125 16.25 3.125Z" stroke="#656167" stroke-width="0.9375" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M7.35156 9.22656L10 11.875L12.6484 9.22656" stroke="#656167" stroke-width="0.9375" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M10 5.625V11.875" stroke="#656167" stroke-width="0.9375" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M3.125 12.5H5.99219C6.07334 12.4997 6.15376 12.5154 6.22883 12.5463C6.3039 12.5771 6.37216 12.6224 6.42969 12.6797L7.94531 14.1953C8.00284 14.2526 8.0711 14.2979 8.14617 14.3287C8.22124 14.3596 8.30166 14.3753 8.38281 14.375H11.6172C11.6983 14.3753 11.7788 14.3596 11.8538 14.3287C11.9289 14.2979 11.9972 14.2526 12.0547 14.1953L13.5703 12.6797C13.6278 12.6224 13.6961 12.5771 13.7712 12.5463C13.8462 12.5154 13.9267 12.4997 14.0078 12.5H16.875" stroke="#656167" stroke-width="0.9375" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  );
+};
+
+export const CWArchiveTrayFilled = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={`${getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )} archiveTrayIcon`}
+      xmlns="http://www.w3.org/2000/svg"
+      width="17"
+      height="16"
+      fill="none"
+      viewBox="0 0 17 16"
+      {...otherProps}
+    >
+      <path d="M13.16 2H3.16C2.89479 2 2.64043 2.10536 2.4529 2.29289C2.26536 2.48043 2.16 2.73478 2.16 3V9.99375V13C2.16 13.2652 2.26536 13.5196 2.4529 13.7071C2.64043 13.8946 2.89479 14 3.16 14H13.16C13.4252 14 13.6796 13.8946 13.8671 13.7071C14.0546 13.5196 14.16 13.2652 14.16 13V3C14.16 2.73478 14.0546 2.48043 13.8671 2.29289C13.6796 2.10536 13.4252 2 13.16 2ZM5.685 7.025C5.77874 6.93149 5.90573 6.87898 6.03813 6.87898C6.17053 6.87898 6.29752 6.93149 6.39125 7.025L7.66 8.29375V4.5C7.66 4.36739 7.71268 4.24021 7.80645 4.14645C7.90022 4.05268 8.0274 4 8.16 4C8.29261 4 8.41979 4.05268 8.51356 4.14645C8.60733 4.24021 8.66 4.36739 8.66 4.5V8.29375L9.92875 7.025C10.0239 6.93882 10.1485 6.89252 10.2768 6.89568C10.4051 6.89883 10.5273 6.95121 10.618 7.04197C10.7088 7.13273 10.7612 7.25491 10.7643 7.38322C10.7675 7.51153 10.7212 7.63614 10.635 7.73125L8.51625 9.85625H8.50375L8.47875 9.88125H8.46625L8.435 9.9C8.435 9.90625 8.42875 9.90625 8.42875 9.9125L8.3975 9.93125H8.385L8.35375 9.95H8.3475L8.30375 9.96875H8.01625L7.9725 9.95H7.96625L7.935 9.93125H7.9225L7.89125 9.9125C7.89125 9.90625 7.885 9.90625 7.885 9.9L7.85375 9.88125H7.84125L7.81625 9.85625H7.80375L5.685 7.73125C5.5915 7.63752 5.53898 7.51052 5.53898 7.37813C5.53898 7.24573 5.5915 7.11873 5.685 7.025ZM13.16 13H3.16V10.5H4.95375L6.16 11.7063C6.25248 11.7994 6.36251 11.8734 6.48373 11.9238C6.60495 11.9742 6.73497 12.0001 6.86625 12H9.45375C9.58504 12.0001 9.71505 11.9742 9.83627 11.9238C9.9575 11.8734 10.0675 11.7994 10.16 11.7063L11.3663 10.5H13.16V13Z" fill="#656167"/>
+    </svg>
+  );
+};
+
+
 export const CWArrowFatUp = (props: IconProps) => {
   const {
     className,
@@ -1013,6 +1073,36 @@ export const CWDots = (props: IconProps) => {
       {...otherProps}
     >
       <path d="M8.059 16a3 3 0 11-6 0 3 3 0 016 0zM18.858 16a3 3 0 11-6 0 3 3 0 016 0zM30.058 16c0 1.657-1.432 3-3.2 3-1.767 0-3.2-1.343-3.2-3s1.433-3 3.2-3c1.768 0 3.2 1.343 3.2 3z"></path>
+    </svg>
+  );
+};
+
+export const CWDotsHorizontal = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="none"
+      viewBox="0 0 16 16"
+      {...otherProps}
+    >
+      <path d="M8.96875 8C8.96875 8.53503 8.53503 8.96875 8 8.96875C7.46497 8.96875 7.03125 8.53503 7.03125 8C7.03125 7.46497 7.46497 7.03125 8 7.03125C8.53503 7.03125 8.96875 7.46497 8.96875 8Z" fill="#656167" stroke="#656167" stroke-width="0.0625"></path>
+      <path xmlns="http://www.w3.org/2000/svg" d="M4 9C4.55228 9 5 8.55228 5 8C5 7.44772 4.55228 7 4 7C3.44772 7 3 7.44772 3 8C3 8.55228 3.44772 9 4 9Z" fill="#656167"></path>
+      <path xmlns="http://www.w3.org/2000/svg" d="M12 9C12.5523 9 13 8.55228 13 8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8C11 8.55228 11.4477 9 12 9Z" fill="#656167"></path>
     </svg>
   );
 };

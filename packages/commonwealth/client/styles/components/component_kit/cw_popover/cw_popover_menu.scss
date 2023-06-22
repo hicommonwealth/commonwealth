@@ -8,6 +8,9 @@
   padding: 8px 16px;
   user-select: none;
 
+  .archiveTrayIcon {
+    fill: none;
+  }
   .menu-item-icon.Icon {
     color: $neutral-600;
   }

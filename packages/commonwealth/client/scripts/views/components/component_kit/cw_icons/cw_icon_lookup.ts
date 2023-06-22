@@ -12,6 +12,8 @@ import * as Icons from './cw_icons';
 import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
+  archiveTray: Icons.CWArchiveTray,
+  archiveTrayFilled: Icons.CWArchiveTrayFilled,
   arrowFatUp: Icons.CWArrowFatUp,
   arrowLeft: Icons.CWArrowLeft,
   arrowRight: Icons.CWArrowRight,
@@ -46,6 +48,7 @@ export const iconLookup = {
   discord: Icons.CWDiscord,
   dots: Icons.CWDots,
   dotsVertical: Icons.CWDotsVertical,
+  dotsHorizontal: Icons.CWDotsHorizontal,
   downvote: Icons.CWDownvote,
   element: Icons.CWElement,
   expand: Icons.CWExpand,

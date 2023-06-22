@@ -13,6 +13,7 @@ import type {
 import { useCommonNavigate } from 'navigation/helpers';
 import { useLocation, matchRoutes } from 'react-router-dom';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -41,6 +42,10 @@ export const DiscussionSection = () => {
   );
   const matchesOverviewRoute = matchRoutes(
     [{ path: '/overview' }, { path: ':scope/overview' }],
+    location
+  );
+  const matchesArchivedRoute = matchRoutes(
+    [{ path: '/threads/' }, { path: ':scope/threads' }],
     location
   );
   const matchesDiscussionsTopicRoute = matchRoutes(
@@ -132,6 +137,28 @@ export const DiscussionSection = () => {
       isVisible: true,
       isUpdated: true,
       isActive: !!matchesOverviewRoute,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/overview`,
+          app.activeChainId(),
+          () => {
+            setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
+          }
+        );
+      },
+      displayData: null,
+    },
+    {
+      title: 'Archived',
+      rightIcon: <CWIcon iconName="archiveTray"></CWIcon>,
+      containsChildren: false,
+      hasDefaultToggle: false,
+      isVisible: true,
+      isUpdated: true,
+      isActive: !!matchesArchivedRoute,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(

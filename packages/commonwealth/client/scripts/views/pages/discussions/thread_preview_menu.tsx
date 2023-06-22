@@ -8,19 +8,24 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { notifySuccess } from '../../../controllers/app/notifications';
 import { ThreadActionType } from '../../../../../shared/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import moment from 'moment';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
   setIsChangeTopicModalOpen: Dispatch<SetStateAction<boolean>>;
   setIsUpdateProposalStatusModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsArchiveModalOpen: Dispatch<SetStateAction<boolean>>;
   setIsLocked: Dispatch<SetStateAction<boolean>>;
+  archivedAt: moment.Moment | null;
 };
 
 export const ThreadPreviewMenu = ({
   thread,
   setIsChangeTopicModalOpen,
   setIsUpdateProposalStatusModalOpen,
+  setIsArchiveModalOpen,
   setIsLocked,
+  archivedAt,
 }: ThreadPreviewMenuProps) => {
   const [isReadOnly, setIsReadOnly] = useState(thread.readOnly);
 
@@ -92,6 +97,7 @@ export const ThreadPreviewMenu = ({
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                     iconLeft: 'pin' as const,
+                    disabled: archivedAt ? true : false,
                   },
                 ]
               : []),
@@ -112,19 +118,30 @@ export const ThreadPreviewMenu = ({
                     },
                     label: isReadOnly ? 'Unlock thread' : 'Lock thread',
                     iconLeft: 'lock' as const,
+                    disabled: archivedAt ? true : false,
                   },
                 ]
               : []),
+              ...(hasAdminPermissions
+                ? [
+                    {
+                      onClick: () => setIsArchiveModalOpen(true),
+                      label: archivedAt ? 'Unarchive' : 'Archive',
+                      iconLeft: 'archiveTray' as const,
+                    },
+                  ]
+                : []),
             ...(hasAdminPermissions
               ? [
                   {
                     onClick: () => setIsChangeTopicModalOpen(true),
                     label: 'Change topic',
                     iconLeft: 'filter' as const,
+                    disabled: archivedAt ? true : false
                   },
                 ]
               : []),
-            ...(isAuthor || hasAdminPermissions
+            ...((isAuthor || hasAdminPermissions)
               ? [
                   {
                     onClick: () => {
@@ -132,6 +149,7 @@ export const ThreadPreviewMenu = ({
                     },
                     label: 'Update status',
                     iconLeft: 'democraticProposal' as const,
+                    disabled: archivedAt ? true : false
                   },
                 ]
               : []),
@@ -147,7 +165,7 @@ export const ThreadPreviewMenu = ({
           ]}
           renderTrigger={(onclick) => (
             <CWIconButton
-              iconName="dotsVertical"
+              iconName="dotsHorizontal"
               iconSize="small"
               onClick={onclick}
             />

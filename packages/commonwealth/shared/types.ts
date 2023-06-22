@@ -107,6 +107,7 @@ export enum ThreadActionType {
   Subscription = 'subscription',
   TopicChange = 'topicchange',
   StageChange = 'stagechange',
+  Archive = 'archive'
 }
 
 export enum SearchContentType {

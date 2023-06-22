@@ -7,8 +7,8 @@ export function isNewThread(threadCreatedAt: moment.Moment){
   return moment.duration(diffInMs).asHours() < 48;
 }
 
-export const NewThreadTag = ({ threadCreatedAt }: {threadCreatedAt: moment.Moment}) => {
-  if (isNewThread(threadCreatedAt)) {
+export const NewThreadTag = ({ threadCreatedAt, archivedAt }: {threadCreatedAt: moment.Moment, archivedAt: moment.Moment | null}) => {
+  if (isNewThread(threadCreatedAt) && !archivedAt) {
     return <CWTag label={'New'} type={'new'} iconName={'newStar'}/>
   }
 

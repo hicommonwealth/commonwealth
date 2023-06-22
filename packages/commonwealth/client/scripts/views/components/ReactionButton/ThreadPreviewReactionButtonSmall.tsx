@@ -15,13 +15,16 @@ import {
 } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
 import { useReactionButton } from './useReactionButton';
+import moment from 'moment';
 
 type ThreadReactionButtonProps = {
   thread: Thread;
+  archivedAt: moment.Moment | null
 };
 
 export const ThreadReactionPreviewButtonSmall = ({
   thread,
+  archivedAt, 
 }: ThreadReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState([]);
@@ -33,7 +36,7 @@ export const ThreadReactionPreviewButtonSmall = ({
     <>
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading || isUserForbidden },
+          { disabled: isLoading || isUserForbidden || (archivedAt ? true : false) },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {

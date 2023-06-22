@@ -31,6 +31,7 @@ export type SidebarComponents = [
 type ContentPageProps = {
   createdAt: moment.Moment | number;
   updatedAt?: moment.Moment;
+  archivedAt: moment.Moment | null;
   title: string | React.ReactNode;
 
   // optional
@@ -61,6 +62,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     contentBodyLabel,
     createdAt,
     updatedAt,
+    archivedAt,
     lastEdited,
     headerComponents,
     readOnly,
@@ -100,7 +102,7 @@ export const CWContentPage = (props: ContentPageProps) => {
                 </CWText>
               ))}
           {!!displayNewTag && (
-            <NewThreadTag threadCreatedAt={moment(createdAt)} />
+            <NewThreadTag archivedAt={moment(archivedAt)} threadCreatedAt={moment(createdAt)} />
           )}
           {!!viewCount && (
             <CWText type="caption" className="header-text">
@@ -112,16 +114,19 @@ export const CWContentPage = (props: ContentPageProps) => {
             <LockWithTooltip lockedAt={lockedAt} updatedAt={updatedAt} />
           )}
           {actions && (
-            <PopoverMenu
-              renderTrigger={(onclick) => (
-                <CWIconButton
-                  iconName="dotsVertical"
-                  iconSize="small"
-                  onClick={onclick}
-                />
-              )}
-              menuItems={actions}
-            />
+            <div>
+              <PopoverMenu
+                renderTrigger={(onclick) => (
+                  <CWIconButton
+                    iconName="dotsHorizontal"
+                    iconSize="small"
+                    onClick={onclick}
+                  />
+                )}
+                menuItems={actions}
+              />
+            </div>
+
           )}
           <SharePopover />
         </div>

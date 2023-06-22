@@ -55,7 +55,7 @@
 
   &.tertiary {
     &:focus-within {
-      border: 2px solid $blue-600;
+      border: 2px solid $primary-600;
     }
   }
 
@@ -186,18 +186,18 @@
     }
 
     &.tertiary {
-      @include iconAndTextColors($blue-500, $blue-500);
+      @include iconAndTextColors($primary-500, $primary-500);
 
       &:hover {
-        @include iconAndTextColors($blue-600, $blue-600);
+        @include iconAndTextColors($primary-600, $primary-600);
       }
 
       &:active {
-        @include iconAndTextColors($blue-500, $blue-500);
+        @include iconAndTextColors($primary-500, $primary-500);
       }
 
       &:focus {
-        @include iconAndTextColors($blue-600, $blue-600);
+        @include iconAndTextColors($primary-600, $primary-600);
       }
 
       &.disabled {
