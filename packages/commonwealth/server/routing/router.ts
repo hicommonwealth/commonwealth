@@ -12,7 +12,9 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
-import getAddressProfile, { getAddressProfileValidation } from '../routes/getAddressProfile';
+import getAddressProfile, {
+  getAddressProfileValidation,
+} from '../routes/getAddressProfile';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
@@ -65,7 +67,6 @@ import deleteRole from '../routes/deleteRole';
 import setDefaultRole from '../routes/setDefaultRole';
 
 import getUploadSignature from '../routes/getUploadSignature';
-import activeThreads from '../routes/activeThreads';
 import createThread from '../routes/createThread';
 import editThread from '../routes/editThread';
 import createPoll from '../routes/createPoll';
@@ -82,8 +83,6 @@ import deleteThread from '../routes/deleteThread';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
-import getThreadsOld from '../routes/getThreads';
-import searchDiscussions from '../routes/searchDiscussions';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
@@ -179,6 +178,7 @@ import { searchCommentsHandler } from '../routes/comments/search_comments_handle
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
+import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -264,7 +264,11 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
-  router.post('/getAddressProfile', getAddressProfileValidation, getAddressProfile.bind(this, models));
+  router.post(
+    '/getAddressProfile',
+    getAddressProfileValidation,
+    getAddressProfile.bind(this, models)
+  );
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
@@ -493,25 +497,30 @@ function setupRouter(
     deleteThread.bind(this, models, banCache)
   );
   router.get(
-    '/bulkThreads',
+    '/threads',
     databaseValidationService.validateChain,
-    bulkThreads.bind(this, models)
+    getThreadsHandler.bind(this, serverControllers)
   );
-  router.get(
-    '/activeThreads',
-    databaseValidationService.validateChain,
-    activeThreads.bind(this, models)
-  );
-  router.get(
-    '/getThreads',
-    // databaseValidationService.validateChain,
-    getThreadsOld.bind(this, models)
-  );
-  router.get(
-    '/searchDiscussions',
-    databaseValidationService.validateChain,
-    searchDiscussions.bind(this, models)
-  );
+  // router.get(
+  //   '/bulkThreads',
+  //   databaseValidationService.validateChain,
+  //   bulkThreads.bind(this, models)
+  // );
+  // router.get(
+  //   '/activeThreads',
+  //   databaseValidationService.validateChain,
+  //   activeThreads.bind(this, models)
+  // );
+  // router.get(
+  //   '/getThreads',
+  //   // databaseValidationService.validateChain,
+  //   getThreadsOld.bind(this, models)
+  // );
+  // router.get(
+  //   '/searchDiscussions',
+  //   databaseValidationService.validateChain,
+  //   searchDiscussions.bind(this, models)
+  // );
   router.get(
     '/searchProfiles',
     databaseValidationService.validateChain,
