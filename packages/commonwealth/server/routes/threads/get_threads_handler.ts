@@ -73,17 +73,16 @@ export const getThreadsHandler = async (
   // get bulk threads
   if (bulk) {
     const {
-      // endpoint specific filters
       stage,
       topic_id,
       includePinnedThreads,
-      // pagination params
       limit,
       page,
       orderBy,
       from_date,
       to_date,
     } = req.query as BulkThreadsRequestQuery;
+
     const bulkThreads = await controllers.threads.getBulkThreads(
       chain,
       stage,
@@ -101,6 +100,7 @@ export const getThreadsHandler = async (
   // get active threads
   if (active) {
     const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
+
     const activeThreads = await controllers.threads.getActiveThreads(
       chain,
       parseInt(threads_per_topic, 10)
@@ -122,6 +122,7 @@ export const getThreadsHandler = async (
       // if no chain resolved, ensure that client explicitly requested all chains
       throw new AppError(Errors.NoChains);
     }
+
     const searchResults = await controllers.threads.searchThreads(
       chain,
       search,
