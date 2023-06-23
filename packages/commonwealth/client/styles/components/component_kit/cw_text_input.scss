@@ -2,7 +2,6 @@
 
 @mixin iconPositionStyles {
   position: absolute;
-  right: 8px;
   top: 50%;
   transform: translateY(-50%);
 }
@@ -58,6 +57,7 @@
         height: 32px;
         line-height: 20px;
         padding: 6px 8px;
+        border-radius: 4px;
       }
 
       &.large {
@@ -65,25 +65,41 @@
         height: 40px;
         letter-spacing: 0.02em;
         line-height: 24px;
-        padding: 6px 8px;
+        padding: 10px 12px;
+        border-radius: 6px;
+      }
+
+      &.hasLeftIcon {
+        padding-left: 36px;
       }
 
       &.hasRightIcon {
-        padding: 8px 24px 8px 8px;
+        padding-right: 11px;
       }
+    }
+
+    .text-input-left-icon.Icon {
+      @include iconPositionStyles;
+      left: 15px;
+    }
+
+    .text-input-left-onClick-icon {
+      @include iconPositionStyles;
+      left: 15px;
     }
 
     .text-input-right-icon.Icon {
       @include iconPositionStyles;
+      right: 15px;
     }
 
     .text-input-right-onClick-icon {
       @include iconPositionStyles;
+      right: 15px;
     }
 
     ::placeholder {
-      // color: $neutral-600;
-      color: $black;
+      color: $neutral-600;
     }
   }
 }

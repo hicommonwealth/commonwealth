@@ -19,11 +19,14 @@ export type BaseTextInputProps = {
   containerClassName?: string;
   defaultValue?: string | number;
   value?: string | number;
+  iconLeft?: IconName;
+  iconLeftonClick?: () => void;
   iconRight?: IconName;
   iconRightonClick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
   label?: string | React.ReactNode;
   maxLength?: number;
+  isCompact?: boolean;
   name?: string;
   onInput?: (e) => void;
   onenterkey?: (e) => void;
@@ -44,6 +47,7 @@ type InputStyleProps = {
 };
 
 type InputInternalStyleProps = {
+  hasLeftIcon?: boolean;
   hasRightIcon?: boolean;
   isTyping?: boolean;
 };
@@ -121,6 +125,8 @@ export const CWTextInput = (props: TextInputProps) => {
     defaultValue,
     value,
     disabled,
+    iconLeft,
+    iconLeftonClick,
     iconRight,
     iconRightonClick,
     inputClassName,
@@ -132,7 +138,7 @@ export const CWTextInput = (props: TextInputProps) => {
     onenterkey,
     onClick,
     placeholder,
-    size = 'large',
+    isCompact = false,
     tabIndex,
     displayOnly,
     manualStatusMessage = '',
@@ -164,15 +170,31 @@ export const CWTextInput = (props: TextInputProps) => {
         />
       )}
       <div className="input-and-icon-container">
+        {iconLeftonClick && !!iconLeft ? (
+          <div className="text-input-left-onClick-icon">
+            <CWIconButton
+              iconName={iconLeft}
+              iconSize="small"
+              onClick={iconLeftonClick}
+            />
+          </div>
+        ) : !!iconLeft ? (
+          <CWIcon
+            iconName={iconLeft}
+            iconSize="small"
+            className="text-input-left-icon"
+          />
+        ) : null}
         <input
           autoFocus={autoFocus}
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({
-            size,
+            size: isCompact ? 'small' : 'large',
             validationStatus: validationProps.validationStatus,
             disabled,
             displayOnly,
             isTyping: validationProps.isTyping,
+            hasLeftIcon: !!iconLeft,
             hasRightIcon: !!iconRight,
             darkMode,
             inputClassName,
@@ -227,7 +249,7 @@ export const CWTextInput = (props: TextInputProps) => {
           value={value}
           defaultValue={defaultValue}
         />
-        {iconRightonClick && !!iconRight && !disabled ? (
+        {iconRightonClick && !!iconRight ? (
           <div className="text-input-right-onClick-icon">
             <CWIconButton
               iconName={iconRight}
@@ -235,7 +257,7 @@ export const CWTextInput = (props: TextInputProps) => {
               onClick={iconRightonClick}
             />
           </div>
-        ) : !!iconRight && !disabled ? (
+        ) : !!iconRight ? (
           <CWIcon
             iconName={iconRight}
             iconSize="small"

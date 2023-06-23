@@ -466,7 +466,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Primary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -478,13 +478,13 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Primary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
@@ -496,7 +496,7 @@ export const ComponentShowcase = () => {
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default disabled w/ left icon"
             disabled
@@ -512,7 +512,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Secondary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -524,32 +524,32 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Secondary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="secondary"
             label="Secondary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            buttonType='secondary'
+            buttonType="secondary"
             label="Secondary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             label="Secondary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Tertiary</CWText>
+          <CWText type="h4">Tertiary</CWText>
           <CWButton
             buttonType="tertiary"
             label="Tertiary default"
@@ -557,7 +557,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="tertiary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Tertiary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -595,7 +595,7 @@ export const ComponentShowcase = () => {
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Destructive</CWText>
+          <CWText type="h4">Destructive</CWText>
           <CWButton
             buttonType="destructive"
             label="Destructive default"
@@ -603,7 +603,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="destructive"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Destructive large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -808,12 +808,67 @@ export const ComponentShowcase = () => {
       </div>
       <div className="form-gallery">
         <CWText type="h3">Form fields</CWText>
-        <CWTextInput name="Text field" label="Large" placeholder="Type here" />
+        <CWText type="h5">isCompact = Yes</CWText>
         <CWTextInput
           name="Text field"
-          label="Small"
+          label="Field label"
           placeholder="Type here"
-          size="small"
+          isCompact
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft="write"
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight="write"
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft="write"
+          iconRight="write"
+          isCompact
+        />
+        <CWTextInput
+          name="Text field"
+          label="Disabled"
+          disabled
+          value="Some disabled text"
+          isCompact
+        />
+        <CWTextInput
+          name="Text field dark mode"
+          label="Dark mode"
+          darkMode
+          placeholder="Type here"
+          isCompact
+        />
+        <CWText type="h5">isCompact = No</CWText>
+        <CWTextInput
+          name="Text field"
+          label="Field label"
+          placeholder="Type here"
         />
         <CWTextInput
           name="Form field"
@@ -831,6 +886,19 @@ export const ComponentShowcase = () => {
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
+          iconLeft="write"
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight="write"
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft="write"
           iconRight="write"
         />
         <CWTextInput
