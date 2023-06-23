@@ -79,8 +79,6 @@ const FeedPage = () => {
     return <ErrorPage message={error.message} />;
   }
 
-  console.log('Feed data:', feedData);
-
   return (
     <div ref={setScrollElement} className="FeedPage">
       <div className="dashboard-column">
