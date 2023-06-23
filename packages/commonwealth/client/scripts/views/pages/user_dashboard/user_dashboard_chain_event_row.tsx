@@ -2,6 +2,8 @@ import React from 'react';
 
 import ChainInfo from '../../../models/ChainInfo';
 
+import app from 'state';
+
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 import type { IEventLabel } from '../../../../../../chain-events/src';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -25,7 +27,15 @@ export const UserDashboardChainEventRow = (
 
   const handleLinkClick = () => {
     if (label.linkUrl) {
-      navigate(label.linkUrl);
+      const activeChainId = app.activeChainId();
+      const shouldUpdateLinkUrl =
+        activeChainId && label.linkUrl.startsWith(`/${activeChainId}`);
+
+      const updatedLinkUrl = shouldUpdateLinkUrl
+        ? label.linkUrl.replace(`/${activeChainId}`, '')
+        : label.linkUrl;
+
+      navigate(updatedLinkUrl);
     }
   };
 

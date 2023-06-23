@@ -55,7 +55,12 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     notification.notificationData
   );
 
-  const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
+  const path = getProposalUrlPath(
+    root_type,
+    thread_id,
+    app.activeChainId() ? true : false,
+    chain_id
+  );
   const handleClick = () => {
     if (path) {
       navigate(path);
