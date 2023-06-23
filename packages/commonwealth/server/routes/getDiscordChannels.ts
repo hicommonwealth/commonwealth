@@ -44,6 +44,8 @@ const getDiscordChannels = async (
     },
   });
 
+  console.log('configEntry', configEntry);
+
   try {
     console.log(`${process.env.DISCORD_BOT_URL}/channel-listing`);
     const channels = await axios.post(

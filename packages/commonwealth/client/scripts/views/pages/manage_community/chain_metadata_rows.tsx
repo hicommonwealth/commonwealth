@@ -62,10 +62,14 @@ export const ChainMetadataRows = ({
   const [hasHomepage, setHasHomepage] = useState(chain.hasHomepage);
   const [selectedTags2, setSelectedTags2] = useState(setSelectedTags(chain.id));
   const [discordBotConnected, setDiscordBotConnected] = useState(
-    chain.discordConfigId !== null ?? returningFromDiscordCallback === 'true'
+    returningFromDiscordCallback === 'true'
+      ? true
+      : chain.discordConfigId !== null
   );
   const [discordBotConnecting, setDiscordBotConnecting] = useState(
-    chain.discordConfigId !== null ?? returningFromDiscordCallback === 'true'
+    returningFromDiscordCallback === 'true'
+      ? true
+      : chain.discordConfigId !== null
   );
   const [communityBanner, setCommunityBanner] = useState(chain.communityBanner);
   const [channelsLoaded, setChannelsLoaded] = useState(false);
@@ -176,7 +180,7 @@ export const ChainMetadataRows = ({
       window.open(
         `https://discord.com/oauth2/authorize?client_id=${
           process.env.DISCORD_CLIENT_ID
-        }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+        }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
           `${window.location.origin}`
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
@@ -221,7 +225,7 @@ export const ChainMetadataRows = ({
       window.open(
         `https://discord.com/oauth2/authorize?client_id=${
           process.env.DISCORD_CLIENT_ID
-        }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+        }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
           `${window.location.origin}`
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
