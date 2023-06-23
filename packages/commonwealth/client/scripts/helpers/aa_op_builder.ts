@@ -1,10 +1,10 @@
 
-import { UserOperationBuilder, Client } from 'userop';
+import { UserOperationBuilder, Client } from '../../../node_modules_perm/userop';
 import Web3 from 'web3';
 import { BigNumberish, ethers } from "ethers"
-import { OpToJSON } from 'userop/dist/utils';
+import { OpToJSON } from '../../../node_modules_perm/userop/dist/utils';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { EntryPoint, EntryPoint__factory } from 'userop/dist/typechain';
+import { EntryPoint, EntryPoint__factory } from '../../../node_modules_perm/userop/dist/typechain';
 
 const bundlerRPC = 'https://api.stackup.sh/v1/node/9fb29d028cc0f052af8136f1f9d68cf8a07db8ebf22869398dd82bc859eb703b';
 const entrypointAddr = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
