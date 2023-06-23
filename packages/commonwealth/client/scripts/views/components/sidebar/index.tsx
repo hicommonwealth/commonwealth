@@ -16,6 +16,7 @@ import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import Permissions from '../../../utils/Permissions';
 
 export type SidebarMenuName =
   | 'default'
@@ -30,17 +31,8 @@ export const Sidebar = ({ isInsideCommunity }) => {
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({
-      chain: app.activeChainId(),
-    });
-
-  const isMod = app.roles.isRoleOfCommunity({
-    role: 'moderator',
-    chain: app.activeChainId(),
-  });
-
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
 
   return (
