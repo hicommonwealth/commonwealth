@@ -704,16 +704,16 @@ class ThreadsController {
   ): Promise<Thread[]> {
     const params = {
       chain: app.activeChainId(),
-      ids,
+      thread_ids: ids,
     };
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/getThreads`, params),
+      axios.get(`${app.serverUrl()}/threads`, { params }),
       app.chainEntities.getRawEntities(app.activeChainId()),
     ]);
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-    return response.result.map((rawThread) => {
+    return response.data.result.map((rawThread) => {
       console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
@@ -881,13 +881,18 @@ class ThreadsController {
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/bulkThreads`, params),
+      axios.get(`${app.serverUrl()}/threads`, {
+        params: {
+          bulk: true,
+          ...params,
+        },
+      }),
       // app.chainEntities.getRawEntities(chain),
     ]);
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads } = response.result;
+    const { threads } = response.data.result;
     // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
@@ -937,8 +942,8 @@ class ThreadsController {
 
     return {
       threads: modeledThreads,
-      limit: response.result.limit,
-      page: response.result.page,
+      limit: response.data.result.limit,
+      page: response.data.result.page,
     };
   }
 
