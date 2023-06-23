@@ -1,5 +1,5 @@
 import 'pages/feed/index.scss';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -7,45 +7,50 @@ import { Feed } from '../../components/feed';
 import ErrorPage from '../error';
 import { DashboardViews } from '../user_dashboard';
 import { fetchActivity } from '../user_dashboard/helpers';
+import { DashboardCommunitiesPreview } from '../user_dashboard/dashboard_communities_preview';
 
 const FeedPage = () => {
+  const [feedData, setFeedData] = useState(null);
+  const [error, setError] = useState(null);
+  const [scrollElement, setScrollElement] = React.useState(null);
+
+  useEffect(() => {
+    console.log('useEffect called');
+    getCombinedFeed()
+      .then((result) => {
+        setFeedData(result.result);
+      })
+      .catch((err) => {
+        console.error('getCombinedFeed error:', err);
+        setError(err);
+      });
+  }, []);
+
   const getGlobalFeed = async () => {
-    try {
-      const activity = await fetchActivity(DashboardViews.Global);
-      const formattedData = activity.result
-        .map((item) => DashboardActivityNotification.fromJSON(item))
-        .filter(
-          (item) =>
-            JSON.parse(item.notificationData).chain_id === app.activeChainId()
-        );
-      return formattedData;
-    } catch (err) {
-      return err;
-    }
+    const activity = await fetchActivity(DashboardViews.Global);
+    const formattedData = activity.result
+      .map((item) => DashboardActivityNotification.fromJSON(item))
+      .filter(
+        (item) =>
+          JSON.parse(item.notificationData).chain_id === app.activeChainId()
+      );
+    return formattedData;
   };
 
   const getChainEvents = async () => {
-    try {
-      const activity = await fetchActivity(DashboardViews.Chain);
-      const formattedData = activity.result
-        .map((item) => DashboardActivityNotification.fromJSON(item))
-        .filter((item) => item.chain === app.activeChainId());
-      return formattedData;
-    } catch (err) {
-      return err;
-    }
+    const activity = await fetchActivity(DashboardViews.Chain);
+    const formattedData = activity.result
+      .map((item) => DashboardActivityNotification.fromJSON(item))
+      .filter((item) => item.chain === app.activeChainId());
+    return formattedData;
   };
 
   const getCombinedFeed = async () => {
-    return Promise.all([getGlobalFeed(), getChainEvents()])
-      .then((result) => {
-        return {
-          result: sortFeed(result[0], result[1]),
-        };
-      })
-      .catch((err) => {
-        return err;
-      });
+    const results = await Promise.all([getGlobalFeed(), getChainEvents()]);
+    console.log('getCombinedFeed results:', results);
+    return {
+      result: sortFeed(results[0], results[1]),
+    };
   };
 
   const sortFeed = (globalFeed, chainEvents) => {
@@ -70,12 +75,33 @@ const FeedPage = () => {
     );
   }
 
+  if (error) {
+    return <ErrorPage message={error.message} />;
+  }
+
+  if (!feedData) {
+    return <div>Loading...</div>;
+  }
+
+  console.log('Feed data:', feedData);
+
   return (
-    <div className="FeedPage">
-      <CWText type="h3" fontWeight="semiBold">
-        Home
-      </CWText>
-      <Feed fetchData={getCombinedFeed} noFeedMessage="No activity yet" />
+    <div ref={setScrollElement} className="FeedPage">
+      <div className="dashboard-column">
+        <div className="dashboard-header">
+          <CWText type="h3" fontWeight="semiBold">
+            Home
+          </CWText>
+          <Feed
+            fetchData={getCombinedFeed}
+            noFeedMessage="No activity yet"
+            customScrollParent={scrollElement}
+          />
+        </div>
+      </div>
+      <div>
+        <DashboardCommunitiesPreview />
+      </div>
     </div>
   );
 };
