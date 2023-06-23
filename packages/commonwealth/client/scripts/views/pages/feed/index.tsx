@@ -79,10 +79,6 @@ const FeedPage = () => {
     return <ErrorPage message={error.message} />;
   }
 
-  if (!feedData) {
-    return <div>Loading...</div>;
-  }
-
   console.log('Feed data:', feedData);
 
   return (
