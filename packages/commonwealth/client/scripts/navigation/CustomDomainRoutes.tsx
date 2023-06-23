@@ -308,7 +308,7 @@ const CustomDomainRoutes = () => {
     />,
     <Route
       path="/discord-callback"
-      element={withLayout(ManageCommunityPage, {
+      element={withLayout(DiscordCallbackPage, {
         scoped: true,
         deferChain: true,
       })}

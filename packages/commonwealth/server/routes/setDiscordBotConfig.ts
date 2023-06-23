@@ -14,7 +14,6 @@ enum SetDiscordBotConfigErrors {
 
 type SetDiscordBotConfigReq = {
   chain_id: string;
-  bot_id?: string;
   guild_id?: string;
   verification_token?: string;
   snapshot_channel_id?: string;
@@ -29,15 +28,10 @@ const setDiscordBotConfig = async (
   req: TypedRequestBody<SetDiscordBotConfigReq>,
   res: TypedResponse<SetDiscordBotConfigResp>
 ) => {
-  const {
-    chain_id,
-    bot_id,
-    guild_id,
-    verification_token,
-    snapshot_channel_id,
-  } = req.body;
+  const { chain_id, guild_id, verification_token, snapshot_channel_id } =
+    req.body;
 
-  const [error] = await validateChain(models, { chain_id });
+  const [chain, error] = await validateChain(models, { chain_id });
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {
@@ -112,7 +106,6 @@ const setDiscordBotConfig = async (
     await configEntry.update(
       {
         chain_id,
-        bot_id,
         guild_id,
         verification_token: null,
         token_expiration: null,

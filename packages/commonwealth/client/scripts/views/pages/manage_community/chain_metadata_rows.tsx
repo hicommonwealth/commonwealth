@@ -178,7 +178,8 @@ export const ChainMetadataRows = ({
             cw_chain_id: app.activeChainId(),
             verification_token,
           })
-        )}`
+        )}`,
+        '_parent'
       );
 
       setDiscordBotConnected(false);
@@ -216,13 +217,14 @@ export const ChainMetadataRows = ({
         `https://discord.com/oauth2/authorize?client_id=${
           process.env.DISCORD_CLIENT_ID
         }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-          process.env.DISCORD_UI_URL
-        )}/callback&response_type=code&scope=bot&state=${encodeURI(
+          `${window.location.origin}`
+        )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
           })
-        )}`
+        )}`,
+        '_parent'
       );
 
       setDiscordBotConnecting(true);
