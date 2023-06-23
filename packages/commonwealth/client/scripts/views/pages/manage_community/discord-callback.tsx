@@ -27,7 +27,11 @@ const DiscordCallbackPage = () => {
           }
         );
 
-        navigate(`/${stateJSON.cw_chain_id}/manage`, {}, null);
+        navigate(
+          `/${stateJSON.cw_chain_id}/manage?returningFromDiscordCallback=true`,
+          {},
+          null
+        );
       } catch (e) {
         throw new Error(e.response.data.error);
       }

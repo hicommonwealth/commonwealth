@@ -36,6 +36,11 @@ export const ChainMetadataRows = ({
   onRoleUpdate,
   onSave,
 }: ChainMetadataRowsProps) => {
+  const params = new URLSearchParams(window.location.search);
+  const returningFromDiscordCallback = params.get(
+    'returningFromDiscordCallback'
+  );
+
   const [name, setName] = useState(chain.name);
   const [description, setDescription] = useState(chain.description);
   const [website, setWebsite] = useState(chain.website);
@@ -57,10 +62,10 @@ export const ChainMetadataRows = ({
   const [hasHomepage, setHasHomepage] = useState(chain.hasHomepage);
   const [selectedTags2, setSelectedTags2] = useState(setSelectedTags(chain.id));
   const [discordBotConnected, setDiscordBotConnected] = useState(
-    chain.discordConfigId !== null
+    chain.discordConfigId !== null ?? returningFromDiscordCallback === 'true'
   );
   const [discordBotConnecting, setDiscordBotConnecting] = useState(
-    chain.discordConfigId !== null
+    chain.discordConfigId !== null ?? returningFromDiscordCallback === 'true'
   );
   const [communityBanner, setCommunityBanner] = useState(chain.communityBanner);
   const [channelsLoaded, setChannelsLoaded] = useState(false);
