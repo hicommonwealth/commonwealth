@@ -1,5 +1,6 @@
 import { DataTypes, Sequelize } from 'sequelize';
-import { DATABASE_URI } from './config';
+import { DATABASE_URI, READ_DATABASE_URI } from './config';
+import { URL } from 'url';
 
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
@@ -44,6 +45,9 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+const databaseUrl = new URL(DATABASE_URI);
+const readDatabaseUrl = READ_DATABASE_URI ? new URL(READ_DATABASE_URI) : null;
+
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
@@ -60,6 +64,24 @@ export const sequelize = new Sequelize(DATABASE_URI, {
         'postgresql://commonwealth:edgeware@localhost/commonwealth'
       ? { requestTimeout: 40000, ssl: false }
       : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
+  replication: readDatabaseUrl
+    ? {
+        read: [
+          {
+            host: readDatabaseUrl.hostname,
+            username: readDatabaseUrl.username,
+            password: readDatabaseUrl.password,
+            port: readDatabaseUrl.port,
+          },
+        ],
+        write: {
+          host: databaseUrl.hostname,
+          username: databaseUrl.username,
+          password: databaseUrl.password,
+          port: databaseUrl.port,
+        },
+      }
+    : false,
   pool: {
     max: 10,
     min: 0,

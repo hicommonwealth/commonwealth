@@ -72,7 +72,11 @@ export const DATABASE_URI = process.env.USES_DOCKER_DB
   ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
   : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
   ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+  : process.env.MASTER_DATABASE_URL
+  ? process.env.MASTER_DATABASE_URL
   : process.env.DATABASE_URL;
+
+export const READ_DATABASE_URI = process.env.READ_DATABASE_URL;
 
 export const VULTR_IP = process.env.VULTR_IP;
 
