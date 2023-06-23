@@ -23,13 +23,24 @@ export const UserDashboardChainEventRow = (
   const { blockNumber, chain, label } = props;
   const navigate = useCommonNavigate();
 
+  const handleLinkClick = () => {
+    if (label.linkUrl) {
+      navigate(label.linkUrl);
+    }
+  };
+
+  const handleCommunityClick = (e) => {
+    e.stopPropagation();
+    if (chain?.id) navigate(`/${chain?.id}`, {}, null);
+  };
+
   return (
-    <a
+    <div
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!label.linkUrl },
         'UserDashboardChainEventRow'
       )}
-      {...(label.linkUrl && { href: label.linkUrl })}
+      onClick={handleLinkClick}
     >
       <div className="chain-event-icon-container">
         <CWIcon
@@ -40,17 +51,11 @@ export const UserDashboardChainEventRow = (
       <div className="chain-event-text-container">
         <div className="community-title">
           <CWCommunityAvatar community={chain} size="small" />
-          <a
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (chain?.id) navigate(`/${chain?.id}`, {}, null);
-            }}
-          >
+          <span onClick={handleCommunityClick} style={{ cursor: 'pointer' }}>
             <CWText type="caption" fontWeight="medium">
               {chain?.name || 'Unknown chain'}
             </CWText>
-          </a>
+          </span>
           <div className="dot">.</div>
           <CWText type="caption" fontWeight="medium" className="block">
             Block {blockNumber}
@@ -63,6 +68,6 @@ export const UserDashboardChainEventRow = (
           {label.label}
         </CWText>
       </div>
-    </a>
+    </div>
   );
 };

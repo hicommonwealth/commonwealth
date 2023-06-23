@@ -56,14 +56,19 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
   );
 
   const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
+  const handleClick = () => {
+    if (path) {
+      navigate(path);
+    }
+  };
 
   return (
-    <a
+    <div
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!path },
         'UserDashboardRow'
       )}
-      href={path}
+      onClick={handleClick}
     >
       <UserDashboardRowTop activityData={notification} category={categoryId} />
       <UserDashboardRowBottom
@@ -73,6 +78,6 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
         commentCount={commentCount}
         commenters={commenters}
       />
-    </a>
+    </div>
   );
 };
