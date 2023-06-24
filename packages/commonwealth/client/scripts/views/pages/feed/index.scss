@@ -22,16 +22,16 @@
     height: 100%;
     min-width: 0;
 
-    .ProposalCarousel {
-      margin-bottom: 16px;
+    .CardCarousel {
+      margin-bottom: 8px;
     }
 
     .dashboard-header {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 16px;
       width: 100%;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
     }
   }
 }

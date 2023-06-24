@@ -11,6 +11,8 @@ import { DashboardCommunitiesPreview } from '../user_dashboard/dashboard_communi
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 
 import { CardCarousel } from './CardCarousel';
+import { Divide } from '@phosphor-icons/react';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 
 const FeedPage = () => {
   const [error, setError] = useState(null);
@@ -77,6 +79,7 @@ const FeedPage = () => {
             Home
           </CWText>
           <CardCarousel />
+          <CWDivider />
           <div className="feed-tabs">
             <CWTabBar>
               <CWTab
