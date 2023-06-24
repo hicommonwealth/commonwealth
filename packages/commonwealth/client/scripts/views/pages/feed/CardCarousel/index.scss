@@ -1,0 +1,29 @@
+.CardCarousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow-x: hidden;
+
+  .proposal-cards-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .left-arrow {
+    left: 0;
+  }
+
+  .right-arrow {
+    right: 0;
+  }
+}

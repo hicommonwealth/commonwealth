@@ -10,6 +10,8 @@ import { fetchActivity } from '../user_dashboard/helpers';
 import { DashboardCommunitiesPreview } from '../user_dashboard/dashboard_communities_preview';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 
+import { CardCarousel } from './CardCarousel';
+
 const FeedPage = () => {
   const [error, setError] = useState(null);
   const [scrollElement, setScrollElement] = React.useState(null);
@@ -74,6 +76,7 @@ const FeedPage = () => {
           <CWText type="h3" fontWeight="semiBold">
             Home
           </CWText>
+          <CardCarousel />
           <div className="feed-tabs">
             <CWTabBar>
               <CWTab
