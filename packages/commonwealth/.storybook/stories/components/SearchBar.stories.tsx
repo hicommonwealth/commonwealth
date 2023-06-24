@@ -1,7 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWSearchBar } from "../../../client/scripts/views/components/component_kit/cw_search_bar";
+import { CWSearchBar } from "../../../client/scripts/views/components/component_kit/new_designs/cw_search_bar";
 
 const searchbar = {
   title: "Components/SearchBar",
@@ -12,5 +12,33 @@ export default searchbar;
 type Story = StoryObj<typeof searchbar>;
 
 export const SearchBar: Story = {
-  render: () => <CWSearchBar />,
+  args: {
+    placeholder: 'Search Common'
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        "autoComplete",
+        "autoFocus",
+        "containerClassName",
+        "defaultValue",
+        "value",
+        "iconLeft",
+        "iconLeftonClick",
+        "inputValidationFn",
+        "label",
+        "name",
+        "onInput",
+        "onenterkey",
+        "onClick",
+        "tabIndex",
+        "manualStatusMessage",
+        "manualValidationStatus",
+        "inputClassName",
+        "displayOnly",
+        "hasLeftIcon",
+      ],
+    },
+  },
+  render: (args) => <CWSearchBar {...args} />,
 };

@@ -1,0 +1,40 @@
+@import '../../shared';
+
+.SearchBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  gap: 8px;
+  position: absolute;
+  width: 608px;
+  height: 40px;
+  background-color: $white;
+
+  border: 1px solid $neutral-200;
+  border-radius: 6px;
+
+  .input-and-icon-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    position: relative;
+
+    .input {
+      @include inputStyles;
+      
+      ::placeholder {
+        color: $neutral-500;
+        padding-left: 48px;
+      }
+    }
+  }
+
+  .magnifyingGlass {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
