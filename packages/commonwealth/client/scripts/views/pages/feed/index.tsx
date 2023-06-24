@@ -119,7 +119,7 @@ const FeedPage = () => {
           )}
         </div>
       </div>
-      <div>
+      <div className="card-column">
         <DashboardCommunitiesPreview />
       </div>
     </div>

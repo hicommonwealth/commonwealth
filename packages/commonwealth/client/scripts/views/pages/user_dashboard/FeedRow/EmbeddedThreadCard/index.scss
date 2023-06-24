@@ -19,7 +19,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 16px;
     width: 100%;
   
     .links-container {
@@ -36,6 +35,10 @@
       &:hover {
         color: $neutral-700;
       }
+    }
+
+    .content-body{
+      padding: 16px;
     }
   }
 }
