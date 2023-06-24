@@ -11,15 +11,17 @@ import AddressInfo from '../../../../models/AddressInfo';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
-import EmbeddedThreadCard from './Option/index';
+import EmbeddedThreadCard from './EmbeddedThreadCard/index';
 
 type UserDashboardRowTopProps = {
   activityData: any;
   category: string;
+  threadText?: string;
+  threadAuthor?: string;
 };
 
 export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
-  const { activityData, category } = props;
+  const { activityData, category, threadText, threadAuthor } = props;
   const navigate = useCommonNavigate();
 
   const {
@@ -102,7 +104,12 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       <div className="comment-preview">
         {<QuillRenderer doc={comment_text} />}
         {isComment && (
-          <EmbeddedThreadCard threadId={thread_id} threadTitle={titleText} />
+          <EmbeddedThreadCard
+            threadId={thread_id}
+            threadText={threadText}
+            threadTitle={titleText}
+            threadAuthor={threadAuthor}
+          />
         )}
       </div>
     </div>
