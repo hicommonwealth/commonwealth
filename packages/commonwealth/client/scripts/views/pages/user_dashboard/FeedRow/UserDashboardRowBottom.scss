@@ -7,29 +7,48 @@
   justify-content: space-between;
   width: 100%;
 
-  .comments {
+  .activity {
     display: flex;
-    align-items: center;
+    align-items: left;
+    justify-content: flex-end;
+    gap: 16px;
+  }
 
-    .count {
-      display: flex;
-      align-items: center;
-      width: 120px;
-    }
+  .commenters {
+    display: flex;
+    align-items: left;
+    padding-bottom: 2x;
 
     .icon,
     .text {
       color: $neutral-500;
     }
+  }
 
-    .icon {
-      margin-right: 8px;
+  .thread-option-btn {
+    outline: 0;
+    border: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: $border-radius-corners-wider;
+    color: $neutral-600;
+
+    &:hover {
+      background-color: $neutral-200;
+    }
+
+    .Text {
+      color: $neutral-600;
     }
   }
 
   .actions {
     display: flex;
-    align-items: center;
+    align-items: right;
     justify-content: flex-end;
     gap: 16px;
   }

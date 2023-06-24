@@ -14,6 +14,7 @@ import { CWText } from '../../../components/component_kit/cw_text';
 import { subscribeToThread } from '../helpers';
 import type NotificationSubscription from '../../../../models/NotificationSubscription';
 import useForceRerender from 'hooks/useForceRerender';
+import { ReactionButton } from '../../discussions/ThreadCard/Options/ReactionButton';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;
@@ -63,16 +64,19 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
 
   return (
     <div className="UserDashboardRowBottom">
-      <div className="comments">
-        <div className="count">
-          <CWIcon iconName="feedback" iconSize="small" className="icon" />
+      {/* <ReactionButton thread={threadId} size="small" /> */}
+      <div className="activity">
+        <button className="thread-option-btn">
+          <CWIcon iconName="comment" iconSize="small" />
           <CWText type="caption" className="text">
             {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
           </CWText>
-        </div>
-        <div>
-          <CWAvatarGroup profiles={commenters} chainId={chainId} />
-        </div>
+        </button>
+        {commenters && (
+          <div className="commenters">
+            <CWAvatarGroup profiles={commenters} chainId={chainId} />
+          </div>
+        )}
       </div>
       <div
         className="actions"
@@ -81,29 +85,6 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           e.preventDefault();
         }}
       >
-        <PopoverMenu
-          menuItems={[
-            {
-              onClick: () => {
-                setSubscription(
-                  threadId,
-                  bothActive,
-                  commentSubscription,
-                  reactionSubscription
-                );
-              },
-              label: bothActive ? 'Unsubscribe' : 'Subscribe',
-              iconLeft: bothActive ? 'unsubscribe' : 'bell',
-            },
-          ]}
-          renderTrigger={(onClick) => (
-            <CWIconButton
-              iconName={bothActive ? 'unsubscribe' : 'bell'}
-              iconSize="small"
-              onClick={onClick}
-            />
-          )}
-        />
         <PopoverMenu
           menuItems={[
             {
@@ -140,9 +121,44 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
             },
           ]}
           renderTrigger={(onClick) => (
-            <CWIconButton iconName="share" iconSize="small" onClick={onClick} />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onClick(e);
+              }}
+              className="thread-option-btn"
+            >
+              <CWIcon
+                color="black"
+                iconName="share"
+                iconSize="small"
+                weight="fill"
+              />
+              <CWText type="caption">Share</CWText>
+            </button>
           )}
         />
+        <button
+          onClick={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            threadId &&
+              (await setSubscription(
+                threadId,
+                bothActive,
+                commentSubscription,
+                reactionSubscription
+              ));
+          }}
+          className="thread-option-btn"
+        >
+          <CWIcon
+            color="black"
+            iconName={bothActive ? 'bellMuted' : 'bell'}
+            iconSize="small"
+          />
+        </button>
       </div>
     </div>
   );
