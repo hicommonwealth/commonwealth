@@ -17,6 +17,7 @@ import {
   LockKey,
   LockKeyOpen,
   PushPin,
+  House,
   Trash,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
@@ -80,7 +81,7 @@ export const iconLookup = {
   heartEmpty: Icons.CWHeartEmpty,
   heartFilled: Icons.CWHeartFilled,
   help: Icons.CWHelp,
-  home: Icons.CWHome,
+  home: withPhosphorIcon(House),
   imageUpload: Icons.CWImageUpload,
   infoEmpty: Icons.CWInfoEmpty,
   infoFilled: Icons.CWInfoFilled,
