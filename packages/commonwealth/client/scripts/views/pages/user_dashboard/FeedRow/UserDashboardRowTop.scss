@@ -46,9 +46,19 @@
     .info-type {
       font-weight: 400;
     }
+
+    .thread-title{
+      @extend .ellipsis; // Add this line
+    }
   }
 
   .comment-preview {
     color: $neutral-600;
   }
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

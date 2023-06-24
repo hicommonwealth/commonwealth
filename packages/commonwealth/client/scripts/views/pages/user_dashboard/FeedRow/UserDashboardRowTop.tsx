@@ -11,6 +11,7 @@ import AddressInfo from '../../../../models/AddressInfo';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
+import EmbeddedThreadCard from './Option/index';
 
 type UserDashboardRowTopProps = {
   activityData: any;
@@ -100,6 +101,9 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       </div>
       <div className="comment-preview">
         {<QuillRenderer doc={comment_text} />}
+        {isComment && (
+          <EmbeddedThreadCard threadId={thread_id} threadTitle={titleText} />
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,41 @@
+@import '../../../../../../styles/shared';
+
+.EmbeddedThreadCard {
+  border-color: $neutral-200;
+  overflow: hidden;
+  margin-top: 8px;
+  padding: 0;
+  width: 90%;
+
+  .header-container {
+    background-color: $neutral-50;
+    border-bottom: 1px solid $neutral-200;
+    min-height: 40px;
+    padding: 8px 16px;
+    width: 100%;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    width: 100%;
+  
+    .links-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
+  
+    .linked-thread-title {
+      color: $neutral-500;
+      cursor: pointer;
+      text-decoration: none;
+      &:hover {
+        color: $neutral-700;
+      }
+    }
+  }
+}
