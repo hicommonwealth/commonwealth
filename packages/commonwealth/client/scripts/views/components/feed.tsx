@@ -52,6 +52,7 @@ export const Feed = ({
             : response.result
         );
       } catch (err) {
+        console.error('Error during data fetching:', err);
         setError(true);
       }
       setLoading(false);
@@ -63,6 +64,7 @@ export const Feed = ({
   if (loading) return <CWSpinner />;
 
   if (error) {
+    console.error('Error rendering feed', error);
     return <PageNotFound message="There was an error rendering the feed." />;
   }
 

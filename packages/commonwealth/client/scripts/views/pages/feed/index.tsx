@@ -1,4 +1,4 @@
-import 'pages/feed/index.scss';
+import './index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
@@ -8,23 +8,12 @@ import ErrorPage from '../error';
 import { DashboardViews } from '../user_dashboard';
 import { fetchActivity } from '../user_dashboard/helpers';
 import { DashboardCommunitiesPreview } from '../user_dashboard/dashboard_communities_preview';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 
 const FeedPage = () => {
-  const [feedData, setFeedData] = useState(null);
   const [error, setError] = useState(null);
   const [scrollElement, setScrollElement] = React.useState(null);
-
-  useEffect(() => {
-    console.log('useEffect called');
-    getCombinedFeed()
-      .then((result) => {
-        setFeedData(result.result);
-      })
-      .catch((err) => {
-        console.error('getCombinedFeed error:', err);
-        setError(err);
-      });
-  }, []);
+  const [activeTab, setActiveTab] = useState('all');
 
   const getGlobalFeed = async () => {
     const activity = await fetchActivity(DashboardViews.Global);
@@ -34,7 +23,7 @@ const FeedPage = () => {
         (item) =>
           JSON.parse(item.notificationData).chain_id === app.activeChainId()
       );
-    return formattedData;
+    return { result: formattedData };
   };
 
   const getChainEvents = async () => {
@@ -42,14 +31,13 @@ const FeedPage = () => {
     const formattedData = activity.result
       .map((item) => DashboardActivityNotification.fromJSON(item))
       .filter((item) => item.chain === app.activeChainId());
-    return formattedData;
+    return { result: formattedData };
   };
 
-  const getCombinedFeed = async () => {
+  const getAllFeed = async () => {
     const results = await Promise.all([getGlobalFeed(), getChainEvents()]);
-    console.log('getCombinedFeed results:', results);
     return {
-      result: sortFeed(results[0], results[1]),
+      result: sortFeed(results[0].result, results[1].result),
     };
   };
 
@@ -86,11 +74,49 @@ const FeedPage = () => {
           <CWText type="h3" fontWeight="semiBold">
             Home
           </CWText>
-          <Feed
-            fetchData={getCombinedFeed}
-            noFeedMessage="No activity yet"
-            customScrollParent={scrollElement}
-          />
+          <div className="feed-tabs">
+            <CWTabBar>
+              <CWTab
+                label="All"
+                isSelected={activeTab === 'all'}
+                onClick={() => setActiveTab('all')}
+              />
+              <CWTab
+                label="Forum"
+                isSelected={activeTab === 'forum'}
+                onClick={() => setActiveTab('forum')}
+              />
+              <CWTab
+                label="Chain"
+                isSelected={activeTab === 'chain'}
+                onClick={() => setActiveTab('chain')}
+              />
+            </CWTabBar>
+          </div>
+          {activeTab === 'all' && (
+            <Feed
+              key="all"
+              fetchData={getAllFeed}
+              noFeedMessage="No activity yet"
+              customScrollParent={scrollElement}
+            />
+          )}
+          {activeTab === 'forum' && (
+            <Feed
+              key="forum"
+              fetchData={getGlobalFeed}
+              noFeedMessage="No forum activity yet"
+              customScrollParent={scrollElement}
+            />
+          )}
+          {activeTab === 'chain' && (
+            <Feed
+              key="chain"
+              fetchData={getChainEvents}
+              noFeedMessage="No chain events yet"
+              customScrollParent={scrollElement}
+            />
+          )}
         </div>
       </div>
       <div>
