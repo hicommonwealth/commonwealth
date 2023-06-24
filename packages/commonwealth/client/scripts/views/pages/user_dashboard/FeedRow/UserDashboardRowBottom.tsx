@@ -2,17 +2,17 @@ import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
 
-import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
+import './UserDashboardRowBottom.scss';
 
 import app from 'state';
-import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
-import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWText } from '../../components/component_kit/cw_text';
-import { subscribeToThread } from './helpers';
-import type NotificationSubscription from '../../../models/NotificationSubscription';
+import { CWAvatarGroup } from '../../../components/component_kit/cw_avatar_group';
+import type { ProfileWithAddress } from '../../../components/component_kit/cw_avatar_group';
+import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../../../components/component_kit/cw_icon_button';
+import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { subscribeToThread } from '../helpers';
+import type NotificationSubscription from '../../../../models/NotificationSubscription';
 import useForceRerender from 'hooks/useForceRerender';
 
 type UserDashboardRowBottomProps = {

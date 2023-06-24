@@ -1,5 +1,5 @@
-@import '../../shared';
-@import 'user_dashboard_row.scss';
+@import '../../../../../styles/shared';
+@import './UserDashboardRow.scss';
 
 .UserDashboardChainEventRow {
   @include userDashboardRowStyles;

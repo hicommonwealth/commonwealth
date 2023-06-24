@@ -3,14 +3,14 @@ import React from 'react';
 import type { CWEvent } from 'chain-events/src';
 import { Label as ChainEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
-import type DashboardActivityNotification from '../../../models/DashboardActivityNotification';
+import type DashboardActivityNotification from '../../../../models/DashboardActivityNotification';
 
-import 'pages/user_dashboard/user_dashboard_row.scss';
+import './UserDashboardRow.scss';
 import app from 'state';
-import { getClasses } from '../../components/component_kit/helpers';
-import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
-import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
-import { UserDashboardRowTop } from './user_dashboard_row_top';
+import { getClasses } from '../../../components/component_kit/helpers';
+import { UserDashboardChainEventRow } from './UserDashboardChainEventRow';
+import { UserDashboardRowBottom } from './UserDashboardRowBottom';
+import { UserDashboardRowTop } from './UserDashboardRowTop';
 import { navigateToPathInNewTab, useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowProps = {
@@ -68,7 +68,6 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
         path,
         chain: chain_id,
       });
-      // window.open(path, '_blank'); // new window by default for threads and stuff
       // navigate(path);
     }
   };

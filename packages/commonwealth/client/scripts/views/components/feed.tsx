@@ -5,7 +5,7 @@ import 'components/feed.scss';
 
 import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
 
-import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
+import { UserDashboardRow } from '../pages/user_dashboard/FeedRow/UserDashboardRow';
 import { PageNotFound } from '../pages/404';
 import { CWSpinner } from './component_kit/cw_spinner';
 

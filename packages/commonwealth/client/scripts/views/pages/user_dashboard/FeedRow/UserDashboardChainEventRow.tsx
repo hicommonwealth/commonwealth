@@ -1,16 +1,16 @@
 import React from 'react';
 
-import ChainInfo from '../../../models/ChainInfo';
+import ChainInfo from '../../../../models/ChainInfo';
 
 import app from 'state';
 
-import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
-import type { IEventLabel } from '../../../../../../chain-events/src';
-import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import type { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
-import { CWText } from '../../components/component_kit/cw_text';
-import { getClasses } from '../../components/component_kit/helpers';
+import './UserDashboardChainEventRow.scss';
+import type { IEventLabel } from '../../../../../../../chain-events/src';
+import { CWCommunityAvatar } from '../../../components/component_kit/cw_community_avatar';
+import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
+import type { IconName } from '../../../components/component_kit/cw_icons/cw_icon_lookup';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { getClasses } from '../../../components/component_kit/helpers';
 import { navigateToPathInNewTab, useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardChainEventRowProps = {

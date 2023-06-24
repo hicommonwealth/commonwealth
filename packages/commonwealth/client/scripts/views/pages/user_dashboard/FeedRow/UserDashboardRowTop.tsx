@@ -3,14 +3,14 @@ import React from 'react';
 import { capitalize } from 'lodash';
 import moment from 'moment';
 
-import 'pages/user_dashboard/user_dashboard_row_top.scss';
+import './UserDashboardRowTop.scss';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
-import AddressInfo from '../../../models/AddressInfo';
-import { CWText } from '../../components/component_kit/cw_text';
+import AddressInfo from '../../../../models/AddressInfo';
+import { CWText } from '../../../components/component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
 
 type UserDashboardRowTopProps = {
   activityData: any;
