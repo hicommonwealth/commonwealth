@@ -1,49 +1,63 @@
 @import '../../shared';
 
-.container {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+@mixin radioCore($color) {
+  display: grid;
+  place-content: center;
+
+  &::after {
+    color: $color;
+    content: '';
+    width: 6px;
+    height: 6px;
+    box-shadow: inset 12px 12px;
+    clip-path: circle(50%);
+  }
 }
 
-.radio-button {
-  width: 20px;
-  height: 20px;
+.RadioButton {
+  align-items: center;
   cursor: pointer;
-  color: $neutral-400;
-  clip-path: circle(50%);
-  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  position: relative;
 
-  &:hover {
-    color: $primary-600;
+  .radio-input {
+    @include hideInput;
   }
 
-  &.checked {
-    color: $primary-500;
+  .radio-control {
+    @include controlStyles;
+
+    border-radius: $border-radius-round;
   }
 
-  &.checked:hover {
-    color: $primary-600;
+  &:hover .radio-control {
+    @include radioCore($primary-200);
+    @include hoverColors;
+  }
+
+  &.checked .radio-control {
+    @include radioCore($primary-500);
+    @include checkedColors;
+  }
+
+  &.checked:hover .radio-control {
+    @include radioCore($primary-600);
+    @include checkedHoverColors;
+  }
+
+  &.checked.disabled .radio-control {
+    @include radioCore($neutral-300);
+    @include disabledColors;
   }
 
   &.disabled {
     pointer-events: none;
-    color: $neutral-200;
+
+    .radio-control {
+      // same color as background, so it's invisble on hover
+      @include radioCore($neutral-200);
+      @include disabledColors;
+    }
   }
-}
-
-.background {
-  position: absolute;
-  top: 2.65px;
-  left: 2.65px;
-  background: $neutral-100;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-}
-
-.label {
-  margin-left: 5px;
 }

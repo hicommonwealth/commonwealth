@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Circle, RadioButton } from '@phosphor-icons/react';
+import React from 'react';
 
 import 'components/component_kit/cw_radio_button.scss';
 import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+
+import { ComponentType } from './types';
 
 export type RadioButtonType = {
   label?: string;
@@ -30,43 +32,29 @@ export const CWRadioButton = (props: RadioButtonProps) => {
     checked,
     value,
   } = props;
-  const [isChecked, setIsChecked] = useState<boolean>(checked);
 
-  const handleClick = () => {
-    if (!disabled) {
-      setIsChecked(!isChecked);
-    }
-    onChange();
-  };
-
-  // For Storybook checked control
-  useEffect(() => setIsChecked(checked), [checked]);
-
-  const commonProps = {
+  const params = {
+    disabled,
     name: groupName,
-    onClick: handleClick,
-    size: 20,
+    onChange,
+    checked,
+    type: 'radio',
+    value,
   };
 
   return (
-    <div className="container">
-      {isChecked ? (
-        <RadioButton
-          className={`radio-button checked ${disabled ? 'disabled' : ''}`}
-          {...commonProps}
-          weight="fill"
-        />
-      ) : (
-        <Circle
-          className={`radio-button ${disabled ? 'disabled' : ''}`}
-          {...commonProps}
-          weight="regular"
-        />
+    <label
+      className={getClasses<RadioButtonStyleProps>(
+        {
+          checked,
+          disabled,
+        },
+        ComponentType.RadioButton
       )}
-      <div className={disabled ? 'background' : ''} />
-      <CWText className="label" type="b2" fontWeight="regular">
-        {label || value}
-      </CWText>
-    </div>
+    >
+      <input className="radio-input" {...params} />
+      <div className="radio-control" />
+      <CWText>{label || value}</CWText>
+    </label>
   );
 };

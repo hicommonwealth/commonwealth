@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import type { Meta } from '@storybook/react';
 
-import { CWRadioButton } from '../../../client/scripts/views/components/component_kit/cw_radio_button';
+import { CWRadioButton } from '../../../client/scripts/views/components/component_kit/new_designs/cw_radio_button';
 
 const radioButton = {
   title: 'Components/RadioButton',
