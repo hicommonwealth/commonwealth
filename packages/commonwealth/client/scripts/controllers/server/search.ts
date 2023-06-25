@@ -200,7 +200,7 @@ class SearchController {
       if (page) {
         queryParams['page'] = page;
       }
-      const response = await axios.get(`${app.serverUrl()}/searchDiscussions`, {
+      const response = await axios.get(`${app.serverUrl()}/threads`, {
         params: queryParams,
       });
       if (response.data.status !== 'Success') {
@@ -249,7 +249,7 @@ class SearchController {
   ): Promise<Thread[]> => {
     const { pageSize, chainScope, communityScope } = params;
     try {
-      const response = await axios.get(`${app.serverUrl()}/searchDiscussions`, {
+      const response = await axios.get(`${app.serverUrl()}/threads`, {
         params: {
           chain: chainScope,
           community: communityScope,

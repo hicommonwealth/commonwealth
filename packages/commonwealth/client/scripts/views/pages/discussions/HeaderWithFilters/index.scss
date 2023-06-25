@@ -1,24 +1,10 @@
-@import '../../shared';
+@import '../../../../../styles/shared';
 
-.RecentThreadsHeader {
+.HeaderWithFilters {
   background-color: $white;
   display: flex;
   flex-direction: column;
   gap: 16px;
-
-  padding: 56px 56px 24px;
-
-  @include medium {
-    padding: 40px 40px 16px;
-  }
-
-  @include mediumSmall {
-    padding: 32px 32px 16px;
-  }
-
-  @include smallInclusive {
-    padding: 24px 24px 16px;
-  }
 
   .header-row {
     display: flex;

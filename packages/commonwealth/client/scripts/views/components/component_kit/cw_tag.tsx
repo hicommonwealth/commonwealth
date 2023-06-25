@@ -16,7 +16,8 @@ type TagType =
   | 'proposal'
   | 'referendum'
   | 'stage'
-  | 'new';
+  | 'new'
+  | 'disabled';
 
 export type TagProps = {
   iconName?: IconName;
