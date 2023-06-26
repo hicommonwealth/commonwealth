@@ -34,9 +34,7 @@ type ContentPageProps = {
   thread?: Thread;
   createdAt?: moment.Moment | number;
   title?: string | ReactNode;
-  //
   updatedAt?: moment.Moment;
-  //
   lastEdited?: moment.Moment | number;
   author?: Account | AddressInfo | MinimumProfile | undefined;
   collaborators?: IThreadCollaborator[];
@@ -44,11 +42,9 @@ type ContentPageProps = {
   comments?: ReactNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   stageLabel?: ThreadStage;
-  //
   headerComponents?: React.ReactNode;
   readOnly?: boolean;
   lockedAt?: moment.Moment;
-  //
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: ReactNode;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import app from 'state';
+import { Skeleton } from 'views/components/Skeleton';
 import type Thread from '../../../../../../models/Thread';
 import {
   getDisplayedReactorsForPopup,
@@ -16,7 +17,6 @@ import {
 import { LoginModal } from '../../../../../modals/login_modal';
 import './index.scss';
 import { useReactionButton } from './useReactionButton';
-import { Skeleton } from 'views/components/Skeleton';
 
 type ReactionButtonProps = {
   thread: Thread;
@@ -32,7 +32,7 @@ const ReactionButtonSkeleton = () => {
     }}
     className={`ThreadReactionButton showSkeleton`}
   >
-    <Skeleton height={52} width={40}/>
+    <Skeleton height={52} width={40} />
   </button>
 }
 
@@ -43,7 +43,7 @@ export const ReactionButton = ({ thread, size, showSkeleton }: ReactionButtonPro
   const { dislike, hasReacted, isLoading, isUserForbidden, like } =
     useReactionButton(thread, setReactors);
 
-  if(showSkeleton) return <ReactionButtonSkeleton/>
+  if (showSkeleton) return <ReactionButtonSkeleton />
 
   return (
     <>
