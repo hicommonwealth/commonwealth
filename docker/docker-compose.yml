@@ -1,6 +1,6 @@
 version: "2.2"
 services:
-  flink_job_manager:
+  jobmanager:
     image: flink:1.16.2-scala_2.12
     ports:
       - "8081:8081"
@@ -10,10 +10,10 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager        
 
-  flink_task_manager:
+  taskmanager:
     image: flink:1.16.2-scala_2.12
     depends_on:
-      - flink_job_manager
+      - jobmanager
     command: taskmanager
     scale: 1
     environment:
@@ -23,9 +23,11 @@ services:
         taskmanager.numberOfTaskSlots: 2
   beam_job_service:
     image: apache/beam_flink1.16_job_server:latest
+    ports:
+      - "8099:8099"
     depends_on:
-      - flink_job_manager
-      - flink_task_manager
+      - jobmanager
+      - taskmanager
     network_mode: host
     command: --flink-master=localhost:8081
 
