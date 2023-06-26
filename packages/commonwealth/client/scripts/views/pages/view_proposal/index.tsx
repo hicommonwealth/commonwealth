@@ -22,7 +22,6 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { User } from '../../components/user/user';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
@@ -127,11 +126,7 @@ const ViewProposalPage = ({
   return (
     <CWContentPage
       title={proposal.title}
-      author={
-        !!proposal.author && (
-          <User avatarSize={24} user={proposal.author} popover linkify />
-        )
-      }
+      author={proposal.author}
       createdAt={proposal.createdAt}
       updatedAt={null}
       subHeader={
@@ -141,7 +136,7 @@ const ViewProposalPage = ({
           votingModalOpen={votingModalOpen}
         />
       }
-      body={
+      body={() =>
         !!proposal.description && (
           <CollapsibleProposalBody proposal={proposal} />
         )
