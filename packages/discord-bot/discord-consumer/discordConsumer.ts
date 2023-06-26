@@ -9,7 +9,9 @@ import {
 } from 'common-common/src/rabbitmq/types';
 import { IDiscordMessage } from 'common-common/src/types';
 import { RABBITMQ_URI } from '../utils/config';
-
+/*
+NOTE: THIS IS ONLY WIP CURRENTLY AND WILL BE COMPLETED AS PART OF #4267 
+*/
 const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
 
 async function consumeMessages() {
