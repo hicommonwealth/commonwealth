@@ -23,8 +23,6 @@ services:
         taskmanager.numberOfTaskSlots: 2
   beam_job_service:
     image: apache/beam_flink1.16_job_server:latest
-    ports:
-      - "8099:8099"
     depends_on:
       - jobmanager
       - taskmanager
