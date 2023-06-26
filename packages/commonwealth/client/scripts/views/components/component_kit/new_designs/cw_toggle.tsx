@@ -1,11 +1,11 @@
 import React from 'react';
 
-import 'components/component_kit/cw_toggle.scss';
+import 'components/component_kit/new_designs/cw_toggle.scss';
 
-import type { BaseStyleProps } from './types';
-import { getClasses } from './helpers';
-import { ComponentType } from './types';
-import { setDarkMode } from '../../../helpers/darkMode';
+import type { BaseStyleProps } from '../types';
+import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
+import { setDarkMode } from '../../../../helpers/darkMode';
 
 export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
   setDarkMode(on);
@@ -15,14 +15,15 @@ export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
 
 export type ToggleStyleProps = {
   checked?: boolean;
+  size: 'small' | 'large';
 } & BaseStyleProps;
 
-type ToggleProps = {
+export type ToggleProps = {
   onChange?: (e?: any) => void;
 } & ToggleStyleProps;
 
 export const CWToggle = (props: ToggleProps) => {
-  const { className, disabled = false, onChange, checked } = props;
+  const { className, disabled = false, onChange, checked, size } = props;
 
   const params = {
     disabled,
@@ -35,6 +36,7 @@ export const CWToggle = (props: ToggleProps) => {
     <label
       className={getClasses<ToggleStyleProps>(
         {
+          size,
           checked,
           disabled,
           className,

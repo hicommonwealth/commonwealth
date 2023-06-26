@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWToggle } from '../../../client/scripts/views/components/component_kit/cw_toggle';
-import type { ToggleProps } from '../../../client/scripts/views/components/component_kit/cw_toggle';
+import { CWToggle } from '../../../client/scripts/views/components/component_kit/new_designs/cw_toggle';
+import type { ToggleProps } from '../../../client/scripts/views/components/component_kit/new_designs/cw_toggle';
 
 const toggle = {
   title: 'Components/Toggle',
@@ -10,7 +10,6 @@ const toggle = {
 } satisfies Meta<typeof CWToggle>;
 
 export default toggle;
-type Story = StoryObj<typeof toggle>;
 
 const Toggle: FC<ToggleProps> = (props) => {
   const { checked, disabled, size } = props;
@@ -65,9 +64,9 @@ const Base = (size: string, checked: boolean, disabled: boolean) => {
   };
 }
 
-export const Small: Story = { ...Base("small", false, false) };
-export const SmallDisabledUnchecked: Story = { ...Base("small", false, true) };
-export const SmallDisabledChecked: Story = { ...Base("small", true, true) };;
-export const Large: Story = { ...Base("large", false, false) };
-export const LargeDisabledUnchecked: Story = { ...Base("large", false, true) };
-export const LargeDisabledChecked: Story = { ...Base("large", true, true) };;
+export const Small = { ...Base("small", false, false) };
+export const SmallDisabledUnchecked = { ...Base("small", false, true) };
+export const SmallDisabledChecked = { ...Base("small", true, true) };;
+export const Large = { ...Base("large", false, false) };
+export const LargeDisabledUnchecked = { ...Base("large", false, true) };
+export const LargeDisabledChecked = { ...Base("large", true, true) };;
