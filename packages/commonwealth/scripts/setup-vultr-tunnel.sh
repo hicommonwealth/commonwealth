@@ -34,7 +34,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Start the SSH tunnel if not already running
-SSH_CMD="autossh -f -N -L ${HEROKU_TUNNEL_PORT}:localhost:${HEROKU_TUNNEL_PORT} ${HEROKU_TUNNEL_USER}@${HEROKU_TUNNEL_IP} -i ~/.ssh/heroku-tunnel"
+SSH_CMD="autossh -M 20000 -f -N -L ${HEROKU_TUNNEL_PORT}:localhost:${HEROKU_TUNNEL_PORT} ${HEROKU_TUNNEL_USER}@${HEROKU_TUNNEL_IP} -i ~/.ssh/heroku-tunnel"
 
 echo $0: Searching for existing tunnel
 PID=$(pgrep -f "${SSH_CMD}")
