@@ -1,14 +1,13 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWTextInput } from '../../../client/scripts/views/components/component_kit/cw_text_input';
-import type { ValidationStatus } from '../../../client/scripts/views/components/component_kit/cw_validation_text';
+import { CWTextInput } from '../../../client/scripts/views/components/component_kit/new_designs/cw_text_input';
 import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
 const input = {
-  title: 'Components/TextInput',
+  title: 'Components/Form Fields/TextInput',
   component: CWTextInput,
 } satisfies Meta<typeof CWTextInput>;
 
