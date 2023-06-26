@@ -3,7 +3,7 @@ services:
   jobmanager:
     image: flink:1.16.2-scala_2.12
     ports:
-      - "8081:8081"
+      - "127.0.0.1:8081:8081"
     command: jobmanager
     environment:
       - |
