@@ -67,7 +67,7 @@ import deleteRole from '../routes/deleteRole';
 import setDefaultRole from '../routes/setDefaultRole';
 
 import getUploadSignature from '../routes/getUploadSignature';
-import activeThreads from '../routes/activeThreads';
+
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
@@ -80,9 +80,6 @@ import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
-import bulkThreads from '../routes/bulkThreads';
-import getThreadsOld from '../routes/getThreads';
-import searchDiscussions from '../routes/searchDiscussions';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
@@ -163,6 +160,10 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
+import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
+import unmarkThreadAsSpam from '../routes/spam/unmarkThreadAsSpam';
+import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
@@ -178,6 +179,7 @@ import { searchCommentsHandler } from '../routes/comments/search_comments_handle
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
+import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
@@ -500,24 +502,9 @@ function setupRouter(
     deleteThreadHandler.bind(this, serverControllers)
   );
   router.get(
-    '/bulkThreads',
+    '/threads',
     databaseValidationService.validateChain,
-    bulkThreads.bind(this, models)
-  );
-  router.get(
-    '/activeThreads',
-    databaseValidationService.validateChain,
-    activeThreads.bind(this, models)
-  );
-  router.get(
-    '/getThreads',
-    // databaseValidationService.validateChain,
-    getThreadsOld.bind(this, models)
-  );
-  router.get(
-    '/searchDiscussions',
-    databaseValidationService.validateChain,
-    searchDiscussions.bind(this, models)
+    getThreadsHandler.bind(this, serverControllers)
   );
   router.get(
     '/searchProfiles',
@@ -924,6 +911,29 @@ function setupRouter(
     '/linking/getLinks',
     passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models)
+  );
+
+  // spam
+  router.post(
+    '/threads/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markThreadAsSpam.bind(this, models)
+  );
+  router.post(
+    '/threads/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkThreadAsSpam.bind(this, models)
+  );
+
+  router.post(
+    '/comments/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markCommentAsSpam.bind(this, models)
+  );
+  router.post(
+    '/comments/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkCommentAsSpam.bind(this, models)
   );
 
   // login

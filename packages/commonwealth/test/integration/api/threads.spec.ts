@@ -7,8 +7,8 @@ import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
-import { Errors as ThreadErrors } from 'server/routes/createThread';
-import { Errors as EditThreadErrors } from 'server/routes/editThread';
+import { Errors as ThreadErrors } from 'server/controllers/server_threads_controller';
+import { Errors as EditThreadErrors } from 'server/controllers/server_threads_controller';
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
 import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
@@ -278,13 +278,14 @@ describe('Thread Tests', () => {
       });
     });
 
-    describe('/bulkThreads', () => {
+    describe('/threads (bulkThreads)', () => {
       it('should return bulk threads for a public chain', async () => {
         const res = await chai.request
           .agent(app)
-          .get('/api/bulkThreads')
+          .get('/api/threads')
           .set('Accept', 'application/json')
           .query({
+            bulk: true,
             chain,
             jwt: adminJWT,
           });

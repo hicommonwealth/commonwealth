@@ -13,7 +13,6 @@ import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { ThreadActionType } from '../../../../shared/types';
 /* eslint-disable no-restricted-syntax */
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
@@ -117,6 +116,7 @@ class ThreadsController {
       title,
       body,
       last_edited,
+      marked_as_spam_at,
       locked_at,
       version_history,
       Attachments,
@@ -198,6 +198,7 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
+    const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
@@ -241,6 +242,7 @@ class ThreadsController {
       chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
+      markedAsSpamAt,
       lockedAt,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
@@ -422,11 +424,6 @@ class ThreadsController {
         address: app.user.activeAccount.address,
       });
       const result = new Topic(response.result);
-
-      app.threadUpdateEmitter.emit('threadUpdated', {
-        threadId,
-        action: ThreadActionType.TopicChange,
-      });
       const thread = app.threads.getById(threadId);
       thread.topic = result;
       app.threads.updateThreadInStore(thread);
@@ -444,23 +441,51 @@ class ThreadsController {
 
   public async delete(proposal) {
     return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /thread
-      $.post(`${app.serverUrl()}/deleteThread`, {
-        jwt: app.user.jwt,
-        thread_id: proposal.id,
-        chain_id: app.activeChainId(),
-      })
+      axios
+        .delete(`${app.serverUrl()}/threads/${proposal.id}`, {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          },
+        })
         .then((result) => {
           // Deleted posts are removed from all stores containing them
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
           this.numTotalThreads -= 1;
-          resolve(result);
+          resolve(result.data);
         })
         .catch((e) => {
           console.error(e);
           notifyError('Could not delete thread');
+          reject(e);
+        });
+    });
+  }
+
+  public async toggleSpam(threadId: number, isSpam: boolean) {
+    return new Promise((resolve, reject) => {
+      $.post(
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isSpam ? 'mark' : 'unmark'
+        }-as-spam`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
+        .then((response) => {
+          const foundThread = this.store.getByIdentifier(threadId);
+          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
+          this.updateThreadInStore(new Thread({ ...foundThread }));
+          resolve(foundThread);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError(
+            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+          );
           reject(e);
         });
     });
@@ -484,11 +509,6 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
-        app.threadUpdateEmitter.emit('threadUpdated', {
-          action: ThreadActionType.StageChange,
-          stage: args.stage,
-          threadId: args.threadId,
-        });
         return result;
       },
       error: (err) => {
@@ -583,7 +603,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
@@ -619,7 +638,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
@@ -685,16 +703,16 @@ class ThreadsController {
   ): Promise<Thread[]> {
     const params = {
       chain: app.activeChainId(),
-      ids,
+      thread_ids: ids,
     };
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/getThreads`, params),
+      axios.get(`${app.serverUrl()}/threads`, { params }),
       app.chainEntities.getRawEntities(app.activeChainId()),
     ]);
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-    return response.result.map((rawThread) => {
+    return response.data.result.map((rawThread) => {
       console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
@@ -862,13 +880,18 @@ class ThreadsController {
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/bulkThreads`, params),
+      axios.get(`${app.serverUrl()}/threads`, {
+        params: {
+          bulk: true,
+          ...params,
+        },
+      }),
       // app.chainEntities.getRawEntities(chain),
     ]);
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads } = response.result;
+    const { threads } = response.data.result;
     // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
@@ -918,8 +941,8 @@ class ThreadsController {
 
     return {
       threads: modeledThreads,
-      limit: response.result.limit,
-      page: response.result.page,
+      limit: response.data.result.limit,
+      page: response.data.result.page,
     };
   }
 
