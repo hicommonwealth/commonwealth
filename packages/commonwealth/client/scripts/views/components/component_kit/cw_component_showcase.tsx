@@ -23,7 +23,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
 import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle, toggleDarkMode } from './cw_toggle';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
@@ -142,17 +142,15 @@ export const ComponentShowcase = () => {
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] = useState<boolean>(
-    false
-  );
+  const [isRadioButtonChecked, setIsRadioButtonChecked] =
+    useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState<boolean>(
-    false
-  );
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
+    useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -469,7 +467,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Primary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -481,13 +479,13 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Primary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
@@ -499,7 +497,7 @@ export const ComponentShowcase = () => {
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default disabled w/ left icon"
             disabled
@@ -515,7 +513,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Secondary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -527,32 +525,32 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Secondary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="secondary"
             label="Secondary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            buttonType='secondary'
+            buttonType="secondary"
             label="Secondary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             label="Secondary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Tertiary</CWText>
+          <CWText type="h4">Tertiary</CWText>
           <CWButton
             buttonType="tertiary"
             label="Tertiary default"
@@ -560,7 +558,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="tertiary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Tertiary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -598,7 +596,7 @@ export const ComponentShowcase = () => {
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Destructive</CWText>
+          <CWText type="h4">Destructive</CWText>
           <CWButton
             buttonType="destructive"
             label="Destructive default"
@@ -606,7 +604,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="destructive"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Destructive large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -704,6 +702,18 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Toggle</CWText>
         <div className="toggle-gallery">
           <CWToggle
+            checked={isSmallToggled}
+            size="small"
+            onChange={() => {
+              setIsSmallToggled(!isSmallToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Small</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
             checked={isDarkModeOn}
             size="small"
             onChange={(e) => {
@@ -714,18 +724,33 @@ export const ComponentShowcase = () => {
             }}
           />
           <div className="toggle-label">
-            <CWText type="caption">Dark mode</CWText>
+            <CWText type="caption">Small Dark mode</CWText>
           </div>
         </div>
-        <CWToggle
-          checked={isSmallToggled}
-          size="small"
-          onChange={() => {
-            setIsSmallToggled(!isSmallToggled);
-          }}
-        />
-        <CWToggle size="small" disabled />
-        <CWToggle size="small" checked disabled />
+        <div className="toggle-gallery">
+          <CWToggle size="small" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="small" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled checked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isLargeToggled}
+            size="large"
+            onChange={() => {
+              setIsLargeToggled(!isLargeToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Large</CWText>
+          </div>
+        </div>
         <div className="toggle-gallery">
           <CWToggle
             checked={isDarkModeOn}
@@ -738,18 +763,21 @@ export const ComponentShowcase = () => {
             }}
           />
           <div className="toggle-label">
-            <CWText type="caption">Dark mode</CWText>
+            <CWText type="caption">Large Dark mode</CWText>
           </div>
         </div>
-        <CWToggle
-          checked={isLargeToggled}
-          size="large"
-          onChange={() => {
-            setIsLargeToggled(!isLargeToggled);
-          }}
-        />
-        <CWToggle size="large" disabled />
-        <CWToggle size="large" checked disabled />
+        <div className="toggle-gallery">
+          <CWToggle size="large" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="large" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled checked</CWText>
+          </div>
+        </div>
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Vote Button</CWText>
