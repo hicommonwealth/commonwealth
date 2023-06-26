@@ -23,7 +23,8 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
-  RABBITMQ_URI, ROLLBAR_ENV,
+  RABBITMQ_URI,
+  ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
 } from './server/config';
@@ -63,6 +64,10 @@ log.info(
 
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
+
+  // HEROKU_APP_NAME
+  const HEROKU_APP_NAME = process.env.HEROKU_APP_NAME;
+  const HEROKU_RELEASE_VERSION = process.env.HEROKU_RELEASE_VERSION;
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
@@ -187,6 +192,18 @@ async function main() {
       res.set('Content-Security-Policy', "frame-ancestors 'none';");
       next();
     });
+
+    // add ORIGIN NAME and COUNTRY NAME to response headers
+    if (HEROKU_APP_NAME) {
+      app.use(function setAppName(req, res, next) {
+        res.set(
+          'X-ORIGIN-APP-NAME',
+          `${HEROKU_APP_NAME} ${HEROKU_RELEASE_VERSION}`
+        );
+        res.set('X-REQ-COUNTRY-NAME', `${req.headers['cf-ipcountry']}`);
+        next();
+      });
+    }
 
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
