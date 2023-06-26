@@ -461,6 +461,7 @@ export class ServerThreadsController implements IServerThreadsController {
     const finalComment = await this.models.Comment.findOne({
       where: { id: comment.id },
       include: [this.models.Address, this.models.Attachment],
+      useMaster: true,
     });
 
     const subsTransaction = await this.models.sequelize.transaction();
