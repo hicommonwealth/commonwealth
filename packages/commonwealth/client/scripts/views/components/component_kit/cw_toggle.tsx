@@ -15,11 +15,11 @@ export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
 
 export type ToggleStyleProps = {
   checked?: boolean;
+  size: 'small' | 'large';
 } & BaseStyleProps;
 
 export type ToggleProps = {
   onChange?: (e?: any) => void;
-  size: 'small' | 'large';
 } & ToggleStyleProps;
 
 export const CWToggle = (props: ToggleProps) => {
@@ -36,12 +36,13 @@ export const CWToggle = (props: ToggleProps) => {
     <label
       className={getClasses<ToggleStyleProps>(
         {
+          size,
           checked,
           disabled,
           className,
         },
         ComponentType.Toggle
-      ).concat(` ${size}`)}
+      )}
     >
       <input className="toggle-input" {...params} />
       <div className="slider" />
