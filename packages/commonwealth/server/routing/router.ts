@@ -162,6 +162,10 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
+import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
+import unmarkThreadAsSpam from '../routes/spam/unmarkThreadAsSpam';
+import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
@@ -905,6 +909,29 @@ function setupRouter(
     '/linking/getLinks',
     passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models)
+  );
+
+  // spam
+  router.post(
+    '/threads/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markThreadAsSpam.bind(this, models)
+  );
+  router.post(
+    '/threads/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkThreadAsSpam.bind(this, models)
+  );
+
+  router.post(
+    '/comments/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markCommentAsSpam.bind(this, models)
+  );
+  router.post(
+    '/comments/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkCommentAsSpam.bind(this, models)
   );
 
   // login
