@@ -8,25 +8,31 @@ import 'components/component_kit/new_designs/cw_upvote.scss';
 import { ComponentType } from '../types';
 
 type CWUpvoteProps = {
-  // updateVoteCount: (newCount: number) => void;
   voteCount: number;
   active?: boolean;
   disabled?: boolean;
+  propsUpvoted?: boolean;
 };
 
-// export const CWUpvote: FC<CWUpvoteProps> = ({ updateVoteCount, voteCount }) => {
 export const CWUpvote: FC<CWUpvoteProps> = ({
   voteCount,
   active,
   disabled,
+  propsUpvoted,
 }) => {
   const [count, setCount] = useState<number>(voteCount);
-  const [upvoted, setUpvoted] = useState<boolean>(false);
+  const [upvoted, setUpvoted] = useState<boolean>(!!propsUpvoted);
+  const [color, setColor] = useState<string>('#656167');
 
   const handleUpvote = () => {
     setCount(voteCount + 1);
     setUpvoted(true);
+    // change color to #338FFF // $primary-500
+    setColor('#338FFF');
   };
+
+  const handleOnMouseOver = () => setColor('#2972CC');
+  const handleOnMouseLeave = () => setColor('#338FFF');
 
   return (
     <button
@@ -38,15 +44,17 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
         ComponentType.Upvote
       )}
       onClick={disabled ? null : handleUpvote}
+      onMouseOver={handleOnMouseOver}
+      onMouseLeave={handleOnMouseLeave}
     >
       <ArrowFatUp
-        className=""
+        className={upvoted ? 'upvoted' : 'noUpvote'}
         size={24}
         weight={upvoted ? 'fill' : 'regular'}
-        color="#2972CC"
+        color={color}
       />
       <CWText
-        className="disabled"
+        className={upvoted ? 'upvoted' : 'noUpvote'}
         type="caption"
         fontWeight={upvoted ? 'bold' : 'regular'}
       >

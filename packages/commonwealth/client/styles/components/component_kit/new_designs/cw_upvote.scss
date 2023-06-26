@@ -12,9 +12,14 @@
   gap: 4px;
   color: $neutral-500;
 
+  &:focus {
+    outline: none;
+  }
+
   &:hover {
     cursor: pointer;
     border-color: $primary-600;
+    color: $primary-600;
   }
 
   &.active {
@@ -26,5 +31,37 @@
     border-color: $neutral-400;
     color: $neutral-400;
     cursor: default;
+  }
+
+  .color {
+    color: $neutral-500;
+
+    :hover {
+      color: $primary-600;
+    }
+  }
+
+  .noUpvote {
+    color: $neutral-500;
+
+    &.disabled {
+      color: $neutral-400;
+    }
+
+    &:hover {
+      color: $primary-600;
+    }
+  }
+
+  .upvoted {
+    color: $primary-500;
+
+    &.disabled {
+      color: $neutral-400;
+    }
+
+    &:hover {
+      color: $primary-600;
+    }
   }
 }
