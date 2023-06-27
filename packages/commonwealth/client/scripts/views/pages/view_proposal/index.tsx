@@ -55,6 +55,14 @@ const ViewProposalPage = ({
     if (metadata?.title) forceRerender();
   }, [metadata?.title, forceRerender]);
 
+  useEffect(() => {
+    proposal?.isFetched.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
       if (hasFetchedProposalRef.current) return;
