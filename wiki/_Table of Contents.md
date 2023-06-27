@@ -73,8 +73,8 @@
 - [Bouncing in Pure React](Bouncing-In-Pure-React
 )
 - [Debouncing in Pure React](Debouncing-in-Pure-React)
-- [Quill React Component](quill-component)
-- [Shadow DOM](shadow-dom)
+- [Quill React Component](Quill-Component)
+- [Shadow DOM](Shadow-DOM)
 
 **Storybook**
 - [Introduction](Storybook-Introduction)
