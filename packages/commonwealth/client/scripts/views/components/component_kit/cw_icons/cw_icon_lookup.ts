@@ -13,6 +13,9 @@ import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
   arrowFatUp: Icons.CWArrowFatUp,
+  arrowFatUpNeutral: Icons.CWArrowFatUpNeutral,
+  arrowFatUpBlue500: Icons.CWArrowFatUpBlue500,
+  arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
   arrowLeft: Icons.CWArrowLeft,
   arrowRight: Icons.CWArrowRight,
   backer: Icons.CWBacker,

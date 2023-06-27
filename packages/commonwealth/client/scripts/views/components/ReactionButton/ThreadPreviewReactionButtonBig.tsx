@@ -62,7 +62,7 @@ export const ThreadPreviewReactionButtonBig = ({
               >
                 <div className="reactions-container">
                   <CWIcon
-                    iconName='arrowFatUp'
+                    iconName={hasReacted ? 'arrowFatUpBlue500' : (isLoading || isUserForbidden ? 'arrowFatUpNeutral' : 'arrowFatUp')}
                     iconSize="small"
                   />
                   <div className="reactions-count">{reactors.length}</div>
