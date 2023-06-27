@@ -390,6 +390,7 @@ const createThread = async (
           models.Attachment,
           { model: models.Topic, as: 'topic' },
         ],
+        useMaster: true,
         transaction,
       });
     } catch (err) {

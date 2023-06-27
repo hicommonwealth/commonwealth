@@ -143,12 +143,14 @@ const createReaction = async (
       where: options,
       defaults: options,
       include: [models.Address],
+      useMaster: true,
     });
 
     if (created)
       finalReaction = await models.Reaction.findOne({
         where: options,
         include: [models.Address],
+        useMaster: true,
       });
   } catch (err) {
     return next(new ServerError(err));

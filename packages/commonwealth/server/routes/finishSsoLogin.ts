@@ -370,6 +370,7 @@ const finishSsoLogin = async (
       // re-fetch address if existing user
       const newAddress = await models.Address.findOne({
         where: { address: checksumAddress },
+        useMaster: true,
       });
       serverAnalyticsTrack({
         event: MixpanelLoginEvent.LOGIN_COMPLETED,
@@ -383,6 +384,7 @@ const finishSsoLogin = async (
           id: result.id,
         },
         include: [models.Address],
+        useMaster: true,
       });
       // TODO: should we req.login here? or not?
       req.login(newUser, (err) => {
