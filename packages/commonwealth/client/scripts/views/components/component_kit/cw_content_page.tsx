@@ -114,7 +114,7 @@ export const CWContentPage = (props: ContentPageProps) => {
             <LockWithTooltip lockedAt={lockedAt} updatedAt={updatedAt} />
           )}
           {actions && (
-            <div>
+            <div className="thread-actions">
               <PopoverMenu
                 renderTrigger={(onclick) => (
                   <CWIconButton
@@ -126,7 +126,6 @@ export const CWContentPage = (props: ContentPageProps) => {
                 menuItems={actions}
               />
             </div>
-
           )}
           <SharePopover />
         </div>

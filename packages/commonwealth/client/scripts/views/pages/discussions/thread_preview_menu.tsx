@@ -125,9 +125,15 @@ export const ThreadPreviewMenu = ({
               ...(hasAdminPermissions
                 ? [
                     {
-                      onClick: () => setIsArchiveModalOpen(true),
+                      onClick: () => { 
+                        if (archivedAt) {
+                          app.threads.unarchive(thread.id)
+                        } else {
+                          setIsArchiveModalOpen(true)
+                        }
+                      },
                       label: archivedAt ? 'Unarchive' : 'Archive',
-                      iconLeft: 'archiveTray' as const,
+                      iconLeft: archivedAt ? 'archiveTrayFilled' as const :'archiveTray' as const,
                     },
                   ]
                 : []),

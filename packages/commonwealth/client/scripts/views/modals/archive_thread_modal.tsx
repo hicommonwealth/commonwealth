@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
-
-import 'modals/change_thread_topic_modal.scss';
+import 'modals/archive_thread_modal.scss';
 import type Thread from '../../models/Thread';
-import type Topic from '../../models/Topic';
-
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { TopicSelector } from '../components/topic_selector';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { useFetchTopicsQuery } from 'state/api/topics';
 
 type ArchiveThreadModalProps = {
   onModalClose: () => void;
@@ -41,16 +35,17 @@ export const ArchiveThreadModal = ({
         <CWText type="h4" fontWeight="semiBold">
           Confirm archive
         </CWText>
-        <CWIconButton iconName="close" onClick={onModalClose} />
       </div>
       <div className="body">
         <div className="warning-text">
-          <CWText>
+          <CWText className='top'>
             Are you sure you want to archive this thread post?
           </CWText>
-          <CWText>
-            Archived posts are hidden from the main feed and can no longer be interacted with. Archiving will move the post to a new topic section titled "Archived," which is still viewabel by all community members.
+
+          <CWText className='middle'>
+            Archived posts are hidden from the main feed and can no longer be interacted with. Archiving will move the post to a new topic section titled "Archived," which is still viewable by all community members.
           </CWText>
+
           <CWText>
             Note that you can always unarchive a post.
           </CWText>
@@ -58,14 +53,14 @@ export const ArchiveThreadModal = ({
 
         <div className="actions">
           <CWButton
-            label="Confirm"
-            buttonType="secondary-red"
-            onClick={handleArchiveThread}
+            label="Cancel"
+            buttonType="secondary-black"
+            onClick={onModalClose}
           />
           <CWButton
-            label="Cancel"
+            label="Confirm"
             buttonType="primary-black"
-            onClick={onModalClose}
+            onClick={handleArchiveThread}
           />
         </div>
       </div>

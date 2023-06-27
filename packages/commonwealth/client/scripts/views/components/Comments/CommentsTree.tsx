@@ -113,6 +113,7 @@ export const CommentsTree = ({
               setIsGloballyEditing={setIsGloballyEditing}
               threadLevel={threadLevel}
               threadId={thread.id}
+              archivedAt={thread.archivedAt}
               updatedCommentsCallback={updatedCommentsCallback}
               isReplying={isReplying}
               parentCommentId={parentCommentId}

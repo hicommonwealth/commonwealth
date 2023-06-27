@@ -57,7 +57,7 @@ export class Thread implements IUniqueId {
   public readonly createdAt: moment.Moment;
   public readonly updatedAt: moment.Moment;
   public readonly lastCommentedOn: moment.Moment;
-  public readonly archivedAt: moment.Moment;
+  public readonly archivedAt: moment.Moment | null;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
@@ -153,7 +153,7 @@ export class Thread implements IUniqueId {
     this.identifier = `${id}`;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.archivedAt = archivedAt;
+    this.archivedAt = archivedAt || null;
     this.topic = topic;
     this.kind = kind;
     this.stage = stage;

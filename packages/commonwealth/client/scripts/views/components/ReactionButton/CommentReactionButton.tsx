@@ -20,13 +20,16 @@ import {
 } from './helpers';
 import { LoginModal } from '../../modals/login_modal';
 import { Modal } from '../component_kit/cw_modal';
+import moment from 'moment';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
+  archivedAt: moment.Moment | null;
 };
 
 export const CommentReactionButton = ({
   comment,
+  archivedAt,
 }: CommentReactionButtonProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
@@ -97,7 +100,7 @@ export const CommentReactionButton = ({
       />
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading || isUserForbidden },
+          { disabled: isLoading || isUserForbidden || archivedAt !== null },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
@@ -105,7 +108,7 @@ export const CommentReactionButton = ({
         }}
       >
         <CWIconButton
-          iconName="upvote"
+          iconName="arrowFatUp"
           iconSize="small"
           selected={hasReacted}
           onClick={async (e) => {

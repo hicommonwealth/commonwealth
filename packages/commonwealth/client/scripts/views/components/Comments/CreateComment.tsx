@@ -14,6 +14,7 @@ import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
 import {
@@ -139,52 +140,69 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return (
-    <div className="CreateComment">
-      <div className="attribution-row">
-        <div className="attribution-left-content">
-          <CWText type="caption">
-            {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
-          </CWText>
-          <CWText type="caption" fontWeight="medium" className="user-link-text">
-            <User user={author} hideAvatar linkify />
-          </CWText>
-        </div>
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-      </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && app.user.activeAccount && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
-      <div className="form-bottom">
-        <div className="form-buttons">
-          {editorValue.length > 0 && (
-            <CWButton
-              buttonType="secondary-blue"
-              onClick={cancel}
-              label="Cancel"
-            />
-          )}
-          <CWButton
-            disabled={disabled}
-            onClick={handleSubmitComment}
-            label="Submit"
+    <>
+      {rootThread.archivedAt === null ? (
+        <div className="CreateComment">
+          <div className="attribution-row">
+            <div className="attribution-left-content">
+              <CWText type="caption">
+                {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
+              </CWText>
+              <CWText type="caption" fontWeight="medium" className="user-link-text">
+                <User user={author} hideAvatar linkify />
+              </CWText>
+            </div>
+            {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
+          </div>
+          <ReactQuillEditor
+            className="editor"
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
           />
+          {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
+            <CWText className="token-req-text">
+              Commenting in {activeTopicName} requires{' '}
+              {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+              {app.chain.meta.default_symbol}.{' '}
+              {userBalance && app.user.activeAccount && (
+                <>
+                  You have {weiToTokens(userBalance.toString(), decimals)}{' '}
+                  {app.chain.meta.default_symbol}.
+                </>
+              )}
+            </CWText>
+          )}
+          <div className="form-bottom">
+            <div className="form-buttons">
+              {editorValue.length > 0 && (
+                <CWButton
+                  buttonType="secondary-blue"
+                  onClick={cancel}
+                  label="Cancel"
+                />
+              )}
+              <CWButton
+                disabled={disabled}
+                onClick={handleSubmitComment}
+                label="Submit"
+              />
+            </div>
+          </div>
+        </div>
+    )
+    :
+      <div className="archive-msg-container">
+        <div className="archive-msg">
+        <CWIcon
+          iconName="archiveTrayFilled"
+          iconSize="small"
+        />
+        {`This thread was archived on ${rootThread.archivedAt.format('MM/DD/YYYY')}, meaning it can no longer be edited or commented on.`}
         </div>
       </div>
-    </div>
+  }
+    </>
   );
 };
+
+

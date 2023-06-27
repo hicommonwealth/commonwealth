@@ -29,6 +29,7 @@ type CommentProps = {
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
   threadId: number;
+  archivedAt: moment.Moment | null;
   updatedCommentsCallback?: () => void;
   isReplying?: boolean;
   parentCommentId?: number;
@@ -45,6 +46,7 @@ export const CommentComponent = ({
   isReplying,
   parentCommentId,
   threadId,
+  archivedAt,
 }: CommentProps) => {
   const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>(false);
@@ -68,7 +70,7 @@ export const CommentComponent = ({
       chain: app.activeChainId(),
     });
 
-  const canReply = !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
+  const canReply = !isLast && !isLocked && archivedAt === null && isLoggedIn && app.user.activeAccount;
 
   const canEditAndDelete =
     !isLocked &&
@@ -148,7 +150,7 @@ export const CommentComponent = ({
             {!comment.deleted && (
               <div className="comment-footer">
                 <div className="menu-buttons-left">
-                  <CommentReactionButton comment={comment} />
+                  <CommentReactionButton comment={comment} archivedAt={archivedAt} />
                   {canReply && (
                     <div
                       className="reply-button"
@@ -165,7 +167,7 @@ export const CommentComponent = ({
                 </div>
                 <div className="menu-buttons-right">
                   <SharePopover commentId={comment.id} />
-                  {canEditAndDelete && (
+                  {canEditAndDelete && archivedAt === null && (
                     <PopoverMenu
                       renderTrigger={(onclick) => (
                         <CWIconButton

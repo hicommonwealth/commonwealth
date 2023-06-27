@@ -48,6 +48,7 @@ import { ThreadReactionPreviewButtonSmall } from '../../components/ReactionButto
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { ChangeThreadTopicModal } from '../../modals/change_thread_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
+import { ArchiveThreadModal } from '../../modals/archive_thread_modal';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -93,6 +94,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [viewCount, setViewCount] = useState(null);
   const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
+  const [isArchiveThreadModalOpen, setIsArchiveThreadModalOpen] = useState(false);
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);
@@ -623,7 +625,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const getActionMenuItems = (): PopoverMenuItem[] => {
     return [
-      ...(hasEditPerms && !thread.readOnly
+      ...(hasEditPerms && !thread.readOnly && thread.archivedAt === null
         ? [
             {
               label: 'Edit',
@@ -632,7 +634,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             },
           ]
         : []),
-      ...(hasEditPerms
+      ...(hasEditPerms && thread.archivedAt === null
         ? [
             {
               label: 'Edit collaborators',
@@ -643,7 +645,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             },
           ]
         : []),
-      ...(isAdminOrMod || isAuthor
+      ...((isAdminOrMod || isAuthor) && thread.archivedAt === null
         ? [
             {
               label: 'Change topic',
@@ -654,7 +656,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             },
           ]
         : []),
-      ...(isAuthor || isAdminOrMod
+      ...(isAdminOrMod
+        ? [
+            {
+              onClick: () => { 
+                if (thread.archivedAt){
+                  app.threads.unarchive(thread.id)
+                } else {
+                  setIsArchiveThreadModalOpen(true)
+                }
+              },
+              label: thread.archivedAt ? 'Unarchive' : 'Archive',
+              iconLeft: thread.archivedAt ? 'archiveTrayFilled' as const :'archiveTray' as const,
+            },
+          ]
+        : []),
+      ...((isAuthor || isAdminOrMod) && thread.archivedAt === null
         ? [
             {
               label: 'Delete',
@@ -663,7 +680,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             },
           ]
         : []),
-      ...(isAuthor || isAdminOrMod
+      ...((isAuthor || isAdminOrMod) && thread.archivedAt === null
         ? [
             {
               label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
@@ -705,20 +722,24 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ]
         : []),
       { type: 'divider' as const },
-      {
-        onClick: () => {
-          handleToggleSubscription(
-            thread,
-            getCommentSubscription(thread),
-            getReactionSubscription(thread),
-            isSubscribed
-          ).then(() => {
-            setRecentlyEdited(true);
-          });
-        },
-        label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
-        iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
-      },
+      ...(thread.archivedAt === null
+      ? [
+          {
+            onClick: () => {
+              handleToggleSubscription(
+                thread,
+                getCommentSubscription(thread),
+                getReactionSubscription(thread),
+                isSubscribed
+              ).then(() => {
+                setRecentlyEdited(true);
+              });
+            },
+            label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
+            iconLeft: isSubscribed ? 'unsubscribe' as const : 'bell' as const,
+          },
+        ]
+      : []),
     ];
   };
 
@@ -886,6 +907,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               : []),
           ] as SidebarComponents
         }
+      />
+      <Modal
+        content={
+          <ArchiveThreadModal
+            thread={thread}
+            onModalClose={() => setIsArchiveThreadModalOpen(false)}
+          />
+        }
+        onClose={() => setIsArchiveThreadModalOpen(false)}
+        open={isArchiveThreadModalOpen}
       />
       <Modal
         content={
