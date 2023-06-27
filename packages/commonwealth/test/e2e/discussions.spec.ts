@@ -66,4 +66,14 @@ test.describe('DiscussionsPage Homepage', () => {
 
     expect(page.url()).to.include('/profile/id/');
   });
+
+  test('Skeleton loader should show on discussion page', async ({ page }) => {
+    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
+
+    // Assert skeleton exists on discussions page
+    const selector = 'div.showSkeleton'
+    await page.waitForSelector(selector);
+    const skeletonExists = (await page.$(selector)) !== null;
+    expect(skeletonExists).to.be.true;
+  });
 });
