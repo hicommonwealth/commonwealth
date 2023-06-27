@@ -100,6 +100,14 @@ export const Select = ({
                         />
                       ),
                     })}
+                    {...(option.value === 'Archived' && {
+                      iconRight: (
+                        <CWIconButton
+                          iconName="archiveTray"
+                          iconSize="small"
+                        />
+                      ),
+                    })}
                   />
                 );
               })}

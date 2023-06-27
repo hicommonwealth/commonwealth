@@ -251,6 +251,11 @@ export const RecentThreadsHeader = ({
                       value: t.name,
                       label: t.name,
                     })),
+                    {
+                      id: 100,
+                      label: 'Archived',
+                      value: 'Archived',
+                    },
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                   canEditOption={app.roles?.isAdminOfEntity({
