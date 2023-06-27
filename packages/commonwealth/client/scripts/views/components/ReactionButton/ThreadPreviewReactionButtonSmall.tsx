@@ -43,7 +43,7 @@ export const ThreadReactionPreviewButtonSmall = ({
         }}
       >
         <CWIconButton
-          iconName="arrowFatUp"
+          iconName={hasReacted ? 'arrowFatUpBlue500' : (isLoading || isUserForbidden ? 'arrowFatUpNeutral' : 'arrowFatUp')}
           iconSize="small"
           selected={hasReacted}
           onClick={async (e) => {
