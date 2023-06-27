@@ -28,6 +28,7 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -54,6 +55,14 @@ const ViewProposalPage = ({
   useEffect(() => {
     if (metadata?.title) forceRerender();
   }, [metadata?.title, forceRerender]);
+
+  useEffect(() => {
+    proposal?.isFetched.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
@@ -90,6 +99,7 @@ const ViewProposalPage = ({
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
         afterAdapterLoaded();
+        // setTimeout(forceRerender, 5500);
       });
     } else {
       afterAdapterLoaded();
