@@ -49,6 +49,7 @@ html.invert {
   -ms-filter: invert(90%);
 
   img,
+  svg,
   .user-avatar:not(:has(.Avatar)),
   .Avatar {
     filter: invert(90%);
@@ -116,4 +117,12 @@ pre {
 // makes sure that popovers are above the modals
 [id^='popover-'] {
   z-index: 10000;
+}
+
+.Splash {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
 }

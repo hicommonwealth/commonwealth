@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import $ from 'jquery';
-
 import 'components/Profile/Profile.scss';
-
-import app from 'state';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import $ from 'jquery';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
 import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
-
-import ProfileHeader from './ProfileHeader';
+import { PageNotFound } from '../../pages/404';
+import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
+import { CWSpinner } from '../component_kit/cw_spinner';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
-import { CWSpinner } from '../component_kit/cw_spinner';
-import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
-import { PageNotFound } from '../../pages/404';
-import Sublayout from '../../Sublayout';
+import ProfileHeader from './ProfileHeader';
 
 enum ProfileError {
   None,
@@ -115,62 +111,58 @@ const Profile = ({ profileId }: ProfileProps) => {
     }
 
     return (
-      <Sublayout>
+      <div
+        className="Profile"
+        style={
+          profile.backgroundImage
+            ? {
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundRepeat: `${
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
+                }`,
+                backgroundSize:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'cover'
+                    : '100px',
+                backgroundPosition:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'center'
+                    : '56px 56px',
+                backgroundAttachment: 'fixed',
+              }
+            : {}
+        }
+      >
         <div
-          className="Profile"
-          style={
+          className={
             profile.backgroundImage
-              ? {
-                  backgroundImage: `url(${backgroundUrl})`,
-                  backgroundRepeat: `${
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'no-repeat'
-                      : 'repeat'
-                  }`,
-                  backgroundSize:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'cover'
-                      : '100px',
-                  backgroundPosition:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'center'
-                      : '56px 56px',
-                  backgroundAttachment: 'fixed',
-                }
-              : {}
+              ? 'ProfilePageContainer'
+              : 'ProfilePageContainer smaller-margins'
           }
         >
-          <div
-            className={
-              profile.backgroundImage
-                ? 'ProfilePageContainer'
-                : 'ProfilePageContainer smaller-margins'
-            }
-          >
-            <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity
-              threads={threads}
-              comments={comments}
-              addresses={addresses}
-            />
-          </div>
+          <ProfileHeader profile={profile} isOwner={isOwner} />
+          <ProfileActivity
+            threads={threads}
+            comments={comments}
+            addresses={addresses}
+          />
         </div>
-      </Sublayout>
+      </div>
     );
   } else {
     return (
-      <Sublayout>
-        <div className="Profile">
-          <div className="ProfilePageContainer">
-            <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity
-              threads={threads}
-              comments={comments}
-              addresses={addresses}
-            />
-          </div>
+      <div className="Profile">
+        <div className="ProfilePageContainer">
+          <ProfileHeader profile={profile} isOwner={isOwner} />
+          <ProfileActivity
+            threads={threads}
+            comments={comments}
+            addresses={addresses}
+          />
         </div>
-      </Sublayout>
+      </div>
     );
   }
 };

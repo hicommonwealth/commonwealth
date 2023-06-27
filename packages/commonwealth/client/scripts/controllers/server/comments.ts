@@ -1,17 +1,17 @@
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
-import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
-
 import app from 'state';
 import { CommentsStore } from 'stores';
-import Thread from '../../models/Thread';
 import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
 import type { IUniqueId } from '../../models/interfaces';
+import Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
+import axios from 'axios';
+import $ from 'jquery';
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
@@ -52,6 +52,10 @@ export const modelFromServer = (comment) => {
     ? versionHistory[0].timestamp
     : null;
 
+  const markedAsSpamAt = comment.marked_as_spam_at
+    ? moment(comment.marked_as_spam_at)
+    : null;
+
   const commentParams =
     comment.deleted_at?.length > 0
       ? {
@@ -68,6 +72,7 @@ export const modelFromServer = (comment) => {
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
+          markedAsSpamAt,
           deleted: true,
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
@@ -87,6 +92,7 @@ export const modelFromServer = (comment) => {
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
+          markedAsSpamAt,
           deleted: false,
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
@@ -146,22 +152,23 @@ class CommentsController {
         parent_comment_id: parentCommentId,
       });
 
-      // TODO: Change to POST /comment
-      const res = await $.post(`${app.serverUrl()}/createComment`, {
-        author_chain: app.user.activeAccount.chain.id,
-        chain,
-        address: app.user.activeAccount.address,
-        parent_id: parentCommentId,
-        chain_entity_id: chainEntity?.id,
-        thread_id: threadId,
-        'attachments[]': attachments,
-        text: encodeURIComponent(unescapedText),
-        jwt: app.user.jwt,
-        canvas_action: action,
-        canvas_session: session,
-        canvas_hash: hash,
-      });
-      const { result } = res;
+      const res = await axios.post(
+        `${app.serverUrl()}/threads/${threadId}/comments`,
+        {
+          author_chain: app.user.activeAccount.chain.id,
+          chain,
+          address: app.user.activeAccount.address,
+          parent_id: parentCommentId,
+          chain_entity_id: chainEntity?.id,
+          'attachments[]': attachments,
+          text: encodeURIComponent(unescapedText),
+          jwt: app.user.jwt,
+          canvas_action: action,
+          canvas_session: session,
+          canvas_hash: hash,
+        }
+      );
+      const { result } = res.data;
       const newComment = modelFromServer(result);
       this._store.add(newComment);
       const activeEntity = app.chain;
@@ -196,25 +203,27 @@ class CommentsController {
   ) {
     const newBody = body || comment.text;
     try {
-      // TODO: Change to PUT /comment
       const { session, action, hash } = await app.sessions.signComment({
         thread_id: comment.threadId,
         body,
         parent_comment_id: comment.parentComment,
       });
-      const response = await $.post(`${app.serverUrl()}/editComment`, {
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
-        id: comment.id,
-        chain: comment.chain,
-        body: encodeURIComponent(newBody),
-        'attachments[]': attachments,
-        jwt: app.user.jwt,
-        canvas_action: action,
-        canvas_session: session,
-        canvas_hash: hash,
-      });
-      const result = modelFromServer(response.result);
+      const res = await axios.patch(
+        `${app.serverUrl()}/comments/${comment.id}`,
+        {
+          address: app.user.activeAccount.address,
+          author_chain: app.user.activeAccount.chain.id,
+          id: comment.id,
+          chain: comment.chain,
+          body: encodeURIComponent(newBody),
+          'attachments[]': attachments,
+          jwt: app.user.jwt,
+          canvas_action: action,
+          canvas_session: session,
+          canvas_hash: hash,
+        }
+      );
+      const result = modelFromServer(res.data.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -235,10 +244,15 @@ class CommentsController {
       comment_id: comment.canvasHash,
     });
     return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /comment
-      $.post(`${app.serverUrl()}/deleteComment`, {
-        jwt: app.user.jwt,
-        comment_id: comment.id,
+      axios({
+        url: `${app.serverUrl()}/comments/${comment.id}`,
+        method: 'DELETE',
+        data: {
+          jwt: app.user.jwt,
+          address: app.user.activeAccount.address,
+          author_chain: app.user.activeAccount.chain.id,
+          chain: comment.chain,
+        },
       })
         .then((result) => {
           const existing = this._store.getById(comment.id);
@@ -276,19 +290,49 @@ class CommentsController {
     });
   }
 
+  public async toggleSpam(commentId: number, isSpam: boolean) {
+    return new Promise((resolve, reject) => {
+      $.post(
+        `${app.serverUrl()}/comments/${commentId}/${
+          !isSpam ? 'mark' : 'unmark'
+        }-as-spam`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
+        .then((response) => {
+          const comment = this._store.getById(commentId);
+          const result = modelFromServer({ ...comment, ...response.result });
+          if (comment) this._store.remove(comment);
+          this._store.add(result);
+          resolve(result);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError(
+            `Could not ${!isSpam ? 'mark' : 'unmark'} comment as spam`
+          );
+          reject(e);
+        });
+    });
+  }
+
   public async refresh(thread: Thread, chainId: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
-        const response = await $.get(`${app.serverUrl()}/viewComments`, {
-          chain: chainId,
-          thread_id: thread.id,
+        const response = await axios.get(`${app.serverUrl()}/viewComments`, {
+          params: {
+            chain: chainId,
+            thread_id: thread.id,
+          },
         });
-        if (response.status !== 'Success') {
+        if (response.data.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));
         }
         this._store.clearByThread(thread);
-        response.result.forEach((comment) => {
+        response.data.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
           const model = modelFromServer(comment);

@@ -1,15 +1,12 @@
+import { byDescendingCreationDate } from 'helpers';
+import 'pages/notifications/index.scss';
 import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-
-import 'pages/notifications/index.scss';
-
 import app from 'state';
-import Sublayout from 'views/Sublayout';
 import PageError from 'views/pages/error';
-import { NotificationRow } from './notification_row';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { byDescendingCreationDate } from 'helpers';
+import { NotificationRow } from './notification_row';
 
 const NotificationsPage = () => {
   const [allRead, setAllRead] = useState<boolean>(false);
@@ -28,54 +25,52 @@ const NotificationsPage = () => {
   ].sort(byDescendingCreationDate);
 
   return (
-    <Sublayout>
-      <div className="NotificationsPage">
-        <div className="notifications-buttons-row">
-          <CWButton
-            label="Mark all as read"
-            onClick={(e) => {
-              e.preventDefault();
-              app.user.notifications.markAsRead(mostRecentFirst);
-              setAllRead(true);
-            }}
-          />
-          <CWButton
-            label="Clear chain events"
-            onClick={async (e) => {
-              e.preventDefault();
+    <div className="NotificationsPage">
+      <div className="notifications-buttons-row">
+        <CWButton
+          label="Mark all as read"
+          onClick={(e) => {
+            e.preventDefault();
+            app.user.notifications.markAsRead(mostRecentFirst);
+            setAllRead(true);
+          }}
+        />
+        <CWButton
+          label="Clear chain events"
+          onClick={async (e) => {
+            e.preventDefault();
 
-              if (app.user.notifications.chainEventNotifications.length === 0) {
-                return;
-              }
+            if (app.user.notifications.chainEventNotifications.length === 0) {
+              return;
+            }
 
-              app.user.notifications.delete(
-                app.user.notifications.chainEventNotifications
-              );
-            }}
-          />
-        </div>
-        <div className="NotificationsList">
-          {mostRecentFirst.length > 0 ? (
-            <Virtuoso
-              style={{ height: '100%' }}
-              data={mostRecentFirst}
-              itemContent={(i, data) => (
-                <NotificationRow
-                  key={i}
-                  notification={data}
-                  onListPage
-                  allRead={allRead}
-                />
-              )}
-            />
-          ) : (
-            <div className="no-notifications">
-              <CWText>No Notifications</CWText>
-            </div>
-          )}
-        </div>
+            app.user.notifications.delete(
+              app.user.notifications.chainEventNotifications
+            );
+          }}
+        />
       </div>
-    </Sublayout>
+      <div className="NotificationsList">
+        {mostRecentFirst.length > 0 ? (
+          <Virtuoso
+            style={{ height: '100%' }}
+            data={mostRecentFirst}
+            itemContent={(i, data) => (
+              <NotificationRow
+                key={i}
+                notification={data}
+                onListPage
+                allRead={allRead}
+              />
+            )}
+          />
+        ) : (
+          <div className="no-notifications">
+            <CWText>No Notifications</CWText>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

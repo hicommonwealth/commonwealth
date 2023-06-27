@@ -13,17 +13,14 @@ import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { TopicSelector } from 'views/components/topic_selector';
 import { ThreadKind, ThreadStage } from '../../../models/types';
+import Permissions from '../../../utils/Permissions';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
-import {
-  checkNewThreadErrors,
-  useAuthorName,
-  useNewThreadForm,
-} from './helpers';
+import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -32,8 +29,7 @@ export const NewThreadForm = () => {
   });
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
-  const { authorName } = useAuthorName();
-  const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
+  const isAdmin = Permissions.isCommunityAdmin();
 
   const topicsForSelector =
     topics ||
@@ -59,7 +55,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, authorName, topicsForSelector);
+  } = useNewThreadForm(chainId, topicsForSelector);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
