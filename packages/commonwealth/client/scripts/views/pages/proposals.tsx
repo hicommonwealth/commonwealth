@@ -66,7 +66,7 @@ const ProposalsPage = () => {
         app.chainAdapterReady.removeAllListeners();
       });
     };
-  }, [setLoading, app]);
+  }, [setLoading]);
 
   useEffect(() => {
     app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
@@ -77,7 +77,7 @@ const ProposalsPage = () => {
         app.chainModuleReady.removeAllListeners();
       });
     };
-  }, [setSubstrateLoading, app]);
+  }, [setSubstrateLoading]);
 
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
