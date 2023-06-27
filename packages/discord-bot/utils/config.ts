@@ -13,3 +13,5 @@ export const RABBITMQ_URI = (() => {
 })();
 
 export const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+
+export const SERVER_URL = process.env.SERVER_URL;

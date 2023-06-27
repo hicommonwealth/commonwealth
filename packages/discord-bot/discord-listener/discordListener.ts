@@ -56,7 +56,7 @@ client.on('messageCreate', async (message: Message) => {
     };
 
     if (!message.nonce) new_message.title = channel.name;
-      
+
     // 3. Publish the message to RabbitMQ queue
     try {
       await initPromise;
@@ -65,8 +65,6 @@ client.on('messageCreate', async (message: Message) => {
     } catch (error) {
       console.log(`Error publishing to rabbitMQ: ${error}`);
     }
-
-    
   } catch (error) {
     console.log(`Error Processing Discord Message: ${error}`);
   }
