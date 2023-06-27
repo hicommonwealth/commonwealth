@@ -1,0 +1,1 @@
+Next page: [Different stories for same component](Different-Stories-For-Same-Component.md)
