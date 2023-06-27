@@ -5,7 +5,7 @@ import { featureFlags } from 'helpers/feature-flags';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/chain_metadata_rows.scss';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import type ChainInfo from '../../../models/ChainInfo';
@@ -20,6 +20,8 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -27,6 +29,50 @@ type ChainMetadataRowsProps = {
   mods: any;
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   onSave: () => void;
+};
+
+type DiscordChannelConnection = {
+  channelName: string;
+  channelId: string;
+  connectedTopicId: string | null;
+  onConnect: (topicId: string) => void;
+};
+
+const DiscordForumConnections = ({
+  channels,
+  topics,
+}: {
+  channels: DiscordChannelConnection[];
+  topics: { id: string; name: string }[];
+}) => {
+  return (
+    <div className="DiscordForumConnections">
+      {channels.map((channel) => {
+        const connectedTopic = topics.find(
+          (topic) => topic.id === channel.connectedTopicId
+        );
+        return (
+          <div key={channel.channelId}>
+            <CWText>{channel.channelName}</CWText>
+            <CWDropdown
+              initialValue={
+                connectedTopic
+                  ? { label: connectedTopic.name, value: connectedTopic.id }
+                  : { label: 'Not connected', value: '' }
+              }
+              options={topics.map((topic) => {
+                return { label: topic.name, value: topic.id };
+              })}
+              onSelect={async (item) => {
+                // Connect the channel to the topic
+                channel.onConnect(item.value);
+              }}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 export const ChainMetadataRows = ({
@@ -40,6 +86,17 @@ export const ChainMetadataRows = ({
   const returningFromDiscordCallback = params.get(
     'returningFromDiscordCallback'
   );
+
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+
+  const { data: discordChannels, isLoading: discordFetchLoading } =
+    useFetchDiscordChannelsQuery({
+      chainId: app.activeChainId(),
+    });
+
+  console.log(discordChannels);
 
   const [name, setName] = useState(chain.name);
   const [description, setDescription] = useState(chain.description);
@@ -72,38 +129,22 @@ export const ChainMetadataRows = ({
       : chain.discordConfigId !== null
   );
   const [communityBanner, setCommunityBanner] = useState(chain.communityBanner);
-  const [channelsLoaded, setChannelsLoaded] = useState(false);
   const [uploadInProgress, setUploadInProgress] = useState(false);
-  const [snapshotChannels, setSnapshotChannels] = useState([]);
   const [snapshotNotificationsEnabled, setSnapshotNotificationsEnabled] =
     useState(false);
   const [selectedSnapshotChannel, setSelectedSnapshotChannel] = useState<{
     id: string;
     name: string;
   } | null>(null);
+  const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
 
-  const getChannels = useCallback(async () => {
-    try {
-      console.log(chain.id);
-      const res = await app.discord.getChannels(chain.id);
-      setSnapshotChannels(res.channels);
-      setSelectedSnapshotChannel(res.selectedChannel);
-
-      if (res.selectedChannel?.id) {
-        setSnapshotNotificationsEnabled(true);
-      }
-
-      setChannelsLoaded(true);
-    } catch (e) {
-      console.log(e);
+  useEffect(() => {
+    if (discordChannels && discordChannels.selectedChannel) {
+      setSelectedSnapshotChannel(discordChannels.selectedChannel);
+      setSnapshotNotificationsEnabled(true);
     }
-  }, [chain.id]);
-
-  useNecessaryEffect(() => {
-    if (discordBotConnected && !channelsLoaded) {
-      getChannels();
-    }
-  }, [channelsLoaded, discordBotConnected, getChannels]);
+    setSelectedChannelLoaded(true);
+  }, [discordChannels]);
 
   if (!selectedTags2) {
     return;
@@ -235,7 +276,6 @@ export const ChainMetadataRows = ({
         )}`,
         '_parent'
       );
-
       setDiscordBotConnecting(true);
     } catch (e) {
       console.log(e);
@@ -487,10 +527,10 @@ export const ChainMetadataRows = ({
               />
             </div>
             <div className="connected-line">
-              {channelsLoaded && (
+              {discordChannels && selectedChannelLoaded && (
                 <CWDropdown
                   label={'Select Channel'}
-                  options={snapshotChannels.map((channel) => {
+                  options={discordChannels.textChannels.map((channel) => {
                     return {
                       label: channel.name,
                       value: channel.id,

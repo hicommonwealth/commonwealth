@@ -22,7 +22,11 @@ type GetDiscordChannelsResp = {
     id: string;
     name: string;
   }[];
-  selected_channel: {
+  forumChannels: {
+    id: string;
+    name: string;
+  }[];
+  selectedChannel: {
     id: string;
     name: string;
   } | null;
@@ -44,32 +48,40 @@ const getDiscordChannels = async (
     },
   });
 
-  console.log('configEntry', configEntry);
+  const url = `https://discord.com/api/v10/guilds/${configEntry.guild_id}/channels`;
 
   try {
-    console.log(`${process.env.DISCORD_BOT_URL}/channel-listing`);
-    const channels = await axios.post(
-      `${process.env.DISCORD_BOT_URL}/channel-listing`,
-      { guildId: configEntry.guild_id },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-        },
-      }
-    );
+    const headers = {
+      Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+    };
+    const response = await axios.get(url, { headers });
 
-    return success(res, {
-      channels: channels.data.channels.map((channel) => {
-        return { id: channel.id, name: channel.name };
-      }),
-      selected_channel: {
-        id: configEntry.snapshot_channel_id,
-        name: channels.data.channels.find(
-          (channel) => channel.id === configEntry.snapshot_channel_id
-        )?.name,
-      },
-    });
+    if (response.status === 200) {
+      const channels = response.data;
+
+      return success(res, {
+        channels: channels
+          .filter((channel) => {
+            return channel.type === 0; // Only Text Channels
+          })
+          .map((channel) => {
+            return { id: channel.id, name: channel.name };
+          }),
+        forumChannels: channels
+          .filter((channel) => {
+            return channel.type === 15; // Only forum channels
+          })
+          .map((channel) => {
+            return { id: channel.id, name: channel.name };
+          }),
+        selectedChannel: {
+          id: configEntry.snapshot_channel_id,
+          name: channels.find(
+            (channel) => channel.id === configEntry.snapshot_channel_id
+          )?.name,
+        },
+      });
+    }
   } catch (e) {
     console.log('Error getting discord channel listing', e);
   }
