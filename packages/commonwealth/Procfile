@@ -1,3 +1,3 @@
 web: cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) ts-node -P tsconfig.server.json -T server.ts
-consumer: cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/commonwealth/server/CommonwealthConsumer/CommonwealthConsumer.js run-as-script
-release: cd packages/commonwealth && ( [ -z "$READ_DATABASE_URL" ] && npx sequelize-cli db:migrate --config server/sequelize.json || echo "Skipping migration due to presence of READ_DATABASE_URL" )
+consumer: [ -z "$READ_DATABASE_URL" ] && (cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/commonwealth/server/CommonwealthConsumer/CommonwealthConsumer.js run-as-script) || echo "Skipping migration due to presence of READ_DATABASE_URL"
+release:  [ -z "$READ_DATABASE_URL" ] && (cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json) || echo "Skipping migration due to presence of READ_DATABASE_URL"
