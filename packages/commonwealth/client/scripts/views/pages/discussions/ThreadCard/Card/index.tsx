@@ -101,6 +101,7 @@ export const Card = ({
               }
               publishDate={moment(thread.createdAt).format('l')}
               isNew={isNewThread(thread.createdAt)}
+              isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
                 lockedAt: thread.lockedAt.toISOString(),
@@ -110,9 +111,34 @@ export const Card = ({
               })}
             />
             <div className="content-header-icons">
-              {isHot(thread) && <CWTag iconName="trendUp" label="Trending" type="trending"/>}
               {thread.pinned && <CWIcon iconName="pin" />}
             </div>
+          </div>
+          <div className="content-body-wrapper">
+            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
+            <div className="content-title">
+              <CWText type="h5" fontWeight="semiBold">
+                {thread.title}
+              </CWText>
+            </div>
+            <div className='top-tags-row'>
+              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+              {linkedSnapshots.length > 0 && (
+                <CWTag
+                  type="active"
+                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
+                    ? linkedSnapshots[0].identifier.split('/')[1]
+                    : linkedSnapshots[0].identifier
+                  )
+                    .toString()
+                    .slice(0, 4)}…`}
+                />
+              )}
+            </div>
+            <CWText type="caption" className="content-body">
+              {thread.plaintext}
+            </CWText>
           </div>
           {isTagsRowVisible && (
             <div className="content-tags">
@@ -146,32 +172,6 @@ export const Card = ({
                 ))}
             </div>
           )}
-          <div className="content-body-wrapper">
-            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
-            <div className="content-title">
-              <CWText type="h5" fontWeight="semiBold">
-                {thread.title}
-              </CWText>
-            </div>
-            <div className='top-tags-row'>
-              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
-
-              {linkedSnapshots.length > 0 && (
-                <CWTag
-                  type="active"
-                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
-                    ? linkedSnapshots[0].identifier.split('/')[1]
-                    : linkedSnapshots[0].identifier
-                  )
-                    .toString()
-                    .slice(0, 4)}…`}
-                />
-              )}
-            </div>
-            <CWText type="caption" className="content-body">
-              {thread.plaintext}
-            </CWText>
-          </div>
           <div
             className="content-footer"
             onClick={(e) => {
