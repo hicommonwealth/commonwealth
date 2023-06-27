@@ -99,7 +99,6 @@ const ViewProposalPage = ({
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
         afterAdapterLoaded();
-        // setTimeout(forceRerender, 5500);
       });
     } else {
       afterAdapterLoaded();

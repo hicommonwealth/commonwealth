@@ -22,7 +22,6 @@ import {
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
-import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import useForceRerender from 'hooks/useForceRerender';
 
 type ProposalCardProps = {
