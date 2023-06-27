@@ -22,17 +22,42 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
 }) => {
   const [count, setCount] = useState<number>(voteCount);
   const [upvoted, setUpvoted] = useState<boolean>(!!propsUpvoted);
-  const [color, setColor] = useState<string>('#656167');
+  const [isHovering, setIsHovering] = useState<boolean>(false);
 
   const handleUpvote = () => {
-    setCount(voteCount + 1);
-    setUpvoted(true);
-    // change color to #338FFF // $primary-500
-    setColor('#338FFF');
+    if (!disabled && !active) {
+      setCount(voteCount + 1);
+      setUpvoted(true);
+    }
   };
 
-  const handleOnMouseOver = () => setColor('#2972CC');
-  const handleOnMouseLeave = () => setColor('#338FFF');
+  const handleOnMouseOver = () => {
+    if (!disabled && !active) {
+      setIsHovering(true);
+    }
+  };
+
+  const handleOnMouseLeave = () => setIsHovering(false);
+
+  const getIconColor = () => {
+    return disabled
+      ? '#A09DA1'
+      : isHovering || active
+      ? '#2972CC'
+      : upvoted
+      ? '#338FFF'
+      : '#656167';
+  };
+
+  const getTextClass = () => {
+    return disabled
+      ? 'fontDisabled'
+      : isHovering || active
+      ? 'fontHovering'
+      : upvoted
+      ? 'fontUpvoted'
+      : 'fontDefault';
+  };
 
   return (
     <button
@@ -50,11 +75,11 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
       <ArrowFatUp
         className={upvoted ? 'upvoted' : 'noUpvote'}
         size={24}
-        weight={upvoted ? 'fill' : 'regular'}
-        color={color}
+        weight={upvoted || isHovering || active ? 'fill' : 'regular'}
+        color={getIconColor()}
       />
       <CWText
-        className={upvoted ? 'upvoted' : 'noUpvote'}
+        className={getTextClass()}
         type="caption"
         fontWeight={upvoted ? 'bold' : 'regular'}
       >

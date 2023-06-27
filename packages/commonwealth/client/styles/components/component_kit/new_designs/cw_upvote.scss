@@ -33,12 +33,20 @@
     cursor: default;
   }
 
-  .color {
+  .fontDefault {
     color: $neutral-500;
+  }
 
-    :hover {
-      color: $primary-600;
-    }
+  .fontUpvoted {
+    color: $primary-500;
+  }
+
+  .fontDisabled {
+    color: $neutral-400;
+  }
+
+  .fontHovering {
+    color: $primary-600;
   }
 
   .noUpvote {
@@ -47,10 +55,6 @@
     &.disabled {
       color: $neutral-400;
     }
-
-    &:hover {
-      color: $primary-600;
-    }
   }
 
   .upvoted {
@@ -58,10 +62,6 @@
 
     &.disabled {
       color: $neutral-400;
-    }
-
-    &:hover {
-      color: $primary-600;
     }
   }
 }
