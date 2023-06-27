@@ -9,6 +9,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn('Threads', 'discordMeta');
+    await queryInterface.removeColumn('Threads', 'discord_meta');
   },
 };
