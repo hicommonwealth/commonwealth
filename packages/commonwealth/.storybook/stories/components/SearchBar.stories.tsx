@@ -13,7 +13,8 @@ type Story = StoryObj<typeof searchbar>;
 
 export const SearchBar: Story = {
   args: {
-    placeholder: 'Search Common'
+    placeholder: 'Search Common',
+    disabled: false,
   },
   parameters: {
     controls: {

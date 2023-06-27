@@ -41,6 +41,7 @@ import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { CWSearchBar } from './new_designs/cw_search_bar';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -156,6 +157,7 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
+      <CWSearchBar placeholder="Search Common" />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
@@ -466,7 +468,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Primary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -478,13 +480,13 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Primary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
@@ -496,7 +498,7 @@ export const ComponentShowcase = () => {
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default disabled w/ left icon"
             disabled
@@ -512,7 +514,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Secondary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -524,32 +526,32 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Secondary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="secondary"
             label="Secondary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            buttonType='secondary'
+            buttonType="secondary"
             label="Secondary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             label="Secondary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Tertiary</CWText>
+          <CWText type="h4">Tertiary</CWText>
           <CWButton
             buttonType="tertiary"
             label="Tertiary default"
@@ -557,7 +559,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="tertiary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Tertiary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -595,7 +597,7 @@ export const ComponentShowcase = () => {
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Destructive</CWText>
+          <CWText type="h4">Destructive</CWText>
           <CWButton
             buttonType="destructive"
             label="Destructive default"
@@ -603,7 +605,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="destructive"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Destructive large"
             onClick={() => notifySuccess('Button clicked!')}
           />

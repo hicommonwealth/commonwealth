@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { MagnifyingGlass } from '@phosphor-icons/react';
+import React, { FC, useState } from 'react';
+import { MagnifyingGlass, X } from '@phosphor-icons/react';
 
 import { ComponentType } from './../types';
 
-import 'components/component_kit/cw_search_bar.scss';
+import 'components/component_kit/new_designs/cw_search_bar.scss';
 import { IconName } from '../cw_icons/cw_icon_lookup';
 import { getClasses } from '../helpers';
 import { ValidationStatus } from '../cw_validation_text';
+import { CWText } from '../cw_text';
 
 type BaseSearchBarProps = {
   autoComplete?: string;
@@ -33,6 +34,7 @@ type InputStyleProps = {
   inputClassName?: string;
   // darkMode?: boolean;
   disabled?: boolean;
+  withTag?: boolean;
   // size?: TextInputSize;
   // validationStatus?: ValidationStatus;
   displayOnly?: boolean;
@@ -48,8 +50,24 @@ type SearchBarProps = BaseSearchBarProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement>;
 
+type TagProps = {
+  communityName: string;
+};
+const Tag: FC<TagProps> = ({ communityName }) => {
+  return (
+    <div className="tag">
+      <div>(-)</div>
+      <CWText type="b2" fontWeight="regular">
+        {communityName}
+      </CWText>
+      <X size={16} color="#656167" />
+    </div>
+  );
+};
+
 export const CWSearchBar = (props: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [tag, setTags] = useState<boolean>(true);
 
   const {
     autoComplete = 'off',
@@ -58,6 +76,7 @@ export const CWSearchBar = (props: SearchBarProps) => {
     defaultValue,
     value,
     disabled,
+    withTag,
     iconLeftonClick,
     inputClassName,
     inputValidationFn,
@@ -84,11 +103,12 @@ export const CWSearchBar = (props: SearchBarProps) => {
       <div className="magnifyingGlass">
         <MagnifyingGlass color="#A09DA1" weight="regular" size={24} />
       </div>
+      {tag && <Tag communityName="Community Name" />}
       <input
         className={getClasses<InputStyleProps & InputInternalStyleProps>(
           {
             disabled,
-            // hasLeftIcon: !!iconLeft,
+            withTag: tag ? withTag : null,
             inputClassName,
           },
           ComponentType.SearchBar
@@ -96,6 +116,7 @@ export const CWSearchBar = (props: SearchBarProps) => {
         placeholder={placeholder}
         value={searchTerm}
         onChange={handleInputChange}
+        disabled={disabled}
       />
     </div>
   );
