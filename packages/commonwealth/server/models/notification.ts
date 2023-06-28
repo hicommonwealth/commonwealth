@@ -12,6 +12,10 @@ export type NotificationAttributes = {
   created_at?: Date;
   updated_at?: Date;
   thread_id?: number;
+  user_id?: number;
+  parent_comment_id?: number;
+  comment_id?: number;
+  snapshot_id?: number;
 };
 
 export type NotificationInstance = ModelInstance<NotificationAttributes> & {};
@@ -32,13 +36,25 @@ export default (
       chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
       category_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      user_id: { type: dataTypes.INTEGER, allowNull: true },
+      parent_comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      snapshot_id: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'Notifications',
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['chain_event_id'], prefix: 'new' }],
+      indexes: [
+        { fields: ['chain_event_id'], prefix: 'new', unique: true },
+        {
+          fields: ['category_id', 'chain_id'],
+          name: 'notifications_chain_category',
+        },
+        { fields: ['comment_id'], name: 'notifications_comment_id' },
+        { fields: ['thread_id'], name: 'notifications_thread_id' },
+      ],
     }
   );
 

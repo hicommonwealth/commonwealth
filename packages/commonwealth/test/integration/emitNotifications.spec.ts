@@ -5,7 +5,7 @@ import * as modelUtils from '../util/modelUtils';
 import { JoinCommunityArgs } from '../util/modelUtils';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../../server/config';
-import emitNotifications from '../../server/util/emitNotifications';
+import emitNotifications from '../../server/util/emitNotifications/emitNotifications';
 import models from '../../server/database';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import {

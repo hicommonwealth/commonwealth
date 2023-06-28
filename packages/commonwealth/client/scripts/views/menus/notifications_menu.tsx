@@ -62,18 +62,6 @@ export const NotificationsMenu = () => {
           }}
         />
         <CWDivider isVertical />
-        <CWButton
-          label="Mark all read"
-          buttonType="tertiary-black"
-          onClick={(e) => {
-            e.preventDefault();
-
-            if (mostRecentFirst.length < 1) return;
-
-            app.user.notifications.markAsRead(mostRecentFirst);
-            setAllRead(true);
-          }}
-        />
       </div>
     </div>
   );
@@ -85,20 +73,13 @@ export const NotificationsMenuPopover = () => {
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
       <div>
-        {app.user.notifications.numUnread > 0 ? (
-          <div className="unreads-icon">
-            <CWCustomIcon
-              iconName="unreads"
-              onClick={popoverProps.handleInteraction}
-            />
-          </div>
-        ) : (
+        {
           <CWIconButton
             iconButtonTheme="black"
             iconName="bell"
             onClick={popoverProps.handleInteraction}
           />
-        )}
+        }
         <Popover content={<NotificationsMenu />} {...popoverProps} />
       </div>
     </ClickAwayListener>

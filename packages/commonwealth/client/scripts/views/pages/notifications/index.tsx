@@ -31,8 +31,6 @@ const NotificationsPage = () => {
           label="Mark all as read"
           onClick={(e) => {
             e.preventDefault();
-            app.user.notifications.markAsRead(mostRecentFirst);
-            setAllRead(true);
           }}
         />
         <CWButton
@@ -60,7 +58,7 @@ const NotificationsPage = () => {
                 key={i}
                 notification={data}
                 onListPage
-                allRead={allRead}
+                allRead={true}
               />
             )}
           />

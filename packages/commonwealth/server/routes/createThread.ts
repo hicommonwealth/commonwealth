@@ -16,7 +16,7 @@ import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import type BanCache from '../util/banCheckCache';
-import emitNotifications from '../util/emitNotifications';
+import emitNotifications from '../util/emitNotifications/emitNotifications';
 import { parseUserMentions } from '../util/parseUserMentions';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';

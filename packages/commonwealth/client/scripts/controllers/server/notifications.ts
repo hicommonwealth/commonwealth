@@ -2,7 +2,9 @@
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import NotificationSubscription, { modelFromServer } from 'models/NotificationSubscription';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
 
 import app from 'state';
 
@@ -47,25 +49,11 @@ class NotificationsController {
   // notification settings page
   private _chainEventSubscribedChainIds: string[] = [];
 
-  private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
-  private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
-
-  private _numPages = 0;
-  private _numUnread = 0;
-
   public isLoaded = new EventEmitter();
   public isUpdated = new EventEmitter();
 
   public get chainEventSubscribedChainIds(): string[] {
     return this._chainEventSubscribedChainIds;
-  }
-
-  public get numPages(): number {
-    return this._numPages;
-  }
-
-  public get numUnread(): number {
-    return this._numUnread;
   }
 
   public get discussionNotifications(): Notification[] {
@@ -200,39 +188,6 @@ class NotificationsController {
     );
   }
 
-  public markAsRead(notifications: Notification[]) {
-    // TODO: Change to PUT /notificationsRead
-    const MAX_NOTIFICATIONS_READ = 100; // mark up to 100 notifications read at a time
-    const unreadNotifications = notifications.filter((notif) => !notif.isRead);
-    if (unreadNotifications.length === 0)
-      return $.Deferred().resolve().promise();
-    return post(
-      '/markNotificationsRead',
-      {
-        'notification_ids[]': unreadNotifications
-          .slice(0, MAX_NOTIFICATIONS_READ)
-          .map((n) => n.id),
-      },
-      () => {
-        for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
-          n.markRead();
-        }
-        if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
-          this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
-        }
-      }
-    );
-  }
-
-  public clearAllRead() {
-    return post('/clearReadNotifications', {}, () => {
-      const toClear = this.allNotifications.filter((n) => n.isRead);
-      for (const n of toClear) {
-        this.removeFromStore(n);
-      }
-    });
-  }
-
   public clear() {
     this._discussionStore.clear();
     this._chainEventStore.clear();
@@ -309,13 +264,8 @@ class NotificationsController {
       ? { chain_filter: app.activeChainId(), maxId: undefined }
       : { chain_filter: undefined, maxId: undefined };
 
-    if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
-      options.maxId = this._maxChainEventNotificationId;
-
     return post('/viewChainEventNotifications', options, (result) => {
-      this._numPages = result.numPages;
-      this._numUnread = result.numUnread;
-      this.parseNotifications(result.subscriptions);
+      this.parseNotifications(result.notifications);
       this.sortNotificationsStore('chain-events');
     });
   }
@@ -328,53 +278,35 @@ class NotificationsController {
       ? { chain_filter: app.activeChainId(), maxId: undefined }
       : { chain_filter: undefined, maxId: undefined };
 
-    if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)
-      options.maxId = this._maxDiscussionNotificationId;
-
     return post('/viewDiscussionNotifications', options, (result) => {
-      this._numPages = result.numPages;
-      this._numUnread = result.numUnread;
-      this.parseNotifications(result.subscriptions);
+      this.parseNotifications(result.notifications);
       this.sortNotificationsStore('discussion');
     });
   }
 
-  private parseNotifications(subscriptions) {
-    const ceSubs = [];
-
-    for (const subscriptionJSON of subscriptions) {
-      const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
-
-      // save the notification read + notification instances if any
-      for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
-        const data = {
-          is_read: notificationsReadJSON.is_read,
-          ...notificationsReadJSON.Notification,
-        };
-        const notification = Notification.fromJSON(data, subscription);
-
-        if (subscription.category === 'chain-event') {
-          if (!this._chainEventStore.getById(notification.id))
-            this._chainEventStore.add(notification);
-          // the minimum id is the new max id for next page
-          if (notificationsReadJSON.id < this._maxChainEventNotificationId) {
-            this._maxChainEventNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1)
-              this._maxChainEventNotificationId = 0;
-          }
-        } else {
-          if (!this._discussionStore.getById(notification.id))
-            this._discussionStore.add(notification);
-          if (notificationsReadJSON.id < this._maxDiscussionNotificationId) {
-            this._maxDiscussionNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1)
-              this._maxDiscussionNotificationId = 0;
-          }
-        }
+  private parseNotifications(notifications) {
+    const subscriptionStore = {};
+    for (const rawNotif of notifications) {
+      // only create NotificationSubscriptions that have not yet been created
+      if (!subscriptionStore[rawNotif.id]) {
+        const subscription = NotificationSubscription.fromJSON(rawNotif);
+        subscriptionStore[subscription.id] = subscription;
       }
-      if (subscription.category === 'chain-event') ceSubs.push(subscription);
+
+      const notification = Notification.fromJSON(
+        rawNotif,
+        subscriptionStore[rawNotif.id]
+      );
+
+      if (rawNotif.category === 'chain-event') {
+        this._chainEventStore.add(notification);
+        app.socket.chainEventsNs.addChainEventSubscriptions(
+          subscriptionStore[rawNotif.id]
+        );
+      } else {
+        this._discussionStore.add(notification);
+      }
     }
-    app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }
 
   public getSubscriptions() {

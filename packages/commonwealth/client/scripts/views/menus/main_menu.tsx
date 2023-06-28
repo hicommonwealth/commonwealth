@@ -33,7 +33,8 @@ export const getMainMenuItems = (
             iconLeft: 'bell',
             iconRight: 'chevronRight',
             type: 'notification',
-            hasUnreads: !!app.user?.notifications.numUnread,
+            // we temporarily will not support unread vs read notification functionality
+            hasUnreads: false,
             onClick: () => setMobileMenuName('NotificationsMenu'),
           },
         ]

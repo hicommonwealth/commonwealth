@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { StatsDController } from 'common-common/src/statsd';
 import type { Logger } from 'typescript-logging';
-import emitNotifications from '../../util/emitNotifications';
+import emitNotifications from '../../util/emitNotifications/emitNotifications';
 import type { SnapshotNotification } from '../../../shared/types';
 import { SnapshotEventType } from '../../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';

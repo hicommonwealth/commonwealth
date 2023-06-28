@@ -8,7 +8,7 @@ import type { ChainEventNotification } from 'types';
 import type { Logger } from 'typescript-logging';
 import type { DB } from '../../models';
 import type { NotificationInstance } from '../../models/notification';
-import emitNotifications from '../../util/emitNotifications';
+import emitNotifications from '../../util/emitNotifications/emitNotifications';
 
 export type Ithis = {
   models: DB;

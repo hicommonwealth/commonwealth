@@ -13,7 +13,7 @@ import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types'
 import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
-import emitNotifications from '../util/emitNotifications';
+import emitNotifications from '../util/emitNotifications/emitNotifications';
 import { findAllRoles } from '../util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';

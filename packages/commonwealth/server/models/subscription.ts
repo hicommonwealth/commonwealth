@@ -91,8 +91,11 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [
-        { fields: ['subscriber_id'] },
-        { fields: ['category_id', 'object_id', 'is_active'] },
+        { fields: ['subscriber_id'], name: 'subscriptions_subscriber_id' },
+        {
+          fields: ['category_id', 'object_id'],
+          name: 'subscriptions_chain_category',
+        },
         { fields: ['offchain_thread_id'] },
       ],
     }

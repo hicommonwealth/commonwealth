@@ -2,7 +2,7 @@ import { SENDGRID_API_KEY } from '../config';
 import { DB } from '../models';
 import emitNotifications, {
   NotificationDataTypes,
-} from '../util/emitNotifications';
+} from '../util/emitNotifications/emitNotifications';
 import { WebhookContent } from '../webhookNotifier';
 
 import sgMail from '@sendgrid/mail';

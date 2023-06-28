@@ -11,19 +11,10 @@ import {
 export type NotificationRowProps = {
   notification: Notification;
   onListPage?: boolean;
-  allRead: boolean;
 };
 
 export const NotificationRow = (props: NotificationRowProps) => {
-  const { notification, onListPage, allRead } = props;
-
-  const [markingRead, setMarkingRead] = React.useState<boolean>(false);
-
-  const handleSetMarkingRead = (isMarkingRead: boolean) => {
-    setMarkingRead(isMarkingRead);
-  };
-
-  useEffect(() => setMarkingRead(allRead), [allRead]);
+  const { notification, onListPage } = props;
 
   const { category } = notification.subscription;
 
@@ -35,22 +26,8 @@ export const NotificationRow = (props: NotificationRowProps) => {
       />
     );
   } else if (category === NotificationCategories.SnapshotProposal) {
-    return (
-      <SnapshotNotificationRow
-        notification={notification}
-        handleSetMarkingRead={handleSetMarkingRead}
-        markingRead={markingRead}
-        allRead={allRead}
-      />
-    );
+    return <SnapshotNotificationRow notification={notification} />;
   } else {
-    return (
-      <DefaultNotificationRow
-        notification={notification}
-        handleSetMarkingRead={handleSetMarkingRead}
-        markingRead={markingRead}
-        allRead={allRead}
-      />
-    );
+    return <DefaultNotificationRow notification={notification} />;
   }
 };

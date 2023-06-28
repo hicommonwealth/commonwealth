@@ -7,16 +7,16 @@ import type {
   IPostNotificationData,
   SnapshotEventType,
   SnapshotNotification,
-} from '../../shared/types';
-import { SERVER_URL } from '../config';
-import type { DB } from '../models';
-import type { NotificationInstance } from '../models/notification';
+} from 'types';
+import { SERVER_URL } from '../../config';
+import type { DB } from '../../models';
+import type { NotificationInstance } from '../../models/notification';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
-} from '../scripts/emails';
-import type { WebhookContent } from '../webhookNotifier';
-import send from '../webhookNotifier';
+} from '../../scripts/emails';
+import type { WebhookContent } from '../../webhookNotifier';
+import send from '../../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SupportedNetwork } from 'chain-events/src';
 
@@ -162,43 +162,6 @@ export default async function emitNotifications(
   } catch (e) {
     console.log('Error generating immediate notification email!');
     console.trace(e);
-  }
-
-  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id, id) VALUES `;
-  const replacements = [];
-  for (const subscription of subscriptions) {
-    if (subscription.subscriber_id) {
-      StatsDController.get().increment('cw.notifications.emitted', {
-        category_id,
-        object_id,
-        chain:
-          (notification_data as any).chain ||
-          (notification_data as any).chain_id,
-        subscriber: `${subscription.subscriber_id}`,
-      });
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `;
-      replacements.push(
-        notification.id,
-        subscription.id,
-        false,
-        subscription.subscriber_id,
-        subscription.subscriber_id
-      );
-    } else {
-      // TODO: rollbar reported issue originates from here
-      log.info(
-        `Subscription: ${JSON.stringify(
-          subscription.toJSON()
-        )}\nNotification_data: ${JSON.stringify(notification_data)}`
-      );
-    }
-  }
-  if (replacements.length > 0) {
-    query = query.slice(0, -2) + ';';
-    await models.sequelize.query(query, {
-      replacements,
-      type: QueryTypes.INSERT,
-    });
   }
 
   // send emails

@@ -12,7 +12,9 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
-import getAddressProfile, { getAddressProfileValidation } from '../routes/getAddressProfile';
+import getAddressProfile, {
+  getAddressProfileValidation,
+} from '../routes/getAddressProfile';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
@@ -47,7 +49,7 @@ import enableImmediateEmails from '../routes/subscription/enableImmediateEmails'
 import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
 import viewNotifications, {
   NotificationCategories,
-} from '../routes/viewNotifications';
+} from '../routes/viewNotifications/viewNotifications';
 import viewUserActivity from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
@@ -264,7 +266,11 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
-  router.post('/getAddressProfile', getAddressProfileValidation, getAddressProfile.bind(this, models));
+  router.post(
+    '/getAddressProfile',
+    getAddressProfileValidation,
+    getAddressProfile.bind(this, models)
+  );
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),

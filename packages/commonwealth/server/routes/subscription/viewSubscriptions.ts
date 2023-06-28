@@ -40,7 +40,7 @@ export default async (
     },
   ];
 
-  const searchParams: any[] = [{ subscriber_id: req.user.id }];
+  const searchParams: any[] = [{ subscriber_id: 6 }];
 
   const subscriptions = await models.Subscription.findAll({
     where: {

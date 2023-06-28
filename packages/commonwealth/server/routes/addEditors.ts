@@ -7,7 +7,7 @@ import { Op } from 'sequelize';
 import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import { failure } from '../types';
-import emitNotifications from '../util/emitNotifications';
+import emitNotifications from '../util/emitNotifications/emitNotifications';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',

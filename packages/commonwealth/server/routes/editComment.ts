@@ -10,7 +10,7 @@ import {
 } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
-import emitNotifications from '../util/emitNotifications';
+import emitNotifications from '../util/emitNotifications/emitNotifications';
 import { parseUserMentions } from '../util/parseUserMentions';
 
 export const Errors = {
