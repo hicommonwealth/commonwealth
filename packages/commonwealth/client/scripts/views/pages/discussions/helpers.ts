@@ -75,18 +75,20 @@ export const handleToggleSubscription = async (
 };
 
 export const getCommentSubscription = (thread: Thread) => {
-  return app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === thread.uniqueIdentifier &&
-      v.category === NotificationCategories.NewComment
+  return app.user.notifications.findSubscription(
+    NotificationCategories.NewComment,
+    {
+      threadId: thread.id,
+    }
   );
 };
 
 export const getReactionSubscription = (thread: Thread) => {
-  return app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === thread.uniqueIdentifier &&
-      v.category === NotificationCategories.NewReaction
+  return app.user.notifications.findSubscription(
+    NotificationCategories.NewReaction,
+    {
+      threadId: thread.id,
+    }
   );
 };
 

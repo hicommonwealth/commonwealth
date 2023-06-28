@@ -12,8 +12,8 @@ export default async (
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
-  if (!req.body.category || req.body.object_id === undefined) {
-    return next(new AppError(Errors.NoCategoryAndObjectId));
+  if (!req.body.category) {
+    return next(new AppError(Errors.NoCategory));
   }
 
   const category = await models.NotificationCategory.findOne({

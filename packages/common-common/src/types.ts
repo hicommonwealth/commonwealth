@@ -13,8 +13,6 @@ export const NotificationCategories = {
   ThreadEdit: 'thread-edit',
   CommentEdit: 'comment-edit',
   ChainEvent: 'chain-event',
-  EntityEvent: 'entity-event',
-  NewSnapshot: 'new-snapshot',
   SnapshotProposal: 'snapshot-proposal',
 };
 

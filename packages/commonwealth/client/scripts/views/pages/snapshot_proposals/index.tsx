@@ -24,9 +24,12 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     []
   );
 
-  const spaceSubscription = app.user.notifications.subscriptions.find((sub) => {
-    return sub.category === 'snapshot-proposal' && sub.objectId === snapshotId;
-  });
+  const spaceSubscription = app.user.notifications.findSubscription(
+    NotificationCategories.SnapshotProposal,
+    {
+      snapshotId,
+    }
+  );
 
   const [hasSubscription, setHasSubscription] = useState<boolean>(
     spaceSubscription !== undefined

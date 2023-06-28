@@ -5,7 +5,7 @@ import $ from 'jquery';
 import NotificationSubscription, {
   modelFromServer,
 } from 'models/NotificationSubscription';
-
+import { NotificationCategories } from 'common-common/src/types';
 import app from 'state';
 
 import { NotificationStore } from 'stores';
@@ -71,14 +71,23 @@ class NotificationsController {
   }
 
   private _subscriptions: NotificationSubscription[] = [];
+
   public get subscriptions() {
     return this._subscriptions;
   }
 
-  public subscribe(category: string, objectId: string) {
-    const subscription = this.subscriptions.find(
-      (v) => v.category === category && v.objectId === objectId
-    );
+  // TODO: @Timothee generalize this away from objectId
+  public subscribe(
+    category: string,
+    data: {
+      chainId?: string;
+      threadId?: number;
+      commentId?: number;
+      snapshotId?: string;
+    }
+  ) {
+    const subscription = this.findSubscription(category, data);
+
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
@@ -86,7 +95,6 @@ class NotificationsController {
         '/createSubscription',
         {
           category,
-          object_id: objectId,
           is_active: true,
         },
         (result) => {
@@ -333,6 +341,75 @@ class NotificationsController {
     ]);
     this.isLoaded.emit('redraw');
     return Promise.resolve();
+  }
+
+  public findSubscription(
+    categoryId: string,
+    data: {
+      chainId?: string;
+      threadId?: number;
+      commentId?: number;
+      snapshotId?: string;
+    }
+  ): NotificationSubscription {
+    if (
+      categoryId === NotificationCategories.ChainEvent ||
+      categoryId === NotificationCategories.NewThread
+    ) {
+      if (!data.chainId) {
+        console.error(
+          `Must provide the chain id to find a ${categoryId} subscription`
+        );
+        return;
+      }
+      return this._subscriptions.find(
+        (s) => s.category === categoryId && s.chainId === data.chainId
+      );
+    } else if (
+      categoryId === NotificationCategories.NewCollaboration ||
+      categoryId === NotificationCategories.NewMention
+    ) {
+      return this._subscriptions.find((s) => s.category === categoryId);
+    } else if (
+      categoryId === NotificationCategories.NewComment ||
+      categoryId === NotificationCategories.NewReaction
+    ) {
+      if ((!data.threadId && !data.commentId) || !data.chainId) {
+        console.error(
+          `Must provide a thread id or comment id and a chain id to find a ${categoryId} subscription`
+        );
+        return;
+      }
+      return this._subscriptions.find((s) => {
+        const commonCheck =
+          s.category === categoryId && s.chainId === data.chainId;
+        if (data.threadId) {
+          return (
+            commonCheck &&
+            (s.Thread.id === data.threadId ||
+              <number>(<unknown>s.Thread) === data.threadId)
+          );
+        } else {
+          return (
+            commonCheck &&
+            (s.Comment.id === data.commentId ||
+              <number>(<unknown>s.Comment) === data.commentId)
+          );
+        }
+      });
+    } else if (categoryId === NotificationCategories.SnapshotProposal) {
+      if (!data.snapshotId) {
+        console.error(
+          'Must provide a snapshot space id to find a snapshot-proposal subscription'
+        );
+        return;
+      }
+      return this._subscriptions.find(
+        (s) => s.category === categoryId && s.snapshotId === data.snapshotId
+      );
+    } else {
+      console.error('Searching for an unsupported subscription category!');
+    }
   }
 }
 

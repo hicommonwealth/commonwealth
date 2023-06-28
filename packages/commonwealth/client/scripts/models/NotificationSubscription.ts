@@ -9,11 +9,11 @@ import { Thread as ThreadT } from './Thread';
 
 class NotificationSubscription {
   public readonly category: string;
-  public readonly objectId: string;
   public readonly createdAt: moment.Moment;
   public readonly chainId: string;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
+  public readonly snapshotId: string;
 
   public readonly id?: number;
   public readonly chainEntityId?: any;
@@ -47,36 +47,36 @@ class NotificationSubscription {
   constructor(
     id,
     category,
-    objectId,
     isActive,
     createdAt,
     immediateEmail,
     chainId?,
     comment?: CommentT<IUniqueId>,
-    thread?: ThreadT
+    thread?: ThreadT,
+    snapshotId?: string
   ) {
     this.id = id;
     this.category = category;
-    this.objectId = objectId;
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.chainId = chainId;
     this.Comment = comment;
     this.Thread = thread;
+    this.snapshotId = snapshotId;
   }
 
   public static fromJSON(json) {
     return new NotificationSubscription(
       json.id,
       json.category_id,
-      json.object_id,
       json.is_active,
       json.created_at,
       json.immediate_email,
       json.chain_id,
       json.Comment || json.offchain_comment_id,
-      json.Thread || json.offchain_thread_id
+      json.Thread || json.offchain_thread_id,
+      json.snapshot_id
     );
   }
 }
@@ -85,13 +85,13 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
   const {
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,
     Chain,
     Comment,
     Thread,
+    snapshot_id,
   } = subscription;
 
   let modeledThread: ThreadT;
@@ -117,13 +117,13 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
   return new NotificationSubscription(
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,
     Chain?.id || Chain,
     modeledComment,
-    modeledThread
+    modeledThread,
+    snapshot_id
   );
 };
 
