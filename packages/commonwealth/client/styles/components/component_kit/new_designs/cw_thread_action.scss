@@ -6,21 +6,21 @@
   padding: 4px 8px;
   align-items: center;
   gap: 4px;
-
   width: fit-content;
-  
   color: $neutral-500;
-  // &.default {
-    //   color: $neutral-500;
-    // }
-    
-  &.hover {
-    background-color: $neutral-100;
-    color: $neutral-600;
-  }
-  
-  &.disabled {
-    color: $neutral-400;
-    background-color: inherit;
-  }
+}
+
+.default {
+  color: $neutral-500;
+}
+
+.hover {
+  background-color: $neutral-100;
+  color: $neutral-600;
+  cursor: pointer;
+}
+
+.disabled {
+  color: $neutral-400;
+  background-color: inherit;
 }

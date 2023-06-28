@@ -9,13 +9,40 @@ import {
 
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
 
-// type CWThreadActionStyleProps = {
-//   disabled?: boolean;
-//   isHovering?: boolean;
-// };
+const commonProps = (disabled: boolean, isHovering: boolean) => {
+  return {
+    className: getClasses({
+      disabled,
+      hover: isHovering,
+    }),
+    size: '20px',
+  };
+};
+
+const renderPhosphorIcon = (
+  label: string,
+  disabled: boolean,
+  isHovering: boolean
+) => {
+  switch (label) {
+    case 'comment':
+      return <ChatCenteredDots {...commonProps(disabled, isHovering)} />;
+    case 'share':
+      return <ArrowBendUpRight {...commonProps(disabled, isHovering)} />;
+    case 'subscribe':
+      return <BellSimple {...commonProps(disabled, isHovering)} />;
+    case 'upvote':
+      return <ArrowFatUp {...commonProps(disabled, isHovering)} />;
+    case 'overflow':
+      return <DotsThree {...commonProps(disabled, isHovering)} />;
+    default:
+      return null;
+  }
+};
 
 type CWThreadActionProps = {
   disabled?: boolean;
@@ -31,7 +58,6 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
   const handleOnMouseOver = () => {
-    console.log('is hovering...');
     if (!disabled) {
       setIsHovering(true);
     }
@@ -39,28 +65,30 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
 
   const handleOnMouseLeave = () => setIsHovering(false);
 
-  const getIconColor = () => {
-    return disabled ? '#A09DA1' : isHovering ? '#514E52' : '#656167';
-  };
-
   return (
     <div
-      className="ThreadAction"
+      className={getClasses(
+        {
+          disabled,
+          hover: isHovering,
+        },
+        ComponentType.ThreadAction
+      )}
       onMouseOver={handleOnMouseOver}
       onMouseLeave={handleOnMouseLeave}
     >
-      <ChatCenteredDots color={getIconColor()} />
-      {label && (
+      {renderPhosphorIcon(label, disabled, isHovering)}
+      {label !== 'overflow' && (label || count) && (
         <CWText
-          // return the key if value is bool, otherwise return value
           className={getClasses({
             disabled,
-            hover: isHovering ? 'hover' : '',
+            hover: isHovering,
+            default: !isHovering,
           })}
           type="caption"
           fontWeight="regular"
         >
-          {label}
+          {count ? count : label}
         </CWText>
       )}
     </div>

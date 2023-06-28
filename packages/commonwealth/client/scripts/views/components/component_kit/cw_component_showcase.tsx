@@ -157,15 +157,17 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
-      <CWThreadAction label="Comment" />
-      <CWThreadAction label="Share" />
-      <CWThreadAction label="Subscribe" />
-      <CWThreadAction label="1" />
+      <CWThreadAction label="comment" />
+      <CWThreadAction label="share" />
+      <CWThreadAction label="subscribe" />
+      <CWThreadAction label="upvote" count={1} />
+      <CWThreadAction label="overflow" />
       <CWThreadAction />
-      <CWThreadAction label="Comment" disabled />
-      <CWThreadAction label="Share" disabled />
-      <CWThreadAction label="Subscribe" disabled />
-      <CWThreadAction label="1" disabled />
+      <CWThreadAction label="comment" disabled />
+      <CWThreadAction label="share" disabled />
+      <CWThreadAction label="subscribe" disabled />
+      <CWThreadAction label="upvote" count={1} disabled />
+      <CWThreadAction label="overflow" disabled />
       <CWThreadAction disabled />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
