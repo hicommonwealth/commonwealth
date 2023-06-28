@@ -157,9 +157,6 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
-      <CWUpvote voteCount={8887} />
-      <CWUpvote voteCount={8887} active />
-      <CWUpvote voteCount={8887} disabled />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
@@ -942,6 +939,21 @@ export const ComponentShowcase = () => {
           <CWText fontWeight="semiBold">Card title</CWText>
           <CWText>Full width</CWText>
         </CWCard>
+      </div>
+      <div className="upvote-gallery">
+        <CWText type="h3">Upvote</CWText>
+        <div className="upvote-row">
+          <CWText>Default</CWText>
+          <CWUpvote voteCount={8887} />
+        </div>
+        <div className="upvote-row">
+          <CWText>Active</CWText>
+          <CWUpvote voteCount={8887} active />
+        </div>
+        <div className="upvote-row">
+          <CWText>Disabled</CWText>
+          <CWUpvote voteCount={8887} disabled />
+        </div>
       </div>
     </div>
   );
