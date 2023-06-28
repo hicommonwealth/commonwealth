@@ -944,7 +944,7 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Upvote</CWText>
         <div className="upvote-row">
           <CWText>Default</CWText>
-          <CWUpvote voteCount={8887} />
+          <CWUpvote voteCount={87} />
         </div>
         <div className="upvote-row">
           <CWText>Active</CWText>
@@ -952,7 +952,7 @@ export const ComponentShowcase = () => {
         </div>
         <div className="upvote-row">
           <CWText>Disabled</CWText>
-          <CWUpvote voteCount={8887} disabled />
+          <CWUpvote voteCount={99999} disabled />
         </div>
       </div>
     </div>

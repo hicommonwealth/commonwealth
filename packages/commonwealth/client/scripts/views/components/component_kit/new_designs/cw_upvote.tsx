@@ -3,6 +3,7 @@ import { ArrowFatUp } from '@phosphor-icons/react';
 
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
+import { formatNumberShort } from 'adapters/currency';
 
 import 'components/component_kit/new_designs/cw_upvote.scss';
 import { ComponentType } from '../types';
@@ -11,7 +12,6 @@ type CWUpvoteProps = {
   voteCount: number;
   active?: boolean;
   disabled?: boolean;
-  propsUpvoted?: boolean;
 };
 
 export const CWUpvote: FC<CWUpvoteProps> = ({
@@ -82,7 +82,7 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
         type="caption"
         fontWeight={upvoted ? 'bold' : 'regular'}
       >
-        {count}
+        {formatNumberShort(count)}
       </CWText>
     </button>
   );
