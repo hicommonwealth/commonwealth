@@ -11,8 +11,10 @@ import { DashboardCommunitiesPreview } from '../user_dashboard/dashboard_communi
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 
 import { CardCarousel } from './CardCarousel';
-import { Divide } from '@phosphor-icons/react';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+
+import { SnapshotProposal } from 'helpers/snapshot_utils';
+import moment from 'moment';
 
 const FeedPage = () => {
   const [error, setError] = useState(null);
@@ -61,6 +63,38 @@ const FeedPage = () => {
     return sortedFeed;
   };
 
+  const fetchActiveProposals = async () => {
+    const snapshotSpaces = app.chain.meta.snapshot;
+    if (snapshotSpaces?.length > 0) {
+      // Create a new array to store all active proposals across all spaces
+      let allActiveProposals = [];
+
+      // Loop over each snapshot space
+      for (const space of snapshotSpaces) {
+        // Initialize the snapshot for the current space
+        await app.snapshot.init(space);
+
+        if (app.snapshot.initialized) {
+          // Fetch the active proposals for the current space
+          const activeProposals = app.snapshot.proposals.filter(
+            (proposal: SnapshotProposal) =>
+              moment(+proposal.end * 1000) >= moment()
+          );
+
+          // Add the active proposals for the current space to the array of all active proposals
+          allActiveProposals = [...allActiveProposals, ...activeProposals];
+        }
+      }
+
+      // Update the state with all active proposals across all spaces
+      return allActiveProposals;
+    }
+  };
+
+  useEffect(() => {
+    fetchActiveProposals();
+  }, []);
+
   if (!app.chain.meta.hasHomepage) {
     return (
       <ErrorPage message="The Homepage feature has not been enabled for this community." />
@@ -78,7 +112,9 @@ const FeedPage = () => {
           <CWText type="h3" fontWeight="semiBold">
             Home
           </CWText>
-          <CardCarousel />
+          {app.chain.meta.snapshot.length > 0 && (
+            <CardCarousel fetchActiveProposals={fetchActiveProposals} />
+          )}
           <CWDivider />
           <div className="feed-tabs">
             <CWTabBar>

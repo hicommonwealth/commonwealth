@@ -9,52 +9,23 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from 'views/components/component_kit/helpers';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
-const sampleProposals = [
-  {
-    snapshotId: '1',
-    proposal: {
-      id: '1',
-      end: Date.now() / 1000 + 1000,
-      ipfs: 'QmWaNJd84hUabMmXQpLJ9fYd9KUqSH5hXx4bg2Cf1iD3Fv',
-      title: 'Proposal 1',
-    },
-  },
-  {
-    snapshotId: '2',
-    proposal: {
-      id: '2',
-      end: Date.now() / 1000 + 2000,
-      ipfs: 'QmWaNJd84hUabMmXQpLJ9fYd9KUqSH5hXx4bg2Cf1iD3Fv',
-      title: 'Proposal 2',
-    },
-  },
-  {
-    snapshotId: '3',
-    proposal: {
-      id: '3',
-      end: Date.now() / 1000 + 3000,
-      ipfs: 'QmWaNJd84hUabMmXQpLJ9fYd9KUqSH5hXx4bg2Cf1iD3Fv',
-      title: 'Proposal 3',
-    },
-  },
-  {
-    snapshotId: '4',
-    proposal: {
-      id: '4',
-      end: Date.now() / 1000 + 3000,
-      ipfs: 'QmWaNJd84hUabMmXQpLJ9fYd9KUqSH5hXx4bg2Cf1iD3Fv',
-      title: 'Proposal 3',
-    },
-  },
-];
-
-export const CardCarousel = () => {
+export const CardCarousel = ({ fetchActiveProposals }) => {
   const [currentProposalsIdx, setCurrentProposalsIdx] = useState(0);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [cardsPosition, setCardsPosition] = useState(0);
+  const [activeProposals, setActiveProposals] = useState<
+    Array<SnapshotProposal>
+  >([]);
+
+  useEffect(() => {
+    fetchActiveProposals().then((fetchedActiveProposals) => {
+      setActiveProposals(fetchedActiveProposals);
+    });
+  }, [fetchActiveProposals]);
 
   const proposalCardsRowRef = useRef(null);
   const cardCarouselRef = useRef(null);
@@ -105,8 +76,8 @@ export const CardCarousel = () => {
 
   useEffect(() => {
     setShowLeftArrow(currentProposalsIdx > 0);
-    setShowRightArrow(currentProposalsIdx + 3 < sampleProposals.length);
-  }, [currentProposalsIdx, sampleProposals.length]);
+    setShowRightArrow(currentProposalsIdx + 3 < activeProposals.length);
+  }, [currentProposalsIdx, activeProposals.length]);
 
   const moveLeft = () => {
     if (currentProposalsIdx > 0) {
@@ -116,11 +87,13 @@ export const CardCarousel = () => {
   };
 
   const moveRight = () => {
-    if (currentProposalsIdx + 3 < sampleProposals.length) {
+    if (currentProposalsIdx + 3 < activeProposals.length) {
       setCurrentProposalsIdx(currentProposalsIdx + 1);
       setCardsPosition(cardsPosition - 50);
     }
   };
+
+  console.log('activeProposals', activeProposals);
 
   return (
     <div
@@ -131,13 +104,13 @@ export const CardCarousel = () => {
         className="proposal-cards-row"
         style={{ transform: `translateX(${cardsPosition}%)` }}
       >
-        {sampleProposals
+        {activeProposals
           .slice(currentProposalsIdx, currentProposalsIdx + 3)
           .map((proposalData, index) => (
             <SnapshotProposalCard
               key={index}
-              snapshotId={proposalData.snapshotId}
-              proposal={proposalData.proposal}
+              snapshotId={proposalData.snapshot}
+              proposal={proposalData}
             />
           ))}
       </div>
