@@ -18,6 +18,7 @@ import {
 import type { WebhookContent } from '../../webhookNotifier';
 import send from '../../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { filterAddresses } from './util';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -37,80 +38,47 @@ export default async function emitNotifications(
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
+  const chain_id =
+    (notification_data as any).chain || (notification_data as any).chain_id;
   // get subscribers to send notifications to
   StatsDController.get().increment('cw.notifications.created', {
     category_id,
     object_id,
-    chain:
-      (notification_data as any).chain || (notification_data as any).chain_id,
+    chain: chain_id,
   });
-  const findOptions: any = {
+  let subFindOptions: any = {
     [Op.and]: [{ category_id }, { object_id }, { is_active: true }],
   };
-
-  // retrieve distinct user ids given a set of addresses
-  const fetchUsersFromAddresses = async (
-    addresses: string[]
-  ): Promise<number[]> => {
-    // fetch user ids from address models
-    const addressModels = await models.Address.findAll({
-      where: {
-        address: {
-          [Op.in]: addresses,
-        },
-      },
-    });
-    if (addressModels && addressModels.length > 0) {
-      const userIds = addressModels.map((a) => a.user_id);
-
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
-      return userIdsDedup;
-    } else {
-      return [];
-    }
-  };
-
-  // currently excludes override includes, but we may want to provide the option for both
-  if (excludeAddresses && excludeAddresses.length > 0) {
-    const ids = await fetchUsersFromAddresses(excludeAddresses);
-    if (ids && ids.length > 0) {
-      findOptions[Op.and].push({ subscriber_id: { [Op.notIn]: ids } });
-    }
-  } else if (includeAddresses && includeAddresses.length > 0) {
-    const ids = await fetchUsersFromAddresses(includeAddresses);
-    if (ids && ids.length > 0) {
-      findOptions[Op.and].push({ subscriber_id: { [Op.in]: ids } });
-    }
-  }
-
-  // get all relevant subscriptions
+  subFindOptions = await filterAddresses(
+    models,
+    subFindOptions,
+    includeAddresses,
+    excludeAddresses
+  );
   const subscriptions = await models.Subscription.findAll({
-    where: findOptions,
-    include: models.User,
+    where: subFindOptions,
+    include: [
+      {
+        model: models.User,
+        required: true,
+      },
+    ],
   });
 
   // get notification if it already exists
-  let notification: NotificationInstance;
-  notification = await models.Notification.findOne({
+  const [notification, created] = await models.Notification.findOrCreate({
     where: {
       notification_data: JSON.stringify(notification_data),
     },
-  });
-
-  // if the notification does not yet exist create it here
-  if (!notification) {
-    notification = await models.Notification.create({
+    defaults: {
       notification_data: JSON.stringify(notification_data),
       category_id,
-      chain_id:
-        (<IPostNotificationData>notification_data).chain_id ||
-        (<ICommunityNotificationData>notification_data).chain,
+      chain_id,
       thread_id:
         Number((<IPostNotificationData>notification_data).thread_id) ||
         undefined,
-    });
-  }
+    },
+  });
 
   let msg;
   try {
@@ -127,10 +95,11 @@ export default async function emitNotifications(
   }
 
   // send emails
-  for (const subscription of subscriptions) {
-    if (msg && subscription?.immediate_email && subscription?.User) {
-      // kick off async call and immediately return
-      sendImmediateNotificationEmail(subscription.User, msg);
+  if (msg) {
+    for (const subscription of subscriptions) {
+      if (subscription?.immediate_email) {
+        sendImmediateNotificationEmail(subscription.User, msg);
+      }
     }
   }
 

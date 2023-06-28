@@ -27,7 +27,6 @@ export async function processChainEventNotificationsCUD(
     // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
     dbNotification = await emitChainEventNotification(
       this.models,
-      data.ChainEvent.chain,
       chainEvent,
       data.event.excludeAddresses,
       data.event.includeAddresses
