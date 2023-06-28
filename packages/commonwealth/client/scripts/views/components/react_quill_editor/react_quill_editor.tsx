@@ -23,6 +23,7 @@ import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useImageUploader } from './use_image_uploader';
 import { RangeStatic } from 'quill';
 import { convertTwitterLinksToEmbeds } from './twitter_embed';
+import clsx from 'clsx';
 
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register('modules/imageUploader', ImageUploader);
@@ -214,7 +215,9 @@ const ReactQuillEditor = ({
             onFocus={(p) => console.log('focused?', { p })}
             onBlur={(p) => console.log('blurred', { p })}
             ref={editorRef}
-            className={`QuillEditor ${className}`}
+            className={clsx('QuillEditor', className, {
+              markdownEnabled: isMarkdownEnabled,
+            })}
             placeholder={placeholder}
             tabIndex={tabIndex}
             theme="snow"

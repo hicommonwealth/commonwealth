@@ -47,3 +47,9 @@
     url('neue-haas-unica-medium.woff') format('woff'),
     url('neue-haas-unica-medium.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: 'DM Mono';
+  font-weight: 300;
+  src: url('DMMono-Regular.ttf') format('truetype');
+}

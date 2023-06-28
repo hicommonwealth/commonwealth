@@ -73,6 +73,12 @@
   //  box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
   //}
 
+  .markdownEnabled {
+    .ql-container {
+      font-family: $font-family-monospace;
+    }
+  }
+
   .ql-container {
     min-height: 212px;
     max-height: 512px;

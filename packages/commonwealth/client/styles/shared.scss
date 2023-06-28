@@ -30,7 +30,7 @@ $font-family-silka: Silka, sans-serif;
 $font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 
-$font-family-monospace: dm-mono;
+$font-family-monospace: 'DM Mono', monospace;
 
 @mixin visibleScrollbar($theme) {
   &::-webkit-scrollbar {
