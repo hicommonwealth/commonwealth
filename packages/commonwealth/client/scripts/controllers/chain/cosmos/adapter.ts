@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import $ from 'jquery';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
@@ -11,6 +11,7 @@ import CosmosChain from './chain';
 import CosmosGovernance from './gov/v1beta1/governance-v1beta1';
 import CosmosGovernanceV1 from './gov/v1/governance-v1';
 import type { CosmosToken } from './types';
+import { getAddressForChainFromKeplr } from 'helpers/wallet';
 
 class Cosmos
   extends IChainAdapter<CosmosToken, CosmosAccount>
@@ -61,12 +62,25 @@ class Cosmos
     if (!activeAddress) return false;
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
+    const chainId = account.chain.id;
+    const userAddress = this.app.user.addresses.find(
+      (a) => a.address === activeAddress
+    );
+    const walletId = userAddress?.walletId;
+    let address = account.address;
+
+    if (
+      (walletId === WalletId.Keplr || walletId === WalletId.KeplrEthereum) &&
+      chainId !== ChainNetwork.Terra
+    ) {
+      address = await getAddressForChainFromKeplr(account);
+    }
 
     try {
       const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
         chain: this.meta.id,
-        address: account.address,
-        author_chain: account.chain.id,
+        address,
+        author_chain: chainId,
       });
       if (balanceResp.result) {
         const balance = new BN(balanceResp.result, 10);

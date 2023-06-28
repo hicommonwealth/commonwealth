@@ -1,6 +1,7 @@
 import IWebWallet from '../models/IWebWallet';
 import Near from '../controllers/chain/near/adapter';
 import axios from 'axios';
+import Account from 'models/Account';
 
 const getAddressFromWallet = (wallet: IWebWallet<any>) => {
   const selectedAddress = (() => {
@@ -67,4 +68,24 @@ const loginToNear = async (activeChain: Near, isCustomDomain: boolean) => {
   });
 };
 
-export { getAddressFromWallet, loginToAxie, loginToNear };
+/**
+  Returns bech32 address for the currently selected chain.
+  In Cosmos, we can check the native chain by selecting the correct address from Keplr,
+  even if using a different cosmos chain to log in.
+*/
+const getAddressForChainFromKeplr = async (
+  account: Account
+): Promise<string> => {
+  const cosm = await import('@cosmjs/stargate');
+  const client = await cosm.StargateClient.connect(account.chain.ChainNode.url);
+  const chainId = await client.getChainId();
+  const accountForChain = await window.keplr.getKey(chainId);
+  return accountForChain?.bech32Address;
+};
+
+export {
+  getAddressFromWallet,
+  loginToAxie,
+  loginToNear,
+  getAddressForChainFromKeplr,
+};
