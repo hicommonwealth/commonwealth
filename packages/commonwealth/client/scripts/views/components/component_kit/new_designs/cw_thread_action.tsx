@@ -13,6 +13,13 @@ import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
 
+export type ActionType =
+  | 'comment'
+  | 'share'
+  | 'subscribe'
+  | 'upvote'
+  | 'overflow';
+
 const commonProps = (disabled: boolean, isHovering: boolean) => {
   return {
     className: getClasses({
@@ -24,7 +31,7 @@ const commonProps = (disabled: boolean, isHovering: boolean) => {
 };
 
 const renderPhosphorIcon = (
-  label: string,
+  label: ActionType,
   disabled: boolean,
   isHovering: boolean
 ) => {
@@ -46,7 +53,7 @@ const renderPhosphorIcon = (
 
 type CWThreadActionProps = {
   disabled?: boolean;
-  label?: string;
+  label?: ActionType;
   count?: number;
 };
 
@@ -88,7 +95,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           type="caption"
           fontWeight="regular"
         >
-          {count ? count : label}
+          {count ? count : label.charAt(0).toUpperCase() + label.slice(1)}
         </CWText>
       )}
     </div>
