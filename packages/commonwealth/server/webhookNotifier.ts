@@ -18,12 +18,11 @@ export interface WebhookContent {
   body?: string;
   community?: string;
   author_chain?: string;
-  title: string;
+  title?: string;
   bodyUrl?: string;
   url?: string;
-  user: any;
+  user?: any;
   chainEvent?: any;
-  chainEventType?: any;
 }
 
 const REGEX_IMAGE =

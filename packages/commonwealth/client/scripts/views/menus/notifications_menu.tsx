@@ -44,7 +44,7 @@ export const NotificationsMenu = () => {
             }
             data={mostRecentFirst}
             itemContent={(i, data) => (
-              <NotificationRow key={i} notification={data} allRead={allRead} />
+              <NotificationRow key={i} notification={data} />
             )}
           />
         ) : (

@@ -3,12 +3,11 @@ import {
   RascalPublications,
   RmqCENotificationCUD,
 } from 'common-common/src/rabbitmq/types';
-import { NotificationCategories } from 'common-common/src/types';
 import type { ChainEventNotification } from 'types';
 import type { Logger } from 'typescript-logging';
 import type { DB } from '../../models';
 import type { NotificationInstance } from '../../models/notification';
-import emitNotifications from '../../util/emitNotifications/emitNotifications';
+import emitChainEventNotification from '../../util/emitNotifications/emitChainEventNotifications';
 
 export type Ithis = {
   models: DB;
@@ -26,15 +25,10 @@ export async function processChainEventNotificationsCUD(
   let dbNotification: NotificationInstance;
   try {
     // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
-    dbNotification = await emitNotifications(
+    dbNotification = await emitChainEventNotification(
       this.models,
-      NotificationCategories.ChainEvent,
       data.ChainEvent.chain,
       chainEvent,
-      {
-        chainEvent,
-        chain: chainEvent.chain,
-      },
       data.event.excludeAddresses,
       data.event.includeAddresses
     );

@@ -18,7 +18,6 @@ import {
 import type { WebhookContent } from '../../webhookNotifier';
 import send from '../../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SupportedNetwork } from 'chain-events/src';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,7 +26,6 @@ const { Op } = Sequelize;
 export type NotificationDataTypes =
   | IPostNotificationData
   | ICommunityNotificationData
-  | IChainEventNotificationData
   | (SnapshotNotification & { eventType: SnapshotEventType });
 
 export default async function emitNotifications(
@@ -49,24 +47,6 @@ export default async function emitNotifications(
   const findOptions: any = {
     [Op.and]: [{ category_id }, { object_id }, { is_active: true }],
   };
-
-  // typeguard function to differentiate between chain event notifications as needed
-  let chainEvent: IChainEventNotificationData;
-  const isChainEventData = !!(
-    typeof (<any>notification_data).id === 'number' &&
-    typeof (<any>notification_data).block_number === 'number' &&
-    (<any>notification_data).event_data &&
-    Object.values(SupportedNetwork).includes(
-      (<any>notification_data).network
-    ) &&
-    (<any>notification_data).chain &&
-    typeof (<any>notification_data).chain === 'string' &&
-    typeof (<any>notification_data).entity_id === 'number'
-  );
-
-  if (isChainEventData) {
-    chainEvent = <IChainEventNotificationData>notification_data;
-  }
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (
@@ -112,42 +92,24 @@ export default async function emitNotifications(
 
   // get notification if it already exists
   let notification: NotificationInstance;
-  notification = await models.Notification.findOne(
-    isChainEventData
-      ? {
-          where: {
-            chain_event_id: chainEvent.id,
-          },
-        }
-      : {
-          where: {
-            notification_data: JSON.stringify(notification_data),
-          },
-        }
-  );
+  notification = await models.Notification.findOne({
+    where: {
+      notification_data: JSON.stringify(notification_data),
+    },
+  });
 
   // if the notification does not yet exist create it here
   if (!notification) {
-    if (isChainEventData) {
-      notification = await models.Notification.create({
-        notification_data: JSON.stringify(chainEvent),
-        chain_event_id: chainEvent.id,
-        category_id: 'chain-event',
-        chain_id: chainEvent.chain,
-        entity_id: chainEvent.entity_id,
-      });
-    } else {
-      notification = await models.Notification.create({
-        notification_data: JSON.stringify(notification_data),
-        category_id,
-        chain_id:
-          (<IPostNotificationData>notification_data).chain_id ||
-          (<ICommunityNotificationData>notification_data).chain,
-        thread_id:
-          Number((<IPostNotificationData>notification_data).thread_id) ||
-          undefined,
-      });
-    }
+    notification = await models.Notification.create({
+      notification_data: JSON.stringify(notification_data),
+      category_id,
+      chain_id:
+        (<IPostNotificationData>notification_data).chain_id ||
+        (<ICommunityNotificationData>notification_data).chain,
+      thread_id:
+        Number((<IPostNotificationData>notification_data).thread_id) ||
+        undefined,
+    });
   }
 
   let msg;
@@ -166,31 +128,14 @@ export default async function emitNotifications(
 
   // send emails
   for (const subscription of subscriptions) {
-    if (msg && isChainEventData && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
-    }
     if (msg && subscription?.immediate_email && subscription?.User) {
       // kick off async call and immediately return
       sendImmediateNotificationEmail(subscription.User, msg);
     }
   }
 
-  const erc20Tokens = (
-    await models.Chain.findAll({
-      where: {
-        base: ChainBase.Ethereum,
-        type: ChainType.Token,
-      },
-    })
-  ).map((o) => o.id);
-
   // send data to relevant webhooks
-  if (
-    webhook_data &&
-    // TODO: this OR clause seems redundant?
-    (webhook_data.chainEventType?.chain ||
-      !erc20Tokens.includes(webhook_data.chainEventType?.chain))
-  ) {
+  if (webhook_data) {
     await send(models, {
       notificationCategory: category_id,
       ...(webhook_data as Required<WebhookContent>),

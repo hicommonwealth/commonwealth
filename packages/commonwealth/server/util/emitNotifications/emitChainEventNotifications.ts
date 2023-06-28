@@ -1,13 +1,6 @@
 import { StatsDController } from 'common-common/src/statsd';
-import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
-import type {
-  IChainEventNotificationData,
-  ICommunityNotificationData,
-  IPostNotificationData,
-  SnapshotEventType,
-  SnapshotNotification,
-} from 'types';
+import type { IChainEventNotificationData } from 'types';
 import { SERVER_URL } from '../../config';
 import type { DB } from '../../models';
 import type { NotificationInstance } from '../../models/notification';
@@ -16,99 +9,112 @@ import {
   sendImmediateNotificationEmail,
 } from '../../scripts/emails';
 import type { WebhookContent } from '../../webhookNotifier';
-import send from '../../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationCategories } from 'common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
+export async function filterAddresses(
+  models,
+  findOptions: any,
+  includedAddresses: string[],
+  excludedAddresses: string[]
+) {
+  const query = `
+        SELECT DISTINCT user_id
+        FROM "Addresses"
+        WHERE address IN (?);
+      `;
+  // currently excludes override includes, but we may want to provide the option for both
+  if (excludedAddresses && excludedAddresses.length > 0) {
+    const ids = <number[]>(
+      (<unknown>(
+        await models.sequelize.query(query, {
+          type: QueryTypes.SELECT,
+          raw: true,
+          replacements: excludedAddresses,
+        })
+      ))
+    );
+    if (ids && ids.length > 0) {
+      findOptions[Op.and].push({ subscriber_id: { [Op.notIn]: ids } });
+    }
+  } else if (includedAddresses && includedAddresses.length > 0) {
+    const ids = <number[]>(
+      (<unknown>(
+        await models.sequelize.query(query, {
+          type: QueryTypes.SELECT,
+          raw: true,
+          replacements: includedAddresses,
+        })
+      ))
+    );
+
+    if (ids && ids.length > 0) {
+      findOptions[Op.and].push({ subscriber_id: { [Op.in]: ids } });
+    }
+  }
+  return findOptions;
+}
+
 export default async function emitChainEventNotification(
   models: DB,
-  category_id: string,
-  object_id: string,
+  chain_id: string,
   notification_data: IChainEventNotificationData,
-  webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
   // get subscribers to send notifications to
   StatsDController.get().increment('cw.notifications.created', {
-    category_id,
-    object_id,
+    category_id: NotificationCategories.ChainEvent,
+    object_id: chain_id,
     chain: notification_data.chain,
   });
 
-  const findOptions: any = {
-    [Op.and]: [{ category_id }, { object_id }, { is_active: true }],
+  let subFindOptions: any = {
+    [Op.and]: [
+      { category_id: NotificationCategories.ChainEvent },
+      { chain_id },
+      { object_id: chain_id },
+      { is_active: true },
+    ],
   };
-
-  const chainEvent = <IChainEventNotificationData>notification_data;
-
-  // retrieve distinct user ids given a set of addresses
-  const fetchUsersFromAddresses = async (
-    addresses: string[]
-  ): Promise<number[]> => {
-    // fetch user ids from address models
-    const addressModels = await models.Address.findAll({
-      where: {
-        address: {
-          [Op.in]: addresses,
-        },
-      },
-    });
-    if (addressModels && addressModels.length > 0) {
-      const userIds = addressModels.map((a) => a.user_id);
-
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
-      return userIdsDedup;
-    } else {
-      return [];
-    }
-  };
-
-  // currently excludes override includes, but we may want to provide the option for both
-  if (excludeAddresses && excludeAddresses.length > 0) {
-    const ids = await fetchUsersFromAddresses(excludeAddresses);
-    if (ids && ids.length > 0) {
-      findOptions[Op.and].push({ subscriber_id: { [Op.notIn]: ids } });
-    }
-  } else if (includeAddresses && includeAddresses.length > 0) {
-    const ids = await fetchUsersFromAddresses(includeAddresses);
-    if (ids && ids.length > 0) {
-      findOptions[Op.and].push({ subscriber_id: { [Op.in]: ids } });
-    }
-  }
-
-  // get all relevant subscriptions
+  subFindOptions = await filterAddresses(
+    models,
+    subFindOptions,
+    includeAddresses,
+    excludeAddresses
+  );
   const subscriptions = await models.Subscription.findAll({
-    where: findOptions,
-    include: models.User,
+    where: subFindOptions,
+    include: [
+      {
+        model: models.User,
+        required: true,
+      },
+    ],
   });
 
-  let notification = await models.Notification.findOne({
+  const [notification, created] = await models.Notification.findOrCreate({
     where: {
-      chain_event_id: chainEvent.id,
+      chain_event_id: notification_data.id,
+    },
+    defaults: {
+      notification_data: JSON.stringify(notification_data),
+      chain_event_id: notification_data.id,
+      category_id: 'chain-event',
+      chain_id: notification_data.chain,
+      entity_id: notification_data.entity_id,
     },
   });
-
-  // if the notification does not yet exist create it here
-  if (!notification) {
-    notification = await models.Notification.create({
-      notification_data: JSON.stringify(chainEvent),
-      chain_event_id: chainEvent.id,
-      category_id: 'chain-event',
-      chain_id: chainEvent.chain,
-      entity_id: chainEvent.entity_id,
-    });
-  }
 
   let msg;
   try {
     msg = await createImmediateNotificationEmailObject(
       notification_data,
-      category_id,
+      chain_id,
       models
     );
   } catch (e) {
@@ -118,22 +124,14 @@ export default async function emitChainEventNotification(
 
   // send emails
   for (const subscription of subscriptions) {
-    if (msg && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
-    }
-    if (msg && subscription?.immediate_email && subscription?.User) {
-      // kick off async call and immediately return
+    if (msg && subscription?.immediate_email) {
+      // TODO: verify this works
+      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${notification_data.chain}/notifications?id=${notification.id}`;
       sendImmediateNotificationEmail(subscription.User, msg);
     }
   }
 
-  // send data to relevant webhooks
-  if (webhook_data) {
-    await send(models, {
-      notificationCategory: category_id,
-      ...(webhook_data as Required<WebhookContent>),
-    });
-  }
+  // TODO: fix chain-event webhooks
 
   return notification;
 }
