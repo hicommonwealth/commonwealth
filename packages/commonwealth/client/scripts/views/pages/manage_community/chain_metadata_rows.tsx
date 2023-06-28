@@ -34,7 +34,6 @@ type ChainMetadataRowsProps = {
 type DiscordChannelConnection = {
   channelName: string;
   channelId: string;
-  connectedTopicId: string | null;
   onConnect: (topicId: string) => void;
 };
 
@@ -43,14 +42,15 @@ const DiscordForumConnections = ({
   topics,
 }: {
   channels: DiscordChannelConnection[];
-  topics: { id: string; name: string }[];
+  topics: { id: string; name: string; channelId: string | null }[];
 }) => {
   return (
     <div className="DiscordForumConnections">
       {channels.map((channel) => {
         const connectedTopic = topics.find(
-          (topic) => topic.id === channel.connectedTopicId
+          (topic) => topic.channelId === channel.channelId
         );
+        console.log(channel);
         return (
           <div key={channel.channelId}>
             <CWText>{channel.channelName}</CWText>
@@ -91,12 +91,10 @@ export const ChainMetadataRows = ({
     chainId: app.activeChainId(),
   });
 
-  const { data: discordChannels, isLoading: discordFetchLoading } =
+  const { data: discordChannels, refetch: refetchDiscordSettings } =
     useFetchDiscordChannelsQuery({
       chainId: app.activeChainId(),
     });
-
-  console.log(discordChannels);
 
   const [name, setName] = useState(chain.name);
   const [description, setDescription] = useState(chain.description);
@@ -556,6 +554,39 @@ export const ChainMetadataRows = ({
               buttonType="primary-black"
               onClick={handleSaveCommonbotSettings}
             />
+            <div className="snapshot-settings">
+              <CWText type="h4">Connected Forum Channels</CWText>
+            </div>
+            <CWText>
+              Adding a connection will sync discord content to your Common
+              forum.
+            </CWText>
+            <div className="connected-line">
+              {discordChannels && (
+                <DiscordForumConnections
+                  channels={discordChannels.forumChannels?.map((channel) => {
+                    return {
+                      channelName: channel.name,
+                      channelId: channel.id,
+                      connectedTopicId: '',
+                      onConnect: async (topicId: string) => {
+                        console.log('here', topicId);
+                        try {
+                          await app.discord.setForumChannelConnection(
+                            topicId,
+                            channel.id
+                          );
+                          refetchDiscordSettings();
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      },
+                    };
+                  })}
+                  topics={topics}
+                />
+              )}
+            </div>
           </>
         ) : discordBotConnecting ? (
           <>

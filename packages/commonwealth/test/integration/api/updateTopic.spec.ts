@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
-import { UpdateTopicErrors } from '../../../server/routes/updateTopic';
+import { UpdateTopicErrors } from '../../../server/routes/updateThreadTopic';
 import { post } from './external/appHook.spec';
 import {
   testAddresses,
