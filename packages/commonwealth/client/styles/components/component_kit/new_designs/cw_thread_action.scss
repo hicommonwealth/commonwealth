@@ -1,0 +1,24 @@
+@import '../../../shared.scss';
+
+.ThreadAction {
+  border-radius: 6px;
+  display: inline-flex;
+  padding: 4px 8px;
+  align-items: center;
+  gap: 4px;
+
+  background-color: $neutral-100;
+  width: fit-content;
+
+  &.default {
+    color: $neutral-500;
+  }
+
+  &.hover {
+    color: $neutral-600;
+  }
+
+  &.disabled {
+    color: $neutral-400;
+  }
+}
