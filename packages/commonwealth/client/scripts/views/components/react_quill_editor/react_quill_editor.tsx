@@ -6,8 +6,6 @@ import ImageUploader from 'quill-image-uploader';
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
 
-import { CWText } from '../component_kit/cw_text';
-import { CWIconButton } from '../component_kit/cw_icon_button';
 import { PreviewModal } from '../../modals/preview_modal';
 import { Modal } from '../component_kit/cw_modal';
 
@@ -204,44 +202,17 @@ const ReactQuillEditor = ({
         onClose={handlePreviewModalClose}
         open={isPreviewVisible}
       />
-      <div className="custom-buttons">
-        {isMarkdownEnabled && (
-          <CWText
-            type="h5"
-            fontWeight="semiBold"
-            className="custom-button"
-            title="Switch to RichText mode"
-            onClick={handleToggleMarkdown}
-          >
-            R
-          </CWText>
-        )}
-        {!isMarkdownEnabled && (
-          <CWText
-            type="h5"
-            fontWeight="semiBold"
-            className="custom-button"
-            title="Switch to Markdown mode"
-            onClick={handleToggleMarkdown}
-          >
-            M
-          </CWText>
-        )}
-        <CWIconButton
-          className="custom-button preview"
-          iconName="search"
-          iconSize="small"
-          iconButtonTheme="primary"
-          onClick={(e) => {
-            e.preventDefault();
-            setIsPreviewVisible(true);
-          }}
-        />
-      </div>
       {isVisible && (
         <>
-          <CustomQuillToolbar toolbarId={toolbarId} />
+          <CustomQuillToolbar
+            toolbarId={toolbarId}
+            isMarkdownEnabled={isMarkdownEnabled}
+            handleToggleMarkdown={handleToggleMarkdown}
+            setIsPreviewVisible={setIsPreviewVisible}
+          />
           <ReactQuill
+            onFocus={(p) => console.log('focused?', { p })}
+            onBlur={(p) => console.log('blurred', { p })}
             ref={editorRef}
             className={`QuillEditor ${className}`}
             placeholder={placeholder}

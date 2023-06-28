@@ -1,50 +1,94 @@
 @import '../../shared';
 
+.CustomQuillToolbar {
+  display: flex;
+  justify-content: space-between;
+
+  .left-buttons,
+  .right-buttons {
+    display: flex;
+    align-items: center;
+  }
+
+  .right-buttons {
+    margin-left: auto;
+
+    .markdown-button {
+      border-radius: 6px;
+      font-size: 14px;
+      color: $primary-500;
+      font-weight: 500;
+      padding: 1px 8px !important;
+      outline: none;
+
+      &.enabled {
+        background: $primary-50;
+        color: $primary-600;
+      }
+    }
+
+    .eye-icon {
+      display: flex;
+      align-items: center;
+      padding: 4px;
+    }
+  }
+
+  .section {
+    margin-right: 24px;
+  }
+
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom: none !important;
+
+  background-color: $neutral-25;
+
+  .ql-formats {
+    margin-right: 24px !important;
+  }
+
+  //&:focus-within {
+  //  border: 1px solid $primary-500;
+  //border-top: none;
+  //box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
+  //}
+
+  button {
+    padding: 4px !important;
+    width: auto !important;
+
+    svg {
+      height: unset !important;
+    }
+  }
+}
+
 .QuillEditorWrapper {
+  border-radius: 6px;
+  border: 1px solid transparent;
+
+  //&:focus-within {
+  //  border: 1px solid $primary-500;
+  //  box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
+  //}
+
   .ql-container {
     min-height: 212px;
     max-height: 512px;
     overflow-y: scroll;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+
+    //&:focus-within {
+    //  border: 1px solid $primary-500;
+    //  border-top: none;
+    //  box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
+    //}
   }
 
   .ql-editor {
     min-height: 212px;
-  }
-
-  .custom-buttons {
-    position: relative;
-    float: right;
-    margin-top: 10px;
-    margin-right: 10px;
-    display: flex;
-    flex-direction: row;
-
-    .custom-button {
-      color: #333;
-      text-align: center;
-      font-size: 1.2em;
-      width: 1.2em;
-      height: 1.2em;
-      align-items: center;
-      justify-content: center;
-      margin-left: 5px;
-
-      -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Safari */
-      -khtml-user-select: none; /* Konqueror HTML */
-      -moz-user-select: none; /* Old versions of Firefox */
-      -ms-user-select: none; /* Internet Explorer/Edge */
-      user-select: none; /* Non-prefixed version, currently
-                                      supported by Chrome, Edge, Opera and Firefox */
-
-      &.preview {
-        padding: 3px;
-      }
-
-      &:hover {
-        color: #888;
-      }
-    }
   }
 
   .LoadingIndicator {

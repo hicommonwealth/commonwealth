@@ -2,6 +2,38 @@ import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
 import { SerializableDeltaStatic } from './utils';
 import { DeltaStatic } from 'quill';
+import ReactDOMServer from 'react-dom/server';
+import clsx from 'clsx';
+import 'components/react_quill/react_quill_editor.scss';
+import {
+  BoldIcon,
+  BulletListIcon,
+  CodeIcon,
+  H1Icon,
+  H2Icon,
+  ImageIcon,
+  ItalicIcon,
+  LinkIcon,
+  NumberListIcon,
+  QuoteIcon,
+  StrikeIcon,
+} from 'views/components/react_quill_editor/toolbarIcons';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+
+const icons = ReactQuill.Quill.import('ui/icons');
+
+icons['header'][1] = ReactDOMServer.renderToStaticMarkup(H1Icon);
+icons['header'][2] = ReactDOMServer.renderToStaticMarkup(H2Icon);
+icons['bold'] = ReactDOMServer.renderToStaticMarkup(BoldIcon);
+icons['italic'] = ReactDOMServer.renderToStaticMarkup(ItalicIcon);
+icons['strike'] = ReactDOMServer.renderToStaticMarkup(StrikeIcon);
+icons['link'] = ReactDOMServer.renderToStaticMarkup(LinkIcon);
+icons['code-block'] = ReactDOMServer.renderToStaticMarkup(CodeIcon);
+icons['blockquote'] = ReactDOMServer.renderToStaticMarkup(QuoteIcon);
+icons['image'] = ReactDOMServer.renderToStaticMarkup(ImageIcon);
+icons['list']['ordered'] = ReactDOMServer.renderToStaticMarkup(NumberListIcon);
+icons['list']['bullet'] = ReactDOMServer.renderToStaticMarkup(BulletListIcon);
+icons['list']['check'] = ReactDOMServer.renderToStaticMarkup(BulletListIcon);
 
 const LIST_ITEM_PREFIX = {
   ordered: '1.',
@@ -11,22 +43,55 @@ const LIST_ITEM_PREFIX = {
 
 type CustomQuillToolbarProps = {
   toolbarId: string;
+  isMarkdownEnabled: boolean;
+  handleToggleMarkdown: () => void;
+  setIsPreviewVisible: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const CustomQuillToolbar = ({ toolbarId }: CustomQuillToolbarProps) => (
-  <div id={toolbarId}>
-    <button className="ql-header" value={1} />
-    <button className="ql-header" value={2} />
-    <button className="ql-bold"></button>
-    <button className="ql-italic"></button>
-    <button className="ql-strike"></button>
-    <button className="ql-link"></button>
-    <button className="ql-code-block"></button>
-    <button className="ql-blockquote"></button>
-    <button className="ql-image"></button>
-    <button className="ql-list" value="ordered" />
-    <button className="ql-list" value="bullet" />
-    <button className="ql-list" value="check" />
+export const CustomQuillToolbar = ({
+  toolbarId,
+  setIsPreviewVisible,
+  handleToggleMarkdown,
+  isMarkdownEnabled,
+}: CustomQuillToolbarProps) => (
+  <div id={toolbarId} className="CustomQuillToolbar">
+    <div className="left-buttons">
+      <div className="section">
+        <button className="ql-header" value={1} />
+        <button className="ql-header" value={2} />
+      </div>
+      <div className="section">
+        <button className="ql-bold"></button>
+        <button className="ql-italic"></button>
+        <button className="ql-strike"></button>
+      </div>
+      <div className="section">
+        <button className="ql-link"></button>
+        <button className="ql-code-block"></button>
+        <button className="ql-blockquote"></button>
+        <button className="ql-image">image</button>
+      </div>
+      <div className="section">
+        <button className="ql-list" value="ordered" />
+        <button className="ql-list" value="bullet" />
+        <button className="ql-list" value="check" />
+      </div>
+    </div>
+    <div className="right-buttons">
+      <button
+        className={clsx('markdown-button', { enabled: isMarkdownEnabled })}
+        onClick={handleToggleMarkdown}
+      >
+        Markdown
+      </button>
+      <div className="eye-icon">
+        <CWIconButton
+          iconName="eye"
+          iconSize="small"
+          onClick={() => setIsPreviewVisible(true)}
+        />
+      </div>
+    </div>
   </div>
 );
 
