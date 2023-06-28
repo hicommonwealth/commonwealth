@@ -20,8 +20,9 @@
   }
 
   &.disabled {
-    border-color: $neutral-50;
+    border-color: $neutral-400;
     color: $neutral-500;
+    background-color: $neutral-200;
     pointer-events: none;
   }
 

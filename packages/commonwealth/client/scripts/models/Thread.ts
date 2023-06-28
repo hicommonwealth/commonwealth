@@ -40,11 +40,11 @@ export class Thread implements IUniqueId {
   public readonly title: string;
   public readonly body: string;
   public readonly plaintext: string;
-  public readonly pinned: boolean;
+  public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
   public readonly attachments: Attachment[];
-  public readonly readOnly: boolean;
+  public readOnly: boolean;
 
   public readonly canvasAction: string;
   public readonly canvasSession: string;
@@ -64,6 +64,7 @@ export class Thread implements IUniqueId {
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+  public markedAsSpamAt: moment.Moment;
   public readonly lockedAt: moment.Moment;
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
@@ -98,6 +99,7 @@ export class Thread implements IUniqueId {
     collaborators,
     chainEntities,
     lastEdited,
+    markedAsSpamAt,
     lockedAt,
     hasPoll,
     lastCommentedOn,
@@ -132,6 +134,7 @@ export class Thread implements IUniqueId {
     collaborators?: any[];
     chainEntities?: any[];
     lastEdited?: moment.Moment;
+    markedAsSpamAt?: moment.Moment;
     lockedAt?: moment.Moment;
     hasPoll: boolean;
     polls?: Poll[];
@@ -179,6 +182,7 @@ export class Thread implements IUniqueId {
       : [];
     this.hasPoll = hasPoll;
     this.lastEdited = lastEdited;
+    this.markedAsSpamAt = markedAsSpamAt;
     this.lockedAt = lockedAt;
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];

@@ -341,9 +341,11 @@ async function constructMagic() {
 export async function loginWithMagicLink({
   email,
   provider,
+  chain,
 }: {
   email?: string;
   provider?: string;
+  chain?: string;
 }) {
   if (!email && !provider) throw new Error('Must provider email or provider');
   const magic = await constructMagic();
@@ -352,16 +354,23 @@ export async function loginWithMagicLink({
     const bearer = await magic.auth.loginWithMagicLink({ email });
     await handleSocialLoginCallback(bearer);
   } else {
+    const params = `?chain=${chain || ''}`;
     // provider-based login
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
-      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+      redirectURI: new URL(
+        '/finishsociallogin' + params,
+        window.location.origin
+      ).href,
     });
   }
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({ provider, userInfo }): {
+function getProfileMetadata({
+  provider,
+  userInfo,
+}): {
   username?: string;
   avatarUrl?: string;
 } {
@@ -369,8 +378,9 @@ function getProfileMetadata({ provider, userInfo }): {
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } =
-      userInfo.sources['https://discord.com/api/users/@me'];
+    const { avatar, id, username } = userInfo.sources[
+      'https://discord.com/api/users/@me'
+    ];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
@@ -396,7 +406,7 @@ export async function handleSocialLoginCallback(bearer?: string) {
     const result = await magic.oauth.getRedirectResult();
     profileMetadata = getProfileMetadata(result.oauth);
     bearer = result.magic.idToken;
-    // console.log('Magic redirect result:', result);
+    console.log('Magic redirect result:', result);
   }
 
   const response = await $.post({

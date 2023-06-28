@@ -1,24 +1,23 @@
-import React from 'react';
-
-import moment from 'moment';
-
+import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/cw_content_page.scss';
-
-import { pluralize } from 'helpers';
-import { NewThreadTag } from '../../pages/discussions/NewThreadTag';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { SharePopover } from '../share_popover';
+import moment from 'moment';
+import React, { ReactNode, useState } from 'react';
+import type Account from '../../../models/Account';
+import AddressInfo from '../../../models/AddressInfo';
+import MinimumProfile from '../../../models/MinimumProfile';
+import { Thread } from '../../../models/Thread';
+import Topic from '../../../models/Topic';
+import { ThreadStage } from '../../../models/types';
+import { AuthorAndPublishInfo as ThreadAuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
+import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
 import { CWCard } from './cw_card';
-import { CWIconButton } from './cw_icon_button';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
-import { LockWithTooltip } from '../lock_with_tooltip';
 
 export type ContentPageSidebarItem = {
   label: string;
-  item: React.ReactNode;
+  item: ReactNode;
 };
 
 // tuple
@@ -29,57 +28,85 @@ export type SidebarComponents = [
 ];
 
 type ContentPageProps = {
+  thread?: Thread;
   createdAt: moment.Moment | number;
+  title: string | ReactNode;
+  //
   updatedAt?: moment.Moment;
   archivedAt: moment.Moment | null;
-  title: string | React.ReactNode;
 
   // optional
   lastEdited?: moment.Moment | number;
-  author?: React.ReactNode;
-  actions?: Array<PopoverMenuItem>;
-  body?: React.ReactNode;
-  comments?: React.ReactNode;
+  author?: Account | AddressInfo | MinimumProfile | undefined;
+  collaborators?: IThreadCollaborator[];
+  body?: (children: ReactNode) => ReactNode;
+  comments?: ReactNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
+  stageLabel?: ThreadStage;
+  //
   headerComponents?: React.ReactNode;
   readOnly?: boolean;
   lockedAt?: moment.Moment;
+  //
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
-  subBody?: React.ReactNode;
-  subHeader?: React.ReactNode;
+  subBody?: ReactNode;
+  subHeader?: ReactNode;
   viewCount?: number;
   displayNewTag?: boolean;
+  isSpamThread?: boolean;
+  onLockToggle?: (isLocked: boolean) => any;
+  onDelete?: () => any;
+  onSpamToggle?: (thread: Thread) => any;
+  onPinToggle?: (isPinned: boolean) => any;
+  onTopicChange?: (newTopic: Topic) => any;
+  onProposalStageChange?: (newStage: ThreadStage) => any;
+  onSnapshotProposalFromThread?: () => any;
+  onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
+  onEditStart?: () => any;
+  onEditConfirm?: () => any;
+  onEditCancel?: () => any;
+  hasPendingEdits?: boolean;
+  canUpdateThread?: boolean;
   showTabs?: boolean;
 };
 
-export const CWContentPage = (props: ContentPageProps) => {
-  const {
-    actions,
-    author,
-    body,
-    comments,
-    contentBodyLabel,
-    createdAt,
-    updatedAt,
-    archivedAt,
-    lastEdited,
-    headerComponents,
-    readOnly,
-    lockedAt,
-    showSidebar,
-    sidebarComponents,
-    subBody,
-    subHeader,
-    title,
-    viewCount,
-    displayNewTag,
-    showTabs = false,
-  } = props;
-
-  const [tabSelected, setTabSelected] = React.useState<number>(0);
+export const CWContentPage = ({
+  thread,
+  author,
+  archivedAt,
+  body,
+  comments,
+  contentBodyLabel,
+  createdAt,
+  lastEdited,
+  stageLabel,
+  showSidebar,
+  sidebarComponents,
+  subBody,
+  subHeader,
+  title,
+  viewCount,
+  displayNewTag,
+  isSpamThread,
+  collaborators,
+  onLockToggle,
+  onPinToggle,
+  onDelete,
+  onTopicChange,
+  onProposalStageChange,
+  onSnapshotProposalFromThread,
+  onCollaboratorsEdit,
+  onEditCancel,
+  onEditConfirm,
+  onEditStart,
+  onSpamToggle,
+  hasPendingEdits,
+  canUpdateThread,
+  showTabs = false,
+}: ContentPageProps) => {
+  const [tabSelected, setTabSelected] = useState<number>(0);
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
-  const createdOrEditedText = lastEdited ? 'Edited' : 'Published';
 
   const mainBody = (
     <div className="main-body-container">
@@ -92,46 +119,65 @@ export const CWContentPage = (props: ContentPageProps) => {
           title
         )}
         <div className="header-info-row">
-          {author}
-          {typeof createdOrEditedDate === 'number' ||
-            (moment.isMoment(createdOrEditedDate) &&
-              createdOrEditedDate.isValid() && (
-                <CWText type="caption" className="header-text">
-                  • &nbsp; {createdOrEditedText} on{' '}
-                  {moment(createdOrEditedDate).format('l')} &nbsp; •
-                </CWText>
-              ))}
-          {!!displayNewTag && (
-            <NewThreadTag archivedAt={moment(archivedAt)} threadCreatedAt={moment(createdAt)} />
-          )}
-          {!!viewCount && (
-            <CWText type="caption" className="header-text">
-              {pluralize(viewCount, 'view')}
-            </CWText>
-          )}
-          {headerComponents}
-          {readOnly && (
-            <LockWithTooltip lockedAt={lockedAt} updatedAt={updatedAt} />
-          )}
-          {actions && (
-            <div className="thread-actions">
-              <PopoverMenu
-                renderTrigger={(onclick) => (
-                  <CWIconButton
-                    iconName="dotsHorizontal"
-                    iconSize="small"
-                    onClick={onclick}
-                  />
-                )}
-                menuItems={actions}
-              />
-            </div>
-          )}
-          <SharePopover />
+          <ThreadAuthorAndPublishInfo
+            showSplitDotIndicator={true}
+            isNew={!!displayNewTag}
+            isLocked={thread.readOnly}
+            {...(thread.lockedAt && {
+              lockedAt: thread.lockedAt.toISOString(),
+            })}
+            {...(thread.updatedAt && {
+              lastUpdated: thread.updatedAt.toISOString(),
+            })}
+            authorInfo={
+              new AddressInfo(
+                null,
+                author.address,
+                typeof author.chain === 'string'
+                  ? author.chain
+                  : author.chain.id,
+                null
+              )
+            }
+            collaboratorsInfo={collaborators}
+            publishDate={
+              createdOrEditedDate
+                ? moment(createdOrEditedDate).format('l')
+                : null
+            }
+            viewsCount={viewCount}
+            showPublishLabelWithDate={!lastEdited}
+            showEditedLabelWithDate={!!lastEdited}
+            isSpamThread={isSpamThread}
+            threadStage={stageLabel}
+          />
         </div>
       </div>
       {subHeader}
-      {body}
+
+      {body &&
+        body(
+          <ThreadOptions
+            canVote={!thread.readOnly}
+            canComment={!thread.readOnly}
+            thread={thread}
+            totalComments={thread.numberOfComments}
+            onLockToggle={onLockToggle}
+            onSpamToggle={onSpamToggle}
+            onDelete={onDelete}
+            onPinToggle={onPinToggle}
+            onTopicChange={onTopicChange}
+            onCollaboratorsEdit={onCollaboratorsEdit}
+            onEditCancel={onEditCancel}
+            onEditConfirm={onEditConfirm}
+            onEditStart={onEditStart}
+            canUpdateThread={canUpdateThread}
+            hasPendingEdits={hasPendingEdits}
+            onProposalStageChange={onProposalStageChange}
+            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+          />
+        )}
+
       {subBody}
       {comments}
     </div>
@@ -188,7 +234,7 @@ export const CWContentPage = (props: ContentPageProps) => {
 };
 
 type ContentPageCardProps = {
-  content: React.ReactNode;
+  content: ReactNode;
   header: string;
 };
 

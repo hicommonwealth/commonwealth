@@ -11,12 +11,19 @@
     flex-direction: row;
     text-overflow: ellipsis;
     height: auto !important;
-    padding: 10px 12px !important;
     border-radius: $border-radius-md  !important;
     font-size: 14px !important;
     min-height: 40px;
     line-height: 20px;
     letter-spacing: 1%;
+
+    &.size-default {
+        padding: 10px 12px !important;
+    }
+
+    &.size-compact {
+        padding: 6px 12px !important;
+    }
 
     &:hover,
     &:active {

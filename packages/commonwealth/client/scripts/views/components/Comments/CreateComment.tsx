@@ -16,7 +16,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWValidationText } from '../component_kit/cw_validation_text';
-import { jumpHighlightComment } from './helpers';
+import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import {
   createDeltaFromText,
   getTextFromDelta,

@@ -1,21 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-
+import useForceRerender from 'hooks/useForceRerender';
 import 'pages/manage_community/index.scss';
-
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
+import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
 import NewProfilesController from '../../../controllers/server/newProfiles';
+import { TTLCache } from '../../../helpers/ttl_cache';
 import RoleInfo from '../../../models/RoleInfo';
-import Sublayout from '../../Sublayout';
-import ErrorPage from '../error';
+import Permissions from '../../../utils/Permissions';
 import { PageLoading } from '../loading';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
-import { sortAdminsAndModsFirst } from './helpers';
-import useForceRerender from 'hooks/useForceRerender';
-import { useDebounce } from 'usehooks-ts';
-import { TTLCache } from '../../../helpers/ttl_cache';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -127,11 +123,7 @@ const ManageCommunityPage = () => {
     searchMembers();
   }, []);
 
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({
-      chain: app.activeChainId(),
-    });
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   if (!initialized) {
     return <PageLoading />;
@@ -195,23 +187,21 @@ const ManageCommunityPage = () => {
   };
 
   return (
-    <Sublayout>
-      <div className="ManageCommunityPage">
-        <ChainMetadataRows
-          admins={admins}
-          chain={app.config.chains.getById(app.activeChainId())}
-          mods={mods}
-          onRoleUpdate={handleRoleUpdate}
-          onSave={() => forceRerender()}
-        />
-        <AdminPanelTabs
-          onRoleUpdate={handleRoleUpdate}
-          roleData={roleData}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-      </div>
-    </Sublayout>
+    <div className="ManageCommunityPage">
+      <ChainMetadataRows
+        admins={admins}
+        chain={app.config.chains.getById(app.activeChainId())}
+        mods={mods}
+        onRoleUpdate={handleRoleUpdate}
+        onSave={() => forceRerender()}
+      />
+      <AdminPanelTabs
+        onRoleUpdate={handleRoleUpdate}
+        roleData={roleData}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
+    </div>
   );
 };
 
