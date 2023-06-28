@@ -39,7 +39,7 @@ type ReactQuillEditorProps = {
 // ReactQuillEditor is a custom wrapper for the react-quill component
 const ReactQuillEditor = ({
   className = '',
-  placeholder,
+  placeholder = 'Placeholder',
   tabIndex,
   contentDelta,
   setContentDelta,
@@ -54,6 +54,7 @@ const ReactQuillEditor = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isMarkdownEnabled, setIsMarkdownEnabled] = useState<boolean>(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   // ref is used to prevent rerenders when selection
   // is changed, since rerenders bug out the editor
@@ -188,7 +189,7 @@ const ReactQuillEditor = ({
   }, [editorRef]);
 
   return (
-    <div className="QuillEditorWrapper">
+    <div className={clsx('QuillEditorWrapper', { isFocused })}>
       {isUploading && <LoadingIndicator />}
       <Modal
         content={
@@ -212,8 +213,6 @@ const ReactQuillEditor = ({
             setIsPreviewVisible={setIsPreviewVisible}
           />
           <ReactQuill
-            onFocus={(p) => console.log('focused?', { p })}
-            onBlur={(p) => console.log('blurred', { p })}
             ref={editorRef}
             className={clsx('QuillEditor', className, {
               markdownEnabled: isMarkdownEnabled,
@@ -222,6 +221,8 @@ const ReactQuillEditor = ({
             tabIndex={tabIndex}
             theme="snow"
             value={contentDelta}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onChange={handleChange}
             onChangeSelection={(selection: RangeStatic) => {
               if (!selection) {

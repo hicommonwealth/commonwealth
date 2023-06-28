@@ -3,6 +3,10 @@
 .CustomQuillToolbar {
   display: flex;
   justify-content: space-between;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border: none !important;
+  background-color: $neutral-25;
 
   .left-buttons,
   .right-buttons {
@@ -38,22 +42,6 @@
     margin-right: 24px;
   }
 
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  border-bottom: none !important;
-
-  background-color: $neutral-25;
-
-  .ql-formats {
-    margin-right: 24px !important;
-  }
-
-  //&:focus-within {
-  //  border: 1px solid $primary-500;
-  //border-top: none;
-  //box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
-  //}
-
   button {
     padding: 4px !important;
     width: auto !important;
@@ -66,12 +54,12 @@
 
 .QuillEditorWrapper {
   border-radius: 6px;
-  border: 1px solid transparent;
+  border: 1px solid $neutral-200;
 
-  //&:focus-within {
-  //  border: 1px solid $primary-500;
-  //  box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
-  //}
+  &.isFocused {
+    border: 1px solid $primary-500;
+    box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
+  }
 
   .markdownEnabled {
     .ql-container {
@@ -83,18 +71,16 @@
     min-height: 212px;
     max-height: 512px;
     overflow-y: scroll;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-
-    //&:focus-within {
-    //  border: 1px solid $primary-500;
-    //  border-top: none;
-    //  box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
-    //}
+    border: none !important;
+    border-top: 1px solid $neutral-200 !important;
   }
 
   .ql-editor {
     min-height: 212px;
+
+    &.ql-blank::before {
+      font-style: normal;
+    }
   }
 
   .LoadingIndicator {
