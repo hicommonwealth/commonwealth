@@ -157,7 +157,16 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
+      <CWThreadAction label="Comment" />
+      <CWThreadAction label="Share" />
+      <CWThreadAction label="Subscribe" />
+      <CWThreadAction label="1" />
       <CWThreadAction />
+      <CWThreadAction label="Comment" disabled />
+      <CWThreadAction label="Share" disabled />
+      <CWThreadAction label="Subscribe" disabled />
+      <CWThreadAction label="1" disabled />
+      <CWThreadAction disabled />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />

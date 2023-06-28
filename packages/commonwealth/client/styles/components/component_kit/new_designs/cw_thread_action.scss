@@ -7,18 +7,20 @@
   align-items: center;
   gap: 4px;
 
-  background-color: $neutral-100;
   width: fit-content;
-
-  &.default {
-    color: $neutral-500;
-  }
-
+  
+  color: $neutral-500;
+  // &.default {
+    //   color: $neutral-500;
+    // }
+    
   &.hover {
+    background-color: $neutral-100;
     color: $neutral-600;
   }
-
+  
   &.disabled {
     color: $neutral-400;
+    background-color: inherit;
   }
 }
