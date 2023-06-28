@@ -16,6 +16,7 @@ import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import app from 'state';
 
 const getTextRows = (
   subscription: NotificationSubscription,
@@ -107,7 +108,7 @@ const getTextRows = (
     return (
       <div
         className="header-row"
-        onClick={() => setRoute(`/${subscription.Chain.id}`)}
+        onClick={() => setRoute(`/${subscription.chainId}`)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -119,7 +120,10 @@ const getTextRows = (
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
-          {subscription.Chain?.name}
+          {
+            // TODO: @Timothee - can we still import and use like this or are we refactoring away from this
+            app.config.chains.getById(subscription.chainId).name
+          }
         </CWText>
       </div>
     );

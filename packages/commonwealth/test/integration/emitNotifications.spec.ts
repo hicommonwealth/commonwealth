@@ -148,16 +148,6 @@ describe.only('emitNotifications tests', () => {
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notification_data)
       );
-
-      const notifRead = await models.NotificationsRead.findOne({
-        where: {
-          subscription_id: subscription.id,
-          notification_id: notif.id,
-          user_id: userId,
-          is_read: false,
-        },
-      });
-      expect(notifRead).to.not.be.null;
     });
 
     it('should generate a notification and notification reads for a thread comment', async () => {
@@ -199,16 +189,6 @@ describe.only('emitNotifications tests', () => {
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notification_data)
       );
-
-      const notifRead = await models.NotificationsRead.findOne({
-        where: {
-          subscription_id: subscription.id,
-          notification_id: notif.id,
-          user_id: userId,
-          is_read: false,
-        },
-      });
-      expect(notifRead).to.not.be.null;
     });
 
     it('should generate a notification and notification reads for a new thread reaction', async () => {
@@ -248,16 +228,6 @@ describe.only('emitNotifications tests', () => {
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notification_data)
       );
-
-      const notifRead = await models.NotificationsRead.findOne({
-        where: {
-          subscription_id: subscription.id,
-          notification_id: notif.id,
-          user_id: userId,
-          is_read: false,
-        },
-      });
-      expect(notifRead).to.not.be.null;
     });
   });
 

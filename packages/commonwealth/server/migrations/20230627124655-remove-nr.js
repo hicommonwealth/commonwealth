@@ -44,7 +44,7 @@ module.exports = {
           INNER JOIN "Users" U ON U.id = S.subscriber_id
           WHERE U.updated_at < NOW() - interval '12 months'
         ) DELETE FROM "Subscriptions"
-        WHERE id IN (SELECT id from delete_sub_ids);
+        WHERE id IN (SELECT id from delete_sub_ids) OR category_id = 'new-chat-mention';
       `,
         { transaction: t }
       );

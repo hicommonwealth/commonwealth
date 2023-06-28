@@ -11,7 +11,7 @@ export const SubscriptionButton = () => {
   const communitySubscription = subscriptions.subscriptions.find(
     (v) =>
       v.category === NotificationCategories.NewThread &&
-      v.objectId === app.activeChainId()
+      v.chainId === app.activeChainId()
   );
   const [notificationsOn, setNotificationsOn] = useState<boolean>(
     isNotUndefined(communitySubscription)

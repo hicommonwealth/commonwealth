@@ -54,12 +54,7 @@ const NotificationsPage = () => {
             style={{ height: '100%' }}
             data={mostRecentFirst}
             itemContent={(i, data) => (
-              <NotificationRow
-                key={i}
-                notification={data}
-                onListPage
-                allRead={true}
-              />
+              <NotificationRow key={i} notification={data} onListPage />
             )}
           />
         ) : (

@@ -36,7 +36,7 @@ export const getProposalUrlPath = (
 export const getNotificationUrlPath = (
   subscription: NotificationSubscription
 ): string => {
-  const community = subscription.Chain.id;
+  const community = subscription.chainId;
   const type = subscription.Thread.slug;
   const id = `${subscription.Thread.identifier}-${slugify(
     subscription.Thread.title

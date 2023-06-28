@@ -3,7 +3,6 @@ import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
 import app from '../state';
-import type ChainInfo from './ChainInfo';
 import type { Comment as CommentT } from './Comment';
 import type { IUniqueId } from './interfaces';
 import { Thread as ThreadT } from './Thread';
@@ -12,7 +11,7 @@ class NotificationSubscription {
   public readonly category: string;
   public readonly objectId: string;
   public readonly createdAt: moment.Moment;
-  public readonly Chain: ChainInfo;
+  public readonly chainId: string;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
 
@@ -37,11 +36,6 @@ class NotificationSubscription {
     return this._isActive;
   }
 
-  // TODO: should resolve Chain vs chain
-  public get getChain() {
-    return this.Chain.id || this.Chain;
-  }
-
   public enable() {
     this._isActive = true;
   }
@@ -57,7 +51,7 @@ class NotificationSubscription {
     isActive,
     createdAt,
     immediateEmail,
-    Chain?,
+    chainId?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT
   ) {
@@ -67,7 +61,7 @@ class NotificationSubscription {
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
-    this.Chain = Chain;
+    this.chainId = chainId;
     this.Comment = comment;
     this.Thread = thread;
   }
@@ -127,7 +121,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     is_active,
     created_at,
     immediate_email,
-    Chain,
+    Chain?.id || Chain,
     modeledComment,
     modeledThread
   );
