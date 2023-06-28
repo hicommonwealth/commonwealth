@@ -27,9 +27,14 @@ async function consumeMessages() {
       )
     )[0][0];
 
-    const jwt = ''
     const profile: any = {
-      
+      _address: '0xE64309301c49E77Cd73596977ebF0BCA929C406D',
+      _chain: 'ethereum',
+      _name: 'IanR',
+      _avatarUrl: null,
+      _id: 90905,
+      _lastActive: '2023-06-27T14:28:43.067Z',
+      _initialized: true,
     };
 
     //TODO: Need to include discord metadata(ie author and channelId(of thread))
@@ -47,7 +52,6 @@ async function consumeMessages() {
         kind: 'discussion',
         url: null,
         readOnly: false,
-        jwt,
         canvas_action: null,
         canvas_hash: null,
         canvas_session: null,
@@ -59,7 +63,7 @@ async function consumeMessages() {
       };
 
       const response = await axios.post(
-        `http://${SERVER_URL}/api/createThread`,
+        `http://${SERVER_URL}/api/bot/createThread`,
         create_thread
       );
     } else {
@@ -75,7 +79,6 @@ async function consumeMessages() {
         chain: topic['chain_id'],
         parentCommentId: null,
         text: encodeURIComponent(parsedMessage.content),
-        jwt,
         canvas_action: null,
         canvas_hash: null,
         canvas_session: null,

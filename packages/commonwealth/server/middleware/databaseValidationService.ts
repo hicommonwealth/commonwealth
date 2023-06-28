@@ -43,6 +43,20 @@ export default class DatabaseValidationService {
     return [chain, error];
   }
 
+  public validateBotUser = async (req: Request,
+    res: Response,
+    next: NextFunction) => {
+      //1. Check for bot token 
+      //2. Get Bot User and inject
+      const user = await this.models.User.findOne({
+        where: {
+          id: 93625
+        }
+      })
+     req.user = user
+     next()
+  }
+
   public validateAuthor = async (
     req: Request,
     res: Response,
