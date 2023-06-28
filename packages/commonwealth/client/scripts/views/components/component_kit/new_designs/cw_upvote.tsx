@@ -18,10 +18,9 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
   voteCount,
   active,
   disabled,
-  propsUpvoted,
 }) => {
   const [count, setCount] = useState<number>(voteCount);
-  const [upvoted, setUpvoted] = useState<boolean>(!!propsUpvoted);
+  const [upvoted, setUpvoted] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
   const handleUpvote = () => {

@@ -160,7 +160,6 @@ export const ComponentShowcase = () => {
       <CWUpvote voteCount={8887} />
       <CWUpvote voteCount={8887} active />
       <CWUpvote voteCount={8887} disabled />
-      <CWUpvote voteCount={8887} disabled propsUpvoted />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
