@@ -22,6 +22,7 @@ import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
+import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -40,34 +41,77 @@ type DiscordChannelConnection = {
 const DiscordForumConnections = ({
   channels,
   topics,
+  refetchTopics,
 }: {
   channels: DiscordChannelConnection[];
   topics: { id: string; name: string; channelId: string | null }[];
+  refetchTopics: () => Promise<void>;
 }) => {
+  const topicOptions = topics.map((topic) => {
+    return { label: topic.name, value: topic.id };
+  });
+
+  const connectedTopics = topics.filter(
+    (topic) => topic.channelId !== null && topic.channelId !== ''
+  );
+
   return (
     <div className="DiscordForumConnections">
+      <div className="TopicRow">
+        <CWText className="HeaderText">Channel</CWText>
+        <CWText>Topic</CWText>
+      </div>
+
       {channels.map((channel) => {
         const connectedTopic = topics.find(
           (topic) => topic.channelId === channel.channelId
         );
-        console.log(channel);
+
+        const remainingTopics = topicOptions.filter(
+          (topic) =>
+            !connectedTopics.find(
+              (connected_topic) => connected_topic.id === topic.value
+            )
+        );
+
+        if (connectedTopic) {
+          remainingTopics.push({
+            label: connectedTopic.name,
+            value: connectedTopic.id,
+          });
+        }
+
         return (
-          <div key={channel.channelId}>
-            <CWText>{channel.channelName}</CWText>
+          <div key={channel.channelId} className="TopicRow">
+            <CWText className="ChannelText">#{channel.channelName}</CWText>
             <CWDropdown
               initialValue={
                 connectedTopic
                   ? { label: connectedTopic.name, value: connectedTopic.id }
                   : { label: 'Not connected', value: '' }
               }
-              options={topics.map((topic) => {
-                return { label: topic.name, value: topic.id };
-              })}
+              options={remainingTopics}
               onSelect={async (item) => {
                 // Connect the channel to the topic
                 channel.onConnect(item.value);
               }}
             />
+            {connectedTopic && (
+              <CWClose
+                className="CloseButton"
+                onClick={async () => {
+                  try {
+                    await app.discord.setForumChannelConnection(
+                      connectedTopic.id,
+                      null
+                    );
+                    await refetchTopics();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+            )}
           </div>
         );
       })}
@@ -87,7 +131,7 @@ export const ChainMetadataRows = ({
     'returningFromDiscordCallback'
   );
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics, refetch: refetchTopics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
 
@@ -547,17 +591,10 @@ export const ChainMetadataRows = ({
                 />
               )}
             </div>
-
-            <CWButton
-              label="Save Commonbot Settings"
-              className="save-snapshot"
-              buttonType="primary-black"
-              onClick={handleSaveCommonbotSettings}
-            />
             <div className="snapshot-settings">
               <CWText type="h4">Connected Forum Channels</CWText>
             </div>
-            <CWText>
+            <CWText type="caption" className="ForumCaption">
               Adding a connection will sync discord content to your Common
               forum.
             </CWText>
@@ -570,13 +607,12 @@ export const ChainMetadataRows = ({
                       channelId: channel.id,
                       connectedTopicId: '',
                       onConnect: async (topicId: string) => {
-                        console.log('here', topicId);
                         try {
                           await app.discord.setForumChannelConnection(
                             topicId,
                             channel.id
                           );
-                          refetchDiscordSettings();
+                          await refetchTopics();
                         } catch (e) {
                           console.log(e);
                         }
@@ -584,9 +620,18 @@ export const ChainMetadataRows = ({
                     };
                   })}
                   topics={topics}
+                  refetchTopics={async () => {
+                    await refetchTopics();
+                  }}
                 />
               )}
             </div>
+            <CWButton
+              label="Save Commonbot Settings"
+              className="save-snapshot"
+              buttonType="primary-black"
+              onClick={handleSaveCommonbotSettings}
+            />
           </>
         ) : discordBotConnecting ? (
           <>
