@@ -559,6 +559,15 @@ function setupRouter(
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
   );
+  
+  router.post(
+    '/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createThreadCommentHandler.bind(this, serverControllers)
+  );
+
   router.patch(
     '/comments/:id',
     passport.authenticate('jwt', { session: false }),

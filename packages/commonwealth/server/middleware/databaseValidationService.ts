@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import { validateChain, validateChainWithTopics } from './validateChain';
+import { CW_BOT_KEY } from '../config';
 
 export const ALL_CHAINS = 'all_chains';
 
@@ -47,10 +48,13 @@ export default class DatabaseValidationService {
     res: Response,
     next: NextFunction) => {
       //1. Check for bot token 
+      if(req.body.auth !== CW_BOT_KEY){
+        return next(new AppError('Approved Bot Only Endpoint'))
+      }
       //2. Get Bot User and inject
       const user = await this.models.User.findOne({
         where: {
-          id: 93625
+          id: 93625 //TODO: Figure out what user to use
         }
       })
      req.user = user
