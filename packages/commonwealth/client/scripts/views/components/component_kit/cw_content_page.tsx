@@ -119,17 +119,18 @@ export const CWContentPage = ({
           <ThreadAuthorAndPublishInfo
             showSplitDotIndicator={true}
             isNew={!!displayNewTag}
-            isLocked={thread.readOnly}
-            {...(thread.lockedAt && {
+            isLocked={thread?.readOnly}
+            {...(thread?.lockedAt && {
               lockedAt: thread.lockedAt.toISOString(),
             })}
-            {...(thread.updatedAt && {
+            {...(thread?.updatedAt && {
               lastUpdated: thread.updatedAt.toISOString(),
             })}
             authorInfo={
+              author &&
               new AddressInfo(
                 null,
-                author.address,
+                author?.address,
                 typeof author.chain === 'string'
                   ? author.chain
                   : author.chain.id,
@@ -155,10 +156,10 @@ export const CWContentPage = ({
       {body &&
         body(
           <ThreadOptions
-            canVote={!thread.readOnly}
-            canComment={!thread.readOnly}
+            canVote={!thread?.readOnly}
+            canComment={!thread?.readOnly}
             thread={thread}
-            totalComments={thread.numberOfComments}
+            totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}
             onSpamToggle={onSpamToggle}
             onDelete={onDelete}
