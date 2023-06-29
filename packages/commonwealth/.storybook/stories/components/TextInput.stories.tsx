@@ -106,83 +106,96 @@ const PhosphorIcon: FC<PhosphorIconProps> = ({ iconName, color }) => {
   );
 };
 
-export const TextInput = {
-  args: {
-    placeholder: "Placeholder",
-    disabled: false,
-    isCompact: true,
-    iconLeft: undefined,
-    iconLeftColor: "neutral-600",
-    iconRight: undefined,
-    iconRightColor: "primary-500",
-  },
-  argTypes: {
-    placeholder: {
-      control: { type: "text" },
+const BaseStory = (isCompact: boolean, disabled: boolean) => {
+  return {
+    args: {
+      placeholder: "Placeholder",
+      disabled,
+      isCompact,
+      iconLeft: undefined,
+      iconLeftColor: "neutral-600",
+      iconRight: undefined,
+      iconRightColor: "primary-500",
     },
-    disabled: {
-      control: { type: "boolean" },
-      options: [ true, false ],
+    argTypes: {
+      placeholder: {
+        control: { type: "text" },
+      },
+      disabled: {
+        control: { type: "boolean" },
+        options: [ true, false ],
+      },
+      isCompact: {
+        control: { type: "boolean" },
+        options: [ true, false ],
+      },
+      iconLeft: {
+        control: { type: "select" },
+        options: iconOptions,
+      },
+      iconLeftColor: {
+        control: { type: "select" },
+        options: Object.keys(palette),
+      },
+      iconRight: {
+        control: { type: "select" },
+        options: iconOptions,
+      },
+      iconRightColor: {
+        control: { type: "select" },
+        options: Object.keys(palette),
+      },
     },
-    isCompact: {
-      control: { type: "boolean" },
-      options: [ true, false ],
+    parameters: {
+      controls: {
+        exclude: [
+          "autoComplete",
+          "containerClassName",
+          "darkMode",
+          "defaultValue",
+          "autoFocus",
+          "value",
+          "iconLeftonClick",
+          "iconRightonClick",
+          "label",
+          "maxLength",
+          "name",
+          "onClick",
+          "onInput",
+          "onenterkey",
+          "tabIndex",
+          "inputClassName",
+          "displayOnly",
+          "hasLeftIcon",
+          "hasRightIcon",
+          "isTyping",
+          "autoFocus",
+          "inputValidationFn",
+          "manualStatusMessage",
+          "manualValidationStatus",
+          "validationStatus",
+          "size",
+          "isCompact",
+          "disabled",
+        ],
+      }
     },
-    iconLeft: {
-      control: { type: "select" },
-      options: iconOptions,
-    },
-    iconLeftColor: {
-      control: { type: "select" },
-      options: Object.keys(palette),
-    },
-    iconRight: {
-      control: { type: "select" },
-      options: iconOptions,
-    },
-    iconRightColor: {
-      control: { type: "select" },
-      options: Object.keys(palette),
-    },
-  },
-  parameters: {
-    controls: {
-      exclude: [
-        "autoComplete",
-        "containerClassName",
-        "darkMode",
-        "defaultValue",
-        "autoFocus",
-        "value",
-        "iconLeftonClick",
-        "iconRightonClick",
-        "label",
-        "maxLength",
-        "name",
-        "onClick",
-        "onInput",
-        "onenterkey",
-        "tabIndex",
-        "inputClassName",
-        "displayOnly",
-        "hasLeftIcon",
-        "hasRightIcon",
-        "isTyping",
-        "autoFocus",
-        "inputValidationFn",
-        "manualStatusMessage",
-        "manualValidationStatus",
-        "validationStatus",
-        "size",
-      ],
-    }
-  },
-  render: ({...args}) => (
-    <CWTextInput
-      name="Text field"
-      {...args}
-      iconLeft={<PhosphorIcon iconName={args.iconLeft} color={args.iconLeftColor} />}
-      iconRight={<PhosphorIcon iconName={args.iconRight} color={args.iconRightColor} />}
-    />
-  )
+    render: ({...args}) => (
+      <CWTextInput
+        name="Text field"
+        {...args}
+        iconLeft={
+          !!args.iconLeft ? <PhosphorIcon iconName={args.iconLeft} color={args.iconLeftColor} /> : undefined
+        }
+        iconRight={
+          !!args.iconRight ? <PhosphorIcon iconName={args.iconRight} color={args.iconRightColor} /> : undefined
+        }
+      />
+    ),
+  };
 };
+
+export const Small = { ...BaseStory(true, false) };
+export const SmallDisabled = { ...BaseStory(true, true) };
+export const Large = { ...BaseStory(false, false) };
+export const LargeDisabled = { ...BaseStory(false, true) };
