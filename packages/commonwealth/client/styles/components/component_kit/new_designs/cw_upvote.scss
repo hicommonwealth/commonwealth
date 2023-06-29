@@ -11,7 +11,10 @@
   padding: 8px 4px;
   gap: 4px;
   background-color: $white;
-  color: $neutral-500;
+
+  &.default {
+    color: $neutral-500;
+  }
 
   &:focus {
     outline: none;
@@ -25,6 +28,7 @@
 
   &.active {
     border-color: $primary-500;
+    color: $primary-500;
   }
 
   &.disabled {
@@ -33,36 +37,24 @@
     color: $neutral-400;
     cursor: default;
   }
+}
 
-  .fontDefault {
-    color: $neutral-500;
-  }
+.default {
+  color: $neutral-500;
+}
 
-  .fontUpvoted {
-    color: $primary-500;
-  }
+.upvoted {
+  color: $primary-500;
+}
 
-  .fontDisabled {
-    color: $neutral-400;
-  }
+.hover {
+  color: $primary-600;
+}
 
-  .fontHovering {
-    color: $primary-600;
-  }
+.active {
+  color: $primary-500;
+}
 
-  .noUpvote {
-    color: $neutral-500;
-
-    &.disabled {
-      color: $neutral-400;
-    }
-  }
-
-  .upvoted {
-    color: $primary-500;
-
-    &.disabled {
-      color: $neutral-400;
-    }
-  }
+.disabled {
+  color: $neutral-400;
 }

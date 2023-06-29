@@ -38,47 +38,30 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
 
   const handleOnMouseLeave = () => setIsHovering(false);
 
-  const getIconColor = () => {
-    return disabled
-      ? '#A09DA1'
-      : isHovering || active
-      ? '#2972CC'
-      : upvoted
-      ? '#338FFF'
-      : '#656167';
-  };
-
-  const getTextClass = () => {
-    return disabled
-      ? 'fontDisabled'
-      : isHovering || active
-      ? 'fontHovering'
-      : upvoted
-      ? 'fontUpvoted'
-      : 'fontDefault';
+  const getParameters = () => {
+    return {
+      default: !isHovering,
+      upvoted: upvoted,
+      hover: isHovering,
+      active: active,
+      disabled: disabled,
+    };
   };
 
   return (
     <button
-      className={getClasses(
-        {
-          active,
-          disabled,
-        },
-        ComponentType.Upvote
-      )}
+      className={getClasses({ ...getParameters() }, ComponentType.Upvote)}
       onClick={disabled ? null : handleUpvote}
       onMouseOver={handleOnMouseOver}
       onMouseLeave={handleOnMouseLeave}
     >
       <ArrowFatUp
-        className={upvoted ? 'upvoted' : 'noUpvote'}
+        className={getClasses({ ...getParameters() })}
         size={24}
         weight={upvoted || isHovering || active ? 'fill' : 'regular'}
-        color={getIconColor()}
       />
       <CWText
-        className={getTextClass()}
+        className={getClasses({ ...getParameters() })}
         type="caption"
         fontWeight={upvoted ? 'bold' : 'regular'}
       >
