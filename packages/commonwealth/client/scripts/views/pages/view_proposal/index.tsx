@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
@@ -22,7 +22,6 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { User } from '../../components/user/user';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
@@ -44,6 +43,7 @@ const ViewProposalPage = ({
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
+  const hasFetchedProposalRef = useRef(false);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [type, setType] = useState(typeProp);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
@@ -55,8 +55,19 @@ const ViewProposalPage = ({
     if (metadata?.title) forceRerender();
   }, [metadata?.title, forceRerender]);
 
+  useEffect(() => {
+    proposal?.isFetched.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
+      if (hasFetchedProposalRef.current) return;
+      hasFetchedProposalRef.current = true;
+
       if (!type) {
         setType(chainToProposalSlug(app.chain.meta));
       }
@@ -127,11 +138,7 @@ const ViewProposalPage = ({
   return (
     <CWContentPage
       title={proposal.title}
-      author={
-        !!proposal.author && (
-          <User avatarSize={24} user={proposal.author} popover linkify />
-        )
-      }
+      author={proposal.author}
       createdAt={proposal.createdAt}
       updatedAt={null}
       subHeader={
@@ -141,7 +148,7 @@ const ViewProposalPage = ({
           votingModalOpen={votingModalOpen}
         />
       }
-      body={
+      body={() =>
         !!proposal.description && (
           <CollapsibleProposalBody proposal={proposal} />
         )
