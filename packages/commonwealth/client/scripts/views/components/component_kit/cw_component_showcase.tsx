@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowCircleRight, MagnifyingGlass } from '@phosphor-icons/react';
 
 import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
@@ -9,6 +10,7 @@ import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { CWButton } from './new_designs/cw_button';
+import { CWTextInput } from './new_designs/cw_text_input';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -21,7 +23,6 @@ import { CWProgressBar } from './cw_progress_bar';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
-import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle, toggleDarkMode } from './cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
@@ -832,22 +833,30 @@ export const ComponentShowcase = () => {
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconLeft="write"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
           isCompact
         />
         <CWTextInput
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconRight="write"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
           isCompact
         />
         <CWTextInput
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconLeft="write"
-          iconRight="write"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
           isCompact
         />
         <CWTextInput
@@ -886,20 +895,28 @@ export const ComponentShowcase = () => {
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconLeft="write"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
         />
         <CWTextInput
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconRight="write"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
         />
         <CWTextInput
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconLeft="write"
-          iconRight="write"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
         />
         <CWTextInput
           name="Text field"

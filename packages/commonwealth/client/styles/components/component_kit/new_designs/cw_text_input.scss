@@ -70,32 +70,32 @@
       }
 
       &.hasLeftIcon {
-        padding-left: 36px;
+        padding-left: 32px;
       }
 
       &.hasRightIcon {
-        padding-right: 11px;
+        padding-right: 32px;
       }
     }
 
-    .text-input-left-icon.Icon {
+    .text-input-left-icon > svg {
       @include iconPositionStyles;
-      left: 15px;
+      left: 8px;
     }
 
-    .text-input-left-onClick-icon {
+    .text-input-left-onClick-icon > svg {
       @include iconPositionStyles;
-      left: 15px;
+      left: 8x;
     }
 
-    .text-input-right-icon.Icon {
+    .text-input-right-icon > svg {
       @include iconPositionStyles;
-      right: 15px;
+      right: 8px;
     }
 
-    .text-input-right-onClick-icon {
+    .text-input-right-onClick-icon > svg {
       @include iconPositionStyles;
-      right: 15px;
+      right: 8px;
     }
 
     ::placeholder {

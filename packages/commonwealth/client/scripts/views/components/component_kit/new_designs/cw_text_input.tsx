@@ -3,7 +3,6 @@ import React from 'react';
 import 'components/component_kit/new_designs/cw_text_input.scss';
 import { CWIconButton } from '../cw_icon_button';
 import { CWIcon } from '../cw_icons/cw_icon';
-import type { IconName } from '../cw_icons/cw_icon_lookup';
 import { CWLabel } from '../cw_label';
 import { CWText } from '../cw_text';
 import type { ValidationStatus } from '../cw_validation_text';
@@ -19,9 +18,9 @@ export type BaseTextInputProps = {
   containerClassName?: string;
   defaultValue?: string | number;
   value?: string | number;
-  iconLeft?: IconName;
+  iconLeft?: JSX.Element;
   iconLeftonClick?: () => void;
-  iconRight?: IconName;
+  iconRight?: JSX.Element;
   iconRightonClick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
   label?: string | React.ReactNode;
@@ -171,19 +170,9 @@ export const CWTextInput = (props: TextInputProps) => {
       )}
       <div className="input-and-icon-container">
         {iconLeftonClick && !!iconLeft ? (
-          <div className="text-input-left-onClick-icon">
-            <CWIconButton
-              iconName={iconLeft}
-              iconSize="small"
-              onClick={iconLeftonClick}
-            />
-          </div>
+          <div className="text-input-left-onClick-icon">{iconLeft}</div>
         ) : !!iconLeft ? (
-          <CWIcon
-            iconName={iconLeft}
-            iconSize="small"
-            className="text-input-left-icon"
-          />
+          <div className="text-input-left-icon">{iconLeft}</div>
         ) : null}
         <input
           autoFocus={autoFocus}
@@ -250,19 +239,9 @@ export const CWTextInput = (props: TextInputProps) => {
           defaultValue={defaultValue}
         />
         {iconRightonClick && !!iconRight ? (
-          <div className="text-input-right-onClick-icon">
-            <CWIconButton
-              iconName={iconRight}
-              iconSize="small"
-              onClick={iconRightonClick}
-            />
-          </div>
+          <div className="text-input-right-onClick-icon">{iconRight}</div>
         ) : !!iconRight ? (
-          <CWIcon
-            iconName={iconRight}
-            iconSize="small"
-            className="text-input-right-icon"
-          />
+          <div className="text-input-right-icon">{iconRight}</div>
         ) : null}
       </div>
     </div>
