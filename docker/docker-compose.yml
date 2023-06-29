@@ -9,9 +9,6 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-    networks:
-      - notification_service_network
-
   taskmanager:
     image: flink:1.16.2-scala_2.12
     depends_on:
@@ -23,22 +20,13 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 2
-    networks:
-      - notification_service_network
-
-  notifications_service:
-    container_name: notifications_service
-    build:
-      dockerfile: dev.Dockerfile
-      context: ../packages/notifications-service
-    tty: true
-    environment:
-      - FLINK_MASTER=jobmanager:8081
-    volumes:
-      - ../packages/notifications-service:/root
-    networks:
-      - notification_service_network
-
-networks:
-  notification_service_network:
-    name: notification_service_network
+  beam_job_service:
+    image: apache/beam_flink1.16_job_server:latest
+    depends_on:
+      - jobmanager
+      - taskmanager
+    ports:
+      - "8097:8097"
+      - "8098:8098"
+      - "8099:8099"
+    command: --flink-master=jobmanager:8081
