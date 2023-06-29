@@ -55,12 +55,14 @@ type CWThreadActionProps = {
   disabled?: boolean;
   label?: ActionType;
   count?: number;
+  onChange: () => void;
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
   disabled,
   label,
   count,
+  onChange,
 }) => {
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
@@ -83,6 +85,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
       )}
       onMouseOver={handleOnMouseOver}
       onMouseLeave={handleOnMouseLeave}
+      onClick={onChange}
     >
       {renderPhosphorIcon(label, disabled, isHovering)}
       {label !== 'overflow' && (label || count) && (

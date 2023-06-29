@@ -157,18 +157,32 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
-      <CWThreadAction label="comment" />
-      <CWThreadAction label="share" />
-      <CWThreadAction label="subscribe" />
-      <CWThreadAction label="upvote" count={1} />
-      <CWThreadAction label="overflow" />
-      <CWThreadAction />
-      <CWThreadAction label="comment" disabled />
-      <CWThreadAction label="share" disabled />
-      <CWThreadAction label="subscribe" disabled />
-      <CWThreadAction label="upvote" count={1} disabled />
-      <CWThreadAction label="overflow" disabled />
-      <CWThreadAction disabled />
+      <CWThreadAction
+        label="comment"
+        onChange={() => console.log('Comment action clicked!')}
+      />
+      <CWThreadAction
+        label="share"
+        onChange={() => console.log('Share action clicked!')}
+      />
+      <CWThreadAction
+        label="subscribe"
+        onChange={() => console.log('Subscribe action clicked!')}
+      />
+      <CWThreadAction
+        label="upvote"
+        count={1}
+        onChange={() => console.log('Upvote action clicked!!')}
+      />
+      <CWThreadAction
+        label="overflow"
+        onChange={() => console.log('Overflow action clicked!')}
+      />
+      <CWThreadAction label="comment" onChange={() => {}} disabled />
+      <CWThreadAction label="share" onChange={() => {}} disabled />
+      <CWThreadAction label="subscribe" onChange={() => {}} disabled />
+      <CWThreadAction label="upvote" count={1} onChange={() => {}} disabled />
+      <CWThreadAction label="overflow" onChange={() => {}} disabled />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
