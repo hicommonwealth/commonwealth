@@ -33,7 +33,6 @@ type ContentPageProps = {
   title: string | ReactNode;
   //
   updatedAt?: moment.Moment;
-  archivedAt: moment.Moment | null;
 
   // optional
   lastEdited?: moment.Moment | number;
@@ -74,7 +73,6 @@ type ContentPageProps = {
 export const CWContentPage = ({
   thread,
   author,
-  archivedAt,
   body,
   comments,
   contentBodyLabel,

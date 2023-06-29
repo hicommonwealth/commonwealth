@@ -519,7 +519,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   return (
     <CWContentPage
-      archivedAt={thread.archivedAt}
       showTabs={isCollapsedSize && tabsShouldBePresent}
       contentBodyLabel="Thread"
       showSidebar={
