@@ -13,7 +13,6 @@ sgMail.setApiKey(SENDGRID_API_KEY);
  */
 export type NotificationOptions = {
   categoryId: string;
-  objectId: string;
   notificationData: NotificationDataTypes;
   webhookData?: Partial<WebhookContent>;
   excludeAddresses?: string[];
@@ -43,7 +42,6 @@ export class ServerNotificationsController
 
   async emit({
     categoryId,
-    objectId,
     notificationData,
     webhookData,
     excludeAddresses,
@@ -52,7 +50,6 @@ export class ServerNotificationsController
     await emitNotifications(
       this.models,
       categoryId,
-      objectId,
       notificationData,
       webhookData,
       excludeAddresses,

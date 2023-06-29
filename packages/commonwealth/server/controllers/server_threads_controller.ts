@@ -186,7 +186,6 @@ export class ServerThreadsController implements IServerThreadsController {
     // build notification options
     const notificationOptions: NotificationOptions = {
       categoryId: NotificationCategories.NewReaction,
-      objectId: `discussion_${thread.id}`,
       notificationData: {
         created_at: new Date(),
         thread_id: thread.id,
@@ -391,7 +390,6 @@ export class ServerThreadsController implements IServerThreadsController {
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewReaction,
-          object_id: `comment-${finalComment.id}`,
           chain_id: finalComment.chain || null,
           comment_id: finalComment.id,
           is_active: true,
@@ -402,7 +400,6 @@ export class ServerThreadsController implements IServerThreadsController {
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewComment,
-          object_id: `comment-${finalComment.id}`,
           chain_id: finalComment.chain || null,
           comment_id: finalComment.id,
           is_active: true,
@@ -451,37 +448,10 @@ export class ServerThreadsController implements IServerThreadsController {
 
     const allNotifications: NotificationOptions[] = [];
 
-    // build notification for root thread
-    allNotifications.push({
-      categoryId: NotificationCategories.NewComment,
-      objectId: `discussion_${threadId}`,
-      notificationData: {
-        created_at: new Date(),
-        thread_id: threadId,
-        root_title,
-        root_type: ProposalType.Thread,
-        comment_id: +finalComment.id,
-        comment_text: finalComment.text,
-        chain_id: finalComment.chain,
-        author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
-      },
-      webhookData: {
-        user: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
-        url: cwUrl,
-        title: root_title,
-        chain: finalComment.chain,
-        body: finalComment.text,
-      },
-      excludeAddresses: excludedAddrs,
-    });
-
     // if child comment, build notification for parent author
     if (parentId && parentComment) {
       allNotifications.push({
         categoryId: NotificationCategories.NewComment,
-        objectId: `comment-${parentId}`,
         notificationData: {
           created_at: new Date(),
           thread_id: +threadId,
@@ -495,7 +465,14 @@ export class ServerThreadsController implements IServerThreadsController {
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
-        webhookData: null,
+        webhookData: {
+          user: finalComment.Address.address,
+          author_chain: finalComment.Address.chain,
+          url: cwUrl,
+          title: root_title,
+          chain: finalComment.chain,
+          body: finalComment.text,
+        },
         excludeAddresses: excludedAddrs,
       });
 
@@ -509,7 +486,6 @@ export class ServerThreadsController implements IServerThreadsController {
           if (shouldNotifyMentionedUser) {
             allNotifications.push({
               categoryId: NotificationCategories.NewMention,
-              objectId: `user-${mentionedAddress.User.id}`,
               notificationData: {
                 created_at: new Date(),
                 thread_id: +threadId,
@@ -527,6 +503,31 @@ export class ServerThreadsController implements IServerThreadsController {
           }
         });
       }
+    } else {
+      // build notification for root thread
+      allNotifications.push({
+        categoryId: NotificationCategories.NewComment,
+        notificationData: {
+          created_at: new Date(),
+          thread_id: threadId,
+          root_title,
+          root_type: ProposalType.Thread,
+          comment_id: +finalComment.id,
+          comment_text: finalComment.text,
+          chain_id: finalComment.chain,
+          author_address: finalComment.Address.address,
+          author_chain: finalComment.Address.chain,
+        },
+        webhookData: {
+          user: finalComment.Address.address,
+          author_chain: finalComment.Address.chain,
+          url: cwUrl,
+          title: root_title,
+          chain: finalComment.chain,
+          body: finalComment.text,
+        },
+        excludeAddresses: excludedAddrs,
+      });
     }
 
     // update author last saved (in background)

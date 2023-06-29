@@ -114,6 +114,7 @@ export function buildCommentQuery(
           AND S.subscriber_id = ?
           AND S.is_active = true
           ${getFilterString(chain_filter)}
+          AND N.parent_comment_id IS NULL
           AND N.created_at >= S.created_at
         ORDER BY notification_created_at DESC;
   `;
@@ -156,7 +157,7 @@ export function buildReactionQuery(
           FROM S
                    INNER JOIN "Notifications" N ON S.category_id = N.category_id AND S.chain_id = N.chain_id AND
                                                    S.offchain_thread_id = N.thread_id
-          WHERE N.created_at >= S.created_at
+          WHERE N.created_at >= S.created_at AND N.comment_id IS NULL
           UNION ALL
           -- child reactions
           SELECT S.id,
