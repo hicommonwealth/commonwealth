@@ -14,13 +14,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
@@ -122,18 +120,7 @@ export const ViewProposalPage = ({
     <CWContentPage
       showSidebar
       title={proposal.title}
-      author={
-        <CWText>
-          {!!proposalAuthor && (
-            <User
-              user={proposalAuthor}
-              showAddressWithDisplayName
-              linkify
-              popover
-            />
-          )}
-        </CWText>
-      }
+      author={proposalAuthor}
       createdAt={proposal.created}
       updatedAt={null}
       contentBodyLabel="Snapshot"
@@ -144,7 +131,7 @@ export const ViewProposalPage = ({
           <ClosedProposalPill proposalState={proposal.state} />
         )
       }
-      body={<QuillRenderer doc={proposal.body} />}
+      body={() => <QuillRenderer doc={proposal.body} />}
       subBody={
         votes.length > 0 && (
           <SnapshotVotesTable
