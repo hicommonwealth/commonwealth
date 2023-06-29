@@ -10,12 +10,19 @@ module.exports = {
         },
         {
           chain_node_id: 1285,
+        },
+        {
+          transaction: t,
         }
       );
 
-      await queryInterface.bulkDelete('ChainNodes', {
-        id: 1285,
-      });
+      await queryInterface.bulkDelete(
+        'ChainNodes',
+        {
+          id: 1285,
+        },
+        { transaction: t }
+      );
     });
   },
 
