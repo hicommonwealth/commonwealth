@@ -12,6 +12,11 @@
   .right-buttons {
     display: flex;
     align-items: center;
+
+    &.isDisabled {
+      opacity: 0.6;
+      filter: grayscale(1);
+    }
   }
 
   .right-buttons {
@@ -59,6 +64,20 @@
   &.isFocused {
     border: 1px solid $primary-500;
     box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
+  }
+
+  &.isDisabled {
+    pointer-events: none;
+    user-select: none;
+
+    .QuillEditor {
+      background: $neutral-50;
+    }
+  }
+
+  .QuillEditor {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
   }
 
   .markdownEnabled {

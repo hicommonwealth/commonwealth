@@ -34,6 +34,7 @@ type ReactQuillEditorProps = {
   tabIndex?: number;
   contentDelta: SerializableDeltaStatic;
   setContentDelta: (d: SerializableDeltaStatic) => void;
+  isDisabled?: boolean;
 };
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -43,6 +44,7 @@ const ReactQuillEditor = ({
   tabIndex,
   contentDelta,
   setContentDelta,
+  isDisabled = false,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -189,7 +191,7 @@ const ReactQuillEditor = ({
   }, [editorRef]);
 
   return (
-    <div className={clsx('QuillEditorWrapper', { isFocused })}>
+    <div className={clsx('QuillEditorWrapper', { isFocused, isDisabled })}>
       {isUploading && <LoadingIndicator />}
       <Modal
         content={
@@ -211,6 +213,7 @@ const ReactQuillEditor = ({
             isMarkdownEnabled={isMarkdownEnabled}
             handleToggleMarkdown={handleToggleMarkdown}
             setIsPreviewVisible={setIsPreviewVisible}
+            isDisabled={isDisabled}
           />
           <ReactQuill
             ref={editorRef}

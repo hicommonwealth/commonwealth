@@ -46,6 +46,7 @@ type CustomQuillToolbarProps = {
   isMarkdownEnabled: boolean;
   handleToggleMarkdown: () => void;
   setIsPreviewVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  isDisabled?: boolean;
 };
 
 export const CustomQuillToolbar = ({
@@ -53,9 +54,10 @@ export const CustomQuillToolbar = ({
   setIsPreviewVisible,
   handleToggleMarkdown,
   isMarkdownEnabled,
+  isDisabled = false,
 }: CustomQuillToolbarProps) => (
   <div id={toolbarId} className="CustomQuillToolbar">
-    <div className="left-buttons">
+    <div className={clsx('left-buttons', { isDisabled })}>
       <div className="section">
         <button className="ql-header" value={1} />
         <button className="ql-header" value={2} />
@@ -77,7 +79,7 @@ export const CustomQuillToolbar = ({
         <button className="ql-list" value="check" />
       </div>
     </div>
-    <div className="right-buttons">
+    <div className={clsx('right-buttons', { isDisabled })}>
       <button
         className={clsx('markdown-button', { enabled: isMarkdownEnabled })}
         onClick={handleToggleMarkdown}
