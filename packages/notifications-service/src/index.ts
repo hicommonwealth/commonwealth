@@ -18,8 +18,12 @@ function printAndReturn(element) {
 }
 
 async function main() {
+  if (!process.env.FLINK_MASTER) {
+    throw new Error('process.env.FLINK_MASTER not defined');
+  }
+  console.log(`––– CONNECTING TO: ${process.env.FLINK_MASTER}`);
   const runner = new PortableRunner({
-    jobEndpoint: 'localhost:8081',
+    jobEndpoint: process.env.FLINK_MASTER,
     environmentType: 'LOOPBACK',
   });
   return runner.run(createPipeline('Blah blah input!'));
