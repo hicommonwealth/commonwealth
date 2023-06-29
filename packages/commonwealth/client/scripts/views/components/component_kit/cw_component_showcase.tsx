@@ -9,6 +9,7 @@ import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { CWButton } from './new_designs/cw_button';
+import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -37,7 +38,6 @@ import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
-import { CWThreadAction } from './new_designs/cw_thread_action';
 import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
@@ -157,32 +157,6 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
-      <CWThreadAction
-        label="comment"
-        onChange={() => console.log('Comment action clicked!')}
-      />
-      <CWThreadAction
-        label="share"
-        onChange={() => console.log('Share action clicked!')}
-      />
-      <CWThreadAction
-        label="subscribe"
-        onChange={() => console.log('Subscribe action clicked!')}
-      />
-      <CWThreadAction
-        label="upvote"
-        count={1}
-        onChange={() => console.log('Upvote action clicked!!')}
-      />
-      <CWThreadAction
-        label="overflow"
-        onChange={() => console.log('Overflow action clicked!')}
-      />
-      <CWThreadAction label="comment" onChange={() => {}} disabled />
-      <CWThreadAction label="share" onChange={() => {}} disabled />
-      <CWThreadAction label="subscribe" onChange={() => {}} disabled />
-      <CWThreadAction label="upvote" count={1} onChange={() => {}} disabled />
-      <CWThreadAction label="overflow" onChange={() => {}} disabled />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
@@ -965,6 +939,42 @@ export const ComponentShowcase = () => {
           <CWText fontWeight="semiBold">Card title</CWText>
           <CWText>Full width</CWText>
         </CWCard>
+        <div className="thread-actions-gallery">
+          <CWText type="h3">Thread Actions</CWText>
+          <CWText type="h5">Default</CWText>
+          <CWThreadAction
+            label="comment"
+            onChange={() => console.log('Comment action clicked!')}
+          />
+          <CWThreadAction
+            label="share"
+            onChange={() => console.log('Share action clicked!')}
+          />
+          <CWThreadAction
+            label="subscribe"
+            onChange={() => console.log('Subscribe action clicked!')}
+          />
+          <CWThreadAction
+            label="upvote"
+            count={1}
+            onChange={() => console.log('Upvote action clicked!!')}
+          />
+          <CWThreadAction
+            label="overflow"
+            onChange={() => console.log('Overflow action clicked!')}
+          />
+          <CWText type="h5">Disabled</CWText>
+          <CWThreadAction label="comment" onChange={() => {}} disabled />
+          <CWThreadAction label="share" onChange={() => {}} disabled />
+          <CWThreadAction label="subscribe" onChange={() => {}} disabled />
+          <CWThreadAction
+            label="upvote"
+            count={1}
+            onChange={() => {}}
+            disabled
+          />
+          <CWThreadAction label="overflow" onChange={() => {}} disabled />
+        </div>
       </div>
     </div>
   );

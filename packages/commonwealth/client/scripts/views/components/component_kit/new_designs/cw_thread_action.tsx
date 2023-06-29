@@ -91,9 +91,9 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
       {label !== 'overflow' && (label || count) && (
         <CWText
           className={getClasses({
-            disabled,
             hover: isHovering,
             default: !isHovering,
+            disabled,
           })}
           type="caption"
           fontWeight="regular"
