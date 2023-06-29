@@ -32,7 +32,7 @@ export type AdminActionsProps = {
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
   hasPendingEdits?: boolean;
-  archivedAt: moment.Moment | null;
+  archivedAt?: moment.Moment | null;
 };
 
 export const AdminActions = ({
