@@ -45,6 +45,10 @@
       width: 100%;
     }
 
+    .right-icon svg {
+      fill: $neutral-500;
+    }
+
     &.background {
       background-color: $primary-100;
     }

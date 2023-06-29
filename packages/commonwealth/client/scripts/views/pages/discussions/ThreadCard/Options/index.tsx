@@ -40,6 +40,7 @@ export const Options = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
+  archivedAt,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -84,31 +85,34 @@ export const Options = ({
           )}
         />
 
-        <button
-          onClick={async (e) => {
-            // prevent clicks from propagating to discussion row
-            e.preventDefault();
-            e.stopPropagation();
-            thread &&
-              (await handleToggleSubscription(
-                thread,
-                getCommentSubscription(thread),
-                getReactionSubscription(thread),
-                isSubscribed,
-                setIsSubscribed
-              ));
-          }}
-          className="thread-option-btn"
-        >
-          <CWIcon
-            color="black"
-            iconName={isSubscribed ? 'bellMuted' : 'bell'}
-            iconSize="small"
-          />
-          <CWText type="caption">
-            {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-          </CWText>
-        </button>
+        { archivedAt === null &&
+          <button
+            onClick={async (e) => {
+              // prevent clicks from propagating to discussion row
+              e.preventDefault();
+              e.stopPropagation();
+              thread &&
+                (await handleToggleSubscription(
+                  thread,
+                  getCommentSubscription(thread),
+                  getReactionSubscription(thread),
+                  isSubscribed,
+                  setIsSubscribed
+                ));
+            }}
+            className="thread-option-btn"
+          >
+            <CWIcon
+              color="black"
+              iconName={isSubscribed ? 'bellMuted' : 'bell'}
+              iconSize="small"
+            />
+            <CWText type="caption">
+              {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+            </CWText>
+          </button>
+        }
+
 
         {canUpdateThread && thread && (
           <AdminActions
@@ -125,6 +129,7 @@ export const Options = ({
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             onSpamToggle={onSpamToggle}
             hasPendingEdits={hasPendingEdits}
+            archivedAt={thread.archivedAt}
           />
         )}
       </div>

@@ -175,6 +175,7 @@ export const CWContentPage = ({
             hasPendingEdits={hasPendingEdits}
             onProposalStageChange={onProposalStageChange}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+            archivedAt={thread.archivedAt}
           />
         )}
 

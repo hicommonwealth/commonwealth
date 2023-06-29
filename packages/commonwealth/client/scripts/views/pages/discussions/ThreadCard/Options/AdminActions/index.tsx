@@ -5,6 +5,7 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
+import { ArchiveThreadModal } from 'views/modals/archive_thread_modal';
 import { notifySuccess } from '../../../../../../controllers/app/notifications';
 import type Thread from '../../../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../../../models/Thread';
@@ -15,6 +16,7 @@ import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon
 import { PopoverMenu } from '../../../../../components/component_kit/cw_popover/cw_popover_menu';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './index.scss';
+import moment from 'moment';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -30,6 +32,7 @@ export type AdminActionsProps = {
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
   hasPendingEdits?: boolean;
+  archivedAt: moment.Moment | null;
 };
 
 export const AdminActions = ({
@@ -46,6 +49,7 @@ export const AdminActions = ({
   onEditCancel,
   onEditConfirm,
   hasPendingEdits,
+  archivedAt,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
@@ -53,6 +57,7 @@ export const AdminActions = ({
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
     useState(false);
+  const [isArchiveThreadModalOpen, setIsArchiveThreadModalOpen] = useState(false);
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -208,9 +213,9 @@ export const AdminActions = ({
         <PopoverMenu
           className="AdminActions"
           menuItems={[
-            ...(hasAdminPermissions ||
+            ...(archivedAt === null && (hasAdminPermissions ||
             isThreadAuthor ||
-            (isThreadCollaborator && !thread.readOnly)
+            (isThreadCollaborator && !thread.readOnly))
               ? [
                   {
                     label: 'Edit',
@@ -236,20 +241,36 @@ export const AdminActions = ({
                     iconLeft: 'pin' as const,
                     iconLeftWeight: 'bold' as const,
                   },
-                  {
-                    onClick: handleThreadLockToggle,
-                    label: thread.readOnly ? 'Unlock' : 'Lock',
-                    iconLeft: thread.readOnly
-                      ? ('keyLockOpened' as const)
-                      : ('keyLockClosed' as const),
-                    iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: () => setIsChangeTopicModalOpen(true),
-                    label: 'Change topic',
-                    iconLeft: 'filter' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
+                  ...(archivedAt === null
+                    ? [
+                        {
+                          onClick: handleThreadLockToggle,
+                          label: thread.readOnly ? 'Unlock' : 'Lock',
+                          iconLeft: thread.readOnly
+                            ? ('keyLockOpened' as const)
+                            : ('keyLockClosed' as const),
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: () => setIsChangeTopicModalOpen(true),
+                          label: 'Change topic',
+                          iconLeft: 'filter' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                      ]
+                    : []),
+                    {
+                      label: archivedAt === null ? 'Archive' : 'Unarchive',
+                      iconLeft: archivedAt === null ? 'archiveTray' as const : 'archiveTrayFilled' as const,
+                      iconLeftWeight: 'bold' as const,
+                      onClick: () => {
+                        if (archivedAt === null) {
+                          setIsArchiveThreadModalOpen(true)
+                        } else {
+                          app.threads.unarchive(thread.id)
+                        }
+                      },
+                    },
                 ]
               : []),
             ...(isThreadAuthor || hasAdminPermissions
@@ -282,20 +303,24 @@ export const AdminActions = ({
                         },
                       ]
                     : []),
-                  {
-                    onClick: () => setIsUpdateProposalStatusModalOpen(true),
-                    label: 'Update status',
-                    iconLeft: 'democraticProposal' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: handleFlagMarkAsSpam,
-                    label: !thread.markedAsSpamAt
-                      ? 'Flag as spam'
-                      : 'Unflag as spam',
-                    iconLeft: 'flag' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
+                  ...(archivedAt === null
+                    ? [
+                        {
+                          onClick: () => setIsUpdateProposalStatusModalOpen(true),
+                          label: 'Update status',
+                          iconLeft: 'democraticProposal' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: handleFlagMarkAsSpam,
+                          label: !thread.markedAsSpamAt
+                            ? 'Flag as spam'
+                            : 'Unflag as spam',
+                          iconLeft: 'flag' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                      ]
+                    : []),
                   {
                     onClick: handleDeleteThread,
                     label: 'Delete',
@@ -357,6 +382,17 @@ export const AdminActions = ({
         }
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
         open={isEditCollaboratorsModalOpen}
+      />
+
+      <Modal
+        content={
+          <ArchiveThreadModal
+            thread={thread}
+            onModalClose={() => setIsArchiveThreadModalOpen(false)}
+          />
+        }
+        onClose={() => setIsArchiveThreadModalOpen(false)}
+        open={isArchiveThreadModalOpen}
       />
     </>
   );

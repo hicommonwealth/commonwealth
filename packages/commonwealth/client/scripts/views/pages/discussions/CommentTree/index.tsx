@@ -393,6 +393,7 @@ export const CommentsTree = ({
                   </div>
                 )}
                 <CommentCard
+                  threadArchivedAt={thread.archivedAt}
                   canEdit={!isLocked && (isCommentAuthor || isAdminOrMod)}
                   editDraft={edits?.[comment.id]?.editDraft || ''}
                   onEditStart={async () => await handleEditStart(comment)}

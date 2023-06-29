@@ -450,12 +450,6 @@ class ThreadsController {
       url: `${app.serverUrl()}/threads/${threadId}/archive`,
       type: 'PATCH',
       success: (response) => {
-
-        app.threadUpdateEmitter.emit('threadUpdated', {
-          threadId,
-          action: ThreadActionType.Archive,
-        });
-
         const result = this.modelFromServer(response.result);
         this._store.update(result);
         this._listingStore.add(result);

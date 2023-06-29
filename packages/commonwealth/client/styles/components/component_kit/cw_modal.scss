@@ -28,7 +28,7 @@ $modal-padding: 16px;
   background: $white;
   border-radius: $border-radius-corners;
   box-shadow: $elevation-3;
-  overflow: scroll;
+  overflow: auto;
 
   &.isFullScreen {
     border-radius: 0;

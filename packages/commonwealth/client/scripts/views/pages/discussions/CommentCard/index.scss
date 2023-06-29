@@ -96,6 +96,10 @@
       align-items: center;
       gap: 8px;
 
+      button {
+        outline: none;
+      }
+
       .comment-option-btn {
         outline: 0;
         border: 0;

@@ -37,6 +37,7 @@ type CommentCardProps = {
   canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
+  threadArchivedAt: moment.Moment | null;
 };
 
 export const CommentCard = ({
@@ -60,6 +61,7 @@ export const CommentCard = ({
   canToggleSpam,
   // actual comment
   comment,
+  threadArchivedAt,
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
@@ -113,7 +115,7 @@ export const CommentCard = ({
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton comment={comment} />
+              <CommentReactionButton comment={comment} archivedAt={threadArchivedAt} />
 
               <SharePopover
                 commentId={comment.id}
@@ -137,7 +139,7 @@ export const CommentCard = ({
                 )}
               />
 
-              {canReply && (
+              {threadArchivedAt === null && canReply && (
                 <button
                   onClick={async (e) => {
                     // prevent clicks from propagating to discussion row
@@ -154,7 +156,7 @@ export const CommentCard = ({
                 </button>
               )}
 
-              {(canEdit || canDelete) && (
+              {threadArchivedAt === null && (canEdit || canDelete) && (
                 <PopoverMenu
                   className="CommentActions"
                   renderTrigger={(onclick) => (

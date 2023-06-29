@@ -201,6 +201,7 @@ export const Card = ({
               onEditCancel={onEditCancel}
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
+              archivedAt={thread.archivedAt}
             />
           </div>
         </div>
