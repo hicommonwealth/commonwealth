@@ -94,10 +94,9 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
                   });
               } else {
                 app.user.notifications
-                  .subscribe(
-                    NotificationCategories.SnapshotProposal,
-                    snapshotId
-                  )
+                  .subscribe(NotificationCategories.SnapshotProposal, {
+                    snapshotId,
+                  })
                   .then(() => {
                     setHasSubscription(true);
                   });

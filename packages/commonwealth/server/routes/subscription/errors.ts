@@ -14,6 +14,7 @@ const Errors = {
   NoChainEntity: 'Cannot find ChainEntity',
   InvalidChain: 'Invalid chain',
   InvalidChainEventId: 'Invalid ChainEvent id',
+  InvalidSnapshotSpace: 'Invalid snapshot space',
   NoMentionDelete: 'Cannot delete mention subscription',
 };
 

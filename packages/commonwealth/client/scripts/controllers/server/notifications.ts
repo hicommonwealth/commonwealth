@@ -42,6 +42,13 @@ interface NotifOptions {
   maxId: number;
 }
 
+interface SubscriptionOptions {
+  chainId?: string;
+  threadId?: number;
+  commentId?: number;
+  snapshotId?: string;
+}
+
 class NotificationsController {
   private _discussionStore: NotificationStore = new NotificationStore();
   private _chainEventStore: NotificationStore = new NotificationStore();
@@ -76,17 +83,15 @@ class NotificationsController {
     return this._subscriptions;
   }
 
-  // TODO: @Timothee generalize this away from objectId
-  public subscribe(
-    category: string,
-    data: {
-      chainId?: string;
-      threadId?: number;
-      commentId?: number;
-      snapshotId?: string;
-    }
-  ) {
+  public subscribe(category: string, data: SubscriptionOptions) {
     const subscription = this.findSubscription(category, data);
+    // convert data keys from camelCase to snake_case for requests
+    const requestData = Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [
+        k.replace(/([A-Z])/g, '_$1').toLowerCase(),
+        v,
+      ])
+    );
 
     if (subscription) {
       return this.enableSubscriptions([subscription]);
@@ -96,6 +101,7 @@ class NotificationsController {
         {
           category,
           is_active: true,
+          ...requestData,
         },
         (result) => {
           const newSubscription = modelFromServer(result);
@@ -345,12 +351,7 @@ class NotificationsController {
 
   public findSubscription(
     categoryId: string,
-    data: {
-      chainId?: string;
-      threadId?: number;
-      commentId?: number;
-      snapshotId?: string;
-    }
+    data: SubscriptionOptions
   ): NotificationSubscription {
     if (
       categoryId === NotificationCategories.ChainEvent ||

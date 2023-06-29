@@ -28,7 +28,9 @@ export const SubscriptionButton = () => {
             .then(() => setNotificationsOn(false));
         } else {
           subscriptions
-            .subscribe(NotificationCategories.NewThread, communityOrChain)
+            .subscribe(NotificationCategories.NewThread, {
+              chainId: communityOrChain,
+            })
             .then(() => setNotificationsOn(true));
         }
       }}

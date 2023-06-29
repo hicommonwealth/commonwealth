@@ -48,14 +48,12 @@ export const handleToggleSubscription = async (
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(
-        NotificationCategories.NewReaction,
-        thread.uniqueIdentifier
-      ),
-      app.user.notifications.subscribe(
-        NotificationCategories.NewComment,
-        thread.uniqueIdentifier
-      ),
+      app.user.notifications.subscribe(NotificationCategories.NewReaction, {
+        threadId: thread.id,
+      }),
+      app.user.notifications.subscribe(NotificationCategories.NewComment, {
+        threadId: thread.id,
+      }),
     ]);
     notifySuccess('Subscribed!');
   } else if (isSubscribed) {

@@ -3,6 +3,9 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.removeColumn('Subscriptions', 'object_id', {
+        transaction: t,
+      });
       // extract user_id for user specific notifications (new-mention and new-collaboration)
       await queryInterface.addColumn(
         'Notifications',

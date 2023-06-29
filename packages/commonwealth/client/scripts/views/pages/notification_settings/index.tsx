@@ -275,7 +275,9 @@ const NotificationSettingsPage = () => {
                   checked={false}
                   onChange={() => {
                     app.user.notifications
-                      .subscribe(NotificationCategories.ChainEvent, chain.id)
+                      .subscribe(NotificationCategories.ChainEvent, {
+                        chainId: chain.id,
+                      })
                       .then(() => {
                         forceRerender();
                       });
