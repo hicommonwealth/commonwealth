@@ -60,6 +60,7 @@
 .QuillEditorWrapper {
   border-radius: 6px;
   border: 1px solid $neutral-200;
+  min-height: 255px;
 
   &.isFocused {
     border: 1px solid $primary-500;
