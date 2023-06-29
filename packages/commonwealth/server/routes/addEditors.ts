@@ -123,7 +123,6 @@ const addEditors = async (
     emitNotifications(
       models,
       NotificationCategories.NewCollaboration,
-      `user-${collaborator.User.id}`,
       {
         created_at: new Date(),
         thread_id: +thread.id,

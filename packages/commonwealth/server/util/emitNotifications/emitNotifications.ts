@@ -14,8 +14,14 @@ import {
 } from '../../scripts/emails';
 import type { WebhookContent } from '../../webhookNotifier';
 import send from '../../webhookNotifier';
+import {
+  NotificationCategory,
+  NotificationCategories,
+} from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { filterAddresses } from './util';
+import { SubscriptionAttributes } from '../../models/subscription';
+import Notification_category from '../../models/notification_category';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -25,6 +31,43 @@ export type NotificationDataTypes =
   | IPostNotificationData
   | ICommunityNotificationData
   | (SnapshotNotification & { eventType: SnapshotEventType });
+
+/**
+ * This function translates a notification category into the set of data points required to uniquely identify a
+ * subscription.
+ */
+export function getUniqueSubscriptionData(
+  category: NotificationCategory,
+  notification_data: any
+) {
+  const chain_id =
+    (notification_data as any).chain || (notification_data as any).chain_id;
+
+  if (category === NotificationCategories.NewThread) {
+    if (!chain_id) {
+      log.error(
+        `Attempting to reference a ${category} subscription without a chain_id`
+      );
+      return;
+    }
+    return { chain_id };
+  } else if (
+    category === NotificationCategories.NewMention ||
+    category === NotificationCategories.NewCollaboration
+  ) {
+    // if (!notification_data.)
+  } else if (
+    category === NotificationCategories.NewReaction ||
+    category === NotificationCategories.NewComment
+  ) {
+  } else if (category === NotificationCategories.SnapshotProposal) {
+  } else {
+    log.trace(
+      `The ${category} notifications category does not support subscriptions`
+    );
+    return;
+  }
+}
 
 export default async function emitNotifications(
   models: DB,
@@ -39,11 +82,18 @@ export default async function emitNotifications(
   // get subscribers to send notifications to
   StatsDController.get().increment('cw.notifications.created', {
     category_id,
-    object_id,
     chain: chain_id,
   });
-  let subFindOptions: any = {
-    [Op.and]: [{ category_id }, { object_id }, { is_active: true }],
+
+  const uniqueData = getUniqueSubscriptionData(category_id, notification_data);
+  if (!uniqueData) {
+    log.error(
+      `Cannot create a notification for ${category_id} since subscriptions cannot be fetched.`
+    );
+  }
+
+  let subFindOptions: { [Op.and]: any[] } = {
+    [Op.and]: [{ category_id }, uniqueData, { is_active: true }],
   };
   subFindOptions = await filterAddresses(
     models,

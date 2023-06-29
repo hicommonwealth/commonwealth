@@ -16,6 +16,9 @@ export const NotificationCategories = {
   SnapshotProposal: 'snapshot-proposal',
 };
 
+export type NotificationCategory =
+  typeof NotificationCategories[keyof typeof NotificationCategories];
+
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',

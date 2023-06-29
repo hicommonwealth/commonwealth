@@ -202,7 +202,6 @@ const createReaction = async (
   emitNotifications(
     models,
     NotificationCategories.NewReaction,
-    location,
     notification_data,
     {
       user: finalReaction.Address.address,

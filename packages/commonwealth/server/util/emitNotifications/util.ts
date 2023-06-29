@@ -7,7 +7,7 @@ import { Op, QueryTypes } from 'sequelize';
  */
 export async function filterAddresses(
   models,
-  findOptions: any,
+  findOptions: { [Op.and]: any[] },
   includedAddresses: string[],
   excludedAddresses: string[]
 ) {
