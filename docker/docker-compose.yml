@@ -8,7 +8,7 @@ services:
     environment:
       - |
         FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager        
+        jobmanager.rpc.address: jobmanager
 
   taskmanager:
     image: flink:1.16.2-scala_2.12
