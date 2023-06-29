@@ -75,7 +75,7 @@ class NotificationSubscription {
       json.immediate_email,
       json.chain_id,
       json.Comment || json.offchain_comment_id,
-      json.Thread || json.offchain_thread_id,
+      json.Thread || json.thread_id,
       json.snapshot_id
     );
   }

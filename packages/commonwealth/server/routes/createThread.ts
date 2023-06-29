@@ -41,14 +41,14 @@ const dispatchHooks = async (
     await models.Subscription.create({
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewComment,
-      offchain_thread_id: finalThread.id,
+      thread_id: finalThread.id,
       chain_id: finalThread.chain,
       is_active: true,
     });
     await models.Subscription.create({
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewReaction,
-      offchain_thread_id: finalThread.id,
+      thread_id: finalThread.id,
       chain_id: finalThread.chain,
       is_active: true,
     });

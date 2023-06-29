@@ -156,7 +156,7 @@ describe.only('emitNotifications tests', () => {
         category_id: NotificationCategories.NewComment,
         object_id: `discussion_${thread.id}`,
         chain_id: chain,
-        offchain_thread_id: thread.id,
+        thread_id: thread.id,
       });
 
       const notification_data: IPostNotificationData = {
@@ -197,7 +197,7 @@ describe.only('emitNotifications tests', () => {
         category_id: NotificationCategories.NewReaction,
         object_id: `discussion_${thread.id}`,
         chain_id: chain,
-        offchain_thread_id: thread.id,
+        thread_id: thread.id,
       });
 
       const notification_data: IPostNotificationData = {

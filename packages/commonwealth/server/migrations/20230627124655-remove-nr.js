@@ -6,6 +6,20 @@ module.exports = {
       await queryInterface.removeColumn('Subscriptions', 'object_id', {
         transaction: t,
       });
+
+      await queryInterface.renameColumn(
+        'Subscriptions',
+        'offchain_thread_id',
+        'thread_id',
+        { transaction: t }
+      );
+      await queryInterface.renameColumn(
+        'Subscriptions',
+        'offchain_comment_id',
+        'comment_id',
+        { transaction: t }
+      );
+
       // extract user_id for user specific notifications (new-mention and new-collaboration)
       await queryInterface.addColumn(
         'Notifications',

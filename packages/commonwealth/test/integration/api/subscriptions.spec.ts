@@ -389,7 +389,7 @@ describe.skip('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, category, is_active, object_id });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.NoCategoryAndObjectId);
+      expect(res.body.error).to.be.equal(Errors.NoCategory);
     });
 
     it.skip('should check /viewSubscriptions for all', async () => {

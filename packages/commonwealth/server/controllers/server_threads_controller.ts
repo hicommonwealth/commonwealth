@@ -393,7 +393,7 @@ export class ServerThreadsController implements IServerThreadsController {
           category_id: NotificationCategories.NewReaction,
           object_id: `comment-${finalComment.id}`,
           chain_id: finalComment.chain || null,
-          offchain_comment_id: finalComment.id,
+          comment_id: finalComment.id,
           is_active: true,
         },
         { transaction: subsTransaction }
@@ -404,7 +404,7 @@ export class ServerThreadsController implements IServerThreadsController {
           category_id: NotificationCategories.NewComment,
           object_id: `comment-${finalComment.id}`,
           chain_id: finalComment.chain || null,
-          offchain_comment_id: finalComment.id,
+          comment_id: finalComment.id,
           is_active: true,
         },
         { transaction: subsTransaction }

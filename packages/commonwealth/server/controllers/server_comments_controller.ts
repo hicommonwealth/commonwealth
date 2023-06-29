@@ -227,14 +227,12 @@ export class ServerCommentsController implements IServerCommentsController {
       canvas_session: canvasSession,
       canvas_hash: canvasHash,
     };
-    const [
-      foundOrCreatedReaction,
-      created,
-    ] = await this.models.Reaction.findOrCreate({
-      where: reactionData,
-      defaults: reactionData,
-      include: [this.models.Address],
-    });
+    const [foundOrCreatedReaction, created] =
+      await this.models.Reaction.findOrCreate({
+        where: reactionData,
+        defaults: reactionData,
+        include: [this.models.Address],
+      });
 
     const finalReaction = created
       ? await this.models.Reaction.findOne({
@@ -624,7 +622,7 @@ export class ServerCommentsController implements IServerCommentsController {
     // find and delete all associated subscriptions
     await this.models.Subscription.destroy({
       where: {
-        offchain_comment_id: comment.id,
+        comment_id: comment.id,
       },
     });
 
