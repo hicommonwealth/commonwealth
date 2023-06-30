@@ -1,8 +1,6 @@
 import React from 'react';
 
 import 'components/component_kit/new_designs/cw_text_input.scss';
-import { CWIconButton } from '../cw_icon_button';
-import { CWIcon } from '../cw_icons/cw_icon';
 import { CWLabel } from '../cw_label';
 import { CWText } from '../cw_text';
 import type { ValidationStatus } from '../cw_validation_text';
@@ -169,9 +167,9 @@ export const CWTextInput = (props: TextInputProps) => {
         />
       )}
       <div className="input-and-icon-container">
-        {iconLeftonClick && !!iconLeft ? (
+        {iconLeftonClick && iconLeft ? (
           <div className="text-input-left-onClick-icon">{iconLeft}</div>
-        ) : !!iconLeft ? (
+        ) : iconLeft ? (
           <div className="text-input-left-icon">{iconLeft}</div>
         ) : null}
         <input
@@ -238,9 +236,9 @@ export const CWTextInput = (props: TextInputProps) => {
           value={value}
           defaultValue={defaultValue}
         />
-        {iconRightonClick && !!iconRight ? (
+        {iconRightonClick && iconRight ? (
           <div className="text-input-right-onClick-icon">{iconRight}</div>
-        ) : !!iconRight ? (
+        ) : iconRight ? (
           <div className="text-input-right-icon">{iconRight}</div>
         ) : null}
       </div>
