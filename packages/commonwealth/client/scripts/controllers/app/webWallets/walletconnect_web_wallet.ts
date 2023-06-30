@@ -104,12 +104,6 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       chains: [chainId],
       methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData_v4'],
       showQrModal: true,
-      qrModalOptions: {
-        themeVariables: {
-          '--w3m-z-index': '10000',
-        },
-        chainImages: undefined,
-      },
     });
 
     await this._provider.connect({
