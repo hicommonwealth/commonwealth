@@ -278,13 +278,14 @@ describe('Thread Tests', () => {
       });
     });
 
-    describe('/bulkThreads', () => {
+    describe('/threads (bulkThreads)', () => {
       it('should return bulk threads for a public chain', async () => {
         const res = await chai.request
           .agent(app)
-          .get('/api/bulkThreads')
+          .get('/api/threads')
           .set('Accept', 'application/json')
           .query({
+            bulk: true,
             chain,
             jwt: adminJWT,
           });
