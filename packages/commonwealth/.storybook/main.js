@@ -3,6 +3,7 @@
 // Custom Webpack configuration being imported.
 import custom from '../webpack/webpack.dev.config';
 import path from 'path';
+import webpack from 'webpack';
 
 module.exports = {
   stories: ['./stories/**/*.mdx', './stories/**/*.stories.@(js|jsx|ts|tsx)'],
@@ -46,6 +47,12 @@ module.exports = {
       ...config,
       output: { ...config.output, pathinfo: true },
       mode: 'development',
+      plugins: [
+        ...config.plugins,
+        new webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+        }),
+      ],
       context: __dirname,
       module: {
         ...config.module,
