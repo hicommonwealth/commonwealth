@@ -54,7 +54,7 @@ export default class DatabaseValidationService {
       //2. Get Bot User and inject
       const user = await this.models.User.findOne({
         where: {
-          id: 93625 //TODO: Figure out what user to use
+          id: 114631 //TODO: Figure out what user to use
         }
       })
      req.user = user

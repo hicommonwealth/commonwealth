@@ -30,11 +30,11 @@ async function consumeMessages() {
 
       //TODO: Make this consistent with User selected in validation + design logic
       const profile: any = {
-        _address: '0xE64309301c49E77Cd73596977ebF0BCA929C406D',
-        _chain: 'ethereum',
+        _address: 'osmo1nawjvqtmhjzmlxs9vt4n0hge7t0zc7xrxkh286',
+        _chain: 'cosmos',
         _name: 'IanR',
         _avatarUrl: null,
-        _id: 90905,
+        _id: 114631,
         _lastActive: '2023-06-27T14:28:43.067Z',
         _initialized: true,
       };
