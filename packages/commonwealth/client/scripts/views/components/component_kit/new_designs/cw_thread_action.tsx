@@ -31,11 +31,11 @@ const commonProps = (disabled: boolean, isHovering: boolean) => {
 };
 
 const renderPhosphorIcon = (
-  label: ActionType,
+  action: ActionType,
   disabled: boolean,
   isHovering: boolean
 ) => {
-  switch (label) {
+  switch (action) {
     case 'comment':
       return <ChatCenteredDots {...commonProps(disabled, isHovering)} />;
     case 'share':
@@ -53,14 +53,14 @@ const renderPhosphorIcon = (
 
 type CWThreadActionProps = {
   disabled?: boolean;
-  label?: ActionType;
+  action?: ActionType;
   count?: number;
   onClick: () => void;
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
   disabled,
-  label,
+  action,
   count,
   onClick,
 }) => {
@@ -87,8 +87,8 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
       onMouseLeave={handleOnMouseLeave}
       onClick={onClick}
     >
-      {renderPhosphorIcon(label, disabled, isHovering)}
-      {label !== 'overflow' && (label || count) && (
+      {renderPhosphorIcon(action, disabled, isHovering)}
+      {action !== 'overflow' && (action || count) && (
         <CWText
           className={getClasses({
             hover: isHovering,
@@ -98,7 +98,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           type="caption"
           fontWeight="regular"
         >
-          {count ? count : label.charAt(0).toUpperCase() + label.slice(1)}
+          {count ? count : action.charAt(0).toUpperCase() + action.slice(1)}
         </CWText>
       )}
     </div>

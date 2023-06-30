@@ -943,37 +943,37 @@ export const ComponentShowcase = () => {
           <CWText type="h3">Thread Actions</CWText>
           <CWText type="h5">Default</CWText>
           <CWThreadAction
-            label="comment"
+            action="comment"
             onClick={() => console.log('Comment action clicked!')}
           />
           <CWThreadAction
-            label="share"
+            action="share"
             onClick={() => console.log('Share action clicked!')}
           />
           <CWThreadAction
-            label="subscribe"
+            action="subscribe"
             onClick={() => console.log('Subscribe action clicked!')}
           />
           <CWThreadAction
-            label="upvote"
+            action="upvote"
             count={1}
             onClick={() => console.log('Upvote action clicked!!')}
           />
           <CWThreadAction
-            label="overflow"
+            action="overflow"
             onClick={() => console.log('Overflow action clicked!')}
           />
           <CWText type="h5">Disabled</CWText>
-          <CWThreadAction label="comment" onClick={() => {}} disabled />
-          <CWThreadAction label="share" onClick={() => {}} disabled />
-          <CWThreadAction label="subscribe" onClick={() => {}} disabled />
+          <CWThreadAction action="comment" onClick={() => {}} disabled />
+          <CWThreadAction action="share" onClick={() => {}} disabled />
+          <CWThreadAction action="subscribe" onClick={() => {}} disabled />
           <CWThreadAction
-            label="upvote"
+            action="upvote"
             count={1}
             onClick={() => {}}
             disabled
           />
-          <CWThreadAction label="overflow" onClick={() => {}} disabled />
+          <CWThreadAction action="overflow" onClick={() => {}} disabled />
         </div>
       </div>
     </div>
