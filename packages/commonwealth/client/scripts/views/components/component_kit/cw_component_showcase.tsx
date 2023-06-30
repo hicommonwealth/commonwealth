@@ -812,7 +812,7 @@ export const ComponentShowcase = () => {
         <CWText type="h5">isCompact = Yes</CWText>
         <CWTextInput
           name="Text field"
-          label="Field label"
+          label="Text Input with default width of 240 px"
           placeholder="Type here"
           isCompact
         />
@@ -828,6 +828,7 @@ export const ComponentShowcase = () => {
           label="This input only accepts A-Z"
           placeholder="Type here"
           isCompact
+          width="250"
         />
         <CWTextInput
           label="Text field with icons"
@@ -837,6 +838,7 @@ export const ComponentShowcase = () => {
             <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
           }
           isCompact
+          width={260}
         />
         <CWTextInput
           label="Text field with icons"
@@ -846,6 +848,7 @@ export const ComponentShowcase = () => {
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
           isCompact
+          width={280}
         />
         <CWTextInput
           label="Text field with icons"
@@ -858,6 +861,20 @@ export const ComponentShowcase = () => {
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
           isCompact
+          width={300}
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+          fullWidth
         />
         <CWTextInput
           name="Text field"
@@ -876,7 +893,7 @@ export const ComponentShowcase = () => {
         <CWText type="h5">isCompact = No</CWText>
         <CWTextInput
           name="Text field"
-          label="Field label"
+          label="Text Input with default width of 240 px"
           placeholder="Type here"
         />
         <CWTextInput
@@ -890,6 +907,7 @@ export const ComponentShowcase = () => {
           }}
           label="This input only accepts A-Z"
           placeholder="Type here"
+          width="250"
         />
         <CWTextInput
           label="Text field with icons"
@@ -898,6 +916,7 @@ export const ComponentShowcase = () => {
           iconLeft={
             <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
           }
+          width={260}
         />
         <CWTextInput
           label="Text field with icons"
@@ -906,6 +925,7 @@ export const ComponentShowcase = () => {
           iconRight={
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
+          width={280}
         />
         <CWTextInput
           label="Text field with icons"
@@ -917,6 +937,19 @@ export const ComponentShowcase = () => {
           iconRight={
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
+          width={300}
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          fullWidth
         />
         <CWTextInput
           name="Text field"
