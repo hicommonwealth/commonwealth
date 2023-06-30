@@ -26,7 +26,7 @@ import { Op, QueryTypes } from 'sequelize';
 import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 import { PaginationSqlBind, buildPaginationSql } from '../util/queries';
 import { getLastEdited } from '../util/getLastEdited';
-import { ServerError } from '../../../common-common/src/errors';
+import { AppError, ServerError } from '../../../common-common/src/errors';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -232,7 +232,7 @@ export class ServerThreadsController implements IServerThreadsController {
           address.address
         );
         if (!canReact) {
-          throw new Error(Errors.InsufficientTokenBalance);
+          throw new AppError(Errors.InsufficientTokenBalance);
         }
       }
     }
@@ -375,7 +375,7 @@ export class ServerThreadsController implements IServerThreadsController {
           address.address
         );
         if (!canReact) {
-          throw new Error(Errors.InsufficientTokenBalance);
+          throw new AppError(Errors.InsufficientTokenBalance);
         }
       }
     }

@@ -24,6 +24,7 @@ import { AnalyticsOptions } from './server_analytics_controller';
 import { buildPaginationSql } from '../util/queries';
 import { CommentAttributes } from '../models/comment';
 import { parseUserMentions } from '../util/parseUserMentions';
+import { AppError } from 'common-common/src/errors';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -212,7 +213,7 @@ export class ServerCommentsController implements IServerCommentsController {
           address.address
         );
         if (!canReact) {
-          throw new Error(Errors.InsufficientTokenBalance);
+          throw new AppError(Errors.InsufficientTokenBalance);
         }
       }
     }
