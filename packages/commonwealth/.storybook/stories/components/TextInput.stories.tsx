@@ -116,6 +116,8 @@ const BaseStory = (isCompact: boolean, disabled: boolean) => {
       iconLeftColor: "neutral-600",
       iconRight: undefined,
       iconRightColor: "primary-500",
+      width: 240,
+      fullWidth: false,
     },
     argTypes: {
       placeholder: {
@@ -144,6 +146,13 @@ const BaseStory = (isCompact: boolean, disabled: boolean) => {
       iconRightColor: {
         control: { type: "select" },
         options: Object.keys(palette),
+      },
+      width: {
+        control: { type: "number" },
+      },
+      fullWidth: {
+        control: { type: "boolean" },
+        options: [ true, false ],
       },
     },
     parameters: {
