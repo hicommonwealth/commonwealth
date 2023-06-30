@@ -944,36 +944,36 @@ export const ComponentShowcase = () => {
           <CWText type="h5">Default</CWText>
           <CWThreadAction
             label="comment"
-            onChange={() => console.log('Comment action clicked!')}
+            onClick={() => console.log('Comment action clicked!')}
           />
           <CWThreadAction
             label="share"
-            onChange={() => console.log('Share action clicked!')}
+            onClick={() => console.log('Share action clicked!')}
           />
           <CWThreadAction
             label="subscribe"
-            onChange={() => console.log('Subscribe action clicked!')}
+            onClick={() => console.log('Subscribe action clicked!')}
           />
           <CWThreadAction
             label="upvote"
             count={1}
-            onChange={() => console.log('Upvote action clicked!!')}
+            onClick={() => console.log('Upvote action clicked!!')}
           />
           <CWThreadAction
             label="overflow"
-            onChange={() => console.log('Overflow action clicked!')}
+            onClick={() => console.log('Overflow action clicked!')}
           />
           <CWText type="h5">Disabled</CWText>
-          <CWThreadAction label="comment" onChange={() => {}} disabled />
-          <CWThreadAction label="share" onChange={() => {}} disabled />
-          <CWThreadAction label="subscribe" onChange={() => {}} disabled />
+          <CWThreadAction label="comment" onClick={() => {}} disabled />
+          <CWThreadAction label="share" onClick={() => {}} disabled />
+          <CWThreadAction label="subscribe" onClick={() => {}} disabled />
           <CWThreadAction
             label="upvote"
             count={1}
-            onChange={() => {}}
+            onClick={() => {}}
             disabled
           />
-          <CWThreadAction label="overflow" onChange={() => {}} disabled />
+          <CWThreadAction label="overflow" onClick={() => {}} disabled />
         </div>
       </div>
     </div>
