@@ -112,7 +112,7 @@
     "@magic-sdk/admin": "^1.10.0",
     "@metamask/detect-provider": "^2.0.0",
     "@metamask/eth-sig-util": "^4.0.0",
-    "@mui/base": "^5.0.0-beta.4",
+    "@mui/base": "^5.0.0-alpha.114",
     "@phosphor-icons/react": "^2.0.8",
     "@polkadot/api": "6.0.5",
     "@polkadot/api-derive": "6.0.5",
