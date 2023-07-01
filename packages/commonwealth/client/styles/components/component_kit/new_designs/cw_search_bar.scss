@@ -1,5 +1,11 @@
 @import '../../../shared';
 
+@mixin positionStyles {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .SearchBar {
   width: 608px;
   display: flex;
@@ -52,32 +58,28 @@
   input {
     // @include inputStyles;
     background-color: inherit;
-    padding-left: 48px;
+    // padding-left: 48px;
+    padding-left: 250px;
   }
 
-  .magnifyingGlass {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-
+  .magnifyingGlass > svg {
+    @include positionStyles;
     left: 16px;
   }
-
+  
   .tag {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50);
+    @include positionStyles;
 
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     padding: 2px 8px;
+    left: 48px;
     gap: 16px;
   
     border-radius: 6px;
-    // border: 1px solid black;
-    background-color: $neutral-300;
+    background-color: $neutral-100;
     height: 24px;
     width: fit-content;
   }
