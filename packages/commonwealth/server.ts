@@ -266,16 +266,16 @@ async function main() {
   setupIpfsProxy(app);
   setupCEProxy(app);
 
-  if (DEV) {
-    if (!NO_CLIENT_SERVER) {
+  if (!NO_CLIENT_SERVER) {
+    if (DEV) {
       // lazy import because we want to keep all of webpacks dependencies in devDependencies
       const setupWebpackDevServer = (
         await import('./server/scripts/setupWebpackDevServer')
       ).default;
       await setupWebpackDevServer(app);
+    } else {
+      app.use('/build', express.static('build'));
     }
-  } else {
-    app.use('/build', express.static('build'));
   }
 
   setupAppRoutes(app, models, templateFile, sendFile);
