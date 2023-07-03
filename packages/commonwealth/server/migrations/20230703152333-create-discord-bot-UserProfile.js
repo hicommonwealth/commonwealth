@@ -22,10 +22,22 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // Delete the newly created record in the 'Profiles' table
-    await queryInterface.bulkDelete('Profiles', null, {});
+    // Find the profile with profile_name='Discord Bot'
+    const profiles = await queryInterface.sequelize.query(
+      `SELECT * FROM "Profiles" WHERE profile_name = 'Discord Bot'`
+    );
+    const profile = profiles[0][0];
 
-    // Delete the newly created record in the 'Users' table
-    await queryInterface.bulkDelete('Users', null, {});
+    if (profile) {
+      // Get the profile_id and user_id
+      const profileId = profile.id;
+      const userId = profile.user_id;
+
+      // Delete the record in the 'Profiles' table
+      await queryInterface.bulkDelete('Profiles', { id: profileId });
+
+      // Delete the record in the 'Users' table
+      await queryInterface.bulkDelete('Users', { id: userId });
+    }
   }
 };
