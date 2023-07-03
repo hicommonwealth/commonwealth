@@ -93,7 +93,8 @@ import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
 import createTopic from '../routes/createTopic';
-import updateTopic from '../routes/updateTopic';
+import updateThreadTopic from '../routes/updateThreadTopic';
+import updateTopic from '../routes/topics/updateTopic';
 import orderTopics from '../routes/orderTopics';
 import editTopic from '../routes/editTopic';
 import deleteTopic from '../routes/deleteTopic';
@@ -599,6 +600,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     createTopic.bind(this, models)
+  );
+  router.post(
+    '/updateThreadTopic',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadTopic.bind(this, models)
   );
   router.post(
     '/updateTopic',

@@ -49,6 +49,20 @@ class DiscordController {
       throw new Error(e);
     }
   }
+
+  public async setForumChannelConnection(topicId: string, channelId: string) {
+    try {
+      await $.post(`${app.serverUrl()}/updateTopic`, {
+        chain_id: app.activeChainId(),
+        topic_id: topicId,
+        channel_id: channelId,
+        jwt: app.user.jwt,
+      });
+    } catch (e) {
+      console.log(e);
+      throw new Error(e);
+    }
+  }
 }
 
 export default DiscordController;

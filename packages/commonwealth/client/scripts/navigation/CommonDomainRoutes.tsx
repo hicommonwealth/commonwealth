@@ -64,6 +64,9 @@ const TipsPage = lazy(() => import('views/pages/tips'));
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/ManageCommunityPage')
 );
+const DiscordCallbackPage = lazy(
+  () => import('views/pages/manage_community/discord-callback')
+);
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals')
@@ -349,6 +352,12 @@ const CommonDomainRoutes = () => [
   <Route
     path="/:scope/manage"
     element={withLayout(ManageCommunityPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/discord-callback"
+    element={withLayout(DiscordCallbackPage, {
       scoped: true,
     })}
   />,

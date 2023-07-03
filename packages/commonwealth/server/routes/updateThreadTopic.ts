@@ -14,7 +14,7 @@ export enum UpdateTopicErrors {
   NoPermission = `You do not have permission to edit post topic`,
 }
 
-const updateTopic = async (
+const updateThreadTopic = async (
   models: DB,
   req,
   res: Response,
@@ -85,4 +85,4 @@ const updateTopic = async (
   return res.json({ status: 'Success', result: newTopic.toJSON() });
 };
 
-export default updateTopic;
+export default updateThreadTopic;
