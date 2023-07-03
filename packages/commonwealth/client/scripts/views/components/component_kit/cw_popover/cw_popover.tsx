@@ -1,5 +1,5 @@
 import React from 'react';
-import { PopperUnstyled } from '@mui/base';
+import PopperUnstyled from '@mui/base/Popper';
 import type { Placement } from '@popperjs/core/lib';
 
 import { uuidv4 } from 'lib/util';
