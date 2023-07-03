@@ -25,9 +25,9 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message: Message) => {
   try {
-    // 1. First we filter for designated forum channels
+    // 1. Filter for designated forum channels
     const channel = client.channels.cache.get(message.channelId);
-    if (channel?.type !== 11) return; // must be thread channel(which is what all forum posts are)
+    if (channel?.type !== 11) return; // must be thread channel(all forum posts are Threads)
     const parent_id = channel.parentId ?? '0';
     // Only process messages from relevant channels
     const relevantChannels = (
@@ -55,29 +55,16 @@ client.on('messageCreate', async (message: Message) => {
       parent_channel_id: parent_id,
     };
 
-    if (!message.nonce) {
-      const forum_post_title = channel.name;
-      const forum_post_content = message.content;
-      console.log(
-        `New forum Post: ${forum_post_title} with content: ${forum_post_content}`
-      );
-      new_message.title = forum_post_title;
-    } else {
-      // This is just for logging
-      const parent_post = channel.name;
-      const comment = message.content;
-      console.log(`New comment on ${parent_post}: ${comment}`);
-    }
+    if (!message.nonce) new_message.title = channel.name;
 
     // 3. Publish the message to RabbitMQ queue
     try {
       await initPromise;
       await controller.publish(new_message, RascalPublications.DiscordListener);
+      console.log('Message published to RabbitMQ:', message.content);
     } catch (error) {
       console.log(`Error publishing to rabbitMQ: ${error}`);
     }
-
-    console.log('Message published to RabbitMQ:', message.content);
   } catch (error) {
     console.log(`Error Processing Discord Message: ${error}`);
   }

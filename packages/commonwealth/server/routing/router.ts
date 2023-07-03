@@ -353,6 +353,15 @@ function setupRouter(
     databaseValidationService.validateChainWithTopics,
     createThread.bind(this, models, tokenBalanceCache, banCache)
   );
+
+  router.post(
+    '/bot/createThread',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    createThread.bind(this, models, tokenBalanceCache, banCache)
+  );
+  
   router.put(
     '/editThread',
     passport.authenticate('jwt', { session: false }),
@@ -551,6 +560,15 @@ function setupRouter(
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
   );
+  
+  router.post(
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createThreadCommentHandler.bind(this, serverControllers)
+  );
+
   router.patch(
     '/comments/:id',
     passport.authenticate('jwt', { session: false }),

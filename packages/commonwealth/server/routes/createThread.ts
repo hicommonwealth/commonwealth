@@ -193,6 +193,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(res)
   const chain = req.chain;
 
   const author = req.address;
@@ -208,6 +209,7 @@ const createThread = async (
     canvas_action,
     canvas_session,
     canvas_hash,
+    discord_meta
   } = req.body;
   let { topic_id } = req.body;
 
@@ -282,6 +284,7 @@ const createThread = async (
     canvas_action,
     canvas_session,
     canvas_hash,
+    discord_meta
   };
 
   // begin essential database changes within transaction
