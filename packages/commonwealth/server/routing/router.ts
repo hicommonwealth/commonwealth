@@ -561,7 +561,7 @@ function setupRouter(
   );
   
   router.post(
-    '/threads/:id/comments',
+    '/bot/threads/:id/comments',
     databaseValidationService.validateBotUser,
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,

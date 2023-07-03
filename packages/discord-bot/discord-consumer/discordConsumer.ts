@@ -83,11 +83,12 @@ async function consumeMessages() {
           canvas_action: null,
           canvas_hash: null,
           canvas_session: null,
+          auth: CW_BOT_KEY
           //discord_user: {} //TODO 3. Need server side + migration for this
         };
 
         const response = await axios.post(
-          `http://${SERVER_URL}/api/threads/${thread_id}/comments`,
+          `http://${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
           create_comment
         );
       }
