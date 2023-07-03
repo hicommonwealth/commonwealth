@@ -1,20 +1,18 @@
-import React from 'react';
-
-import { getDecimals } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-
+import { getDecimals } from 'helpers';
 import 'modals/edit_topic_thresholds_modal.scss';
-import type Topic from '../../models/Topic';
-
+import React from 'react';
 import app from 'state';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import {
   useFetchTopicsQuery,
   useSetTopicThresholdMutation,
 } from 'state/api/topics';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
+import type Topic from '../../models/Topic';
+import Permissions from '../../utils/Permissions';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -84,10 +82,7 @@ export const EditTopicThresholdsModal = ({
     chainId: app.activeChainId(),
   });
 
-  if (
-    !app.user.isSiteAdmin &&
-    !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
-  ) {
+  if (!(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())) {
     return null;
   }
 

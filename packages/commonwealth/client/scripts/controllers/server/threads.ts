@@ -13,7 +13,6 @@ import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { ThreadActionType } from '../../../../shared/types';
 /* eslint-disable no-restricted-syntax */
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
@@ -117,6 +116,7 @@ class ThreadsController {
       title,
       body,
       last_edited,
+      marked_as_spam_at,
       locked_at,
       version_history,
       Attachments,
@@ -198,6 +198,7 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
+    const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
@@ -241,6 +242,7 @@ class ThreadsController {
       chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
+      markedAsSpamAt,
       lockedAt,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
@@ -424,11 +426,6 @@ class ThreadsController {
         address: app.user.activeAccount.address,
       });
       const result = new Topic(response.result);
-
-      app.threadUpdateEmitter.emit('threadUpdated', {
-        threadId,
-        action: ThreadActionType.TopicChange,
-      });
       const thread = app.threads.getById(threadId);
       thread.topic = result;
       app.threads.updateThreadInStore(thread);
@@ -468,6 +465,33 @@ class ThreadsController {
     });
   }
 
+  public async toggleSpam(threadId: number, isSpam: boolean) {
+    return new Promise((resolve, reject) => {
+      $.post(
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isSpam ? 'mark' : 'unmark'
+        }-as-spam`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
+        .then((response) => {
+          const foundThread = this.store.getByIdentifier(threadId);
+          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
+          this.updateThreadInStore(new Thread({ ...foundThread }));
+          resolve(foundThread);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError(
+            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+          );
+          reject(e);
+        });
+    });
+  }
+
   public async setStage(args: { threadId: number; stage: ThreadStage }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadStage`,
@@ -486,11 +510,6 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
-        app.threadUpdateEmitter.emit('threadUpdated', {
-          action: ThreadActionType.StageChange,
-          stage: args.stage,
-          threadId: args.threadId,
-        });
         return result;
       },
       error: (err) => {
@@ -585,7 +604,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
@@ -621,7 +639,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
