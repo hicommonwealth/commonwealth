@@ -52,7 +52,7 @@ export const Popover = (props: PopoverProps) => {
       id={id}
       open={open}
       anchorEl={anchorEl}
-      placement={placement}
+      placement={placement || 'bottom-start'}
       modifiers={[
         {
           name: 'preventOverflow',
