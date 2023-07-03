@@ -28,13 +28,13 @@ async function consumeMessages() {
         )
       )[0][0];
 
-      //TODO: Make this consistent with User selected in validation + design logic
+      
       const profile: any = {
-        _address: 'osmo1nawjvqtmhjzmlxs9vt4n0hge7t0zc7xrxkh286',
-        _chain: 'cosmos',
-        _name: 'IanR',
+        _address: '0xdiscordbot',
+        _chain: topic['chain_id'],
+        _name: 'Discord Bot',
         _avatarUrl: null,
-        _id: 114631,
+        _id: 115326,
         _lastActive: '2023-06-27T14:28:43.067Z',
         _initialized: true,
       };

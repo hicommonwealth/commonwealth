@@ -52,12 +52,12 @@ export default class DatabaseValidationService {
         return next(new AppError('Approved Bot Only Endpoint'))
       }
       //2. Get Bot User and inject
-      const user = await this.models.User.findOne({
+      const profile = await this.models.Profile.findOne({
         where: {
-          id: 114631 //TODO: Figure out what user to use
+          profile_name: 'Discord Bot'
         }
       })
-     req.user = user
+     req.user = await profile.getUser()
      next()
   }
 

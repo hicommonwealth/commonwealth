@@ -33,7 +33,7 @@ const setDiscordBotConfig = async (
 
   const [chain, error] = await validateChain(models, { chain_id });
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
-
+  
   if (snapshot_channel_id) {
     // An update that comes from CW, not the bot. Handle accordingly
     const configEntry = await models.DiscordBotConfig.findOne({
@@ -95,6 +95,23 @@ const setDiscordBotConfig = async (
     throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
   } else {
     try {
+      const profile = await models.Profile.findOne({
+        where: {
+          profile_name: 'Discord Bot'
+        }
+      })
+      await models.Address.create({
+        user_id: profile.user_id,
+        profile_id: profile.id,
+        address: '0xdiscordbot',
+        chain: chain_id,
+        role: 'admin',
+        verification_token: '123456',
+        verification_token_expires: new Date(2030, 1, 1),
+        verified: new Date(),
+        last_active: new Date(),
+      });
+
       chainInstance.discord_config_id = configEntry.id;
       await chainInstance.save();
     } catch (e) {
