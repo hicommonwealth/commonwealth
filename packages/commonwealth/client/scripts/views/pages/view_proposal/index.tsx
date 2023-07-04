@@ -1,35 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-
-import app from 'state';
-import Sublayout from 'views/Sublayout';
 import { ChainBase } from 'common-common/src/types';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import useForceRerender from 'hooks/useForceRerender';
+import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
-import type { AnyProposal } from '../../../models/types';
-
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
+import type { AnyProposal } from '../../../models/types';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { User } from '../../components/user/user';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import useForceRerender from 'hooks/useForceRerender';
-import { useCommonNavigate } from 'navigation/helpers';
-import Cosmos from 'controllers/chain/cosmos/adapter';
-import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -42,16 +40,34 @@ const ViewProposalPage = ({
 }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
+  const hasFetchedProposalRef = useRef(false);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [type, setType] = useState(typeProp);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
+  const { metadata } = useProposalMetadata({ app, proposal });
 
   useEffect(() => {
+    if (metadata?.title) forceRerender();
+  }, [metadata?.title, forceRerender]);
+
+  useEffect(() => {
+    proposal?.isFetched.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
+  useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
+      if (hasFetchedProposalRef.current) return;
+      hasFetchedProposalRef.current = true;
+
       if (!type) {
         setType(chainToProposalSlug(app.chain.meta));
       }
@@ -120,49 +136,41 @@ const ViewProposalPage = ({
   };
 
   return (
-    <Sublayout
-    //  title={headerTitle}
-    >
-      <CWContentPage
-        title={proposal.title}
-        author={
-          !!proposal.author && (
-            <User avatarSize={24} user={proposal.author} popover linkify />
-          )
-        }
-        createdAt={proposal.createdAt}
-        updatedAt={null}
-        subHeader={
-          <ProposalSubheader
-            proposal={proposal as SubheaderProposalType}
+    <CWContentPage
+      title={proposal.title}
+      author={proposal.author}
+      createdAt={proposal.createdAt}
+      updatedAt={null}
+      subHeader={
+        <ProposalSubheader
+          proposal={proposal as SubheaderProposalType}
+          toggleVotingModal={toggleVotingModal}
+          votingModalOpen={votingModalOpen}
+        />
+      }
+      body={() =>
+        !!proposal.description && (
+          <CollapsibleProposalBody proposal={proposal} />
+        )
+      }
+      subBody={
+        <>
+          <LinkedProposalsEmbed
+            proposal={proposal as LinkedSubstrateProposal}
+          />
+          {proposal instanceof AaveProposal && (
+            <AaveViewProposalDetail proposal={proposal} />
+          )}
+          <VotingResults proposal={proposal} />
+          <VotingActions
+            onModalClose={onModalClose}
+            proposal={proposal}
             toggleVotingModal={toggleVotingModal}
             votingModalOpen={votingModalOpen}
           />
-        }
-        body={
-          !!proposal.description && (
-            <CollapsibleProposalBody proposal={proposal} />
-          )
-        }
-        subBody={
-          <>
-            <LinkedProposalsEmbed
-              proposal={proposal as LinkedSubstrateProposal}
-            />
-            {proposal instanceof AaveProposal && (
-              <AaveViewProposalDetail proposal={proposal} />
-            )}
-            <VotingResults proposal={proposal} />
-            <VotingActions
-              onModalClose={onModalClose}
-              proposal={proposal}
-              toggleVotingModal={toggleVotingModal}
-              votingModalOpen={votingModalOpen}
-            />
-          </>
-        }
-      />
-    </Sublayout>
+        </>
+      }
+    />
   );
 };
 

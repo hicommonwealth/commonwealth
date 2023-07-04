@@ -18,6 +18,7 @@ import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import { Avatar } from 'views/components/Avatar';
+import Permissions from '../../../utils/Permissions';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -88,10 +89,7 @@ export const User = ({
 
   if (user) {
     loggedInUserIsAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
-      });
+      Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
     addrShort = formatAddressShort(
       user.address,
@@ -205,7 +203,8 @@ export const User = ({
       key={profile?.address || '-'}
     >
       {showAvatar && (
-        <div
+        <Link
+          to={profile ? `/profile/id/${profile.id}` : undefined}
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
@@ -214,7 +213,7 @@ export const User = ({
             size={avatarSize}
             address={profile?.id}
           />
-        </div>
+        </Link>
       )}
       {
         <>
@@ -223,6 +222,9 @@ export const User = ({
             <Link
               className="user-display-name username"
               to={profile ? `/profile/id/${profile.id}` : undefined}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             >
               <>
                 {!profile ? (

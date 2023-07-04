@@ -1,5 +1,6 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
+import moment from 'moment';
 import { longify } from '@cosmjs/stargate/build/queries/utils';
 import {
   QueryDepositsResponseSDKType,
@@ -14,11 +15,15 @@ import type {
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
 
-import moment from 'moment';
-import { ITXModalData } from '../../../../../models/interfaces';
-import { ProposalEndTime, ProposalStatus, VotingType, VotingUnit } from '../../../../../models/types';
-import { DepositVote } from '../../../../../models/votes';
-import Proposal from '../../../../../models/Proposal';
+import { ITXModalData } from 'models/interfaces';
+import {
+  ProposalEndTime,
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from 'models/types';
+import { DepositVote } from 'models/votes';
+import Proposal from 'models/Proposal';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
@@ -53,12 +58,16 @@ export class CosmosProposalV1 extends Proposal<
     return `#${this.identifier.toString()}`;
   }
 
-  public get title() {
-    return this.data.title;
+  public get title(): string {
+    return this.data.title || this._metadata?.title;
   }
 
   public get description() {
-    return this.data.description;
+    return (
+      this.data.description ||
+      this._metadata?.summary ||
+      this._metadata?.description
+    );
   }
 
   public get author() {
@@ -94,6 +103,11 @@ export class CosmosProposalV1 extends Proposal<
     );
   }
 
+  private _metadata: any;
+  public get metadata() {
+    return this._metadata;
+  }
+
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
   private _Governance: CosmosGovernanceV1;
@@ -115,7 +129,22 @@ export class CosmosProposalV1 extends Proposal<
     throw new Error('unimplemented');
   }
 
+  public updateMetadata(metadata: any) {
+    this._metadata = metadata;
+  }
+
   public async init() {
+    await this.fetchVoteInfo();
+
+    if (!this.initialized) {
+      this._initialized = true;
+    }
+    if (this.data.state.completed) {
+      super.complete(this._Governance.store);
+    }
+  }
+
+  private async fetchVoteInfo() {
     const lcd = this._Chain.lcd;
     const proposalId = longify(this.data.identifier);
     // only fetch voter data if active
@@ -164,15 +193,11 @@ export class CosmosProposalV1 extends Proposal<
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTallyV1(tallyResp?.tally);
         }
+
+        this.isFetched.emit('redraw');
       } catch (err) {
         console.error(`Cosmos query failed: ${err.message}`);
       }
-    }
-    if (!this.initialized) {
-      this._initialized = true;
-    }
-    if (this.data.state.completed) {
-      super.complete(this._Governance.store);
     }
   }
 
