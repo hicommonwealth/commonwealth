@@ -27,7 +27,7 @@ import { CWToggle, toggleDarkMode } from './cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
-import { CWTag } from './cw_tag';
+import { CWTag } from './new_designs/cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import { CWRadioButton } from './cw_radio_button';
@@ -453,6 +453,67 @@ export const ComponentShowcase = () => {
               Body1 noWrap
             </CWText>
           </div>
+        </div>
+      </div>
+      <div className="tag-gallery">
+        <CWText type="h3">Tags</CWText>
+        <div className="tag-row">
+          <CWText type="h4">Spam Tag</CWText>
+          <CWTag label="SPAM" type="spam" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Status Tags</CWText>
+          <CWTag label="New" type="new" iconName='newStar' />
+          <CWTag label="Trending" type="trending" iconName='trendUp' />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Elements Tags</CWText>
+          <CWTag label="Poll" type="poll" />
+          <CWTag label="Snapshot" type="active" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Stage Tags</CWText>
+          <CWTag label="Stage 1" type="new-stage" classNames='rorange-600'/>
+          <CWTag label="Stage 2" type="new-stage" classNames='rorange-400'/>
+          <CWTag label="Stage 3" type="new-stage" classNames='yellow-500'/>
+          <CWTag label="Stage 4" type="new-stage" classNames='green-600'/>
+          <CWTag label="Stage 5" type="new-stage" classNames='green-500'/>
+          <CWTag label="Stage 6" type="new-stage" classNames='primary-600'/>
+          <CWTag label="Stage 7" type="new-stage" classNames='primary-400'/>
+          <CWTag label="Stage 8" type="new-stage" classNames='purple-600'/>
+          <CWTag label="Stage 9" type="new-stage" classNames='purple-400'/>
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Proposal Tag</CWText>
+          <CWTag label="Proposal" type="proposal" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Input Tag</CWText>
+          <CWTag label="Display name" type="input" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Login User Tag</CWText>
+          <CWTag label="mnh7a" type="login" loginIcon='cosmos' />
+          <CWTag label="mnh7a" type="login" loginIcon='discordLogin' />
+          <CWTag label="mnh7a" type="login" loginIcon='envelope' />
+          <CWTag label="mnh7a" type="login" loginIcon='ethereum' />
+          <CWTag label="mnh7a" type="login" loginIcon='octocat' />
+          <CWTag label="mnh7a" type="login" loginIcon='near' />
+          <CWTag label="mnh7a" type="login" loginIcon='polkadot' />
+          <CWTag label="mnh7a" type="login" loginIcon='polygon' />
+          <CWTag label="mnh7a" type="login" loginIcon='twitterNew' />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Address Tags</CWText>
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='cosmos' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='discordLogin' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='envelope' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='ethereum' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='octocat' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='near' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='polkadot' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='polygon' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='twitterNew' />
         </div>
       </div>
       <div className="button-gallery">

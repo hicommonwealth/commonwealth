@@ -176,4 +176,11 @@ $width: 360px;
       align-items: center;
     }
   }
+
+  .tag-gallery {
+    .tag-row {
+      display: flex;
+      gap: 8px;
+    }
+  }
 }
