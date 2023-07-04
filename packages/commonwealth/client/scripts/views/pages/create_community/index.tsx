@@ -16,6 +16,7 @@ import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
+import { PolygonForm } from './polygon_form';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -26,6 +27,7 @@ export enum CommunityType {
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
+  Polygon = 'Polygon',
   AbiFactory = 'Abi Factory',
 }
 
@@ -105,6 +107,8 @@ const CreateCommunity = () => {
         return (
           <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
+      case CommunityType.Polygon:
+          return <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />;
       case CommunityType.SplToken:
         return <SplTokenForm />;
       default:
