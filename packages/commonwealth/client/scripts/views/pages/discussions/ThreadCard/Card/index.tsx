@@ -8,7 +8,8 @@ import {
 } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import useBrowserWindow from '../../../../../hooks/useBrowserWindow';
@@ -18,14 +19,13 @@ import Permissions from '../../../../../utils/Permissions';
 import { CWTag } from '../../../../components/component_kit/cw_tag';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import { getClasses } from '../../../../components/component_kit/helpers';
-import { isHot } from '../../helpers';
 import { isNewThread } from '../../NewThreadTag';
+import { isHot } from '../../helpers';
 import { AuthorAndPublishInfo } from '../AuthorAndPublishInfo';
 import { Options } from '../Options';
 import { AdminActionsProps } from '../Options/AdminActions';
 import { ReactionButton } from '../Options/ReactionButton';
 import './index.scss';
-import { Link } from 'react-router-dom';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
@@ -138,11 +138,10 @@ export const Card = ({
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
                     )} 
-                        ${
-                          Number.isNaN(parseInt(link.identifier, 10))
-                            ? ''
-                            : ` #${link.identifier}`
-                        }`}
+                        ${Number.isNaN(parseInt(link.identifier, 10))
+                        ? ''
+                        : ` #${link.identifier}`
+                      }`}
                   />
                 ))}
             </div>
@@ -171,13 +170,7 @@ export const Card = ({
               {thread.plaintext}
             </CWText>
           </div>
-          <div
-            className="content-footer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
+          <div className="content-footer">
             <Options
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}
