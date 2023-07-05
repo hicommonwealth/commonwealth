@@ -15,7 +15,12 @@ import type {
 
 import moment from 'moment';
 import { ITXModalData, IVote } from '../../../../../models/interfaces';
-import { ProposalEndTime, ProposalStatus, VotingType, VotingUnit } from '../../../../../models/types';
+import {
+  ProposalEndTime,
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../../models/types';
 import { DepositVote } from '../../../../../models/votes';
 import Proposal from '../../../../../models/Proposal';
 import CosmosAccount from '../../account';
@@ -143,6 +148,17 @@ export class CosmosProposal extends Proposal<
   }
 
   public async init() {
+    await this.fetchVoteInfo();
+
+    if (!this.initialized) {
+      this._initialized = true;
+    }
+    if (this.data.state.completed) {
+      super.complete(this._Governance.store);
+    }
+  }
+
+  private async fetchVoteInfo() {
     const api = this._Chain.api;
     // only fetch voter data if active
     if (!this.data.state.completed) {
@@ -190,15 +206,10 @@ export class CosmosProposal extends Proposal<
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTally(tallyResp?.tally);
         }
+        this.isFetched.emit('redraw');
       } catch (err) {
         console.error(`Cosmos query failed: ${err.message}`);
       }
-    }
-    if (!this.initialized) {
-      this._initialized = true;
-    }
-    if (this.data.state.completed) {
-      super.complete(this._Governance.store);
     }
   }
 
