@@ -1,0 +1,126 @@
+config:
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+      metricsNamespace: "latency_metrics"
+  environments:
+    us:
+      target: "https://us.unique.rocks"
+    eu:
+      target: "https://eu.unique.rocks"
+    local:
+      target: "http://localhost:8080"  
+  http:
+    extendedMetrics: true
+  phases:
+    - name: "Warm up"
+      duration: 10
+      arrivalRate: 5
+  processor: "functions.js" # Specify the path to the JavaScript file containing custom functions
+scenarios:
+  - name: "Read Endpoints"
+    flow:
+      - get:
+          url: "/"
+      - get:
+          url: "/api/domain"
+      - get:
+          url: "/api/status"
+      - post:
+          url: "/api/viewDiscussionNotifications"
+          form:
+            jwt: "{{$processEnvironment.JWT}}"
+      - post:
+          url: "/api/viewChainEventNotifications"
+          form:
+            jwt: "{{$processEnvironment.JWT}}"
+      - post:
+          url: "/api/getSubscribedChains"
+          form:
+            jwt: "{{$processEnvironment.JWT}}"
+      - get:
+          url: "/api/viewSubscriptions"
+          qs:
+            jwt: "{{$processEnvironment.JWT}}"
+      - get:
+          url: "/cmn-protocol"
+      - get:
+          url: "/api/bulkOffchain"
+          qs:
+            chain: "cmn-protocol"
+            community:
+            jwt: "{{$processEnvironment.JWT}}"
+      - get:
+          url: "/api/threads"
+          qs:
+            chain: "cmn-protocol"
+            active: true
+            threads_per_topic: 3
+      - get:
+          url: "/api/bulkTopics"
+          qs:
+            chain: "cmn-protocol"
+      - post:
+          url: "/api/threadsUsersCountAndAvatars"
+          json:
+            chain: "cmn-protocol"
+            threads: []
+      - get:
+          url: "/api/threads"
+          qs:
+            chain: "cmn-protocol"
+            bulk: true
+            limit: 20
+            page: 0
+            includePinnedThreads: true
+            to_date: "2023-07-05T06:39:12.543Z"
+            orderBy: "createdAt:desc"
+          capture:
+            json: "$.result.threads[*].id"
+            as: "threadIds"
+      - post:
+          url: "/api/reactionsCounts"
+          json:
+            thread_ids: "{{$threadIds}}"
+      - post:
+          url: "/api/selectChain"
+          form:
+            chain: "cmn-protocol"
+            auth: true
+            jwt: "{{$processEnvironment.JWT}}"
+      - post:
+          url: "/api/viewUserActivity"
+          form:
+            jwt: "{{$processEnvironment.JWT}}"
+  - name: "Add a comment and reaction"
+    flow:
+      - function: "generateRandomData"
+      - post:
+          url: "/api/threads/{{$processEnvironment.POST_THREAD_ID}}/comments"
+          json:
+            author_chain: "cmn-protocol"
+            chain: "cmn-protocol"
+            thread_id: {{$processEnvironment.POST_THREAD_ID}}
+            parent_id: null
+            text: "%7B%22ops%22%3A%5B%7B%22insert%22%3A%22{{ comment }}%5Cn%22%7D%5D%2C%22___isMarkdown%22%3Atrue%7D"
+            address: "{{$processEnvironment.USER_ADDRESS}}"
+            canvas_action: "{}"
+            canvas_session: "{}"
+            canvas_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            jwt: "{{$processEnvironment.JWT}}"
+          capture:
+            json: "$.result.id"
+            as: "commentId"
+      - log: "Captured ID: {{commentId}}"           
+      - post:
+          url: "/api/comments/{{commentId}}/reactions"
+          form:
+            author_chain: "cmn-protocol"
+            chain: "cmn-protocol"
+            address: "{{$processEnvironment.USER_ADDRESS}}"
+            reaction: "like"
+            jwt: "{{$processEnvironment.JWT}}"
+            canvas_action: "{}"
+            canvas_session: "{}"
+            canvas_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            comment_id: "{{commentId}}"
