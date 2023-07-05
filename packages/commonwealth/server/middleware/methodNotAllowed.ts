@@ -6,14 +6,17 @@ import {
   Router,
 } from 'express';
 import { HttpMethod } from 'aws-sdk/clients/appmesh';
+import { ValidationChain } from 'express-validator';
 
 const routesMethods: { [key: string]: string[] } = {};
+
+type ValidateThenHandle = [ValidationChain[], ...RequestHandler[]];
 
 export const registerRoute = (
   router: Router,
   method: HttpMethod,
   path: string,
-  ...handlers: RequestHandler[]
+  ...handlers: RequestHandler[] | ValidateThenHandle
 ) => {
   router[method](path, ...handlers);
   const realPath = `/api${path}`;

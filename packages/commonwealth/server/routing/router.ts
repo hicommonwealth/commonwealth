@@ -386,14 +386,23 @@ function setupRouter(
     getSupportedEthChains.bind(this, models)
   );
 
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/createChainNode',
     passport.authenticate('jwt', { session: false }),
     createChainNode.bind(this, models)
   );
 
-  router.get('/adminAnalytics', adminAnalytics.bind(this, models));
-  router.post(
+  registerRoute(
+    router,
+    'get',
+    '/adminAnalytics',
+    adminAnalytics.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
     '/communitySpecificAnalytics',
     databaseValidationService.validateChain,
     communitySpecificAnalytics.bind(this, models)
@@ -507,8 +516,9 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     getTemplates.bind(this, models)
   );
-
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/contract/template',
     passport.authenticate('jwt', { session: false }),
     deleteTemplate.bind(this, models)
@@ -770,7 +780,9 @@ function setupRouter(
     databaseValidationService.validateChain,
     createCommentReactionHandler.bind(this, serverControllers)
   );
-  router.delete(
+  registerRoute(
+    router,
+    'delete',
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
     deleteReactionHandler.bind(this, serverControllers)
@@ -1161,23 +1173,30 @@ function setupRouter(
   );
 
   // spam
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/threads/:id/mark-as-spam',
     passport.authenticate('jwt', { session: false }),
     markThreadAsSpam.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/threads/:id/unmark-as-spam',
     passport.authenticate('jwt', { session: false }),
     unmarkThreadAsSpam.bind(this, models)
   );
-
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/comments/:id/mark-as-spam',
     passport.authenticate('jwt', { session: false }),
     markCommentAsSpam.bind(this, models)
   );
-  router.post(
+  registerRoute(
+    router,
+    'post',
     '/comments/:id/unmark-as-spam',
     passport.authenticate('jwt', { session: false }),
     unmarkCommentAsSpam.bind(this, models)
