@@ -25,13 +25,17 @@ const argTypesObj = () => {
       control: { type: "text" },
     },
     iconName: {
-      control: { type: "inline-radio" },
-      options: ['newStar', 'trendUp']
+      control: { type: "select" },
+      options: ['', 'newStar', 'trendUp']
     },
     loginIcon: {
-      control: { type: "text" },
-      options: ['cosmos', 'discordLogin', 'envelope', 'ethereum', 'octocat', 'near', 'polkadot', 'polygon', 'twitternew']
+      control: { type: "select" },
+      options: ['cosmos', 'discordLogin', 'envelope', 'ethereum', 'octocat', 'near', 'polkadot', 'polygon', 'twitterNew']
     },
+    classNames: {
+      control: { type: "inline-radio" },
+      options: [ "rorange-600", "rorange-400", "yellow-500", "green-600", "green-500", "primary-600", "primary-400", "purple-600", "purple-400" ]
+    }
   }
 }
 
@@ -41,10 +45,83 @@ const commonParameters = {
   },
 };
 
-/** Primary buttons */
-export const Status: Story = {
+/** Status tags */
+export const New: Story = {
   args: {
-    label: "Status",
+    label: "New",
+    type: "new",
+    iconName:"newStar"
+  },
+  argTypes: argTypesObj(),
+  render: ({...args}) => (
+    <CWTag {...args} />
+  ),
+};
+
+export const Trending: Story = {
+  args: {
+    label: "Trending",
+    type: "trending",
+    iconName:"trendUp"
+  },
+  argTypes: argTypesObj(),
+  render: ({...args}) => (
+    <CWTag {...args} />
+  ),
+};
+
+/** Spam tag */
+export const Spam: Story = {
+  args: {
+    label: "SPAM",
+    type: "spam"
+  },
+  argTypes: argTypesObj(),
+  render: ({...args}) => (
+    <CWTag {...args} />
+  ),
+};
+
+/** Elements tags */
+export const Poll: Story = {
+  args: {
+    label: "Poll",
+    type: "poll"
+  },
+  argTypes: argTypesObj(),
+  render: ({...args}) => (
+    <CWTag {...args} />
+  ),
+};
+
+export const Snapshot: Story = {
+  args: {
+    label: "Snapshot",
+    type: "active"
+  },
+  argTypes: argTypesObj(),
+  render: ({...args}) => (
+    <CWTag {...args} />
+  ),
+};
+
+/** New stages tags*/
+export const Stages: Story = {
+  args: {
+    label: "Stage 1",
+    type: "new-stage",
+    classNames: 'rorange-600'
+  },
+  argTypes: argTypesObj(),
+  render: ({...args}) => (
+    <CWTag {...args} />
+  ),
+};
+
+/** Proposal tag*/
+export const Proposal: Story = {
+  args: {
+    label: "Proposal",
     type: "proposal"
   },
   argTypes: argTypesObj(),
@@ -53,121 +130,28 @@ export const Status: Story = {
   ),
 };
 
-/** Secondary buttons */
-export const Spam: Story = {
-  args: {
-    label: "Secondary",
-    iconLeft: "person",
-    iconRight: undefined,
-    buttonType: "secondary",
-    buttonWidth: "narrow",
-    buttonHeight: "med",
-    disabled: false,
-  },
-  argTypes: argTypesObj(),
-  render: ({...args}) => (
-    <CWTag {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Tertiary buttons */
-export const Elements: Story = {
-  args: {
-    label: "Tertiary",
-    iconLeft: "person",
-    iconRight: undefined,
-    buttonType: "tertiary",
-    buttonWidth: "narrow",
-    buttonHeight: "med",
-    disabled: false,
-  },
-  argTypes: argTypesObj(),
-  render: ({...args}) => (
-    <CWTag {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Tertiary buttons */
-export const Stage: Story = {
-  args: {
-    label: "Tertiary",
-    iconLeft: "person",
-    iconRight: undefined,
-    buttonType: "tertiary",
-    buttonWidth: "narrow",
-    buttonHeight: "med",
-    disabled: false,
-  },
-  argTypes: argTypesObj(),
-  render: ({...args}) => (
-    <CWTag {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Tertiary buttons */
-export const Proposal: Story = {
-  args: {
-    label: "Tertiary",
-    iconLeft: "person",
-    iconRight: undefined,
-    buttonType: "tertiary",
-    buttonWidth: "narrow",
-    buttonHeight: "med",
-    disabled: false,
-  },
-  argTypes: argTypesObj(),
-  render: ({...args}) => (
-    <CWTag {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Destructive buttons */
-export const Input: Story = {
-  args: {
-    label: "Destructive",
-    iconLeft: "person",
-    iconRight: undefined,
-    buttonType: "destructive",
-    buttonWidth: "narrow",
-    buttonHeight: "med",
-    disabled: false,
-  },
-  argTypes: argTypesObj(),
-  render: ({...args}) => (
-    <CWTag {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Tertiary buttons */
-export const Address: Story = {
-  args: {
-    label: "Tertiary",
-    iconLeft: "person",
-    iconRight: undefined,
-    buttonType: "tertiary",
-    buttonWidth: "narrow",
-    buttonHeight: "med",
-    disabled: false,
-  },
-  argTypes: argTypesObj(),
-  render: ({...args}) => (
-    <CWTag {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Tertiary buttons */
+/** Login tags*/
 export const Login: Story = {
   args: {
-    label: "Tertiary",
-    iconLeft: "person",
-    iconRight: undefined,
-    buttonType: "tertiary",
-    buttonWidth: "narrow",
-    buttonHeight: "med",
-    disabled: false,
+    label: "mnh7a",
+    type: "login",
+    loginIcon: "cosmos"
   },
   argTypes: argTypesObj(),
   render: ({...args}) => (
-    <CWTag {...args} onClick={() => notifySuccess('Button clicked!') } />
+    <CWTag {...args} />
+  ),
+};
+
+/** Address tags*/
+export const Address: Story = {
+  args: {
+    label: "0xd83e1...a39bD",
+    type: "address",
+    loginIcon: "cosmos"
+  },
+  argTypes: argTypesObj(),
+  render: ({...args}) => (
+    <CWTag {...args} />
   ),
 };

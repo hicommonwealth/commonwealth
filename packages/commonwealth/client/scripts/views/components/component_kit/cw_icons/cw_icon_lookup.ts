@@ -69,6 +69,7 @@ export const iconLookup = {
   dots: Icons.CWDots,
   dotsVertical: Icons.CWDotsVertical,
   downvote: withPhosphorIcon(ArrowFatDown),
+  edgeware: Icons.CWEdgeware,
   element: Icons.CWElement,
   envelope: Icons.CWEnvelope,
   ethereum: Icons.CWEthereum,

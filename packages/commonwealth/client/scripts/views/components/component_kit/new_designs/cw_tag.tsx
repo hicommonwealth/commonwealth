@@ -70,7 +70,7 @@ export const CWTag = ({ iconName, label, type, onClick, trimAt, classNames, logi
         // />
         // icon inserted for styling purposes. 
         // replace CWIcon below with avatar above
-        <CWIcon iconName='compass' iconSize="small" className="tag-icon" />
+        <CWIcon iconName='edgeware' iconSize="small" className="tag-icon" />
       }
       {!!iconName && (
         <CWIcon iconName={iconName} iconSize="small" className="tag-icon" />
@@ -79,7 +79,9 @@ export const CWTag = ({ iconName, label, type, onClick, trimAt, classNames, logi
         {displayLabel()}
       </CWText>
       { type === 'input' &&
-        <CWIcon iconName='close' iconSize="small" className="tag-icon" />
+        <div className="close-container">
+          <CWIcon iconName='close' iconSize="small" className="tag-icon" />
+        </div>
       }
     </div>
   );

@@ -186,8 +186,15 @@
     border-radius: $border-radius-corners-wider;
     background-color: $neutral-100;
     padding: 2px 8px;
+    gap: 8px;
+
+    .close-container {
+      display: flex;
+      margin-left: 8px;
+    }
 
     .tag-text.Text {
+      font-size: 14px;
       line-height: 20px;
     }
 
@@ -215,6 +222,10 @@
       color: $neutral-600;
     }
 
+    .tag-icon.Icon {
+      fill: none;
+    }
+
     &:hover {
       background-color: $neutral-300;
 
@@ -233,6 +244,10 @@
     .tag-text.Text,
     .tag-icon.Icon {
       color: $neutral-600;
+    }
+
+    .tag-icon.Icon {
+      fill: none;
     }
 
     &:hover {

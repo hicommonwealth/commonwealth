@@ -8,7 +8,7 @@ import { iconLookup } from '../../../../client/scripts/views/components/componen
 const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
 const button = {
-  title: 'Components/Atoms/Button',
+  title: 'Components/Button',
   component: CWButton,
 } satisfies Meta<typeof CWButton>;
 
