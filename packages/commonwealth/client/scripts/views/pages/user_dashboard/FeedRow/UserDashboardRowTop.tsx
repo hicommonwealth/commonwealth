@@ -1,9 +1,10 @@
-import React from 'react';
-
 import { capitalize } from 'lodash';
 import moment from 'moment';
 
 import './UserDashboardRowTop.scss';
+
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
@@ -77,15 +78,14 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       <div className="community-info">
         <img className="icon" src={communityIcon} />
         <CWText type="caption" fontWeight="medium">
-          <a
+          <Link
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              navigate(`/${chain_id}`);
             }}
+            to={`/${chain_id}`}
           >
             {communityName}
-          </a>
+          </Link>
         </CWText>
         <div className="dot">.</div>
         <CWText type="caption" fontWeight="medium" className="gray-text">
