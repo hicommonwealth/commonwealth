@@ -14,6 +14,7 @@ export const withPhosphorIcon = (Icon: PhosphorIcon) => (props: IconProps) => {
     iconButtonTheme,
     iconSize,
     selected,
+    weight,
     ...otherProps
   } = props;
 
@@ -24,6 +25,7 @@ export const withPhosphorIcon = (Icon: PhosphorIcon) => (props: IconProps) => {
         componentType
       )}
       onClick={otherProps.onClick}
+      weight={weight}
     />
   );
 };
