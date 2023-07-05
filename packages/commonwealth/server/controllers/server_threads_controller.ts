@@ -306,7 +306,8 @@ export class ServerThreadsController implements IServerThreadsController {
     attachments: any,
     canvasAction?: any,
     canvasSession?: any,
-    canvasHash?: any
+    canvasHash?: any,
+    discord_meta?: any,
   ): Promise<[CommentAttributes, NotificationOptions[], AnalyticsOptions]> {
     // check if banned
     const [canInteract, banError] = await this.banCache.checkBan({
@@ -407,6 +408,7 @@ export class ServerThreadsController implements IServerThreadsController {
       canvas_action: canvasAction,
       canvas_session: canvasSession,
       canvas_hash: canvasHash,
+      discord_meta,
     };
     if (parentId) {
       Object.assign(commentContent, { parent_id: parentId });

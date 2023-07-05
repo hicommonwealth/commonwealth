@@ -51,6 +51,7 @@ client.on('messageCreate', async (message: Message) => {
       },
       // If title is nothing == comment. channel_id will correspond to the thread channel id.
       content: message.content,
+      message_id: message.id,
       channel_id: message.channelId,
       parent_channel_id: parent_id,
     };
