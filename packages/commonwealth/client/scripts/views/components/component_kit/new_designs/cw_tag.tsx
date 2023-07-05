@@ -7,8 +7,6 @@ import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 
 import { ComponentType } from '../types';
-import { Avatar } from '../../Avatar';
-import MinimumProfile from 'client/scripts/models/MinimumProfile';
 
 type TagType =
   | 'passed'
@@ -61,14 +59,14 @@ export const CWTag = ({ iconName, label, type, onClick, trimAt, classNames, logi
       { (type === 'login' || type === 'address') &&
         <CWIcon iconName={loginIcon} iconSize="small" className="tag-icon" />
       }
-      { type === 'input' && 
+      { type === 'input' &&
         // profile &&
         // <Avatar
         //   url={profile?.avatarUrl}
         //   size={16}
         //   address={profile?.id}
         // />
-        // icon inserted for styling purposes. 
+        // icon inserted for styling purposes.
         // replace CWIcon below with avatar above
         <CWIcon iconName='edgeware' iconSize="small" className="tag-icon" />
       }
@@ -87,27 +85,3 @@ export const CWTag = ({ iconName, label, type, onClick, trimAt, classNames, logi
   );
 };
 
-function getLoginIcon(loginMethod) {
-  switch(loginMethod) {
-    case 'cosmos':
-      return 'cosmos';
-    case 'discord':
-      return 'discord';
-    case 'email':
-      return 'email';
-    case 'ethereum':
-      return 'email';
-    case 'github':
-      return 'github';
-    case 'near':
-      return 'near';
-    case 'polkadot':
-      return 'polkadot';
-    case 'polygon':
-      return 'polygon';
-    case 'twitter':
-      return 'twitter';
-    default:
-      return 'ethereum';
-  }
-}
