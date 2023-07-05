@@ -6,6 +6,7 @@
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "psql": "yarn --cwd packages/commonwealth psql",
     "test-api": "yarn --cwd packages/commonwealth test-api",
+    "test-load": "chmod +x load-testing/load-test.sh && ./load-testing/load-test.sh",
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
     "load-db": "yarn --cwd packages/commonwealth load-db",
