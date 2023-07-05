@@ -12,6 +12,7 @@ import type {
   VotingType,
   VotingUnit,
 } from './types';
+import { EventEmitter } from 'events';
 
 abstract class Proposal<
   ApiT,
@@ -56,6 +57,8 @@ abstract class Proposal<
   public abstract get endTime(): ProposalEndTime;
 
   public abstract get isPassing(): ProposalStatus;
+
+  public isFetched = new EventEmitter();
 
   // display
   public abstract get support(): Coin | number;

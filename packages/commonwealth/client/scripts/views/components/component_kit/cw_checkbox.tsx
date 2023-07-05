@@ -51,8 +51,10 @@ export const CWCheckbox = (props: CheckboxProps) => {
         ComponentType.Checkbox
       )}
     >
-      <input className="checkbox-input" {...params} />
-      <div className="checkbox-control" />
+      <div className="check">
+        <input className="checkbox-input" {...params} />
+        <div className="checkbox-control" />
+      </div>
       <CWText className="checkbox-label">{label || value}</CWText>
     </label>
   );
