@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { ProposalType } from 'common-common/src/types';
-
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
@@ -23,6 +21,8 @@ import {
 } from './helpers';
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
+import useForceRerender from 'hooks/useForceRerender';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -35,8 +35,14 @@ export const ProposalCard = ({
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
   const [title, setTitle] = useState(proposal.title);
+  const { metadata } = useProposalMetadata({ app, proposal });
+  const forceRerender = useForceRerender();
 
   const secondaryTagText = getSecondaryTagText(proposal);
+
+  useEffect(() => {
+    if (metadata?.title) setTitle(metadata?.title);
+  }, [metadata?.title]);
 
   useEffect(() => {
     if (proposal instanceof AaveProposal) {
@@ -46,6 +52,14 @@ export const ProposalCard = ({
       });
     }
   }, [proposal]);
+
+  useEffect(() => {
+    proposal?.isFetched.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
 
   return (
     <CWCard

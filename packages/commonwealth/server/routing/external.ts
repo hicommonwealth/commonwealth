@@ -1,7 +1,6 @@
 import type {
   // PostProfilesReq,
   PostReactionsReq,
-  PostRolesReq,
   PostTopicsReq,
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
@@ -48,7 +47,6 @@ import type { TypedRequest } from '../types';
 import {
   onlyIds,
   postReactionsValidation,
-  postRolesValidation,
   postTopicsValidation,
   putCommentsValidation,
 } from '../util/helperValidations';
@@ -145,25 +143,6 @@ export function addExternalRoutes(
     '/topics',
     onlyIds,
     deleteEntities.bind(this, 'chain_id', models, models.Topic)
-  );
-
-  router.post(
-    '/roles',
-    passport.authenticate('jwt', { session: false }),
-    postRolesValidation,
-    addEntities.bind(
-      this,
-      'chain_id',
-      models,
-      (a) => models.Role.bulkCreate(a),
-      (req: TypedRequest<PostRolesReq>) => req.body.roles
-    )
-  );
-  router.delete(
-    '/roles',
-    passport.authenticate('jwt', { session: false }),
-    onlyIds,
-    deleteEntities.bind(this, 'chain_id', models, models.Role)
   );
 
   router.get(

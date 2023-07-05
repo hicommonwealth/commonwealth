@@ -6,6 +6,7 @@ import 'components/user/user.scss';
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import { formatAddressShort } from '../../../../../shared/utils';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
@@ -17,6 +18,7 @@ import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import { Avatar } from 'views/components/Avatar';
+import Permissions from '../../../utils/Permissions';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -59,11 +61,11 @@ export const User = ({
   const forceRerender = useForceRerender();
 
   useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => {
+    NewProfilesController.Instance.isFetched.on('redraw', () => {
       forceRerender();
     });
 
-    app.newProfiles.isFetched.off('redraw', () => {
+    NewProfilesController.Instance.isFetched.off('redraw', () => {
       forceRerender();
     });
   }, [forceRerender]);
@@ -87,10 +89,7 @@ export const User = ({
 
   if (user) {
     loggedInUserIsAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
-      });
+      Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
     addrShort = formatAddressShort(
       user.address,
@@ -122,7 +121,7 @@ export const User = ({
         }
       }
 
-      profile = app.newProfiles.getProfile(chainId.id, address);
+      profile = NewProfilesController.Instance.getProfile(chainId.id, address);
 
       if (!role) {
         role = adminsAndMods.find(
@@ -154,7 +153,10 @@ export const User = ({
       // but we currently inject objects of type 'any' on the profile page
       const chainId = account.chain.id;
 
-      profile = app.newProfiles.getProfile(chainId, account.address);
+      profile = NewProfilesController.Instance.getProfile(
+        chainId,
+        account.address
+      );
 
       if (!role) {
         role = adminsAndMods.find(
@@ -183,6 +185,10 @@ export const User = ({
     }
   };
 
+  const isSelfSelected = app.user.addresses
+    .map((a) => a.address)
+    .includes(account?.address);
+
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
       <Avatar
@@ -197,7 +203,8 @@ export const User = ({
       key={profile?.address || '-'}
     >
       {showAvatar && (
-        <div
+        <Link
+          to={profile ? `/profile/id/${profile.id}` : undefined}
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
@@ -206,7 +213,7 @@ export const User = ({
             size={avatarSize}
             address={profile?.id}
           />
-        </div>
+        </Link>
       )}
       {
         <>
@@ -215,6 +222,9 @@ export const User = ({
             <Link
               className="user-display-name username"
               to={profile ? `/profile/id/${profile.id}` : undefined}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             >
               <>
                 {!profile ? (
@@ -331,7 +341,7 @@ export const User = ({
           )}
           {getRoleTags()}
           {/* If Admin Allow Banning */}
-          {loggedInUserIsAdmin && (
+          {loggedInUserIsAdmin && !isSelfSelected && (
             <div className="ban-wrapper">
               <CWButton
                 onClick={() => {

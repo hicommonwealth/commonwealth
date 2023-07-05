@@ -1,33 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
-
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
-import type ProposalModule from '../../models/ProposalModule';
-import { initChain } from 'helpers/chain';
+import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/proposals.scss';
-
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/ProposalCard';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
+import type ProposalModule from '../../models/ProposalModule';
 import { CardsCollection } from '../components/cards_collection';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { getStatusText } from '../components/ProposalCard/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import {
   CompoundProposalStats,
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
-import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -58,34 +55,29 @@ const ProposalsPage = () => {
     isCosmosCompletedProposalsLoadingMore,
     setIsCosmosCompletedProposalsLoadingMore,
   ] = useState(false);
-  const hasFetchedApiRef = useRef(false);
-
-  useEffect(() => {
-    const chainInit = async () => {
-      if (!hasFetchedApiRef.current) {
-        hasFetchedApiRef.current = true;
-        await initChain();
-      }
-    };
-
-    if (!app.chain?.apiInitialized || !app.chain?.loaded) chainInit();
-  }, [app.chain, initChain]);
+  useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
-    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
 
     return () => {
       app.chainAdapterReady.off('ready', () => {
         setLoading(false);
         app.chainAdapterReady.removeAllListeners();
       });
+    };
+  }, [setLoading]);
+
+  useEffect(() => {
+    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
+
+    return () => {
       app.chainModuleReady.off('ready', () => {
         setSubstrateLoading(false);
         app.chainModuleReady.removeAllListeners();
       });
     };
-  }, [setLoading, setSubstrateLoading]);
+  }, [setSubstrateLoading]);
 
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
@@ -285,20 +277,18 @@ const ProposalsPage = () => {
   );
 
   return (
-    <Sublayout>
-      <div className="ProposalsPage">
-        {onSubstrate && (
-          <SubstrateProposalStats
-            nextLaunchBlock={
-              (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            }
-          />
-        )}
-        {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
-        <CardsCollection content={activeProposalContent} header="Active" />
-        <CardsCollection content={inactiveProposalContent} header="Inactive" />
-      </div>
-    </Sublayout>
+    <div className="ProposalsPage">
+      {onSubstrate && (
+        <SubstrateProposalStats
+          nextLaunchBlock={
+            (app.chain as Substrate).democracyProposals.nextLaunchBlock
+          }
+        />
+      )}
+      {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
+      <CardsCollection content={activeProposalContent} header="Active" />
+      <CardsCollection content={inactiveProposalContent} header="Inactive" />
+    </div>
   );
 };
 

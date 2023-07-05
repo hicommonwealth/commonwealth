@@ -21,8 +21,8 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import type { RoleInstanceWithPermission } from '../util/roles';
-import { createDefaultCommunityRoles, createRole } from '../util/roles';
+
+import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
@@ -133,7 +133,8 @@ const createChain = async (
     return next(new AppError(Errors.NoBase));
   }
 
-  if ((await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB) {
+  if (req.body.icon_url &&
+    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB) {
     throw new AppError(Errors.ImageTooLarge);
   }
 
@@ -190,10 +191,16 @@ const createChain = async (
       privateUrl = node.private_url;
     }
 
-    const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
+    const node_url = privateUrl || url;
+    const provider =
+      node_url.slice(0, 4) == 'http'
+        ? new Web3.providers.HttpProvider(node_url)
+        : new Web3.providers.WebsocketProvider(node_url);
+
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
-    provider.disconnect(1000, 'finished');
+    if (provider instanceof Web3.providers.WebsocketProvider)
+      provider.disconnect(1000, 'finished');
     if (code === '0x') {
       return next(new AppError(Errors.InvalidAddress));
     }
@@ -348,8 +355,6 @@ const createChain = async (
     has_homepage: true,
   });
 
-  await createDefaultCommunityRoles(models, chain.id);
-
   if (req.body.address) {
     const erc20Abi = await models.ContractAbi.findOne({
       where: {
@@ -396,7 +401,7 @@ const createChain = async (
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (chain.base === ChainBase.Ethereum) {
-    addressToBeAdmin = await models.Address.findOne({
+    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
       where: {
         user_id: req.user.id,
         address: {
@@ -412,7 +417,7 @@ const createChain = async (
       ],
     });
   } else if (chain.base === ChainBase.NEAR) {
-    addressToBeAdmin = await models.Address.findOne({
+    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
       where: {
         user_id: req.user.id,
         address: {
@@ -428,7 +433,7 @@ const createChain = async (
       ],
     });
   } else if (chain.base === ChainBase.Solana) {
-    addressToBeAdmin = await models.Address.findOne({
+    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
       where: {
         user_id: req.user.id,
         address: {
@@ -447,12 +452,27 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    role = await createRole(
-      models,
-      addressToBeAdmin.id,
+    const newAddress = await models.Address.create({
+      user_id: req.user.id,
+      profile_id: addressToBeAdmin.id,
+      address: addressToBeAdmin.address,
+      chain: chain.id,
+      verification_token: addressToBeAdmin.verification_token,
+      verification_token_expires: addressToBeAdmin.verification_token_expires,
+      verified: addressToBeAdmin.verified,
+      keytype: addressToBeAdmin.keytype,
+      wallet_id: addressToBeAdmin.wallet_id,
+      is_user_default: true,
+      role: 'admin',
+      last_active: new Date(),
+    });
+
+    role = new RoleInstanceWithPermission(
+      { community_role_id: 0, address_id: newAddress.id },
       chain.id,
       'admin',
-      true
+      0,
+      0
     );
 
     await models.Subscription.findOrCreate({

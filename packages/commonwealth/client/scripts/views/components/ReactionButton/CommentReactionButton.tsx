@@ -1,25 +1,26 @@
-import React, { useState } from 'react';
-
 import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-
+import React, { useState, useEffect } from 'react';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
+import Permissions from '../../../utils/Permissions';
+import { LoginModal } from '../../modals/login_modal';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import ReactionCount from '../../../models/ReactionCount';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
+import { Modal } from '../component_kit/cw_modal';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import {
   getClasses,
   isWindowMediumSmallInclusive,
 } from '../component_kit/helpers';
 import {
-  fetchReactionsByPost,
+  fetchReactionsByComment,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
-import { LoginModal } from '../../modals/login_modal';
-import { Modal } from '../component_kit/cw_modal';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
@@ -31,14 +32,28 @@ export const CommentReactionButton = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
 
-  const reactionCounts = app.reactionCounts.store.getByPost(comment);
+  useEffect(() => {
+    const redrawFunction = (comment_id) => {
+      if (comment_id !== comment.id) {
+        return;
+      }
+
+      setReactionCounts(app.reactionCounts.store.getByPost(comment));
+    };
+
+    app.reactionCounts.isFetched.on('redraw', redrawFunction);
+
+    return () => {
+      app.reactionCounts.isFetched.off('redraw', redrawFunction);
+    };
+  });
+
   const { likes = 0, hasReacted } = reactionCounts || {};
 
   // token balance check if needed
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const parentThread = app.threads.getById(comment.threadId);
 
@@ -49,7 +64,7 @@ export const CommentReactionButton = ({
   const activeAddress = app.user.activeAccount?.address;
 
   const dislike = async (userAddress: string) => {
-    const reaction = (await fetchReactionsByPost(comment)).find((r) => {
+    const reaction = (await fetchReactionsByComment(comment.id)).find((r) => {
       return r.Address.address === activeAddress;
     });
 
@@ -66,6 +81,7 @@ export const CommentReactionButton = ({
           reactors.filter(({ Address }) => Address.address !== userAddress)
         );
 
+        setReactionCounts(app.reactionCounts.store.getByPost(comment));
         setIsLoading(false);
       });
   };
@@ -74,7 +90,7 @@ export const CommentReactionButton = ({
     setIsLoading(true);
 
     app.reactionCounts
-      .create(userAddress, comment, 'like', chainId)
+      .createCommentReaction(userAddress, comment, 'like', chainId)
       .then(() => {
         setReactors([
           ...reactors,
@@ -83,6 +99,7 @@ export const CommentReactionButton = ({
           },
         ]);
 
+        setReactionCounts(app.reactionCounts.store.getByPost(comment));
         setIsLoading(false);
       });
   };
@@ -95,27 +112,25 @@ export const CommentReactionButton = ({
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-      <div
+      <button
         className={getClasses<{ disabled?: boolean }>(
           { disabled: isLoading || isUserForbidden },
-          'CommentReactionButton'
+          `CommentReactionButton ${hasReacted ? ' has-reacted' : ''}`
         )}
         onMouseEnter={async () => {
-          setReactors(await fetchReactionsByPost(comment));
+          setReactors(await fetchReactionsByComment(comment.id));
+        }}
+        onClick={async (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (!app.isLoggedIn() || !app.user.activeAccount) {
+            setIsModalOpen(true);
+          } else {
+            onReactionClick(e, hasReacted, dislike, like);
+          }
         }}
       >
-        <CWIconButton
-          iconName="upvote"
-          iconSize="small"
-          selected={hasReacted}
-          onClick={async (e) => {
-            if (!app.isLoggedIn() || !app.user.activeAccount) {
-              setIsModalOpen(true);
-            } else {
-              onReactionClick(e, hasReacted, dislike, like);
-            }
-          }}
-        />
         {likes > 0 ? (
           <CWTooltip
             content={
@@ -126,27 +141,37 @@ export const CommentReactionButton = ({
               </div>
             }
             renderTrigger={(handleInteraction) => (
-              <CWText
+              <div
                 onMouseEnter={handleInteraction}
                 onMouseLeave={handleInteraction}
-                className="menu-buttons-text"
-                type="caption"
-                fontWeight="medium"
+                className="btn-container"
               >
-                {likes}
-              </CWText>
+                <CWIcon
+                  iconName="upvote"
+                  iconSize="small"
+                  {...(hasReacted && { weight: 'fill' })}
+                />
+                <div
+                  className={`reactions-count ${
+                    hasReacted ? ' has-reacted' : ''
+                  }`}
+                >
+                  {likes}
+                </div>
+              </div>
             )}
           />
         ) : (
-          <CWText
-            className="menu-buttons-text"
-            type="caption"
-            fontWeight="medium"
-          >
-            {likes}
-          </CWText>
+          <>
+            <CWIcon iconName="upvote" iconSize="small" />
+            <div
+              className={`reactions-count ${hasReacted ? ' has-reacted' : ''}`}
+            >
+              {likes}
+            </div>
+          </>
         )}
-      </div>
+      </button>
     </>
   );
 };
