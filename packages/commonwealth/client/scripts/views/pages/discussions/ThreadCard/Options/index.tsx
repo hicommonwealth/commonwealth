@@ -2,7 +2,6 @@ import Thread from 'models/Thread';
 import React, { useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
-import { ReactionButton } from './ReactionButton';
 import { SharePopover } from '../../../../components/share_popover';
 import {
   getCommentSubscription,
@@ -10,6 +9,7 @@ import {
   handleToggleSubscription,
 } from '../../helpers';
 import { AdminActions, AdminActionsProps } from './AdminActions';
+import { ReactionButton } from './ReactionButton';
 import './index.scss';
 
 type OptionsProps = AdminActionsProps & {
@@ -43,13 +43,19 @@ export const Options = ({
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
-      getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive
+    getCommentSubscription(thread)?.isActive &&
+    getReactionSubscription(thread)?.isActive
   );
 
   return (
     <>
-      <div className="Options">
+      <div
+        className="Options"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         {canVote && thread && <ReactionButton thread={thread} size="small" />}
 
         {canComment && totalComments >= 0 && (
