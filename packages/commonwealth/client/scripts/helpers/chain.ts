@@ -49,7 +49,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
-  let initApi; // required for NEAR
+  let initApi; // required for NEAR and substrate
 
   if (chain.base === ChainBase.Substrate) {
     const Substrate = (
@@ -60,6 +60,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
       )
     ).default;
     newChain = new Substrate(chain, app);
+    initApi = true;
   } else if (chain.base === ChainBase.CosmosSDK) {
     const Cosmos = (
       await import(
@@ -192,7 +193,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
   }
 
   if (initApi) {
-    await app.chain.initApi(); // required for loading NearAccounts
+    await app.chain.initApi(); // required for loading NearAccounts and SubstrateAccounts
   }
 
   app.chainPreloading = false;
