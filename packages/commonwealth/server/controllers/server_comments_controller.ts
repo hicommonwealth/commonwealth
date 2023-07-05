@@ -167,6 +167,7 @@ export class ServerCommentsController implements IServerCommentsController {
   ): Promise<[ReactionAttributes, NotificationOptions[], AnalyticsOptions[]]> {
     const comment = await this.models.Comment.findOne({
       where: { id: commentId },
+      useMaster: true,
     });
     if (!comment) {
       throw new Error(`${Errors.CommentNotFound}: ${commentId}`);
@@ -227,19 +228,19 @@ export class ServerCommentsController implements IServerCommentsController {
       canvas_session: canvasSession,
       canvas_hash: canvasHash,
     };
-    const [
-      foundOrCreatedReaction,
-      created,
-    ] = await this.models.Reaction.findOrCreate({
-      where: reactionData,
-      defaults: reactionData,
-      include: [this.models.Address],
-    });
+    const [foundOrCreatedReaction, created] =
+      await this.models.Reaction.findOrCreate({
+        where: reactionData,
+        defaults: reactionData,
+        include: [this.models.Address],
+        useMaster: true,
+      });
 
     const finalReaction = created
       ? await this.models.Reaction.findOne({
           where: reactionData,
           include: [this.models.Address],
+          useMaster: true,
         })
       : foundOrCreatedReaction;
 
