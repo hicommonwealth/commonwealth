@@ -181,7 +181,11 @@ export const ChainMetadataRows = ({
   const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
 
   useEffect(() => {
-    if (discordChannels && discordChannels.selectedChannel) {
+    if (
+      discordChannels &&
+      discordChannels.selectedChannel &&
+      discordChannels.selectedChannel.id
+    ) {
       setSelectedSnapshotChannel(discordChannels.selectedChannel);
       setSnapshotNotificationsEnabled(true);
       setSelectedChannelLoaded(true);
@@ -569,7 +573,7 @@ export const ChainMetadataRows = ({
               />
             </div>
             <div className="connected-line">
-              {discordChannels && selectedChannelLoaded && (
+              {discordChannels && snapshotNotificationsEnabled && (
                 <CWDropdown
                   label={'Select Channel'}
                   options={discordChannels.textChannels.map((channel) => {
