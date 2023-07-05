@@ -184,8 +184,8 @@ export const ChainMetadataRows = ({
     if (discordChannels && discordChannels.selectedChannel) {
       setSelectedSnapshotChannel(discordChannels.selectedChannel);
       setSnapshotNotificationsEnabled(true);
+      setSelectedChannelLoaded(true);
     }
-    setSelectedChannelLoaded(true);
   }, [discordChannels]);
 
   if (!selectedTags2) {
