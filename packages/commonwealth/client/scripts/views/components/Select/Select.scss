@@ -6,12 +6,12 @@
     min-width: 144px;
     max-width: max(24ch, 264px);
     text-overflow: ellipsis;
-    border-radius: $border-radius-md  !important;
     cursor: pointer;
     height: auto !important;
     background-color: $white;
     font-size: 14px !important;
-    border: 0px !important;
+    border: 1px solid transparent !important;
+    border-radius: $border-radius-md  !important;
     box-shadow: 0 0 0 1px $neutral-200 inset;
     margin: 0;
     line-height: 20px;
@@ -26,11 +26,12 @@
     }
 
     &:hover {
-        border-color: $primary-600  !important;
+        border: 1px solid $primary-600  !important;
     }
 
     &:active {
-        border-color: $primary-500  !important;
+        border: 1px solid $primary-500  !important;
+        box-shadow: 0px 0px 0px 3px $primary-100 !important;
     }
 
     .button-text {
@@ -40,10 +41,12 @@
         line-height: 20px;
         letter-spacing: 1%;
         font-weight: 400;
+        margin-top: 3px;
     }
 
     &.active {
-        border-color: $primary-500  !important;
+        border: 1px solid $primary-500  !important;
+        box-shadow: 0px 0px 0px 3px $primary-100 !important;
     }
 }
 
