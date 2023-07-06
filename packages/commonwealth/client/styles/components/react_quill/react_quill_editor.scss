@@ -33,6 +33,7 @@
       font-weight: 500;
       padding: 1px 8px !important;
       outline: none;
+      width: auto;
 
       &.enabled {
         background: $primary-50;
@@ -49,14 +50,21 @@
 
   .section {
     margin-right: 24px;
-  }
 
-  button {
-    padding: 4px !important;
-    width: auto !important;
+    button {
+      padding: 4px !important;
+      width: auto !important;
 
-    svg {
-      height: unset !important;
+      &:hover {
+        svg {
+          fill: $neutral-600;
+        }
+      }
+
+      svg {
+        height: unset !important;
+        fill: $neutral-500;
+      }
     }
   }
 }

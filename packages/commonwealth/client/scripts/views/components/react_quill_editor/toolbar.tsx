@@ -1,39 +1,47 @@
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
-import { SerializableDeltaStatic } from './utils';
+import { renderToolbarIcon, SerializableDeltaStatic } from './utils';
 import { DeltaStatic } from 'quill';
-import ReactDOMServer from 'react-dom/server';
 import clsx from 'clsx';
-import 'components/react_quill/react_quill_editor.scss';
 import {
-  BoldIcon,
-  BulletListIcon,
-  CodeIcon,
-  H1Icon,
-  H2Icon,
-  ImageIcon,
-  ItalicIcon,
-  LinkIcon,
-  NumberListIcon,
-  QuoteIcon,
-  StrikeIcon,
-} from 'views/components/react_quill_editor/toolbarIcons';
+  TextHOne,
+  TextHTwo,
+  TextB,
+  TextItalic,
+  TextStrikethrough,
+  LinkSimple,
+  Code,
+  Quotes,
+  Image,
+  ListNumbers,
+  ListBullets,
+  ListChecks,
+} from '@phosphor-icons/react';
+
+import 'components/react_quill/react_quill_editor.scss';
+
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
-const icons = ReactQuill.Quill.import('ui/icons');
+const quillIcons = ReactQuill.Quill.import('ui/icons');
 
-icons['header'][1] = ReactDOMServer.renderToStaticMarkup(H1Icon);
-icons['header'][2] = ReactDOMServer.renderToStaticMarkup(H2Icon);
-icons['bold'] = ReactDOMServer.renderToStaticMarkup(BoldIcon);
-icons['italic'] = ReactDOMServer.renderToStaticMarkup(ItalicIcon);
-icons['strike'] = ReactDOMServer.renderToStaticMarkup(StrikeIcon);
-icons['link'] = ReactDOMServer.renderToStaticMarkup(LinkIcon);
-icons['code-block'] = ReactDOMServer.renderToStaticMarkup(CodeIcon);
-icons['blockquote'] = ReactDOMServer.renderToStaticMarkup(QuoteIcon);
-icons['image'] = ReactDOMServer.renderToStaticMarkup(ImageIcon);
-icons['list']['ordered'] = ReactDOMServer.renderToStaticMarkup(NumberListIcon);
-icons['list']['bullet'] = ReactDOMServer.renderToStaticMarkup(BulletListIcon);
-icons['list']['check'] = ReactDOMServer.renderToStaticMarkup(BulletListIcon);
+Object.assign(quillIcons, {
+  header: {
+    1: renderToolbarIcon(TextHOne),
+    2: renderToolbarIcon(TextHTwo),
+  },
+  bold: renderToolbarIcon(TextB),
+  italic: renderToolbarIcon(TextItalic),
+  strike: renderToolbarIcon(TextStrikethrough),
+  link: renderToolbarIcon(LinkSimple),
+  'code-block': renderToolbarIcon(Code),
+  blockquote: renderToolbarIcon(Quotes, { weight: 'fill' }),
+  image: renderToolbarIcon(Image),
+  list: {
+    ordered: renderToolbarIcon(ListNumbers),
+    bullet: renderToolbarIcon(ListBullets),
+    check: renderToolbarIcon(ListChecks),
+  },
+});
 
 const LIST_ITEM_PREFIX = {
   ordered: '1.',
