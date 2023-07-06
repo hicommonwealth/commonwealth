@@ -118,8 +118,6 @@ export const CreateComment = ({
   const disabled =
     editorValue.length === 0 || sendingComment || userFailsThreshold;
 
-  const decimals = getDecimals(app.chain);
-
   const cancel = (e) => {
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
@@ -156,19 +154,25 @@ export const CreateComment = ({
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
       />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && app.user.activeAccount && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
+      {app.activeChainId &&
+        tokenPostingThreshold &&
+        tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {activeTopicName} requires{' '}
+            {weiToTokens(
+              tokenPostingThreshold.toString(),
+              getDecimals(app.chain)
+            )}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && app.user.activeAccount && (
+              <>
+                You have{' '}
+                {weiToTokens(userBalance.toString(), getDecimals(app.chain))}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
+          </CWText>
+        )}
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (

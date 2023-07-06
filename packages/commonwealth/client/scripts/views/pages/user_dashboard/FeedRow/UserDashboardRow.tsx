@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import type { CWEvent } from 'chain-events/src';
 import { Label as ChainEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
 import type DashboardActivityNotification from '../../../../models/DashboardActivityNotification';
+import Thread from 'models/Thread';
 
 import './UserDashboardRow.scss';
 import app from 'state';
@@ -19,6 +20,7 @@ type UserDashboardRowProps = {
 
 export const UserDashboardRow = (props: UserDashboardRowProps) => {
   const { notification } = props;
+  const [thread, setThread] = useState<Thread>(null);
   const navigate = useCommonNavigate();
 
   const {
@@ -55,6 +57,19 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     notification.notificationData
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const fetchThread = async () => {
+      const res = await app.threads.fetchThreadsFromId([thread_id], chain_id);
+      setThread(res[0]);
+      console.log(res[0]);
+      console.log(thread_id, 'thread_id');
+      console.log(comment_id, 'comment_id');
+    };
+
+    if (categoryId === 'new-comment-creation') fetchThread();
+  }, [chain_id, thread_id, comment_id]);
+
   const path = getProposalUrlPath(
     root_type,
     thread_id,
@@ -80,13 +95,19 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
       )}
       onClick={handleClick}
     >
-      <UserDashboardRowTop activityData={notification} category={categoryId} />
+      <UserDashboardRowTop
+        activityData={notification}
+        category={categoryId}
+        threadText={thread?.plaintext}
+        threadAuthor={thread?.author}
+      />
       <UserDashboardRowBottom
         threadId={threadId}
         commentId={comment_id}
         chainId={chain_id}
         commentCount={commentCount}
         commenters={commenters}
+        thread={thread}
       />
     </div>
   );

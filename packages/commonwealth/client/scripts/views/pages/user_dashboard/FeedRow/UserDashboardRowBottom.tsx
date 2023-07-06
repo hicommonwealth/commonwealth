@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
 
@@ -14,7 +14,11 @@ import { CWText } from '../../../components/component_kit/cw_text';
 import { subscribeToThread } from '../helpers';
 import type NotificationSubscription from '../../../../models/NotificationSubscription';
 import useForceRerender from 'hooks/useForceRerender';
+import { CommentReactionButton } from '../../../components/ReactionButton/CommentReactionButton';
 import { ReactionButton } from '../../discussions/ThreadCard/Options/ReactionButton';
+import Thread from 'models/Thread';
+import { CreateComment } from '../../../components/Comments/CreateComment';
+import { toNumber } from 'lodash';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;
@@ -22,11 +26,26 @@ type UserDashboardRowBottomProps = {
   chainId: string;
   commentId?: string;
   commenters: ProfileWithAddress[];
+  thread?: Thread;
+  comment?: Comment<any>;
 };
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
-  const { threadId, commentCount, commentId, chainId, commenters } = props;
+  const {
+    threadId,
+    commentCount,
+    commentId,
+    chainId,
+    commenters,
+    thread,
+    comment,
+  } = props;
   const forceRerender = useForceRerender();
+  const [isReplying, setIsReplying] = useState(false);
+
+  const handleIsReplying = () => {
+    setIsReplying(!isReplying);
+  };
 
   const setSubscription = async (
     subThreadId: string,
@@ -62,11 +81,25 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
 
   const domain = document.location.origin;
 
+  console.log(comment, 'comment');
+
   return (
     <div className="UserDashboardRowBottom">
-      {/* <ReactionButton thread={threadId} size="small" /> */}
       <div className="activity">
-        <button className="thread-option-btn">
+        {
+          thread && (
+            <ReactionButton thread={thread} size="small" />
+          ) /* Show on more than threads? */
+        }
+        {/* {comment && <CommentReactionButton comment={comment} />} */}
+        <button
+          className="thread-option-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleIsReplying();
+          }}
+        >
           <CWIcon iconName="comment" iconSize="small" />
           <CWText type="caption" className="text">
             {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
@@ -160,6 +193,14 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           />
         </button>
       </div>
+      {isReplying && (
+        <CreateComment
+          handleIsReplying={handleIsReplying}
+          parentCommentId={commentId ? toNumber(commentId) : null}
+          rootThread={thread}
+          updatedCommentsCallback={forceRerender}
+        />
+      )}
     </div>
   );
 };
