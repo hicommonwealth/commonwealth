@@ -1,0 +1,24 @@
+name: Convert PRs to Drafts without Linked Issue
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  checkLinkedIssue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR has a linked issue
+        id: check_issue
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prPayload = context.payload.pull_request;
+            if (!prPayload.issue_url) {
+              const octokit = context.github;
+              const updatePayload = context.issue({ draft: true });
+              await octokit.pulls.update(updatePayload);
+              core.setFailed('Pull request converted to draft as it does not have a linked issue.');
+            }
