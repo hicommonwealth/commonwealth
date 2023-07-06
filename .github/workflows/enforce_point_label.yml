@@ -1,0 +1,32 @@
+name: Enforce Point Label on In-Progress Issues
+
+on:
+  issues:
+    types:
+      - labeled
+      - unlabeled
+
+jobs:
+  checkPointLabel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check issue status and label
+        id: check_issue
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issuePayload = context.payload.issue;
+            const issueLabels = issuePayload.labels;
+            const issueBody = issuePayload.body.toLowerCase();
+
+            const isInProgress = issueBody.includes('In Progress');
+
+            const labelRegex = /^\d+$/; // Matches only numbers
+            
+            if (issueStatus === 'open' && isInProgress && !issueLabels.find(label => labelRegex.test(label.name))) {
+              const octokit = context.github;
+              const addLabelPayload = context.issue({ labels: ['point'] });
+              await octokit.issues.addLabels(addLabelPayload);
+              core.setFailed('The "point" label is required for issues in progress.');
+            }

@@ -1,0 +1,36 @@
+name: Close Ticket on Boom
+
+on:
+  project_card:
+    types:
+      - moved
+
+jobs:
+  closeTicket:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Close Ticket
+        if: contains(github.event.project_card.column_name == 'Boom')
+        run: |
+          # Extract the ticket number from the project card's content URL
+          TICKET_NUMBER=$(echo "${{ github.event.project_card.content_url }}" | awk -F'/' '{print $NF}')
+
+          # Close the corresponding issue
+          echo "::set-env name=TICKET_NUMBER::$TICKET_NUMBER"  # Set the ticket number as an environment variable
+          echo "::set-output name=ISSUE_NUMBER::$TICKET_NUMBER"  # Set the issue number as an output for later steps
+
+      - name: Set Issue Number
+        id: issue_number
+        run: echo "::set-output name=ISSUE_NUMBER::$TICKET_NUMBER"
+
+      - name: Close Issue
+        if: steps.closeTicket.outputs.ISSUE_NUMBER != ''
+        uses: peter-evans/close-issue@v1
+        with:
+          issue-number: ${{ steps.issue_number.outputs.ISSUE_NUMBER }}
+          comment: 'This issue was closed because the corresponding item was moved to the "boom" column.'
+          delete-branch: false
