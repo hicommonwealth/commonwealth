@@ -18,7 +18,7 @@ jobs:
             const prDescription = context.payload.pull_request.body;
             const issueMatcher = /[cC]loses:\s*#(\d+)/;
             
-            console.log(prDescription);
+            console.log(context);
             console.log(issueMatcher.test(prDescription));
             if (!issueMatcher.test(prDescription)) {
               const octokit = context.github;
