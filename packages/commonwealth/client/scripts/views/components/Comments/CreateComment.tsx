@@ -61,7 +61,8 @@ export const CreateComment = ({
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (e) => {
+    e.stopPropagation();
     setErrorMsg(null);
     setSendingComment(true);
 
@@ -119,6 +120,7 @@ export const CreateComment = ({
     editorValue.length === 0 || sendingComment || userFailsThreshold;
 
   const cancel = (e) => {
+    e.stopPropagation();
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
