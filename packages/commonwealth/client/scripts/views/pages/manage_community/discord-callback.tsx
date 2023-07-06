@@ -1,6 +1,6 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import { PageLoading } from '../loading';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PageNotFound } from '../404';
 import axios from 'axios';
 import app from 'state';
@@ -43,13 +43,17 @@ const DiscordCallbackPage = () => {
   const state = params.get('state');
   const guildId = params.get('guild_id');
 
+  useEffect(() => {
+    if (state && guildId) {
+      setBotConfig(state, guildId).catch((e) => {
+        setFailed(true);
+        setFailureMessage(e.message);
+      });
+    }
+  }, []);
+
   if (!state || !guildId) {
     return <PageNotFound message="No callback data provided." />;
-  } else {
-    setBotConfig(state, guildId).catch((e) => {
-      setFailed(true);
-      setFailureMessage(e.message);
-    });
   }
 
   // Payable functions are not supported in this implementation
@@ -59,5 +63,4 @@ const DiscordCallbackPage = () => {
     <PageLoading message="Connecting Discord" />
   );
 };
-
 export default DiscordCallbackPage;
