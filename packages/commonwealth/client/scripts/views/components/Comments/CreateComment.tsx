@@ -151,11 +151,13 @@ export const CreateComment = ({
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
+      <div onClick={(e) => e.stopPropagation()}>
+        <ReactQuillEditor
+          className="editor"
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+        />
+      </div>
       {app.activeChainId &&
         tokenPostingThreshold &&
         tokenPostingThreshold.gt(new BN(0)) && (
