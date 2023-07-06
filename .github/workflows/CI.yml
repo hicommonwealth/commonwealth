@@ -266,6 +266,7 @@ jobs:
           files: |
             packages/commonwealth/test/devnet/cosmos/**/*
             packages/commonwealth/server/util/cosmosProxy.ts
+            packages/commonwealth/client/scripts/controllers/chain/cosmos/gov/**/*
             packages/chain-events/cosmos-chain-testing/**/*
             packages/common-common/src/cosmos-ts/**/*
 
