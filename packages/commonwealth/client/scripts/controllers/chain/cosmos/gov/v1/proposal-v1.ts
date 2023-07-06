@@ -134,6 +134,17 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async init() {
+    await this.fetchVoteInfo();
+
+    if (!this.initialized) {
+      this._initialized = true;
+    }
+    if (this.data.state.completed) {
+      super.complete(this._Governance.store);
+    }
+  }
+
+  private async fetchVoteInfo() {
     const lcd = this._Chain.lcd;
     const proposalId = longify(this.data.identifier);
     // only fetch voter data if active
@@ -182,15 +193,11 @@ export class CosmosProposalV1 extends Proposal<
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTallyV1(tallyResp?.tally);
         }
+
+        this.isFetched.emit('redraw');
       } catch (err) {
         console.error(`Cosmos query failed: ${err.message}`);
       }
-    }
-    if (!this.initialized) {
-      this._initialized = true;
-    }
-    if (this.data.state.completed) {
-      super.complete(this._Governance.store);
     }
   }
 
@@ -266,7 +273,7 @@ export class CosmosProposalV1 extends Proposal<
       case 'Rejected':
         return ProposalStatus.Failed;
       case 'VotingPeriod':
-        return this.support > 0.5 && this.veto <= 1 / 3
+        return +this.support > 0.5 && this.veto <= 1 / 3
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
