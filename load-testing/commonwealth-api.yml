@@ -9,7 +9,11 @@ config:
     eu:
       target: "https://eu.unique.rocks"
     local:
-      target: "http://localhost:8080"  
+      target: "http://localhost:8080"
+    beta:
+      target: "https://commonwealth-beta.herokuapp.com"
+    frick:
+      target: "https://commonwealth-frick.herokuapp.com"
   http:
     extendedMetrics: true
   phases:
