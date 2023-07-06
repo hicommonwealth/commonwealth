@@ -19,7 +19,7 @@ jobs:
             const issueMatcher = /[cC]loses:\s*#(\d+)/;
             
             console.log(prDescription);
-            console.log(issueMatcher.test(prDescription);
+            console.log(issueMatcher.test(prDescription));
             if (!issueMatcher.test(prDescription)) {
               const octokit = context.github;
               console.log(octokit);
