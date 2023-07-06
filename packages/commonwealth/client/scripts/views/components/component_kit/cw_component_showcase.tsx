@@ -41,6 +41,11 @@ import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  ReactQuillEditor,
+} from 'views/components/react_quill_editor';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -153,6 +158,11 @@ export const ComponentShowcase = () => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
+
+  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
+  const [isEditorDisabled, setIsEditorDisabled] = useState(false);
 
   return (
     <div className="ComponentShowcase">
@@ -466,7 +476,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Primary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -478,13 +488,13 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Primary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
@@ -496,7 +506,7 @@ export const ComponentShowcase = () => {
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="primary"
             label="Primary default disabled w/ left icon"
             disabled
@@ -512,7 +522,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Secondary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -524,32 +534,32 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             buttonWidth="wide"
             label="Secondary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             buttonType="secondary"
             label="Secondary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            buttonType='secondary'
+            buttonType="secondary"
             label="Secondary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            iconLeft='person'
+            iconLeft="person"
             label="Secondary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Tertiary</CWText>
+          <CWText type="h4">Tertiary</CWText>
           <CWButton
             buttonType="tertiary"
             label="Tertiary default"
@@ -557,7 +567,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="tertiary"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Tertiary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -595,7 +605,7 @@ export const ComponentShowcase = () => {
           />
         </div>
         <div className="button-row">
-        <CWText type="h4">Destructive</CWText>
+          <CWText type="h4">Destructive</CWText>
           <CWButton
             buttonType="destructive"
             label="Destructive default"
@@ -603,7 +613,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="destructive"
-            buttonHeight='lg'
+            buttonHeight="lg"
             label="Destructive large"
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -938,6 +948,25 @@ export const ComponentShowcase = () => {
           <CWText fontWeight="semiBold">Card title</CWText>
           <CWText>Full width</CWText>
         </CWCard>
+      </div>
+      <div className="Quill">
+        <CWText type="h3">Quill Editor</CWText>
+        <div className="editor-toggle">
+          <CWToggle
+            checked={isEditorDisabled}
+            onChange={() => {
+              setIsEditorDisabled((prev) => !prev);
+            }}
+          />
+          <CWText type="caption">
+            Editor {isEditorDisabled ? 'Disabled' : 'Enabled'}
+          </CWText>
+        </div>
+        <ReactQuillEditor
+          contentDelta={threadContentDelta}
+          setContentDelta={setThreadContentDelta}
+          isDisabled={isEditorDisabled}
+        />
       </div>
     </div>
   );
