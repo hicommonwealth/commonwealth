@@ -15,12 +15,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prPayload = context.payload.pull_request;
-            console.log(context.payload);
-            console.log('======');
-            console.log('======');
-            if (!prPayload.issue_url) {
-            console.log('======');
+            const prDescription = context.payload.pull_request.body;
+            const issueMatcher = /[cC]loses:\s*#(\d+)/;
+            
+            console.log(prDescription);
+            console.log(issueMatcher.test(prDescription);
+            if (!issueMatcher.test(prDescription)) {
               const octokit = context.github;
               console.log(octokit);
               const updatePayload = context.issue({ draft: true });
