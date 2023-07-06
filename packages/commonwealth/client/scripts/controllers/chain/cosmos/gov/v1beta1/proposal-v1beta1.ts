@@ -285,7 +285,7 @@ export class CosmosProposal extends Proposal<
       case 'Rejected':
         return ProposalStatus.Failed;
       case 'VotingPeriod':
-        return this.support > 0.5 && this.veto <= 1 / 3
+        return +this.support > 0.5 && this.veto <= 1 / 3
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
