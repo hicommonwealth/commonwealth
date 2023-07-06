@@ -44,6 +44,7 @@ export const CWDropdown = ({
         }}
         label={label}
         onClick={() => {
+          if (disabled) return;
           setShowDropdown(!showDropdown);
         }}
         disabled={disabled}
