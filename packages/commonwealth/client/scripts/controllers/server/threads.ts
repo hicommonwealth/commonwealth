@@ -19,7 +19,7 @@ import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
 import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
-import Thread from '../../models/Thread';
+import Thread, { AssociatedReaction } from '../../models/Thread';
 import Topic from '../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
@@ -69,6 +69,20 @@ class ThreadsController {
   private readonly _listingStore: RecentListingStore;
   private readonly _overviewStore: ProposalStore<Thread>;
   public isFetched = new EventEmitter();
+  private _threadIdToReactions: Map<number, AssociatedReaction[]> = new Map<
+    number,
+    AssociatedReaction[]
+  >();
+
+  public refreshReactionsFromThreads(threads: Thread[]) {
+    threads.forEach((t) => {
+      this._threadIdToReactions.set(t.id, t.associatedReactions);
+    });
+  }
+
+  public get threadIdToReactions() {
+    return this._threadIdToReactions;
+  }
 
   private constructor() {
     this._store = new ProposalStore<Thread>();
@@ -169,8 +183,8 @@ class ThreadsController {
             typeof history.author === 'string'
               ? JSON.parse(history.author)
               : typeof history.author === 'object'
-              ? history.author
-              : null;
+                ? history.author
+                : null;
           history.timestamp = moment(history.timestamp);
         } catch (e) {
           console.log(e);
@@ -195,8 +209,8 @@ class ThreadsController {
     const lastEditedProcessed = last_edited
       ? moment(last_edited)
       : versionHistoryProcessed && versionHistoryProcessed?.length > 1
-      ? versionHistoryProcessed[0].timestamp
-      : null;
+        ? versionHistoryProcessed[0].timestamp
+        : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     let topicModel = null;
@@ -344,8 +358,8 @@ class ThreadsController {
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
           : err.message
-          ? err.message
-          : 'Failed to create thread'
+            ? err.message
+            : 'Failed to create thread'
       );
     }
   }
@@ -468,8 +482,7 @@ class ThreadsController {
   public async toggleSpam(threadId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
       $.post(
-        `${app.serverUrl()}/threads/${threadId}/${
-          !isSpam ? 'mark' : 'unmark'
+        `${app.serverUrl()}/threads/${threadId}/${!isSpam ? 'mark' : 'unmark'
         }-as-spam`,
         {
           jwt: app.user.jwt,
@@ -898,7 +911,7 @@ class ThreadsController {
       return this.modelFromServer(t);
     });
 
-    app.threadReactions.refreshReactionsFromThreads(modeledThreads);
+    this.refreshReactionsFromThreads(modeledThreads)
 
     modeledThreads.forEach((thread) => {
       try {
