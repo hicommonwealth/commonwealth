@@ -25,8 +25,8 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
 
   const handleUpvote = () => {
     if (!disabled && !active) {
-      setCount(voteCount + 1);
-      setUpvoted(true);
+      setCount(upvoted ? voteCount : voteCount + 1);
+      setUpvoted(!upvoted);
     }
   };
 
