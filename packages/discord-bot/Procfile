@@ -1,0 +1,2 @@
+listener: ts-node discord-listener/discordListener.ts
+consumer: ts-node discord-consumer/discordConsumer.ts
