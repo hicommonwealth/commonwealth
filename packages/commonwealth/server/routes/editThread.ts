@@ -185,6 +185,7 @@ const editThread = async (
         models.Attachment,
         { model: models.Topic, as: 'topic' },
       ],
+      useMaster: true,
     });
 
     // dispatch notifications to subscribers of the given chain

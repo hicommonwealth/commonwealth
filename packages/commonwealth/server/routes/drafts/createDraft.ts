@@ -60,6 +60,7 @@ const createDraft = async (
     finalDraft = await models.DiscussionDraft.findOne({
       where: { id: draft.id },
       include: [models.Address, models.Attachment],
+      useMaster: true,
     });
   } catch (err) {
     return next(err);

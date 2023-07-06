@@ -64,6 +64,7 @@ const deleteThreadLinks = async (
         as: 'topic',
       },
     ],
+    useMaster: true,
   });
 
   return success(res, finalThread.toJSON());

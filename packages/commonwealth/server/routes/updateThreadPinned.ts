@@ -60,6 +60,7 @@ const updateThreadPinned = async (
           as: 'topic',
         },
       ],
+      useMaster: true,
     });
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });

@@ -73,6 +73,7 @@ const deleteEditors = async (
         as: 'Address',
       },
     ],
+    useMaster: true,
   });
 
   return res.json({

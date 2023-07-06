@@ -259,6 +259,7 @@ export class ServerThreadsController implements IServerThreadsController {
       ? await this.models.Reaction.findOne({
           where: reactionData,
           include: [this.models.Address],
+          useMaster: true,
         })
       : foundOrCreatedReaction;
 

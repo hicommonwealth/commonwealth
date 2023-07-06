@@ -36,7 +36,8 @@ const addThreadLink = async (
     thread.address_id,
     thread.chain
   );
-  if (!isAuth && !req.user.isAdmin) return next(new AppError(Errors.NotAdminOrOwner));
+  if (!isAuth && !req.user.isAdmin)
+    return next(new AppError(Errors.NotAdminOrOwner));
 
   if (thread.links) {
     const filteredLinks = links.filter((link) => {
@@ -72,6 +73,7 @@ const addThreadLink = async (
         as: 'topic',
       },
     ],
+    useMaster: true,
   });
 
   serverAnalyticsTrack({

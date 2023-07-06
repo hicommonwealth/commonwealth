@@ -154,6 +154,7 @@ const addEditors = async (
         as: 'Address',
       },
     ],
+    useMaster: true,
   });
 
   return res.json({

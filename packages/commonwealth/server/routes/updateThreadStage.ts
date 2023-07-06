@@ -91,6 +91,7 @@ const updateThreadStage = async (
           as: 'topic',
         },
       ],
+      useMaster: true,
     });
 
     serverAnalyticsTrack({

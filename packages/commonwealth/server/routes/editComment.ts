@@ -109,6 +109,7 @@ const editComment = async (
     const finalComment = await models.Comment.findOne({
       where: { id: comment.id },
       include: [models.Address, models.Attachment],
+      useMaster: true,
     });
 
     // get thread for crafting commonwealth url
