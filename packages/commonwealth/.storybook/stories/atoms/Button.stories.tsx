@@ -1,15 +1,9 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-<<<<<<< HEAD:packages/commonwealth/.storybook/stories/old/atoms/Button.stories.tsx
-import { CWButton } from '../../../../client/scripts/views/components/component_kit/new_designs/cw_button';
-import { notifySuccess } from '../../../../client/scripts/controllers/app/notifications';
-import { iconLookup } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
-=======
 import { CWButton } from '../../../client/scripts/views/components/component_kit/new_designs/cw_button';
 import { notifySuccess } from '../../../client/scripts/controllers/app/notifications';
 import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
->>>>>>> 4121-design_thread_listing:packages/commonwealth/.storybook/stories/atoms/Button.stories.tsx
 
 const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
