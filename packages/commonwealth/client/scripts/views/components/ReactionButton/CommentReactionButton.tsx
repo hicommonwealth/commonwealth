@@ -6,7 +6,11 @@ import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
 import ReactionCount from '../../../models/ReactionCount';
-import { useCreateCommentReactionMutation, useDeleteCommentReactionMutation } from '../../../state/api/comments';
+import {
+  useCreateCommentReactionMutation,
+  useDeleteCommentReactionMutation,
+  useFetchCommentReactionsQuery
+} from '../../../state/api/comments';
 import Permissions from '../../../utils/Permissions';
 import { LoginModal } from '../../modals/login_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -17,7 +21,6 @@ import {
   isWindowMediumSmallInclusive,
 } from '../component_kit/helpers';
 import {
-  fetchReactionsByComment,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
@@ -33,8 +36,18 @@ export const CommentReactionButton = ({
   const [reactors, setReactors] = useState<Array<any>>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
-  const { mutateAsync: createCommentReaction } = useCreateCommentReactionMutation()
-  const { mutateAsync: deleteCommentReaction } = useDeleteCommentReactionMutation()
+  const { mutateAsync: createCommentReaction } = useCreateCommentReactionMutation({
+    commentId: comment.id,
+    chainId: app.activeChainId()
+  })
+  const { mutateAsync: deleteCommentReaction } = useDeleteCommentReactionMutation({
+    commentId: comment.id,
+    chainId: app.activeChainId()
+  })
+  const { data: reactions } = useFetchCommentReactionsQuery({
+    chainId: app.activeChainId(),
+    commentId: comment.id,
+  })
 
   useEffect(() => {
     const redrawFunction = (comment_id) => {
@@ -66,15 +79,15 @@ export const CommentReactionButton = ({
   const activeAddress = app.user.activeAccount?.address;
 
   const dislike = async (userAddress: string) => {
-    const reaction = (await fetchReactionsByComment(comment.id)).find((r) => {
+    const foundReaction = reactions.find((r) => {
       return r.Address.address === activeAddress;
     });
 
     setIsLoading(true);
 
     deleteCommentReaction({
-      canvasHash: reaction.canvas_hash,
-      reactionId: reaction.id,
+      canvasHash: foundReaction.canvas_hash,
+      reactionId: foundReaction.id,
       reactionCount: {
         ...reactionCounts,
         likes: likes - 1,
@@ -123,8 +136,9 @@ export const CommentReactionButton = ({
           { disabled: isLoading || isUserForbidden },
           `CommentReactionButton ${hasReacted ? ' has-reacted' : ''}`
         )}
+        // TODO: won't be needed now?
         onMouseEnter={async () => {
-          setReactors(await fetchReactionsByComment(comment.id));
+          setReactors(reactions);
         }}
         onClick={async (e) => {
           e.stopPropagation();

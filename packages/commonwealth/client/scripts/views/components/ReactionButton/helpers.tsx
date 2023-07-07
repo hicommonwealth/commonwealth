@@ -47,13 +47,6 @@ export const getDisplayedReactorsForPopup = ({
   );
 };
 
-export const fetchReactionsByComment = async (commentId: number) => {
-  const { result = [] } = await $.get(
-    `${app.serverUrl()}/comments/${commentId}/reactions`
-  );
-  return result;
-};
-
 export const onReactionClick = (
   e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
   hasReacted: boolean,
