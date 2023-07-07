@@ -10,9 +10,19 @@ import {
 import { IDiscordMessage } from 'common-common/src/types';
 import { RABBITMQ_URI, SERVER_URL, CW_BOT_KEY } from '../utils/config';
 import axios from 'axios';
+import v8 from 'v8';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
+
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 /*
-NOTE: THIS IS ONLY WIP CURRENTLY AND WILL BE COMPLETED AS PART OF #4267 
+NOTE: THIS IS ONLY WIP CURRENTLY AND WILL BE COMPLETED AS PART OF #4267
 */
 const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
 
@@ -20,7 +30,7 @@ async function consumeMessages() {
   await controller.init();
 
   const processMessage = async (data: TRmqMessages) => {
-    try{
+    try {
       const parsedMessage = data as IDiscordMessage;
       const topic: any = (
         await sequelize.query(
@@ -48,8 +58,8 @@ async function consumeMessages() {
             message_id: parsedMessage.message_id,
             channel_id: parsedMessage.channel_id,
             user: parsedMessage.user,
-          }, 
-          auth: CW_BOT_KEY
+          },
+          auth: CW_BOT_KEY,
         };
 
         const response = await axios.post(
@@ -57,7 +67,6 @@ async function consumeMessages() {
           create_thread
         );
       } else {
-        
         const thread_id = (
           await sequelize.query(
             `SELECT id FROM "Threads" WHERE discord_meta->>'channel_id' = '${parsedMessage.channel_id}'`
@@ -86,8 +95,8 @@ async function consumeMessages() {
           create_comment
         );
       }
-    } catch(error){
-      console.log(`Failed to process Message: ${error}`)
+    } catch (error) {
+      log.error(`Failed to process Message:`, error);
     }
   };
   await controller.startSubscription(

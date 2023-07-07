@@ -4,7 +4,8 @@
       "lib": ["es2019"],
       "typeRoots": ["./node_modules/@types"],
       "skipLibCheck": true,
-      "outDir": "./build"
+      "outDir": "./build",
+      "strict": false
     },
     "paths": {
       "common-common": ["../../packages/common-common"],
@@ -12,4 +13,4 @@
     },
     "include": ["discord-consumer", "discord-listener", "utils"],
     "exclude": ["./node_modules", "node_modules", "build"]
-  }
+}

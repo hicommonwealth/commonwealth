@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias",
     "start": "ts-node discord-listener/discordListener.ts",
-    "start-consumer": "ts-node discord-consumer/discordConsumer.ts"
+    "start-consumer": "ts-node discord-consumer/discordConsumer.ts",
+    "check-types": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
