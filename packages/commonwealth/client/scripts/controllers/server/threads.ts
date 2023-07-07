@@ -3,7 +3,7 @@ import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelReactionCountFromServer } from 'controllers/server/comments';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
@@ -774,17 +774,17 @@ class ThreadsController {
     });
 
     for (const rc of reactionCounts) {
-      const id = app.reactionCounts.store.getIdentifier({
+      const id = app.comments.reactionCountsStore.getIdentifier({
         threadId: rc.thread_id,
         proposalId: rc.proposal_id,
         commentId: rc.comment_id,
       });
-      const existing = app.reactionCounts.store.getById(id);
+      const existing = app.comments.reactionCountsStore.getById(id);
       if (existing) {
-        app.reactionCounts.store.remove(existing);
+        app.comments.reactionCountsStore.remove(existing);
       }
       try {
-        app.reactionCounts.store.add(
+        app.comments.reactionCountsStore.add(
           modelReactionCountFromServer({ ...rc, id })
         );
       } catch (e) {

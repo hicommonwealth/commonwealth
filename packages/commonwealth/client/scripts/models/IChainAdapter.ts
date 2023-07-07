@@ -101,7 +101,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     if (this.app.chainEntities) {
       this.app.chainEntities.deinit();
     }
-    this.app.reactionCounts.deinit();
+    this.app.comments.deInitReactionCountsStore();
     this.app.threadUniqueAddressesCount.deinit();
     console.log(`${this.meta.name} stopped`);
   }

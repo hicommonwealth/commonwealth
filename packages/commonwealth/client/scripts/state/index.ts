@@ -10,7 +10,6 @@ import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
 import NewProfilesController from 'controllers/server/newProfiles';
 import PollsController from 'controllers/server/polls';
-import ReactionCountsController from 'controllers/server/reactionCounts';
 import ReactionsController from 'controllers/server/reactions';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
@@ -58,7 +57,6 @@ export interface IApp {
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   comments: CommentsController;
   reactions: ReactionsController;
-  reactionCounts: ReactionCountsController;
   polls: PollsController;
 
   // Proposals
@@ -148,7 +146,6 @@ const app: IApp = {
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
   reactions: new ReactionsController(),
-  reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
 
   // Proposals

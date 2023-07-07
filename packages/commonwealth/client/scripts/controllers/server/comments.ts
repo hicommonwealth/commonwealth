@@ -12,6 +12,23 @@ import Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
 import axios from 'axios';
 import $ from 'jquery';
+import { EventEmitter } from 'events';
+import { ReactionCountsStore } from 'stores';
+import ReactionCount from 'models/ReactionCount';
+
+export const modelReactionCountFromServer = (reactionCount) => {
+  const { id, thread_id, comment_id, proposal_id, has_reacted, like } =
+    reactionCount;
+  return new ReactionCount(
+    id,
+    thread_id,
+    comment_id,
+    proposal_id,
+    has_reacted,
+    // eslint-disable-next-line radix
+    parseInt(like)
+  );
+};
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
@@ -103,10 +120,20 @@ export const modelFromServer = (comment) => {
 };
 
 class CommentsController {
+  public isReactionFetched = new EventEmitter();
   private _store: CommentsStore = new CommentsStore();
+  private _reactionCountsStore: ReactionCountsStore = new ReactionCountsStore();
 
   public get store() {
     return this._store;
+  }
+
+  public get reactionCountsStore() {
+    return this._reactionCountsStore;
+  }
+
+  public deInitReactionCountsStore() {
+    this.reactionCountsStore.clear();
   }
 
   public getById(id: number) {
