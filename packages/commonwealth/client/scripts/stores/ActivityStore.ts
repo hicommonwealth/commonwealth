@@ -34,9 +34,9 @@ export class ActiveThreadsStore {
     allThreads.forEach((thread) => {
       const allComments = app.comments.getByThread(thread);
       comments[thread.id] = allComments;
-      reactions[thread.id] = app.reactions.getByPost(thread);
+      reactions[thread.id] = app.comments.getReactionByPost(thread);
       allComments.forEach((c) => {
-        reactions[thread.id].concat(app.reactions.getByPost(c));
+        reactions[thread.id].concat(app.comments.getReactionByPost(c));
       });
     });
     allThreads.sort((threadA, threadB) => {

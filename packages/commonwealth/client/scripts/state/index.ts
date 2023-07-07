@@ -10,7 +10,6 @@ import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
 import NewProfilesController from 'controllers/server/newProfiles';
 import PollsController from 'controllers/server/polls';
-import ReactionsController from 'controllers/server/reactions';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
@@ -56,7 +55,6 @@ export interface IApp {
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   comments: CommentsController;
-  reactions: ReactionsController;
   polls: PollsController;
 
   // Proposals
@@ -145,7 +143,6 @@ const app: IApp = {
   threads: ThreadsController.Instance,
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
-  reactions: new ReactionsController(),
   polls: new PollsController(),
 
   // Proposals

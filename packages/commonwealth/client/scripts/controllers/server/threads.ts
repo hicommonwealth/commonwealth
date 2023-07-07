@@ -3,8 +3,7 @@ import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
-import { modelReactionCountFromServer } from 'controllers/server/comments';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { modelReactionCountFromServer, modelReactionFromServer } from 'controllers/server/comments';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 import moment from 'moment';
@@ -165,7 +164,7 @@ class ThreadsController {
 
     if (reactions) {
       for (const reaction of reactions) {
-        app.reactions.store.add(modelReactionFromServer(reaction));
+        app.comments.reactionsStore.add(modelReactionFromServer(reaction));
       }
       reactionIds = reactions.map((r) => r.id);
       reactionType = reactions.map((r) => r.type);

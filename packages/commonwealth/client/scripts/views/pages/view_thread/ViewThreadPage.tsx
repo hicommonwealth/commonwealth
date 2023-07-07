@@ -173,7 +173,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .then((res) => {
         const t = res[0];
         if (t) {
-          const reactions = app.reactions.getByPost(t);
+          const reactions = app.comments.getReactionByPost(t);
           t.associatedReactions = reactions
             .filter((r) => r.reaction === 'like')
             .map((r) => {
