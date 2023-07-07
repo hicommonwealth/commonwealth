@@ -19,6 +19,7 @@ jobs:
             const issueMatcher = /[cC]loses:\s*#(\d+)/;
             
             let prNumber = -1;
+            console.log(prDescription);
             if (!issueMatcher.test(prDescription)) {
               prNumber = context.payload.number
             }
