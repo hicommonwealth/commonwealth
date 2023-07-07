@@ -30,7 +30,7 @@ jobs:
         run: echo "${{steps.set-result.outputs.result}}"
 
       - name: Mark as draft
-        if: ${{ steps.set-result.outputs.result != '-1' }}
+        if: ${{ steps.set-result.outputs.result == '-1' }}
         uses: voiceflow/draft-pr@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
