@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Check if PR has a linked issue
         id: check_issue
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -31,17 +31,11 @@ jobs:
             return prNumber.toString();
           result-encoding: string
 
-      - name: temp
-        id: temp
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            console.log(${{ steps.check_issue.outputs.prNumber }})
-            console.log('====')
+      - name: Get result
+        run: echo "${{steps.set-check_issue.outputs.result}}"
 
       - name: Mark as draft
-        if: ${{ steps.check_issue.outputs.prNumber != '-1' }}
+        if: ${{ steps.check_issue.outputs.result != '-1' }}
         uses: voiceflow/draft-pr@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
