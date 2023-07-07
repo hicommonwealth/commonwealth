@@ -3,39 +3,44 @@ import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/discussions/recent_threads_header.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
-import type Topic from '../../../models/Topic';
+import type Topic from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
   ThreadTimelineFilterTypes,
-} from '../../../models/types';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
-import { Select } from '../../components/Select';
+} from '../../../../models/types';
+import { CWButton } from '../../../components/component_kit/cw_button';
+import { CWCheckbox } from '../../../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../../../components/component_kit/cw_icon_button';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { Select } from '../../../components/Select';
+import './index.scss';
 
-type RecentThreadsHeaderProps = {
+type HeaderWithFiltersProps = {
   stage: string;
   topic: string;
   featuredFilter: ThreadFeaturedFilterTypes;
   dateRange: ThreadTimelineFilterTypes;
   totalThreadCount: number;
+  isIncludingSpamThreads: boolean;
+  onIncludeSpamThreads: (includeSpams: boolean) => any;
 };
 
-export const RecentThreadsHeader = ({
+export const HeaderWithFilters = ({
   stage,
   topic,
   featuredFilter,
   dateRange,
   totalThreadCount,
-}: RecentThreadsHeaderProps) => {
+  isIncludingSpamThreads,
+  onIncludeSpamThreads,
+}: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
   const forceRerender = useForceRerender();
@@ -143,7 +148,7 @@ export const RecentThreadsHeader = ({
   };
 
   return (
-    <div className="RecentThreadsHeader">
+    <div className="HeaderWithFilters">
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic) ? 'All Discussions' : topic}
@@ -324,6 +329,15 @@ export const RecentThreadsHeader = ({
           </div>
         </div>
       )}
+
+      <CWCheckbox
+        checked={isIncludingSpamThreads}
+        label="Include posts flagged as spam"
+        className="ml-auto"
+        onChange={(e) => {
+          onIncludeSpamThreads(e.target.checked);
+        }}
+      />
 
       <Modal
         content={

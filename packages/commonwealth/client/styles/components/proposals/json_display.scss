@@ -1,0 +1,27 @@
+@import '../../shared';
+
+.BlobContainer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  flex-direction: column;
+  background: $neutral-50;
+  border-radius: 5px;
+
+  .labelText {
+    color: $neutral-600;
+    padding: 15px 15px 0px;
+  }
+
+  .Blob {
+    background: $neutral-50;
+    border-radius: 5px;
+    display: flex;
+    padding: 8px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    width: 100%;
+    overflow: auto;
+  }
+}
