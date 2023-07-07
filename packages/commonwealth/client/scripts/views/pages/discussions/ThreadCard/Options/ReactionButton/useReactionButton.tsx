@@ -53,7 +53,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
 
     setIsLoading(true);
 
-    deleteThreadReaction({ threadId: thread.id, reactionId: reactedId })
+    deleteThreadReaction({ threadId: thread.id, reactionId: reactedId as number })
       .then(() => {
         setReactors((oldReactors) =>
           oldReactors.filter((r) => r !== activeAddress)
