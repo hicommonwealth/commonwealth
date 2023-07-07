@@ -7,6 +7,16 @@ import {
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { IDiscordMessage } from 'common-common/src/types';
 import { RABBITMQ_URI, DISCORD_TOKEN } from '../utils/config';
+import { factory, formatFilename } from 'common-common/src/logging';
+import v8 from 'v8';
+
+const log = factory.getLogger(formatFilename(__filename));
+
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 const client = new Client({
   intents: [
@@ -20,7 +30,7 @@ const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
 const initPromise = controller.init();
 
 client.on('ready', () => {
-  console.log('Discord bot is ready.');
+  log.info('Discord bot is ready.');
 });
 
 client.on('messageCreate', async (message: Message) => {
@@ -62,12 +72,14 @@ client.on('messageCreate', async (message: Message) => {
     try {
       await initPromise;
       await controller.publish(new_message, RascalPublications.DiscordListener);
-      console.log('Message published to RabbitMQ:', message.content);
+      log.info(
+        `Message published to RabbitMQ: ${JSON.stringify(message.content)}`
+      );
     } catch (error) {
-      console.log(`Error publishing to rabbitMQ: ${error}`);
+      log.info(`Error publishing to rabbitMQ`, error);
     }
   } catch (error) {
-    console.log(`Error Processing Discord Message: ${error}`);
+    log.info(`Error Processing Discord Message`, error);
   }
 });
 
