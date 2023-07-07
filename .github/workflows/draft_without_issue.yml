@@ -10,9 +10,8 @@ jobs:
   checkLinkedIssue:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if PR has a linked issue
-        id: check_issue
-        uses: actions/github-script@v6
+      - uses: actions/github-script@v6
+        id: set-result
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -20,23 +19,18 @@ jobs:
             const issueMatcher = /[cC]loses:\s*#(\d+)/;
             
             let prNumber = -1;
-            console.log(prDescription);
-            console.log(issueMatcher.test(prDescription));
             if (issueMatcher.test(prDescription)) {
               prNumber = context.payload.number
             }
-            
-            console.log(prNumber);
-            console.log("=====");
             
             return prNumber;
           result-encoding: string
 
       - name: Get result
-        run: echo "${{steps.set-check_issue.outputs.result}}"
+        run: echo "${{steps.set-result.outputs.result}}"
 
       - name: Mark as draft
-        if: ${{ steps.check_issue.outputs.result != '-1' }}
+        if: ${{ steps.set-result.outputs.result != '-1' }}
         uses: voiceflow/draft-pr@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
