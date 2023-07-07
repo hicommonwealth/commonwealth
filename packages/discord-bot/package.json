@@ -2,12 +2,10 @@
   "name": "discord-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias",
     "start": "ts-node discord-listener/discordListener.ts",
     "start-consumer": "ts-node discord-consumer/discordConsumer.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
