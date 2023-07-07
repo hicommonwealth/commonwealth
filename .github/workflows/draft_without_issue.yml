@@ -20,8 +20,8 @@ jobs:
             
             let prNumber = -1;
             console.log(prDescription);
-            console.log(!issueMatcher.test(prDescription));
-            if (!issueMatcher.test(prDescription)) {
+            console.log(issueMatcher.test(prDescription));
+            if (issueMatcher.test(prDescription)) {
               prNumber = context.payload.number
             }
             
