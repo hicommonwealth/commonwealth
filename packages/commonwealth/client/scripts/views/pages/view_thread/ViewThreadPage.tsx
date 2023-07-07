@@ -676,37 +676,37 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       )}
       comments={
         <>
-          <div className='comments-filter-row'>
-            <Select
-              key={commentSortType}
-              size='compact'
-              selected={commentSortType}
-              onSelect={(item: any) => {
-                setCommentSortType(item.value)
-              }}
-              options={[
-                {
-                  id: 1,
-                  value: CommentsFeaturedFilterTypes.Newest,
-                  label: 'Newest',
-                  iconLeft: 'sparkle',
-                },
-                {
-                  id: 2,
-                  value: CommentsFeaturedFilterTypes.Oldest,
-                  label: 'Oldest',
-                  iconLeft: 'clockCounterClockwise',
-                },
-              ]}
-            />
-            {comments.length > 0 && (
+          {comments.length > 0 && (
+            <div className='comments-filter-row'>
+              <Select
+                key={commentSortType}
+                size='compact'
+                selected={commentSortType}
+                onSelect={(item: any) => {
+                  setCommentSortType(item.value)
+                }}
+                options={[
+                  {
+                    id: 1,
+                    value: CommentsFeaturedFilterTypes.Newest,
+                    label: 'Newest',
+                    iconLeft: 'sparkle',
+                  },
+                  {
+                    id: 2,
+                    value: CommentsFeaturedFilterTypes.Oldest,
+                    label: 'Oldest',
+                    iconLeft: 'clockCounterClockwise',
+                  },
+                ]}
+              />
               <CWCheckbox
                 checked={includeSpamThreads}
                 label="Include comments flagged as spam"
                 onChange={(e) => setIncludeSpamThreads(e.target.checked)}
               />
-            )}
-          </div>
+            </div>
+          )}
           <CommentsTree
             comments={sortedComments}
             includeSpams={includeSpamThreads}
