@@ -31,6 +31,15 @@ jobs:
             return prNumber.toString();
           result-encoding: string
 
+      - name: temp
+        id: temp
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            console.log(${{ steps.check_issue.outputs.prNumber }})
+            console.log('====')
+
       - name: Mark as draft
         if: ${{ steps.check_issue.outputs.prNumber != '-1' }}
         uses: voiceflow/draft-pr@latest
