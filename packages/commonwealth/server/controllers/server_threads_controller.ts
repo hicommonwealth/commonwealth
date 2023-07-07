@@ -38,6 +38,7 @@ const Errors = {
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
 
   NotAdmin: 'Not an admin',
+  ThreadArchived: 'Thread is archived',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -216,6 +217,11 @@ export class ServerThreadsController implements IServerThreadsController {
       throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
     }
 
+    // check if thread is archived
+    if (thread.archived_at) {
+      throw new Error(Errors.ThreadArchived);
+    }
+
     // check address ban
     if (chain) {
       const [canInteract, banError] = await this.banCache.checkBan({
@@ -344,6 +350,11 @@ export class ServerThreadsController implements IServerThreadsController {
     // check if thread is read-only
     if (thread.read_only) {
       throw new Error(Errors.CantCommentOnReadOnly);
+    }
+
+    // check if thread is archived
+    if (thread.archived_at) {
+      throw new Error(Errors.ThreadArchived);
     }
 
     // get parent comment
