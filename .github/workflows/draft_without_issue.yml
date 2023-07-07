@@ -15,6 +15,6 @@ jobs:
         id: set-result
         with:
           script: return -1;
-          result-encoding: number
+          result-encoding: string
       - name: Get result
         run: echo "${{steps.set-result.outputs.result}}"
