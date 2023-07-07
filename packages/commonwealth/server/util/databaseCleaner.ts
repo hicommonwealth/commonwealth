@@ -20,8 +20,14 @@ export default class DatabaseCleaner {
    * @param models An instance of the DB containing the sequelize instance and all the models.
    * @param hourToRun A number in [0, 24) indicating the hour in which to run the cleaner. Uses UTC!
    * @param rollbar A rollbar instance to report errors
+   * @param oneRunMax If set to true the database clean will only occur once and will not be re-scheduled
    */
-  constructor(models: DB, hourToRun: number, rollbar?: Rollbar) {
+  constructor(
+    models: DB,
+    hourToRun: number,
+    rollbar?: Rollbar,
+    oneRunMax = false
+  ) {
     this._models = models;
     this._rollbar = rollbar;
 
@@ -41,25 +47,29 @@ export default class DatabaseCleaner {
     this._timeToRun.setUTCMinutes(0);
     this._timeToRun.setUTCMilliseconds(0);
 
-    this._timeoutID = setTimeout(this.start.bind(this), this.getTimeout());
+    this._timeoutID = setTimeout(
+      this.start.bind(this),
+      this.getTimeout(),
+      oneRunMax
+    );
 
     this.log.info(
       `The current date is ${now.toString()}. The cleaner will run on ${this._timeToRun.toString()}`
     );
   }
 
-  public async start() {
+  public async start(oneRunMax = false) {
     this.log.info('Database clean-up starting...');
 
     try {
-      await this.cleanNotifications();
+      await this.cleanNotifications(oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean notifications', e);
       this._rollbar?.error('Failed to clean notifications', e);
     }
 
     try {
-      await this.cleanSubscriptions();
+      await this.cleanSubscriptions(oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
       this._rollbar?.error('Failed to clean subscriptions', e);
@@ -67,7 +77,9 @@ export default class DatabaseCleaner {
 
     this._completed = true;
     this.log.info('Database clean-up finished.');
-    this._timeoutID = setTimeout(this.start.bind(this), this.getTimeout());
+    if (!oneRunMax) {
+      this._timeoutID = setTimeout(this.start.bind(this), this.getTimeout());
+    }
   }
 
   /**

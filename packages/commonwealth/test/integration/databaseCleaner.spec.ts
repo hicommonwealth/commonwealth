@@ -36,48 +36,66 @@ describe('DatabaseCleaner Tests', () => {
       const now = new Date();
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
-      const dbCleaner = new DatabaseCleaner(models, now.getUTCHours() + 4);
+      const dbCleaner = new DatabaseCleaner(
+        models,
+        now.getUTCHours() + 4,
+        undefined,
+        true
+      );
+      expect(dbCleaner.timeoutID).to.not.be.undefined;
+      clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(
         now.getTime() + 14400000
       );
       expect(dbCleaner.completed).to.be.false;
-      expect(dbCleaner.timeoutID).to.not.be.undefined;
     });
 
     it('should run exactly once (immediately) if started in the correct hour', () => {
       const now = new Date();
-      const dbCleaner = new DatabaseCleaner(models, now.getUTCHours());
+      const dbCleaner = new DatabaseCleaner(
+        models,
+        now.getUTCHours(),
+        undefined,
+        true
+      );
+      expect(dbCleaner.timeoutID).to.not.be.undefined;
+      clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getUTCHours()).to.be.equal(now.getUTCHours());
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(now.getTime());
-      expect(dbCleaner.timeoutID).to.not.be.undefined;
     });
 
     it('should not run if started after the correct hour', () => {
       const now = new Date();
-      const dbCleaner = new DatabaseCleaner(models, now.getUTCHours() - 4);
+      const dbCleaner = new DatabaseCleaner(
+        models,
+        now.getUTCHours() - 4,
+        undefined,
+        true
+      );
+      expect(dbCleaner.timeoutID).to.not.be.undefined;
+      clearTimeout(dbCleaner.timeoutID);
       now.setUTCDate(now.getUTCDate() + 1);
       now.setUTCHours(now.getUTCHours() - 4);
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(now.getTime());
       expect(dbCleaner.completed).to.be.false;
-      expect(dbCleaner.timeoutID).to.not.be.undefined;
     });
 
     it('should not run if an hour to run is not provided', () => {
-      const dbCleaner = new DatabaseCleaner(models, NaN);
+      const dbCleaner = new DatabaseCleaner(models, NaN, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
     it('should not run if the hour provided is invalid', () => {
-      let dbCleaner = new DatabaseCleaner(models, 24);
+      let dbCleaner = new DatabaseCleaner(models, 24, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
-      dbCleaner = new DatabaseCleaner(models, 25);
+      dbCleaner = new DatabaseCleaner(models, 25, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
-      dbCleaner = new DatabaseCleaner(models, -1);
+      dbCleaner = new DatabaseCleaner(models, -1, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
@@ -131,13 +149,17 @@ describe('DatabaseCleaner Tests', () => {
         category_id: 'new-thread-creation',
       });
 
-      const dbCleaner = new DatabaseCleaner(models, now.getUTCHours() + 2);
-      const originalTimeoutID = dbCleaner.timeoutID;
+      const dbCleaner = new DatabaseCleaner(
+        models,
+        now.getUTCHours() + 2,
+        undefined,
+        true
+      );
       clock.runAll();
 
       const waitForStart = new Promise((resolve) => {
         const intervalId = setInterval(() => {
-          if (dbCleaner.timeoutID != originalTimeoutID) {
+          if (dbCleaner.completed === true) {
             clearInterval(intervalId);
             resolve(null);
           } else {
@@ -204,13 +226,17 @@ describe('DatabaseCleaner Tests', () => {
         immediate_email: false,
       });
 
-      const dbCleaner = new DatabaseCleaner(models, now.getHours() + 2);
-      const originalTimeoutID = dbCleaner.timeoutID;
+      const dbCleaner = new DatabaseCleaner(
+        models,
+        now.getHours() + 2,
+        undefined,
+        true
+      );
       clock.runAll();
 
       const waitForStart = new Promise((resolve) => {
         const intervalId = setInterval(() => {
-          if (dbCleaner.timeoutID != originalTimeoutID) {
+          if (dbCleaner.completed === true) {
             clearInterval(intervalId);
             resolve(null);
           } else {
