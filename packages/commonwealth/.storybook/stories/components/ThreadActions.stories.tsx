@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { CWThreadAction } from "../../../client/scripts/views/components/component_kit/new_designs/cw_thread_action";
+import type { ActionType } from "../../../client/scripts/views/components/component_kit/new_designs/cw_thread_action";
 
 const threadActions = {
   title: "Components/Thread Actions/Actions",
@@ -11,112 +12,32 @@ const threadActions = {
 export default threadActions;
 type Story = StoryObj<typeof threadActions>;
 
-export const Comment: Story = {
-  args: {
-    disabled: false,
-  },
-  parameters: {
-    controls: {
-      exclude: [
-        "label",
-        "count",
-        "onChange",
-      ],
+const BaseStory = (action: ActionType) => {
+  return {
+    args: {
+      disabled: false,
     },
-  },
-  render: ({...args}) => (
-    <CWThreadAction
-      label="comment"
-      onChange={() => console.log('Comment action clicked!')}
-      disabled={args.disabled}
-    />
-  ),
+    parameters: {
+      controls: {
+        exclude: [
+          "action",
+          "count",
+          "onClick",
+        ],
+      },
+    },
+    render: ({...args}) => (
+      <CWThreadAction
+        action={action}
+        onClick={() => console.log(`${action} action clicked!`)}
+        disabled={args.disabled}
+      />
+    ),
+  };
 };
 
-export const Share: Story = {
-  args: {
-    disabled: false,
-  },
-  parameters: {
-    controls: {
-      exclude: [
-        "label",
-        "count",
-        "onChange",
-      ],
-    },
-  },
-  render: ({...args}) => (
-    <CWThreadAction
-      label="share"
-      onChange={() => console.log('Share action clicked!')}
-      disabled={args.disabled}
-    />
-  ),
-};
-
-export const Subscribe: Story = {
-  args: {
-    disabled: false,
-  },
-  parameters: {
-    controls: {
-      exclude: [
-        "label",
-        "count",
-        "onChange",
-      ],
-    },
-  },
-  render: ({...args}) => (
-    <CWThreadAction
-      label="subscribe"
-      onChange={() => console.log('Subscribe action clicked!')}
-      disabled={args.disabled}
-    />
-  ),
-};
-
-export const Upvote: Story = {
-  args: {
-    disabled: false,
-  },
-  parameters: {
-    controls: {
-      exclude: [
-        "label",
-        "count",
-        "onChange",
-      ],
-    },
-  },
-  render: ({...args}) => (
-    <CWThreadAction
-      label="upvote"
-      onChange={() => console.log('Upvote action clicked!')}
-      disabled={args.disabled}
-    />
-  ),
-};
-
-export const Overflow: Story = {
-  args: {
-    disabled: false,
-  },
-  parameters: {
-    controls: {
-      exclude: [
-        "label",
-        "count",
-        "onChange",
-      ],
-    },
-  },
-  render: ({...args}) => (
-    <CWThreadAction
-      label="overflow"
-      onChange={() => console.log('Overflow action clicked!')}
-      disabled={args.disabled}
-    />
-  ),
-};
+export const Comment: Story = { ...BaseStory("comment") };
+export const Share: Story = { ...BaseStory("share") };
+export const Subscribe: Story = { ...BaseStory("subscribe") };
+export const Upvote: Story = { ...BaseStory("upvote") };
+export const Overflow: Story = { ...BaseStory("overflow") };
