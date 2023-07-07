@@ -26,10 +26,8 @@ jobs:
             return prNumber.toString();
           result-encoding: string
 
-      - name: Draft Existing PR
+      - name: Mark as draft
         if: ${{ steps.check_issue.outputs.prNumber != '-1' }}
-        uses: softprops/action-update-pull-request@v1
+        uses: voiceflow/draft-pr@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          pull_request_number: ${{ steps.check_issue.inputs.pr_number }}
-          draft: true
