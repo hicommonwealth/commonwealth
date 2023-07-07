@@ -179,7 +179,7 @@ interface IServerThreadsController {
    *
    * @param user - Current user
    * @param threadID - ID of the thread
-   * @param shouldArchive - Whether the archive or unarchive the thread
+   * @param shouldArchive - Whether to archive or unarchive the thread
    * @returns Promise that resolves to the Thread
    */
   archiveOrUnarchiveThread(
