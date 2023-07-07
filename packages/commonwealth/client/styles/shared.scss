@@ -19,7 +19,7 @@ $sidebar-community-header-height: 56px;
 
 // base fonts
 
-$fonts: NeueHaasUnica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
+$fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
   'Segoe UI Emoji', 'Segoe UI Symbol';
 
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
@@ -27,7 +27,7 @@ $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
 
 $font-family-silka: Silka, sans-serif;
 
-$font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
+$font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 
 $font-family-monospace: dm-mono;
@@ -52,9 +52,7 @@ $font-family-monospace: dm-mono;
       border-radius: $border-radius-corners;
       background-color: $neutral-200;
     }
-  }
-
-  @else if $theme ==dark {
+  } @else if $theme ==dark {
     &::-webkit-scrollbar-track {
       background: $neutral-700;
       border-radius: $border-radius-corners;
@@ -90,17 +88,13 @@ $font-family-monospace: dm-mono;
       display: block;
       font-size: 14px;
     }
-  }
-
-  @else if $size ==medium {
+  } @else if $size ==medium {
     .flame::after {
       content: '\1F525';
       display: block;
       font-size: 22px;
     }
-  }
-
-  @else if $size ==large {
+  } @else if $size ==large {
     .flame::after {
       content: '\1F525';
       display: block;
