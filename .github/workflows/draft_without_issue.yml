@@ -2,8 +2,10 @@ name: Convert PRs to Drafts without Linked Issue
 
 on:
   pull_request:
-    types:
-      - opened
+  push:
+    branches:
+      - master
+
 
 jobs:
   checkLinkedIssue:
