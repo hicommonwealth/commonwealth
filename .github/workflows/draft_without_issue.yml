@@ -23,6 +23,9 @@ jobs:
               prNumber = context.payload.number
             }
             
+            console.log(prNumber.toString());
+            console.log("=====");
+            
             return prNumber.toString();
           result-encoding: string
 
