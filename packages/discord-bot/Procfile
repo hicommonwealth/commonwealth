@@ -1,2 +1,2 @@
-listener: ts-node discord-listener/discordListener.ts
-consumer: ts-node discord-consumer/discordConsumer.ts
+listener: cd packages/discord-bot && ts-node discord-listener/discordListener.ts
+consumer: cd packages/discord-bot && ts-node discord-consumer/discordConsumer.ts
