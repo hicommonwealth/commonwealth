@@ -6,7 +6,9 @@
     "build": "tsc --project tsconfig.json && tsc-alias",
     "start": "ts-node discord-listener/discordListener.ts",
     "start-consumer": "ts-node discord-consumer/discordConsumer.ts",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "start-prod-consumer": "node build/discord-bot/discord-consumer/discordConsumer.js",
+    "start-prod-listener": "node build/discord-bot/discord-listener/discordListener.js"
   },
   "keywords": [],
   "author": "",

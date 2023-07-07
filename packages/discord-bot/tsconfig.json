@@ -5,7 +5,6 @@
       "typeRoots": ["./node_modules/@types"],
       "skipLibCheck": true,
       "outDir": "./build",
-      "strict": false
     },
     "paths": {
       "common-common": ["../../packages/common-common"],
