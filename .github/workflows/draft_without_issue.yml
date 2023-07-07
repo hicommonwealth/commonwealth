@@ -26,7 +26,7 @@ jobs:
             return prNumber;
           result-encoding: string
 
-      - name: Get results
+      - name: Get result
         run: echo "${{steps.set-result.outputs.result}}"
 
       - name: Mark as draft
