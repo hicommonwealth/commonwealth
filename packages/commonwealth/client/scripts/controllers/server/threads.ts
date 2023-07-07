@@ -25,6 +25,7 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../models/types';
+import fetchThreadReactionCounts from "../../state/api/threads/fetchReactionCounts";
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -726,7 +727,6 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.data.result.map((rawThread) => {
-      console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
        * here we will find if thread is in store and if so use most keys
@@ -760,17 +760,15 @@ class ThreadsController {
   // TODO Graham 4/24/22: All "ReactionsCount" names need renaming to "ReactionCount" (singular)
   // TODO Graham 4/24/22: All of JB's AJAX requests should be swapped out for .get and .post reqs
   fetchReactionsCount = async (threads) => {
-    const { result: reactionCounts } = await $.ajax({
-      type: 'POST',
-      url: `${app.serverUrl()}/reactionsCounts`,
-      headers: {
-        'content-type': 'application/json',
-      },
-      data: JSON.stringify({
-        thread_ids: threads.map((thread) => thread.id),
-        active_address: app.user.activeAccount?.address,
-      }),
-    });
+    // TODO: fetchThreadReactionCounts here is the migrated query func of this non-react controller
+    // when this controller is migrated to react query, we should also complete the migrate of react
+    // query for fetchThreadReactionCounts in its file. At the moment, the query function for
+    // fetchThreadReactionCounts is migrated but the cache logic is commented in that file.
+    // The reason why it was not migrated is because "reactive" code from react query wont work in this
+    // non reactive scope
+    const reactionCounts = await fetchThreadReactionCounts({
+      threadIds: threads.map((thread) => thread.id) as number[]
+    })
 
     for (const rc of reactionCounts) {
       const id = app.comments.reactionCountsStore.getIdentifier({
