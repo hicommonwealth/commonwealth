@@ -117,6 +117,7 @@ class ThreadsController {
       body,
       last_edited,
       marked_as_spam_at,
+      archived_at,
       locked_at,
       version_history,
       Attachments,
@@ -199,6 +200,8 @@ class ThreadsController {
       : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    const archivedAt = archived_at ? moment(archived_at) : null;
+
     let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
@@ -486,6 +489,33 @@ class ThreadsController {
           console.error(e);
           notifyError(
             `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+          );
+          reject(e);
+        });
+    });
+  }
+
+  public async setArchived(threadId: number, isArchived: boolean) {
+    return new Promise((resolve, reject) => {
+      $.post(
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isArchived ? 'archive' : 'unarchive'
+        }`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
+        .then((response) => {
+          const foundThread = this.store.getByIdentifier(threadId);
+          foundThread.archivedAt = response.result.archived_at;
+          this.updateThreadInStore(new Thread({ ...foundThread }));
+          resolve(foundThread);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError(
+            `Could not ${!isArchived ? 'archive' : 'unarchive'} thread`
           );
           reject(e);
         });

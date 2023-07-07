@@ -36,6 +36,8 @@ const Errors = {
   InvalidParent: 'Invalid parent',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
+
+  NotAdmin: 'Not an admin',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -170,6 +172,20 @@ interface IServerThreadsController {
     limit: number;
     page: number;
   }>;
+
+  /**
+   * Sets a thread as either archived or unarchived
+   *
+   * @param user - Current user
+   * @param threadID - ID of the thread
+   * @param shouldArchive - Whether the archive or unarchive the thread
+   * @returns Promise that resolves to the Thread
+   */
+  archiveOrUnarchiveThread(
+    user: UserInstance,
+    threadId: string,
+    shouldArchive: boolean
+  ): Promise<ThreadAttributes>;
 }
 
 /**
@@ -891,6 +907,7 @@ export class ServerThreadsController implements IServerThreadsController {
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.chain AS addr_chain, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
+        threads.archived_at,
         thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
         threads.read_only, threads.body, threads.stage,
         threads.has_poll, threads.plaintext,
@@ -906,6 +923,7 @@ export class ServerThreadsController implements IServerThreadsController {
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
           t.marked_as_spam_at,
+          t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
           t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
@@ -1034,6 +1052,7 @@ export class ServerThreadsController implements IServerThreadsController {
           : [],
         reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
         marked_as_spam_at: t.marked_as_spam_at,
+        archived_at: t.archived_at,
       };
       if (t.topic_id) {
         data['topic'] = {
@@ -1071,5 +1090,53 @@ export class ServerThreadsController implements IServerThreadsController {
       threads,
       numVotingThreads,
     };
+  }
+
+  async archiveOrUnarchiveThread(
+    user: UserInstance,
+    threadId: string,
+    shouldArchive: boolean
+  ): Promise<ThreadAttributes> {
+    const thread = await this.models.Thread.findOne({
+      where: {
+        id: threadId,
+      },
+    });
+    if (!thread) {
+      throw new Error(Errors.ThreadNotFound);
+    }
+    const userOwnedAddressIds = (await user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
+    if (!userOwnedAddressIds.includes(thread.address_id) && !user.isAdmin) {
+      // is not author or site admin
+      const roles = await findAllRoles(
+        this.models,
+        { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+        thread.chain,
+        ['admin', 'moderator']
+      );
+      const role = roles.find((r) => {
+        return r.chain_id === thread.chain;
+      });
+      if (!role) {
+        throw new Error(Errors.NotAdmin);
+      }
+    }
+
+    await thread.update({
+      archived_at: shouldArchive
+        ? this.models.Sequelize.literal('CURRENT_TIMESTAMP')
+        : null,
+    });
+
+    // get thread with updated timestamp
+    const updatedThread = await this.models.Thread.findOne({
+      where: {
+        id: thread.id,
+      },
+    });
+
+    return updatedThread;
   }
 }
