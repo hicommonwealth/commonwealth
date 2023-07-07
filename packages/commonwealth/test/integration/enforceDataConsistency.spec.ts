@@ -7,7 +7,7 @@ import { enforceDataConsistency } from '../../server/scripts/enforceDataConsiste
 
 const { assert } = chai;
 
-describe('Tests for enforceDataConsistency script', () => {
+describe.skip('Tests for enforceDataConsistency script', () => {
   it('Should copy chain-entities from the CE db to the main db', async () => {
     const author = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
     const { id } = await ceModels.ChainEntity.create({

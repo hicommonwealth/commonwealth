@@ -428,8 +428,6 @@ export enum CACHE_ENDPOINTS {
 }
 
 export const setupCacheTestEndpoints = (appAttach: Express) => {
-  log.info('setupCacheTestEndpoints');
-
   // /cachedummy endpoint for testing
   appAttach.get(
     CACHE_ENDPOINTS.BROKEN_4XX,
@@ -530,8 +528,6 @@ function availableRoutes() {
       };
     });
 }
-
-console.log(JSON.stringify(availableRoutes(), null, 2));
 
 export const resetDatabase = () => resetServer();
 export const getTokenBalanceCache = () => tokenBalanceCache;

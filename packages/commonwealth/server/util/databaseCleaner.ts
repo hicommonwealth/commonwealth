@@ -1,24 +1,24 @@
 import type { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { QueryTypes } from 'sequelize';
-import clean = Mocha.utils.clean;
 import Rollbar from 'rollbar';
 
-// 4 AM Paris time e.g. 2 AM UTC
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
- * the cleaning functions to run at a specific hour each day as defined by the `hourToRun` constructor argument.
+ * the cleaning functions to run at a specific hour each day as defined by the `hourToRun` constructor argument. This
+ * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
 export default class DatabaseCleaner {
   private readonly log = factory.getLogger(formatFilename(__filename));
   private readonly _models: DB;
   private readonly _rollbar?: Rollbar;
-  private _timeToRun: Date;
+  private readonly _timeToRun: Date;
   private _completed = false;
+  private _timeoutID;
 
   /**
    * @param models An instance of the DB containing the sequelize instance and all the models.
-   * @param hourToRun A number in [0, 24) indicating the hour in which to run the cleaner
+   * @param hourToRun A number in [0, 24) indicating the hour in which to run the cleaner. Uses UTC!
    * @param rollbar A rollbar instance to report errors
    */
   constructor(models: DB, hourToRun: number, rollbar?: Rollbar) {
@@ -29,19 +29,23 @@ export default class DatabaseCleaner {
       this.log.error(
         `${hourToRun} is not a valid hour. The given hourToRun must be greater than or equal to 0 and less than 24`
       );
+      this._rollbar?.error(
+        `The database cleaner failed to initialize. ${hourToRun} is not a valid hour.`
+      );
       return;
     }
 
     const now = new Date();
-    this._timeToRun = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      hourToRun,
-      0
-    );
+    this._timeToRun = new Date(now);
+    this._timeToRun.setUTCHours(hourToRun);
+    this._timeToRun.setUTCMinutes(0);
+    this._timeToRun.setUTCMilliseconds(0);
 
-    setTimeout(this.start.bind(this), this.getTimeout());
+    this._timeoutID = setTimeout(this.start.bind(this), this.getTimeout());
+
+    this.log.info(
+      `The current date is ${now.toString()}. The cleaner will run on ${this._timeToRun.toString()}`
+    );
   }
 
   public async start() {
@@ -63,7 +67,7 @@ export default class DatabaseCleaner {
 
     this._completed = true;
     this.log.info('Database clean-up finished.');
-    setTimeout(this.start.bind(this), this.getTimeout());
+    this._timeoutID = setTimeout(this.start.bind(this), this.getTimeout());
   }
 
   /**
@@ -200,6 +204,13 @@ export default class DatabaseCleaner {
         `,
           { type: QueryTypes.BULKDELETE, transaction: t }
         );
+
+        await this._models.sequelize.query(
+          `
+          DROP TABLE sub_ids_to_delete;
+        `,
+          { transaction: t }
+        );
         totalSubsDeleted += numSubsDeleted;
 
         if (shouldContinueSubDelete()) {
@@ -220,7 +231,7 @@ export default class DatabaseCleaner {
     ) {
       // if already completed then set new timeToRun as next day
       if (this._completed) {
-        this._timeToRun.setDate(this._timeToRun.getDate() + 1);
+        this._timeToRun.setUTCDate(this._timeToRun.getUTCDate() + 1);
         this._completed = false;
         return this._timeToRun.getTime() - now.getTime();
       }
@@ -230,10 +241,22 @@ export default class DatabaseCleaner {
 
     this._completed = false;
     if (this._timeToRun.getTime() + 3600000 < now.getTime()) {
-      this._timeToRun.setDate(this._timeToRun.getDate() + 1);
+      this._timeToRun.setUTCDate(this._timeToRun.getUTCDate() + 1);
       return this._timeToRun.getTime() - now.getTime();
     } else {
       return this._timeToRun.getTime() - now.getTime();
     }
+  }
+
+  public get timeToRun() {
+    return this._timeToRun;
+  }
+
+  public get completed() {
+    return this._completed;
+  }
+
+  public get timeoutID() {
+    return this._timeoutID;
   }
 }
