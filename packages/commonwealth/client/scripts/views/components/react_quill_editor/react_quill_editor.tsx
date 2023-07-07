@@ -40,7 +40,7 @@ type ReactQuillEditorProps = {
 // ReactQuillEditor is a custom wrapper for the react-quill component
 const ReactQuillEditor = ({
   className = '',
-  placeholder = 'Placeholder',
+  placeholder,
   tabIndex,
   contentDelta,
   setContentDelta,
