@@ -6,7 +6,6 @@ on:
     branches:
       - master
 
-
 jobs:
   checkLinkedIssue:
     runs-on: ubuntu-latest
