@@ -179,7 +179,7 @@ jobs:
         env:
           NO_CLIENT: true
 
-      - name: Run until integration tests
+      - name: Run util integration tests
         run: yarn --cwd packages/commonwealth test-integration-util
         env:
           NO_CLIENT: true
