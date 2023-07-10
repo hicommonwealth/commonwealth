@@ -1,5 +1,8 @@
 import axios from 'axios';
 import type { DeltaStatic } from 'quill';
+import { Icon, IconProps } from '@phosphor-icons/react';
+import ReactDOMServer from 'react-dom/server';
+import React from 'react';
 
 export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
@@ -174,4 +177,10 @@ export const fetchTwitterEmbedInfo = async (url: string) => {
     throw new Error(res.data);
   }
   return res.data;
+};
+
+export const renderToolbarIcon = (PhosphorIcon: Icon, props?: IconProps) => {
+  return ReactDOMServer.renderToStaticMarkup(
+    <PhosphorIcon weight="bold" {...props} />
+  );
 };
