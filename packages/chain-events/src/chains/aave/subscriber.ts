@@ -79,10 +79,12 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
       const logs: Log[] = await provider.send('eth_getLogs', [
         {
-          fromBlock: ethers.BigNumber.from(
-            this.lastBlockNumber + 1
-          ).toHexString(),
-          toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
+          fromBlock: ethers.utils.hexStripZeros(
+            ethers.BigNumber.from(this.lastBlockNumber + 1).toHexString()
+          ),
+          toBlock: ethers.utils.hexStripZeros(
+            ethers.BigNumber.from(currentBlockNum).toHexString()
+          ),
           address: [
             this._api.aaveToken.address,
             this._api.governance.address,
