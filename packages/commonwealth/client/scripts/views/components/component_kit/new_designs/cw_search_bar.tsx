@@ -71,7 +71,7 @@ const Tag: FC<TagProps> = ({ communityName, onClick }) => {
         </CWText>
       </div>
       <div className="action" onClick={handleClick}>
-        <X size={16} color="#656167" />
+        <X size={16} className="action" />
       </div>
     </div>
   );

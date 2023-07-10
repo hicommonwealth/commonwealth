@@ -8,29 +8,28 @@
   box-sizing: border-box;
   padding: 8px 16px;
   gap: 8px;
-  position: absolute;
   height: 40px;
-  background-color: #FFFFFF;
-  border: 1px solid #E0DFE1;
+  background-color: $white;
+  border: 1px solid $neutral-200;
   border-radius: 6px;
-  color: #282729;
+  color: $neutral-800;
 
   &.isTyping {
     outline: none;
     border-color: $primary-500;
     box-shadow: 0px 2px 2px -1px rgba(0, 0, 0, 0.12),
-      0px 0px 0px 3px #CCE3FF;
+      0px 0px 0px 3px $primary-100;
   }
 
   &:hover {
-    border: 1px solid #2972CC;
+    border: 1px solid $primary-600;
   }
 
   &.disabled {
-    background-color: #F7F7F7;
-    border-color: #E0DFE1;
+    background-color: $neutral-50;
+    border-color: $neutral-200;
     box-shadow: none;
-    color: #656167;
+    color: $neutral-500;
   }
 
   input {
@@ -43,7 +42,7 @@
     }
 
     ::placeholder {
-      color: #282729;
+      color: $neutral-800;
     }
   }
 
@@ -68,15 +67,23 @@
     align-items: center;
     gap: 8px;
   }
-
-  .action {
-    display: grid;
-    align-items: center;
-  }
 }
 
 .magnifyingGlass {
-  color: #A09DA1;
+  color: $neutral-400;
+}
+
+.action {
+  display: grid;
+  align-items: center;
+  color: $neutral-500;
+  
+  :hover {
+    cursor: pointer;
+    background-color: $neutral-300;
+    border-radius: 6px;
+    color: $neutral-200;
+  }
 }
 
 .inputElement {
