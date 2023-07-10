@@ -61,5 +61,11 @@
     .button-margin-bottom {
       margin-bottom: 20px;
     }
+
+    .spinner-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
   }
 }
