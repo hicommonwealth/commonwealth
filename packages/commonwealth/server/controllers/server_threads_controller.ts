@@ -361,7 +361,11 @@ export class ServerThreadsController implements IServerThreadsController {
     }
 
     // check balance (bypass for admin)
-    if (chain) {
+    if (
+      chain &&
+      (chain.type === ChainType.Token ||
+        chain.network === ChainNetwork.Ethereum)
+    ) {
       const addressAdminRoles = await findAllRoles(
         this.models,
         { where: { address_id: address.id } },
