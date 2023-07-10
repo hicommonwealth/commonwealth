@@ -35,7 +35,11 @@ import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import type ChainInfo from '../../../models/ChainInfo';
-import type { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
+import type {
+  IChainModule,
+  ITXData,
+  ITXModalData,
+} from '../../../models/interfaces';
 import type NodeInfo from '../../../models/NodeInfo';
 import { TransactionStatus } from '../../../models/types';
 import { chainToEventNetwork } from '../../server/chain_entities';
@@ -255,14 +259,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   // load existing events and subscribe to future via client node connection
   public async initChainEntities(): Promise<void> {
     await this._app.chainEntities.refresh(this.app.chain.id);
-    const subscriber = new SubstrateEvents.Subscriber(this.api);
-    const processor = new SubstrateEvents.Processor(this.api);
-    return this._app.chainEntities.subscribeEntities(
-      this._app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      subscriber,
-      processor
-    );
+    console.warn('Substrate chain-events are not supported!');
   }
 
   public listApiModules() {
