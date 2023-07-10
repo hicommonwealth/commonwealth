@@ -16,6 +16,7 @@ import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
+import { ProtocolCommunityForm } from './protocol_community';
 import { PolygonForm } from './polygon_form';
 
 export enum CommunityType {
@@ -29,6 +30,7 @@ export enum CommunityType {
   SplToken = 'Solana Token',
   Polygon = 'Polygon',
   AbiFactory = 'Abi Factory',
+  CommonProtocol = 'Common Protocol',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -108,9 +110,13 @@ const CreateCommunity = () => {
           <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
       case CommunityType.Polygon:
-          return <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />;
+        return (
+          <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />
+        );
       case CommunityType.SplToken:
         return <SplTokenForm />;
+      case CommunityType.CommonProtocol:
+        return <ProtocolCommunityForm />;
       default:
         throw new Error(`Invalid community type: ${currentForm}`);
     }
