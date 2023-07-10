@@ -16,6 +16,7 @@ import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
+import { ProtocolCommunityForm } from './protocol_community';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -27,6 +28,7 @@ export enum CommunityType {
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
   AbiFactory = 'Abi Factory',
+  CommonProtocol = 'Common Protocol',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -107,6 +109,8 @@ const CreateCommunity = () => {
         );
       case CommunityType.SplToken:
         return <SplTokenForm />;
+      case CommunityType.CommonProtocol:
+        return <ProtocolCommunityForm />;
       default:
         throw new Error(`Invalid community type: ${currentForm}`);
     }
