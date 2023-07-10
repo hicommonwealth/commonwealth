@@ -23,7 +23,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
 import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle, toggleDarkMode } from './cw_toggle';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
@@ -143,7 +143,8 @@ export const ComponentShowcase = () => {
   const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
     Array<string>
   >([]);
-  const [isToggled, setIsToggled] = useState<boolean>(false);
+  const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
+  const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
@@ -711,7 +712,20 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Toggle</CWText>
         <div className="toggle-gallery">
           <CWToggle
+            checked={isSmallToggled}
+            size="small"
+            onChange={() => {
+              setIsSmallToggled(!isSmallToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Small</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
             checked={isDarkModeOn}
+            size="small"
             onChange={(e) => {
               isDarkModeOn
                 ? toggleDarkMode(false, setIsDarkModeOn)
@@ -720,17 +734,60 @@ export const ComponentShowcase = () => {
             }}
           />
           <div className="toggle-label">
-            <CWText type="caption">Dark mode</CWText>
+            <CWText type="caption">Small Dark mode</CWText>
           </div>
         </div>
-        <CWToggle
-          checked={isToggled}
-          onChange={() => {
-            setIsToggled(!isToggled);
-          }}
-        />
-        <CWToggle disabled />
-        <CWToggle checked disabled />
+        <div className="toggle-gallery">
+          <CWToggle size="small" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="small" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled checked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isLargeToggled}
+            size="large"
+            onChange={() => {
+              setIsLargeToggled(!isLargeToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Large</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isDarkModeOn}
+            size="large"
+            onChange={(e) => {
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
+              e.stopPropagation();
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Large Dark mode</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="large" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="large" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled checked</CWText>
+          </div>
+        </div>
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Vote Button</CWText>
