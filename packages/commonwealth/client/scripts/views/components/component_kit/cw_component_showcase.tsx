@@ -10,6 +10,7 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
+import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -24,7 +25,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
 import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle, toggleDarkMode } from './cw_toggle';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
@@ -42,6 +43,11 @@ import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  ReactQuillEditor,
+} from 'views/components/react_quill_editor';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -139,7 +145,8 @@ export const ComponentShowcase = () => {
   const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
     Array<string>
   >([]);
-  const [isToggled, setIsToggled] = useState<boolean>(false);
+  const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
+  const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
@@ -154,6 +161,11 @@ export const ComponentShowcase = () => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
+
+  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
+  const [isEditorDisabled, setIsEditorDisabled] = useState(false);
 
   return (
     <div className="ComponentShowcase">
@@ -702,7 +714,20 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Toggle</CWText>
         <div className="toggle-gallery">
           <CWToggle
+            checked={isSmallToggled}
+            size="small"
+            onChange={() => {
+              setIsSmallToggled(!isSmallToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Small</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
             checked={isDarkModeOn}
+            size="small"
             onChange={(e) => {
               isDarkModeOn
                 ? toggleDarkMode(false, setIsDarkModeOn)
@@ -711,17 +736,60 @@ export const ComponentShowcase = () => {
             }}
           />
           <div className="toggle-label">
-            <CWText type="caption">Dark mode</CWText>
+            <CWText type="caption">Small Dark mode</CWText>
           </div>
         </div>
-        <CWToggle
-          checked={isToggled}
-          onChange={() => {
-            setIsToggled(!isToggled);
-          }}
-        />
-        <CWToggle disabled />
-        <CWToggle checked disabled />
+        <div className="toggle-gallery">
+          <CWToggle size="small" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="small" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled checked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isLargeToggled}
+            size="large"
+            onChange={() => {
+              setIsLargeToggled(!isLargeToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Large</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isDarkModeOn}
+            size="large"
+            onChange={(e) => {
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
+              e.stopPropagation();
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Large Dark mode</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="large" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="large" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled checked</CWText>
+          </div>
+        </div>
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Vote Button</CWText>
@@ -939,6 +1007,78 @@ export const ComponentShowcase = () => {
           <CWText fontWeight="semiBold">Card title</CWText>
           <CWText>Full width</CWText>
         </CWCard>
+        <div className="thread-actions-gallery">
+          <CWText type="h3">Thread Actions</CWText>
+          <CWText type="h5">Default</CWText>
+          <CWThreadAction
+            action="comment"
+            onClick={() => console.log('Comment action clicked!')}
+          />
+          <CWThreadAction
+            action="share"
+            onClick={() => console.log('Share action clicked!')}
+          />
+          <CWThreadAction
+            action="subscribe"
+            onClick={() => console.log('Subscribe action clicked!')}
+          />
+          <CWThreadAction
+            action="upvote"
+            count={1}
+            onClick={() => console.log('Upvote action clicked!!')}
+          />
+          <CWThreadAction
+            action="overflow"
+            onClick={() => console.log('Overflow action clicked!')}
+          />
+          <CWText type="h5">Disabled</CWText>
+          <CWThreadAction
+            action="comment"
+            onClick={() => console.log('Comment action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="share"
+            onClick={() => console.log('Share action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="subscribe"
+            onClick={() => console.log('Subscribe action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="upvote"
+            count={1}
+            onClick={() => console.log('Upvote action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="overflow"
+            onClick={() => console.log('Overflow action clicked!')}
+            disabled
+          />
+        </div>
+      </div>
+      <div className="Quill">
+        <CWText type="h3">Quill Editor</CWText>
+        <div className="editor-toggle">
+          <CWToggle
+            size={'small'}
+            checked={isEditorDisabled}
+            onChange={() => {
+              setIsEditorDisabled((prev) => !prev);
+            }}
+          />
+          <CWText type="caption">
+            Editor {isEditorDisabled ? 'Disabled' : 'Enabled'}
+          </CWText>
+        </div>
+        <ReactQuillEditor
+          contentDelta={threadContentDelta}
+          setContentDelta={setThreadContentDelta}
+          isDisabled={isEditorDisabled}
+        />
       </div>
       <div className="upvote-gallery">
         <CWText type="h3">Upvote</CWText>

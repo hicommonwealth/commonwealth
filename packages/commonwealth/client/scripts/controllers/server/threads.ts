@@ -273,7 +273,6 @@ class ThreadsController {
     readOnly?: boolean
   ) {
     try {
-      // TODO: Change to POST /thread
       const {
         action = null,
         session = null,
@@ -285,7 +284,7 @@ class ThreadsController {
         link: url,
         topic: topic.id,
       });
-      const response = await $.post(`${app.serverUrl()}/createThread`, {
+      const response = await $.post(`${app.serverUrl()}/threads`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,
@@ -372,14 +371,13 @@ class ThreadsController {
     });
 
     await $.ajax({
-      url: `${app.serverUrl()}/editThread`,
-      type: 'PUT',
+      url: `${app.serverUrl()}/threads/${proposal.id}`,
+      type: 'PATCH',
       data: {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         address: app.user.activeAccount.address,
         chain: app.activeChainId(),
-        thread_id: proposal.id,
         kind: proposal.kind,
         stage: proposal.stage,
         body: encodeURIComponent(newBody),
@@ -443,19 +441,20 @@ class ThreadsController {
 
   public async delete(proposal) {
     return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /thread
-      $.post(`${app.serverUrl()}/deleteThread`, {
-        jwt: app.user.jwt,
-        thread_id: proposal.id,
-        chain_id: app.activeChainId(),
-      })
+      axios
+        .delete(`${app.serverUrl()}/threads/${proposal.id}`, {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          },
+        })
         .then((result) => {
           // Deleted posts are removed from all stores containing them
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
           this.numTotalThreads -= 1;
-          resolve(result);
+          resolve(result.data);
         })
         .catch((e) => {
           console.error(e);

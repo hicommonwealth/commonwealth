@@ -59,6 +59,10 @@ $width: 360px;
     }
   }
 
+  .thread-actions-gallery {
+    @include gallery-grid(8px, column);
+  }
+
   .text-gallery {
     @include gallery-grid(initial, column);
 
@@ -164,6 +168,16 @@ $width: 360px;
     .toggle-label {
       display: grid;
       align-items: center;
+    }
+  }
+
+  .editor-toggle {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+
+    .caption {
+      margin-left: 8px;
     }
   }
 }
