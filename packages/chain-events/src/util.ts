@@ -222,6 +222,11 @@ export function populateRange(
   return range;
 }
 
+/**
+ * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
+ * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding
+ * @param decimal
+ */
 export function decimalToHex(decimal: number | string) {
   if (decimal == '0') {
     return '0x0';
