@@ -90,10 +90,14 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
 
   useEffect(() => {
     if (threadTopic.defaultOffchainTemplate) {
-      const template = JSON.parse(
-        threadTopic.defaultOffchainTemplate
-      ) as DeltaStatic;
-      setThreadContentDelta(template);
+      try {
+        const template = JSON.parse(
+          threadTopic.defaultOffchainTemplate
+        ) as DeltaStatic;
+        setThreadContentDelta(template);
+      } catch (e) {
+        console.log(e);
+      }
     }
   }, [threadTopic]);
 
