@@ -48,6 +48,17 @@ $width: 360px;
     }
   }
 
+  .upvote-gallery {
+    @include gallery-grid(8px, column);
+
+    .upvote-row {
+      align-items: center;
+      @include gallery-grid(initial, row);
+      justify-content: space-between;
+      width: 180px;
+    }
+  }
+
   .thread-actions-gallery {
     @include gallery-grid(8px, column);
   }
