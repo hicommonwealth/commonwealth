@@ -1,27 +1,21 @@
 @import '../../../shared';
 
-@mixin positionStyles {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
 .SearchBar {
   width: 608px;
   display: flex;
-  flex-direction: row;
+  // flex-direction: row;
   align-items: center;
   box-sizing: border-box;
   padding: 8px 16px;
   gap: 8px;
   position: absolute;
   height: 40px;
-  background-color: $white;
-  border: 1px solid $neutral-200;
+  background-color: #FFFFFF;
+  border: 1px solid #E0DFE1;
   border-radius: 6px;
-  color: $neutral-800;
+  color: #282729;
 
-  &:focus {
+  &.isTyping {
     outline: none;
     border-color: $primary-500;
     box-shadow: 0px 2px 2px -1px rgba(0, 0, 0, 0.12),
@@ -29,59 +23,63 @@
   }
 
   &:hover {
-    border: 1px solid $primary-600;
+    border: 1px solid #2972CC;
   }
 
   &.disabled {
-    background-color: $neutral-50;
-    border-color: $neutral-200;
+    background-color: #F7F7F7;
+    border-color: #E0DFE1;
     box-shadow: none;
-    color: $neutral-500;
+    color: #656167;
   }
-
-  .withTag {
-    padding-left: 237px;
-  }
-
-  ::placeholder {
-    color: $neutral-800;
-    padding-left: 100px;
-  }
-}
-
-.input-and-icon-container {
-  position: relative;
-  display: grid;
-  align-items: center;
-  justify-content: center;
 
   input {
-    // @include inputStyles;
-    background-color: inherit;
-    // padding-left: 48px;
-    padding-left: 250px;
+    width: 100%;
+
+    border: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    ::placeholder {
+      color: #282729;
+    }
   }
 
-  .magnifyingGlass > svg {
-    @include positionStyles;
-    left: 16px;
-  }
-  
-  .tag {
-    @include positionStyles;
+}
 
+.tag {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px 2px 8px;
+  left: 48px;
+  gap: 16px;
+  border-radius: 6px;
+  background-color: $neutral-200;
+  height: 24px;
+  width: fit-content;
+
+  .name {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    padding: 2px 8px;
-    left: 48px;
-    gap: 16px;
-  
-    border-radius: 6px;
-    background-color: $neutral-100;
-    height: 24px;
-    width: fit-content;
+    gap: 8px;
   }
+
+  .action {
+    display: grid;
+    align-items: center;
+  }
+}
+
+.magnifyingGlass {
+  color: #A09DA1;
+}
+
+.inputElement {
+  flex: 1;
 }
 

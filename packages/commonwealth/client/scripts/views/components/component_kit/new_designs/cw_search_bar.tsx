@@ -8,6 +8,7 @@ import { IconName } from '../cw_icons/cw_icon_lookup';
 import { getClasses } from '../helpers';
 import { ValidationStatus } from '../cw_validation_text';
 import { CWText } from '../cw_text';
+import { CWCommunityAvatar } from '../cw_community_avatar';
 
 type BaseSearchBarProps = {
   autoComplete?: string;
@@ -32,17 +33,12 @@ type BaseSearchBarProps = {
 
 type InputStyleProps = {
   inputClassName?: string;
-  // darkMode?: boolean;
   disabled?: boolean;
-  withTag?: boolean;
-  // size?: TextInputSize;
-  // validationStatus?: ValidationStatus;
-  displayOnly?: boolean;
 };
 
 type InputInternalStyleProps = {
   hasLeftIcon?: boolean;
-  // isTyping?: boolean;
+  isTyping?: boolean;
 };
 
 type SearchBarProps = BaseSearchBarProps &
@@ -52,72 +48,76 @@ type SearchBarProps = BaseSearchBarProps &
 
 type TagProps = {
   communityName: string;
+  onClick: () => void;
 };
-const Tag: FC<TagProps> = ({ communityName }) => {
+
+const Tag: FC<TagProps> = ({ communityName, onClick }) => {
+  const handleClick = () => {
+    console.log('clicked!');
+    onClick();
+  };
+
   return (
     <div className="tag">
-      <div>(-)</div>
-      <CWText type="b2" fontWeight="regular">
-        {communityName}
-      </CWText>
-      <X size={16} color="#656167" />
+      <div className="name">
+        <CWCommunityAvatar
+          size="small"
+          // community={app.chain.meta}
+          community={null}
+          onClick={() => {}}
+        />
+        <CWText type="b2" fontWeight="regular">
+          {communityName}
+        </CWText>
+      </div>
+      <div className="action" onClick={handleClick}>
+        <X size={16} color="#656167" />
+      </div>
     </div>
   );
 };
 
 export const CWSearchBar = (props: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [tag, setTags] = useState<boolean>(true);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [tag, setTag] = useState<boolean>(true);
 
-  const {
-    autoComplete = 'off',
-    autoFocus,
-    containerClassName,
-    defaultValue,
-    value,
-    disabled,
-    withTag,
-    iconLeftonClick,
-    inputClassName,
-    inputValidationFn,
-    label,
-    maxLength,
-    name,
-    onInput,
-    onenterkey,
-    onClick,
-    placeholder,
-    tabIndex,
-    displayOnly,
-    manualStatusMessage = '',
-    manualValidationStatus = '',
-  } = props;
+  const { disabled, placeholder } = props;
 
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
   };
 
+  const handleOnInput = (e) => {
+    if (e.currentTarget.value?.length === 0) {
+      setIsTyping(false);
+    } else {
+      setIsTyping(true);
+    }
+  };
+
   return (
-    <div className="input-and-icon-container">
-      <div className="magnifyingGlass">
-        <MagnifyingGlass color="#A09DA1" weight="regular" size={24} />
+    <div
+      className={getClasses<InputStyleProps & InputInternalStyleProps>(
+        {
+          isTyping,
+        },
+        ComponentType.SearchBar
+      )}
+    >
+      <MagnifyingGlass className="magnifyingGlass" weight="regular" size={24} />
+      {tag && <Tag communityName="1inch" onClick={() => setTag(false)} />}
+      {tag && <Tag communityName="Ethereum" onClick={() => setTag(false)} />}
+      <div className="inputElement">
+        <input
+          placeholder={placeholder}
+          value={searchTerm}
+          onChange={handleInputChange}
+          onInput={handleOnInput}
+          disabled={disabled}
+        />
       </div>
-      {tag && <Tag communityName="Community Name" />}
-      <input
-        className={getClasses<InputStyleProps & InputInternalStyleProps>(
-          {
-            disabled,
-            withTag: tag ? withTag : null,
-            inputClassName,
-          },
-          ComponentType.SearchBar
-        )}
-        placeholder={placeholder}
-        value={searchTerm}
-        onChange={handleInputChange}
-        disabled={disabled}
-      />
     </div>
   );
 };
