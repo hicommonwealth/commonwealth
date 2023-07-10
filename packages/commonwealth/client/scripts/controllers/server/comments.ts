@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
-import $ from 'jquery';
 import _ from 'lodash';
 import ReactionCount from 'models/ReactionCount';
 import moment from 'moment';
@@ -25,7 +24,6 @@ export const modelReactionCountFromServer = (reactionCount) => {
     comment_id,
     proposal_id,
     has_reacted,
-    // eslint-disable-next-line radix
     parseInt(like)
   );
 };
@@ -153,7 +151,7 @@ class CommentsController {
     return this._reactionsStore;
   }
 
-  public deInitReactionCountsStore() {
+  public deinitReactionCountsStore() {
     this.reactionCountsStore.clear();
   }
 
@@ -161,7 +159,7 @@ class CommentsController {
     return this.reactionsStore.getByPost(post);
   }
 
-  public deInitReactionsStore() {
+  public deinitReactionsStore() {
     this.store.clear();
   }
 
@@ -348,7 +346,7 @@ class CommentsController {
 
   public async toggleSpam(commentId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
-      $.post(
+      axios.post(
         `${app.serverUrl()}/comments/${commentId}/${!isSpam ? 'mark' : 'unmark'
         }-as-spam`,
         {
@@ -358,7 +356,7 @@ class CommentsController {
       )
         .then((response) => {
           const comment = this._store.getById(commentId);
-          const result = modelFromServer({ ...comment, ...response.result });
+          const result = modelFromServer({ ...comment, ...response.data.result });
           if (comment) this._store.remove(comment);
           this._store.add(result);
           resolve(result);

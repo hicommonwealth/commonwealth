@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-
 import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';

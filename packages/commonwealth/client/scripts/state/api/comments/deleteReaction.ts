@@ -44,12 +44,12 @@ const deleteReaction = async ({
   }));
 };
 
-interface IuseDeleteCommentReactionMutation {
+interface UseDeleteCommentReactionMutationProps {
   chainId: string;
   commentId: number;
 }
 
-const useDeleteCommentReactionMutation = ({ commentId, chainId }: IuseDeleteCommentReactionMutation) => {
+const useDeleteCommentReactionMutation = ({ commentId, chainId }: UseDeleteCommentReactionMutationProps) => {
   const queryClient = useQueryClient();
   const { data: reactions } = useFetchCommentReactionsQuery({
     chainId,
@@ -64,7 +64,7 @@ const useDeleteCommentReactionMutation = ({ commentId, chainId }: IuseDeleteComm
       // update fetch reaction query state
       const key = [ApiEndpoints.getCommentReactions(commentId), chainId]
       queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData([...key],
+      queryClient.setQueryData(key,
         () => {
           const updatedReactions = [...(reactions || []).filter(x => x.id !== reactionId)]
           return updatedReactions
