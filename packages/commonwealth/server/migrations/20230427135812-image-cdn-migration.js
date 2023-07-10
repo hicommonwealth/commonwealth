@@ -36,7 +36,7 @@ async function reverseReplaceImageWithCdn(
 ) {
   await queryInterface.sequelize.query(
     `UPDATE "${tableName}" SET "${fieldName}" = 
-     regexp_replace(${fieldName}, 'assets.commonwealth.im/(.*)', 'https:/commonwealth-uploads.s3.us-east-2.amazonaws.com/\\1')`,
+     regexp_replace(${fieldName}, 'https://assets.commonwealth.im/(.*)', 'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/\\1')`,
     { transaction }
   );
 }
