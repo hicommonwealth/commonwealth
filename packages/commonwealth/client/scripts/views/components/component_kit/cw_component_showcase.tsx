@@ -9,6 +9,7 @@ import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { CWButton } from './new_designs/cw_button';
+import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -1005,11 +1006,64 @@ export const ComponentShowcase = () => {
           <CWText fontWeight="semiBold">Card title</CWText>
           <CWText>Full width</CWText>
         </CWCard>
+        <div className="thread-actions-gallery">
+          <CWText type="h3">Thread Actions</CWText>
+          <CWText type="h5">Default</CWText>
+          <CWThreadAction
+            action="comment"
+            onClick={() => console.log('Comment action clicked!')}
+          />
+          <CWThreadAction
+            action="share"
+            onClick={() => console.log('Share action clicked!')}
+          />
+          <CWThreadAction
+            action="subscribe"
+            onClick={() => console.log('Subscribe action clicked!')}
+          />
+          <CWThreadAction
+            action="upvote"
+            count={1}
+            onClick={() => console.log('Upvote action clicked!!')}
+          />
+          <CWThreadAction
+            action="overflow"
+            onClick={() => console.log('Overflow action clicked!')}
+          />
+          <CWText type="h5">Disabled</CWText>
+          <CWThreadAction
+            action="comment"
+            onClick={() => console.log('Comment action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="share"
+            onClick={() => console.log('Share action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="subscribe"
+            onClick={() => console.log('Subscribe action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="upvote"
+            count={1}
+            onClick={() => console.log('Upvote action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="overflow"
+            onClick={() => console.log('Overflow action clicked!')}
+            disabled
+          />
+        </div>
       </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
         <div className="editor-toggle">
           <CWToggle
+            size={'small'}
             checked={isEditorDisabled}
             onChange={() => {
               setIsEditorDisabled((prev) => !prev);
