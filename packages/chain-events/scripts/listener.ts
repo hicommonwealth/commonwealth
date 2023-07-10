@@ -16,7 +16,7 @@ import {
   CosmosEvents,
 } from '../src/index';
 
-import { contracts, networkSpecs, networkUrls } from './listenerUtils';
+import { contracts, networkUrls } from './listenerUtils';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -58,18 +58,13 @@ const { argv } = yargs
   })
   .check((data) => {
     if (!data.url && !data.chain) {
-      if (data.network === SupportedNetwork.Substrate) {
-        throw new Error('Must pass either URL or chain name!');
-      } else {
-        // default to eth mainnet if not on substrate
-        data.chain = 'erc20';
-      }
+      // default to eth mainnet if not on substrate
+      data.chain = 'erc20';
     }
     if (!networkUrls[data.chain] && !data.url) {
       throw new Error(`no URL found for ${data.chain}`);
     }
     if (
-      data.network !== SupportedNetwork.Substrate &&
       data.network !== SupportedNetwork.ERC20 &&
       data.network !== SupportedNetwork.ERC721 &&
       data.network !== SupportedNetwork.Cosmos &&
@@ -77,12 +72,6 @@ const { argv } = yargs
       !contracts[data.chain]
     ) {
       throw new Error(`no contract found for ${data.chain}`);
-    }
-    if (
-      data.network === SupportedNetwork.Substrate &&
-      !networkSpecs[data.chain]
-    ) {
-      throw new Error(`no spec found for ${data.chain}`);
     }
     return true;
   });
@@ -93,7 +82,6 @@ const startBlock: number = argv.startBlock ?? 0;
 const { network } = argv;
 const chain = argv.chain || 'dummy';
 const url = argv.url || networkUrls[chain];
-const spec = networkSpecs[chain];
 const contract = argv.contractAddress || contracts[chain];
 
 class StandaloneEventHandler extends IEventHandler {
@@ -130,28 +118,7 @@ async function getTokenList(tokenListUrl: string): Promise<TokenListEntry[]> {
 
 console.log(`Connecting to ${chain} on url ${url}...`);
 
-if (network === SupportedNetwork.Substrate) {
-  SubstrateEvents.createApi(url, spec as any).then(async (api) => {
-    const fetcher = new SubstrateEvents.StorageFetcher(api);
-    try {
-      const fetched = await fetcher.fetch();
-      console.log(fetched.map((f) => f.data));
-    } catch (err) {
-      console.log(err);
-      console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
-    }
-    SubstrateEvents.subscribeEvents({
-      chain,
-      api,
-      handlers: [new StandaloneEventHandler()],
-      skipCatchup,
-      archival,
-      startBlock,
-      verbose: true,
-      enricherConfig: { balanceTransferThresholdPermill: 1_000 }, // 0.1% of total issuance
-    });
-  });
-} else if (network === SupportedNetwork.Compound) {
+if (network === SupportedNetwork.Compound) {
   CompoundEvents.createApi(url, contract).then(async (api) => {
     const fetcher = new CompoundEvents.StorageFetcher(api);
     try {
