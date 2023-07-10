@@ -104,12 +104,12 @@ const resetServer = (debug = false): Promise<void> => {
       const nodes = [
         ['mainnet1.edgewa.re', 'Edgeware Mainnet', null, BalanceType.Substrate],
         [
-          'wss://eth-mainnet.alchemyapi.io/v2/dummy_key',
+          'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
           'Ethereum Mainnet',
           '1',
         ],
         [
-          'wss://eth-ropsten.alchemyapi.io/v2/dummy_key',
+          'https://eth-ropsten.alchemyapi.io/v2/dummy_key',
           'Ropsten Testnet',
           '3',
         ],
