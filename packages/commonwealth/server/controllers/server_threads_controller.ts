@@ -26,7 +26,7 @@ import { Op, QueryTypes } from 'sequelize';
 import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 import { PaginationSqlBind, buildPaginationSql } from '../util/queries';
 import { getLastEdited } from '../util/getLastEdited';
-import { AppError, ServerError } from '../../../common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -35,6 +35,7 @@ const Errors = {
   InvalidParent: 'Invalid parent',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
+  BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -225,12 +226,18 @@ export class ServerThreadsController implements IServerThreadsController {
       const isGodMode = user.isAdmin;
       const hasAdminRole = addressAdminRoles.length > 0;
       if (!isGodMode && !hasAdminRole) {
-        const canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
+        let canReact;
+        try {
+          canReact = await validateTopicThreshold(
+            this.tokenBalanceCache,
+            this.models,
+            thread.topic_id,
+            address.address
+          );
+        } catch (e) {
+          throw new ServerError(Errors.BalanceCheckFailed, e);
+        }
+
         if (!canReact) {
           throw new AppError(Errors.InsufficientTokenBalance);
         }
@@ -354,11 +361,7 @@ export class ServerThreadsController implements IServerThreadsController {
     }
 
     // check balance (bypass for admin)
-    if (
-      chain &&
-      (chain.type === ChainType.Token ||
-        chain.network === ChainNetwork.Ethereum)
-    ) {
+    if (chain) {
       const addressAdminRoles = await findAllRoles(
         this.models,
         { where: { address_id: address.id } },
@@ -368,12 +371,18 @@ export class ServerThreadsController implements IServerThreadsController {
       const isGodMode = user.isAdmin;
       const hasAdminRole = addressAdminRoles.length > 0;
       if (!isGodMode && !hasAdminRole) {
-        const canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
+        let canReact;
+        try {
+          canReact = await validateTopicThreshold(
+            this.tokenBalanceCache,
+            this.models,
+            thread.topic_id,
+            address.address
+          );
+        } catch (e) {
+          throw new ServerError(Errors.BalanceCheckFailed, e);
+        }
+
         if (!canReact) {
           throw new AppError(Errors.InsufficientTokenBalance);
         }

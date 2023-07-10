@@ -24,7 +24,7 @@ import { AnalyticsOptions } from './server_analytics_controller';
 import { buildPaginationSql } from '../util/queries';
 import { CommentAttributes } from '../models/comment';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { AppError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -33,6 +33,7 @@ const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
   ParseMentionsFailed: 'Failed to parse mentions',
   NotOwned: 'Not owned by this user',
+  BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
@@ -206,12 +207,18 @@ export class ServerCommentsController implements IServerCommentsController {
       const isGodMode = user.isAdmin;
       const hasAdminRole = addressAdminRoles.length > 0;
       if (!isGodMode && !hasAdminRole) {
-        const canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
+        let canReact;
+        try {
+          canReact = await validateTopicThreshold(
+            this.tokenBalanceCache,
+            this.models,
+            thread.topic_id,
+            address.address
+          );
+        } catch (e) {
+          throw new ServerError(Errors.BalanceCheckFailed, e);
+        }
+
         if (!canReact) {
           throw new AppError(Errors.InsufficientTokenBalance);
         }
