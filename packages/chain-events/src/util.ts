@@ -41,6 +41,7 @@ import {
 } from './chains/cosmos';
 import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
+import { ethers } from 'ethers';
 
 export function Title(
   network: SupportedNetwork,
@@ -219,4 +220,14 @@ export function populateRange(
     );
   }
   return range;
+}
+
+export function decimalToHex(decimal: number | string) {
+  if (decimal == '0') {
+    return '0x0';
+  } else {
+    return ethers.utils.hexStripZeros(
+      ethers.BigNumber.from(decimal).toHexString()
+    );
+  }
 }
