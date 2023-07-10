@@ -54,8 +54,6 @@ export const Errors = {
   NoBodyOrAttachments: 'Discussion posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only discussion and link posts supported',
-  InsufficientTokenBalance:
-    "Users need to hold some of the community's tokens to post",
   FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
 };
@@ -1166,14 +1164,20 @@ export class ServerThreadsController implements IServerThreadsController {
             ['admin']
           );
           if (!user.isAdmin && isAdmin.length === 0) {
-            const canReact = await validateTopicThreshold(
-              this.tokenBalanceCache,
-              this.models,
-              topicId,
-              address.address
-            );
+            let canReact;
+            try {
+              canReact = await validateTopicThreshold(
+                this.tokenBalanceCache,
+                this.models,
+                topicId,
+                address.address
+              );
+            } catch (e) {
+              throw new ServerError(Errors.BalanceCheckFailed, e);
+            }
+
             if (!canReact) {
-              throw new Error(Errors.BalanceCheckFailed);
+              throw new AppError(Errors.InsufficientTokenBalance);
             }
           }
         }
