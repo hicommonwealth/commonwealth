@@ -21,6 +21,7 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -189,6 +190,14 @@ export const NewThreadForm = () => {
                 buttonWidth="wide"
               />
             </div>
+
+            <CWBanner
+              className="join-community-banner"
+              title="Want to contribute to this discussion?"
+              body="Join now to engage in discussions, leave comments, reply to others,
+                    upvote content, and enjoy a host of additional features."
+              buttons={[{ label: 'Join community', buttonType: 'primary' }]}
+            />
           </div>
         </div>
       </div>
