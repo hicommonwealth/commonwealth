@@ -18,7 +18,7 @@ const routesMethods: { [key: string]: string[] } = {};
  * @param router The router on which to add the request/route handlers.
  * @param method The HTTP method of the route e.g. 'post', 'get', 'patch', etc.
  * @param path The path of the route e.g. '/comments'.
- * @param handlers Any request body validators or route handlers.
+ * @param handlers Any request handlers.
  */
 export const registerRoute = (
   router: Express,
