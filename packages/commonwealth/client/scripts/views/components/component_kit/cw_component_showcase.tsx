@@ -1063,6 +1063,7 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Quill Editor</CWText>
         <div className="editor-toggle">
           <CWToggle
+            size={'small'}
             checked={isEditorDisabled}
             onChange={() => {
               setIsEditorDisabled((prev) => !prev);
