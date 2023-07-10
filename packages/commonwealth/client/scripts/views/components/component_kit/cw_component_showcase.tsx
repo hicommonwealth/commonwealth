@@ -9,6 +9,7 @@ import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { CWButton } from './new_designs/cw_button';
+import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
@@ -1078,6 +1079,21 @@ export const ComponentShowcase = () => {
           setContentDelta={setThreadContentDelta}
           isDisabled={isEditorDisabled}
         />
+      </div>
+      <div className="upvote-gallery">
+        <CWText type="h3">Upvote</CWText>
+        <div className="upvote-row">
+          <CWText>Default</CWText>
+          <CWUpvote voteCount={87} />
+        </div>
+        <div className="upvote-row">
+          <CWText>Active</CWText>
+          <CWUpvote voteCount={8887} active />
+        </div>
+        <div className="upvote-row">
+          <CWText>Disabled</CWText>
+          <CWUpvote voteCount={99999} disabled />
+        </div>
       </div>
     </div>
   );
