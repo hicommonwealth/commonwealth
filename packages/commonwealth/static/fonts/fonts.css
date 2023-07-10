@@ -57,3 +57,9 @@
     url('NeueHaasUnica-Regular.woff') format('woff'),
     url('NeueHaasUnica-Regular.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: 'DM Mono';
+  font-weight: 300;
+  src: url('DMMono-Regular.ttf') format('truetype');
+}
