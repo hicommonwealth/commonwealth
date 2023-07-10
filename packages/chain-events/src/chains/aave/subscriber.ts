@@ -82,11 +82,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
         {
           fromBlock: decimalToHex(this.lastBlockNumber + 1),
           toBlock: decimalToHex(currentBlockNum),
-          address: [
-            this._api.aaveToken.address,
-            this._api.governance.address,
-            this._api.stkAaveToken.address,
-          ],
+          address: [this._api.governance.address],
         },
       ]);
 
