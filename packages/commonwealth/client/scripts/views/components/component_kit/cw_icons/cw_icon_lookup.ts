@@ -21,6 +21,7 @@ import {
   PushPin,
   House,
   Trash,
+  Eye,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -29,6 +30,7 @@ import { withPhosphorIcon } from './cw_phosphor_icons';
 export const iconLookup = {
   keyLockOpened: withPhosphorIcon(LockKeyOpen),
   keyLockClosed: withPhosphorIcon(LockKey),
+  eye: withPhosphorIcon(Eye),
   archiveTray: withPhosphorIcon(ArchiveTray),
   arrowLeft: withPhosphorIcon(ArrowFatLeft),
   arrowRight: withPhosphorIcon(ArrowFatRight),
