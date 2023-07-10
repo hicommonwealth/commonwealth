@@ -61,8 +61,8 @@ const generateImage = async (
     const upload = await s3.upload(params).promise();
     imageUrl = upload.Location;
     imageUrl = imageUrl.replace(
-      'commonwealth-uploads.s3.us-east-2.amazonaws.com',
-      'commonwealth.im/assets'
+      'assets.commonwealth.im.s3.us-east-2.amazonaws.com',
+      'assets.commonwealth.im'
     );
   } catch (e) {
     console.log(e);

@@ -48,8 +48,8 @@ const getUploadSignature = async (
 
   s3.getSignedUrl('putObject', params, (err, url) => {
     url = url.replace(
-      'commonwealth-uploads.s3.us-east-2.amazonaws.com',
-      'commonwealth.im/assets'
+      'assets.commonwealth.im.s3.us-east-2.amazonaws.com',
+      'assets.commonwealth.im'
     );
     if (err) {
       res.json({ status: 'Failure', result: err });
