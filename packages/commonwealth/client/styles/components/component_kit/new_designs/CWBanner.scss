@@ -1,6 +1,6 @@
 @import '../../../shared';
 
-.Banner {
+.CWBanner {
   padding: 16px;
   display: flex;
   border-radius: 6px;
@@ -15,7 +15,7 @@
   .content-container {
     display: flex;
     flex-direction: column;
-    padding-right: 8px;
+    padding-right: 75px;
 
     .header {
       color: $neutral-600;

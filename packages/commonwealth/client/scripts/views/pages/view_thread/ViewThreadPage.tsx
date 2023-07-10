@@ -27,7 +27,10 @@ import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
-import { CommentsFeaturedFilterTypes, ThreadStage } from '../../../models/types';
+import {
+  CommentsFeaturedFilterTypes,
+  ThreadStage,
+} from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
@@ -49,6 +52,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
+import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -85,9 +89,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [commentSortType, setCommentSortType] = useState<
-    CommentsFeaturedFilterTypes
-  >(CommentsFeaturedFilterTypes.Newest);
+  const [commentSortType, setCommentSortType] =
+    useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -512,10 +515,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
   const sortedComments = [...comments].sort((a, b) =>
-    commentSortType === CommentsFeaturedFilterTypes.Oldest ?
-      moment(a.createdAt).diff(moment(b.createdAt)) :
-      moment(b.createdAt).diff(moment(a.createdAt))
-  )
+    commentSortType === CommentsFeaturedFilterTypes.Oldest
+      ? moment(a.createdAt).diff(moment(b.createdAt))
+      : moment(b.createdAt).diff(moment(a.createdAt))
+  );
 
   return (
     <CWContentPage
@@ -669,6 +672,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     updatedCommentsCallback={updatedCommentsCallback}
                     rootThread={thread}
                   />
+                  <CWBanner
+                    className="join-community-banner"
+                    title="Want to contribute to this discussion?"
+                    body="Join now to engage in discussions, leave comments, reply to others,
+                    upvote content, and enjoy a host of additional features."
+                    buttons={[
+                      { label: 'Join community', buttonType: 'primary' },
+                    ]}
+                  />
                 </>
               ) : null}
             </>
@@ -678,13 +690,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       comments={
         <>
           {comments.length > 0 && (
-            <div className='comments-filter-row'>
+            <div className="comments-filter-row">
               <Select
                 key={commentSortType}
-                size='compact'
+                size="compact"
                 selected={commentSortType}
                 onSelect={(item: any) => {
-                  setCommentSortType(item.value)
+                  setCommentSortType(item.value);
                 }}
                 options={[
                   {
@@ -721,65 +733,65 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         [
           ...(showLinkedProposalOptions || showLinkedThreadOptions
             ? [
-              {
-                label: 'Links',
-                item: (
-                  <div className="cards-column">
-                    {showLinkedProposalOptions && (
-                      <LinkedProposalsCard
-                        onChangeHandler={handleLinkedProposalChange}
-                        thread={thread}
-                        showAddProposalButton={isAuthor || isAdminOrMod}
-                      />
-                    )}
-                    {showLinkedThreadOptions && (
-                      <LinkedThreadsCard
-                        thread={thread}
-                        allowLinking={isAuthor || isAdminOrMod}
-                        onChangeHandler={handleLinkedThreadChange}
-                      />
-                    )}
-                  </div>
-                ),
-              },
-            ]
-            : []),
-          ...(polls?.length > 0 ||
-            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
-            ? [
-              {
-                label: 'Polls',
-                item: (
-                  <div className="cards-column">
-                    {[
-                      ...new Map(
-                        polls?.map((poll) => [poll.id, poll])
-                      ).values(),
-                    ].map((poll: Poll) => {
-                      return (
-                        <ThreadPollCard
-                          poll={poll}
-                          key={poll.id}
-                          onVote={() => setInitializedPolls(false)}
-                          showDeleteButton={isAuthor || isAdmin}
-                          onDelete={() => {
-                            setInitializedPolls(false);
-                          }}
-                        />
-                      );
-                    })}
-                    {isAuthor &&
-                      (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                        <ThreadPollEditorCard
+                {
+                  label: 'Links',
+                  item: (
+                    <div className="cards-column">
+                      {showLinkedProposalOptions && (
+                        <LinkedProposalsCard
+                          onChangeHandler={handleLinkedProposalChange}
                           thread={thread}
-                          threadAlreadyHasPolling={!polls?.length}
-                          onPollCreate={() => setInitializedPolls(false)}
+                          showAddProposalButton={isAuthor || isAdminOrMod}
                         />
                       )}
-                  </div>
-                ),
-              },
-            ]
+                      {showLinkedThreadOptions && (
+                        <LinkedThreadsCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleLinkedThreadChange}
+                        />
+                      )}
+                    </div>
+                  ),
+                },
+              ]
+            : []),
+          ...(polls?.length > 0 ||
+          (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+            ? [
+                {
+                  label: 'Polls',
+                  item: (
+                    <div className="cards-column">
+                      {[
+                        ...new Map(
+                          polls?.map((poll) => [poll.id, poll])
+                        ).values(),
+                      ].map((poll: Poll) => {
+                        return (
+                          <ThreadPollCard
+                            poll={poll}
+                            key={poll.id}
+                            onVote={() => setInitializedPolls(false)}
+                            showDeleteButton={isAuthor || isAdmin}
+                            onDelete={() => {
+                              setInitializedPolls(false);
+                            }}
+                          />
+                        );
+                      })}
+                      {isAuthor &&
+                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                          <ThreadPollEditorCard
+                            thread={thread}
+                            threadAlreadyHasPolling={!polls?.length}
+                            onPollCreate={() => setInitializedPolls(false)}
+                          />
+                        )}
+                    </div>
+                  ),
+                },
+              ]
             : []),
         ] as SidebarComponents
       }

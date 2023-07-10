@@ -15,6 +15,7 @@ import {
   ButtonType,
   CWButton,
 } from 'views/components/component_kit/new_designs/cw_button';
+import clsx from 'clsx';
 
 // TODO this component covers only one type of Banner,
 // it should be extended with other types
@@ -36,6 +37,7 @@ interface CWBannerProps {
   title: string;
   body?: string;
   buttons: ButtonProps[];
+  className?: string;
 }
 
 const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
@@ -50,11 +52,17 @@ const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
   return 'tertiary';
 };
 
-const CWBanner = ({ type = 'info', title, body, buttons }: CWBannerProps) => {
+const CWBanner = ({
+  type = 'default',
+  title,
+  body,
+  buttons,
+  className,
+}: CWBannerProps) => {
   const TypeIcon = typeIconLookup[type];
 
   return (
-    <div className="Banner">
+    <div className={clsx('CWBanner', className)}>
       {type !== 'default' && (
         <div className="type-icon-container">
           <TypeIcon size={24} />
