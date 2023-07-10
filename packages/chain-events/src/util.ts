@@ -1,68 +1,29 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
-
 import type {
   IDisconnectedRange,
   IEventProcessor,
   IEventSubscriber,
   IStorageFetcher,
   CWEvent,
-  IEventTitle,
   IEventLabel,
-  IChainEventKind,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
-import { Listener as SubstrateListener } from './chains/substrate/Listener';
-import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
 import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import {
   Listener as CompoundListener,
-  Title as CompoundTitle,
   Label as CompoundLabel,
 } from './chains/compound';
-import {
-  Listener as Erc20Listener,
-  Title as Erc20Title,
-  Label as Erc20Label,
-} from './chains/erc20';
+import { Listener as Erc20Listener, Label as Erc20Label } from './chains/erc20';
 import {
   Listener as Erc721Listener,
-  Title as Erc721Title,
   Label as Erc721Label,
 } from './chains/erc721';
-import {
-  Listener as AaveListener,
-  Title as AaveTitle,
-  Label as AaveLabel,
-} from './chains/aave';
+import { Listener as AaveListener, Label as AaveLabel } from './chains/aave';
 import {
   Listener as CosmosListener,
-  Title as CosmosTitle,
   Label as CosmosLabel,
 } from './chains/cosmos';
 import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
-
-export function Title(
-  network: SupportedNetwork,
-  kind: IChainEventKind
-): IEventTitle {
-  switch (network) {
-    case SupportedNetwork.Substrate:
-      return SubstrateTitle(kind);
-    case SupportedNetwork.Aave:
-      return AaveTitle(kind);
-    case SupportedNetwork.Compound:
-      return CompoundTitle(kind);
-    case SupportedNetwork.ERC20:
-      return Erc20Title(kind);
-    case SupportedNetwork.ERC721:
-      return Erc721Title(kind);
-    case SupportedNetwork.Cosmos:
-      return CosmosTitle(kind);
-    default:
-      throw new Error(`Invalid network: ${network}`);
-  }
-}
 
 export function Label(chain: string, event: CWEvent): IEventLabel {
   switch (event.network) {
@@ -100,7 +61,6 @@ export async function createListener(
     skipCatchup?: boolean;
     startBlock?: number;
     archival?: boolean;
-    spec?: RegisteredTypes;
     url?: string;
     enricherConfig?: any;
     pollTime?: number;
@@ -124,20 +84,7 @@ export async function createListener(
   >;
   const log = factory.getLogger(addPrefix(__filename, [network, chain]));
 
-  if (network === SupportedNetwork.Substrate) {
-    // start a substrate listener
-    listener = new SubstrateListener(
-      chain,
-      options.url,
-      options.spec,
-      !!options.archival,
-      options.startBlock || 0,
-      !!options.skipCatchup,
-      options.enricherConfig,
-      !!options.verbose,
-      options.discoverReconnectRange
-    );
-  } else if (network === SupportedNetwork.Compound) {
+  if (network === SupportedNetwork.Compound) {
     listener = new CompoundListener(
       chain,
       options.address,
