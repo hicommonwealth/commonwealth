@@ -38,14 +38,13 @@ export const CreateComment = ({
   updatedCommentsCallback,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
-    `new-thread-comment-${rootThread.id}`
+    !parentCommentId
+      ? `new-thread-comment-${rootThread.id}`
+      : `new-comment-reply-${parentCommentId}`
   );
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
-    if (handleIsReplying) {
-      return createDeltaFromText('');
-    }
     return restoreDraft() || createDeltaFromText('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -125,16 +124,12 @@ export const CreateComment = ({
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
       handleIsReplying(false);
-    } else {
-      clearDraft();
     }
+    clearDraft();
   };
 
   // on content updated, save draft
   useEffect(() => {
-    if (handleIsReplying) {
-      return;
-    }
     saveDraft(contentDelta);
   }, [handleIsReplying, saveDraft, contentDelta]);
 
