@@ -1,0 +1,41 @@
+@import '../../../shared';
+
+.Banner {
+  padding: 16px;
+  display: flex;
+  border-radius: 6px;
+  border: 1px solid $neutral-600;
+  background: $neutral-25;
+  justify-content: flex-start;
+
+  .type-icon-container {
+    margin-right: 8px;
+  }
+
+  .content-container {
+    display: flex;
+    flex-direction: column;
+    padding-right: 8px;
+
+    .header {
+      color: $neutral-600;
+    }
+
+    .body {
+      color: $neutral-600;
+    }
+  }
+
+  .close-icon-container {
+    margin-left: auto;
+
+    .close-icon {
+      cursor: pointer;
+    }
+  }
+
+  .actions-row {
+    display: flex;
+    margin-top: 24px;
+  }
+}
