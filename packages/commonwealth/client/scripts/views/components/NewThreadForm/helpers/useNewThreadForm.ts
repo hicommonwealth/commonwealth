@@ -89,7 +89,7 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
   }, [defaultTopic, threadTopic]);
 
   useEffect(() => {
-    if (threadTopic.defaultOffchainTemplate) {
+    if (threadTopic?.defaultOffchainTemplate) {
       try {
         const template = JSON.parse(
           threadTopic.defaultOffchainTemplate
