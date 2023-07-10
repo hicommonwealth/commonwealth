@@ -12,7 +12,7 @@ import Thread from '../../../models/Thread';
 import app from 'state';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
-import { CWButton } from '../component_kit/cw_button';
+import { CWButton } from '../component_kit/new_designs/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -167,16 +167,13 @@ export const CreateComment = ({
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (
-            <CWButton
-              buttonType="secondary-blue"
-              onClick={cancel}
-              label="Cancel"
-            />
+            <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
           )}
           <CWButton
+            buttonWidth="wide"
             disabled={disabled}
             onClick={handleSubmitComment}
-            label="Submit"
+            label={parentType === ContentType.Comment ? 'Reply' : 'Comment'}
           />
         </div>
       </div>

@@ -176,4 +176,14 @@ $width: 360px;
       align-items: center;
     }
   }
+
+  .editor-toggle {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+
+    .caption {
+      margin-left: 8px;
+    }
+  }
 }
