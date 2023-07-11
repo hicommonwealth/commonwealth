@@ -38,6 +38,8 @@ export const SearchBar: Story = {
         "inputClassName",
         "displayOnly",
         "hasLeftIcon",
+        "maxLength",
+        "isTyping",
       ],
     },
   },
