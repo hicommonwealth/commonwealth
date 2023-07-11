@@ -54,6 +54,9 @@ import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 
+const JOIN_COMMUNITY_BANNER_KEY = (communityId) =>
+  `${communityId}-joinCommunityBannerClosedAt`;
+
 export type ThreadPrefetch = {
   [identifier: string]: {
     commentsStarted: boolean;
@@ -93,6 +96,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState(null);
+  const [isBannerVisible, setIsBannerVisible] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -442,6 +446,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [comments, thread, threadId]);
 
+  useEffect(() => {
+    const bannerClosedAt = Number(
+      localStorage.getItem(JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()))
+    );
+
+    if (!bannerClosedAt) {
+      setIsBannerVisible(true);
+      return;
+    }
+
+    const timeDifference = moment().diff(moment(bannerClosedAt), 'week');
+    const bannerClosedMoreThanWeekAgo = timeDifference >= 1;
+    setIsBannerVisible(bannerClosedMoreThanWeekAgo);
+  }, []);
+
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
@@ -482,8 +501,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
+  const activeAccounts = app.user?.activeAccounts?.filter(
+    (a) => a.chain.id === app.chain.id
+  );
+  const hasJoinedCommunity =
+    !!app.user.activeAccount || activeAccounts.length > 0;
   const canComment =
-    app.user.activeAccount ||
+    !!hasJoinedCommunity ||
     (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
 
   const handleLinkedThreadChange = (links: Thread['links']) => {
@@ -521,6 +545,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       ? moment(a.createdAt).diff(moment(b.createdAt))
       : moment(b.createdAt).diff(moment(a.createdAt))
   );
+
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
+
+  const handleCloseBanner = () => {
+    localStorage.setItem(
+      JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()),
+      String(Date.now())
+    );
+    setIsBannerVisible(false);
+  };
+
+  const handleJoinCommunity = () => {
+    console.log('click handle join community');
+  };
 
   return (
     <CWContentPage
@@ -667,22 +705,30 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     />
                   )}
                 </>
-              ) : !isGloballyEditing && canComment && isLoggedIn ? (
+              ) : !isGloballyEditing && isLoggedIn ? (
                 <>
                   {threadOptionsComp}
                   <CreateComment
                     updatedCommentsCallback={updatedCommentsCallback}
                     rootThread={thread}
+                    canComment={canComment}
                   />
-                  <CWBanner
-                    className="join-community-banner"
-                    title="Want to contribute to this discussion?"
-                    body="Join now to engage in discussions, leave comments, reply to others,
+                  {showBanner && (
+                    <CWBanner
+                      className="join-community-banner"
+                      title="Want to contribute to this discussion?"
+                      body="Join now to engage in discussions, leave comments, reply to others,
                     upvote content, and enjoy a host of additional features."
-                    buttons={[
-                      { label: 'Join community', buttonType: 'primary' },
-                    ]}
-                  />
+                      buttons={[
+                        {
+                          label: 'Join community',
+                          buttonType: 'primary',
+                          onClick: handleJoinCommunity,
+                        },
+                      ]}
+                      onClose={handleCloseBanner}
+                    />
+                  )}
                 </>
               ) : null}
             </>
@@ -732,6 +778,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             setIsReplying={setIsReplying}
             parentCommentId={parentCommentId}
             setParentCommentId={setParentCommentId}
+            canComment={canComment}
           />
         </>
       }
