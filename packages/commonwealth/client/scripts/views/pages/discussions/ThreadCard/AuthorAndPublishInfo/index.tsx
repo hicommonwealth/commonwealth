@@ -83,7 +83,7 @@ export const AuthorAndPublishInfo = ({
         <>
           {dotIndicator}
           <CWText type="caption" className="discord-author">
-            author:
+            by
             <b>{discord_meta?.user?.username}</b>
           </CWText>
         </>

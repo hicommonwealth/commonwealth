@@ -77,6 +77,7 @@ export const modelFromServer = (comment) => {
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
           canvasHash: comment.canvas_hash,
+          discord_meta: comment.discord_meta,
         }
       : {
           chain: comment.chain,
@@ -97,6 +98,7 @@ export const modelFromServer = (comment) => {
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
           canvasHash: comment.canvas_hash,
+          discord_meta: comment.discord_meta,
         };
 
   return new Comment(commentParams);
