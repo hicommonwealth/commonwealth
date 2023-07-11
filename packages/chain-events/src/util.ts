@@ -149,31 +149,6 @@ export async function createListener(
   return listener;
 }
 
-export function populateRange(
-  range: IDisconnectedRange,
-  currentBlock: number
-): IDisconnectedRange {
-  // populate range fully if not given
-  if (!range) {
-    range = { startBlock: 0 };
-  } else if (!range.startBlock) {
-    range.startBlock = 0;
-  } else if (range.startBlock >= currentBlock) {
-    throw new Error(
-      `Start block ${range.startBlock} greater than current block ${currentBlock}!`
-    );
-  }
-  if (!range.endBlock) {
-    range.endBlock = currentBlock;
-  }
-  if (range.startBlock >= range.endBlock) {
-    throw new Error(
-      `Invalid fetch range: ${range.startBlock}-${range.endBlock}.`
-    );
-  }
-  return range;
-}
-
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
  * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding

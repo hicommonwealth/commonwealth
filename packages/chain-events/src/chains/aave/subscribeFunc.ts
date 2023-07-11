@@ -39,9 +39,7 @@ export async function createApi(
       );
       await governanceContract.deployed();
 
-      return {
-        governance: governanceContract,
-      };
+      return governanceContract;
     } catch (err) {
       log.error(
         `Aave ${governanceAddress} at ${ethNetworkUrl} failure: ${err.message}`

@@ -3,6 +3,7 @@ import { ethers, providers } from 'ethers';
 import { addPrefix, factory } from './logging';
 import { JsonRpcProvider, Log } from '@ethersproject/providers';
 import { EvmEventSourceMapType } from 'chain-events/src/interfaces';
+import { decimalToHex } from 'chain-events/src/util';
 
 export async function createProvider(
   ethNetworkUrl: string,
@@ -60,20 +61,20 @@ export async function getRawEvents(
   blockRange: { start: number; end?: number },
   verbose = false
 ) {
+  // some RPC nodes like Celo don't support more than 1000 blocks at a time so this is a safe upper limit
   const MAX_BLOCK_RANGE = 500;
   let { start, end } = blockRange;
   const rawEvents = [];
+  // if end is not given then go until the latest block number
   if (!end) end = await provider.getBlockNumber();
 
   while (start <= end) {
-    // if end is not given then go until the latest block number
-    if (!end) end = await provider.getBlockNumber();
     const toBlock = Math.min(start + MAX_BLOCK_RANGE, end);
 
     const logs: Log[] = await provider.send('eth_getLogs', [
       {
-        fromBlock: ethers.BigNumber.from(start).toHexString(),
-        toBlock: ethers.BigNumber.from(toBlock).toHexString(),
+        fromBlock: decimalToHex(start),
+        toBlock: decimalToHex(toBlock),
         address: Object.keys(eventSources),
       },
     ]);

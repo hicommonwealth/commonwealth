@@ -133,40 +133,14 @@ export class Listener extends BaseListener<any, any, any, any, any> {
   }
 
   private getEventSourceMap(): EvmEventSourceMapType {
-    if (this.listenerBase === 'aave') {
-      const gov = this._api.governance;
-      const aaveToken = this._api.aaveToken;
-      const stkAaveToken = this._api.stkAaveToken;
-      return {
-        [gov.address.toLowerCase()]: {
-          eventSignatures: Object.keys(gov.interface.events).map((x) =>
-            ethers.utils.id(x)
-          ),
-          api: gov.interface,
-        },
-        [aaveToken.address.toLowerCase()]: {
-          eventSignatures: Object.keys(aaveToken.interface.events).map((x) =>
-            ethers.utils.id(x)
-          ),
-          api: aaveToken.interface,
-        },
-        [stkAaveToken.address.toLowerCase()]: {
-          eventSignatures: Object.keys(stkAaveToken.interface.events).map((x) =>
-            ethers.utils.id(x)
-          ),
-          api: stkAaveToken.interface,
-        },
-      };
-    } else {
-      return {
-        [this._api.address.toLowerCase()]: {
-          eventSignatures: Object.keys(this._api.interface.events).map((x) =>
-            ethers.utils.id(x)
-          ),
-          api: this._api.interface,
-        },
-      };
-    }
+    return {
+      [this._api.address.toLowerCase()]: {
+        eventSignatures: Object.keys(this._api.interface.events).map((x) =>
+          ethers.utils.id(x)
+        ),
+        api: this._api.interface,
+      },
+    };
   }
 
   private async processMissedBlocks(): Promise<void> {
@@ -219,7 +193,7 @@ export class Listener extends BaseListener<any, any, any, any, any> {
   public async isConnected(): Promise<boolean> {
     // force type to any because the Ethers Provider interface does not include the original
     // Web3 provider, yet it exists under provider.provider
-    return !!this.getProvider().provider;
+    return !!this.getProvider();
   }
 
   public async fetchEvents(blockRange: { start: number; end?: number }) {
@@ -250,22 +224,10 @@ export class Listener extends BaseListener<any, any, any, any, any> {
   }
 
   public getProvider() {
-    if (this.listenerBase === 'aave') {
-      return this._api.governance.provider;
-    } else {
-      return this._api.provider;
-    }
+    return this._api.provider;
   }
 
   public getContractAddresses(): string[] {
-    if (this.listenerBase === 'aave') {
-      return [
-        this._api.governance.address,
-        this._api.aaveToken.address,
-        this._api.stkAaveToken.address,
-      ];
-    } else {
-      return [this._api.address];
-    }
+    return [this._api.address];
   }
 }

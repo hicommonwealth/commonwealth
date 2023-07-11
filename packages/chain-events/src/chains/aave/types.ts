@@ -11,18 +11,7 @@ export type Proposal = UnPromisify<
   ReturnType<IAaveGovernanceV2['getProposalById']>
 >;
 
-// API is imported contracts classes
-interface IAaveContracts {
-  governance: IAaveGovernanceV2;
-}
-
-export interface ListenerOptions {
-  url: string;
-  govContractAddress: string;
-  skipCatchup?: boolean;
-}
-
-export type Api = IAaveContracts;
+export type Api = IAaveGovernanceV2;
 
 // creates a FilterEventTypes mapped type that iterates over all the keys of the filters object,
 // gets the return type of each function using ReturnType, and then returns an object with the
