@@ -78,7 +78,7 @@ export class Subscriber {
     cb: (event: RawEvent) => void
   ) {
     const currentBlockNum = await provider.getBlockNumber();
-    console.log('Subscriber polled current block number:', currentBlockNum);
+    this.log.info(`Subscriber polled current block number: ${currentBlockNum}`);
     if (
       this.lastCachedBlockNumber.get() &&
       this.lastCachedBlockNumber.get() != currentBlockNum

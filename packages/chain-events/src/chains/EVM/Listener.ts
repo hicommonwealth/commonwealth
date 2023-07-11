@@ -35,17 +35,11 @@ export class Listener extends BaseListener<any, any, any, any, any> {
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    if (listenerBase === 'aave') {
-      super(SupportedNetwork.Aave, chain, verbose);
-      this.log = factory.getLogger(
-        addPrefix(__filename, [SupportedNetwork.Aave, this._chain])
-      );
-    } else {
-      super(SupportedNetwork.Compound, chain, verbose);
-      this.log = factory.getLogger(
-        addPrefix(__filename, [SupportedNetwork.Compound, this._chain])
-      );
-    }
+    // the listenerBase has the same format as SupportedNetwork so this avoids a pointless conditional
+    super(<SupportedNetwork>listenerBase, chain, verbose);
+    this.log = factory.getLogger(
+      addPrefix(__filename, [listenerBase, this._chain])
+    );
 
     this._options = {
       url,
