@@ -913,37 +913,38 @@ function setupRouter(
     getLinks.bind(this, models)
   );
 
-  // spam
-  router.post(
-    '/threads/:id/mark-as-spam',
+  // thread spam
+  router.put(
+    '/threads/:id/spam',
     passport.authenticate('jwt', { session: false }),
     markThreadAsSpam.bind(this, models)
   );
-  router.post(
-    '/threads/:id/unmark-as-spam',
+  router.delete(
+    '/threads/:id/spam',
     passport.authenticate('jwt', { session: false }),
     unmarkThreadAsSpam.bind(this, models)
   );
 
-  // archive
-  router.post(
+  // thread archive
+  router.put(
     '/threads/:id/archive',
     passport.authenticate('jwt', { session: false }),
     archiveThreadHandler.bind(this, serverControllers)
   );
-  router.post(
-    '/threads/:id/unarchive',
+  router.delete(
+    '/threads/:id/archive',
     passport.authenticate('jwt', { session: false }),
     unarchiveThreadHandler.bind(this, serverControllers)
   );
 
-  router.post(
-    '/comments/:id/mark-as-spam',
+  // comment spam
+  router.put(
+    '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     markCommentAsSpam.bind(this, models)
   );
-  router.post(
-    '/comments/:id/unmark-as-spam',
+  router.delete(
+    '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     unmarkCommentAsSpam.bind(this, models)
   );
