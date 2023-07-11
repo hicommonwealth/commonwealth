@@ -57,10 +57,14 @@ const DiscordForumConnections = ({
 
   return (
     <div className="DiscordForumConnections">
-      <div className="TopicRow">
-        <CWText className="HeaderText">Channel</CWText>
-        <CWText>Topic</CWText>
-      </div>
+      {channels.length > 0 ? (
+        <div className="TopicRow">
+          <CWText className="HeaderText">Channel</CWText>
+          <CWText>Topic</CWText>
+        </div>
+      ) : (
+        <CWText>Add a forum channel in your Discord server</CWText>
+      )}
 
       {channels.map((channel) => {
         const connectedTopic = topics.find(
