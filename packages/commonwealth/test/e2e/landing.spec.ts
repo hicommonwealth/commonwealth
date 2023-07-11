@@ -28,9 +28,8 @@ test.describe('Commonwealth Homepage', () => {
     // This is loaded in after all other bundles are loaded in. The landing page should have 2 initial bundles and 2
     // Loaded in bundles for the page itself. If it is more, then we have accidentally added an extra bundle into the
     // build.
-    expect(loadedJsBundles[loadedJsBundles.length - 1]).toContain(
-      'client_scripts_views_pages_landing_index_tsx.5d36c013.chunk.js'
-    );
+    const landingChunkRegex = /client_scripts_views_pages_landing_index_tsx\.[a-fA-F0-9]+\.chunk\.js$/;
+    expect(loadedJsBundles[loadedJsBundles.length - 1]).toMatch(landingChunkRegex);
 
     await page.waitForTimeout(100);
     expect(loadedJsBundles.length).toEqual(4);
