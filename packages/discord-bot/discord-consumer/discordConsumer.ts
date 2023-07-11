@@ -63,7 +63,7 @@ async function consumeMessages() {
         };
 
         const response = await axios.post(
-          `${SERVER_URL}/api/bot/createThread`,
+          `${SERVER_URL}/api/bot/threads`,
           create_thread
         );
         console.log(response.status, response.statusText)

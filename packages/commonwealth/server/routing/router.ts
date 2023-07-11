@@ -356,11 +356,11 @@ function setupRouter(
   );
 
   router.post(
-    '/bot/createThread',
+    '/bot/threads',
     databaseValidationService.validateBotUser,
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
-    createThread.bind(this, models, tokenBalanceCache, banCache)
+    createThreadHandler.bind(this, serverControllers)
   );
 
   router.patch(

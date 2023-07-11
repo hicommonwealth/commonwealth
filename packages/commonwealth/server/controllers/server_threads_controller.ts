@@ -1053,7 +1053,8 @@ export class ServerThreadsController implements IServerThreadsController {
     attachments?: any,
     canvasAction?: any,
     canvasSession?: any,
-    canvasHash?: any
+    canvasHash?: any,
+    discord_meta?: any,
   ): Promise<[ThreadAttributes, NotificationOptions[], AnalyticsOptions]> {
     if (kind === 'discussion') {
       if (!title || !title.trim()) {
@@ -1127,6 +1128,7 @@ export class ServerThreadsController implements IServerThreadsController {
       canvas_action: canvasAction,
       canvas_session: canvasSession,
       canvas_hash: canvasHash,
+      discord_meta
     };
 
     // begin essential database changes within transaction
