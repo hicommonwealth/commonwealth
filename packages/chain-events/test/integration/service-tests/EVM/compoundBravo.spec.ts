@@ -405,7 +405,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
   });
 
-  describe('Tests the Compound listener catch-up using the cahin subscriber', async () => {
+  describe('Tests the Compound listener catch-up using the chain subscriber', async () => {
     let createdBlock;
     before(async () => {
       events = {};
