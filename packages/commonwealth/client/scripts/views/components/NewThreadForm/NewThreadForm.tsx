@@ -23,6 +23,12 @@ import {
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import moment from 'moment';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import { TOSModal } from 'views/components/Header/TOSModal';
+import { LoginModal } from 'views/modals/login_modal';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 
 const JOIN_COMMUNITY_BANNER_KEY = (communityId) =>
   `${communityId}-joinCommunityBannerClosedAt`;
@@ -33,11 +39,16 @@ export const NewThreadForm = () => {
     chainId: app.activeChainId(),
   });
   const [isBannerVisible, setIsBannerVisible] = useState(false);
-  const [hasJoinedCommunity, setHasJoinedCommunity] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
+    useState(false);
+  const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
 
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
+  const activeChainInfo = app.chain?.meta;
 
   const topicsForSelector =
     topics ||
@@ -64,6 +75,18 @@ export const NewThreadForm = () => {
     isDisabled,
     clearDraft,
   } = useNewThreadForm(chainId, topicsForSelector);
+
+  const {
+    handleJoinCommunity,
+    sameBaseAddressesRemoveDuplicates,
+    performJoinCommunityLinking,
+    linkToCommunity,
+  } = useJoinCommunity({
+    setIsAccountSelectorModalOpen,
+    setIsLoginModalOpen,
+    setIsTOSModalOpen,
+    setIsJoined,
+  });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -147,14 +170,8 @@ export const NewThreadForm = () => {
     const activeAccounts = app.user?.activeAccounts?.filter(
       (a) => a.chain.id === app.chain.id
     );
-    setHasJoinedCommunity(
-      !!app.user.activeAccount || activeAccounts.length > 0
-    );
+    setIsJoined(!!app.user.activeAccount || activeAccounts.length > 0);
   }, []);
-
-  const handleJoinCommunity = () => {
-    console.log('click handle join community');
-  };
 
   const handleCloseBanner = () => {
     localStorage.setItem(
@@ -164,7 +181,7 @@ export const NewThreadForm = () => {
     setIsBannerVisible(false);
   };
 
-  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const showBanner = !isJoined && isBannerVisible;
 
   return (
     <>
@@ -214,6 +231,7 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
+              isDisabled={!isJoined}
             />
 
             <div className="buttons-row">
@@ -229,7 +247,7 @@ export const NewThreadForm = () => {
                 label={
                   app.user.activeAccount ? 'Post' : 'Join community to create'
                 }
-                disabled={isDisabled}
+                disabled={isDisabled || !isJoined}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
                 buttonWidth="wide"
@@ -255,6 +273,49 @@ export const NewThreadForm = () => {
           </div>
         </div>
       </div>
+      <Modal
+        content={
+          <AccountSelector
+            accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
+              address: addressInfo.address,
+            }))}
+            walletNetwork={activeChainInfo?.network}
+            walletChain={activeChainInfo?.base}
+            onSelect={async (accountIndex) => {
+              await linkToCommunity(accountIndex);
+              setIsAccountSelectorModalOpen(false);
+            }}
+            onModalClose={() => setIsAccountSelectorModalOpen(false)}
+          />
+        }
+        onClose={() => setIsAccountSelectorModalOpen(false)}
+        open={isAccountSelectorModalOpen}
+      />
+      <Modal
+        content={
+          <TOSModal
+            onAccept={async () => {
+              await performJoinCommunityLinking();
+              setIsTOSModalOpen(false);
+              setIsJoined(true);
+            }}
+            onModalClose={() => setIsTOSModalOpen(false)}
+          />
+        }
+        onClose={() => setIsTOSModalOpen(false)}
+        open={isTOSModalOpen}
+      />
+      <Modal
+        content={
+          <LoginModal
+            onSuccess={() => setIsJoined(true)}
+            onModalClose={() => setIsLoginModalOpen(false)}
+          />
+        }
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsLoginModalOpen(false)}
+        open={isLoginModalOpen}
+      />
     </>
   );
 };
