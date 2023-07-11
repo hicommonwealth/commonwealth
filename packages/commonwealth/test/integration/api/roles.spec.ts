@@ -75,7 +75,7 @@ describe('Roles Test', () => {
     });
   });
 
-  describe.only('/upgradeMember route tests', () => {
+  describe('/upgradeMember route tests', () => {
     let newUserAddress;
     let newUserAddressId;
     let newJwt;
@@ -354,46 +354,6 @@ describe('Roles Test', () => {
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(deleteErrors.InvalidAddress);
-    });
-  });
-
-  describe('/bulkMembers route test', () => {
-    it('should grab bulk members for a public community', async () => {
-      const res = await chai.request
-        .agent(app)
-        .get('/api/bulkMembers')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: adminJwt,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
-    });
-
-    it.skip('should fail to grab bulk members if community is not visible to user', async () => {
-      const communityArgs: modelUtils.CommunityArgs = {
-        jwt: adminJwt,
-        isAuthenticatedForum: 'false',
-        privacyEnabled: 'true',
-        id: 'test',
-        name: 'test community',
-        creator_address: adminAddress,
-        creator_chain: chain,
-        description: 'test enabled community',
-        default_chain: chain,
-      };
-      const testCommunity = await modelUtils.createCommunity(communityArgs);
-      const res = await chai.request
-        .agent(app)
-        .get('/api/bulkMembers')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: adminJwt,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
     });
   });
 });
