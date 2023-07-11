@@ -38,6 +38,7 @@ interface CWBannerProps {
   body?: string;
   buttons: ButtonProps[];
   className?: string;
+  onClose: () => void;
 }
 
 const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
@@ -58,6 +59,7 @@ const CWBanner = ({
   body,
   buttons,
   className,
+  onClose,
 }: CWBannerProps) => {
   const TypeIcon = typeIconLookup[type];
 
@@ -95,7 +97,7 @@ const CWBanner = ({
         )}
       </div>
       <div className="close-icon-container">
-        <X weight="light" size={20} className="close-icon" />
+        <X weight="light" size={20} className="close-icon" onClick={onClose} />
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -22,12 +22,19 @@ import {
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
+import moment from 'moment';
+
+const JOIN_COMMUNITY_BANNER_KEY = (communityId) =>
+  `${communityId}-joinCommunityBannerClosedAt`;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
+  const [isBannerVisible, setIsBannerVisible] = useState(false);
+  const [hasJoinedCommunity, setHasJoinedCommunity] = useState(false);
+
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
@@ -121,6 +128,44 @@ export const NewThreadForm = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
+  useEffect(() => {
+    const bannerClosedAt = Number(
+      localStorage.getItem(JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()))
+    );
+
+    if (!bannerClosedAt) {
+      setIsBannerVisible(true);
+      return;
+    }
+
+    const timeDifference = moment().diff(moment(bannerClosedAt), 'week');
+    const bannerClosedMoreThanWeekAgo = timeDifference >= 1;
+    setIsBannerVisible(bannerClosedMoreThanWeekAgo);
+  }, []);
+
+  useEffect(() => {
+    const activeAccounts = app.user?.activeAccounts?.filter(
+      (a) => a.chain.id === app.chain.id
+    );
+    setHasJoinedCommunity(
+      !!app.user.activeAccount || activeAccounts.length > 0
+    );
+  }, []);
+
+  const handleJoinCommunity = () => {
+    console.log('click handle join community');
+  };
+
+  const handleCloseBanner = () => {
+    localStorage.setItem(
+      JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()),
+      String(Date.now())
+    );
+    setIsBannerVisible(false);
+  };
+
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
+
   return (
     <>
       <div className="NewThreadForm">
@@ -191,13 +236,22 @@ export const NewThreadForm = () => {
               />
             </div>
 
-            <CWBanner
-              className="join-community-banner"
-              title="Want to contribute to this discussion?"
-              body="Join now to engage in discussions, leave comments, reply to others,
+            {showBanner && (
+              <CWBanner
+                className="join-community-banner"
+                title="Want to contribute to this discussion?"
+                body="Join now to engage in discussions, leave comments, reply to others,
                     upvote content, and enjoy a host of additional features."
-              buttons={[{ label: 'Join community', buttonType: 'primary' }]}
-            />
+                onClose={handleCloseBanner}
+                buttons={[
+                  {
+                    label: 'Join community',
+                    buttonType: 'primary',
+                    onClick: handleJoinCommunity,
+                  },
+                ]}
+              />
+            )}
           </div>
         </div>
       </div>
