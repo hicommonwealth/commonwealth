@@ -519,6 +519,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : moment(b.createdAt).diff(moment(a.createdAt))
   );
 
+  const fromDiscordBot =
+    thread.discord_meta !== null && thread.discord_meta !== undefined;
+
+  const showLocked =
+    (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
+
   return (
     <CWContentPage
       showTabs={isCollapsedSize && tabsShouldBePresent}
@@ -645,7 +651,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ) : (
             <>
               <QuillRenderer doc={thread.body} cutoffLines={50} />
-              {thread.readOnly ? (
+              {thread.readOnly || fromDiscordBot ? (
                 <>
                   {threadOptionsComp}
                   {!thread.readOnly && thread.markedAsSpamAt && (
@@ -658,10 +664,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       </CWText>
                     </div>
                   )}
-                  {thread.readOnly && !thread.markedAsSpamAt && (
+                  {showLocked && (
                     <LockMessage
                       lockedAt={thread.lockedAt}
                       updatedAt={thread.updatedAt}
+                      fromDiscordBot={fromDiscordBot}
                     />
                   )}
                 </>
@@ -717,6 +724,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             thread={thread}
             setIsGloballyEditing={setIsGloballyEditing}
             updatedCommentsCallback={updatedCommentsCallback}
+            fromDiscordBot={fromDiscordBot}
           />
         </>
       }

@@ -27,6 +27,7 @@ type CommentsTreeAttrs = {
   setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
   includeSpams: boolean;
+  fromDiscordBot?: boolean;
 };
 
 export const CommentsTree = ({
@@ -35,6 +36,7 @@ export const CommentsTree = ({
   setIsGloballyEditing,
   updatedCommentsCallback,
   includeSpams,
+  fromDiscordBot,
 }: CommentsTreeAttrs) => {
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
@@ -57,7 +59,8 @@ export const CommentsTree = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
-  const isLocked = !!(thread instanceof Thread && thread.readOnly);
+  const isLocked =
+    fromDiscordBot || !!(thread instanceof Thread && thread.readOnly);
 
   useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
