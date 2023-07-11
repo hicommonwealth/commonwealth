@@ -1,5 +1,3 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
-
 import type {
   IDisconnectedRange,
   IEventProcessor,
@@ -9,7 +7,6 @@ import type {
   IEventLabel,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
-import { Listener as SubstrateListener } from './chains/substrate/Listener';
 import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import { Listener as EvmListener } from './chains/EVM';
 import { Label as CompoundLabel } from './chains/compound';
@@ -25,6 +22,7 @@ import {
 } from './chains/cosmos';
 import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
+import { ethers } from 'ethers';
 
 export function Label(chain: string, event: CWEvent): IEventLabel {
   switch (event.network) {
@@ -62,7 +60,6 @@ export async function createListener(
     skipCatchup?: boolean;
     startBlock?: number;
     archival?: boolean;
-    spec?: RegisteredTypes;
     url?: string;
     enricherConfig?: any;
     pollTime?: number;
@@ -86,20 +83,7 @@ export async function createListener(
   >;
   const log = factory.getLogger(addPrefix(__filename, [network, chain]));
 
-  if (network === SupportedNetwork.Substrate) {
-    // start a substrate listener
-    listener = new SubstrateListener(
-      chain,
-      options.url,
-      options.spec,
-      !!options.archival,
-      options.startBlock || 0,
-      !!options.skipCatchup,
-      options.enricherConfig,
-      !!options.verbose,
-      options.discoverReconnectRange
-    );
-  } else if (network === SupportedNetwork.Compound) {
+  if (network === SupportedNetwork.Compound) {
     // TODO: @Timothee - Remove any type once listeners are combined
     listener = <any>(
       new EvmListener(
@@ -188,4 +172,19 @@ export function populateRange(
     );
   }
   return range;
+}
+
+/**
+ * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
+ * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding
+ * @param decimal
+ */
+export function decimalToHex(decimal: number | string) {
+  if (decimal == '0') {
+    return '0x0';
+  } else {
+    return ethers.utils.hexStripZeros(
+      ethers.BigNumber.from(decimal).toHexString()
+    );
+  }
 }

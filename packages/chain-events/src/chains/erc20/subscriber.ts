@@ -18,6 +18,7 @@ import Timeout = NodeJS.Timeout;
 import { ethers } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
+import { decimalToHex } from 'chain-events/src';
 
 export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   private _name: string;
@@ -92,10 +93,8 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     ) {
       const logs: Log[] = await provider.send('eth_getLogs', [
         {
-          fromBlock: ethers.BigNumber.from(
-            this._lastCachedBlockNumber.get() + 1
-          ).toHexString(),
-          toBlock: ethers.BigNumber.from(currentBlockNum).toHexString(),
+          fromBlock: decimalToHex(this._lastCachedBlockNumber.get() + 1),
+          toBlock: decimalToHex(currentBlockNum),
           address: this._api.tokens.map((t) =>
             t.contract.address.toLowerCase()
           ),

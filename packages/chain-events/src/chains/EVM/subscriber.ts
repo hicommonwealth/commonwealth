@@ -7,6 +7,7 @@ import Timeout = NodeJS.Timeout;
 import { getRawEvents } from 'chain-events/src/eth';
 import { RawEvent } from 'chain-events/src/chains/EVM/types';
 import { LastCachedBlockNumber } from 'chain-events/src/LastCachedBlockNumber';
+import { decimalToHex } from 'chain-events/src';
 
 export class Subscriber {
   private readonly _name: string;
