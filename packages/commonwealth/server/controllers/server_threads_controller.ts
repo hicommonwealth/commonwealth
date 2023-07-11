@@ -31,16 +31,16 @@ import { Op, QueryTypes } from 'sequelize';
 import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 import { PaginationSqlBind, buildPaginationSql } from '../util/queries';
 import { getLastEdited } from '../util/getLastEdited';
-import { ServerError } from '../../../common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
   BanError: 'Ban error',
-  BalanceCheckFailed: 'Could not verify user token balance',
-
+  InsufficientTokenBalance: 'Insufficient token balance',
   InvalidParent: 'Invalid parent',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
+  BalanceCheckFailed: 'Could not verify user token balance',
 
   NotOwned: 'Not owned by this user',
 
@@ -54,8 +54,6 @@ export const Errors = {
   NoBodyOrAttachments: 'Discussion posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only discussion and link posts supported',
-  InsufficientTokenBalance:
-    "Users need to hold some of the community's tokens to post",
   FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
 };
@@ -330,14 +328,20 @@ export class ServerThreadsController implements IServerThreadsController {
       const isGodMode = user.isAdmin;
       const hasAdminRole = addressAdminRoles.length > 0;
       if (!isGodMode && !hasAdminRole) {
-        const canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
+        let canReact;
+        try {
+          canReact = await validateTopicThreshold(
+            this.tokenBalanceCache,
+            this.models,
+            thread.topic_id,
+            address.address
+          );
+        } catch (e) {
+          throw new ServerError(Errors.BalanceCheckFailed, e);
+        }
+
         if (!canReact) {
-          throw new Error(Errors.BalanceCheckFailed);
+          throw new AppError(Errors.InsufficientTokenBalance);
         }
       }
     }
@@ -473,14 +477,20 @@ export class ServerThreadsController implements IServerThreadsController {
       const isGodMode = user.isAdmin;
       const hasAdminRole = addressAdminRoles.length > 0;
       if (!isGodMode && !hasAdminRole) {
-        const canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
+        let canReact;
+        try {
+          canReact = await validateTopicThreshold(
+            this.tokenBalanceCache,
+            this.models,
+            thread.topic_id,
+            address.address
+          );
+        } catch (e) {
+          throw new ServerError(Errors.BalanceCheckFailed, e);
+        }
+
         if (!canReact) {
-          throw new Error(Errors.BalanceCheckFailed);
+          throw new AppError(Errors.InsufficientTokenBalance);
         }
       }
     }
@@ -1154,14 +1164,20 @@ export class ServerThreadsController implements IServerThreadsController {
             ['admin']
           );
           if (!user.isAdmin && isAdmin.length === 0) {
-            const canReact = await validateTopicThreshold(
-              this.tokenBalanceCache,
-              this.models,
-              topicId,
-              address.address
-            );
+            let canReact;
+            try {
+              canReact = await validateTopicThreshold(
+                this.tokenBalanceCache,
+                this.models,
+                topicId,
+                address.address
+              );
+            } catch (e) {
+              throw new ServerError(Errors.BalanceCheckFailed, e);
+            }
+
             if (!canReact) {
-              throw new Error(Errors.BalanceCheckFailed);
+              throw new AppError(Errors.InsufficientTokenBalance);
             }
           }
         }
