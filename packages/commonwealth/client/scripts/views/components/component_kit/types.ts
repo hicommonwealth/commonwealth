@@ -42,9 +42,11 @@ export enum ComponentType {
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',
+  ThreadAction = 'ThreadAction',
   ThreadVoteButton = 'ThreadVoteButton',
   Toggle = 'Toggle',
   Tooltip = 'Tooltip',
+  Upvote = 'Upvote',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
 }
