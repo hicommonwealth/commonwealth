@@ -79,6 +79,7 @@ const abi = [
 export const ProtocolCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
   const [loading, setLoading] = useState<boolean>(false);
+  const [gate, setGate] = useState<string>('');
 
   const { id, setId, name, setName, symbol, setSymbol } =
     useChainFormIdFields();
@@ -118,6 +119,13 @@ export const ProtocolCommunityForm = () => {
         options={[{ label: 'ethereum', value: 'ethereum' }]}
         onSelect={(o) => {
           setBase(o.value as ChainBase);
+        }}
+      />
+      <InputRow
+        title="Gate Address(Optional)"
+        value={gate}
+        onChangeHandler={(v) => {
+          setGate(v);
         }}
       />
       {defaultChainRows(chainFormDefaultFields)}
