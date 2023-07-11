@@ -107,10 +107,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
       // get title and description from 1st message if no top-level title/desc
       if (!title) title = content?.title;
       if (!description) description = content?.description;
-      return {
-        typeUrl: m.type_url,
-        value: m.value,
-      };
+      return m;
     });
   }
 
