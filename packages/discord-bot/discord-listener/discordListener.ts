@@ -64,6 +64,7 @@ client.on('messageCreate', async (message: Message) => {
       message_id: message.id,
       channel_id: message.channelId,
       parent_channel_id: parent_id,
+      guild_id: message.guildId
     };
 
     if (!message.nonce) new_message.title = channel.name;
