@@ -19,20 +19,20 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Roles Test', () => {
-  let jwtToken;
-  let loggedInAddr;
-  let loggedInAddrId;
+  let adminJwt;
+  let adminAddress;
+  let adminAddressId;
   let adminUserId;
   const chain = 'ethereum';
 
   before('reset database', async () => {
     await resetDatabase();
     const res = await modelUtils.createAndVerifyAddress({ chain });
-    loggedInAddr = res.address;
-    loggedInAddrId = res.address_id;
-    jwtToken = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    adminAddress = res.address;
+    adminAddressId = res.address_id;
+    adminJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     adminUserId = res.user_id;
-    const isAdmin = await modelUtils.updateRole({
+    await modelUtils.updateRole({
       address_id: res.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
@@ -67,7 +67,7 @@ describe('Roles Test', () => {
         .post('/api/createRole')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
         });
       expect(res.body.error).to.not.be.null;
@@ -75,7 +75,7 @@ describe('Roles Test', () => {
     });
   });
 
-  describe('/upgradeMember route tests', () => {
+  describe.only('/upgradeMember route tests', () => {
     let newUserAddress;
     let newUserAddressId;
     let newJwt;
@@ -89,7 +89,7 @@ describe('Roles Test', () => {
         newUserAddressId = res.address_id;
         newJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
         newUserId = res.user_id;
-        const isMember = await modelUtils.updateRole({
+        await modelUtils.updateRole({
           address_id: newUserAddressId,
           chainOrCommObj: { chain_id: chain },
           role: 'member',
@@ -97,48 +97,68 @@ describe('Roles Test', () => {
       }
     );
 
-    it('should pass when admin upgrades new member', async () => {
-      const role = 'moderator';
-      const res = await chai
+    afterEach(async () => {
+      await models.Address.destroy({
+        where: {
+          id: newUserAddressId,
+        },
+      });
+    });
+
+    it('should be able to upgrade a member or moderator as an admin', async () => {
+      const modRole = 'moderator';
+      const modRes = await chai
         .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
           address: newUserAddress,
-          new_role: role,
+          new_role: modRole,
         });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.permission).to.be.equal(role);
+      expect(modRes.body.status).to.be.equal('Success');
+      expect(modRes.body.result.permission).to.be.equal(modRole);
+
+      const adminRole = 'admin';
+      const adminRes = await chai
+        .request(app)
+        .post('/api/upgradeMember')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJwt,
+          chain,
+          address: newUserAddress,
+          new_role: adminRole,
+        });
+      expect(adminRes.body.status).to.be.equal('Success');
+      expect(adminRes.body.result.permission).to.be.equal(adminRole);
     });
 
     it('should fail when admin upgrades without address', async () => {
-      const role = 'moderator';
       const res = await chai
         .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
-          new_role: role,
+          new_role: 'moderator',
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(upgradeErrors.InvalidAddress);
     });
 
     it('should fail when admin upgrades invalid address', async () => {
-      const role = 'moderator';
       const res = await chai
         .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
           address: 'invalid address',
-          new_role: role,
+          new_role: 'moderator',
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(upgradeErrors.NoMember);
@@ -150,7 +170,7 @@ describe('Roles Test', () => {
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
           address: newUserAddress,
         });
@@ -164,7 +184,7 @@ describe('Roles Test', () => {
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
           address: newUserAddress,
           new_role: 'commander in chief',
@@ -189,17 +209,12 @@ describe('Roles Test', () => {
     });
 
     it('should fail to upgrade a nonexistent member', async () => {
-      const temp = await modelUtils.createAndVerifyAddress({ chain });
-      const tempJwt = jwt.sign(
-        { id: temp.user_id, email: temp.email },
-        JWT_SECRET
-      );
       const res = await chai
         .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
           address: generateEthAddress().address,
           new_role: 'admin',
@@ -209,54 +224,49 @@ describe('Roles Test', () => {
     });
 
     it('should fail when the only admin demotes self', async () => {
-      const role = 'member';
       const res = await chai
         .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: adminJwt,
           chain,
-          address: loggedInAddr,
-          new_role: role,
+          address: adminAddress,
+          new_role: 'member',
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(upgradeErrors.MustHaveAdmin);
     });
 
     it('should pass when admin demotes self', async () => {
-      // set new user as new admin
-      const role = 'admin';
-      const res = await chai
-        .request(app)
-        .post('/api/upgradeMember')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          chain,
-          address: newUserAddress,
-          new_role: role,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.permission).to.be.equal(role);
+      await models.Address.update(
+        {
+          role: 'admin',
+        },
+        {
+          where: {
+            id: newUserAddressId,
+          },
+        }
+      );
 
-      const newAdminRole = 'member';
+      const role = 'member';
       const demoteRes = await chai
         .request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
         .send({
-          jwt: jwtToken,
+          jwt: newJwt,
           chain,
-          address: loggedInAddr,
-          new_role: newAdminRole,
+          address: newUserAddress,
+          new_role: role,
         });
       expect(demoteRes.body.status).to.be.equal('Success');
-      expect(demoteRes.body.result.permission).to.be.equal(newAdminRole);
+      expect(demoteRes.body.result.permission).to.be.equal(role);
     });
   });
 
-  describe.only('/deleteRole route tests', () => {
+  describe('/deleteRole route tests', () => {
     let memberAddress;
     let memberAddressId;
     let memberJwt;
@@ -355,7 +365,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .query({
           chain,
-          jwt: jwtToken,
+          jwt: adminJwt,
         });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.length).to.be.greaterThan(0);
@@ -363,12 +373,12 @@ describe('Roles Test', () => {
 
     it.skip('should fail to grab bulk members if community is not visible to user', async () => {
       const communityArgs: modelUtils.CommunityArgs = {
-        jwt: jwtToken,
+        jwt: adminJwt,
         isAuthenticatedForum: 'false',
         privacyEnabled: 'true',
         id: 'test',
         name: 'test community',
-        creator_address: loggedInAddr,
+        creator_address: adminAddress,
         creator_chain: chain,
         description: 'test enabled community',
         default_chain: chain,
@@ -380,7 +390,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .query({
           chain,
-          jwt: jwtToken,
+          jwt: adminJwt,
         });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.length).to.be.greaterThan(0);
