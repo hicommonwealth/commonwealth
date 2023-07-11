@@ -446,7 +446,7 @@ class ThreadsController {
   ) {
     await $.ajax({
       url: `${app.serverUrl()}/threads/${threadId}/archive`,
-      type: 'PATCH',
+      type: 'PUT',
       success: (response) => {
         const result = this.modelFromServer(response.result);
         this._store.update(result);
@@ -470,7 +470,7 @@ class ThreadsController {
   ) {
     await $.ajax({
       url: `${app.serverUrl()}/threads/${threadId}/unarchive`,
-      type: 'PATCH',
+      type: 'PUT',
       success: (response) => {
         const result = this.modelFromServer(response.result);
         this._store.update(result);
