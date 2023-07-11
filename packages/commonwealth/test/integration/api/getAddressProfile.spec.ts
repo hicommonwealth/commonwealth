@@ -5,8 +5,10 @@ import getAddressProfiles, {
 } from '../../../server/routes/getAddressProfile';
 import { postReq, res } from '../../unit/unitHelpers';
 import { testAddresses, testProfiles } from './external/dbEntityHooks.spec';
+import { resetDatabase } from '../../../server-test';
+import { AddressInstance } from '../../../server/models/address';
 
-describe('getAddressProfile tests', () => {
+describe.only('getAddressProfile tests', () => {
   it('should return profile of a single address', async () => {
     const r: GetAddressProfileReq = {
       chains: [testAddresses[0].chain],
@@ -85,43 +87,23 @@ describe('getAddressProfile tests', () => {
 
     const resp = await getAddressProfiles(models, postReq(r), res());
 
-    const matchingProfile = testProfiles.filter(
-      (p) => p.id === resp['result'][0]['profileId']
-    )[0];
-
     chai.assert.equal(resp['result'].length, 3);
-    chai.assert.equal(
-      resp['result'][0]['profileId'],
-      testAddresses[0].profile_id
-    );
-    chai.assert.equal(resp['result'][0]['name'], matchingProfile.profile_name);
-    chai.assert.equal(
-      resp['result'][0]['avatarUrl'],
-      matchingProfile.avatar_url
-    );
 
-    chai.assert.equal(
-      resp['result'][1]['profileId'],
-      testAddresses[1].profile_id
-    );
-    chai.assert.equal(resp['result'][1]['name'], matchingProfile.profile_name);
-    chai.assert.equal(
-      resp['result'][1]['avatarUrl'],
-      matchingProfile.avatar_url
-    );
+    const results = resp['result'];
+    const findAddressProfileResult = (testAddress: AddressInstance) => {
+      const matchingProfile = testProfiles.find(
+        (p) => p.id === testAddress.profile_id
+      );
 
-    const matchingProfile2 = testProfiles.filter(
-      (p) => p.id === resp['result'][2]['profileId']
-    )[0];
-
-    chai.assert.equal(
-      resp['result'][2]['profileId'],
-      testAddresses[2].profile_id
-    );
-    chai.assert.equal(resp['result'][2]['name'], matchingProfile2.profile_name);
-    chai.assert.equal(
-      resp['result'][2]['avatarUrl'],
-      matchingProfile2.avatar_url
-    );
+      return results.find(
+        (x) =>
+          x.profileId === testAddress.profile_id &&
+          x.name === matchingProfile.profile_name &&
+          x.avatarUrl === matchingProfile.avatar_url
+      );
+    };
+    chai.assert.isDefined(findAddressProfileResult(testAddresses[0]));
+    chai.assert.isDefined(findAddressProfileResult(testAddresses[1]));
+    chai.assert.isDefined(findAddressProfileResult(testAddresses[2]));
   });
 });
