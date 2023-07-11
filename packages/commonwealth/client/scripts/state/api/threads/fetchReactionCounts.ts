@@ -11,10 +11,12 @@ interface FetchThreadReactionCountsProps {
 }
 
 const fetchThreadReactionCounts = async ({ threadIds }: FetchThreadReactionCountsProps) => {
-  return await axios.post(`${app.serverUrl()}/reactionsCounts`, {
+  const response = await axios.post(`${app.serverUrl()}/reactionsCounts`, {
     thread_ids: threadIds,
     active_address: app.user.activeAccount?.address,
-  }).then((response) => ([...response.data.result]));
+  });
+
+  return [...response.data.result];
 };
 
 // TODO: when we migrate the threads controller to react query, then we should also implement cache logic below

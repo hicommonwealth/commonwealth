@@ -16,23 +16,25 @@ const deleteReaction = async ({ reactionId, threadId }: DeleteReactionProps) => 
     thread_id: threadId,
   });
 
-  return await axios.delete(`${app.serverUrl()}/reactions/${reactionId}`, {
+  const response = await axios.delete(`${app.serverUrl()}/reactions/${reactionId}`, {
     data: {
       jwt: app.user.jwt,
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,
     },
-  }).then((r) => ({
-    ...r,
+  });
+
+  return {
+    ...response,
     data: {
-      ...r.data,
+      ...response.data,
       result: {
         thread_id: threadId,
         reaction_id: reactionId,
       }
     }
-  }));
+  }
 };
 
 const useDeleteThreadReactionMutation = () => {
