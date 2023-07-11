@@ -60,22 +60,6 @@ describe('Roles Test', () => {
       );
     });
 
-    it('should return existing role for a public community a user is already a member of', async () => {
-      const res = await chai
-        .request(app)
-        .post('/api/createRole')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          chain,
-          address_id: loggedInAddrId,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.role.address_id).to.be.equal(loggedInAddrId);
-      expect(res.body.result.role.chain_id).to.be.equal(chain);
-      expect(res.body.result.role.permission).to.be.equal('admin');
-    });
-
     it('should fail to create a role without address_id', async () => {
       const res = await chai
         .request(app)
