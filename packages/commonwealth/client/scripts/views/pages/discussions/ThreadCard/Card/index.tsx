@@ -109,6 +109,7 @@ export const Card = ({
               {...(thread.updatedAt && {
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
+              discord_meta={thread.discord_meta}
             />
             <div className="content-header-icons">
               {isHot(thread) && <div className="flame" />}
@@ -138,10 +139,11 @@ export const Card = ({
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
                     )} 
-                        ${Number.isNaN(parseInt(link.identifier, 10))
-                        ? ''
-                        : ` #${link.identifier}`
-                      }`}
+                        ${
+                          Number.isNaN(parseInt(link.identifier, 10))
+                            ? ''
+                            : ` #${link.identifier}`
+                        }`}
                   />
                 ))}
             </div>

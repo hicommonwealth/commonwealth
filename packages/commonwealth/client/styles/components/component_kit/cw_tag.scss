@@ -65,12 +65,12 @@
   }
 
   &.disabled {
-    background-color: $neutral-300  !important;
+    background-color: $neutral-300 !important;
     border-radius: $border-radius-corners;
 
     .tag-text.Text,
     .tag-icon.Icon {
-      color: $white  !important;
+      color: $white !important;
     }
   }
 
@@ -101,6 +101,22 @@
 
     .tag-text.Text {
       color: $yellow-600;
+    }
+
+    .tag-icon.Icon {
+      stroke: $yellow-600;
+      padding: 0;
+      fill: none;
+    }
+  }
+
+  &.discord {
+    background-color: $purple-50;
+    border-radius: $border-radius-corners-wider;
+    padding: 4px 8px;
+
+    .tag-text.Text {
+      color: $purple-300;
     }
 
     .tag-icon.Icon {

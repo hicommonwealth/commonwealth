@@ -36,6 +36,11 @@ type ContentPageProps = {
   //
   lastEdited?: moment.Moment | number;
   author?: Account | AddressInfo | MinimumProfile | undefined;
+  discord_meta?: {
+    user: { id: string; username: string };
+    channel_id: string;
+    message_id: string;
+  };
   collaborators?: IThreadCollaborator[];
   body?: (children: ReactNode) => ReactNode;
   comments?: ReactNode;
@@ -72,6 +77,7 @@ type ContentPageProps = {
 export const CWContentPage = ({
   thread,
   author,
+  discord_meta,
   body,
   comments,
   contentBodyLabel,
@@ -119,6 +125,7 @@ export const CWContentPage = ({
           <ThreadAuthorAndPublishInfo
             showSplitDotIndicator={true}
             isNew={!!displayNewTag}
+            discord_meta={discord_meta}
             isLocked={thread?.readOnly}
             {...(thread?.lockedAt && {
               lockedAt: thread.lockedAt.toISOString(),
