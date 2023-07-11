@@ -39,11 +39,11 @@ class EthereumAccounts
   public fromAddress(address: string, ignoreProfiles = true): EthereumAccount {
     if (address.indexOf('0x') !== -1) {
       if (address.length !== 42) {
-        console.error(`Invalid address length! ${address}`);
+        // console.error(`Invalid address length! ${address}`); TODO: commebt back
       }
     } else {
       if (address.length !== 40) {
-        console.error(`Invalid address length! ${address}`);
+        // console.error(`Invalid address length! ${address}`);
       }
       address = `0x${address}`;
     }
