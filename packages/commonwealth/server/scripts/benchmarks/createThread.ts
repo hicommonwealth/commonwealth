@@ -5,7 +5,7 @@ import { syncPerformanceTester } from './util';
 const jwt =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIxMTMsImVtYWlsIjpudWxsLCJp' +
   'YXQiOjE2NTI2NzA4MDR9.WN5vxIaAcAzpNvTJiCeelm071yErhRtcEgXbA5iS-wA';
-const url = 'http://localhost:8080/api/createThread';
+const url = 'http://localhost:8080/api/threads';
 
 const options = {
   headers: {

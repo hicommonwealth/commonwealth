@@ -12,7 +12,7 @@ import Thread from '../../../models/Thread';
 import app from 'state';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
-import { CWButton } from '../component_kit/cw_button';
+import { CWButton } from '../component_kit/new_designs/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWValidationText } from '../component_kit/cw_validation_text';
@@ -39,14 +39,13 @@ export const CreateComment = ({
   updatedCommentsCallback,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
-    `new-thread-comment-${rootThread.id}`
+    !parentCommentId
+      ? `new-thread-comment-${rootThread.id}`
+      : `new-comment-reply-${parentCommentId}`
   );
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
-    if (handleIsReplying) {
-      return createDeltaFromText('');
-    }
     return restoreDraft() || createDeltaFromText('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -126,22 +125,18 @@ export const CreateComment = ({
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
       handleIsReplying(false);
-    } else {
-      clearDraft();
     }
+    clearDraft();
   };
 
   // on content updated, save draft
   useEffect(() => {
-    if (handleIsReplying) {
-      return;
-    }
     saveDraft(contentDelta);
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return (
     <>
-      {rootThread.archivedAt === null ? (
+      { rootThread.archivedAt === null ? (
         <div className="CreateComment">
           <div className="attribution-row">
             <div className="attribution-left-content">
@@ -175,32 +170,29 @@ export const CreateComment = ({
           <div className="form-bottom">
             <div className="form-buttons">
               {editorValue.length > 0 && (
-                <CWButton
-                  buttonType="secondary-blue"
-                  onClick={cancel}
-                  label="Cancel"
-                />
+                <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
               )}
               <CWButton
+                buttonWidth="wide"
                 disabled={disabled}
                 onClick={handleSubmitComment}
-                label="Submit"
+                label={parentType === ContentType.Comment ? 'Reply' : 'Comment'}
               />
             </div>
           </div>
         </div>
-    )
-    :
-      <div className="archive-msg-container">
-        <div className="archive-msg">
-        <CWIcon
-          iconName="archiveTrayFilled"
-          iconSize="small"
-        />
-        {`This thread was archived on ${rootThread.archivedAt.format('MM/DD/YYYY')}, meaning it can no longer be edited or commented on.`}
-        </div>
-      </div>
-  }
+      ): (
+          <div className="archive-msg-container">
+            <div className="archive-msg">
+            <CWIcon
+              iconName="archiveTrayFilled"
+              iconSize="small"
+            />
+            {`This thread was archived on ${rootThread.archivedAt.format('MM/DD/YYYY')}, meaning it can no longer be edited or commented on.`}
+            </div>
+          </div>
+        )
+      }
     </>
   );
 };
