@@ -130,6 +130,8 @@ export class CosmosProposal extends Proposal<
   private _Accounts: CosmosAccounts;
   private _Governance: CosmosGovernance;
 
+  private _isFetching: boolean;
+
   constructor(
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
@@ -148,7 +150,7 @@ export class CosmosProposal extends Proposal<
   }
 
   public async init() {
-    await this.fetchVoteInfo();
+    this.fetchVoteInfo();
 
     if (!this.initialized) {
       this._initialized = true;
@@ -159,6 +161,8 @@ export class CosmosProposal extends Proposal<
   }
 
   private async fetchVoteInfo() {
+    if (this._isFetching) return;
+    this._isFetching = true;
     const api = this._Chain.api;
     // only fetch voter data if active
     if (!this.data.state.completed) {
@@ -206,9 +210,11 @@ export class CosmosProposal extends Proposal<
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTally(tallyResp?.tally);
         }
-        this.isFetched.emit('redraw');
       } catch (err) {
-        console.error(`Cosmos query failed: ${err.message}`);
+        console.error(`Votes query failed: ${err.message}`);
+      } finally {
+        this._isFetching = false;
+        this.isFetched.emit('redraw');
       }
     }
   }

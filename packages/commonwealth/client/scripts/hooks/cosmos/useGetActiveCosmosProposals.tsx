@@ -16,12 +16,14 @@ interface Props {
   app: IApp;
   setIsLoading: UseStateSetter<boolean>;
   isLoading: boolean;
+  isApiReady?: boolean;
 }
 
 export const useGetActiveCosmosProposals = ({
   app,
   setIsLoading,
   isLoading,
+  isApiReady,
 }: Props): Response => {
   const [activeCosmosProposals, setActiveCosmosProposals] = useState<
     CosmosProposal[]
@@ -32,42 +34,33 @@ export const useGetActiveCosmosProposals = ({
   useEffect(() => {
     const cosmos = app.chain as Cosmos;
 
-    const getAndSetProposals = async () => {
-      const proposals = await getActiveProposals(cosmos);
-      setActiveCosmosProposals(proposals);
+    const fetchProposals = async () => {
+      if (isApiReady && !hasFetchedDataRef.current) {
+        hasFetchedDataRef.current = true;
+        const proposals = await getActiveProposals(cosmos);
+        setActiveCosmosProposals(proposals);
+      }
     };
 
     const getProposals = async () => {
-      if (!hasFetchedDataRef.current) {
-        hasFetchedDataRef.current = true;
-        const storedProposals =
-          cosmos.governance.store.getAll() as CosmosProposal[];
-        const activeProposals = storedProposals.filter((p) => !p.completed);
+      const storedProposals =
+        cosmos.governance.store.getAll() as CosmosProposal[];
+      const activeProposals = storedProposals.filter((p) => !p.completed);
 
-        if (activeProposals?.length) {
-          setActiveCosmosProposals(activeProposals); // show whatever we have stored
-          await getAndSetProposals(); // update if there are more from the API
-        } else {
-          setIsLoading(true);
-          await getAndSetProposals();
-          setIsLoading(false);
-        }
+      if (activeProposals?.length) {
+        setActiveCosmosProposals(activeProposals); // show whatever we have stored
+        await fetchProposals(); // update if there are more from the API
+      } else {
+        setIsLoading(true);
+        await fetchProposals();
+        setIsLoading(false);
       }
-    };
-
-    const initApiThenFetch = async () => {
-      await app.chain.initApi();
-      await getProposals();
     };
 
     if (app.chain?.base === ChainBase.CosmosSDK && !isLoading) {
-      if (app.chain?.apiInitialized) {
-        getProposals();
-      } else {
-        initApiThenFetch();
-      }
+      getProposals();
     }
-  }, [app.chain?.apiInitialized]);
+  }, [isApiReady]);
 
   return {
     activeCosmosProposals,

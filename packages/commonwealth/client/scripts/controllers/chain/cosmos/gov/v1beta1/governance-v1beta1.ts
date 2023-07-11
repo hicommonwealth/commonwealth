@@ -18,7 +18,7 @@ import {
   msgToIProposal,
 } from './utils-v1beta1';
 
-/* AKA CosmosGovernance v1beta1 */
+/* CosmosGovernance v1beta1 */
 
 class CosmosGovernance extends ProposalModule<
   CosmosApiType,
@@ -50,72 +50,110 @@ class CosmosGovernance extends ProposalModule<
     this._Accounts = Accounts;
 
     // query chain-wide params
-    const { depositParams } = await this._Chain.api.gov.params('deposit');
-    const { tallyParams } = await this._Chain.api.gov.params('tallying');
-    const { votingParams } = await this._Chain.api.gov.params('voting');
-    this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
-    this._yesThreshold = await asciiLiteralToDecimal(tallyParams.threshold);
-    this._vetoThreshold = await asciiLiteralToDecimal(
-      tallyParams.vetoThreshold
-    );
-    this._maxDepositPeriodS = depositParams.maxDepositPeriod.seconds.toNumber();
-
-    // TODO: support off-denom deposits
-    const depositCoins = depositParams.minDeposit.find(
-      ({ denom }) => denom === this._Chain.denom
-    );
-    if (depositCoins) {
-      this._minDeposit = new CosmosToken(
-        depositCoins.denom,
-        new BN(depositCoins.amount)
-      );
-    } else {
-      console.error('Gov minDeposit in wrong denom:', depositParams.minDeposit);
-      this._minDeposit = new CosmosToken(this._Chain.denom, 0);
-    }
-    console.log(this._minDeposit);
+    this.fetchDepositParams();
+    this.fetchTallyThresholds();
+    this.fetchVotingPeriod();
 
     // query existing proposals
     await this._initProposals();
     this._initialized = true;
   }
 
+  private async fetchDepositParams(): Promise<void> {
+    try {
+      const { depositParams } = await this._Chain.api.gov.params('deposit');
+      this._maxDepositPeriodS =
+        depositParams.maxDepositPeriod.seconds.toNumber();
+
+      // TODO: support off-denom deposits
+      const depositCoins = depositParams.minDeposit.find(
+        ({ denom }) => denom === this._Chain.denom
+      );
+      if (depositCoins) {
+        this._minDeposit = new CosmosToken(
+          depositCoins.denom,
+          new BN(depositCoins.amount)
+        );
+      } else {
+        console.error(
+          'Gov minDeposit in wrong denom:',
+          depositParams.minDeposit
+        );
+        this._minDeposit = new CosmosToken(this._Chain.denom, 0);
+      }
+      console.log('minDeposit: ', this._minDeposit);
+    } catch (e) {
+      console.error('Error fetching deposit params', e);
+    }
+  }
+
+  private async fetchTallyThresholds(): Promise<void> {
+    try {
+      const { tallyParams } = await this._Chain.api.gov.params('tallying');
+      this._yesThreshold = await asciiLiteralToDecimal(tallyParams.threshold);
+      this._vetoThreshold = await asciiLiteralToDecimal(
+        tallyParams.vetoThreshold
+      );
+    } catch (e) {
+      console.error('Error fetching tally params', e);
+    }
+  }
+
+  private async fetchVotingPeriod(): Promise<void> {
+    try {
+      const { votingParams } = await this._Chain.api.gov.params('voting');
+      this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
+    } catch (e) {
+      console.error('Error fetching voting params', e);
+    }
+  }
+
   public async getProposal(proposalId: number): Promise<CosmosProposal> {
     const existingProposal = this.store.getByIdentifier(proposalId);
-    if (existingProposal) {
-      return existingProposal;
+    if (existingProposal) return existingProposal;
+
+    try {
+      const { proposal } = await this._Chain.api.gov.proposal(proposalId);
+      const cosmosProp = new CosmosProposal(
+        this._Chain,
+        this._Accounts,
+        this,
+        msgToIProposal(proposal)
+      );
+      await cosmosProp.init();
+      return cosmosProp;
+    } catch (e) {
+      console.error('Error fetching proposal', e);
     }
-    const { proposal } = await this._Chain.api.gov.proposal(proposalId);
-    const cosmosProp = new CosmosProposal(
-      this._Chain,
-      this._Accounts,
-      this,
-      msgToIProposal(proposal)
-    );
-    await cosmosProp.init();
-    return cosmosProp;
   }
 
   private async _initProposals(proposalId?: number): Promise<void> {
     let cosmosProposals: CosmosProposal[];
-    if (!proposalId) {
-      const activeProposals = await getActiveProposalsV1Beta1(this._Chain.api);
+    try {
+      if (!proposalId) {
+        const activeProposals = await getActiveProposalsV1Beta1(
+          this._Chain.api
+        );
 
-      cosmosProposals = activeProposals.map(
-        (p) => new CosmosProposal(this._Chain, this._Accounts, this, p)
-      );
-    } else {
-      const { proposal } = await this._Chain.api.gov.proposal(proposalId);
-      cosmosProposals = [
-        new CosmosProposal(
-          this._Chain,
-          this._Accounts,
-          this,
-          msgToIProposal(proposal)
-        ),
-      ];
+        cosmosProposals = activeProposals.map(
+          (p) => new CosmosProposal(this._Chain, this._Accounts, this, p)
+        );
+      } else {
+        const { proposal } = await this._Chain.api.gov.proposal(proposalId);
+        cosmosProposals = [
+          new CosmosProposal(
+            this._Chain,
+            this._Accounts,
+            this,
+            msgToIProposal(proposal)
+          ),
+        ];
+      }
+    } catch (e) {
+      console.error('Error fetching proposals: ', e);
+    } finally {
+      Promise.all(cosmosProposals.map((p) => p.init()));
     }
-    Promise.all(cosmosProposals.map((p) => p.init()));
   }
 
   public createTx(
