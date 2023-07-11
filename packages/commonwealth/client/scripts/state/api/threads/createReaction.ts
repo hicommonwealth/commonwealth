@@ -13,7 +13,6 @@ const createReaction = async ({
   reactionType,
   threadId
 }: CreateReactionProps) => {
-  // TODO: use canvas id
   const {
     session = null,
     action = null,
