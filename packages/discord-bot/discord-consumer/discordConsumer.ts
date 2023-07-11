@@ -46,7 +46,7 @@ async function consumeMessages() {
           topic_id: topic['id'],
           topic_name: topic['name'],
           title: encodeURIComponent(parsedMessage.title),
-          body: encodeURIComponent(parsedMessage.content + `\n\n [Go to Discord post](https://discord.com/channels/${parsedMessage.guild_id}/${parsedMessage.channel_id})` ),
+          body: encodeURIComponent( `[Go to Discord post](https://discord.com/channels/${parsedMessage.guild_id}/${parsedMessage.channel_id}) \n\n` + parsedMessage.content),
           stage: 'discussion',
           kind: 'discussion',
           url: null,
