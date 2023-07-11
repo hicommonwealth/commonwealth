@@ -79,6 +79,7 @@ const abi = [
 export const ProtocolCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
   const [loading, setLoading] = useState<boolean>(false);
+  const [gate, setGate] = useState<string>("");
 
   const { id, setId, name, setName, symbol, setSymbol } =
     useChainFormIdFields();
@@ -120,6 +121,13 @@ export const ProtocolCommunityForm = () => {
         ]}
         onSelect={(o) => {
           setBase(o.value as ChainBase);
+        }}
+      />
+      <InputRow
+        title="Gate Address(Optional)"
+        value={gate}
+        onChangeHandler={(v) => {
+           setGate(v)
         }}
       />
       {defaultChainRows(chainFormDefaultFields)}
@@ -168,12 +176,13 @@ export const ProtocolCommunityForm = () => {
 
             setLoading(true);
             const txReceipt = await factory.methods
-            .createNamespace(web3.utils.asciiToHex(name), '0x0000000000000000000000000000000000000000').send({from: signingWallet.accounts[0]})
+            .createNamespace(web3.utils.asciiToHex(name), gate === '' ? '0x0000000000000000000000000000000000000000' : gate).send({from: signingWallet.accounts[0]})
+            
             if(!txReceipt){
                 setLoading(false)
                 throw new Error('Transaction failed');
             }
-            
+
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               jwt: app.user.jwt,
               address: '',
