@@ -7,8 +7,8 @@ import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
-import { Errors as ThreadErrors } from 'server/routes/createThread';
-import { Errors as EditThreadErrors } from 'server/routes/editThread';
+import { Errors as ThreadErrors } from 'server/controllers/server_threads_controller';
+import { Errors as EditThreadErrors } from 'server/controllers/server_threads_controller';
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
 import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
@@ -81,7 +81,7 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    describe('/createThread', () => {
+    describe('POST /threads', () => {
       const readOnly = true;
 
       it('should fail to create a thread without a kind', async () => {
