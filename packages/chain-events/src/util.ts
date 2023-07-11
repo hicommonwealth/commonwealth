@@ -24,6 +24,7 @@ import {
 } from './chains/cosmos';
 import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
+import { ethers } from 'ethers';
 
 export function Label(chain: string, event: CWEvent): IEventLabel {
   switch (event.network) {
@@ -166,4 +167,19 @@ export function populateRange(
     );
   }
   return range;
+}
+
+/**
+ * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
+ * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding
+ * @param decimal
+ */
+export function decimalToHex(decimal: number | string) {
+  if (decimal == '0') {
+    return '0x0';
+  } else {
+    return ethers.utils.hexStripZeros(
+      ethers.BigNumber.from(decimal).toHexString()
+    );
+  }
 }
