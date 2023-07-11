@@ -171,6 +171,7 @@ export const ComponentShowcase = () => {
   return (
     <div className="ComponentShowcase">
       <CWSearchBar placeholder="Search Common" />
+      <CWSearchBar placeholder="Search Common" disabled />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />

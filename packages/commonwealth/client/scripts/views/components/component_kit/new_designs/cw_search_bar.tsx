@@ -48,10 +48,11 @@ type SearchBarProps = BaseSearchBarProps &
 
 type TagProps = {
   communityName: string;
+  disabled?: boolean;
   onClick: () => void;
 };
 
-const Tag: FC<TagProps> = ({ communityName, onClick }) => {
+const Tag: FC<TagProps> = ({ communityName, disabled, onClick }) => {
   const handleClick = () => {
     console.log('clicked!');
     onClick();
@@ -70,7 +71,13 @@ const Tag: FC<TagProps> = ({ communityName, onClick }) => {
           {communityName}
         </CWText>
       </div>
-      <div className="action" onClick={handleClick}>
+      <div
+        className={getClasses({
+          action: true,
+          disabled,
+        })}
+        onClick={handleClick}
+      >
         <X size={16} className="action" />
       </div>
     </div>
@@ -102,6 +109,7 @@ export const CWSearchBar = (props: SearchBarProps) => {
       className={getClasses<InputStyleProps & InputInternalStyleProps>(
         {
           isTyping,
+          disabled,
         },
         ComponentType.SearchBar
       )}

@@ -3,7 +3,6 @@
 .SearchBar {
   width: 608px;
   display: flex;
-  // flex-direction: row;
   align-items: center;
   box-sizing: border-box;
   padding: 8px 16px;
@@ -21,20 +20,23 @@
       0px 0px 0px 3px $primary-100;
   }
 
-  &:hover {
-    border: 1px solid $primary-600;
-  }
-
   &.disabled {
     background-color: $neutral-50;
     border-color: $neutral-200;
     box-shadow: none;
     color: $neutral-500;
+
+    &:hover {
+      border-color: $neutral-200;
+    }
+  }
+
+  &:hover {
+    border: 1px solid $primary-600;
   }
 
   input {
     width: 100%;
-
     border: none;
 
     &:focus {
@@ -77,7 +79,7 @@
   display: grid;
   align-items: center;
   color: $neutral-500;
-  
+
   :hover {
     cursor: pointer;
     color: $neutral-600;
