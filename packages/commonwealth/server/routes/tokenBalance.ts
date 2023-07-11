@@ -63,7 +63,7 @@ const tokenBalance = async (
     } else if (e.message === FetchTokenBalanceErrors.UnsupportedContractType) {
       throw new AppError(FetchTokenBalanceErrors.UnsupportedContractType);
     } else {
-      throw new ServerError(Errors.QueryFailed);
+      throw new ServerError(Errors.QueryFailed, e);
     }
   }
 };

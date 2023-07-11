@@ -25,8 +25,7 @@ export const Errors = {
   NoReaction: 'Must provide a reaction',
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
-  InsufficientTokenBalance:
-    "Users need to hold some of the community's tokens to react",
+  InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
@@ -105,11 +104,11 @@ const createReaction = async (
           req.body.address
         );
         if (!canReact) {
-          return next(new AppError(Errors.BalanceCheckFailed));
+          return next(new AppError(Errors.InsufficientTokenBalance));
         }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new ServerError(Errors.BalanceCheckFailed));
+        return next(new ServerError(Errors.BalanceCheckFailed, e));
       }
     }
   }
