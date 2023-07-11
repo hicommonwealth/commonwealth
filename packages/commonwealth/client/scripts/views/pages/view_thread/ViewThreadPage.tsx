@@ -91,6 +91,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [commentSortType, setCommentSortType] =
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
+  const [isReplying, setIsReplying] = useState(false);
+  const [parentCommentId, setParentCommentId] = useState(null);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -726,6 +728,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             thread={thread}
             setIsGloballyEditing={setIsGloballyEditing}
             updatedCommentsCallback={updatedCommentsCallback}
+            isReplying={isReplying}
+            setIsReplying={setIsReplying}
+            parentCommentId={parentCommentId}
+            setParentCommentId={setParentCommentId}
           />
         </>
       }
