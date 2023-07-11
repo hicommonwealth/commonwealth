@@ -71,7 +71,7 @@ const upgradeMember = async (
   );
   const isLastAdmin = allCommunityAdmin.length < 2;
   const adminSelfDemoting =
-    requesterAdminAddressIds.includes(address.id) && new_role !== 'admin';
+    requesterAdminAddressIds.includes(targetAddress.id) && new_role !== 'admin';
 
   if (isLastAdmin && adminSelfDemoting) {
     return next(new AppError(Errors.MustHaveAdmin));
