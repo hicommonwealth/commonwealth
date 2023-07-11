@@ -121,7 +121,7 @@ export const Card = ({
                 {thread.title}
               </CWText>
             </div>
-            <div className='top-tags-row'>
+            <div className='content-top-tags'>
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
               {linkedSnapshots.length > 0 && (
