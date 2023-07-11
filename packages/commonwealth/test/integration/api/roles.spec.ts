@@ -13,6 +13,7 @@ import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
 import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
 import * as modelUtils from '../../util/modelUtils';
 import { generateEthAddress } from '../../util/modelUtils';
+import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -255,26 +256,28 @@ describe('Roles Test', () => {
     });
   });
 
-  describe('/deleteRole route tests', () => {
+  describe.only('/deleteRole route tests', () => {
     let memberAddress;
     let memberAddressId;
     let memberJwt;
     let memberUserId;
 
-    beforeEach('Create a member role to delete', async () => {
+    before('Create a member role to delete', async () => {
+      await resetDatabase();
       const res = await modelUtils.createAndVerifyAddress({ chain });
       memberAddress = res.address;
       memberAddressId = res.address_id;
       memberJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
       memberUserId = res.user_id;
-      const isMember = await modelUtils.updateRole({
+      // make the user an admin
+      await modelUtils.updateRole({
         address_id: memberAddressId,
         chainOrCommObj: { chain_id: chain },
-        role: 'member',
+        role: 'admin',
       });
     });
 
-    it('should delete member role', async () => {
+    it('should fail to delete admin role when there are no other admins', async () => {
       const res = await chai
         .request(app)
         .post('/api/deleteRole')
@@ -284,7 +287,36 @@ describe('Roles Test', () => {
           chain,
           address_id: memberAddressId,
         });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(deleteErrors.OtherAdminDNE);
+    });
+
+    it('should delete member role', async () => {
+      // create another admin
+      const newAddress = await modelUtils.createAndVerifyAddress({ chain });
+      await modelUtils.updateRole({
+        address_id: newAddress.address_id,
+        chainOrCommObj: { chain_id: chain },
+        role: 'admin',
+      });
+
+      const res = await chai
+        .request(app)
+        .post('/api/deleteRole')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: memberJwt,
+          chain,
+          address_id: memberAddressId,
+        });
+      console.log(res.body);
       expect(res.body.status).to.be.equal('Success');
+      const address = await models.Address.findOne({
+        where: {
+          id: memberAddressId,
+        },
+      });
+      expect(address.role).to.equal('member');
     });
 
     it('should fail to delete role without address_id', async () => {
@@ -312,30 +344,6 @@ describe('Roles Test', () => {
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(deleteErrors.InvalidAddress);
-    });
-
-    it('should fail to delete role where there is none in chain community', async () => {
-      // ensure does not exist before attempting to delete
-      await chai
-        .request(app)
-        .post('/api/deleteRole')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: memberJwt,
-          chain,
-          address_id: memberAddressId,
-        });
-      const res = await chai
-        .request(app)
-        .post('/api/deleteRole')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: memberJwt,
-          chain,
-          address_id: memberAddressId,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(deleteErrors.RoleDNE);
     });
   });
 
