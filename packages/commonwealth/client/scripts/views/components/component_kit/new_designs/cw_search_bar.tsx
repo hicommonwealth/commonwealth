@@ -108,7 +108,6 @@ export const CWSearchBar = (props: SearchBarProps) => {
     >
       <MagnifyingGlass className="magnifyingGlass" weight="regular" size={24} />
       {tag && <Tag communityName="1inch" onClick={() => setTag(false)} />}
-      {tag && <Tag communityName="Ethereum" onClick={() => setTag(false)} />}
       <div className="inputElement">
         <input
           placeholder={placeholder}
