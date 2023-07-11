@@ -3,3 +3,6 @@ export USER_ADDRESS=0xAA365a38bD45E573d0d1F3A870E68aA5DeDeA22e
 export POST_THREAD_ID=11875
 export ENV=local
 export REPORT_DIR=output
+export DD_API_KEY=lldjfs
+export DD_APP_KEY=lsdfsjsldk
+export DD_SITE=us5.datadoghq.com

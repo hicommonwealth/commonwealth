@@ -10,6 +10,14 @@ fi
 export REPORT_DIR=${SCRIPT_DIR}/$REPORT_DIR
 mkdir -p ${SCRIPT_DIR}/$REPORT_DIR
 
+# capture process id of datadog metrics
+# https://stackoverflow.com/questions/9117507/shell-script-to-capture-pid-of-a-daemon-process
+# node ${SCRIPT_DIR}/post-datadog-metrics.js &
+# pid=$!
+
 set -x
 yarn --cwd ${SCRIPT_DIR} test:load
 yarn --cwd ${SCRIPT_DIR} test:report
+
+# kill datadog metrics process
+# kill $pid
