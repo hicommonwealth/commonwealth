@@ -50,7 +50,7 @@ const generateImage = async (
   const resp = await fetch(image);
   const buffer = await resp.buffer();
   const params = {
-    Bucket: 'commonwealth-uploads',
+    Bucket: 'assets.commonwealth.im',
     Key: `${uuidv4()}.png`,
     Body: buffer,
     ContentType: 'image/png',
