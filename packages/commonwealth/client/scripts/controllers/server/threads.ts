@@ -469,18 +469,16 @@ class ThreadsController {
 
   public async toggleSpam(threadId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
-      $.post(
-        `${app.serverUrl()}/threads/${threadId}/${
-          !isSpam ? 'mark' : 'unmark'
-        }-as-spam`,
-        {
+      const verb = isSpam ? 'put' : 'delete';
+      axios[verb](`${app.serverUrl()}/threads/${threadId}/spam`, {
+        data: {
           jwt: app.user.jwt,
           chain_id: app.activeChainId(),
-        }
-      )
+        } as any,
+      })
         .then((response) => {
           const foundThread = this.store.getByIdentifier(threadId);
-          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
+          foundThread.markedAsSpamAt = response.data.result.marked_as_spam_at;
           this.updateThreadInStore(new Thread({ ...foundThread }));
           resolve(foundThread);
         })

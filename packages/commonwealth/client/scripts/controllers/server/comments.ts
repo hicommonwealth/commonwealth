@@ -292,18 +292,19 @@ class CommentsController {
 
   public async toggleSpam(commentId: number, isSpam: boolean) {
     return new Promise((resolve, reject) => {
-      $.post(
-        `${app.serverUrl()}/comments/${commentId}/${
-          !isSpam ? 'mark' : 'unmark'
-        }-as-spam`,
-        {
+      const verb = isSpam ? 'put' : 'delete';
+      axios[verb](`${app.serverUrl()}/comments/${commentId}/spam`, {
+        data: {
           jwt: app.user.jwt,
           chain_id: app.activeChainId(),
-        }
-      )
+        } as any,
+      })
         .then((response) => {
           const comment = this._store.getById(commentId);
-          const result = modelFromServer({ ...comment, ...response.result });
+          const result = modelFromServer({
+            ...comment,
+            ...response.data.result,
+          });
           if (comment) this._store.remove(comment);
           this._store.add(result);
           resolve(result);
