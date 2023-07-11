@@ -19,7 +19,7 @@ const updateThreadPrivacy = async (
 ) => {
   const { thread_id, read_only } = req.body;
   if (!thread_id) return next(new AppError(Errors.NoThreadId));
-  if (!read_only) return next(new AppError(Errors.NoReadOnly));
+  if (read_only == undefined) return next(new AppError(Errors.NoReadOnly));
 
   try {
     const thread = await models.Thread.findOne({
@@ -28,9 +28,11 @@ const updateThreadPrivacy = async (
       },
     });
     if (!thread) return next(new AppError(Errors.NoThread));
+
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
+
     if (!userOwnedAddressIds.includes(thread.address_id)) {
       // is not author
       const roles = await findAllRoles(
@@ -39,6 +41,7 @@ const updateThreadPrivacy = async (
         thread.chain,
         ['admin', 'moderator']
       );
+
       const role = roles.find((r) => {
         return r.chain_id === thread.chain;
       });

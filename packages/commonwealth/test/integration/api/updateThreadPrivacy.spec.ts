@@ -13,6 +13,7 @@ import {
 } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
+const { expect } = chai;
 
 describe('updateThreadPrivacy Integration Tests', () => {
   let jwtTokenUser1;
@@ -41,7 +42,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
     );
 
     response.should.have.status(400);
-    chai.assert.equal(response.error, Errors.NoThreadId);
+    expect(response.error).to.equal(Errors.NoThreadId);
   });
 
   it('should return an error response if an invalid read only is specified', async () => {
@@ -60,7 +61,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
     );
 
     response.should.have.status(400);
-    chai.assert.equal(response.error, Errors.NoReadOnly);
+    expect(response.error).to.equal(Errors.NoReadOnly);
   });
 
   it('should return an error response if the user does not own the thread or is not an admin', async () => {
@@ -83,7 +84,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
     chai.assert.equal(response.error, Errors.NotAdmin);
   });
 
-  it('should update thread stage and return a success response', async () => {
+  it('should lock a thread', async () => {
     const validRequest = {
       jwt: jwtTokenUser1,
       author_chain: testAddresses[0].chain,
@@ -92,20 +93,46 @@ describe('updateThreadPrivacy Integration Tests', () => {
       read_only: true,
     };
 
-    chai.assert.notEqual(testThreads[0].read_only, false);
+    expect(testThreads[0].read_only).to.equal(false);
 
     const response = await post(
       '/api/updateThreadPrivacy',
       validRequest,
-      true,
+      false,
       app
     );
 
-    chai.assert.equal(response.status, 'Success');
+    expect(response.status).to.equal('Success');
     const thread = await models.Thread.findOne({
       where: { id: testThreads[0].id },
     });
 
-    chai.assert.notEqual(thread.read_only, true);
+    expect(thread.read_only).to.equal(true);
+  });
+
+  it('should unlock a thread', async () => {
+    const validRequest = {
+      jwt: jwtTokenUser1,
+      author_chain: testAddresses[0].chain,
+      chain: testAddresses[0].chain,
+      thread_id: testThreads[0].id,
+      read_only: false,
+    };
+
+    const response = await post(
+      '/api/updateThreadPrivacy',
+      validRequest,
+      false,
+      app
+    );
+
+    expect(response.status).to.equal('Success');
+    const thread = await models.Thread.findOne({
+      where: {
+        id: testThreads[0].id,
+      },
+    });
+
+    expect(thread.read_only).to.equal(false);
   });
 });
