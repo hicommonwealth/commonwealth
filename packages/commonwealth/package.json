@@ -166,6 +166,7 @@
     "chart.js": "^2.8.0",
     "cheerio": "1.0.0-rc.3",
     "clipboard-polyfill": "^2.8.6",
+    "clsx": "^1.2.1",
     "compression": "^1.7.4",
     "connect-session-sequelize": "^7.1.1",
     "cookie-parser": "^1.4.4",
