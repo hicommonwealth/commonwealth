@@ -20,7 +20,13 @@ type TokenBalanceReq = {
   contract_address?: string;
   all?: boolean;
 };
-type TokenBalanceResp = string;
+
+type TokenBalanceResp =
+  | string
+  | {
+      address: string;
+      balance: string;
+    };
 
 const tokenBalance = async (
   models: DB,
@@ -53,7 +59,7 @@ const tokenBalance = async (
   }
 
   try {
-    let balance: string;
+    let balance: any;
     if (req.body.all) {
       const user_id = await models.Address.findOne({
         where: {
@@ -73,21 +79,17 @@ const tokenBalance = async (
         throw new AppError('No Addresses associated with user on this chain');
       }
 
-      const balances = await Promise.all(
+      balance = await Promise.all(
         addresses.map(async (address) => {
-          return tokenBalanceCache.fetchUserBalance(
+          const addrBalance = await tokenBalanceCache.fetchUserBalance(
             chain.network,
             chain_node_id,
             address.dataValues.distinctAddress,
             req.body.contract_address
           );
+          return { address, balance: addrBalance };
         })
       );
-
-      balance = balances
-        .map((b) => new BN(b))
-        .reduce((acc: BN, val: BN) => acc.add(val))
-        .toString();
     } else {
       balance = await tokenBalanceCache.fetchUserBalance(
         chain.network,

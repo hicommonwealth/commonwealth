@@ -6,6 +6,7 @@ import NewProfilesController from '../controllers/server/newProfiles';
 
 import type MinimumProfile from './MinimumProfile';
 import type ChainInfo from './ChainInfo';
+import BN from 'bn.js';
 
 class Account {
   public readonly address: string;
@@ -22,6 +23,9 @@ class Account {
   private _walletId?: WalletId;
 
   private _profile?: MinimumProfile;
+
+  private _tokenBalance?: BN;
+
   public get profile() {
     return this._profile;
   }
@@ -112,6 +116,14 @@ class Account {
 
   public setSessionPublicAddress(sessionPublicAddress: string) {
     this._sessionPublicAddress = sessionPublicAddress;
+  }
+
+  get tokenBalance(): BN {
+    return this._tokenBalance;
+  }
+
+  public setTokenBalance(balance: BN) {
+    this._tokenBalance = balance;
   }
 
   public async validate(
