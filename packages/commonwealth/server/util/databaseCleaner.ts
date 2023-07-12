@@ -31,7 +31,13 @@ export default class DatabaseCleaner {
     this._models = models;
     this._rollbar = rollbar;
 
-    if (!hourToRun || hourToRun < 0 || hourToRun >= 24) {
+    if (!hourToRun) {
+      this.log.warn(`No hourToRun given. The cleaner will not run.`);
+      this._rollbar?.warn(`No hourToRun given. The cleaner will not run.`);
+      return;
+    }
+
+    if (hourToRun < 0 || hourToRun >= 24) {
       this.log.error(
         `${hourToRun} is not a valid hour. The given hourToRun must be greater than or equal to 0 and less than 24`
       );
