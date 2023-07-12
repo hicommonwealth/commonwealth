@@ -6,3 +6,6 @@ export REPORT_DIR=output
 export DD_API_KEY=lldjfs
 export DD_APP_KEY=lsdfsjsldk
 export DD_SITE=us5.datadoghq.com
+export TEST_LOCATION=us-east
+export TEST_ID=$(uuidgen)
+export TEST_NAME=commonwealth-api-read-load-test

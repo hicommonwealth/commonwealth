@@ -1,5 +1,13 @@
 const dgram = require('dgram');
 const { client, v2 } = require('@datadog/datadog-api-client');
+
+const metricTypes = {
+  UNSPECIFIED: 0,
+  COUNT: 1,
+  RATE: 2,
+  GAUGE: 3,
+};
+
 const configurationOpts = {
   authMethods: {
     apiKeyAuth: process.env.DD_API_KEY,
@@ -15,8 +23,16 @@ client.setServerVariables(configuration, {
 
 const metricsApi = new v2.MetricsApi(configuration);
 const prefix = 'artillery.publish_metrics_plugin.';
-const tags = ['env:dev', 'reporterType:datadog-agent'];
+const tags = [
+  `env:${process.env.ENV}`,
+  'reporterType:datadog-api',
+  `testTool:artillery`,
+  `testLocation:${process.env.TEST_LOCATION}`,
+  `testId:${process.env.TEST_ID}`,
+  `testName:${process.env.TEST_NAME}`,
+];
 
+console.log(`Tags: ${tags}`);
 const server = dgram.createSocket('udp4');
 
 server.on('error', (err) => {
@@ -26,15 +42,38 @@ server.on('error', (err) => {
 
 server.on('message', (msg, rinfo) => {
   const message = msg.toString();
+  if (message.includes('Finished: Artillery.io Test')) {
+    server.close();
+    console.log('====Server closed====');
+  }
+  console.log(`server got: ${message} from ${rinfo.address}:${rinfo.port}`);
   if (message.startsWith(prefix)) {
-    const [metricName, metricValue, metricType] = message.split(':');
+    let metricType;
+    let [metricName, metricValue] = message.split(':');
+    [metricValue, metricType] = metricValue.split('|');
+    if (metricType == 'g') {
+      metricType = metricTypes.GAUGE;
+    } else if (metricType == 'c') {
+      metricType = metricTypes.COUNT;
+    } else if (metricType == 'r') {
+      metricType = metricTypes.RATE;
+    } else {
+      metricType = metricTypes.UNSPECIFIED;
+    }
+
+    metricValue = parseInt(metricValue);
 
     const params = {
       body: {
         series: [
           {
             metric: metricName,
-            points: [[Date.now() / 1000, parseInt(metricValue)]],
+            points: [
+              {
+                timestamp: Math.round(new Date().getTime() / 1000),
+                value: metricValue,
+              },
+            ],
             type: metricType,
             tags: tags,
           },
@@ -42,13 +81,17 @@ server.on('message', (msg, rinfo) => {
       },
     };
 
+    // https://docs.datadoghq.com/api/latest/metrics/#submit-metrics
     metricsApi
       .submitMetrics(params)
       .then((data) => {
-        console.log(`Metrics posted successfully for ${metricName}:`, data);
+        console.log(
+          `Metrics posted successfully for ${metricName} ${metricType} ${metricValue}:`,
+          data
+        );
       })
       .catch((error) => {
-        console.error(`Error posting metrics for ${metricName}:`, error);
+        console.error(`Error posting metrics for ${message}:`, error);
       });
   }
 });

@@ -5,7 +5,7 @@ config:
       metricsNamespace: "latency_metrics"
     publish-metrics:
       - type: statsd
-        prefix: "artillery.publish_metrics_plugin.{{$processEnvironment.ENV}}."
+        prefix: "artillery.publish_metrics_plugin."
   environments:
     us:
       target: "https://us.unique.rocks"
