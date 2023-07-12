@@ -11,7 +11,6 @@ import { LoginModal } from 'views/modals/login_modal';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Modal } from '../component_kit/cw_modal';
@@ -39,17 +38,14 @@ export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
-    useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
     performJoinCommunityLinking,
-    linkToCommunity,
+    AccountSelectorModal,
   } = useJoinCommunity({
-    setIsAccountSelectorModalOpen,
     setIsLoginModalOpen,
     setIsTOSModalOpen,
   });
@@ -108,8 +104,6 @@ export const LoginSelector = () => {
   if (!profileLoadComplete && NewProfilesController.Instance.allLoaded()) {
     setProfileLoadComplete(true);
   }
-
-  const activeChainInfo = app.chain?.meta;
 
   return (
     <>
@@ -178,24 +172,7 @@ export const LoginSelector = () => {
           </div>
         </ClickAwayListener>
       </div>
-      <Modal
-        content={
-          <AccountSelector
-            accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
-              address: addressInfo.address,
-            }))}
-            walletNetwork={activeChainInfo?.network}
-            walletChain={activeChainInfo?.base}
-            onSelect={async (accountIndex) => {
-              await linkToCommunity(accountIndex);
-              setIsAccountSelectorModalOpen(false);
-            }}
-            onModalClose={() => setIsAccountSelectorModalOpen(false)}
-          />
-        }
-        onClose={() => setIsAccountSelectorModalOpen(false)}
-        open={isAccountSelectorModalOpen}
-      />
+      {AccountSelectorModal}
       <Modal
         content={
           <TOSModal

@@ -55,7 +55,6 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -101,11 +100,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
-    useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
-  const activeChainInfo = app.chain?.meta;
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
@@ -458,11 +454,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const {
     handleJoinCommunity,
-    sameBaseAddressesRemoveDuplicates,
     performJoinCommunityLinking,
-    linkToCommunity,
+    AccountSelectorModal,
   } = useJoinCommunity({
-    setIsAccountSelectorModalOpen,
     setIsLoginModalOpen,
     setIsTOSModalOpen,
   });
@@ -845,24 +839,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ] as SidebarComponents
         }
       />
-      <Modal
-        content={
-          <AccountSelector
-            accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
-              address: addressInfo.address,
-            }))}
-            walletNetwork={activeChainInfo?.network}
-            walletChain={activeChainInfo?.base}
-            onSelect={async (accountIndex) => {
-              await linkToCommunity(accountIndex);
-              setIsAccountSelectorModalOpen(false);
-            }}
-            onModalClose={() => setIsAccountSelectorModalOpen(false)}
-          />
-        }
-        onClose={() => setIsAccountSelectorModalOpen(false)}
-        open={isAccountSelectorModalOpen}
-      />
+      {AccountSelectorModal}
       <Modal
         content={
           <TOSModal

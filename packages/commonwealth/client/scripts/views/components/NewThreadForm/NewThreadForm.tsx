@@ -24,7 +24,6 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
@@ -37,14 +36,11 @@ export const NewThreadForm = () => {
     chainId: app.activeChainId(),
   });
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
-    useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
-  const activeChainInfo = app.chain?.meta;
 
   const topicsForSelector =
     topics ||
@@ -74,11 +70,9 @@ export const NewThreadForm = () => {
 
   const {
     handleJoinCommunity,
-    sameBaseAddressesRemoveDuplicates,
     performJoinCommunityLinking,
-    linkToCommunity,
+    AccountSelectorModal,
   } = useJoinCommunity({
-    setIsAccountSelectorModalOpen,
     setIsLoginModalOpen,
     setIsTOSModalOpen,
   });
@@ -241,24 +235,7 @@ export const NewThreadForm = () => {
           </div>
         </div>
       </div>
-      <Modal
-        content={
-          <AccountSelector
-            accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
-              address: addressInfo.address,
-            }))}
-            walletNetwork={activeChainInfo?.network}
-            walletChain={activeChainInfo?.base}
-            onSelect={async (accountIndex) => {
-              await linkToCommunity(accountIndex);
-              setIsAccountSelectorModalOpen(false);
-            }}
-            onModalClose={() => setIsAccountSelectorModalOpen(false)}
-          />
-        }
-        onClose={() => setIsAccountSelectorModalOpen(false)}
-        open={isAccountSelectorModalOpen}
-      />
+      {AccountSelectorModal}
       <Modal
         content={
           <TOSModal

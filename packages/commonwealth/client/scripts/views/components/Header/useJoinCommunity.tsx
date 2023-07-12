@@ -8,20 +8,23 @@ import {
 import AddressInfo from 'models/AddressInfo';
 import { isSameAccount } from 'helpers';
 import ITokenAdapter from 'models/ITokenAdapter';
-import React from 'react';
+import React, { useState } from 'react';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 
 const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
 interface UseJoinCommunityProps {
-  setIsAccountSelectorModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLoginModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsTOSModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const useJoinCommunity = ({
-  setIsAccountSelectorModalOpen,
   setIsLoginModalOpen,
   setIsTOSModalOpen,
 }: UseJoinCommunityProps) => {
+  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
+    useState(false);
+
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
   const hasTermsOfService = !!activeChainInfo?.terms;
@@ -190,11 +193,33 @@ const useJoinCommunity = ({
     }
   };
 
+  const AccountSelectorModal = (
+    <Modal
+      content={
+        <AccountSelector
+          accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
+            address: addressInfo.address,
+          }))}
+          walletNetwork={activeChainInfo?.network}
+          walletChain={activeChainInfo?.base}
+          onSelect={async (accountIndex) => {
+            await linkToCommunity(accountIndex);
+            setIsAccountSelectorModalOpen(false);
+          }}
+          onModalClose={() => setIsAccountSelectorModalOpen(false)}
+        />
+      }
+      onClose={() => setIsAccountSelectorModalOpen(false)}
+      open={isAccountSelectorModalOpen}
+    />
+  );
+
   return {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
     performJoinCommunityLinking,
     linkToCommunity,
+    AccountSelectorModal,
   };
 };
 
