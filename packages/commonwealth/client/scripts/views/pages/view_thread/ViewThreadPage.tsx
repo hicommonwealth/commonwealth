@@ -512,11 +512,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isAdminOrMod;
 
   // Todo who should actually be able to view this
-  const showCreateSnapshotOptions =
+  const canCreateSnapshotProposal =
     isAuthor || (isAdminOrMod && !!app.chain?.meta.snapshot.length);
 
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
+
+  const hasSnapshotProposal = thread.links.find(x => x.source === 'snapshot')
 
   const canComment =
     app.user.activeAccount ||
@@ -658,84 +660,84 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return [
       ...(hasEditPerms && !thread.readOnly
         ? [
-            {
-              label: 'Edit',
-              iconLeft: 'write' as const,
-              onClick: handleEditThread,
-            },
-          ]
+          {
+            label: 'Edit',
+            iconLeft: 'write' as const,
+            onClick: handleEditThread,
+          },
+        ]
         : []),
       ...(hasEditPerms
         ? [
-            {
-              label: 'Edit collaborators',
-              iconLeft: 'write' as const,
-              onClick: () => {
-                setIsEditCollaboratorsModalOpen(true);
-              },
+          {
+            label: 'Edit collaborators',
+            iconLeft: 'write' as const,
+            onClick: () => {
+              setIsEditCollaboratorsModalOpen(true);
             },
-          ]
+          },
+        ]
         : []),
       ...(isAdminOrMod || isAuthor
         ? [
-            {
-              label: 'Change topic',
-              iconLeft: 'write' as const,
-              onClick: () => {
-                setIsChangeTopicModalOpen(true);
-              },
+          {
+            label: 'Change topic',
+            iconLeft: 'write' as const,
+            onClick: () => {
+              setIsChangeTopicModalOpen(true);
             },
-          ]
+          },
+        ]
         : []),
       ...(isAuthor || isAdminOrMod
         ? [
-            {
-              label: 'Delete',
-              iconLeft: 'trash' as const,
-              onClick: handleDeleteThread,
-            },
-          ]
+          {
+            label: 'Delete',
+            iconLeft: 'trash' as const,
+            onClick: handleDeleteThread,
+          },
+        ]
         : []),
       ...(isAuthor || isAdminOrMod
         ? [
-            {
-              label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
-              iconLeft: 'lock' as const,
-              onClick: () => {
-                app.threads
-                  .setPrivacy({
-                    threadId: thread.id,
-                    readOnly: !thread.readOnly,
-                  })
-                  .then(() => {
-                    setIsGloballyEditing(false);
-                    setIsEditingBody(false);
-                    setRecentlyEdited(true);
-                    notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
-                  });
-                setThread(
-                  new Thread({ ...thread, readOnly: !thread.readOnly })
-                );
-              },
+          {
+            label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+            iconLeft: 'lock' as const,
+            onClick: () => {
+              app.threads
+                .setPrivacy({
+                  threadId: thread.id,
+                  readOnly: !thread.readOnly,
+                })
+                .then(() => {
+                  setIsGloballyEditing(false);
+                  setIsEditingBody(false);
+                  setRecentlyEdited(true);
+                  notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
+                });
+              setThread(
+                new Thread({ ...thread, readOnly: !thread.readOnly })
+              );
             },
-          ]
+          },
+        ]
         : []),
       ...((isAuthor || isAdminOrMod) && !!app.chain?.meta.snapshot.length
         ? [
-            {
-              label: 'Snapshot proposal from thread',
-              iconLeft: 'democraticProposal' as const,
-              onClick: () => {
-                const snapshotSpaces = app.chain.meta.snapshot;
+          {
+            label: 'Snapshot proposal from thread',
+            iconLeft: 'democraticProposal' as const,
+            onClick: () => {
+              const snapshotSpaces = app.chain.meta.snapshot;
 
-                if (snapshotSpaces.length > 1) {
-                  navigate('/multiple-snapshots');
-                } else {
-                  navigate(`/snapshot/${snapshotSpaces}`);
-                }
-              },
+              if (snapshotSpaces.length > 1) {
+                navigate('/multiple-snapshots');
+              } else {
+                navigate(`/snapshot/${snapshotSpaces}`);
+              }
             },
-          ]
+          },
+        ]
         : []),
       { type: 'divider' as const },
       {
@@ -856,81 +858,81 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div className="cards-column">
-                        {showLinkedProposalOptions && (
-                          <LinkedProposalsCard
-                            onChangeHandler={handleLinkedProposalChange}
-                            thread={thread}
-                            showAddProposalButton={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                        {showLinkedThreadOptions && (
-                          <LinkedThreadsCard
-                            thread={thread}
-                            allowLinking={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleLinkedThreadChange}
-                          />
-                        )}
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
-            ...(showCreateSnapshotOptions
-              ? [
-                  {
-                    label: 'Snapshot',
-                    item: (
-                      <div className="cards-column">
-                        <SnapshotCreationCard
+                {
+                  label: 'Links',
+                  item: (
+                    <div className="cards-column">
+                      {showLinkedProposalOptions && (
+                        <LinkedProposalsCard
+                          onChangeHandler={handleLinkedProposalChange}
                           thread={thread}
-                          allowSnapshotCreation={isAuthor || isAdminOrMod}
-                          onChangeHandler={handleNewSnapshotChange}
+                          showAddProposalButton={isAuthor || isAdminOrMod}
                         />
-                      </div>
-                    ),
-                  },
-                ]
+                      )}
+                      {showLinkedThreadOptions && (
+                        <LinkedThreadsCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleLinkedThreadChange}
+                        />
+                      )}
+                    </div>
+                  ),
+                },
+              ]
+              : []),
+            ...(canCreateSnapshotProposal && !hasSnapshotProposal
+              ? [
+                {
+                  label: 'Snapshot',
+                  item: (
+                    <div className="cards-column">
+                      <SnapshotCreationCard
+                        thread={thread}
+                        allowSnapshotCreation={isAuthor || isAdminOrMod}
+                        onChangeHandler={handleNewSnapshotChange}
+                      />
+                    </div>
+                  ),
+                },
+              ]
               : []),
             ...(polls?.length > 0 ||
-            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                  {
-                    label: 'Polls',
-                    item: (
-                      <div className="cards-column">
-                        {[
-                          ...new Map(
-                            polls?.map((poll) => [poll.id, poll])
-                          ).values(),
-                        ].map((poll: Poll) => {
-                          return (
-                            <ThreadPollCard
-                              poll={poll}
-                              key={poll.id}
-                              onVote={() => setInitializedPolls(false)}
-                              showDeleteButton={isAuthor || isAdmin}
-                              onDelete={() => {
-                                setInitializedPolls(false);
-                              }}
-                            />
-                          );
-                        })}
-                        {isAuthor &&
-                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                            <ThreadPollEditorCard
-                              thread={thread}
-                              threadAlreadyHasPolling={!polls?.length}
-                              onPollCreate={() => setInitializedPolls(false)}
-                            />
-                          )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Polls',
+                  item: (
+                    <div className="cards-column">
+                      {[
+                        ...new Map(
+                          polls?.map((poll) => [poll.id, poll])
+                        ).values(),
+                      ].map((poll: Poll) => {
+                        return (
+                          <ThreadPollCard
+                            poll={poll}
+                            key={poll.id}
+                            onVote={() => setInitializedPolls(false)}
+                            showDeleteButton={isAuthor || isAdmin}
+                            onDelete={() => {
+                              setInitializedPolls(false);
+                            }}
+                          />
+                        );
+                      })}
+                      {isAuthor &&
+                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                          <ThreadPollEditorCard
+                            thread={thread}
+                            threadAlreadyHasPolling={!polls?.length}
+                            onPollCreate={() => setInitializedPolls(false)}
+                          />
+                        )}
+                    </div>
+                  ),
+                },
+              ]
               : []),
           ] as SidebarComponents
         }
