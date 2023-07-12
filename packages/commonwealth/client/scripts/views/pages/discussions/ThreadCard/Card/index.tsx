@@ -160,7 +160,7 @@ export const Card = ({
                   label={`${chainEntityTypeToProposalShortName(
                     'proposal' as IChainEntityKind
                   )} 
-                        ${Number.isNaN(parseInt(link.identifier, 10))
+                          ${Number.isNaN(parseInt(link.identifier, 10))
                       ? ''
                       : ` #${link.identifier}`
                     }`}
