@@ -118,7 +118,7 @@ describe('Webhook Tests', () => {
           address: notLoggedInAddr,
           chain,
           webhookUrl,
-          jwt: jwt.sign({ id: -1, email: null }, JWT_SECRET),
+          jwt: jwt.sign({ id: -999999, email: null }, JWT_SECRET),
         });
       expectErrorOnResponse(401, undefined, errorRes);
       const webhookUrls = await models['Webhook'].findAll({
