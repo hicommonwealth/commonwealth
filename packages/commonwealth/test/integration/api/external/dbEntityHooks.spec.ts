@@ -129,7 +129,7 @@ export async function createTestEntities() {
             type: 'offchain',
             base: 'ethereum',
             // collapsed_on_homepage: true,
-            // custom_stages: true,
+            custom_stages: 'true',
             // stages_enabled: true,
             // has_chain_events_listener: false,
             icon_url:
@@ -335,7 +335,7 @@ if (process.env.TEST_ENV !== 'playwright') {
     await createTestEntities();
   });
 
-  afterEach(async () => {
-    await clearTestEntities();
-  });
+  // afterEach(async () => {
+  //   await clearTestEntities();
+  // });
 }

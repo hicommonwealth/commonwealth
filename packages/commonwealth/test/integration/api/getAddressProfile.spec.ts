@@ -5,10 +5,9 @@ import getAddressProfiles, {
 } from '../../../server/routes/getAddressProfile';
 import { postReq, res } from '../../unit/unitHelpers';
 import { testAddresses, testProfiles } from './external/dbEntityHooks.spec';
-import { resetDatabase } from '../../../server-test';
 import { AddressInstance } from '../../../server/models/address';
 
-describe.only('getAddressProfile tests', () => {
+describe('getAddressProfile tests', () => {
   it('should return profile of a single address', async () => {
     const r: GetAddressProfileReq = {
       chains: [testAddresses[0].chain],
