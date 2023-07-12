@@ -5,7 +5,7 @@ import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -23,9 +23,6 @@ import {
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { LoginModal } from 'views/modals/login_modal';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 
@@ -34,7 +31,6 @@ export const NewThreadForm = () => {
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
@@ -66,11 +62,7 @@ export const NewThreadForm = () => {
     clearDraft,
   } = useNewThreadForm(chainId, topicsForSelector);
 
-  const { handleJoinCommunity, AccountSelectorModal, TermsOfServiceModal } =
-    useJoinCommunity({
-      setIsLoginModalOpen,
-    });
-
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -229,14 +221,7 @@ export const NewThreadForm = () => {
           </div>
         </div>
       </div>
-      {AccountSelectorModal}
-      {TermsOfServiceModal}
-      <Modal
-        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {JoinCommunityModals}
     </>
   );
 };

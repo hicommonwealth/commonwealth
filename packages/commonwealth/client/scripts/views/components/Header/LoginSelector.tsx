@@ -41,11 +41,8 @@ export const LoginSelector = () => {
   const {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
-    AccountSelectorModal,
-    TermsOfServiceModal,
-  } = useJoinCommunity({
-    setIsLoginModalOpen,
-  });
+    JoinCommunityModals,
+  } = useJoinCommunity();
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -169,14 +166,7 @@ export const LoginSelector = () => {
           </div>
         </ClickAwayListener>
       </div>
-      {AccountSelectorModal}
-      {TermsOfServiceModal}
-      <Modal
-        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {JoinCommunityModals}
     </>
   );
 };

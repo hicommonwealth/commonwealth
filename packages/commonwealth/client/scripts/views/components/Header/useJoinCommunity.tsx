@@ -12,16 +12,16 @@ import React, { useState } from 'react';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { TOSModal } from 'views/components/Header/TOSModal';
+import { LoginModal } from 'views/modals/login_modal';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 
 const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
-interface UseJoinCommunityProps {
-  setIsLoginModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-const useJoinCommunity = ({ setIsLoginModalOpen }: UseJoinCommunityProps) => {
+const useJoinCommunity = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -228,13 +228,27 @@ const useJoinCommunity = ({ setIsLoginModalOpen }: UseJoinCommunityProps) => {
     />
   );
 
+  const LoginModalWrapper = (
+    <Modal
+      content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
+      isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+      onClose={() => setIsLoginModalOpen(false)}
+      open={isLoginModalOpen}
+    />
+  );
+
+  const JoinCommunityModals = (
+    <>
+      {AccountSelectorModal}
+      {TermsOfServiceModal}
+      {LoginModalWrapper}
+    </>
+  );
+
   return {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
-    performJoinCommunityLinking,
-    linkToCommunity,
-    AccountSelectorModal,
-    TermsOfServiceModal,
+    JoinCommunityModals,
   };
 };
 

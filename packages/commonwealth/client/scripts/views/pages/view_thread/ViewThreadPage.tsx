@@ -54,8 +54,6 @@ import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { LoginModal } from 'views/modals/login_modal';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 
@@ -98,7 +96,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -449,12 +446,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [comments, thread, threadId]);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
-
-  const { handleJoinCommunity, AccountSelectorModal, TermsOfServiceModal } =
-    useJoinCommunity({
-      setIsLoginModalOpen,
-    });
-
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   if (typeof identifier !== 'string') {
@@ -833,14 +825,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ] as SidebarComponents
         }
       />
-      {AccountSelectorModal}
-      {TermsOfServiceModal}
-      <Modal
-        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {JoinCommunityModals}
     </>
   );
 };
