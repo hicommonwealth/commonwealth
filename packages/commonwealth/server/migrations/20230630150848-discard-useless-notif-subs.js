@@ -9,6 +9,9 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // irreversible
+    await queryInterface.removeIndex(
+      'Subscriptions',
+      'subscriptions_subscriber_id'
+    );
   },
 };
