@@ -187,7 +187,7 @@ export async function updateActiveAddresses({
     !app.user.activeAccounts[0].tokenBalance
   ) {
     const contract = app.contracts.getCommunityContracts();
-    await $.post(`${app.serverUrl()}/tokenBalance`, {
+    $.post(`${app.serverUrl()}/tokenBalance`, {
       chain: app.chain.meta.id,
       address: app.user.activeAccounts[0].address,
       author_chain: app.chain.meta.id,
