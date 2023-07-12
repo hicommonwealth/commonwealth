@@ -20,7 +20,10 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
 
   if (!profiles || profiles?.filter((p) => !!p).length === 0) return;
 
-  const truncatedProfiles = profiles.filter((p) => !!p).slice(0, 4).reverse();
+  const truncatedProfiles = profiles
+    .filter((p) => !!p)
+    .slice(0, 4)
+    .reverse();
 
   const count = profiles.length - 4;
   let countText;
@@ -48,11 +51,15 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
               return addr.chain == chainId;
             });
 
-            return (
-              <div className="avatar-group-icon" key={i}>
-                <CWJdenticon address={address.address} size={16} />
-              </div>
-            );
+            // some old posts are broken = have no address in the specified community.
+            // if so, we omit their icon as a quick fix.
+            if (address) {
+              return (
+                <div className="avatar-group-icon" key={i}>
+                  <CWJdenticon address={address.address} size={16} />
+                </div>
+              );
+            }
           }
         })}
       </div>
