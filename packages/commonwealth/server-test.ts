@@ -338,10 +338,6 @@ const resetServer = (debug = false): Promise<void> => {
         description: 'someone created a role',
       });
       await models.NotificationCategory.create({
-        name: NotificationCategories.EntityEvent,
-        description: 'an entity-event as occurred',
-      });
-      await models.NotificationCategory.create({
         name: NotificationCategories.SnapshotProposal,
         description: 'Snapshot proposal notifications',
       });
