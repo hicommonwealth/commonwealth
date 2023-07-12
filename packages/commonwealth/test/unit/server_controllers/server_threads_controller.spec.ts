@@ -1,9 +1,6 @@
 import BN from 'bn.js';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
-import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
-import { UserInstance } from 'server/models/user';
 import Sinon from 'sinon';
 
 describe('ServerThreadsController', () => {
@@ -336,7 +333,7 @@ describe('ServerThreadsController', () => {
           reaction as any,
           commentId
         )
-      ).to.be.rejectedWith('Could not verify user token balance');
+      ).to.be.rejectedWith('Insufficient token balance');
     });
   });
 
@@ -851,6 +848,710 @@ describe('ServerThreadsController', () => {
           canvasHash
         )
       ).to.be.rejectedWith('Comments can only be nested 8 levels deep');
+    });
+  });
+
+  describe('#deleteThread', () => {
+    it('should delete a thread', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            Address: {
+              id: 1,
+              address: '0x123',
+            },
+          }),
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const threadId = 1;
+      await serverThreadsController.deleteThread(user as any, threadId);
+    });
+
+    it('should should throw error (thread not found)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => null,
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const threadId = 1;
+      expect(
+        serverThreadsController.deleteThread(user as any, threadId)
+      ).to.be.rejectedWith('Thread not found: 1');
+    });
+
+    it('should throw error (banned)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            Address: {
+              id: 1,
+              address: '0x123',
+            },
+          }),
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [false, 'bad'],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const threadId = 1;
+      expect(
+        serverThreadsController.deleteThread(user as any, threadId)
+      ).to.be.rejectedWith('Ban error: bad');
+    });
+
+    it('should throw error (not owned)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            id: 1,
+            Address: {
+              id: 1,
+              address: '0x123',
+            },
+          }),
+          destroy: async () => ({}),
+        },
+        CommunityRole: {
+          findAll: async () => [{}], // no mod/admin roles
+        },
+        Subscription: {
+          destroy: async () => ({}),
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        // address is different from thread author
+        getAddresses: async () => [{ id: 2, address: '0x124', verified: true }],
+      };
+      const threadId = 1;
+      expect(
+        serverThreadsController.deleteThread(user as any, threadId)
+      ).to.be.rejectedWith('Not owned by this user');
+    });
+  });
+
+  describe('#updateThread', () => {
+    it('should update a thread', async () => {
+      let data;
+      data = {
+        id: 1,
+        title: 'title',
+        body: 'body',
+        chain: 'ethereum',
+        kind: 'discussion',
+        Address: {
+          address: '0x123',
+          chain: 'ethereum',
+        },
+        version_history: ['{"body":""}'],
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+
+      const db = {
+        Thread: {
+          findOne: async () => data,
+        },
+        Collaboration: {
+          findOne: async () => ({
+            id: 1,
+          }),
+        },
+        CommunityRole: {
+          findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 2, address: '0x123', verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const threadId = 1;
+      const body = 'hello';
+      const title = 'mythread';
+      const stage = 'stage';
+      const url = 'http://blah';
+      const attachments = undefined;
+      const canvasAction = undefined;
+      const canvasSession = undefined;
+      const canvasHash = undefined;
+
+      const [updatedThread, notificationOptions] =
+        await serverThreadsController.updateThread(
+          user as any,
+          address as any,
+          chain as any,
+          threadId,
+          title,
+          body,
+          stage,
+          url,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash
+        );
+
+      expect(updatedThread.title).to.equal(title);
+      expect(updatedThread.body).to.equal(body);
+      expect(updatedThread.stage).to.equal(stage);
+
+      expect(!!updatedThread).to.equal(true);
+      expect(notificationOptions).to.have.length(1);
+      expect(notificationOptions[0]).to.include({
+        categoryId: 'thread-edit',
+        objectId: '',
+        webhookData: null,
+      });
+      expect(notificationOptions[0].notificationData).to.include({
+        thread_id: 1,
+        root_type: 'discussion',
+        root_title: 'mythread',
+        chain_id: 'ethereum',
+        author_address: '0x123',
+        author_chain: 'ethereum',
+      });
+      expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
+    });
+
+    it('should throw error (banned)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => null,
+        },
+        Collaboration: {
+          findOne: async () => ({
+            id: 1,
+          }),
+        },
+        CommunityRole: {
+          findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [false, 'banned'],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 2, address: '0x123', verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const threadId = 1;
+      const body = 'hello';
+      const title = 'mythread';
+      const stage = 'stage';
+      const url = 'http://blah';
+      const attachments = undefined;
+      const canvasAction = undefined;
+      const canvasSession = undefined;
+      const canvasHash = undefined;
+
+      expect(
+        serverThreadsController.updateThread(
+          user as any,
+          address as any,
+          chain as any,
+          threadId,
+          title,
+          body,
+          stage,
+          url,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash
+        )
+      ).to.be.rejectedWith('Ban error: banned');
+    });
+
+    it('should throw error (discussion without body or attachments)', async () => {
+      let data;
+      data = {
+        id: 1,
+        title: 'title',
+        body: 'body',
+        chain: 'ethereum',
+        kind: 'discussion',
+        Address: {
+          address: '0x123',
+          chain: 'ethereum',
+        },
+        version_history: ['{"body":""}'],
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+
+      const db = {
+        Thread: {
+          findOne: async () => data,
+        },
+        Collaboration: {
+          findOne: async () => ({
+            id: 1,
+          }),
+        },
+        CommunityRole: {
+          findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 2, address: '0x123', verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const threadId = 1;
+      const body = '';
+      const title = 'mythread';
+      const stage = 'stage';
+      const url = 'http://blah';
+      const attachments = undefined;
+      const canvasAction = undefined;
+      const canvasSession = undefined;
+      const canvasHash = undefined;
+
+      expect(
+        serverThreadsController.updateThread(
+          user as any,
+          address as any,
+          chain as any,
+          threadId,
+          title,
+          body,
+          stage,
+          url,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash
+        )
+      ).to.be.rejectedWith('Must provide body or attachment');
+    });
+
+    it('should throw error (thread not found)', async () => {
+      const db = {
+        Thread: {
+          findOne: async () => null,
+        },
+        Collaboration: {
+          findOne: async () => ({
+            id: 1,
+          }),
+        },
+        CommunityRole: {
+          findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 2, address: '0x123', verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const threadId = 1;
+      const body = 'hello';
+      const title = 'mythread';
+      const stage = 'stage';
+      const url = 'http://blah';
+      const attachments = undefined;
+      const canvasAction = undefined;
+      const canvasSession = undefined;
+      const canvasHash = undefined;
+
+      expect(
+        serverThreadsController.updateThread(
+          user as any,
+          address as any,
+          chain as any,
+          threadId,
+          title,
+          body,
+          stage,
+          url,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash
+        )
+      ).to.be.rejectedWith('Thread not found: 1');
+    });
+
+    it('should throw error (invalid link)', async () => {
+      let data;
+      data = {
+        id: 1,
+        title: 'title',
+        body: 'body',
+        chain: 'ethereum',
+        kind: 'link',
+        Address: {
+          address: '0x123',
+          chain: 'ethereum',
+        },
+        version_history: ['{"body":""}'],
+        save: async () => ({}),
+        toJSON: () => data,
+      };
+
+      const db = {
+        Thread: {
+          findOne: async () => data,
+        },
+        Collaboration: {
+          findOne: async () => ({
+            id: 1,
+          }),
+        },
+        CommunityRole: {
+          findAll: async () => [], // no mod/admin roles
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 2, address: '0x123', verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const threadId = 1;
+      const body = 'hello';
+      const title = 'mythread';
+      const stage = 'stage';
+      const url = '--';
+      const attachments = undefined;
+      const canvasAction = undefined;
+      const canvasSession = undefined;
+      const canvasHash = undefined;
+
+      expect(
+        serverThreadsController.updateThread(
+          user as any,
+          address as any,
+          chain as any,
+          threadId,
+          title,
+          body,
+          stage,
+          url,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash
+        )
+      ).to.be.rejectedWith('Invalid thread URL');
+    });
+  });
+
+  describe('#createThread', () => {
+    it('should create a thread', async () => {
+      let data = {};
+
+      const db = {
+        CommunityRole: {
+          findAll: async () => [
+            {
+              toJSON: () => ({
+                chain_id: 'ethereum',
+                name: 'member',
+                allow: '0',
+                deny: '0',
+                RoleAssignments: [{}],
+              }),
+            },
+          ],
+        },
+        Chain: {
+          findOne: async () => ({}),
+        },
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
+          query: async () => ({}),
+        },
+        Topic: {
+          findOrCreate: async () => ({}),
+        },
+        Thread: {
+          findOne: async () => ({
+            ...data,
+            Address: {
+              address: '0x123',
+              chain: 'ethereum',
+            },
+            toJSON: () => ({
+              ...data,
+              Address: {
+                address: '0x123',
+                chain: 'ethereum',
+              },
+            }),
+          }),
+          create: async (d) => {
+            data = {
+              id: 1,
+              ...d,
+            };
+            return data;
+          },
+        },
+        Subscription: {
+          create: async () => ({}),
+        },
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+      const user = {
+        getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
+      };
+      const address = {
+        id: 1,
+        address: '0x123',
+        chain: 'ethereum',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+      };
+      const body = 'hello';
+      const kind = 'discussion';
+      const readOnly = false;
+      const topicId = 1;
+      const topicName = undefined;
+      const title = 'mythread';
+      const stage = 'stage';
+      const url = 'http://blah';
+      const attachments = undefined;
+      const canvasAction = undefined;
+      const canvasSession = undefined;
+      const canvasHash = undefined;
+
+      const [thread, notificationOptions, analyticsOptions] =
+        await serverThreadsController.createThread(
+          user as any,
+          address as any,
+          chain as any,
+          title,
+          body,
+          kind,
+          readOnly,
+          topicId,
+          topicName,
+          stage,
+          url,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash
+        );
+
+      expect(thread.title).to.equal(title);
+      expect(thread.body).to.equal(body);
+      expect(thread.stage).to.equal(stage);
+
+      expect(notificationOptions).to.have.length(1);
+      expect(notificationOptions[0]).to.include({
+        categoryId: 'new-thread-creation',
+        objectId: 'ethereum',
+      });
+      expect(notificationOptions[0].webhookData).to.include({
+        user: '0x123',
+        author_chain: 'ethereum',
+        url: 'http://localhost:8080/ethereum/discussion/1-mythread',
+        title: 'mythread',
+        bodyUrl: 'http://blah',
+        chain: 'ethereum',
+        body: 'hello',
+      });
+      expect(notificationOptions[0].notificationData).to.include({
+        thread_id: 1,
+        root_type: 'discussion',
+        root_title: 'mythread',
+        chain_id: 'ethereum',
+        author_address: '0x123',
+        author_chain: 'ethereum',
+      });
+      expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });
   });
 });

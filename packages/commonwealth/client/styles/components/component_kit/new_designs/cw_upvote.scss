@@ -1,0 +1,60 @@
+@import '../../../shared.scss';
+
+.Upvote {
+  width: 40px;
+  height: 54px;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  gap: 4px;
+  background-color: $white;
+
+  &.default {
+    color: $neutral-500;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    cursor: pointer;
+    border-color: $primary-600;
+    color: $primary-600;
+  }
+
+  &.active {
+    border-color: $primary-500;
+    color: $primary-500;
+  }
+
+  &.disabled {
+    background-color: $neutral-200;
+    border-color: $neutral-400;
+    color: $neutral-400;
+    cursor: default;
+  }
+}
+
+.default {
+  color: $neutral-500;
+}
+
+.upvoted {
+  color: $primary-500;
+}
+
+.hover {
+  color: $primary-600;
+}
+
+.active {
+  color: $primary-500;
+}
+
+.disabled {
+  color: $neutral-400;
+}
