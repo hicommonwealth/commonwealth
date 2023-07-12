@@ -335,7 +335,7 @@ if (process.env.TEST_ENV !== 'playwright') {
     await createTestEntities();
   });
 
-  // afterEach(async () => {
-  //   await clearTestEntities();
-  // });
+  afterEach(async () => {
+    await clearTestEntities();
+  });
 }
