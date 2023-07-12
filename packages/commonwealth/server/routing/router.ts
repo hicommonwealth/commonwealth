@@ -813,6 +813,7 @@ function setupRouter(
     router,
     'get',
     '/roles',
+    databaseValidationService.validateChain,
     controllers.listRoles.bind(this, models)
   );
 
