@@ -630,7 +630,7 @@ export class ServerCommentsController implements IServerCommentsController {
     // find and delete all associated subscriptions
     await this.models.Subscription.destroy({
       where: {
-        offchain_comment_id: comment.id,
+        comment_id: comment.id,
       },
     });
 

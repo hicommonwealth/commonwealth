@@ -586,7 +586,7 @@ export class ServerThreadsController implements IServerThreadsController {
           category_id: NotificationCategories.NewReaction,
           object_id: `comment-${finalComment.id}`,
           chain_id: finalComment.chain || null,
-          offchain_comment_id: finalComment.id,
+          comment_id: finalComment.id,
           is_active: true,
         },
         { transaction: subsTransaction }
@@ -597,7 +597,7 @@ export class ServerThreadsController implements IServerThreadsController {
           category_id: NotificationCategories.NewComment,
           object_id: `comment-${finalComment.id}`,
           chain_id: finalComment.chain || null,
-          offchain_comment_id: finalComment.id,
+          comment_id: finalComment.id,
           is_active: true,
         },
         { transaction: subsTransaction }
@@ -1237,7 +1237,7 @@ export class ServerThreadsController implements IServerThreadsController {
       subscriber_id: user.id,
       category_id: NotificationCategories.NewComment,
       object_id: `discussion_${finalThread.id}`,
-      offchain_thread_id: finalThread.id,
+      thread_id: finalThread.id,
       chain_id: finalThread.chain,
       is_active: true,
     });
@@ -1245,7 +1245,7 @@ export class ServerThreadsController implements IServerThreadsController {
       subscriber_id: user.id,
       category_id: NotificationCategories.NewReaction,
       object_id: `discussion_${finalThread.id}`,
-      offchain_thread_id: finalThread.id,
+      thread_id: finalThread.id,
       chain_id: finalThread.chain,
       is_active: true,
     });
@@ -1261,11 +1261,11 @@ export class ServerThreadsController implements IServerThreadsController {
       FROM "Subscriptions"
       WHERE subscriber_id IN (
         SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
-      ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
+      ) AND category_id = ? AND object_id = ? AND thread_id = ? AND chain_id = ? AND is_active = true
     )
     INSERT INTO "Subscriptions"
-    (subscriber_id, category_id, object_id, offchain_thread_id, chain_id, is_active, created_at, updated_at)
-    SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as
+    (subscriber_id, category_id, object_id, thread_id, chain_id, is_active, created_at, updated_at)
+    SELECT subscriber_id, ? as category_id, ? as object_id, ? as thread_id, ? as
      chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
     FROM "Subscriptions"
     WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);

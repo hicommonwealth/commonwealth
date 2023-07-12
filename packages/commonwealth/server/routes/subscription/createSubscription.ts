@@ -59,13 +59,13 @@ export default async (
           where: { id: Number(p_id) },
         });
         if (!thread) return next(new AppError(Errors.NoThread));
-        obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain };
+        obj = { thread_id: Number(p_id), chain_id: thread.chain };
       } else if (p_entity === 'comment') {
         const comment = await models.Comment.findOne({
           where: { id: Number(p_id) },
         });
         if (!comment) return next(new AppError(Errors.NoComment));
-        obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
+        obj = { comment_id: Number(p_id), chain_id: comment.chain };
       }
       break;
     }

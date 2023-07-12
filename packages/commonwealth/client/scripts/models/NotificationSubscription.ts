@@ -81,8 +81,8 @@ class NotificationSubscription {
       json.created_at,
       json.immediate_email,
       json.chain_id,
-      json.Comment || json.offchain_comment_id,
-      json.Thread || json.offchain_thread_id
+      json.Comment || json.comment_id,
+      json.Thread || json.thread_id
     );
   }
 }

@@ -331,7 +331,7 @@ class ThreadsController {
         created_at: Date.now(),
         immediate_email: false,
         chain_id: result.chain,
-        offchain_thread_id: result.id,
+        thread_id: result.id,
       };
       app.user.notifications.subscriptions.push(
         NotificationSubscription.fromJSON(subscriptionJSON)
