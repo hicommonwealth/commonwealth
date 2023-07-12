@@ -1,32 +1,28 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
-import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
+import Thread from 'models/Thread';
+import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/new_snapshot_proposal.scss';
-
+import { DeltaStatic } from 'quill';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import app from 'state';
+import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-
-import Sublayout from '../../Sublayout';
-import type { ThreadForm } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useLocation } from 'react-router';
 import {
-  createDeltaFromText,
   ReactQuillEditor,
+  createDeltaFromText,
 } from '../../components/react_quill_editor';
-import { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
-import Thread from 'models/Thread';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
+import type { ThreadForm } from './types';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -309,14 +305,12 @@ const NewSnapshotProposalPageComponent = ({
   snapshotId,
 }: NewSnapshotProposalPageProps) => {
   return (
-    <Sublayout>
-      <div className="NewSnapshotProposalPage">
-        <CWText type="h3" fontWeight="medium">
-          New Snapshot Proposal
-        </CWText>
-        <NewSnapshotProposalForm snapshotId={snapshotId} />
-      </div>
-    </Sublayout>
+    <div className="NewSnapshotProposalPage">
+      <CWText type="h3" fontWeight="medium">
+        New Snapshot Proposal
+      </CWText>
+      <NewSnapshotProposalForm snapshotId={snapshotId} />
+    </div>
   );
 };
 

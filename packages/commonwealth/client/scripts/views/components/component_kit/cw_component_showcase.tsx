@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 
 import 'components/component_kit/cw_component_showcase.scss';
+import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWAuthButton } from './cw_auth_button';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
-import { CWButton } from './cw_button';
+import { CWButton } from './new_designs/cw_button';
+import { CWUpvote } from './new_designs/cw_upvote';
+import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -22,7 +25,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
 import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle, toggleDarkMode } from './cw_toggle';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
@@ -40,6 +43,11 @@ import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  ReactQuillEditor,
+} from 'views/components/react_quill_editor';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -137,7 +145,8 @@ export const ComponentShowcase = () => {
   const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
     Array<string>
   >([]);
-  const [isToggled, setIsToggled] = useState<boolean>(false);
+  const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
+  const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
@@ -152,6 +161,11 @@ export const ComponentShowcase = () => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
+
+  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
+  const [isEditorDisabled, setIsEditorDisabled] = useState(false);
 
   return (
     <div className="ComponentShowcase">
@@ -457,176 +471,184 @@ export const ComponentShowcase = () => {
       <div className="button-gallery">
         <CWText type="h3">Buttons</CWText>
         <div className="button-row">
+          <CWText type="h4">Primary</CWText>
+          <CWButton
+            buttonType="primary"
+            label="Primary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary"
+            buttonHeight="lg"
+            label="Primary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary"
+            buttonWidth="wide"
+            label="Primary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary"
+            buttonHeight="lg"
+            buttonWidth="wide"
+            label="Primary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
           <CWButton
             iconLeft="person"
-            buttonType="primary-red"
-            label="Primary red with icon"
+            buttonType="primary"
+            label="Primary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            buttonType="primary-blue"
-            label="Primary blue"
+            buttonType="primary"
+            label="Primary default disabled"
+            disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            buttonType="primary-black"
-            label="Primary black"
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Primary disabled"
+            iconLeft="person"
+            buttonType="primary"
+            label="Primary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div className="button-row">
+          <CWText type="h4">Secondary</CWText>
+          <CWButton
+            buttonType="secondary"
+            label="Secondary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            label="Secondary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="wide"
+            label="Secondary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonWidth="wide"
+            label="Secondary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
           <CWButton
             iconLeft="person"
-            label="Secondary red with icon"
-            buttonType="secondary-red"
+            buttonType="secondary"
+            label="Secondary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Secondary blue"
-            buttonType="secondary-blue"
+            buttonType="secondary"
+            label="Secondary default disabled"
+            disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Secondary black"
-            buttonType="secondary-black"
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary disabled"
-            buttonType="secondary-blue"
+            iconLeft="person"
+            label="Secondary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div className="button-row">
+          <CWText type="h4">Tertiary</CWText>
+          <CWButton
+            buttonType="tertiary"
+            label="Tertiary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="tertiary"
+            buttonHeight="lg"
+            label="Tertiary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="tertiary"
+            buttonWidth="wide"
+            label="Tertiary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="tertiary"
+            buttonHeight="lg"
+            buttonWidth="wide"
+            label="Tertiary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
           <CWButton
             iconLeft="person"
-            label="Tertiary blue with icon"
-            buttonType="tertiary-blue"
+            buttonType="tertiary"
+            label="Tertiary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Tertiary black"
-            buttonType="tertiary-black"
+            buttonType="tertiary"
+            label="Tertiary default disabled"
+            disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Tertiary disabled"
-            buttonType="tertiary-black"
+            buttonType="tertiary"
+            iconLeft="person"
+            label="Tertiary default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div className="button-row">
+          <CWText type="h4">Destructive</CWText>
           <CWButton
-            iconLeft="person"
-            label="Large primary red with icon"
-            buttonType="lg-primary-red"
+            buttonType="destructive"
+            label="Destructive default"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Large primary blue"
-            buttonType="lg-primary-blue"
+            buttonType="destructive"
+            buttonHeight="lg"
+            label="Destructive large"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Large primary blue"
-            buttonType="lg-primary-blue"
-            disabled
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div className="button-row">
-          <CWButton
-            iconLeft="person"
-            label="Large secondary red with icon"
-            buttonType="lg-secondary-red"
+            buttonType="destructive"
+            buttonWidth="wide"
+            label="Destructive wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Large secondary blue"
-            buttonType="lg-secondary-blue"
+            buttonType="destructive"
+            buttonHeight="lg"
+            buttonWidth="wide"
+            label="Destructive large and wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Large secondary disabled"
-            buttonType="lg-secondary-blue"
-            disabled
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div className="button-row">
-          <CWButton
-            iconLeft="person"
-            label="Large tertiary red with icon"
-            buttonType="lg-tertiary-red"
+            iconLeft="trash"
+            buttonType="destructive"
+            label="Destructive default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Large tertiary blue"
-            buttonType="lg-tertiary-blue"
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Large tertiary disabled"
-            buttonType="lg-tertiary-blue"
-            disabled
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div className="button-row">
-          <CWButton
-            label="Primary blue dark disabled"
-            buttonType="primary-blue-dark"
+            buttonType="destructive"
+            label="Destructive default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Secondary blue dark disabled"
-            buttonType="secondary-blue-dark"
-            disabled
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div className="button-row">
-          <CWButton
-            iconLeft="person"
-            buttonType="mini-black"
-            label="Mini with icon"
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Mini"
-            buttonType="mini-black"
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Mini Disabled"
-            buttonType="mini-black"
-            disabled
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div className="button-row">
-          <CWButton
-            iconLeft="person"
-            buttonType="mini-white"
-            label="Mini white with icons"
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Mini white"
-            buttonType="mini-white"
-            onClick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Mini white disabled"
-            buttonType="mini-white"
+            buttonType="destructive"
+            iconLeft="trash"
+            label="Destructive default disabled w/ left icon"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -692,7 +714,20 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Toggle</CWText>
         <div className="toggle-gallery">
           <CWToggle
+            checked={isSmallToggled}
+            size="small"
+            onChange={() => {
+              setIsSmallToggled(!isSmallToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Small</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
             checked={isDarkModeOn}
+            size="small"
             onChange={(e) => {
               isDarkModeOn
                 ? toggleDarkMode(false, setIsDarkModeOn)
@@ -701,17 +736,60 @@ export const ComponentShowcase = () => {
             }}
           />
           <div className="toggle-label">
-            <CWText type="caption">Dark mode</CWText>
+            <CWText type="caption">Small Dark mode</CWText>
           </div>
         </div>
-        <CWToggle
-          checked={isToggled}
-          onChange={() => {
-            setIsToggled(!isToggled);
-          }}
-        />
-        <CWToggle disabled />
-        <CWToggle checked disabled />
+        <div className="toggle-gallery">
+          <CWToggle size="small" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="small" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Small disabled checked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isLargeToggled}
+            size="large"
+            onChange={() => {
+              setIsLargeToggled(!isLargeToggled);
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Large</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isDarkModeOn}
+            size="large"
+            onChange={(e) => {
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
+              e.stopPropagation();
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Large Dark mode</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="large" disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled unchecked</CWText>
+          </div>
+        </div>
+        <div className="toggle-gallery">
+          <CWToggle size="large" checked disabled />
+          <div className="toggle-label">
+            <CWText type="caption">Large disabled checked</CWText>
+          </div>
+        </div>
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Vote Button</CWText>
@@ -929,6 +1007,93 @@ export const ComponentShowcase = () => {
           <CWText fontWeight="semiBold">Card title</CWText>
           <CWText>Full width</CWText>
         </CWCard>
+        <div className="thread-actions-gallery">
+          <CWText type="h3">Thread Actions</CWText>
+          <CWText type="h5">Default</CWText>
+          <CWThreadAction
+            action="comment"
+            onClick={() => console.log('Comment action clicked!')}
+          />
+          <CWThreadAction
+            action="share"
+            onClick={() => console.log('Share action clicked!')}
+          />
+          <CWThreadAction
+            action="subscribe"
+            onClick={() => console.log('Subscribe action clicked!')}
+          />
+          <CWThreadAction
+            action="upvote"
+            count={1}
+            onClick={() => console.log('Upvote action clicked!!')}
+          />
+          <CWThreadAction
+            action="overflow"
+            onClick={() => console.log('Overflow action clicked!')}
+          />
+          <CWText type="h5">Disabled</CWText>
+          <CWThreadAction
+            action="comment"
+            onClick={() => console.log('Comment action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="share"
+            onClick={() => console.log('Share action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="subscribe"
+            onClick={() => console.log('Subscribe action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="upvote"
+            count={1}
+            onClick={() => console.log('Upvote action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="overflow"
+            onClick={() => console.log('Overflow action clicked!')}
+            disabled
+          />
+        </div>
+      </div>
+      <div className="Quill">
+        <CWText type="h3">Quill Editor</CWText>
+        <div className="editor-toggle">
+          <CWToggle
+            size={'small'}
+            checked={isEditorDisabled}
+            onChange={() => {
+              setIsEditorDisabled((prev) => !prev);
+            }}
+          />
+          <CWText type="caption">
+            Editor {isEditorDisabled ? 'Disabled' : 'Enabled'}
+          </CWText>
+        </div>
+        <ReactQuillEditor
+          contentDelta={threadContentDelta}
+          setContentDelta={setThreadContentDelta}
+          isDisabled={isEditorDisabled}
+        />
+      </div>
+      <div className="upvote-gallery">
+        <CWText type="h3">Upvote</CWText>
+        <div className="upvote-row">
+          <CWText>Default</CWText>
+          <CWUpvote voteCount={87} />
+        </div>
+        <div className="upvote-row">
+          <CWText>Active</CWText>
+          <CWUpvote voteCount={8887} active />
+        </div>
+        <div className="upvote-row">
+          <CWText>Disabled</CWText>
+          <CWUpvote voteCount={99999} disabled />
+        </div>
       </div>
     </div>
   );

@@ -25,10 +25,10 @@ test.describe('DiscussionsPage Homepage', () => {
   }) => {
     await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
 
-    await page.waitForSelector('div.RecentThreadsHeader');
+    await page.waitForSelector('div.HeaderWithFilters');
 
     // Assert Thread header exists on discussions page
-    const headerExists = (await page.$('div.RecentThreadsHeader')) !== null;
+    const headerExists = (await page.$('div.HeaderWithFilters')) !== null;
 
     expect(headerExists).to.be.true;
 
@@ -40,7 +40,7 @@ test.describe('DiscussionsPage Homepage', () => {
       'div[data-test-id] > div',
       (divs) => divs.length
     );
-    expect(numberOfThreads).to.equal(Math.min(20, testThreads.length + 1));
+    expect(numberOfThreads).to.equal(Math.min(20, testThreads.length));
 
     const firstThread = await page.$(
       'div[data-test-id="virtuoso-item-list"] > div:first-child'

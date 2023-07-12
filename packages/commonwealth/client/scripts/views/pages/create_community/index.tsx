@@ -7,7 +7,6 @@ import app from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
-import Sublayout from '../../Sublayout';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
@@ -17,6 +16,7 @@ import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
+import { PolygonForm } from './polygon_form';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -27,6 +27,7 @@ export enum CommunityType {
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
+  Polygon = 'Polygon',
   AbiFactory = 'Abi Factory',
 }
 
@@ -106,6 +107,8 @@ const CreateCommunity = () => {
         return (
           <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
+      case CommunityType.Polygon:
+          return <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />;
       case CommunityType.SplToken:
         return <SplTokenForm />;
       default:
@@ -114,35 +117,33 @@ const CreateCommunity = () => {
   };
 
   return (
-    <Sublayout>
-      <div className="CreateCommunityIndex">
-        <CWText type="h3" fontWeight="semiBold">
-          New Commonwealth Community
-        </CWText>
-        <CWTabBar>
-          {Object.values(CommunityType)
-            .filter((t) => {
-              return (
-                (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-                t !== CommunityType.AbiFactory
-              );
-            })
-            .map((t, i) => {
-              return (
-                <CWTab
-                  key={i}
-                  label={t.toString()}
-                  isSelected={currentForm === t}
-                  onClick={() => {
-                    setCurrentForm(t);
-                  }}
-                />
-              );
-            })}
-        </CWTabBar>
-        {getCurrentForm()}
-      </div>
-    </Sublayout>
+    <div className="CreateCommunityIndex">
+      <CWText type="h3" fontWeight="semiBold">
+        New Commonwealth Community
+      </CWText>
+      <CWTabBar>
+        {Object.values(CommunityType)
+          .filter((t) => {
+            return (
+              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+              t !== CommunityType.AbiFactory
+            );
+          })
+          .map((t, i) => {
+            return (
+              <CWTab
+                key={i}
+                label={t.toString()}
+                isSelected={currentForm === t}
+                onClick={() => {
+                  setCurrentForm(t);
+                }}
+              />
+            );
+          })}
+      </CWTabBar>
+      {getCurrentForm()}
+    </div>
   );
 };
 

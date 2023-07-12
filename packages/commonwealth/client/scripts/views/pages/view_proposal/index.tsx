@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
@@ -17,19 +17,18 @@ import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
 import type { AnyProposal } from '../../../models/types';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { User } from '../../components/user/user';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
+import { JSONDisplay } from './json_display';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -45,6 +44,7 @@ const ViewProposalPage = ({
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
+  const hasFetchedProposalRef = useRef(false);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [type, setType] = useState(typeProp);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
@@ -56,8 +56,19 @@ const ViewProposalPage = ({
     if (metadata?.title) forceRerender();
   }, [metadata?.title, forceRerender]);
 
+  useEffect(() => {
+    proposal?.isFetched.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
+      if (hasFetchedProposalRef.current) return;
+      hasFetchedProposalRef.current = true;
+
       if (!type) {
         setType(chainToProposalSlug(app.chain.meta));
       }
@@ -126,49 +137,45 @@ const ViewProposalPage = ({
   };
 
   return (
-    <Sublayout
-    //  title={headerTitle}
-    >
-      <CWContentPage
-        title={proposal.title}
-        author={
-          !!proposal.author && (
-            <User avatarSize={24} user={proposal.author} popover linkify />
-          )
-        }
-        createdAt={proposal.createdAt}
-        updatedAt={null}
-        subHeader={
-          <ProposalSubheader
-            proposal={proposal as SubheaderProposalType}
+    <CWContentPage
+      title={proposal.title}
+      author={proposal.author}
+      createdAt={proposal.createdAt}
+      updatedAt={null}
+      subHeader={
+        <ProposalSubheader
+          proposal={proposal as SubheaderProposalType}
+          toggleVotingModal={toggleVotingModal}
+          votingModalOpen={votingModalOpen}
+        />
+      }
+      body={() =>
+        !!proposal.description && (
+          <CollapsibleProposalBody proposal={proposal} />
+        )
+      }
+      subBody={
+        <>
+          <LinkedProposalsEmbed
+            proposal={proposal as LinkedSubstrateProposal}
+          />
+          {proposal instanceof AaveProposal && (
+            <AaveViewProposalDetail proposal={proposal} />
+          )}
+          {metadata && <JSONDisplay data={metadata} title="Metadata" />}
+          {proposal.data?.messages && (
+            <JSONDisplay data={proposal.data.messages} title="Messages" />
+          )}
+          <VotingResults proposal={proposal} />
+          <VotingActions
+            onModalClose={onModalClose}
+            proposal={proposal}
             toggleVotingModal={toggleVotingModal}
             votingModalOpen={votingModalOpen}
           />
-        }
-        body={
-          !!proposal.description && (
-            <CollapsibleProposalBody proposal={proposal} />
-          )
-        }
-        subBody={
-          <>
-            <LinkedProposalsEmbed
-              proposal={proposal as LinkedSubstrateProposal}
-            />
-            {proposal instanceof AaveProposal && (
-              <AaveViewProposalDetail proposal={proposal} />
-            )}
-            <VotingResults proposal={proposal} />
-            <VotingActions
-              onModalClose={onModalClose}
-              proposal={proposal}
-              toggleVotingModal={toggleVotingModal}
-              votingModalOpen={votingModalOpen}
-            />
-          </>
-        }
-      />
-    </Sublayout>
+        </>
+      }
+    />
   );
 };
 
