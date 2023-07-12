@@ -10,7 +10,7 @@ import { testAddresses, testUsers } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
 
-describe.only('upgradeMember Integration Tests', () => {
+describe('upgradeMember Integration Tests', () => {
   let jwtToken;
 
   beforeEach(() => {
