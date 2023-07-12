@@ -92,7 +92,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
       read_only: true,
     };
 
-    chai.assert.notEqual(testThreads[0].read_only, false);
+    chai.assert.equal(testThreads[0].read_only, false);
 
     const response = await post(
       '/api/updateThreadPrivacy',
@@ -132,6 +132,6 @@ describe('updateThreadPrivacy Integration Tests', () => {
       },
     });
 
-    chai.assert.notEqual(thread.read_only, false);
+    chai.assert.equal(thread.read_only, false);
   });
 });
