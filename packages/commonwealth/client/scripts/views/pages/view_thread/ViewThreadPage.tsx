@@ -52,10 +52,10 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -690,19 +690,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       canComment={canComment}
                     />
                     {showBanner && (
-                      <CWBanner
-                        className="join-community-banner"
-                        title="Want to contribute to this discussion?"
-                        body="Join now to engage in discussions, leave comments, reply to others,
-                    upvote content, and enjoy a host of additional features."
-                        buttons={[
-                          {
-                            label: 'Join community',
-                            buttonType: 'primary',
-                            onClick: handleJoinCommunity,
-                          },
-                        ]}
+                      <JoinCommunityBanner
                         onClose={handleCloseBanner}
+                        onJoin={handleJoinCommunity}
                       />
                     )}
                   </>
