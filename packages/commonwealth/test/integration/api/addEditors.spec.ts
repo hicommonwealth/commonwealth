@@ -12,6 +12,7 @@ import {
 } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
+const { expect } = chai;
 
 describe('addEditors Integration Tests', () => {
   let jwtToken;
@@ -67,19 +68,23 @@ describe('addEditors Integration Tests', () => {
       (a) => a.id === testThreads[0].address_id
     )[0];
     const validRequest = {
+      address: testAddresses[0].address,
+      author_chain: testAddresses[0].chain,
+      chain: testAddresses[0].chain,
+      editors: [{ address: testAddress.address, chain: testAddress.chain }],
       jwt: jwtToken,
       thread_id: testThreads[0].id,
-      editors: [{ chain: testAddress.chain, address: testAddress.address }],
-      author_chain: testAddresses[0].chain,
-      address: testAddresses[0].address,
-      chain: testAddresses[0].chain,
     };
-
     const response = await post('/api/addEditors', validRequest, true, app);
 
-    chai.assert.equal(response.status, 'Success');
-    chai.assert.equal(response.result.collaborators.length, 2);
-    chai.assert.equal(response.result.collaborators[0].id, -1);
-    chai.assert.equal(response.result.collaborators[1].id, -2);
+    expect(response.status).to.equal('Success');
+    expect(response.result.collaborators).to.haveOwnProperty('length');
+    expect(response.result.collaborators.length).equal(2);
+
+    const findCollab = (id) => {
+      return response.result.collaborators.find((c) => c.id == id);
+    };
+    expect(findCollab(-1)).to.exist;
+    expect(findCollab(-2)).to.exist;
   });
 });

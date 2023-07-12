@@ -18,7 +18,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _extension;
 
   public readonly name = WalletId.TerraStation;
-  public readonly label = 'Terra Station';
+  public readonly label = 'Station';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Terra;
   public readonly specificChains = ['terra'];
@@ -46,7 +46,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   public async enable() {
     this._terra = await import('@terra-money/terra.js');
     this._extension = new this._terra.Extension();
-    console.log('Attempting to enable Terra Station');
+    console.log('Attempting to enable Station');
     this._enabling = true;
 
     // use a promise so that this function returns *after* the wallet has connected
@@ -54,7 +54,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       this._extension.once('onConnect', resolve);
       this._extension.connect();
     }).catch((error) => {
-      console.error(`Failed to enabled Terra Station ${error.message}`);
+      console.error(`Failed to enabled Station ${error.message}`);
     });
 
     if (accountAddr && !this._accounts.includes(accountAddr)) {
