@@ -4,6 +4,8 @@ import { FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { fn, col, literal } from 'sequelize';
+import { BN } from 'ethereumjs-util';
 
 export const Errors = {
   NoAddress: 'Address not found',
@@ -16,6 +18,7 @@ type TokenBalanceReq = {
   address: string;
   chain: string;
   contract_address?: string;
+  all?: boolean;
 };
 type TokenBalanceResp = string;
 
@@ -50,12 +53,49 @@ const tokenBalance = async (
   }
 
   try {
-    const balance = await tokenBalanceCache.fetchUserBalance(
-      chain.network,
-      chain_node_id,
-      req.body.address,
-      req.body.contract_address
-    );
+    let balance: string;
+    if (req.body.all) {
+      const user_id = await models.Address.findOne({
+        where: {
+          chain: req.body.chain,
+          address: req.body.address,
+        },
+      });
+      const addresses: any = await models.Address.findAll({
+        attributes: [[fn('DISTINCT', col('address')), 'distinctAddress']],
+        where: {
+          chain: req.body.chain,
+          user_id: user_id.user_id,
+        },
+      });
+
+      if (addresses.length == 0) {
+        throw new AppError('No Addresses associated with user on this chain');
+      }
+
+      const balances = await Promise.all(
+        addresses.map(async (address) => {
+          return tokenBalanceCache.fetchUserBalance(
+            chain.network,
+            chain_node_id,
+            address.dataValues.distinctAddress,
+            req.body.contract_address
+          );
+        })
+      );
+
+      balance = balances
+        .map((b) => new BN(b))
+        .reduce((acc: BN, val: BN) => acc.add(val))
+        .toString();
+    } else {
+      balance = await tokenBalanceCache.fetchUserBalance(
+        chain.network,
+        chain_node_id,
+        req.body.address,
+        req.body.contract_address
+      );
+    }
     return success(res, balance);
   } catch (e) {
     if (e.message === FetchTokenBalanceErrors.NoBalanceProvider) {

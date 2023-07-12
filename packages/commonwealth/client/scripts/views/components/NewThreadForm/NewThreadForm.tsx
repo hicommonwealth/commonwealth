@@ -1,6 +1,5 @@
 import 'components/NewThreadForm.scss';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { capitalize } from 'lodash';
@@ -35,9 +34,7 @@ export const NewThreadForm = () => {
     topics ||
     [].filter((t) => {
       return (
-        isAdmin ||
-        t.tokenThreshold.isZero() ||
-        !TopicGateCheck.isGatedTopic(t.name)
+        isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.name)
       );
     });
 

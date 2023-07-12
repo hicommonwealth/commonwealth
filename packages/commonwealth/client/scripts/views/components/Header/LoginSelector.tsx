@@ -18,7 +18,6 @@ import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import AddressInfo from '../../../models/AddressInfo';
-import ITokenAdapter from '../../../models/ITokenAdapter';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
@@ -233,11 +232,6 @@ export const LoginSelector = () => {
           }
         } else {
           // Todo: handle error
-        }
-
-        // If token forum make sure has token and add to app.chain obj
-        if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-          await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
       } catch (err) {
         console.error(err);

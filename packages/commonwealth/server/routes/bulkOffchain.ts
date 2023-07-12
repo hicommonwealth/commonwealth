@@ -14,6 +14,7 @@ import type { CommunityContractTemplateInstance } from 'server/models/community_
 import type { ThreadInstance } from '../models/thread';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
+import { TopicInstance } from 'server/models/topic';
 
 export const Errors = {};
 
@@ -32,6 +33,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     totalThreads,
     communityBanner,
     contractsWithTemplatesData,
+    topics,
   ] = await (<
     Promise<
       [
@@ -44,7 +46,8 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           contract: ContractInstance;
           ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
-        }>
+        }>,
+        TopicInstance[]
       ]
     >
   >Promise.all([
@@ -191,6 +194,14 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
+    models.Topic.findAll({
+      where: {
+        chain_id: chain.id,
+        token_threshold: {
+          [Op.not]: null,
+        },
+      },
+    }),
   ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -198,6 +209,15 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   ).length;
 
   const numTotalThreads = parseInt(totalThreads[0].count);
+  const gateStrategies = topics.map((topic) => {
+    return {
+      topic: topic.name,
+      type: 'token',
+      data: {
+        threshold: topic.token_threshold,
+      },
+    };
+  });
 
   return res.json({
     status: 'Success',
@@ -214,6 +234,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),
+      gateStrategies,
     },
   });
 };

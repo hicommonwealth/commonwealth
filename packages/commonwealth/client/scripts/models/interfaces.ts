@@ -123,3 +123,11 @@ export interface IUnavailableEndTime {
 export interface IQueuedEndTime {
   kind: 'queued';
 }
+
+export interface IGatedTopic {
+  topic: string;
+  type: string;
+  data: {
+    threshold: number;
+  };
+}

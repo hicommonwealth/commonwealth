@@ -4,7 +4,6 @@ import BN from 'bn.js';
 
 import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { weiToTokens, getDecimals } from 'helpers';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
@@ -106,13 +105,10 @@ export const CreateComment = ({
 
   // token balance check if needed
   const tokenPostingThreshold: BN =
-    TopicGateCheck.getTopicThreshold(activeTopicName);
+    app.chain.getTopicThreshold(activeTopicName);
 
-  const userBalance: BN = TopicGateCheck.getUserBalance();
-  const userFailsThreshold =
-    tokenPostingThreshold?.gtn(0) &&
-    userBalance?.gtn(0) &&
-    userBalance.lt(tokenPostingThreshold);
+  const userFailsThreshold = app.chain.isGatedTopic(activeTopicName);
+  const userBalance = app.chain.userChainBalance;
 
   const disabled =
     editorValue.length === 0 || sendingComment || userFailsThreshold;

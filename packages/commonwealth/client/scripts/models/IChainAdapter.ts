@@ -9,8 +9,14 @@ import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
+import type {
+  IAccountsModule,
+  IBlockInfo,
+  IChainModule,
+  IGatedTopic,
+} from './interfaces';
 import ProposalModule from './ProposalModule';
+import BN from 'bn.js';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -67,6 +73,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
+      gateStrategies,
     } = response.result;
     this.app.threads.initialize(
       pinnedThreads,
@@ -78,6 +85,25 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
+    if (gateStrategies.length > 0) {
+      this.gatedTopics = gateStrategies;
+      const address = this.app.user.addresses.filter(
+        (a) => a.chain.id === this.meta.id
+      );
+      if (address.length > 0) {
+        await $.post(`${this.app.serverUrl()}/tokenBalance`, {
+          chain: this.meta.id,
+          address: address[0].address,
+          author_chain: this.meta.id,
+          all: true,
+        }).then((balanceResp) => {
+          if (balanceResp.result) {
+            const balance = new BN(balanceResp.result, 10);
+            if (balance) this.userChainBalance = balance;
+          }
+        });
+      }
+    }
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
 
@@ -150,6 +176,25 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
   }
 
+  public getTopicThreshold(topicName: string): BN {
+    if (this.gatedTopics?.length > 0 && topicName) {
+      const topicGate = this.gatedTopics.find((i) => i.topic === topicName);
+
+      if (!topicGate) return new BN('0', 10);
+
+      return new BN(topicGate.data.threshold);
+    }
+    return new BN('0', 10);
+  }
+
+  public isGatedTopic(topicName: string): boolean {
+    const tokenPostingThreshold = this.getTopicThreshold(topicName);
+    return (
+      tokenPostingThreshold != new BN('0', 10) &&
+      tokenPostingThreshold.gt(this.userChainBalance)
+    );
+  }
+
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
@@ -162,6 +207,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public version: string;
   public name: string;
   public runtimeName: string;
+  public gatedTopics: IGatedTopic[];
+  public userChainBalance: BN;
 
   constructor(meta: ChainInfo, app: IApp) {
     this.meta = meta;
