@@ -55,7 +55,6 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -100,7 +99,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -452,14 +450,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
-  const {
-    handleJoinCommunity,
-    performJoinCommunityLinking,
-    AccountSelectorModal,
-  } = useJoinCommunity({
-    setIsLoginModalOpen,
-    setIsTOSModalOpen,
-  });
+  const { handleJoinCommunity, AccountSelectorModal, TermsOfServiceModal } =
+    useJoinCommunity({
+      setIsLoginModalOpen,
+    });
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -840,19 +834,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }
       />
       {AccountSelectorModal}
-      <Modal
-        content={
-          <TOSModal
-            onAccept={async () => {
-              await performJoinCommunityLinking();
-              setIsTOSModalOpen(false);
-            }}
-            onModalClose={() => setIsTOSModalOpen(false)}
-          />
-        }
-        onClose={() => setIsTOSModalOpen(false)}
-        open={isTOSModalOpen}
-      />
+      {TermsOfServiceModal}
       <Modal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}

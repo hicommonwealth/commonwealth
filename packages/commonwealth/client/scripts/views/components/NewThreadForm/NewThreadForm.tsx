@@ -24,7 +24,6 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -36,7 +35,6 @@ export const NewThreadForm = () => {
     chainId: app.activeChainId(),
   });
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
@@ -68,14 +66,10 @@ export const NewThreadForm = () => {
     clearDraft,
   } = useNewThreadForm(chainId, topicsForSelector);
 
-  const {
-    handleJoinCommunity,
-    performJoinCommunityLinking,
-    AccountSelectorModal,
-  } = useJoinCommunity({
-    setIsLoginModalOpen,
-    setIsTOSModalOpen,
-  });
+  const { handleJoinCommunity, AccountSelectorModal, TermsOfServiceModal } =
+    useJoinCommunity({
+      setIsLoginModalOpen,
+    });
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -236,19 +230,7 @@ export const NewThreadForm = () => {
         </div>
       </div>
       {AccountSelectorModal}
-      <Modal
-        content={
-          <TOSModal
-            onAccept={async () => {
-              await performJoinCommunityLinking();
-              setIsTOSModalOpen(false);
-            }}
-            onModalClose={() => setIsTOSModalOpen(false)}
-          />
-        }
-        onClose={() => setIsTOSModalOpen(false)}
-        open={isTOSModalOpen}
-      />
+      {TermsOfServiceModal}
       <Modal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}

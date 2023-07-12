@@ -11,19 +11,17 @@ import ITokenAdapter from 'models/ITokenAdapter';
 import React, { useState } from 'react';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import { TOSModal } from 'views/components/Header/TOSModal';
 
 const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
 interface UseJoinCommunityProps {
   setIsLoginModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsTOSModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const useJoinCommunity = ({
-  setIsLoginModalOpen,
-  setIsTOSModalOpen,
-}: UseJoinCommunityProps) => {
+const useJoinCommunity = ({ setIsLoginModalOpen }: UseJoinCommunityProps) => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
+  const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -214,12 +212,29 @@ const useJoinCommunity = ({
     />
   );
 
+  const TermsOfServiceModal = (
+    <Modal
+      content={
+        <TOSModal
+          onAccept={async () => {
+            await performJoinCommunityLinking();
+            setIsTOSModalOpen(false);
+          }}
+          onModalClose={() => setIsTOSModalOpen(false)}
+        />
+      }
+      onClose={() => setIsTOSModalOpen(false)}
+      open={isTOSModalOpen}
+    />
+  );
+
   return {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
     performJoinCommunityLinking,
     linkToCommunity,
     AccountSelectorModal,
+    TermsOfServiceModal,
   };
 };
 

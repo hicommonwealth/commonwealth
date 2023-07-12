@@ -17,7 +17,6 @@ import { Modal } from '../component_kit/cw_modal';
 import useForceRerender from 'hooks/useForceRerender';
 import { LoginSelectorMenuLeft } from 'views/components/Header/LoginSelectorMenuLeft';
 import { LoginSelectorMenuRight } from 'views/components/Header/LoginSelectorMenuRight';
-import { TOSModal } from 'views/components/Header/TOSModal';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
@@ -38,16 +37,14 @@ export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
-    performJoinCommunityLinking,
     AccountSelectorModal,
+    TermsOfServiceModal,
   } = useJoinCommunity({
     setIsLoginModalOpen,
-    setIsTOSModalOpen,
   });
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -173,19 +170,7 @@ export const LoginSelector = () => {
         </ClickAwayListener>
       </div>
       {AccountSelectorModal}
-      <Modal
-        content={
-          <TOSModal
-            onAccept={async () => {
-              await performJoinCommunityLinking();
-              setIsTOSModalOpen(false);
-            }}
-            onModalClose={() => setIsTOSModalOpen(false)}
-          />
-        }
-        onClose={() => setIsTOSModalOpen(false)}
-        open={isTOSModalOpen}
-      />
+      {TermsOfServiceModal}
       <Modal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
