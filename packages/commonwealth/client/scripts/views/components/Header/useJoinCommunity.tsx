@@ -16,13 +16,11 @@ interface UseJoinCommunityProps {
   setIsAccountSelectorModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLoginModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsTOSModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsJoined: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const useJoinCommunity = ({
   setIsAccountSelectorModalOpen,
   setIsLoginModalOpen,
   setIsTOSModalOpen,
-  setIsJoined,
 }: UseJoinCommunityProps) => {
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -188,7 +186,6 @@ const useJoinCommunity = ({
         setIsTOSModalOpen(true);
       } else {
         await performJoinCommunityLinking();
-        setIsJoined(true);
       }
     }
   };

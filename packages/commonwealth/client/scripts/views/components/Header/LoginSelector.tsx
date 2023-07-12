@@ -20,6 +20,7 @@ import { LoginSelectorMenuLeft } from 'views/components/Header/LoginSelectorMenu
 import { LoginSelectorMenuRight } from 'views/components/Header/LoginSelectorMenuRight';
 import { TOSModal } from 'views/components/Header/TOSModal';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -41,7 +42,6 @@ export const LoginSelector = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
 
   const {
     handleJoinCommunity,
@@ -52,21 +52,15 @@ export const LoginSelector = () => {
     setIsAccountSelectorModalOpen,
     setIsLoginModalOpen,
     setIsTOSModalOpen,
-    setIsJoined,
   });
+
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     NewProfilesController.Instance.isFetched.on('redraw', () => {
       setProfileLoadComplete(true);
     });
   }, []);
-
-  useEffect(() => {
-    const activeAccounts = app.user?.activeAccounts?.filter(
-      (a) => a.chain.id === app.chain.id
-    );
-    setIsJoined(!!app.user.activeAccount || activeAccounts.length > 0);
-  }, [app.user.activeAccount, app.user.activeAccounts]);
 
   useEffect(() => {
     if (!isLoginModalOpen && app.chain?.meta?.id == 'injective') {
@@ -120,23 +114,26 @@ export const LoginSelector = () => {
   return (
     <>
       <div className="LoginSelector">
-        {app.chain && !app.chainPreloading && profileLoadComplete && !isJoined && (
-          <div className="join-button-container">
-            <CWButton
-              buttonType="tertiary-black"
-              onClick={handleJoinCommunity}
-              label={
-                sameBaseAddressesRemoveDuplicates.length === 0
-                  ? `No ${
-                      CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                      CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                      ''
-                    } address`
-                  : 'Join'
-              }
-            />
-          </div>
-        )}
+        {app.chain &&
+          !app.chainPreloading &&
+          profileLoadComplete &&
+          !hasJoinedCommunity && (
+            <div className="join-button-container">
+              <CWButton
+                buttonType="tertiary-black"
+                onClick={handleJoinCommunity}
+                label={
+                  sameBaseAddressesRemoveDuplicates.length === 0
+                    ? `No ${
+                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                        ''
+                      } address`
+                    : 'Join'
+                }
+              />
+            </div>
+          )}
         {profileLoadComplete && (
           <ClickAwayListener
             onClickAway={() => {
@@ -205,7 +202,6 @@ export const LoginSelector = () => {
             onAccept={async () => {
               await performJoinCommunityLinking();
               setIsTOSModalOpen(false);
-              setIsJoined(true);
             }}
             onModalClose={() => setIsTOSModalOpen(false)}
           />
@@ -214,12 +210,7 @@ export const LoginSelector = () => {
         open={isTOSModalOpen}
       />
       <Modal
-        content={
-          <LoginModal
-            onSuccess={() => setIsJoined(true)}
-            onModalClose={() => setIsLoginModalOpen(false)}
-          />
-        }
+        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}

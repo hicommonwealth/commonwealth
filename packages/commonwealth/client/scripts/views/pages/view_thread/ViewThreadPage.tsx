@@ -58,6 +58,7 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const JOIN_COMMUNITY_BANNER_KEY = (communityId) =>
   `${communityId}-joinCommunityBannerClosedAt`;
@@ -92,7 +93,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [thread, setThread] = useState<Thread>(null);
   const [threadFetchFailed, setThreadFetchFailed] = useState(false);
   const [title, setTitle] = useState('');
-  const [viewCount, setViewCount] = useState(null);
+  const [viewCount, setViewCount] = useState<number>(null);
   const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
@@ -100,13 +101,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [commentSortType, setCommentSortType] =
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
-  const [parentCommentId, setParentCommentId] = useState(null);
+  const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
 
   const activeChainInfo = app.chain?.meta;
   const threadId = identifier.split('-')[0];
@@ -472,13 +472,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsBannerVisible(bannerClosedMoreThanWeekAgo);
   }, []);
 
-  useEffect(() => {
-    const activeAccounts = app.user?.activeAccounts?.filter(
-      (a) => a.chain.id === app.chain.id
-    );
-    setIsJoined(!!app.user.activeAccount || activeAccounts.length > 0);
-  }, []);
-
   const {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
@@ -488,8 +481,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsAccountSelectorModalOpen,
     setIsLoginModalOpen,
     setIsTOSModalOpen,
-    setIsJoined,
   });
+
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -532,7 +526,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
   const canComment =
-    !!isJoined ||
+    !!hasJoinedCommunity ||
     (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
 
   const handleLinkedThreadChange = (links: Thread['links']) => {
@@ -571,7 +565,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : moment(b.createdAt).diff(moment(a.createdAt))
   );
 
-  const showBanner = !isJoined && isBannerVisible;
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
 
   const handleCloseBanner = () => {
     localStorage.setItem(
@@ -899,7 +893,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             onAccept={async () => {
               await performJoinCommunityLinking();
               setIsTOSModalOpen(false);
-              setIsJoined(true);
+              // setIsJoined(true);
             }}
             onModalClose={() => setIsTOSModalOpen(false)}
           />
@@ -910,7 +904,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       <Modal
         content={
           <LoginModal
-            onSuccess={() => setIsJoined(true)}
+            // onSuccess={() => setIsJoined(true)}
             onModalClose={() => setIsLoginModalOpen(false)}
           />
         }

@@ -29,6 +29,7 @@ import { AccountSelector } from 'views/components/component_kit/cw_wallets_list'
 import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const JOIN_COMMUNITY_BANNER_KEY = (communityId) =>
   `${communityId}-joinCommunityBannerClosedAt`;
@@ -43,7 +44,6 @@ export const NewThreadForm = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
 
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
@@ -85,8 +85,9 @@ export const NewThreadForm = () => {
     setIsAccountSelectorModalOpen,
     setIsLoginModalOpen,
     setIsTOSModalOpen,
-    setIsJoined,
   });
+
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -166,13 +167,6 @@ export const NewThreadForm = () => {
     setIsBannerVisible(bannerClosedMoreThanWeekAgo);
   }, []);
 
-  useEffect(() => {
-    const activeAccounts = app.user?.activeAccounts?.filter(
-      (a) => a.chain.id === app.chain.id
-    );
-    setIsJoined(!!app.user.activeAccount || activeAccounts.length > 0);
-  }, []);
-
   const handleCloseBanner = () => {
     localStorage.setItem(
       JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()),
@@ -181,7 +175,7 @@ export const NewThreadForm = () => {
     setIsBannerVisible(false);
   };
 
-  const showBanner = !isJoined && isBannerVisible;
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
 
   return (
     <>
@@ -231,7 +225,7 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
-              isDisabled={!isJoined}
+              isDisabled={!hasJoinedCommunity}
             />
 
             <div className="buttons-row">
@@ -247,7 +241,7 @@ export const NewThreadForm = () => {
                 label={
                   app.user.activeAccount ? 'Post' : 'Join community to create'
                 }
-                disabled={isDisabled || !isJoined}
+                disabled={isDisabled || !hasJoinedCommunity}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
                 buttonWidth="wide"
@@ -297,7 +291,6 @@ export const NewThreadForm = () => {
             onAccept={async () => {
               await performJoinCommunityLinking();
               setIsTOSModalOpen(false);
-              setIsJoined(true);
             }}
             onModalClose={() => setIsTOSModalOpen(false)}
           />
@@ -306,12 +299,7 @@ export const NewThreadForm = () => {
         open={isTOSModalOpen}
       />
       <Modal
-        content={
-          <LoginModal
-            onSuccess={() => setIsJoined(true)}
-            onModalClose={() => setIsLoginModalOpen(false)}
-          />
-        }
+        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
