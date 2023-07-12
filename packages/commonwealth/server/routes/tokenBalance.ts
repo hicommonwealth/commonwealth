@@ -26,7 +26,7 @@ type TokenBalanceResp =
   | {
       address: string;
       balance: string;
-    };
+    }[];
 
 const tokenBalance = async (
   models: DB,
@@ -59,7 +59,12 @@ const tokenBalance = async (
   }
 
   try {
-    let balance: any;
+    let balance:
+      | string
+      | {
+          address: string;
+          balance: string;
+        }[];
     if (req.body.all) {
       const user_id = await models.Address.findOne({
         where: {
