@@ -428,8 +428,6 @@ export enum CACHE_ENDPOINTS {
 }
 
 export const setupCacheTestEndpoints = (appAttach: Express) => {
-  log.info('setupCacheTestEndpoints');
-
   // /cachedummy endpoint for testing
   appAttach.get(
     CACHE_ENDPOINTS.BROKEN_4XX,
@@ -519,19 +517,6 @@ const rollbar = new Rollbar({
 
 setupErrorHandlers(app, rollbar);
 setupServer();
-
-function availableRoutes() {
-  return app._router.stack
-    .filter((r) => r.route)
-    .map((r) => {
-      return {
-        method: Object.keys(r.route.methods)[0].toUpperCase(),
-        path: r.route.path,
-      };
-    });
-}
-
-console.log(JSON.stringify(availableRoutes(), null, 2));
 
 export const resetDatabase = () => resetServer();
 export const getTokenBalanceCache = () => tokenBalanceCache;
