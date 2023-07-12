@@ -8,21 +8,19 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { TopicSelector } from 'views/components/topic_selector';
 import { ThreadKind, ThreadStage } from '../../../models/types';
+import Permissions from '../../../utils/Permissions';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
-import {
-  checkNewThreadErrors,
-  useNewThreadForm,
-} from './helpers';
+import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -31,7 +29,7 @@ export const NewThreadForm = () => {
   });
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
-  const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
+  const isAdmin = Permissions.isCommunityAdmin();
 
   const topicsForSelector =
     topics ||
@@ -175,21 +173,20 @@ export const NewThreadForm = () => {
             <div className="buttons-row">
               {isPopulated && (
                 <CWButton
-                  label={'Cancel'}
+                  buttonType="tertiary"
                   onClick={handleCancel}
                   tabIndex={3}
-                  buttonType="secondary-blue"
+                  label="Cancel"
                 />
               )}
               <CWButton
                 label={
-                  app.user.activeAccount
-                    ? 'Create thread'
-                    : 'Join community to create'
+                  app.user.activeAccount ? 'Post' : 'Join community to create'
                 }
                 disabled={isDisabled}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
+                buttonWidth="wide"
               />
             </div>
           </div>
