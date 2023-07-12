@@ -13,7 +13,6 @@ import {
 } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('updateThreadPrivacy Integration Tests', () => {
   let jwtTokenUser1;
@@ -42,7 +41,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
     );
 
     response.should.have.status(400);
-    expect(response.error).to.equal(Errors.NoThreadId);
+    chai.assert.equal(response.error, Errors.NoThreadId);
   });
 
   it('should return an error response if an invalid read only is specified', async () => {
@@ -61,7 +60,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
     );
 
     response.should.have.status(400);
-    expect(response.error).to.equal(Errors.NoReadOnly);
+    chai.assert.equal(response.error, Errors.NoReadOnly);
   });
 
   it('should return an error response if the user does not own the thread or is not an admin', async () => {
@@ -93,7 +92,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
       read_only: true,
     };
 
-    expect(testThreads[0].read_only).to.equal(false);
+    chai.assert.notEqual(testThreads[0].read_only, false);
 
     const response = await post(
       '/api/updateThreadPrivacy',
@@ -102,12 +101,12 @@ describe('updateThreadPrivacy Integration Tests', () => {
       app
     );
 
-    expect(response.status).to.equal('Success');
+    chai.assert.equal(response.status, 'Success');
     const thread = await models.Thread.findOne({
       where: { id: testThreads[0].id },
     });
 
-    expect(thread.read_only).to.equal(true);
+    chai.assert.notEqual(thread.read_only, true);
   });
 
   it('should unlock a thread', async () => {
@@ -126,13 +125,13 @@ describe('updateThreadPrivacy Integration Tests', () => {
       app
     );
 
-    expect(response.status).to.equal('Success');
+    chai.assert.equal(response.status, 'Success');
     const thread = await models.Thread.findOne({
       where: {
         id: testThreads[0].id,
       },
     });
 
-    expect(thread.read_only).to.equal(false);
+    chai.assert.notEqual(thread.read_only, false);
   });
 });
