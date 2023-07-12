@@ -5,7 +5,7 @@ import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -22,7 +22,6 @@ import {
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
-import moment from 'moment';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
@@ -30,16 +29,13 @@ import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-
-const JOIN_COMMUNITY_BANNER_KEY = (communityId) =>
-  `${communityId}-joinCommunityBannerClosedAt`;
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
-  const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
@@ -87,6 +83,7 @@ export const NewThreadForm = () => {
     setIsTOSModalOpen,
   });
 
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -150,29 +147,6 @@ export const NewThreadForm = () => {
       topicsForSelector.find((t) => t.name.includes('General')) || null
     );
     setThreadContentDelta(createDeltaFromText(''));
-  };
-
-  useEffect(() => {
-    const bannerClosedAt = Number(
-      localStorage.getItem(JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()))
-    );
-
-    if (!bannerClosedAt) {
-      setIsBannerVisible(true);
-      return;
-    }
-
-    const timeDifference = moment().diff(moment(bannerClosedAt), 'week');
-    const bannerClosedMoreThanWeekAgo = timeDifference >= 1;
-    setIsBannerVisible(bannerClosedMoreThanWeekAgo);
-  }, []);
-
-  const handleCloseBanner = () => {
-    localStorage.setItem(
-      JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()),
-      String(Date.now())
-    );
-    setIsBannerVisible(false);
   };
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;

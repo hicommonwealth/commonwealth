@@ -59,9 +59,7 @@ import { AccountSelector } from 'views/components/component_kit/cw_wallets_list'
 import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-
-const JOIN_COMMUNITY_BANNER_KEY = (communityId) =>
-  `${communityId}-joinCommunityBannerClosedAt`;
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -102,7 +100,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-  const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
@@ -457,20 +454,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [comments, thread, threadId]);
 
-  useEffect(() => {
-    const bannerClosedAt = Number(
-      localStorage.getItem(JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()))
-    );
-
-    if (!bannerClosedAt) {
-      setIsBannerVisible(true);
-      return;
-    }
-
-    const timeDifference = moment().diff(moment(bannerClosedAt), 'week');
-    const bannerClosedMoreThanWeekAgo = timeDifference >= 1;
-    setIsBannerVisible(bannerClosedMoreThanWeekAgo);
-  }, []);
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
   const {
     handleJoinCommunity,
@@ -566,14 +550,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
-
-  const handleCloseBanner = () => {
-    localStorage.setItem(
-      JOIN_COMMUNITY_BANNER_KEY(app.activeChainId()),
-      String(Date.now())
-    );
-    setIsBannerVisible(false);
-  };
 
   return (
     <>
@@ -893,7 +869,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             onAccept={async () => {
               await performJoinCommunityLinking();
               setIsTOSModalOpen(false);
-              // setIsJoined(true);
             }}
             onModalClose={() => setIsTOSModalOpen(false)}
           />
@@ -902,12 +877,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         open={isTOSModalOpen}
       />
       <Modal
-        content={
-          <LoginModal
-            // onSuccess={() => setIsJoined(true)}
-            onModalClose={() => setIsLoginModalOpen(false)}
-          />
-        }
+        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
