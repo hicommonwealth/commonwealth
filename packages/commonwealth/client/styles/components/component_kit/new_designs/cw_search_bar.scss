@@ -90,3 +90,34 @@
   flex: 1;
 }
 
+.popper {
+  position: static;
+}
+
+
+.listBox {
+  box-sizing: border-box;
+  padding: 6px;
+  // margin-top: -32px;
+  width: 608px;
+  border-radius: 6px;
+  overflow: auto;
+  outline: 0px;
+  z-index: 1;
+  background-color: $white;
+  border: 1px solid #d0d7de;
+  color: #24292f;
+  box-shadow: 0px 4px 30px #d0d7de;
+}
+
+.option {
+  list-style: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: default;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $neutral-100;
+  }
+}
