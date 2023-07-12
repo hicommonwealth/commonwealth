@@ -106,7 +106,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
       where: { id: testThreads[0].id },
     });
 
-    chai.assert.notEqual(thread.read_only, true);
+    chai.assert.equal(thread.read_only, true);
   });
 
   it('should unlock a thread', async () => {
