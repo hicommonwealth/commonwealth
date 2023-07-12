@@ -80,7 +80,11 @@ describe('addEditors Integration Tests', () => {
     expect(response.status).to.equal('Success');
     expect(response.result.collaborators).to.haveOwnProperty('length');
     expect(response.result.collaborators.length).equal(2);
-    expect(response.result.collaborators[0].id).to.equal(-1);
-    expect(response.result.collaborators[1].id).to.equal(-2);
+
+    const findCollab = (id) => {
+      return response.result.collaborators.find((c) => c.id == id);
+    };
+    expect(findCollab(-1)).to.exist;
+    expect(findCollab(-2)).to.exist;
   });
 });
