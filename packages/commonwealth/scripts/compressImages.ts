@@ -78,7 +78,7 @@ async function main() {
       }
 
       const params: S3.Types.PutObjectRequest = {
-        Bucket: 'commonwealth-uploads',
+        Bucket: 'assets.commonwealth.im',
         Key: `${chain.id}_200x200.${contentType.split('/')[1]}`,
         Body: compressedImage,
         ContentType: contentType,

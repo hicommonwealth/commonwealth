@@ -9,4 +9,4 @@ load-env-var '.env';
 
 
 
-psql -d postgres -U commonwealth -c 'DROP DATABASE commonwealth_chain_events WITH (FORCE);' && npx sequelize db:create
+psql -h localhost -d postgres -U commonwealth -c 'DROP DATABASE commonwealth_chain_events WITH (FORCE);' && npx sequelize db:create
