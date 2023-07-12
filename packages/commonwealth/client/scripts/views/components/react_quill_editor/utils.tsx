@@ -3,6 +3,7 @@ import type { DeltaStatic } from 'quill';
 import { Icon, IconProps } from '@phosphor-icons/react';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 
 export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
@@ -98,7 +99,7 @@ export const uploadFileToS3 = async (
       },
     });
 
-    const trimmedURL = signedUploadUrl.split('?')[0];
+    const trimmedURL = replaceBucketWithCDN(signedUploadUrl.split('?')[0]);
     console.log(`upload succeeded: ${trimmedURL}`);
 
     return trimmedURL;
