@@ -319,7 +319,6 @@ describe('Roles Test', () => {
           chain,
           address_id: memberAddressId,
         });
-      console.log(res.body);
       expect(res.body.status).to.be.equal('Success');
       const address = await models.Address.findOne({
         where: {
