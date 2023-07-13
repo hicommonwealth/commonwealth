@@ -504,6 +504,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
+            buttonWidth="full"
+            label="Primary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary"
             label="Primary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -512,6 +518,13 @@ export const ComponentShowcase = () => {
             iconLeft="person"
             buttonType="primary"
             label="Primary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary"
+            buttonWidth="full"
+            label="Primary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -550,6 +563,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
+            buttonWidth="full"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
             label="Secondary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -557,6 +576,13 @@ export const ComponentShowcase = () => {
           <CWButton
             iconLeft="person"
             label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            label="Secondary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -595,6 +621,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="tertiary"
+            buttonWidth="full"
+            label="Tertiary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="tertiary"
             label="Tertiary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -603,6 +635,13 @@ export const ComponentShowcase = () => {
             buttonType="tertiary"
             iconLeft="person"
             label="Tertiary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="tertiary"
+            buttonWidth="full"
+            label="Tertiary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -641,6 +680,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="destructive"
+            buttonWidth="full"
+            label="Destructive full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="destructive"
             label="Destructive default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -649,6 +694,13 @@ export const ComponentShowcase = () => {
             buttonType="destructive"
             iconLeft="trash"
             label="Destructive default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="destructive"
+            buttonWidth="full"
+            label="Destructive disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />

@@ -9,20 +9,11 @@ import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
 import { CWText } from '../cw_text';
 
-type ButtonType =
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'destructive';
+type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 
-type ButtonHeight =
-  | 'lg'
-  | 'med'
-  | 'sm';
+type ButtonHeight = 'lg' | 'med' | 'sm';
 
-type ButtonWidth =
-  | 'narrow'
-  | 'wide';
+type ButtonWidth = 'narrow' | 'wide' | 'full';
 
 type ButtonStyleProps = {
   buttonType?: ButtonType;
@@ -47,6 +38,12 @@ const getTextType = (buttonType: ButtonType) => {
   }
 };
 
+const widthStyle = (buttonWidth: ButtonWidth) => {
+  return {
+    style: buttonWidth === 'full' ? { width: '100%' } : { width: 'auto' },
+  };
+};
+
 export const CWButton = (props: ButtonProps) => {
   const {
     buttonType = 'primary',
@@ -62,7 +59,10 @@ export const CWButton = (props: ButtonProps) => {
   } = props;
 
   return (
-    <div className={`btn-border ${buttonType} ${disabled ? 'disabled' : ''}`}>
+    <div
+      className={`btn-border ${buttonType} ${disabled ? 'disabled' : ''}`}
+      {...widthStyle(buttonWidth)}
+    >
       <button
         className={getClasses<ButtonStyleProps>(
           {
@@ -74,19 +74,16 @@ export const CWButton = (props: ButtonProps) => {
           },
           ComponentType.Button
         )}
+        {...widthStyle(buttonWidth)}
         onClick={onClick}
         disabled={disabled}
         {...otherProps}
       >
-        {!!iconLeft && (
-          <CWIcon iconName={iconLeft} className="button-icon" />
-        )}
-        <CWText type={"buttonMini"} className="button-text" noWrap>
+        {!!iconLeft && <CWIcon iconName={iconLeft} className="button-icon" />}
+        <CWText type={'buttonMini'} className="button-text" noWrap>
           {label}
         </CWText>
-        {!!iconRight && (
-          <CWIcon iconName={iconRight} className="button-icon" />
-        )}
+        {!!iconRight && <CWIcon iconName={iconRight} className="button-icon" />}
       </button>
     </div>
   );
