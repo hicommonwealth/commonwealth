@@ -61,6 +61,13 @@ const updateTopic = async (
       },
     });
 
+    // filter threadsOnTopicFromDiscordBot by parsing the discord_meta JSON and checking if channel_id matches
+    const threadsOnTopicFromDiscordBotWithChannelId =
+      threadsOnTopicFromDiscordBot.filter((thread) => {
+        const discordMeta = JSON.parse(thread.discord_meta);
+        return discordMeta.channel_id === channel_id;
+      });
+
     // batch update threads to have new topic id
     await models.Thread.update(
       {
@@ -68,7 +75,9 @@ const updateTopic = async (
       },
       {
         where: {
-          id: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
+          id: threadsOnTopicFromDiscordBotWithChannelId.map(
+            (thread) => thread.id
+          ),
         },
       }
     );
