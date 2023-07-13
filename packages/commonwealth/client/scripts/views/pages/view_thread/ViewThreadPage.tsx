@@ -553,6 +553,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       canUpdateThread={
         isLoggedIn &&
         (Permissions.isSiteAdmin() ||
+          Permissions.isCommunityAdmin() ||
+          Permissions.isCommunityModerator() ||
           Permissions.isThreadAuthor(thread) ||
           Permissions.isThreadCollaborator(thread))
       }
