@@ -121,7 +121,7 @@ export const Card = ({
                 {thread.title}
               </CWText>
             </div>
-            <div className='top-tags-row'>
+            <div className='content-top-tags'>
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
               {linkedSnapshots.length > 0 && (
@@ -171,31 +171,13 @@ export const Card = ({
                 ))}
             </div>
           )}
-          <div className="content-body-wrapper">
-            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
-            <div className="content-title">
-              <CWText type="h5" fontWeight="semiBold">
-                {thread.title}
-              </CWText>
-              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
-
-              {linkedSnapshots.length > 0 && (
-                <CWTag
-                  type="active"
-                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
-                    ? linkedSnapshots[0].identifier.split('/')[1]
-                    : linkedSnapshots[0].identifier
-                  )
-                    .toString()
-                    .slice(0, 4)}…`}
-                />
-              )}
-            </div>
-            <CWText type="caption" className="content-body">
-              {thread.plaintext}
-            </CWText>
-          </div>
-          <div className="content-footer">
+          <div
+            className="content-footer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
             <Options
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}

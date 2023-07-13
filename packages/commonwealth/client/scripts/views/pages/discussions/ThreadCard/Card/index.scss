@@ -75,6 +75,11 @@
       }
     }
 
+    .content-top-tags {
+      display: flex;
+      gap: 8px;
+    }
+
     .content-tags {
       display: flex;
       flex-wrap: wrap;
