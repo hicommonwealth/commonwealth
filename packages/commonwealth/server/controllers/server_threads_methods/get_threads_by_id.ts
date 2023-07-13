@@ -1,6 +1,5 @@
 import { Op } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
-import getThreadsWithCommentCount from '../../util/getThreadCommentsCount';
 import { ThreadAttributes } from '../../models/thread';
 
 export type GetThreadsByIdOptions = {
@@ -47,9 +46,10 @@ export async function __getThreadsById(
     ],
   });
 
-  threads = await getThreadsWithCommentCount({
-    threads: threads.map((th) => th.toJSON()),
-    models: this.models,
+  threads = threads.map((thread) => {
+    const t = thread.toJSON();
+    t.numberOfComments = t.comment_count || 0;
+    return t;
   });
 
   return threads;

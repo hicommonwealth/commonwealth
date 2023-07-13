@@ -12,11 +12,11 @@ export async function getActivityFeed(models: DB, id = 0) {
 
   const query = `
   WITH ranked_thread_notifs as (SELECT t.id AS thread_id,
-                                  t.max_not_id
+                                  t.max_notif_id
                                 FROM "Threads" t 
                                 ${filterByChainForUsers}
-                                WHERE t.max_not_id IS NOT NULL
-                                ORDER BY t.max_not_id DESC
+                                WHERE t.max_notif_id IS NOT NULL
+                                ORDER BY t.max_notif_id DESC
                                 LIMIT 50
                                 )
   -- this section combines the ranked thread ids from above with comments and reactions in order to
@@ -30,7 +30,7 @@ export async function getActivityFeed(models: DB, id = 0) {
          thr.comment_count AS comment_count,
          thr.reaction_count AS reaction_count
   FROM ranked_thread_notifs nt
-  INNER JOIN "Notifications" nts ON nt.max_not_id = nts.id
+  INNER JOIN "Notifications" nts ON nt.max_notif_id = nts.id
   JOIN "Threads" thr ON thr.id = nt.thread_id
   ORDER BY nts.created_at DESC;
 `;
