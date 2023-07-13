@@ -55,6 +55,8 @@ const DiscordForumConnections = ({
     (topic) => topic.channelId !== null && topic.channelId !== ''
   );
 
+  const [connectionVerified, setConnectionVerified] = useState(true);
+
   return (
     <div className="DiscordForumConnections">
       {channels.length > 0 ? (
@@ -88,18 +90,20 @@ const DiscordForumConnections = ({
         return (
           <div key={channel.channelId} className="TopicRow">
             <CWText className="ChannelText">#{channel.channelName}</CWText>
-            <CWDropdown
-              initialValue={
-                connectedTopic
-                  ? { label: connectedTopic.name, value: connectedTopic.id }
-                  : { label: 'Not connected', value: '' }
-              }
-              options={remainingTopics}
-              onSelect={async (item) => {
-                // Connect the channel to the topic
-                channel.onConnect(item.value);
-              }}
-            />
+            {connectionVerified && (
+              <CWDropdown
+                initialValue={
+                  connectedTopic
+                    ? { label: connectedTopic.name, value: connectedTopic.id }
+                    : { label: 'Not connected', value: '' }
+                }
+                options={remainingTopics}
+                onSelect={async (item) => {
+                  // Connect the channel to the topic
+                  channel.onConnect(item.value);
+                }}
+              />
+            )}
             {connectedTopic && (
               <CWClose
                 className="CloseButton"
@@ -109,7 +113,9 @@ const DiscordForumConnections = ({
                       connectedTopic.id,
                       null
                     );
+                    setConnectionVerified(false);
                     await refetchTopics();
+                    setConnectionVerified(true);
                   } catch (e) {
                     console.log(e);
                   }

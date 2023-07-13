@@ -7,6 +7,8 @@ import {
 import { AppError } from '../../../../common-common/src/errors';
 import type { DB } from '../../models';
 import { findAllRoles } from '../../util/roles';
+import Sequelize from 'sequelize';
+const Op = Sequelize.Op;
 
 const Errors = {
   MissingTopic: 'Invalid topic ID',
@@ -40,6 +42,7 @@ const updateTopic = async (
 
   if (!topic) throw new AppError(Errors.MissingTopic);
 
+  // Find previous topic associated with channel
   const topicWithChannel = await models.Topic.findOne({
     where: {
       channel_id,
@@ -47,6 +50,30 @@ const updateTopic = async (
   });
 
   if (topicWithChannel) {
+    // Previous threads on topic from discord bot
+    const threadsOnTopicFromDiscordBot = await models.Thread.findAll({
+      where: {
+        topic_id: topicWithChannel.id,
+        // discord meta is not null
+        discord_meta: {
+          [Op.ne]: null,
+        },
+      },
+    });
+
+    // batch update threads to have new topic id
+    await models.Thread.update(
+      {
+        topic_id: topic.id,
+      },
+      {
+        where: {
+          id: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
+        },
+      }
+    );
+
+    // Remove channel_id from old topic
     topicWithChannel.channel_id = null;
     await topicWithChannel.save();
   }
