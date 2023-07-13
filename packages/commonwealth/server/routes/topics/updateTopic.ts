@@ -40,6 +40,17 @@ const updateTopic = async (
 
   if (!topic) throw new AppError(Errors.MissingTopic);
 
+  const topicWithChannel = await models.Topic.findOne({
+    where: {
+      channel_id,
+    },
+  });
+
+  if (topicWithChannel) {
+    topicWithChannel.channel_id = null;
+    await topicWithChannel.save();
+  }
+
   try {
     topic.channel_id = channel_id;
     await topic.save();
