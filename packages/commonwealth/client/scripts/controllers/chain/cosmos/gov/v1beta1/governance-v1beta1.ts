@@ -55,7 +55,7 @@ class CosmosGovernance extends ProposalModule<
     await this.fetchVotingPeriod();
 
     // query existing proposals
-    this._initProposals();
+    await this._initProposals();
     this._initialized = true;
   }
 
