@@ -61,7 +61,7 @@ export const useGetAllCosmosProposals = ({
     ) {
       initApi();
     }
-  }, [needToInitAPI]);
+  }, [needToInitAPI, app.chain]);
 
   return {
     activeCosmosProposals,

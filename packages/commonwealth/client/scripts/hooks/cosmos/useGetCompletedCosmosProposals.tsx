@@ -63,7 +63,7 @@ export const useGetCompletedCosmosProposals = ({
     if (app.chain?.base === ChainBase.CosmosSDK && !isLoading) {
       getProposals();
     }
-  }, [isApiReady]);
+  }, [isApiReady, app.chain, isLoading, setIsLoading, setIsLoadingMore]);
 
   return {
     completedCosmosProposals,

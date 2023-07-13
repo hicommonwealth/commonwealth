@@ -60,7 +60,7 @@ export const useGetActiveCosmosProposals = ({
     if (app.chain?.base === ChainBase.CosmosSDK && !isLoading) {
       getProposals();
     }
-  }, [isApiReady]);
+  }, [isApiReady, app.chain, isLoading, setIsLoading]);
 
   return {
     activeCosmosProposals,
