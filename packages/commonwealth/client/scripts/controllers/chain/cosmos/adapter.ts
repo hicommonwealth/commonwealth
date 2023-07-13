@@ -39,9 +39,9 @@ class Cosmos
   }
 
   public async initData() {
-    this.activeAddressHasToken(this.app.user?.activeAccount?.address);
     await this.governance.init(this.chain, this.accounts);
     await super.initData();
+    await this.activeAddressHasToken(this.app.user?.activeAccount?.address);
   }
 
   public async deinit(): Promise<void> {
