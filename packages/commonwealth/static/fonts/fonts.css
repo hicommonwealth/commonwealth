@@ -49,11 +49,17 @@
 }
 
 @font-face {
-  /* font-family: neue-haas-unica; */
   font-family: NeueHaasUnica;
   font-weight: 400;
+  font-style: normal;
   src: url('NeueHaasUnica-Regular.eot'),
     url('NeueHaasUnica-Regular.woff2') format('woff2'),
     url('NeueHaasUnica-Regular.woff') format('woff'),
     url('NeueHaasUnica-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-weight: 300;
+  src: url('DMMono-Regular.ttf') format('truetype');
 }

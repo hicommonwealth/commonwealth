@@ -5,7 +5,6 @@ import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { ChainInstance } from 'commonwealth/server/models/chain';
-import { SubstrateTypes } from '../src/types';
 import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,
@@ -53,12 +52,7 @@ export const generateHandlers = (
 
   // emits notifications by writing into the db's Notifications table, and also optionally
   // sending a notification to the client via websocket
-  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
-  const notificationHandler = new NotificationHandler(
-    ceModels,
-    rmqController,
-    excludedNotificationEvents
-  );
+  const notificationHandler = new NotificationHandler(ceModels, rmqController);
 
   // creates and updates ChainEntity rows corresponding with entity-related events
   const entityArchivalHandler = new EntityArchivalHandler(

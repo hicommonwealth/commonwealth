@@ -14,7 +14,7 @@ import Rollbar from 'rollbar';
 import { SubstrateTypes } from 'chain-events/src/types';
 
 import models from '../database/database';
-import {RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN} from '../config';
+import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
 
 import EventStorageHandler from './ChainEventHandlers/storage';
 import NotificationsHandler from './ChainEventHandlers/notification';
@@ -49,12 +49,7 @@ export async function setupChainEventConsumer(
     rmqController
   );
 
-  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
-  const notificationsHandler = new NotificationsHandler(
-    models,
-    rmqController,
-    excludedNotificationEvents
-  );
+  const notificationsHandler = new NotificationsHandler(models, rmqController);
 
   // WARNING: due to dbEvent in each handler ORDER OF HANDLERS MATTERS!
   const allChainEventHandlers = [
