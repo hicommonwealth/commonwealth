@@ -9,7 +9,7 @@ import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
 import { CWText } from '../cw_text';
 
-type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
+export type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 
 type ButtonHeight = 'lg' | 'med' | 'sm';
 
