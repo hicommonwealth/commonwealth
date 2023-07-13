@@ -18,7 +18,7 @@ export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, threadId }
+  { user, threadId }: DeleteThreadOptions
 ): Promise<DeleteThreadResult> {
   // find thread
   const thread = await this.models.Thread.findOne({

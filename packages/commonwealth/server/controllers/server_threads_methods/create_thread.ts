@@ -70,7 +70,7 @@ export async function __createThread({
   canvasAction,
   canvasSession,
   canvasHash,
-}): Promise<CreateThreadResult> {
+}: CreateThreadOptions): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
       throw new Error(Errors.DiscussionMissingTitle);

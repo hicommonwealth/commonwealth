@@ -62,7 +62,7 @@ export async function __createThreadComment({
   canvasAction,
   canvasSession,
   canvasHash,
-}): Promise<CreateThreadCommentResult> {
+}: CreateThreadCommentOptions): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,
