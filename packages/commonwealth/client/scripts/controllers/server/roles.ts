@@ -130,6 +130,8 @@ export class RolesController {
       this.roles.length === 0
     )
       return;
+    console.log('roles...');
+    console.log(this.roles);
     return this.roles.find((r) => {
       const permission = r.permission === options.role;
       const referencedAddress = this.User.addresses.find(

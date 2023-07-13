@@ -42,8 +42,6 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     return;
   }
 
-  // Shut down old chain if applicable
-  await deinitChainOrCommunity();
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
 

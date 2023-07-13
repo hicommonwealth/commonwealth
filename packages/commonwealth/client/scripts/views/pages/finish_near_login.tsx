@@ -25,6 +25,7 @@ import { Modal } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
+import { updateAdminRole } from './create_community/chain_input_rows';
 
 // TODO:
 //  - figure out how account switching will work
@@ -202,7 +203,8 @@ const FinishNearLogin = () => {
           chainCreateArgs
         );
 
-        await initAppState(false);
+        await updateAdminRole(id);
+
         navigate(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
         setValidationError(`Failed to initialize chain node: ${err.message}`);

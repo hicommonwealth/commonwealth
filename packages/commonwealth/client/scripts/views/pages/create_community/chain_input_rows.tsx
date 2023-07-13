@@ -1,6 +1,7 @@
+import axios from 'axios';
 import React, { useEffect } from 'react';
 
-import app from 'state';
+import app, { initAppState } from 'state';
 import { AvatarUpload } from 'views/components/Avatar';
 import { InputRow } from 'views/components/metadata_rows';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
@@ -13,6 +14,23 @@ import type {
   UseChainFormStateHookType,
   UseEthChainFormFieldsHookType,
 } from './types';
+
+export async function updateAdminRole(chainId: string) {
+  await initAppState(false);
+
+  app.user.ephemerallySetActiveAccount(
+    app.user.addresses.filter((a) => a.chain.id === chainId)[0]
+  );
+
+  const roles = await axios.get(`${app.serverUrl()}/roles`, {
+    params: {
+      chain_id: chainId,
+      permissions: ['admin'],
+    },
+  });
+
+  app.roles.addRole(roles.data.result[0]);
+}
 
 export const initChainForm = (): ChainFormDefaultFields => {
   return {

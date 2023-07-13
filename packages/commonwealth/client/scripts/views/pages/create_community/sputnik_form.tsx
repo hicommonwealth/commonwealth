@@ -14,7 +14,7 @@ import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 // import { CommunityType } from '.';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { defaultChainRows } from './chain_input_rows';
+import { defaultChainRows, updateAdminRole } from './chain_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   useChainFormIdFields,
@@ -128,7 +128,7 @@ export const SputnikForm = () => {
               );
             }
 
-            await initAppState(false);
+            await updateAdminRole(id);
 
             navigate(`/${res.result.chain.id}`);
           } catch (err) {

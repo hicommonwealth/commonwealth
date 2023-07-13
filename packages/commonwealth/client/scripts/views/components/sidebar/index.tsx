@@ -33,6 +33,7 @@ export const Sidebar = ({ isInsideCommunity }) => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
+  console.log(app.user);
   const showAdmin = app.user && (isAdmin || isMod);
 
   return (

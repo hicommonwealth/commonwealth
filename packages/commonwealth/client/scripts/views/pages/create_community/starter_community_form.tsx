@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import $ from 'jquery';
 
@@ -14,7 +15,7 @@ import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/
 import { baseToNetwork } from '../../../helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { defaultChainRows } from './chain_input_rows';
+import { defaultChainRows, updateAdminRole } from './chain_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   useChainFormDefaultFields,
@@ -143,7 +144,7 @@ export const StarterCommunityForm = () => {
               );
             }
 
-            await initAppState(false);
+            await updateAdminRole(id);
 
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {
