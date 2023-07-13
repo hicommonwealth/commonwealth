@@ -37,7 +37,9 @@ export const useGetActiveCosmosProposals = ({
     const fetchProposals = async () => {
       if (isApiReady && !hasFetchedDataRef.current) {
         hasFetchedDataRef.current = true;
+        setIsLoading(true);
         const proposals = await getActiveProposals(cosmos);
+        setIsLoading(false);
         setActiveCosmosProposals(proposals);
       }
     };
@@ -51,16 +53,14 @@ export const useGetActiveCosmosProposals = ({
         setActiveCosmosProposals(activeProposals); // show whatever we have stored
         await fetchProposals(); // update if there are more from the API
       } else {
-        setIsLoading(true);
         await fetchProposals();
-        setIsLoading(false);
       }
     };
 
     if (app.chain?.base === ChainBase.CosmosSDK && !isLoading) {
       getProposals();
     }
-  }, [isApiReady, app.chain, isLoading, setIsLoading]);
+  }, [isApiReady, app.chain, setIsLoading]);
 
   return {
     activeCosmosProposals,

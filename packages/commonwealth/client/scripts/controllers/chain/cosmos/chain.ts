@@ -122,9 +122,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       }
     }
 
-    this.fetchPoolParams();
-    this.fetchStakingParams();
-    this.fetchBlock(); // Poll for new block immediately
+    await this.fetchPoolParams();
+    await this.fetchBlock(); // Poll for new block immediately
+    await this.fetchStakingParams();
   }
 
   private async fetchPoolParams(): Promise<void> {
