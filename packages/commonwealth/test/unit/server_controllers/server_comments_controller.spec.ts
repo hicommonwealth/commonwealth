@@ -770,12 +770,12 @@ describe('ServerCommentsController', () => {
       const address = {};
       const chain = {};
       const commentId = 1;
-      await serverCommentsController.deleteComment(
-        user as any,
-        address as any,
-        chain as any,
-        commentId
-      );
+      await serverCommentsController.deleteComment({
+        user: user as any,
+        address: address as any,
+        chain: chain as any,
+        commentId,
+      });
     });
   });
 });

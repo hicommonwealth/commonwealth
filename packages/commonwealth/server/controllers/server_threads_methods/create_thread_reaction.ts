@@ -16,7 +16,7 @@ import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { TrackOptions } from '../server_analytics_methods/track';
 
-const Errors = {
+export const Errors = {
   ThreadNotFound: 'Thread not found',
   BanError: 'Ban error',
   InsufficientTokenBalance: 'Insufficient token balance',

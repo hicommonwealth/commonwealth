@@ -2,6 +2,7 @@ import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { AppError } from '../../../../common-common/src/errors';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+import { SearchCommentsResult } from 'server/controllers/server_comments_methods/search_comments';
 
 export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
 
@@ -20,7 +21,7 @@ type SearchCommentsRequestParams = {
   page?: string;
   page_size?: string;
 };
-type SearchCommentsResponse = SearchCommentResult[];
+type SearchCommentsResponse = SearchCommentsResult;
 
 export const searchCommentsHandler = async (
   controllers: ServerControllers,
