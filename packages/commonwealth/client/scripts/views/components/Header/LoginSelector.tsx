@@ -19,7 +19,8 @@ import { LoginModal } from 'views/modals/login_modal';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import AddressInfo from '../../../models/AddressInfo';
 import ITokenAdapter from '../../../models/ITokenAdapter';
-import { CWButton } from '../component_kit/cw_button';
+import { CWButton as CWButtonOld } from '../component_kit/cw_button';
+import { CWButton } from '../component_kit/new_designs/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
@@ -83,7 +84,7 @@ export const LoginSelector = () => {
     return (
       <>
         <div className="LoginSelector">
-          <CWButton
+          <CWButtonOld
             buttonType="tertiary-black"
             iconLeft="person"
             label="Log in"
@@ -269,7 +270,8 @@ export const LoginSelector = () => {
         {app.chain && !app.chainPreloading && profileLoadComplete && !isJoined && (
           <div className="join-button-container">
             <CWButton
-              buttonType="tertiary-black"
+              buttonType="primary"
+              buttonHeight="sm"
               onClick={async () => {
                 if (
                   sameBaseAddressesRemoveDuplicates.length === 0 ||
@@ -294,7 +296,7 @@ export const LoginSelector = () => {
                       CHAINBASE_SHORT[app.chain?.meta?.base] ||
                       ''
                     } address`
-                  : 'Join'
+                  : 'Join community'
               }
             />
           </div>
