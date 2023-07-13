@@ -235,6 +235,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             label="Discord"
             darkMode={darkMode}
             onClick={async () => onSocialLogin('discord')}
+            className="DiscordAuthButton"
           />
           <CWAuthButton
             type="github"

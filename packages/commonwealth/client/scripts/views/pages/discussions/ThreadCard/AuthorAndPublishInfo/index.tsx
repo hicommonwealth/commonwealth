@@ -83,8 +83,13 @@ export const AuthorAndPublishInfo = ({
         <>
           {dotIndicator}
           <CWText type="caption" className="discord-author">
-            by
             <b>{discord_meta?.user?.username}</b>
+          </CWText>
+          {dotIndicator}
+          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
+          {dotIndicator}
+          <CWText type="caption" className="discord-author">
+            Bridged from Discord
           </CWText>
         </>
       )}
@@ -164,13 +169,6 @@ export const AuthorAndPublishInfo = ({
         <>
           {dotIndicator}
           <CWTag label={'NEW'} type={'new'} iconName={'newStar'} />
-        </>
-      )}
-
-      {fromDiscordBot && (
-        <>
-          {dotIndicator}
-          <CWTag label={'DISCORD'} type={'discord'} />
         </>
       )}
 
