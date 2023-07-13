@@ -813,7 +813,7 @@ export const ComponentShowcase = () => {
         <CWTextInput
           name="Text field"
           label="Text Input with default width of 240 px"
-          placeholder="Type here"
+          placeholder="Placeholder"
           isCompact
         />
         <CWTextInput
@@ -894,7 +894,7 @@ export const ComponentShowcase = () => {
         <CWTextInput
           name="Text field"
           label="Text Input with default width of 240 px"
-          placeholder="Type here"
+          placeholder="Placeholder"
         />
         <CWTextInput
           name="Form field"
