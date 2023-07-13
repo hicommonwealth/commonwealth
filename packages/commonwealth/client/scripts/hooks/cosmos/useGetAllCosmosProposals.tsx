@@ -15,19 +15,19 @@ interface Response {
 
 interface Props {
   app: IApp;
-  setIsLoadingActive?: UseStateSetter<boolean>;
-  setIsLoadingCompleted?: UseStateSetter<boolean>;
-  isLoadingActive?: boolean;
-  isLoadingCompleted?: boolean;
+  setIsLoadingActiveProposals?: UseStateSetter<boolean>;
+  setIsLoadingCompletedProposals?: UseStateSetter<boolean>;
+  isLoadingActiveProposals?: boolean;
+  isLoadingCompletedProposals?: boolean;
   needToInitAPI?: boolean;
 }
 
 export const useGetAllCosmosProposals = ({
   app,
-  setIsLoadingActive,
-  setIsLoadingCompleted,
-  isLoadingActive,
-  isLoadingCompleted,
+  setIsLoadingActiveProposals,
+  setIsLoadingCompletedProposals,
+  isLoadingActiveProposals,
+  isLoadingCompletedProposals,
   needToInitAPI,
 }: Props): Response => {
   const startedApiRef = useRef(false);
@@ -35,15 +35,15 @@ export const useGetAllCosmosProposals = ({
 
   const { activeCosmosProposals } = useGetActiveCosmosProposals({
     app,
-    setIsLoading: setIsLoadingActive,
-    isLoading: isLoadingActive,
+    setIsLoading: setIsLoadingActiveProposals,
+    isLoading: isLoadingActiveProposals,
     isApiReady,
   });
 
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
-    setIsLoading: setIsLoadingCompleted,
-    isLoading: isLoadingCompleted,
+    setIsLoading: setIsLoadingCompletedProposals,
+    isLoading: isLoadingCompletedProposals,
     isApiReady,
   });
 

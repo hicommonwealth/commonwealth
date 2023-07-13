@@ -32,10 +32,10 @@ export const CosmosProposalSelector = ({
   const { activeCosmosProposals, completedCosmosProposals } =
     useGetAllCosmosProposals({
       app,
-      setIsLoadingActive: setActiveLoading,
-      setIsLoadingCompleted: setCompletedProposalsLoading,
-      isLoadingActive: loadingActive,
-      isLoadingCompleted: loadingCompletedProposals,
+      setIsLoadingActiveProposals: setActiveLoading,
+      setIsLoadingCompletedProposals: setCompletedProposalsLoading,
+      isLoadingActiveProposals: loadingActive,
+      isLoadingCompletedProposals: loadingCompletedProposals,
       needToInitAPI:
         !app.chain.apiInitialized &&
         app.chain.networkStatus !== ApiStatus.Connecting,
