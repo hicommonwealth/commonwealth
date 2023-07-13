@@ -1,11 +1,9 @@
-import {
-  MIN_COMMENT_SEARCH_QUERY_LENGTH,
-  SearchCommentResult,
-} from '../../controllers/server_comments_controller';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { AppError } from '../../../../common-common/src/errors';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+
+export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -44,13 +42,13 @@ export const searchCommentsHandler = async (
     throw new AppError(Errors.NoChains);
   }
 
-  const commentSearchResults = await controllers.comments.searchComments(
-    req.chain,
-    options.search,
-    options.sort,
-    parseInt(options.page, 10) || 0,
-    parseInt(options.page_size, 10) || 0
-  );
+  const commentSearchResults = await controllers.comments.searchComments({
+    chain: req.chain,
+    search: options.search,
+    sort: options.sort,
+    page: parseInt(options.page, 10) || 0,
+    pageSize: parseInt(options.page_size, 10) || 0,
+  });
 
   return success(res, commentSearchResults);
 };

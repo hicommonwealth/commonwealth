@@ -22,7 +22,7 @@ export const deleteThreadHandler = async (
     throw new AppError(Errors.InvalidThreadID);
   }
 
-  await controllers.threads.deleteThread(user, threadId);
+  await controllers.threads.deleteThread({ user, threadId });
 
   return success(res, undefined);
 };
