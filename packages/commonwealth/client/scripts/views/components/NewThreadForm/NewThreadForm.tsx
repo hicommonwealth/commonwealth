@@ -30,13 +30,11 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector =
-    topics ||
-    [].filter((t) => {
-      return (
-        isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.name)
-      );
-    });
+  const topicsForSelector = topics.filter((t) => {
+    return (
+      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.name)
+    );
+  });
 
   const {
     threadTitle,

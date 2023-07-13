@@ -22,6 +22,7 @@ import {
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
+import Permissions from '../../../utils/Permissions';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -108,8 +109,8 @@ export const CreateComment = ({
     app.chain.getTopicThreshold(activeTopicName);
 
   const userFailsThreshold = app.chain.isGatedTopic(activeTopicName);
-  const userBalance = app.chain.userChainBalance;
-
+  const userBalance = app.user.activeAccount.tokenBalance;
+  const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 || sendingComment || userFailsThreshold;
 
@@ -167,7 +168,7 @@ export const CreateComment = ({
           )}
           <CWButton
             buttonWidth="wide"
-            disabled={disabled}
+            disabled={disabled && !isAdmin}
             onClick={handleSubmitComment}
             label={parentType === ContentType.Comment ? 'Reply' : 'Comment'}
           />

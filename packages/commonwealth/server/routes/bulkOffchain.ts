@@ -198,7 +198,14 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       where: {
         chain_id: chain.id,
         token_threshold: {
-          [Op.not]: null,
+          [Op.and]: [
+            {
+              [Op.not]: '0',
+            },
+            {
+              [Op.not]: null,
+            },
+          ],
         },
       },
     }),
