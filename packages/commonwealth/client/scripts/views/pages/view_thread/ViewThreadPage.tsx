@@ -532,15 +532,95 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showBanner = !hasJoinedCommunity && isBannerVisible;
 
   return (
+    /* left fragment open tag in when fixing merge conflict (fragment close tag on line 554 */
     <>
-      <CWContentPage
-        showTabs={isCollapsedSize && tabsShouldBePresent}
-        contentBodyLabel="Thread"
-        showSidebar={
-          showLinkedProposalOptions ||
-          showLinkedThreadOptions ||
-          polls?.length > 0 ||
-          isAuthor
+    <CWContentPage
+      showTabs={isCollapsedSize && tabsShouldBePresent}
+      contentBodyLabel="Thread"
+      showSidebar={
+        showLinkedProposalOptions ||
+        showLinkedThreadOptions ||
+        polls?.length > 0 ||
+        isAuthor
+      }
+      isSpamThread={!!thread.markedAsSpamAt}
+      title={
+        isEditingBody ? (
+          <CWTextInput
+            onInput={(e) => {
+              setTitle(e.target.value);
+            }}
+            defaultValue={thread.title}
+          />
+        ) : (
+          thread.title
+        )
+      }
+      author={app.chain.accounts.get(thread.author)}
+      collaborators={thread.collaborators}
+      createdAt={thread.createdAt}
+      updatedAt={thread.updatedAt}
+      lastEdited={thread.lastEdited}
+      viewCount={viewCount}
+      canUpdateThread={
+        isLoggedIn &&
+        (Permissions.isSiteAdmin() ||
+          Permissions.isCommunityAdmin() ||
+          Permissions.isCommunityModerator() ||
+          Permissions.isThreadAuthor(thread) ||
+          Permissions.isThreadCollaborator(thread))
+      }
+      displayNewTag={true}
+      stageLabel={!isStageDefault && thread.stage}
+      subHeader={
+        !!thread.url && (
+          <ExternalLink url={thread.url}>
+            {extractDomain(thread.url)}
+          </ExternalLink>
+        )
+      }
+      thread={thread}
+      onLockToggle={(isLock) => {
+        setIsGloballyEditing(false);
+        setIsEditingBody(false);
+        setRecentlyEdited(true);
+        setThread((t) => ({
+          ...t,
+          readOnly: isLock,
+          uniqueIdentifier: t.uniqueIdentifier,
+        }));
+      }}
+      onPinToggle={(isPin) => {
+        setThread((t) => ({
+          ...t,
+          pinned: isPin,
+          uniqueIdentifier: t.uniqueIdentifier,
+        }));
+      }}
+      onTopicChange={(topic: Topic) => {
+        const newThread = new Thread({ ...thread, topic });
+        setThread(newThread);
+      }}
+      onCollaboratorsEdit={(collaborators: IThreadCollaborator[]) => {
+        const newThread = new Thread({ ...thread, collaborators });
+        setThread(newThread);
+      }}
+      onDelete={() => navigate('/discussions')}
+      onEditCancel={() => {
+        setIsGloballyEditing(true);
+        setIsEditingBody(true);
+      }}
+      onEditConfirm={() => {
+        setShouldRestoreEdits(true);
+        setIsGloballyEditing(true);
+        setIsEditingBody(true);
+      }}
+      onEditStart={() => {
+        if (editsToSave) {
+          clearEditingLocalStorage(thread.id, ContentType.Thread);
+
+          setSavedEdits(editsToSave || '');
+
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={
