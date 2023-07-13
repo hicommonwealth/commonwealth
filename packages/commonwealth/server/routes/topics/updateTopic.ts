@@ -64,7 +64,7 @@ const updateTopic = async (
     // batch update threads to have new topic id
     await models.Thread.update(
       {
-        topic_id: topic.id,
+        topic_id: channel_id !== null ? topic.id : null,
       },
       {
         where: {
