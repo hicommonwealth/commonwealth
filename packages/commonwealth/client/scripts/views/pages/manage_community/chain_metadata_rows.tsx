@@ -150,7 +150,6 @@ export const ChainMetadataRows = ({
       chainId: app.activeChainId(),
     });
 
-  console.log({ chain });
   const [name, setName] = useState(chain.name);
   const [description, setDescription] = useState(chain.description);
   const [website, setWebsite] = useState(chain.website);

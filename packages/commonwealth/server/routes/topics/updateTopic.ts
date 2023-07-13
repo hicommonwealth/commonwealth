@@ -49,7 +49,7 @@ const updateTopic = async (
     },
   });
 
-  if (topicWithChannel) {
+  if (topicWithChannel && topicWithChannel.id !== topic.id) {
     // Previous threads on topic from discord bot
     const threadsOnTopicFromDiscordBot = await models.Thread.findAll({
       where: {
@@ -61,13 +61,6 @@ const updateTopic = async (
       },
     });
 
-    // filter threadsOnTopicFromDiscordBot by parsing the discord_meta JSON and checking if channel_id matches
-    const threadsOnTopicFromDiscordBotWithChannelId =
-      threadsOnTopicFromDiscordBot.filter((thread) => {
-        const discordMeta = JSON.parse(thread.discord_meta);
-        return discordMeta.channel_id === channel_id;
-      });
-
     // batch update threads to have new topic id
     await models.Thread.update(
       {
@@ -75,9 +68,7 @@ const updateTopic = async (
       },
       {
         where: {
-          id: threadsOnTopicFromDiscordBotWithChannelId.map(
-            (thread) => thread.id
-          ),
+          id: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
         },
       }
     );
