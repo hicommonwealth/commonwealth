@@ -15,14 +15,12 @@ interface Response {
 interface Props {
   app: IApp;
   setIsLoading: UseStateSetter<boolean>;
-  isLoading: boolean;
   isApiReady?: boolean;
 }
 
 export const useGetActiveCosmosProposals = ({
   app,
   setIsLoading,
-  isLoading,
   isApiReady,
 }: Props): Response => {
   const [activeCosmosProposals, setActiveCosmosProposals] = useState<
@@ -57,7 +55,7 @@ export const useGetActiveCosmosProposals = ({
       }
     };
 
-    if (app.chain?.base === ChainBase.CosmosSDK && !isLoading) {
+    if (app.chain?.base === ChainBase.CosmosSDK) {
       getProposals();
     }
   }, [isApiReady, app.chain, setIsLoading]);

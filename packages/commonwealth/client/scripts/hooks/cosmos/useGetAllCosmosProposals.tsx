@@ -36,14 +36,12 @@ export const useGetAllCosmosProposals = ({
   const { activeCosmosProposals } = useGetActiveCosmosProposals({
     app,
     setIsLoading: setIsLoadingActiveProposals,
-    isLoading: isLoadingActiveProposals,
     isApiReady,
   });
 
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
     setIsLoading: setIsLoadingCompletedProposals,
-    isLoading: isLoadingCompletedProposals,
     isApiReady,
   });
 

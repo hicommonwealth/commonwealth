@@ -15,7 +15,6 @@ interface Response {
 interface Props {
   app: IApp;
   setIsLoading: UseStateSetter<boolean>;
-  isLoading: boolean;
   setIsLoadingMore?: UseStateSetter<boolean>;
   isApiReady?: boolean;
 }
@@ -23,7 +22,6 @@ interface Props {
 export const useGetCompletedCosmosProposals = ({
   app,
   setIsLoading,
-  isLoading,
   setIsLoadingMore,
   isApiReady,
 }: Props): Response => {
@@ -60,7 +58,7 @@ export const useGetCompletedCosmosProposals = ({
       }
     };
 
-    if (app.chain?.base === ChainBase.CosmosSDK && !isLoading) {
+    if (app.chain?.base === ChainBase.CosmosSDK) {
       getProposals();
     }
   }, [isApiReady, app.chain, setIsLoading, setIsLoadingMore]);
