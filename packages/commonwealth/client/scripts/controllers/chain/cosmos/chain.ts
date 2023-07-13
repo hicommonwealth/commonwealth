@@ -119,9 +119,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       }
     }
 
-    await this.fetchPoolParams();
-    await this.fetchBlock(); // Poll for new block immediately
-    await this.fetchStakingParams();
+    await Promise.all([
+      this.fetchPoolParams(),
+      this.fetchBlock(), // Poll for new block immediately
+      this.fetchStakingParams(),
+    ]);
   }
 
   private async fetchPoolParams(): Promise<void> {
@@ -158,7 +160,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         params: { bondDenom },
       } = await this._api.staking.params();
       this._denom = bondDenom;
-      this._isFetchingStakingParams = false;
     } catch (e) {
       console.error('Error fetching staking params: ', e);
     }

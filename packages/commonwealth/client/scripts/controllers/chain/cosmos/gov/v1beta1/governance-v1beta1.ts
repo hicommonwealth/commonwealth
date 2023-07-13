@@ -49,13 +49,12 @@ class CosmosGovernance extends ProposalModule<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
 
-    // query chain-wide params
-    await this.fetchDepositParams();
-    await this.fetchTallyThresholds();
-    await this.fetchVotingPeriod();
-
-    // query existing proposals
-    await this._initProposals();
+    await Promise.all([
+      this.fetchDepositParams(),
+      this.fetchTallyThresholds(),
+      this.fetchVotingPeriod(),
+      this._initProposals(),
+    ]);
     this._initialized = true;
   }
 
