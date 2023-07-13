@@ -85,9 +85,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _tmClient: Tendermint34Client;
-  private _isFetchingPoolParams: boolean;
-  private _isFetchingStakingParams: boolean;
-  private _isFetchingBlock: boolean;
 
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
@@ -128,8 +125,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private async fetchPoolParams(): Promise<void> {
-    if (this._isFetchingPoolParams) return;
-    this._isFetchingPoolParams = true;
     try {
       const {
         pool: { bondedTokens },
@@ -137,14 +132,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this._staked = this.coins(new BN(bondedTokens));
     } catch (e) {
       console.error('Error fetching pool params: ', e);
-    } finally {
-      this._isFetchingPoolParams = false;
     }
   }
 
   private async fetchBlock(): Promise<void> {
-    if (this._isFetchingBlock) return;
-    this._isFetchingBlock = true;
     try {
       const { block } = await this._tmClient.block();
       const height = +block.header.height;
@@ -156,16 +147,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this.app.chain.block.lastTime = time;
       this.app.chain.block.height = height;
       this.app.chain.networkStatus = ApiStatus.Connected;
-      this._isFetchingBlock = false;
     } catch (e) {
       console.error('Error fetching block: ', e);
-      this._isFetchingBlock = false;
     }
   }
 
   private async fetchStakingParams(): Promise<void> {
-    if (this._isFetchingStakingParams) return;
-    this._isFetchingStakingParams = true;
     try {
       const {
         params: { bondDenom },
@@ -174,7 +161,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this._isFetchingStakingParams = false;
     } catch (e) {
       console.error('Error fetching staking params: ', e);
-      this._isFetchingStakingParams = false;
     }
   }
 
