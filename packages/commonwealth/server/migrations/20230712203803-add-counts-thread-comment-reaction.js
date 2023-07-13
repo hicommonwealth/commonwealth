@@ -10,7 +10,7 @@ module.exports = {
         `
         ALTER TABLE "Threads" ADD COLUMN IF NOT EXISTS comment_count integer NOT NULL DEFAULT 0;
         ALTER TABLE "Threads" ADD COLUMN IF NOT EXISTS reaction_count integer NOT NULL DEFAULT 0;
-        ALTER TABLE "Threads" ADD COLUMN IF NOT EXISTS max_not_id integer NOT NULL DEFAULT 0;
+        ALTER TABLE "Threads" ADD COLUMN IF NOT EXISTS max_notif_id integer NOT NULL DEFAULT 0;
         ALTER TABLE "Comments" ADD COLUMN IF NOT EXISTS reaction_count integer NOT NULL DEFAULT 0;
         `,
         { raw: true, transaction: t, logging: console.log }
@@ -99,7 +99,7 @@ module.exports = {
         )
 
         Update "Threads"
-        SET max_not_id=mn.max_id
+        SET max_notif_id=mn.max_id
         FROM maxNotificationIdByThread mn
         where mn.thread_id="Threads".id
         
@@ -116,7 +116,7 @@ module.exports = {
         `
         ALTER TABLE "Threads" DROP COLUMN IF EXISTS comment_count;
         ALTER TABLE "Threads" DROP COLUMN IF EXISTS reaction_count;
-        ALTER TABLE "Threads" DROP COLUMN IF EXISTS max_not_id;
+        ALTER TABLE "Threads" DROP COLUMN IF EXISTS max_notif_id;
         ALTER TABLE "Comments" DROP COLUMN IF EXISTS reaction_count;
         `,
         { raw: true, transaction: t, logging: console.log }

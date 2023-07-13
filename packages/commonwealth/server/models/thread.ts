@@ -65,7 +65,7 @@ export type ThreadAttributes = {
   comment_count: number;
 
   //notifications
-  max_not_id: number;
+  max_notif_id: number;
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -150,7 +150,7 @@ export default (
       },
 
       //notifications
-      max_not_id: {
+      max_notif_id: {
         type: dataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
