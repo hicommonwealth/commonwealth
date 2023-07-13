@@ -20,10 +20,12 @@ import clsx from 'clsx';
 // TODO this component covers only one type of Banner,
 // it should be extended with other types
 // https://github.com/hicommonwealth/commonwealth/issues/4407
+//
 
 const typeIconLookup: {
-  [key: BannerType]: React.ForwardRefExoticComponent<IconProps>;
+  [key in BannerType]: React.ForwardRefExoticComponent<IconProps>;
 } = {
+  default: null,
   info: Info,
   success: CheckCircle,
   warning: WarningCircle,
@@ -86,7 +88,7 @@ const CWBanner = ({
 
               return (
                 <CWButton
-                  key={buttonProps.label + index}
+                  key={`${buttonProps.label}-index`}
                   buttonHeight="sm"
                   buttonType={buttonType}
                   {...buttonProps}
