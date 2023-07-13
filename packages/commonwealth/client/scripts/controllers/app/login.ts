@@ -15,7 +15,6 @@ import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import SocialAccount from '../../models/SocialAccount';
 import { CosmosExtension } from '@magic-ext/cosmos';
-import BN from 'bn.js';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
