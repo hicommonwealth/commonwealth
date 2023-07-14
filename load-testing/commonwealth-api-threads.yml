@@ -3,9 +3,6 @@ config:
     metrics-by-endpoint:
       useOnlyRequestNames: true
       metricsNamespace: "latency_metrics"
-    publish-metrics:
-      - type: statsd
-        prefix: "artillery.publish_metrics_plugin."
   environments:
     us:
       target: "https://us.unique.rocks"
@@ -29,51 +26,51 @@ config:
 scenarios:
   - name: "Read Endpoints"
     flow:
-      - get:
-          url: "/"
-      - get:
-          url: "/api/domain"
-      - get:
-          url: "/api/status"
-      - post:
-          url: "/api/viewDiscussionNotifications"
-          form:
-            jwt: "{{$processEnvironment.JWT}}"
-      - post:
-          url: "/api/viewChainEventNotifications"
-          form:
-            jwt: "{{$processEnvironment.JWT}}"
-      - post:
-          url: "/api/getSubscribedChains"
-          form:
-            jwt: "{{$processEnvironment.JWT}}"
-      - get:
-          url: "/api/viewSubscriptions"
-          qs:
-            jwt: "{{$processEnvironment.JWT}}"
-      - get:
-          url: "/cmn-protocol"
-      - get:
-          url: "/api/bulkOffchain"
-          qs:
-            chain: "cmn-protocol"
-            community:
-            jwt: "{{$processEnvironment.JWT}}"
-      - post:
-          url: "/api/selectChain"
-          form:
-            chain: "cmn-protocol"
-            auth: true
-            jwt: "{{$processEnvironment.JWT}}"
-      - post:
-          url: "/api/threadsUsersCountAndAvatars"
-          json:
-            chain: "cmn-protocol"
-            threads: []
-      - get:
-          url: "/api/bulkTopics"
-          qs:
-            chain: "cmn-protocol"
+      # - get:
+      #     url: "/"
+      # - get:
+      #     url: "/api/domain"
+      # - get:
+      #     url: "/api/status"
+      # - post:
+      #     url: "/api/viewDiscussionNotifications"
+      #     form:
+      #       jwt: "{{$processEnvironment.JWT}}"
+      # - post:
+      #     url: "/api/viewChainEventNotifications"
+      #     form:
+      #       jwt: "{{$processEnvironment.JWT}}"
+      # - post:
+      #     url: "/api/getSubscribedChains"
+      #     form:
+      #       jwt: "{{$processEnvironment.JWT}}"
+      # - get:
+      #     url: "/api/viewSubscriptions"
+      #     qs:
+      #       jwt: "{{$processEnvironment.JWT}}"
+      # - get:
+      #     url: "/cmn-protocol"
+      # - get:
+      #     url: "/api/bulkOffchain"
+      #     qs:
+      #       chain: "cmn-protocol"
+      #       community:
+      #       jwt: "{{$processEnvironment.JWT}}"
+      # - post:
+      #     url: "/api/selectChain"
+      #     form:
+      #       chain: "cmn-protocol"
+      #       auth: true
+      #       jwt: "{{$processEnvironment.JWT}}"
+      # - post:
+      #     url: "/api/threadsUsersCountAndAvatars"
+      #     json:
+      #       chain: "cmn-protocol"
+      #       threads: []
+      # - get:
+      #     url: "/api/bulkTopics"
+      #     qs:
+      #       chain: "cmn-protocol"
       - get:
           name: "/api/activeThreads"
           url: "/api/threads"

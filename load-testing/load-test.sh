@@ -7,7 +7,7 @@ fi
 
 . ${SCRIPT_DIR}/env.sh
 export REPORT_DIR=${SCRIPT_DIR}/$REPORT_DIR
-mkdir -p ${SCRIPT_DIR}/$REPORT_DIR
+mkdir -p $REPORT_DIR
 
 echo "Running load test with the following environment variables:"
 env | grep -E 'JWT|USER_ADDRESS|POST_THREAD_ID|ENV|REPORT_DIR|DD_SITE|TEST_LOCATION|TEST_ID|TEST_NAME'
