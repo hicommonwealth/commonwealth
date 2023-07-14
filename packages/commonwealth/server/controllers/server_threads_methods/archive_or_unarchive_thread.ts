@@ -19,10 +19,8 @@ export type ArchiveOrUnarchiveThreadResult = ThreadAttributes;
 
 export async function __archiveOrUnarchiveThread(
   this: ServerThreadsController,
-  options: ArchiveOrUnarchiveThreadOptions
+  { user, threadId, shouldArchive }: ArchiveOrUnarchiveThreadOptions
 ): Promise<ArchiveOrUnarchiveThreadResult> {
-  const { user, threadId, shouldArchive } = options;
-
   const thread = await this.models.Thread.findOne({
     where: {
       id: threadId,
