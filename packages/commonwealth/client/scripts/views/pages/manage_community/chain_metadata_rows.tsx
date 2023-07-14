@@ -23,6 +23,7 @@ import { ManageRoles } from './manage_roles';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
+import { openConfirmation } from '../../modals/confirmation_modal';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -56,6 +57,39 @@ const DiscordForumConnections = ({
   );
 
   const [connectionVerified, setConnectionVerified] = useState(true);
+  const [topicIdToRemoveConnection, setTopicIdToRemoveConnection] = useState<
+    string | null
+  >(null);
+
+  const removeConnection = (topicId: string) => {
+    setTopicIdToRemoveConnection(topicId);
+
+    openConfirmation({
+      title: 'Warning',
+      // eslint-disable-next-line max-len
+      description: `Are you sure you want to remove this connection? New comments on Discord threads will NOT be updated on Commonwealth.`,
+      buttons: [
+        {
+          label: 'Remove',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              await app.discord.setForumChannelConnection(topicId, null);
+              setConnectionVerified(false);
+              await refetchTopics();
+              setConnectionVerified(true);
+            } catch (e) {
+              console.log(e);
+            }
+          },
+        },
+        {
+          label: 'No',
+          buttonType: 'mini-white',
+        },
+      ],
+    });
+  };
 
   return (
     <div className="DiscordForumConnections">
@@ -107,18 +141,8 @@ const DiscordForumConnections = ({
             {connectedTopic && (
               <CWClose
                 className="CloseButton"
-                onClick={async () => {
-                  try {
-                    await app.discord.setForumChannelConnection(
-                      connectedTopic.id,
-                      null
-                    );
-                    setConnectionVerified(false);
-                    await refetchTopics();
-                    setConnectionVerified(true);
-                  } catch (e) {
-                    console.log(e);
-                  }
+                onClick={() => {
+                  removeConnection(connectedTopic.id);
                 }}
               />
             )}
