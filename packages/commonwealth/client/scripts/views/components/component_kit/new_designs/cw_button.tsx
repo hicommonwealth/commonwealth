@@ -38,12 +38,6 @@ const getTextType = (buttonType: ButtonType) => {
   }
 };
 
-const widthStyle = (buttonWidth: ButtonWidth) => {
-  return {
-    style: buttonWidth === 'full' ? { width: '100%' } : { width: 'auto' },
-  };
-};
-
 export const CWButton = (props: ButtonProps) => {
   const {
     buttonType = 'primary',
@@ -60,8 +54,12 @@ export const CWButton = (props: ButtonProps) => {
 
   return (
     <div
-      className={`btn-border ${buttonType} ${disabled ? 'disabled' : ''}`}
-      {...widthStyle(buttonWidth)}
+      className={getClasses({
+        btnBorder: 'btn-border',
+        buttonType,
+        disabled,
+        buttonWidth: buttonWidth === 'full' ? 'full' : '',
+      })}
     >
       <button
         className={getClasses<ButtonStyleProps>(
@@ -74,7 +72,6 @@ export const CWButton = (props: ButtonProps) => {
           },
           ComponentType.Button
         )}
-        {...widthStyle(buttonWidth)}
         onClick={onClick}
         disabled={disabled}
         {...otherProps}

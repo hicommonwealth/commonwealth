@@ -19,6 +19,10 @@
     padding: 2px;
     border-radius: 10px;
     width: fit-content;
+
+    &.full {
+      width: 100%;
+    }
   }
 
   &.tertiary {
@@ -26,6 +30,10 @@
     padding: 2px;
     border-radius: 10px;
     width: fit-content;
+
+    &.full {
+      width: 100%;
+    }
   }
 
   &.secondary {
@@ -50,6 +58,10 @@
 
     &.disabled {
       border: 1px solid $neutral-200;
+    }
+
+    &.full {
+      width: 100%;
     }
   }
 
@@ -133,6 +145,10 @@
     &.wide {
       padding-left: 4rem;
       padding-right: 4rem;
+    }
+
+    &.full {
+      width: 100%;
     }
 
     &.primary {
