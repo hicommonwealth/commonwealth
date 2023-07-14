@@ -1,16 +1,22 @@
 import { ChainInstance } from '../../models/chain';
 import { ServerCommentsController } from '../server_comments_controller';
-import { buildPaginationSql } from '../../util/queries';
+import {
+  PaginationSqlOptions,
+  buildPaginatedResponse,
+  buildPaginationSql,
+} from '../../util/queries';
 import { QueryTypes } from 'sequelize';
+import { TypedPaginatedResult } from 'server/types';
 
 export type SearchCommentsOptions = {
   chain: ChainInstance;
   search: string;
-  sort?: string;
+  limit?: number;
   page?: number;
-  pageSize?: number;
+  orderBy?: string;
+  orderDirection?: 'ASC' | 'DESC';
 };
-export type SearchCommentsResult = {
+export type SearchCommentsResult = TypedPaginatedResult<{
   id: number;
   title: string;
   text: string;
@@ -22,35 +28,34 @@ export type SearchCommentsResult = {
   created_at: string;
   chain: string;
   rank: number;
-}[];
+}>;
 
 export async function __searchComments(
   this: ServerCommentsController,
-  { chain, search, sort, page, pageSize }: SearchCommentsOptions
+  { chain, search, limit, page, orderBy, orderDirection }: SearchCommentsOptions
 ): Promise<SearchCommentsResult> {
   // sort by rank by default
-  let sortOptions: {
-    column: string;
-    direction: 'ASC' | 'DESC';
-  } = {
-    column: 'rank',
-    direction: 'DESC',
+  let sortOptions: PaginationSqlOptions = {
+    limit: limit || 10,
+    page: page || 1,
+    orderDirection,
   };
-  switch ((sort || '').toLowerCase()) {
-    case 'newest':
-      sortOptions = { column: '"Comments".created_at', direction: 'DESC' };
+  switch (orderBy) {
+    case 'created_at':
+      sortOptions = {
+        ...sortOptions,
+        orderBy: `"Comments".${orderBy}`,
+      };
       break;
-    case 'oldest':
-      sortOptions = { column: '"Comments".created_at', direction: 'ASC' };
-      break;
+    default:
+      sortOptions = {
+        ...sortOptions,
+        orderBy: `rank`,
+      };
   }
 
-  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
-    limit: pageSize || 10,
-    page: page || 1,
-    orderBy: sortOptions.column,
-    orderDirection: sortOptions.direction,
-  });
+  const { sql: paginationSort, bind: paginationBind } =
+    buildPaginationSql(sortOptions);
 
   const bind: {
     searchTerm?: string;
@@ -66,35 +71,55 @@ export async function __searchComments(
 
   const chainWhere = bind.chain ? '"Comments".chain = $chain AND' : '';
 
-  const comments = await this.models.sequelize.query(
-    `
+  const sqlBaseQuery = `
     SELECT
-        "Comments".id,
-        "Threads".title,
-        "Comments".text,
-        "Comments".thread_id as proposalId,
-        'comment' as type,
-        "Addresses".id as address_id,
-        "Addresses".address,
-        "Addresses".chain as address_chain,
-        "Comments".created_at,
-        "Threads".chain,
-        ts_rank_cd("Comments"._search, query) as rank
-      FROM "Comments"
-      JOIN "Threads" ON "Comments".thread_id = "Threads".id
-      JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
-      websearch_to_tsquery('english', $searchTerm) as query
-      WHERE
-        ${chainWhere}
-        "Comments".deleted_at IS NULL AND
-        query @@ "Comments"._search
-      ${paginationSort}
-    `,
-    {
+      "Comments".id,
+      "Threads".title,
+      "Comments".text,
+      "Comments".thread_id as proposalId,
+      'comment' as type,
+      "Addresses".id as address_id,
+      "Addresses".address,
+      "Addresses".chain as address_chain,
+      "Comments".created_at,
+      "Threads".chain,
+      ts_rank_cd("Comments"._search, query) as rank
+    FROM "Comments"
+    JOIN "Threads" ON "Comments".thread_id = "Threads".id
+    JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
+    websearch_to_tsquery('english', $searchTerm) as query
+    WHERE
+      ${chainWhere}
+      "Comments".deleted_at IS NULL AND
+      query @@ "Comments"._search
+    ${paginationSort}
+  `;
+
+  const sqlCountQuery = `
+    SELECT
+      COUNT (*) as count
+    FROM "Comments"
+    JOIN "Threads" ON "Comments".thread_id = "Threads".id
+    JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
+    websearch_to_tsquery('english', $searchTerm) as query
+    WHERE
+      ${chainWhere}
+      "Comments".deleted_at IS NULL AND
+      query @@ "Comments"._search
+  `;
+
+  const [results, [{ count }]]: [any[], any[]] = await Promise.all([
+    this.models.sequelize.query(sqlBaseQuery, {
       bind,
       type: QueryTypes.SELECT,
-    }
-  );
+    }),
+    this.models.sequelize.query(sqlCountQuery, {
+      bind,
+      type: QueryTypes.SELECT,
+    }),
+  ]);
 
-  return comments as SearchCommentsResult;
+  const totalResults = parseInt(count, 10);
+
+  return buildPaginatedResponse(results, totalResults, bind);
 }

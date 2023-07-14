@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
+import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import { ChainInstance } from 'server/models/chain';
 import Sinon from 'sinon';
 
@@ -471,7 +472,11 @@ describe('ServerCommentsController', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         sequelize: {
-          query: sandbox.stub().resolves([{ id: 1 }, { id: 2 }]),
+          query: sandbox.stub().resolves(() =>
+            Array(11)
+              .fill(0)
+              .map((_, idx) => ({ id: idx + 1 }))
+          ),
         },
       };
       const tokenBalanceCache = {};
@@ -484,30 +489,32 @@ describe('ServerCommentsController', () => {
       );
 
       const chain = { id: 'ethereum' };
-      const searchOptions = {
-        search: 'hello',
-        sort: 'blah',
-        page: 7,
-        pageSize: 5,
-      };
-      const comments = await serverCommentsController.searchComments({
+      const searchOptions: SearchCommentsOptions = {
         chain: chain as ChainInstance,
-        search: searchOptions.search,
-        sort: searchOptions.sort,
-        page: searchOptions.page,
-        pageSize: searchOptions.pageSize,
-      });
+        search: 'hello',
+        limit: 5,
+        page: 2,
+        orderBy: 'created_at',
+        orderDirection: 'DESC',
+      };
+      const comments = await serverCommentsController.searchComments(
+        searchOptions
+      );
       const sqlArgs = db.sequelize.query.args[0];
       expect(sqlArgs).to.have.length(2);
       expect(sqlArgs[1].bind).to.include({
         searchTerm: 'hello',
         limit: 5,
-        offset: 30,
+        offset: 5,
         chain: 'ethereum',
       });
-      expect(comments).to.have.length(2);
-      expect(comments[0].id).to.equal(1);
-      expect(comments[1].id).to.equal(2);
+      expect(comments.results).to.have.length(2);
+      expect(comments.results[0].id).to.equal(1);
+      expect(comments.results[1].id).to.equal(2);
+      expect(comments.limit).to.equal(5);
+      expect(comments.page).to.equal(2);
+      expect(comments.totalPages).to.equal(3);
+      expect(comments.totalResults).to.equal(11);
     });
   });
 

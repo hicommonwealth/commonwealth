@@ -17,9 +17,10 @@ const Errors = {
 type SearchCommentsRequestParams = {
   search: string;
   chain?: string;
-  sort?: string;
+  limit?: string;
   page?: string;
-  page_size?: string;
+  order_by?: string;
+  order_direction?: string;
 };
 type SearchCommentsResponse = SearchCommentsResult;
 
@@ -46,9 +47,10 @@ export const searchCommentsHandler = async (
   const commentSearchResults = await controllers.comments.searchComments({
     chain: req.chain,
     search: options.search,
-    sort: options.sort,
+    limit: parseInt(options.limit, 10) || 0,
     page: parseInt(options.page, 10) || 0,
-    pageSize: parseInt(options.page_size, 10) || 0,
+    orderBy: options.order_by,
+    orderDirection: options.order_direction as any,
   });
 
   return success(res, commentSearchResults);

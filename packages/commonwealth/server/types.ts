@@ -4,6 +4,14 @@ import type { AddressInstance } from './models/address';
 import type { ChainInstance } from './models/chain';
 import type { UserInstance } from './models/user';
 
+export type TypedPaginatedResult<T> = {
+  results: T[];
+  limit: number;
+  page: number;
+  totalPages: number;
+  totalResults: number;
+};
+
 export type TypedRequestQuery<
   Q extends Record<string, unknown> = Record<string, unknown>
 > = Express.Request & {

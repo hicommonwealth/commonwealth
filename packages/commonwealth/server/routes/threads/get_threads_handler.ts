@@ -27,9 +27,10 @@ type ActiveThreadsRequestQuery = {
 type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
-  sort?: string;
+  limit?: string;
   page?: string;
-  page_size?: string;
+  order_by?: string;
+  order_direction?: string;
 };
 type BulkThreadsRequestQuery = {
   topic_id: string;
@@ -110,7 +111,7 @@ export const getThreadsHandler = async (
 
   // search for threads
   if (search) {
-    const { thread_title_only, sort, page, page_size } =
+    const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
     if (!search) {
       throw new AppError(Errors.QueryMissing);
@@ -127,9 +128,10 @@ export const getThreadsHandler = async (
       chain,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
-      sort,
-      page: parseInt(page, 10),
-      pageSize: parseInt(page_size, 10),
+      limit: parseInt(limit, 10) || 0,
+      page: parseInt(page, 10) || 0,
+      orderBy: order_by,
+      orderDirection: order_direction as any,
     });
     return success(res, searchResults);
   }
