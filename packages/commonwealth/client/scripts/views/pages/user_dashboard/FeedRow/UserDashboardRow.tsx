@@ -62,12 +62,10 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     const fetchThread = async () => {
       const res = await app.threads.fetchThreadsFromId([thread_id], chain_id);
       setThread(res[0]);
-      console.log(res[0]);
-      console.log(thread_id, 'thread_id');
-      console.log(comment_id, 'comment_id');
     };
 
     if (categoryId === 'new-comment-creation') fetchThread();
+    else if (categoryId === 'new-thread-creation') fetchThread();
   }, [chain_id, thread_id, comment_id]);
 
   const path = getProposalUrlPath(
