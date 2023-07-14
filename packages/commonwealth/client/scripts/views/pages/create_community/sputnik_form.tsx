@@ -128,7 +128,7 @@ export const SputnikForm = () => {
               );
             }
 
-            await updateAdminRole(id);
+            await updateAdminRole(_id);
 
             navigate(`/${res.result.chain.id}`);
           } catch (err) {

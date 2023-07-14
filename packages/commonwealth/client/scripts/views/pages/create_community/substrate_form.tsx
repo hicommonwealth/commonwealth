@@ -152,7 +152,7 @@ export const SubstrateForm = () => {
                   res.result.role.chain_id
                 );
               }
-              await updateAdminRole(id);
+              await updateAdminRole(slugify(name));
               navigate(`/${res.result.chain.id}`);
             })
             .catch((err: any) => {
