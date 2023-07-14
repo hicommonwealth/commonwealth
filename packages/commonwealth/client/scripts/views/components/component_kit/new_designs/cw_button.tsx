@@ -28,16 +28,6 @@ export type ButtonProps = {
 } & ButtonStyleProps &
   React.HTMLAttributes<HTMLButtonElement>;
 
-const getTextType = (buttonType: ButtonType) => {
-  if (buttonType.slice(0, 2) === 'lg') {
-    return 'buttonLg';
-  } else if (buttonType.slice(0, 4) === 'mini') {
-    return 'buttonMini';
-  } else {
-    return 'buttonSm';
-  }
-};
-
 export const CWButton = (props: ButtonProps) => {
   const {
     buttonType = 'primary',
