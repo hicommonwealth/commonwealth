@@ -50,7 +50,10 @@ class DiscordController {
     }
   }
 
-  public async setForumChannelConnection(topicId: string, channelId: string) {
+  public async setForumChannelConnection(
+    topicId: string,
+    channelId: string | null
+  ) {
     try {
       await $.post(`${app.serverUrl()}/updateTopic`, {
         chain_id: app.activeChainId(),
