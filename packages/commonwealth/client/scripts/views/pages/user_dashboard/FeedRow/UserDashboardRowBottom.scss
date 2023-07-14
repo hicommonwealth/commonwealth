@@ -5,13 +5,27 @@
   flex-wrap: wrap;
   gap: 16px;
   justify-content: space-between;
+  flex-direction: column;
   width: 100%;
 
-  .activity {
+  .top-row {
     display: flex;
-    align-items: left;
-    justify-content: flex-end;
-    gap: 16px;
+    flex-direction: row;
+    width: 100%;
+
+    .activity {
+      display: flex;
+      align-items: center; // Align items vertically in the center
+      flex-direction: row; // Align items horizontally
+      gap: 16px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center; // Align items vertically in the center
+      flex-direction: row; // Align items horizontally
+      gap: 16px;
+    }
   }
 
   .commenters {
@@ -46,10 +60,8 @@
     }
   }
 
-  .actions {
-    display: flex;
-    align-items: right;
-    justify-content: flex-end;
-    gap: 16px;
+  .CreateComment {
+    width: 100%; // make it span full width
+    // Remove the fixed width if it exists
   }
 }

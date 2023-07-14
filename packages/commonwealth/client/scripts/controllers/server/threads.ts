@@ -957,7 +957,6 @@ class ThreadsController {
       });
 
       const thread = response['data']['result'][0];
-      console.log(thread, 'thread in getThreadCommunityId');
       return thread;
     } catch (e) {
       return null;
