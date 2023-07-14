@@ -86,6 +86,6 @@ export class ServerCommentsController {
   async deleteComment(
     options: DeleteCommentOptions
   ): Promise<DeleteCommentResult> {
-    return __deleteComment.bind(this, options);
+    return __deleteComment.call(this, options);
   }
 }
