@@ -64,6 +64,7 @@
     "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
     "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
     "gen-e2e": "npx playwright codegen",
+    "e2e-start-server": "ETH_RPC=e2e-test yarn start",
     "test-e2e": "TEST_ENV=playwright npx playwright test ./test/e2e/*",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
     "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
