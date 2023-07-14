@@ -46,7 +46,10 @@ async function consumeMessages() {
           topic_id: topic['id'],
           topic_name: topic['name'],
           title: encodeURIComponent(parsedMessage.title),
-          body: encodeURIComponent( `[Go to Discord post](https://discord.com/channels/${parsedMessage.guild_id}/${parsedMessage.channel_id}) \n\n` + parsedMessage.content),
+          body: encodeURIComponent(
+            `[Go to Discord post](https://discord.com/channels/${parsedMessage.guild_id}/${parsedMessage.channel_id}) \n\n` +
+              parsedMessage.content
+          ),
           stage: 'discussion',
           kind: 'discussion',
           url: null,
@@ -56,7 +59,7 @@ async function consumeMessages() {
           canvas_session: null,
           discord_meta: {
             message_id: parsedMessage.message_id,
-            channel_id: parsedMessage.channel_id,
+            channel_id: parsedMessage.parent_channel_id,
             user: parsedMessage.user,
           },
           auth: CW_BOT_KEY,
@@ -66,11 +69,11 @@ async function consumeMessages() {
           `${SERVER_URL}/api/bot/threads`,
           create_thread
         );
-        console.log(response.status, response.statusText)
+        console.log(response.status, response.statusText);
       } else {
         const thread_id = (
           await sequelize.query(
-            `SELECT id FROM "Threads" WHERE discord_meta->>'channel_id' = '${parsedMessage.channel_id}'`
+            `SELECT id FROM "Threads" WHERE discord_meta->>'message_id' = '${parsedMessage.channel_id}'`
           )
         )[0][0]['id'];
 
@@ -86,7 +89,7 @@ async function consumeMessages() {
           auth: CW_BOT_KEY,
           discord_meta: {
             message_id: parsedMessage.message_id,
-            channel_id: parsedMessage.channel_id,
+            channel_id: parsedMessage.parent_channel_id,
             user: parsedMessage.user,
           },
         };
@@ -95,7 +98,7 @@ async function consumeMessages() {
           `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
           create_comment
         );
-        console.log(response.status, response.statusText)
+        console.log(response.status, response.statusText);
       }
     } catch (error) {
       log.error(`Failed to process Message:`, error);

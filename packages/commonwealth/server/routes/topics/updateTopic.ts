@@ -40,8 +40,6 @@ const updateTopic = async (
     },
   });
 
-  console.log({ topic });
-
   if (!topic) throw new AppError(Errors.MissingTopic);
 
   // Find previous topic associated with channel
@@ -51,7 +49,8 @@ const updateTopic = async (
     },
   });
 
-  if (topicWithChannel) {
+  // Either we are removing a connect (channel_id is null) or we are connecting to a new channel
+  if (topicWithChannel && (topicWithChannel.id !== topic.id || !channel_id)) {
     // Previous threads on topic from discord bot
     const threadsOnTopicFromDiscordBot = await models.Thread.findAll({
       where: {
@@ -64,7 +63,7 @@ const updateTopic = async (
     });
 
     // batch update threads to have new topic id
-    const result = await models.Thread.update(
+    await models.Thread.update(
       {
         topic_id: channel_id ? topic.id : null,
       },
@@ -81,22 +80,19 @@ const updateTopic = async (
     topicWithChannel.channel_id = null;
     await topicWithChannel.save();
   } else {
-    console.log('im in this case', channel_id);
     // No previous topic associated with channel. Set all threads with channel id to new topic
     const threadsOnTopicFromDiscordBot = await models.Thread.findAll({
       where: {
         chain: chain_id,
         // discord meta is not null
         discord_meta: {
-          [Op.contains]: [{ channel_id: channel_id }],
+          [Op.contains]: { channel_id: channel_id },
         },
       },
     });
 
-    console.log({ threadsOnTopicFromDiscordBot });
-
     // batch update threads to have new topic id
-    const result = await models.Thread.update(
+    await models.Thread.update(
       {
         topic_id: topic.id,
       },
@@ -108,8 +104,6 @@ const updateTopic = async (
         },
       }
     );
-
-    console.log({ result });
   }
 
   try {
