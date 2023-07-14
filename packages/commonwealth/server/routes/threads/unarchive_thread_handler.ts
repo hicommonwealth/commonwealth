@@ -21,11 +21,11 @@ export const unarchiveThreadHandler = async (
     throw new AppError(Errors.NotLoggedIn);
   }
 
-  const updatedThread = await controllers.threads.archiveOrUnarchiveThread(
-    req.user,
+  const updatedThread = await controllers.threads.archiveOrUnarchiveThread({
+    user: req.user,
     threadId,
-    false
-  );
+    shouldArchive: false,
+  });
 
   return success(res, updatedThread);
 };
