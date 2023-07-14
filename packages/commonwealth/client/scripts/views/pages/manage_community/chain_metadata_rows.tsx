@@ -168,8 +168,7 @@ export const ChainMetadataRows = ({
       await app.discord.createConfig(verification_token);
 
       window.open(
-        `https://discord.com/oauth2/authorize?client_id=${
-          process.env.DISCORD_CLIENT_ID
+        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID
         }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
           process.env.DISCORD_UI_URL
         )}/callback&response_type=code&scope=bot&state=${encodeURI(
@@ -212,8 +211,7 @@ export const ChainMetadataRows = ({
       await app.discord.createConfig(verification_token);
 
       window.open(
-        `https://discord.com/oauth2/authorize?client_id=${
-          process.env.DISCORD_CLIENT_ID
+        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID
         }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
           process.env.DISCORD_UI_URL
         )}/callback&response_type=code&scope=bot&state=${encodeURI(
@@ -389,7 +387,8 @@ export const ChainMetadataRows = ({
                 }
               })
               .filter((val) => val.length > 4);
-            setSnapshot(snapshots);
+            const uniqueSnpshots = [...new Set(snapshots)] as string[]
+            setSnapshot(uniqueSnpshots);
             setSnapshotString(v);
           }}
         />
