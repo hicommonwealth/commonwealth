@@ -90,15 +90,14 @@
   flex: 1;
 }
 
-.popper {
+.container {
   position: static;
 }
 
-
 .listBox {
+  position: relative;
   box-sizing: border-box;
   padding: 6px;
-  // margin-top: -32px;
   width: 608px;
   border-radius: 6px;
   overflow: auto;

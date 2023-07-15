@@ -1,7 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FC, ChangeEvent, useState } from 'react';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import useAutocomplete from '@mui/base/useAutocomplete';
-import Popper from '@mui/base/Popper';
 
 import { ComponentType } from './../types';
 
@@ -100,16 +99,15 @@ const Tag: FC<TagProps> = ({ communityName, disabled, onClick }) => {
   );
 };
 
-export const CWSearchBar = (props: SearchBarProps) => {
+export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
   const [value, setValue] = useState<string>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  // const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [communityName, setCommunityName] = useState<string>(null);
 
-  const { disabled, placeholder } = props;
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setValue(e.target.value);
 
-  const handleInputChange = (e) => setValue(e.target.value);
-
-  const handleOnInput = (e) => {
+  const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.currentTarget.value?.length === 0) {
       setIsTyping(false);
     } else {
@@ -122,22 +120,19 @@ export const CWSearchBar = (props: SearchBarProps) => {
     getInputProps,
     getListboxProps,
     getOptionProps,
-    popupOpen,
-    anchorEl,
-    setAnchorEl,
     groupedOptions,
   } = useAutocomplete({
     options: communities,
     value,
-    onChange: (event: any, newValue) => setValue(newValue),
+    onChange: (event: any, newValue) => {
+      setCommunityName(newValue);
+      setValue('');
+    },
     getOptionLabel: (option) => option,
   });
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popper' : undefined;
-
   return (
-    <>
+    <div className="container">
       <div
         className={getClasses<InputStyleProps & InputInternalStyleProps>(
           {
@@ -152,11 +147,10 @@ export const CWSearchBar = (props: SearchBarProps) => {
           weight="regular"
           size={24}
         />
-        {value && (
+        {communityName && (
           <Tag
-            communityName={value}
-            // onClick={() => setCommunityName(null)}
-            onClick={() => setValue(null)}
+            communityName={communityName}
+            onClick={() => setCommunityName(null)}
           />
         )}
         <div className="inputElement" {...getRootProps()}>
@@ -170,25 +164,15 @@ export const CWSearchBar = (props: SearchBarProps) => {
           />
         </div>
       </div>
-      <Popper
-        // className="popper"
-        id={id}
-        open={true}
-        anchorEl={anchorEl}
-        placement="bottom"
-      >
-        <div className="listBox">
-          {groupedOptions.length > 0 && (
-            <ul {...getListboxProps()}>
-              {(groupedOptions as typeof communities).map((option, index) => (
-                <li className="option" {...getOptionProps({ option, index })}>
-                  {option}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </Popper>
-    </>
+      {groupedOptions.length > 0 && (
+        <ul className="listBox" {...getListboxProps()}>
+          {(groupedOptions as typeof communities).map((option, index) => (
+            <li className="option" {...getOptionProps({ option, index })}>
+              {option}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 };
