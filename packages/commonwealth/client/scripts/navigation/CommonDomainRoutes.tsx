@@ -48,7 +48,7 @@ const ChainEntityLinkRedirectPage = lazy(
 const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect')
 );
-const FeedPage = lazy(() => import('views/pages/Feed'));
+const FeedPage = lazy(() => import('views/pages/feed'));
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
