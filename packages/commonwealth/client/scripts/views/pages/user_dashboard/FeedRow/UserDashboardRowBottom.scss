@@ -1,0 +1,67 @@
+@import '../../../../../styles/shared';
+
+.UserDashboardRowBottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 100%;
+
+  .top-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    .activity {
+      display: flex;
+      align-items: center; // Align items vertically in the center
+      flex-direction: row; // Align items horizontally
+      gap: 16px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center; // Align items vertically in the center
+      flex-direction: row; // Align items horizontally
+      gap: 16px;
+    }
+  }
+
+  .commenters {
+    display: flex;
+    align-items: left;
+    padding-bottom: 2x;
+
+    .icon,
+    .text {
+      color: $neutral-500;
+    }
+  }
+
+  .thread-option-btn {
+    outline: 0;
+    border: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: $border-radius-corners-wider;
+    color: $neutral-600;
+
+    &:hover {
+      background-color: $neutral-200;
+    }
+
+    .Text {
+      color: $neutral-600;
+    }
+  }
+
+  .CreateComment {
+    width: 100%; // make it span full width
+    // Remove the fixed width if it exists
+  }
+}

@@ -3,51 +3,51 @@ import { expect } from 'chai';
 import 'chai/register-should';
 import app from 'client/scripts/state';
 import sinon from 'sinon';
-import NewProfilesController, { newProfilesChunkSize } from '../../client/scripts/controllers/server/newProfiles';
+import NewProfilesController, {
+  newProfilesChunkSize,
+} from '../../client/scripts/controllers/server/newProfiles';
 import MinimumProfile from '../../client/scripts/models/MinimumProfile';
 
 app.serverUrl = () => '/api';
 
 describe('NewProfilesController tests', async () => {
-  let newProfilesController;
-  const axiosStub = sinon.stub(axios, 'post');
+  let newProfilesController, axiosStub;
   const expectedAddress = 'testAddress';
   const expectedChain = 'testChain';
+
+  beforeEach(() => {
+    axiosStub = sinon.stub(axios, 'post');
+
+    axiosStub.withArgs(`${app.serverUrl()}/updateProfile/v2`).resolves({
+      data: {
+        result: {
+          status: 'Success',
+        },
+      },
+    });
+
+    axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
+      data: {
+        result: new Array(newProfilesChunkSize + 1).fill({
+          name: '',
+          address: expectedAddress,
+          avatarUrl: '',
+          profileId: 1,
+          lastActive: new Date(),
+        }),
+      },
+    });
+
+    newProfilesController = NewProfilesController.Instance;
+  });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  axiosStub.withArgs(`${app.serverUrl()}/updateProfile/v2`).resolves({
-    data: {
-      result: {
-        status: 'Success',
-      },
-    },
-  });
-
-  axiosStub.withArgs(`${app.serverUrl()}/getAddressProfile`).resolves({
-    data: {
-      result: new Array(newProfilesChunkSize + 1).fill({
-        name: '',
-        address: expectedAddress,
-        avatarUrl: '',
-        profileId: 1,
-        lastActive: new Date(),
-      }),
-    },
-  });
-
-  beforeEach(() => {
-    newProfilesController = NewProfilesController.Instance;
-  });
-
   it('should return the correct profile', async () => {
     const controller = NewProfilesController.Instance;
-    const actualProfile = controller.getProfile(
-      expectedChain,
-      expectedAddress
-    );
+    const actualProfile = controller.getProfile(expectedChain, expectedAddress);
 
     expect(actualProfile.address).to.equal(expectedAddress);
     expect(actualProfile.chain).to.equal(expectedChain);
@@ -83,6 +83,9 @@ describe('NewProfilesController tests', async () => {
 
     await controller.updateProfileForAccount(expectedAddress, data);
 
+    // the controller calls an async method synchronously - even though we stub it synchronously we still need the delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     // Calls once from getProfile invocation, then twice from updateProfileForAccount
     // (once for getProfile and once for update)
     sinon.assert.callCount(axiosStub, 2);
@@ -111,6 +114,6 @@ describe('NewProfilesController tests', async () => {
 
     // Calls once from getProfile invocation, then twice from updateProfileForAccount
     // (twice for getProfile and for update)
-    sinon.assert.callCount(axiosStub, 4);
+    sinon.assert.callCount(axiosStub, 2);
   });
 });

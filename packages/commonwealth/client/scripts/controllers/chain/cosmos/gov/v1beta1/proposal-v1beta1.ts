@@ -15,7 +15,12 @@ import type {
 
 import moment from 'moment';
 import { ITXModalData, IVote } from '../../../../../models/interfaces';
-import { ProposalEndTime, ProposalStatus, VotingType, VotingUnit } from '../../../../../models/types';
+import {
+  ProposalEndTime,
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../../models/types';
 import { DepositVote } from '../../../../../models/votes';
 import Proposal from '../../../../../models/Proposal';
 import CosmosAccount from '../../account';
@@ -143,6 +148,17 @@ export class CosmosProposal extends Proposal<
   }
 
   public async init() {
+    await this.fetchVoteInfo();
+
+    if (!this.initialized) {
+      this._initialized = true;
+    }
+    if (this.data.state.completed) {
+      super.complete(this._Governance.store);
+    }
+  }
+
+  private async fetchVoteInfo() {
     const api = this._Chain.api;
     // only fetch voter data if active
     if (!this.data.state.completed) {
@@ -191,14 +207,10 @@ export class CosmosProposal extends Proposal<
           this.data.state.tally = marshalTally(tallyResp?.tally);
         }
       } catch (err) {
-        console.error(`Cosmos query failed: ${err.message}`);
+        console.error(`Votes query failed: ${err.message}`);
+      } finally {
+        this.isFetched.emit('redraw');
       }
-    }
-    if (!this.initialized) {
-      this._initialized = true;
-    }
-    if (this.data.state.completed) {
-      super.complete(this._Governance.store);
     }
   }
 
@@ -274,7 +286,7 @@ export class CosmosProposal extends Proposal<
       case 'Rejected':
         return ProposalStatus.Failed;
       case 'VotingPeriod':
-        return this.support > 0.5 && this.veto <= 1 / 3
+        return +this.support > 0.5 && this.veto <= 1 / 3
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':

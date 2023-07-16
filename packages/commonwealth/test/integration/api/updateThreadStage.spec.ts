@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import { Errors } from '../../../server/routes/updateThreadStage';
@@ -85,6 +85,27 @@ describe('updateThreadStage Integration Tests', () => {
   });
 
   it('should return an error response if not enough permission to update stage (not admin or owner)', async () => {
+    await models.Address.update(
+      {
+        role: 'member',
+      },
+      {
+        where: {
+          id: testAddresses[0].id,
+        },
+      }
+    );
+    await models.User.update(
+      {
+        isAdmin: false,
+      },
+      {
+        where: {
+          id: testUsers[0].id,
+        },
+      }
+    );
+
     const invalidRequest = {
       jwt: jwtTokenUser1,
       author_chain: testAddresses[0].chain,

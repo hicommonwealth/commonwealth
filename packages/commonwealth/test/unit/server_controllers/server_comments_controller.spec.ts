@@ -70,13 +70,13 @@ describe('ServerCommentsController', () => {
       );
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
-        await serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        );
+        await serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId,
+        });
 
       expect(newReaction).to.be.ok;
 
@@ -185,13 +185,13 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          123
-        )
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId: 123,
+        })
       ).to.be.rejectedWith('Comment not found: 123');
     });
 
@@ -254,13 +254,13 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          123
-        )
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId: 123,
+        })
       ).to.be.rejectedWith('Thread not found for comment: 123');
     });
 
@@ -328,13 +328,13 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        )
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId,
+        })
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
@@ -426,14 +426,14 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        )
-      ).to.be.rejectedWith('Could not verify user token balance');
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId,
+        })
+      ).to.be.rejectedWith('Insufficient token balance');
     });
   });
 
@@ -459,7 +459,9 @@ describe('ServerCommentsController', () => {
         banCache as any
       );
 
-      const reactions = await serverCommentsController.getCommentReactions(777);
+      const reactions = await serverCommentsController.getCommentReactions({
+        commentId: 777,
+      });
       expect(reactions).to.have.length(2);
     });
   });
@@ -488,13 +490,13 @@ describe('ServerCommentsController', () => {
         page: 7,
         pageSize: 5,
       };
-      const comments = await serverCommentsController.searchComments(
-        chain as ChainInstance,
-        searchOptions.search,
-        searchOptions.sort,
-        searchOptions.page,
-        searchOptions.pageSize
-      );
+      const comments = await serverCommentsController.searchComments({
+        chain: chain as ChainInstance,
+        search: searchOptions.search,
+        sort: searchOptions.sort,
+        page: searchOptions.page,
+        pageSize: searchOptions.pageSize,
+      });
       const sqlArgs = db.sequelize.query.args[0];
       expect(sqlArgs).to.have.length(2);
       expect(sqlArgs[1].bind).to.include({
@@ -566,13 +568,13 @@ describe('ServerCommentsController', () => {
       const commentId = 123;
       const commentBody = 'Hello';
       const [updatedComment, allNotificationOptions] =
-        await serverCommentsController.updateComment(
-          user as any,
-          address as any,
-          chain as any,
+        await serverCommentsController.updateComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           commentId,
-          commentBody
-        );
+          commentBody,
+        });
 
       expect(updatedComment).to.include({
         id: 123,
@@ -667,13 +669,13 @@ describe('ServerCommentsController', () => {
       const commentId = 123;
       const commentBody = 'Hello';
       expect(
-        serverCommentsController.updateComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverCommentsController.updateComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           commentId,
-          commentBody
-        )
+          commentBody,
+        })
       ).to.be.rejectedWith('Ban error: banned');
     });
 
@@ -728,13 +730,13 @@ describe('ServerCommentsController', () => {
       const commentId = 123;
       const commentBody = 'Hello';
       expect(
-        serverCommentsController.updateComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverCommentsController.updateComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           commentId,
-          commentBody
-        )
+          commentBody,
+        })
       ).to.be.rejectedWith('Thread not found for comment');
     });
   });
@@ -768,12 +770,12 @@ describe('ServerCommentsController', () => {
       const address = {};
       const chain = {};
       const commentId = 1;
-      await serverCommentsController.deleteComment(
-        user as any,
-        address as any,
-        chain as any,
-        commentId
-      );
+      await serverCommentsController.deleteComment({
+        user: user as any,
+        address: address as any,
+        chain: chain as any,
+        commentId,
+      });
     });
   });
 });

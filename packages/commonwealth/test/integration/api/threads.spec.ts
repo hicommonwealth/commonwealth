@@ -7,8 +7,9 @@ import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
-import { Errors as ThreadErrors } from 'server/routes/createThread';
-import { Errors as EditThreadErrors } from 'server/routes/editThread';
+import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
+import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
+import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
 import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
@@ -81,7 +82,7 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    describe('/createThread', () => {
+    describe('POST /threads', () => {
       const readOnly = true;
 
       it('should fail to create a thread without a kind', async () => {
@@ -98,7 +99,7 @@ describe('Thread Tests', () => {
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
-        expect(tRes.error).to.be.equal(ThreadErrors.UnsupportedKind);
+        expect(tRes.error).to.be.equal(CreateThreadErrors.UnsupportedKind);
       });
 
       it('should fail to create a forum thread with an empty title', async () => {
@@ -115,7 +116,9 @@ describe('Thread Tests', () => {
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
-        expect(tRes.error).to.be.equal(ThreadErrors.DiscussionMissingTitle);
+        expect(tRes.error).to.be.equal(
+          CreateThreadErrors.DiscussionMissingTitle
+        );
       });
 
       it('should fail to create a link thread with an empty title', async () => {
@@ -133,7 +136,9 @@ describe('Thread Tests', () => {
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
-        expect(tRes.error).to.be.equal(ThreadErrors.LinkMissingTitleOrUrl);
+        expect(tRes.error).to.be.equal(
+          CreateThreadErrors.LinkMissingTitleOrUrl
+        );
       });
 
       it('should fail to create a link thread with an empty URL', async () => {
@@ -151,7 +156,9 @@ describe('Thread Tests', () => {
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
-        expect(tRes.error).to.be.equal(ThreadErrors.LinkMissingTitleOrUrl);
+        expect(tRes.error).to.be.equal(
+          CreateThreadErrors.LinkMissingTitleOrUrl
+        );
       });
 
       it('should fail to create a comment on a readOnly thread', async () => {
@@ -278,13 +285,14 @@ describe('Thread Tests', () => {
       });
     });
 
-    describe('/bulkThreads', () => {
+    describe('/threads (bulkThreads)', () => {
       it('should return bulk threads for a public chain', async () => {
         const res = await chai.request
           .agent(app)
-          .get('/api/bulkThreads')
+          .get('/api/threads')
           .set('Accept', 'application/json')
           .query({
+            bulk: true,
             chain,
             jwt: adminJWT,
           });
@@ -511,7 +519,9 @@ describe('Thread Tests', () => {
           });
         expect(res.body.error).to.not.be.null;
         expect(res.status).to.be.equal(400);
-        expect(res.body.error).to.be.equal(EditThreadErrors.NoThreadId);
+        expect(res.body.error).to.be.equal(
+          EditThreadHandlerErrors.InvalidThreadID
+        );
       });
 
       it('should fail to edit a thread without passing a body', async () => {

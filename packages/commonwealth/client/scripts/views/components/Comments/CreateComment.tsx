@@ -12,10 +12,10 @@ import Thread from '../../../models/Thread';
 import app from 'state';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
-import { CWButton } from '../component_kit/cw_button';
+import { CWButton } from '../component_kit/new_designs/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
-import { jumpHighlightComment } from './helpers';
+import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import {
   createDeltaFromText,
   getTextFromDelta,
@@ -38,14 +38,13 @@ export const CreateComment = ({
   updatedCommentsCallback,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
-    `new-thread-comment-${rootThread.id}`
+    !parentCommentId
+      ? `new-thread-comment-${rootThread.id}`
+      : `new-comment-reply-${parentCommentId}`
   );
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
-    if (handleIsReplying) {
-      return createDeltaFromText('');
-    }
     return restoreDraft() || createDeltaFromText('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -61,7 +60,8 @@ export const CreateComment = ({
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (e) => {
+    e.stopPropagation();
     setErrorMsg(null);
     setSendingComment(true);
 
@@ -118,23 +118,18 @@ export const CreateComment = ({
   const disabled =
     editorValue.length === 0 || sendingComment || userFailsThreshold;
 
-  const decimals = getDecimals(app.chain);
-
   const cancel = (e) => {
+    e.stopPropagation();
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
       handleIsReplying(false);
-    } else {
-      clearDraft();
     }
+    clearDraft();
   };
 
   // on content updated, save draft
   useEffect(() => {
-    if (handleIsReplying) {
-      return;
-    }
     saveDraft(contentDelta);
   }, [handleIsReplying, saveDraft, contentDelta]);
 
@@ -151,37 +146,42 @@ export const CreateComment = ({
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && app.user.activeAccount && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
+      <div onClick={(e) => e.stopPropagation()}>
+        <ReactQuillEditor
+          className="editor"
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+        />
+      </div>
+      {app.activeChainId &&
+        tokenPostingThreshold &&
+        tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {activeTopicName} requires{' '}
+            {weiToTokens(
+              tokenPostingThreshold.toString(),
+              getDecimals(app.chain)
+            )}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && app.user.activeAccount && (
+              <>
+                You have{' '}
+                {weiToTokens(userBalance.toString(), getDecimals(app.chain))}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
+          </CWText>
+        )}
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (
-            <CWButton
-              buttonType="secondary-blue"
-              onClick={cancel}
-              label="Cancel"
-            />
+            <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
           )}
           <CWButton
+            buttonWidth="wide"
             disabled={disabled}
             onClick={handleSubmitComment}
-            label="Submit"
+            label={parentType === ContentType.Comment ? 'Reply' : 'Comment'}
           />
         </div>
       </div>

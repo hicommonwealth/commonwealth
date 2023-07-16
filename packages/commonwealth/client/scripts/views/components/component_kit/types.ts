@@ -42,9 +42,11 @@ export enum ComponentType {
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',
+  ThreadAction = 'ThreadAction',
   ThreadVoteButton = 'ThreadVoteButton',
   Toggle = 'Toggle',
   Tooltip = 'Tooltip',
+  Upvote = 'Upvote',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
 }
@@ -54,18 +56,25 @@ export type BaseStyleProps = {
   className?: string;
 };
 
-export type DividerMenuItem = { type: 'divider' };
+export type DividerMenuItem = { type: 'divider'; className?: string };
 
-export type HeaderMenuItem = { type: 'header'; label?: string };
+export type HeaderMenuItem = {
+  type: 'header';
+  label?: string;
+  className?: string;
+};
 
 export type DefaultMenuItem = {
   disabled?: boolean;
   iconLeft?: IconName;
+  iconLeftWeight?: 'fill' | 'bold';
   iconRight?: IconName;
+  iconRightWeight?: 'fill' | 'bold';
   isSecondary?: boolean;
   label?: string;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'default';
+  className?: string;
 };
 
 type NotificationMenuItem = {

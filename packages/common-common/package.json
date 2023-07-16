@@ -15,7 +15,6 @@
     "lint": "../../scripts/lint-new-work.sh",
     "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --noEmit",
-    "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json ./test/unit/**/*.spec.ts",
     "publish-rmq-msg": "ts-node --project tsconfig.json src/rabbitmq/scripts/publishRmqMessageScript.ts"
   },
   "dependencies": {

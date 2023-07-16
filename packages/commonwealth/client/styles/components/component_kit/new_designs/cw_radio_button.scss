@@ -1,0 +1,49 @@
+@import '../../../shared';
+
+.container {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.radio-button {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  color: $neutral-400;
+  clip-path: circle(50%);
+  z-index: 1;
+
+  &:hover {
+    color: $primary-600;
+  }
+
+  &.checked {
+    color: $primary-500;
+  }
+
+  &.checked:hover {
+    color: $primary-600;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    color: $neutral-200;
+  }
+}
+
+.background {
+  position: absolute;
+  top: 2.65px;
+  left: 2.65px;
+  background: $neutral-100;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.label {
+  margin-left: 5px;
+}

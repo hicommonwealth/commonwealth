@@ -8,6 +8,7 @@
 @import 'mixins/inputs';
 @import 'mixins/icons';
 @import 'mixins/text';
+@import 'utils';
 
 // layout & global nav parameters
 
@@ -29,7 +30,7 @@ $font-family-silka: Silka, sans-serif;
 $font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 
-$font-family-monospace: dm-mono;
+$font-family-monospace: 'DM Mono', monospace;
 
 @mixin visibleScrollbar($theme) {
   &::-webkit-scrollbar {
@@ -41,7 +42,7 @@ $font-family-monospace: dm-mono;
     width: 8px;
   }
 
-  @if $theme == light {
+  @if $theme ==light {
     &::-webkit-scrollbar-track {
       background: $neutral-50;
       border-radius: $border-radius-corners;
@@ -51,7 +52,7 @@ $font-family-monospace: dm-mono;
       border-radius: $border-radius-corners;
       background-color: $neutral-200;
     }
-  } @else if $theme == dark {
+  } @else if $theme ==dark {
     &::-webkit-scrollbar-track {
       background: $neutral-700;
       border-radius: $border-radius-corners;
@@ -81,19 +82,19 @@ $font-family-monospace: dm-mono;
 }
 
 @mixin flame($size: medium) {
-  @if $size == small {
+  @if $size ==small {
     .flame::after {
       content: '\1F525';
       display: block;
       font-size: 14px;
     }
-  } @else if $size == medium {
+  } @else if $size ==medium {
     .flame::after {
       content: '\1F525';
       display: block;
       font-size: 22px;
     }
-  } @else if $size == large {
+  } @else if $size ==large {
     .flame::after {
       content: '\1F525';
       display: block;

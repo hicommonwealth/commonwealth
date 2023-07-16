@@ -20,33 +20,38 @@ export const fetchProposalsByStatusV1 = async (
   lcd: LCD,
   status: ProposalStatus
 ): Promise<ProposalSDKType[]> => {
-  const { proposals: proposalsByStatus, pagination } =
-    await lcd.cosmos.gov.v1.proposals({
-      proposalStatus: status,
-      voter: '',
-      depositor: '',
-    });
-
-  let nextKey = pagination?.next_key;
-  while (nextKey?.length > 0) {
-    // console.log(nextKey);
-    const { proposals, pagination: nextPage } =
+  try {
+    const { proposals: proposalsByStatus, pagination } =
       await lcd.cosmos.gov.v1.proposals({
         proposalStatus: status,
         voter: '',
         depositor: '',
-        pagination: {
-          key: nextKey,
-          limit: null,
-          offset: null,
-          countTotal: true,
-          reverse: true,
-        },
       });
-    proposalsByStatus.push(...proposals);
-    nextKey = nextPage.next_key;
+
+    let nextKey = pagination?.next_key;
+    while (nextKey?.length > 0) {
+      // console.log(nextKey);
+      const { proposals, pagination: nextPage } =
+        await lcd.cosmos.gov.v1.proposals({
+          proposalStatus: status,
+          voter: '',
+          depositor: '',
+          pagination: {
+            key: nextKey,
+            limit: null,
+            offset: null,
+            countTotal: true,
+            reverse: true,
+          },
+        });
+      proposalsByStatus.push(...proposals);
+      nextKey = nextPage.next_key;
+    }
+    return proposalsByStatus;
+  } catch (e) {
+    console.error(`Error fetching proposal by status ${status}`, e);
+    return [];
   }
-  return proposalsByStatus;
 };
 
 export const getActiveProposalsV1 = async (
@@ -107,10 +112,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
       // get title and description from 1st message if no top-level title/desc
       if (!title) title = content?.title;
       if (!description) description = content?.description;
-      return {
-        typeUrl: m.type_url,
-        value: m.value,
-      };
+      return m;
     });
   }
 
