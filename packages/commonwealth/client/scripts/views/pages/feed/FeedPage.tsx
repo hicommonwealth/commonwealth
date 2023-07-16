@@ -1,5 +1,6 @@
-import './FeedPage.scss';
 import React, { useEffect, useState } from 'react';
+
+import './FeedPage.scss';
 import app from 'state';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
