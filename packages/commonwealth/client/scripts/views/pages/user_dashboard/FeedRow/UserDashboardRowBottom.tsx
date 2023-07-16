@@ -96,11 +96,10 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     <div className="UserDashboardRowBottom">
       <div className="top-row">
         <div className="activity">
-          {
+          {/* {
             thread && (
               <ReactionButton thread={thread} size="small" />
-            ) /* Show on more than threads? */
-          }
+            ) /* Show on more than threads? */}
           {/* {comment && <CommentReactionButton comment={comment} />} */}
           <button
             className="thread-option-btn"
