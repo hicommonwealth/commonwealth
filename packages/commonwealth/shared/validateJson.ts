@@ -29,6 +29,7 @@ const schema = {
           },
           additionalProperties: false,
         },
+        is4337: { type: 'boolean'}
       },
       required: ['method'],
       additionalProperties: false,
