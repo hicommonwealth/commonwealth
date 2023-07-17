@@ -291,32 +291,32 @@ class CommentsController {
   }
 
   public async toggleSpam(commentId: number, isSpam: boolean) {
-    return new Promise((resolve, reject) => {
+    try {
       const verb = isSpam ? 'put' : 'delete';
-      axios[verb](`${app.serverUrl()}/comments/${commentId}/spam`, {
-        data: {
-          jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
-        } as any,
-      })
-        .then((response) => {
-          const comment = this._store.getById(commentId);
-          const result = modelFromServer({
-            ...comment,
-            ...response.data.result,
-          });
-          if (comment) this._store.remove(comment);
-          this._store.add(result);
-          resolve(result);
-        })
-        .catch((e) => {
-          console.error(e);
-          notifyError(
-            `Could not ${!isSpam ? 'mark' : 'unmark'} comment as spam`
-          );
-          reject(e);
-        });
-    });
+      const response = await axios[verb](
+        `${app.serverUrl()}/comments/${commentId}/spam`,
+        {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          } as any,
+        }
+      );
+      const comment = this._store.getById(commentId);
+      const result = modelFromServer({
+        ...comment,
+        ...response.data.result,
+      });
+      if (comment) {
+        this._store.remove(comment);
+      }
+      this._store.add(result);
+      return result;
+    } catch (err) {
+      console.error(err);
+      notifyError(`Could not ${!isSpam ? 'mark' : 'unmark'} comment as spam`);
+      throw err;
+    }
   }
 
   public async refresh(thread: Thread, chainId: string) {

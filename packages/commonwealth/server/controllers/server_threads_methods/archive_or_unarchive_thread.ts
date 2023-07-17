@@ -1,12 +1,11 @@
 import { UserInstance } from '../../models/user';
 import { ServerThreadsController } from '../server_threads_controller';
 import { ThreadAttributes } from '../../models/thread';
-import { findAllRoles } from '../../util/roles';
-import { Op } from 'sequelize';
+import { validateOwner } from '../../util/validateOwner';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
-  NotAdmin: 'Not an admin',
+  InvalidPermissions: 'Invalid permissions',
 };
 
 export type ArchiveOrUnarchiveThreadOptions = {
@@ -29,23 +28,19 @@ export async function __archiveOrUnarchiveThread(
   if (!thread) {
     throw new Error(Errors.ThreadNotFound);
   }
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  if (!userOwnedAddressIds.includes(thread.address_id) && !user.isAdmin) {
-    // is not author or site admin
-    const roles = await findAllRoles(
-      this.models,
-      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-      thread.chain,
-      ['admin', 'moderator']
-    );
-    const role = roles.find((r) => {
-      return r.chain_id === thread.chain;
-    });
-    if (!role) {
-      throw new Error(Errors.NotAdmin);
-    }
+
+  const isOwner = await validateOwner({
+    models: this.models,
+    user,
+    chainId: thread.chain,
+    entity: thread,
+    allowMod: true,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+
+  if (!isOwner) {
+    throw new Error(Errors.InvalidPermissions);
   }
 
   await thread.update({
