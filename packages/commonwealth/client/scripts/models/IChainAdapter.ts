@@ -160,9 +160,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
   }
 
-  public getTopicThreshold(topicName: string): BN {
-    if (this.gatedTopics?.length > 0 && topicName) {
-      const topicGate = this.gatedTopics.find((i) => i.topic === topicName);
+  public getTopicThreshold(topicId: number): BN {
+    if (this.gatedTopics?.length > 0 && topicId) {
+      const topicGate = this.gatedTopics.find((i) => i.id === topicId);
 
       if (!topicGate) return new BN('0', 10);
 
@@ -171,11 +171,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     return new BN('0', 10);
   }
 
-  public isGatedTopic(topicName: string): boolean {
-    const tokenPostingThreshold = this.getTopicThreshold(topicName);
+  public isGatedTopic(topicId: number): boolean {
+    const tokenPostingThreshold = this.getTopicThreshold(topicId);
     if (!this.app.user.activeAccount?.tokenBalance) return true;
     return (
-      tokenPostingThreshold != new BN('0', 10) &&
+      !tokenPostingThreshold.isZero() &&
       tokenPostingThreshold.gt(this.app.user.activeAccount.tokenBalance)
     );
   }

@@ -125,7 +125,7 @@ export interface IQueuedEndTime {
 }
 
 export interface IGatedTopic {
-  topic: string;
+  id: number;
   type: string;
   data: {
     threshold: number;

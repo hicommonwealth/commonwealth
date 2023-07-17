@@ -101,18 +101,17 @@ export const CreateComment = ({
     }
   };
 
-  const activeTopicName =
-    rootThread instanceof Thread ? rootThread?.topic?.name : null;
+  const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 
   // token balance check if needed
-  const tokenPostingThreshold: BN =
-    app.chain.getTopicThreshold(activeTopicName);
+  const tokenPostingThreshold: BN = app.chain.getTopicThreshold(activeTopic.id);
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopicName);
+  const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
   const userBalance = app.user.activeAccount.tokenBalance;
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
-    editorValue.length === 0 || sendingComment || userFailsThreshold;
+    !isAdmin &&
+    (editorValue.length === 0 || sendingComment || userFailsThreshold);
 
   const decimals = getDecimals(app.chain);
 
@@ -150,7 +149,7 @@ export const CreateComment = ({
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires{' '}
+          Commenting in {activeTopic?.name} requires{' '}
           {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
           {app.chain.meta.default_symbol}.{' '}
           {userBalance && app.user.activeAccount && (

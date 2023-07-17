@@ -38,8 +38,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
   // token balance check if needed
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  const isUserForbidden =
-    !isAdmin && app.chain.isGatedTopic(thread.topic?.name);
+  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(thread.topic?.id);
 
   const dislike = async () => {
     if (reactedId === -1 || !hasReacted || isLoading) {

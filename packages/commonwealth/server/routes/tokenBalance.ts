@@ -66,17 +66,12 @@ const tokenBalance = async (
           balance: string;
         }[];
     if (req.body.all) {
-      const user_id = await models.Address.findOne({
-        where: {
-          chain: req.body.chain,
-          address: req.body.address,
-        },
-      });
+      const user_id = req.user?.id;
       const addresses: any = await models.Address.findAll({
         attributes: [[fn('DISTINCT', col('address')), 'distinctAddress']],
         where: {
           chain: req.body.chain,
-          user_id: user_id.user_id,
+          user_id: user_id,
         },
       });
 

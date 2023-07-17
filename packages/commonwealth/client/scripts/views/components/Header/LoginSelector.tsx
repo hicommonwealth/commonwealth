@@ -28,6 +28,7 @@ import useForceRerender from 'hooks/useForceRerender';
 import { LoginSelectorMenuLeft } from 'views/components/Header/LoginSelectorMenuLeft';
 import { LoginSelectorMenuRight } from 'views/components/Header/LoginSelectorMenuRight';
 import { TOSModal } from 'views/components/Header/TOSModal';
+import { getTokenBalance } from 'helpers/token_balance_helper';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -233,6 +234,7 @@ export const LoginSelector = () => {
         } else {
           // Todo: handle error
         }
+        await getTokenBalance();
       } catch (err) {
         console.error(err);
       }

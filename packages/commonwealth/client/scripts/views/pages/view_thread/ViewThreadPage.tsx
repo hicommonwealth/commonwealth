@@ -482,7 +482,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const canComment =
     app.user.activeAccount ||
-    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.name));
+    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
   const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({

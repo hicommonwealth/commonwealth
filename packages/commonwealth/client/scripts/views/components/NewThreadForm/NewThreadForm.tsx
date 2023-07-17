@@ -32,7 +32,7 @@ export const NewThreadForm = () => {
 
   const topicsForSelector = topics.filter((t) => {
     return (
-      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.name)
+      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
     );
   });
 

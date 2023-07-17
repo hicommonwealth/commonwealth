@@ -218,7 +218,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const numTotalThreads = parseInt(totalThreads[0].count);
   const gateStrategies = topics.map((topic) => {
     return {
-      topic: topic.name,
+      id: topic.id,
       type: 'token',
       data: {
         threshold: topic.token_threshold,
