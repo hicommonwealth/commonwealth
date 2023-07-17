@@ -4,8 +4,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CWButton } from '../../../client/scripts/views/components/component_kit/new_designs/cw_button';
 import { CWTooltip } from "../../../client/scripts/views/components/component_kit/new_designs/cw_tooltip";
 
-import '../styles/tooltip.scss';
-
 const tooltip = {
   title: "Components/Tooltip",
   component: CWTooltip,
