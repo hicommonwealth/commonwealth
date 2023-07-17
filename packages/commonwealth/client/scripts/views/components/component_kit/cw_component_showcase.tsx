@@ -11,6 +11,7 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
+import { CWTooltip as CWTooltipNew } from './new_designs/cw_tooltip';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -1094,6 +1095,33 @@ export const ComponentShowcase = () => {
           <CWText>Disabled</CWText>
           <CWUpvote voteCount={99999} disabled />
         </div>
+      </div>
+      <CWText type="h3">Tooltip</CWText>
+      <div className="tooltip">
+        <CWTooltipNew
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="top"
+        >
+          <CWButton label="Top" />
+        </CWTooltipNew>
+        <CWTooltipNew
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="right"
+        >
+          <CWButton label="Right" />
+        </CWTooltipNew>
+        <CWTooltipNew
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="bottom"
+        >
+          <CWButton label="Bottom" />
+        </CWTooltipNew>
+        <CWTooltipNew
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="left"
+        >
+          <CWButton label="Left" />
+        </CWTooltipNew>
       </div>
     </div>
   );

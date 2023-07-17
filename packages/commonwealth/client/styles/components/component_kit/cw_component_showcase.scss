@@ -180,4 +180,14 @@ $width: 360px;
       margin-left: 8px;
     }
   }
+
+  .tooltip {
+    @include gallery-grid(32px, column);
+    align-items: center;
+
+    .tooltip-row {
+      align-items: center;
+      // @include gallery-grid(initial, row);
+    }
+  }
 }
