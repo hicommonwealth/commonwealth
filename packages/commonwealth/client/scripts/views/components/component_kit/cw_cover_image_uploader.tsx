@@ -14,6 +14,7 @@ import { CWText } from './cw_text';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
+import { compressImage } from 'utils/ImageCompression';
 
 type CoverImageUploaderProps = {
   headerText?: string;
@@ -65,10 +66,12 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
       );
       if (signatureResponse.status !== 'Success') throw new Error();
 
+      const compressedImage = await compressImage(file);
+
       const uploadURL = signatureResponse.result;
       const uploadResponse = await fetch(uploadURL, {
         method: 'put',
-        body: file,
+        body: compressedImage,
       });
 
       const trimmedImageURL = uploadResponse.url?.replace(/\?.*/, '').trim();
