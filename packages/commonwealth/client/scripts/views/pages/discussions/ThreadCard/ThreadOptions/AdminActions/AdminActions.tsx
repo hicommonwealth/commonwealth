@@ -11,10 +11,10 @@ import type { IThreadCollaborator } from '../../../../../../models/Thread';
 import Topic from '../../../../../../models/Topic';
 import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
-import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from '../../../../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
-import './index.scss';
+import './AdminActions.scss';
 
 export type AdminActionsProps = {
   thread: Thread;

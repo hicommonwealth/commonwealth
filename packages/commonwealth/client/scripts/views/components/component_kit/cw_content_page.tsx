@@ -9,7 +9,7 @@ import { Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
 import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
-import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
+import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';

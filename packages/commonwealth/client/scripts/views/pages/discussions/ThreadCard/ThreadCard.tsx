@@ -22,9 +22,9 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import { isNewThread } from '../NewThreadTag';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
-import { Options } from './Options';
-import { AdminActionsProps } from './Options/AdminActions';
-import { ReactionButton } from './Options/ReactionButton';
+import { ThreadOptions } from './ThreadOptions';
+import { AdminActionsProps } from './ThreadOptions/AdminActions';
+import { ReactionButton } from './ThreadOptions/ReactionButton';
 import './ThreadCard.scss';
 
 type CardProps = AdminActionsProps & {
@@ -173,7 +173,7 @@ export const ThreadCard = ({
           </div>
           {/*// TODO discussions page */}
           <div className="content-footer">
-            <Options
+            <ThreadOptions
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}
               thread={thread}

@@ -1,8 +1,8 @@
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../../../../components/component_kit/cw_text';
-import { SharePopover } from '../../../../components/share_popover';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { SharePopover } from 'views/components/share_popover';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -10,7 +10,7 @@ import {
 } from '../../helpers';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
-import './index.scss';
+import './ThreadOptions.scss';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
@@ -21,7 +21,7 @@ type OptionsProps = AdminActionsProps & {
   totalComments?: number;
 };
 
-export const Options = ({
+export const ThreadOptions = ({
   thread,
   canVote = false,
   canComment = true,
@@ -43,8 +43,8 @@ export const Options = ({
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
-    getCommentSubscription(thread)?.isActive &&
-    getReactionSubscription(thread)?.isActive
+      getCommentSubscription(thread)?.isActive &&
+      getReactionSubscription(thread)?.isActive
   );
 
   return (
