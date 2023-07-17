@@ -1,7 +1,6 @@
 import React from 'react';
 import 'view_template/view_template.scss';
 import app from 'state';
-
 import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -234,6 +233,7 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
   const formatTransactionParams = () => {
     const { tx_template } = json;
     const txObject = {};
+    if (!tx_template.tx_params) return {};
     Object.keys(tx_template.tx_params).map((key) => {
       const arg = tx_template.tx_params[key];
       if (arg.startsWith('$')) {
@@ -270,7 +270,14 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
           return <CWDivider key={key} />;
         case TemplateComponents.TEXT:
           return (
-            <CWText key={key} fontStyle={field[component].field_type}>
+            <CWText
+              key={key}
+              fontStyle={
+                field[component].field_type == 'h1'
+                  ? 'h2'
+                  : field[component].field_type
+              }
+            >
               {field[component].field_value}
             </CWText>
           );
@@ -282,7 +289,19 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
               value={formState[field[component].field_ref] || ''}
               placeholder={field[component].field_name}
               onInput={(e) => {
-                // rest of the code
+                setFormState((prevState) => {
+                  const newState = { ...prevState };
+
+                  if (nested_field_ref) {
+                    newState[nested_field_ref][nested_index][
+                      field[component].field_ref
+                    ] = e.target.value;
+                  } else {
+                    newState[field[component].field_ref] = e.target.value;
+                  }
+
+                  return newState; // return the new state object
+                });
               }}
               inputValidationFn={(val) =>
                 validateType(val, field[component].formatter)
@@ -381,7 +400,7 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
     // <CWText type="h3" className="header">
     //   Text
     // </CWText>
-    <div className="form">
+    <div className="ContentPageCard">
       <CWText type="h3" className="header">
         {templateNickname}
       </CWText>
@@ -401,7 +420,6 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
       )}
       <CWDivider />
       <div className="bottom-row">
-        <CWButton label="Cancel" buttonType="secondary-black" />
         <CWButton
           label="Create"
           buttonType="primary-black"
