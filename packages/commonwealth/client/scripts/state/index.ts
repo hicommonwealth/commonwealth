@@ -18,7 +18,6 @@ import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
 import ThreadsController from 'controllers/server/threads';
 import ThreadUniqueAddressesCount from 'controllers/server/threadUniqueAddressesCount';
-import TopicsController from 'controllers/server/topics';
 import { UserController } from 'controllers/server/user';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
@@ -63,7 +62,6 @@ export interface IApp {
   threadReactions: ThreadReactionsController;
   reactionCounts: ReactionCountsController;
   polls: PollsController;
-  threadUpdateEmitter: EventEmitter;
 
   // Proposals
   proposalEmitter: EventEmitter;
@@ -73,7 +71,6 @@ export interface IApp {
   searchAddressCache: any;
 
   // Community
-  topics: TopicsController;
   communities: CommunitiesController;
 
   // Contracts
@@ -86,7 +83,6 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  newProfiles: NewProfilesController;
   sessions: SessionsController;
 
   // Web3
@@ -157,14 +153,12 @@ const app: IApp = {
   threadReactions: new ThreadReactionsController(),
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
-  threadUpdateEmitter: new EventEmitter(),
 
   // Proposals
   proposalEmitter: new EventEmitter(),
 
   // Community
   communities: new CommunitiesController(),
-  topics: new TopicsController(),
 
   // Contracts
   contracts: new ContractsController(),
@@ -183,7 +177,6 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),

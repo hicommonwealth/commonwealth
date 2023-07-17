@@ -1,23 +1,17 @@
 /**
  * Defines general interfaces for chain event fetching and processing.
  */
-
-import type { ApiPromise as SubstrateApi } from '@polkadot/api';
-
 import type { ChainEventInstance } from '../services/database/models/chain_event';
 
 import * as SubstrateTypes from './chains/substrate/types';
 import * as CompoundTypes from './chains/compound/types';
-import * as Erc20Types from './chains/erc20/types';
-import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CosmosTypes from './chains/cosmos/types';
-import type { IErc721Contracts as ERC721Api } from './chains/erc721/types';
-import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
 import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { Interface, LogDescription } from '@ethersproject/abi/src.ts/interface';
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -29,22 +23,13 @@ export type IChainEventData =
   | SubstrateTypes.IEventData
   | CompoundTypes.IEventData
   | AaveTypes.IEventData
-  | Erc20Types.IEventData
-  | Erc721Types.IEventData
   | CosmosTypes.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
   | CompoundTypes.EventKind
   | AaveTypes.EventKind
-  | Erc20Types.EventKind
-  | Erc721Types.EventKind
   | CosmosTypes.EventKind;
-export type IAPIs =
-  | SubstrateApi
-  | ERC721Api
-  | ERC20Api
-  | CompoundApi
-  | AaveApi;
+export type IAPIs = CompoundApi | AaveApi;
 export type IAnyListener = Listener<
   IAPIs,
   IStorageFetcher<IAPIs>,
@@ -57,8 +42,6 @@ export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...CompoundTypes.EventKinds,
   ...AaveTypes.EventKinds,
-  ...Erc20Types.EventKinds,
-  ...Erc721Types.EventKinds,
   ...CosmosTypes.EventKinds,
 ];
 
@@ -122,10 +105,20 @@ export abstract class IEventSubscriber<Api, RawEvent> {
   }
 
   // throws on error
-  public abstract subscribe(cb: (event: RawEvent) => void): Promise<void>;
+  public abstract subscribe(
+    cb: (event: RawEvent) => void,
+    ...args: any
+  ): Promise<void>;
 
   public abstract unsubscribe(): void;
 }
+
+export type EvmEventSourceMapType = {
+  [address: string]: {
+    eventSignatures: string[];
+    api: Interface;
+  };
+};
 
 export interface IDisconnectedRange {
   startBlock?: number;
@@ -165,17 +158,6 @@ export abstract class IStorageFetcher<Api> {
   ): Promise<CWEvent[]>;
 }
 
-// fetches historical blocks from chain for processing
-export abstract class IEventPoller<Api, RawEvent> {
-  constructor(protected _api: Api) {}
-
-  // throws on error
-  public abstract poll(
-    range: IDisconnectedRange,
-    maxRange?: number
-  ): Promise<RawEvent[]>;
-}
-
 // a set of labels used to display notifications
 export interface IEventLabel {
   heading: string;
@@ -192,13 +174,6 @@ export type LabelerFilter = (
   ...formatters
 ) => IEventLabel;
 
-export interface IEventTitle {
-  title: string;
-  description: string;
-}
-
-export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
-
 /**
  * This function takes the network and base attribute of our current chains model and returns the relevant chain-event
  * network. The chain-event network is an instance of SupportedNetwork enum. This is NOT the same as the network on
@@ -212,8 +187,7 @@ export function getChainEventNetwork(
   chainNetwork: string,
   chainBase: string
 ): SupportedNetwork {
-  if (chainBase === ChainBase.Substrate) return SupportedNetwork.Substrate;
-  else if (chainBase === ChainBase.CosmosSDK) return SupportedNetwork.Cosmos;
+  if (chainBase === ChainBase.CosmosSDK) return SupportedNetwork.Cosmos;
   else if (chainNetwork === ChainNetwork.Compound)
     return SupportedNetwork.Compound;
   else if (chainNetwork === ChainNetwork.Aave) return SupportedNetwork.Aave;
@@ -226,6 +200,7 @@ export function getChainEventNetwork(
  * @param network An instance of a network for which chain-events supports chain-events and chain-entities
  * @param entityKind The entity's creation event kind used to determine type_id for substrate network
  */
+// TODO: now that substrate is removed we don't really need this function anymore
 export function getUniqueEntityKey(
   network: SupportedNetwork,
   entityKind: IChainEntityKind
@@ -239,26 +214,7 @@ export function getUniqueEntityKey(
   if (network === SupportedNetwork.Cosmos) {
     return 'id';
   }
-  switch (entityKind) {
-    case SubstrateTypes.EntityKind.DemocracyProposal: {
-      return 'proposalIndex';
-    }
-    case SubstrateTypes.EntityKind.DemocracyReferendum: {
-      return 'referendumIndex';
-    }
-    case SubstrateTypes.EntityKind.DemocracyPreimage: {
-      return 'proposalHash';
-    }
-    case SubstrateTypes.EntityKind.TreasuryProposal: {
-      return 'proposalIndex';
-    }
-    case SubstrateTypes.EntityKind.TipProposal: {
-      return 'proposalHash';
-    }
-    default: {
-      return null;
-    }
-  }
+  return null;
 }
 
 export function eventToEntity(
@@ -315,99 +271,6 @@ export function eventToEntity(
         return [CosmosTypes.EntityKind.Proposal, EntityEventKind.Vote];
       default:
         return null;
-    }
-  }
-  if (network === SupportedNetwork.Substrate) {
-    switch (event) {
-      // SUBSTRATE
-      // Democracy Events
-      case SubstrateTypes.EventKind.DemocracyProposed: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyProposal,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.DemocracyTabled: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      case SubstrateTypes.EventKind.DemocracyStarted: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyReferendum,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.DemocracyVoted: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyReferendum,
-          EntityEventKind.Vote,
-        ];
-      }
-      case SubstrateTypes.EventKind.DemocracyPassed: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyReferendum,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.DemocracyNotPassed:
-      case SubstrateTypes.EventKind.DemocracyCancelled:
-      case SubstrateTypes.EventKind.DemocracyExecuted: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyReferendum,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      // Preimage Events
-      case SubstrateTypes.EventKind.PreimageNoted: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyPreimage,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.PreimageUsed:
-      case SubstrateTypes.EventKind.PreimageInvalid:
-      case SubstrateTypes.EventKind.PreimageReaped: {
-        return [
-          SubstrateTypes.EntityKind.DemocracyPreimage,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      // Tip Events
-      case SubstrateTypes.EventKind.NewTip: {
-        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Create];
-      }
-      case SubstrateTypes.EventKind.TipVoted:
-      case SubstrateTypes.EventKind.TipClosing: {
-        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Update];
-      }
-      case SubstrateTypes.EventKind.TipClosed:
-      case SubstrateTypes.EventKind.TipRetracted:
-      case SubstrateTypes.EventKind.TipSlashed: {
-        return [
-          SubstrateTypes.EntityKind.TipProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      // Treasury Events
-      case SubstrateTypes.EventKind.TreasuryProposed: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryProposal,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryRejected:
-      case SubstrateTypes.EventKind.TreasuryAwarded: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryProposal,
-          EntityEventKind.Complete,
-        ];
-      }
     }
   }
   return null;

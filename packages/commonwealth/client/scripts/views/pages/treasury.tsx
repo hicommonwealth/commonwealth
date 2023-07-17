@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from 'react';
-
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
-
 import 'pages/treasury.scss';
-
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { ProposalCard } from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/ProposalCard';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 
@@ -86,45 +82,43 @@ const TreasuryPage = () => {
   );
 
   return (
-    <Sublayout>
-      <div className="TreasuryPage">
-        {onSubstrate && (
-          <GovExplainer
-            statHeaders={[
-              {
-                statName: 'Treasury Proposals',
-                statDescription: `are used to request funds from the on-chain \
+    <div className="TreasuryPage">
+      {onSubstrate && (
+        <GovExplainer
+          statHeaders={[
+            {
+              statName: 'Treasury Proposals',
+              statDescription: `are used to request funds from the on-chain \
                   treasury. They are approved/rejected by referendum.`,
-              },
-            ]}
-            stats={[
-              {
-                statHeading: 'Treasury:',
-                stat: formatCoin((app.chain as Substrate).treasury.pot),
-              },
-              {
-                statHeading: 'Next spend period:',
-                stat: (app.chain as Substrate).treasury.nextSpendBlock ? (
-                  <CountdownUntilBlock
-                    block={(app.chain as Substrate).treasury.nextSpendBlock}
-                  />
-                ) : (
-                  '--'
-                ),
-              },
-            ]}
-          />
-        )}
-        <CardsCollection
-          content={activeTreasuryContent}
-          header="Active Treasury Proposals"
+            },
+          ]}
+          stats={[
+            {
+              statHeading: 'Treasury:',
+              stat: formatCoin((app.chain as Substrate).treasury.pot),
+            },
+            {
+              statHeading: 'Next spend period:',
+              stat: (app.chain as Substrate).treasury.nextSpendBlock ? (
+                <CountdownUntilBlock
+                  block={(app.chain as Substrate).treasury.nextSpendBlock}
+                />
+              ) : (
+                '--'
+              ),
+            },
+          ]}
         />
-        <CardsCollection
-          content={inactiveTreasuryContent}
-          header="Inactive Treasury Proposals"
-        />
-      </div>
-    </Sublayout>
+      )}
+      <CardsCollection
+        content={activeTreasuryContent}
+        header="Active Treasury Proposals"
+      />
+      <CardsCollection
+        content={inactiveTreasuryContent}
+        header="Inactive Treasury Proposals"
+      />
+    </div>
   );
 };
 

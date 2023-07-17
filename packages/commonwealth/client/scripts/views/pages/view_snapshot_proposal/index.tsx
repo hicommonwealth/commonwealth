@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
 import {
+  getPower,
+  getResults,
   Power,
   SnapshotProposal,
   SnapshotProposalVote,
@@ -8,24 +8,21 @@ import {
   VoteResults,
   VoteResultsData,
 } from 'helpers/snapshot_utils';
-import { getPower, getResults } from 'helpers/snapshot_utils';
-
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { LinkSource } from 'models/Thread';
+import React, { useCallback, useMemo, useState } from 'react';
 import app from 'state';
-import Sublayout from 'views/Sublayout';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
-import { User } from '../../components/user/user';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { LinkSource } from 'models/Thread';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -111,7 +108,7 @@ export const ViewProposalPage = ({
     [activeUserAddress]
   );
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     loadVotes(snapshotId, identifier).catch(console.error);
   }, [identifier, loadVotes, snapshotId]);
 
@@ -120,70 +117,58 @@ export const ViewProposalPage = ({
   }
 
   return (
-    <Sublayout>
-      <CWContentPage
-        showSidebar
-        title={proposal.title}
-        author={
-          <CWText>
-            {!!proposalAuthor && (
-              <User
-                user={proposalAuthor}
-                showAddressWithDisplayName
-                linkify
-                popover
-              />
-            )}
-          </CWText>
-        }
-        createdAt={proposal.created}
-        contentBodyLabel="Snapshot"
-        subHeader={
-          proposal.state === 'active' ? (
-            <ActiveProposalPill proposalEnd={proposal.end} />
-          ) : (
-            <ClosedProposalPill proposalState={proposal.state} />
-          )
-        }
-        body={<QuillRenderer doc={proposal.body} />}
-        subBody={
-          votes.length > 0 && (
-            <SnapshotVotesTable
-              choices={proposal.choices}
+    <CWContentPage
+      showSidebar
+      title={proposal.title}
+      author={proposalAuthor}
+      createdAt={proposal.created}
+      updatedAt={null}
+      contentBodyLabel="Snapshot"
+      subHeader={
+        proposal.state === 'active' ? (
+          <ActiveProposalPill proposalEnd={proposal.end} />
+        ) : (
+          <ClosedProposalPill proposalState={proposal.state} />
+        )
+      }
+      body={() => <QuillRenderer doc={proposal.body} />}
+      subBody={
+        votes.length > 0 && (
+          <SnapshotVotesTable
+            choices={proposal.choices}
+            symbol={symbol}
+            voters={votes}
+          />
+        )
+      }
+      sidebarComponents={[
+        {
+          label: 'Info',
+          item: (
+            <SnapshotInformationCard proposal={proposal} threads={threads} />
+          ),
+        },
+        {
+          label: 'Poll',
+          item: (
+            <SnapshotPollCardContainer
+              activeUserAddress={activeUserAddress}
+              fetchedPower={!!power}
+              identifier={identifier}
+              proposal={proposal}
+              scores={[]} // unused?
+              space={space}
               symbol={symbol}
-              voters={votes}
+              totals={totals}
+              totalScore={totalScore}
+              validatedAgainstStrategies={validatedAgainstStrategies}
+              votes={votes}
+              loadVotes={async () => loadVotes(snapshotId, identifier)}
             />
-          )
-        }
-        sidebarComponents={[
-          {
-            label: 'Info',
-            item: (
-              <SnapshotInformationCard proposal={proposal} threads={threads} />
-            ),
-          },
-          {
-            label: 'Poll',
-            item: (
-              <SnapshotPollCardContainer
-                activeUserAddress={activeUserAddress}
-                fetchedPower={!!power}
-                identifier={identifier}
-                proposal={proposal}
-                scores={[]} // unused?
-                space={space}
-                symbol={symbol}
-                totals={totals}
-                totalScore={totalScore}
-                validatedAgainstStrategies={validatedAgainstStrategies}
-                votes={votes}
-                loadVotes={async () => loadVotes(snapshotId, identifier)}
-              />
-            ),
-          },
-        ]}
-      />
-    </Sublayout>
+          ),
+        },
+      ]}
+    />
   );
 };
 

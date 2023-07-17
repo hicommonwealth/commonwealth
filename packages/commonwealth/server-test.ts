@@ -30,7 +30,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
 import setupCosmosProxy from 'server/util/cosmosProxy';
@@ -56,7 +55,6 @@ const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const tokenBalanceCache = new TokenBalanceCache(0, 0, [
   mockTokenBalanceProvider,
 ]);
-const ruleCache = new RuleCache();
 const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
@@ -106,12 +104,12 @@ const resetServer = (debug = false): Promise<void> => {
       const nodes = [
         ['mainnet1.edgewa.re', 'Edgeware Mainnet', null, BalanceType.Substrate],
         [
-          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
           'Ethereum Mainnet',
           '1',
         ],
         [
-          'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+          'https://eth-ropsten.alchemyapi.io/v2/dummy_key',
           'Ropsten Testnet',
           '3',
         ],
@@ -344,8 +342,8 @@ const resetServer = (debug = false): Promise<void> => {
         description: 'an entity-event as occurred',
       });
       await models.NotificationCategory.create({
-        name: NotificationCategories.NewChatMention,
-        description: 'someone mentions a user in chat',
+        name: NotificationCategories.SnapshotProposal,
+        description: 'Snapshot proposal notifications',
       });
 
       // Admins need to be subscribed to mentions and collaborations
@@ -505,7 +503,6 @@ setupAPI(
   models,
   viewCountCache,
   tokenBalanceCache,
-  ruleCache,
   banCache,
   globalActivityCache,
   databaseValidationService

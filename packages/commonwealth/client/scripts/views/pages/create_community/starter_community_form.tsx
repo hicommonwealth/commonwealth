@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import $ from 'jquery';
 
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-// import { CommunityType } from '.';
-
 import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -66,13 +62,6 @@ export const StarterCommunityForm = () => {
         ]}
         onSelect={(o) => {
           setBase(o.value as ChainBase);
-
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
-          //   chainBase: o.value,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: CommunityType.StarterCommunity,
-          // });
         }}
       />
       {defaultChainRows(chainFormDefaultFields)}
@@ -89,13 +78,7 @@ export const StarterCommunityForm = () => {
             alt_wallet_url?: string;
           } = {};
 
-          // mixpanelBrowserTrack({
-          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-          //   chainBase: base,
-          //   isCustomDomain: app.isCustomDomain(),
-          //   communityType: CommunityType.StarterCommunity,
-          // });
-
+          // TODO: switch to using ChainNode.name instead of URL
           // defaults to be overridden when chain is no longer "starter" type
           switch (base) {
             case ChainBase.CosmosSDK: {
@@ -125,7 +108,7 @@ export const StarterCommunityForm = () => {
             default: {
               additionalArgs.eth_chain_id = 1;
               additionalArgs.node_url =
-                'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
+                'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
               additionalArgs.alt_wallet_url =
                 'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
               break;

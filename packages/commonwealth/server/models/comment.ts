@@ -23,6 +23,7 @@ export type CommentAttributes = {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+  marked_as_spam_at?: Date;
 
   // associations
   Chain?: ChainAttributes;
@@ -43,9 +44,17 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       chain: { type: dataTypes.STRING, allowNull: false },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false },
+      thread_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Threads',
+          key: 'id',
+        },
+      },
       parent_id: { type: dataTypes.STRING, allowNull: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address_id: { type: dataTypes.INTEGER, allowNull: true },
+      created_by: { type: dataTypes.STRING, allowNull: true },
       text: { type: dataTypes.TEXT, allowNull: false },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
       version_history: {
@@ -61,6 +70,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
+      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       timestamps: true,

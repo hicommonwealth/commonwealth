@@ -107,10 +107,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
       // get title and description from 1st message if no top-level title/desc
       if (!title) title = content?.title;
       if (!description) description = content?.description;
-      return {
-        typeUrl: m.type_url,
-        value: m.value,
-      };
+      return m;
     });
   }
 
@@ -120,6 +117,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
     title,
     description,
     messages,
+    metadata: p.metadata,
     submitTime: moment.unix(new Date(p.submit_time).valueOf() / 1000),
     depositEndTime: moment.unix(new Date(p.deposit_end_time).valueOf() / 1000),
     votingEndTime: moment.unix(new Date(p.voting_end_time).valueOf() / 1000),

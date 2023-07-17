@@ -70,8 +70,9 @@
 .User {
   display: flex;
   white-space: nowrap;
+  align-items: center;
 
-  > a {
+  >a {
     // reset link styles
 
     &,
@@ -90,21 +91,22 @@
   }
 
   a.user-display-name {
+    color: $neutral-800;
     cursor: inherit;
     text-decoration: initial;
   }
 
   .id-short {
-    color: $neutral-500;
+    color: $neutral-600;
     display: inline-block;
-    font-size: 75%;
+    font-size: 10px;
+    line-height: 16px;
     font-weight: 500;
-    margin-left: 4px;
-    background: $neutral-100;
-    border-radius: $border-radius-rounded-corners;
+    margin-left: 8px;
+    background: $neutral-200;
+    border-radius: $border-radius-corners-wider;
     text-decoration: none !important;
-    padding: 0 8px;
-    height: 16px;
+    padding: 2px 8px;
   }
 
   &.linkified a.user-display-name {
@@ -121,6 +123,7 @@
 
   .role-tag-container {
     display: inline-block;
+
     .role-tag-text.Text {
       background-color: $neutral-200;
       border-radius: $border-radius-rounded-corners;
@@ -165,7 +168,7 @@
 
     a {
       text-decoration: none !important;
-      color: $neutral-800 !important;
+      color: $neutral-800  !important;
     }
 
     a:hover {
@@ -175,7 +178,7 @@
 
   .user-address,
   .user-chain {
-    color: $neutral-500 !important;
+    color: $neutral-500  !important;
   }
 
   .role-tag {

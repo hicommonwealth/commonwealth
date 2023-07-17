@@ -30,6 +30,24 @@ export enum TransactionStatus {
   'Error',
 }
 
+export enum ThreadFeaturedFilterTypes {
+  Newest = 'newest',
+  Oldest = 'oldest',
+  MostLikes = 'mostLikes',
+  MostComments = 'mostComments',
+}
+
+export enum CommentsFeaturedFilterTypes {
+  Newest = 'newest',
+  Oldest = 'oldest',
+}
+
+export enum ThreadTimelineFilterTypes {
+  AllTime = 'allTime',
+  ThisWeek = 'thisWeek',
+  ThisMonth = 'thisMonth',
+}
+
 export enum ProposalStatus {
   Passing = 'pass',
   Failing = 'fail',

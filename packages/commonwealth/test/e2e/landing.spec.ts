@@ -1,7 +1,40 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { PORT } from '../../server/config';
 
 test.describe('Commonwealth Homepage', () => {
+  test('Amount of bundles has not increased', async ({ page }) => {
+    const loadedJsBundles = [];
+    // Enable network interception
+    await page.route('*/**', (route) => {
+      // Filter requests for JavaScript files
+      if (route.request().resourceType() === 'script') {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const initializerUrl = route.request()._initializer.url;
+        if (initializerUrl.startsWith('http://localhost')) {
+          loadedJsBundles.push(initializerUrl);
+          console.log(`Loaded in bundle: ${initializerUrl}`);
+        }
+      }
+      route.continue();
+    });
+
+    await page.goto(`http://localhost:${PORT}/`);
+
+    while (loadedJsBundles.length < 4) {
+      await page.waitForTimeout(100); // Wait for a short interval before checking again
+    }
+
+    // This is loaded in after all other bundles are loaded in. The landing page should have 2 initial bundles and 2
+    // Loaded in bundles for the page itself. If it is more, then we have accidentally added an extra bundle into the
+    // build.
+    const landingChunkRegex = /client_scripts_views_pages_landing_index_tsx\.[a-fA-F0-9]+\.chunk\.js$/;
+    expect(loadedJsBundles[loadedJsBundles.length - 1]).toMatch(landingChunkRegex);
+
+    await page.waitForTimeout(100);
+    expect(loadedJsBundles.length).toEqual(4);
+  });
+
   test('Check Login Modal', async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/`);
 
@@ -81,17 +114,6 @@ test.describe('Commonwealth Homepage - Links', () => {
     await newPage.waitForURL(`https://blog.commonwealth.im`);
   });
 
-  test('Check Jobs button', async ({ page, context }) => {
-    const jobs = await page.locator('.footer-link', { hasText: 'Jobs' });
-
-    const pagePromise = context.waitForEvent('page');
-
-    await jobs.click();
-
-    const newPage = await pagePromise;
-    await newPage.waitForURL(`https://angel.co/company/commonwealth-labs/jobs`);
-  });
-
   test('Check Terms button', async ({ page }) => {
     const terms = await page.locator('.footer-link', { hasText: 'Terms' });
     expect(terms).toBeTruthy();
@@ -105,4 +127,33 @@ test.describe('Commonwealth Homepage - Links', () => {
     await privacy.click();
     await page.waitForURL(`http://localhost:${PORT}/privacy`);
   });
+
+  test('Test Login', async ({ page }) => {
+    await page.goto('http://localhost:8080/');
+
+    await login(page);
+
+    await page.waitForSelector('.new-or-returning');
+    await page.getByText('New Account').click();
+    await page.getByText('Finish').click();
+    await page.waitForSelector('.username');
+    const element = await page.$('.username');
+    expect(element).toBeTruthy();
+  });
 });
+
+// Since we lazily import web3 in order to inject metamask into the window, it might not be available right away.
+// This allows us to wait until it becomes available by re-clicking the login button until it shows up.
+export async function login(page) {
+  await page.getByText('Login').click();
+  await page.waitForSelector('.LoginDesktop');
+
+  let metaMaskIcon = await page.$$("text='Metamask'");
+  do {
+    await page.mouse.click(0, 0);
+    await page.getByText('Login').click();
+    metaMaskIcon = await page.$$("text='Metamask'");
+  } while (metaMaskIcon.length === 0);
+
+  await page.getByText('Metamask').click();
+}

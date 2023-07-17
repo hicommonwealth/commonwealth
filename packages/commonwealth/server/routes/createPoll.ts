@@ -1,7 +1,6 @@
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
 import { findOneRole } from '../util/roles';
 
@@ -42,8 +41,8 @@ const createPoll = async (
     custom_duration === 'Infinite'
       ? null
       : custom_duration
-      ? moment().add(custom_duration, 'days')
-      : getNextPollEndingTime(moment());
+      ? moment().add(custom_duration, 'days').toDate()
+      : moment().add(5, 'days').toDate();
 
   try {
     const thread = await models.Thread.findOne({

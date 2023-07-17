@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from 'react';
-
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration } from 'helpers';
-
 import 'pages/referenda.scss';
-
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { ProposalCard } from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/ProposalCard';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 import ErrorPage from './error';
@@ -91,55 +87,52 @@ const ReferendaPage = () => {
   );
 
   return (
-    <Sublayout>
-      <div className="ReferendaPage">
-        {onSubstrate && (
-          <GovExplainer
-            statHeaders={[
-              {
-                statName: 'Referenda',
-                statDescription: `are final votes to approve/reject treasury proposals, \
+    <div className="ReferendaPage">
+      {onSubstrate && (
+        <GovExplainer
+          statHeaders={[
+            {
+              statName: 'Referenda',
+              statDescription: `are final votes to approve/reject treasury proposals, \
                     upgrade the chain, or change technical parameters.`,
-              },
-            ]}
-            stats={[
-              {
-                statHeading: 'Next referendum:',
-                stat: (app.chain as Substrate).democracyProposals
-                  .nextLaunchBlock ? (
-                  <CountdownUntilBlock
-                    block={
-                      (app.chain as Substrate).democracyProposals
-                        .nextLaunchBlock
-                    }
-                  />
-                ) : (
-                  '--'
-                ),
-              },
-              {
-                statHeading: 'Passed referenda are enacted after:',
-                stat: `${
-                  (app.chain as Substrate).democracy.enactmentPeriod
-                    ? blockperiodToDuration(
-                        (app.chain as Substrate).democracy.enactmentPeriod
-                      ).asDays()
-                    : '--'
-                } days`,
-              },
-            ]}
-          />
-        )}
-        <CardsCollection
-          content={activeProposalContent}
-          header="Active Referenda"
+            },
+          ]}
+          stats={[
+            {
+              statHeading: 'Next referendum:',
+              stat: (app.chain as Substrate).democracyProposals
+                .nextLaunchBlock ? (
+                <CountdownUntilBlock
+                  block={
+                    (app.chain as Substrate).democracyProposals.nextLaunchBlock
+                  }
+                />
+              ) : (
+                '--'
+              ),
+            },
+            {
+              statHeading: 'Passed referenda are enacted after:',
+              stat: `${
+                (app.chain as Substrate).democracy.enactmentPeriod
+                  ? blockperiodToDuration(
+                      (app.chain as Substrate).democracy.enactmentPeriod
+                    ).asDays()
+                  : '--'
+              } days`,
+            },
+          ]}
         />
-        <CardsCollection
-          content={inactiveProposalContent}
-          header="Inactive Referenda"
-        />
-      </div>
-    </Sublayout>
+      )}
+      <CardsCollection
+        content={activeProposalContent}
+        header="Active Referenda"
+      />
+      <CardsCollection
+        content={inactiveProposalContent}
+        header="Inactive Referenda"
+      />
+    </div>
   );
 };
 

@@ -5,6 +5,7 @@ import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
+import { NotificationAttributes } from './notification';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -49,6 +50,8 @@ export type ThreadAttributes = {
   last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
+  marked_as_spam_at?: Date;
+  locked_at?: Date;
 
   // associations
   Chain?: ChainAttributes;
@@ -56,6 +59,7 @@ export type ThreadAttributes = {
   Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
+  Notifications?: NotificationAttributes[];
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -72,7 +76,8 @@ export default (
     'Thread',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address_id: { type: dataTypes.INTEGER, allowNull: true },
+      created_by: { type: dataTypes.STRING, allowNull: true },
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
@@ -119,6 +124,11 @@ export default (
       last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
+      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
+      locked_at: {
+        type: dataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -155,6 +165,10 @@ export default (
       constraints: false,
       scope: { attachable: 'thread' },
     });
+    models.Thread.hasMany(models.Comment, {
+      foreignKey: 'thread_id',
+      constraints: false,
+    });
     models.Thread.belongsTo(models.Topic, {
       as: 'topic',
       foreignKey: 'topic_id',
@@ -169,6 +183,9 @@ export default (
     });
     models.Thread.hasMany(models.Collaboration);
     models.Thread.hasMany(models.Poll, {
+      foreignKey: 'thread_id',
+    });
+    models.Thread.hasMany(models.Notification, {
       foreignKey: 'thread_id',
     });
     models.Thread.hasOne(models.ChainEntityMeta, {

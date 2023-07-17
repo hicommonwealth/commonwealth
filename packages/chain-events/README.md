@@ -213,9 +213,6 @@ async function subscribe(url) {
 }
 ```
 
-Alternatively, the individual `Subscriber`, `Poller`, `StorageFetcher`, and `Processor` objects can be accessed directly on the `SubstrateEvents` object, and
-can be set up directly. For an example of this, see the initialization procedure in [subscribeFunc.ts](src/chains/substrate/subscribeFunc.ts).
-
 ### Class Details
 
 The top level `@commonwealth/chain-events` import exposes various abstract types from the [interfaces.ts](./src/interfaces.ts) file, as well as "per-chain" modules, e.g. for Substrate, `SubstrateTypes` and `SubstrateEvents`, with the former containing interfaces and the latter containing classes and functions.

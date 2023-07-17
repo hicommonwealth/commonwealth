@@ -1,5 +1,9 @@
 import { Listener as BaseListener } from '../../Listener';
-import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import type {
+  CWEvent,
+  EvmEventSourceMapType,
+  IDisconnectedRange,
+} from '../../interfaces';
 import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
@@ -14,6 +18,7 @@ import { createApi } from './subscribeFunc';
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
+import { ethers } from 'ethers';
 
 export class Listener extends BaseListener<
   Api,
@@ -91,12 +96,27 @@ export class Listener extends BaseListener<
       this.log.info(
         `Subscribing to Aave contract: ${this._chain}, on url ${this._options.url}`
       );
-      await this._subscriber.subscribe(this.processBlock.bind(this));
+      await this._subscriber.subscribe(
+        this.processBlock.bind(this),
+        this.getEventSourceMap()
+      );
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
       throw error;
     }
+  }
+
+  private getEventSourceMap(): EvmEventSourceMapType {
+    const gov = this._api.governance;
+    return {
+      [gov.address.toLowerCase()]: {
+        eventSignatures: Object.keys(gov.interface.events).map((x) =>
+          ethers.utils.id(x)
+        ),
+        api: gov.interface,
+      },
+    };
   }
 
   public async updateAddress(): Promise<void> {
@@ -158,7 +178,6 @@ export class Listener extends BaseListener<
     ) {
       this._lastCachedBlockNumber = blockNumber;
     }
-
   }
 
   public get options(): AaveListenerOptions {
@@ -173,12 +192,6 @@ export class Listener extends BaseListener<
     // force type to any because the Ethers Provider interface does not include the original
     // Web3 provider, yet it exists under provider.provider
     const provider = <any>this._api.governance.provider;
-
-    // WebSocket ReadyState - more info: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
-    const readyState = provider.provider.connection._readyState === 1;
-    const socketConnected = provider.provider.connected;
-    const polling = provider.polling;
-
-    return readyState && socketConnected && polling;
+    return provider.provider ? true : false;
   }
 }

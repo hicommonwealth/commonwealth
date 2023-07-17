@@ -12,21 +12,15 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
-import getAddressProfile from '../routes/getAddressProfile';
+import getAddressProfile, {
+  getAddressProfileValidation,
+} from '../routes/getAddressProfile';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
 import finishOAuthLogin from '../routes/finishOAuthLogin';
 import startOAuthLogin from '../routes/startOAuthLogin';
-import createComment from '../routes/createComment';
-import editComment from '../routes/editComment';
-import deleteComment from '../routes/deleteComment';
 import viewComments from '../routes/viewComments';
-import bulkComments from '../routes/bulkComments';
-import createReaction from '../routes/createReaction';
-import deleteReaction from '../routes/deleteReaction';
-import viewReactions from '../routes/viewReactions';
-import bulkReactions from '../routes/bulkReactions';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
@@ -42,6 +36,9 @@ import {
 } from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
+import adminAnalytics, {
+  communitySpecificAnalytics,
+} from '../routes/adminAnalytics';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -58,9 +55,10 @@ import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
-import bulkMembers from '../routes/bulkMembers';
 import searchProfiles from '../routes/searchProfiles';
-import upgradeMember from '../routes/upgradeMember';
+import upgradeMember, {
+  upgradeMemberValidation,
+} from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
 
@@ -69,9 +67,7 @@ import deleteRole from '../routes/deleteRole';
 import setDefaultRole from '../routes/setDefaultRole';
 
 import getUploadSignature from '../routes/getUploadSignature';
-import activeThreads from '../routes/activeThreads';
-import createThread from '../routes/createThread';
-import editThread from '../routes/editThread';
+
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
@@ -82,13 +78,8 @@ import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
 import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
-import deleteThread from '../routes/deleteThread';
-import addEditors from '../routes/addEditors';
+import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
-import bulkThreads from '../routes/bulkThreads';
-import getThreadsOld from '../routes/getThreads';
-import searchDiscussions from '../routes/searchDiscussions';
-import searchComments from '../routes/searchComments';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
@@ -107,17 +98,6 @@ import deleteTopic from '../routes/deleteTopic';
 import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
-import getChatMessages from '../routes/chat/getChatMessages';
-import getChatChannel from '../routes/chat/getChatChannel';
-import createChatChannel from '../routes/chat/createChatChannel';
-import deleteChatChannel from '../routes/chat/deleteChatChannel';
-import deleteChatCategory from '../routes/chat/deleteChatCategory';
-import editChatChannel from '../routes/chat/editChatChannel';
-import editChatCategory from '../routes/chat/editChatCategory';
-
-import createRule from '../routes/rules/createRule';
-import deleteRule from '../routes/rules/deleteRule';
-import getRuleTypes from '../routes/rules/getRuleTypes';
 
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
@@ -131,7 +111,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getEntityMeta from '../routes/getEntityMeta';
-import { getTokensFromLists } from '../routes/getTokensFromLists';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
 import bulkBalances from '../routes/bulkBalances';
@@ -142,7 +121,6 @@ import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
-import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import type BanCache from '../util/banCheckCache';
@@ -182,6 +160,37 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
+import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
+import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
+import unmarkThreadAsSpam from '../routes/spam/unmarkThreadAsSpam';
+import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
+
+import { ServerThreadsController } from '../controllers/server_threads_controller';
+import { ServerCommentsController } from '../controllers/server_comments_controller';
+import { ServerReactionsController } from '../controllers/server_reactions_controller';
+import { ServerNotificationsController } from '../controllers/server_notifications_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+
+import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
+import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
+import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
+import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
+import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
+import { updateCommentHandler } from '../routes/comments/update_comment_handler';
+import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
+import { getThreadsHandler } from '../routes/threads/get_threads_handler';
+import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import { updateThreadHandler } from '../routes/threads/update_thread_handler';
+import { createThreadHandler } from '../routes/threads/create_thread_handler';
+
+export type ServerControllers = {
+  threads: ServerThreadsController;
+  comments: ServerCommentsController;
+  reactions: ServerReactionsController;
+  notifications: ServerNotificationsController;
+  analytics: ServerAnalyticsController;
+};
 
 function setupRouter(
   endpoint: string,
@@ -189,11 +198,22 @@ function setupRouter(
   models: DB,
   viewCountCache: ViewCountCache,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService
 ) {
+  // controllers
+
+  const serverControllers: ServerControllers = {
+    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
+    comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
+    reactions: new ServerReactionsController(models, banCache),
+    notifications: new ServerNotificationsController(models),
+    analytics: new ServerAnalyticsController(),
+  };
+
+  // ---
+
   const router = express.Router();
 
   router.use((req, res, next) => {
@@ -248,7 +268,11 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
-  router.post('/getAddressProfile', getAddressProfile.bind(this, models));
+  router.post(
+    '/getAddressProfile',
+    getAddressProfileValidation,
+    getAddressProfile.bind(this, models)
+  );
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
@@ -302,7 +326,6 @@ function setupRouter(
     '/bulkBalances',
     bulkBalances.bind(this, models, tokenBalanceCache)
   );
-  router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get(
     '/getSupportedEthChains',
@@ -315,20 +338,27 @@ function setupRouter(
     createChainNode.bind(this, models)
   );
 
+  router.get('/adminAnalytics', adminAnalytics.bind(this, models));
+  router.post(
+    '/communitySpecificAnalytics',
+    databaseValidationService.validateChain,
+    communitySpecificAnalytics.bind(this, models)
+  );
+
   // threads
   router.post(
-    '/createThread',
+    '/threads',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
-    createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createThreadHandler.bind(this, serverControllers)
   );
-  router.put(
-    '/editThread',
+  router.patch(
+    '/threads/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    editThread.bind(this, models, banCache)
+    updateThreadHandler.bind(this, serverControllers)
   );
   router.post(
     '/createPoll',
@@ -368,7 +398,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    updateVote.bind(this, models, tokenBalanceCache, ruleCache)
+    updateVote.bind(this, models, tokenBalanceCache)
   );
   router.get(
     '/viewVotes',
@@ -455,6 +485,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
+    addEditorValidation,
     addEditors.bind(this, models)
   );
   router.post(
@@ -464,35 +495,16 @@ function setupRouter(
     databaseValidationService.validateChain,
     deleteEditors.bind(this, models)
   );
-  router.post(
-    '/deleteThread',
+  router.delete(
+    '/threads/:id',
     passport.authenticate('jwt', { session: false }),
-    deleteThread.bind(this, models, banCache)
-  );
-  router.get(
-    '/bulkThreads',
     databaseValidationService.validateChain,
-    bulkThreads.bind(this, models)
+    deleteThreadHandler.bind(this, serverControllers)
   );
   router.get(
-    '/activeThreads',
+    '/threads',
     databaseValidationService.validateChain,
-    activeThreads.bind(this, models)
-  );
-  router.get(
-    '/getThreads',
-    // databaseValidationService.validateChain,
-    getThreadsOld.bind(this, models)
-  );
-  router.get(
-    '/searchDiscussions',
-    databaseValidationService.validateChain,
-    searchDiscussions.bind(this, models)
-  );
-  router.get(
-    '/searchComments',
-    databaseValidationService.validateChain,
-    searchComments.bind(this, models)
+    getThreadsHandler.bind(this, serverControllers)
   );
   router.get(
     '/searchProfiles',
@@ -534,23 +546,25 @@ function setupRouter(
 
   // comments
   router.post(
-    '/createComment',
+    '/threads/:id/comments',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createThreadCommentHandler.bind(this, serverControllers)
   );
-  router.post(
-    '/editComment',
+  router.patch(
+    '/comments/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    editComment.bind(this, models, banCache)
+    updateCommentHandler.bind(this, serverControllers)
   );
-  router.post(
-    '/deleteComment',
+  router.delete(
+    '/comments/:id',
     passport.authenticate('jwt', { session: false }),
-    deleteComment.bind(this, models, banCache)
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteCommentHandler.bind(this, serverControllers)
   );
   router.get(
     '/viewComments',
@@ -558,9 +572,9 @@ function setupRouter(
     viewComments.bind(this, models)
   );
   router.get(
-    '/bulkComments',
+    '/comments',
     databaseValidationService.validateChain,
-    bulkComments.bind(this, models)
+    searchCommentsHandler.bind(this, serverControllers)
   );
 
   // topics
@@ -606,23 +620,28 @@ function setupRouter(
 
   // reactions
   router.post(
-    '/createReaction',
+    '/threads/:id/reactions',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
+    createThreadReactionHandler.bind(this, serverControllers)
   );
   router.post(
-    '/deleteReaction',
+    '/comments/:id/reactions',
     passport.authenticate('jwt', { session: false }),
-    deleteReaction.bind(this, models, banCache)
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createCommentReactionHandler.bind(this, serverControllers)
+  );
+  router.delete(
+    '/reactions/:id',
+    passport.authenticate('jwt', { session: false }),
+    deleteReactionHandler.bind(this, serverControllers)
   );
   router.get(
-    '/viewReactions',
-    databaseValidationService.validateChain,
-    viewReactions.bind(this, models)
+    '/comments/:id/reactions',
+    getCommentReactionsHandler.bind(this, serverControllers)
   );
-  router.get('/bulkReactions', bulkReactions.bind(this, models));
   router.post('/reactionsCounts', reactionsCounts.bind(this, models));
   router.post(
     '/threadsUsersCountAndAvatars',
@@ -630,23 +649,17 @@ function setupRouter(
   );
 
   // roles
-  router.get('/roles', controllers.getRoles.bind(this, models));
-  router.post('/roles', controllers.createRole.bind(this, models));
-  router.patch('/roles', controllers.updateRole.bind(this, models));
-  // permissions
-  router.get('/permissions', controllers.getPermissions.bind(this, models));
-  router.post('/permissions', controllers.createPermission.bind(this, models));
-  router.patch('/permissions', controllers.updatePermission.bind(this, models));
-
   router.get(
-    '/bulkMembers',
+    '/roles',
     databaseValidationService.validateChain,
-    bulkMembers.bind(this, models)
+    controllers.listRoles.bind(this, models)
   );
+
   router.post(
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
+    upgradeMemberValidation,
     upgradeMember.bind(this, models)
   );
 
@@ -829,63 +842,6 @@ function setupRouter(
     updateChainCategory.bind(this, models)
   );
 
-  // chat
-  router.get(
-    '/getChatMessages',
-    passport.authenticate('jwt', { session: false }),
-    getChatMessages.bind(this, models)
-  );
-
-  router.get(
-    '/getChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    getChatChannel.bind(this, models)
-  );
-
-  router.post(
-    '/createChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    createChatChannel.bind(this, models)
-  );
-
-  router.delete(
-    '/deleteChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    deleteChatChannel.bind(this, models)
-  );
-
-  router.delete(
-    '/deleteChatCategory',
-    passport.authenticate('jwt', { session: false }),
-    deleteChatCategory.bind(this, models)
-  );
-
-  router.put(
-    '/editChatChannel',
-    passport.authenticate('jwt', { session: false }),
-    editChatChannel.bind(this, models)
-  );
-
-  router.put(
-    '/editChatCategory',
-    passport.authenticate('jwt', { session: false }),
-    editChatCategory.bind(this, models)
-  );
-
-  // rules
-  router.post(
-    '/createRule',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createRule.bind(this, models)
-  );
-  router.post(
-    '/deleteRule',
-    passport.authenticate('jwt', { session: false }),
-    deleteRule.bind(this, models)
-  );
-  router.get('/getRuleTypes', getRuleTypes.bind(this, models));
-
   // settings
   router.post(
     '/writeUserSetting',
@@ -955,6 +911,29 @@ function setupRouter(
     '/linking/getLinks',
     passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models)
+  );
+
+  // spam
+  router.post(
+    '/threads/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markThreadAsSpam.bind(this, models)
+  );
+  router.post(
+    '/threads/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkThreadAsSpam.bind(this, models)
+  );
+
+  router.post(
+    '/comments/:id/mark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    markCommentAsSpam.bind(this, models)
+  );
+  router.post(
+    '/comments/:id/unmark-as-spam',
+    passport.authenticate('jwt', { session: false }),
+    unmarkCommentAsSpam.bind(this, models)
   );
 
   // login

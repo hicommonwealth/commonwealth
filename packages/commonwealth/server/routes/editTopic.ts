@@ -18,7 +18,6 @@ export const Errors = {
   TopicNotFound: 'Topic not found',
   TopicRequired: 'Topic name required',
   DefaultTemplateRequired: 'Default Template required',
-  RuleNotFound: 'Rule not found',
   InvalidTopicName: 'Topic uses disallowed special characters',
 };
 
@@ -30,10 +29,9 @@ type EditTopicReq = {
   description?: string;
   telegram?: string;
   featured_order: number;
-  featured_in_sidebar: string; // boolean
-  featured_in_new_post: string; // boolean
+  featured_in_sidebar: boolean;
+  featured_in_new_post: boolean;
   default_offchain_template: string;
-  rule_id?: number;
 };
 
 type EditTopicResp = TopicAttributes;
@@ -55,8 +53,8 @@ const editTopic = async (
     return next(new AppError(Errors.InvalidTopicName));
   }
 
-  const featured_in_sidebar = req.body.featured_in_sidebar === 'true';
-  const featured_in_new_post = req.body.featured_in_new_post === 'true';
+  const featured_in_sidebar = req.body.featured_in_sidebar;
+  const featured_in_new_post = req.body.featured_in_new_post;
   const default_offchain_template = req.body.default_offchain_template?.trim();
   if (featured_in_new_post && !default_offchain_template) {
     return next(new AppError(Errors.DefaultTemplateRequired));
@@ -72,7 +70,7 @@ const editTopic = async (
     return next(new AppError(Errors.NotAdmin));
   }
 
-  const { id, description, telegram, rule_id } = req.body;
+  const { id, description, telegram } = req.body;
   try {
     const topic = await models.Topic.findOne({ where: { id } });
     if (!topic) return next(new AppError(Errors.TopicNotFound));
@@ -82,11 +80,6 @@ const editTopic = async (
     topic.featured_in_sidebar = featured_in_sidebar;
     topic.featured_in_new_post = featured_in_new_post;
     topic.default_offchain_template = default_offchain_template || '';
-    if (rule_id) {
-      const rule = await models.Rule.findOne({ where: { id: rule_id } });
-      if (!rule) return next(new AppError(Errors.RuleNotFound));
-      topic.rule_id = rule_id;
-    }
     await topic.save();
 
     return success(res, topic.toJSON());

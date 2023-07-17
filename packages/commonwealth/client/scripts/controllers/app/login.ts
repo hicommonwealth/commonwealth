@@ -2,7 +2,7 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
@@ -30,7 +30,10 @@ export function linkExistingAddressToChainOrCommunity(
   });
 }
 
-export async function setActiveAccount(account: Account): Promise<void> {
+export async function setActiveAccount(
+  account: Account,
+  shouldRedraw = true
+): Promise<void> {
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
 
@@ -44,8 +47,22 @@ export async function setActiveAccount(account: Account): Promise<void> {
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      app.user.setActiveAccounts(
+        app.user.activeAccounts.concat([account]),
+        shouldRedraw
+      );
     }
+
+    // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
+    // Emit a force re-render on cosmos chains to make sure
+    // that app.user.activeAccount is set - this is required for many actions
+    // There is a race condition b/w the app accessing app.user.activeAccount
+    // and updating it. A proper solution would be to fix this race condition
+    // for cosmos chains - since the issue happens only on that chain
+    if (app.chain.base === 'cosmos') {
+      app.loginStateEmitter.emit('redraw');
+    }
+
     return;
   }
 
@@ -75,7 +92,10 @@ export async function setActiveAccount(account: Account): Promise<void> {
     app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
     0
   ) {
-    app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+    app.user.setActiveAccounts(
+      app.user.activeAccounts.concat([account]),
+      shouldRedraw
+    );
   }
 }
 
@@ -150,14 +170,21 @@ export async function updateLastVisited(
   }
 }
 
-export async function updateActiveAddresses(chain?: ChainInfo) {
+export async function updateActiveAddresses({
+  chain,
+  shouldRedraw = true,
+}: {
+  chain?: ChainInfo;
+  shouldRedraw?: boolean;
+}) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
-      .filter((addr) => addr)
+      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
+      .filter((addr) => addr),
+    shouldRedraw
   );
 
   // select the address that the new chain should be initialized with
@@ -167,7 +194,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
-    await setActiveAccount(memberAddresses[0]);
+    await setActiveAccount(memberAddresses[0], shouldRedraw);
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
@@ -182,7 +209,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
           a.address === existingAddress.address
         );
       });
-      if (account) await setActiveAccount(account);
+      if (account) await setActiveAccount(account, shouldRedraw);
     }
   }
 }
@@ -264,6 +291,7 @@ export async function createUserWithAddress(
     walletId,
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
+    ignoreProfile: false,
   });
   return { account, newlyCreated: response.result.newly_created };
 }
@@ -294,57 +322,118 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-export async function loginWithMagicLink(email: string) {
+async function constructMagic() {
   const { Magic } = await import('magic-sdk');
-  let chainAddress;
-  const isCosmos = app?.chain?.meta?.base === ChainBase.CosmosSDK;
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: isCosmos
-      ? [
-          new CosmosExtension({
-            rpcUrl: app.chain.meta?.node?.url,
-          }),
-        ]
-      : null,
+  const { OAuthExtension } = await import('@magic-ext/oauth');
+  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: [
+      new OAuthExtension(),
+      new CosmosExtension({
+        // default to Osmosis URL
+        rpcUrl:
+          app.chain?.meta?.node?.url ||
+          app.config.chains.getById('osmosis').node.url,
+      }),
+    ],
   });
+}
 
-  // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-  if (isCosmos) {
-    const bech32Prefix = app.chain.meta.bech32Prefix;
-    try {
-      chainAddress = await magic.cosmos.changeAddress(bech32Prefix);
-    } catch (err) {
-      console.error(
-        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
-      );
+export async function loginWithMagicLink({
+  email,
+  provider,
+  chain,
+}: {
+  email?: string;
+  provider?: string;
+  chain?: string;
+}) {
+  if (!email && !provider) throw new Error('Must provider email or provider');
+  const magic = await constructMagic();
+
+  if (email) {
+    const bearer = await magic.auth.loginWithMagicLink({ email });
+    await handleSocialLoginCallback(bearer);
+  } else {
+    const params = `?chain=${chain || ''}`;
+    // provider-based login
+    await magic.oauth.loginWithRedirect({
+      provider: provider as any,
+      redirectURI: new URL(
+        '/finishsociallogin' + params,
+        window.location.origin
+      ).href,
+    });
+  }
+}
+
+// Cannot get proper type due to code splitting
+function getProfileMetadata({
+  provider,
+  userInfo,
+}): {
+  username?: string;
+  avatarUrl?: string;
+} {
+  // provider: result.oauth.provider (twitter, discord, github)
+  if (provider === 'discord') {
+    // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
+    //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
+    const { avatar, id, username } = userInfo.sources[
+      'https://discord.com/api/users/@me'
+    ];
+    if (avatar) {
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
+      return { username, avatarUrl };
+    } else {
+      return { username };
     }
+  } else if (provider === 'github') {
+    // for github: result.oauth.userInfo.name / picture
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
+  } else if (provider === 'twitter') {
+    // for twitter: result.oauth.userInfo.name / profile
+    return { username: userInfo.name, avatarUrl: userInfo.profile };
+  } else if (provider === 'google') {
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
+  }
+  return {};
+}
+
+export async function handleSocialLoginCallback(bearer?: string) {
+  let profileMetadata: { username?: string; avatarUrl?: string } = {};
+  if (!bearer) {
+    const magic = await constructMagic();
+    const result = await magic.oauth.getRedirectResult();
+    profileMetadata = getProfileMetadata(result.oauth);
+    bearer = result.magic.idToken;
+    console.log('Magic redirect result:', result);
   }
 
-  const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
-      Authorization: `Bearer ${didToken}`,
+      Authorization: `Bearer ${bearer}`,
     },
     xhrFields: {
       withCredentials: true,
     },
     data: {
-      // send chain/community to request
       chain: app.activeChainId(),
-      address: chainAddress,
+      jwt: app.user.jwt,
+      username: profileMetadata?.username,
+      avatarUrl: profileMetadata?.avatarUrl,
     },
   });
+
   if (response.status === 'Success') {
-    // log in as the new user (assume all verification done server-side)
     await initAppState(false);
     if (app.chain) {
       const c = app.user.selectedChain
         ? app.user.selectedChain
         : app.config.chains.getById(app.activeChainId());
-      await updateActiveAddresses(c);
+      await updateActiveAddresses({ chain: c });
     }
   } else {
-    throw new Error(`Magic auth unsuccessful: ${response.status}`);
+    throw new Error(`Social auth unsuccessful: ${response.status}`);
   }
 }

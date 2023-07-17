@@ -1,29 +1,31 @@
 /* eslint-disable no-restricted-globals */
+import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
-
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { EventEmitter } from 'events';
 import $ from 'jquery';
+import moment from 'moment';
+import { Link, LinkSource } from 'server/models/thread';
+import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ProposalStore, RecentListingStore } from 'stores';
+import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 /* eslint-disable no-restricted-syntax */
-
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
 import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
-import type Topic from '../../models/Topic';
-import { ThreadStage } from '../../models/types';
-import moment from 'moment';
-
-import app from 'state';
-import { ProposalStore, RecentListingStore } from 'stores';
-import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { EventEmitter } from 'events';
-import { Link, LinkSource } from 'server/models/thread';
-import axios from 'axios';
+import Topic from '../../models/Topic';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadStage,
+  ThreadTimelineFilterTypes,
+} from '../../models/types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -114,9 +116,12 @@ class ThreadsController {
       title,
       body,
       last_edited,
+      marked_as_spam_at,
+      locked_at,
       version_history,
       Attachments,
       created_at,
+      updated_at,
       topic,
       kind,
       stage,
@@ -193,9 +198,11 @@ class ThreadsController {
       ? versionHistoryProcessed[0].timestamp
       : null;
 
-    let topicFromStore = null;
+    const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    let topicModel = null;
+    const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
-      topicFromStore = app.topics.store.getById(topic.id);
+      topicModel = new Topic(topic);
     }
 
     let decodedTitle;
@@ -221,8 +228,9 @@ class ThreadsController {
       title: decodedTitle,
       body: decodedBody,
       createdAt: moment(created_at),
+      updatedAt: moment(updated_at),
       attachments,
-      topic: topicFromStore,
+      topic: topicModel,
       kind,
       stage,
       chain,
@@ -234,6 +242,8 @@ class ThreadsController {
       chainEntities: chainEntitiesProcessed,
       versionHistory: versionHistoryProcessed,
       lastEdited: lastEditedProcessed,
+      markedAsSpamAt,
+      lockedAt,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
@@ -246,8 +256,6 @@ class ThreadsController {
       canvasHash,
       links,
     });
-
-    ThreadsController.Instance.store.add(t);
 
     return t;
   }
@@ -265,7 +273,6 @@ class ThreadsController {
     readOnly?: boolean
   ) {
     try {
-      // TODO: Change to POST /thread
       const {
         action = null,
         session = null,
@@ -277,7 +284,7 @@ class ThreadsController {
         link: url,
         topic: topic.id,
       });
-      const response = await $.post(`${app.serverUrl()}/createThread`, {
+      const response = await $.post(`${app.serverUrl()}/threads`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,
@@ -302,7 +309,14 @@ class ThreadsController {
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
-      this.store.add(result);
+      const lastPinnedThreadIndex = this.store
+        .getAll()
+        .slice()
+        .reverse()
+        .findIndex((x) => x.pinned === true);
+      this.store.add(result, {
+        pushToIndex: lastPinnedThreadIndex || 0,
+      });
       this.numTotalThreads += 1;
       this._listingStore.add(result);
       const activeEntity = app.chain;
@@ -357,14 +371,13 @@ class ThreadsController {
     });
 
     await $.ajax({
-      url: `${app.serverUrl()}/editThread`,
-      type: 'PUT',
+      url: `${app.serverUrl()}/threads/${proposal.id}`,
+      type: 'PATCH',
       data: {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         address: app.user.activeAccount.address,
         chain: app.activeChainId(),
-        thread_id: proposal.id,
         kind: proposal.kind,
         stage: proposal.stage,
         body: encodeURIComponent(newBody),
@@ -397,25 +410,82 @@ class ThreadsController {
     });
   }
 
+  public async updateTopic(
+    threadId: number,
+    topicName: string,
+    topicId?: number
+  ): Promise<Topic> {
+    try {
+      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+        jwt: app.user.jwt,
+        thread_id: threadId,
+        topic_id: topicId,
+        topic_name: topicName,
+        address: app.user.activeAccount.address,
+      });
+      const result = new Topic(response.result);
+      const thread = app.threads.getById(threadId);
+      thread.topic = result;
+      app.threads.updateThreadInStore(thread);
+
+      return result;
+    } catch (err) {
+      console.log('Failed to update thread topic');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update thread topic'
+      );
+    }
+  }
+
   public async delete(proposal) {
     return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /thread
-      $.post(`${app.serverUrl()}/deleteThread`, {
-        jwt: app.user.jwt,
-        thread_id: proposal.id,
-        chain_id: app.activeChainId(),
-      })
+      axios
+        .delete(`${app.serverUrl()}/threads/${proposal.id}`, {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          },
+        })
         .then((result) => {
           // Deleted posts are removed from all stores containing them
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
           this.numTotalThreads -= 1;
-          resolve(result);
+          resolve(result.data);
         })
         .catch((e) => {
           console.error(e);
           notifyError('Could not delete thread');
+          reject(e);
+        });
+    });
+  }
+
+  public async toggleSpam(threadId: number, isSpam: boolean) {
+    return new Promise((resolve, reject) => {
+      $.post(
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isSpam ? 'mark' : 'unmark'
+        }-as-spam`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
+        .then((response) => {
+          const foundThread = this.store.getByIdentifier(threadId);
+          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
+          this.updateThreadInStore(new Thread({ ...foundThread }));
+          resolve(foundThread);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError(
+            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+          );
           reject(e);
         });
     });
@@ -439,7 +509,6 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
-        app.threadUpdateEmitter.emit('threadUpdated', {});
         return result;
       },
       error: (err) => {
@@ -463,17 +532,29 @@ class ThreadsController {
         read_only: args.readOnly,
       },
       success: (response) => {
-        const result = this.modelFromServer(response.result);
-        // Post edits propagate to all thread stores
-        this._listingStore.add(result);
-        this._overviewStore.update(result);
-        return result;
+        const thread = this.modelFromServer(response.result);
+
+        // update thread in store
+        const foundThread = this._store.getByIdentifier(thread.identifier);
+        const finalThread = new Thread({
+          ...((foundThread || {}) as any),
+          readOnly: args.readOnly,
+        });
+        this._store.update(finalThread);
+        this._listingStore.add(finalThread);
+        this._overviewStore.update(finalThread);
+
+        return thread;
       },
       error: (err) => {
         notifyError('Could not update thread read_only');
         console.error(err);
       },
     });
+  }
+
+  public async updateThreadInStore(thread: Thread) {
+    this._store.update(thread);
   }
 
   public async pin(args: { proposal: Thread }) {
@@ -488,6 +569,7 @@ class ThreadsController {
         const result = this.modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._listingStore.add(result);
+        this.store.add(result);
         return result;
       },
       error: (err) => {
@@ -521,7 +603,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
@@ -557,7 +638,6 @@ class ThreadsController {
       const updatedThread = this.modelFromServer(response.data.result);
       this._listingStore.remove(updatedThread);
       this._listingStore.add(updatedThread);
-      app.threadUpdateEmitter.emit('threadUpdated', {});
 
       return response.data.result;
     } catch (err) {
@@ -623,26 +703,43 @@ class ThreadsController {
   ): Promise<Thread[]> {
     const params = {
       chain: app.activeChainId(),
-      ids,
+      thread_ids: ids,
     };
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/getThreads`, params),
+      axios.get(`${app.serverUrl()}/threads`, { params }),
       app.chainEntities.getRawEntities(app.activeChainId()),
     ]);
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-    return response.result.map((rawThread) => {
+    return response.data.result.map((rawThread) => {
+      console.log('rawThread => ', rawThread);
+      /**
+       * rawThread has a different DS than the threads in store
+       * here we will find if thread is in store and if so use most keys
+       * of that data else if there is a valid key rawThread then it will
+       * replace existing key from foundThread
+       */
       const thread = this.modelFromServer(rawThread);
-      const existing = this._store.getByIdentifier(thread.id);
-      if (existing) this._store.remove(existing);
-      else {
-        this._store.update(thread);
+      const foundThread = this._store.getByIdentifier(thread.identifier);
+      const finalThread = new Thread({
+        ...((foundThread || {}) as any),
+        ...((thread || {}) as any),
+      });
+      finalThread.associatedReactions =
+        thread.associatedReactions.length > 0
+          ? thread.associatedReactions
+          : foundThread?.associatedReactions || [];
+      finalThread.numberOfComments =
+        rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
+      this._store.update(finalThread);
+      if (foundThread) {
         this.numTotalThreads += 1;
       }
+
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
-      this.fetchReactionsCount([thread]);
-      return thread;
+      this.fetchReactionsCount([finalThread]);
+      return finalThread;
     });
   }
 
@@ -686,6 +783,9 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
     includePinnedThreads?: boolean;
+    featuredFilter: ThreadFeaturedFilterTypes;
+    dateRange: ThreadTimelineFilterTypes;
+    page: number;
   }) {
     // Used to reset pagination when switching between topics
     if (this._resetPagination) {
@@ -693,32 +793,105 @@ class ThreadsController {
       this._resetPagination = false;
     }
 
-    if (this.listingStore.isDepleted(options)) {
-      return;
-    }
-    const { topicName, stageName, includePinnedThreads } = options;
-    const chain = app.activeChainId();
-    const params = {
-      chain,
-      cutoff_date: this.listingStore.isInitialized(options)
-        ? this.listingStore.getCutoffDate(options).toISOString()
-        : moment().toISOString(),
-    };
-    const topicId = app.topics.getByName(topicName, chain)?.id;
+    const {
+      topicName,
+      stageName,
+      includePinnedThreads,
+      featuredFilter,
+      dateRange,
+      page,
+    } = options;
 
-    if (topicId) params['topic_id'] = topicId;
-    if (stageName) params['stage'] = stageName;
-    if (includePinnedThreads) params['includePinnedThreads'] = true;
+    const topics =
+      (await queryClient.ensureQueryData<Topic[]>([
+        ApiEndpoints.BULK_TOPICS,
+        app.chain.id,
+      ])) || [];
+
+    const chain = app.activeChainId();
+    const params = (() => {
+      // find topic id (if any)
+      const topicId = topics.find(({ name }) => name === topicName)?.id;
+
+      // calculate 'from' and 'to' dates
+      const today = moment();
+      const fromDate = (() => {
+        if (dateRange) {
+          if (
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            return today
+              .startOf(dateRange.toLowerCase().replace('this', '') as any)
+              .toISOString();
+          }
+
+          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
+            return new Date(0).toISOString();
+          }
+        }
+
+        return null;
+      })();
+      const toDate = (() => {
+        if (dateRange) {
+          if (
+            [
+              ThreadTimelineFilterTypes.ThisMonth,
+              ThreadTimelineFilterTypes.ThisWeek,
+            ].includes(dateRange)
+          ) {
+            return today
+              .endOf(dateRange.toLowerCase().replace('this', '') as any)
+              .toISOString();
+          }
+
+          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
+            return moment().toISOString();
+          }
+        }
+
+        return moment().toISOString();
+      })();
+
+      const featuredFilterQueryMap = {
+        newest: 'createdAt:desc',
+        oldest: 'createdAt:asc',
+        mostLikes: 'numberOfLikes:desc',
+        mostComments: 'numberOfComments:desc',
+      };
+
+      return {
+        limit: 20,
+        page: page,
+        chain,
+        ...(topicId && { topic_id: topicId }),
+        ...(stageName && { stage: stageName }),
+        ...(includePinnedThreads && { includePinnedThreads: true }),
+        ...(fromDate && { from_date: fromDate }),
+        to_date: toDate,
+        orderBy:
+          featuredFilterQueryMap[featuredFilter] ||
+          featuredFilterQueryMap.newest,
+      };
+    })();
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/bulkThreads`, params),
+      axios.get(`${app.serverUrl()}/threads`, {
+        params: {
+          bulk: true,
+          ...params,
+        },
+      }),
       // app.chainEntities.getRawEntities(chain),
     ]);
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads } = response.result;
+    const { threads } = response.data.result;
     // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
@@ -766,7 +939,11 @@ class ThreadsController {
       this.listingStore.depleteListing(options);
     }
 
-    return modeledThreads;
+    return {
+      threads: modeledThreads,
+      limit: response.data.result.limit,
+      page: response.data.result.page,
+    };
   }
 
   public async getThreadCommunityId(threadId: string) {
@@ -794,6 +971,7 @@ class ThreadsController {
       this._store.clear();
       this._listingStore.clear();
     }
+
     for (const thread of initialThreads) {
       const modeledThread = this.modelFromServer(thread);
       if (!thread.Address) {

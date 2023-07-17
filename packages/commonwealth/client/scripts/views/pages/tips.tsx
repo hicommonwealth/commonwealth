@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from 'react';
-
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-
 import 'pages/tips.scss';
-
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { ProposalCard } from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/ProposalCard';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
 import { CardsCollection } from '../components/cards_collection';
 import { CWText } from '../components/component_kit/cw_text';
 import { GovExplainer } from '../components/gov_explainer';
@@ -127,28 +123,26 @@ const TipsPage = () => {
   );
 
   return (
-    <Sublayout>
-      <div className="TipsPage">
-        <GovExplainer
-          statHeaders={[
-            {
-              statName: 'Tips',
-              statDescription: `are rewards paid by the treasury without first \
+    <div className="TipsPage">
+      <GovExplainer
+        statHeaders={[
+          {
+            statName: 'Tips',
+            statDescription: `are rewards paid by the treasury without first \
                 having a pre-determined stakeholder group come to consensus on payment amount.`,
-            },
-          ]}
-          stats={[
-            {
-              statHeading: 'Treasury:',
-              stat:
-                app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-            },
-          ]}
-        />
-        <CardsCollection content={activeTipContent} header="Active Tips" />
-        <CardsCollection content={inactiveTipContent} header="Inactive Tips" />
-      </div>
-    </Sublayout>
+          },
+        ]}
+        stats={[
+          {
+            statHeading: 'Treasury:',
+            stat:
+              app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+          },
+        ]}
+      />
+      <CardsCollection content={activeTipContent} header="Active Tips" />
+      <CardsCollection content={inactiveTipContent} header="Inactive Tips" />
+    </div>
   );
 };
 

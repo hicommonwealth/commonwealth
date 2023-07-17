@@ -14,10 +14,10 @@ import type { UserAttributes } from '../models/user';
 
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { createRole } from '../util/roles';
 
 import { redirectWithLoginError } from './finishEmailLogin';
+import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -253,12 +253,10 @@ const finishSsoLogin = async (
               res,
               `Could not log in with ronin wallet`
             );
-          if (process.env.NODE_ENV !== 'test') {
-            mixpanelTrack({
-              event: MixpanelLoginEvent.LOGIN,
-              isCustomDomain: null,
-            });
-          }
+          serverAnalyticsTrack({
+            event: MixpanelLoginEvent.LOGIN_COMPLETED,
+            isCustomDomain: null,
+          });
         });
         return success(res, { user: existingUser });
       } else {
@@ -269,17 +267,21 @@ const finishSsoLogin = async (
         existingAddress.user_id = newUser.id;
         await existingAddress.save();
         req.login(newUser, (err) => {
-          if (err)
+          if (err) {
+            serverAnalyticsTrack({
+              event: MixpanelLoginEvent.LOGIN_FAILED,
+              isCustomDomain: null,
+            });
             return redirectWithLoginError(
               res,
               `Could not log in with ronin wallet`
             );
-          if (process.env.NODE_ENV !== 'test') {
-            mixpanelTrack({
-              event: MixpanelLoginEvent.LOGIN,
-              isCustomDomain: null,
-            });
           }
+
+          serverAnalyticsTrack({
+            event: MixpanelLoginEvent.LOGIN_COMPLETED,
+            isCustomDomain: null,
+          });
         });
         return success(res, { user: newUser });
       }
@@ -355,17 +357,6 @@ const finishSsoLogin = async (
         { transaction: t }
       );
 
-      // Automatically create subscription to chat mentions
-      await models.Subscription.create(
-        {
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewChatMention,
-          object_id: `user-${user.id}`,
-          is_active: true,
-        },
-        { transaction: t }
-      );
-
       // populate token
       emptyTokenInstance.issuer = jwtPayload.iss;
       emptyTokenInstance.issued_at = jwtPayload.iat;
@@ -379,6 +370,10 @@ const finishSsoLogin = async (
       // re-fetch address if existing user
       const newAddress = await models.Address.findOne({
         where: { address: checksumAddress },
+      });
+      serverAnalyticsTrack({
+        event: MixpanelLoginEvent.LOGIN_COMPLETED,
+        isCustomDomain: null,
       });
       return success(res, { address: newAddress });
     } else {
@@ -396,12 +391,10 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        if (process.env.NODE_ENV !== 'test') {
-          mixpanelTrack({
-            event: MixpanelLoginEvent.LOGIN,
-            isCustomDomain: null,
-          });
-        }
+        serverAnalyticsTrack({
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          isCustomDomain: null,
+        });
       });
       return success(res, { user: newUser });
     }

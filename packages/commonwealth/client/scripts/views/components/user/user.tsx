@@ -1,13 +1,12 @@
-/* eslint-disable no-script-url */
-import React, { useEffect } from 'react';
-
-import { link } from 'helpers';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import 'components/user/user.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import { formatAddressShort } from '../../../../../shared/utils';
+import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
@@ -18,6 +17,8 @@ import { CWText } from '../component_kit/cw_text';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { Avatar } from 'views/components/Avatar';
+import Permissions from '../../../utils/Permissions';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -39,45 +40,45 @@ type UserAttrs = {
   showAsDeleted?: boolean;
   showRole?: boolean;
   user: Account | AddressInfo | MinimumProfile | undefined;
+  role?: { permission: string };
 };
 
-export const User = (props: UserAttrs) => {
-  // TODO: Fix showRole logic to fetch the role from chain
-  const {
-    avatarOnly,
-    hideAvatar,
-    showAddressWithDisplayName,
-    user,
-    linkify,
-    onClick,
-    popover,
-    showRole,
-    showAsDeleted = false,
-  } = props;
+export const User = ({
+  avatarOnly,
+  hideAvatar,
+  showAddressWithDisplayName,
+  user,
+  linkify,
+  onClick,
+  popover,
+  showRole,
+  showAsDeleted = false,
+  addressDisplayOptions,
+  avatarSize: size,
+  role,
+}: UserAttrs) => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
 
   useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => {
+    NewProfilesController.Instance.isFetched.on('redraw', () => {
       forceRerender();
     });
 
-    app.newProfiles.isFetched.off('redraw', () => {
+    NewProfilesController.Instance.isFetched.off('redraw', () => {
       forceRerender();
     });
   }, [forceRerender]);
 
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const popoverProps = usePopover();
 
-  const { maxCharLength } = props.addressDisplayOptions || {};
+  const { maxCharLength } = addressDisplayOptions || {};
 
-  const avatarSize = props.avatarSize || 16;
+  const avatarSize = size || 16;
 
   const showAvatar = user ? !hideAvatar : false;
-
-  // if (!user) return;
 
   let account: Account;
   let profile: MinimumProfile;
@@ -85,14 +86,10 @@ export const User = (props: UserAttrs) => {
   let loggedInUserIsAdmin = false;
   let friendlyChainName: string | undefined;
   let adminsAndMods = [];
-  let role;
 
   if (user) {
     loggedInUserIsAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
-      });
+      Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
     addrShort = formatAddressShort(
       user.address,
@@ -107,10 +104,10 @@ export const User = (props: UserAttrs) => {
 
     adminsAndMods = app.chain?.meta.adminsAndMods || [];
 
-    if (props.user instanceof AddressInfo) {
-      const chainId = props.user.chain;
+    if (user instanceof AddressInfo) {
+      const chainId = user.chain;
 
-      const address = props.user.address;
+      const address = user.address;
 
       if (!chainId || !address) return;
 
@@ -124,13 +121,15 @@ export const User = (props: UserAttrs) => {
         }
       }
 
-      profile = app.newProfiles.getProfile(chainId.id, address);
+      profile = NewProfilesController.Instance.getProfile(chainId.id, address);
 
-      role = adminsAndMods.find(
-        (r) => r.address === address && r.address_chain === chainId.id
-      );
-    } else if (props.user instanceof MinimumProfile) {
-      profile = props.user;
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) => r.address === address && r.address_chain === chainId.id
+        );
+      }
+    } else if (user instanceof MinimumProfile) {
+      profile = user;
 
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
@@ -142,21 +141,28 @@ export const User = (props: UserAttrs) => {
         }
       }
 
-      role = adminsAndMods.find(
-        (r) =>
-          r.address === profile.address && r.address_chain === profile.chain
-      );
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) =>
+            r.address === profile.address && r.address_chain === profile.chain
+        );
+      }
     } else {
-      account = props.user;
+      account = user;
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
       const chainId = account.chain.id;
 
-      profile = app.newProfiles.getProfile(chainId, account.address);
-
-      role = adminsAndMods.find(
-        (r) => r.address === account.address && r.address_chain === chainId
+      profile = NewProfilesController.Instance.getProfile(
+        chainId,
+        account.address
       );
+
+      if (!role) {
+        role = adminsAndMods.find(
+          (r) => r.address === account.address && r.address_chain === chainId
+        );
+      }
     }
   }
 
@@ -179,13 +185,17 @@ export const User = (props: UserAttrs) => {
     }
   };
 
+  const isSelfSelected = app.user.addresses
+    .map((a) => a.address)
+    .includes(account?.address);
+
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
-      {!profile
-        ? null
-        : profile.avatarUrl
-        ? profile.getAvatar(avatarSize)
-        : profile.getAvatar(avatarSize - 4)}
+      <Avatar
+        url={profile?.avatarUrl}
+        size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
+        address={profile?.id}
+      />
     </div>
   ) : (
     <div
@@ -193,20 +203,29 @@ export const User = (props: UserAttrs) => {
       key={profile?.address || '-'}
     >
       {showAvatar && (
-        <div
+        <Link
+          to={profile ? `/profile/id/${profile.id}` : undefined}
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
-          {profile && profile.getAvatar(avatarSize)}
-        </div>
+          <Avatar
+            url={profile?.avatarUrl}
+            size={avatarSize}
+            address={profile?.id}
+          />
+        </Link>
       )}
       {
         <>
           {/* non-substrate name */}
           {linkify && profile?.id ? (
-            link(
-              'a.user-display-name.username',
-              profile ? `/profile/id/${profile.id}` : 'javascript:',
+            <Link
+              className="user-display-name username"
+              to={profile ? `/profile/id/${profile.id}` : undefined}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
               <>
                 {!profile ? (
                   addrShort
@@ -221,9 +240,8 @@ export const User = (props: UserAttrs) => {
                   </>
                 )}
                 {getRoleTags()}
-              </>,
-              handleClick
-            )
+              </>
+            </Link>
           ) : (
             <a className="user-display-name username">
               {!profile ? (
@@ -266,7 +284,7 @@ export const User = (props: UserAttrs) => {
   );
 
   const userPopover = (
-    <React.Fragment>
+    <>
       {profile && (
         <div
           className="UserPopover"
@@ -275,19 +293,19 @@ export const User = (props: UserAttrs) => {
           }}
         >
           <div className="user-avatar">
-            {!profile
-              ? null
-              : profile.avatarUrl
-              ? profile.getAvatar(36)
-              : profile.getAvatar(32)}
+            <Avatar
+              url={profile?.avatarUrl}
+              size={profile?.avatarUrl ? 36 : 32}
+              address={profile?.id}
+            />
           </div>
           <div className="user-name">
-            {app.chain &&
-              app.chain.base === ChainBase.Substrate &&
-              link(
-                'a.user-display-name',
-                profile?.id ? `/profile/id/${profile.id}` : 'javascript:',
-                !profile || !profile?.id ? (
+            {app.chain && app.chain.base === ChainBase.Substrate && (
+              <Link
+                className="user-display-name substrate@"
+                to={profile?.id ? `/profile/id/${profile.id}` : undefined}
+              >
+                {!profile || !profile?.id ? (
                   !profile?.id ? (
                     `${profile.address.slice(0, 8)}...${profile.address.slice(
                       -5
@@ -298,15 +316,15 @@ export const User = (props: UserAttrs) => {
                 ) : !showAddressWithDisplayName ? (
                   profile.name
                 ) : (
-                  <React.Fragment>
+                  <>
                     {profile.name}
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
-                  </React.Fragment>
-                ),
-                handleClick
-              )}
+                  </>
+                )}
+              </Link>
+            )}
           </div>
           {profile?.address && (
             <div className="user-address">
@@ -321,10 +339,9 @@ export const User = (props: UserAttrs) => {
           {friendlyChainName && (
             <div className="user-chain">{friendlyChainName}</div>
           )}
-          {/* always show roleTags in UserPopover */}
           {getRoleTags()}
           {/* If Admin Allow Banning */}
-          {loggedInUserIsAdmin && (
+          {loggedInUserIsAdmin && !isSelfSelected && (
             <div className="ban-wrapper">
               <CWButton
                 onClick={() => {
@@ -347,7 +364,7 @@ export const User = (props: UserAttrs) => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 
   return popover ? (

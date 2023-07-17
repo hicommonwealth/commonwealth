@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-
-import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { Link as ReactRouterLink } from 'react-router-dom';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
   chainEntityTypeToProposalName,
@@ -42,41 +41,21 @@ const LinkedProposal = ({
 }: LinkedProposalProps) => {
   const slug = chainEntityTypeToProposalSlug(ceType);
 
-  const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
-  }${getProposalUrlPath(slug, ceTypeId, true)}`;
+  const threadLink =
+    thread.chain === 'edgeware' && !ceType.includes('/')
+      ? `/${thread.chain}/link/chain-entity/${ceTypeId}`
+      : `${app.isCustomDomain() ? '' : `/${thread.chain}`}${getProposalUrlPath(
+          slug,
+          ceTypeId,
+          true
+        )}`;
 
   return (
-    <a href={threadLink}>
-      {`${title ?? chainEntityTypeToProposalName(ceType)} #${ceTypeId} ${
-        ceCompleted ? ' (Completed)' : ''
-      }`}
-    </a>
-  );
-};
-
-type LinkedTemplateProps = {
-  thread: Thread;
-  title: string;
-  contractAddress: string;
-  slug: string;
-};
-
-const LinkedTemplate = ({
-  thread,
-  title,
-  contractAddress,
-  slug,
-}: LinkedTemplateProps) => {
-  const templateLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
-  }/${contractAddress}/${slug}`;
-
-  return (
-    <a href={templateLink}>{`${title ?? 'Template'} (${smartTruncate(
-      contractAddress,
-      6
-    )}`}</a>
+    <ReactRouterLink to={threadLink}>
+      {`${
+        title ?? chainEntityTypeToProposalName(ceType) ?? 'Proposal'
+      } #${ceTypeId} ${ceCompleted ? ' (Completed)' : ''}`}
+    </ReactRouterLink>
   );
 };
 
@@ -91,10 +70,9 @@ export const LinkedProposalsCard = ({
   thread,
   showAddProposalButton,
 }: LinkedProposalsCardProps) => {
-  const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
   const [snapshotUrl, setSnapshotUrl] = useState('');
-  const [space, setSpace] = useState<SnapshotSpace>(null);
+  const [snapshotTitle, setSnapshotTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const initialSnapshotLinks = useMemo(
@@ -104,11 +82,6 @@ export const LinkedProposalsCard = ({
 
   const initialProposalLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Proposal),
-    [thread.links]
-  );
-
-  const initialTemplateLinks = useMemo(
-    () => filterLinks(thread.links, LinkSource.Template),
     [thread.links]
   );
 
@@ -128,8 +101,7 @@ export const LinkedProposalsCard = ({
               (sn) => sn.id === proposal.identifier
             );
             if (matchingSnapshot) {
-              setSnapshot(matchingSnapshot);
-              setSpace(_space);
+              setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
                 `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
                   _space.id
@@ -145,7 +117,7 @@ export const LinkedProposalsCard = ({
   }, [initialSnapshotLinks]);
 
   const showSnapshot =
-    snapshot && initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
+    initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
 
   return (
     <>
@@ -158,9 +130,7 @@ export const LinkedProposalsCard = ({
             </div>
           ) : (
             <div className="LinkedProposalsCard">
-              {initialProposalLinks.length > 0 ||
-              showSnapshot ||
-              initialTemplateLinks.length > 0 ? (
+              {initialProposalLinks.length > 0 || showSnapshot ? (
                 <div className="links-container">
                   {initialProposalLinks.length > 0 && (
                     <div className="linked-proposals">
@@ -178,32 +148,14 @@ export const LinkedProposalsCard = ({
                     </div>
                   )}
                   {showSnapshot && (
-                    <a href={snapshotUrl}>
-                      Snapshot:{' '}
-                      {initialSnapshotLinks[0].title ?? snapshot.title}
-                    </a>
-                  )}
-                  {initialTemplateLinks.length > 0 && (
-                    <div className="linked-templates">
-                      {initialTemplateLinks.map((l) => {
-                        const [id, contractAddress, slug] =
-                          l.identifier.split('/');
-                        return (
-                          <LinkedTemplate
-                            key={id}
-                            thread={thread}
-                            title={l.title}
-                            contractAddress={contractAddress}
-                            slug={slug}
-                          />
-                        );
-                      })}
-                    </div>
+                    <ReactRouterLink to={snapshotUrl}>
+                    Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
+                    </ReactRouterLink>
                   )}
                 </div>
               ) : (
                 <CWText type="b2" className="no-proposals-text">
-                  There are currently no linked proposals or templates.
+                  There are currently no linked proposals.
                 </CWText>
               )}
               {showAddProposalButton && (
