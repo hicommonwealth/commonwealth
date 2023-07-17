@@ -88,44 +88,81 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
-    console.log(`Starting Tendermint RPC API at ${url}...`);
+
     // TODO: configure broadcast mode
-
-    this._tmClient = await getTMClient(url);
-    this._api = await getRPCClient(this._tmClient);
-
-    if (chain?.cosmosGovernanceVersion === 'v1') {
-      const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
-      const lcd = await getLCDClient(lcdUrl);
-      this._lcd = lcd;
+    try {
+      console.log(`Starting Tendermint client...`);
+      this._tmClient = await getTMClient(url);
+    } catch (e) {
+      console.error('Error starting tendermint client: ', e);
     }
-
-    const {
-      pool: { bondedTokens },
-    } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bondedTokens));
-
-    const {
-      params: { bondDenom },
-    } = await this._api.staking.params();
-    this._denom = bondDenom;
 
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
 
-    // Poll for new block immediately
-    const { block } = await this._tmClient.block();
-    const height = +block.header.height;
-    const { block: prevBlock } = await this._tmClient.block(height - 1);
-    const time = moment.unix(block.header.time.valueOf() / 1000);
-    // TODO: check if this is correctly seconds or milliseconds
-    this.app.chain.block.duration =
-      block.header.time.valueOf() - prevBlock.header.time.valueOf();
-    this.app.chain.block.lastTime = time;
-    this.app.chain.block.height = height;
+    try {
+      console.log(`Starting RPC API at ${url}...`);
+      this._api = await getRPCClient(this._tmClient);
+    } catch (e) {
+      console.error('Error starting RPC client: ', e);
+    }
 
-    this.app.chain.networkStatus = ApiStatus.Connected;
+    if (chain?.cosmosGovernanceVersion === 'v1') {
+      try {
+        const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
+        console.log(`Starting LCD API at ${lcdUrl}...`);
+        const lcd = await getLCDClient(lcdUrl);
+        this._lcd = lcd;
+      } catch (e) {
+        console.error('Error starting LCD client: ', e);
+      }
+    }
+
+    await Promise.all([
+      this.fetchPoolParams(),
+      this.fetchBlock(), // Poll for new block immediately
+      this.fetchStakingParams(),
+    ]);
+  }
+
+  private async fetchPoolParams(): Promise<void> {
+    try {
+      const {
+        pool: { bondedTokens },
+      } = await this._api.staking.pool();
+      this._staked = this.coins(new BN(bondedTokens));
+    } catch (e) {
+      console.error('Error fetching pool params: ', e);
+    }
+  }
+
+  private async fetchBlock(): Promise<void> {
+    try {
+      const { block } = await this._tmClient.block();
+      const height = +block.header.height;
+      const { block: prevBlock } = await this._tmClient.block(height - 1);
+      // TODO: check if this is correctly seconds or milliseconds
+      const time = moment.unix(block.header.time.valueOf() / 1000);
+      this.app.chain.block.duration =
+        block.header.time.valueOf() - prevBlock.header.time.valueOf();
+      this.app.chain.block.lastTime = time;
+      this.app.chain.block.height = height;
+      this.app.chain.networkStatus = ApiStatus.Connected;
+    } catch (e) {
+      console.error('Error fetching block: ', e);
+    }
+  }
+
+  private async fetchStakingParams(): Promise<void> {
+    try {
+      const {
+        params: { bondDenom },
+      } = await this._api.staking.params();
+      this._denom = bondDenom;
+    } catch (e) {
+      console.error('Error fetching staking params: ', e);
+    }
   }
 
   public async deinit(): Promise<void> {

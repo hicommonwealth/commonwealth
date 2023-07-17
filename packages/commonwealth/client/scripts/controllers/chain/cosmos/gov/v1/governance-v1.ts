@@ -50,48 +50,12 @@ class CosmosGovernanceV1 extends ProposalModule<
   ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    try {
-      // query chain-wide params
-      const { deposit_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'deposit',
-      });
-      const { tally_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'tallying',
-      });
-      const { voting_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'voting',
-      });
-      this._votingPeriodS = +voting_params.voting_period.replace('s', '');
-      this._yesThreshold = +tally_params?.threshold;
-      this._vetoThreshold = +tally_params?.veto_threshold;
-      this._maxDepositPeriodS = +deposit_params?.max_deposit_period.replace(
-        's',
-        ''
-      );
-
-      // TODO: support off-denom deposits
-      const depositCoins = deposit_params?.min_deposit.find(
-        ({ denom }) => denom === this._Chain.denom
-      );
-      if (depositCoins) {
-        this._minDeposit = new CosmosToken(
-          depositCoins.denom,
-          new BN(depositCoins.amount)
-        );
-      } else {
-        console.error(
-          'Gov minDeposit in wrong denom:',
-          deposit_params?.min_deposit
-        );
-        this._minDeposit = new CosmosToken(this._Chain.denom, 0);
-      }
-      console.log(this._minDeposit);
-    } catch (e) {
-      console.error(e);
-    }
-
-    // query existing proposals
-    await this._initProposals();
+    await Promise.all([
+      this.fetchDepositParams(),
+      this.fetchTallyThresholds(),
+      this.fetchVotingPeriod(),
+      this._initProposals(),
+    ]);
     this._initialized = true;
   }
 
@@ -138,6 +102,61 @@ class CosmosGovernanceV1 extends ProposalModule<
       Promise.all(cosmosProposals?.map((p) => p.init()));
     } catch (error) {
       console.error('Error fetching proposals: ', error);
+    }
+  }
+
+  private async fetchDepositParams(): Promise<void> {
+    try {
+      const { deposit_params } = await this._Chain.lcd.cosmos.gov.v1.params({
+        paramsType: 'deposit',
+      });
+      this._maxDepositPeriodS = +deposit_params?.max_deposit_period.replace(
+        's',
+        ''
+      );
+
+      // TODO: support off-denom deposits
+      const depositCoins = deposit_params?.min_deposit.find(
+        ({ denom }) => denom === this._Chain.denom
+      );
+      if (depositCoins) {
+        this._minDeposit = new CosmosToken(
+          depositCoins.denom,
+          new BN(depositCoins.amount)
+        );
+      } else {
+        console.error(
+          'Gov minDeposit in wrong denom:',
+          deposit_params?.min_deposit
+        );
+        this._minDeposit = new CosmosToken(this._Chain.denom, 0);
+      }
+      console.log(this._minDeposit);
+    } catch (e) {
+      console.error('Error fetching deposit params', e);
+    }
+  }
+
+  private async fetchTallyThresholds(): Promise<void> {
+    try {
+      const { tally_params } = await this._Chain.lcd.cosmos.gov.v1.params({
+        paramsType: 'tallying',
+      });
+      this._yesThreshold = +tally_params?.threshold;
+      this._vetoThreshold = +tally_params?.veto_threshold;
+    } catch (e) {
+      console.error('Error fetching tally params', e);
+    }
+  }
+
+  private async fetchVotingPeriod(): Promise<void> {
+    try {
+      const { voting_params } = await this._Chain.lcd.cosmos.gov.v1.params({
+        paramsType: 'voting',
+      });
+      this._votingPeriodS = +voting_params.voting_period.replace('s', '');
+    } catch (e) {
+      console.error('Error fetching voting params', e);
     }
   }
 
