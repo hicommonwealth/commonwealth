@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import Tooltip from '@mui/joy/Tooltip';
 
-type Placement = 'top' | 'right' | 'bottom' | 'left';
+export type Placement = 'top' | 'right' | 'bottom' | 'left';
 
 type CWTooltipProps = {
   content: string;

@@ -1098,6 +1098,12 @@ export const ComponentShowcase = () => {
       </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
+        {/* <CWTooltipNew
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="top"
+          >
+          <CWUpvote voteCount={87} />
+        </CWTooltipNew> */}
         <CWTooltipNew
           content="A tooltip is a non-actionable label for explaining a UI element or feature."
           placement="top"

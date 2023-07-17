@@ -184,10 +184,5 @@ $width: 360px;
   .tooltip {
     @include gallery-grid(32px, column);
     align-items: center;
-
-    .tooltip-row {
-      align-items: center;
-      // @include gallery-grid(initial, row);
-    }
   }
 }
