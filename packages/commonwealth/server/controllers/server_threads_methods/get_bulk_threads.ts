@@ -76,6 +76,7 @@ export async function __getBulkThreads(
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.chain AS addr_chain, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
+        threads.archived_at,
         thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
         threads.read_only, threads.body, threads.stage,
         threads.has_poll, threads.plaintext,
@@ -91,6 +92,7 @@ export async function __getBulkThreads(
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
           t.marked_as_spam_at,
+          t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
           t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
@@ -219,6 +221,7 @@ export async function __getBulkThreads(
         : [],
       reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
       marked_as_spam_at: t.marked_as_spam_at,
+      archived_at: t.archived_at,
     };
     if (t.topic_id) {
       data['topic'] = {
