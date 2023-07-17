@@ -175,6 +175,7 @@ export class UserController {
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
   public ephemerallySetActiveAccount(account: Account): void {
     this._setActiveAccount(account);
+    this.isFetched.emit('redraw');
   }
 
   public setEmail(email: string): void {

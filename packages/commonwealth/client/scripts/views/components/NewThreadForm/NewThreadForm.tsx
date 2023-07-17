@@ -20,12 +20,17 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
+
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
@@ -51,6 +56,10 @@ export const NewThreadForm = () => {
     isDisabled,
     clearDraft,
   } = useNewThreadForm(chainId, topicsForSelector);
+
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -115,6 +124,8 @@ export const NewThreadForm = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
+
   return (
     <>
       <div className="NewThreadForm">
@@ -163,6 +174,7 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
+              isDisabled={!hasJoinedCommunity}
             />
 
             <div className="buttons-row">
@@ -178,15 +190,23 @@ export const NewThreadForm = () => {
                 label={
                   app.user.activeAccount ? 'Post' : 'Join community to create'
                 }
-                disabled={isDisabled}
+                disabled={isDisabled || !hasJoinedCommunity}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
                 buttonWidth="wide"
               />
             </div>
+
+            {showBanner && (
+              <JoinCommunityBanner
+                onClose={handleCloseBanner}
+                onJoin={handleJoinCommunity}
+              />
+            )}
           </div>
         </div>
       </div>
+      {JoinCommunityModals}
     </>
   );
 };

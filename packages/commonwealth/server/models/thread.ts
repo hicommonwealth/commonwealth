@@ -50,6 +50,7 @@ export type ThreadAttributes = {
   deleted_at?: Date;
   last_commented_on?: Date;
   marked_as_spam_at?: Date;
+  archived_at?: Date;
   locked_at?: Date;
 
   // associations
@@ -124,6 +125,7 @@ export default (
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
       marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
+      archived_at: { type: dataTypes.DATE, allowNull: true },
       locked_at: {
         type: dataTypes.DATE,
         allowNull: true,
