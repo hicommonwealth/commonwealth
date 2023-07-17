@@ -69,10 +69,17 @@
   }
 }
 
+.QuillEditorContainer {
+  &.isDisabled {
+    cursor: not-allowed;
+  }
+}
+
 .QuillEditorWrapper {
   border-radius: 6px;
   border: 1px solid $neutral-200;
   min-height: 255px;
+  position: relative;
 
   &.isFocused {
     border: 1px solid $primary-500;
@@ -157,6 +164,26 @@
         transform: rotate(360deg);
       }
     }
+  }
+}
+
+.QuillTooltip {
+  font-size: 12px;
+  letter-spacing: 0.24px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 20px));
+  border-radius: 4px;
+  background-color: $neutral-900;
+  padding: 4px 8px;
+  color: $white;
+  text-align: center;
+
+  span {
+    height: 16px;
+    display: flex;
+    align-items: center;
   }
 }
 

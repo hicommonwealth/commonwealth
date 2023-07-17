@@ -14,8 +14,12 @@
       display: flex;
       gap: 4px;
 
-      .user-link-text.Text {
-        color: $primary-500;
+      .user-link-text {
+        &.disabled {
+          .user-display-name {
+            color: $neutral-400 !important;
+          }
+        }
       }
     }
   }
