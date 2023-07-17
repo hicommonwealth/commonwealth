@@ -9,20 +9,11 @@ import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
 import { CWText } from '../cw_text';
 
-type ButtonType =
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'destructive';
+export type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 
-type ButtonHeight =
-  | 'lg'
-  | 'med'
-  | 'sm';
+type ButtonHeight = 'lg' | 'med' | 'sm';
 
-type ButtonWidth =
-  | 'narrow'
-  | 'wide';
+type ButtonWidth = 'narrow' | 'wide';
 
 type ButtonStyleProps = {
   buttonType?: ButtonType;
@@ -78,15 +69,11 @@ export const CWButton = (props: ButtonProps) => {
         disabled={disabled}
         {...otherProps}
       >
-        {!!iconLeft && (
-          <CWIcon iconName={iconLeft} className="button-icon" />
-        )}
-        <CWText type={"buttonMini"} className="button-text" noWrap>
+        {!!iconLeft && <CWIcon iconName={iconLeft} className="button-icon" />}
+        <CWText type={'buttonMini'} className="button-text" noWrap>
           {label}
         </CWText>
-        {!!iconRight && (
-          <CWIcon iconName={iconRight} className="button-icon" />
-        )}
+        {!!iconRight && <CWIcon iconName={iconRight} className="button-icon" />}
       </button>
     </div>
   );
