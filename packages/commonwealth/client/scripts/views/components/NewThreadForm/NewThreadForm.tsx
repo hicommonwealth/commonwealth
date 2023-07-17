@@ -180,7 +180,6 @@ export const NewThreadForm = () => {
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
               isDisabled={!hasJoinedCommunity}
-              tooltipLabel="Join community to submit"
             />
 
             <div className="buttons-row">
@@ -193,7 +192,9 @@ export const NewThreadForm = () => {
                 />
               )}
               <CWButton
-                label="Submit"
+                label={
+                  app.user.activeAccount ? 'Post' : 'Join community to create'
+                }
                 disabled={isDisabled || !hasJoinedCommunity}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
