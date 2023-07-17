@@ -8,8 +8,8 @@ export async function compressImage(file: File): Promise<File> {
     }
 
     const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
+      maxSizeMB: 10,
+      maxWidthOrHeight: 1000, // in pixels, due to cloudflare polish limit
       useWebWorker: true, // allows compression to run in separate thread in browser
     };
 
