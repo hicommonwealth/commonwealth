@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import Tooltip from '@mui/joy/Tooltip';
 
 export type Placement = 'top' | 'right' | 'bottom' | 'left';
