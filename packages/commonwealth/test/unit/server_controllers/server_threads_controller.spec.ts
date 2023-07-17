@@ -63,13 +63,13 @@ describe('ServerThreadsController', () => {
       );
 
       const [newReaction, notificationOptions, analyticsOptions] =
-        await serverThreadsController.createThreadReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          threadId
-        );
+        await serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId: threadId,
+        });
 
       expect(newReaction).to.be.ok;
 
@@ -166,14 +166,83 @@ describe('ServerThreadsController', () => {
       );
 
       expect(
-        serverThreadsController.createThreadReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          123
-        )
+        serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId: 123,
+        })
       ).to.be.rejectedWith('Thread not found: 123');
+    });
+
+    it('should throw an error (thread archived)', async () => {
+      const sandbox = Sinon.createSandbox();
+      const db = {
+        Reaction: {
+          findOne: sandbox.stub().resolves({
+            id: 2,
+            chain: 'ethereum',
+            Address: {
+              address: '0x123',
+              chain: 'ethereum',
+            },
+            destroy: sandbox.stub(),
+            toJSON: () => ({}),
+          }),
+          findOrCreate: sandbox.stub().resolves([
+            {
+              id: 2,
+              chain: 'ethereum',
+              Address: {
+                address: '0x123',
+                chain: 'ethereum',
+              },
+              destroy: sandbox.stub(),
+              toJSON: () => ({}),
+            },
+            false,
+          ]),
+        },
+        Thread: {
+          findOne: sandbox.stub().resolves({
+            id: 4,
+            title: 'Big Thread!',
+            chain: 'ethereum',
+            archived_at: Date.now(),
+          }),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: sandbox.stub().resolves([true, null]),
+      };
+
+      const user = {
+        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
+      };
+      const address = {};
+      const chain = {
+        id: 'ethereum',
+      };
+      const reaction = {};
+      const threadId = 123;
+
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      expect(
+        serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId,
+        })
+      ).to.be.rejectedWith('Thread is archived');
     });
 
     it('should throw error (banned)', async () => {
@@ -225,7 +294,7 @@ describe('ServerThreadsController', () => {
         id: 'ethereum',
       };
       const reaction = {};
-      const commentId = 123;
+      const threadId = 123;
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
@@ -234,13 +303,13 @@ describe('ServerThreadsController', () => {
       );
 
       expect(
-        serverThreadsController.createThreadReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        )
+        serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId,
+        })
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
@@ -317,7 +386,7 @@ describe('ServerThreadsController', () => {
         network: 'ethereum',
       };
       const reaction = {};
-      const commentId = 123;
+      const threadId = 123;
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
@@ -326,13 +395,13 @@ describe('ServerThreadsController', () => {
       );
 
       expect(
-        serverThreadsController.createThreadReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        )
+        serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId,
+        })
       ).to.be.rejectedWith('Insufficient token balance');
     });
   });
@@ -414,18 +483,18 @@ describe('ServerThreadsController', () => {
       );
 
       const [newComment, notificationOptions, analyticsOptions] =
-        await serverThreadsController.createThreadComment(
-          user as any,
-          address as any,
-          chain as any,
+        await serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           parentId,
           threadId,
           text,
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        );
+          canvasHash,
+        });
       expect(newComment).to.include({
         thread_id: threadId,
         text,
@@ -505,18 +574,18 @@ describe('ServerThreadsController', () => {
       const canvasSession = null;
 
       expect(
-        serverThreadsController.createThreadComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           parentId,
           threadId,
           text,
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Ban error: big bad error');
     });
 
@@ -584,19 +653,111 @@ describe('ServerThreadsController', () => {
       const canvasSession = null;
 
       expect(
-        serverThreadsController.createThreadComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           parentId,
           threadId,
           text,
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Thread not found');
+    });
+
+    it('should throw an error (thread archived)', async () => {
+      const user = {};
+      const address = {
+        id: 1,
+        address: '0x123',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+        network: 'ethereum',
+      };
+      const parentId = null;
+      const threadId = 1;
+      const text = 'hello';
+      const attachments = null;
+      const canvasAction = null;
+      const canvasHash = null;
+      const canvasSession = null;
+
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            archived_at: Date.now(),
+            save: async () => ({}),
+          }),
+        },
+        // for findAllRoles
+        Address: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        sequelize: {
+          transaction: async () => ({
+            rollback: async () => ({}),
+            commit: async () => ({}),
+          }),
+        },
+        Comment: {
+          create: async (data) => ({
+            id: 1,
+            ...data,
+          }),
+          findOne: async () => {
+            const data = {
+              id: 1,
+              thread_id: threadId,
+              text,
+              address_id: address.id,
+              chain: chain.id,
+              Address: address,
+            };
+            return {
+              ...data,
+              destroy: async () => ({}),
+              toJSON: () => data,
+            };
+          },
+        },
+        Subscription: {
+          create: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      expect(
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          parentId,
+          threadId,
+          text,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash,
+        })
+      ).to.be.rejectedWith('Thread is archived');
     });
 
     it('should throw error (thread readonly)', async () => {
@@ -666,18 +827,18 @@ describe('ServerThreadsController', () => {
       const canvasSession = null;
 
       expect(
-        serverThreadsController.createThreadComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           parentId,
           threadId,
           text,
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Cannot comment when thread is read_only');
     });
 
@@ -752,18 +913,18 @@ describe('ServerThreadsController', () => {
       const canvasSession = null;
 
       expect(
-        serverThreadsController.createThreadComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           parentId,
           threadId,
           text,
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Invalid parent');
     });
 
@@ -835,18 +996,18 @@ describe('ServerThreadsController', () => {
       const canvasSession = null;
 
       expect(
-        serverThreadsController.createThreadComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           parentId,
           threadId,
           text,
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Comments can only be nested 8 levels deep');
     });
   });
@@ -891,7 +1052,10 @@ describe('ServerThreadsController', () => {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
       const threadId = 1;
-      await serverThreadsController.deleteThread(user as any, threadId);
+      await serverThreadsController.deleteThread({
+        user: user as any,
+        threadId,
+      });
     });
 
     it('should should throw error (thread not found)', async () => {
@@ -925,7 +1089,10 @@ describe('ServerThreadsController', () => {
       };
       const threadId = 1;
       expect(
-        serverThreadsController.deleteThread(user as any, threadId)
+        serverThreadsController.deleteThread({
+          user: user as any,
+          threadId,
+        })
       ).to.be.rejectedWith('Thread not found: 1');
     });
 
@@ -966,7 +1133,10 @@ describe('ServerThreadsController', () => {
       };
       const threadId = 1;
       expect(
-        serverThreadsController.deleteThread(user as any, threadId)
+        serverThreadsController.deleteThread({
+          user: user as any,
+          threadId,
+        })
       ).to.be.rejectedWith('Ban error: bad');
     });
 
@@ -1007,7 +1177,10 @@ describe('ServerThreadsController', () => {
       };
       const threadId = 1;
       expect(
-        serverThreadsController.deleteThread(user as any, threadId)
+        serverThreadsController.deleteThread({
+          user: user as any,
+          threadId,
+        })
       ).to.be.rejectedWith('Not owned by this user');
     });
   });
@@ -1078,10 +1251,10 @@ describe('ServerThreadsController', () => {
       const canvasHash = undefined;
 
       const [updatedThread, notificationOptions] =
-        await serverThreadsController.updateThread(
-          user as any,
-          address as any,
-          chain as any,
+        await serverThreadsController.updateThread({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           threadId,
           title,
           body,
@@ -1090,8 +1263,8 @@ describe('ServerThreadsController', () => {
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        );
+          canvasHash,
+        });
 
       expect(updatedThread.title).to.equal(title);
       expect(updatedThread.body).to.equal(body);
@@ -1164,10 +1337,10 @@ describe('ServerThreadsController', () => {
       const canvasHash = undefined;
 
       expect(
-        serverThreadsController.updateThread(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.updateThread({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           threadId,
           title,
           body,
@@ -1176,8 +1349,8 @@ describe('ServerThreadsController', () => {
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Ban error: banned');
     });
 
@@ -1246,10 +1419,10 @@ describe('ServerThreadsController', () => {
       const canvasHash = undefined;
 
       expect(
-        serverThreadsController.updateThread(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.updateThread({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           threadId,
           title,
           body,
@@ -1258,8 +1431,8 @@ describe('ServerThreadsController', () => {
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Must provide body or attachment');
     });
 
@@ -1312,10 +1485,10 @@ describe('ServerThreadsController', () => {
       const canvasHash = undefined;
 
       expect(
-        serverThreadsController.updateThread(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.updateThread({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           threadId,
           title,
           body,
@@ -1324,8 +1497,8 @@ describe('ServerThreadsController', () => {
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Thread not found: 1');
     });
 
@@ -1394,10 +1567,10 @@ describe('ServerThreadsController', () => {
       const canvasHash = undefined;
 
       expect(
-        serverThreadsController.updateThread(
-          user as any,
-          address as any,
-          chain as any,
+        serverThreadsController.updateThread({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           threadId,
           title,
           body,
@@ -1406,8 +1579,8 @@ describe('ServerThreadsController', () => {
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        )
+          canvasHash,
+        })
       ).to.be.rejectedWith('Invalid thread URL');
     });
   });
@@ -1507,10 +1680,10 @@ describe('ServerThreadsController', () => {
       const canvasHash = undefined;
 
       const [thread, notificationOptions, analyticsOptions] =
-        await serverThreadsController.createThread(
-          user as any,
-          address as any,
-          chain as any,
+        await serverThreadsController.createThread({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           title,
           body,
           kind,
@@ -1522,8 +1695,8 @@ describe('ServerThreadsController', () => {
           attachments,
           canvasAction,
           canvasSession,
-          canvasHash
-        );
+          canvasHash,
+        });
 
       expect(thread.title).to.equal(title);
       expect(thread.body).to.equal(body);

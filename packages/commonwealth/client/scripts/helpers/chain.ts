@@ -219,8 +219,11 @@ export const initChain = async (): Promise<void> => {
     await app.chain.initApi();
   }
 
+  if (!app.chain.loaded) {
+    await app.chain.initData();
+  }
+
   const chain = app.chain.meta;
-  await app.chain.initData();
 
   // Emit chain as updated
   app.chainAdapterReady.emit('ready');
