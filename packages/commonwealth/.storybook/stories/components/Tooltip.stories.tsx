@@ -27,7 +27,7 @@ const Tooltip: FC<TooltipProps> = ({ content }) => {
         height: '300px',
       }}
     >
-      <CWTooltip content={content} placement="top" >
+      <CWTooltip content={content} placement="top">
         <CWButton label="top" />
       </CWTooltip>
       <div
@@ -48,7 +48,7 @@ const Tooltip: FC<TooltipProps> = ({ content }) => {
             justifyContent: 'center',
           }}
         >
-          <CWTooltip content={content} placement="left" >
+          <CWTooltip content={content} placement="left">
             <CWButton label="left" />
           </CWTooltip>
         </div>
@@ -61,12 +61,12 @@ const Tooltip: FC<TooltipProps> = ({ content }) => {
             justifyContent: 'center',
           }}
         >
-          <CWTooltip content={content} placement="right" >
+          <CWTooltip content={content} placement="right">
             <CWButton label="right" />
           </CWTooltip>
         </div>
       </div>
-      <CWTooltip content={content} placement="bottom" >
+      <CWTooltip content={content} placement="bottom">
         <CWButton label="bottom" />
       </CWTooltip>
     </div>

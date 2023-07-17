@@ -19,7 +19,6 @@ export const CWTooltip = (props: CWTooltipProps) => {
         flexDirection: 'column',
         alignItems: 'center',
         padding: '4px 8px',
-        paddingBottom: '10px',
         isolation: 'isolate',
         maxWidth: '232px',
         height: '40px',
