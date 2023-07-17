@@ -8,7 +8,7 @@ import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import { AuthorAndPublishInfo as ThreadAuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
+import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
@@ -116,7 +116,7 @@ export const CWContentPage = ({
           title
         )}
         <div className="header-info-row">
-          <ThreadAuthorAndPublishInfo
+          <AuthorAndPublishInfo
             showSplitDotIndicator={true}
             isNew={!!displayNewTag}
             isLocked={thread?.readOnly}
@@ -155,6 +155,7 @@ export const CWContentPage = ({
 
       {body &&
         body(
+          // todo
           <ThreadOptions
             canVote={!thread?.readOnly}
             canComment={!thread?.readOnly}

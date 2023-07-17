@@ -12,20 +12,20 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import useBrowserWindow from '../../../../../hooks/useBrowserWindow';
-import AddressInfo from '../../../../../models/AddressInfo';
-import { ThreadStage } from '../../../../../models/types';
-import Permissions from '../../../../../utils/Permissions';
-import { CWTag } from '../../../../components/component_kit/cw_tag';
-import { CWText } from '../../../../components/component_kit/cw_text';
-import { getClasses } from '../../../../components/component_kit/helpers';
-import { isNewThread } from '../../NewThreadTag';
-import { isHot } from '../../helpers';
-import { AuthorAndPublishInfo } from '../AuthorAndPublishInfo';
-import { Options } from '../Options';
-import { AdminActionsProps } from '../Options/AdminActions';
-import { ReactionButton } from '../Options/ReactionButton';
-import './index.scss';
+import useBrowserWindow from '../../../../hooks/useBrowserWindow';
+import AddressInfo from '../../../../models/AddressInfo';
+import { ThreadStage } from '../../../../models/types';
+import Permissions from '../../../../utils/Permissions';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from 'views/components/component_kit/helpers';
+import { isNewThread } from '../NewThreadTag';
+import { isHot } from '../helpers';
+import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
+import { Options } from './Options';
+import { AdminActionsProps } from './Options/AdminActions';
+import { ReactionButton } from './Options/ReactionButton';
+import './ThreadCard.scss';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
@@ -33,7 +33,7 @@ type CardProps = AdminActionsProps & {
   threadHref: string;
 };
 
-export const Card = ({
+export const ThreadCard = ({
   thread,
   onDelete,
   onSpamToggle,
@@ -138,10 +138,11 @@ export const Card = ({
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
                     )} 
-                        ${Number.isNaN(parseInt(link.identifier, 10))
-                        ? ''
-                        : ` #${link.identifier}`
-                      }`}
+                        ${
+                          Number.isNaN(parseInt(link.identifier, 10))
+                            ? ''
+                            : ` #${link.identifier}`
+                        }`}
                   />
                 ))}
             </div>
@@ -170,6 +171,7 @@ export const Card = ({
               {thread.plaintext}
             </CWText>
           </div>
+          {/*// TODO discussions page */}
           <div className="content-footer">
             <Options
               totalComments={thread.numberOfComments}
