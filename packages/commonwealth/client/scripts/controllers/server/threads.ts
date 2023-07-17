@@ -468,28 +468,26 @@ class ThreadsController {
   }
 
   public async toggleSpam(threadId: number, isSpam: boolean) {
-    return new Promise((resolve, reject) => {
+    try {
       const verb = isSpam ? 'put' : 'delete';
-      axios[verb](`${app.serverUrl()}/threads/${threadId}/spam`, {
-        data: {
-          jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
-        } as any,
-      })
-        .then((response) => {
-          const foundThread = this.store.getByIdentifier(threadId);
-          foundThread.markedAsSpamAt = response.data.result.marked_as_spam_at;
-          this.updateThreadInStore(new Thread({ ...foundThread }));
-          resolve(foundThread);
-        })
-        .catch((e) => {
-          console.error(e);
-          notifyError(
-            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
-          );
-          reject(e);
-        });
-    });
+      const response = await axios[verb](
+        `${app.serverUrl()}/threads/${threadId}/spam`,
+        {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          } as any,
+        }
+      );
+      const foundThread = this.store.getByIdentifier(threadId);
+      foundThread.markedAsSpamAt = response.data.result.marked_as_spam_at;
+      this.updateThreadInStore(new Thread({ ...foundThread }));
+      return foundThread;
+    } catch (err) {
+      console.error(err);
+      notifyError(`Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`);
+      throw err;
+    }
   }
 
   public async setArchived(threadId: number, isArchived: boolean) {
