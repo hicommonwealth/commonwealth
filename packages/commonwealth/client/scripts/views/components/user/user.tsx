@@ -193,7 +193,7 @@ export const User = ({
     <div className="User avatar-only" key={profile?.address || '-'}>
       <Avatar
         url={profile?.avatarUrl}
-        size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
+        size={24}
         address={profile?.id}
       />
     </div>
