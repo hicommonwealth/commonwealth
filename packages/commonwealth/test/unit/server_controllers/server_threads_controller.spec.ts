@@ -176,6 +176,75 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found: 123');
     });
 
+    it('should throw an error (thread archived)', async () => {
+      const sandbox = Sinon.createSandbox();
+      const db = {
+        Reaction: {
+          findOne: sandbox.stub().resolves({
+            id: 2,
+            chain: 'ethereum',
+            Address: {
+              address: '0x123',
+              chain: 'ethereum',
+            },
+            destroy: sandbox.stub(),
+            toJSON: () => ({}),
+          }),
+          findOrCreate: sandbox.stub().resolves([
+            {
+              id: 2,
+              chain: 'ethereum',
+              Address: {
+                address: '0x123',
+                chain: 'ethereum',
+              },
+              destroy: sandbox.stub(),
+              toJSON: () => ({}),
+            },
+            false,
+          ]),
+        },
+        Thread: {
+          findOne: sandbox.stub().resolves({
+            id: 4,
+            title: 'Big Thread!',
+            chain: 'ethereum',
+            archived_at: Date.now(),
+          }),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: sandbox.stub().resolves([true, null]),
+      };
+
+      const user = {
+        getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
+      };
+      const address = {};
+      const chain = {
+        id: 'ethereum',
+      };
+      const reaction = {};
+      const threadId = 123;
+
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      expect(
+        serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId,
+        })
+      ).to.be.rejectedWith('Thread is archived');
+    });
+
     it('should throw error (banned)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
@@ -597,6 +666,98 @@ describe('ServerThreadsController', () => {
           canvasHash,
         })
       ).to.be.rejectedWith('Thread not found');
+    });
+
+    it('should throw an error (thread archived)', async () => {
+      const user = {};
+      const address = {
+        id: 1,
+        address: '0x123',
+        save: async () => ({}),
+      };
+      const chain = {
+        id: 'ethereum',
+        network: 'ethereum',
+      };
+      const parentId = null;
+      const threadId = 1;
+      const text = 'hello';
+      const attachments = null;
+      const canvasAction = null;
+      const canvasHash = null;
+      const canvasSession = null;
+
+      const db = {
+        Thread: {
+          findOne: async () => ({
+            archived_at: Date.now(),
+            save: async () => ({}),
+          }),
+        },
+        // for findAllRoles
+        Address: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        sequelize: {
+          transaction: async () => ({
+            rollback: async () => ({}),
+            commit: async () => ({}),
+          }),
+        },
+        Comment: {
+          create: async (data) => ({
+            id: 1,
+            ...data,
+          }),
+          findOne: async () => {
+            const data = {
+              id: 1,
+              thread_id: threadId,
+              text,
+              address_id: address.id,
+              chain: chain.id,
+              Address: address,
+            };
+            return {
+              ...data,
+              destroy: async () => ({}),
+              toJSON: () => data,
+            };
+          },
+        },
+        Subscription: {
+          create: async () => ({}),
+        },
+      };
+      const tokenBalanceCache = {};
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
+
+      const serverThreadsController = new ServerThreadsController(
+        db as any,
+        tokenBalanceCache as any,
+        banCache as any
+      );
+
+      expect(
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          parentId,
+          threadId,
+          text,
+          attachments,
+          canvasAction,
+          canvasSession,
+          canvasHash,
+        })
+      ).to.be.rejectedWith('Thread is archived');
     });
 
     it('should throw error (thread readonly)', async () => {

@@ -21,6 +21,7 @@ export const Errors = {
   BanError: 'Ban error',
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
+  ThreadArchived: 'Thread is archived',
 };
 
 export type CreateThreadReactionOptions = {
@@ -56,6 +57,11 @@ export async function __createThreadReaction({
 
   if (!thread) {
     throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+  }
+
+  // check if thread is archived
+  if (thread.archived_at) {
+    throw new Error(Errors.ThreadArchived);
   }
 
   // check address ban
