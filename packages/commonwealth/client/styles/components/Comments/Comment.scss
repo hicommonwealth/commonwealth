@@ -80,39 +80,6 @@
         align-items: center;
         display: flex;
         gap: 16px;
-
-        .reply-button {
-          align-items: center;
-          cursor: pointer;
-          display: flex;
-          gap: 4px;
-
-          .Icon,
-          .menu-buttons-text.Text {
-            color: $neutral-500;
-          }
-
-          &:hover {
-            .Icon,
-            .menu-buttons-text.Text {
-              color: $neutral-600;
-            }
-          }
-
-          &:active {
-            .Icon,
-            .menu-buttons-text.Text {
-              color: $neutral-800;
-            }
-          }
-
-          &.selected {
-            .Icon,
-            .menu-buttons-text.Text {
-              color: $neutral-800;
-            }
-          }
-        }
       }
 
       .menu-buttons-right {

@@ -109,7 +109,7 @@ export const TopicSummaryRow = ({
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
-                    <NewThreadTag threadCreatedAt={thread.createdAt}/>
+                    <NewThreadTag threadCreatedAt={thread.createdAt} />
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}
@@ -141,9 +141,9 @@ export const TopicSummaryRow = ({
                 <div className="row-bottom">
                   <div className="comments-and-users">
                     <div className="comments-count">
-                      <CWIcon iconName="feedback" iconSize="small" />
+                      <CWIcon iconName="comment" iconSize="small" />
                       <CWText type="caption">
-                        {pluralize(thread.numberOfComments, 'comment')}
+                        {pluralize(thread.numberOfComments, 'Comment')}
                       </CWText>
                     </div>
                   </div>

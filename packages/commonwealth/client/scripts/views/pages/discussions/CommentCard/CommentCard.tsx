@@ -15,6 +15,7 @@ import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { SharePopover } from 'views/components/share_popover';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type CommentCardProps = {
   // Edit
@@ -140,20 +141,15 @@ export const CommentCard = ({
               />
 
               {canReply && (
-                <button
+                <CWThreadAction
+                  label="Reply"
+                  action="comment"
                   onClick={async (e) => {
-                    // prevent clicks from propagating to discussion row
                     e.preventDefault();
                     e.stopPropagation();
                     await onReply();
                   }}
-                  className="comment-option-btn"
-                >
-                  <CWIcon iconName="comment" iconSize="small" />
-                  <CWText type="caption" className="menu-buttons-text">
-                    Reply
-                  </CWText>
-                </button>
+                />
               )}
 
               {(canEdit || canDelete) && (

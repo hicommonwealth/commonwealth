@@ -46,13 +46,15 @@ const renderPhosphorIcon = (
 type CWThreadActionProps = {
   disabled?: boolean;
   action?: ActionType;
-  onClick: () => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  label?: string;
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
   disabled,
   action,
   onClick,
+  label,
 }) => {
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
@@ -88,7 +90,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           type="caption"
           fontWeight="regular"
         >
-          {action.charAt(0).toUpperCase() + action.slice(1)}
+          {label || action.charAt(0).toUpperCase() + action.slice(1)}
         </CWText>
       )}
     </div>

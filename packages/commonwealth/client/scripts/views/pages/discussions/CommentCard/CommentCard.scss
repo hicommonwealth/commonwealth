@@ -23,7 +23,6 @@
 .Comment {
   display: flex;
 
-
   &.highlighted {
     background-color: $yellow-200;
     border-radius: $border-radius-corners;
@@ -43,7 +42,6 @@
     gap: 12px;
 
     .comment-text {
-
       div,
       span,
       p {
@@ -94,7 +92,7 @@
     .comment-footer {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 1px;
 
       .comment-option-btn {
         outline: 0;
@@ -116,56 +114,20 @@
           color: $neutral-600;
         }
       }
-
-      .reply-button {
-        align-items: center;
-        cursor: pointer;
-        display: flex;
-        gap: 4px;
-
-        .Icon,
-        .menu-buttons-text.Text {
-          color: $neutral-500;
-        }
-
-        &:hover {
-
-          .Icon,
-          .menu-buttons-text.Text {
-            color: $neutral-600;
-          }
-        }
-
-        &:active {
-
-          .Icon,
-          .menu-buttons-text.Text {
-            color: $neutral-800;
-          }
-        }
-
-        &.selected {
-
-          .Icon,
-          .menu-buttons-text.Text {
-            color: $neutral-800;
-          }
-        }
-      }
     }
   }
 }
 
 .CommentActions {
   .danger {
-    color: $rorange-600  !important;
+    color: $rorange-600 !important;
 
     .Icon {
-      color: $rorange-600  !important;
+      color: $rorange-600 !important;
     }
 
     .Text {
-      color: $rorange-600  !important;
+      color: $rorange-600 !important;
     }
   }
 }

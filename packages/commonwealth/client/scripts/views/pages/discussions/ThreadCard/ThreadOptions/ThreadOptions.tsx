@@ -11,6 +11,8 @@ import {
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { pluralize } from 'helpers';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
@@ -59,12 +61,10 @@ export const ThreadOptions = ({
         {canVote && thread && <ReactionButton thread={thread} size="small" />}
 
         {canComment && totalComments >= 0 && (
-          <button className="thread-option-btn">
-            <CWIcon color="black" iconName="comment" iconSize="small" />
-            <CWText type="caption">
-              {`${totalComments} comment${totalComments > 1 ? 's' : ''}`}
-            </CWText>
-          </button>
+          <CWThreadAction
+            label={`${pluralize(totalComments, 'Comment')}`}
+            action="comment"
+          />
         )}
 
         <SharePopover
