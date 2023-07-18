@@ -16,7 +16,7 @@ export const ArchiveThreadModal = ({
 }: ArchiveThreadModalProps) => {
   const handleArchiveThread = async () => {
     try {
-      await app.threads.archive(thread.id);
+      await app.threads.setArchived(thread.id, !!thread.archivedAt);
       onModalClose();
     } catch (err) {
       console.log('Failed to archive thread.');

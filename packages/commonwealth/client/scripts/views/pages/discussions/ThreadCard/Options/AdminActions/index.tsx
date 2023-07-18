@@ -267,7 +267,7 @@ export const AdminActions = ({
                         if (archivedAt === null) {
                           setIsArchiveThreadModalOpen(true)
                         } else {
-                          app.threads.unarchive(thread.id)
+                          app.threads.setArchived(thread.id, !!thread.archivedAt)
                         }
                       },
                     },

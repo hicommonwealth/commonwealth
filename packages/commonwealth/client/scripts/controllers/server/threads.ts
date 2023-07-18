@@ -200,6 +200,8 @@ class ThreadsController {
       : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    const archivedAt = archived_at ? moment(archived_at) : null;
+
     let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
@@ -465,29 +467,7 @@ class ThreadsController {
     });
   }
 
-  public async unarchive(
-    threadId: number,
-  ) {
-    await $.ajax({
-      url: `${app.serverUrl()}/threads/${threadId}/unarchive`,
-      type: 'PUT',
-      success: (response) => {
-        const result = this.modelFromServer(response.result);
-        this._store.update(result);
-        this._listingStore.add(result);
 
-        return result;
-      },
-      error: (err) => {
-        console.log('Failed to unarchive thread');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to unarchive thread'
-        );
-      },
-    });
-  }
 
   public async delete(proposal) {
     return new Promise((resolve, reject) => {
@@ -515,29 +495,51 @@ class ThreadsController {
   }
 
   public async toggleSpam(threadId: number, isSpam: boolean) {
-    return new Promise((resolve, reject) => {
-      $.post(
-        `${app.serverUrl()}/threads/${threadId}/${
-          !isSpam ? 'mark' : 'unmark'
-        }-as-spam`,
+    try {
+      const verb = isSpam ? 'put' : 'delete';
+      const response = await axios[verb](
+        `${app.serverUrl()}/threads/${threadId}/spam`,
         {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          } as any,
+        }
+      );
+      const foundThread = this.store.getByIdentifier(threadId);
+      foundThread.markedAsSpamAt = response.data.result.marked_as_spam_at;
+      this.updateThreadInStore(new Thread({ ...foundThread }));
+      return foundThread;
+    } catch (err) {
+      console.error(err);
+      notifyError(`Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`);
+      throw err;
+    }
+  }
+
+  public async setArchived(threadId: number, isArchived: boolean) {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: `${app.serverUrl()}/threads/${threadId}/archive`,
+        type: !isArchived ? 'PUT' : 'DELETE',
+        data: {
           jwt: app.user.jwt,
           chain_id: app.activeChainId(),
         }
-      )
-        .then((response) => {
-          const foundThread = this.store.getByIdentifier(threadId);
-          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
-          this.updateThreadInStore(new Thread({ ...foundThread }));
-          resolve(foundThread);
-        })
-        .catch((e) => {
-          console.error(e);
-          notifyError(
-            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
-          );
-          reject(e);
-        });
+      })
+      .then((response) => {
+        const foundThread = this.store.getByIdentifier(threadId);
+        foundThread.archivedAt = response.result.archived_at;
+        this.updateThreadInStore(new Thread({ ...foundThread }));
+        resolve(foundThread);
+      })
+      .catch((e) => {
+        console.error(e);
+        notifyError(
+          `Could not ${!isArchived ? 'archive' : 'unarchive'} thread`
+        );
+        reject(e);
+      });
     });
   }
 
@@ -763,7 +765,6 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.data.result.map((rawThread) => {
-      console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
        * here we will find if thread is in store and if so use most keys

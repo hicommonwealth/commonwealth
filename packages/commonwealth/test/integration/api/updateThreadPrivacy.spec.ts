@@ -83,7 +83,7 @@ describe('updateThreadPrivacy Integration Tests', () => {
     chai.assert.equal(response.error, Errors.NotAdmin);
   });
 
-  it('should update thread stage and return a success response', async () => {
+  it('should lock a thread', async () => {
     const validRequest = {
       jwt: jwtTokenUser1,
       author_chain: testAddresses[0].chain,
@@ -92,12 +92,12 @@ describe('updateThreadPrivacy Integration Tests', () => {
       read_only: true,
     };
 
-    chai.assert.notEqual(testThreads[0].read_only, false);
+    chai.assert.equal(testThreads[0].read_only, false);
 
     const response = await post(
       '/api/updateThreadPrivacy',
       validRequest,
-      true,
+      false,
       app
     );
 
@@ -106,6 +106,32 @@ describe('updateThreadPrivacy Integration Tests', () => {
       where: { id: testThreads[0].id },
     });
 
-    chai.assert.notEqual(thread.read_only, true);
+    chai.assert.equal(thread.read_only, true);
+  });
+
+  it('should unlock a thread', async () => {
+    const validRequest = {
+      jwt: jwtTokenUser1,
+      author_chain: testAddresses[0].chain,
+      chain: testAddresses[0].chain,
+      thread_id: testThreads[0].id,
+      read_only: false,
+    };
+
+    const response = await post(
+      '/api/updateThreadPrivacy',
+      validRequest,
+      false,
+      app
+    );
+
+    chai.assert.equal(response.status, 'Success');
+    const thread = await models.Thread.findOne({
+      where: {
+        id: testThreads[0].id,
+      },
+    });
+
+    chai.assert.equal(thread.read_only, false);
   });
 });
