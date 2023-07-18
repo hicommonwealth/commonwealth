@@ -35,7 +35,12 @@ describe('updateTopic Integration Tests', () => {
       address: testAddresses[0].address,
     };
 
-    const response = await post('/api/updateTopic', invalidRequest, true, app);
+    const response = await post(
+      '/api/updateThreadTopic',
+      invalidRequest,
+      true,
+      app
+    );
 
     response.should.have.status(400);
     chai.assert.equal(response.error, UpdateTopicErrors.NoThread);
@@ -51,7 +56,12 @@ describe('updateTopic Integration Tests', () => {
       address: false,
     };
 
-    const response = await post('/api/updateTopic', invalidRequest, true, app);
+    const response = await post(
+      '/api/updateThreadTopic',
+      invalidRequest,
+      true,
+      app
+    );
 
     response.should.have.status(400);
     chai.assert.equal(response.error, UpdateTopicErrors.NoAddr);
@@ -67,7 +77,12 @@ describe('updateTopic Integration Tests', () => {
       address: testAddresses[0].address,
     };
 
-    const response = await post('/api/updateTopic', invalidRequest, true, app);
+    const response = await post(
+      '/api/updateThreadTopic',
+      invalidRequest,
+      true,
+      app
+    );
 
     response.should.have.status(400);
     chai.assert.equal(response.error, UpdateTopicErrors.NoTopic);
@@ -83,7 +98,12 @@ describe('updateTopic Integration Tests', () => {
       address: testAddresses[3].address,
     };
 
-    const response = await post('/api/updateTopic', invalidRequest, true, app);
+    const response = await post(
+      '/api/updateThreadTopic',
+      invalidRequest,
+      true,
+      app
+    );
 
     response.should.have.status(400);
     chai.assert.equal(response.error, UpdateTopicErrors.NoPermission);
@@ -102,7 +122,12 @@ describe('updateTopic Integration Tests', () => {
     chai.assert.notEqual(testTopics[0].id, testTopics[1].id);
     chai.assert.equal(testThreads[0].topic_id, testTopics[0].id);
 
-    const response = await post('/api/updateTopic', validRequest, true, app);
+    const response = await post(
+      '/api/updateThreadTopic',
+      validRequest,
+      true,
+      app
+    );
 
     chai.assert.equal(response.status, 'Success');
     const thread = await models.Thread.findOne({
