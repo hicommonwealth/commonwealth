@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import {
   ArrowBendUpRight,
   BellSimple,
+  BellSimpleSlash,
   DotsThree,
   ChatCenteredDots,
 } from '@phosphor-icons/react';
@@ -27,7 +28,8 @@ const commonProps = (disabled: boolean, isHovering: boolean) => {
 const renderPhosphorIcon = (
   action: ActionType,
   disabled: boolean,
-  isHovering: boolean
+  isHovering: boolean,
+  selected: boolean
 ) => {
   switch (action) {
     case 'comment':
@@ -35,7 +37,11 @@ const renderPhosphorIcon = (
     case 'share':
       return <ArrowBendUpRight {...commonProps(disabled, isHovering)} />;
     case 'subscribe':
-      return <BellSimple {...commonProps(disabled, isHovering)} />;
+      return selected ? (
+        <BellSimple {...commonProps(disabled, isHovering)} />
+      ) : (
+        <BellSimpleSlash {...commonProps(disabled, isHovering)} />
+      );
     case 'overflow':
       return <DotsThree {...commonProps(disabled, isHovering)} />;
     default:
@@ -48,6 +54,7 @@ type CWThreadActionProps = {
   action?: ActionType;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   label?: string;
+  selected?: boolean;
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
@@ -55,6 +62,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   action,
   onClick,
   label,
+  selected,
 }) => {
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
@@ -79,7 +87,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
       onMouseLeave={handleOnMouseLeave}
       onClick={onClick}
     >
-      {renderPhosphorIcon(action, disabled, isHovering)}
+      {renderPhosphorIcon(action, disabled, isHovering, selected)}
       {action !== 'overflow' && action && (
         <CWText
           className={getClasses({

@@ -1,7 +1,5 @@
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { SharePopover } from 'views/components/share_popover';
 import {
   getCommentSubscription,
@@ -49,6 +47,24 @@ export const ThreadOptions = ({
       getReactionSubscription(thread)?.isActive
   );
 
+  const handleToggleSubscribe = async (e) => {
+    // prevent clicks from propagating to discussion row
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!thread) {
+      return;
+    }
+
+    await handleToggleSubscription(
+      thread,
+      getCommentSubscription(thread),
+      getReactionSubscription(thread),
+      isSubscribed,
+      setIsSubscribed
+    );
+  };
+
   return (
     <>
       <div
@@ -71,31 +87,12 @@ export const ThreadOptions = ({
           discussionLink={shareEndpoint}
         />
 
-        <button
-          onClick={async (e) => {
-            // prevent clicks from propagating to discussion row
-            e.preventDefault();
-            e.stopPropagation();
-            thread &&
-              (await handleToggleSubscription(
-                thread,
-                getCommentSubscription(thread),
-                getReactionSubscription(thread),
-                isSubscribed,
-                setIsSubscribed
-              ));
-          }}
-          className="thread-option-btn"
-        >
-          <CWIcon
-            color="black"
-            iconName={isSubscribed ? 'bellMuted' : 'bell'}
-            iconSize="small"
-          />
-          <CWText type="caption">
-            {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-          </CWText>
-        </button>
+        <CWThreadAction
+          action="subscribe"
+          onClick={handleToggleSubscribe}
+          selected={!isSubscribed}
+          label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+        />
 
         {canUpdateThread && thread && (
           <AdminActions
