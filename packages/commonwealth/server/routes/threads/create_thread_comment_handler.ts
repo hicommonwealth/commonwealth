@@ -41,7 +41,7 @@ export const createThreadCommentHandler = async (
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta
+    discord_meta,
   } = req.body;
 
   if (!threadId) {
@@ -56,20 +56,23 @@ export const createThreadCommentHandler = async (
 
   const attachments = req.body['attachments[]'];
 
-  const [comment, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadComment(
-      user,
-      address,
-      chain,
-      parentId,
-      parseInt(threadId, 10),
-      text,
-      attachments,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-      discord_meta,
-    );
+  const [
+    comment,
+    notificationOptions,
+    analyticsOptions,
+  ] = await controllers.threads.createThreadComment({
+    user,
+    address,
+    chain,
+    parentId,
+    threadId: parseInt(threadId, 10),
+    text,
+    attachments,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discord_meta,
+  });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

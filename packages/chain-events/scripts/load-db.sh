@@ -12,4 +12,4 @@ if [ "$1" ]; then
   DUMP_NAME=$1
 fi
 
-psql -d commonwealth_chain_events -U commonwealth -f "$DUMP_NAME";
+psql -h localhost -d commonwealth_chain_events -U commonwealth -f "$DUMP_NAME";

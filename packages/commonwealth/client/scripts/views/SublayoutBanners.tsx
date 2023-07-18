@@ -5,7 +5,7 @@ import { isNonEmptyString } from 'helpers/typeGuards';
 import ITokenAdapter from '../models/ITokenAdapter';
 import ChainInfo from '../models/ChainInfo';
 import {
-  CWBanner,
+  Old_CWBanner,
   CWMessageBanner,
 } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';
@@ -40,7 +40,7 @@ export const SublayoutBanners = ({
       {app.isLoggedIn() &&
         ITokenAdapter.instanceOf(app.chain) &&
         !app.user.activeAccount && (
-          <CWBanner
+          <Old_CWBanner
             bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
           />
         )}

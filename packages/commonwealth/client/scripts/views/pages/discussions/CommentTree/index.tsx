@@ -32,6 +32,7 @@ type CommentsTreeAttrs = {
   parentCommentId: number;
   setParentCommentId: (id: number) => void;
   fromDiscordBot?: boolean;
+  canComment: boolean;
 };
 
 export const CommentsTree = ({
@@ -45,6 +46,7 @@ export const CommentsTree = ({
   setIsReplying,
   parentCommentId,
   setParentCommentId,
+  canComment,
 }: CommentsTreeAttrs) => {
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
@@ -432,6 +434,7 @@ export const CommentsTree = ({
                   parentCommentId={parentCommentId}
                   rootThread={thread}
                   updatedCommentsCallback={updatedCommentsCallback}
+                  canComment={canComment}
                 />
               )}
               {!!children.length &&

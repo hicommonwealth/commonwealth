@@ -1,5 +1,5 @@
 import { AppError } from 'common-common/src/errors';
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import type { ValidateChainParams } from '../middleware/validateChain';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -9,7 +9,6 @@ import { findOneRole } from '../util/roles';
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   InvalidAddress: 'Invalid address',
-  RoleDNE: 'Role does not exist',
   OtherAdminDNE: 'Must assign another admin',
 };
 
@@ -36,25 +35,17 @@ const deleteRole = async (
     },
   });
   if (!validAddress) throw new AppError(Errors.InvalidAddress);
-  const existingRole = await findOneRole(
-    models,
-    { where: { address_id: req.body.address_id } },
-    chain.id
-  );
-  if (!existingRole) throw new AppError(Errors.RoleDNE);
 
-  if (existingRole.permission === 'admin') {
-    const otherExistingAdmin = await findOneRole(
-      models,
-      {
-        where: {
-          address_id: req.body.address_id,
-          id: { [Sequelize.Op.ne]: existingRole.toJSON().id },
+  if (validAddress.role === 'admin') {
+    const otherExistingAdmin = await models.Address.findOne({
+      where: {
+        chain: chain.id,
+        role: 'admin',
+        id: {
+          [Op.ne]: validAddress.id,
         },
       },
-      chain.id,
-      ['admin']
-    );
+    });
     if (!otherExistingAdmin) throw new AppError(Errors.OtherAdminDNE);
   }
 
