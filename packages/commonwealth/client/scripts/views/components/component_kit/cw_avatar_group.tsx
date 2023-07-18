@@ -18,10 +18,11 @@ type AvatarGroupProps = {
 export const CWAvatarGroup = (props: AvatarGroupProps) => {
   const { profiles, chainId } = props;
 
-  if (!profiles || profiles?.filter((p) => !!p).length === 0) return;
+  if (!profiles || profiles?.filter((p) => !!p && p.Addresses).length === 0)
+    return;
 
   const truncatedProfiles = profiles
-    .filter((p) => !!p)
+    .filter((p) => !!p && p.Addresses)
     .slice(0, 4)
     .reverse();
 
@@ -52,14 +53,15 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
             });
 
             // some old posts are broken = have no address in the specified community.
-            // if so, we omit their icon as a quick fix.
-            if (address) {
-              return (
-                <div className="avatar-group-icon" key={i}>
-                  <CWJdenticon address={address.address} size={16} />
-                </div>
-              );
-            }
+            // if so, we display an arbitrary icon based on their non-chain address.
+            const displayAddress =
+              address?.address || profile.Addresses[0].address;
+
+            return (
+              <div className="avatar-group-icon" key={i}>
+                <CWJdenticon address={displayAddress} size={16} />
+              </div>
+            );
           }
         })}
       </div>
