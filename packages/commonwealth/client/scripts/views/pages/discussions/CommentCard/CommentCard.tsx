@@ -118,27 +118,7 @@ export const CommentCard = ({
             <div className="comment-footer">
               <CommentReactionButton comment={comment} />
 
-              <SharePopover
-                commentId={comment.id}
-                renderTrigger={(onClick) => (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      onClick(e);
-                    }}
-                    className="comment-option-btn"
-                  >
-                    <CWIcon
-                      color="black"
-                      iconName="share"
-                      iconSize="small"
-                      weight="fill"
-                    />
-                    <CWText type="caption">Share</CWText>
-                  </button>
-                )}
-              />
+              <SharePopover commentId={comment.id} />
 
               {canReply && (
                 <CWThreadAction

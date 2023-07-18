@@ -1,10 +1,10 @@
 import React from 'react';
 import app from '../../state';
 
-import { CWIconButton } from './component_kit/cw_icon_button';
 import type { PopoverTriggerProps } from './component_kit/cw_popover/cw_popover';
 import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { useLocation } from 'react-router-dom';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type SharePopoverProps = {
   commentId?: number;
@@ -19,8 +19,8 @@ export const SharePopover = ({
   const domain = document.location.origin;
   const { pathname: currentRoute } = useLocation();
 
-  const defaultRenderTrigger = (onclick) => (
-    <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
+  const defaultRenderTrigger = (onClick) => (
+    <CWThreadAction action="share" onClick={onClick} />
   );
 
   return (
@@ -34,9 +34,8 @@ export const SharePopover = ({
 
             if (commentId) {
               // If we copy a comment on discussion page
-              const currentRouteSansCommentParam = currentRoute.split(
-                '?comment='
-              )[0];
+              const currentRouteSansCommentParam =
+                currentRoute.split('?comment=')[0];
               urlToCopy = `${domain}${currentRouteSansCommentParam}?comment=${commentId}`;
             } else if (discussionLink) {
               const urlParts = currentRoute.split('/');

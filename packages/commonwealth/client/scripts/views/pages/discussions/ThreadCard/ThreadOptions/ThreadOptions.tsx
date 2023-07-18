@@ -55,7 +55,6 @@ export const ThreadOptions = ({
         className="ThreadOptions"
         onClick={(e) => {
           e.preventDefault();
-          e.stopPropagation();
         }}
       >
         {canVote && thread && <ReactionButton thread={thread} size="small" />}
@@ -70,24 +69,6 @@ export const ThreadOptions = ({
         <SharePopover
           // if share endpoint is present it will be used, else the current url will be used
           discussionLink={shareEndpoint}
-          renderTrigger={(onClick) => (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                onClick(e);
-              }}
-              className="thread-option-btn"
-            >
-              <CWIcon
-                color="black"
-                iconName="share"
-                iconSize="small"
-                weight="fill"
-              />
-              <CWText type="caption">Share</CWText>
-            </button>
-          )}
         />
 
         <button

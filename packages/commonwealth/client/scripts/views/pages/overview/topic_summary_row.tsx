@@ -20,6 +20,7 @@ import { getLastUpdated, isHot } from '../discussions/helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { NewThreadTag } from '../discussions/NewThreadTag';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
@@ -140,12 +141,14 @@ export const TopicSummaryRow = ({
 
                 <div className="row-bottom">
                   <div className="comments-and-users">
-                    <div className="comments-count">
-                      <CWIcon iconName="comment" iconSize="small" />
-                      <CWText type="caption">
-                        {pluralize(thread.numberOfComments, 'Comment')}
-                      </CWText>
-                    </div>
+                    <CWThreadAction
+                      label={`${pluralize(thread.numberOfComments, 'Comment')}`}
+                      action="comment"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                    />
                   </div>
                   <div className="row-bottom-menu">
                     <div
