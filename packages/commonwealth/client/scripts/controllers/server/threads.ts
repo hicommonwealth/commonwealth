@@ -443,32 +443,6 @@ class ThreadsController {
     }
   }
 
-  public async archive(
-    threadId: number,
-  ) {
-    await $.ajax({
-      url: `${app.serverUrl()}/threads/${threadId}/archive`,
-      type: 'PUT',
-      success: (response) => {
-        const result = this.modelFromServer(response.result);
-        this._store.update(result);
-        this._listingStore.add(result);
-
-        return result;
-      },
-      error: (err) => {
-        console.log('Failed to archive thread');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to archive thread'
-        );
-      },
-    });
-  }
-
-
-
   public async delete(proposal) {
     return new Promise((resolve, reject) => {
       axios
