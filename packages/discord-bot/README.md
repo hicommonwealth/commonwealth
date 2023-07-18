@@ -57,3 +57,6 @@ The following would be an order of operations for a full setup with the granular
 2. Start Commonwealth App with `CW_BOT_KEY` set.
 3. Start `discordListener`
 4. Start any number instances of `discordConsumer` with bot key included above
+
+## Architecture Diagram 
+<img width="1149" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/36428666/abadbccf-e33b-4b70-abc4-69df9f8b3549">
