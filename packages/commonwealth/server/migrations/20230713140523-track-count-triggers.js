@@ -84,6 +84,73 @@ module.exports = {
           FOR EACH ROW
           EXECUTE FUNCTION update_max_notif_id();
         END $$;
+
+        CREATE OR REPLACE FUNCTION update_reaction_count()
+        RETURNS TRIGGER AS $$
+        BEGIN
+          IF NEW.thread_id IS NOT NULL THEN
+            UPDATE "Threads"
+            SET reaction_count = reaction_count + 1
+            WHERE id = NEW.thread_id;
+          END IF;
+          
+          IF NEW.comment_id IS NOT NULL THEN
+            UPDATE "Comments"
+            SET reaction_count = reaction_count + 1
+            WHERE id = NEW.comment_id;
+          END IF;
+          
+          RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM pg_trigger WHERE tgname = 'reaction_count_trigger'
+          ) THEN
+            DROP TRIGGER reaction_count_trigger ON "Reactions";
+          END IF;
+          CREATE TRIGGER reaction_count_trigger
+          AFTER INSERT ON "Reactions"
+          FOR EACH ROW
+          EXECUTE FUNCTION update_reaction_count();
+        END $$;
+
+
+        CREATE OR REPLACE FUNCTION decrement_reaction_count()
+        RETURNS TRIGGER AS $$
+        BEGIN
+          IF OLD.thread_id IS NOT NULL THEN
+            UPDATE "Threads"
+            SET reaction_count = reaction_count - 1
+            WHERE id = OLD.thread_id;
+          END IF;
+          
+          IF OLD.comment_id IS NOT NULL THEN
+            UPDATE "Comments"
+            SET reaction_count = reaction_count - 1
+            WHERE id = OLD.comment_id;
+          END IF;
+            
+          RETURN OLD;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM pg_trigger WHERE tgname = 'reaction_count_decrement_trigger'
+          ) THEN
+            DROP TRIGGER reaction_count_decrement_trigger ON "Reactions";
+          END IF;
+          CREATE TRIGGER reaction_count_decrement_trigger
+          AFTER DELETE ON "Reactions"
+          FOR EACH ROW
+          EXECUTE FUNCTION decrement_reaction_count();
+        END $$;
+
+
         `,
         { raw: true, transaction: t, logging: console.log }
       );
@@ -113,6 +180,18 @@ module.exports = {
           SELECT 1 FROM pg_trigger WHERE tgname = 'update_max_notif_id'
         ) THEN
           DROP TRIGGER update_max_notif_id ON "Notifications";
+        END IF;
+
+        IF EXISTS (
+          SELECT 1 FROM pg_trigger WHERE tgname = 'reaction_count_trigger'
+        ) THEN
+          DROP TRIGGER reaction_count_trigger ON "Reactions";
+        END IF;
+
+        IF EXISTS (
+          SELECT 1 FROM pg_trigger WHERE tgname = 'reaction_count_decrement_trigger'
+        ) THEN
+          DROP TRIGGER reaction_count_decrement_trigger ON "Reactions";
         END IF;
         `,
         { raw: true, transaction: t, logging: console.log }

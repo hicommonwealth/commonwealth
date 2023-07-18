@@ -41,26 +41,15 @@ module.exports = {
       console.time('Add thread reaction count');
       await queryInterface.sequelize.query(
         `
-        -- SELECT DISTINCT reaction FROM "Comments" 
         ;with reactionCntByThread AS (
           SELECT SUM(CASE WHEN reaction='like' THEN 1 ELSE -1 END) as cnt, r.thread_id
           FROM "Reactions" r
           GROUP BY thread_id
-        ),reactionCntByCommentForThreads AS (
-          SELECT SUM(CASE WHEN reaction='like' THEN 1 ELSE -1 END) as cnt, c.thread_id
-          FROM "Reactions" r
-          JOIN "Comments" c on r.comment_id=c.id
-          GROUP BY c.thread_id
-        ), combineReactionCountsByThread as (
-          SELECT  COALESCE(rt.cnt,0)+COALESCE(rc.cnt,0) as cnt, t.id as thread_id
-          FROM "Threads" t
-          LEFT JOIN reactionCntByThread rt on t.id=rt.thread_id
-          LEFT JOIN reactionCntByCommentForThreads rc on t.id=rc.thread_id
         )
 
         Update "Threads"
         SET reaction_count=rc.cnt
-        FROM combineReactionCountsByThread rc
+        FROM reactionCntByThread rc
         where rc.thread_id="Threads".id
         `,
         { raw: true, transaction: t, logging: console.log }
