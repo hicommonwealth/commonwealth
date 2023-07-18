@@ -305,6 +305,11 @@ export async function unlinkLogin(account: AddressInfo) {
     auth: true,
     jwt: app.user.jwt,
   });
+  // remove deleted role from app.roles
+  app.roles.deleteRole({
+    address: account,
+    chain: account.chain.id,
+  })
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);
