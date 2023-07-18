@@ -55,7 +55,6 @@ import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
 import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
-import searchProfiles from '../routes/searchProfiles';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
@@ -170,6 +169,7 @@ import { ServerCommentsController } from '../controllers/server_comments_control
 import { ServerReactionsController } from '../controllers/server_reactions_controller';
 import { ServerNotificationsController } from '../controllers/server_notifications_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import { ServerProfilesController } from '../controllers/server_profiles_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -183,6 +183,7 @@ import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
+import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -190,6 +191,7 @@ export type ServerControllers = {
   reactions: ServerReactionsController;
   notifications: ServerNotificationsController;
   analytics: ServerAnalyticsController;
+  profiles: ServerProfilesController;
 };
 
 function setupRouter(
@@ -210,6 +212,7 @@ function setupRouter(
     reactions: new ServerReactionsController(models, banCache),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
+    profiles: new ServerProfilesController(models),
   };
 
   // ---
@@ -507,9 +510,9 @@ function setupRouter(
     getThreadsHandler.bind(this, serverControllers)
   );
   router.get(
-    '/searchProfiles',
+    '/profiles',
     databaseValidationService.validateChain,
-    searchProfiles.bind(this, models)
+    searchProfilesHandler.bind(this, serverControllers)
   );
 
   router.get('/profile/v2', getProfileNew.bind(this, models));

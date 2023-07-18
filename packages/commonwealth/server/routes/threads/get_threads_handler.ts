@@ -1,4 +1,9 @@
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import {
+  PaginationQueryParams,
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+} from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { AppError } from '../../../../common-common/src/errors';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
@@ -27,11 +32,7 @@ type ActiveThreadsRequestQuery = {
 type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
-  limit?: string;
-  page?: string;
-  order_by?: string;
-  order_direction?: string;
-};
+} & PaginationQueryParams;
 type BulkThreadsRequestQuery = {
   topic_id: string;
   stage?: string;

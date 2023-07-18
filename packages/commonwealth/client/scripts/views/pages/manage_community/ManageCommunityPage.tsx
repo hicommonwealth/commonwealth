@@ -65,7 +65,7 @@ const ManageCommunityPage = () => {
       if (cachedResult) {
         profiles = cachedResult.profiles;
       } else {
-        const res = await axios.get(`${app.serverUrl()}/searchProfiles`, {
+        const res = await axios.get(`${app.serverUrl()}/profiles`, {
           params: {
             chain: app.activeChainId(),
             search: searchQuery || '',

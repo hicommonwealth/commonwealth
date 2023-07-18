@@ -4,6 +4,13 @@ import type { AddressInstance } from './models/address';
 import type { ChainInstance } from './models/chain';
 import type { UserInstance } from './models/user';
 
+export type PaginationQueryParams = {
+  limit?: string;
+  page?: string;
+  order_by?: string;
+  order_direction?: string;
+};
+
 export type TypedPaginatedResult<T> = {
   results: T[];
   limit: number;

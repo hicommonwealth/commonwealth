@@ -8,6 +8,7 @@ import {
 } from '../../util/queries';
 import { ChainInstance } from '../../models/chain';
 import { ThreadAttributes } from '../../models/thread';
+import { TypedPaginatedResult } from 'server/types';
 
 export type SearchThreadsOptions = {
   chain: ChainInstance;
@@ -19,7 +20,9 @@ export type SearchThreadsOptions = {
   orderDirection?: 'ASC' | 'DESC';
 };
 
-export type SearchThreadsResult = ThreadAttributes[];
+export type SearchThreadsResult =
+  | TypedPaginatedResult<ThreadAttributes[]>
+  | ThreadAttributes[];
 
 export async function __searchThreads(
   this: ServerThreadsController,

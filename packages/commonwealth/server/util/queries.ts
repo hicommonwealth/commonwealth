@@ -115,7 +115,7 @@ export function buildPaginatedResponse<T>(
   items: T[],
   totalResults: number,
   bind: PaginationSqlBind
-): TypedPaginatedResult {
+): TypedPaginatedResult<T> {
   return {
     results: items,
     limit: bind.limit,
