@@ -24,7 +24,7 @@ type UserDashboardProps = {
 
 const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
-  const {isLoggedIn} = useUserLoggedIn();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global
@@ -66,7 +66,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage, subpage]);
 
   return (
-    <div ref={setScrollElement} className="UserDashboard" key={isLoggedIn + ''}>
+    <div ref={setScrollElement} className="UserDashboard" key={`${isLoggedIn}`}>
       <div className="dashboard-column">
         <div className="dashboard-header">
           <CWTabBar>
