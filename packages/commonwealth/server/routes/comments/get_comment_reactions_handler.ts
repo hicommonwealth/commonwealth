@@ -30,7 +30,9 @@ export const getCommentReactionsHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
-  const reactions = await controllers.comments.getCommentReactions(commentId);
+  const reactions = await controllers.comments.getCommentReactions({
+    commentId,
+  });
 
   return success(res, reactions);
 };

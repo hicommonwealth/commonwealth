@@ -55,18 +55,18 @@ export const createThreadCommentHandler = async (
   const attachments = req.body['attachments[]'];
 
   const [comment, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadComment(
+    await controllers.threads.createThreadComment({
       user,
       address,
       chain,
       parentId,
-      parseInt(threadId, 10),
+      threadId: parseInt(threadId, 10),
       text,
       attachments,
       canvasAction,
       canvasSession,
-      canvasHash
-    );
+      canvasHash,
+    });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
