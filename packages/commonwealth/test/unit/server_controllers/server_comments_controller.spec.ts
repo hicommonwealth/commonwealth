@@ -750,10 +750,13 @@ describe('ServerCommentsController', () => {
 
   describe('#deleteComment', () => {
     it('should delete a comment', async () => {
+      let didDestroy = false;
       const db = {
         Comment: {
           findOne: async () => ({
-            destroy: async () => ({}),
+            destroy: async () => {
+              didDestroy = true;
+            },
           }),
         },
         Subscription: {
@@ -783,6 +786,7 @@ describe('ServerCommentsController', () => {
         chain: chain as any,
         commentId,
       });
+      expect(didDestroy).to.be.true;
     });
   });
 });

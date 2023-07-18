@@ -29,6 +29,7 @@ type CreateCommentProps = {
   parentCommentId?: number;
   rootThread: Thread;
   updatedCommentsCallback: () => void;
+  canComment: boolean;
 };
 
 export const CreateComment = ({
@@ -36,6 +37,7 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   updatedCommentsCallback,
+  canComment,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -115,7 +117,10 @@ export const CreateComment = ({
     userBalance.lt(tokenPostingThreshold);
 
   const disabled =
-    editorValue.length === 0 || sendingComment || userFailsThreshold;
+    editorValue.length === 0 ||
+    sendingComment ||
+    userFailsThreshold ||
+    !canComment;
 
   const decimals = getDecimals(app.chain);
 
@@ -150,6 +155,7 @@ export const CreateComment = ({
         className="editor"
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
+        isDisabled={!canComment}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
