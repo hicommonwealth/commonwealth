@@ -50,7 +50,7 @@ module.exports = {
             IF EXISTS (
                 SELECT 1 FROM pg_trigger WHERE tgname = 'update_comment_count_logical_delete'
             ) THEN
-                DROP TRIGGER update_comment_count_ ON "Comments";
+                DROP TRIGGER update_comment_count_logical_delete ON "Comments";
             END IF;
         
             CREATE TRIGGER update_comment_count_logical_delete
