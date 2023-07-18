@@ -58,9 +58,14 @@ export async function removeUser() {
 
 // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
 export async function addUserIfNone() {
-  const addQuery = `
-  WITH inserted_user AS (
-      INSERT INTO "Users" (
+  const userExists = await testDb.query(
+    `select 1 from "Addresses" where address = '${testAddress}'`
+  );
+
+  if (userExists[0].length > 0) return;
+
+  const userId = await testDb.query(`
+  INSERT INTO "Users" (
         email,
         created_at,
         updated_at,
@@ -80,25 +85,27 @@ export async function addUserIfNone() {
         false,
         NULL,
         'never'
-      ) RETURNING id
-    ),
-    pr as (
-    INSERT INTO "Profiles" (
+      ) RETURNING id`);
+
+  const profileId = await testDb.query(`
+  INSERT INTO "Profiles" (
       user_id,
       created_at,
       updated_at,
       profile_name,
       is_default,
       socials
-    ) Select
-      inserted_user.id,
+    ) VALUES (
+      ${userId[0][0]['id']},
       '2023-07-14 13:03:56.203-07',
       '2023-07-14 13:03:56.415-07',
       'TestAddress',
       false,
       '{}'
-    from inserted_user),
-    ad as (
+    ) RETURNING id
+  `);
+
+  testDb.query(`
     INSERT INTO "Addresses" (
       address,
       chain,
@@ -116,32 +123,23 @@ export async function addUserIfNone() {
       block_info,
       is_user_default,
       role
-    ) select
+    ) VALUES (
       '${testAddress}',
       'ethereum',
       '2023-07-14 13:03:55.754-07',
       '2023-07-14 13:03:56.212-07',
-      (SELECT id FROM inserted_user),
+      ${userId[0][0]['id']},
       'a4934d7895bd5cd31ba5c7f5f8383689aed3',
       '2023-07-14 13:03:56.212-07',
       '2023-07-14 13:03:56.212-07',
       false,
       false,
       false,
-      113877,
+      ${profileId[0][0]['id']},
       'metamask',
-      '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede","timestamp":1689365027}',
+      '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
       false,
       'member'
-    from inserted_user)
-    select inserted_user.* from inserted_user;
-`;
-
-  const testQuery = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}'`
-  );
-  // if the user doesn't have their address in a db, add one
-  if (testQuery[0].length < 1) {
-    await testDb.query(addQuery);
-  }
+    )
+  `);
 }
