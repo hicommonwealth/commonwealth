@@ -1,4 +1,3 @@
-import 'components/ReactionButton/CommentReactionButton.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import React, { useState, useEffect } from 'react';
 import app from 'state';
@@ -6,21 +5,15 @@ import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
 import Permissions from '../../../utils/Permissions';
 import { LoginModal } from '../../modals/login_modal';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import ReactionCount from '../../../models/ReactionCount';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWText } from '../component_kit/cw_text';
 import { Modal } from '../component_kit/cw_modal';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
-import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../component_kit/helpers';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import {
   fetchReactionsByComment,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
@@ -104,6 +97,21 @@ export const CommentReactionButton = ({
       });
   };
 
+  const handleVoteClick = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!app.isLoggedIn() || !app.user.activeAccount) {
+      setIsModalOpen(true);
+    } else {
+      onReactionClick(e, hasReacted, dislike, like);
+    }
+  };
+
+  const handleVoteMouseEnter = async () => {
+    setReactors(await fetchReactionsByComment(comment.id));
+  };
+
   return (
     <>
       <Modal
@@ -112,66 +120,20 @@ export const CommentReactionButton = ({
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-      <button
-        className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading || isUserForbidden },
-          `CommentReactionButton ${hasReacted ? ' has-reacted' : ''}`
-        )}
-        onMouseEnter={async () => {
-          setReactors(await fetchReactionsByComment(comment.id));
-        }}
-        onClick={async (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          if (!app.isLoggedIn() || !app.user.activeAccount) {
-            setIsModalOpen(true);
-          } else {
-            onReactionClick(e, hasReacted, dislike, like);
-          }
-        }}
-      >
-        {likes > 0 ? (
-          <CWTooltip
-            content={
-              <div className="reaction-button-tooltip-contents">
-                {getDisplayedReactorsForPopup({
-                  reactors: reactors.map((r) => r.Address.address),
-                })}
-              </div>
-            }
-            renderTrigger={(handleInteraction) => (
-              <div
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-                className="btn-container"
-              >
-                <CWIcon
-                  iconName="upvote"
-                  iconSize="small"
-                  {...(hasReacted && { weight: 'fill' })}
-                />
-                <div
-                  className={`reactions-count ${
-                    hasReacted ? ' has-reacted' : ''
-                  }`}
-                >
-                  {likes}
-                </div>
-              </div>
-            )}
-          />
-        ) : (
-          <>
-            <CWIcon iconName="upvote" iconSize="small" />
-            <div
-              className={`reactions-count ${hasReacted ? ' has-reacted' : ''}`}
-            >
-              {likes}
-            </div>
-          </>
-        )}
-      </button>
+      <CWUpvoteSmall
+        voteCount={likes}
+        disabled={isLoading || isUserForbidden}
+        selected={hasReacted}
+        onMouseEnter={handleVoteMouseEnter}
+        onClick={handleVoteClick}
+        tooltipContent={
+          <div>
+            {getDisplayedReactorsForPopup({
+              reactors: reactors.map((r) => r.Address.address),
+            })}
+          </div>
+        }
+      />
     </>
   );
 };

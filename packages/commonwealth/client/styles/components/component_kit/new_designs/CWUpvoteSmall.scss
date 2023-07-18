@@ -1,6 +1,6 @@
-@import '../../shared';
+@import '../../../shared';
 
-.CommentReactionButton {
+.CWUpvoteSmall {
   outline: 0;
   border: 0;
   display: flex;
@@ -47,9 +47,4 @@
     gap: 4px;
     align-items: center;
   }
-}
-
-.reaction-button-tooltip-contents {
-  display: flex;
-  flex-direction: column;
 }
