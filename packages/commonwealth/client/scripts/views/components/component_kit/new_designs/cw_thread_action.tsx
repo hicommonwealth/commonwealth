@@ -1,7 +1,6 @@
 import React, { FC, useState } from 'react';
 import {
   ArrowBendUpRight,
-  ArrowFatUp,
   BellSimple,
   DotsThree,
   ChatCenteredDots,
@@ -13,12 +12,7 @@ import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
 
-export type ActionType =
-  | 'comment'
-  | 'share'
-  | 'subscribe'
-  | 'upvote'
-  | 'overflow';
+export type ActionType = 'comment' | 'share' | 'subscribe' | 'overflow';
 
 const commonProps = (disabled: boolean, isHovering: boolean) => {
   return {
@@ -42,8 +36,6 @@ const renderPhosphorIcon = (
       return <ArrowBendUpRight {...commonProps(disabled, isHovering)} />;
     case 'subscribe':
       return <BellSimple {...commonProps(disabled, isHovering)} />;
-    case 'upvote':
-      return <ArrowFatUp {...commonProps(disabled, isHovering)} />;
     case 'overflow':
       return <DotsThree {...commonProps(disabled, isHovering)} />;
     default:
@@ -54,14 +46,12 @@ const renderPhosphorIcon = (
 type CWThreadActionProps = {
   disabled?: boolean;
   action?: ActionType;
-  count?: number;
   onClick: () => void;
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
   disabled,
   action,
-  count,
   onClick,
 }) => {
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -88,7 +78,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
       onClick={onClick}
     >
       {renderPhosphorIcon(action, disabled, isHovering)}
-      {action !== 'overflow' && (action || count) && (
+      {action !== 'overflow' && action && (
         <CWText
           className={getClasses({
             hover: isHovering,
@@ -98,7 +88,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           type="caption"
           fontWeight="regular"
         >
-          {count ? count : action.charAt(0).toUpperCase() + action.slice(1)}
+          {action.charAt(0).toUpperCase() + action.slice(1)}
         </CWText>
       )}
     </div>
