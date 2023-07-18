@@ -50,7 +50,7 @@ export const ThreadOptions = ({
   return (
     <>
       <div
-        className="Options"
+        className="ThreadOptions"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
