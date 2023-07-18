@@ -160,7 +160,7 @@ export const ProtocolCommunityForm = () => {
             const signingWallet = WebWalletController.Instance.availableWallets(
               ChainBase.Ethereum
             )[0];
-            await signingWallet.enable();
+            await signingWallet.enable('5');
             if (!signingWallet.api) {
               throw new Error('Web3 Api Not Initialized');
             }
