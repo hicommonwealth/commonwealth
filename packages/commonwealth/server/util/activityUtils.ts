@@ -27,8 +27,7 @@ export async function getActivityFeed(models: DB, id = 0) {
          nts.notification_data,
          nts.category_id,
          thr.view_count as view_count,
-         thr.comment_count AS comment_count,
-         thr.reaction_count AS reaction_count
+         thr.comment_count AS comment_count
   FROM ranked_thread_notifs nt
   INNER JOIN "Notifications" nts ON nt.max_notif_id = nts.id
   JOIN "Threads" thr ON thr.id = nt.thread_id
@@ -56,17 +55,14 @@ export async function getActivityFeed(models: DB, id = 0) {
         [Op.in]: comments.map((c) => c.address_id),
       },
     },
+    attributes: ['id', 'address', 'chain', 'profile_id'],
   });
 
-  const profiles = await models.Profile.findAll({
-    where: {
-      id: addresses.map((a) => a.profile_id),
-    },
-    include: [
-      {
-        model: models.Address,
-      },
-    ],
+  const profiles = addresses.map((a) => {
+    return {
+      id: a.profile_id,
+      Addresses: [a],
+    };
   });
 
   const notificationsWithProfiles = notifications.map((notification) => {
