@@ -10,9 +10,10 @@ enum AvatarSizes {
   Lg = 36,
 
   // TODO: this is to account for sizing in user popover and avatar upload
-  Tmp1 = 32,
-  Tmp2 = 60, 
-  Tmp3 = 108
+  Tmp1 = 18,
+  Tmp2 = 32,
+  Tmp3 = 60,
+  Tmp4 = 108
 };
 
 interface AvatarProps {
