@@ -88,7 +88,7 @@ export const LoginSelector = () => {
       </>
     );
   }
-  
+
   if (!profileLoadComplete && NewProfilesController.Instance.allLoaded()) {
     setProfileLoadComplete(true);
   }
