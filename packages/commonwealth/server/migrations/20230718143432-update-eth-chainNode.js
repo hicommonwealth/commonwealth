@@ -1,35 +1,64 @@
 'use strict';
 
-const oldChainNode = 'https://matic-mainnet.chainstacklabs.com';
-const newChainNode =
+const oldChainNodeEth = 'https://matic-mainnet.chainstacklabs.com';
+const newChainNodeEth =
   'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8';
+const oldChainNodeBnb =
+  'wss://holy-spring-wave.bsc.quiknode.pro/205d64ae5a12236f4d40137a3ef53ec663091881/';
+const newChainNodeBnb = 'https://bsc-dataseed3.binance.org';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkUpdate(
-      'ChainNodes',
-      {
-        url: newChainNode,
-        alt_wallet_url: newChainNode,
-        name: 'Polygon',
-      },
-      {
-        url: oldChainNode,
-      }
-    );
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.bulkUpdate(
+        'ChainNodes',
+        {
+          url: newChainNodeEth,
+          alt_wallet_url: newChainNodeEth,
+          name: 'Polygon',
+        },
+        {
+          url: oldChainNodeEth,
+        },
+        { transaction }
+      );
+      await queryInterface.bulkUpdate(
+        'ChainNodes',
+        {
+          url: newChainNodeBnb,
+        },
+        {
+          url: oldChainNodeBnb,
+        },
+        { transaction }
+      );
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkUpdate(
-      'ChainNodes',
-      {
-        url: oldChainNode,
-        alt_wallet_url: oldChainNode,
-        name: 'Matic',
-      },
-      {
-        url: newChainNode,
-      }
-    );
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.bulkUpdate(
+        'ChainNodes',
+        {
+          url: oldChainNodeEth,
+          alt_wallet_url: oldChainNodeEth,
+          name: 'Matic',
+        },
+        {
+          url: newChainNodeEth,
+        },
+        { transaction }
+      );
+      await queryInterface.bulkUpdate(
+        'ChainNodes',
+        {
+          url: oldChainNodeBnb,
+        },
+        {
+          url: newChainNodeBnb,
+        },
+        { transaction }
+      );
+    });
   },
 };
