@@ -23,6 +23,7 @@ import {
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
+import clsx from 'clsx';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -145,7 +146,11 @@ export const CreateComment = ({
           <CWText type="caption">
             {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
           </CWText>
-          <CWText type="caption" fontWeight="medium" className="user-link-text">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className={clsx('user-link-text', { disabled: !canComment })}
+          >
             <User user={author} hideAvatar linkify />
           </CWText>
         </div>
@@ -156,6 +161,7 @@ export const CreateComment = ({
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
         isDisabled={!canComment}
+        tooltipLabel="Join community to comment"
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
@@ -179,7 +185,7 @@ export const CreateComment = ({
             buttonWidth="wide"
             disabled={disabled}
             onClick={handleSubmitComment}
-            label={parentType === ContentType.Comment ? 'Reply' : 'Comment'}
+            label="Submit"
           />
         </div>
       </div>
