@@ -24,6 +24,7 @@ import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
 import Permissions from '../../../utils/Permissions';
 import clsx from 'clsx';
+import { getTokenBalance } from 'helpers/token_balance_helper';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -56,7 +57,8 @@ export const CreateComment = ({
 
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
+  const [userBalance, setUserBalance] = useState(new BN('0'));
+  const [balanceLoading, setBalanceLoading] = useState(false);
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
@@ -108,9 +110,18 @@ export const CreateComment = ({
 
   // token balance check if needed
   const tokenPostingThreshold: BN = app.chain.getTopicThreshold(activeTopic.id);
-
+  console.log(app.user.activeAccount?.tokenBalance);
+  if (tokenPostingThreshold && !balanceLoading) {
+    setBalanceLoading(true);
+    if (!app.user.activeAccount?.tokenBalance) {
+      getTokenBalance().then(() => {
+        setUserBalance(app.user.activeAccount?.tokenBalance);
+      });
+    } else {
+      setUserBalance(app.user.activeAccount?.tokenBalance);
+    }
+  }
   const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
-  const userBalance = app.user.activeAccount?.tokenBalance;
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||
@@ -163,7 +174,7 @@ export const CreateComment = ({
           Commenting in {activeTopic?.name} requires{' '}
           {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
           {app.chain.meta.default_symbol}.{' '}
-          {userBalance && app.user.activeAccount && (
+          {userBalance && (
             <>
               You have {weiToTokens(userBalance.toString(), decimals)}{' '}
               {app.chain.meta.default_symbol}.
