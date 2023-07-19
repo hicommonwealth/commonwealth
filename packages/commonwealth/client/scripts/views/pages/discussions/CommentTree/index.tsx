@@ -2,7 +2,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { useDeleteCommentMutation, useEditCommentMutation, useToggleCommentSpamStatusMutation } from 'state/api/comments';
+import { useDeleteCommentMutation, useEditCommentMutation, useToggleCommentSpamStatusMutation, useFetchCommentsQuery } from 'state/api/comments';
 import { ContentType } from 'types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { notifyError } from '../../../../controllers/app/notifications';
@@ -39,6 +39,11 @@ export const CommentsTree = ({
   const [highlightedComment, setHighlightedComment] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState(null);
+
+  const { data: allComments = [] } = useFetchCommentsQuery({
+    chainId: app.activeChainId(),
+    threadId: parseInt(`${thread.id}`)
+  })
 
   const { mutateAsync: deleteComment } = useDeleteCommentMutation({
     chainId: app.activeChainId(),
@@ -112,9 +117,7 @@ export const CommentsTree = ({
           break;
         }
 
-        const grandchildren = app.comments
-          .getByThread(thread)
-          .filter((c) => c.parentComment === child.id);
+        const grandchildren = allComments.filter(c => c.threadId === thread.id && c.parentComment === comment.id)
 
         for (let j = 0; j < grandchildren.length; j++) {
           const grandchild = grandchildren[j];
@@ -378,9 +381,7 @@ export const CommentsTree = ({
     return comments_
       .filter((x) => (includeSpams ? true : !x.markedAsSpamAt))
       .map((comment: CommentType<any>) => {
-        const children = app.comments
-          .getByThread(thread)
-          .filter((c) => c.parentComment === comment.id);
+        const children = allComments.filter(c => c.threadId === thread.id && c.parentComment === comment.id)
 
         if (isLivingCommentTree(comment, children)) {
           const isCommentAuthor =

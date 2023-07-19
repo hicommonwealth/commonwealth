@@ -467,7 +467,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
-  const sortedComments = [...comments].sort((a, b) =>
+  const sortedComments = [...comments].filter(c => !c.parentComment).sort((a, b) =>
     commentSortType === CommentsFeaturedFilterTypes.Oldest ?
       moment(a.createdAt).diff(moment(b.createdAt)) :
       moment(b.createdAt).diff(moment(a.createdAt))

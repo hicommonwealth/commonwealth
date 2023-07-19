@@ -32,12 +32,12 @@ export class ActiveThreadsStore {
     const reactions = {};
     const allThreads = this.getThreadsByCommunity(parentEntity);
     allThreads.forEach((thread) => {
-      const allComments = app.comments.getByThread(thread);
-      comments[thread.id] = allComments;
-      reactions[thread.id] = app.comments.getReactionByPost(thread);
-      allComments.forEach((c) => {
-        reactions[thread.id].concat(app.comments.getReactionByPost(c));
-      });
+      // const allComments = app.comments.getByThread(thread);
+      // comments[thread.id] = allComments;
+      // reactions[thread.id] = app.comments.getReactionByPost(thread);
+      // allComments.forEach((c) => {
+      //   reactions[thread.id].concat(app.comments.getReactionByPost(c));
+      // });
     });
     allThreads.sort((threadA, threadB) => {
       const totalActivityA =
