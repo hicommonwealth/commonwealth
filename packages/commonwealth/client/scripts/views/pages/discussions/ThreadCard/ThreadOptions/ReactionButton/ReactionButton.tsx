@@ -50,13 +50,9 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
           selected={hasReacted}
           onMouseEnter={handleSmallVoteMouseEnter}
           onClick={handleSmallVoteClick}
-          tooltipContent={
-            <div className="reaction-button-tooltip-contents">
-              {getDisplayedReactorsForPopup({
-                reactors: reactors,
-              })}
-            </div>
-          }
+          tooltipContent={getDisplayedReactorsForPopup({
+            reactors: reactors,
+          })}
         />
       ) : (
         <button
@@ -81,13 +77,9 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
         >
           {reactors.length > 0 ? (
             <CWTooltip
-              content={
-                <div className="reaction-button-tooltip-contents">
-                  {getDisplayedReactorsForPopup({
-                    reactors,
-                  })}
-                </div>
-              }
+              content={getDisplayedReactorsForPopup({
+                reactors,
+              })}
               renderTrigger={(handleInteraction) => (
                 <div
                   onMouseEnter={handleInteraction}

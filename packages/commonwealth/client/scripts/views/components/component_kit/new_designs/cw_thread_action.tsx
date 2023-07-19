@@ -1,10 +1,11 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import {
   ArrowBendUpRight,
   BellSimple,
   BellSimpleSlash,
   DotsThree,
   ChatCenteredDots,
+  ArrowFatUp,
 } from '@phosphor-icons/react';
 
 import { CWText } from '../cw_text';
@@ -13,37 +14,47 @@ import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
 
-export type ActionType = 'comment' | 'share' | 'subscribe' | 'overflow';
+export type ActionType =
+  | 'upvote'
+  | 'comment'
+  | 'share'
+  | 'subscribe'
+  | 'overflow';
 
-const commonProps = (disabled: boolean, isHovering: boolean) => {
+const commonProps = (disabled: boolean) => {
   return {
     className: getClasses({
       disabled,
-      hover: isHovering,
     }),
-    size: '20px',
+    size: '18px',
   };
 };
 
 const renderPhosphorIcon = (
   action: ActionType,
   disabled: boolean,
-  isHovering: boolean,
   selected: boolean
 ) => {
   switch (action) {
+    case 'upvote':
+      return (
+        <ArrowFatUp
+          {...commonProps(disabled)}
+          {...(selected ? { weight: 'fill' } : {})}
+        />
+      );
     case 'comment':
-      return <ChatCenteredDots {...commonProps(disabled, isHovering)} />;
+      return <ChatCenteredDots {...commonProps(disabled)} />;
     case 'share':
-      return <ArrowBendUpRight {...commonProps(disabled, isHovering)} />;
+      return <ArrowBendUpRight {...commonProps(disabled)} />;
     case 'subscribe':
       return selected ? (
-        <BellSimple {...commonProps(disabled, isHovering)} />
+        <BellSimple {...commonProps(disabled)} />
       ) : (
-        <BellSimpleSlash {...commonProps(disabled, isHovering)} />
+        <BellSimpleSlash {...commonProps(disabled)} />
       );
     case 'overflow':
-      return <DotsThree {...commonProps(disabled, isHovering)} />;
+      return <DotsThree {...commonProps(disabled)} />;
     default:
       return null;
   }
@@ -64,36 +75,23 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   label,
   selected,
 }) => {
-  const [isHovering, setIsHovering] = useState<boolean>(false);
-
-  const handleOnMouseOver = () => {
-    if (!disabled) {
-      setIsHovering(true);
-    }
-  };
-
-  const handleOnMouseLeave = () => setIsHovering(false);
-
   return (
     <div
       className={getClasses(
         {
           disabled,
-          hover: isHovering,
+          upvoteSelected: action === 'upvote' && selected,
         },
         ComponentType.ThreadAction
       )}
-      onMouseOver={handleOnMouseOver}
-      onMouseLeave={handleOnMouseLeave}
       onClick={onClick}
     >
-      {renderPhosphorIcon(action, disabled, isHovering, selected)}
+      {renderPhosphorIcon(action, disabled, selected)}
       {action !== 'overflow' && action && (
         <CWText
           className={getClasses({
-            hover: isHovering,
-            default: !isHovering,
             disabled,
+            upvoteSelected: action === 'upvote' && selected,
           })}
           type="caption"
           fontWeight="regular"

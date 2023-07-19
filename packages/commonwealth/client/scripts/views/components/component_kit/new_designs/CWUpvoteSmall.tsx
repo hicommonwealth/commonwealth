@@ -3,14 +3,14 @@ import React from 'react';
 import 'components/component_kit/new_designs/CWUpvoteSmall.scss';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 interface CWUpvoteSmallProps {
   voteCount: number;
   disabled: boolean;
   selected: boolean;
   onMouseEnter: () => void;
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   tooltipContent: JSX.Element;
 }
 
@@ -23,11 +23,8 @@ const CWUpvoteSmall = ({
   tooltipContent,
 }: CWUpvoteSmallProps) => {
   return (
-    <button
-      className={getClasses<{ disabled?: boolean }>(
-        { disabled },
-        `CWUpvoteSmall ${selected ? ' has-reacted' : ''}`
-      )}
+    <div
+      className={getClasses<{ disabled?: boolean }>({ disabled })}
       onMouseEnter={onMouseEnter}
       onClick={onClick}
     >
@@ -38,30 +35,25 @@ const CWUpvoteSmall = ({
             <div
               onMouseEnter={handleInteraction}
               onMouseLeave={handleInteraction}
-              className="btn-container"
             >
-              <CWIcon
-                iconName="upvote"
-                iconSize="small"
-                {...(selected && { weight: 'fill' })}
+              <CWThreadAction
+                action="upvote"
+                selected={selected}
+                label={String(voteCount)}
               />
-              <div
-                className={`reactions-count ${selected ? ' has-reacted' : ''}`}
-              >
-                {voteCount}
-              </div>
             </div>
           )}
         />
       ) : (
         <>
-          <CWIcon iconName="upvote" iconSize="small" />
-          <div className={`reactions-count ${selected ? ' has-reacted' : ''}`}>
-            {voteCount}
-          </div>
+          <CWThreadAction
+            action="upvote"
+            selected={selected}
+            label={String(voteCount)}
+          />
         </>
       )}
-    </button>
+    </div>
   );
 };
 

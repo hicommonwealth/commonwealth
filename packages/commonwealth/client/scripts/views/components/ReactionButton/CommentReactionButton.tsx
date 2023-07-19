@@ -126,13 +126,9 @@ export const CommentReactionButton = ({
         selected={hasReacted}
         onMouseEnter={handleVoteMouseEnter}
         onClick={handleVoteClick}
-        tooltipContent={
-          <div>
-            {getDisplayedReactorsForPopup({
-              reactors: reactors.map((r) => r.Address.address),
-            })}
-          </div>
-        }
+        tooltipContent={getDisplayedReactorsForPopup({
+          reactors: reactors.map((r) => r.Address.address),
+        })}
       />
     </>
   );
