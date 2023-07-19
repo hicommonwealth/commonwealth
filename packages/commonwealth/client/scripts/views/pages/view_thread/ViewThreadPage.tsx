@@ -10,12 +10,14 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
 import type { IThreadCollaborator } from 'models/Thread';
+import ReactionCount from 'models/ReactionCount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import fetchThreadReactionCounts from 'state/api/reactionCounts/fetchReactionCounts';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
@@ -222,35 +224,28 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
 
   useNecessaryEffect(() => {
-    // fetch reactions
-    // const { result: reactionCounts } = await $.ajax({
-    //   type: 'POST',
-    //   url: `${app.serverUrl()}/reactionsCounts`,
-    //   headers: {
-    //     'content-type': 'application/json',
-    //   },
-    //   data: JSON.stringify({
-    //     proposal_ids: [threadId],
-    //     comment_ids: app.comments
-    //       .getByThread(thread)
-    //       .map((comment) => comment.id),
-    //     active_address: app.user.activeAccount?.address,
-    //   }),
-    // });
+    if (comments.length > 0 && thread && thread.id) {
+      fetchThreadReactionCounts({
+        proposalIds: [`${thread.id}`],
+        commentIds: comments.map(c => `${c.id}`),
+        address: app.user.activeAccount?.address,
+      }).then(reactionCounts => {
+        for (const rc of reactionCounts) {
+          const id = app.comments.reactionCountsStore.getIdentifier({
+            threadId: rc.thread_id,
+            proposalId: rc.proposal_id,
+            commentId: rc.comment_id,
+          });
 
-    // for (const rc of reactionCounts) {
-    //   const id = app.comments.reactionCountsStore.getIdentifier({
-    //     threadId: rc.thread_id,
-    //     proposalId: rc.proposal_id,
-    //     commentId: rc.comment_id,
-    //   });
+          app.comments.reactionCountsStore.add(
+            new ReactionCount({ ...rc, id } as any)
+          );
 
-    //   app.comments.reactionCountsStore.add(
-    //     new ReactionCount({ ...rc, id } as any)
-    //   );
-
-    //   app.comments.isReactionFetched.emit('redraw', rc.comment_id);
-  }, [prefetch, thread, threadId]);
+          app.comments.isReactionFetched.emit('redraw', rc.comment_id);
+        }
+      })
+    }
+  }, [thread, threadId, comments]);
 
   useEffect(() => {
     if (!initializedComments) {

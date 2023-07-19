@@ -3,7 +3,7 @@ import axios from 'axios';
 import ReactionCount from 'models/ReactionCount';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import useFetchCommentReactionsQuery from './fetchReaction';
+import useFetchCommentReactionsQuery from './fetchReactions';
 
 interface DeleteReactionProps {
   reactionCount: ReactionCount<any>

@@ -5,15 +5,25 @@ import app from 'state';
 
 // const THREAD_REACTION_COUNTS_STALE_TIME = 30 * 1_000; // 30 s
 
-interface FetchThreadReactionCountsProps {
+interface FetchReactionCountsProps {
   // chainId: string; // this should be used when we fully migrate thread controller to react query
-  threadIds: number[];
+  address: string;
+  threadIds?: number[];
+  proposalIds?: string[];
+  commentIds?: string[];
 }
 
-const fetchThreadReactionCounts = async ({ threadIds }: FetchThreadReactionCountsProps) => {
+const fetchReactionCounts = async ({
+  address,
+  threadIds,
+  proposalIds,
+  commentIds
+}: FetchReactionCountsProps) => {
   const response = await axios.post(`${app.serverUrl()}/reactionsCounts`, {
-    thread_ids: threadIds,
-    active_address: app.user.activeAccount?.address,
+    ...(threadIds && threadIds.length > 0 && { thread_ids: threadIds }),
+    ...(proposalIds && proposalIds.length > 0 && { proposal_ids: proposalIds }),
+    ...(commentIds && commentIds.length > 0 && { comment_ids: commentIds }),
+    active_address: address,
   });
 
   return [...response.data.result];
@@ -22,13 +32,13 @@ const fetchThreadReactionCounts = async ({ threadIds }: FetchThreadReactionCount
 // TODO: when we migrate the threads controller to react query, then we should also implement cache logic below
 // for this query. The reason why it was not implemented is because "reactive" code from react query wont work in
 // the non-reactive scope of threads controller.
-// const useFetchThreadReactionCountsQuery = ({ chainId, commentId }: FetchThreadReactionCountsProps) => {
+// const useFetchReactionCountsQuery = ({ chainId, commentId }: FetchReactionCountsProps) => {
 //   return useQuery({
 //     queryKey: [ApiEndpoints.getCommentReactions(commentId), chainId],
-//     queryFn: () => fetchThreadReactionCounts({ commentId, chainId }),
+//     queryFn: () => fetchReactionCounts({ commentId, chainId }),
 //     staleTime: THREAD_REACTION_COUNTS_STALE_TIME,
 //   });
 // };
 
-// export default useFetchThreadReactionCountsQuery;
-export default fetchThreadReactionCounts;
+// export default useFetchReactionCountsQuery;
+export default fetchReactionCounts;

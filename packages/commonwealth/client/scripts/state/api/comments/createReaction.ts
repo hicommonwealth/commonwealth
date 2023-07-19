@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import useFetchCommentReactionsQuery from './fetchReaction';
+import useFetchCommentReactionsQuery from './fetchReactions';
 import ReactionCount from 'models/ReactionCount';
 
 interface CreateReactionProps {

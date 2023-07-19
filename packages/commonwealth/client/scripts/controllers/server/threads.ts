@@ -26,7 +26,7 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../models/types';
-import fetchThreadReactionCounts from "../../state/api/threads/fetchReactionCounts";
+import fetchThreadReactionCounts from "../../state/api/reactionCounts/fetchReactionCounts";
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -768,6 +768,7 @@ class ThreadsController {
     // The reason why it was not migrated is because "reactive" code from react query wont work in this
     // non reactive scope
     const reactionCounts = await fetchThreadReactionCounts({
+      address: app.user.activeAccount.address,
       threadIds: threads.map((thread) => thread.id) as number[]
     })
 
