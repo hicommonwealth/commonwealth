@@ -10,12 +10,12 @@
   color: $neutral-500;
   border: 0;
 
-  &:focus {
-    outline: 0;
-  }
-
   .Text {
     color: $neutral-500;
+  }
+
+  &:focus {
+    outline: 0;
   }
 
   &.upvoteSelected {
@@ -38,11 +38,19 @@
     background-color: $neutral-100;
     color: $neutral-600;
     cursor: pointer;
+
+    .Text {
+      color: $neutral-600;
+    }
   }
 
   &.disabled {
     color: $neutral-400;
     background-color: inherit;
     cursor: not-allowed;
+
+    .Text {
+      color: $neutral-400;
+    }
   }
 }

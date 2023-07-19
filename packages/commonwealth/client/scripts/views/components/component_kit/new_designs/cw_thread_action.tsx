@@ -69,7 +69,7 @@ type CWThreadActionProps = {
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
-  disabled = false,
+  disabled,
   action,
   onClick,
   label,
@@ -77,6 +77,8 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
 }) => {
   return (
     <button
+      disabled={disabled}
+      onClick={onClick}
       className={getClasses(
         {
           disabled,
@@ -84,7 +86,6 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
         },
         ComponentType.ThreadAction
       )}
-      onClick={onClick}
     >
       {renderPhosphorIcon(action, disabled, selected)}
       {action !== 'overflow' && action && (

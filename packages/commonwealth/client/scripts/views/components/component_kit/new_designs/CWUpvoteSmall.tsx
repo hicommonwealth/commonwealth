@@ -22,13 +22,20 @@ const CWUpvoteSmall = ({
   disabled,
   tooltipContent,
 }: CWUpvoteSmallProps) => {
+  const handleClick = (e) => {
+    if (disabled) {
+      return;
+    }
+
+    onClick?.(e);
+  };
   return (
     <div
       className={getClasses<{ disabled?: boolean }>({ disabled })}
       onMouseEnter={onMouseEnter}
-      onClick={onClick}
+      onClick={handleClick}
     >
-      {voteCount > 0 ? (
+      {voteCount > 0 && !disabled ? (
         <CWTooltip
           content={tooltipContent}
           renderTrigger={(handleInteraction) => (
@@ -40,6 +47,7 @@ const CWUpvoteSmall = ({
                 action="upvote"
                 selected={selected}
                 label={String(voteCount)}
+                disabled={disabled}
               />
             </div>
           )}
@@ -50,6 +58,7 @@ const CWUpvoteSmall = ({
             action="upvote"
             selected={selected}
             label={String(voteCount)}
+            disabled={disabled}
           />
         </>
       )}
