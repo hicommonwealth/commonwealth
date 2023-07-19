@@ -2,136 +2,15 @@ import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
 import _ from 'lodash';
-import ReactionCount from 'models/ReactionCount';
 import moment from 'moment';
 import app from 'state';
 import { CommentsStore, ReactionCountsStore, ReactionStore } from 'stores';
 import AbridgedThread from '../../models/AbridgedThread';
-import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
-import Reaction from '../../models/Reaction';
 import Thread from '../../models/Thread';
 import type { IUniqueId } from '../../models/interfaces';
 import type { AnyProposal } from '../../models/types';
 import { updateLastVisited } from '../app/login';
-
-export const modelReactionCountFromServer = (reactionCount) => {
-  const { id, thread_id, comment_id, proposal_id, has_reacted, like } =
-    reactionCount;
-  return new ReactionCount(
-    id,
-    thread_id,
-    comment_id,
-    proposal_id,
-    has_reacted,
-    parseInt(like)
-  );
-};
-
-export const modelReactionFromServer = (reaction) => {
-  return new Reaction({
-    id: reaction.id,
-    author: reaction.Address.address,
-    author_chain: reaction.Address.chain,
-    chain: reaction.chain,
-    reaction: reaction.reaction,
-    threadId: reaction.thread_id,
-    proposalId: reaction.proposal_id,
-    commentId: reaction.comment_id,
-    canvasAction: reaction.canvas_action,
-    canvasSession: reaction.canvas_session,
-    canvasHash: reaction.canvas_hash,
-  });
-};
-
-export const modelFromServer = (comment) => {
-  const attachments = comment.Attachments
-    ? comment.Attachments.map((a) => new Attachment(a.url, a.description))
-    : [];
-
-  const { reactions } = comment;
-  if (reactions) {
-    for (const reaction of reactions) {
-      app.comments.reactionsStore.add(modelReactionFromServer(reaction));
-    }
-  }
-
-  let versionHistory;
-  if (comment.version_history) {
-    versionHistory = comment.version_history.map((v) => {
-      if (!v) return;
-      let history;
-      try {
-        history = JSON.parse(v || '{}');
-        history.author =
-          typeof history.author === 'string'
-            ? JSON.parse(history.author)
-            : typeof history.author === 'object'
-              ? history.author
-              : null;
-        history.timestamp = moment(history.timestamp);
-      } catch (e) {
-        console.log(e);
-      }
-      return history;
-    });
-  }
-
-  const lastEdited = comment.last_edited
-    ? moment(comment.last_edited)
-    : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
-      : null;
-
-  const markedAsSpamAt = comment.marked_as_spam_at
-    ? moment(comment.marked_as_spam_at)
-    : null;
-
-  const commentParams =
-    comment.deleted_at?.length > 0
-      ? {
-        chain: comment.chain,
-        author: comment?.Address?.address || comment.author,
-        text: '[deleted]',
-        plaintext: '[deleted]',
-        versionHistory: [],
-        attachments: [],
-        threadId: comment.thread_id,
-        id: comment.id,
-        createdAt: moment(comment.created_at),
-        rootThread: comment.thread_id,
-        parentComment: Number(comment.parent_id) || null,
-        authorChain: comment?.Address?.chain || comment.authorChain,
-        lastEdited,
-        markedAsSpamAt,
-        deleted: true,
-        canvasAction: comment.canvas_action,
-        canvasSession: comment.canvas_session,
-        canvasHash: comment.canvas_hash,
-      }
-      : {
-        chain: comment.chain,
-        author: comment?.Address?.address || comment.author,
-        text: decodeURIComponent(comment.text),
-        plaintext: comment.plaintext,
-        versionHistory,
-        attachments,
-        threadId: comment.thread_id,
-        id: comment.id,
-        createdAt: moment(comment.created_at),
-        rootThread: comment.thread_id,
-        parentComment: Number(comment.parent_id) || null,
-        authorChain: comment?.Address?.chain || comment.authorChain,
-        lastEdited,
-        markedAsSpamAt,
-        deleted: false,
-        canvasAction: comment.canvas_action,
-        canvasSession: comment.canvas_session,
-        canvasHash: comment.canvas_hash,
-      };
-
-  return new Comment(commentParams);
-};
 
 class CommentsController {
   public isReactionFetched = new EventEmitter();
@@ -210,7 +89,7 @@ class CommentsController {
         `${app.serverUrl()}/threads/${threadId}/comments`,
         {
           author_chain: app.user.activeAccount.chain.id,
-          chain,
+          chain: chain,
           address: app.user.activeAccount.address,
           parent_id: parentCommentId,
           chain_entity_id: chainEntity?.id,
@@ -223,7 +102,7 @@ class CommentsController {
         }
       );
       const { result } = res.data;
-      const newComment = modelFromServer(result);
+      const newComment = new Comment(result);
       this._store.add(newComment);
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
@@ -277,7 +156,7 @@ class CommentsController {
           canvas_hash: hash,
         }
       );
-      const result = modelFromServer(res.data.result);
+      const result = new Comment(res.data.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -356,7 +235,7 @@ class CommentsController {
       )
         .then((response) => {
           const comment = this._store.getById(commentId);
-          const result = modelFromServer({ ...comment, ...response.data.result });
+          const result = new Comment({ ...comment, ...response.data.result });
           if (comment) this._store.remove(comment);
           this._store.add(result);
           resolve(result);
@@ -371,6 +250,7 @@ class CommentsController {
     });
   }
 
+  // TODO: map the response in fetchComments
   public async refresh(thread: Thread, chainId: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
@@ -388,7 +268,7 @@ class CommentsController {
         response.data.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
-          const model = modelFromServer(comment);
+          const model = new Comment(comment);
           this._store.add(model);
         });
         resolve();
@@ -418,7 +298,7 @@ class CommentsController {
         this._store.remove(existing);
       }
       try {
-        this._store.add(modelFromServer(comment));
+        this._store.add(new Comment(comment));
       } catch (e) {
         // Comment is on an object that was deleted or unavailable
       }

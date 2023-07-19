@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { modelReactionCountFromServer } from 'controllers/server/comments';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentReactionsQuery from './fetchReaction';
+import ReactionCount from 'models/ReactionCount';
 
 interface CreateReactionProps {
   address: string;
@@ -78,7 +78,7 @@ const useCreateCommentReactionMutation = ({ commentId, chainId }: Partial<Create
           proposalId: proposal_id,
           commentId: comment_id,
         });
-        app.comments.reactionCountsStore.add(modelReactionCountFromServer({
+        app.comments.reactionCountsStore.add(new ReactionCount({
           id,
           thread_id,
           proposal_id,

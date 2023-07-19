@@ -3,7 +3,6 @@ import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
-import { modelReactionCountFromServer, modelReactionFromServer } from 'controllers/server/comments';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 import moment from 'moment';
@@ -18,6 +17,8 @@ import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
 import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
+import Reaction from '../../models/Reaction';
+import ReactionCount from '../../models/ReactionCount';
 import Thread, { AssociatedReaction } from '../../models/Thread';
 import Topic from '../../models/Topic';
 import {
@@ -165,7 +166,7 @@ class ThreadsController {
 
     if (reactions) {
       for (const reaction of reactions) {
-        app.comments.reactionsStore.add(modelReactionFromServer(reaction));
+        app.comments.reactionsStore.add(new Reaction(reaction));
       }
       reactionIds = reactions.map((r) => r.id);
       reactionType = reactions.map((r) => r.type);
@@ -782,7 +783,7 @@ class ThreadsController {
       }
       try {
         app.comments.reactionCountsStore.add(
-          modelReactionCountFromServer({ ...rc, id })
+          new ReactionCount({ ...rc, id })
         );
       } catch (e) {
         console.error(e.message);
