@@ -173,7 +173,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public isGatedTopic(topicId: number): boolean {
     const tokenPostingThreshold = this.getTopicThreshold(topicId);
-    if (!this.app.user.activeAccount?.tokenBalance) return true;
+    if (
+      !tokenPostingThreshold.isZero() &&
+      !this.app.user.activeAccount?.tokenBalance
+    )
+      return true;
     return (
       !tokenPostingThreshold.isZero() &&
       tokenPostingThreshold.gt(this.app.user.activeAccount.tokenBalance)

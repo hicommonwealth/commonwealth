@@ -57,6 +57,9 @@ export const CreateComment = ({
 
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [tokenPostingThreshold, setTokenPostingThreshold] = useState(
+    new BN('0')
+  );
   const [userBalance, setUserBalance] = useState(new BN('0'));
   const [balanceLoading, setBalanceLoading] = useState(false);
   const editorValue = getTextFromDelta(contentDelta);
@@ -64,6 +67,24 @@ export const CreateComment = ({
   const author = app.user.activeAccount;
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
+  const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
+
+  useEffect(() => {
+    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
+  }, [activeTopic]);
+
+  useEffect(() => {
+    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
+      setBalanceLoading(true);
+      if (!app.user.activeAccount?.tokenBalance) {
+        getTokenBalance().then(() => {
+          setUserBalance(app.user.activeAccount?.tokenBalance);
+        });
+      } else {
+        setUserBalance(app.user.activeAccount?.tokenBalance);
+      }
+    }
+  }, [tokenPostingThreshold]);
 
   const handleSubmitComment = async () => {
     setErrorMsg(null);
@@ -106,21 +127,6 @@ export const CreateComment = ({
     }
   };
 
-  const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
-
-  // token balance check if needed
-  const tokenPostingThreshold: BN = app.chain.getTopicThreshold(activeTopic.id);
-
-  if (tokenPostingThreshold && !balanceLoading) {
-    setBalanceLoading(true);
-    if (!app.user.activeAccount?.tokenBalance) {
-      getTokenBalance().then(() => {
-        setUserBalance(app.user.activeAccount?.tokenBalance);
-      });
-    } else {
-      setUserBalance(app.user.activeAccount?.tokenBalance);
-    }
-  }
   const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
