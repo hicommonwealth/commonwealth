@@ -34,19 +34,20 @@ const renderThreadResult = (thread: ThreadResult, searchTerm, setRoute) => {
     title = thread.title;
   }
 
-  const proposalId = thread.proposalid;
-  const chain = thread.chain;
-
   const handleClick = () => {
-    setRoute(`/discussion/${proposalId}`, {}, thread.chain);
+    setRoute(`/discussion/${thread.proposalid}`, {}, thread.chain);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) {
+  if (app.isCustomDomain() && app.customDomainId() !== thread.chain) {
     return;
   }
 
   return (
-    <div key={proposalId} className="search-result-row" onClick={handleClick}>
+    <div
+      key={thread.proposalid}
+      className="search-result-row"
+      onClick={handleClick}
+    >
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
@@ -214,29 +215,16 @@ const getMemberResult = (addr: MemberResult, setRoute) => {
   );
 };
 
-type ListingResult<S extends SearchScope, T> = T & {
-  searchScope: S;
-};
-type ListingResults = {
-  [key in SearchScope]?: (
-    | ListingResult<SearchScope.Threads, ThreadResult>
-    | ListingResult<SearchScope.Members, MemberResult>
-    | ListingResult<SearchScope.Communities, CommunityResult>
-    | ListingResult<SearchScope.Replies, ReplyResult>
-  )[];
-};
 export const renderSearchResults = (
-  results: ListingResults,
+  results: any[],
   searchTerm: string,
   searchType: SearchScope,
   setRoute: any
 ) => {
-  if (Object.keys(results).length === 0 || !results[searchType]) {
+  if (!results || results.length === 0) {
     return [];
   }
-
-  const items = results[searchType];
-  const components = items.map((res) => {
+  const components = results.map((res) => {
     switch (searchType) {
       case SearchScope.Threads:
         return renderThreadResult(res as ThreadResult, searchTerm, setRoute);
@@ -250,6 +238,5 @@ export const renderSearchResults = (
         return <>ERROR</>;
     }
   });
-
   return components;
 };
