@@ -1,6 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -512,7 +511,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const canComment =
     !!hasJoinedCommunity ||
-    (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
+    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
   const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({
