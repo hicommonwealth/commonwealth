@@ -96,6 +96,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
+  const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -194,10 +195,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
           setThread(t);
         }
+        setThreadFetchCompleted(true);
       })
       .catch(() => {
         notifyError('Thread not found');
         setThreadFetchFailed(true);
+        setThreadFetchCompleted(true);
       });
   }, [threadId]);
 
@@ -460,6 +463,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // load app controller
   if (!app.threads.initialized) {
     return <PageLoading />;
+  }
+
+  if (!thread && threadFetchCompleted) {
+    return <PageNotFound />;
   }
 
   if (threadFetchFailed) {
