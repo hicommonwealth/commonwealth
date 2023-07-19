@@ -4,6 +4,7 @@ import { Icon, IconProps } from '@phosphor-icons/react';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
+import { compressImage } from 'utils/ImageCompression';
 
 export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
@@ -92,8 +93,10 @@ export const uploadFileToS3 = async (
 
     const signedUploadUrl = sigResponse.data.result;
 
+    const compressedFile = await compressImage(file);
+
     // upload the file via the signed URL
-    await axios.put(signedUploadUrl, file, {
+    await axios.put(signedUploadUrl, compressedFile, {
       params: {
         'Content-Type': file.type,
       },
