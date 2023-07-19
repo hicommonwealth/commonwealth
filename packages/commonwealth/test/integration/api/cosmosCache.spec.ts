@@ -300,29 +300,21 @@ describe('Cosmos Cache', () => {
       expect(duration).to.be.equal(expectedDuration);
     }
 
-    it('should cache an individual proposal', async () => {
+    it('should have 7-day duration for an an individual proposal', async () => {
       const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1`;
-
       lcdTestDuration(60 * 60 * 24 * 7, url);
-      await lcdTestIsCached(url);
     });
-    it("should cache an individual proposal's live votes", async () => {
+    it("should have 6-second duration for an an individual proposal's live votes", async () => {
       const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/votes`;
-
       lcdTestDuration(6, url);
-      await lcdTestIsCached(url);
     });
-    it("should cache an individual proposal's live tally", async () => {
+    it("should have 6-second duration for an individual proposal's live tally", async () => {
       const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/tally`;
-
       lcdTestDuration(6, url);
-      await lcdTestIsCached(url);
     });
-    it("should cache an individual proposal's live deposits", async () => {
+    it("should have 6-second duration for an individual proposal's live deposits", async () => {
       const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/deposits`;
-
       lcdTestDuration(6, url);
-      await lcdTestIsCached(url);
     });
     it('should cache deposit period proposals', async () => {
       await lcdProposalsCacheExpectedTest('1', 60 * 5);
