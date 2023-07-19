@@ -3,6 +3,18 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
 
+const getServerUrl = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://commonwealth.im';
+  } else if (process.env.NODE_ENV === 'alpha') {
+    return 'https://alpha.common.xyz/api';
+  } else if (process.env.NODE_ENV === 'mobile') {
+    return process.env.SERVICE_URL;
+  } else {
+    return 'http://localhost:8080/api';
+  }
+};
+
 module.exports = merge(common, {
   mode: 'production',
   stats: 'errors-only',
@@ -16,7 +28,7 @@ module.exports = merge(common, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.SERVER_URL': JSON.stringify(process.env.SERVER_URL),
+      'process.env.SERVER_URL': JSON.stringify(getServerUrl()),
     }),
   ],
 });

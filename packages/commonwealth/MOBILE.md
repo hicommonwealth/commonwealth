@@ -84,5 +84,5 @@ To open the debugger, go to Safari, with Developer mode enabled in
 settings. You can open an inspector for the iOS Simulator from the
 Develop menu.
 
-To turn off minification, go to webpack.config.mobile.js, and
+To turn off minification, go to webpack.mobile.config.js, and
 inside module.exports, set `optimization: { minimize: false }`

@@ -18,12 +18,12 @@ const Splash = () => {
 };
 
 const App = () => {
-  const { customDomain, isLoading } = useInitApp();
+  const { customDomain, loading } = useInitApp();
 
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        {isLoading ? (
+        {loading ? (
           <Splash />
         ) : (
           <RouterProvider router={router(customDomain)} />

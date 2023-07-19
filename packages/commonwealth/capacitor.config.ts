@@ -28,17 +28,17 @@ switch (process.env.NODE_ENV) {
     config = {
       ...baseConfig,
       server: {
-        url: 'http://127.0.0.1:8080',
+        url: process.env.SERVICE_URL,
         cleartext: true,
         allowNavigation: ['*'],
       },
     };
     break;
-  case 'staging':
+  case 'alpha':
     config = {
       ...baseConfig,
       server: {
-        url: 'https://commonwealth-frick.herokuapp.com',
+        url: 'https://alpha.common.xyz',
         cleartext: true,
         allowNavigation: ['*'],
       },

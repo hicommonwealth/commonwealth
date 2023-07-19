@@ -200,7 +200,7 @@ const app: IApp = {
     document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
     //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
-    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
+    const mobileUrl = process.env.SERVER_URL; // Replace with your computer ip, staging, or production url
 
     if (app.isNative(window)) {
       return mobileUrl;
