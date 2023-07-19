@@ -3,7 +3,6 @@ import moment from 'moment';
 
 import 'pages/search/index.scss';
 
-import type { SearchSort } from 'models/SearchQuery';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import app from 'state';
@@ -17,7 +16,17 @@ import { User } from '../../components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 
-const getDiscussionResult = (thread, searchTerm, setRoute) => {
+type ThreadResult = {
+  chain: string;
+  proposalid: number;
+  title: string;
+  body: string;
+  address_id: number;
+  address: string;
+  address_chain: string;
+  created_at: string;
+};
+const renderThreadResult = (thread: ThreadResult, searchTerm, setRoute) => {
   let title = '';
   try {
     title = decodeURIComponent(thread.title);
@@ -74,7 +83,19 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   );
 };
 
-const getCommentResult = (comment, searchTerm, setRoute) => {
+type ReplyResult = {
+  id: number;
+  proposalid: number;
+  chain: string;
+  community: string;
+  title: string;
+  text: string;
+  address_id: number;
+  address: string;
+  address_chain: string;
+  created_at: string;
+};
+const renderReplyResult = (comment: ReplyResult, searchTerm, setRoute) => {
   const proposalId = comment.proposalid;
   const chain = comment.chain;
 
@@ -131,7 +152,11 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
  *  The route should be set to /<community-id>, so null should be passed instead of a prefix,
  *  as defined in the useCommonNavigate hook and the getScopePrefix helper function.
  */
-const getCommunityResult = (community, setRoute) => {
+type CommunityResult = {
+  SearchContentType: SearchContentType;
+  id: any;
+};
+const renderCommunityResult = (community: CommunityResult, setRoute) => {
   const params =
     community.SearchContentType === SearchContentType.Token
       ? { community }
@@ -158,7 +183,11 @@ const getCommunityResult = (community, setRoute) => {
   );
 };
 
-const getMemberResult = (addr, setRoute) => {
+type MemberResult = {
+  chain: string;
+  address: string;
+};
+const getMemberResult = (addr: MemberResult, setRoute) => {
   const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
     addr.chain,
     addr.address
@@ -185,28 +214,42 @@ const getMemberResult = (addr, setRoute) => {
   );
 };
 
-export const getListing = (
-  results: any,
+type ListingResult<S extends SearchScope, T> = T & {
+  searchScope: S;
+};
+type ListingResults = {
+  [key in SearchScope]?: (
+    | ListingResult<SearchScope.Threads, ThreadResult>
+    | ListingResult<SearchScope.Members, MemberResult>
+    | ListingResult<SearchScope.Communities, CommunityResult>
+    | ListingResult<SearchScope.Replies, ReplyResult>
+  )[];
+};
+export const renderSearchResults = (
+  results: ListingResults,
   searchTerm: string,
-  sort: SearchSort,
   searchType: SearchScope,
   setRoute: any
 ) => {
-  if (Object.keys(results).length === 0 || !results[searchType]) return [];
+  if (Object.keys(results).length === 0 || !results[searchType]) {
+    return [];
+  }
 
-  const tabScopedResults = results[searchType].map((res) => {
-    return res.searchType === SearchScope.Threads ? (
-      getDiscussionResult(res, searchTerm, setRoute)
-    ) : res.searchType === SearchScope.Members ? (
-      getMemberResult(res, setRoute)
-    ) : res.searchType === SearchScope.Communities ? (
-      getCommunityResult(res, setRoute)
-    ) : res.searchType === SearchScope.Replies ? (
-      getCommentResult(res, searchTerm, setRoute)
-    ) : (
-      <>ERROR</>
-    );
+  const items = results[searchType];
+  const components = items.map((res) => {
+    switch (searchType) {
+      case SearchScope.Threads:
+        return renderThreadResult(res as ThreadResult, searchTerm, setRoute);
+      case SearchScope.Members:
+        return getMemberResult(res as MemberResult, setRoute);
+      case SearchScope.Communities:
+        return renderCommunityResult(res as CommunityResult, setRoute);
+      case SearchScope.Replies:
+        return renderReplyResult(res as ReplyResult, searchTerm, setRoute);
+      default:
+        return <>ERROR</>;
+    }
   });
 
-  return tabScopedResults;
+  return components;
 };

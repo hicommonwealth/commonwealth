@@ -7,6 +7,15 @@ export enum SearchScope {
   'All' = 'All',
 }
 
+export const VALID_SEARCH_SCOPES: SearchScope[] = [
+  SearchScope.Members,
+  SearchScope.Communities,
+  SearchScope.Proposals,
+  SearchScope.Threads,
+  SearchScope.Replies,
+  SearchScope.All,
+];
+
 export enum SearchSort {
   'Best' = 'Best',
   'Newest' = 'Newest',

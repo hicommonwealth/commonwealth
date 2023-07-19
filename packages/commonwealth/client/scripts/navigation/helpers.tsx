@@ -70,7 +70,7 @@ export const useCommonNavigate = () => {
 
 // This helper should be used as a wrapper to Class Components
 // to access react-router functionalities
-const withRouter = (Component) => {
+const withRouter = (Component: any) => {
   return (props) => {
     const location = useLocation();
     const navigate = useNavigate();
