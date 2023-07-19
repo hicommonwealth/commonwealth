@@ -13,6 +13,7 @@ import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
+import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 
 export type ActionType =
   | 'upvote'
@@ -68,6 +69,49 @@ type CWThreadActionProps = {
   selected?: boolean;
 };
 
+interface TooltipWrapperProps {
+  disabled: boolean;
+  text: string;
+}
+
+const TooltipWrapper: FC = ({
+  children,
+  disabled,
+  text,
+}: TooltipWrapperProps) => {
+  if (!disabled) {
+    return <>{children}</>;
+  }
+
+  return (
+    <CWTooltip
+      content={text}
+      placement="top"
+      renderTrigger={(handleInteraction) => (
+        <div onMouseEnter={handleInteraction} onMouseLeave={handleInteraction}>
+          {children}
+        </div>
+      )}
+    />
+  );
+};
+
+const getTooltipCopy = (action: ActionType) => {
+  switch (action) {
+    case 'upvote':
+      return 'Join community to upvote';
+    // todo distinguish reply vs comment
+    case 'comment':
+      return 'Join community to comment';
+    case 'overflow':
+      return 'Join community to view more actions';
+    case 'subscribe':
+      return 'Join community to subscribe';
+    default:
+      return '';
+  }
+};
+
 export const CWThreadAction: FC<CWThreadActionProps> = ({
   disabled,
   action,
@@ -75,31 +119,44 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   label,
   selected,
 }) => {
+  const handleClick = (e) => {
+    if (disabled) {
+      return;
+    }
+
+    onClick?.(e);
+  };
+
   return (
-    <button
+    <TooltipWrapper
       disabled={disabled}
-      onClick={onClick}
-      className={getClasses(
-        {
-          disabled,
-          upvoteSelected: action === 'upvote' && selected,
-        },
-        ComponentType.ThreadAction
-      )}
+      action={action}
+      text={getTooltipCopy(action)}
     >
-      {renderPhosphorIcon(action, disabled, selected)}
-      {action !== 'overflow' && action && (
-        <CWText
-          className={getClasses({
+      <button
+        onClick={handleClick}
+        className={getClasses(
+          {
             disabled,
             upvoteSelected: action === 'upvote' && selected,
-          })}
-          type="caption"
-          fontWeight="regular"
-        >
-          {label || action.charAt(0).toUpperCase() + action.slice(1)}
-        </CWText>
-      )}
-    </button>
+          },
+          ComponentType.ThreadAction
+        )}
+      >
+        {renderPhosphorIcon(action, disabled, selected)}
+        {action !== 'overflow' && action && (
+          <CWText
+            className={getClasses({
+              disabled,
+              upvoteSelected: action === 'upvote' && selected,
+            })}
+            type="caption"
+            fontWeight="regular"
+          >
+            {label || action.charAt(0).toUpperCase() + action.slice(1)}
+          </CWText>
+        )}
+      </button>
+    </TooltipWrapper>
   );
 };
