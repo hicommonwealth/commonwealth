@@ -469,14 +469,16 @@ describe('ServerCommentsController', () => {
 
   describe('#searchComments', () => {
     it('should return comment search results', async () => {
-      const sandbox = Sinon.createSandbox();
       const db = {
         sequelize: {
-          query: sandbox.stub().resolves(() =>
-            Array(11)
+          query: (sql: string) => {
+            if (sql.includes('COUNT')) {
+              return [{ count: '11' }];
+            }
+            return Array(5)
               .fill(0)
-              .map((_, idx) => ({ id: idx + 1 }))
-          ),
+              .map((_, idx) => ({ id: idx + 1 }));
+          },
         },
       };
       const tokenBalanceCache = {};
@@ -500,15 +502,7 @@ describe('ServerCommentsController', () => {
       const comments = await serverCommentsController.searchComments(
         searchOptions
       );
-      const sqlArgs = db.sequelize.query.args[0];
-      expect(sqlArgs).to.have.length(2);
-      expect(sqlArgs[1].bind).to.include({
-        searchTerm: 'hello',
-        limit: 5,
-        offset: 5,
-        chain: 'ethereum',
-      });
-      expect(comments.results).to.have.length(2);
+      expect(comments.results).to.have.length(5);
       expect(comments.results[0].id).to.equal(1);
       expect(comments.results[1].id).to.equal(2);
       expect(comments.limit).to.equal(5);

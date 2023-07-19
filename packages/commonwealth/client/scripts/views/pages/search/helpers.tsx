@@ -17,8 +17,8 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 
 type ThreadResult = {
+  id: number;
   chain: string;
-  proposalid: number;
   title: string;
   body: string;
   address_id: number;
@@ -35,7 +35,7 @@ const renderThreadResult = (thread: ThreadResult, searchTerm, setRoute) => {
   }
 
   const handleClick = () => {
-    setRoute(`/discussion/${thread.proposalid}`, {}, thread.chain);
+    setRoute(`/discussion/${thread.id}`, {}, thread.chain);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== thread.chain) {
@@ -43,11 +43,7 @@ const renderThreadResult = (thread: ThreadResult, searchTerm, setRoute) => {
   }
 
   return (
-    <div
-      key={thread.proposalid}
-      className="search-result-row"
-      onClick={handleClick}
-    >
+    <div key={thread.id} className="search-result-row" onClick={handleClick}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">

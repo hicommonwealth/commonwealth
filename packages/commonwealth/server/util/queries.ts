@@ -60,7 +60,9 @@ export type PaginationSqlOptions = {
   limit?: number;
   page?: number;
   orderBy?: string;
+  orderBySecondary?: string;
   orderDirection?: 'ASC' | 'DESC';
+  orderDirectionSecondary?: 'ASC' | 'DESC';
   nullsLast?: boolean;
 };
 export type PaginationSqlResult = {
@@ -86,7 +88,15 @@ export const validateOrderDirection = (
 export const buildPaginationSql = (
   options: PaginationSqlOptions
 ): PaginationSqlResult => {
-  const { limit, page, orderBy, orderDirection, nullsLast } = options;
+  const {
+    limit,
+    page,
+    orderBy,
+    orderBySecondary,
+    orderDirection,
+    orderDirectionSecondary,
+    nullsLast,
+  } = options;
   let sql = '';
   const bind: PaginationSqlBind = {};
   if (typeof limit === 'number') {
@@ -96,6 +106,14 @@ export const buildPaginationSql = (
       if (nullsLast) {
         sql += 'NULLS LAST ';
       }
+    } else {
+      sql += 'DESC ';
+    }
+  }
+  if (orderBy && orderBySecondary) {
+    sql += `, ${orderBySecondary} `;
+    if (validateOrderDirection(orderDirectionSecondary)) {
+      sql += `${orderDirectionSecondary} `;
     } else {
       sql += 'DESC ';
     }
@@ -116,6 +134,7 @@ export function buildPaginatedResponse<T>(
   totalResults: number,
   bind: PaginationSqlBind
 ): TypedPaginatedResult<T> {
+  console.log({ totalResults, bind });
   return {
     results: items,
     limit: bind.limit,

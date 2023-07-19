@@ -76,13 +76,15 @@ export async function __searchThreads(
     case 'created_at':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Comments".${orderBy}`,
+        orderBy: `"Threads".${orderBy}`,
       };
       break;
     default:
       sortOptions = {
         ...sortOptions,
         orderBy: `rank`,
+        orderBySecondary: `"Threads".created_at`,
+        orderDirectionSecondary: 'DESC',
       };
   }
 
@@ -107,7 +109,6 @@ export async function __searchThreads(
       "Threads".id,
       "Threads".title,
       "Threads".body,
-      CAST("Threads".id as VARCHAR) as proposalId,
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,

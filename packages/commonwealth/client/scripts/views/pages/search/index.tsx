@@ -1,37 +1,27 @@
 import { notifyError } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
-import { capitalize, debounce, uniqBy } from 'lodash';
-import SearchQuery, {
+import { capitalize } from 'lodash';
+import {
   SearchScope,
   SearchSort,
   VALID_SEARCH_SCOPES,
 } from 'models/SearchQuery';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/search/index.scss';
-import QueryString from 'qs';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import {
-  NavigateOptions,
-  useLocation,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+
+import React, { useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
-import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderSearchResults } from './helpers';
 import axios from 'axios';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
+
+const VISIBLE_TABS = VALID_SEARCH_SCOPES;
 
 type SearchQueryParams = {
   q?: string;
@@ -50,8 +40,6 @@ type SearchResultsPayload = {
 const SearchPage = () => {
   const navigate = useCommonNavigate();
   const [urlQueryParams, setUrlQueryParams] = useSearchParams();
-
-  // const debouncedSetPage = useCallback(debounce(setPage, 200), []);
 
   const [bottomRef, bottomInView] = useInView();
 
@@ -158,13 +146,22 @@ const SearchPage = () => {
     }
   }, [queryParams]);
 
+  // when error, notify
+  useEffect(() => {
+    if (error) {
+      notifyError((error as Error).message);
+    }
+  }, [error]);
+
+  // when tab changes...
+  useEffect(() => {}, [activeTab]);
+
+  // when scroll to bottom, fetch next page
   useEffect(() => {
     if (bottomInView) {
       fetchNextPage();
     }
   }, [bottomInView]);
-
-  const visibleTabs = VALID_SEARCH_SCOPES;
 
   return (
     <div className="SearchPage">
@@ -172,7 +169,7 @@ const SearchPage = () => {
       {!isLoading && (
         <>
           <div className="search-results">
-            {visibleTabs.length > 0 &&
+            {VISIBLE_TABS.length > 0 &&
               [SearchScope.Threads, SearchScope.Replies].includes(
                 activeTab
               ) && (
@@ -193,7 +190,7 @@ const SearchPage = () => {
                 </div>
               )}
             <CWTabBar>
-              {visibleTabs.map((s, i) => (
+              {VISIBLE_TABS.map((s, i) => (
                 <CWTab
                   key={i}
                   label={s}
