@@ -54,6 +54,7 @@ import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { TemplateActionCard } from './template_action_card';
 import { ViewTemplateFormCard } from './view_template_form_card';
+import ViewTemplateForm from '../view_template/view_template_form';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -94,6 +95,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState(null);
+  const [hideTemplate, setHideTemplate] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -667,6 +669,25 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ) : (
             <>
               <QuillRenderer doc={thread.body} cutoffLines={50} />
+              {showLinkedTemplateOptions && !hideTemplate && (
+                <ViewTemplateForm
+                  address={linkedTemplates[0]?.identifier.split('/')[1]}
+                  slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                  setTemplateNickname={null}
+                />
+              )}
+              {hideTemplate ? (
+                <CWText
+                  type="buttonMini"
+                  onClick={() => setHideTemplate(false)}
+                >
+                  Show transaction template
+                </CWText>
+              ) : (
+                <CWText type="buttonMini" onClick={() => setHideTemplate(true)}>
+                  Hide transaction template
+                </CWText>
+              )}
               {thread.readOnly ? (
                 <>
                   {threadOptionsComp}
@@ -810,36 +831,36 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 },
               ]
             : []),
-            ...(showLinkedTemplateOptions
-              ? [
-                  {
-                    label: 'View Template',
-                    item: (
-                      <div className="cards-column">
-                        <ViewTemplateFormCard
-                          address={linkedTemplates[0]?.identifier.split('/')[1]}
-                          slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                        />
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
-            ...(showTemplateOptions
-              ? [
-                  {
-                    label: 'Template',
-                    item: (
-                      <div className="cards-column">
-                        <TemplateActionCard
-                          thread={thread}
-                          onChangeHandler={handleLinkedTemplateChange}
-                        />
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
+          ...(showLinkedTemplateOptions && hideTemplate
+            ? [
+                {
+                  label: 'View Template',
+                  item: (
+                    <div className="cards-column">
+                      <ViewTemplateFormCard
+                        address={linkedTemplates[0]?.identifier.split('/')[1]}
+                        slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                      />
+                    </div>
+                  ),
+                },
+              ]
+            : []),
+          ...(showTemplateOptions
+            ? [
+                {
+                  label: 'Template',
+                  item: (
+                    <div className="cards-column">
+                      <TemplateActionCard
+                        thread={thread}
+                        onChangeHandler={handleLinkedTemplateChange}
+                      />
+                    </div>
+                  ),
+                },
+              ]
+            : []),
         ] as SidebarComponents
       }
     />

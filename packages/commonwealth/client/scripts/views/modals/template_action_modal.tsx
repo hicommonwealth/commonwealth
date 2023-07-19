@@ -39,7 +39,7 @@ export const TemplateActionModal = ({
   // Fetch contracts
   const fetchContracts = async () => {
     setLoading(true);
-    const contractsInStore = await app.contracts.getCommunityContracts();
+    const contractsInStore = app.contracts.getCommunityContracts();
     console.log(contractsInStore);
     setContracts(contractsInStore);
     setFetched(true);
@@ -72,7 +72,7 @@ export const TemplateActionModal = ({
       (_cct) => String(_cct.templateId) === identifier
     );
 
-    const newIdentifier = `${identifier}/${contract.address}${cct?.cctmd.slug}`;
+    const newIdentifier = `${identifier}/${contract.address}/${cct?.cctmd.slug}`;
 
     return { contract, cct, newIdentifier };
   };
@@ -129,6 +129,7 @@ export const TemplateActionModal = ({
     }
 
     onSave(links);
+    onClose();
   };
   // Fetch contracts when the modal is open
   useEffect(() => {

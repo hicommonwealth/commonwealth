@@ -1,10 +1,8 @@
 import React from 'react';
 import 'view_template/view_template.scss';
 import app from 'state';
-import Sublayout from '../../Sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import isValidJson from '../../../../../shared/validateJson';
 import {
   CWTextInput,
@@ -34,6 +32,7 @@ export enum TemplateComponents {
 type ViewTemplateFormProps = {
   address?: string;
   slug?: string;
+  setTemplateNickname(name: string): any;
 };
 
 type Json = {
@@ -54,14 +53,17 @@ type Json = {
   };
 };
 
-const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
+const ViewTemplateForm = ({
+  address,
+  slug,
+  setTemplateNickname,
+}: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
   const params = useParams();
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
-  const [templateNickname, setTemplateNickname] = useState('');
   const [templateError, setTemplateError] = useState(false);
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
 
@@ -76,11 +78,13 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
     });
 
     if (!contractInStore || !templateMetadata) {
-      navigate('/404', {}, null);
+      return <div>No Contract Available</div>;
     }
 
     setCurrentContract(contractInStore);
-    setTemplateNickname(templateMetadata.cctmd.nickname);
+    if (typeof setTemplateNickname === 'function') {
+      setTemplateNickname(templateMetadata.cctmd.nickname);
+    }
 
     app.contracts
       .getTemplatesForContract(contractInStore.id)
@@ -397,15 +401,7 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
   }
 
   return (
-    // <CWText type="h3" className="header">
-    //   Text
-    // </CWText>
-    <div className="ContentPageCard">
-      <CWText type="h3" className="header">
-        {templateNickname}
-      </CWText>
-      <CWDivider className="divider" />
-
+    <div>
       {!templateError ? (
         <div className="template">
           {isFetched && renderTemplate(json.form_fields)}
@@ -419,7 +415,7 @@ const ViewTemplateForm = ({ address, slug }: ViewTemplateFormProps) => {
         />
       )}
       <CWDivider />
-      <div className="bottom-row">
+      <div className="bottom-row" style={{ marginTop: '4px' }}>
         <CWButton
           label="Create"
           buttonType="primary-black"
