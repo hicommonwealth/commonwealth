@@ -110,7 +110,7 @@ export const CreateComment = ({
 
   // token balance check if needed
   const tokenPostingThreshold: BN = app.chain.getTopicThreshold(activeTopic.id);
-  console.log(app.user.activeAccount?.tokenBalance);
+
   if (tokenPostingThreshold && !balanceLoading) {
     setBalanceLoading(true);
     if (!app.user.activeAccount?.tokenBalance) {
