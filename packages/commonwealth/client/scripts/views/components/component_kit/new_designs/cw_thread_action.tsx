@@ -85,6 +85,7 @@ const TooltipWrapper: FC = ({
 
   return (
     <CWTooltip
+      disablePortal
       content={text}
       placement="top"
       renderTrigger={(handleInteraction) => (
