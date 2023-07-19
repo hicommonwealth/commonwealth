@@ -44,8 +44,21 @@ export const useImageDropAndPaste = ({
           imageType = 'image/png';
         }
 
-        const selectedIndex =
+        const selectedIndex: number =
           editor.getSelection()?.index || editor.getLength() || 0;
+
+        // adds line break to insert image above or below text
+        const text: string = editor.getText();
+        const isEndOfLine: boolean = editor
+          .getText()
+          [selectedIndex].endsWith('\n');
+        const lineBreak: string = isEndOfLine ? '\n' : '\n\n';
+        editor.setText(
+          text
+            .slice(0, selectedIndex)
+            .concat(lineBreak)
+            .concat(text.slice(selectedIndex))
+        );
 
         // filter out ops that contain a base64 image
         const opsWithoutBase64Images: DeltaOperation[] = (
@@ -74,9 +87,9 @@ export const useImageDropAndPaste = ({
 
         // insert image op at the selected index
         if (isMarkdownEnabled) {
-          editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
+          editor.insertText(selectedIndex + 1, `![image](${uploadedFileUrl})`);
         } else {
-          editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
+          editor.insertEmbed(selectedIndex + 1, 'image', uploadedFileUrl);
         }
         setContentDelta({
           ...editor.getContents(),
