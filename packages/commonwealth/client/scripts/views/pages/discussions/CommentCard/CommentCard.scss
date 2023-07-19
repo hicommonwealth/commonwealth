@@ -93,27 +93,6 @@
       display: flex;
       align-items: center;
       gap: 1px;
-
-      .comment-option-btn {
-        outline: 0;
-        border: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 4px;
-        cursor: pointer;
-        padding: 4px 8px;
-        border-radius: $border-radius-corners-wider;
-        color: $neutral-600;
-
-        &:hover {
-          background-color: $neutral-200;
-        }
-
-        .Text {
-          color: $neutral-600;
-        }
-      }
     }
   }
 }

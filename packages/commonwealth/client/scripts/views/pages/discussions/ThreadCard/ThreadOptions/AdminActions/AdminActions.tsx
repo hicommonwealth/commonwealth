@@ -11,10 +11,10 @@ import type { IThreadCollaborator } from '../../../../../../models/Thread';
 import Topic from '../../../../../../models/Topic';
 import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -306,17 +306,8 @@ export const AdminActions = ({
                 ]
               : []),
           ]}
-          renderTrigger={(onclick) => (
-            <button
-              onClick={async (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                onclick(e);
-              }}
-              className="action-btn"
-            >
-              <CWIcon iconName="dots" iconSize="small" />
-            </button>
+          renderTrigger={(onClick) => (
+            <CWThreadAction action="overflow" onClick={onClick} />
           )}
         />
       </span>

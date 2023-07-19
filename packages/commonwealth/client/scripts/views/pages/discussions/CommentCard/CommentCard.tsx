@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import app from 'state';
 import type Comment from '../../../../models/Comment';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -135,17 +134,8 @@ export const CommentCard = ({
               {(canEdit || canDelete) && (
                 <PopoverMenu
                   className="CommentActions"
-                  renderTrigger={(onclick) => (
-                    <button
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        onclick(e);
-                      }}
-                      className="comment-option-btn"
-                    >
-                      <CWIcon iconName="dots" iconSize="small" />
-                    </button>
+                  renderTrigger={(onClick) => (
+                    <CWThreadAction action="overflow" onClick={onClick} />
                   )}
                   menuItems={[
                     canEdit && {
