@@ -109,7 +109,7 @@ export const CreateComment = ({
   const tokenPostingThreshold: BN = app.chain.getTopicThreshold(activeTopic.id);
 
   const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
-  const userBalance = app.user.activeAccount.tokenBalance;
+  const userBalance = app.user.activeAccount?.tokenBalance;
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||
