@@ -372,12 +372,7 @@ export const CommentTree = ({
 
           const isLast = threadLevel === 8;
 
-          const canReply = !!(
-            !isLast &&
-            !isLocked &&
-            isLoggedIn &&
-            app.user.activeAccount
-          );
+          const replyBtnVisible = !!(!isLast && !isLocked && isLoggedIn);
 
           return (
             <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
@@ -413,7 +408,7 @@ export const CommentTree = ({
                   isSavingEdit={edits?.[comment.id]?.isSavingEdit || false}
                   isEditing={edits?.[comment.id]?.isEditing || false}
                   canDelete={!isLocked && (isCommentAuthor || isAdminOrMod)}
-                  canReply={canReply}
+                  replyBtnVisible={replyBtnVisible}
                   onReply={() => {
                     setParentCommentId(comment.id);
                     setIsReplying(true);

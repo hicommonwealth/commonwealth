@@ -17,12 +17,13 @@ import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSm
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
+  disabled: boolean;
 };
 
 export const CommentReactionButton = ({
   comment,
+  disabled,
 }: CommentReactionButtonProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
@@ -61,8 +62,6 @@ export const CommentReactionButton = ({
       return r.Address.address === activeAddress;
     });
 
-    setIsLoading(true);
-
     app.reactionCounts
       .delete(reaction, {
         ...reactionCounts,
@@ -75,13 +74,10 @@ export const CommentReactionButton = ({
         );
 
         setReactionCounts(app.reactionCounts.store.getByPost(comment));
-        setIsLoading(false);
       });
   };
 
   const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
-    setIsLoading(true);
-
     app.reactionCounts
       .createCommentReaction(userAddress, comment, 'like', chainId)
       .then(() => {
@@ -93,7 +89,6 @@ export const CommentReactionButton = ({
         ]);
 
         setReactionCounts(app.reactionCounts.store.getByPost(comment));
-        setIsLoading(false);
       });
   };
 
@@ -122,7 +117,7 @@ export const CommentReactionButton = ({
       />
       <CWUpvoteSmall
         voteCount={likes}
-        disabled={isLoading || isUserForbidden}
+        disabled={isUserForbidden || disabled}
         selected={hasReacted}
         onMouseEnter={handleVoteMouseEnter}
         onClick={handleVoteClick}

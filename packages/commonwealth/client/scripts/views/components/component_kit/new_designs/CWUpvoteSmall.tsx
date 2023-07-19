@@ -37,6 +37,7 @@ const CWUpvoteSmall = ({
     >
       {voteCount > 0 && !disabled ? (
         <CWTooltip
+          disablePortal
           content={tooltipContent}
           renderTrigger={(handleInteraction) => (
             <div

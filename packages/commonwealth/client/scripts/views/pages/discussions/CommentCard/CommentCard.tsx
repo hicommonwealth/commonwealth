@@ -15,6 +15,7 @@ import { SharePopover } from 'views/components/share_popover';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CommentCardProps = {
   // Edit
@@ -29,7 +30,7 @@ type CommentCardProps = {
   canDelete?: boolean;
   onDelete?: () => any;
   // Reply
-  canReply?: boolean;
+  replyBtnVisible?: boolean;
   onReply?: () => any;
   // Spam
   isSpam?: boolean;
@@ -52,7 +53,7 @@ export const CommentCard = ({
   canDelete,
   onDelete,
   // reply
-  canReply,
+  replyBtnVisible,
   onReply,
   // spam
   isSpam,
@@ -63,6 +64,7 @@ export const CommentCard = ({
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   return (
     <div className="comment-body">
@@ -115,14 +117,18 @@ export const CommentCard = ({
           {/*// TODO comment */}
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton comment={comment} />
+              <CommentReactionButton
+                comment={comment}
+                disabled={!hasJoinedCommunity}
+              />
 
               <SharePopover commentId={comment.id} />
 
-              {canReply && (
+              {replyBtnVisible && (
                 <CWThreadAction
                   label="Reply"
                   action="comment"
+                  disabled={!hasJoinedCommunity}
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();

@@ -157,8 +157,8 @@ export const CWContentPage = ({
         body(
           // todo
           <ThreadOptions
-            canVote={!thread?.readOnly}
-            canComment={!thread?.readOnly}
+            upvoteBtnVisible={!thread?.readOnly}
+            commentBtnVisible={!thread?.readOnly}
             thread={thread}
             totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}

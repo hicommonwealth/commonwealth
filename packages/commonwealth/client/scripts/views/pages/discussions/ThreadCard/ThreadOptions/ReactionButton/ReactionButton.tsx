@@ -17,9 +17,14 @@ import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSm
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
+  disabled: boolean;
 };
 
-export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
+export const ReactionButton = ({
+  thread,
+  size,
+  disabled,
+}: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
 
@@ -46,7 +51,7 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
       {size === 'small' ? (
         <CWUpvoteSmall
           voteCount={reactors.length}
-          disabled={isLoading || isUserForbidden}
+          disabled={isUserForbidden || disabled}
           selected={hasReacted}
           onMouseEnter={handleSmallVoteMouseEnter}
           onClick={handleSmallVoteClick}

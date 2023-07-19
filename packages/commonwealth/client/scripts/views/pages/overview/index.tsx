@@ -95,6 +95,7 @@ const OverviewPage = () => {
             onClick={() => {
               navigate('/new/discussion');
             }}
+            // TODO fix
             disabled={!app.user.activeAccount}
           />
         ) : (
@@ -105,6 +106,7 @@ const OverviewPage = () => {
             onClick={() => {
               navigate('/new/discussion');
             }}
+            // TODO fix
             disabled={!app.user.activeAccount}
           />
         )}

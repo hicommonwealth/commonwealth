@@ -11,11 +11,12 @@ import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { pluralize } from 'helpers';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
-  canVote?: boolean;
-  canComment?: boolean;
+  upvoteBtnVisible?: boolean;
+  commentBtnVisible?: boolean;
   shareEndpoint?: string;
   canUpdateThread?: boolean;
   totalComments?: number;
@@ -23,8 +24,8 @@ type OptionsProps = AdminActionsProps & {
 
 export const ThreadOptions = ({
   thread,
-  canVote = false,
-  canComment = true,
+  upvoteBtnVisible = false,
+  commentBtnVisible = true,
   shareEndpoint,
   canUpdateThread,
   totalComments,
@@ -46,6 +47,8 @@ export const ThreadOptions = ({
       getCommentSubscription(thread)?.isActive &&
       getReactionSubscription(thread)?.isActive
   );
+
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const handleToggleSubscribe = async (e) => {
     // prevent clicks from propagating to discussion row
@@ -73,12 +76,19 @@ export const ThreadOptions = ({
           e.preventDefault();
         }}
       >
-        {canVote && thread && <ReactionButton thread={thread} size="small" />}
+        {upvoteBtnVisible && thread && (
+          <ReactionButton
+            thread={thread}
+            size="small"
+            disabled={!hasJoinedCommunity}
+          />
+        )}
 
-        {canComment && totalComments >= 0 && (
+        {commentBtnVisible && totalComments >= 0 && (
           <CWThreadAction
             label={`${pluralize(totalComments, 'Comment')}`}
             action="comment"
+            disabled={!hasJoinedCommunity}
           />
         )}
 
@@ -92,6 +102,7 @@ export const ThreadOptions = ({
           onClick={handleToggleSubscribe}
           selected={!isSubscribed}
           label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+          disabled={!hasJoinedCommunity}
         />
 
         {canUpdateThread && thread && (

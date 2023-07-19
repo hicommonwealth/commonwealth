@@ -177,8 +177,8 @@ export const ThreadCard = ({
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}
               thread={thread}
-              canVote={isWindowSmallInclusive}
-              canComment={!thread.readOnly}
+              upvoteBtnVisible={isWindowSmallInclusive}
+              commentBtnVisible={!thread.readOnly}
               canUpdateThread={
                 isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)

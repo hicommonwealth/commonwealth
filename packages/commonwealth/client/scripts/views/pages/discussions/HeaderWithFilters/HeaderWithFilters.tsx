@@ -168,6 +168,7 @@ export const HeaderWithFilters = ({
               onClick={() => {
                 navigate('/new/discussion');
               }}
+              // todo FIX
               disabled={!app.user.activeAccount}
             />
           ) : (
@@ -180,6 +181,7 @@ export const HeaderWithFilters = ({
                   `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
                 );
               }}
+              // TODO fix
               disabled={!app.user.activeAccount}
             />
           )}
