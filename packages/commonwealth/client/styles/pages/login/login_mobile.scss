@@ -126,6 +126,10 @@
     top: 8px;
   }
 
+  .close-btn {
+    margin-top: var(--safe-area-inset-top)
+  }
+
   .walletList {
 
     @include innerBodyStyles;

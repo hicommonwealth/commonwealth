@@ -64,6 +64,7 @@ export const LoginMobile = ({
     <div className="LoginMobile">
       <CWIconButton
         iconName="close"
+        className="close-btn"
         onClick={async () => {
           if (activeStep === 'redirectToSign' && !app.user.activeAccount) {
             // Reset WC if we quit the login flow before signing in
