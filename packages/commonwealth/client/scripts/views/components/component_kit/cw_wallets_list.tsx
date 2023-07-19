@@ -167,7 +167,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClick={async () => {
                   await onWalletSelect(wallet);
                   if (wallet.chain === 'substrate') {
-                    setIsModalOpen(true);
+                    // setIsModalOpen(true);
                   }
                 }}
               />
@@ -190,7 +190,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                       })();
 
                       await onWalletAddressSelect(wallet, selectedAddress);
-                      setIsModalOpen(false);
+                      // setIsModalOpen(false);
                     }}
                     onModalClose={() => setIsModalOpen(false)}
                   />

@@ -2,16 +2,16 @@ import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import _ from 'lodash';
 import moment from 'moment';
-
 import app from 'state';
 import { CommentsStore } from 'stores';
-import Thread from '../../models/Thread';
 import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
 import type { IUniqueId } from '../../models/interfaces';
+import Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
 import axios from 'axios';
+import $ from 'jquery';
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
@@ -52,6 +52,10 @@ export const modelFromServer = (comment) => {
     ? versionHistory[0].timestamp
     : null;
 
+  const markedAsSpamAt = comment.marked_as_spam_at
+    ? moment(comment.marked_as_spam_at)
+    : null;
+
   const commentParams =
     comment.deleted_at?.length > 0
       ? {
@@ -68,6 +72,7 @@ export const modelFromServer = (comment) => {
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
+          markedAsSpamAt,
           deleted: true,
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
@@ -87,6 +92,7 @@ export const modelFromServer = (comment) => {
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
+          markedAsSpamAt,
           deleted: false,
           canvasAction: comment.canvas_action,
           canvasSession: comment.canvas_session,
@@ -279,6 +285,34 @@ class CommentsController {
         .catch((e) => {
           console.error(e);
           notifyError('Could not delete comment');
+          reject(e);
+        });
+    });
+  }
+
+  public async toggleSpam(commentId: number, isSpam: boolean) {
+    return new Promise((resolve, reject) => {
+      $.post(
+        `${app.serverUrl()}/comments/${commentId}/${
+          !isSpam ? 'mark' : 'unmark'
+        }-as-spam`,
+        {
+          jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
+        }
+      )
+        .then((response) => {
+          const comment = this._store.getById(commentId);
+          const result = modelFromServer({ ...comment, ...response.result });
+          if (comment) this._store.remove(comment);
+          this._store.add(result);
+          resolve(result);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError(
+            `Could not ${!isSpam ? 'mark' : 'unmark'} comment as spam`
+          );
           reject(e);
         });
     });

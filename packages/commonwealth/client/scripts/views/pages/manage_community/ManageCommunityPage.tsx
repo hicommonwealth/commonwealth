@@ -8,6 +8,7 @@ import { AccessLevel } from '../../../../../shared/permissions';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { TTLCache } from '../../../helpers/ttl_cache';
 import RoleInfo from '../../../models/RoleInfo';
+import Permissions from '../../../utils/Permissions';
 import { PageLoading } from '../loading';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
@@ -122,11 +123,7 @@ const ManageCommunityPage = () => {
     searchMembers();
   }, []);
 
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({
-      chain: app.activeChainId(),
-    });
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   if (!initialized) {
     return <PageLoading />;

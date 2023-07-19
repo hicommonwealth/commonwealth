@@ -64,6 +64,16 @@
     }
   }
 
+  &.disabled {
+    background-color: $neutral-300  !important;
+    border-radius: $border-radius-corners;
+
+    .tag-text.Text,
+    .tag-icon.Icon {
+      color: $white  !important;
+    }
+  }
+
   &.referendum {
     background-color: $neutral-100;
     border-radius: $border-radius-corners;
@@ -92,6 +102,7 @@
     .tag-text.Text {
       color: $yellow-600;
     }
+
     .tag-icon.Icon {
       stroke: $yellow-600;
       padding: 0;

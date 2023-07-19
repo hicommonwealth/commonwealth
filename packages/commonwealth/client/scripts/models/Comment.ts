@@ -19,6 +19,7 @@ export class Comment<T extends IUniqueId> {
   public readonly threadId: number;
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;
+  public markedAsSpamAt: moment.Moment;
   public readonly deleted: boolean;
 
   public readonly canvasAction: string;
@@ -39,6 +40,7 @@ export class Comment<T extends IUniqueId> {
     parentComment,
     authorChain,
     lastEdited, // moment.Moment
+    markedAsSpamAt, // moment.Moment
     deleted,
     canvasAction,
     canvasSession,
@@ -56,6 +58,7 @@ export class Comment<T extends IUniqueId> {
     this.parentComment = parentComment;
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
+    this.markedAsSpamAt = markedAsSpamAt;
     this.deleted = deleted;
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;

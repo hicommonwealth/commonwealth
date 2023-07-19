@@ -23,6 +23,7 @@ export type PopoverMenuItem =
 
 type PopoverMenuProps = {
   menuItems: Array<PopoverMenuItem>;
+  className?: string;
 } & PopoverTriggerProps;
 
 export const PopoverMenu = (props: PopoverMenuProps) => {
@@ -37,12 +38,12 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
         {renderTrigger(popoverProps.handleInteraction)}
         <Popover
           content={
-            <div className={ComponentType.PopoverMenu}>
+            <div className={`${ComponentType.PopoverMenu} ${props.className}`}>
               {menuItems.map((item, i) => {
                 if (item.type === 'header') {
                   return (
                     <CWText
-                      className="menu-section-header-text"
+                      className={`menu-section-header-text ${item.className}`}
                       type="caption"
                       key={i}
                     >
@@ -50,17 +51,33 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                     </CWText>
                   );
                 } else if (item.type === 'divider') {
-                  return <div className="menu-section-divider" key={i} />;
+                  return (
+                    <div
+                      className={`menu-section-divider ${item.className}`}
+                      key={i}
+                    />
+                  );
                 } else {
-                  const { disabled, isSecondary, iconLeft, label, onClick } =
-                    item;
+                  const {
+                    disabled,
+                    isSecondary,
+                    iconLeft,
+                    iconLeftWeight,
+                    label,
+                    onClick,
+                  } = item;
                   return (
                     <div
                       className={getClasses<{
                         disabled?: boolean;
                         isSecondary?: boolean;
-                      }>({ disabled, isSecondary }, 'PopoverMenuItem')}
+                      }>(
+                        { disabled, isSecondary },
+                        `PopoverMenuItem ${item.className}`
+                      )}
                       onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
                         onClick(e);
                         popoverProps.handleInteraction(e);
                       }}
@@ -71,6 +88,7 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                           className="menu-item-icon"
                           iconName={iconLeft}
                           iconSize="small"
+                          weight={iconLeftWeight}
                         />
                       )}
                       <CWText type="b2" className="menu-item-text">

@@ -123,7 +123,7 @@ Section 6.10 No Waiver. No failure on the part of any Person to exercise any pow
 
 const notice = `Notice is hereby given, pursuant to Section 184(1B) of the BVI Business Companies Act, 2004 (as amended), that the Company intends to continue as a company incorporated under the laws of Delaware, United States of America.`;
 
-const TermsPage = () => {
+const OldTermsPage = () => {
   return (
     <Sublayout>
       <div className="TermsPage">
@@ -140,4 +140,4 @@ const TermsPage = () => {
   );
 };
 
-export default TermsPage;
+export default OldTermsPage;

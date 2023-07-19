@@ -20,7 +20,7 @@ export const LockWithTooltip = ({ lockedAt, updatedAt }: LockWithTooltip) => {
       }
       renderTrigger={(handleInteraction) => (
         <CWIcon
-          iconName="lock"
+          iconName="keyLockClosed"
           iconSize="small"
           onMouseEnter={handleInteraction}
           onMouseLeave={handleInteraction}

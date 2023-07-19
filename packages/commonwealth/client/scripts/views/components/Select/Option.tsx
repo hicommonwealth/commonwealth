@@ -5,6 +5,7 @@ import { getClasses } from '../component_kit/helpers';
 import './Option.scss';
 
 export type OptionProps = {
+  size?: 'default' | 'compact',
   iconLeft?: IconName;
   iconRight?: ReactNode;
   isSelected: boolean;
@@ -13,6 +14,7 @@ export type OptionProps = {
 };
 
 export const Option = ({
+  size = 'default',
   iconRight,
   isSelected,
   label,
@@ -23,7 +25,7 @@ export const Option = ({
     <div
       className={getClasses<{ isSelected: boolean }>(
         { isSelected },
-        'select-option'
+        `select-option ${`size-${size}`}`
       )}
       onClick={onClick}
     >

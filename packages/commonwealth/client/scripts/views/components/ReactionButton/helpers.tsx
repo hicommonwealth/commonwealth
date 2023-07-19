@@ -55,7 +55,7 @@ export const fetchReactionsByComment = async (commentId: number) => {
 };
 
 export const onReactionClick = (
-  e: React.MouseEvent<HTMLDivElement>,
+  e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
   hasReacted: boolean,
   dislike: (userAddress: string) => void,
   like: (chain: ChainInfo, chainId: string, userAddress: string) => void
