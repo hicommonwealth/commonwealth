@@ -80,6 +80,27 @@ const withRouter = (Component) => {
   };
 };
 
+export const navigateToPathInNewTab = ({
+  navigate,
+  path,
+  chain,
+}: NavigateToCommunityProps) => {
+  const isCustomDomain = app.isCustomDomain();
+  const activeChainId = app.activeChainId();
+
+  if (isCustomDomain) {
+    window.open(`${PROD_URL}/${chain}${path}`, '_blank');
+  } else {
+    const newPath = activeChainId ? path : `${path}`;
+
+    if (activeChainId) {
+      navigate(newPath);
+    } else {
+      window.open(newPath, '_blank');
+    }
+  }
+};
+
 interface NavigateToCommunityProps {
   navigate: (
     url: To,

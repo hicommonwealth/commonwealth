@@ -1,0 +1,50 @@
+.CardCarousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow-x: hidden;
+  width: 95%;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+
+  .proposal-cards-row {
+    display: flex;
+    gap: 16px;
+    transition: transform 0.3s; // Add this line to include the transition
+  }
+
+  .arrow {
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+
+  &:hover {
+    .arrow {
+      opacity: 1;
+    }
+  }
+
+  &.small-screen:hover {
+    .arrow {
+      opacity: 1;
+    }
+  }
+
+  .left-arrow {
+    left: 0;
+  }
+
+  .right-arrow {
+    right: 0;
+  }
+
+  &.small-screen .right-arrow {
+    right: 85%;
+  }
+}

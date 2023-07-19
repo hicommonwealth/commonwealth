@@ -58,7 +58,7 @@ export const onReactionClick = (
   e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
   hasReacted: boolean,
   dislike: (userAddress: string) => void,
-  like: (chain: ChainInfo, chainId: string, userAddress: string) => void
+  like: (userAddress: string, chain?: ChainInfo, chainId?: string) => void
 ) => {
   const { address: userAddress, chain } = app.user.activeAccount;
 
@@ -68,6 +68,6 @@ export const onReactionClick = (
   if (hasReacted) {
     dislike(userAddress);
   } else {
-    like(chain, chainId, userAddress);
+    like(userAddress);
   }
 };

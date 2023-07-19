@@ -76,9 +76,9 @@ export const useReactionButton = (thread: Thread, setReactors) => {
   };
 
   const like = async (
-    chain: ChainInfo,
-    chainId: string,
-    userAddress: string
+    userAddress: string,
+    chain?: ChainInfo,
+    chainId?: string
   ) => {
     const foundThread = app.threads.getById(thread.id);
     if (

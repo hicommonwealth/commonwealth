@@ -1,6 +1,7 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
+import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import 'pages/user_dashboard/index.scss';
 import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
@@ -29,6 +30,8 @@ const UserDashboard = (props: UserDashboardProps) => {
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global
   );
+
+  const { isWindowLarge } = useBrowserWindow({});
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -173,9 +176,11 @@ const UserDashboard = (props: UserDashboardProps) => {
           )}
         </>
       </div>
-      <div>
-        <DashboardCommunitiesPreview />
-      </div>
+      {isWindowLarge && (
+        <div>
+          <DashboardCommunitiesPreview />
+        </div>
+      )}
     </div>
   );
 };

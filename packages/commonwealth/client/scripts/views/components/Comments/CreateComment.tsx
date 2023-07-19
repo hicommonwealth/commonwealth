@@ -63,7 +63,8 @@ export const CreateComment = ({
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (e) => {
+    e.stopPropagation();
     setErrorMsg(null);
     setSendingComment(true);
 
@@ -123,9 +124,8 @@ export const CreateComment = ({
     userFailsThreshold ||
     !canComment;
 
-  const decimals = getDecimals(app.chain);
-
   const cancel = (e) => {
+    e.stopPropagation();
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
@@ -156,26 +156,32 @@ export const CreateComment = ({
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-        isDisabled={!canComment}
-        tooltipLabel="Join community to comment"
-      />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && app.user.activeAccount && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
+      <div onClick={(e) => e.stopPropagation()}>
+        <ReactQuillEditor
+          className="editor"
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+        />
+      </div>
+      {app.activeChainId &&
+        tokenPostingThreshold &&
+        tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {activeTopicName} requires{' '}
+            {weiToTokens(
+              tokenPostingThreshold.toString(),
+              getDecimals(app.chain)
+            )}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && app.user.activeAccount && (
+              <>
+                You have{' '}
+                {weiToTokens(userBalance.toString(), getDecimals(app.chain))}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
+          </CWText>
+        )}
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (

@@ -725,10 +725,11 @@ class ThreadsController {
   }
 
   public async fetchThreadsFromId(
-    ids: Array<number | string>
+    ids: Array<number | string>,
+    chain?: string
   ): Promise<Thread[]> {
     const params = {
-      chain: app.activeChainId(),
+      chain: chain ? chain : app.activeChainId(),
       thread_ids: ids,
     };
     const [response] = await Promise.all([
