@@ -63,20 +63,20 @@ const renderPhosphorIcon = (
 type CWThreadActionProps = {
   disabled?: boolean;
   action?: ActionType;
-  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   label?: string;
   selected?: boolean;
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
-  disabled,
+  disabled = false,
   action,
   onClick,
   label,
   selected,
 }) => {
   return (
-    <div
+    <button
       className={getClasses(
         {
           disabled,
@@ -99,6 +99,6 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           {label || action.charAt(0).toUpperCase() + action.slice(1)}
         </CWText>
       )}
-    </div>
+    </button>
   );
 };

@@ -8,6 +8,11 @@
   gap: 4px;
   width: fit-content;
   color: $neutral-500;
+  border: 0;
+
+  &:focus {
+    outline: 0;
+  }
 
   .Text {
     color: $neutral-500;
