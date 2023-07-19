@@ -69,16 +69,16 @@ const useCreateCommentReactionMutation = ({ commentId, chainId }: Partial<Create
       // TODO: this state below would be stored in comments react query state when we migrate the
       // whole comment controller from current state to react query (there is a good chance we can
       // remove this entirely)
-      const reactionCount = app.comments.reactionCountsStore.getByPost(reaction);
+      const reactionCount = app.threads.reactionCountsStore.getByPost(reaction);
 
       if (!reactionCount) {
         const { thread_id, proposal_id, comment_id } = reaction;
-        const id = app.comments.reactionCountsStore.getIdentifier({
+        const id = app.threads.reactionCountsStore.getIdentifier({
           threadId: thread_id,
           proposalId: proposal_id,
           commentId: comment_id,
         });
-        app.comments.reactionCountsStore.add(new ReactionCount({
+        app.threads.reactionCountsStore.add(new ReactionCount({
           id,
           thread_id,
           proposal_id,
@@ -87,7 +87,7 @@ const useCreateCommentReactionMutation = ({ commentId, chainId }: Partial<Create
           like: 1,
         }));
       } else {
-        app.comments.reactionCountsStore.update({
+        app.threads.reactionCountsStore.update({
           ...reactionCount,
           likes: reactionCount.likes + 1,
           hasReacted: true,

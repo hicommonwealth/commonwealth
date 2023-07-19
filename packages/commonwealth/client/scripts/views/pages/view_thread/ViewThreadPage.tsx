@@ -168,7 +168,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .then((res) => {
         const t = res[0];
         if (t) {
-          const reactions = app.comments.getReactionByPost(t);
+          const reactions = app.threads.getReactionByPost(t);
           t.associatedReactions = reactions
             .filter((r) => r.reaction === 'like')
             .map((r) => {
@@ -231,17 +231,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         address: app.user.activeAccount?.address,
       }).then(reactionCounts => {
         for (const rc of reactionCounts) {
-          const id = app.comments.reactionCountsStore.getIdentifier({
+          const id = app.threads.reactionCountsStore.getIdentifier({
             threadId: rc.thread_id,
             proposalId: rc.proposal_id,
             commentId: rc.comment_id,
           });
 
-          app.comments.reactionCountsStore.add(
+          app.threads.reactionCountsStore.add(
             new ReactionCount({ ...rc, id } as any)
           );
 
-          app.comments.isReactionFetched.emit('redraw', rc.comment_id);
+          app.threads.isReactionFetched.emit('redraw', rc.comment_id);
         }
       })
     }

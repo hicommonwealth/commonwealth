@@ -5,7 +5,6 @@ import { EventEmitter } from 'events';
 import { ChainStore, NodeStore } from 'stores';
 import RecentActivityController from 'controllers/app/recent_activity';
 import SnapshotController from 'controllers/chain/snapshot';
-import CommentsController from 'controllers/server/comments';
 import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
 import NewProfilesController from 'controllers/server/newProfiles';
@@ -54,7 +53,6 @@ export interface IApp {
   // Threads
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
-  comments: CommentsController;
   polls: PollsController;
 
   // Proposals
@@ -142,7 +140,6 @@ const app: IApp = {
   // Thread
   threads: ThreadsController.Instance,
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
-  comments: new CommentsController(),
   polls: new PollsController(),
 
   // Proposals

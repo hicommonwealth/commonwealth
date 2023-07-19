@@ -27,6 +27,11 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../models/types';
 import fetchThreadReactionCounts from "../../state/api/reactionCounts/fetchReactionCounts";
+import { ReactionCountsStore, ReactionStore } from 'stores';
+import AbridgedThread from '../../models/AbridgedThread';
+import Comment from '../../models/Comment';
+import type { AnyProposal } from '../../models/types';
+
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -74,6 +79,26 @@ class ThreadsController {
     number,
     AssociatedReaction[]
   >();
+
+  public isReactionFetched = new EventEmitter();
+  private _reactionCountsStore: ReactionCountsStore = new ReactionCountsStore();
+  private _reactionsStore: ReactionStore = new ReactionStore();
+
+  public get reactionCountsStore() {
+    return this._reactionCountsStore;
+  }
+
+  public get reactionsStore() {
+    return this._reactionsStore;
+  }
+
+  public deinitReactionCountsStore() {
+    this.reactionCountsStore.clear();
+  }
+
+  public getReactionByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
+    return this.reactionsStore.getByPost(post);
+  }
 
   public refreshReactionsFromThreads(threads: Thread[]) {
     threads.forEach((t) => {
@@ -166,7 +191,7 @@ class ThreadsController {
 
     if (reactions) {
       for (const reaction of reactions) {
-        app.comments.reactionsStore.add(new Reaction(reaction));
+        app.threads.reactionsStore.add(new Reaction(reaction));
       }
       reactionIds = reactions.map((r) => r.id);
       reactionType = reactions.map((r) => r.type);
@@ -773,17 +798,17 @@ class ThreadsController {
     })
 
     for (const rc of reactionCounts) {
-      const id = app.comments.reactionCountsStore.getIdentifier({
+      const id = app.threads.reactionCountsStore.getIdentifier({
         threadId: rc.thread_id,
         proposalId: rc.proposal_id,
         commentId: rc.comment_id,
       });
-      const existing = app.comments.reactionCountsStore.getById(id);
+      const existing = app.threads.reactionCountsStore.getById(id);
       if (existing) {
-        app.comments.reactionCountsStore.remove(existing);
+        app.threads.reactionCountsStore.remove(existing);
       }
       try {
-        app.comments.reactionCountsStore.add(
+        app.threads.reactionCountsStore.add(
           new ReactionCount({ ...rc, id })
         );
       } catch (e) {

@@ -74,9 +74,9 @@ const useDeleteCommentReactionMutation = ({ commentId, chainId }: UseDeleteComme
       // TODO: this state below would be stored in comments react query state when we migrate the
       // whole comment controller from current state to react query (there is a good chance we can
       // remove this entirely)
-      app.comments.reactionCountsStore.update(reactionCount);
+      app.threads.reactionCountsStore.update(reactionCount);
       if (reactionCount.likes === 0 && reactionCount.dislikes === 0) {
-        app.comments.reactionCountsStore.remove(reactionCount);
+        app.threads.reactionCountsStore.remove(reactionCount);
       }
     }
   });
