@@ -183,6 +183,8 @@ const ViewTemplatePage = () => {
         });
 
         outputArr.push(subArr);
+      } else if (arg.value) {
+        outputArr.push(arg['value']);
       } else {
         if (arg.startsWith('$')) {
           const ref = arg.slice(1);
@@ -233,6 +235,25 @@ const ViewTemplatePage = () => {
     return txObject;
   };
 
+  const saveTemplateDraft = async () => {
+    Object.keys(json.tx_template.args).map((key) => {
+      const arg = json.tx_template.args[key];
+      if (arg.startsWith('$')) {
+        json.tx_template.args[key] = {
+          value: formState[arg.slice(1)],
+          ref: arg,
+        };
+      }
+    });
+    await app.contracts.addTemplate({
+      name: `${templateNickname}-draft`,
+      template: JSON.stringify(json),
+      description: `Draft of ${templateNickname}`,
+      contract_id: currentContract.id.toString(),
+      community: app.activeChainId(),
+    });
+  };
+
   const constructTxPreview = () => {
     const functionArgs = formatFunctionArgs();
     const txParams = formatTransactionParams();
@@ -259,11 +280,23 @@ const ViewTemplatePage = () => {
             </CWText>
           );
         case TemplateComponents.INPUT:
+          const ref = field[component].field_ref;
+          const argValues: any = Object.values(json.tx_template.args).find(
+            (v: any) => {
+              if (v.value) {
+                return v.ref.slice(1) == ref;
+              }
+            }
+          );
+          const placeholder = argValues
+            ? argValues.value
+            : field[component].field_name;
           return (
             <CWTextInput
               label={field[component].field_label}
               value={formState[field[component].field_ref]}
-              placeholder={field[component].field_name}
+              placeholder={placeholder}
+              disabled={placeholder !== field[component].field_name}
               onInput={(e) => {
                 setFormState((prevState) => {
                   const newState = { ...prevState };
@@ -320,9 +353,17 @@ const ViewTemplatePage = () => {
     });
   };
 
-  const txReady = Object.values(formState).every((val) => {
-    return val !== null && val !== '';
-  });
+  const txReady =
+    Object.values(formState).every((val) => {
+      return val !== null && val !== '';
+    }) ||
+    Object.values(json.tx_template.args).every((val: any) => {
+      if (val.value || !val.startsWith('$')) {
+        return true;
+      } else {
+        return false;
+      }
+    });
 
   const handleCreate = () => {
     openConfirmation({
@@ -406,6 +447,12 @@ const ViewTemplatePage = () => {
             buttonType="primary-black"
             disabled={!txReady}
             onClick={handleCreate}
+          />
+          <CWButton
+            label="Save"
+            buttonType="primary-black"
+            disabled={!txReady}
+            onClick={saveTemplateDraft}
           />
         </div>
       </div>
