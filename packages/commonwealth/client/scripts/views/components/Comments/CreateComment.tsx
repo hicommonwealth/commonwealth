@@ -4,7 +4,6 @@ import BN from 'bn.js';
 
 import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { weiToTokens, getDecimals } from 'helpers';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
@@ -23,6 +22,9 @@ import {
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
+import Permissions from '../../../utils/Permissions';
+import clsx from 'clsx';
+import { getTokenBalance } from 'helpers/token_balance_helper';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -55,12 +57,34 @@ export const CreateComment = ({
 
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
+  const [tokenPostingThreshold, setTokenPostingThreshold] = useState(
+    new BN('0')
+  );
+  const [userBalance, setUserBalance] = useState(new BN('0'));
+  const [balanceLoading, setBalanceLoading] = useState(false);
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
+  const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
+
+  useEffect(() => {
+    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
+  }, [activeTopic]);
+
+  useEffect(() => {
+    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
+      setBalanceLoading(true);
+      if (!app.user.activeAccount?.tokenBalance) {
+        getTokenBalance().then(() => {
+          setUserBalance(app.user.activeAccount?.tokenBalance);
+        });
+      } else {
+        setUserBalance(app.user.activeAccount?.tokenBalance);
+      }
+    }
+  }, [tokenPostingThreshold]);
 
   const handleSubmitComment = async () => {
     setErrorMsg(null);
@@ -103,19 +127,8 @@ export const CreateComment = ({
     }
   };
 
-  const activeTopicName =
-    rootThread instanceof Thread ? rootThread?.topic?.name : null;
-
-  // token balance check if needed
-  const tokenPostingThreshold: BN =
-    TopicGateCheck.getTopicThreshold(activeTopicName);
-
-  const userBalance: BN = TopicGateCheck.getUserBalance();
-  const userFailsThreshold =
-    tokenPostingThreshold?.gtn(0) &&
-    userBalance?.gtn(0) &&
-    userBalance.lt(tokenPostingThreshold);
-
+  const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
+  const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||
     sendingComment ||
@@ -145,7 +158,11 @@ export const CreateComment = ({
           <CWText type="caption">
             {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
           </CWText>
-          <CWText type="caption" fontWeight="medium" className="user-link-text">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className={clsx('user-link-text', { disabled: !canComment })}
+          >
             <User user={author} hideAvatar linkify />
           </CWText>
         </div>
@@ -156,13 +173,14 @@ export const CreateComment = ({
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
         isDisabled={!canComment}
+        tooltipLabel="Join community to comment"
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires{' '}
+          Commenting in {activeTopic?.name} requires{' '}
           {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
           {app.chain.meta.default_symbol}.{' '}
-          {userBalance && app.user.activeAccount && (
+          {userBalance && (
             <>
               You have {weiToTokens(userBalance.toString(), decimals)}{' '}
               {app.chain.meta.default_symbol}.
@@ -177,9 +195,9 @@ export const CreateComment = ({
           )}
           <CWButton
             buttonWidth="wide"
-            disabled={disabled}
+            disabled={disabled && !isAdmin}
             onClick={handleSubmitComment}
-            label={parentType === ContentType.Comment ? 'Reply' : 'Comment'}
+            label="Submit"
           />
         </div>
       </div>
