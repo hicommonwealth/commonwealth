@@ -114,7 +114,6 @@ export const CommentCard = ({
           <CWText className="comment-text">
             <QuillRenderer doc={comment.text} />
           </CWText>
-          {/*// TODO comment */}
           {!comment.deleted && (
             <div className="comment-footer">
               <CommentReactionButton
