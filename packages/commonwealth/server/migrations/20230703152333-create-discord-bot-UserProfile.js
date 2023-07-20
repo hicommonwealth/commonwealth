@@ -3,7 +3,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      
       const user = await queryInterface.bulkInsert(
         'Users',
         [
@@ -16,7 +15,6 @@ module.exports = {
         { returning: true, transaction }
       );
 
-      
       const userId = user[0].id;
 
       await queryInterface.bulkInsert(
@@ -46,9 +44,17 @@ module.exports = {
         const profileId = profile.id;
         const userId = profile.user_id;
 
-        await queryInterface.bulkDelete('Profiles', { id: profileId }, { transaction });
+        await queryInterface.bulkDelete(
+          'Profiles',
+          { id: profileId },
+          { transaction }
+        );
 
-        await queryInterface.bulkDelete('Users', { id: userId }, { transaction });
+        await queryInterface.bulkDelete(
+          'Users',
+          { id: userId },
+          { transaction }
+        );
       }
     });
   },
