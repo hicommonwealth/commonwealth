@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { notifyError } from '../../../controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 
 export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
@@ -101,6 +102,7 @@ export const uploadFileToS3 = async (
     return trimmedURL;
   } catch (err) {
     console.error('upload failed: ', err);
+    notifyError('Upload failed');
     throw err;
   }
 };

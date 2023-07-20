@@ -44,22 +44,6 @@ export const useImageDropAndPaste = ({
           imageType = 'image/png';
         }
 
-        const selectedIndex: number =
-          editor.getSelection()?.index || editor.getLength() || 0;
-
-        // adds line break to insert image above or below text
-        const text: string = editor.getText();
-        const isEndOfLine: boolean = editor
-          .getText()
-          [selectedIndex].endsWith('\n');
-        const lineBreak: string = isEndOfLine ? '\n' : '\n\n';
-        editor.setText(
-          text
-            .slice(0, selectedIndex)
-            .concat(lineBreak)
-            .concat(text.slice(selectedIndex))
-        );
-
         // filter out ops that contain a base64 image
         const opsWithoutBase64Images: DeltaOperation[] = (
           editor.getContents() || []
@@ -85,11 +69,40 @@ export const useImageDropAndPaste = ({
           app.user.jwt
         );
 
+        const selectedIndex: number = editor.getSelection()?.index;
+        const text: string = editor.getText();
+        const blankEditor: boolean = editor.getLength() === 1;
+        const isEndOfLine: boolean = text[selectedIndex].endsWith('\n');
+        var middleOfText: boolean = false;
+
+        // adds line break to insert image above or below text
+        if (!blankEditor) {
+          var lineBreak: string = '\n';
+          if (text[selectedIndex - 1] && text[selectedIndex]) {
+            lineBreak = '\n\n';
+            middleOfText = true;
+          }
+
+          editor.setText(
+            text
+              .slice(0, selectedIndex)
+              .concat(lineBreak)
+              .concat(text.slice(selectedIndex))
+          );
+        } else {
+          editor.setText('\n'.concat(text));
+        }
+
+        const destinationIndex: number =
+          (isEndOfLine && !blankEditor) || middleOfText
+            ? selectedIndex + 1
+            : selectedIndex;
+
         // insert image op at the selected index
         if (isMarkdownEnabled) {
-          editor.insertText(selectedIndex + 1, `![image](${uploadedFileUrl})`);
+          editor.insertText(destinationIndex, `![image](${uploadedFileUrl})`);
         } else {
-          editor.insertEmbed(selectedIndex + 1, 'image', uploadedFileUrl);
+          editor.insertEmbed(destinationIndex, 'image', uploadedFileUrl);
         }
         setContentDelta({
           ...editor.getContents(),
