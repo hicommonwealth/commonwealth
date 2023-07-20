@@ -23,7 +23,6 @@ import {
   getUniqueEntityKey,
   IEventHandler,
 } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -76,13 +75,6 @@ export default class extends IEventHandler {
       author?: string,
       completed = false
     ) => {
-      if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
-        // we always mark preimages as "completed" -- we have no link between democracy proposals
-        // and preimages in the database, so we want to always fetch them for archival purposes,
-        // which requires marking them completed.
-        completed = true;
-      }
-
       const dbEntity = await this._models.ChainEntity.create({
         type: type.toString(),
         type_id,

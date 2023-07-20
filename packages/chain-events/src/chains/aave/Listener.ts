@@ -109,26 +109,12 @@ export class Listener extends BaseListener<
 
   private getEventSourceMap(): EvmEventSourceMapType {
     const gov = this._api.governance;
-    const aaveToken = this._api.aaveToken;
-    const stkAaveToken = this._api.stkAaveToken;
     return {
       [gov.address.toLowerCase()]: {
         eventSignatures: Object.keys(gov.interface.events).map((x) =>
           ethers.utils.id(x)
         ),
         api: gov.interface,
-      },
-      [aaveToken.address.toLowerCase()]: {
-        eventSignatures: Object.keys(aaveToken.interface.events).map((x) =>
-          ethers.utils.id(x)
-        ),
-        api: aaveToken.interface,
-      },
-      [stkAaveToken.address.toLowerCase()]: {
-        eventSignatures: Object.keys(stkAaveToken.interface.events).map((x) =>
-          ethers.utils.id(x)
-        ),
-        api: stkAaveToken.interface,
       },
     };
   }

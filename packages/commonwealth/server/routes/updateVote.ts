@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
 import moment from 'moment';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
@@ -17,6 +17,7 @@ export const Errors = {
   InvalidOption: 'Invalid response option',
   PollingClosed: 'Polling already finished',
   BalanceCheckFailed: 'Could not verify user token balance',
+  InsufficientTokenBalance: 'Insufficient token balance',
 };
 
 type UpdateVoteReq = {
@@ -65,15 +66,19 @@ const updateVote = async (
   });
   if (!thread) return next(new AppError(Errors.NoThread));
 
-  // check token balance threshold if needed
-  const canVote = await validateTopicThreshold(
-    tokenBalanceCache,
-    models,
-    thread.topic_id,
-    address
-  );
-  if (!canVote) {
-    return next(new AppError(Errors.BalanceCheckFailed));
+  try {
+    // check token balance threshold if needed
+    const canVote = await validateTopicThreshold(
+      tokenBalanceCache,
+      models,
+      thread.topic_id,
+      address
+    );
+    if (!canVote) {
+      return next(new AppError(Errors.InsufficientTokenBalance));
+    }
+  } catch (e) {
+    return next(new ServerError(Errors.BalanceCheckFailed, e));
   }
 
   let vote: VoteInstance;

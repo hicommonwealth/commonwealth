@@ -131,6 +131,7 @@ class ThreadsController {
       body,
       last_edited,
       marked_as_spam_at,
+      archived_at,
       locked_at,
       version_history,
       Attachments,
@@ -213,6 +214,8 @@ class ThreadsController {
         : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    const archivedAt = archived_at ? moment(archived_at) : null;
+
     let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
@@ -287,7 +290,6 @@ class ThreadsController {
     readOnly?: boolean
   ) {
     try {
-      // TODO: Change to POST /thread
       const {
         action = null,
         session = null,
@@ -299,7 +301,7 @@ class ThreadsController {
         link: url,
         topic: topic.id,
       });
-      const response = await $.post(`${app.serverUrl()}/createThread`, {
+      const response = await $.post(`${app.serverUrl()}/threads`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,
@@ -386,14 +388,13 @@ class ThreadsController {
     });
 
     await $.ajax({
-      url: `${app.serverUrl()}/editThread`,
-      type: 'PUT',
+      url: `${app.serverUrl()}/threads/${proposal.id}`,
+      type: 'PATCH',
       data: {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         address: app.user.activeAccount.address,
         chain: app.activeChainId(),
-        thread_id: proposal.id,
         kind: proposal.kind,
         stage: proposal.stage,
         body: encodeURIComponent(newBody),
@@ -457,19 +458,20 @@ class ThreadsController {
 
   public async delete(proposal) {
     return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /thread
-      $.post(`${app.serverUrl()}/deleteThread`, {
-        jwt: app.user.jwt,
-        thread_id: proposal.id,
-        chain_id: app.activeChainId(),
-      })
+      axios
+        .delete(`${app.serverUrl()}/threads/${proposal.id}`, {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          },
+        })
         .then((result) => {
           // Deleted posts are removed from all stores containing them
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
           this.numTotalThreads -= 1;
-          resolve(result);
+          resolve(result.data);
         })
         .catch((e) => {
           console.error(e);
@@ -480,10 +482,34 @@ class ThreadsController {
   }
 
   public async toggleSpam(threadId: number, isSpam: boolean) {
+    try {
+      const verb = isSpam ? 'put' : 'delete';
+      const response = await axios[verb](
+        `${app.serverUrl()}/threads/${threadId}/spam`,
+        {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          } as any,
+        }
+      );
+      const foundThread = this.store.getByIdentifier(threadId);
+      foundThread.markedAsSpamAt = response.data.result.marked_as_spam_at;
+      this.updateThreadInStore(new Thread({ ...foundThread }));
+      return foundThread;
+    } catch (err) {
+      console.error(err);
+      notifyError(`Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`);
+      throw err;
+    }
+  }
+
+  public async setArchived(threadId: number, isArchived: boolean) {
     return new Promise((resolve, reject) => {
       $.post(
-        `${app.serverUrl()}/threads/${threadId}/${!isSpam ? 'mark' : 'unmark'
-        }-as-spam`,
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isArchived ? 'archive' : 'unarchive'
+        }`,
         {
           jwt: app.user.jwt,
           chain_id: app.activeChainId(),
@@ -491,14 +517,14 @@ class ThreadsController {
       )
         .then((response) => {
           const foundThread = this.store.getByIdentifier(threadId);
-          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
+          foundThread.archivedAt = response.result.archived_at;
           this.updateThreadInStore(new Thread({ ...foundThread }));
           resolve(foundThread);
         })
         .catch((e) => {
           console.error(e);
           notifyError(
-            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+            `Could not ${!isArchived ? 'archive' : 'unarchive'} thread`
           );
           reject(e);
         });

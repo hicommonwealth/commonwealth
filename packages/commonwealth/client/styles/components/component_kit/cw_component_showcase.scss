@@ -1,18 +1,20 @@
 @import '../../shared';
 
+@mixin gallery-grid($gap, $flex-direction) {
+  display: flex;
+  flex-direction: $flex-direction;
+  gap: $gap;
+}
+
 $width: 360px;
 
 .ComponentShowcase {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  @include gallery-grid(32px, column);
   padding: 24px;
   width: 100%;
 
   .basic-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
     width: $width;
 
     .item-row {
@@ -27,21 +29,16 @@ $width: 360px;
   }
 
   .progress-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
     width: 400px;
   }
 
   .tooltip-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
 
     .tooltip-row {
       align-items: center;
-      display: flex;
-      flex-direction: row;
+      @include gallery-grid(initial, row);
       justify-content: space-between;
       width: 240px;
 
@@ -51,14 +48,27 @@ $width: 360px;
     }
   }
 
+  .upvote-gallery {
+    @include gallery-grid(8px, column);
+
+    .upvote-row {
+      align-items: center;
+      @include gallery-grid(initial, row);
+      justify-content: space-between;
+      width: 180px;
+    }
+  }
+
+  .thread-actions-gallery {
+    @include gallery-grid(8px, column);
+  }
+
   .text-gallery {
-    display: flex;
-    flex-direction: column;
+    @include gallery-grid(initial, column);
 
     .text-row {
       align-items: center;
-      display: flex;
-      flex-direction: row;
+      @include gallery-grid(initial, row);
       height: 48px;
       justify-content: space-between;
       width: 400px;
@@ -71,8 +81,7 @@ $width: 360px;
   }
 
   .icon-gallery {
-    display: flex;
-    flex-direction: column;
+    @include gallery-grid(initial, column);
     width: 100%;
 
     .all-icons-container {
@@ -85,8 +94,7 @@ $width: 360px;
 
       .icon-container {
         align-items: flex-start;
-        display: flex;
-        flex-direction: column;
+        @include gallery-grid(initial, column);
         height: 40px;
         justify-content: center;
         margin: 8px;
@@ -109,14 +117,11 @@ $width: 360px;
   }
 
   .icon-button-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
 
     .icon-button-row {
       align-items: center;
-      display: flex;
-      flex-direction: row;
+      @include gallery-grid(initial, row);
       height: 32px;
       justify-content: space-between;
       width: 120px;
@@ -128,9 +133,7 @@ $width: 360px;
   }
 
   .button-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
 
     .button-row {
       align-items: center;
@@ -141,39 +144,40 @@ $width: 360px;
   }
 
   .choice-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
   }
 
   .card-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
     width: 100%;
 
     .top-card-row {
-      display: flex;
-      flex-direction: row;
+      @include gallery-grid(initial, row);
       justify-content: space-between;
     }
   }
 
   .form-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    @include gallery-grid(8px, column);
     width: $width;
   }
 
   .toggle-gallery {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
+    @include gallery-grid(8px, row);
 
     .toggle-label {
       display: grid;
       align-items: center;
+    }
+  }
+
+  .editor-toggle {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+
+    .caption {
+      margin-left: 8px;
     }
   }
 }

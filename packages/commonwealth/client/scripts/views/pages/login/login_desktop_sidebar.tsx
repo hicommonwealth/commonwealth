@@ -26,7 +26,7 @@ const generateText = (wallets: Array<IWebWallet<any>>) => {
   const startsWithVowel = wallet.chain === ChainBase.Ethereum;
   const walletType =
     wallet.defaultNetwork === ChainNetwork.Terra
-      ? `Terra Station`
+      ? `Station`
       : wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1);
 
   return `This Community requires a${
