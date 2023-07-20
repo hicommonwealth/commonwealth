@@ -30,6 +30,12 @@ export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
 
 // removes default user from the db. Subsequent login will need to go through the profile creation screen
 export async function removeUser() {
+  const userExists = await testDb.query(
+    `select 1 from "Addresses" where address = '${testAddress}'`
+  );
+
+  if (userExists[0].length === 0) return;
+
   const removeQuery = `
     DELETE FROM "Subscriptions"
     WHERE subscriber_id in (
