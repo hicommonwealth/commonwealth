@@ -19,7 +19,7 @@ import {
 import { useCommonNavigate } from 'navigation/helpers';
 import { useDebounce } from 'usehooks-ts';
 import axios from 'axios';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   CommunityResult,
   MemberResult,

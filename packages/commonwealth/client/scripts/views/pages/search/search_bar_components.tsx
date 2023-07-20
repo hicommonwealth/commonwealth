@@ -4,7 +4,6 @@ import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
 
-import app from 'state';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import AddressInfo from '../../../models/AddressInfo';
 import ChainInfo from '../../../models/ChainInfo';
