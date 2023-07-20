@@ -90,11 +90,6 @@ export const LoginSelector = () => {
     );
   }
 
-  const activeAccountsByRole = app.roles.getActiveAccountsByRole();
-
-  const nAccountsWithoutRole = activeAccountsByRole.filter(([, role]) => !role)
-    .length;
-
   if (!profileLoadComplete && NewProfilesController.Instance.allLoaded()) {
     setProfileLoadComplete(true);
   }
@@ -136,14 +131,7 @@ export const LoginSelector = () => {
                 <User user={app.user.addresses[0]} />
               </div>
 
-              <Popover
-                content={
-                  <LoginSelectorMenuLeft
-                    nAccountsWithoutRole={nAccountsWithoutRole}
-                  />
-                }
-                {...leftMenuProps}
-              />
+              <Popover content={<LoginSelectorMenuLeft />} {...leftMenuProps} />
             </div>
           </ClickAwayListener>
         )}

@@ -14,7 +14,8 @@
     }
   }
 
-  &.primary, &.destructive {
+  &.primary,
+  &.destructive {
     border: 2px solid $transparent;
     padding: 2px;
     border-radius: 10px;
@@ -53,7 +54,7 @@
     &:focus-within {
       border: 2px solid $neutral-800;
       padding: 2px;
-      margin: 0px;
+      margin: 0;
     }
 
     &.disabled {
@@ -98,7 +99,7 @@
       padding-bottom: 0.25rem;
       gap: 0.625rem;
     }
-  
+
     &.med {
       height: 2.5rem;
       padding-top: 0.5rem;
@@ -110,7 +111,7 @@
       height: 3rem;
       padding-top: 0.625rem;
       padding-bottom: 0.625rem;
-  
+
       .Text.button-text {
         font-size: 1rem;
       }
@@ -121,7 +122,8 @@
       }
     }
 
-    &.sm, &.med {
+    &.sm,
+    &.med {
       gap: 0.625rem;
       .Text.button-text {
         font-size: 0.875rem;
@@ -134,7 +136,7 @@
     }
 
     &.disabled {
-      pointer-events: none;
+      cursor: not-allowed;
     }
 
     &.narrow {
@@ -244,4 +246,3 @@
     }
   }
 }
-
