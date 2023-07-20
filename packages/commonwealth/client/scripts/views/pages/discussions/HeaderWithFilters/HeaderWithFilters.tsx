@@ -21,6 +21,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { Select } from 'views/components/Select';
 import './HeaderWithFilters.scss';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -48,6 +49,8 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
   const onFilterResize = () => {
     if (filterRowRef.current) {
       setRightFiltersDropdownPosition(
@@ -69,11 +72,9 @@ export const HeaderWithFilters = ({
 
   useEffect(() => {
     app.loginStateEmitter.on('redraw', forceRerender);
-    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       app.loginStateEmitter.off('redraw', forceRerender);
-      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
@@ -168,8 +169,7 @@ export const HeaderWithFilters = ({
               onClick={() => {
                 navigate('/new/discussion');
               }}
-              // todo FIX
-              disabled={!app.user.activeAccount}
+              disabled={!hasJoinedCommunity}
             />
           ) : (
             <CWButton
@@ -181,8 +181,7 @@ export const HeaderWithFilters = ({
                   `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
                 );
               }}
-              // TODO fix
-              disabled={!app.user.activeAccount}
+              disabled={!hasJoinedCommunity}
             />
           )}
         </div>
