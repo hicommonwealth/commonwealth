@@ -16,7 +16,7 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 import ChainInfo from '../../../models/ChainInfo';
 
-type ThreadResult = {
+export type ThreadResult = {
   id: number;
   chain: string;
   title: string;
@@ -80,7 +80,7 @@ const renderThreadResult = (thread: ThreadResult, searchTerm, setRoute) => {
   );
 };
 
-type ReplyResult = {
+export type ReplyResult = {
   id: number;
   proposalid: number;
   chain: string;
@@ -149,7 +149,7 @@ const renderReplyResult = (comment: ReplyResult, searchTerm, setRoute) => {
  *  The route should be set to /<community-id>, so null should be passed instead of a prefix,
  *  as defined in the useCommonNavigate hook and the getScopePrefix helper function.
  */
-type CommunityResult = {
+export type CommunityResult = {
   id: string;
   name: string;
   default_symbol: string;
@@ -178,9 +178,15 @@ const renderCommunityResult = (community: CommunityResult, setRoute) => {
   );
 };
 
-type MemberResult = {
+export type MemberResult = {
+  id: number;
+  user_id: number;
+  profile_name: string;
+  avatar_url: string | null;
   chains: string[];
+  address_ids: number[];
   addresses: string[];
+  created_at: string;
 };
 const getMemberResult = (addr: MemberResult, setRoute) => {
   const chain = addr.chains[0];

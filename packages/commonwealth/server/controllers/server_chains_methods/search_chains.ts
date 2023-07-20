@@ -41,6 +41,7 @@ export async function __searchChains(
       sortOptions = {
         ...sortOptions,
         orderBy: `"Chains".created_at`,
+        orderDirection: 'ASC',
       };
   }
 

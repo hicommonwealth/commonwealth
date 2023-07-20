@@ -19,11 +19,65 @@ import {
 import { useCommonNavigate } from 'navigation/helpers';
 import { useDebounce } from 'usehooks-ts';
 import axios from 'axios';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  CommunityResult,
+  MemberResult,
+  ReplyResult,
+  ThreadResult,
+} from './helpers';
 
 const MIN_SEARCH_TERM_LENGTH = 4;
 const NUM_RESULTS_PER_SECTION = 2;
 
 let resetTimer = null;
+
+const SEARCH_URLS: Record<SearchScope, string> = {
+  [SearchScope.Threads]: '/api/threads',
+  [SearchScope.Members]: '/api/profiles',
+  [SearchScope.Communities]: '/api/chains',
+  [SearchScope.Replies]: '/api/comments',
+  [SearchScope.Proposals]: '',
+  [SearchScope.All]: '',
+};
+
+// fetches a single page of results for the search scope
+async function searchInScope<T>(
+  chain: string,
+  searchScope: SearchScope,
+  searchTerm: string
+): Promise<T[]> {
+  try {
+    const urlParams = {
+      chain: chain || 'all_chains',
+      search: searchTerm,
+      limit: NUM_RESULTS_PER_SECTION.toString(),
+      page: 1,
+      order_by: 'rank',
+      order_direction: 'DESC',
+    };
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(urlParams)) {
+      q.set(k, v.toString());
+    }
+    const url = SEARCH_URLS[searchScope];
+    if (!url) {
+      throw new Error(`could not get url for search scope: ${searchScope}`);
+    }
+    const { data } = await axios.get<{ result: { results } }>(
+      `${url}?${q.toString()}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return data.result.results as T[];
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
 
 const goToSearchPage = (
   query: SearchQuery,
@@ -46,28 +100,21 @@ const goToSearchPage = (
 
 export const SearchBar = () => {
   const navigate = useCommonNavigate();
+  const chain = app.activeChainId() || 'all_chains';
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<
-    Record<string, Array<any>>
-  >({});
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const showDropdown =
-    Object.keys(searchResults || {}).length > 0 && searchTerm.length > 0;
-
   const resetSearchBar = () => {
     setSearchTerm('');
-    setSearchResults({});
   };
 
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: app.activeChainId(),
+      chainScope: chain,
     });
-
     goToSearchPage(searchQuery, navigate);
   };
 
@@ -76,45 +123,67 @@ export const SearchBar = () => {
     setSearchTerm(value);
   };
 
-  const handleGetSearchPreview = async (value: string) => {
-    const searchQuery = new SearchQuery(value, {
-      isSearchPreview: true,
-      chainScope: app.activeChainId() || 'all_chains',
-    });
-
-    try {
-      // TODO: fix this for search bar
-      return;
-      await app.search.search(searchQuery);
-      const searchResponse = app.search.getByQuery(searchQuery)?.results;
-
-      const results = searchResponse
-        ? Object.fromEntries(
-            Object.entries(searchResponse).map(([k, v]) => [
-              k,
-              v.slice(0, NUM_RESULTS_PER_SECTION),
-            ])
-          )
-        : {};
-
-      setSearchResults(results);
-      app.search.addToHistory(searchQuery);
-    } catch (err) {
-      console.error(err);
-      setSearchResults({});
-      notifyError(
-        err.responseJSON?.error || err.responseText || err.toString()
-      );
-    }
+  const fetchSearchResults = async () => {
+    const [
+      threadResults,
+      replyResults,
+      communityResults,
+      memberResults,
+    ] = await Promise.all([
+      searchInScope<ThreadResult>(
+        chain,
+        SearchScope.Threads,
+        debouncedSearchTerm
+      ),
+      searchInScope<ReplyResult>(
+        chain,
+        SearchScope.Replies,
+        debouncedSearchTerm
+      ),
+      searchInScope<CommunityResult>(
+        chain,
+        SearchScope.Communities,
+        debouncedSearchTerm
+      ),
+      searchInScope<MemberResult>(
+        chain,
+        SearchScope.Members,
+        debouncedSearchTerm
+      ),
+    ]);
+    return {
+      [SearchScope.Threads]: threadResults,
+      [SearchScope.Replies]: replyResults,
+      [SearchScope.Communities]: communityResults,
+      [SearchScope.Members]: memberResults,
+    };
   };
 
-  // when debounced search term changes, fetch search results
+  const isValidSearchTerm =
+    debouncedSearchTerm.length >= MIN_SEARCH_TERM_LENGTH;
+
+  const { data: searchResults, refetch } = useQuery({
+    queryKey: [
+      'searchBar',
+      {
+        debouncedSearchTerm,
+        chain,
+      },
+    ],
+    queryFn: fetchSearchResults,
+    enabled: isValidSearchTerm,
+  });
+
+  const showDropdown =
+    searchTerm.length > 0 && Object.keys(searchResults || {}).length > 0;
+
+  // when debounced search term changes, refetch
   useEffect(() => {
-    clearTimeout(resetTimer);
-    if (debouncedSearchTerm?.length >= MIN_SEARCH_TERM_LENGTH) {
-      handleGetSearchPreview(debouncedSearchTerm);
+    if (!isValidSearchTerm) {
+      return;
     }
-  }, [debouncedSearchTerm]);
+    refetch();
+  }, [isValidSearchTerm, debouncedSearchTerm, refetch]);
 
   return (
     <div
