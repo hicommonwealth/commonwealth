@@ -37,48 +37,54 @@ const upgradeMember = async (
   const chain = req.chain;
   const { address, new_role } = req.body;
 
-  // Get address ids of user making request to assert admin status
-  const requesterAddresses = await req.user.getAddresses();
-  const requesterAddressIds = requesterAddresses
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-
-  const addresses = await models.Address.findAll({
+  // find if the requester has an admin address in the target community
+  const adminAddress = await models.Address.findOne({
     where: {
       chain: chain.id,
-      [Op.or]: {
-        id: { [Op.in]: requesterAddressIds },
-        address: address,
+      user_id: req.user.id,
+      verified: {
+        [Op.ne]: null,
       },
+      role: 'admin',
     },
   });
 
-  const targetAddress = addresses.find((a) => address === a.address);
+  if (!adminAddress) {
+    return next(new AppError(Errors.MustBeAdmin));
+  }
 
   // check if address provided exists
+  const targetAddress = await models.Address.findOne({
+    where: {
+      chain: chain.id,
+      address: address,
+    },
+  });
+
   if (!targetAddress) return next(new AppError(Errors.NoMember));
-
-  const allCommunityAdmin = addresses.filter((m) => m.role === 'admin');
-  const requesterAdminRoles = allCommunityAdmin.filter((a) =>
-    requesterAddressIds.includes(a.id)
-  );
-
-  if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
-    return next(new AppError(Errors.MustBeAdmin));
-
-  const requesterAdminAddressIds = requesterAdminRoles.map(
-    (r) => r.toJSON().id
-  );
-  const isLastAdmin = allCommunityAdmin.length < 2;
-  const adminSelfDemoting =
-    requesterAdminAddressIds.includes(address.id) && new_role !== 'admin';
-
-  if (isLastAdmin && adminSelfDemoting) {
-    return next(new AppError(Errors.MustHaveAdmin));
-  }
 
   if (new_role === targetAddress.role) {
     return next(new AppError(Errors.InvalidRole));
+  }
+
+  // if demoting from admin ensure at least 1 other admin remains
+  if (
+    targetAddress.role === 'admin' &&
+    (new_role === 'moderator' || new_role === 'member')
+  ) {
+    const otherExistingAdmin = await models.Address.findOne({
+      where: {
+        chain: chain.id,
+        role: 'admin',
+        id: {
+          [Op.ne]: targetAddress.id,
+        },
+      },
+    });
+
+    if (!otherExistingAdmin) {
+      return next(new AppError(Errors.MustHaveAdmin));
+    }
   }
 
   // If all validations pass, update role;

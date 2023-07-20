@@ -197,20 +197,19 @@ export function formatAddressShort(
   address: string,
   chain?: string,
   includeEllipsis?: boolean,
-  maxCharLength?: number
+  maxCharLength?: number,
+  prefix?: string
 ) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (
-    chain === 'straightedge' ||
-    chain === 'cosmoshub' ||
-    chain === 'osmosis' ||
-    chain === 'injective' ||
-    chain === 'injective-testnet' ||
-    chain === 'osmosis-local'
-  ) {
-    return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
+  } else if (prefix && !maxCharLength) {
+    if (!includeEllipsis) return address;
+    const totalLength = address.length;
+    return `${address.slice(0, prefix.length + 3)}...${address.slice(
+      totalLength - 4,
+      totalLength
+    )}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
       includeEllipsis ? '…' : ''

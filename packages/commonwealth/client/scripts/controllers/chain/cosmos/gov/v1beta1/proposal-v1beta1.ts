@@ -206,9 +206,10 @@ export class CosmosProposal extends Proposal<
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTally(tallyResp?.tally);
         }
-        this.isFetched.emit('redraw');
       } catch (err) {
-        console.error(`Cosmos query failed: ${err.message}`);
+        console.error(`Votes query failed: ${err.message}`);
+      } finally {
+        this.isFetched.emit('redraw');
       }
     }
   }

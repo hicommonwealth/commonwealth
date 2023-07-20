@@ -72,25 +72,27 @@ const fetchProposalsByStatus = async (
     return [];
   }
 
-  const { proposals: proposalsByStatus, pagination } = await api.gov.proposals(
-    status,
-    '',
-    ''
-  );
+  try {
+    const { proposals: proposalsByStatus, pagination } =
+      await api.gov.proposals(status, '', '');
 
-  let nextKey = pagination?.nextKey;
-  while (nextKey.length > 0) {
-    // console.log(nextKey);
-    const { proposals, pagination: nextPage } = await api.gov.proposals(
-      status,
-      '',
-      '',
-      nextKey
-    );
-    proposalsByStatus.push(...proposals);
-    nextKey = nextPage.nextKey;
+    let nextKey = pagination?.nextKey;
+    while (nextKey.length > 0) {
+      // console.log(nextKey);
+      const { proposals, pagination: nextPage } = await api.gov.proposals(
+        status,
+        '',
+        '',
+        nextKey
+      );
+      proposalsByStatus.push(...proposals);
+      nextKey = nextPage.nextKey;
+    }
+    return proposalsByStatus;
+  } catch (e) {
+    console.error(`Error fetching proposals by status ${status}`, e);
+    return [];
   }
-  return proposalsByStatus;
 };
 
 export const getActiveProposalsV1Beta1 = async (
