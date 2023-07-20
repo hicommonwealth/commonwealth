@@ -23,7 +23,7 @@ config:
     - name: "Warm up"
       duration: 10
       arrivalRate: 5
-  processor: "functions.js" # Specify the path to the JavaScript file containing custom functions
+  processor: "../functions.js" # Specify the path to the JavaScript file containing custom functions
 scenarios:
   - name: "Read Endpoints"
     flow:

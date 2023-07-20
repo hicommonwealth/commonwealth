@@ -43,8 +43,8 @@ server.on('error', (err) => {
 server.on('message', (msg, rinfo) => {
   const message = msg.toString();
   if (message.includes('Finished: Artillery.io Test')) {
+    console.log('====Artillery Test Finished====');
     server.close();
-    console.log('====Server closed====');
   }
   console.log(`server got: ${message} from ${rinfo.address}:${rinfo.port}`);
   if (message.startsWith(prefix)) {
@@ -101,6 +101,12 @@ server.on('listening', () => {
   console.log(
     `Listening for StatsD events on ${address.address}:${address.port}`
   );
+});
+
+server.on('close', () => {
+  console.log('====closing statsd server====');
+  //exit
+  process.exit(0);
 });
 
 server.bind(8125);

@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "https://www.artillery.io/docs/reference/engines/http",
   "scripts": {
-    "test:load": "artillery run -o ${REPORT_DIR}/report-${ENV}.json --environment ${ENV} commonwealth-api.yml",
-    "test:report": "artillery report --output ${REPORT_DIR}/report-${ENV}.html ${REPORT_DIR}/report-${ENV}.json"
+    "post:datadog": "node post-datadog-metrics.js",
+    "test:load": "artillery run -o ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json --environment ${ENV} app/scenarios/${TEST_NAME}.yml",
+    "test:report": "artillery report --output ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.html ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json"
   },
   "author": "",
   "license": "ISC",

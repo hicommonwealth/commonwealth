@@ -1,5 +1,5 @@
-export JWT=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE5NTM1LCJlbWFpbCI6Im5ha3VsbS5ueXVAZ21haWwuY29tIiwiaWF0IjoxNjg4NTgxOTk0fQ.KrrizRMe3nRScvqtlY4h_3wEwd1D_qCgreAdN7i5m2k
-export USER_ADDRESS=0xAA365a38bD45E573d0d1F3A870E68aA5DeDeA22e
+export JWT=eyJWT
+export USER_ADDRESS=0xAABCDEF
 export POST_THREAD_ID=11875
 export ENV=local
 export REPORT_DIR=output
@@ -8,4 +8,4 @@ export DD_APP_KEY=lsdfsjsldk
 export DD_SITE=us5.datadoghq.com
 export TEST_LOCATION=us-east
 export TEST_ID=$(uuidgen)
-export TEST_NAME=commonwealth-api-read-load-test
+export TEST_NAME=commonwealth-api-threads
