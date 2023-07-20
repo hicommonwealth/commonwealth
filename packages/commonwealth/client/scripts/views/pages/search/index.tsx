@@ -97,7 +97,7 @@ const SearchPage = () => {
         case SearchScope.Members:
           return '/api/profiles';
         case SearchScope.Communities:
-          return '/api/external/communities';
+          return '/api/chains';
         case SearchScope.Replies:
           return '/api/comments';
         default:

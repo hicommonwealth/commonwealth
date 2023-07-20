@@ -15,6 +15,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
+import ChainInfo from 'client/scripts/models/ChainInfo';
 
 type ThreadResult = {
   id: number;
@@ -150,24 +151,22 @@ const renderReplyResult = (comment: ReplyResult, searchTerm, setRoute) => {
  *  as defined in the useCommonNavigate hook and the getScopePrefix helper function.
  */
 type CommunityResult = {
-  SearchContentType: SearchContentType;
-  id: any;
+  id: string;
+  name: string;
+  default_symbol: string;
+  type: string;
+  icon_url: string;
+  created_at: string | null;
 };
 const renderCommunityResult = (community: CommunityResult, setRoute) => {
-  const params =
-    community.SearchContentType === SearchContentType.Token
-      ? { community }
-      : community.SearchContentType === SearchContentType.Chain
-      ? { community }
-      : null;
-
   const handleClick = () => {
-    if (params.community) {
-      setRoute(params.community.id ? `/${params.community.id}` : '/', {}, null);
-    } else {
-      setRoute(community.id ? `/${community.id}` : '/', {}, null);
-    }
+    // if (['token', 'chain'].includes(community.type)) {
+    //   setRoute(community.id ? `/${community.id}` : '/', {}, null);
+    // }
+    setRoute(community.id ? `/${community.id}` : '/', {}, null);
   };
+
+  const chainInfo = ChainInfo.fromJSON(community as any);
 
   return (
     <div
@@ -175,7 +174,7 @@ const renderCommunityResult = (community: CommunityResult, setRoute) => {
       className="community-result-row"
       onClick={handleClick}
     >
-      <CommunityLabel {...params} />
+      <CommunityLabel community={chainInfo} />
     </div>
   );
 };

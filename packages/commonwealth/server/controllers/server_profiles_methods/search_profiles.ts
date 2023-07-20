@@ -73,8 +73,9 @@ export async function __searchProfiles(
       };
   }
 
-  const { sql: paginationSort, bind: paginationBind } =
-    buildPaginationSql(sortOptions);
+  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql(
+    sortOptions
+  );
 
   const bind: any = {
     searchTerm: `%${search}%`,
@@ -104,9 +105,9 @@ export async function __searchProfiles(
     WHERE
       ${chainWhere}
       (
-        "Profiles".profile_name ILIKE $searchTerm
+        "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
         OR
-        "Addresses".address ILIKE $searchTerm
+        "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
     GROUP BY
       "Profiles".id
