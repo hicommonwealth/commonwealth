@@ -21,18 +21,18 @@ export class Comment<T extends IUniqueId> {
   public readonly created_at: momentType.Moment;
   public readonly authorChain?: string;
   public readonly parentComment: number;
-  public readonly thread_id: number;
+  public readonly threadId: number;
   public readonly version_history: VersionHistory[];
-  public readonly last_edited: string;
+  public readonly lastEdited: string;
   public markedAsSpamAt: momentType.Moment;
   public readonly deleted: boolean;
   public readonly rootThread: string;
-  public readonly parent_id: number;
-  public readonly deleted_at: any;
+  public readonly parentId: number;
+  public readonly deletedAt: any;
 
-  public readonly canvas_action: string;
-  public readonly canvas_session: string;
-  public readonly canvas_hash: string;
+  public readonly canvasAction: string;
+  public readonly canvasSession: string;
+  public readonly canvasHash: string;
 
   constructor({
     id,
