@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { expect } from 'chai';
-import { PORT } from '../../server/config';
-import { login } from './utils/e2eUtils';
+import { PORT } from '../../../server/config';
+import { login } from '../utils/e2eUtils';
 
 test.describe('Commonwealth Create Community', () => {
   test.beforeEach(async ({ page }) => {
@@ -65,6 +65,7 @@ async function fillOutERCForm(page, formName, tokenContractAddress, chainName) {
 
   // populate token contract address
   const tokenContractAddressForm = await page.$('input[id*=Contract]');
+  console.log(tokenContractAddressForm);
   await tokenContractAddressForm.type(tokenContractAddress);
   await (await page.$('button.Button.primary-blue >> text=/Populate/')).click();
 

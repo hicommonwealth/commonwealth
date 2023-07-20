@@ -1,4 +1,6 @@
 // Note, this login will not work for the homepage
+import { TestInfo } from '@playwright/test';
+import { Page } from 'playwright-test';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
 
@@ -20,6 +22,24 @@ export async function login(page) {
   } while (metaMaskIcon.length === 0);
 
   await page.getByText('Metamask').click();
+}
+
+export async function screenshotOnFailure(
+  { page }: { page: Page },
+  testInfo: TestInfo
+) {
+  if (testInfo.status !== testInfo.expectedStatus) {
+    // Get a unique place for the screenshot.
+    const screenshotPath = testInfo.outputPath(`failure.png`);
+    // Add it to the report.
+    testInfo.attachments.push({
+      name: 'screenshot',
+      path: screenshotPath,
+      contentType: 'image/png',
+    });
+    // Take the screenshot itself.
+    await page.screenshot({ path: screenshotPath, timeout: 5000 });
+  }
 }
 
 // This connection is used to speed up tests, so we don't need to load in all the models with the associated
