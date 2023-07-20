@@ -19,6 +19,7 @@ import { renderSearchResults } from './helpers';
 import axios from 'axios';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
+import { useCommonNavigate } from '../../../navigation/helpers';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
   (scope) => !['All', 'Proposals'].includes(scope)
@@ -48,6 +49,8 @@ type SearchResultsPayload = {
 
 const SearchPage = () => {
   const navigate = useNavigate();
+  const commonNavigate = useCommonNavigate();
+
   const location = useLocation();
   const [urlQueryParams] = useSearchParams();
   const [bottomRef, bottomInView] = useInView();
@@ -252,7 +255,7 @@ const SearchPage = () => {
                       results as any,
                       queryParams.q,
                       activeTab,
-                      navigate
+                      commonNavigate
                     )}
                     <div ref={bottomRef}></div>
                   </div>
