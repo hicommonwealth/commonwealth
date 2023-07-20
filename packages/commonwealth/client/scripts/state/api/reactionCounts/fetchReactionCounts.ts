@@ -20,9 +20,9 @@ const fetchReactionCounts = async ({
   commentIds
 }: FetchReactionCountsProps) => {
   const response = await axios.post(`${app.serverUrl()}/reactionsCounts`, {
-    ...(threadIds && threadIds.length > 0 && { thread_ids: threadIds }),
-    ...(proposalIds && proposalIds.length > 0 && { proposal_ids: proposalIds }),
-    ...(commentIds && commentIds.length > 0 && { comment_ids: commentIds }),
+    ...(threadIds?.length > 0 && { thread_ids: threadIds }),
+    ...(proposalIds?.length > 0 && { proposal_ids: proposalIds }),
+    ...(commentIds?.length > 0 && { comment_ids: commentIds }),
     active_address: address,
   });
 

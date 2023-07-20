@@ -1,6 +1,5 @@
 import type momentType from 'moment';
 import moment from 'moment';
-import app from 'state';
 import type { VersionHistory } from '../controllers/server/threads';
 import AddressInfo from './AddressInfo';
 import Attachment from './Attachment';
@@ -56,7 +55,6 @@ export class Comment<T extends IUniqueId> {
     version_history,
     marked_as_spam_at,
   }) {
-
     const versionHistory = version_history ? version_history.map((v) => {
       if (!v) return;
       let history;

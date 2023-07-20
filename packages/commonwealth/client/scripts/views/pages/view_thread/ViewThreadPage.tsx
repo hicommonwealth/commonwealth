@@ -9,15 +9,15 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
-import type { IThreadCollaborator } from 'models/Thread';
 import ReactionCount from 'models/ReactionCount';
+import type { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import fetchThreadReactionCounts from 'state/api/reactionCounts/fetchReactionCounts';
+import { fetchReactionCounts } from 'state/api/reactionCounts';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
@@ -225,7 +225,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   useNecessaryEffect(() => {
     if (comments.length > 0 && thread && thread.id) {
-      fetchThreadReactionCounts({
+      fetchReactionCounts({
         proposalIds: [`${thread.id}`],
         commentIds: comments.map(c => `${c.id}`),
         address: app.user.activeAccount?.address,

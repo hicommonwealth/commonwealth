@@ -12,7 +12,7 @@ interface CreateCommentProps {
   threadId: number,
   chainId: string;
   unescapedText: string,
-  parentCommentId: any,
+  parentCommentId: number,
   attachments?: string[]
 }
 
@@ -41,7 +41,6 @@ const createComment = async ({
       chain: chainId,
       address: address,
       parent_id: parentCommentId,
-      // chain_entity_id: chainEntity?.id,
       'attachments[]': attachments,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
@@ -67,7 +66,7 @@ const useCreateCommentMutation = ({ chainId, threadId }: Partial<CreateCommentPr
       // update fetch comments query state
       const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId]
       queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData([...key],
+      queryClient.setQueryData(key,
         () => {
           const updatedComments = [...(comments || []).filter(x => x.id !== newComment.id), newComment]
           return updatedComments

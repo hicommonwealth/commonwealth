@@ -74,9 +74,9 @@ const useEditCommentMutation = ({ chainId, threadId }: UseEditCommentMutationPro
         queryClient.cancelQueries({ queryKey: key });
         queryClient.setQueryData([...key],
           () => {
-            const updatedComments = [...(comments || [])]
-            updatedComments[foundCommentIndex] = updatedComment
-            return [...updatedComments]
+            const updatedComments = [...(comments || [])];
+            updatedComments[foundCommentIndex] = updatedComment;
+            return updatedComments;
           }
         );
       }

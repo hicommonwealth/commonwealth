@@ -96,7 +96,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public deinitServer() {
     this._serverLoaded = false;
     this.app.threads.deinit();
-    // this.app.threads.deinit(); // TODO: do we want to clear react query state here?
     if (this.app.chainEntities) {
       this.app.chainEntities.deinit();
     }
