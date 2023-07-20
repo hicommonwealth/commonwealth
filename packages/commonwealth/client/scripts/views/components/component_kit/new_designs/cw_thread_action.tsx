@@ -74,14 +74,11 @@ type CWThreadActionProps = {
 interface TooltipWrapperProps {
   disabled: boolean;
   text: string;
+  children: JSX.Element;
 }
 
 // Tooltip should only wrap the ThreadAction when the button is disabled
-const TooltipWrapper: FC = ({
-  children,
-  disabled,
-  text,
-}: TooltipWrapperProps) => {
+const TooltipWrapper = ({ children, disabled, text }: TooltipWrapperProps) => {
   if (!disabled) {
     return <>{children}</>;
   }
@@ -135,11 +132,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   const upvoteSelected = action === 'upvote' && selected;
 
   return (
-    <TooltipWrapper
-      disabled={disabled}
-      action={action}
-      text={getTooltipCopy(action)}
-    >
+    <TooltipWrapper disabled={disabled} text={getTooltipCopy(action)}>
       <button
         onClick={handleClick}
         className={getClasses(

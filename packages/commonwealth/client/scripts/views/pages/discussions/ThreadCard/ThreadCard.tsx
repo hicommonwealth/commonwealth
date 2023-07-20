@@ -26,6 +26,7 @@ import { ThreadOptions } from './ThreadOptions';
 import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
 import './ThreadCard.scss';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
@@ -53,6 +54,7 @@ export const ThreadCard = ({
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -91,7 +93,11 @@ export const ThreadCard = ({
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ReactionButton thread={thread} size="big" />
+          <ReactionButton
+            thread={thread}
+            size="big"
+            disabled={!hasJoinedCommunity}
+          />
         )}
         <div className="content-wrapper">
           <div className="content-header">

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import 'components/component_kit/new_designs/CWUpvoteSmall.scss';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
