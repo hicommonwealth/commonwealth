@@ -171,7 +171,6 @@ export const ThreadCard = ({
               {thread.plaintext}
             </CWText>
           </div>
-          {/*// TODO discussions page */}
           <div className="content-footer">
             <ThreadOptions
               totalComments={thread.numberOfComments}

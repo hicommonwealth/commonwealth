@@ -29,6 +29,7 @@ const CWUpvoteSmall = ({
 
     onClick?.(e);
   };
+
   return (
     <div
       className={getClasses<{ disabled?: boolean }>({ disabled })}

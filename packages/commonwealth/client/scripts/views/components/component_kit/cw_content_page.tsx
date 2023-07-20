@@ -155,7 +155,6 @@ export const CWContentPage = ({
 
       {body &&
         body(
-          // todo
           <ThreadOptions
             upvoteBtnVisible={!thread?.readOnly}
             commentBtnVisible={!thread?.readOnly}

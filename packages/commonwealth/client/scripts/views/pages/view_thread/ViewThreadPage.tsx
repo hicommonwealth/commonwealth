@@ -666,7 +666,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
                   <>
-                    {/*// TODO read only */}
                     {threadOptionsComp}
                     {!thread.readOnly && thread.markedAsSpamAt && (
                       <div className="callout-text">
@@ -691,7 +690,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   </>
                 ) : !isGloballyEditing && isLoggedIn ? (
                   <>
-                    {/*// TODO main thread */}
                     {threadOptionsComp}
                     <CreateComment
                       updatedCommentsCallback={updatedCommentsCallback}

@@ -1023,6 +1023,10 @@ export const ComponentShowcase = () => {
             onClick={() => console.log('Subscribe action clicked!')}
           />
           <CWThreadAction
+            action="upvote"
+            onClick={() => console.log('Upvote action clicked!')}
+          />
+          <CWThreadAction
             action="overflow"
             onClick={() => console.log('Overflow action clicked!')}
           />
@@ -1040,6 +1044,11 @@ export const ComponentShowcase = () => {
           <CWThreadAction
             action="subscribe"
             onClick={() => console.log('Subscribe action clicked!')}
+            disabled
+          />
+          <CWThreadAction
+            action="upvote"
+            onClick={() => console.log('Upvote action clicked!')}
             disabled
           />
           <CWThreadAction

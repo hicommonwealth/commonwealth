@@ -1,5 +1,3 @@
-import 'components/ReactionButton/CommentReactionButton.scss';
-
 import React, { useState, useEffect } from 'react';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
