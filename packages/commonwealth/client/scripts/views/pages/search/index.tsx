@@ -17,7 +17,7 @@ import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderSearchResults } from './helpers';
 import axios from 'axios';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
@@ -118,7 +118,14 @@ const SearchPage = () => {
     return result;
   };
 
-  const handleSearchAllCommunities = () => null;
+  const handleSearchAllCommunities = () => {
+    const newQueryParams = new URLSearchParams(urlQueryParams.toString());
+    newQueryParams.set('chainScope', 'all_chains');
+    navigate({
+      pathname: location.pathname,
+      search: `?${newQueryParams.toString()}`,
+    });
+  };
 
   const handleSortChange = (newSort) => {
     const sort = newSort.value;
@@ -166,13 +173,12 @@ const SearchPage = () => {
   const scopeText = useMemo(() => {
     if (chain) {
       if (chain === 'all_chains') {
-        return 'in all communities.';
+        return 'across all communities.';
       }
       return `in ${capitalize(chain)}.`;
-    } else if (app.isCustomDomain()) {
-      return '';
     } else {
-      return 'across all communities.';
+      // also applies when app.isCustomDomain() is true
+      return '';
     }
   }, [chain]);
 

@@ -6,7 +6,6 @@ import 'pages/search/index.scss';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import app from 'state';
-import { SearchContentType } from 'types';
 import { SearchScope } from '../../../models/SearchQuery';
 import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../../components/community_label';
@@ -15,7 +14,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
-import ChainInfo from 'client/scripts/models/ChainInfo';
+import ChainInfo from '../../../models/ChainInfo';
 
 type ThreadResult = {
   id: number;
@@ -170,7 +169,7 @@ const renderCommunityResult = (community: CommunityResult, setRoute) => {
 
   return (
     <div
-      key={community?.id}
+      key={community.id}
       className="community-result-row"
       onClick={handleClick}
     >
@@ -200,7 +199,7 @@ const getMemberResult = (addr: MemberResult, setRoute) => {
   }
 
   return (
-    <div key={profile.id} className="member-result-row" onClick={handleClick}>
+    <div key={address} className="member-result-row" onClick={handleClick}>
       <User
         user={profile}
         showRole

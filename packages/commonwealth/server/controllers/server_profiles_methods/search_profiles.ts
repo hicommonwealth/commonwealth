@@ -60,12 +60,6 @@ export async function __searchProfiles(
         orderBy: `"Profiles".created_at`,
       };
       break;
-    case 'last_active':
-      sortOptions = {
-        ...sortOptions,
-        orderBy: `last_active`,
-      };
-      break;
     default:
       sortOptions = {
         ...sortOptions,

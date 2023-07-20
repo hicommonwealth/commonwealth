@@ -8,11 +8,11 @@ export enum SearchScope {
 }
 
 export const VALID_SEARCH_SCOPES: SearchScope[] = [
-  SearchScope.Members,
-  SearchScope.Communities,
-  SearchScope.Proposals,
   SearchScope.Threads,
   SearchScope.Replies,
+  SearchScope.Communities,
+  SearchScope.Members,
+  SearchScope.Proposals,
   SearchScope.All,
 ];
 
