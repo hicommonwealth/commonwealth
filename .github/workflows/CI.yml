@@ -77,6 +77,7 @@ jobs:
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
+          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
@@ -150,6 +151,7 @@ jobs:
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
+          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2

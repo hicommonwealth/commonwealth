@@ -1,6 +1,7 @@
 // Note, this login will not work for the homepage
 import { TestInfo } from '@playwright/test';
 import { Page } from 'playwright-test';
+import * as process from 'process';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
 
@@ -44,9 +45,24 @@ export async function screenshotOnFailure(
 
 // This connection is used to speed up tests, so we don't need to load in all the models with the associated
 // imports. This can only be used with raw sql queries.
-export const testDb = new Sequelize(DATABASE_URI);
+export const testDb = new Sequelize(DATABASE_URI, { logging: false });
 
 export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
+
+export async function addAlchemyKey() {
+  if (!process.env.ETH_ALCHEMY_API_KEY) {
+    throw Error('ETH_ALCHEMY_API_KEY not found');
+  }
+
+  await testDb.query(`
+  UPDATE "ChainNodes"
+  SET 
+    url = 'https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}',
+    alt_wallet_url = 'https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}'
+  WHERE 
+    eth_chain_id = 1;
+  `);
+}
 
 // removes default user from the db. Subsequent login will need to go through the profile creation screen
 export async function removeUser() {
