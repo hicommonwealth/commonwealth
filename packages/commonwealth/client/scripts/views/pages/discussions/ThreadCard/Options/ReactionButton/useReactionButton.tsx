@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type ChainInfo from '../../../../../../models/ChainInfo';
 import Thread from '../../../../../../models/Thread';
 import app from '../../../../../../state';
+import { useCreateThreadReactionMutation, useDeleteThreadReactionMutation } from '../../../../../../state/api/threads';
 import Permissions from '../../../../../../utils/Permissions';
 
 export const useReactionButton = (thread: Thread, setReactors) => {
@@ -16,6 +17,9 @@ export const useReactionButton = (thread: Thread, setReactors) => {
   const [reactedId, setReactedId] = useState(
     thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id
   );
+
+  const { mutateAsync: createThreadReaction } = useCreateThreadReactionMutation();
+  const { mutateAsync: deleteThreadReaction } = useDeleteThreadReactionMutation();
 
   useEffect(() => {
     const fetch = () => {
@@ -47,8 +51,7 @@ export const useReactionButton = (thread: Thread, setReactors) => {
 
     setIsLoading(true);
 
-    app.threadReactions
-      .deleteOnThread(thread, reactedId)
+    deleteThreadReaction({ threadId: thread.id, reactionId: reactedId as number })
       .then(() => {
         setReactors((oldReactors) =>
           oldReactors.filter((r) => r !== activeAddress)
@@ -92,32 +95,35 @@ export const useReactionButton = (thread: Thread, setReactors) => {
     }
 
     setIsLoading(true);
-    app.threadReactions
-      .createOnThread(userAddress, thread, 'like')
-      .then((reaction) => {
-        setReactedId(reaction.id);
-        setReactors((oldReactors) => [
-          ...oldReactors.filter((o) => o !== activeAddress),
-          activeAddress,
-        ]);
-        setHasReacted(true);
+    createThreadReaction({
+      address: userAddress,
+      threadId: thread.id,
+      reactionType: 'like'
+    }).then((response) => {
+      const reaction = response.data.result
+      setReactedId(reaction.id);
+      setReactors((oldReactors) => [
+        ...oldReactors.filter((o) => o !== activeAddress),
+        activeAddress,
+      ]);
+      setHasReacted(true);
 
-        // update in store
-        const tempReaction = {
-          id: (reaction.id + '') as any,
-          type: reaction.reaction,
-          address: activeAddress,
-        };
-        if (foundThread) {
-          foundThread.associatedReactions = [
-            ...foundThread.associatedReactions.filter(
-              (x) => x.address !== activeAddress
-            ),
-            tempReaction,
-          ];
-          app.threads.updateThreadInStore(foundThread);
-        }
-      })
+      // update in store
+      const tempReaction = {
+        id: (reaction.id + '') as any,
+        type: reaction.reaction,
+        address: activeAddress,
+      };
+      if (foundThread) {
+        foundThread.associatedReactions = [
+          ...foundThread.associatedReactions.filter(
+            (x) => x.address !== activeAddress
+          ),
+          tempReaction,
+        ];
+        app.threads.updateThreadInStore(foundThread);
+      }
+    })
       .catch((e) => {
         console.log(e);
       })
