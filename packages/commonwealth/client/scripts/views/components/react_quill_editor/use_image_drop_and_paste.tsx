@@ -73,11 +73,11 @@ export const useImageDropAndPaste = ({
         const text: string = editor.getText();
         const blankEditor: boolean = editor.getLength() === 1;
         const isEndOfLine: boolean = text[selectedIndex].endsWith('\n');
-        let middleOfText: boolean = false;
+        let middleOfText = false;
 
         // adds line break to insert image above or below text
         if (!blankEditor) {
-          let lineBreak: string = '\n';
+          let lineBreak = '\n';
           if (text[selectedIndex - 1] && text[selectedIndex]) {
             lineBreak = '\n\n';
             middleOfText = true;
