@@ -27,19 +27,9 @@ const useInitApp = () => {
           setCustomDomain(serverCustomDomain);
           return Promise.resolve(serverCustomDomain);
         })
-        .then((serverCustomDomain) => {
-          console.log(
-            'Initializing app state with custom domain:',
-            serverCustomDomain
-          );
-          initAppState(true, serverCustomDomain);
-        })
-        .catch((err) => {
-          console.log('Failed fetching custom domain', err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+        .then((serverCustomDomain) => initAppState(true, serverCustomDomain))
+        .catch((err) => console.log('Failed fetching custom domain', err))
+        .finally(() => setLoading(false));
     }
   }, []);
 
