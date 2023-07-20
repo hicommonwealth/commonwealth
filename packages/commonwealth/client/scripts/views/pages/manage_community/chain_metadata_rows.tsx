@@ -601,7 +601,7 @@ export const ChainMetadataRows = ({
               className="connect-button"
               onClick={handleReconnectBot}
             />
-            <div className="snapshot-settings">
+            {/* <div className="snapshot-settings">
               <CWText type="h4">Snapshot Notifications</CWText>
               <CWToggle
                 onChange={() =>
@@ -632,7 +632,7 @@ export const ChainMetadataRows = ({
                   }}
                 />
               )}
-            </div>
+            </div> */}
             <div className="snapshot-settings">
               <CWText type="h4">Connected Forum Channels</CWText>
             </div>
@@ -668,12 +668,12 @@ export const ChainMetadataRows = ({
                 />
               )}
             </div>
-            <CWButton
+            {/* <CWButton
               label="Save Commonbot Settings"
               className="save-snapshot"
               buttonType="primary-black"
               onClick={handleSaveCommonbotSettings}
-            />
+            /> */}
           </>
         ) : discordBotConnecting ? (
           <>
