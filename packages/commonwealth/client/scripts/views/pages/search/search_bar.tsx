@@ -18,6 +18,7 @@ import {
 } from './search_bar_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useDebounce } from 'usehooks-ts';
+import axios from 'axios';
 
 const MIN_SEARCH_TERM_LENGTH = 4;
 const NUM_RESULTS_PER_SECTION = 2;
@@ -82,6 +83,8 @@ export const SearchBar = () => {
     });
 
     try {
+      // TODO: fix this for search bar
+      return;
       await app.search.search(searchQuery);
       const searchResponse = app.search.getByQuery(searchQuery)?.results;
 

@@ -181,20 +181,22 @@ const renderCommunityResult = (community: CommunityResult, setRoute) => {
 };
 
 type MemberResult = {
-  chain: string;
-  address: string;
+  chains: string[];
+  addresses: string[];
 };
 const getMemberResult = (addr: MemberResult, setRoute) => {
+  const chain = addr.chains[0];
+  const address = addr.addresses[0];
   const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
-    addr.chain,
-    addr.address
+    chain,
+    address
   );
 
   const handleClick = () => {
     setRoute(`/profile/id/${profile.id}`, {}, null);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) {
+  if (app.isCustomDomain() && app.customDomainId() !== chain) {
     return null;
   }
 

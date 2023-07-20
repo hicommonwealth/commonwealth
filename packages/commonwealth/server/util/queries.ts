@@ -110,6 +110,7 @@ export const buildPaginationSql = (
       sql += 'DESC ';
     }
   }
+  // TODO: check if nullsLast works with secondary order
   if (orderBy && orderBySecondary) {
     sql += `, ${orderBySecondary} `;
     if (validateOrderDirection(orderDirectionSecondary)) {
@@ -134,7 +135,6 @@ export function buildPaginatedResponse<T>(
   totalResults: number,
   bind: PaginationSqlBind
 ): TypedPaginatedResult<T> {
-  console.log({ totalResults, bind });
   return {
     results: items,
     limit: bind.limit,

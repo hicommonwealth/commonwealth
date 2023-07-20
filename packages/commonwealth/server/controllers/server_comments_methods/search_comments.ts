@@ -51,11 +51,14 @@ export async function __searchComments(
       sortOptions = {
         ...sortOptions,
         orderBy: `rank`,
+        orderBySecondary: `"Comments".created_at`,
+        orderDirectionSecondary: 'DESC',
       };
   }
 
-  const { sql: paginationSort, bind: paginationBind } =
-    buildPaginationSql(sortOptions);
+  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql(
+    sortOptions
+  );
 
   const bind: {
     searchTerm?: string;
