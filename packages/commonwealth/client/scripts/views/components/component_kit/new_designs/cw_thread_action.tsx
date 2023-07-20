@@ -18,6 +18,7 @@ import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip'
 export type ActionType =
   | 'upvote'
   | 'comment'
+  | 'reply'
   | 'share'
   | 'subscribe'
   | 'overflow';
@@ -45,6 +46,7 @@ const renderPhosphorIcon = (
         />
       );
     case 'comment':
+    case 'reply':
       return <ChatCenteredDots {...commonProps(disabled)} />;
     case 'share':
       return <ArrowBendUpRight {...commonProps(disabled)} />;
@@ -101,9 +103,10 @@ const getTooltipCopy = (action: ActionType) => {
   switch (action) {
     case 'upvote':
       return 'Join community to upvote';
-    // todo distinguish reply vs comment
     case 'comment':
       return 'Join community to comment';
+    case 'reply':
+      return 'Join community to reply';
     case 'overflow':
       return 'Join community to view more actions';
     case 'subscribe':

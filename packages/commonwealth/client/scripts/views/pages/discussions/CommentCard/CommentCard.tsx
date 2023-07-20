@@ -126,8 +126,7 @@ export const CommentCard = ({
 
               {replyBtnVisible && (
                 <CWThreadAction
-                  label="Reply"
-                  action="comment"
+                  action="reply"
                   disabled={!hasJoinedCommunity}
                   onClick={async (e) => {
                     e.preventDefault();
