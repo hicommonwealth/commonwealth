@@ -2,7 +2,12 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { useDeleteCommentMutation, useEditCommentMutation, useToggleCommentSpamStatusMutation, useFetchCommentsQuery } from 'state/api/comments';
+import {
+  useDeleteCommentMutation,
+  useEditCommentMutation,
+  useFetchCommentsQuery,
+  useToggleCommentSpamStatusMutation
+} from 'state/api/comments';
 import { ContentType } from 'types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { notifyError } from '../../../../controllers/app/notifications';
