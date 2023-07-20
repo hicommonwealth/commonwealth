@@ -27,9 +27,13 @@ const Tooltip: FC<TooltipProps> = ({ content }) => {
         height: '300px',
       }}
     >
-      <CWTooltip content={content} placement="top">
-        <CWButton label="top" />
-      </CWTooltip>
+      <CWTooltip content={content} placement="top" renderTrigger={(handleInteraction) => (
+        <CWButton
+          label="top"
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+        />
+      )} />
       <div
         style={{
           display: 'flex',
@@ -48,9 +52,13 @@ const Tooltip: FC<TooltipProps> = ({ content }) => {
             justifyContent: 'center',
           }}
         >
-          <CWTooltip content={content} placement="left">
-            <CWButton label="left" />
-          </CWTooltip>
+          <CWTooltip content={content} placement="left" renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="left"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )} />
         </div>
         <div
           style={{
@@ -61,14 +69,22 @@ const Tooltip: FC<TooltipProps> = ({ content }) => {
             justifyContent: 'center',
           }}
         >
-          <CWTooltip content={content} placement="right">
-            <CWButton label="right" />
-          </CWTooltip>
+          <CWTooltip content={content} placement="right" renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="right"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )} />
         </div>
       </div>
-      <CWTooltip content={content} placement="bottom">
-        <CWButton label="bottom" />
-      </CWTooltip>
+      <CWTooltip content={content} placement="bottom" renderTrigger={(handleInteraction) => (
+        <CWButton
+          label="bottom"
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+        />
+      )} />
     </div>
   );
 };
@@ -79,7 +95,7 @@ export const Overview = {
     content: "A tooltip is a non-actionable label for explaining a UI element or feature.",
   },
   parameters: {
-    controls: { exclude: [ "placement" ] },
+    controls: { exclude: [ "placement", "hasBackground", "renderTrigger" ] },
   },
   render: ({...args}) => (
     <Tooltip content={args.content} />

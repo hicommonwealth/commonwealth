@@ -1,50 +1,70 @@
 import React from 'react';
-import Tooltip from '@mui/joy/Tooltip';
 
-export type Placement = 'top' | 'right' | 'bottom' | 'left';
+import 'components/component_kit/new_designs/cw_tooltip.scss';
 
-type CWTooltipProps = {
-  content: string;
+import { Popover, usePopover } from '../cw_popover/cw_popover';
+import type { PopoverTriggerProps } from '../cw_popover/cw_popover';
+import { CWText } from '../cw_text';
+import { ComponentType } from '../types';
+import { getClasses } from '../helpers';
+import { Placement } from '@popperjs/core/lib';
+
+type TooltipProps = {
+  content: string | React.ReactNode;
+  placement?: Placement;
+} & PopoverTriggerProps;
+
+type TooltipContainerProps = {
   placement: Placement;
-  children: any;
+  children: React.ReactNode;
 };
 
-export const CWTooltip = (props: CWTooltipProps) => {
-  const { content, placement, children } = props;
+const TooltipContainer = (props: TooltipContainerProps) => {
+  const { placement, children } = props;
 
   return (
-    <Tooltip
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '4px 8px',
-        isolation: 'isolate',
-        maxWidth: '232px',
-        height: '40px',
-        backgroundColor: '#141315',
-        color: '#FFFFFF',
-        borderRadius: '4px',
-        fontFamily: 'NeueHaasUnica',
-        fontStyle: 'normal',
-        fontWeight: 400,
-        fontSize: '12px',
-        lineHeight: '16px',
-        textAlign: 'center',
-        letterSpacing: '0.02em',
-        fontFeatureSettings: `'tnum' on, 'lnum' on`,
-        '& .MuiTooltip-arrow::before': {
-          borderTopColor: '#141315',
-          borderRightColor: '#141315',
-          borderRadius: '0',
+    <div
+      className={getClasses(
+        {
+          placement,
         },
-      }}
-      title={content}
-      arrow
-      placement={placement}
+        ComponentType.Tooltip
+      )}
     >
       {children}
-    </Tooltip>
+      <div
+        className={getClasses({
+          tipTop: placement === 'top',
+          tipRight: placement === 'right',
+          tipBottom: placement === 'bottom',
+          tipLeft: placement === 'left',
+        })}
+      />
+    </div>
+  );
+};
+
+export const CWTooltip = (props: TooltipProps) => {
+  const { content, renderTrigger, placement } = props;
+
+  const popoverProps = usePopover();
+
+  return (
+    <>
+      {renderTrigger(popoverProps.handleInteraction)}
+      <Popover
+        placement={placement}
+        content={
+          typeof content === 'string' ? (
+            <TooltipContainer placement={placement}>
+              <CWText type="caption">{content}</CWText>
+            </TooltipContainer>
+          ) : (
+            <TooltipContainer placement={placement}>{content}</TooltipContainer>
+          )
+        }
+        {...popoverProps}
+      />
+    </>
   );
 };

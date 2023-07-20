@@ -11,7 +11,7 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
-import { CWTooltip as CWTooltipNew } from './new_designs/cw_tooltip';
+import { CWTooltip } from './new_designs/cw_tooltip';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -19,7 +19,7 @@ import { CWIconButton } from './cw_icon_button';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWTab, CWTabBar } from './cw_tabs';
@@ -258,7 +258,7 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Tooltips</CWText>
         <div className="tooltip-row">
           <CWText>Default</CWText>
-          <CWTooltip
+          <CWTooltipOld
             content={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
@@ -274,7 +274,7 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tooltip-row">
           <CWText>Solid background</CWText>
-          <CWTooltip
+          <CWTooltipOld
             content={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
@@ -1118,30 +1118,50 @@ export const ComponentShowcase = () => {
       </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
-        <CWTooltipNew
+        <CWTooltip
           content="A tooltip is a non-actionable label for explaining a UI element or feature."
           placement="top"
-        >
-          <CWButton label="Top" />
-        </CWTooltipNew>
-        <CWTooltipNew
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="top"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
           content="A tooltip is a non-actionable label for explaining a UI element or feature."
           placement="right"
-        >
-          <CWButton label="Right" />
-        </CWTooltipNew>
-        <CWTooltipNew
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="right"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
           content="A tooltip is a non-actionable label for explaining a UI element or feature."
           placement="bottom"
-        >
-          <CWButton label="Bottom" />
-        </CWTooltipNew>
-        <CWTooltipNew
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="bottom"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
           content="A tooltip is a non-actionable label for explaining a UI element or feature."
           placement="left"
-        >
-          <CWButton label="Left" />
-        </CWTooltipNew>
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="left"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
       </div>
     </div>
   );
