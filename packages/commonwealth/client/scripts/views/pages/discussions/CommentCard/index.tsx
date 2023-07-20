@@ -3,7 +3,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 import app from 'state';
 import type Comment from '../../../../models/Comment';
-import { CWButton } from '../../../components/component_kit/cw_button';
+import { CWButton } from '../../../components/component_kit/new_designs/cw_button';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../../components/component_kit/cw_tag';
@@ -86,7 +86,7 @@ export const CommentCard = ({
             <CWButton
               label="Cancel"
               disabled={isSavingEdit}
-              buttonType="secondary-blue"
+              buttonType="tertiary"
               onClick={async (e) => {
                 e.preventDefault();
                 const hasContentChanged =
@@ -96,6 +96,7 @@ export const CommentCard = ({
             />
             <CWButton
               label="Save"
+              buttonWidth="wide"
               disabled={isSavingEdit}
               onClick={async (e) => {
                 e.preventDefault();

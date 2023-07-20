@@ -41,14 +41,14 @@ export const updateCommentHandler = async (
   const attachments = req.body['attachments[]'];
 
   const [updatedComment, notificationOptions] =
-    await controllers.comments.updateComment(
+    await controllers.comments.updateComment({
       user,
       address,
       chain,
       commentId,
       commentBody,
-      attachments
-    );
+      attachments,
+    });
 
   // emit notifications
   for (const n of notificationOptions) {

@@ -27,6 +27,11 @@ type CommentsTreeAttrs = {
   setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
   includeSpams: boolean;
+  isReplying: boolean;
+  setIsReplying: (status: boolean) => void;
+  parentCommentId: number;
+  setParentCommentId: (id: number) => void;
+  canComment: boolean;
 };
 
 export const CommentsTree = ({
@@ -35,11 +40,14 @@ export const CommentsTree = ({
   setIsGloballyEditing,
   updatedCommentsCallback,
   includeSpams,
+  isReplying,
+  setIsReplying,
+  parentCommentId,
+  setParentCommentId,
+  canComment,
 }: CommentsTreeAttrs) => {
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
-  const [isReplying, setIsReplying] = useState(false);
-  const [parentCommentId, setParentCommentId] = useState(null);
 
   const [edits, setEdits] = useState<{
     [commentId: number]: {
@@ -423,6 +431,7 @@ export const CommentsTree = ({
                   parentCommentId={parentCommentId}
                   rootThread={thread}
                   updatedCommentsCallback={updatedCommentsCallback}
+                  canComment={canComment}
                 />
               )}
               {!!children.length &&

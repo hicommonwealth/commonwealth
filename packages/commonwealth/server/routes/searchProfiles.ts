@@ -166,7 +166,7 @@ const searchProfiles = async (
     const addressIdRoles: Record<number, RoleInstanceWithPermission[]> = {};
     for (const role of roles) {
       const attributes = role.toJSON();
-      addressIdRoles[attributes.address_id] ||= [];
+      addressIdRoles[attributes.address_id] = [];
       addressIdRoles[attributes.address_id].push(role);
     }
 
