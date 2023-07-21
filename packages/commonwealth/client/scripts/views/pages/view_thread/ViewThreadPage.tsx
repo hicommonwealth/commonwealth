@@ -1,6 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelReactionCountFromServer } from 'controllers/server/comments';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -181,7 +181,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .then((res) => {
         const t = res[0];
         if (t) {
-          const reactions = app.reactions.getByPost(t);
+          const reactions = app.comments.getReactionByPost(t);
           t.associatedReactions = reactions
             .filter((r) => r.reaction === 'like')
             .map((r) => {
@@ -269,19 +269,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             }),
           });
 
-          // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier({
+            const id = app.comments.reactionCountsStore.getIdentifier({
               threadId: rc.thread_id,
               proposalId: rc.proposal_id,
               commentId: rc.comment_id,
             });
 
-            app.reactionCounts.store.add(
+            app.comments.reactionCountsStore.add(
               modelReactionCountFromServer({ ...rc, id })
             );
 
-            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
+            app.comments.isReactionFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {
