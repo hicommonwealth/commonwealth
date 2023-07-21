@@ -65,8 +65,7 @@ const useCreateCommentMutation = ({ chainId, threadId }: Partial<CreateCommentPr
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData(key,
         () => {
-          const updatedComments = [...(comments || []).filter(x => x.id !== newComment.id), newComment]
-          return updatedComments
+          return [...comments, newComment]
         }
       );
 
