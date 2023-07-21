@@ -2,7 +2,6 @@ import type momentType from 'moment';
 import moment from 'moment';
 import type { VersionHistory } from '../controllers/server/threads';
 import AddressInfo from './AddressInfo';
-import Attachment from './Attachment';
 import Reaction from './Reaction';
 import type { IUniqueId } from './interfaces';
 
@@ -15,7 +14,6 @@ export class Comment<T extends IUniqueId> {
   public readonly Address: AddressInfo;
   public readonly text: string;
   public readonly plaintext: string;
-  public readonly Attachments: Attachment[];
   public readonly reactions: Reaction[];
   public readonly id: number;
   public readonly created_at: momentType.Moment;
@@ -47,7 +45,6 @@ export class Comment<T extends IUniqueId> {
     created_at,
     deleted_at,
     authorChain,
-    Attachments,
     last_edited,
     canvas_hash,
     canvas_action,
@@ -78,7 +75,6 @@ export class Comment<T extends IUniqueId> {
     this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
     this.versionHistory = versionHistory;
-    this.attachments = (Attachments || [])?.map((a) => new Attachment(a.url, a.description));
     this.threadId = thread_id;
     this.id = id;
     this.createdAt = moment(created_at);

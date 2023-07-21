@@ -13,14 +13,12 @@ interface CreateCommentProps {
   chainId: string;
   unescapedText: string,
   parentCommentId: number,
-  attachments?: string[]
 }
 
 const createComment = async ({
   chainId,
   address,
   threadId,
-  attachments,
   unescapedText,
   parentCommentId = null,
 }: CreateCommentProps) => {
@@ -41,7 +39,6 @@ const createComment = async ({
       chain: chainId,
       address: address,
       parent_id: parentCommentId,
-      'attachments[]': attachments,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
       canvas_action: action,

@@ -12,7 +12,6 @@ interface EditCommentProps {
   threadId: number;
   commentId: number;
   updatedBody: string;
-  attachments?: string[];
 }
 
 const editComment = async ({
@@ -22,7 +21,6 @@ const editComment = async ({
   threadId,
   commentId,
   updatedBody,
-  attachments,
 }: EditCommentProps) => {
   const {
     session = null,
@@ -40,7 +38,6 @@ const editComment = async ({
     id: commentId,
     chain: chainId,
     body: encodeURIComponent(updatedBody),
-    'attachments[]': attachments,
     jwt: app.user.jwt,
     canvas_action: action,
     canvas_session: session,
