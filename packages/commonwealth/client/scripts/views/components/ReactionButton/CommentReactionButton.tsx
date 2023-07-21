@@ -1,6 +1,5 @@
 import 'components/ReactionButton/CommentReactionButton.scss';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
@@ -72,9 +71,9 @@ export const CommentReactionButton = ({
 
   const parentThread = app.threads.getById(comment.threadId);
 
-  const topicName = parentThread?.topic?.name;
+  const topicId = parentThread?.topic?.id;
 
-  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
+  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(topicId);
 
   const activeAddress = app.user.activeAccount?.address;
 

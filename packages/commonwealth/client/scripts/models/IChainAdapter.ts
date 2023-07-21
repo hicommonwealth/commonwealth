@@ -9,8 +9,14 @@ import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
+import type {
+  IAccountsModule,
+  IBlockInfo,
+  IChainModule,
+  IGatedTopic,
+} from './interfaces';
 import ProposalModule from './ProposalModule';
+import BN from 'bn.js';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -67,6 +73,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
+      gateStrategies,
     } = response.result;
     this.app.threads.initialize(
       pinnedThreads,
@@ -78,6 +85,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
+    if (gateStrategies.length > 0) {
+      this.gatedTopics = gateStrategies;
+    }
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
 
@@ -147,6 +157,30 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
   }
 
+  public getTopicThreshold(topicId: number): BN {
+    if (this.gatedTopics?.length > 0 && topicId) {
+      const topicGate = this.gatedTopics.find((i) => i.id === topicId);
+
+      if (!topicGate) return new BN('0', 10);
+
+      return new BN(topicGate.data.threshold);
+    }
+    return new BN('0', 10);
+  }
+
+  public isGatedTopic(topicId: number): boolean {
+    const tokenPostingThreshold = this.getTopicThreshold(topicId);
+    if (
+      !tokenPostingThreshold.isZero() &&
+      !this.app.user.activeAccount?.tokenBalance
+    )
+      return true;
+    return (
+      !tokenPostingThreshold.isZero() &&
+      tokenPostingThreshold.gt(this.app.user.activeAccount.tokenBalance)
+    );
+  }
+
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
@@ -159,6 +193,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public version: string;
   public name: string;
   public runtimeName: string;
+  public gatedTopics: IGatedTopic[];
 
   constructor(meta: ChainInfo, app: IApp) {
     this.meta = meta;

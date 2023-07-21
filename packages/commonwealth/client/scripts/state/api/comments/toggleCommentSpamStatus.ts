@@ -16,10 +16,12 @@ const toggleCommentSpamStatus = async ({
   commentId,
   isSpam
 }: ToggleCommentSpamStatusProps) => {
-  return await axios.post(`${app.serverUrl()}/comments/${commentId}/${!isSpam ? 'mark' : 'unmark'
-    }-as-spam`, {
-    jwt: app.user.jwt,
-    chain: chainId,
+  const method = isSpam ? 'put' : 'delete';
+  return await axios[method](`${app.serverUrl()}/comments/${commentId}/spam`, {
+    data: {
+      jwt: app.user.jwt,
+      chain_id: chainId,
+    } as any,
   })
 };
 

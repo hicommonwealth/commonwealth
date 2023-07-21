@@ -32,6 +32,11 @@ type CommentsTreeAttrs = {
   thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
   includeSpams: boolean;
+  isReplying: boolean;
+  setIsReplying: (status: boolean) => void;
+  parentCommentId: number;
+  setParentCommentId: (id: number) => void;
+  canComment: boolean;
 };
 
 export const CommentsTree = ({
@@ -39,11 +44,14 @@ export const CommentsTree = ({
   thread,
   setIsGloballyEditing,
   includeSpams,
+  isReplying,
+  setIsReplying,
+  parentCommentId,
+  setParentCommentId,
+  canComment,
 }: CommentsTreeAttrs) => {
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
-  const [isReplying, setIsReplying] = useState(false);
-  const [parentCommentId, setParentCommentId] = useState(null);
 
   const { data: allComments = [] } = useFetchCommentsQuery({
     chainId: app.activeChainId(),
@@ -451,6 +459,7 @@ export const CommentsTree = ({
                   handleIsReplying={handleIsReplying}
                   parentCommentId={parentCommentId}
                   rootThread={thread}
+                  canComment={canComment}
                 />
               )}
               {!!children.length &&

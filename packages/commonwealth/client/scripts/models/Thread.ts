@@ -63,8 +63,11 @@ export class Thread implements IUniqueId {
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+
   public markedAsSpamAt: moment.Moment;
+  public archivedAt: moment.Moment;
   public readonly lockedAt: moment.Moment;
+
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
   public numberOfComments: number;
@@ -98,6 +101,7 @@ export class Thread implements IUniqueId {
     chainEntities,
     lastEdited,
     markedAsSpamAt,
+    archivedAt,
     lockedAt,
     hasPoll,
     lastCommentedOn,
@@ -132,6 +136,7 @@ export class Thread implements IUniqueId {
     chainEntities?: any[];
     lastEdited?: moment.Moment;
     markedAsSpamAt?: moment.Moment;
+    archivedAt?: moment.Moment;
     lockedAt?: moment.Moment;
     hasPoll: boolean;
     polls?: Poll[];
@@ -179,6 +184,7 @@ export class Thread implements IUniqueId {
     this.hasPoll = hasPoll;
     this.lastEdited = lastEdited;
     this.markedAsSpamAt = markedAsSpamAt;
+    this.archivedAt = archivedAt;
     this.lockedAt = lockedAt;
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];

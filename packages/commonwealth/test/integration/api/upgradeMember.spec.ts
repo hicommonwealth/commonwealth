@@ -61,21 +61,29 @@ describe('upgradeMember Integration Tests', () => {
   });
 
   it('should upgrade member and return a success response', async () => {
+    await models.Address.update(
+      {
+        role: 'admin',
+      },
+      {
+        where: {
+          id: testAddresses[0].id,
+        },
+      }
+    );
     const validRequest = {
       jwt: jwtToken,
       author_chain: testAddresses[0].chain,
       chain: testAddresses[0].chain,
       new_role: 'admin',
-      address: testAddresses[0].address,
+      address: testAddresses[1].address,
     };
 
-    chai.assert.equal(testAddresses[0].role, 'member');
-
-    const response = await post('/api/upgradeMember', validRequest, true, app);
+    const response = await post('/api/upgradeMember', validRequest, false, app);
 
     chai.assert.equal(response.status, 'Success');
     const address = await models.Address.findOne({
-      where: { id: testAddresses[0].id },
+      where: { id: testAddresses[1].id },
     });
 
     chai.assert.equal(address.role, 'admin');

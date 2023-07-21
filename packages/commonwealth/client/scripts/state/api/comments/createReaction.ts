@@ -18,7 +18,6 @@ const createReaction = async ({
   chainId,
   commentId
 }: CreateReactionProps) => {
-  // TODO: use canvas id
   const {
     session = null,
     action = null,
