@@ -62,21 +62,15 @@ const useEditCommentMutation = ({ chainId, threadId }: UseEditCommentMutationPro
   return useMutation({
     mutationFn: editComment,
     onSuccess: async (updatedComment) => {
-      // find the existing comment index
-      const foundCommentIndex = comments.findIndex(x => x.id === updatedComment.id)
-
       // update fetch comments query state with updated comment
-      if (foundCommentIndex > -1) {
-        const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId]
-        queryClient.cancelQueries({ queryKey: key });
-        queryClient.setQueryData([...key],
-          () => {
-            const updatedComments = [...(comments || [])];
-            updatedComments[foundCommentIndex] = updatedComment;
-            return updatedComments;
-          }
-        );
-      }
+      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId]
+      queryClient.cancelQueries({ queryKey: key });
+      queryClient.setQueryData([...key],
+        () => {
+          // find the existing comment index, and return updated comment in its place
+          return comments.map(x => x.id === updatedComment.id ? updatedComment : x);
+        }
+      );
 
       return updatedComment
     }
