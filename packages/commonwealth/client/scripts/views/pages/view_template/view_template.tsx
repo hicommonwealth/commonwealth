@@ -56,6 +56,8 @@ const ViewTemplatePage = () => {
   const [templateNickname, setTemplateNickname] = useState('');
   const [templateError, setTemplateError] = useState(false);
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
+  const [templateDraftName, setDraftName] = useState('');
+  const [draftOpen, setDraftOpen] = useState(false);
 
   const loadData = useCallback(() => {
     const { contract_address, slug } = params;
@@ -236,22 +238,44 @@ const ViewTemplatePage = () => {
   };
 
   const saveTemplateDraft = async () => {
-    Object.keys(json.tx_template.args).map((key) => {
-      const arg = json.tx_template.args[key];
-      if (arg.startsWith('$')) {
-        json.tx_template.args[key] = {
-          value: formState[arg.slice(1)],
-          ref: arg,
-        };
-      }
-    });
-    await app.contracts.addTemplate({
-      name: `${templateNickname}-draft`,
-      template: JSON.stringify(json),
-      description: `Draft of ${templateNickname}`,
-      contract_id: currentContract.id.toString(),
-      community: app.activeChainId(),
-    });
+    if (!draftOpen) {
+      setDraftOpen(true);
+    } else {
+      Object.keys(json.tx_template.args).map((key) => {
+        const arg = json.tx_template.args[key];
+        if (arg.startsWith('$')) {
+          json.tx_template.args[key] = {
+            value: formState[arg.slice(1)],
+            ref: arg,
+          };
+        }
+      });
+      const communityId = app.activeChainId();
+      const contractId = currentContract.id.toString();
+      const templateId = await app.contracts.addTemplate({
+        name: templateDraftName,
+        template: JSON.stringify(json),
+        description: `Draft of ${templateNickname}`,
+        contract_id: contractId,
+        community: communityId,
+      });
+
+      const communityContractTemplateAndMetadata = {
+        slug: templateDraftName.replace(' ', '-'),
+        nickname: templateDraftName,
+        display_name: templateDraftName,
+        display_options: '3',
+        community_id: communityId,
+        template_id: templateId,
+        contract_id: parseInt(contractId),
+        enabled_by: app.user.activeAccount.address,
+      };
+
+      await app.contracts.addCommunityContractTemplate(
+        communityContractTemplateAndMetadata
+      );
+      navigate('/contracts');
+    }
   };
 
   const constructTxPreview = () => {
@@ -414,6 +438,7 @@ const ViewTemplatePage = () => {
     return;
   }
 
+  const disableDraft = draftOpen ? templateDraftName.length === 0 : !txReady;
   return (
     <div className="ViewTemplatePage">
       <CWBreadcrumbs
@@ -448,10 +473,19 @@ const ViewTemplatePage = () => {
             disabled={!txReady}
             onClick={handleCreate}
           />
+          {draftOpen && (
+            <CWTextInput
+              value={templateDraftName}
+              placeholder="New draft name"
+              onInput={(v) => {
+                setDraftName(v.target.value);
+              }}
+            ></CWTextInput>
+          )}
           <CWButton
             label="Save"
             buttonType="primary-black"
-            disabled={!txReady}
+            disabled={disableDraft}
             onClick={saveTemplateDraft}
           />
         </div>
