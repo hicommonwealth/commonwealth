@@ -94,6 +94,11 @@ export const Overview = {
   args: {
     content: "A tooltip is a non-actionable label for explaining a UI element or feature.",
   },
+  argTypes: {
+    content: {
+      control: { type: "text" },
+    },
+  },
   parameters: {
     controls: { exclude: [ "placement", "hasBackground", "renderTrigger" ] },
   },

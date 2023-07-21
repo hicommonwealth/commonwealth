@@ -14,12 +14,16 @@ type TooltipProps = {
   placement?: Placement;
 } & PopoverTriggerProps;
 
-type TooltipContainerProps = {
+type ContainerProps = {
   placement: Placement;
   children: React.ReactNode;
 };
 
-const TooltipContainer = (props: TooltipContainerProps) => {
+const formatText = (content: string): string => {
+  return content.length > 75 ? content.slice(0, 75).concat('...') : content;
+};
+
+const Container = (props: ContainerProps) => {
   const { placement, children } = props;
 
   return (
@@ -57,11 +61,11 @@ export const CWTooltip = (props: TooltipProps) => {
         placement={placement}
         content={
           typeof content === 'string' ? (
-            <TooltipContainer placement={placement}>
-              <CWText type="caption">{content}</CWText>
-            </TooltipContainer>
+            <Container placement={placement}>
+              <CWText type="caption">{formatText(content)}</CWText>
+            </Container>
           ) : (
-            <TooltipContainer placement={placement}>{content}</TooltipContainer>
+            <Container placement={placement}>{content}</Container>
           )
         }
         {...popoverProps}
