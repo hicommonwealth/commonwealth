@@ -89,11 +89,17 @@ export default class TerraBalanceProvider extends BalanceProvider<
 
     let bankBalance = new BN(0);
 
-    bankBalance = await terraBalanceFn(encodedAddress);
+    const fetchedBalance = await terraBalanceFn(encodedAddress);
+    if (fetchedBalance) {
+      bankBalance = fetchedBalance;
+    }
 
     let stakedBalance = new BN(0);
 
-    stakedBalance = await stakedBalanceFn(encodedAddress);
+    const fetchedStakedBalance = await stakedBalanceFn(encodedAddress);
+    if (fetchedStakedBalance) {
+      stakedBalance = fetchedStakedBalance;
+    }
 
     return bankBalance.add(stakedBalance).toString();
   }

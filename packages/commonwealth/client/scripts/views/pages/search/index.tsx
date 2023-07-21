@@ -39,7 +39,8 @@ const SearchPage = () => {
         'tab'
       ] as SearchScope) || SearchScope.Threads
     );
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const setActiveTab = (newTab: SearchScope) => {
     navigate(`/search?${searchQuery.toUrlParams()}&tab=${newTab}`, {
@@ -139,9 +140,9 @@ const SearchPage = () => {
   const resultCount =
     tabScopedListing.length >= 10
       ? `${tabScopedListing.length}+ ${pluralize(
-          2,
-          activeTab.toLowerCase()
-        ).replace('2 ', '')}`
+        2,
+        activeTab.toLowerCase()
+      ).replace('2 ', '')}`
       : pluralize(tabScopedListing.length, activeTab.toLowerCase());
 
   const getCaptionScope = () => {

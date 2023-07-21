@@ -28,6 +28,7 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
+import { JSONDisplay } from './json_display';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -160,6 +161,10 @@ const ViewProposalPage = ({
           />
           {proposal instanceof AaveProposal && (
             <AaveViewProposalDetail proposal={proposal} />
+          )}
+          {metadata && <JSONDisplay data={metadata} title="Metadata" />}
+          {proposal.data?.messages && (
+            <JSONDisplay data={proposal.data.messages} title="Messages" />
           )}
           <VotingResults proposal={proposal} />
           <VotingActions

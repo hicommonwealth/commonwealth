@@ -80,6 +80,7 @@
       .buttons-row {
         display: flex;
         gap: 8px;
+        justify-content: end;
       }
     }
   }
@@ -125,5 +126,9 @@
         }
       }
     }
+  }
+
+  .JoinCommunityBanner {
+    margin-top: 8px;
   }
 }
