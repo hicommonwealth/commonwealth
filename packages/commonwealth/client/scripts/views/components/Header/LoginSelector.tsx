@@ -112,7 +112,7 @@ export const LoginSelector = () => {
                         CHAINBASE_SHORT[app.chain?.meta?.base] ||
                         ''
                       } address`
-                    : 'Join'
+                    : 'Join community'
                 }
               />
             </div>
