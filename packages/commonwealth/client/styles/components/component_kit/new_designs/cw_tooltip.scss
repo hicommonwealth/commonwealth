@@ -36,22 +36,6 @@
   order: 0;
   flex-grow: 0;
 
-  .top {
-    bottom: -4px;
-  }
-
-  .right {
-    left: -4px;
-  }
-
-  .bottom {
-    top: -4px;
-  }
-
-  .left {
-    right: -4px;
-  }
-  
   .tipTop {
     @include tip(auto, auto, -4px, calc(50% - 8px/2));
   }
@@ -80,4 +64,20 @@
     font-feature-settings: 'tnum' on, 'lnum' on;
     color: $white;
   }
+}
+
+.top {
+  margin-bottom: 8px;
+}
+
+.right {
+  margin-left: 8px;
+}
+
+.bottom {
+  margin-top: 8px;
+}
+
+.left {
+  margin-right: 8px;
 }

@@ -34,6 +34,7 @@ const TooltipContainer = (props: TooltipContainerProps) => {
       {children}
       <div
         className={getClasses({
+          placement,
           tipTop: placement === 'top',
           tipRight: placement === 'right',
           tipBottom: placement === 'bottom',
