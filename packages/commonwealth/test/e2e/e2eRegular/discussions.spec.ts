@@ -6,8 +6,9 @@ import {
   clearTestEntities,
   createTestEntities,
   testChains,
-  testThreads,
 } from '../../integration/api/external/dbEntityHooks.spec';
+import { login } from '../utils/e2eUtils';
+
 chai.use(chaiHttp);
 const { expect } = chai;
 
@@ -20,11 +21,13 @@ test.afterEach(async () => {
 });
 
 test.describe('DiscussionsPage Homepage', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
+  });
+
   test('Discussion page loads and can navigate to first thread', async ({
     page,
   }) => {
-    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
-
     await page.waitForSelector('div.HeaderWithFilters');
 
     // Assert Thread header exists on discussions page
@@ -53,8 +56,6 @@ test.describe('DiscussionsPage Homepage', () => {
   });
 
   test('Check navigation to first profile', async ({ page }) => {
-    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
-
     let userProfileLinks = await page.locator('a.user-display-name.username');
 
     do {
@@ -65,5 +66,33 @@ test.describe('DiscussionsPage Homepage', () => {
     await userProfileLinks.first().click();
 
     expect(page.url()).to.include('/profile/id/');
+  });
+
+  test('Check User can Like/Dislike post', async ({ page }) => {
+    await login(page);
+
+    let reactionsCountDivs = await page.$$('.reactions-count');
+    const firstThreadReactionCount = reactionsCountDivs[0].innerText();
+
+    // click button
+    await page.getByRole('button', { name: '0', exact: true }).first().click();
+
+    reactionsCountDivs = await page.$$('.reactions-count');
+    console.log(await reactionsCountDivs[0].innerText());
+    chai.assert.equal(
+      await reactionsCountDivs[0].innerText(),
+      (await firstThreadReactionCount) + 1,
+      'reaction count did not increase after clicked'
+    );
+
+    // click button
+    await page.getByRole('button', { name: '1', exact: true }).first().click();
+
+    reactionsCountDivs = await page.$$('.reactions-count');
+    chai.assert.equal(
+      await reactionsCountDivs[0].innerText(),
+      firstThreadReactionCount,
+      'reaction count did not decrease after clicked'
+    );
   });
 });

@@ -28,17 +28,33 @@ export let testProfiles: ProfileAttributes[];
 
 export async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Reaction.destroy({
+    where: { address_id: { [Op.lt]: 0 } },
+    force: true,
+  });
   await models.Collaboration.destroy({
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
   });
   await models.Comment.destroy({
-    where: { [Op.or]: [{ id: { [Op.lt]: 0 } }, { thread_id: { [Op.lt]: 0 } }] },
+    where: { address_id: { [Op.lt]: 0 } },
     force: true,
   });
-  await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Thread.destroy({
+    where: {
+      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+    },
+    force: true,
+  });
+  await models.Address.destroy({
+    where: {
+      [Op.or]: [
+        { id: { [Op.lt]: 0 } },
+        { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
+      ],
+    },
+    force: true,
+  });
   await models.Subscription.destroy({
     where: { subscriber_id: { [Op.lt]: 0 } },
     force: true,
@@ -99,6 +115,7 @@ export async function createTestEntities() {
       await models.ChainNode.findOrCreate({
         where: {
           id: -1,
+          eth_chain_id: 1,
           url: 'test1',
           balance_type: 'cmntest',
           name: 'TestName1',
@@ -109,6 +126,7 @@ export async function createTestEntities() {
       await models.ChainNode.findOrCreate({
         where: {
           id: -2,
+          eth_chain_id: 1,
           url: 'test2',
           balance_type: 'cmntest',
           name: 'TestName2',
@@ -180,6 +198,13 @@ export async function createTestEntities() {
     )[0],
   ];
 
+  const addresses = [
+    '0x834731c87A7a6f8B57F4aa42c205265EAcbFCCD7',
+    '0x7EcA9278094511486506bb34B31087df7C25Db6f',
+    '0xd65FA09DE724f0D68EcbF5e0e186d3d59080172C',
+    '0x89F40750d76D646c2f822E4Dd6Ea1558A83eDb82',
+  ];
+
   testAddresses = await Promise.all(
     [...Array(4).keys()].map(
       async (i) =>
@@ -188,7 +213,7 @@ export async function createTestEntities() {
             where: {
               id: -i - 1,
               user_id: -i - 1,
-              address: `testAddress${-i - 1}`,
+              address: addresses[i],
               chain: 'cmntest',
               verification_token: '',
               profile_id: i < 2 ? -1 : -2,

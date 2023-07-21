@@ -5,11 +5,12 @@ import * as process from 'process';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
 
-export async function login(page) {
-  await addUserIfNone();
+// Logs in user for specific chain
+export async function login(page, chain = 'ethereum') {
+  await addUserIfNone(chain);
 
   await page.waitForSelector('.LoginSelector button');
-  let button = await page.$('.LoginSelector button');
+  let button = await page.locator('.LoginSelector button');
   await button.click();
 
   await page.waitForSelector('.LoginDesktop');
@@ -17,12 +18,14 @@ export async function login(page) {
   let metaMaskIcon = await page.$$("text='Metamask'");
   do {
     await page.mouse.click(0, 0);
-    button = await page.$('.LoginSelector button');
+    button = await page.locator('.LoginSelector button');
     await button.click();
     metaMaskIcon = await page.$$("text='Metamask'");
   } while (metaMaskIcon.length === 0);
 
   await page.getByText('Metamask').click();
+
+  await page.waitForSelector('a.user-display-name.username', { timeout: 5000 });
 }
 
 export async function screenshotOnFailure(
@@ -99,9 +102,12 @@ export async function removeUser() {
 }
 
 // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
-export async function addUserIfNone() {
+export async function addUserIfNone(chain) {
+  if (chain != 'ethereum') {
+    await addUserIfNone('ethereum');
+  }
   const userExists = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}'`
+    `select 1 from "Addresses" where address = '${testAddress}' AND chain = '${chain}'`
   );
 
   if (userExists[0].length > 0) return;
@@ -167,7 +173,7 @@ export async function addUserIfNone() {
       role
     ) VALUES (
       '${testAddress}',
-      'ethereum',
+      '${chain}',
       '2023-07-14 13:03:55.754-07',
       '2023-07-14 13:03:56.212-07',
       ${userId[0][0]['id']},
