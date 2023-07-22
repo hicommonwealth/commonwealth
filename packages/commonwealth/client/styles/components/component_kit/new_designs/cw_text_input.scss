@@ -40,9 +40,9 @@
 
   .input-and-icon-container {
     display: flex;
-    flex: 1;
-    flex-direction: column;
+    align-items: center; /* Center icons vertically */
     position: relative;
+    flex: 1;
 
     input {
       @include inputStyles;
