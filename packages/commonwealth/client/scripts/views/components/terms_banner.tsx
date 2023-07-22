@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import 'pages/terms_banner.scss';
 
 import app from 'state';
-import { CWBanner } from './component_kit/cw_banner';
+import { Old_CWBanner } from './component_kit/cw_banner';
 import { CWText } from './component_kit/cw_text';
 
 type TermsBannerProps = { terms: string };
@@ -25,7 +25,7 @@ export const TermsBanner = ({ terms }: TermsBannerProps) => {
   }
 
   return (
-    <CWBanner
+    <Old_CWBanner
       className="TermsBanner"
       bannerContent={
         <CWText type="b2" className="terms-text">
