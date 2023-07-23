@@ -24,6 +24,10 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
+import {
+  FirebaseMessaging,
+  GetTokenOptions,
+} from '@capacitor-firebase/messaging';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -39,6 +43,7 @@ const NotificationSettingsPage = () => {
   const [email, setEmail] = useState('');
   const [emailValidated, setEmailValidated] = useState(false);
   const [sentEmail, setSentEmail] = useState(false);
+  const [token, setToken] = useState('');
 
   const [currentFrequency, setCurrentFrequency] = useState(
     app.user.emailInterval
@@ -47,6 +52,27 @@ const NotificationSettingsPage = () => {
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [app?.user.notifications, app.user.emailInterval]);
+
+  // useEffect(() => {
+  //   const messaging = FirebaseMessaging.messaging();
+
+  //   messaging.onMessage((payload) => {
+  //     console.log('Message received. ', payload);
+  //     // Customize notification here
+  //     const notificationTitle = payload.notification.title;
+  //     const notificationOptions = {
+  //       body: payload.notification.body,
+  //       icon: payload.notification.icon
+  //     };
+
+  //     if (!("Notification" in window)) {
+  //       console.log("This browser does not support system notifications");
+  //     } else if (Notification.permission === "granted") {
+  //       // If it's okay let's create a notification
+  //       new Notification(notificationTitle, notificationOptions);
+  //     }
+  //   });
+  // }, []);
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
@@ -105,6 +131,33 @@ const NotificationSettingsPage = () => {
     .map((x) => x.chain)
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
 
+  // Handler for the 'Request Permission' button
+  const requestPermission = async () => {
+    const permission = await FirebaseMessaging.requestPermissions();
+    console.log(`Permission: ${permission}`);
+  };
+
+  // Handler for the 'Get Token' button
+  const getToken = async () => {
+    const vapidKey =
+      'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
+
+    await FirebaseMessaging.getToken({ vapidKey: vapidKey })
+      .then((currentToken) => {
+        if (currentToken) {
+          console.log('Current token:', currentToken);
+          setToken(currentToken.token);
+        } else {
+          console.log(
+            'No registration token available. Request permission to generate one.'
+          );
+        }
+      })
+      .catch((err) => {
+        console.log('An error occurred while retrieving token. ', err);
+      });
+  };
+
   return (
     <div className="NotificationSettingsPage">
       <CWText type="h3" fontWeight="semiBold" className="page-header-text">
@@ -114,6 +167,11 @@ const NotificationSettingsPage = () => {
         Notification settings for all new threads, comments, mentions, likes,
         and chain events in the following communities.
       </CWText>
+      <div className="firebase-notification-section">
+        <p>Token: {token}</p>
+        <button onClick={requestPermission}>Request Permissions</button>
+        <button onClick={getToken}>Get Token</button>
+      </div>
       <div className="email-management-section">
         <div className="text-description">
           <CWText type="h5">Scheduled Email Digest</CWText>

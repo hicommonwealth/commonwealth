@@ -26,6 +26,7 @@ import NotificationCategory from 'models/NotificationCategory';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
+import { CapacitorCookies } from '@capacitor/core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
