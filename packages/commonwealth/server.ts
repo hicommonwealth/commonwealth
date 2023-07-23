@@ -114,21 +114,21 @@ async function main() {
 
   sessionStore.sync();
 
-  const sessionParser = session({
-    secret: SESSION_SECRET,
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
-  });
-
   const setupMiddleware = () => {
     // redirect from commonwealthapp.herokuapp.com to commonwealth.im
     app.all(/.*/, (req, res, next) => {
       const host = req.header('host');
       const origin = req.get('origin');
 
+      // Log the request method, url and origin
+      console.log(`Request method: ${req.method}`);
+      console.log(`Request URL: ${req.url}`);
+      console.log(`Request Origin: ${origin}`);
+
       // if host is native mobile app, don't redirect
       if (origin?.includes('capacitor://')) {
+        console.log('Request from Capacitor. Applying special sessionParser.');
+
         res.header('Access-Control-Allow-Origin', origin);
         // Set other necessary CORS headers if needed
         res.header(
@@ -142,17 +142,41 @@ async function main() {
         res.header('Access-Control-Allow-Credentials', 'true');
 
         // For development only - need to figure out prod solution
-        sessionParser.cookie = {
-          sameSite: 'none', // Client=capacitor://localhost on iOS or http://localhost on Android, tldr cross site
-          secure: process.env.NODE_ENV === 'production' ? true : false, // for development
-          httpOnly: false, // Capacitor needs to use JS to manage cookie, cannot do natively
-        };
+        const sessionParserForCapacitor = session({
+          secret: SESSION_SECRET,
+          store: sessionStore,
+          resave: false,
+          saveUninitialized: false,
+          cookie: {
+            sameSite: 'none',
+            secure: process.env.NODE_ENV === 'production' ? true : false,
+            httpOnly: false,
+          },
+        });
+
+        return sessionParserForCapacitor(req, res, next);
       }
 
       if (host?.match(/commonwealthapp.herokuapp.com/i)) {
+        console.log(
+          'Redirecting from commonwealthapp.herokuapp.com to commonwealth.im.'
+        );
         res.redirect(301, `https://commonwealth.im${req.url}`);
       } else {
-        next();
+        console.log(
+          'Not from Capacitor or commonwealthapp.herokuapp.com. Using default sessionParser.'
+        );
+        const defaultSessionParser = session({
+          secret: SESSION_SECRET,
+          store: sessionStore,
+          resave: false,
+          saveUninitialized: false,
+          cookie: {
+            secure: process.env.NODE_ENV === 'production' ? true : false,
+            httpOnly: true,
+          },
+        });
+        defaultSessionParser(req, res, next);
       }
     });
 
@@ -215,7 +239,6 @@ async function main() {
     app.use(bodyParser.json({ limit: '1mb' }));
     app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
     app.use(cookieParser());
-    app.use(sessionParser);
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));

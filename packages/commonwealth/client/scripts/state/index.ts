@@ -23,7 +23,7 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
-import $ from 'jquery';
+import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
 
@@ -229,8 +229,11 @@ export async function initAppState(
   shouldRedraw = true
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(`${app.serverUrl()}/status`)
-      .then(async (data) => {
+    axios
+      .get(`${app.serverUrl()}/status`, { withCredentials: true })
+      .then(async (response) => {
+        const data = response.data;
+
         app.config.chains.clear();
         app.config.nodes.clear();
         app.user.notifications.clear();
