@@ -149,7 +149,7 @@ async function main() {
           saveUninitialized: false,
           cookie: {
             sameSite: 'none',
-            secure: process.env.NODE_ENV === 'production' ? true : false,
+            secure: false,
             httpOnly: false,
           },
         });
