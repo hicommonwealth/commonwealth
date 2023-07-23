@@ -149,8 +149,7 @@ async function main() {
           saveUninitialized: false,
           cookie: {
             sameSite: 'none',
-            domain: process.env.CAP_HOST_NAME,
-            secure: process.env.NODE_ENV === 'production' ? true : false,
+            secure: false,
             httpOnly: false,
           },
         });
@@ -172,11 +171,6 @@ async function main() {
           store: sessionStore,
           resave: false,
           saveUninitialized: false,
-          cookie: {
-            secure: process.env.NODE_ENV === 'production' ? true : false,
-            domain: process.env.CAP_HOST_NAME,
-            httpOnly: true,
-          },
         });
         defaultSessionParser(req, res, next);
       }
