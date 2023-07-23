@@ -126,7 +126,7 @@ type WalletsListProps = {
   onResetWalletConnect: () => void;
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
-    type: 'google' | 'twitter' | 'discord' | 'github'
+    type: 'google' | 'twitter' | 'discord' | 'github' | 'apple'
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
@@ -248,6 +248,14 @@ export const CWWalletsList = (props: WalletsListProps) => {
             darkMode={darkMode}
             onClick={() => onSocialLogin('twitter')}
           />
+          {app.isNative && (
+            <CWAuthButton
+              type="apple"
+              label="Apple"
+              darkMode={darkMode}
+              onClick={() => onSocialLogin('apple')}
+            />
+          )}
 
           {wallets.length === 0 && (
             <CWNoAuthMethodsAvailable darkMode={darkMode} />

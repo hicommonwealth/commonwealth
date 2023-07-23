@@ -16,6 +16,7 @@ import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 import { CosmosExtension } from '@magic-ext/cosmos';
+import axios from 'axios';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -309,7 +310,7 @@ export async function unlinkLogin(account: AddressInfo) {
   app.roles.deleteRole({
     address: account,
     chain: account.chain.id,
-  })
+  });
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);
@@ -372,10 +373,7 @@ export async function loginWithMagicLink({
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({
-  provider,
-  userInfo,
-}): {
+function getProfileMetadata({ provider, userInfo }): {
   username?: string;
   avatarUrl?: string;
 } {
@@ -383,9 +381,8 @@ function getProfileMetadata({
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } = userInfo.sources[
-      'https://discord.com/api/users/@me'
-    ];
+    const { avatar, id, username } =
+      userInfo.sources['https://discord.com/api/users/@me'];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
@@ -400,6 +397,8 @@ function getProfileMetadata({
     return { username: userInfo.name, avatarUrl: userInfo.profile };
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
+  } else if (provider === 'apple') {
+    return {};
   }
   return {};
 }
@@ -414,31 +413,39 @@ export async function handleSocialLoginCallback(bearer?: string) {
     console.log('Magic redirect result:', result);
   }
 
-  const response = await $.post({
-    url: `${app.serverUrl()}/auth/magic`,
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-    xhrFields: {
+  try {
+    const response = await axios.request({
+      method: 'post',
+      url: `${app.serverUrl()}/auth/magic`,
+      headers: {
+        Authorization: `Bearer ${bearer}`,
+      },
       withCredentials: true,
-    },
-    data: {
-      chain: app.activeChainId(),
-      jwt: app.user.jwt,
-      username: profileMetadata?.username,
-      avatarUrl: profileMetadata?.avatarUrl,
-    },
-  });
+      data: {
+        chain: app.activeChainId(),
+        jwt: app.user.jwt,
+        username: profileMetadata?.username,
+        avatarUrl: profileMetadata?.avatarUrl,
+      },
+    });
 
-  if (response.status === 'Success') {
-    await initAppState(false);
-    if (app.chain) {
-      const c = app.user.selectedChain
-        ? app.user.selectedChain
-        : app.config.chains.getById(app.activeChainId());
-      await updateActiveAddresses({ chain: c });
+    console.log(response, 'response in finish social login');
+    console.log(response.headers, 'headers in finish social login');
+
+    if (response.data.status === 'Success') {
+      await initAppState(false);
+
+      if (app.chain) {
+        const c = app.user.selectedChain
+          ? app.user.selectedChain
+          : app.config.chains.getById(app.activeChainId());
+        await updateActiveAddresses({ chain: c });
+      }
+    } else {
+      throw new Error(`Social auth unsuccessful: ${response.status}`);
     }
-  } else {
-    throw new Error(`Social auth unsuccessful: ${response.status}`);
+  } catch (error) {
+    console.error('Error handling social login:', error);
+    // Handle errors here
   }
 }

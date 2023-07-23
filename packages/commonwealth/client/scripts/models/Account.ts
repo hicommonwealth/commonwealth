@@ -1,6 +1,6 @@
 import type { WalletId } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
-import $ from 'jquery';
+import axios from 'axios';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
@@ -142,30 +142,40 @@ class Account {
       session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,
     };
-    const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
-    if (result.status === 'Success') {
-      // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(
-        ({ address, ghostAddress, chain }) =>
-          ghostAddress &&
-          this.chain.id === chain.id &&
-          app.user.activeAccounts.some((account) => account.address === address)
+    try {
+      const result = await axios.post(
+        `${app.serverUrl()}/verifyAddress`,
+        params,
+        { withCredentials: true }
       );
-      if (hasGhostAddress) {
-        const { success, ghostAddressId } = await $.post(
-          `${app.serverUrl()}/updateAddress`,
-          params
+      if (result.data.status === 'Success') {
+        const hasGhostAddress = app.user.addresses.some(
+          ({ address, ghostAddress, chain }) =>
+            ghostAddress &&
+            this.chain.id === chain.id &&
+            app.user.activeAccounts.some(
+              (account) => account.address === address
+            )
         );
-        if (success && ghostAddressId) {
-          // remove ghost address from addresses
-          app.user.setAddresses(
-            app.user.addresses.filter(({ ghostAddress }) => {
-              return !ghostAddress;
-            })
+        if (hasGhostAddress) {
+          const response = await axios.post(
+            `${app.serverUrl()}/updateAddress`,
+            params,
+            { withCredentials: true }
           );
-          app.user.setActiveAccounts([], shouldRedraw);
+          const { success, ghostAddressId } = response.data;
+          if (success && ghostAddressId) {
+            app.user.setAddresses(
+              app.user.addresses.filter(({ ghostAddress }) => {
+                return !ghostAddress;
+              })
+            );
+            app.user.setActiveAccounts([], shouldRedraw);
+          }
         }
       }
+    } catch (error) {
+      console.error(error);
     }
   }
 }

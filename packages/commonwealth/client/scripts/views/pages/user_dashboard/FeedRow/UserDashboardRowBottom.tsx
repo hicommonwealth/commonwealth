@@ -44,15 +44,15 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const [isReplying, setIsReplying] = useState(false);
 
   // console log props with object destructuring
-  console.log({
-    threadId,
-    commentCount,
-    commentId,
-    chainId,
-    commenters,
-    thread,
-    comment,
-  });
+  // console.log({
+  //   threadId,
+  //   commentCount,
+  //   commentId,
+  //   chainId,
+  //   commenters,
+  //   thread,
+  //   comment,
+  // });
 
   const handleIsReplying = () => {
     setIsReplying(!isReplying);

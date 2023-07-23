@@ -23,7 +23,8 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
-  RABBITMQ_URI, ROLLBAR_ENV,
+  RABBITMQ_URI,
+  ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
 } from './server/config';
@@ -126,10 +127,26 @@ async function main() {
       const host = req.header('host');
       const origin = req.get('origin');
 
-      // For development only - need to figure out prod solution
       // if host is native mobile app, don't redirect
       if (origin?.includes('capacitor://')) {
-        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Origin', origin);
+        // Set other necessary CORS headers if needed
+        res.header(
+          'Access-Control-Allow-Methods',
+          'GET, POST, PUT, DELETE, OPTIONS'
+        );
+        res.header(
+          'Access-Control-Allow-Headers',
+          'Content-Type, Authorization'
+        );
+        res.header('Access-Control-Allow-Credentials', 'true');
+
+        // For development only - need to figure out prod solution
+        sessionParser.cookie = {
+          sameSite: 'none', // Client=capacitor://localhost on iOS or http://localhost on Android, tldr cross site
+          secure: process.env.NODE_ENV === 'production' ? true : false, // for development
+          httpOnly: false, // Capacitor needs to use JS to manage cookie, cannot do natively
+        };
       }
 
       if (host?.match(/commonwealthapp.herokuapp.com/i)) {
