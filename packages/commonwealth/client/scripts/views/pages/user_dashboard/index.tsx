@@ -11,6 +11,7 @@ import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -24,6 +25,7 @@ type UserDashboardProps = {
 
 const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
+  const { isLoggedIn } = useUserLoggedIn();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global
@@ -67,7 +69,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage, subpage]);
 
   return (
-    <div ref={setScrollElement} className="UserDashboard">
+    <div ref={setScrollElement} className="UserDashboard" key={`${isLoggedIn}`}>
       <div className="dashboard-column">
         <div className="dashboard-header">
           <CWTabBar>

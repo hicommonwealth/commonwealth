@@ -23,7 +23,7 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
-import $ from 'jquery';
+import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
 
@@ -200,7 +200,7 @@ const app: IApp = {
     document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
     //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
-    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
+    const mobileUrl = process.env.SERVER_URL; // Replace with your computer ip, staging, or production url
 
     if (app.isNative(window)) {
       return mobileUrl;
@@ -229,8 +229,11 @@ export async function initAppState(
   shouldRedraw = true
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(`${app.serverUrl()}/status`)
-      .then(async (data) => {
+    axios
+      .get(`${app.serverUrl()}/status`, { withCredentials: true })
+      .then(async (response) => {
+        const data = response.data;
+
         app.config.chains.clear();
         app.config.nodes.clear();
         app.user.notifications.clear();
