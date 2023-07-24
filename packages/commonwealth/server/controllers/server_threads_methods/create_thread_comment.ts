@@ -238,7 +238,7 @@ export async function __createThreadComment({
         category_id: NotificationCategories.NewReaction,
         object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
       { transaction: subsTransaction }
@@ -249,7 +249,7 @@ export async function __createThreadComment({
         category_id: NotificationCategories.NewComment,
         object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
       { transaction: subsTransaction }
