@@ -1,0 +1,15 @@
+@import '../../../../../../../styles/shared';
+
+.AdminActions {
+  .danger {
+    color: $rorange-600 !important;
+
+    .Icon {
+      color: $rorange-600 !important;
+    }
+
+    .Text {
+      color: $rorange-600 !important;
+    }
+  }
+}

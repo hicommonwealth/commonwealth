@@ -74,11 +74,6 @@ class ThreadsController {
   private readonly _listingStore: RecentListingStore;
   private readonly _overviewStore: ProposalStore<Thread>;
   public isFetched = new EventEmitter();
-  private _threadIdToReactions: Map<number, AssociatedReaction[]> = new Map<
-    number,
-    AssociatedReaction[]
-  >();
-
   public isReactionFetched = new EventEmitter();
   private _reactionCountsStore: ReactionCountsStore = new ReactionCountsStore();
   private _reactionsStore: ReactionStore = new ReactionStore();
@@ -97,16 +92,6 @@ class ThreadsController {
 
   public getReactionByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
     return this.reactionsStore.getByPost(post);
-  }
-
-  public refreshReactionsFromThreads(threads: Thread[]) {
-    threads.forEach((t) => {
-      this._threadIdToReactions.set(t.id, t.associatedReactions);
-    });
-  }
-
-  public get threadIdToReactions() {
-    return this._threadIdToReactions;
   }
 
   private constructor() {
@@ -194,8 +179,8 @@ class ThreadsController {
         app.threads.reactionsStore.add(new Reaction(reaction));
       }
       reactionIds = reactions.map((r) => r.id);
-      reactionType = reactions.map((r) => r.type);
-      addressesReacted = reactions.map((r) => r.address);
+      reactionType = reactions.map((r) => r?.type || r?.reaction);
+      addressesReacted = reactions.map((r) => r?.address || r?.Address?.address);
     }
 
     let versionHistoryProcessed;
@@ -532,8 +517,7 @@ class ThreadsController {
   public async setArchived(threadId: number, isArchived: boolean) {
     return new Promise((resolve, reject) => {
       $.post(
-        `${app.serverUrl()}/threads/${threadId}/${
-          !isArchived ? 'archive' : 'unarchive'
+        `${app.serverUrl()}/threads/${threadId}/${!isArchived ? 'archive' : 'unarchive'
         }`,
         {
           jwt: app.user.jwt,
@@ -790,10 +774,13 @@ class ThreadsController {
         ...((foundThread || {}) as any),
         ...((thread || {}) as any),
       });
-      finalThread.associatedReactions =
-        thread.associatedReactions.length > 0
-          ? thread.associatedReactions
-          : foundThread?.associatedReactions || [];
+      finalThread.associatedReactions = [
+        ...(
+          thread.associatedReactions.length > 0
+            ? thread.associatedReactions
+            : foundThread?.associatedReactions || []
+        )
+      ];
       finalThread.numberOfComments =
         rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
       this._store.update(finalThread);
@@ -959,8 +946,6 @@ class ThreadsController {
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
     });
-
-    this.refreshReactionsFromThreads(modeledThreads)
 
     modeledThreads.forEach((thread) => {
       try {
