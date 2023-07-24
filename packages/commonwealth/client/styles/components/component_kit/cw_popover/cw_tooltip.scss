@@ -1,5 +1,25 @@
 @import '../../../shared';
 
+// This is temporary solution, just updated styles of the current Tooltip
+// It should be removed when Tooltip from new designs will be introduced
+@mixin newTempBlackTooltip {
+  font-size: 12px;
+  letter-spacing: 0.24px;
+  border-radius: 4px;
+  background-color: $neutral-900;
+  padding: 4px 8px;
+  color: $white;
+  text-align: center;
+  border: none;
+
+  .Text {
+    height: 16px;
+    display: flex;
+    align-items: center;
+    color: $white;
+  }
+}
+
 .OldTooltip {
   align-items: center;
   background-color: $white;

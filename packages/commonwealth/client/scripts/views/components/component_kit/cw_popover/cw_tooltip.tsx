@@ -13,17 +13,23 @@ type TooltipProps = {
   content: string | React.ReactNode;
   hasBackground?: boolean;
   placement?: Placement;
+  disablePortal?: boolean;
 } & PopoverTriggerProps;
 
-export const CWTooltip = (props: TooltipProps) => {
-  const { content, hasBackground, renderTrigger, placement } = props;
-
+export const CWTooltip = ({
+  content,
+  hasBackground,
+  renderTrigger,
+  placement,
+  disablePortal,
+}: TooltipProps) => {
   const popoverProps = usePopover();
 
   return (
     <>
       {renderTrigger(popoverProps.handleInteraction)}
       <Popover
+        disablePortal={disablePortal}
         placement={placement}
         content={
           typeof content === 'string' ? (

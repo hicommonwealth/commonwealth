@@ -19,9 +19,7 @@ type ContainerProps = {
   children: React.ReactNode;
 };
 
-const Container = (props: ContainerProps) => {
-  const { placement, children } = props;
-
+const Container: FC<ContainerProps> = ({ placement, children }) => {
   return (
     <div className={getClasses({ placement }, ComponentType.Tooltip)}>
       {children}
