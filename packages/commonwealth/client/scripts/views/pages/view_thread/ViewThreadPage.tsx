@@ -48,7 +48,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { CommentsTree } from '../discussions/CommentTree';
+import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
@@ -685,6 +685,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <div className="thread-content">
             {isEditingBody ? (
               <>
+                {/*// TODO editing thread */}
                 {threadOptionsComp}
                 <EditBody
                   title={title}
@@ -775,7 +776,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 />
               </div>
             )}
-            <CommentsTree
+            <CommentTree
               comments={sortedComments}
               includeSpams={includeSpamThreads}
               thread={thread}
