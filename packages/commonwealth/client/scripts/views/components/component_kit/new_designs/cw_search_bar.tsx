@@ -1,7 +1,9 @@
-import React, { FC, ChangeEvent, useState } from 'react';
+import React, { FC, ChangeEvent, useState, useEffect } from 'react';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import useAutocomplete from '@mui/base/useAutocomplete';
 
+import app from 'state';
+import ChainInfo from 'client/scripts/models/ChainInfo';
 import { ComponentType } from './../types';
 
 import 'components/component_kit/new_designs/cw_search_bar.scss';
@@ -53,19 +55,26 @@ type TagProps = {
   onClick: () => void;
 };
 
-const communities = [
-  'Altitude',
-  'Terra Classic',
-  'Osmosis',
-  'Qwoyn Network',
-  '1inch',
-  'Stargate Finance',
-  'Timeless',
-  'Terra Agora',
-  'Injective',
-  'Juno',
-  'Common',
+const communities: any = [
+  ...app.config.chains
+    .getAll()
+    // .map((c) => {c.id, c.name})
+    .map((c) => c.name)
+    .sort(),
 ];
+// const communities = [
+//   'Altitude',
+//   'Terra Classic',
+//   'Osmosis',
+//   'Qwoyn Network',
+//   '1inch',
+//   'Stargate Finance',
+//   'Timeless',
+//   'Terra Agora',
+//   'Injective',
+//   'Juno',
+//   'Common',
+// ];
 
 const Tag: FC<TagProps> = ({ communityName, disabled, onClick }) => {
   const handleClick = () => {
@@ -131,6 +140,10 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
     getOptionLabel: (option) => option,
   });
 
+  useEffect(() => {
+    console.log('chains:', app.config.chains.getAll());
+  }, []);
+
   return (
     <div className="container">
       <div
@@ -165,13 +178,15 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
         </div>
       </div>
       {groupedOptions.length > 0 && (
-        <ul className="listBox" {...getListboxProps()}>
-          {(groupedOptions as typeof communities).map((option, index) => (
-            <li className="option" {...getOptionProps({ option, index })}>
-              {option}
-            </li>
-          ))}
-        </ul>
+        <div className="listBox">
+          <ul {...getListboxProps()}>
+            {(groupedOptions as typeof communities).map((option, index) => (
+              <li className="option" {...getOptionProps({ option, index })}>
+                {option}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

@@ -43,6 +43,10 @@
       outline: none;
     }
 
+    &.disabled {
+      background-color: $neutral-50;
+    }
+
     ::placeholder {
       color: $neutral-800;
     }
@@ -91,14 +95,19 @@
 }
 
 .container {
-  position: static;
+  position: relative;
+  width: 608px;
 }
 
 .listBox {
-  position: relative;
+  position: absolute;
+  top: "100%";
+  left: 0;
+  width: 100%;
   box-sizing: border-box;
   padding: 6px;
-  width: 608px;
+  // width: 608px;
+  max-height: 300px;
   border-radius: 6px;
   overflow: auto;
   outline: 0px;
