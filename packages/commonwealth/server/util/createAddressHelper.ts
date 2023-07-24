@@ -196,9 +196,10 @@ export async function createAddressHelper(
         isCustomDomain: null,
       });
 
-      const isNewlyCreatedAddress = existingAddressOnOtherChain ? false : true;
-
-      return { ...newObj.toJSON(), newly_created: isNewlyCreatedAddress };
+      return {
+        ...newObj.toJSON(),
+        newly_created: !existingAddressOnOtherChain,
+      };
     } catch (e) {
       return next(e);
     }
