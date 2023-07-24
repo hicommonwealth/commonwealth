@@ -20,6 +20,11 @@ import moment from 'moment';
 export type AuthorAndPublishInfoProps = {
   isNew?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
+  discord_meta?: {
+    user: { id: string; username: string };
+    channel_id: string;
+    message_id: string;
+  };
   collaboratorsInfo?: IThreadCollaborator[];
   isLocked?: boolean;
   lockedAt?: string;
@@ -43,6 +48,7 @@ export const AuthorAndPublishInfo = ({
   lastUpdated,
   viewsCount,
   publishDate,
+  discord_meta,
   showSplitDotIndicator = true,
   showPublishLabelWithDate,
   showEditedLabelWithDate,
@@ -58,6 +64,8 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
+  const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
+
   return (
     <div className="AuthorAndPublishInfo">
       <User
@@ -65,8 +73,25 @@ export const AuthorAndPublishInfo = ({
         user={authorInfo}
         popover
         linkify
-        showAddressWithDisplayName={showUserAddressWithInfo}
+        showAddressWithDisplayName={
+          fromDiscordBot ? false : showUserAddressWithInfo
+        }
       />
+
+      {fromDiscordBot && (
+        <>
+          {dotIndicator}
+          <CWText type="caption" className="discord-author">
+            <b>{discord_meta?.user?.username}</b>
+          </CWText>
+          {dotIndicator}
+          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
+          {dotIndicator}
+          <CWText type="caption" className="discord-author">
+            Bridged from Discord
+          </CWText>
+        </>
+      )}
 
       {collaboratorsInfo?.length > 0 && (
         <>
