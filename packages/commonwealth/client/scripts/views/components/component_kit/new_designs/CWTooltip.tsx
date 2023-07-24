@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { FC } from 'react';
 
-import 'components/component_kit/new_designs/cw_tooltip.scss';
+import 'components/component_kit/new_designs/CWTooltip.scss';
 
 import { Popover, usePopover } from '../cw_popover/cw_popover';
 import type { PopoverTriggerProps } from '../cw_popover/cw_popover';
@@ -27,31 +27,30 @@ const Container = (props: ContainerProps) => {
   const { placement, children } = props;
 
   return (
-    <div
-      className={getClasses(
-        {
-          placement,
-        },
-        ComponentType.Tooltip
-      )}
-    >
+    <div className={getClasses({ placement }, ComponentType.Tooltip)}>
       {children}
       <div
-        className={getClasses({
-          placement,
-          tipTop: placement === 'top',
-          tipRight: placement === 'right',
-          tipBottom: placement === 'bottom',
-          tipLeft: placement === 'left',
-        })}
+        className={getClasses(
+          {
+            placement,
+            Arrow: true,
+            tipTop: placement === 'top',
+            tipRight: placement === 'right',
+            tipBottom: placement === 'bottom',
+            tipLeft: placement === 'left',
+          },
+          ComponentType.Tooltip
+        )}
       />
     </div>
   );
 };
 
-export const CWTooltip = (props: TooltipProps) => {
-  const { content, renderTrigger, placement } = props;
-
+export const CWTooltip: FC<TooltipProps> = ({
+  content,
+  renderTrigger,
+  placement,
+}) => {
   const popoverProps = usePopover();
 
   return (
@@ -60,13 +59,11 @@ export const CWTooltip = (props: TooltipProps) => {
       <Popover
         placement={placement}
         content={
-          typeof content === 'string' ? (
-            <Container placement={placement}>
-              <CWText type="caption">{formatText(content)}</CWText>
-            </Container>
-          ) : (
-            <Container placement={placement}>{content}</Container>
-          )
+          <Container placement={placement}>
+            <CWText type="caption">
+              {typeof content === 'string' ? formatText(content) : content}
+            </CWText>
+          </Container>
         }
         {...popoverProps}
       />
