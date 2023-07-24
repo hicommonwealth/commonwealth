@@ -518,17 +518,6 @@ const rollbar = new Rollbar({
 setupErrorHandlers(app, rollbar);
 setupServer();
 
-function availableRoutes() {
-  return app._router.stack
-    .filter((r) => r.route)
-    .map((r) => {
-      return {
-        method: Object.keys(r.route.methods)[0].toUpperCase(),
-        path: r.route.path,
-      };
-    });
-}
-
 export const resetDatabase = () => resetServer();
 export const getTokenBalanceCache = () => tokenBalanceCache;
 export const getBanCache = () => banCache;
