@@ -65,7 +65,9 @@ test.describe('Commonwealth Create Community', () => {
 });
 
 async function fillOutERCForm(page, formName, tokenContractAddress, chainName) {
-  await page.getByText(formName).click();
+  do {
+    await page.getByText(formName).click();
+  } while (!(await page.$('input[id*=Contract]')));
 
   // populate token contract address
   const tokenContractAddressForm = await page.$('input[id*=Contract]');

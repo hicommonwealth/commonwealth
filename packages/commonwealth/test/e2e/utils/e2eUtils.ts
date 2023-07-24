@@ -25,24 +25,6 @@ export async function login(page) {
   await page.getByText('Metamask').click();
 }
 
-export async function screenshotOnFailure(
-  { page }: { page: Page },
-  testInfo: TestInfo
-) {
-  if (testInfo.status !== testInfo.expectedStatus) {
-    // Get a unique place for the screenshot.
-    const screenshotPath = testInfo.outputPath(`failure.png`);
-    // Add it to the report.
-    testInfo.attachments.push({
-      name: 'screenshot',
-      path: screenshotPath,
-      contentType: 'image/png',
-    });
-    // Take the screenshot itself.
-    await page.screenshot({ path: screenshotPath, timeout: 5000 });
-  }
-}
-
 // This connection is used to speed up tests, so we don't need to load in all the models with the associated
 // imports. This can only be used with raw sql queries.
 export const testDb = new Sequelize(DATABASE_URI, { logging: false });
@@ -60,7 +42,8 @@ export async function addAlchemyKey() {
     url = 'https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}',
     alt_wallet_url = 'https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}'
   WHERE 
-    eth_chain_id = 1;
+    eth_chain_id = 1
+    AND NOT EXISTS (select 1 from "ChainNodes" where url = 'https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}')
   `);
 }
 
