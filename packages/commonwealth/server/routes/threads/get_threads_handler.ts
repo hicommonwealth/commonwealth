@@ -8,14 +8,11 @@ import { ServerControllers } from '../../routing/router';
 import { AppError } from '../../../../common-common/src/errors';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 
-const MIN_SEARCH_QUERY_LENGTH = 4;
-
 const Errors = {
   UnexpectedError: 'Unexpected error',
   InvalidRequest: 'Invalid request',
   InvalidThreadId: 'Invalid thread ID',
   QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 4 characters',
   NoChains: 'No chains resolved to execute search',
 };
 
@@ -116,9 +113,6 @@ export const getThreadsHandler = async (
       req.query as SearchThreadsRequestQuery;
     if (!search) {
       throw new AppError(Errors.QueryMissing);
-    }
-    if (search.length < MIN_SEARCH_QUERY_LENGTH) {
-      throw new AppError(Errors.QueryTooShort);
     }
     if (!req.chain && req.query.chain !== ALL_CHAINS) {
       // if no chain resolved, ensure that client explicitly requested all chains

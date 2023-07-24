@@ -169,8 +169,8 @@ export const SearchBarMemberPreviewRow = (
   props: SearchBarMemberPreviewRowProps
 ) => {
   const { searchResult } = props;
-  const chain = searchResult.chains[0];
-  const address = searchResult.addresses[0];
+  const chain = searchResult.addresses[0].chain;
+  const address = searchResult.addresses[0].address;
 
   const navigate = useCommonNavigate();
 

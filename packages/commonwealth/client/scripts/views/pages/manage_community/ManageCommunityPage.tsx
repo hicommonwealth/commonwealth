@@ -6,29 +6,42 @@ import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
 import NewProfilesController from '../../../controllers/server/newProfiles';
-import { TTLCache } from '../../../helpers/ttl_cache';
 import RoleInfo from '../../../models/RoleInfo';
 import Permissions from '../../../utils/Permissions';
-import { PageLoading } from '../loading';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
+import { useQuery } from '@tanstack/react-query';
+import ErrorPage from '../error';
+
+type ProfilesSearchResponse = {
+  results: {
+    id: number;
+    user_id: string;
+    profile_name: string;
+    avatar_url: string;
+    addresses: {
+      id: number;
+      chain: string;
+      address: string;
+    }[];
+    roles?: any[];
+  }[];
+  limit: number;
+  page: number;
+  totalPages: number;
+  totalResults: number;
+};
+
+const orderBy = 'last_active';
+const orderDirection = 'DESC';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
-  const [initialized, setInitialized] = useState(false);
-  const [roleData, setRoleData] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [mods, setMods] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
-
-  const membersCache = useMemo(() => {
-    return new TTLCache(
-      1_000 * 60,
-      `manage-community-members-${app.activeChainId()}`
-    );
-  }, []);
 
   const fetchAdmins = async () => {
     const memberAdmins = [];
@@ -57,48 +70,58 @@ const ManageCommunityPage = () => {
     setMods(memberMods);
   };
 
-  const searchMembers = async (searchQuery?: string) => {
-    try {
-      let profiles = [];
-
-      const cachedResult = membersCache.get(searchQuery);
-      if (cachedResult) {
-        profiles = cachedResult.profiles;
-      } else {
-        const res = await axios.get(`${app.serverUrl()}/profiles`, {
-          params: {
-            chain: app.activeChainId(),
-            search: searchQuery || '',
-            page_size: 100,
-            page: 1,
-            include_roles: true,
-          },
-        });
-        if (res.data.status !== 'Success') {
-          throw new Error('Could not fetch members');
-        }
-        membersCache.set(searchQuery, res.data.result);
-        profiles = res.data.result.profiles;
-      }
-
-      let roles = [];
-
-      if (profiles.length > 0) {
-        roles = profiles.map((profile) => {
-          return {
-            ...(profile.roles[0] || {}),
-            Address: profile.addresses[0],
-            id: profile.addresses[0].id,
-          };
-        });
-      }
-      setRoleData(roles);
-      setInitialized(true);
-    } catch (err) {
-      setRoleData([]);
-      setInitialized(true);
+  const fetchSearchResults = async ({ pageParam = 0 }) => {
+    const urlParams = {
+      chain: app.activeChainId(),
+      search: searchTerm,
+      limit: (50).toString(),
+      page: pageParam.toString(),
+      order_by: orderBy,
+      order_direction: orderDirection,
+      include_roles: 'true',
+    };
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(urlParams)) {
+      q.set(k, v);
     }
+    const {
+      data: { result },
+    } = await axios.get<{ result: ProfilesSearchResponse }>(
+      `/api/profiles?${q.toString()}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return result.results;
   };
+
+  const { data: searchResults, refetch } = useQuery({
+    queryKey: [
+      'search-members-manage',
+      {
+        debouncedSearchTerm,
+        chain: app.activeChainId(),
+        orderBy,
+        orderDirection,
+      },
+    ],
+    queryFn: fetchSearchResults,
+  });
+
+  const roleData = useMemo(() => {
+    if (!searchResults) {
+      return [];
+    }
+    return searchResults.map((profile) => {
+      return {
+        ...(profile.roles[0] || {}),
+        Address: profile.addresses[0],
+        id: profile.addresses[0].id,
+      };
+    });
+  }, [searchResults]);
 
   useEffect(() => {
     NewProfilesController.Instance.isFetched.on('redraw', () =>
@@ -110,7 +133,7 @@ const ManageCommunityPage = () => {
 
   // on update debounced search term, fetch
   useEffect(() => {
-    searchMembers(debouncedSearchTerm);
+    refetch();
   }, [debouncedSearchTerm]);
 
   // on init, fetch
@@ -118,20 +141,14 @@ const ManageCommunityPage = () => {
     if (!app.activeChainId()) {
       return;
     }
-
     fetchAdmins();
-    searchMembers();
   }, []);
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  if (!initialized) {
-    return <PageLoading />;
+  if (!isAdmin) {
+    return <ErrorPage message={'Must be admin'} />;
   }
-
-  // if (!isAdmin) {
-  //   return <ErrorPage message={'Must be admin'} />;
-  // }
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
@@ -183,7 +200,7 @@ const ManageCommunityPage = () => {
       }
     }
 
-    searchMembers();
+    refetch();
   };
 
   return (

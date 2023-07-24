@@ -27,7 +27,6 @@ import {
   ThreadResult,
 } from './helpers';
 
-const MIN_SEARCH_TERM_LENGTH = 4;
 const NUM_RESULTS_PER_SECTION = 2;
 
 let resetTimer = null;
@@ -88,11 +87,6 @@ const goToSearchPage = (
     return;
   }
 
-  if (query.searchTerm.length < MIN_SEARCH_TERM_LENGTH) {
-    notifyError(`Query must be at least ${MIN_SEARCH_TERM_LENGTH} characters`);
-    return;
-  }
-
   app.search.addToHistory(query);
 
   setRoute(`/search?${query.toUrlParams()}`);
@@ -116,6 +110,7 @@ export const SearchBar = () => {
       chainScope: chain,
     });
     goToSearchPage(searchQuery, navigate);
+    resetSearchBar();
   };
 
   const handleInputChange = (e) => {
@@ -124,33 +119,29 @@ export const SearchBar = () => {
   };
 
   const fetchSearchResults = async () => {
-    const [
-      threadResults,
-      replyResults,
-      communityResults,
-      memberResults,
-    ] = await Promise.all([
-      searchInScope<ThreadResult>(
-        chain,
-        SearchScope.Threads,
-        debouncedSearchTerm
-      ),
-      searchInScope<ReplyResult>(
-        chain,
-        SearchScope.Replies,
-        debouncedSearchTerm
-      ),
-      searchInScope<CommunityResult>(
-        chain,
-        SearchScope.Communities,
-        debouncedSearchTerm
-      ),
-      searchInScope<MemberResult>(
-        chain,
-        SearchScope.Members,
-        debouncedSearchTerm
-      ),
-    ]);
+    const [threadResults, replyResults, communityResults, memberResults] =
+      await Promise.all([
+        searchInScope<ThreadResult>(
+          chain,
+          SearchScope.Threads,
+          debouncedSearchTerm
+        ),
+        searchInScope<ReplyResult>(
+          chain,
+          SearchScope.Replies,
+          debouncedSearchTerm
+        ),
+        searchInScope<CommunityResult>(
+          chain,
+          SearchScope.Communities,
+          debouncedSearchTerm
+        ),
+        searchInScope<MemberResult>(
+          chain,
+          SearchScope.Members,
+          debouncedSearchTerm
+        ),
+      ]);
     return {
       [SearchScope.Threads]: threadResults,
       [SearchScope.Replies]: replyResults,
@@ -159,8 +150,7 @@ export const SearchBar = () => {
     };
   };
 
-  const isValidSearchTerm =
-    debouncedSearchTerm.length >= MIN_SEARCH_TERM_LENGTH;
+  const isValidSearchTerm = debouncedSearchTerm.length > 0;
 
   const { data: searchResults, refetch } = useQuery({
     queryKey: [

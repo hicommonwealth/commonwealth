@@ -12,7 +12,6 @@ export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
 
 const Errors = {
   QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 4 characters',
 };
 
 type SearchChainsRequestParams = {
@@ -29,9 +28,6 @@ export const searchChainsHandler = async (
   const options = req.query;
   if (!options.search) {
     throw new AppError(Errors.QueryMissing);
-  }
-  if (options.search.length < MIN_COMMENT_SEARCH_QUERY_LENGTH) {
-    throw new AppError(Errors.QueryTooShort);
   }
 
   const results = await controllers.chains.searchChains({

@@ -36,7 +36,7 @@ export async function __searchComments(
 ): Promise<SearchCommentsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
-    limit: limit || 10,
+    limit: Math.min(limit, 100) || 10,
     page: page || 1,
     orderDirection,
   };
@@ -56,9 +56,8 @@ export async function __searchComments(
       };
   }
 
-  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql(
-    sortOptions
-  );
+  const { sql: paginationSort, bind: paginationBind } =
+    buildPaginationSql(sortOptions);
 
   const bind: {
     searchTerm?: string;

@@ -10,6 +10,8 @@ import { MembersSearchBar } from '../components/members_search_bar';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
+const MIN_SEARCH_TERM_LENGTH = 1;
+
 type MemberInfo = {
   profile: MinimumProfile;
   role: any;
@@ -46,7 +48,7 @@ const MembersPage = () => {
   const fetchSearchResults = async ({ pageParam = 0 }) => {
     const urlParams = {
       chain,
-      search: searchTerm,
+      search: debouncedSearchTerm,
       limit: (10).toString(),
       page: pageParam.toString(),
       order_by: orderBy,
@@ -106,7 +108,7 @@ const MembersPage = () => {
     [
       'search-members',
       {
-        searchTerm,
+        debouncedSearchTerm,
         chain: app.activeChainId(),
         orderBy,
         orderDirection,
@@ -126,7 +128,7 @@ const MembersPage = () => {
 
   // on debounced search term change, refresh search results
   useEffect(() => {
-    if (debouncedSearchTerm.length < 3) {
+    if (debouncedSearchTerm.length < MIN_SEARCH_TERM_LENGTH) {
       return;
     }
     refetch();

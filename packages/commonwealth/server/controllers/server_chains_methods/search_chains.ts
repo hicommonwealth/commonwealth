@@ -24,7 +24,7 @@ export async function __searchChains(
   { search, limit, page, orderBy, orderDirection }: SearchChainsOptions
 ): Promise<SearchChainsResult> {
   let sortOptions: PaginationSqlOptions = {
-    limit: limit || 10,
+    limit: Math.min(limit, 100) || 10,
     page: page || 1,
     orderDirection,
   };
@@ -45,9 +45,8 @@ export async function __searchChains(
       };
   }
 
-  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql(
-    sortOptions
-  );
+  const { sql: paginationSort, bind: paginationBind } =
+    buildPaginationSql(sortOptions);
 
   const bind = {
     searchTerm: search,

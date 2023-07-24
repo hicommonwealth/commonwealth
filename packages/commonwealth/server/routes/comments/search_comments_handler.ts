@@ -9,12 +9,9 @@ import { AppError } from '../../../../common-common/src/errors';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { SearchCommentsResult } from 'server/controllers/server_comments_methods/search_comments';
 
-export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
-
 const Errors = {
   UnexpectedError: 'Unexpected error',
   QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 4 characters',
   NoCommunity: 'Title search must be community scoped',
   NoChains: 'No chains resolved to execute search',
 };
@@ -34,9 +31,6 @@ export const searchCommentsHandler = async (
   const options = req.query;
   if (!options.search) {
     throw new AppError(Errors.QueryMissing);
-  }
-  if (options.search.length < MIN_COMMENT_SEARCH_QUERY_LENGTH) {
-    throw new AppError(Errors.QueryTooShort);
   }
   if (!options.chain) {
     throw new AppError(Errors.NoChains);
