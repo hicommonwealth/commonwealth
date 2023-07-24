@@ -8,8 +8,8 @@ import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import { AuthorAndPublishInfo as ThreadAuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
-import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
+import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
+import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
@@ -116,7 +116,7 @@ export const CWContentPage = ({
           title
         )}
         <div className="header-info-row">
-          <ThreadAuthorAndPublishInfo
+          <AuthorAndPublishInfo
             showSplitDotIndicator={true}
             isNew={!!displayNewTag}
             isLocked={thread?.readOnly}
@@ -156,8 +156,8 @@ export const CWContentPage = ({
       {body &&
         body(
           <ThreadOptions
-            canVote={!thread?.readOnly}
-            canComment={!thread?.readOnly}
+            upvoteBtnVisible={!thread?.readOnly}
+            commentBtnVisible={!thread?.readOnly}
             thread={thread}
             totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}
