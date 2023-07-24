@@ -42,24 +42,8 @@ const useCreateThreadReactionMutation = () => {
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
-      const reaction = response.data.result
-      const formattedReaction = {
-        id: reaction.id + '',
-        type: reaction.reaction,
-        address: reaction.Address.address
-      }
-
-      // TODO: this state below would be stored in threads react query state when we migrate the
-      // whole thread controller from current state to react query
-      const existingReactions = app.threads.threadIdToReactions.get(reaction.thread_id)
-      if (!existingReactions) {
-        app.threads.threadIdToReactions.set(reaction.thread_id, [formattedReaction]);
-      } else {
-        app.threads.threadIdToReactions.set(reaction.thread_id, [
-          ...existingReactions,
-          formattedReaction
-        ]);
-      }
+      // TODO: when we migrate the reactionCounts store proper to react query
+      // then we will have to update the react query state here
     },
   });
 };

@@ -41,16 +41,8 @@ const useDeleteThreadReactionMutation = () => {
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
-      // TODO: this state below would be stored in threads react query state when we migrate the
-      // whole thread controller from current state to react query
-      const reaction = response.data.result
-
-      app.threads.threadIdToReactions.set(
-        reaction.thread_id,
-        [...(app.threads.threadIdToReactions
-          .get(reaction.thread_id)
-          ?.filter((r) => r.id !== reaction.reaction_id + '') || [])]
-      );
+      // TODO: when we migrate the reactionCounts store proper to react query
+      // then we will have to update the react query state here
     }
   });
 };
