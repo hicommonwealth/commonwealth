@@ -12,11 +12,6 @@ import {
   Listener as CompoundListener,
   Label as CompoundLabel,
 } from './chains/compound';
-import { Listener as Erc20Listener, Label as Erc20Label } from './chains/erc20';
-import {
-  Listener as Erc721Listener,
-  Label as Erc721Label,
-} from './chains/erc721';
 import { Listener as AaveListener, Label as AaveLabel } from './chains/aave';
 import {
   Listener as CosmosListener,
@@ -34,10 +29,6 @@ export function Label(chain: string, event: CWEvent): IEventLabel {
       return AaveLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.Compound:
       return CompoundLabel(event.blockNumber, chain, event.data);
-    case SupportedNetwork.ERC20:
-      return Erc20Label(event.blockNumber, chain, event.data);
-    case SupportedNetwork.ERC721:
-      return Erc721Label(event.blockNumber, chain, event.data);
     case SupportedNetwork.Cosmos:
       return CosmosLabel(event.blockNumber, chain, event.data);
     default:
@@ -93,23 +84,6 @@ export async function createListener(
       !!options.skipCatchup,
       !!options.verbose,
       options.discoverReconnectRange
-    );
-  } else if (network === SupportedNetwork.ERC20) {
-    listener = new Erc20Listener(
-      chain,
-      options.tokenAddresses || [options.address],
-      options.url,
-      Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
-      options.enricherConfig,
-      !!options.verbose
-    );
-  } else if (network === SupportedNetwork.ERC721) {
-    listener = new Erc721Listener(
-      chain,
-      options.tokenAddresses || [options.address],
-      options.url,
-      Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
-      !!options.verbose
     );
   } else if (network === SupportedNetwork.Aave) {
     listener = new AaveListener(

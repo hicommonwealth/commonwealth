@@ -5,12 +5,8 @@ import type { ChainEventInstance } from '../services/database/models/chain_event
 
 import * as SubstrateTypes from './chains/substrate/types';
 import * as CompoundTypes from './chains/compound/types';
-import * as Erc20Types from './chains/erc20/types';
-import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CosmosTypes from './chains/cosmos/types';
-import type { IErc721Contracts as ERC721Api } from './chains/erc721/types';
-import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
 import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
@@ -27,17 +23,13 @@ export type IChainEventData =
   | SubstrateTypes.IEventData
   | CompoundTypes.IEventData
   | AaveTypes.IEventData
-  | Erc20Types.IEventData
-  | Erc721Types.IEventData
   | CosmosTypes.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
   | CompoundTypes.EventKind
   | AaveTypes.EventKind
-  | Erc20Types.EventKind
-  | Erc721Types.EventKind
   | CosmosTypes.EventKind;
-export type IAPIs = ERC721Api | ERC20Api | CompoundApi | AaveApi;
+export type IAPIs = CompoundApi | AaveApi;
 export type IAnyListener = Listener<
   IAPIs,
   IStorageFetcher<IAPIs>,
@@ -50,8 +42,6 @@ export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...CompoundTypes.EventKinds,
   ...AaveTypes.EventKinds,
-  ...Erc20Types.EventKinds,
-  ...Erc721Types.EventKinds,
   ...CosmosTypes.EventKinds,
 ];
 

@@ -16,7 +16,7 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
 };
 
 export class RolesController {
-  constructor(public readonly User: UserController) {}
+  constructor(public readonly User: UserController) { }
 
   private _roles: RoleInfo[] = [];
   public get roles(): RoleInfo[] {
@@ -48,43 +48,28 @@ export class RolesController {
     address: AddressInfo | Omit<AddressInfo, 'chain'>;
     chain?: string;
     community?: string;
-  }): JQueryPromise<void> {
-    // TODO: Change to POST /role
-    return $.post('/api/createRole', {
-      jwt: this.User.jwt,
+  }): any {
+    this.addRole({
+      address: options.address.address,
+      address_chain: options.chain,
       address_id: options.address.id,
-      chain:
-        options.chain ||
-        options.community ||
-        (options.address as AddressInfo).chain?.id,
-    }).then((result) => {
-      // handle state updates
-      this.addRole(result.result.role);
-    });
+      allow: 0,
+      chain_id: options.chain,
+      community_role_id: options.address.id,
+      deny: 0,
+      is_user_default: true,
+      permission: AccessLevel.Member,
+    } as any)
   }
 
   public deleteRole(options: {
     address: AddressInfo;
-    chain?: string;
-    community?: string;
-  }): JQueryPromise<void> {
-    // TODO: Change to DELETE /role
-    return $.post('/api/deleteRole', {
-      jwt: this.User.jwt,
-      address_id: options.address.id,
-      chain: options.chain || options.community || options.address.chain?.id,
-    }).then((result) => {
-      if (result.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${result.status}`);
-      }
-      // handle state updates
-      if (options.chain) {
-        this.removeRole((r) => {
-          return (
-            r.chain_id === options.chain && r.address_id === options.address.id
-          );
-        });
-      }
+    chain: string;
+  }): any {
+    this.removeRole((r) => {
+      return (
+        r.chain_id === options.chain && r.address_id === options.address.id
+      );
     });
   }
 
@@ -244,10 +229,10 @@ export class RolesController {
     const addressinfo: AddressInfo | undefined =
       options.account instanceof Account
         ? this.User.addresses.find(
-            (a) =>
-              options.account.address === a.address &&
-              (options.account.chain as ChainInfo).id === a.chain.id
-          )
+          (a) =>
+            options.account.address === a.address &&
+            (options.account.chain as ChainInfo).id === a.chain.id
+        )
         : options.account;
     const roles = this.roles.filter((role) =>
       addressinfo ? role.address_id === addressinfo.id : true
