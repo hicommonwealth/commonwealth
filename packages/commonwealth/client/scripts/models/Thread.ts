@@ -14,7 +14,7 @@ export interface IThreadCollaborator {
 }
 
 export type AssociatedReaction = {
-  id: number;
+  id: number | string;
   type: ReactionType;
   address: string;
 };

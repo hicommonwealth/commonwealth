@@ -13,4 +13,6 @@ export const ApiEndpoints = {
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
   BULK_TOPICS: '/bulkTopics',
   DISCORD_CHANNELS: '/getDiscordChannels',
+  getCommentReactions: (commentId: number) =>
+    `/comments/${commentId}/reactions`,
 };

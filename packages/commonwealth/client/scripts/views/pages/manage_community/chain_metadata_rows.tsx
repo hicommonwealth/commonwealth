@@ -511,7 +511,7 @@ export const ChainMetadataRows = ({
       />
       {app.chain?.meta.base === ChainBase.Ethereum && (
         <InputRow
-          title="Snapshot(s)"
+          title="Snapshot(s) -- use commas to add multiple spaces"
           value={snapshotString}
           placeholder={chain.network}
           onChangeHandler={(v) => {
@@ -525,7 +525,8 @@ export const ChainMetadataRows = ({
                 }
               })
               .filter((val) => val.length > 4);
-            setSnapshot(snapshots);
+            const uniqueSnpshots = [...new Set(snapshots)] as string[];
+            setSnapshot(uniqueSnpshots);
             setSnapshotString(v);
           }}
         />
