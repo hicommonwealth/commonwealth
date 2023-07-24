@@ -51,22 +51,19 @@ async function searchInScope<T>(
     if (!url) {
       throw new Error(`could not get url for search scope: ${searchScope}`);
     }
-    const { data } = await axios.get<{ result: { results } }>(
-      `${url}?${q.toString()}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        params: {
-          chain: chain || 'all_chains',
-          search: searchTerm,
-          limit: NUM_RESULTS_PER_SECTION.toString(),
-          page: 1,
-          order_by: 'rank',
-          order_direction: 'DESC',
-        },
-      }
-    );
+    const { data } = await axios.get<{ result: { results } }>(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        chain: chain || 'all_chains',
+        search: searchTerm,
+        limit: NUM_RESULTS_PER_SECTION.toString(),
+        page: 1,
+        order_by: 'rank',
+        order_direction: 'DESC',
+      },
+    });
     return data.result.results as T[];
   } catch (err) {
     console.error(err);
