@@ -46,7 +46,6 @@ const ViewProposalPage = ({
 
   const hasFetchedProposalRef = useRef(false);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [type, setType] = useState(typeProp);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
@@ -69,12 +68,13 @@ const ViewProposalPage = ({
       if (hasFetchedProposalRef.current) return;
       hasFetchedProposalRef.current = true;
 
-      if (!type) {
-        setType(chainToProposalSlug(app.chain.meta));
+      let resolvedType = typeProp;
+      if (!typeProp) {
+        resolvedType = chainToProposalSlug(app.chain.meta);
       }
 
       try {
-        const proposalFromStore = idToProposal(type, proposalId);
+        const proposalFromStore = idToProposal(resolvedType, proposalId);
         setProposal(proposalFromStore);
         setError(null);
       } catch (e) {
@@ -103,7 +103,7 @@ const ViewProposalPage = ({
     } else {
       afterAdapterLoaded();
     }
-  }, [type, isAdapterLoaded, proposalId]);
+  }, [isAdapterLoaded, proposalId]);
 
   if (!isAdapterLoaded || !proposal) {
     return <PageLoading message="Loading..." />;
