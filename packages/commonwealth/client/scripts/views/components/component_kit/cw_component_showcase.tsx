@@ -1119,7 +1119,30 @@ export const ComponentShowcase = () => {
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
         <CWTooltip
+          content="Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects together. Never miss an on-chain event, proposal, or important discussion again."
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWText
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              Commonwealth
+            </CWText>
+          )}
+        />
+        <CWTooltip
           content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWIcon
+              iconName="infoEmpty"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="Commonwealth labs"
           placement="top"
           renderTrigger={(handleInteraction) => (
             <CWButton
@@ -1130,7 +1153,7 @@ export const ComponentShowcase = () => {
           )}
         />
         <CWTooltip
-          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam semper justo eget facilisis auctor. Mauris consequat arcu non est semper vestibulum. Nulla nec porta nisi. Nullam eu erat vel arcu finibus imperdiet nec eget mi. Pellentesque enim nibh, consequat eu urna id, rhoncus porta metus. Vestibulum hendrerit felis urna, in tempor purus lobortis sit amet. Etiam pulvinar nisl eu enim laoreet tristique. Nam semper venenatis massa vel finibus."
           placement="right"
           renderTrigger={(handleInteraction) => (
             <CWButton

@@ -77,6 +77,8 @@
   }
 
   .Text {
+    @include multiline-text-ellipsis(2);
+
     text-align: center;
     font-family: 'NeueHaasUnica';
     font-style: normal;
@@ -86,5 +88,6 @@
     letter-spacing: 0.02em;
     font-feature-settings: 'tnum' on, 'lnum' on;
     color: $white;
+    word-break: break-word;
   }
 }

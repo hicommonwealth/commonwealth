@@ -19,10 +19,6 @@ type ContainerProps = {
   children: React.ReactNode;
 };
 
-const formatText = (content: string): string => {
-  return content.length > 75 ? content.slice(0, 75).concat('...') : content;
-};
-
 const Container = (props: ContainerProps) => {
   const { placement, children } = props;
 
@@ -60,9 +56,7 @@ export const CWTooltip: FC<TooltipProps> = ({
         placement={placement}
         content={
           <Container placement={placement}>
-            <CWText type="caption">
-              {typeof content === 'string' ? formatText(content) : content}
-            </CWText>
+            <CWText type="caption">{content}</CWText>
           </Container>
         }
         {...popoverProps}
