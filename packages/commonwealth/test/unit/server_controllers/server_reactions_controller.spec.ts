@@ -29,7 +29,10 @@ describe('ServerReactionsController', () => {
         db as any,
         banCache as any
       );
-      await serverReactionsController.deleteReaction(user as any, 777);
+      await serverReactionsController.deleteReaction({
+        user: user as any,
+        reactionId: 777,
+      });
     });
 
     it('should throw error (reaction not found)', async () => {
@@ -51,7 +54,10 @@ describe('ServerReactionsController', () => {
         banCache as any
       );
       expect(
-        serverReactionsController.deleteReaction(user as any, 888)
+        serverReactionsController.deleteReaction({
+          user: user as any,
+          reactionId: 888,
+        })
       ).to.be.rejectedWith(`Reaction not found: 888`);
     });
 
@@ -81,7 +87,10 @@ describe('ServerReactionsController', () => {
         banCache as any
       );
       expect(
-        serverReactionsController.deleteReaction(user as any, 999)
+        serverReactionsController.deleteReaction({
+          user: user as any,
+          reactionId: 999,
+        })
       ).to.be.rejectedWith('Ban error: big ban err');
     });
   });

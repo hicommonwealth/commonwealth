@@ -40,7 +40,7 @@ export const createThreadHandler = async (
   const attachments = req.body['attachments[]'];
 
   const [thread, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThread(
+    await controllers.threads.createThread({
       user,
       address,
       chain,
@@ -48,15 +48,15 @@ export const createThreadHandler = async (
       body,
       kind,
       readOnly,
-      parseInt(topicId, 10) || undefined,
+      topicId: parseInt(topicId, 10) || undefined,
       topicName,
       stage,
       url,
       attachments,
       canvasAction,
       canvasSession,
-      canvasHash
-    );
+      canvasHash,
+    });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

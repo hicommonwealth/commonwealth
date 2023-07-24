@@ -1,6 +1,5 @@
 import 'components/NewThreadForm.scss';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { capitalize } from 'lodash';
@@ -21,25 +20,26 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
+
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector =
-    topics ||
-    [].filter((t) => {
-      return (
-        isAdmin ||
-        t.tokenThreshold.isZero() ||
-        !TopicGateCheck.isGatedTopic(t.name)
-      );
-    });
+  const topicsForSelector = topics.filter((t) => {
+    return (
+      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
+    );
+  });
 
   const {
     threadTitle,
@@ -56,6 +56,10 @@ export const NewThreadForm = () => {
     isDisabled,
     clearDraft,
   } = useNewThreadForm(chainId, topicsForSelector);
+
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -120,6 +124,8 @@ export const NewThreadForm = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
+
   return (
     <>
       <div className="NewThreadForm">
@@ -168,10 +174,12 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
+              isDisabled={!hasJoinedCommunity}
+              tooltipLabel="Join community to submit"
             />
 
             <div className="buttons-row">
-              {isPopulated && (
+              {isPopulated && hasJoinedCommunity && (
                 <CWButton
                   buttonType="tertiary"
                   onClick={handleCancel}
@@ -180,18 +188,24 @@ export const NewThreadForm = () => {
                 />
               )}
               <CWButton
-                label={
-                  app.user.activeAccount ? 'Post' : 'Join community to create'
-                }
-                disabled={isDisabled}
+                label="Submit"
+                disabled={isDisabled || !hasJoinedCommunity}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
                 buttonWidth="wide"
               />
             </div>
+
+            {showBanner && (
+              <JoinCommunityBanner
+                onClose={handleCloseBanner}
+                onJoin={handleJoinCommunity}
+              />
+            )}
           </div>
         </div>
       </div>
+      {JoinCommunityModals}
     </>
   );
 };
