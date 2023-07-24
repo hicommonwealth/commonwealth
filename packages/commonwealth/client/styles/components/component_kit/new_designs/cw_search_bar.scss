@@ -115,6 +115,15 @@
   border-radius: 8px;
   cursor: default;
 
+  font-family: 'NeueHaasUnica';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  align-items: center;
+  letter-spacing: 0.01em;
+  font-feature-settings: 'tnum' on, 'lnum' on;
+
   &:hover {
     cursor: pointer;
     background-color: $neutral-100;
