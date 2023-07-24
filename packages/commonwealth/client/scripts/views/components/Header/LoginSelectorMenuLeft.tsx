@@ -61,9 +61,11 @@ export const LoginSelectorMenuLeft = () => {
     <div className="LoginSelectorMenu left">
       {app.activeChainId() && (
         <>
-          <CWText type="caption" className="title">
-            Select address to use
-          </CWText>
+          {activeAccounts?.length > 0 && (
+            <CWText type="caption" className="title">
+              Select address to use
+            </CWText>
+          )}
           {activeAccounts.map((account, i) => {
             return (
               <div
@@ -109,9 +111,7 @@ export const LoginSelectorMenuLeft = () => {
         className="login-menu-item"
         onClick={() => setIsLoginModalOpen(true)}
       >
-        <CWText type="caption">
-          Connect a new address
-        </CWText>
+        <CWText type="caption">Connect a new address</CWText>
       </div>
       <Modal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}

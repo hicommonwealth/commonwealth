@@ -10,21 +10,10 @@
     align-items: center;
     display: flex;
     gap: 16px;
-
-    .comments-count {
-      align-items: center;
-      display: flex;
-      gap: 4px;
-
-      .Text,
-      .Icon {
-        color: $neutral-500;
-      }
-    }
   }
 
   .callout-text {
-    background: #F7F6F7;
+    background: #f7f6f7;
     display: flex;
     gap: 10px;
     color: #656167;
@@ -66,7 +55,7 @@
   }
 }
 
-@include extraSmall {  
+@include extraSmall {
   .comments-filter-row {
     flex-direction: column;
     align-items: flex-start;
@@ -76,5 +65,4 @@
       margin-left: 0 !important;
     }
   }
-
 }
