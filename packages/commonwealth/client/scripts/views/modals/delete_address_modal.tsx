@@ -45,6 +45,12 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         chain,
         jwt: app.user.jwt,
       });
+      // remove deleted role from app.roles
+      const foundAddressInfo = addresses.find(a => a.address === address)
+      app.roles.deleteRole({
+        address: foundAddressInfo,
+        chain: chain,
+      })
 
       if (response?.status === 'Success') {
         notifySuccess('Address has been successfully removed.');

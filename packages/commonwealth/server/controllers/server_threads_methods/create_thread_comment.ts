@@ -28,6 +28,7 @@ const Errors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
   BalanceCheckFailed: 'Could not verify user token balance',
+  ThreadArchived: 'Thread is archived',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -78,6 +79,11 @@ export async function __createThreadComment({
   });
   if (!thread) {
     throw new Error(Errors.ThreadNotFound);
+  }
+
+  // check if thread is archived
+  if (thread.archived_at) {
+    throw new Error(Errors.ThreadArchived);
   }
 
   // check if thread is read-only

@@ -1,12 +1,13 @@
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelReactionCountFromServer } from 'controllers/server/comments';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
@@ -19,6 +20,8 @@ import app from 'state';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
@@ -52,10 +55,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -182,7 +182,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .then((res) => {
         const t = res[0];
         if (t) {
-          const reactions = app.reactions.getByPost(t);
+          const reactions = app.comments.getReactionByPost(t);
           t.associatedReactions = reactions
             .filter((r) => r.reaction === 'like')
             .map((r) => {
@@ -270,19 +270,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             }),
           });
 
-          // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier({
+            const id = app.comments.reactionCountsStore.getIdentifier({
               threadId: rc.thread_id,
               proposalId: rc.proposal_id,
               commentId: rc.comment_id,
             });
 
-            app.reactionCounts.store.add(
+            app.comments.reactionCountsStore.add(
               modelReactionCountFromServer({ ...rc, id })
             );
 
-            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
+            app.comments.isReactionFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {
@@ -493,12 +492,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isAuthor ||
     isAdminOrMod;
 
+  // Todo who should actually be able to view this
+  const canCreateSnapshotProposal =
+    app.chain?.meta?.snapshot?.length > 0 && (isAuthor || isAdminOrMod);
+
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
+  const hasSnapshotProposal = thread.links.find(x => x.source === 'snapshot')
+
   const canComment =
     !!hasJoinedCommunity ||
-    (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
+    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
   const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({
@@ -517,6 +522,35 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       ...thread,
       stage,
       links,
+    } as Thread;
+
+    setThread(newThread);
+  };
+
+  const handleNewSnapshotChange = async ({
+    id,
+    snapshot_title,
+  }: {
+    id: string;
+    snapshot_title: string;
+  }) => {
+    const newLink: Link = {
+      source: LinkSource.Snapshot,
+      identifier: id,
+      title: snapshot_title,
+    };
+    const toAdd = [newLink]; // Add this line to create an array with the new link
+
+    if (toAdd.length > 0) {
+      await app.threads.addLinks({
+        threadId: thread.id,
+        links: toAdd,
+      });
+    }
+
+    const newThread = {
+      ...thread,
+      links: [...thread.links, newLink],
     } as Thread;
 
     setThread(newThread);
@@ -759,65 +793,81 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div className="cards-column">
-                        {showLinkedProposalOptions && (
-                          <LinkedProposalsCard
-                            onChangeHandler={handleLinkedProposalChange}
-                            thread={thread}
-                            showAddProposalButton={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                        {showLinkedThreadOptions && (
-                          <LinkedThreadsCard
-                            thread={thread}
-                            allowLinking={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleLinkedThreadChange}
-                          />
-                        )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Links',
+                  item: (
+                    <div className="cards-column">
+                      {showLinkedProposalOptions && (
+                        <LinkedProposalsCard
+                          onChangeHandler={handleLinkedProposalChange}
+                          thread={thread}
+                          showAddProposalButton={isAuthor || isAdminOrMod}
+                        />
+                      )}
+                      {showLinkedThreadOptions && (
+                        <LinkedThreadsCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleLinkedThreadChange}
+                        />
+                      )}
+                    </div>
+                  ),
+                },
+              ]
+              : []),
+            ...(canCreateSnapshotProposal && !hasSnapshotProposal
+              ? [
+                {
+                  label: 'Snapshot',
+                  item: (
+                    <div className="cards-column">
+                      <SnapshotCreationCard
+                        thread={thread}
+                        allowSnapshotCreation={isAuthor || isAdminOrMod}
+                        onChangeHandler={handleNewSnapshotChange}
+                      />
+                    </div>
+                  ),
+                },
+              ]
               : []),
             ...(polls?.length > 0 ||
-            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                  {
-                    label: 'Polls',
-                    item: (
-                      <div className="cards-column">
-                        {[
-                          ...new Map(
-                            polls?.map((poll) => [poll.id, poll])
-                          ).values(),
-                        ].map((poll: Poll) => {
-                          return (
-                            <ThreadPollCard
-                              poll={poll}
-                              key={poll.id}
-                              onVote={() => setInitializedPolls(false)}
-                              showDeleteButton={isAuthor || isAdmin}
-                              onDelete={() => {
-                                setInitializedPolls(false);
-                              }}
-                            />
-                          );
-                        })}
-                        {isAuthor &&
-                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                            <ThreadPollEditorCard
-                              thread={thread}
-                              threadAlreadyHasPolling={!polls?.length}
-                              onPollCreate={() => setInitializedPolls(false)}
-                            />
-                          )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Polls',
+                  item: (
+                    <div className="cards-column">
+                      {[
+                        ...new Map(
+                          polls?.map((poll) => [poll.id, poll])
+                        ).values(),
+                      ].map((poll: Poll) => {
+                        return (
+                          <ThreadPollCard
+                            poll={poll}
+                            key={poll.id}
+                            onVote={() => setInitializedPolls(false)}
+                            showDeleteButton={isAuthor || isAdmin}
+                            onDelete={() => {
+                              setInitializedPolls(false);
+                            }}
+                          />
+                        );
+                      })}
+                      {isAuthor &&
+                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                          <ThreadPollEditorCard
+                            thread={thread}
+                            threadAlreadyHasPolling={!polls?.length}
+                            onPollCreate={() => setInitializedPolls(false)}
+                          />
+                        )}
+                    </div>
+                  ),
+                },
+              ]
               : []),
           ] as SidebarComponents
         }
