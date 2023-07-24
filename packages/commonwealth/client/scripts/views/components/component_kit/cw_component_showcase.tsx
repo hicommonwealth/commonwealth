@@ -1024,8 +1024,7 @@ export const ComponentShowcase = () => {
           />
           <CWThreadAction
             action="upvote"
-            count={1}
-            onClick={() => console.log('Upvote action clicked!!')}
+            onClick={() => console.log('Upvote action clicked!')}
           />
           <CWThreadAction
             action="overflow"
@@ -1049,7 +1048,6 @@ export const ComponentShowcase = () => {
           />
           <CWThreadAction
             action="upvote"
-            count={1}
             onClick={() => console.log('Upvote action clicked!')}
             disabled
           />
