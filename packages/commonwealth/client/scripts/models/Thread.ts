@@ -27,10 +27,17 @@ export enum LinkSource {
   Template = 'template',
 }
 
+export enum LinkDisplay {
+  inline = 'inline',
+  sidebar = 'sidebar',
+  both = 'both',
+}
+
 export type Link = {
   source: LinkSource;
   identifier: string;
   title?: string;
+  display?: LinkDisplay;
 };
 
 export class Thread implements IUniqueId {
