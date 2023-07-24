@@ -12,7 +12,6 @@ import { SearchProfilesResult } from 'server/controllers/server_profiles_methods
 const Errors = {
   InvalidChain: 'Invalid chain',
   QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 4 characters',
   NoChains: 'No chains resolved to execute search',
 };
 

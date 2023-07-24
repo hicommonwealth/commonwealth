@@ -47,7 +47,6 @@ export async function __searchProfiles(
     orderDirection,
   }: SearchProfilesOptions
 ): Promise<SearchProfilesResult> {
-  // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
     page: page || 1,

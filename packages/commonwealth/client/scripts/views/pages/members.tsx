@@ -46,29 +46,22 @@ const MembersPage = () => {
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const fetchSearchResults = async ({ pageParam = 0 }) => {
-    const urlParams = {
-      chain,
-      search: debouncedSearchTerm,
-      limit: (10).toString(),
-      page: pageParam.toString(),
-      order_by: orderBy,
-      order_direction: orderDirection,
-      include_roles: 'true',
-    };
-    const q = new URLSearchParams();
-    for (const [k, v] of Object.entries(urlParams)) {
-      q.set(k, v);
-    }
     const {
       data: { result },
-    } = await axios.get<{ result: ProfilesSearchResponse }>(
-      `/api/profiles?${q.toString()}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    } = await axios.get<{ result: ProfilesSearchResponse }>(`/api/profiles`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        chain,
+        search: debouncedSearchTerm,
+        limit: (10).toString(),
+        page: pageParam.toString(),
+        order_by: orderBy,
+        order_direction: orderDirection,
+        include_roles: 'true',
+      },
+    });
 
     const members = result.results.map((p) => ({
       id: p.id,

@@ -47,18 +47,6 @@ async function searchInScope<T>(
   searchTerm: string
 ): Promise<T[]> {
   try {
-    const urlParams = {
-      chain: chain || 'all_chains',
-      search: searchTerm,
-      limit: NUM_RESULTS_PER_SECTION.toString(),
-      page: 1,
-      order_by: 'rank',
-      order_direction: 'DESC',
-    };
-    const q = new URLSearchParams();
-    for (const [k, v] of Object.entries(urlParams)) {
-      q.set(k, v.toString());
-    }
     const url = SEARCH_URLS[searchScope];
     if (!url) {
       throw new Error(`could not get url for search scope: ${searchScope}`);
@@ -68,6 +56,14 @@ async function searchInScope<T>(
       {
         headers: {
           'Content-Type': 'application/json',
+        },
+        params: {
+          chain: chain || 'all_chains',
+          search: searchTerm,
+          limit: NUM_RESULTS_PER_SECTION.toString(),
+          page: 1,
+          order_by: 'rank',
+          order_direction: 'DESC',
         },
       }
     );

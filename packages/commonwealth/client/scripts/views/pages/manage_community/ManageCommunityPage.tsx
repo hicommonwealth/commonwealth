@@ -71,29 +71,22 @@ const ManageCommunityPage = () => {
   };
 
   const fetchSearchResults = async ({ pageParam = 0 }) => {
-    const urlParams = {
-      chain: app.activeChainId(),
-      search: searchTerm,
-      limit: (50).toString(),
-      page: pageParam.toString(),
-      order_by: orderBy,
-      order_direction: orderDirection,
-      include_roles: 'true',
-    };
-    const q = new URLSearchParams();
-    for (const [k, v] of Object.entries(urlParams)) {
-      q.set(k, v);
-    }
     const {
       data: { result },
-    } = await axios.get<{ result: ProfilesSearchResponse }>(
-      `/api/profiles?${q.toString()}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    } = await axios.get<{ result: ProfilesSearchResponse }>(`/api/profiles`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        chain: app.activeChainId(),
+        search: searchTerm,
+        limit: (50).toString(),
+        page: pageParam.toString(),
+        order_by: orderBy,
+        order_direction: orderDirection,
+        include_roles: 'true',
+      },
+    });
     return result.results;
   };
 

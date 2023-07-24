@@ -80,18 +80,6 @@ const SearchPage = () => {
   const fetchSearchResults = async ({ pageParam = 0 }) => {
     const [orderBy, orderDirection] =
       SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
-    const urlParams = {
-      chain: chain,
-      search: queryParams.q,
-      limit: (10).toString(),
-      page: pageParam.toString(),
-      order_by: orderBy,
-      order_direction: orderDirection,
-    };
-    const q = new URLSearchParams();
-    for (const [k, v] of Object.entries(urlParams)) {
-      q.set(k, v);
-    }
 
     const url = (() => {
       switch (activeTab) {
@@ -110,14 +98,19 @@ const SearchPage = () => {
 
     const {
       data: { result },
-    } = await axios.get<{ result: SearchResultsPayload }>(
-      `${url}?${q.toString()}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    } = await axios.get<{ result: SearchResultsPayload }>(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        chain: chain,
+        search: queryParams.q,
+        limit: (10).toString(),
+        page: pageParam.toString(),
+        order_by: orderBy,
+        order_direction: orderDirection,
+      },
+    });
     return result;
   };
 
@@ -197,6 +190,7 @@ const SearchPage = () => {
     if (bottomInView) {
       fetchNextPage();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomInView]);
 
   return (
