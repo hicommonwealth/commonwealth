@@ -71,7 +71,6 @@ export async function __searchChains(
       )
   `;
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([
-    // get profiles and aggregate all addresses for each profile
     this.models.sequelize.query(`${sqlWithoutPagination} ${paginationSort}`, {
       bind,
       type: QueryTypes.SELECT,
