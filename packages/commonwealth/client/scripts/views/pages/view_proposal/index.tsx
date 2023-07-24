@@ -69,12 +69,14 @@ const ViewProposalPage = ({
       if (hasFetchedProposalRef.current) return;
       hasFetchedProposalRef.current = true;
 
+      let resolvedType = type;
       if (!type) {
         setType(chainToProposalSlug(app.chain.meta));
+        resolvedType = chainToProposalSlug(app.chain.meta);
       }
 
       try {
-        const proposalFromStore = idToProposal(type, proposalId);
+        const proposalFromStore = idToProposal(resolvedType, proposalId);
         setProposal(proposalFromStore);
         setError(null);
       } catch (e) {
