@@ -26,12 +26,13 @@ export type SearchProfilesResult = TypedPaginatedResult<{
   id: number;
   user_id: string;
   profile_name: string;
+  avatar_url: string;
   addresses: {
     id: number;
     chain: string;
     address: string;
   }[];
-  roles?: string;
+  roles?: any[];
 }>;
 
 export async function __searchProfiles(
@@ -60,6 +61,12 @@ export async function __searchProfiles(
         orderBy: `"Profiles".created_at`,
       };
       break;
+    case 'profile_name':
+      sortOptions = {
+        ...sortOptions,
+        orderBy: `"Profiles".profile_name`,
+      };
+      break;
     default:
       sortOptions = {
         ...sortOptions,
@@ -67,9 +74,8 @@ export async function __searchProfiles(
       };
   }
 
-  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql(
-    sortOptions
-  );
+  const { sql: paginationSort, bind: paginationBind } =
+    buildPaginationSql(sortOptions);
 
   const bind: any = {
     searchTerm: `%${search}%`,
@@ -170,11 +176,11 @@ export async function __searchProfiles(
       for (const address of profile.addresses) {
         const addressRoles = addressIdRoles[address.id] || [];
         for (const role of addressRoles) {
-          profile.roles.push(role);
+          profile.roles.push(role.toJSON());
         }
       }
     }
   }
 
-  return buildPaginatedResponse(results, totalResults, bind);
+  return buildPaginatedResponse(profilesWithAddresses, totalResults, bind);
 }

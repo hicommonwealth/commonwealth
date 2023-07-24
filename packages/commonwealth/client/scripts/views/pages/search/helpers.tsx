@@ -159,9 +159,6 @@ export type CommunityResult = {
 };
 const renderCommunityResult = (community: CommunityResult, setRoute) => {
   const handleClick = () => {
-    // if (['token', 'chain'].includes(community.type)) {
-    //   setRoute(community.id ? `/${community.id}` : '/', {}, null);
-    // }
     setRoute(community.id ? `/${community.id}` : '/', {}, null);
   };
 

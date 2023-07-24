@@ -7,44 +7,73 @@ import { User } from 'views/components/user/user';
 import MinimumProfile from '../../models/MinimumProfile';
 import { CWText } from '../components/component_kit/cw_text';
 import { MembersSearchBar } from '../components/members_search_bar';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 type MemberInfo = {
   profile: MinimumProfile;
   role: any;
 };
+type ProfilesSearchResponse = {
+  results: {
+    id: number;
+    user_id: string;
+    profile_name: string;
+    avatar_url: string;
+    addresses: {
+      id: number;
+      chain: string;
+      address: string;
+    }[];
+    roles?: any[];
+  }[];
+  limit: number;
+  page: number;
+  totalPages: number;
+  totalResults: number;
+};
+
+const orderBy = 'last_active';
+const orderDirection = 'DESC';
 
 const MembersPage = () => {
   const containerRef = useRef<VirtuosoHandle>();
-
-  const [membersList, setMembersList] = React.useState<Array<MemberInfo>>([]);
-  const [totalCount, setTotalCount] = useState<number>(1);
-  const [page, setPage] = useState<number>(1);
+  const chain = app.activeChainId();
 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const handleLoadNextPage = async (searchQuery: string, reset: boolean) => {
-    const newPage = reset ? 1 : page + 1;
-    setPage(newPage);
-
-    const response = await app.search.searchMentionableProfiles(
-      searchQuery || '',
-      app.activeChainId(),
-      50,
-      newPage,
-      true
+  const fetchSearchResults = async ({ pageParam = 0 }) => {
+    const urlParams = {
+      chain,
+      search: searchTerm,
+      limit: (10).toString(),
+      page: pageParam.toString(),
+      order_by: orderBy,
+      order_direction: orderDirection,
+      include_roles: 'true',
+    };
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(urlParams)) {
+      q.set(k, v);
+    }
+    const {
+      data: { result },
+    } = await axios.get<{ result: ProfilesSearchResponse }>(
+      `/api/profiles?${q.toString()}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
     );
 
-    if (response.totalCount) {
-      setTotalCount(response.totalCount);
-    }
-
-    const members = response.profiles.map((p) => ({
+    const members = result.results.map((p) => ({
       id: p.id,
       address_id: p.addresses?.[0]?.id,
       address: p.addresses?.[0]?.address,
       address_chain: p.addresses?.[0]?.chain,
-      chain_id: p.addresses?.[0]?.chain,
+      chain: p.addresses?.[0]?.chain,
       profile_name: p.profile_name,
       avatar_url: p.avatar_url,
       roles: p.roles,
@@ -70,38 +99,52 @@ const MembersPage = () => {
       };
     });
 
-    if (reset) {
-      setMembersList(profiles);
-      if (containerRef) {
-        containerRef.current.scrollToIndex(0);
-      }
-    } else {
-      setMembersList([...membersList, ...profiles]);
-    }
+    return { ...result, results: profiles };
   };
+
+  const { data, fetchNextPage, refetch } = useInfiniteQuery(
+    [
+      'search-members',
+      {
+        searchTerm,
+        chain: app.activeChainId(),
+        orderBy,
+        orderDirection,
+      },
+    ],
+    fetchSearchResults,
+    {
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) {
+          return nextPageNum;
+        }
+        return undefined;
+      },
+    }
+  );
 
   // on debounced search term change, refresh search results
   useEffect(() => {
-    if (debouncedSearchTerm === '') {
-      handleLoadNextPage('', true);
+    if (debouncedSearchTerm.length < 3) {
       return;
     }
-    if (debouncedSearchTerm.length >= 3) {
-      handleLoadNextPage(debouncedSearchTerm, true);
-    }
+    refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm]);
 
-  // on init, load first page
+  // on data change, scroll to top
   useEffect(() => {
-    handleLoadNextPage('', true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    containerRef.current.scrollToIndex(0);
+  }, [data]);
+
+  const members =
+    data?.pages.reduce((acc, page) => [...acc, ...page.results], []) || [];
 
   return (
     <div className="MembersPage">
       <CWText type="h3" fontWeight="medium">
-        Members ({totalCount})
+        Members ({data?.pages?.[0]?.totalResults || 0})
       </CWText>
       <MembersSearchBar
         searchTerm={searchTerm}
@@ -110,8 +153,8 @@ const MembersPage = () => {
       />
       <Virtuoso
         ref={containerRef}
-        data={membersList}
-        endReached={() => handleLoadNextPage(searchTerm, false)}
+        data={members}
+        endReached={() => fetchNextPage()}
         itemContent={(index, profileInfo) => {
           return (
             <div className="member-row" key={index}>
