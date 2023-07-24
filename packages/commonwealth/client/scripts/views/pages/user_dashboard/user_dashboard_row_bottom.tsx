@@ -44,16 +44,18 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
 
   const adjustedId = `discussion_${threadId}`;
 
-  const commentSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewComment
+  const commentSubscription = app.user.notifications.findSubscription(
+    NotificationCategories.NewComment,
+    {
+      threadId: Number(threadId),
+    }
   );
 
-  const reactionSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewReaction
+  const reactionSubscription = app.user.notifications.findSubscription(
+    NotificationCategories.NewReaction,
+    {
+      threadId: Number(threadId),
+    }
   );
 
   const bothActive =

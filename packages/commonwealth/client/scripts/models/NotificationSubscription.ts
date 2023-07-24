@@ -10,14 +10,12 @@ import { Thread as ThreadT } from './Thread';
 
 class NotificationSubscription {
   public readonly category: string;
-  public readonly objectId: string;
   public readonly createdAt: moment.Moment;
   public readonly Chain: ChainInfo;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
 
   public readonly id?: number;
-  public readonly chainEntityId?: any;
 
   private _immediateEmail: boolean;
   public get immediateEmail() {
@@ -37,9 +35,20 @@ class NotificationSubscription {
     return this._isActive;
   }
 
-  // TODO: should resolve Chain vs chain
-  public get getChain() {
+  public get categoryId() {
+    return this.category;
+  }
+
+  public get chainId() {
     return this.Chain.id || this.Chain;
+  }
+
+  public get threadId() {
+    return this.Thread.id || this.Thread;
+  }
+
+  public get commentId() {
+    return this.Comment.id || this.Comment;
   }
 
   public enable() {
@@ -53,7 +62,6 @@ class NotificationSubscription {
   constructor(
     id,
     category,
-    objectId,
     isActive,
     createdAt,
     immediateEmail,
@@ -63,7 +71,6 @@ class NotificationSubscription {
   ) {
     this.id = id;
     this.category = category;
-    this.objectId = objectId;
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
@@ -76,7 +83,6 @@ class NotificationSubscription {
     return new NotificationSubscription(
       json.id,
       json.category_id,
-      json.object_id,
       json.is_active,
       json.created_at,
       json.immediate_email,
@@ -91,7 +97,6 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
   const {
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,
@@ -123,7 +128,6 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
   return new NotificationSubscription(
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,

@@ -4,6 +4,7 @@ import type { ChainEventNotification } from 'types';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import Notification from '../../../models/Notification';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
+import { NotificationCategories } from 'common-common/src/types';
 
 export class ChainEventsNamespace {
   private ceNs: Socket;
@@ -63,8 +64,11 @@ export class ChainEventsNamespace {
   }
 
   private onChainEvent(notification: ChainEventNotification) {
-    const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.getChain === notification.ChainEvent.chain
+    const subscription = app.user.notifications.findSubscription(
+      NotificationCategories.ChainEvent,
+      {
+        chainId: notification.ChainEvent.chain,
+      }
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally

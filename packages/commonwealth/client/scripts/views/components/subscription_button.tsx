@@ -8,10 +8,11 @@ import { CWButton } from './component_kit/cw_button';
 
 export const SubscriptionButton = () => {
   const subscriptions = app.user.notifications;
-  const communitySubscription = subscriptions.subscriptions.find(
-    (v) =>
-      v.category === NotificationCategories.NewThread &&
-      v.objectId === app.activeChainId()
+  const communitySubscription = subscriptions.findSubscription(
+    NotificationCategories.NewThread,
+    {
+      chainId: app.activeChainId(),
+    }
   );
   const [notificationsOn, setNotificationsOn] = useState<boolean>(
     isNotUndefined(communitySubscription)
@@ -28,7 +29,9 @@ export const SubscriptionButton = () => {
             .then(() => setNotificationsOn(false));
         } else {
           subscriptions
-            .subscribe(NotificationCategories.NewThread, communityOrChain)
+            .subscribe(NotificationCategories.NewThread, {
+              chainId: communityOrChain,
+            })
             .then(() => setNotificationsOn(true));
         }
       }}

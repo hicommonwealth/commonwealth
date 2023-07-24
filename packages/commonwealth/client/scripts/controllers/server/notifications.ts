@@ -1,13 +1,32 @@
 /* eslint-disable no-restricted-syntax */
 import { EventEmitter } from 'events';
 import $ from 'jquery';
+import {
+  NotificationCategories,
+  NotificationCategory,
+} from 'common-common/src/types';
 
-import NotificationSubscription, { modelFromServer } from 'models/NotificationSubscription';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
 
 import app from 'state';
 
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
+import {
+  checkSubscriptionKeyExistence,
+  formatStringCase,
+  getUniqueSubscriptionKeys,
+  getUniqueSubscriptionPairs,
+} from 'common-common/src/subscriptionsMapping';
+
+interface SubscriptionOptions {
+  chainId?: string;
+  threadId?: number;
+  commentId?: number;
+  snapshotId?: string;
+}
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -87,9 +106,13 @@ class NotificationsController {
     return this._subscriptions;
   }
 
-  public subscribe(category: string, objectId: string) {
-    const subscription = this.subscriptions.find(
-      (v) => v.category === category && v.objectId === objectId
+  public subscribe(category: string, data: SubscriptionOptions) {
+    const subscription = this.findSubscription(category, data);
+    const requestData = Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [
+        formatStringCase('snake_case', k),
+        v,
+      ])
     );
     if (subscription) {
       return this.enableSubscriptions([subscription]);
@@ -98,8 +121,8 @@ class NotificationsController {
         '/createSubscription',
         {
           category,
-          object_id: objectId,
           is_active: true,
+          ...requestData,
         },
         (result) => {
           const newSubscription = modelFromServer(result);
@@ -390,6 +413,31 @@ class NotificationsController {
     return post('/getSubscribedChains', {}, (result) => {
       this._chainEventSubscribedChainIds = result.map((x) => x.id);
     });
+  }
+
+  public findSubscription(
+    category: NotificationCategory,
+    data: SubscriptionOptions
+  ): NotificationSubscription {
+    try {
+      const pairs = getUniqueSubscriptionPairs<false, SubscriptionOptions>(
+        category,
+        'camelCase',
+        data,
+        (category, key) => {
+          console.error(
+            `Must provide a ${key} to find a ${category} subscription`
+          );
+          return false;
+        }
+      );
+      return this._subscriptions.find((sub) =>
+        Object.keys(pairs).every((key) => pairs[key] === data[key])
+      );
+    } catch (e) {
+      console.error(e);
+      return;
+    }
   }
 
   public async refresh() {

@@ -28,14 +28,12 @@ export const subscribeToThread = async (
     return Promise.resolve();
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(
-        NotificationCategories.NewReaction,
-        adjustedId
-      ),
-      app.user.notifications.subscribe(
-        NotificationCategories.NewComment,
-        adjustedId
-      ),
+      app.user.notifications.subscribe(NotificationCategories.NewReaction, {
+        threadId: Number(threadId),
+      }),
+      app.user.notifications.subscribe(NotificationCategories.NewComment, {
+        threadId: Number(threadId),
+      }),
     ]);
 
     notifySuccess('Subscribed!');
