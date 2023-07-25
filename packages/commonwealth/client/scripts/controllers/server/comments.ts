@@ -1,17 +1,48 @@
+import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { EventEmitter } from 'events';
 import _ from 'lodash';
+import ReactionCount from 'models/ReactionCount';
 import moment from 'moment';
 import app from 'state';
-import { CommentsStore } from 'stores';
+import { CommentsStore, ReactionCountsStore, ReactionStore } from 'stores';
 import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
-import type { IUniqueId } from '../../models/interfaces';
+import Reaction from '../../models/Reaction';
 import Thread from '../../models/Thread';
+import type { IUniqueId } from '../../models/interfaces';
+import type { AnyProposal } from '../../models/types';
 import { updateLastVisited } from '../app/login';
-import axios from 'axios';
-import $ from 'jquery';
+
+export const modelReactionCountFromServer = (reactionCount) => {
+  const { id, thread_id, comment_id, proposal_id, has_reacted, like } =
+    reactionCount;
+  return new ReactionCount(
+    id,
+    thread_id,
+    comment_id,
+    proposal_id,
+    has_reacted,
+    parseInt(like)
+  );
+};
+
+export const modelReactionFromServer = (reaction) => {
+  return new Reaction({
+    id: reaction.id,
+    author: reaction.Address.address,
+    author_chain: reaction.Address.chain,
+    chain: reaction.chain,
+    reaction: reaction.reaction,
+    threadId: reaction.thread_id,
+    proposalId: reaction.proposal_id,
+    commentId: reaction.comment_id,
+    canvasAction: reaction.canvas_action,
+    canvasSession: reaction.canvas_session,
+    canvasHash: reaction.canvas_hash,
+  });
+};
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
@@ -21,7 +52,7 @@ export const modelFromServer = (comment) => {
   const { reactions } = comment;
   if (reactions) {
     for (const reaction of reactions) {
-      app.reactions.store.add(modelReactionFromServer(reaction));
+      app.comments.reactionsStore.add(modelReactionFromServer(reaction));
     }
   }
 
@@ -36,8 +67,8 @@ export const modelFromServer = (comment) => {
           typeof history.author === 'string'
             ? JSON.parse(history.author)
             : typeof history.author === 'object'
-            ? history.author
-            : null;
+              ? history.author
+              : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
         console.log(e);
@@ -49,8 +80,8 @@ export const modelFromServer = (comment) => {
   const lastEdited = comment.last_edited
     ? moment(comment.last_edited)
     : versionHistory && versionHistory?.length > 1
-    ? versionHistory[0].timestamp
-    : null;
+      ? versionHistory[0].timestamp
+      : null;
 
   const markedAsSpamAt = comment.marked_as_spam_at
     ? moment(comment.marked_as_spam_at)
@@ -59,54 +90,77 @@ export const modelFromServer = (comment) => {
   const commentParams =
     comment.deleted_at?.length > 0
       ? {
-          chain: comment.chain,
-          author: comment?.Address?.address || comment.author,
-          text: '[deleted]',
-          plaintext: '[deleted]',
-          versionHistory: [],
-          attachments: [],
-          threadId: comment.thread_id,
-          id: comment.id,
-          createdAt: moment(comment.created_at),
-          rootThread: comment.thread_id,
-          parentComment: Number(comment.parent_id) || null,
-          authorChain: comment?.Address?.chain || comment.authorChain,
-          lastEdited,
-          markedAsSpamAt,
-          deleted: true,
-          canvasAction: comment.canvas_action,
-          canvasSession: comment.canvas_session,
-          canvasHash: comment.canvas_hash,
-        }
+        chain: comment.chain,
+        author: comment?.Address?.address || comment.author,
+        text: '[deleted]',
+        plaintext: '[deleted]',
+        versionHistory: [],
+        attachments: [],
+        threadId: comment.thread_id,
+        id: comment.id,
+        createdAt: moment(comment.created_at),
+        rootThread: comment.thread_id,
+        parentComment: Number(comment.parent_id) || null,
+        authorChain: comment?.Address?.chain || comment.authorChain,
+        lastEdited,
+        markedAsSpamAt,
+        deleted: true,
+        canvasAction: comment.canvas_action,
+        canvasSession: comment.canvas_session,
+        canvasHash: comment.canvas_hash,
+      }
       : {
-          chain: comment.chain,
-          author: comment?.Address?.address || comment.author,
-          text: decodeURIComponent(comment.text),
-          plaintext: comment.plaintext,
-          versionHistory,
-          attachments,
-          threadId: comment.thread_id,
-          id: comment.id,
-          createdAt: moment(comment.created_at),
-          rootThread: comment.thread_id,
-          parentComment: Number(comment.parent_id) || null,
-          authorChain: comment?.Address?.chain || comment.authorChain,
-          lastEdited,
-          markedAsSpamAt,
-          deleted: false,
-          canvasAction: comment.canvas_action,
-          canvasSession: comment.canvas_session,
-          canvasHash: comment.canvas_hash,
-        };
+        chain: comment.chain,
+        author: comment?.Address?.address || comment.author,
+        text: decodeURIComponent(comment.text),
+        plaintext: comment.plaintext,
+        versionHistory,
+        attachments,
+        threadId: comment.thread_id,
+        id: comment.id,
+        createdAt: moment(comment.created_at),
+        rootThread: comment.thread_id,
+        parentComment: Number(comment.parent_id) || null,
+        authorChain: comment?.Address?.chain || comment.authorChain,
+        lastEdited,
+        markedAsSpamAt,
+        deleted: false,
+        canvasAction: comment.canvas_action,
+        canvasSession: comment.canvas_session,
+        canvasHash: comment.canvas_hash,
+      };
 
   return new Comment(commentParams);
 };
 
 class CommentsController {
+  public isReactionFetched = new EventEmitter();
   private _store: CommentsStore = new CommentsStore();
+  private _reactionCountsStore: ReactionCountsStore = new ReactionCountsStore();
+  private _reactionsStore: ReactionStore = new ReactionStore();
 
   public get store() {
     return this._store;
+  }
+
+  public get reactionCountsStore() {
+    return this._reactionCountsStore;
+  }
+
+  public get reactionsStore() {
+    return this._reactionsStore;
+  }
+
+  public deinitReactionCountsStore() {
+    this.reactionCountsStore.clear();
+  }
+
+  public getReactionByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
+    return this.reactionsStore.getByPost(post);
+  }
+
+  public deinitReactionsStore() {
+    this.store.clear();
   }
 
   public getById(id: number) {
@@ -291,31 +345,32 @@ class CommentsController {
   }
 
   public async toggleSpam(commentId: number, isSpam: boolean) {
-    return new Promise((resolve, reject) => {
-      $.post(
-        `${app.serverUrl()}/comments/${commentId}/${
-          !isSpam ? 'mark' : 'unmark'
-        }-as-spam`,
+    try {
+      const verb = isSpam ? 'put' : 'delete';
+      const response = await axios[verb](
+        `${app.serverUrl()}/comments/${commentId}/spam`,
         {
-          jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          } as any,
         }
-      )
-        .then((response) => {
-          const comment = this._store.getById(commentId);
-          const result = modelFromServer({ ...comment, ...response.result });
-          if (comment) this._store.remove(comment);
-          this._store.add(result);
-          resolve(result);
-        })
-        .catch((e) => {
-          console.error(e);
-          notifyError(
-            `Could not ${!isSpam ? 'mark' : 'unmark'} comment as spam`
-          );
-          reject(e);
-        });
-    });
+      );
+      const comment = this._store.getById(commentId);
+      const result = modelFromServer({
+        ...comment,
+        ...response.data.result,
+      });
+      if (comment) {
+        this._store.remove(comment);
+      }
+      this._store.add(result);
+      return result;
+    } catch (err) {
+      console.error(err);
+      notifyError(`Could not ${!isSpam ? 'mark' : 'unmark'} comment as spam`);
+      throw err;
+    }
   }
 
   public async refresh(thread: Thread, chainId: string) {
