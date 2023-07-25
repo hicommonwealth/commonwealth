@@ -340,7 +340,6 @@ const finishSsoLogin = async (
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewMention,
-          object_id: `user-${user.id}`,
           is_active: true,
         },
         { transaction: t }
@@ -351,7 +350,6 @@ const finishSsoLogin = async (
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewCollaboration,
-          object_id: `user-${user.id}`,
           is_active: true,
         },
         { transaction: t }

@@ -116,7 +116,6 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewThread,
-        object_id: chain,
         chain_id: chain,
       });
 
@@ -164,7 +163,6 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${thread.id}`,
         chain_id: chain,
         thread_id: thread.id,
       });
@@ -212,7 +210,6 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewReaction,
-        object_id: `discussion_${thread.id}`,
         chain_id: chain,
         thread_id: thread.id,
       });
@@ -262,7 +259,6 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.SnapshotProposal,
-        object_id: space,
         snapshot_id: space,
       });
 

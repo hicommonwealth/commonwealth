@@ -22,7 +22,6 @@ import type { UserAttributes } from './user';
 export type SubscriptionAttributes = {
   subscriber_id: number;
   category_id: string;
-  object_id: string;
   id?: number;
   is_active?: boolean;
   immediate_email?: boolean;
@@ -49,7 +48,6 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
   emitNotifications?: (
     models: DB,
     category_id: string,
-    object_id: string,
     notification_data:
       | IForumNotificationData
       | IChainEventNotificationData
@@ -70,7 +68,6 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
       category_id: { type: dataTypes.STRING, allowNull: false },
-      object_id: { type: dataTypes.STRING, allowNull: false },
       is_active: {
         type: dataTypes.BOOLEAN,
         defaultValue: true,
@@ -97,7 +94,7 @@ export default (
       updatedAt: 'updated_at',
       indexes: [
         { fields: ['subscriber_id'] },
-        { fields: ['category_id', 'object_id', 'is_active'] },
+        { fields: ['category_id', 'is_active'] },
         { fields: ['thread_id'] },
       ],
     }

@@ -126,13 +126,11 @@ const processAddress = async (
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       });
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       });
       addressInstance.user_id = newUser.id;

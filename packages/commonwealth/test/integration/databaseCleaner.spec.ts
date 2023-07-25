@@ -213,7 +213,6 @@ describe('DatabaseCleaner Tests', () => {
       const newSub = await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
-        object_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });
@@ -221,7 +220,6 @@ describe('DatabaseCleaner Tests', () => {
       const oldSub = await models.Subscription.create({
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
-        object_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });

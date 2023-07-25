@@ -139,7 +139,6 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
-      object_id: `user-${newUser.id}`,
       is_active: true,
     });
 
@@ -147,7 +146,6 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewCollaboration,
-      object_id: `user-${newUser.id}`,
       is_active: true,
     });
 

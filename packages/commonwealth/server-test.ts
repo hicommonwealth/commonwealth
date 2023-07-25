@@ -338,13 +338,11 @@ const resetServer = (debug = false): Promise<void> => {
       await models.Subscription.create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${drew.id}`,
         is_active: true,
       });
       await models.Subscription.create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${drew.id}`,
         is_active: true,
       });
       await models.SnapshotSpace.create({

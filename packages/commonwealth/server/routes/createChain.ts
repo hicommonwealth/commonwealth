@@ -133,8 +133,10 @@ const createChain = async (
     return next(new AppError(Errors.NoBase));
   }
 
-  if (req.body.icon_url &&
-    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB) {
+  if (
+    req.body.icon_url &&
+    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
+  ) {
     throw new AppError(Errors.ImageTooLarge);
   }
 
@@ -480,7 +482,6 @@ const createChain = async (
         subscriber_id: req.user.id,
         category_id: NotificationCategories.NewThread,
         chain_id: chain.id,
-        object_id: chain.id,
         is_active: true,
       },
     });
