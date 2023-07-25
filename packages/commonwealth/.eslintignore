@@ -1,2 +1,3 @@
 node_modules
 webpack
+firebase-messaging-sw.js

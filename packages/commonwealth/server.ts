@@ -232,6 +232,12 @@ async function main() {
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
+    app.use(express.static(__dirname));
+
+    app.get('/firebase-messaging-sw.js', function (req, res) {
+      res.setHeader('Content-Type', 'application/javascript');
+      res.sendFile(__dirname + '/firebase-messaging-sw.js');
+    });
 
     // add other middlewares
     app.use(logger('dev'));
