@@ -170,8 +170,6 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
-      <CWSearchBar placeholder="Search Common" />
-      <CWSearchBar placeholder="Search Common" disabled />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
@@ -1147,6 +1145,10 @@ export const ComponentShowcase = () => {
           <CWText>Disabled</CWText>
           <CWUpvote voteCount={99999} disabled />
         </div>
+      </div>
+      <div className="searchbar-gallery">
+        <CWText type="h3">SearchBar</CWText>
+        <CWSearchBar placeholder="Search Common" />
       </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
