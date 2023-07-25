@@ -11,7 +11,7 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
-import { CWSearchBar } from './new_designs/cw_search_bar';
+import { CWSearchBar } from './new_designs/CWSearchBar';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';

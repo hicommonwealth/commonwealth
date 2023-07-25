@@ -1,17 +1,14 @@
 import React, { FC, ChangeEvent, useState, useEffect } from 'react';
-import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import useAutocomplete from '@mui/base/useAutocomplete';
 
-import app from 'state';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { ComponentType } from './../types';
+import { ComponentType } from '../types';
+import { CWTag } from './CWTag';
 
-import 'components/component_kit/new_designs/cw_search_bar.scss';
+import 'components/component_kit/new_designs/CWSearchBar.scss';
 import { IconName } from '../cw_icons/cw_icon_lookup';
 import { getClasses } from '../helpers';
 import { ValidationStatus } from '../cw_validation_text';
-import { CWText } from '../cw_text';
-import { CWCommunityAvatar } from '../cw_community_avatar';
 
 type BaseSearchBarProps = {
   autoComplete?: string;
@@ -49,64 +46,19 @@ type SearchBarProps = BaseSearchBarProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement>;
 
-type TagProps = {
-  communityName: string;
-  disabled?: boolean;
-  onClick: () => void;
-};
-
-const communities: any = [
-  ...app.config.chains
-    .getAll()
-    // .map((c) => {c.id, c.name})
-    .map((c) => c.name)
-    .sort(),
+const communities = [
+  'Altitude',
+  'Terra Classic',
+  'Osmosis',
+  'Qwoyn Network',
+  '1inch',
+  'Stargate Finance',
+  'Timeless',
+  'Terra Agora',
+  'Injective',
+  'Juno',
+  'Common',
 ];
-// const communities = [
-//   'Altitude',
-//   'Terra Classic',
-//   'Osmosis',
-//   'Qwoyn Network',
-//   '1inch',
-//   'Stargate Finance',
-//   'Timeless',
-//   'Terra Agora',
-//   'Injective',
-//   'Juno',
-//   'Common',
-// ];
-
-const Tag: FC<TagProps> = ({ communityName, disabled, onClick }) => {
-  const handleClick = () => {
-    console.log('clicked!');
-    onClick();
-  };
-
-  return (
-    <div className="tag">
-      <div className="name">
-        <CWCommunityAvatar
-          size="small"
-          // community={app.chain.meta}
-          community={null}
-          onClick={() => console.log('clicked!')}
-        />
-        <CWText type="b2" fontWeight="regular">
-          {communityName}
-        </CWText>
-      </div>
-      <div
-        className={getClasses({
-          action: true,
-          disabled,
-        })}
-        onClick={handleClick}
-      >
-        <X size={16} className="action" />
-      </div>
-    </div>
-  );
-};
 
 export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
   const [value, setValue] = useState<string>(null);
@@ -140,10 +92,6 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
     getOptionLabel: (option) => option,
   });
 
-  useEffect(() => {
-    console.log('chains:', app.config.chains.getAll());
-  }, []);
-
   return (
     <div className="container">
       <div
@@ -156,17 +104,26 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
         )}
       >
         <MagnifyingGlass
-          className="magnifyingGlass"
+          className={getClasses(
+            { magnifyingGlass: true },
+            ComponentType.SearchBar
+          )}
           weight="regular"
           size={24}
         />
         {communityName && (
-          <Tag
+          <CWTag
             communityName={communityName}
             onClick={() => setCommunityName(null)}
           />
         )}
-        <div className="inputElement" {...getRootProps()}>
+        <div
+          className={getClasses(
+            { inputElement: true },
+            ComponentType.SearchBar
+          )}
+          {...getRootProps()}
+        >
           <input
             placeholder={placeholder}
             value={value}
@@ -178,15 +135,13 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
         </div>
       </div>
       {groupedOptions.length > 0 && (
-        <div className="listBox">
-          <ul {...getListboxProps()}>
-            {(groupedOptions as typeof communities).map((option, index) => (
-              <li className="option" {...getOptionProps({ option, index })}>
-                {option}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="listBox" {...getListboxProps()}>
+          {(groupedOptions as typeof communities).map((option, index) => (
+            <li className="option" {...getOptionProps({ option, index })}>
+              {option}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

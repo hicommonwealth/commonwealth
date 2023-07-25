@@ -1,7 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWSearchBar } from "../../../client/scripts/views/components/component_kit/new_designs/cw_search_bar";
+import { CWSearchBar } from "../../../client/scripts/views/components/component_kit/new_designs/CWSearchBar";
 
 const searchbar = {
   title: "Components/SearchBar",

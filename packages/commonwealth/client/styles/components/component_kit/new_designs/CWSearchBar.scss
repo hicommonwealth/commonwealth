@@ -52,46 +52,42 @@
     }
   }
 
-}
-
-.tag {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 8px 2px 8px;
-  left: 48px;
-  gap: 16px;
-  border-radius: 6px;
-  background-color: $neutral-200;
-  height: 24px;
-  width: fit-content;
-
-  .name {
-    display: flex;
-    flex-direction: row;
+  &.magnifyingGlass {
+    color: $neutral-400;
+    width: fit-content;
+    padding: 0;
+    height: fit-content;
+    background-color: inherit;
+    border: none;
+    border-radius: 0;
+  }
+  
+  &.action {
+    display: grid;
     align-items: center;
-    gap: 8px;
+    color: $neutral-500;
+    width: fit-content;
+    padding: 0;
+    height: fit-content;
+    background-color: inherit;
+    border: none;
+    border-radius: 0;
+  
+    &:hover {
+      cursor: pointer;
+      color: $neutral-600;
+    }
   }
-}
-
-.magnifyingGlass {
-  color: $neutral-400;
-}
-
-.action {
-  display: grid;
-  align-items: center;
-  color: $neutral-500;
-
-  :hover {
-    cursor: pointer;
-    color: $neutral-600;
+  
+  &.inputElement {
+    flex: 1;
+    width: fit-content;
+    padding: 0;
+    height: fit-content;
+    background-color: inherit;
+    border: none;
+    border-radius: 0;
   }
-}
-
-.inputElement {
-  flex: 1;
 }
 
 .container {
@@ -101,12 +97,11 @@
 
 .listBox {
   position: absolute;
-  top: "100%";
+  top: 100%;
   left: 0;
   width: 100%;
   box-sizing: border-box;
   padding: 6px;
-  // width: 608px;
   max-height: 300px;
   border-radius: 6px;
   overflow: auto;

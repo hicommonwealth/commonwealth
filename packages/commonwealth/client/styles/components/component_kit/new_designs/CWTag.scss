@@ -1,0 +1,22 @@
+@import '../../../shared';
+
+.SearchBarTag {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px 2px 8px;
+  left: 48px;
+  gap: 16px;
+  border-radius: 6px;
+  background-color: $neutral-200;
+  height: 24px;
+  width: fit-content;
+
+  .name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+}
