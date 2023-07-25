@@ -140,7 +140,6 @@ export async function __createCommentReaction(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    objectId: `comment-${comment.id}`,
     notificationData: {
       category: NotificationCategories.NewReaction,
       data: {

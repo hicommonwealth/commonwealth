@@ -18,6 +18,7 @@ import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SupportedNetwork } from 'chain-events/src';
+import { mapNotificationsDataToSubscriptions } from 'subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -25,7 +26,6 @@ const { Op } = Sequelize;
 
 export default async function emitNotifications(
   models: DB,
-  object_id: string,
   notification_data_and_category: NotificationDataAndCategory,
   webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
@@ -36,12 +36,15 @@ export default async function emitNotifications(
   // get subscribers to send notifications to
   StatsDController.get().increment('cw.notifications.created', {
     category_id,
-    object_id,
     chain:
       (notification_data as any).chain || (notification_data as any).chain_id,
   });
+
+  const uniqueOptions = mapNotificationsDataToSubscriptions(
+    notification_data_and_category
+  );
   const findOptions: any = {
-    [Op.and]: [{ category_id }, { object_id }, { is_active: true }],
+    [Op.and]: [{ category_id }, { ...uniqueOptions }, { is_active: true }],
   };
 
   // typeguard function to differentiate between chain event notifications as needed
@@ -162,7 +165,6 @@ export default async function emitNotifications(
     if (subscription.subscriber_id) {
       StatsDController.get().increment('cw.notifications.emitted', {
         category_id,
-        object_id,
         chain:
           (notification_data as any).chain ||
           (notification_data as any).chain_id,

@@ -122,7 +122,7 @@ describe('emitNotifications tests', () => {
 
       const notification_data = {};
 
-      await emitNotifications(models, chain, {
+      await emitNotifications(models, {
         category: NotificationCategories.NewThread,
         data: {
           created_at: new Date(),
@@ -183,7 +183,7 @@ describe('emitNotifications tests', () => {
           author_chain: chain,
         },
       };
-      await emitNotifications(models, `discussion_${thread.id}`, notifData);
+      await emitNotifications(models, notifData);
 
       const notif = await models.Notification.findOne({
         where: {
@@ -229,11 +229,7 @@ describe('emitNotifications tests', () => {
           author_chain: chain,
         },
       };
-      await emitNotifications(
-        models,
-        `discussion_${thread.id}`,
-        notification_data
-      );
+      await emitNotifications(models, notification_data);
 
       const notif = await models.Notification.findOne({
         where: {
@@ -289,16 +285,11 @@ describe('emitNotifications tests', () => {
         },
       };
 
-      await emitNotifications(
-        models,
-        snapshotNotificationData.space,
-        notififcation_data,
-        {
-          notificationCategory: eventType,
-          body: snapshotNotificationData.body,
-          title: snapshotNotificationData.title,
-        }
-      );
+      await emitNotifications(models, notififcation_data, {
+        notificationCategory: eventType,
+        body: snapshotNotificationData.body,
+        title: snapshotNotificationData.title,
+      });
 
       const notif = await models.Notification.findOne({
         where: {

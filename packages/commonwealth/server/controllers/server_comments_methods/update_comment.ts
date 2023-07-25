@@ -129,7 +129,6 @@ export async function __updateComment(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    objectId: '',
     notificationData: {
       category: NotificationCategories.CommentEdit,
       data: {
@@ -198,7 +197,6 @@ export async function __updateComment(
         return; // some Addresses may be missing users, e.g. if the user removed the address
       }
       allNotificationOptions.push({
-        objectId: `user-${mentionedAddress.User.id}`,
         notificationData: {
           category: NotificationCategories.NewMention,
           data: {

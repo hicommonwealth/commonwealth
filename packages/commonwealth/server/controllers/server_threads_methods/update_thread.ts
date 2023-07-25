@@ -204,7 +204,6 @@ export async function __updateThread(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    objectId: '',
     notificationData: {
       category: NotificationCategories.ThreadEdit,
       data: {
@@ -269,7 +268,6 @@ export async function __updateThread(
         return; // some Addresses may be missing users, e.g. if the user removed the address
       }
       allNotificationOptions.push({
-        objectId: `user-${mentionedAddress.User.id}`,
         notificationData: {
           category: NotificationCategories.NewMention,
           data: {

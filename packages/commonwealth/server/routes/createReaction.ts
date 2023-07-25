@@ -198,13 +198,8 @@ const createReaction = async (
     notification_data.data.comment_text = comment.text;
   }
 
-  const location = thread_id
-    ? `discussion_${thread_id}`
-    : proposal_id || `comment-${comment_id}`;
-
   emitNotifications(
     models,
-    location,
     notification_data,
     {
       user: finalReaction.Address.address,

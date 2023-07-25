@@ -5,7 +5,6 @@ import { NotificationInstance } from '../../models/notification';
 import { NotificationDataAndCategory } from 'types';
 
 export type EmitOptions = {
-  objectId: string;
   notificationData: NotificationDataAndCategory;
   webhookData?: Partial<WebhookContent>;
   excludeAddresses?: string[];
@@ -17,7 +16,6 @@ export type EmitResult = NotificationInstance;
 export async function __emit(
   this: ServerNotificationsController,
   {
-    objectId,
     notificationData,
     webhookData,
     excludeAddresses,
@@ -26,7 +24,6 @@ export async function __emit(
 ): Promise<EmitResult> {
   return emitNotifications(
     this.models,
-    objectId,
     notificationData,
     webhookData,
     excludeAddresses,

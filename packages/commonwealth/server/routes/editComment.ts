@@ -125,7 +125,6 @@ const editComment = async (
     // dispatch notifications to subscribers of the comment/thread
     emitNotifications(
       models,
-      '',
       {
         category: NotificationCategories.CommentEdit,
         data: {
@@ -201,7 +200,6 @@ const editComment = async (
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
         emitNotifications(
           models,
-          `user-${mentionedAddress.User.id}`,
           {
             category: NotificationCategories.NewMention,
             data: {

@@ -7,7 +7,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export function notificationDataToSubscription(
+export function mapNotificationsDataToSubscriptions(
   notification: NotificationDataAndCategory
 ) {
   const uniqueData = { category_id: notification.category };
