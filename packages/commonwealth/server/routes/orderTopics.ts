@@ -3,7 +3,7 @@ import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
 import type { TopicInstance } from 'server/models/topic';
 import type { DB } from '../models';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../util/validateOwner';
 
 enum OrderTopicsErrors {
   NoUser = 'Not logged in',

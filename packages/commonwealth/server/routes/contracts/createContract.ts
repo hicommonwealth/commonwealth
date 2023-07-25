@@ -10,7 +10,7 @@ import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
   NoType: 'Must provide contract type',

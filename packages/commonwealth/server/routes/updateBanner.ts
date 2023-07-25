@@ -4,7 +4,7 @@ import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { TypedRequestBody } from '../types';
 import { success } from '../types';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../util/validateOwner';
 
 enum UpdateBannerErrors {
   NoChain = 'Must supply a chain ID',

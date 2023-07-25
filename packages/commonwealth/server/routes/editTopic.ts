@@ -5,7 +5,7 @@ import type { DB } from '../models';
 import type { TopicAttributes } from '../models/topic';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../util/validateOwner';
 
 // TODO Graham 8-12-22: This route has high redundancy with createTopic, and has fallen out of sync.
 // We should consider merging or consolidating somehow, to prevent checks diverging again.

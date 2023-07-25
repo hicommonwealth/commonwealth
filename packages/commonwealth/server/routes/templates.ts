@@ -7,7 +7,7 @@ import { success } from '../types';
 import type { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
 import isValidJson from '../../shared/validateJson';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../util/validateOwner';
 
 type CreateTemplateAndMetadataReq = {
   contract_id: string;

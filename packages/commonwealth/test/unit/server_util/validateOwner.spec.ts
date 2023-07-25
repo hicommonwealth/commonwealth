@@ -1,7 +1,5 @@
 import { expect } from 'chai';
 import { AddressAttributes } from 'server/models/address';
-import { ThreadAttributes } from 'server/models/thread';
-import { UserInstance } from 'server/models/user';
 import { validateOwner } from 'server/util/validateOwner';
 
 describe('validateOwner', () => {

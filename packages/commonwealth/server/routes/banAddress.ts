@@ -3,7 +3,7 @@ import type { DB } from '../models';
 import type { BanAttributes, BanInstance } from '../models/ban';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../util/validateOwner';
 
 enum BanAddressErrors {
   NoChain = 'Must supply a chain ID',

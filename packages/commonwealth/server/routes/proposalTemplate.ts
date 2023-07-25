@@ -5,7 +5,7 @@ import type { CommunityContractTemplateAttributes } from '../models/community_co
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../util/validateOwner';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
   cct_id: string;
