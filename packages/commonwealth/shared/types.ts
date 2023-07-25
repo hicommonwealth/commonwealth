@@ -80,6 +80,54 @@ export interface IForumNotificationData {
   comment_count?: number;
 }
 
+export interface IBaseForumNotificationData {
+  created_at: any;
+  thread_id: number | string;
+  root_title: string;
+  root_type: string;
+  chain_id: string;
+  author_address: string;
+  author_chain: string;
+}
+
+export interface INewCommentNotificationData
+  extends IBaseForumNotificationData {
+  comment_id: number;
+  comment_text: string;
+  parent_comment_id?: number;
+  parent_comment_text?: string;
+}
+
+export interface INewReactionNotificationData
+  extends IBaseForumNotificationData {
+  comment_id?: number;
+  comment_text?: string;
+}
+
+export interface INewThreadNotificationData extends IBaseForumNotificationData {
+  comment_text: string;
+}
+
+export interface INewMentionNotificationData
+  extends IBaseForumNotificationData {
+  comment_id?: number;
+  comment_text: string;
+}
+
+export interface INewCollaborationNotificationData
+  extends IBaseForumNotificationData {
+  comment_text: string;
+}
+
+export interface IThreadEditNotificationData
+  extends IBaseForumNotificationData {}
+
+export interface ICommentEditNotificationData
+  extends IBaseForumNotificationData {
+  comment_id: number;
+  comment_text: string;
+}
+
 export interface IChainEventNotificationData extends ChainEventAttributes {}
 
 export type NotificationDataTypes =
@@ -89,19 +137,19 @@ export type NotificationDataTypes =
 
 export type NotifCategoryToNotifDataMapping = {
   [K in NotificationCategory]: K extends typeof NotificationCategories.NewComment
-    ? IForumNotificationData
+    ? INewCommentNotificationData
     : K extends typeof NotificationCategories.NewThread
-    ? IForumNotificationData
+    ? INewThreadNotificationData
     : K extends typeof NotificationCategories.NewMention
-    ? IForumNotificationData
+    ? INewMentionNotificationData
     : K extends typeof NotificationCategories.NewReaction
-    ? IForumNotificationData
+    ? INewReactionNotificationData
     : K extends typeof NotificationCategories.NewCollaboration
-    ? IForumNotificationData
+    ? INewCollaborationNotificationData
     : K extends typeof NotificationCategories.ThreadEdit
-    ? IForumNotificationData
+    ? IThreadEditNotificationData
     : K extends typeof NotificationCategories.CommentEdit
-    ? IForumNotificationData
+    ? ICommentEditNotificationData
     : K extends typeof NotificationCategories.ChainEvent
     ? IChainEventNotificationData
     : K extends typeof NotificationCategories.SnapshotProposal
