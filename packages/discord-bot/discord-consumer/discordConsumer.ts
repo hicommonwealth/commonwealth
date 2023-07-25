@@ -12,6 +12,7 @@ import { RABBITMQ_URI, SERVER_URL, CW_BOT_KEY } from '../utils/config';
 import axios from 'axios';
 import v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -70,6 +71,9 @@ async function consumeMessages() {
           create_thread
         );
         console.log(response.status, response.statusText);
+        StatsDController.get().increment('cw.discord_thread_added', 1, {
+          chain: topic['chain_id'],
+        });
       } else {
         const thread_id = (
           await sequelize.query(
@@ -99,6 +103,9 @@ async function consumeMessages() {
           create_comment
         );
         console.log(response.status, response.statusText);
+        StatsDController.get().increment('cw.discord_comment_added', 1, {
+          chain: topic['chain_id'],
+        });
       }
     } catch (error) {
       log.error(`Failed to process Message:`, error);
