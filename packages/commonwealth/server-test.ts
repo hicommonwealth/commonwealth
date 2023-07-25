@@ -298,10 +298,6 @@ const resetServer = (debug = false): Promise<void> => {
 
       // Notification Categories
       await models.NotificationCategory.create({
-        name: NotificationCategories.NewCommunity,
-        description: 'someone makes a new community',
-      });
-      await models.NotificationCategory.create({
         name: NotificationCategories.NewThread,
         description: 'someone makes a new thread',
       });
@@ -332,14 +328,6 @@ const resetServer = (debug = false): Promise<void> => {
       await models.NotificationCategory.create({
         name: NotificationCategories.CommentEdit,
         description: 'someoned edited a comment',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.NewRoleCreation,
-        description: 'someone created a role',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.EntityEvent,
-        description: 'an entity-event as occurred',
       });
       await models.NotificationCategory.create({
         name: NotificationCategories.SnapshotProposal,
