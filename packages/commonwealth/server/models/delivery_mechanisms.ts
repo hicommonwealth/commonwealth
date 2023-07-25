@@ -12,6 +12,7 @@ export type DeliveryMechanismAttributes = {
   type: DeliveryMechanismType;
   identifier: string; // e.g., email address, FCM token, url if webhook
   user_id: number;
+  enabled: boolean;
   created_at?: Date;
   updated_at?: Date;
 
@@ -36,6 +37,7 @@ export default (
       type: { type: dataTypes.STRING, allowNull: false },
       identifier: { type: dataTypes.STRING, allowNull: false },
       user_id: { type: dataTypes.INTEGER, allowNull: false },
+      enabled: { type: dataTypes.BOOLEAN, defaultValue: true },
     },
     {
       tableName: 'DeliveryMechanisms',

@@ -2,6 +2,8 @@ import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
 import type { DB } from '../models';
 import type { ModelInstance, ModelStatic } from './types';
+import { SubscriptionAttributes } from './subscription';
+import { DeliveryMechanismAttributes } from './delivery_mechanisms';
 
 export type SubscriptionDeliveryAttributes = {
   id?: number;
@@ -9,6 +11,9 @@ export type SubscriptionDeliveryAttributes = {
   delivery_mechanism_id: number;
   created_at?: Date;
   updated_at?: Date;
+
+  Subscription?: SubscriptionAttributes;
+  DeliveryMechanism?: DeliveryMechanismAttributes;
 };
 
 export type SubscriptionDeliveryInstance =
