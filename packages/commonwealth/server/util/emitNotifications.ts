@@ -5,8 +5,7 @@ import type {
   IChainEventNotificationData,
   ICommunityNotificationData,
   IPostNotificationData,
-  SnapshotEventType,
-  SnapshotNotification,
+  NotificationDataTypes,
 } from '../../shared/types';
 import { SERVER_URL } from '../config';
 import type { DB } from '../models';
@@ -23,12 +22,6 @@ import { SupportedNetwork } from 'chain-events/src';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
-
-export type NotificationDataTypes =
-  | IPostNotificationData
-  | ICommunityNotificationData
-  | IChainEventNotificationData
-  | (SnapshotNotification & { eventType: SnapshotEventType });
 
 export default async function emitNotifications(
   models: DB,

@@ -95,6 +95,12 @@ export interface ISnapshotNotificationData {
   snapshotEventType: string;
 }
 
+export type NotificationDataTypes =
+  | IPostNotificationData
+  | ICommunityNotificationData
+  | IChainEventNotificationData
+  | (SnapshotNotification & { eventType: SnapshotEventType });
+
 export enum ContentType {
   Thread = 'thread',
   Comment = 'comment',

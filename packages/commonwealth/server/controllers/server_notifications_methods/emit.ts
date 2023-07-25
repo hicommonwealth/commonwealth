@@ -1,9 +1,8 @@
-import emitNotifications, {
-  NotificationDataTypes,
-} from '../../util/emitNotifications';
+import emitNotifications from '../../util/emitNotifications';
 import { WebhookContent } from '../../webhookNotifier';
 import { ServerNotificationsController } from '../server_notifications_controller';
 import { NotificationInstance } from '../../models/notification';
+import { NotificationDataTypes } from 'types';
 
 export type EmitOptions = {
   categoryId: string;
