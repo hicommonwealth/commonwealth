@@ -25,7 +25,7 @@ import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource, Thread } from '../../../models/Thread';
+import { Link, LinkDisplay, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import {
   CommentsFeaturedFilterTypes,
@@ -687,25 +687,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
-                {showLinkedTemplateOptions && !hideTemplate && (
-                <ViewTemplateForm
-                  address={linkedTemplates[0]?.identifier.split('/')[1]}
-                  slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                  setTemplateNickname={null}
-                />
-              )}
-              {hideTemplate ? (
-                <CWText
-                  type="buttonMini"
-                  onClick={() => setHideTemplate(false)}
-                >
-                  Show transaction template
-                </CWText>
-              ) : (
-                <CWText type="buttonMini" onClick={() => setHideTemplate(true)}>
-                  Hide transaction template
-                </CWText>
-              )}
+                {showLinkedTemplateOptions &&
+                linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
+                  <ViewTemplateForm
+                    address={linkedTemplates[0]?.identifier.split('/')[1]}
+                    slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                    setTemplateNickname={null}
+                  />
+                )}
               {thread.readOnly ? (
                   <>
                     {threadOptionsComp}
@@ -861,7 +850,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
-            ...(showLinkedTemplateOptions && hideTemplate
+            ...(showLinkedTemplateOptions &&
+          linkedTemplates[0]?.display !== LinkDisplay.inline
             ? [
                 {
                   label: 'View Template',

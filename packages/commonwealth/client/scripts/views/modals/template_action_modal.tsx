@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import 'modals/template_action_modal.scss';
 
 import app from 'state';
-import Thread, { Link, LinkSource } from '../../models/Thread';
+import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
 import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TemplateSelector } from '../components/template_action_selector';
@@ -12,6 +12,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 type TemplateFormModalProps = {
   isOpen: boolean;
   thread: Thread; // Pass the thread content to the form
+  display: LinkDisplay;
   onSave: (link?: Link[]) => void;
   onClose: () => void;
 };
@@ -25,6 +26,7 @@ const getInitialTemplates = (thread: Thread) =>
 export const TemplateActionModal = ({
   isOpen,
   thread,
+  display,
   onSave,
   onClose,
 }: TemplateFormModalProps) => {
@@ -97,6 +99,7 @@ export const TemplateActionModal = ({
             source: LinkSource.Template,
             identifier: newIdentifier,
             title: title,
+            display: display,
           };
         });
 
