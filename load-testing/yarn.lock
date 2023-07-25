@@ -1456,7 +1456,7 @@ arrivals@^2.1.2:
     debug "^4.0.1"
     nanotimer "0.3.14"
 
-artillery-engine-playwright@^0.3.0:
+artillery-engine-playwright@^0.3.0, artillery-engine-playwright@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/artillery-engine-playwright/-/artillery-engine-playwright-0.3.1.tgz#39ffb0d1496843ba8c3a91de1eff6182941bcb4e"
   integrity sha512-o4YjEQiq7Yclz9SeqM6Qmu7A/lCOba4ZNsKlhOIzxpgoK/VtuTtgIH4zOcFHu3cqbRDV0B6tAws+4aPEe7Vttg==

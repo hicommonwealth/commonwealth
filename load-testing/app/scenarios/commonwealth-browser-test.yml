@@ -1,0 +1,27 @@
+config:
+  environments:
+    us:
+      target: "https://us.unique.rocks"
+    eu:
+      target: "https://eu.unique.rocks"
+    local:
+      target: "http://localhost:8080"
+    beta:
+      target: "https://commonwealth-beta.herokuapp.com"
+    frick:
+      target: "https://commonwealth-frick.herokuapp.com"
+    frack:
+      target: "https://commonwealth-frack.herokuapp.com"
+  # Load the Playwright engine:
+  engines:
+    playwright: {}
+  # Path to JavaScript file that defines Playwright test functions
+  processor: "../browserFunctions.js"
+  phases:
+  - name: "Warm up"
+    duration: 5
+    arrivalRate: 1
+scenarios:
+  - engine: playwright
+    testFunction: "visitForum"
+    name: "Visit Forum"
