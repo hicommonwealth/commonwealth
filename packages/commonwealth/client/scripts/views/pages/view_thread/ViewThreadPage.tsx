@@ -48,7 +48,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { CommentsTree } from '../discussions/CommentTree';
+import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
@@ -181,20 +181,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .fetchThreadsFromId([+threadId])
       .then((res) => {
         const t = res[0];
-        if (t) {
-          const reactions = app.comments.getReactionByPost(t);
-          t.associatedReactions = reactions
-            .filter((r) => r.reaction === 'like')
-            .map((r) => {
-              return {
-                id: r.id,
-                type: 'like',
-                address: r.author,
-              };
-            });
-
-          setThread(t);
-        }
+        if (t) setThread(t);
         setThreadFetchCompleted(true);
       })
       .catch(() => {
@@ -685,6 +672,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <div className="thread-content">
             {isEditingBody ? (
               <>
+                {/*// TODO editing thread */}
                 {threadOptionsComp}
                 <EditBody
                   title={title}
@@ -775,7 +763,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 />
               </div>
             )}
-            <CommentsTree
+            <CommentTree
               comments={sortedComments}
               includeSpams={includeSpamThreads}
               thread={thread}

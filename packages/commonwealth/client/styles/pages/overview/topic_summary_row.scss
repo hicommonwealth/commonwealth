@@ -122,17 +122,6 @@
           display: flex;
           gap: 16px;
 
-          .comments-count {
-            align-items: center;
-            display: flex;
-            gap: 4px;
-
-            .Icon,
-            .Text {
-              color: $neutral-500;
-            }
-          }
-
           .user-gallery {
             display: flex;
             gap: 8px;
