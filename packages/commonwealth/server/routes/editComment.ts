@@ -205,6 +205,7 @@ const editComment = async (
           {
             category: NotificationCategories.NewMention,
             data: {
+              mentioned_user_id: mentionedAddress.User.id,
               created_at: new Date(),
               thread_id: +comment.thread_id,
               root_title,

@@ -110,6 +110,7 @@ export interface INewThreadNotificationData extends IBaseForumNotificationData {
 
 export interface INewMentionNotificationData
   extends IBaseForumNotificationData {
+  mentioned_user_id: number;
   comment_id?: number;
   comment_text: string;
 }
@@ -117,6 +118,7 @@ export interface INewMentionNotificationData
 export interface INewCollaborationNotificationData
   extends IBaseForumNotificationData {
   comment_text: string;
+  collaborator_user_id: number;
 }
 
 export interface IThreadEditNotificationData

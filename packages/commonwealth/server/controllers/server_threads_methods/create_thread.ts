@@ -379,6 +379,7 @@ export async function __createThread({
         notificationData: {
           category: NotificationCategories.NewMention,
           data: {
+            mentioned_user_id: mentionedAddress.User.id,
             created_at: new Date(),
             thread_id: finalThread.id,
             root_type: ProposalType.Thread,

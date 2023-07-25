@@ -359,6 +359,7 @@ export async function __createThreadComment({
             notificationData: {
               category: NotificationCategories.NewMention,
               data: {
+                mentioned_user_id: mentionedAddress.User.id,
                 created_at: new Date(),
                 thread_id: +threadId,
                 root_title,

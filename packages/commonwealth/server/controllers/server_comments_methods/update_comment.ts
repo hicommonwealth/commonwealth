@@ -202,6 +202,7 @@ export async function __updateComment(
         notificationData: {
           category: NotificationCategories.NewMention,
           data: {
+            mentioned_user_id: mentionedAddress.User.id,
             created_at: new Date(),
             thread_id: +comment.thread_id,
             root_title,

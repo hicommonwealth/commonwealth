@@ -126,6 +126,7 @@ const addEditors = async (
       {
         category: NotificationCategories.NewCollaboration,
         data: {
+          collaborator_user_id: collaborator.User.id,
           created_at: new Date(),
           thread_id: +thread.id,
           root_type: ProposalType.Thread,
