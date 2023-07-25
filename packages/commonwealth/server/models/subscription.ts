@@ -2,7 +2,6 @@ import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
 import type {
   IChainEventNotificationData,
-  ICommunityNotificationData,
   IPostNotificationData,
   ISnapshotNotificationData,
 } from '../../shared/types';
@@ -53,7 +52,6 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
     object_id: string,
     notification_data:
       | IPostNotificationData
-      | ICommunityNotificationData
       | IChainEventNotificationData
       | ISnapshotNotificationData,
     webhook_data?: Partial<WebhookContent>,

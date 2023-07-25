@@ -3,7 +3,6 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
-  ICommunityNotificationData,
   IPostNotificationData,
   NotificationDataTypes,
 } from '../../shared/types';
@@ -133,9 +132,7 @@ export default async function emitNotifications(
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id:
-          (<IPostNotificationData>notification_data).chain_id ||
-          (<ICommunityNotificationData>notification_data).chain,
+        chain_id: (<IPostNotificationData>notification_data).chain_id,
         thread_id:
           Number((<IPostNotificationData>notification_data).thread_id) ||
           undefined,

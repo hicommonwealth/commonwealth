@@ -76,18 +76,10 @@ export interface IPostNotificationData {
   comment_count?: number;
 }
 
-export interface ICommunityNotificationData {
-  created_at: any;
-  role_id: string | number;
-  author_address: string;
-  chain: string;
-}
-
 export interface IChainEventNotificationData extends ChainEventAttributes {}
 
 export type NotificationDataTypes =
   | IPostNotificationData
-  | ICommunityNotificationData
   | IChainEventNotificationData
   | ISnapshotNotificationData;
 

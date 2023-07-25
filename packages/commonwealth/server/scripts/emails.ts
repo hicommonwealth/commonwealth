@@ -8,8 +8,6 @@ import { Op } from 'sequelize';
 import type {
   IPostNotificationData,
   IChainEventNotificationData,
-  ICommunityNotificationData,
-  SnapshotEventType,
   ISnapshotNotificationData,
 } from '../../shared/types';
 import {
@@ -142,7 +140,6 @@ const getForumNotificationCopy = async (
 export const createImmediateNotificationEmailObject = async (
   notification_data:
     | IPostNotificationData
-    | ICommunityNotificationData
     | IChainEventNotificationData
     | ISnapshotNotificationData,
   category_id,
