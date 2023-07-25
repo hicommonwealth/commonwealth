@@ -1,28 +1,25 @@
+import React from 'react';
+import 'view_template/view_template.scss';
 import app from 'state';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import isValidJson from '../../../../../shared/validateJson';
 import {
   CWTextInput,
   MessageRow,
 } from 'views/components/component_kit/cw_text_input';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import 'view_template/view_template.scss';
-import Web3 from 'web3';
-import isValidJson from '../../../../../shared/validateJson';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWButton } from '../../components/component_kit/cw_button';
 import type Contract from 'models/Contract';
-import { callContractFunction, get4337Account } from 'controllers/chain/ethereum/callContractFunction';
+import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'helpers/validateTypes';
+import Web3 from 'web3';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useCallback, useEffect, useState } from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useParams } from 'react-router-dom';
-import WebWalletController from 'controllers/app/web_wallets';
-import { ChainBase } from '../../../../../../common-common/src/types';
-import React from 'react';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWButton } from '../../components/component_kit/cw_button';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 export enum TemplateComponents {
   DIVIDER = 'divider',
@@ -31,6 +28,12 @@ export enum TemplateComponents {
   DROPDOWN = 'dropdown',
   FUNCTIONFORM = 'function',
 }
+
+type ViewTemplateFormProps = {
+  address?: string;
+  slug?: string;
+  setTemplateNickname(name: string): any;
+};
 
 type Json = {
   form_fields: any[]; // TODO type this or import from somewhere
@@ -47,41 +50,41 @@ type Json = {
       gas: string;
       gasPrice: string;
     };
-    is4337?: boolean;
   };
 };
 
-const ViewTemplatePage = () => {
+const ViewTemplateForm = ({
+  address,
+  slug,
+  setTemplateNickname,
+}: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
   const params = useParams();
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [templateNickname, setTemplateNickname] = useState('');
+  const [isFetched, setIsFetched] = useState(false);
   const [templateError, setTemplateError] = useState(false);
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
-  const [templateDraftName, setDraftName] = useState('');
-  const [draftOpen, setDraftOpen] = useState(false);
-  const [erc4337Sender, setErc4337Sender] = useState("");
 
   const loadData = useCallback(() => {
-    const { contract_address, slug } = params;
-
     if (Object.keys(app.contracts.store._storeAddress).length < 1) {
       return;
     }
     // Make sure this contract and slug exists in the store
-    const contractInStore = app.contracts.getByAddress(contract_address);
+    const contractInStore = app.contracts.getByAddress(address);
     const templateMetadata = contractInStore?.ccts?.find((cct) => {
       return cct.cctmd.slug === slug || cct.cctmd.slug === `/${slug}`;
     });
 
     if (!contractInStore || !templateMetadata) {
-      navigate('/404', {}, null);
+      return <div>No Contract Available</div>;
     }
 
     setCurrentContract(contractInStore);
-    setTemplateNickname(templateMetadata.cctmd.nickname);
+    if (typeof setTemplateNickname === 'function') {
+      setTemplateNickname(templateMetadata.cctmd.nickname);
+    }
 
     app.contracts
       .getTemplatesForContract(contractInStore.id)
@@ -98,22 +101,7 @@ const ViewTemplatePage = () => {
         } catch (err) {
           console.log('err', err);
         }
-        if(parsedJSON.tx_template.is4337){
-          try{
-            WebWalletController.Instance.locateWallet(
-              app.user.activeAccount,
-              ChainBase.Ethereum
-            ).then((signingWallet) => {
-              if (!signingWallet.api) {
-                throw new Error('Web3 Api Not Initialized');
-              }
-              const web3: Web3 = signingWallet.api;
-              get4337Account(web3, signingWallet.accounts[0]).then(addr => setErc4337Sender(addr))
-            });
-          } catch{
-            console.log('failed to fetch erc 4337 account')
-          }
-        }
+
         for (const field of parsedJSON.form_fields) {
           switch (Object.keys(field)[0]) {
             case TemplateComponents.INPUT:
@@ -165,11 +153,17 @@ const ViewTemplatePage = () => {
 
         setIsLoaded(true);
       });
-  }, [json, navigate, params]);
+  }, [navigate, address, slug]);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (!isFetched) {
+      console.log('load data');
+      console.log('address', address);
+      console.log('slug', slug);
+      loadData();
+      setIsFetched(true);
+    }
+  }, [address, slug, isFetched, loadData]);
 
   const formatFunctionArgs = () => {
     const { tx_template } = json;
@@ -205,8 +199,6 @@ const ViewTemplatePage = () => {
         });
 
         outputArr.push(subArr);
-      } else if (arg.value) {
-        outputArr.push(arg['value']);
       } else {
         if (arg.startsWith('$')) {
           const ref = arg.slice(1);
@@ -257,47 +249,6 @@ const ViewTemplatePage = () => {
     return txObject;
   };
 
-  const saveTemplateDraft = async () => {
-    if (!draftOpen) {
-      setDraftOpen(true);
-    } else {
-      Object.keys(json.tx_template.args).map((key) => {
-        const arg = json.tx_template.args[key];
-        if (arg.startsWith('$')) {
-          json.tx_template.args[key] = {
-            value: formState[arg.slice(1)],
-            ref: arg,
-          };
-        }
-      });
-      const communityId = app.activeChainId();
-      const contractId = currentContract.id.toString();
-      const templateId = await app.contracts.addTemplate({
-        name: templateDraftName,
-        template: JSON.stringify(json),
-        description: `Draft of ${templateNickname}`,
-        contract_id: contractId,
-        community: communityId,
-      });
-
-      const communityContractTemplateAndMetadata = {
-        slug: templateDraftName.replace(' ', '-'),
-        nickname: templateDraftName,
-        display_name: templateDraftName,
-        display_options: '3',
-        community_id: communityId,
-        template_id: templateId,
-        contract_id: parseInt(contractId),
-        enabled_by: app.user.activeAccount.address,
-      };
-
-      await app.contracts.addCommunityContractTemplate(
-        communityContractTemplateAndMetadata
-      );
-      navigate('/contracts');
-    }
-  };
-
   const constructTxPreview = () => {
     const functionArgs = formatFunctionArgs();
     const txParams = formatTransactionParams();
@@ -313,34 +264,34 @@ const ViewTemplatePage = () => {
   const renderTemplate = (form_fields, nested_field_ref?, nested_index?) => {
     return form_fields.flatMap((field, index) => {
       const [component] = Object.keys(form_fields[index]);
+      const key = nested_field_ref ? `${nested_field_ref}-${index}` : index;
+
+      console.log('field', field);
+      console.log('component', component);
 
       switch (component) {
         case TemplateComponents.DIVIDER:
-          return <CWDivider />;
+          return <CWDivider key={key} />;
         case TemplateComponents.TEXT:
           return (
-            <CWText fontStyle={field[component].field_type}>
+            <CWText
+              key={key}
+              fontStyle={
+                field[component].field_type == 'h1'
+                  ? 'h2'
+                  : field[component].field_type
+              }
+            >
               {field[component].field_value}
             </CWText>
           );
         case TemplateComponents.INPUT:
-          const ref = field[component].field_ref;
-          const argValues: any = Object.values(json.tx_template.args).find(
-            (v: any) => {
-              if (v.value) {
-                return v.ref.slice(1) == ref;
-              }
-            }
-          );
-          const placeholder = argValues
-            ? argValues.value
-            : field[component].field_name;
           return (
             <CWTextInput
+              key={key}
               label={field[component].field_label}
-              value={formState[field[component].field_ref]}
-              placeholder={placeholder}
-              disabled={placeholder !== field[component].field_name}
+              value={formState[field[component].field_ref] || ''}
+              placeholder={field[component].field_name}
               onInput={(e) => {
                 setFormState((prevState) => {
                   const newState = { ...prevState };
@@ -363,8 +314,10 @@ const ViewTemplatePage = () => {
           );
         case TemplateComponents.FUNCTIONFORM: {
           const functionComponents = [
-            <CWDivider />,
-            <CWText type="h3">{field[component].field_label}</CWText>,
+            <CWDivider key={`${key}-divider`} />,
+            <CWText key={`${key}-h3`} type="h3">
+              {field[component].field_label}
+            </CWText>,
           ];
 
           functionComponents.push(
@@ -374,20 +327,17 @@ const ViewTemplatePage = () => {
             })
           );
 
-          functionComponents.push(<CWDivider />);
+          functionComponents.push(<CWDivider key={`${key}-divider-end`} />);
           return functionComponents;
         }
         case TemplateComponents.DROPDOWN:
           return (
             <CWDropdown
+              key={key}
               label={field[component].field_label}
               options={field[component].field_options}
               onSelect={(item) => {
-                setFormState((prevState) => {
-                  const newState = { ...prevState };
-                  newState[field[component].field_ref] = item.value;
-                  return newState;
-                });
+                // rest of the code
               }}
             />
           );
@@ -397,17 +347,9 @@ const ViewTemplatePage = () => {
     });
   };
 
-  const txReady =
-    Object.values(formState).every((val) => {
-      return val !== null && val !== '';
-    }) ||
-    Object.values(json.tx_template.args).every((val: any) => {
-      if (val.value || !val.startsWith('$')) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  const txReady = Object.values(formState).every((val) => {
+    return val !== null && val !== '';
+  });
 
   const handleCreate = () => {
     openConfirmation({
@@ -431,7 +373,6 @@ const ViewTemplatePage = () => {
                 fn: functionAbi,
                 inputArgs: functionArgs,
                 tx_options: txParams,
-                senderERC4337: json.tx_template.is4337 ?? false
               });
 
               if (res.status) {
@@ -456,64 +397,34 @@ const ViewTemplatePage = () => {
   };
 
   if (!json) {
-    return;
+    return <div>Loading...</div>;
   }
 
-  const disableDraft = draftOpen ? templateDraftName.length === 0 : !txReady;
   return (
-    <div className="ViewTemplatePage">
-      <CWBreadcrumbs
-        breadcrumbs={[
-          { label: 'Contracts', path: `/contracts`, navigate },
-          { label: templateNickname },
-        ]}
-      />
-      <CWText type="h3" className="header">
-        {templateNickname}
-      </CWText>
-
-      <div className="form">
-        <CWDivider className="divider" />
-
-        {!templateError ? (
-          <div className="template">{renderTemplate(json.form_fields)}</div>
-        ) : (
-          <MessageRow
-            label="error"
-            hasFeedback
-            validationStatus="failure"
-            statusMessage="invalid template format"
-          />
-        )}
-        <CWDivider />
-        <div className="bottom-row">
-          <CWButton label="Cancel" buttonType="secondary-black" />
-          <CWButton
-            label="Create"
-            buttonType="primary-black"
-            disabled={!txReady}
-            onClick={handleCreate}
-          />
-          {draftOpen && (
-            <CWTextInput
-              value={templateDraftName}
-              placeholder="New draft name"
-              onInput={(v) => {
-                setDraftName(v.target.value);
-              }}
-            ></CWTextInput>
-          )}
-          <CWButton
-            label="Save"
-            buttonType="primary-black"
-            disabled={disableDraft}
-            onClick={saveTemplateDraft}
-          />
+    <div>
+      {!templateError ? (
+        <div className="template">
+          {isFetched && renderTemplate(json.form_fields)}
         </div>
-          {json.tx_template.is4337 && (<CWText>You're acting on behalf of your ERC4337 Account: {erc4337Sender}</CWText> )}
+      ) : (
+        <MessageRow
+          label="error"
+          hasFeedback
+          validationStatus="failure"
+          statusMessage="invalid template format"
+        />
+      )}
+      <CWDivider />
+      <div className="bottom-row" style={{ marginTop: '4px' }}>
+        <CWButton
+          label="Create"
+          buttonType="primary-black"
+          disabled={!txReady}
+          onClick={handleCreate}
+        />
       </div>
     </div>
   );
 };
 
-export default ViewTemplatePage;
+export default ViewTemplateForm;

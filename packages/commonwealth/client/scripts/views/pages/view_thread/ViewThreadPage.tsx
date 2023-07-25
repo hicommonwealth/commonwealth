@@ -25,7 +25,7 @@ import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource, Thread } from '../../../models/Thread';
+import { Link, LinkDisplay, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import {
   CommentsFeaturedFilterTypes,
@@ -56,6 +56,9 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import { TemplateActionCard } from './template_action_card';
+import { ViewTemplateFormCard } from './view_template_form_card';
+import ViewTemplateForm from '../view_template/view_template_form';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -97,6 +100,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
+  const [hideTemplate, setHideTemplate] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -208,6 +212,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (!thread) {
       return;
     }
+
+    console.log('thread', thread);
+    console.log('linkedTemplates', linkedTemplates);
+    console.log('linkedTemplates[0]', linkedTemplates[0]);
 
     // load proposal
     if (!prefetch[threadId]['threadReactionsStarted']) {
@@ -486,15 +494,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
     linkedProposals.length > 0 ||
+    linkedTemplates.length > 0 ||
     isAuthor ||
     isAdminOrMod;
 
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
+
+  const showTemplateOptions = isAuthor || isAdminOrMod;
+
+  const showLinkedTemplateOptions = linkedTemplates.length > 0;
 
   const canComment =
     !!hasJoinedCommunity ||
@@ -516,6 +530,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const newThread = {
       ...thread,
       stage,
+      links,
+    } as Thread;
+
+    setThread(newThread);
+  };
+
+  const handleLinkedTemplateChange = (links: Link[] = []) => {
+    const newThread = {
+      ...thread,
       links,
     } as Thread;
 
@@ -664,7 +687,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
-                {thread.readOnly ? (
+                {showLinkedTemplateOptions &&
+                linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
+                  <ViewTemplateForm
+                    address={linkedTemplates[0]?.identifier.split('/')[1]}
+                    slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                    setTemplateNickname={null}
+                  />
+                )}
+              {thread.readOnly ? (
                   <>
                     {threadOptionsComp}
                     {!thread.readOnly && thread.markedAsSpamAt && (
@@ -819,7 +850,38 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
-          ] as SidebarComponents
+            ...(showLinkedTemplateOptions &&
+          linkedTemplates[0]?.display !== LinkDisplay.inline
+            ? [
+                {
+                  label: 'View Template',
+                  item: (
+                    <div className="cards-column">
+                      <ViewTemplateFormCard
+                        address={linkedTemplates[0]?.identifier.split('/')[1]}
+                        slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                      />
+                    </div>
+                  ),
+                },
+              ]
+            : []),
+          ...(showTemplateOptions
+            ? [
+                {
+                  label: 'Template',
+                  item: (
+                    <div className="cards-column">
+                      <TemplateActionCard
+                        thread={thread}
+                        onChangeHandler={handleLinkedTemplateChange}
+                      />
+                    </div>
+                  ),
+                },
+              ]
+            : []),
+        ] as SidebarComponents
         }
       />
       {JoinCommunityModals}

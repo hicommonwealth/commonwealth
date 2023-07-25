@@ -1,0 +1,16 @@
+@import '../../shared';
+
+.ViewTemplateFormCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+
+  .view-template-form-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+  }
+}
