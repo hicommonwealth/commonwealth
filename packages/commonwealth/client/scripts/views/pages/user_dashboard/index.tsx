@@ -1,6 +1,7 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
+import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import 'pages/user_dashboard/index.scss';
 import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
@@ -10,6 +11,7 @@ import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -23,10 +25,13 @@ type UserDashboardProps = {
 
 const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
+  const { isLoggedIn } = useUserLoggedIn();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global
   );
+
+  const { isWindowLarge } = useBrowserWindow({});
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -64,7 +69,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage, subpage]);
 
   return (
-    <div ref={setScrollElement} className="UserDashboard">
+    <div ref={setScrollElement} className="UserDashboard" key={`${isLoggedIn}`}>
       <div className="dashboard-column">
         <div className="dashboard-header">
           <CWTabBar>
@@ -171,9 +176,11 @@ const UserDashboard = (props: UserDashboardProps) => {
           )}
         </>
       </div>
-      <div>
-        <DashboardCommunitiesPreview />
-      </div>
+      {isWindowLarge && (
+        <div>
+          <DashboardCommunitiesPreview />
+        </div>
+      )}
     </div>
   );
 };

@@ -94,7 +94,7 @@ const addEditors = async (
         where: {
           subscriber_id: collaborator.User.id,
           category_id: NotificationCategories.NewComment,
-          object_id: thread.id,
+          object_id: String(thread.id),
           offchain_thread_id: thread.id,
           chain_id: thread.chain,
           is_active: true,
@@ -104,7 +104,7 @@ const addEditors = async (
         where: {
           subscriber_id: collaborator.User.id,
           category_id: NotificationCategories.NewReaction,
-          object_id: thread.id,
+          object_id: String(thread.id),
           offchain_thread_id: thread.id,
           chain_id: thread.chain,
           is_active: true,

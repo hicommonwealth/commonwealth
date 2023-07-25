@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import 'components/Avatar/AvatarUpload.scss';
 
 import app from 'state';
+import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import Account from '../../../models/Account';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
@@ -87,6 +88,7 @@ export const AvatarUpload = ({
         await uploadToS3(acceptedFiles[0], uploadURL);
 
         if (uploadCompleteCallback) {
+          acceptedFiles[0].uploadURL = replaceBucketWithCDN(uploadURL);
           uploadCompleteCallback([acceptedFiles[0]]);
         }
       } catch (e) {

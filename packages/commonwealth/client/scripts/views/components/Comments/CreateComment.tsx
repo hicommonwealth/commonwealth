@@ -23,12 +23,14 @@ import {
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
+import clsx from 'clsx';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
   rootThread: Thread;
   updatedCommentsCallback: () => void;
+  canComment: boolean;
 };
 
 export const CreateComment = ({
@@ -36,6 +38,7 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   updatedCommentsCallback,
+  canComment,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -60,7 +63,8 @@ export const CreateComment = ({
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (e) => {
+    e.stopPropagation();
     setErrorMsg(null);
     setSendingComment(true);
 
@@ -115,11 +119,13 @@ export const CreateComment = ({
     userBalance.lt(tokenPostingThreshold);
 
   const disabled =
-    editorValue.length === 0 || sendingComment || userFailsThreshold;
-
-  const decimals = getDecimals(app.chain);
+    editorValue.length === 0 ||
+    sendingComment ||
+    userFailsThreshold ||
+    !canComment;
 
   const cancel = (e) => {
+    e.stopPropagation();
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
@@ -140,30 +146,42 @@ export const CreateComment = ({
           <CWText type="caption">
             {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
           </CWText>
-          <CWText type="caption" fontWeight="medium" className="user-link-text">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className={clsx('user-link-text', { disabled: !canComment })}
+          >
             <User user={author} hideAvatar linkify />
           </CWText>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && app.user.activeAccount && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
+      <div onClick={(e) => e.stopPropagation()}>
+        <ReactQuillEditor
+          className="editor"
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+        />
+      </div>
+      {app.activeChainId &&
+        tokenPostingThreshold &&
+        tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {activeTopicName} requires{' '}
+            {weiToTokens(
+              tokenPostingThreshold.toString(),
+              getDecimals(app.chain)
+            )}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && app.user.activeAccount && (
+              <>
+                You have{' '}
+                {weiToTokens(userBalance.toString(), getDecimals(app.chain))}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
+          </CWText>
+        )}
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (
@@ -173,7 +191,7 @@ export const CreateComment = ({
             buttonWidth="wide"
             disabled={disabled}
             onClick={handleSubmitComment}
-            label={parentType === ContentType.Comment ? 'Reply' : 'Comment'}
+            label="Submit"
           />
         </div>
       </div>

@@ -3,7 +3,7 @@ import { ServerControllers } from '../../routing/router';
 import { ThreadAttributes } from '../../models/thread';
 import { AppError } from '../../../../common-common/src/errors';
 
-const Errors = {
+export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
   MissingTextOrAttachment: 'Must provide text or attachment',
 };
@@ -24,7 +24,7 @@ export const updateThreadHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { id } = req.params;
-  const { body, title, kind, stage, url } = req.body;
+  const { body, title, stage, url } = req.body;
 
   const threadId = parseInt(id, 10) || 0;
   if (!threadId) {
@@ -39,17 +39,16 @@ export const updateThreadHandler = async (
   }
 
   const [updatedThread, notificationOptions] =
-    await controllers.threads.updateThread(
+    await controllers.threads.updateThread({
       user,
       address,
       chain,
       threadId,
       title,
       body,
-      kind,
       stage,
-      url
-    );
+      url,
+    });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

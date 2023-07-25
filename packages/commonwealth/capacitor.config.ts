@@ -8,10 +8,16 @@ const baseConfig: CapacitorConfig = {
   webDir: 'build',
   bundledWebRuntime: false,
   plugins: {
-    SplashScreen: {
-      launchShowDuration: 5000,
-      launchAutoHide: true,
+    // SplashScreen: {
+    //   launchShowDuration: 5000,
+    //   launchAutoHide: true,
+    // },
+    FirebaseMessaging: {
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
+    // CapacitorCookies: {
+    //   enabled: true,
+    // },
   },
   ios: {
     allowsLinkPreview: true,
@@ -28,17 +34,18 @@ switch (process.env.NODE_ENV) {
     config = {
       ...baseConfig,
       server: {
-        url: 'http://127.0.0.1:8080',
+        url: process.env.SERVICE_URL,
+        hostname: 'alpha.common.xyz', // If server.url = localhost:8080/api, hostname would be = localhost:8080
         cleartext: true,
         allowNavigation: ['*'],
       },
     };
     break;
-  case 'staging':
+  case 'alpha':
     config = {
       ...baseConfig,
       server: {
-        url: 'https://commonwealth-frick.herokuapp.com',
+        url: 'https://alpha.common.xyz/api',
         cleartext: true,
         allowNavigation: ['*'],
       },

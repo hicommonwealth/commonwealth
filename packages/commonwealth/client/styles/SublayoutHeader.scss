@@ -5,10 +5,15 @@
   border-bottom: 1px solid $neutral-200;
   display: flex;
   gap: 8px;
-  height: $global-header-height;
+  height: calc(#{$global-header-height} + var(--safe-area-inset-top)); /* Use CSS variable */
   justify-content: space-between;
   min-height: $global-header-height;
   padding: 0 8px;
+
+  // Add this to adjust padding for the iOS notch
+  @supports (padding-top: var(--safe-area-inset-top)) { /* Use CSS variable */
+    padding-top: var(--safe-area-inset-top); /* Use CSS variable */
+  }
 
   .header-left {
     align-items: center;

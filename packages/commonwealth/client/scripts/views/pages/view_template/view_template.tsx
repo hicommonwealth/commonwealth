@@ -1,11 +1,3 @@
-import { parseFunctionFromABI } from 'abi_utils';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
-import validateType from 'helpers/validateTypes';
-import type Contract from 'models/Contract';
-import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import app from 'state';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -18,8 +10,19 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import 'view_template/view_template.scss';
 import Web3 from 'web3';
 import isValidJson from '../../../../../shared/validateJson';
-import { CWButton } from '../../components/component_kit/cw_button';
+import type Contract from 'models/Contract';
+import { callContractFunction, get4337Account } from 'controllers/chain/ethereum/callContractFunction';
+import { parseFunctionFromABI } from 'abi_utils';
+import validateType from 'helpers/validateTypes';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { useCallback, useEffect, useState } from 'react';
+import { useCommonNavigate } from 'navigation/helpers';
+import { useParams } from 'react-router-dom';
+import WebWalletController from 'controllers/app/web_wallets';
+import { ChainBase } from '../../../../../../common-common/src/types';
+import React from 'react';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 export enum TemplateComponents {
   DIVIDER = 'divider',
@@ -44,6 +47,7 @@ type Json = {
       gas: string;
       gasPrice: string;
     };
+    is4337?: boolean;
   };
 };
 
@@ -58,6 +62,7 @@ const ViewTemplatePage = () => {
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
   const [templateDraftName, setDraftName] = useState('');
   const [draftOpen, setDraftOpen] = useState(false);
+  const [erc4337Sender, setErc4337Sender] = useState("");
 
   const loadData = useCallback(() => {
     const { contract_address, slug } = params;
@@ -93,7 +98,22 @@ const ViewTemplatePage = () => {
         } catch (err) {
           console.log('err', err);
         }
-
+        if(parsedJSON.tx_template.is4337){
+          try{
+            WebWalletController.Instance.locateWallet(
+              app.user.activeAccount,
+              ChainBase.Ethereum
+            ).then((signingWallet) => {
+              if (!signingWallet.api) {
+                throw new Error('Web3 Api Not Initialized');
+              }
+              const web3: Web3 = signingWallet.api;
+              get4337Account(web3, signingWallet.accounts[0]).then(addr => setErc4337Sender(addr))
+            });
+          } catch{
+            console.log('failed to fetch erc 4337 account')
+          }
+        }
         for (const field of parsedJSON.form_fields) {
           switch (Object.keys(field)[0]) {
             case TemplateComponents.INPUT:
@@ -411,6 +431,7 @@ const ViewTemplatePage = () => {
                 fn: functionAbi,
                 inputArgs: functionArgs,
                 tx_options: txParams,
+                senderERC4337: json.tx_template.is4337 ?? false
               });
 
               if (res.status) {
@@ -489,6 +510,7 @@ const ViewTemplatePage = () => {
             onClick={saveTemplateDraft}
           />
         </div>
+          {json.tx_template.is4337 && (<CWText>You're acting on behalf of your ERC4337 Account: {erc4337Sender}</CWText> )}
       </div>
     </div>
   );
