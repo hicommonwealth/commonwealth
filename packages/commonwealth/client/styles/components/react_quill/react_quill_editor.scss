@@ -123,9 +123,10 @@
   }
 
   .LoadingIndicator {
-    position: relative;
+    position: absolute;
     left: 50%;
     top: calc(50% + 15px);
+    z-index: 1;
 
     .outer-circle {
       width: 10px;
