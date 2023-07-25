@@ -100,13 +100,13 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
             isTyping,
             disabled,
           },
-          ComponentType.SearchBar
+          ComponentType.Searchbar
         )}
       >
         <MagnifyingGlass
           className={getClasses(
             { magnifyingGlass: true },
-            ComponentType.SearchBar
+            ComponentType.Searchbar
           )}
           weight="regular"
           size={24}
@@ -120,7 +120,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
         <div
           className={getClasses(
             { inputElement: true },
-            ComponentType.SearchBar
+            ComponentType.Searchbar
           )}
           {...getRootProps()}
         >

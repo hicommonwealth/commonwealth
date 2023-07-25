@@ -4,6 +4,7 @@ import { X } from '@phosphor-icons/react';
 import { CWCommunityAvatar } from '../cw_community_avatar';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/CWTag.scss';
 
@@ -38,7 +39,10 @@ export const CWTag: FC<TagProps> = ({ communityName, disabled, onClick }) => {
         })}
         onClick={handleClick}
       >
-        <X size={16} className="SearchBar action" />
+        <X
+          className={getClasses({ action: true }, ComponentType.Searchbar)}
+          size={16}
+        />
       </div>
     </div>
   );
