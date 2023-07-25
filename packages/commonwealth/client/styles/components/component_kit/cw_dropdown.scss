@@ -9,9 +9,9 @@
     box-shadow: $elevation-3;
     margin-top: 5px;
     overflow: hidden;
-    position: absolute;
+    position: relative;
     width: 100%;
-    z-index: 1001;
+    z-index: 5000;
 
     .dropdown-item {
       align-items: center;
