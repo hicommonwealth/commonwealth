@@ -11,6 +11,7 @@ import { DEFAULT_PORT } from '../config';
 import setupPassport from './passport';
 import setupRouter from './router';
 import { factory, formatFilename } from 'common-common/src/logging';
+import {methodNotAllowedMiddleware} from "chain-events/services/app/middleware";
 
 const log = factory.getLogger(formatFilename(__filename));
 log.info(
@@ -40,6 +41,7 @@ export async function createChainEventsApp(): Promise<Express> {
 
   const router = setupRouter(models);
   app.use('/api', router);
+  app.use(methodNotAllowedMiddleware());
   app.set('port', port);
 
   const onError = (error) => {
