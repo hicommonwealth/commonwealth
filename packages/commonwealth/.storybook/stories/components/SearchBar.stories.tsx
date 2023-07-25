@@ -1,12 +1,12 @@
-import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
+import React from 'react';
+import type { StoryObj } from '@storybook/react';
 
-import { CWSearchBar } from "../../../client/scripts/views/components/component_kit/new_designs/CWSearchBar";
+import { CWSearchBar } from '../../../client/scripts/views/components/component_kit/new_designs/CWSearchBar';
 
 const searchbar = {
-  title: "Components/SearchBar",
+  title: 'Components/SearchBar',
   component: CWSearchBar,
-} satisfies Meta<typeof CWSearchBar>;
+};
 
 export default searchbar;
 type Story = StoryObj<typeof searchbar>;
@@ -19,27 +19,27 @@ export const SearchBar: Story = {
   parameters: {
     controls: {
       exclude: [
-        "autoComplete",
-        "autoFocus",
-        "containerClassName",
-        "defaultValue",
-        "value",
-        "iconLeft",
-        "iconLeftonClick",
-        "inputValidationFn",
-        "label",
-        "name",
-        "onInput",
-        "onenterkey",
-        "onClick",
-        "tabIndex",
-        "manualStatusMessage",
-        "manualValidationStatus",
-        "inputClassName",
-        "displayOnly",
-        "hasLeftIcon",
-        "maxLength",
-        "isTyping",
+        'autoComplete',
+        'autoFocus',
+        'containerClassName',
+        'defaultValue',
+        'value',
+        'iconLeft',
+        'iconLeftonClick',
+        'inputValidationFn',
+        'label',
+        'name',
+        'onInput',
+        'onenterkey',
+        'onClick',
+        'tabIndex',
+        'manualStatusMessage',
+        'manualValidationStatus',
+        'inputClassName',
+        'displayOnly',
+        'hasLeftIcon',
+        'maxLength',
+        'isTyping',
       ],
     },
   },
