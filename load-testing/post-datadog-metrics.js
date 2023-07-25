@@ -34,7 +34,7 @@ const tags = [
   'reporterType:datadog-api',
   `testTool:artillery`,
   `testLocation:${process.env.TEST_LOCATION}`,
-  `testId:${process.env.TEST_ID}`,
+  `testId:${Date.now().toString()}`,
   `testName:${process.env.TEST_NAME}`,
 ];
 
