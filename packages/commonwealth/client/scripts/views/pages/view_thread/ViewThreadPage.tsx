@@ -19,6 +19,7 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import { fetchReactionCounts } from 'state/api/reactionCounts';
+import { useAddThreadLinksMutation } from 'state/api/threads';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
@@ -104,6 +105,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { data: comments = [], error: fetchCommentsError } = useFetchCommentsQuery({
     chainId: app.activeChainId(),
     threadId: parseInt(`${threadId}`)
+  })
+
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id
   })
 
   useEffect(() => {
@@ -486,10 +492,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const toAdd = [newLink]; // Add this line to create an array with the new link
 
     if (toAdd.length > 0) {
-      await app.threads.addLinks({
-        threadId: thread.id,
-        links: toAdd,
-      });
+      try {
+        await addThreadLinks({
+          chainId: app.activeChainId(),
+          threadId: thread.id,
+          links: toAdd,
+        });
+      } catch {
+        notifyError('Failed to update linked threads');
+        return;
+      }
     }
 
     const newThread = {

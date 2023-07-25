@@ -2,7 +2,7 @@ import React from 'react';
 
 import type Thread from '../../../models/Thread';
 import 'pages/view_thread/edit_body.scss';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
 import { ContentType } from 'types';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
@@ -11,6 +11,7 @@ import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { useEditThreadMutation } from 'state/api/threads';
 
 type EditBodyProps = {
   title: string;
@@ -37,6 +38,11 @@ export const EditBody = (props: EditBodyProps) => {
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
+
+  const { mutateAsync: editThread } = useEditThreadMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id
+  })
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -75,12 +81,26 @@ export const EditBody = (props: EditBodyProps) => {
 
     try {
       const newBody = JSON.stringify(contentDelta);
-      await app.threads.edit(thread, newBody, title);
+      await editThread({
+        newBody: JSON.stringify(contentDelta) || thread.body,
+        newTitle: title || thread.title,
+        threadId: thread.id,
+        topicId: thread.topic.id,
+        kind: thread.kind,
+        stage: thread.stage,
+        authorProfile: app.user.activeAccount.profile,
+        address: app.user.activeAccount.address,
+        chainId: app.activeChainId(),
+      })
       clearEditingLocalStorage(thread.id, ContentType.Thread);
       notifySuccess('Thread successfully edited');
       threadUpdatedCallback(title, newBody);
     } catch (err) {
-      console.error(err);
+      const error = err.responseJSON && err.responseJSON.error
+        ? err.responseJSON.error
+        : 'Failed to edit thread'
+      console.log(error);
+      notifyError(error)
     } finally {
       setSaving(false);
     }

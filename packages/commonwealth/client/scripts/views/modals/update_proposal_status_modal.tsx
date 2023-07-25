@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import {
-  loadMultipleSpacesData,
   SnapshotProposal,
+  loadMultipleSpacesData,
 } from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
@@ -12,17 +12,18 @@ import type Thread from '../../models/Thread';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
-import app from 'state';
-import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
-import { CWButton } from '../components/component_kit/cw_button';
-import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { Link, LinkSource } from 'models/Thread';
-import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
-import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
-import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { ChainBase } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
+import { Link, LinkSource } from 'models/Thread';
+import app from 'state';
+import { useAddThreadLinksMutation, useDeleteThreadLinksMutation, useEditThreadStageMutation } from 'state/api/threads';
+import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
+import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -56,12 +57,12 @@ export const UpdateProposalStatusModal = ({
   const { customStages } = app.chain.meta;
   const stages = !customStages
     ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
-      ]
+      ThreadStage.Discussion,
+      ThreadStage.ProposalInReview,
+      ThreadStage.Voting,
+      ThreadStage.Passed,
+      ThreadStage.Failed,
+    ]
     : parseCustomStages(customStages);
 
   const [tempStage, setTempStage] = useState(
@@ -82,16 +83,33 @@ export const UpdateProposalStatusModal = ({
   const showChainEvents =
     !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
 
+  const { mutateAsync: editThreadStage } = useEditThreadStageMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id
+  })
+
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id
+  })
+
+  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id
+  })
+
   const handleSaveChanges = async () => {
     // set stage
     try {
-      await app.threads.setStage({
+      await editThreadStage({
+        chainId: app.activeChainId(),
         threadId: thread.id,
-        stage: tempStage,
-      });
+        stage: tempStage
+      })
     } catch (err) {
-      notifyError(`Failed to update stage. Make sure one is selected.`);
-      throw new Error('Failed to update stage');
+      const error = err?.responseJSON?.error || 'Failed to update stage. Make sure one is selected.'
+      notifyError(error);
+      throw new Error(error);
     }
 
     let links: Link[] = thread.links;
@@ -125,7 +143,8 @@ export const UpdateProposalStatusModal = ({
             }
           });
         }
-        const updatedThread = await app.threads.addLinks({
+        const updatedThread = await addThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: [
             {
@@ -134,13 +153,14 @@ export const UpdateProposalStatusModal = ({
               title: enrichedSnapshot.title,
             },
           ],
-        });
+        })
 
         links = updatedThread.links;
       }
 
       if (toDelete.length > 0) {
-        const updatedThread = await app.threads.deleteLinks({
+        const updatedThread = await deleteThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map((sn) => ({
             source: LinkSource.Snapshot,
@@ -163,7 +183,8 @@ export const UpdateProposalStatusModal = ({
       );
 
       if (toAdd.length > 0) {
-        const updatedThread = await app.threads.addLinks({
+        const updatedThread = await addThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map(({ typeId }) => ({
             source: LinkSource.Proposal,
@@ -175,7 +196,8 @@ export const UpdateProposalStatusModal = ({
       }
 
       if (toDelete.length > 0) {
-        const updatedThread = await app.threads.deleteLinks({
+        const updatedThread = await deleteThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ typeId }) => ({
             source: LinkSource.Proposal,
@@ -197,7 +219,8 @@ export const UpdateProposalStatusModal = ({
         'identifier'
       );
       if (toAdd.length > 0) {
-        const updatedThread = await app.threads.addLinks({
+        const updatedThread = await addThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map(({ identifier, title }) => ({
             source: LinkSource.Proposal,
@@ -210,7 +233,8 @@ export const UpdateProposalStatusModal = ({
       }
 
       if (toDelete.length > 0) {
-        const updatedThread = await app.threads.deleteLinks({
+        const updatedThread = await deleteThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
@@ -269,8 +293,8 @@ export const UpdateProposalStatusModal = ({
     );
     const updatedProposals = isSelected
       ? tempCosmosProposals.filter(
-          ({ identifier }) => proposal.identifier !== String(identifier)
-        )
+        ({ identifier }) => proposal.identifier !== String(identifier)
+      )
       : [...tempCosmosProposals, proposal];
     setTempCosmosProposals(updatedProposals);
     setVotingStage();
