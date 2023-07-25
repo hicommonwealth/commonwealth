@@ -3,6 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
+      console.log('Creating temp table...');
       await queryInterface.sequelize.query(
         `
         CREATE TEMPORARY TABLE subs_ids_to_delete as (
@@ -14,6 +15,7 @@ module.exports = {
         { transaction: t }
       );
 
+      console.log('Delete NR...');
       await queryInterface.sequelize.query(
         `
         DELETE FROM "NotificationsRead" NR
@@ -23,6 +25,9 @@ module.exports = {
         { transaction: t }
       );
 
+      console.log(
+        'Deleting subscriptions... ---- this is super slow for some reason'
+      );
       await queryInterface.sequelize.query(
         `
         DELETE FROM "Subscriptions" S
@@ -32,6 +37,7 @@ module.exports = {
         { transaction: t }
       );
 
+      console.log('Deleting new-chat-mention notifications...');
       await queryInterface.bulkDelete(
         'Notifications',
         {
@@ -40,6 +46,7 @@ module.exports = {
         { transaction: t }
       );
 
+      console.log('Deleting notification categories...');
       await queryInterface.bulkDelete(
         'NotificationCategories',
         {
