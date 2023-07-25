@@ -17,6 +17,7 @@ type UsePopoverProps = {
 type PopoverProps = {
   content: React.ReactNode;
   placement?: Placement;
+  disablePortal?: boolean;
 } & UsePopoverProps;
 
 export type PopoverTriggerProps = {
@@ -44,14 +45,20 @@ export const usePopover = (): UsePopoverProps => {
   };
 };
 
-export const Popover = (props: PopoverProps) => {
-  const { anchorEl, content, id, open, placement } = props;
-
+export const Popover = ({
+  anchorEl,
+  content,
+  id,
+  open,
+  placement,
+  disablePortal,
+}: PopoverProps) => {
   return (
     <PopperUnstyled
       id={id}
       open={open}
       anchorEl={anchorEl}
+      disablePortal={disablePortal}
       placement={placement || 'bottom-start'}
       modifiers={[
         {

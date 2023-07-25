@@ -9,6 +9,7 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const resetSidebarState = () => {
   sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -253,12 +254,13 @@ export const CreateContentMenu = () => {
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   if (
     !isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
-    !app.user.activeAccount
+    !hasJoinedCommunity
   ) {
     return;
   }

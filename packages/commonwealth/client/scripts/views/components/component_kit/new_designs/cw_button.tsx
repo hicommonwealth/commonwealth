@@ -13,7 +13,7 @@ export type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 
 type ButtonHeight = 'lg' | 'med' | 'sm';
 
-type ButtonWidth = 'narrow' | 'wide';
+type ButtonWidth = 'narrow' | 'wide' | 'full';
 
 type ButtonStyleProps = {
   buttonType?: ButtonType;
@@ -27,16 +27,6 @@ export type ButtonProps = {
   label: string | React.ReactNode;
 } & ButtonStyleProps &
   React.HTMLAttributes<HTMLButtonElement>;
-
-const getTextType = (buttonType: ButtonType) => {
-  if (buttonType.slice(0, 2) === 'lg') {
-    return 'buttonLg';
-  } else if (buttonType.slice(0, 4) === 'mini') {
-    return 'buttonMini';
-  } else {
-    return 'buttonSm';
-  }
-};
 
 export const CWButton = (props: ButtonProps) => {
   const {
@@ -53,7 +43,14 @@ export const CWButton = (props: ButtonProps) => {
   } = props;
 
   return (
-    <div className={`btn-border ${buttonType} ${disabled ? 'disabled' : ''}`}>
+    <div
+      className={getClasses({
+        btnBorder: 'btn-border',
+        buttonType,
+        disabled,
+        buttonWidth: buttonWidth === 'full' ? 'full' : '',
+      })}
+    >
       <button
         className={getClasses<ButtonStyleProps>(
           {

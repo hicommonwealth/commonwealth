@@ -1,98 +1,64 @@
 import React, { useState } from 'react';
 import app from 'state';
 import type Thread from '../../../../../../models/Thread';
-import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
-import { Modal } from '../../../../../components/component_kit/cw_modal';
-import { CWTooltip } from '../../../../../components/component_kit/cw_popover/cw_tooltip';
-import { CWText } from '../../../../../components/component_kit/cw_text';
-import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../../../../../components/component_kit/helpers';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import {
   getDisplayedReactorsForPopup,
   onReactionClick,
-} from '../../../../../components/ReactionButton/helpers';
+} from 'views/components/ReactionButton/helpers';
 import { LoginModal } from '../../../../../modals/login_modal';
-import './index.scss';
+import './ReactionButton.scss';
 import { useReactionButton } from './useReactionButton';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
+  disabled: boolean;
 };
 
-export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
+export const ReactionButton = ({
+  thread,
+  size,
+  disabled,
+}: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
 
   const { dislike, hasReacted, isLoading, isUserForbidden, like } =
     useReactionButton(thread, setReactors);
 
+  const handleSmallVoteClick = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!app.isLoggedIn() || !app.user.activeAccount) {
+      setIsModalOpen(true);
+    } else {
+      onReactionClick(e, hasReacted, dislike, like);
+    }
+  };
+  const handleSmallVoteMouseEnter = async () => {
+    if (reactors.length === 0) {
+      setReactors(thread.associatedReactions.map((addr) => addr));
+    }
+  };
+
   return (
     <>
       {size === 'small' ? (
-        <button
-          className={getClasses<{ disabled?: boolean }>(
-            { disabled: isLoading || isUserForbidden },
-            `CommentReactionButton ${hasReacted ? ' has-reacted' : ''}`
-          )}
-          onMouseEnter={async () => {
-            if (reactors.length === 0) {
-              setReactors(thread.associatedReactions.map((addr) => addr));
-            }
-          }}
-          onClick={async (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (!app.isLoggedIn() || !app.user.activeAccount) {
-              setIsModalOpen(true);
-            } else {
-              onReactionClick(e, hasReacted, dislike, like);
-            }
-          }}
-        >
-          <CWIcon
-            iconName="upvote"
-            {...(hasReacted && { weight: 'fill' })}
-            iconSize="small"
-            selected={hasReacted}
-          />
-          {reactors.length > 0 ? (
-            <CWTooltip
-              content={
-                <div className="reaction-button-tooltip-contents">
-                  {getDisplayedReactorsForPopup({
-                    reactors: reactors,
-                  })}
-                </div>
-              }
-              renderTrigger={(handleInteraction) => (
-                <CWText
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                  className={`menu-buttons-text ${
-                    hasReacted ? ' has-reacted' : ''
-                  }`}
-                  type="caption"
-                  fontWeight="medium"
-                >
-                  {reactors.length}
-                </CWText>
-              )}
-            />
-          ) : (
-            <CWText
-              className={`menu-buttons-text ${
-                hasReacted ? ' has-reacted' : ''
-              }`}
-              type="caption"
-              fontWeight="medium"
-            >
-              {reactors.length}
-            </CWText>
-          )}
-        </button>
+        <CWUpvoteSmall
+          voteCount={reactors.length}
+          disabled={isUserForbidden || disabled}
+          selected={hasReacted}
+          onMouseEnter={handleSmallVoteMouseEnter}
+          onClick={handleSmallVoteClick}
+          tooltipContent={getDisplayedReactorsForPopup({
+            reactors: reactors,
+          })}
+        />
       ) : (
         <button
           onMouseEnter={async () => {
@@ -116,13 +82,9 @@ export const ReactionButton = ({ thread, size }: ReactionButtonProps) => {
         >
           {reactors.length > 0 ? (
             <CWTooltip
-              content={
-                <div className="reaction-button-tooltip-contents">
-                  {getDisplayedReactorsForPopup({
-                    reactors,
-                  })}
-                </div>
-              }
+              content={getDisplayedReactorsForPopup({
+                reactors,
+              })}
               renderTrigger={(handleInteraction) => (
                 <div
                   onMouseEnter={handleInteraction}
