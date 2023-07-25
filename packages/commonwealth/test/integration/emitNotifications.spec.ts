@@ -10,8 +10,8 @@ import models from '../../server/database';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import {
   IPostNotificationData,
+  ISnapshotNotificationData,
   SnapshotEventType,
-  SnapshotNotification,
 } from 'types';
 import { Op, Sequelize } from 'sequelize';
 
@@ -286,7 +286,7 @@ describe('emitNotifications tests', () => {
       const notififcation_data = {
         eventType,
         ...snapshotNotificationData,
-      } as unknown as SnapshotNotification & { eventType: SnapshotEventType };
+      } as unknown as ISnapshotNotificationData;
 
       await emitNotifications(
         models,

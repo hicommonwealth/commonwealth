@@ -29,26 +29,11 @@ export type ChainEventNotification = {
   ChainEvent: ChainEventAttributes;
 };
 
-export interface SnapshotNotification {
-  id?: string;
-  title?: string;
-  body?: string;
-  choices?: string[];
-  space?: string;
-  event?: string;
-  start?: string;
-  expire?: string;
-}
-
 export const enum SnapshotEventType {
   Created = 'proposal/created',
   Deleted = 'proposal/deleted',
   Ended = 'proposal/end',
   Started = 'proposal/start',
-}
-
-export interface INotification {
-  kind: ChainEventNotification | SnapshotNotification;
 }
 
 export enum WebsocketNamespaces {
@@ -60,6 +45,18 @@ export enum WebsocketNamespaces {
 export enum WebsocketEngineEvents {
   CreateRoom = 'create-room',
   DeleteRoom = 'delete-room',
+}
+
+export interface ISnapshotNotificationData {
+  id?: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space?: string;
+  event?: string;
+  start?: string;
+  expire?: string;
+  eventType: SnapshotEventType;
 }
 
 export interface IPostNotificationData {
@@ -88,31 +85,16 @@ export interface ICommunityNotificationData {
 
 export interface IChainEventNotificationData extends ChainEventAttributes {}
 
-export interface ISnapshotNotificationData {
-  created_at: Date;
-  snapshot_id: string;
-  chain_id: string;
-  snapshotEventType: string;
-}
-
 export type NotificationDataTypes =
   | IPostNotificationData
   | ICommunityNotificationData
   | IChainEventNotificationData
-  | (SnapshotNotification & { eventType: SnapshotEventType });
+  | ISnapshotNotificationData;
 
 export enum ContentType {
   Thread = 'thread',
   Comment = 'comment',
   // Proposal = 'proposal',
-}
-
-export enum ThreadActionType {
-  Deletion = 'deletion',
-  Pinning = 'pinning',
-  Subscription = 'subscription',
-  TopicChange = 'topicchange',
-  StageChange = 'stagechange',
 }
 
 export enum SearchContentType {
@@ -123,11 +105,6 @@ export enum SearchContentType {
   Member = 'member',
 }
 
-export const PROFILE_NAME_MAX_CHARS = 40;
-export const PROFILE_HEADLINE_MAX_CHARS = 80;
-export const PROFILE_BIO_MAX_CHARS = 1000;
-export const PROFILE_NAME_MIN_CHARS = 3;
-
 export const DynamicTemplate = {
   ImmediateEmailNotification: 'd-3f30558a95664528a2427b40292fec51',
   BatchNotifications: 'd-468624f3c2d7434c86ae0ed0e1d2227e',
@@ -136,33 +113,6 @@ export const DynamicTemplate = {
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
   EmailDigest: 'd-a4f27421ce5a41d29dca7625d2136cc3',
-};
-
-export type SnapshotGraphQLResponse = {
-  data?: {
-    proposal: {
-      id: string;
-      title: string;
-      body: string;
-      choices: string[];
-      start: number;
-      end: number;
-      snapshot: number;
-      author: string;
-      created: number;
-      scores: number[];
-      scores_by_strategy: number[][];
-      scores_total: number;
-      scores_updated: number;
-      plugins: any;
-      network: string;
-      strategies: any;
-      space: {
-        id: string;
-        name: string;
-      };
-    };
-  };
 };
 
 export type RoleObject = {
