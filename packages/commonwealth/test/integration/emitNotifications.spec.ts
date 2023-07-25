@@ -18,7 +18,7 @@ import { Op, Sequelize } from 'sequelize';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('emitNotifications tests', () => {
+describe('emitNotifications tests', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
@@ -261,7 +261,7 @@ describe.only('emitNotifications tests', () => {
     });
   });
 
-  describe.only('SnapshotNotificationData', () => {
+  describe('SnapshotNotificationData', () => {
     it('should generate a notification for a new snapshot proposal', async () => {
       const space = 'plutusclub.eth';
       const subscription = await models.Subscription.create({
