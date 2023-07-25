@@ -126,6 +126,13 @@ export const iconLookup = {
 
 export const customIconLookup = {
   email: CustomIcons.CWEmail,
+  eth: CustomIcons.CWEth,
+  cosmos: CustomIcons.CWCosmos,
+  nearIcon: CustomIcons.CWNearIcon,
+  discord: CustomIcons.CWDiscord,
+  github: CustomIcons.CWGithub,
+  twitter: CustomIcons.CWTwitter,
+  envelope: CustomIcons.CWEnvelop,
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWMetaMask,
   keplr: CustomIcons.CWKeplr,

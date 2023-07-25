@@ -61,6 +61,9 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.SESSION_KEYS': JSON.stringify(process.env.SESSION_KEYS),
+    }),
+    new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
     new HtmlWebpackPlugin({
