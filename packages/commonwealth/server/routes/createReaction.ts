@@ -17,6 +17,7 @@ import emitNotifications from '../util/emitNotifications';
 import { findAllRoles } from '../util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { NotificationDataAndCategory } from 'types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -175,23 +176,26 @@ const createReaction = async (
   const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
   // dispatch notifications
-  const notification_data = {
-    created_at: new Date(),
-    thread_id: comment
-      ? comment.thread_id
-      : proposal?.thread_id
-      ? proposal.thread_id
-      : proposal?.id,
-    root_title,
-    root_type,
-    chain_id: finalReaction.chain,
-    author_address: finalReaction.Address.address,
-    author_chain: finalReaction.Address.chain,
+  const notification_data: NotificationDataAndCategory = {
+    category: NotificationCategories.NewReaction,
+    data: {
+      created_at: new Date(),
+      thread_id: comment
+        ? comment.thread_id
+        : proposal?.thread_id
+        ? proposal.thread_id
+        : proposal?.id,
+      root_title,
+      root_type,
+      chain_id: finalReaction.chain,
+      author_address: finalReaction.Address.address,
+      author_chain: finalReaction.Address.chain,
+    },
   };
 
   if (comment_id) {
-    notification_data['comment_id'] = Number(comment.id);
-    notification_data['comment_text'] = comment.text;
+    notification_data.data.comment_id = Number(comment.id);
+    notification_data.data.comment_text = comment.text;
   }
 
   const location = thread_id

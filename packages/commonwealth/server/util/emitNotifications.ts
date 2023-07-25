@@ -4,6 +4,7 @@ import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
+  NotificationDataAndCategory,
   NotificationDataTypes,
 } from '../../shared/types';
 import { SERVER_URL } from '../config';
@@ -26,11 +27,12 @@ export default async function emitNotifications(
   models: DB,
   category_id: string,
   object_id: string,
-  notification_data: NotificationDataTypes,
+  notification_data_and_category: NotificationDataAndCategory,
   webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
+  const notification_data = notification_data_and_category.data;
   // get subscribers to send notifications to
   StatsDController.get().increment('cw.notifications.created', {
     category_id,

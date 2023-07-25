@@ -11,6 +11,7 @@ import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import {
   IForumNotificationData,
   ISnapshotNotificationData,
+  NotificationDataAndCategory,
   SnapshotEventType,
 } from 'types';
 import { Op, Sequelize } from 'sequelize';
@@ -119,22 +120,21 @@ describe('emitNotifications tests', () => {
         chain_id: chain,
       });
 
-      const notification_data: IForumNotificationData = {
-        created_at: new Date(),
-        thread_id: thread.id,
-        root_type: ProposalType.Thread,
-        root_title: title,
-        chain_id: chain,
-        author_address: userAddress2,
-        author_chain: chain,
-      };
+      const notification_data = {};
 
-      await emitNotifications(
-        models,
-        NotificationCategories.NewThread,
-        chain,
-        notification_data
-      );
+      await emitNotifications(models, NotificationCategories.NewThread, chain, {
+        category: NotificationCategories.NewThread,
+        data: {
+          created_at: new Date(),
+          thread_id: thread.id,
+          root_type: ProposalType.Thread,
+          root_title: title,
+          comment_text: '',
+          chain_id: chain,
+          author_address: userAddress2,
+          author_chain: chain,
+        },
+      });
 
       const notif = await models.Notification.findOne({
         where: {
@@ -169,23 +169,25 @@ describe('emitNotifications tests', () => {
         thread_id: thread.id,
       });
 
-      const notification_data: IForumNotificationData = {
-        created_at: new Date(),
-        thread_id: thread.id,
-        root_type: ProposalType.Thread,
-        root_title: title,
-        comment_text: commentBody,
-        chain_id: chain,
-        author_address: userAddress2,
-        author_chain: chain,
+      const notifData: NotificationDataAndCategory = {
+        category: NotificationCategories.NewComment,
+        data: {
+          created_at: new Date(),
+          thread_id: thread.id,
+          root_type: ProposalType.Thread,
+          root_title: title,
+          comment_id: comment.id,
+          comment_text: commentBody,
+          chain_id: chain,
+          author_address: userAddress2,
+          author_chain: chain,
+        },
       };
-
-      const object_id = `discussion_${thread.id}`;
       await emitNotifications(
         models,
         NotificationCategories.NewComment,
         `discussion_${thread.id}`,
-        notification_data
+        notifData
       );
 
       const notif = await models.Notification.findOne({
@@ -197,7 +199,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notification_data)
+        JSON.stringify(notifData)
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -220,14 +222,17 @@ describe('emitNotifications tests', () => {
         thread_id: thread.id,
       });
 
-      const notification_data: IForumNotificationData = {
-        created_at: new Date(),
-        thread_id: thread.id,
-        root_type: ProposalType.Thread,
-        root_title: title,
-        chain_id: chain,
-        author_address: userAddress,
-        author_chain: chain,
+      const notification_data: NotificationDataAndCategory = {
+        category: NotificationCategories.NewReaction,
+        data: {
+          created_at: new Date(),
+          thread_id: thread.id,
+          root_type: ProposalType.Thread,
+          root_title: title,
+          chain_id: chain,
+          author_address: userAddress,
+          author_chain: chain,
+        },
       };
       await emitNotifications(
         models,
@@ -272,21 +277,23 @@ describe('emitNotifications tests', () => {
       });
 
       const snapshotNotificationData = {
-        eventType: 'proposal/created',
+        eventType: SnapshotEventType.Created,
         space,
         id: '0x8b65f5c841816e9fbe54da3fb79ab7abf3444ddc4ca228f97e8c347a53695a98',
         title: 'Drop confirm',
         body: '',
         choices: ['Yes', 'No'],
-        start: 1680610125,
-        expire: 1680869325,
+        start: String(1680610125),
+        expire: String(1680869325),
       };
 
       const eventType: SnapshotEventType = SnapshotEventType.Created;
-      const notififcation_data = {
-        eventType,
-        ...snapshotNotificationData,
-      } as unknown as ISnapshotNotificationData;
+      const notififcation_data: NotificationDataAndCategory = {
+        category: NotificationCategories.SnapshotProposal,
+        data: {
+          ...snapshotNotificationData,
+        },
+      };
 
       await emitNotifications(
         models,

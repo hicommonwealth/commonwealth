@@ -78,7 +78,13 @@ export async function processSnapshotMessage(
     this.models,
     NotificationCategories.SnapshotProposal,
     snapshotNotificationData.space,
-    { eventType, ...snapshotNotificationData },
+    {
+      category: NotificationCategories.SnapshotProposal,
+      data: {
+        eventType,
+        ...snapshotNotificationData,
+      },
+    },
     {
       notificationCategory: eventType,
       body: snapshotNotificationData.body,

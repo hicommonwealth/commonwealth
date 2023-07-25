@@ -2,12 +2,12 @@ import emitNotifications from '../../util/emitNotifications';
 import { WebhookContent } from '../../webhookNotifier';
 import { ServerNotificationsController } from '../server_notifications_controller';
 import { NotificationInstance } from '../../models/notification';
-import { NotificationDataTypes } from 'types';
+import { NotificationDataAndCategory } from 'types';
 
 export type EmitOptions = {
   categoryId: string;
   objectId: string;
-  notificationData: NotificationDataTypes;
+  notificationData: NotificationDataAndCategory;
   webhookData?: Partial<WebhookContent>;
   excludeAddresses?: string[];
   includeAddresses?: string[];

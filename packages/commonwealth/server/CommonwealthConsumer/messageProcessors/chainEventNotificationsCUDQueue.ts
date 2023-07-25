@@ -30,7 +30,12 @@ export async function processChainEventNotificationsCUD(
       this.models,
       NotificationCategories.ChainEvent,
       data.ChainEvent.chain,
-      chainEvent,
+      {
+        category: NotificationCategories.ChainEvent,
+        data: {
+          ...chainEvent,
+        },
+      },
       {
         chainEvent,
         chain: chainEvent.chain,

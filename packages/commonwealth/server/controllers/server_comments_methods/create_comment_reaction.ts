@@ -143,15 +143,18 @@ export async function __createCommentReaction(
     categoryId: NotificationCategories.NewReaction,
     objectId: `comment-${comment.id}`,
     notificationData: {
-      created_at: new Date(),
-      thread_id: thread.id,
-      comment_id: comment.id,
-      comment_text: comment.text,
-      root_title: thread.title,
-      root_type: null, // What is this for?
-      chain_id: finalReaction.chain,
-      author_address: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
+      category: NotificationCategories.NewReaction,
+      data: {
+        created_at: new Date(),
+        thread_id: thread.id,
+        comment_id: comment.id,
+        comment_text: comment.text,
+        root_title: thread.title,
+        root_type: null, // What is this for?
+        chain_id: finalReaction.chain,
+        author_address: finalReaction.Address.address,
+        author_chain: finalReaction.Address.chain,
+      },
     },
     webhookData: {
       user: finalReaction.Address.address,
