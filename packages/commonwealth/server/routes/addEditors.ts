@@ -122,7 +122,6 @@ const addEditors = async (
 
     emitNotifications(
       models,
-      NotificationCategories.NewCollaboration,
       `user-${collaborator.User.id}`,
       {
         category: NotificationCategories.NewCollaboration,

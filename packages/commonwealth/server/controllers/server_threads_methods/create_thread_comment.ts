@@ -296,7 +296,6 @@ export async function __createThreadComment({
 
   // build notification for root thread
   allNotificationOptions.push({
-    categoryId: NotificationCategories.NewComment,
     objectId: `discussion_${threadId}`,
     notificationData: {
       category: NotificationCategories.NewComment,
@@ -326,7 +325,6 @@ export async function __createThreadComment({
   // if child comment, build notification for parent author
   if (parentId && parentComment) {
     allNotificationOptions.push({
-      categoryId: NotificationCategories.NewComment,
       objectId: `comment-${parentId}`,
       notificationData: {
         category: NotificationCategories.NewComment,
@@ -357,7 +355,6 @@ export async function __createThreadComment({
         const shouldNotifyMentionedUser = true;
         if (shouldNotifyMentionedUser) {
           allNotificationOptions.push({
-            categoryId: NotificationCategories.NewMention,
             objectId: `user-${mentionedAddress.User.id}`,
             notificationData: {
               category: NotificationCategories.NewMention,

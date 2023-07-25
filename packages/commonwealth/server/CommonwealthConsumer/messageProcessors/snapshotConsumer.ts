@@ -76,7 +76,6 @@ export async function processSnapshotMessage(
   // Notifications
   emitNotifications(
     this.models,
-    NotificationCategories.SnapshotProposal,
     snapshotNotificationData.space,
     {
       category: NotificationCategories.SnapshotProposal,

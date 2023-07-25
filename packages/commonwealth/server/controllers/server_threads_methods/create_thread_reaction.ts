@@ -133,7 +133,6 @@ export async function __createThreadReaction({
 
   // build notification options
   const notificationOptions: EmitOptions = {
-    categoryId: NotificationCategories.NewReaction,
     objectId: `discussion_${thread.id}`,
     notificationData: {
       category: NotificationCategories.NewReaction,
