@@ -3,7 +3,7 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
-  IPostNotificationData,
+  IForumNotificationData,
   NotificationDataTypes,
 } from '../../shared/types';
 import { SERVER_URL } from '../config';
@@ -132,9 +132,9 @@ export default async function emitNotifications(
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id: (<IPostNotificationData>notification_data).chain_id,
+        chain_id: (<IForumNotificationData>notification_data).chain_id,
         thread_id:
-          Number((<IPostNotificationData>notification_data).thread_id) ||
+          Number((<IForumNotificationData>notification_data).thread_id) ||
           undefined,
       });
     }

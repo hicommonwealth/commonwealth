@@ -9,7 +9,7 @@ import emitNotifications from '../../server/util/emitNotifications';
 import models from '../../server/database';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import {
-  IPostNotificationData,
+  IForumNotificationData,
   ISnapshotNotificationData,
   SnapshotEventType,
 } from 'types';
@@ -119,7 +119,7 @@ describe('emitNotifications tests', () => {
         chain_id: chain,
       });
 
-      const notification_data: IPostNotificationData = {
+      const notification_data: IForumNotificationData = {
         created_at: new Date(),
         thread_id: thread.id,
         root_type: ProposalType.Thread,
@@ -169,7 +169,7 @@ describe('emitNotifications tests', () => {
         thread_id: thread.id,
       });
 
-      const notification_data: IPostNotificationData = {
+      const notification_data: IForumNotificationData = {
         created_at: new Date(),
         thread_id: thread.id,
         root_type: ProposalType.Thread,
@@ -220,7 +220,7 @@ describe('emitNotifications tests', () => {
         thread_id: thread.id,
       });
 
-      const notification_data: IPostNotificationData = {
+      const notification_data: IForumNotificationData = {
         created_at: new Date(),
         thread_id: thread.id,
         root_type: ProposalType.Thread,

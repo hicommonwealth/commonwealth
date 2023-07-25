@@ -6,7 +6,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
 import { Op } from 'sequelize';
 import type {
-  IPostNotificationData,
+  IForumNotificationData,
   IChainEventNotificationData,
   ISnapshotNotificationData,
 } from '../../shared/types';
@@ -30,7 +30,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 const getForumNotificationCopy = async (
   models: DB,
-  notification_data: IPostNotificationData,
+  notification_data: IForumNotificationData,
   category_id
 ) => {
   // unpack notification_data
@@ -139,7 +139,7 @@ const getForumNotificationCopy = async (
 
 export const createImmediateNotificationEmailObject = async (
   notification_data:
-    | IPostNotificationData
+    | IForumNotificationData
     | IChainEventNotificationData
     | ISnapshotNotificationData,
   category_id,
@@ -199,7 +199,7 @@ export const createImmediateNotificationEmailObject = async (
       authorPath,
     ] = await getForumNotificationCopy(
       models,
-      notification_data as IPostNotificationData,
+      notification_data as IForumNotificationData,
       category_id
     );
     return {
