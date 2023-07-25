@@ -7,7 +7,7 @@ import { success } from '../types';
 import type { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
 import isValidJson from '../../shared/validateJson';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from 'server/util/validateOwner';
 
 type CreateTemplateAndMetadataReq = {
   contract_id: string;
@@ -42,8 +42,16 @@ export async function createTemplate(
     created_for_community,
   } = req.body;
 
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
-  if (!isAdmin) throw new AppError('Must be admin');
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain_id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    throw new AppError('Must be admin');
+  }
 
   if (!contract_id || !name || !template) {
     throw new AppError('Must provide contract_id, name, and template');

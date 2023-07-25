@@ -3,7 +3,7 @@ import type { DB } from '../models';
 import type { BanAttributes, BanInstance } from '../models/ban';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from 'server/util/validateOwner';
 
 enum BanAddressErrors {
   NoChain = 'Must supply a chain ID',
@@ -24,11 +24,21 @@ const banAddress = async (
   res: TypedResponse<BanAddressResp>
 ) => {
   const chain = req.chain;
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
-  if (!isAdmin) throw new AppError(BanAddressErrors.NoPermission);
 
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain.id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    throw new AppError(BanAddressErrors.NoPermission);
+  }
   const { address } = req.body;
-  if (!address) throw new AppError(BanAddressErrors.NoAddress);
+  if (!address) {
+    throw new AppError(BanAddressErrors.NoAddress);
+  }
 
   // find or create Ban
   const [ban] = await models.Ban.findOrCreate({

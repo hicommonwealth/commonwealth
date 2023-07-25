@@ -5,7 +5,7 @@ import type { CommunityContractTemplateAttributes } from '../models/community_co
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from 'server/util/validateOwner';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
   cct_id: string;
@@ -49,8 +49,16 @@ export async function createCommunityContractTemplateAndMetadata(
     enabled_by,
   } = req.body;
 
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
-  if (!isAdmin) throw new AppError('Must be admin');
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain_id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    throw new AppError('Must be admin');
+  }
 
   if (!community_id || !contract_id || !template_id) {
     throw new AppError(
@@ -186,8 +194,16 @@ export async function updateCommunityContractTemplate(
       chain_id,
     } = req.body;
 
-    const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
-    if (!isAdmin) throw new AppError('Must be admin');
+    const isAdmin = await validateOwner({
+      models: models,
+      user: req.user,
+      chainId: chain_id,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      throw new AppError('Must be admin');
+    }
 
     if (!contract_id) {
       throw new AppError('Must provide contract_id.');
@@ -250,8 +266,16 @@ export async function deleteCommunityContractTemplate(
 
     const { contract_id, template_id, cctmd_id, chain_id } = req.body;
 
-    const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
-    if (!isAdmin) throw new AppError('Must be admin');
+    const isAdmin = await validateOwner({
+      models: models,
+      user: req.user,
+      chainId: chain_id,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      throw new AppError('Must be admin');
+    }
 
     const shouldDeleteCommunityContract = req.query.community_contract;
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
@@ -385,13 +409,16 @@ export async function updateCommunityContractTemplateMetadata(
       });
     }
 
-    const isAdmin = await validateRoles(
-      models,
-      req.user,
-      'admin',
-      req.body.chain_id
-    );
-    if (!isAdmin) throw new AppError('Must be admin');
+    const isAdmin = await validateOwner({
+      models: models,
+      user: req.user,
+      chainId: req.body.chain_id,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      throw new AppError('Must be admin');
+    }
 
     const contractTemplateMetadata: CommunityContractTemplateMetadataAttributes =
       req.body.contractMetadata;
@@ -443,13 +470,16 @@ export async function deleteCommunityContractTemplateMetadata(
       });
     }
 
-    const isAdmin = await validateRoles(
-      models,
-      req.user,
-      'admin',
-      req.body.chain_id
-    );
-    if (!isAdmin) throw new AppError('Must be admin');
+    const isAdmin = await validateOwner({
+      models: models,
+      user: req.user,
+      chainId: req.body.chain_id,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      throw new AppError('Must be admin');
+    }
 
     const contractTemplateMetadata: CommunityContractTemplateMetadataAttributes =
       req.body.contractMetadata;

@@ -5,7 +5,7 @@ import type { DB } from '../models';
 import type { TopicAttributes } from '../models/topic';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from 'server/util/validateOwner';
 
 // TODO Graham 8-12-22: This route has high redundancy with createTopic, and has fallen out of sync.
 // We should consider merging or consolidating somehow, to prevent checks diverging again.
@@ -60,13 +60,14 @@ const editTopic = async (
     return next(new AppError(Errors.DefaultTemplateRequired));
   }
 
-  const requesterIsAdmin = await validateRoles(
-    models,
-    req.user,
-    'admin',
-    chain.id
-  );
-  if (requesterIsAdmin === null) {
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain.id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
     return next(new AppError(Errors.NotAdmin));
   }
 
