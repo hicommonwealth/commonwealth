@@ -316,42 +316,6 @@ export const CWCheck = (props: IconProps) => {
   );
 };
 
-export const CWCheckCircle = (props: IconProps) => {
-  const {
-    className,
-    componentType,
-    disabled,
-    iconButtonTheme,
-    iconSize,
-    selected,
-    ...otherProps
-  } = props;
-  return (
-    <svg
-      className={getClasses<IconStyleProps>(
-        { className, disabled, iconButtonTheme, iconSize, selected },
-        componentType
-      )}
-      xmlns="http://www.w3.org/2000/svg"
-      width="33"
-      height="33"
-      fill="none"
-      viewBox="0 0 33 33"
-      {...otherProps}
-    >
-      <polygon
-        points="10.0246914 12.9878307 7.8521164 15.0126102 14.8644621 22.5681658 31.0126102 6.42001764 28.9385362 4.34594356 14.9632275
- 18.3212522"
-      ></polygon>
-      <path
-        d="M29.037037,16.0001764 C29.037037,23.2102293 23.2100529,29.0372134 16,29.0372134 C8.78994709,29.0372134 2.96296296,23.2102293 2.
-96296296,16.0001764 C2.96296296,8.79012346 8.78994709,2.96313933 16,2.96313933 L16,0 C7.16049383,0 0,7.16040564 0,16 C0,24.8395062 7.16075838,32
-16,32 C24.8392416,32 32,24.8392416 32,16 L29.037037,16.0001764 Z"
-      ></path>
-    </svg>
-  );
-};
-
 export const CWChevronDown = (props: IconProps) => {
   const {
     className,
@@ -1855,7 +1819,7 @@ export const CWNewStar = (props: IconProps) => {
       viewBox="0 0 16 16"
       {...otherProps}
     >
-      <path d="m8.669 10.969-1.2 3.256a.5.5 0 0 1-.938 0l-1.2-3.256a.506.506 0 0 0-.3-.3l-3.256-1.2a.5.5 0 0 1 0-.938l3.256-1.2a.506.506 0 0 0 .3-.3l1.2-3.256a.5.5 0 0 1 .938 0l1.2 3.256a.506.506 0 0 0 .3.3l3.256 1.2a.5.5 0 0 1 0 .938l-3.256 1.2a.507.507 0 0 0-.3.3v0ZM11 1v3m1.5-1.5h-3m4.5 2v2m1-1h-2"/>
+      <path d="m8.669 10.969-1.2 3.256a.5.5 0 0 1-.938 0l-1.2-3.256a.506.506 0 0 0-.3-.3l-3.256-1.2a.5.5 0 0 1 0-.938l3.256-1.2a.506.506 0 0 0 .3-.3l1.2-3.256a.5.5 0 0 1 .938 0l1.2 3.256a.506.506 0 0 0 .3.3l3.256 1.2a.5.5 0 0 1 0 .938l-3.256 1.2a.507.507 0 0 0-.3.3v0ZM11 1v3m1.5-1.5h-3m4.5 2v2m1-1h-2" />
     </svg>
   );
 };

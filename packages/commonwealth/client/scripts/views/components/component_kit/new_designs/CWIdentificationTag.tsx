@@ -8,7 +8,7 @@ import 'components/component_kit/new_designs/CWIdentificationTag.scss';
 
 interface CWIdentificationTagProps {
   iconLeft: CustomIconName;
-  iconRight: boolean;
+  iconRight?: boolean;
   address?: string;
   username?: string;
 }

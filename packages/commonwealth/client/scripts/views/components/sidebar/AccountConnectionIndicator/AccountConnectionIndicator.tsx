@@ -4,6 +4,7 @@ import React from 'react';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
 
 import './AccountConnectionIndicator.scss';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 interface AccountConnectionIndicatorProps {
   connected: boolean;
@@ -12,6 +13,10 @@ interface AccountConnectionIndicatorProps {
 const AccountConnectionIndicator = ({
   connected,
 }: AccountConnectionIndicatorProps) => {
+  const handleJoinCommunity = () => {
+    console.log('join community click!');
+  };
+
   return (
     <div className="AccountConnectionIndicator">
       <CWText fontWeight="medium" type="caption" className="status-text">
@@ -19,14 +24,20 @@ const AccountConnectionIndicator = ({
       </CWText>
       <div className="status-row">
         <div className={clsx('status-light', { connected })} />
-        <div className="status-address">
-          <CWIdentificationTag
-            iconLeft="twitter"
-            iconRight
-            username="twitterHandlerName"
-            address="0xc4ED43a303E3ADFA0aa9711f12285C910a1D3499"
-          />
-        </div>
+        <CWIdentificationTag
+          iconLeft="eth"
+          address="0xc4ED43a303E3ADFA0aa9711f12285C910a1D3499"
+        />
+      </div>
+      <div className="status-button">
+        <CWButton
+          {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
+          buttonHeight="sm"
+          buttonWidth="full"
+          label={connected ? 'Joined' : 'Join community'}
+          disabled={connected}
+          onClick={handleJoinCommunity}
+        />
       </div>
     </div>
   );

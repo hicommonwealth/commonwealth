@@ -1,10 +1,10 @@
 @import '../../../../../styles/shared';
 
-
 .AccountConnectionIndicator {
-  padding: 16px 24px;
+  padding-top: 16px;
 
   .status-text {
+    padding-inline: 24px;
     color: $neutral-400;
     line-height: 16px;
     letter-spacing: 0.24px;
@@ -14,7 +14,7 @@
   .status-row {
     display: flex;
     align-items: center;
-    margin-top: 8px;
+    margin: 8px 24px 16px;
 
     .status-light {
       width: 8px;
@@ -27,9 +27,11 @@
         background-color: $green-600;
       }
     }
-    .status-address {
-    }
+  }
+
+  .status-button {
+    padding: 16px;
+    border-top: 1px solid $neutral-200;
+    border-bottom: 1px solid $neutral-200;
   }
 }
-
-

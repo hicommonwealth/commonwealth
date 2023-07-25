@@ -19,6 +19,7 @@ import {
   PushPin,
   Trash,
   Eye,
+  CheckCircle,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -40,7 +41,8 @@ export const iconLookup = {
   cautionTriangle: Icons.CWCautionTriangle,
   chatDots: withPhosphorIcon(ChatDots),
   check: Icons.CWCheck,
-  checkCircle: Icons.CWCheckCircle,
+  checkCircle: withPhosphorIcon(CheckCircle),
+  checkCircleFilled: () => withPhosphorIcon(CheckCircle)({ weight: 'fill' }),
   chevronDown: Icons.CWChevronDown,
   chevronLeft: Icons.CWChevronLeft,
   chevronRight: Icons.CWChevronRight,
