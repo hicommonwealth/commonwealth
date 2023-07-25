@@ -15,6 +15,12 @@ const configurationOpts = {
   },
 };
 
+// not DD_API_KEY and DD_APP_KEY are set in the environment exit
+if (!process.env.DD_API_KEY || !process.env.DD_APP_KEY) {
+  console.log('DD_API_KEY and DD_APP_KEY must be set in the environment');
+  process.exit(1);
+}
+
 const configuration = client.createConfiguration(configurationOpts);
 
 client.setServerVariables(configuration, {
