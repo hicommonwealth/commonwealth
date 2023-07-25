@@ -43,15 +43,14 @@ module.exports = {
       await queryInterface.bulkDelete(
         'NotificationCategories',
         {
-          name: 'new-chat-mention',
-        },
-        { transaction: t }
-      );
-
-      await queryInterface.bulkDelete(
-        'NotificationCategories',
-        {
-          name: 'entity-event',
+          name: {
+            [Sequelize.Op.or]: [
+              'entity-event',
+              'new-chat-mention',
+              'new-community-creation',
+              'new-role-creation',
+            ],
+          },
         },
         { transaction: t }
       );
