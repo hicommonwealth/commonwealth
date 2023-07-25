@@ -1,5 +1,30 @@
 @import '../../../shared';
 
+@mixin bannerTheme($main, $background, $accent) {
+  border: 1px solid $main;
+  background: $background;
+
+  .type-icon-container {
+    svg {
+      fill: $main;
+    }
+  }
+
+  .header {
+    color: $main;
+  }
+
+  .body {
+    color: $main;
+  }
+
+  .close-icon-container {
+    svg {
+      fill: $accent;
+    }
+  }
+}
+
 .CWBanner {
   padding: 16px;
   display: flex;
@@ -37,5 +62,29 @@
   .actions-row {
     display: flex;
     margin-top: 24px;
+  }
+
+  &.info {
+    @include bannerTheme($primary-700, $primary-25, $primary-500);
+  }
+
+  &.success {
+    @include bannerTheme($green-700, $green-25, $green-600);
+  }
+
+  &.warning {
+    @include bannerTheme($yellow-700, $yellow-25, $yellow-600);
+  }
+
+  &.error {
+    @include bannerTheme($rorange-600, $rorange-25, $rorange-500);
+
+    .Button.primary {
+      background-color: $rorange-500;
+
+      &:hover {
+        background-color: $rorange-400;
+      }
+    }
   }
 }

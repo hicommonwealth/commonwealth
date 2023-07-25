@@ -66,7 +66,7 @@ const CWBanner = ({
   const TypeIcon = typeIconLookup[type];
 
   return (
-    <div className={clsx('CWBanner', className)}>
+    <div className={clsx('CWBanner', className, type)}>
       {type !== 'default' && (
         <div className="type-icon-container">
           <TypeIcon size={24} />
