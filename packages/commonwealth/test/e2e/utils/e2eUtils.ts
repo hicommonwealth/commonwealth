@@ -28,24 +28,6 @@ export async function login(page, chain = 'ethereum') {
   await page.waitForSelector('a.user-display-name.username', { timeout: 5000 });
 }
 
-export async function screenshotOnFailure(
-  { page }: { page: Page },
-  testInfo: TestInfo
-) {
-  if (testInfo.status !== testInfo.expectedStatus) {
-    // Get a unique place for the screenshot.
-    const screenshotPath = testInfo.outputPath(`failure.png`);
-    // Add it to the report.
-    testInfo.attachments.push({
-      name: 'screenshot',
-      path: screenshotPath,
-      contentType: 'image/png',
-    });
-    // Take the screenshot itself.
-    await page.screenshot({ path: screenshotPath, timeout: 5000 });
-  }
-}
-
 // This connection is used to speed up tests, so we don't need to load in all the models with the associated
 // imports. This can only be used with raw sql queries.
 export const testDb = new Sequelize(DATABASE_URI, { logging: false });
@@ -53,17 +35,43 @@ export const testDb = new Sequelize(DATABASE_URI, { logging: false });
 export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
 
 export async function addAlchemyKey() {
-  if (!process.env.ETH_ALCHEMY_API_KEY) {
+  const apiKey = process.env.ETH_ALCHEMY_API_KEY;
+  if (!apiKey) {
     throw Error('ETH_ALCHEMY_API_KEY not found');
   }
 
+  // If chainNode for eth doesn't exist, add it and add key.
+  const ethChainNodeExists = await testDb.query(
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1'
+  );
+  if (ethChainNodeExists[0].length === 0) {
+    try {
+      await testDb.query(`
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        VALUES (37, 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}', 1,
+         'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)');
+    `);
+    } catch (e) {
+      console.log(e);
+    }
+
+    return;
+  }
+
+  // If ethChainNode already has the apiKey, early return
+  if (ethChainNodeExists[0][0]['url'].includes(apiKey)) {
+    return;
+  }
+
+  // If it does exist, update the key
   await testDb.query(`
   UPDATE "ChainNodes"
   SET 
-    url = 'https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}',
-    alt_wallet_url = 'https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}'
+    url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}',
+    alt_wallet_url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}'
   WHERE 
-    eth_chain_id = 1;
+    eth_chain_id = 1
+    AND NOT EXISTS (select 1 from "ChainNodes" where url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}')
   `);
 }
 
@@ -191,3 +199,5 @@ export async function addUserIfNone(chain) {
     )
   `);
 }
+
+export async function addEthereumChainNode() {}

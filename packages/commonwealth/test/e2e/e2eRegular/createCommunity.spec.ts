@@ -3,6 +3,8 @@ import { expect } from 'chai';
 import { PORT } from '../../../server/config';
 import { addAlchemyKey, login } from '../utils/e2eUtils';
 
+test.setTimeout(45000);
+
 test.describe('Commonwealth Create Community', () => {
   test.beforeAll(async () => {
     await addAlchemyKey();
@@ -31,7 +33,7 @@ test.describe('Commonwealth Create Community', () => {
     await fillOutERCForm(
       page,
       'ERC20',
-      '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+      '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
       chainName
     );
 
@@ -44,7 +46,7 @@ test.describe('Commonwealth Create Community', () => {
     await fillOutERCForm(
       page,
       'ERC721',
-      '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+      '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
       chainName
     );
 
@@ -65,7 +67,9 @@ test.describe('Commonwealth Create Community', () => {
 });
 
 async function fillOutERCForm(page, formName, tokenContractAddress, chainName) {
-  await page.getByText(formName).click();
+  do {
+    await page.getByText(formName).click();
+  } while (!(await page.$('input[id*=Contract]')));
 
   // populate token contract address
   const tokenContractAddressForm = await page.$('input[id*=Contract]');
@@ -77,7 +81,9 @@ async function fillOutERCForm(page, formName, tokenContractAddress, chainName) {
   await iconField.type(
     'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
   );
-  await page.click('button.Button.primary-blue >> text=/Save/');
+  do {
+    await page.click('button.Button.primary-blue >> text=/Save/');
+  } while (!page.getByText('Success!'));
 }
 
 async function assertAdminCapablities(page, chainName) {

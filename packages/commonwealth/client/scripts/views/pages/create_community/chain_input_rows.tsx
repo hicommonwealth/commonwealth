@@ -153,6 +153,8 @@ export const ethChainRows = (
     app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
   ] as Array<DropdownItemType>;
 
+  const ethChainNode = options.filter((o) => o.label === 'Ethereum Mainnet')[0];
+
   function onSelectHandler(o) {
     state.setChainString(o.value);
 
@@ -174,7 +176,7 @@ export const ethChainRows = (
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    onSelectHandler(options[6]);
+    onSelectHandler(ethChainNode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -183,7 +185,7 @@ export const ethChainRows = (
       <CWDropdown
         label="Chain"
         options={options}
-        initialValue={options[6]}
+        initialValue={ethChainNode}
         onSelect={(o) => onSelectHandler(o)}
         disabled={!!props.disabled}
       />

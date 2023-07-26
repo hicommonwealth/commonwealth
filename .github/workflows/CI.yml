@@ -79,6 +79,13 @@ jobs:
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
 
+      - name: Upload e2e recordings on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: Recordings
+          path: packages/commonwealth/test-results/
+
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:

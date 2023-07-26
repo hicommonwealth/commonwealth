@@ -66,7 +66,7 @@
     "gen-e2e": "npx playwright codegen",
     "e2e-start-server": "ETH_RPC=e2e-test yarn start",
     "test-e2e-serial": "TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
-    "test-e2e": "TEST_ENV=playwright npx playwright test --workers 4 --debug ./test/e2e/e2eRegular/*",
+    "test-e2e": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 4 ./test/e2e/e2eRegular/*",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
     "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
     "storybook": "storybook dev -p 6006",
