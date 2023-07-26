@@ -55,27 +55,6 @@ const NotificationSettingsPage = () => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [app?.user.notifications, app.user.emailInterval]);
 
-  // useEffect(() => {
-  //   const messaging = FirebaseMessaging.messaging();
-
-  //   messaging.onMessage((payload) => {
-  //     console.log('Message received. ', payload);
-  //     // Customize notification here
-  //     const notificationTitle = payload.notification.title;
-  //     const notificationOptions = {
-  //       body: payload.notification.body,
-  //       icon: payload.notification.icon
-  //     };
-
-  //     if (!("Notification" in window)) {
-  //       console.log("This browser does not support system notifications");
-  //     } else if (Notification.permission === "granted") {
-  //       // If it's okay let's create a notification
-  //       new Notification(notificationTitle, notificationOptions);
-  //     }
-  //   });
-  // }, []);
-
   // Handler for the 'Request Permission' button
   const requestPermission = async () => {
     const permission = await FirebaseMessaging.requestPermissions();

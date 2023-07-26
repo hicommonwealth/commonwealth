@@ -318,6 +318,8 @@ export async function initAppState(
         let tokenRefreshListener = null;
         if (app.loginState === LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
+
+          app.firebase();
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh(); // TODO: redraw if needed
