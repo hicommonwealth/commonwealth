@@ -4,7 +4,7 @@ import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { TypedRequestBody } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from '../util/validateOwner';
 
 enum UpdateBannerErrors {
   NoChain = 'Must supply a chain ID',
@@ -22,8 +22,17 @@ const updateBanner = async (
   res: Response
 ) => {
   const chain = req.chain;
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
-  if (!isAdmin) throw new AppError(UpdateBannerErrors.NoPermission);
+
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain.id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    throw new AppError(UpdateBannerErrors.NoPermission);
+  }
 
   const { banner_text } = req.body || { banner_text: '' };
 
