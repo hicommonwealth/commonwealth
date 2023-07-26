@@ -50,6 +50,11 @@ module.exports = {
       await queryInterface.createTable(
         'SubscriptionDeliveries',
         {
+          id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+          },
           subscription_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
@@ -84,10 +89,10 @@ module.exports = {
       await queryInterface.removeColumn('Subscriptions', 'delivery_interval', {
         transaction: t,
       });
-      await queryInterface.dropTable('DeliveryMechanisms', { transaction: t });
       await queryInterface.dropTable('SubscriptionDeliveries', {
         transaction: t,
       });
+      await queryInterface.dropTable('DeliveryMechanisms', { transaction: t });
     });
   },
 };
