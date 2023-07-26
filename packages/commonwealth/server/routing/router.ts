@@ -137,6 +137,10 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import createChainNode from '../routes/createChainNode';
+import addDeliveryMechanism from '../routes/subscription/addDeliveryMechanism';
+import disableDeliveryMechanism from '../routes/subscription/disableDeliveryMechanism';
+import updateDeliveryMechanism from '../routes/subscription/updateDeliveryMechanism';
+import viewDeliveryMechanisms from '../routes/subscription/viewDeliveryMechanisms';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -766,6 +770,30 @@ function setupRouter(
     '/disableSubscriptions',
     passport.authenticate('jwt', { session: false }),
     disableSubscriptions.bind(this, models)
+  );
+
+  router.post(
+    '/addDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    addDeliveryMechanism.bind(this, models)
+  );
+
+  router.post(
+    '/disableDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    disableDeliveryMechanism.bind(this, models)
+  );
+
+  router.post(
+    '/updateDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    updateDeliveryMechanism.bind(this, models)
+  );
+
+  router.get(
+    '/viewDeliveryMechanisms',
+    passport.authenticate('jwt', { session: false }),
+    viewDeliveryMechanisms.bind(this, models)
   );
 
   router.post(

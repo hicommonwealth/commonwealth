@@ -26,6 +26,12 @@ import NotificationCategory from 'models/NotificationCategory';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
+import { Capacitor } from '@capacitor/core';
+import { initializeApp } from 'firebase/app';
+import {
+  FirebaseMessaging,
+  GetTokenOptions,
+} from '@capacitor-firebase/messaging';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -38,6 +44,18 @@ export const enum LoginState {
   LoggedOut = 'logged_out',
   LoggedIn = 'logged_in',
 }
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyA93Av0xLkOB_nP9hyzhGYg78n9JEfS1bQ',
+  authDomain: 'common-staging-384806.firebaseapp.com',
+  projectId: 'common-staging-384806',
+  storageBucket: 'common-staging-384806.appspot.com',
+  messagingSenderId: '158803639844',
+  appId: '1:158803639844:web:b212938a52d995c6d862b1',
+  measurementId: 'G-4PNZZQDNFE',
+  vapidKey:
+    'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30',
+};
 
 export interface IApp {
   socket: WebSocketController;
@@ -103,12 +121,19 @@ export interface IApp {
     chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
   };
 
+  firebase(): any;
+
+  isFirebaseInitialized(): boolean;
+
   loginStatusLoaded(): boolean;
 
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
+
   isNative(win): boolean;
+
+  platform(): string;
 
   serverUrl(): string;
 
@@ -189,12 +214,23 @@ const app: IApp = {
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
   },
+  firebase: () => {
+    if (app.isFirebaseInitialized) {
+      initializeApp(firebaseConfig);
+      app.isFirebaseInitialized;
+    }
+  },
+  isFirebaseInitialized: () => false,
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
   isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
+  },
+  platform: () => {
+    // Update this to use to Desktop API later to determine platform = desktop
+    return Capacitor.getPlatform();
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
@@ -279,14 +315,34 @@ export async function initAppState(
           ? LoginState.LoggedIn
           : LoginState.LoggedOut;
 
+        let tokenRefreshListener = null;
         if (app.loginState === LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
+
+          app.firebase();
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh(); // TODO: redraw if needed
           if (shouldRedraw) {
             app.loginStateEmitter.emit('redraw');
           }
+
+          tokenRefreshListener = FirebaseMessaging.addListener(
+            'tokenReceived',
+            (token) => {
+              const mechanism = app.user.notifications.deliveryMechanisms.find(
+                (m) => m.type === app.platform()
+              );
+              // If matching mechanism found, update it on the server
+              if (mechanism) {
+                app.user.notifications.updateDeliveryMechanism(
+                  token.token,
+                  mechanism.type,
+                  mechanism.enabled
+                );
+              }
+            }
+          );
         } else if (
           app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
@@ -295,6 +351,11 @@ export async function initAppState(
           app.socket.disconnect();
           if (shouldRedraw) {
             app.loginStateEmitter.emit('redraw');
+          }
+
+          if (tokenRefreshListener) {
+            tokenRefreshListener.remove();
+            tokenRefreshListener = null;
           }
         }
 

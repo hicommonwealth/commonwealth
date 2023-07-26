@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
 import NotificationSubscription from '../../../models/NotificationSubscription';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
@@ -24,6 +25,11 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
+import { DeliveryMechanismType } from '../../../../../shared/types';
+import {
+  FirebaseMessaging,
+  GetTokenOptions,
+} from '@capacitor-firebase/messaging';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -39,6 +45,7 @@ const NotificationSettingsPage = () => {
   const [email, setEmail] = useState('');
   const [emailValidated, setEmailValidated] = useState(false);
   const [sentEmail, setSentEmail] = useState(false);
+  const [token, setToken] = useState('');
 
   const [currentFrequency, setCurrentFrequency] = useState(
     app.user.emailInterval
@@ -47,6 +54,76 @@ const NotificationSettingsPage = () => {
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [app?.user.notifications, app.user.emailInterval]);
+
+  // Handler for the 'Request Permission' button
+  const requestPermission = async () => {
+    const permission = await FirebaseMessaging.requestPermissions();
+    return permission;
+  };
+
+  // Handler for the 'Get Token' button
+  const getToken = async () => {
+    const vapidKey =
+      'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
+
+    let _token;
+    await FirebaseMessaging.getToken({ vapidKey: vapidKey })
+      .then((currentToken) => {
+        if (currentToken) {
+          console.log('Current token:', currentToken);
+          setToken(currentToken.token);
+          _token = currentToken.token;
+        } else {
+          console.log(
+            'No registration token available. Request permission to generate one.'
+          );
+        }
+      })
+      .catch((err) => {
+        console.log('An error occurred while retrieving token. ', err);
+      });
+    return _token;
+  };
+
+  const handleToggleDeliveryMechanism = async (mechanismType, isEnabled) => {
+    const mechanism = app.user.notifications.deliveryMechanisms.find(
+      (m) => m.type === mechanismType
+    );
+
+    const platform = app.platform();
+
+    const isOnRightPlatform =
+      (mechanismType === DeliveryMechanismType.Ios && platform === 'ios') ||
+      (mechanismType === DeliveryMechanismType.Android &&
+        platform === 'android') ||
+      (mechanismType === DeliveryMechanismType.Browser && platform === 'web') ||
+      (mechanismType === DeliveryMechanismType.Desktop && platform === 'web');
+
+    if (
+      isOnRightPlatform &&
+      (await requestPermission()).receive === 'granted'
+    ) {
+      if (!mechanism && isEnabled) {
+        const _token = await getToken();
+        await app.user.notifications.addDeliveryMechanism(
+          _token,
+          mechanismType,
+          true
+        );
+      } else if (mechanism && isEnabled) {
+        const _token = await getToken();
+        await app.user.notifications.updateDeliveryMechanism(
+          _token,
+          mechanismType,
+          true
+        );
+      } else if (mechanism && !isEnabled) {
+        // If the user wants to disable the delivery mechanism and it exists, we disable it
+        await app.user.notifications.disableMechanism(mechanismType);
+      }
+      forceRerender();
+    }
+  };
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
@@ -104,6 +181,8 @@ const NotificationSettingsPage = () => {
   const relevantSubscribedChains = app?.user.addresses
     .map((x) => x.chain)
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
+
+  const deliveryMechanismTypes = Object.values(DeliveryMechanismType);
 
   return (
     <div className="NotificationSettingsPage">
@@ -216,6 +295,93 @@ const NotificationSettingsPage = () => {
           </CWCard>
         </div>
       )}
+      <CWText className="page-subheader-text">
+        Configure which platforms you want to receive notifications to. After
+        you configure them you can directly manage which subscriptions go to
+        which platforms.
+      </CWText>
+      <div className="column-header-row">
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="column-header-text"
+        >
+          Platform
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Toggle
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Device Allowed
+        </CWText>
+      </div>
+      {deliveryMechanismTypes.map((mechanismType) => {
+        const mechanism = app?.user.notifications.deliveryMechanisms.find(
+          (m) => m.type === mechanismType
+        );
+        const platform = app.platform();
+        const isOnPlatform =
+          (mechanismType === DeliveryMechanismType.Ios && platform === 'ios') ||
+          (mechanismType === DeliveryMechanismType.Android &&
+            platform === 'android') ||
+          (mechanismType === DeliveryMechanismType.Browser &&
+            platform === 'web') ||
+          (mechanismType === DeliveryMechanismType.Desktop &&
+            platform === 'web');
+
+        return (
+          <div
+            key={mechanismType}
+            className="notification-row chain-events-subscriptions-padding"
+          >
+            <div className="notification-row-header">
+              <div className="left-content-container">
+                <div className="avatar-and-name">
+                  <CWIcon name={mechanismType} iconName={'home'} />
+                  <CWText type="h5" fontWeight="medium">
+                    {mechanismType.charAt(0).toUpperCase() +
+                      mechanismType.slice(1)}
+                  </CWText>
+                </div>
+              </div>
+              <CWToggle
+                checked={mechanism?.enabled || false}
+                disabled={!isOnPlatform}
+                onChange={() => {
+                  if (isOnPlatform) {
+                    const newEnabledState = mechanism
+                      ? !mechanism.enabled
+                      : true;
+                    handleToggleDeliveryMechanism(
+                      mechanismType,
+                      newEnabledState
+                    );
+                  }
+                }}
+              />
+              {!isOnPlatform && (
+                <div className="platform-warning">
+                  <CWText
+                    isCentered={true}
+                    type="caption"
+                    className="platform-warning-text"
+                  >
+                    Should be on device toggle delivery on.
+                  </CWText>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
       <CWText
         type="h4"
         fontWeight="semiBold"

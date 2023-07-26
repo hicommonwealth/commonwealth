@@ -2,12 +2,15 @@
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import NotificationSubscription, { modelFromServer } from 'models/NotificationSubscription';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
+import Notification from 'models/Notification';
+import DeliveryMechanism from 'models/DeliveryMechanism';
 
 import app from 'state';
 
 import { NotificationStore } from 'stores';
-import Notification from '../../models/Notification';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -50,6 +53,8 @@ class NotificationsController {
   private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
   private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
 
+  private _deliveryMechanisms: DeliveryMechanism[] = [];
+
   private _numPages = 0;
   private _numUnread = 0;
 
@@ -85,6 +90,14 @@ class NotificationsController {
   private _subscriptions: NotificationSubscription[] = [];
   public get subscriptions() {
     return this._subscriptions;
+  }
+
+  public get deliveryMechanisms() {
+    return this._deliveryMechanisms;
+  }
+
+  public set deliveryMechanisms(mechanisms: DeliveryMechanism[]) {
+    this._deliveryMechanisms = mechanisms;
   }
 
   public subscribe(category: string, objectId: string) {
@@ -392,12 +405,87 @@ class NotificationsController {
     });
   }
 
+  public getDeliveryMechanisms() {
+    return get('/viewDeliveryMechanisms', {}, (result) => {
+      this._deliveryMechanisms = result.map((mech) =>
+        DeliveryMechanism.modelFromServer(mech)
+      );
+    });
+  }
+
+  public addDeliveryMechanism(
+    identifier: string,
+    type: string,
+    enabled: boolean
+  ) {
+    return post(
+      '/addDeliveryMechanism',
+      {
+        identifier,
+        type,
+        enabled,
+      },
+      (result) => {
+        this._deliveryMechanisms.push(
+          DeliveryMechanism.modelFromServer(result)
+        );
+      }
+    );
+  }
+
+  public updateDeliveryMechanism(
+    identifier: string,
+    type: string,
+    enabled: boolean
+  ) {
+    return post(
+      '/updateDeliveryMechanism',
+      {
+        identifier,
+        type,
+        enabled,
+      },
+      (result) => {
+        const updatedMechanism = DeliveryMechanism.modelFromServer(result);
+        const index = this._deliveryMechanisms.findIndex(
+          (m) => m.id === updatedMechanism.id
+        );
+
+        // if the mechanism was found in the array, replace it
+        if (index !== -1) {
+          this._deliveryMechanisms[index] = updatedMechanism;
+        }
+      }
+    );
+  }
+
+  public disableMechanism(type: string) {
+    return post(
+      '/disableDeliveryMechanism',
+      {
+        type,
+      },
+      (result) => {
+        const updatedMechanism = DeliveryMechanism.modelFromServer(result);
+        const index = this._deliveryMechanisms.findIndex(
+          (m) => m.id === updatedMechanism.id
+        );
+
+        // if the mechanism was found in the array, replace it
+        if (index !== -1) {
+          this._deliveryMechanisms[index] = updatedMechanism;
+        }
+      }
+    );
+  }
+
   public async refresh() {
     await Promise.all([
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
       this.getSubscriptions(),
       this.getSubscribedChains(),
+      this.getDeliveryMechanisms(),
     ]);
     this.isLoaded.emit('redraw');
     return Promise.resolve();

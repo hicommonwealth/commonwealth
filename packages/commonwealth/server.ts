@@ -127,8 +127,6 @@ async function main() {
 
       // if host is native mobile app, don't redirect
       if (origin?.includes('capacitor://')) {
-        console.log('Request from Capacitor. Applying special sessionParser.');
-
         res.header('Access-Control-Allow-Origin', origin);
         // Set other necessary CORS headers if needed
         res.header(
@@ -163,9 +161,6 @@ async function main() {
         );
         res.redirect(301, `https://commonwealth.im${req.url}`);
       } else {
-        console.log(
-          'Not from Capacitor or commonwealthapp.herokuapp.com. Using default sessionParser.'
-        );
         const defaultSessionParser = session({
           secret: SESSION_SECRET,
           store: sessionStore,
@@ -228,6 +223,12 @@ async function main() {
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
+    app.use(express.static(__dirname));
+
+    app.get('/firebase-messaging-sw.js', function (req, res) {
+      res.setHeader('Content-Type', 'application/javascript');
+      res.sendFile(__dirname + '/firebase-messaging-sw.js');
+    });
 
     // add other middlewares
     app.use(logger('dev'));
