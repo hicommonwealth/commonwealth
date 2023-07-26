@@ -2,6 +2,7 @@ import { modelFromServer as modelCommentFromServer } from 'controllers/server/co
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
+import DeliveryMechanism from './DeliveryMechanism';
 import app from '../state';
 import type ChainInfo from './ChainInfo';
 import type { Comment as CommentT } from './Comment';
@@ -15,6 +16,8 @@ class NotificationSubscription {
   public readonly Chain: ChainInfo;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
+  public readonly deliveryInterval?: string;
+  public readonly SubscriptionDelivery: DeliveryMechanism[];
 
   public readonly id?: number;
   public readonly chainEntityId?: any;
@@ -57,6 +60,8 @@ class NotificationSubscription {
     isActive,
     createdAt,
     immediateEmail,
+    deliveryInterval,
+    SubscriptionDelivery?: DeliveryMechanism[],
     Chain?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT
@@ -67,6 +72,8 @@ class NotificationSubscription {
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
+    this.deliveryInterval = deliveryInterval;
+    this.SubscriptionDelivery = SubscriptionDelivery || [];
     this.Chain = Chain;
     this.Comment = comment;
     this.Thread = thread;
@@ -80,6 +87,8 @@ class NotificationSubscription {
       json.is_active,
       json.created_at,
       json.immediate_email,
+      json.delivery_interval,
+      json.SubscriptionDelivery || [],
       json.chain_id,
       json.Comment || json.offchain_comment_id,
       json.Thread || json.offchain_thread_id
@@ -95,6 +104,8 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     is_active,
     created_at,
     immediate_email,
+    delivery_interval,
+    SubscriptionDelivery,
     Chain,
     Comment,
     Thread,
@@ -120,6 +131,11 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     }
   }
 
+  const modeledSubscriptionDeliveries: DeliveryMechanism[] =
+    SubscriptionDelivery.map((subDelivery) =>
+      DeliveryMechanism.modelFromServer(subDelivery.DeliveryMechanism)
+    );
+
   return new NotificationSubscription(
     id,
     category_id,
@@ -127,6 +143,8 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     is_active,
     created_at,
     immediate_email,
+    delivery_interval,
+    modeledSubscriptionDeliveries,
     Chain,
     modeledComment,
     modeledThread
