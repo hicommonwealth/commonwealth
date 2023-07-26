@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "discord.js": "^14.11.0",
     "sequelize": "^6.32.1",
     "ts-node": "^10.9.1",
