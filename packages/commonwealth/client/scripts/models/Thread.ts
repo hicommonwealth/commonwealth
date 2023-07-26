@@ -81,6 +81,7 @@ export class Thread implements IUniqueId {
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
+  public readonly discord_meta: any;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -121,6 +122,7 @@ export class Thread implements IUniqueId {
     canvasSession,
     canvasHash,
     links,
+    discord_meta,
   }: {
     author: string;
     title: string;
@@ -156,6 +158,7 @@ export class Thread implements IUniqueId {
     canvasSession?: string;
     canvasHash?: string;
     links?: Link[];
+    discord_meta?: any;
   }) {
     this.author = author;
     this.title = title;
@@ -209,6 +212,7 @@ export class Thread implements IUniqueId {
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
     this.links = links || [];
+    this.discord_meta = discord_meta;
   }
 }
 

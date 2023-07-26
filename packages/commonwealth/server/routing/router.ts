@@ -88,7 +88,7 @@ import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
 import createTopic from '../routes/createTopic';
-import updateTopic from '../routes/updateTopic';
+import updateTopic from '../routes/topics/updateTopic';
 import orderTopics from '../routes/orderTopics';
 import editTopic from '../routes/editTopic';
 import deleteTopic from '../routes/deleteTopic';
@@ -998,7 +998,7 @@ registerRoute(
 
   registerRoute(
     router,
-    'post',
+    'get',
     '/viewDeliveryMechanisms',
     passport.authenticate('jwt', { session: false }),
     viewDeliveryMechanisms.bind(this, models)
