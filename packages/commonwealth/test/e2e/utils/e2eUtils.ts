@@ -56,7 +56,7 @@ export async function addAlchemyKey() {
   }
 
   // If ethChainNode already has the apiKey, early return
-  if (ethChainNodeExists[0][0].url.includes(apiKey)) {
+  if (ethChainNodeExists[0][0]['url'].includes(apiKey)) {
     return;
   }
 
