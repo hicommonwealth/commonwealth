@@ -142,3 +142,5 @@ export const ETH_RPC = process.env.ETH_RPC || 'prod';
 export const COSMOS_GOV_V1 = process.env.COSMOS_GOV_V1;
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
+// Don't set default value so if env var is not set the database cleaner will not run
+export const DATABASE_CLEAN_HOUR = process.env.DATABASE_CLEAN_HOUR;

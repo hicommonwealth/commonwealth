@@ -157,13 +157,21 @@ export enum DefaultPage {
 
 export interface IDiscordMessage {
   user: {
-    id: string,
-    username: string
-  },
-  title?: string,
-  content: string,
-  message_id: string,
-  channel_id: string,
-  parent_channel_id: string,
-  guild_id: string
+    id: string;
+    username: string;
+  };
+  title?: string;
+  content: string;
+  message_id: string;
+  channel_id: string;
+  parent_channel_id: string;
+  guild_id: string;
 }
+export type HttpMethod =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head';
