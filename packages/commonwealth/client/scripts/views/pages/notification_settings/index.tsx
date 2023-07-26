@@ -87,11 +87,13 @@ const NotificationSettingsPage = () => {
     const vapidKey =
       'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
 
+    let _token;
     await FirebaseMessaging.getToken({ vapidKey: vapidKey })
       .then((currentToken) => {
         if (currentToken) {
           console.log('Current token:', currentToken);
           setToken(currentToken.token);
+          _token = currentToken.token;
         } else {
           console.log(
             'No registration token available. Request permission to generate one.'
@@ -101,6 +103,7 @@ const NotificationSettingsPage = () => {
       .catch((err) => {
         console.log('An error occurred while retrieving token. ', err);
       });
+    return _token;
   };
 
   const handleToggleDeliveryMechanism = async (mechanismType, isEnabled) => {
@@ -121,18 +124,16 @@ const NotificationSettingsPage = () => {
       isOnRightPlatform &&
       (await requestPermission()).receive === 'granted'
     ) {
-      await getToken(); // simplify by assigning token directly
       if (isEnabled) {
-        // If the user wants to enable the delivery mechanism
-        // Whether mechanism exists or not, we add/update it with the token
+        const _token = await getToken();
         await app.user.notifications.addDeliveryMechanism(
-          token,
+          _token,
           mechanismType,
           true
         );
       } else if (mechanism) {
         // If the user wants to disable the delivery mechanism and it exists, we disable it
-        await app.user.notifications.disableMechanism(mechanism.type);
+        await app.user.notifications.disableMechanism(mechanismType);
       }
       forceRerender();
     }
