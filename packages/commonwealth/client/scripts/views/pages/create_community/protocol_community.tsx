@@ -26,6 +26,11 @@ import WebWalletController from 'controllers/app/web_wallets';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { CWRadioButton } from '../../components/component_kit/cw_radio_button';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+
 const abi = [
   {
     inputs: [
@@ -76,10 +81,48 @@ const abi = [
     type: 'function',
   },
 ];
+
+const membershipOptions = [
+  {
+    label: 'Anyone with an address',
+    value: 'all',
+  },
+  {
+    label: 'Holders of NFT',
+    value: 'nft',
+  },
+  {
+    label: 'Holders of ERC20',
+    value: 'erc20',
+  },
+  {
+    label: 'Custom Gate',
+    value: 'custom',
+  },
+];
+
+const seedOptions = [
+  {
+    label: 'Send From wallet',
+    value: 'wallet',
+  },
+  {
+    label: 'Send from multi-sig',
+    value: 'multi',
+  },
+  {
+    label: 'Create transfer proposal',
+    value: 'proposal',
+  },
+];
 export const ProtocolCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
   const [loading, setLoading] = useState<boolean>(false);
   const [gate, setGate] = useState<string>('');
+  const [gateType, setGateType] = useState<string>('all');
+  const [gateMeta, setGateMeta] = useState<any>({ token: '', amount: 0 });
+  const [selectedRadio, setSelectedRadio] = useState<string>('wallet');
+  const [checked, setChecked] = useState<boolean>(true);
 
   const { id, setId, name, setName, symbol, setSymbol } =
     useChainFormIdFields();
@@ -90,6 +133,143 @@ export const ProtocolCommunityForm = () => {
 
   const navigate = useCommonNavigate();
 
+  const onGateChange = (v) => {
+    setGateType(v.value);
+    switch (v) {
+      case 'nft':
+        setGate('0xNFT');
+      case 'erc20':
+        setGate('0xerc20');
+    }
+  };
+
+  const getGateForm = (type) => {
+    switch (type) {
+      case 'nft':
+        return (
+          <>
+            <InputRow
+              title="NFT Token Address"
+              value={gateMeta.token}
+              onChangeHandler={(v) => {
+                setGateMeta({
+                  token: v,
+                  amount: gateMeta.amount,
+                });
+              }}
+            />
+            <InputRow
+              title="NFT Id(optional)"
+              value={gateMeta.token}
+              onChangeHandler={(v) => {
+                setGateMeta({
+                  token: gateMeta.token,
+                  amount: v,
+                });
+              }}
+            />
+          </>
+        );
+      case 'custom':
+        return (
+          <InputRow
+            title="Custom Gate Address"
+            value={gate}
+            onChangeHandler={(v) => {
+              setGate(v);
+            }}
+          />
+        );
+      case 'erc20':
+        return (
+          <>
+            <InputRow
+              title="ERC20 Token Address"
+              value={gateMeta.token}
+              onChangeHandler={(v) => {
+                setGateMeta({
+                  token: v,
+                  amount: gateMeta.amount,
+                });
+              }}
+            />
+            <InputRow
+              title="Amount(optional)"
+              value={gateMeta.token}
+              onChangeHandler={(v) => {
+                setGateMeta({
+                  token: gateMeta.token,
+                  amount: v,
+                });
+              }}
+            />
+          </>
+        );
+    }
+  };
+
+  const seedWalletForm = () => {
+    const radioGroup = seedOptions.map((option) => (
+      <CWRadioButton
+        key={option.value}
+        checked={option.value === selectedRadio}
+        onChange={() => setSelectedRadio(option.value)}
+        label={option.label}
+        value={option.value}
+      />
+    ));
+    return (
+      <>
+        {radioGroup}
+        {selectedRadio === 'wallet' && (
+          <InputRow
+            title="Amount of ETH"
+            onChangeHandler={function (e: any): void {
+              throw new Error('Function not implemented.');
+            }}
+            value={''}
+          />
+        )}
+        {selectedRadio === 'multi' && (
+          <>
+            <InputRow
+              title="Multi-sig Wallet Address"
+              onChangeHandler={function (e: any): void {
+                throw new Error('Function not implemented.');
+              }}
+              value={''}
+            />
+            <InputRow
+              title="Amount of ETH"
+              onChangeHandler={function (e: any): void {
+                throw new Error('Function not implemented.');
+              }}
+              value={''}
+            />
+          </>
+        )}
+        {selectedRadio === 'proposal' && (
+          <>
+            <InputRow
+              title="Governance Contract"
+              onChangeHandler={function (e: any): void {
+                throw new Error('Function not implemented.');
+              }}
+              value={''}
+            />
+            <InputRow
+              title="Amount of ETH"
+              onChangeHandler={function (e: any): void {
+                throw new Error('Function not implemented.');
+              }}
+              value={''}
+            />
+          </>
+        )}
+      </>
+    );
+  };
+
   return loading ? (
     <div className="spinner-group">
       <CWSpinner />
@@ -97,6 +277,13 @@ export const ProtocolCommunityForm = () => {
     </div>
   ) : (
     <div className="CreateCommunityForm">
+      <CWText type="h2" fontWeight="bold">
+        1. General Info
+      </CWText>
+      <CWDivider />
+      <CWText type="caption">
+        Set a name, description, socials and upload an image
+      </CWText>
       <InputRow
         title="Name"
         placeholder="Enter the name of your community"
@@ -114,6 +301,14 @@ export const ProtocolCommunityForm = () => {
           setSymbol(v);
         }}
       />
+      {defaultChainRows(chainFormDefaultFields)}
+      <CWText type="h2" fontWeight="bold">
+        2. Base Membership
+      </CWText>
+      <CWDivider />
+      <CWText type="caption">
+        Gate access using NFT ownership, ERC20 holders, or anyone on-chain
+      </CWText>
       <CWDropdown
         label="Base Chain"
         options={[{ label: 'ethereum', value: 'ethereum' }]}
@@ -121,14 +316,28 @@ export const ProtocolCommunityForm = () => {
           setBase(o.value as ChainBase);
         }}
       />
-      <InputRow
-        title="Gate Address(Optional)"
-        value={gate}
-        onChangeHandler={(v) => {
-          setGate(v);
+      <CWDropdown
+        label="Membership Access Options"
+        options={membershipOptions}
+        onSelect={(v) => onGateChange(v)}
+        initialValue={membershipOptions[0]}
+      />
+      {gateType !== 'all' && getGateForm(gateType)}
+      <CWText type="h2" fontWeight="bold">
+        3. Seed Your Community Wallet
+      </CWText>
+      <CWDivider />
+      <CWText type="caption">
+        Choose to link an existing Gnosis Safe/Multi-Sig, create a funding
+        proposal, or send from your wallet.
+      </CWText>
+      <CWToggle
+        checked={checked}
+        onChange={() => {
+          setChecked(!checked);
         }}
       />
-      {defaultChainRows(chainFormDefaultFields)}
+      {checked && seedWalletForm()}
       <CWButton
         label="Save changes"
         disabled={saving || id.length < 1}
