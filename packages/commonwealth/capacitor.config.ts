@@ -35,7 +35,7 @@ switch (process.env.NODE_ENV) {
       ...baseConfig,
       server: {
         url: process.env.SERVICE_URL,
-        hostname: '192.168.1.183:8080', // If SERVER = localhost:8080/api, hostname = localhost:8080
+        hostname: 'alpha.common.xyz', // If server.url = localhost:8080/api, hostname would be = localhost:8080
         cleartext: true,
         allowNavigation: ['*'],
       },

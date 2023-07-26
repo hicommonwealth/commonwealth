@@ -127,8 +127,6 @@ async function main() {
 
       // if host is native mobile app, don't redirect
       if (origin?.includes('capacitor://')) {
-        console.log('Request from Capacitor. Applying special sessionParser.');
-
         res.header('Access-Control-Allow-Origin', origin);
         // Set other necessary CORS headers if needed
         res.header(
@@ -163,18 +161,11 @@ async function main() {
         );
         res.redirect(301, `https://commonwealth.im${req.url}`);
       } else {
-        console.log(
-          'Not from Capacitor or commonwealthapp.herokuapp.com. Using default sessionParser.'
-        );
         const defaultSessionParser = session({
           secret: SESSION_SECRET,
           store: sessionStore,
           resave: false,
           saveUninitialized: false,
-          cookie: {
-            secure: process.env.NODE_ENV === 'production' ? true : false,
-            httpOnly: true,
-          },
         });
         defaultSessionParser(req, res, next);
       }

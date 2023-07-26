@@ -16,7 +16,6 @@ const useInitApp = () => {
       console.log(
         'On native device, skipping custom domain and initializing app state.'
       );
-      console.log('Init app here');
       initAppState(true).then(() => {
         setLoading(false);
       });
