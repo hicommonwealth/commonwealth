@@ -88,7 +88,8 @@ import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
 import createTopic from '../routes/createTopic';
-import updateTopic from '../routes/updateTopic';
+import updateThreadTopic from '../routes/updateThreadTopic';
+import updateTopic from '../routes/topics/updateTopic';
 import orderTopics from '../routes/orderTopics';
 import editTopic from '../routes/editTopic';
 import deleteTopic from '../routes/deleteTopic';
@@ -418,6 +419,17 @@ function setupRouter(
     databaseValidationService.validateChainWithTopics,
     createThreadHandler.bind(this, serverControllers)
   );
+
+  registerRoute(
+    router,
+    'post',
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    createThreadHandler.bind(this, serverControllers)
+  );
+
   registerRoute(
     router,
     'patch',
@@ -674,6 +686,17 @@ function setupRouter(
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
   );
+
+  registerRoute(
+    router,
+    'post',
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createThreadCommentHandler.bind(this, serverControllers)
+  );
+
   registerRoute(
     router,
     'patch',
@@ -715,6 +738,14 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     createTopic.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/updateThreadTopic',
+    passport.authenticate('jwt', { session: false }),
+    updateThreadTopic.bind(this, models)
   );
   registerRoute(
     router,
