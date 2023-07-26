@@ -3,7 +3,7 @@ import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
 import type { TopicInstance } from 'server/models/topic';
 import type { DB } from '../models';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from '../util/validateOwner';
 
 enum OrderTopicsErrors {
   NoUser = 'Not logged in',
@@ -23,14 +23,21 @@ const OrderTopics = async (
 ) => {
   const chain = req.chain;
 
-  if (!req.user) return next(new AppError(OrderTopicsErrors.NoUser));
-  const isAdminOrMod: boolean = await validateRoles(
-    models,
-    req.user,
-    'moderator',
-    chain.id
-  );
-  if (!isAdminOrMod) return next(new AppError(OrderTopicsErrors.NoPermission));
+  if (!req.user) {
+    return next(new AppError(OrderTopicsErrors.NoUser));
+  }
+
+  const isAdminOrMod = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain.id,
+    allowMod: true,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdminOrMod) {
+    return next(new AppError(OrderTopicsErrors.NoPermission));
+  }
 
   const newTopicOrder: string[] = req.body.orderedIds;
 
