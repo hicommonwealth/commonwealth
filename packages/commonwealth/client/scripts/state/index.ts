@@ -26,7 +26,7 @@ import NotificationCategory from 'models/NotificationCategory';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
-import { CapacitorCookies } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -109,7 +109,10 @@ export interface IApp {
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
+
   isNative(win): boolean;
+
+  platform(): string;
 
   serverUrl(): string;
 
@@ -196,6 +199,10 @@ const app: IApp = {
   isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
+  },
+  platform: () => {
+    // Update this to use to Desktop API later to determine platform = desktop
+    return Capacitor.getPlatform();
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
