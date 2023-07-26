@@ -124,14 +124,21 @@ const NotificationSettingsPage = () => {
       isOnRightPlatform &&
       (await requestPermission()).receive === 'granted'
     ) {
-      if (isEnabled) {
+      if (!mechanism && isEnabled) {
         const _token = await getToken();
         await app.user.notifications.addDeliveryMechanism(
           _token,
           mechanismType,
           true
         );
-      } else if (mechanism) {
+      } else if (mechanism && isEnabled) {
+        const _token = await getToken();
+        await app.user.notifications.updateDeliveryMechanism(
+          _token,
+          mechanismType,
+          true
+        );
+      } else if (mechanism && !isEnabled) {
         // If the user wants to disable the delivery mechanism and it exists, we disable it
         await app.user.notifications.disableMechanism(mechanismType);
       }
@@ -320,7 +327,7 @@ const NotificationSettingsPage = () => {
           fontWeight="medium"
           className="column-header-text"
         >
-          Notifications Platform
+          Platform
         </CWText>
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
