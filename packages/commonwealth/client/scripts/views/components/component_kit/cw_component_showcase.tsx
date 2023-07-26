@@ -48,6 +48,9 @@ import {
   createDeltaFromText,
   ReactQuillEditor,
 } from 'views/components/react_quill_editor';
+import CWBanner, {
+  BannerType,
+} from 'views/components/component_kit/new_designs/CWBanner';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -89,6 +92,14 @@ const checkboxGroupOptions: Array<CheckboxType> = [
     label: 'Failed',
     value: 'failed',
   },
+];
+
+const bannerTypes: BannerType[] = [
+  'default',
+  'info',
+  'success',
+  'warning',
+  'error',
 ];
 
 const popoverMenuOptions = (): Array<PopoverMenuItem> => {
@@ -138,6 +149,11 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
   ];
 };
 
+const initialBannersState = bannerTypes.reduce(
+  (acc, el) => ({ ...acc, [el]: true }),
+  {}
+);
+
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
@@ -166,6 +182,9 @@ export const ComponentShowcase = () => {
     createDeltaFromText('')
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
+  const [isBannerVisible, setIsBannerVisible] = useState<{
+    [k: BannerType]: boolean;
+  }>(initialBannersState);
 
   return (
     <div className="ComponentShowcase">
@@ -1164,6 +1183,37 @@ export const ComponentShowcase = () => {
           setContentDelta={setThreadContentDelta}
           isDisabled={isEditorDisabled}
         />
+      </div>
+      <div className="banners">
+        <CWText type="h3">Banners</CWText>
+        <CWButton
+          buttonHeight="sm"
+          label="Restore all banners"
+          onClick={() => setIsBannerVisible(initialBannersState)}
+        />
+        <div className="container">
+          {bannerTypes.map((bannerType, i) => {
+            if (!isBannerVisible[bannerType]) {
+              return null;
+            }
+
+            return (
+              <CWBanner
+                key={i}
+                type={bannerType}
+                title="Default banner"
+                body="This is banner body with custom message"
+                buttons={[{ label: 'Primary' }, { label: 'Secondary' }]}
+                onClose={() => {
+                  setIsBannerVisible((prevState) => ({
+                    ...prevState,
+                    [bannerType]: false,
+                  }));
+                }}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

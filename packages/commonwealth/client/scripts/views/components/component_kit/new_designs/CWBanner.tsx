@@ -32,7 +32,7 @@ const typeIconLookup: {
   error: Warning,
 };
 
-type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
+export type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
 
 interface CWBannerProps {
   type?: BannerType;
