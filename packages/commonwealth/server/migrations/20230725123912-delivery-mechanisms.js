@@ -53,10 +53,22 @@ module.exports = {
           subscription_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
+            references: {
+              model: 'Subscriptions',
+              key: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
           },
           delivery_mechanism_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
+            references: {
+              model: 'DeliveryMechanisms',
+              key: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
           },
           created_at: Sequelize.DATE,
           updated_at: Sequelize.DATE,

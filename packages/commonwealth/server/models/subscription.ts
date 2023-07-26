@@ -134,9 +134,9 @@ export default (
       foreignKey: 'offchain_comment_id',
       targetKey: 'id',
     });
-    models.Subscription.belongsToMany(models.DeliveryMechanism, {
-      through: 'SubscriptionDelivery',
+    models.Subscription.hasMany(models.SubscriptionDelivery, {
       foreignKey: 'subscription_id',
+      as: 'SubscriptionDelivery',
     });
   };
 
