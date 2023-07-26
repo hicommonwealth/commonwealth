@@ -791,7 +791,7 @@ function setupRouter(
   );
 
   router.get(
-    '/viewDeliveryMechanism',
+    '/viewDeliveryMechanisms',
     passport.authenticate('jwt', { session: false }),
     viewDeliveryMechanisms.bind(this, models)
   );
