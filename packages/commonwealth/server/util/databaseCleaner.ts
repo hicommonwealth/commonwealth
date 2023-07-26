@@ -36,7 +36,7 @@ export default class DatabaseCleaner {
    * @param rollbar A rollbar instance to report errors
    * @param oneRunMax If set to true the database clean will only occur once and will not be re-scheduled
    */
-  public async initLoop(
+  public initLoop(
     models: DB,
     hourToRun: number,
     redisCache: RedisCache,
