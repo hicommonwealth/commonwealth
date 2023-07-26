@@ -112,6 +112,7 @@ export const CosmosForm = () => {
               );
             }
 
+            await initAppState(false);
             await updateAdminRole(id);
 
             navigate(`/${res.result.chain?.id}`);

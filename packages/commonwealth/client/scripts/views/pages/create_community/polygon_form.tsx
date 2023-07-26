@@ -159,16 +159,6 @@ export const PolygonForm = (props: EthChainFormState) => {
     chainFormState.setLoading(false);
   };
 
-  console.log(
-    chainFormState.saving ||
-      (!validAddress && !!ethChainFormFields.address) ||
-      chainFormState.loading
-  );
-  console.log(
-    chainFormState.saving,
-    !validAddress && !!ethChainFormFields.address,
-    chainFormState.loading
-  );
   return (
     <div className="CreateCommunityForm">
       {ethChainRows(
@@ -248,6 +238,7 @@ export const PolygonForm = (props: EthChainFormState) => {
               );
             }
 
+            await initAppState(false);
             await updateAdminRole(id);
 
             navigate(`/${res.result.chain?.id}`);
