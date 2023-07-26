@@ -168,7 +168,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     featuredFilter,
     dateRange,
     sortPinned,
-    sortByFeaturedFilter
+    sortByFeaturedFilter,
   ]);
 
   const loadMore = useCallback(async () => {

@@ -24,6 +24,7 @@ export type CommentAttributes = {
   updated_at?: Date;
   deleted_at?: Date;
   marked_as_spam_at?: Date;
+  discord_meta?: any;
 
   // associations
   Chain?: ChainAttributes;
@@ -71,6 +72,7 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
+      discord_meta: { type: dataTypes.JSONB, allowNull: true},
     },
     {
       timestamps: true,
