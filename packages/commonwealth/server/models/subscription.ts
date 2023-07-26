@@ -28,7 +28,6 @@ export type SubscriptionAttributes = {
   id?: number;
   is_active?: boolean;
   immediate_email?: boolean;
-  delivery_interval?: string; // added attribute
   created_at?: Date;
   updated_at?: Date;
   chain_id?: string;
@@ -86,7 +85,6 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      delivery_interval: { type: dataTypes.STRING, allowNull: true },
       // TODO: change allowNull to false once subscription refactor is implemented
       chain_id: { type: dataTypes.STRING, allowNull: true },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },

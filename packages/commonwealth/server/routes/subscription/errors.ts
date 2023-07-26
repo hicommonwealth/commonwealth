@@ -15,6 +15,9 @@ const Errors = {
   InvalidChain: 'Invalid chain',
   InvalidChainEventId: 'Invalid ChainEvent id',
   NoMentionDelete: 'Cannot delete mention subscription',
+  NoSubscriptionIdOrDeliveryMechanismType:
+    'Must provide subscription id(s) and delivery mechanism type',
+  NoDeliveryMechanismFound: 'No delivery mechanism found',
 };
 
 export default Errors;

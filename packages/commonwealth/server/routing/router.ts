@@ -50,6 +50,12 @@ import disableImmediateEmails from '../routes/subscription/disableImmediateEmail
 import viewNotifications, {
   NotificationCategories,
 } from '../routes/viewNotifications';
+import addDeliveryMechanism from '../routes/subscription/addDeliveryMechanism';
+import disableDeliveryMechanism from '../routes/subscription/disableDeliveryMechanism';
+import updateDeliveryMechanism from '../routes/subscription/updateDeliveryMechanism';
+import viewDeliveryMechanisms from '../routes/subscription/viewDeliveryMechanisms';
+import enableSubscriptionDeliveryMechanism from '../routes/subscription/enableSubscriptionDeliveryMechanism';
+import disableSubscriptionDeliveryMechanism from '../routes/subscription/disableSubscriptionDeliveryMechanism';
 import viewUserActivity from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
@@ -137,10 +143,6 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import createChainNode from '../routes/createChainNode';
-import addDeliveryMechanism from '../routes/subscription/addDeliveryMechanism';
-import disableDeliveryMechanism from '../routes/subscription/disableDeliveryMechanism';
-import updateDeliveryMechanism from '../routes/subscription/updateDeliveryMechanism';
-import viewDeliveryMechanisms from '../routes/subscription/viewDeliveryMechanisms';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -794,6 +796,18 @@ function setupRouter(
     '/viewDeliveryMechanisms',
     passport.authenticate('jwt', { session: false }),
     viewDeliveryMechanisms.bind(this, models)
+  );
+
+  router.post(
+    '/enableSubscriptionDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    enableSubscriptionDeliveryMechanism.bind(this, models)
+  );
+
+  router.post(
+    '/disableSubscriptionDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    disableSubscriptionDeliveryMechanism.bind(this, models)
   );
 
   router.post(

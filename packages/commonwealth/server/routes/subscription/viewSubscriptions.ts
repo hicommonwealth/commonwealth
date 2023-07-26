@@ -41,6 +41,13 @@ export default async (
     {
       model: models.SubscriptionDelivery,
       as: 'SubscriptionDelivery',
+      include: [
+        // Add this include array
+        {
+          model: models.DeliveryMechanism,
+          as: 'DeliveryMechanism',
+        },
+      ],
     },
   ];
 

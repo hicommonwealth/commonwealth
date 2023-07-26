@@ -3,17 +3,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      // Adding interval to Subscriptions
-      await queryInterface.addColumn(
-        'Subscriptions',
-        'delivery_interval',
-        {
-          type: Sequelize.STRING,
-          allowNull: true,
-        },
-        { transaction: t }
-      );
-
       // Creating DeliveryMechanism table
       await queryInterface.createTable(
         'DeliveryMechanisms',

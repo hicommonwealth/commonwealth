@@ -192,6 +192,42 @@ class NotificationsController {
     );
   }
 
+  public enableSubscriptionDeliveryMechanism(
+    deliveryMechType: string,
+    subscriptions: NotificationSubscription[]
+  ) {
+    return post(
+      '/enableSubscriptionDeliveryMechanism',
+      {
+        delivery_mechanism_type: deliveryMechType,
+        'subscription_ids[]': subscriptions.map((n) => n.id),
+      },
+      () => {
+        for (const s of subscriptions) {
+          s.enableDeliveryOption(deliveryMechType);
+        }
+      }
+    );
+  }
+
+  public disableSubscriptionDeliveryMechanism(
+    deliveryMechType: string,
+    subscriptions: NotificationSubscription[]
+  ) {
+    return post(
+      '/disableSubscriptionDeliveryMechanism',
+      {
+        delivery_mechanism_type: deliveryMechType,
+        'subscription_ids[]': subscriptions.map((n) => n.id),
+      },
+      () => {
+        for (const s of subscriptions) {
+          s.disableDeliveryOption(deliveryMechType);
+        }
+      }
+    );
+  }
+
   public deleteSubscription(subscription: NotificationSubscription) {
     // TODO: Change to DELETE /subscription
     return post(
