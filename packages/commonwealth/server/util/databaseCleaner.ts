@@ -20,9 +20,9 @@ export default class DatabaseCleaner {
   private _completed = false;
   private _oneRunMax = false;
   private _timeoutID;
-  private lockName = 'cw_database_cleaner_locker';
+  private _lockName = 'cw_database_cleaner_locker';
   // lock times out in 2 hours
-  private lockTimeoutSeconds = 7200;
+  private _lockTimeoutSeconds = 7200;
 
   public init(models: DB, rollbar?: Rollbar) {
     this._models = models;
@@ -301,9 +301,9 @@ export default class DatabaseCleaner {
     // the lock will automatically time out so there is no need to unlock it
     return await this._redisCache.setKey(
       RedisNamespaces.Database_Cleaner,
-      this.lockName,
+      this._lockName,
       uuidv4(),
-      this.lockTimeoutSeconds,
+      this._lockTimeoutSeconds,
       true
     );
   }
