@@ -96,6 +96,10 @@ const CommonDomainRoutes = () => [
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
   <Route
+    path="/createCommunity/:type"
+    element={withLayout(CreateCommunityPage, { type: 'common' })}
+  />,
+  <Route
     path="/whyCommonwealth"
     element={withLayout(WhyCommonwealthPage, {
       type: 'common',
