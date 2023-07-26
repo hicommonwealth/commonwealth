@@ -96,13 +96,19 @@ const getTypeUrl = (type: CommunityType): string => {
 
 const CreateCommunity = (props: CreateCommunityProps) => {
   const { type } = props;
+  const navigate = useCommonNavigate();
+
+  useEffect(() => {
+    if (!type) {
+      navigate('/createCommunity/starter');
+    }
+  }, [type]);
 
   const [currentForm, setCurrentForm] = useState<CommunityType>(
     getFormType(type)
   );
   const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
     useEthChainFormState();
-  const navigate = useCommonNavigate();
 
   useBrowserAnalyticsTrack({
     payload: {
