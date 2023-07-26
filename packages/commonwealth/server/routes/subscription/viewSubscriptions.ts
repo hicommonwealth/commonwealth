@@ -38,6 +38,10 @@ export default async (
       required: false,
       where: { active: true },
     },
+    {
+      model: models.SubscriptionDelivery,
+      as: 'SubscriptionDelivery',
+    },
   ];
 
   const searchParams: any[] = [{ subscriber_id: req.user.id }];
