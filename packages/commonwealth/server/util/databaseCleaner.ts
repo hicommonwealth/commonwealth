@@ -5,7 +5,6 @@ import Rollbar from 'rollbar';
 import { RedisCache } from 'common-common/src/redisCache';
 import { v4 as uuidv4 } from 'uuid';
 import { RedisNamespaces } from 'common-common/src/types';
-import models from '../database';
 
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
@@ -323,11 +322,3 @@ export default class DatabaseCleaner {
 }
 
 export const databaseCleaner = new DatabaseCleaner();
-
-if (require.main === module) {
-  const log = factory.getLogger(formatFilename(__filename));
-  databaseCleaner.init(models);
-  databaseCleaner.executeQueries().catch((err) => {
-    log.error(`Failed to clean the database.`, err);
-  });
-}

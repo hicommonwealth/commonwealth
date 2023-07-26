@@ -7,7 +7,6 @@ import {
 import type { RedisNamespaces } from './types';
 import type Rollbar from 'rollbar';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SetOptions } from 'sequelize';
 
 const log = factory.getLogger(formatFilename(__filename));
 

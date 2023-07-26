@@ -52,9 +52,7 @@ import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
-import DatabaseCleaner, {
-  databaseCleaner,
-} from './server/util/databaseCleaner';
+import { databaseCleaner } from './server/util/databaseCleaner';
 import { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
