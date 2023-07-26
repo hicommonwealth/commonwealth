@@ -181,7 +181,8 @@ $width: 360px;
     }
   }
 
-  .banners {
+  .banners,
+  .alerts {
     .container {
       margin-top: 10px;
       @include gallery-grid(8px, column);

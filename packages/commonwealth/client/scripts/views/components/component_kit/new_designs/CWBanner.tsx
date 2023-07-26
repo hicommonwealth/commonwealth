@@ -38,7 +38,7 @@ interface CWBannerProps {
   type?: BannerType;
   title: string;
   body?: string;
-  buttons: ButtonProps[];
+  buttons?: ButtonProps[];
   className?: string;
   onClose: () => void;
 }

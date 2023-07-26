@@ -185,6 +185,9 @@ export const ComponentShowcase = () => {
   const [isBannerVisible, setIsBannerVisible] = useState<{
     [k: BannerType]: boolean;
   }>(initialBannersState);
+  const [isAlertVisible, setIsAlertVisible] = useState<{
+    [k: BannerType]: boolean;
+  }>(initialBannersState);
 
   return (
     <div className="ComponentShowcase">
@@ -1206,6 +1209,36 @@ export const ComponentShowcase = () => {
                 buttons={[{ label: 'Primary' }, { label: 'Secondary' }]}
                 onClose={() => {
                   setIsBannerVisible((prevState) => ({
+                    ...prevState,
+                    [bannerType]: false,
+                  }));
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+      <div className="alerts">
+        <CWText type="h3">Alerts</CWText>
+        <CWButton
+          buttonHeight="sm"
+          label="Restore all alerts"
+          onClick={() => setIsAlertVisible(initialBannersState)}
+        />
+        <div className="container">
+          {bannerTypes.map((bannerType, i) => {
+            if (!isAlertVisible[bannerType]) {
+              return null;
+            }
+
+            return (
+              <CWBanner
+                key={i}
+                type={bannerType}
+                title="Default alert"
+                body="This is alert body with custom message"
+                onClose={() => {
+                  setIsAlertVisible((prevState) => ({
                     ...prevState,
                     [bannerType]: false,
                   }));
