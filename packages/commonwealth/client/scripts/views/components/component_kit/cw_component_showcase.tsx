@@ -149,9 +149,9 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
   ];
 };
 
-const initialBannersState = bannerTypes.reduce(
+const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
-  {}
+  {} as { [K in BannerType]: boolean }
 );
 
 export const ComponentShowcase = () => {
@@ -182,12 +182,8 @@ export const ComponentShowcase = () => {
     createDeltaFromText('')
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
-  const [isBannerVisible, setIsBannerVisible] = useState<{
-    [k: BannerType]: boolean;
-  }>(initialBannersState);
-  const [isAlertVisible, setIsAlertVisible] = useState<{
-    [k: BannerType]: boolean;
-  }>(initialBannersState);
+  const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
+  const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
 
   return (
     <div className="ComponentShowcase">
