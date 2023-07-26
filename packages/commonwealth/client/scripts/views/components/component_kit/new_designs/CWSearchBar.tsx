@@ -65,10 +65,13 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [communityName, setCommunityName] = useState<string>(null);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log('value:', value);
     setValue(e.target.value);
+  };
 
   const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
     if (e.currentTarget.value?.length === 0) {
       setIsTyping(false);
     } else {
@@ -93,7 +96,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
   });
 
   return (
-    <div className="container">
+    <div className="container" onBlur={() => setIsTyping(false)}>
       <div
         className={getClasses<InputStyleProps & InputInternalStyleProps>(
           {

@@ -20,7 +20,7 @@ export const CWTag: FC<TagProps> = ({ communityName, disabled, onClick }) => {
   };
 
   return (
-    <div className="SearchBarTag">
+    <div className="CWTag">
       <div className="name">
         <CWCommunityAvatar size="small" community={null} />
         <CWText type="b2" fontWeight="regular">
