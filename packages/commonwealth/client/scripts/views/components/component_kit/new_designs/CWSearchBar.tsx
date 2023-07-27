@@ -66,7 +66,6 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
   const [communityName, setCommunityName] = useState<string>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log('value:', value);
     setValue(e.target.value);
   };
 
@@ -76,6 +75,12 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
       setIsTyping(false);
     } else {
       setIsTyping(true);
+    }
+  };
+
+  const handleOnKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Backspace') {
+      // TODO remove tag when backspace key pressed
     }
   };
 
@@ -132,6 +137,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
             value={value}
             onChange={handleInputChange}
             onInput={handleOnInput}
+            onKeyDown={handleOnKeyDown}
             disabled={disabled}
             {...getInputProps()}
           />
