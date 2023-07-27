@@ -21,8 +21,8 @@ export default class DatabaseCleaner {
   private _oneRunMax = false;
   private _timeoutID;
   private _lockName = 'cw_database_cleaner_locker';
-  // lock times out in 2 hours
-  private _lockTimeoutSeconds = 7200;
+  // lock times out in 12 hours
+  private _lockTimeoutSeconds = 43200;
 
   public init(models: DB, rollbar?: Rollbar) {
     this._models = models;
