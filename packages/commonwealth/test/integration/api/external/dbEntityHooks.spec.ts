@@ -27,115 +27,127 @@ export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
 
 export async function clearTestEntities() {
-  await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Reaction.destroy({
-    where: { address_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.Collaboration.destroy({
-    where: { thread_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.Comment.destroy({
-    where: { address_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.Thread.destroy({
-    where: {
-      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
-    },
-    force: true,
-  });
-  await models.Address.destroy({
-    where: {
-      [Op.or]: [
-        { id: { [Op.lt]: 0 } },
-        { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
-      ],
-    },
-    force: true,
-  });
-  await models.Subscription.destroy({
-    where: { subscriber_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Notification.destroy({
-    where: { thread_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.Chain.destroy({
-    where: { chain_node_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.ChainNode.destroy({
-    where: { id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  try {
+    await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+    await models.Reaction.destroy({
+      where: { address_id: { [Op.lt]: 0 } },
+      force: true,
+    });
+    await models.Collaboration.destroy({
+      where: { thread_id: { [Op.lt]: 0 } },
+      force: true,
+    });
+    await models.Comment.destroy({
+      where: {
+        [Op.or]: [
+          { thread_id: { [Op.lt]: 0 } },
+          { address_id: { [Op.lt]: 0 } },
+        ],
+      },
+      force: true,
+    });
+    await models.Thread.destroy({
+      where: {
+        [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+      },
+      force: true,
+    });
+    await models.Address.destroy({
+      where: {
+        [Op.or]: [
+          { id: { [Op.lt]: 0 } },
+          { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
+        ],
+      },
+      force: true,
+    });
+    await models.Subscription.destroy({
+      where: { subscriber_id: { [Op.lt]: 0 } },
+      force: true,
+    });
+    await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+    await models.Notification.destroy({
+      where: { thread_id: { [Op.lt]: 0 } },
+      force: true,
+    });
+    await models.Chain.destroy({
+      where: { chain_node_id: { [Op.lt]: 0 } },
+      force: true,
+    });
+    await models.ChainNode.destroy({
+      where: { id: { [Op.lt]: 0 } },
+      force: true,
+    });
+    await models.Profile.destroy({
+      where: { id: { [Op.lt]: 0 } },
+      force: true,
+    });
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export async function createTestEntities() {
-  testUsers = await Promise.all(
-    [...Array(4).keys()].map(
-      async (i) =>
-        (
-          await models.User.findOrCreate({
-            where: {
-              id: -i - 1,
-              email: `test${i - 1}@gmail.com`,
-              emailVerified: true,
-              isAdmin: true,
-              lastVisited: '{}',
-            },
-          })
-        )[0]
-    )
-  );
-
-  testProfiles = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Profile.findOrCreate({
-            where: {
-              id: -i - 1,
-              profile_name: `testName${-i - 1}`,
-              avatar_url: `testAvatarUrl${-i - 1}`,
-              email: `test${i - 1}@gmail.com`,
-              user_id: -i - 1,
-            },
-          })
-        )[0]
-    )
-  );
-
-  testChainNodes = [
-    (
-      await models.ChainNode.findOrCreate({
-        where: {
-          id: -1,
-          eth_chain_id: 1,
-          url: 'test1',
-          balance_type: 'cmntest',
-          name: 'TestName1',
-        },
-      })
-    )[0],
-    (
-      await models.ChainNode.findOrCreate({
-        where: {
-          id: -2,
-          eth_chain_id: 1,
-          url: 'test2',
-          balance_type: 'cmntest',
-          name: 'TestName2',
-        },
-      })
-    )[0],
-  ];
-
   try {
+    testUsers = await Promise.all(
+      [...Array(4).keys()].map(
+        async (i) =>
+          (
+            await models.User.findOrCreate({
+              where: {
+                id: -i - 1,
+                email: `test${i - 1}@gmail.com`,
+                emailVerified: true,
+                isAdmin: true,
+                lastVisited: '{}',
+              },
+            })
+          )[0]
+      )
+    );
+
+    testProfiles = await Promise.all(
+      [...Array(2).keys()].map(
+        async (i) =>
+          (
+            await models.Profile.findOrCreate({
+              where: {
+                id: -i - 1,
+                profile_name: `testName${-i - 1}`,
+                avatar_url: `testAvatarUrl${-i - 1}`,
+                email: `test${i - 1}@gmail.com`,
+                user_id: -i - 1,
+              },
+            })
+          )[0]
+      )
+    );
+
+    testChainNodes = [
+      (
+        await models.ChainNode.findOrCreate({
+          where: {
+            id: -1,
+            eth_chain_id: 1,
+            url: 'test1',
+            balance_type: 'cmntest',
+            name: 'TestName1',
+          },
+        })
+      )[0],
+      (
+        await models.ChainNode.findOrCreate({
+          where: {
+            id: -2,
+            eth_chain_id: 1,
+            url: 'test2',
+            balance_type: 'cmntest',
+            name: 'TestName2',
+          },
+        })
+      )[0],
+    ];
+
     testChains = [
       (
         await models.Chain.findOrCreate({
@@ -173,184 +185,184 @@ export async function createTestEntities() {
         }).catch((e) => console.log(e))
       )[0],
     ];
-  } catch (e) {
-    console.log(e);
-  }
 
-  testTopics = [
-    (
-      await models.Topic.findOrCreate({
-        where: {
-          id: -1,
-          name: 'testTopic',
-          chain_id: 'cmntest',
-        },
-      })
-    )[0],
-    (
-      await models.Topic.findOrCreate({
-        where: {
-          id: -2,
-          name: 'testTopic2',
-          chain_id: 'cmntest',
-        },
-      })
-    )[0],
-  ];
+    testTopics = [
+      (
+        await models.Topic.findOrCreate({
+          where: {
+            id: -1,
+            name: 'testTopic',
+            chain_id: 'cmntest',
+          },
+        })
+      )[0],
+      (
+        await models.Topic.findOrCreate({
+          where: {
+            id: -2,
+            name: 'testTopic2',
+            chain_id: 'cmntest',
+          },
+        })
+      )[0],
+    ];
 
-  const addresses = [
-    '0x834731c87A7a6f8B57F4aa42c205265EAcbFCCD7',
-    '0x7EcA9278094511486506bb34B31087df7C25Db6f',
-    '0xd65FA09DE724f0D68EcbF5e0e186d3d59080172C',
-    '0x89F40750d76D646c2f822E4Dd6Ea1558A83eDb82',
-  ];
+    const addresses = [
+      '0x834731c87A7a6f8B57F4aa42c205265EAcbFCCD7',
+      '0x7EcA9278094511486506bb34B31087df7C25Db6f',
+      '0xd65FA09DE724f0D68EcbF5e0e186d3d59080172C',
+      '0x89F40750d76D646c2f822E4Dd6Ea1558A83eDb82',
+    ];
 
-  testAddresses = await Promise.all(
-    [...Array(4).keys()].map(
-      async (i) =>
-        (
-          await models.Address.findOrCreate({
-            where: {
-              id: -i - 1,
-              user_id: -i - 1,
-              address: addresses[i],
-              chain: 'cmntest',
-              verification_token: '',
-              profile_id: i < 2 ? -1 : -2,
-              verified: moment.now(),
-            },
-          })
-        )[0]
-    )
-  );
+    testAddresses = await Promise.all(
+      [...Array(4).keys()].map(
+        async (i) =>
+          (
+            await models.Address.findOrCreate({
+              where: {
+                id: -i - 1,
+                user_id: -i - 1,
+                address: addresses[i],
+                chain: 'cmntest',
+                verification_token: '',
+                profile_id: i < 2 ? -1 : -2,
+                verified: moment.now(),
+              },
+            })
+          )[0]
+      )
+    );
 
-  testThreads = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Thread.findOrCreate({
-            where: {
-              id: -i - 1,
-              address_id: -1,
-              title: '',
-              body: '',
-              chain: 'cmntest',
-              topic_id: -1,
-              kind: 'discussion',
-            },
-          })
-        )[0]
-    )
-  );
-
-  testThreads.push(
-    ...(await Promise.all(
-      [...Array(3).keys()].map(
+    testThreads = await Promise.all(
+      [...Array(2).keys()].map(
         async (i) =>
           (
             await models.Thread.findOrCreate({
               where: {
-                id: -i - 1 - 2,
-                address_id: -2,
-                title: '',
-                body: '',
+                id: -i - 1,
+                address_id: -1,
+                title: `testThread Title ${-i - 1}`,
+                body: `testThread Body ${-i - 1}`,
                 chain: 'cmntest',
-                topic_id: -2,
+                topic_id: -1,
                 kind: 'discussion',
               },
             })
           )[0]
       )
-    ))
-  );
+    );
 
-  testCollaborations = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Collaboration.findOrCreate({
-            where: {
-              thread_id: -1,
-              address_id: -i - 1,
-            },
-          })
-        )[0]
-    )
-  );
+    testThreads.push(
+      ...(await Promise.all(
+        [...Array(3).keys()].map(
+          async (i) =>
+            (
+              await models.Thread.findOrCreate({
+                where: {
+                  id: -i - 1 - 2,
+                  address_id: -2,
+                  title: `testThread Title ${-i - 1 - 2}`,
+                  body: `testThread Body ${-i - 1 - 2}`,
+                  chain: 'cmntest',
+                  topic_id: -2,
+                  kind: 'discussion',
+                },
+              })
+            )[0]
+        )
+      ))
+    );
 
-  testComments = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Comment.findOrCreate({
-            where: {
-              id: -i - 1,
-              chain: 'cmntest',
-              address_id: -1,
-              text: '',
-              thread_id: -1,
-              plaintext: '',
-            },
-          })
-        )[0]
-    )
-  );
+    testCollaborations = await Promise.all(
+      [...Array(2).keys()].map(
+        async (i) =>
+          (
+            await models.Collaboration.findOrCreate({
+              where: {
+                thread_id: -1,
+                address_id: -i - 1,
+              },
+            })
+          )[0]
+      )
+    );
 
-  testComments.push(
-    ...(await Promise.all(
-      [...Array(3).keys()].map(
+    testComments = await Promise.all(
+      [...Array(2).keys()].map(
         async (i) =>
           (
             await models.Comment.findOrCreate({
               where: {
-                id: -i - 1 - 2,
+                id: -i - 1,
                 chain: 'cmntest',
-                address_id: -2,
+                address_id: -1,
                 text: '',
-                thread_id: -2,
+                thread_id: -1,
                 plaintext: '',
               },
             })
           )[0]
       )
-    ))
-  );
+    );
 
-  testReactions = await Promise.all(
-    [...Array(2).keys()].map(
-      async (i) =>
-        (
-          await models.Reaction.findOrCreate({
-            where: {
-              id: -i - 1,
-              reaction: 'like',
-              address_id: -1,
-              thread_id: -1,
-              chain: 'cmntest',
-            },
-          })
-        )[0]
-    )
-  );
+    testComments.push(
+      ...(await Promise.all(
+        [...Array(3).keys()].map(
+          async (i) =>
+            (
+              await models.Comment.findOrCreate({
+                where: {
+                  id: -i - 1 - 2,
+                  chain: 'cmntest',
+                  address_id: -2,
+                  text: '',
+                  thread_id: -2,
+                  plaintext: '',
+                },
+              })
+            )[0]
+        )
+      ))
+    );
 
-  testReactions.push(
-    ...(await Promise.all(
-      [...Array(3).keys()].map(
+    testReactions = await Promise.all(
+      [...Array(2).keys()].map(
         async (i) =>
           (
             await models.Reaction.findOrCreate({
               where: {
-                id: -i - 1 - 2,
+                id: -i - 1,
                 reaction: 'like',
-                address_id: -2,
-                comment_id: -2,
+                address_id: -1,
+                thread_id: -1,
                 chain: 'cmntest',
               },
             })
           )[0]
       )
-    ))
-  );
+    );
+
+    testReactions.push(
+      ...(await Promise.all(
+        [...Array(3).keys()].map(
+          async (i) =>
+            (
+              await models.Reaction.findOrCreate({
+                where: {
+                  id: -i - 1 - 2,
+                  reaction: 'like',
+                  address_id: -2,
+                  comment_id: -2,
+                  chain: 'cmntest',
+                },
+              })
+            )[0]
+        )
+      ))
+    );
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 if (process.env.TEST_ENV !== 'playwright') {
