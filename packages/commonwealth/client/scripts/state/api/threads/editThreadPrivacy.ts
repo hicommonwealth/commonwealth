@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Thread from 'models/Thread';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface EditThreadPrivacyProps {
   chainId: string;
@@ -32,16 +32,7 @@ const useEditThreadPrivacyMutation = ({ chainId, threadId }: UseEditThreadPrivac
   return useMutation({
     mutationFn: editThreadPrivacy,
     onSuccess: async (updatedThread) => {
-      // TODO: migrate the thread store objects, then clean this up
-      // update thread in store
-      const foundThread = app.threads._store.getByIdentifier(updatedThread.identifier);
-      const finalThread = new Thread({
-        ...((foundThread || {}) as any),
-        readOnly: updatedThread.readOnly,
-      });
-      app.threads._store.update(finalThread);
-      app.threads._listingStore.add(finalThread);
-      app.threads._overviewStore.update(finalThread);
+      updateThreadInAllCaches(chainId, updatedThread)
 
       return updatedThread;
     }

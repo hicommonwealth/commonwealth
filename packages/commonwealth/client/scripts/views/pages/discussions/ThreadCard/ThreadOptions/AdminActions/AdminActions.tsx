@@ -180,8 +180,8 @@ export const AdminActions = ({
       readOnly: !thread.readOnly,
       chainId: app.activeChainId()
     }).then(() => {
-      notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
-      onLockToggle(!thread.readOnly);
+      notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
+      onLockToggle(!thread?.readOnly);
     }).catch(() => {
       notifyError('Could not update thread read_only')
     });

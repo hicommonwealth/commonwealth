@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'models/Thread';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface AddThreadLinksProps {
   chainId: string;
@@ -32,10 +33,7 @@ const useAddThreadLinksMutation = ({ chainId, threadId }: UseAddThreadLinksMutat
   return useMutation({
     mutationFn: addThreadLinks,
     onSuccess: async (updatedThread) => {
-      // TODO: migrate the thread store objects, then clean this up
-      app.threads._listingStore.remove(updatedThread);
-      app.threads._listingStore.add(updatedThread);
-
+      updateThreadInAllCaches(chainId, updatedThread)
       return updatedThread
     }
   });

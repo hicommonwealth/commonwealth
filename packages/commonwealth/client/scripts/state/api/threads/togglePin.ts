@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface ToggleThreadPinProps {
   chainId: string;
@@ -28,11 +29,7 @@ const useToggleThreadPinMutation = ({ chainId, threadId }: ToggleThreadPinMutati
   return useMutation({
     mutationFn: toggleThreadPin,
     onSuccess: async (updatedThread) => {
-      console.log("updatedThread => ", updatedThread)
-      // TODO: migrate the thread store objects, then clean this up
-      // Post edits propagate to all thread stores
-      app.threads._listingStore.add(updatedThread);
-      app.threads.store.add(updatedThread);
+      updateThreadInAllCaches(chainId, updatedThread)
       return updatedThread;
     }
   });

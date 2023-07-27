@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ThreadStage } from 'models/types';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface EditThreadStageProps {
   chainId: string;
@@ -33,13 +34,11 @@ const useEditThreadStageMutation = ({ chainId, threadId }: UseEditThreadStageMut
   return useMutation({
     mutationFn: editThreadStage,
     onSuccess: async (updatedThread) => {
+      updateThreadInAllCaches(chainId, updatedThread)
       // TODO: migrate the thread store objects, then clean this up
       // TODO: get this from react query state when fully migrated
       // if (args.stage === ThreadStage.Voting) app.threads.numVotingThreads--;
       if (updatedThread.stage === ThreadStage.Voting) app.threads.numVotingThreads++;
-      // Post edits propagate to all thread stores
-      app.threads._store.update(updatedThread);
-      app.threads._listingStore.add(updatedThread);
       return updatedThread;
     }
   });

@@ -1,36 +1,26 @@
 /* eslint-disable no-restricted-globals */
 import axios from 'axios';
-import { NotificationCategories } from 'common-common/src/types';
-import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 import moment from 'moment';
-import { Link, LinkSource } from 'server/models/thread';
+import { Link } from 'server/models/thread';
 import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
 import { ProposalStore, RecentListingStore } from 'stores';
-import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 /* eslint-disable no-restricted-syntax */
+import { ReactionCountsStore, ReactionStore } from 'stores';
+import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
+import Comment from '../../models/Comment';
 import type MinimumProfile from '../../models/MinimumProfile';
-import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Reaction from '../../models/Reaction';
 import ReactionCount from '../../models/ReactionCount';
-import Thread, { AssociatedReaction } from '../../models/Thread';
+import Thread from '../../models/Thread';
 import Topic from '../../models/Topic';
-import {
-  ThreadFeaturedFilterTypes,
-  ThreadStage,
-  ThreadTimelineFilterTypes,
-} from '../../models/types';
-import { fetchReactionCounts } from "../../state/api/reactionCounts";
-import { ReactionCountsStore, ReactionStore } from 'stores';
-import AbridgedThread from '../../models/AbridgedThread';
-import Comment from '../../models/Comment';
 import type { AnyProposal } from '../../models/types';
+import { fetchReactionCounts } from "../../state/api/reactionCounts";
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -318,35 +308,6 @@ class ThreadsController {
   }
 
   /**
-   * Gets all links or filtered by linkType for a thread id
-   * @param args
-   * @returns list of resolved links using adapters + link object
-   */
-  public async getLinksForThread({
-    threadId,
-    linkType,
-    link,
-  }: {
-    threadId: number;
-    linkType?: LinkSource[];
-    link?: Link;
-  }): Promise<string[]> {
-    try {
-      const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
-        thread_id: threadId,
-        linkType,
-        link,
-        jwt: app.user.jwt,
-      });
-
-      return response.data;
-    } catch (err) {
-      notifyError('Could not get links');
-      console.log(err);
-    }
-  }
-
-  /**
    * Gets all threads associated with a link(ie all threads linked to 1 proposal)
    * @param args
    * @returns A list of resolved thread objects
@@ -450,186 +411,6 @@ class ThreadsController {
       }
     }
   };
-
-  public async loadNextPage(options: {
-    topicName?: string;
-    stageName?: string;
-    includePinnedThreads?: boolean;
-    featuredFilter: ThreadFeaturedFilterTypes;
-    dateRange: ThreadTimelineFilterTypes;
-    page: number;
-  }) {
-    // Used to reset pagination when switching between topics
-    if (this._resetPagination) {
-      this.listingStore.clear();
-      this._resetPagination = false;
-    }
-
-    const {
-      topicName,
-      stageName,
-      includePinnedThreads,
-      featuredFilter,
-      dateRange,
-      page,
-    } = options;
-
-    const topics =
-      (await queryClient.ensureQueryData<Topic[]>([
-        ApiEndpoints.BULK_TOPICS,
-        app.chain.id,
-      ])) || [];
-
-    const chain = app.activeChainId();
-    const params = (() => {
-      // find topic id (if any)
-      const topicId = topics.find(({ name }) => name === topicName)?.id;
-
-      // calculate 'from' and 'to' dates
-      const today = moment();
-      const fromDate = (() => {
-        if (dateRange) {
-          if (
-            [
-              ThreadTimelineFilterTypes.ThisMonth,
-              ThreadTimelineFilterTypes.ThisWeek,
-            ].includes(dateRange)
-          ) {
-            return today
-              .startOf(dateRange.toLowerCase().replace('this', '') as any)
-              .toISOString();
-          }
-
-          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
-            return new Date(0).toISOString();
-          }
-        }
-
-        return null;
-      })();
-      const toDate = (() => {
-        if (dateRange) {
-          if (
-            [
-              ThreadTimelineFilterTypes.ThisMonth,
-              ThreadTimelineFilterTypes.ThisWeek,
-            ].includes(dateRange)
-          ) {
-            return today
-              .endOf(dateRange.toLowerCase().replace('this', '') as any)
-              .toISOString();
-          }
-
-          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
-            return moment().toISOString();
-          }
-        }
-
-        return moment().toISOString();
-      })();
-
-      const featuredFilterQueryMap = {
-        newest: 'createdAt:desc',
-        oldest: 'createdAt:asc',
-        mostLikes: 'numberOfLikes:desc',
-        mostComments: 'numberOfComments:desc',
-      };
-
-      return {
-        limit: 20,
-        page: page,
-        chain,
-        ...(topicId && { topic_id: topicId }),
-        ...(stageName && { stage: stageName }),
-        ...(includePinnedThreads && { includePinnedThreads: true }),
-        ...(fromDate && { from_date: fromDate }),
-        to_date: toDate,
-        orderBy:
-          featuredFilterQueryMap[featuredFilter] ||
-          featuredFilterQueryMap.newest,
-      };
-    })();
-
-    // fetch threads and refresh entities so we can join them together
-    const [response] = await Promise.all([
-      axios.get(`${app.serverUrl()}/threads`, {
-        params: {
-          bulk: true,
-          ...params,
-        },
-      }),
-      // app.chainEntities.getRawEntities(chain),
-    ]);
-    if (response.data.status !== 'Success') {
-      throw new Error(`Unsuccessful refresh status: ${response.status}`);
-    }
-    const { threads } = response.data.result;
-    // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
-    const modeledThreads: Thread[] = threads.map((t) => {
-      return this.modelFromServer(t);
-    });
-
-    modeledThreads.forEach((thread) => {
-      try {
-        this._store.add(thread);
-        this._listingStore.add(thread);
-      } catch (e) {
-        console.error(e.message);
-      }
-    });
-
-    // Update listing cutoff date (date up to which threads have been fetched)
-    const unPinnedThreads = modeledThreads.filter((t) => !t.pinned);
-    if (modeledThreads?.length) {
-      const lastThread = unPinnedThreads.sort(orderDiscussionsbyLastComment)[
-        unPinnedThreads.length - 1
-      ];
-
-      if (lastThread) {
-        const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
-        this.listingStore.setCutoffDate(options, cutoffDate);
-      }
-    }
-
-    await Promise.all([
-      this.fetchReactionsCount(threads),
-      app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
-        threads,
-        chain,
-      }),
-    ]);
-
-    if (!this.listingStore.isInitialized(options)) {
-      this.listingStore.initializeListing(options);
-    }
-    if (
-      (includePinnedThreads ? threads.length : unPinnedThreads.length) <
-      DEFAULT_PAGE_SIZE
-    ) {
-      this.listingStore.depleteListing(options);
-    }
-
-    return {
-      threads: modeledThreads,
-      limit: response.data.result.limit,
-      page: response.data.result.page,
-    };
-  }
-
-  public async getThreadCommunityId(threadId: string) {
-    try {
-      const response = await axios.get(`${app.serverUrl()}/getThreads`, {
-        params: {
-          ids: [threadId],
-        },
-      });
-
-      const thread = response['data']['result'][0];
-      return thread;
-    } catch (e) {
-      return null;
-    }
-  }
 
   public initialize(
     initialThreads = [],

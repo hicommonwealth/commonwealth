@@ -109,7 +109,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
+    threadId: thread?.id
   })
 
   useEffect(() => {

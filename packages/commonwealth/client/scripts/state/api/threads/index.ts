@@ -1,7 +1,7 @@
 import useCreateThreadReactionMutation from './createReaction';
 import useDeleteThreadReactionMutation from './deleteReaction';
 
-// import useFetchThreadsQuery from './fetchThreads';
+import useFetchThreadsQuery from './fetchThreads';
 import useCreateThreadMutation from './createThread';
 import useEditThreadMutation from './editThread';
 import useDeleteThreadMutation from './deleteThread';
@@ -16,7 +16,7 @@ import useDeleteThreadLinksMutation from './deleteThreadLinks';
 export {
     useCreateThreadReactionMutation,
     useDeleteThreadReactionMutation,
-    // useFetchThreadsQuery,
+    useFetchThreadsQuery,
     useCreateThreadMutation,
     useEditThreadMutation,
     useDeleteThreadMutation,
