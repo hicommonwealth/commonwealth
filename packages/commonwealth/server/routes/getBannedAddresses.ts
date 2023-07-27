@@ -3,7 +3,7 @@ import type { DB } from '../models';
 import type { BanAttributes } from '../models/ban';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from '../util/validateOwner';
 
 enum GetBannedAddressesErrors {
   NoChain = 'Must supply a chain ID',
@@ -22,8 +22,17 @@ const getBannedAddresses = async (
   res: TypedResponse<GetBannedAddressesResp>
 ) => {
   const chain = req.chain;
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
-  if (!isAdmin) throw new AppError(GetBannedAddressesErrors.NoPermission);
+
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain.id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    throw new AppError(GetBannedAddressesErrors.NoPermission);
+  }
 
   const bans = await models.Ban.findAll({ where: { chain_id: chain.id } });
   return success(

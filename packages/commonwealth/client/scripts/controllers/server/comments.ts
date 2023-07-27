@@ -67,8 +67,8 @@ export const modelFromServer = (comment) => {
           typeof history.author === 'string'
             ? JSON.parse(history.author)
             : typeof history.author === 'object'
-              ? history.author
-              : null;
+            ? history.author
+            : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
         console.log(e);
@@ -80,8 +80,8 @@ export const modelFromServer = (comment) => {
   const lastEdited = comment.last_edited
     ? moment(comment.last_edited)
     : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
-      : null;
+    ? versionHistory[0].timestamp
+    : null;
 
   const markedAsSpamAt = comment.marked_as_spam_at
     ? moment(comment.marked_as_spam_at)
@@ -90,45 +90,47 @@ export const modelFromServer = (comment) => {
   const commentParams =
     comment.deleted_at?.length > 0
       ? {
-        chain: comment.chain,
-        author: comment?.Address?.address || comment.author,
-        text: '[deleted]',
-        plaintext: '[deleted]',
-        versionHistory: [],
-        attachments: [],
-        threadId: comment.thread_id,
-        id: comment.id,
-        createdAt: moment(comment.created_at),
-        rootThread: comment.thread_id,
-        parentComment: Number(comment.parent_id) || null,
-        authorChain: comment?.Address?.chain || comment.authorChain,
-        lastEdited,
-        markedAsSpamAt,
-        deleted: true,
-        canvasAction: comment.canvas_action,
-        canvasSession: comment.canvas_session,
-        canvasHash: comment.canvas_hash,
-      }
+          chain: comment.chain,
+          author: comment?.Address?.address || comment.author,
+          text: '[deleted]',
+          plaintext: '[deleted]',
+          versionHistory: [],
+          attachments: [],
+          threadId: comment.thread_id,
+          id: comment.id,
+          createdAt: moment(comment.created_at),
+          rootThread: comment.thread_id,
+          parentComment: Number(comment.parent_id) || null,
+          authorChain: comment?.Address?.chain || comment.authorChain,
+          lastEdited,
+          markedAsSpamAt,
+          deleted: true,
+          canvasAction: comment.canvas_action,
+          canvasSession: comment.canvas_session,
+          canvasHash: comment.canvas_hash,
+          discord_meta: comment.discord_meta,
+        }
       : {
-        chain: comment.chain,
-        author: comment?.Address?.address || comment.author,
-        text: decodeURIComponent(comment.text),
-        plaintext: comment.plaintext,
-        versionHistory,
-        attachments,
-        threadId: comment.thread_id,
-        id: comment.id,
-        createdAt: moment(comment.created_at),
-        rootThread: comment.thread_id,
-        parentComment: Number(comment.parent_id) || null,
-        authorChain: comment?.Address?.chain || comment.authorChain,
-        lastEdited,
-        markedAsSpamAt,
-        deleted: false,
-        canvasAction: comment.canvas_action,
-        canvasSession: comment.canvas_session,
-        canvasHash: comment.canvas_hash,
-      };
+          chain: comment.chain,
+          author: comment?.Address?.address || comment.author,
+          text: decodeURIComponent(comment.text),
+          plaintext: comment.plaintext,
+          versionHistory,
+          attachments,
+          threadId: comment.thread_id,
+          id: comment.id,
+          createdAt: moment(comment.created_at),
+          rootThread: comment.thread_id,
+          parentComment: Number(comment.parent_id) || null,
+          authorChain: comment?.Address?.chain || comment.authorChain,
+          lastEdited,
+          markedAsSpamAt,
+          deleted: false,
+          canvasAction: comment.canvas_action,
+          canvasSession: comment.canvas_session,
+          canvasHash: comment.canvas_hash,
+          discord_meta: comment.discord_meta,
+        };
 
   return new Comment(commentParams);
 };
@@ -155,7 +157,9 @@ class CommentsController {
     this.reactionCountsStore.clear();
   }
 
-  public getReactionByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
+  public getReactionByPost(
+    post: Thread | AbridgedThread | AnyProposal | Comment<any>
+  ) {
     return this.reactionsStore.getByPost(post);
   }
 
