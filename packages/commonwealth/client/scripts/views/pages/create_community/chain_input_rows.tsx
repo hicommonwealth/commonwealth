@@ -16,8 +16,6 @@ import type {
 } from './types';
 
 export async function updateAdminRole(chainId: string) {
-  await initAppState(false);
-
   app.user.ephemerallySetActiveAccount(
     app.user.addresses.filter((a) => a.chain.id === chainId)[0]
   );

@@ -172,6 +172,7 @@ export const SplTokenForm = () => {
               );
             }
 
+            await initAppState(false);
             await updateAdminRole(id);
 
             navigate(`/${res.result.chain?.id}`);
