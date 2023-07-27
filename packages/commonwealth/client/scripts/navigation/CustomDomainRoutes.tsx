@@ -95,6 +95,13 @@ const CustomDomainRoutes = () => {
         type: 'common',
       })}
     />,
+    <Route
+      path="/createCommunity/:type"
+      element={withLayout(CreateCommunityPage, {
+        scoped: true,
+        type: 'common',
+      })}
+    />,
     <Route path="/home" element={<Navigate to="/overview" />} />,
     <Route
       path="/search"
