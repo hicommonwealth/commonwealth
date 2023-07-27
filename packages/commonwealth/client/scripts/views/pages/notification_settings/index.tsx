@@ -10,6 +10,7 @@ import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
+import { CWMultiSelectDropdown } from '../../components/component_kit/cw_dropdown_multi';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -30,6 +31,7 @@ import {
   FirebaseMessaging,
   GetTokenOptions,
 } from '@capacitor-firebase/messaging';
+import { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -125,6 +127,41 @@ const NotificationSettingsPage = () => {
     }
   };
 
+  const handleSubscriptionDelivery = async (
+    selectedItems: DropdownItemType[],
+    subs: NotificationSubscription[],
+    initialValues: any
+  ) => {
+    const selectedTypes = selectedItems.map((item) => item.value);
+
+    // Types that were initially selected but are now deselected
+    const typesToDisable = initialValues
+      .filter((item) => !selectedTypes.includes(item.value))
+      .map((item) => item.value);
+    // Types that were initially deselected but are now selected
+    const typesToEnable = selectedTypes.filter(
+      (type) => !initialValues.includes(type)
+    );
+
+    for (const type of typesToDisable) {
+      console.log(type, subs, 'disabling');
+      await app.user.notifications.disableSubscriptionDeliveryMechanism(
+        type,
+        subs
+      );
+    }
+
+    for (const type of typesToEnable) {
+      console.log(type, subs, 'enabling');
+      await app.user.notifications.enableSubscriptionDeliveryMechanism(
+        type,
+        subs
+      );
+    }
+
+    forceRerender();
+  };
+
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
     subs: NotificationSubscription[]
@@ -183,6 +220,11 @@ const NotificationSettingsPage = () => {
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
 
   const deliveryMechanismTypes = Object.values(DeliveryMechanismType);
+
+  const options = app.user.notifications.deliveryMechanisms.map((mech) => ({
+    label: mech.type.charAt(0).toUpperCase() + mech.type.slice(1),
+    value: mech.type,
+  }));
 
   return (
     <div className="NotificationSettingsPage">
@@ -300,7 +342,7 @@ const NotificationSettingsPage = () => {
         you configure them you can directly manage which subscriptions go to
         which platforms.
       </CWText>
-      <div className="column-header-row">
+      <div className="platform-column-header-row">
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
           fontWeight="medium"
@@ -342,7 +384,7 @@ const NotificationSettingsPage = () => {
             key={mechanismType}
             className="notification-row chain-events-subscriptions-padding"
           >
-            <div className="notification-row-header">
+            <div className="platform-row-header">
               <div className="left-content-container">
                 <div className="avatar-and-name">
                   <CWIcon name={mechanismType} iconName={'home'} />
@@ -407,9 +449,16 @@ const NotificationSettingsPage = () => {
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
           fontWeight="medium"
-          className="last-column-header-text"
+          className="column-header-text"
         >
           In-App
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Other Methods
         </CWText>
       </div>
       {relevantSubscribedChains
@@ -447,6 +496,16 @@ const NotificationSettingsPage = () => {
                       });
                   }}
                 />
+                <CWMultiSelectDropdown
+                  placeholder={'Options'}
+                  options={options}
+                  containerClassName="subscriptions-option-dropdown"
+                  onSelect={(selectedValues) =>
+                    handleSubscriptionDelivery(selectedValues, [], [])
+                  }
+                  initialValues={[]}
+                  disabled={true}
+                />
               </div>
             </div>
           );
@@ -458,6 +517,21 @@ const NotificationSettingsPage = () => {
           const chainInfo = app.config.chains.getById(chainName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          const initialValues = subs
+            .flatMap((sub) => sub.SubscriptionDelivery)
+            .filter((delivery) => delivery.enabled)
+            .map((delivery) => ({
+              label:
+                delivery.type.charAt(0).toUpperCase() + delivery.type.slice(1),
+              value: delivery.type,
+            }));
+          const wrappedHandleSubscriptionDelivery = (
+            selectedItems: DropdownItemType[]
+          ) => {
+            handleSubscriptionDelivery(selectedItems, subs, initialValues);
+          };
+          console.log(initialValues, subs);
+
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
@@ -484,6 +558,15 @@ const NotificationSettingsPage = () => {
                   onChange={() => {
                     handleSubscriptions(hasSomeInAppSubs, subs);
                   }}
+                />
+                <CWMultiSelectDropdown
+                  placeholder={'Options'}
+                  options={options}
+                  containerClassName="subscriptions-option-dropdown"
+                  onSelect={wrappedHandleSubscriptionDelivery}
+                  initialValues={initialValues}
+                  disabled={options.length === 0}
+                  // other props...
                 />
               </div>
             </div>
@@ -514,9 +597,16 @@ const NotificationSettingsPage = () => {
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
           fontWeight="medium"
-          className="last-column-header-text"
+          className="column-header-text"
         >
           In-App
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Other Methods
         </CWText>
       </div>
       {Object.entries(bundledSubs)
@@ -525,6 +615,19 @@ const NotificationSettingsPage = () => {
           const chainInfo = app?.config.chains.getById(chainName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          const initialValues = subs
+            .flatMap((sub) => sub.SubscriptionDelivery)
+            .filter((delivery) => delivery.enabled)
+            .map((delivery) => ({
+              label:
+                delivery.type.charAt(0).toUpperCase() + delivery.type.slice(1),
+              value: delivery.type,
+            }));
+          const wrappedHandleSubscriptionDelivery = (
+            selectedItems: DropdownItemType[]
+          ) => {
+            handleSubscriptionDelivery(selectedItems, subs);
+          };
 
           if (!chainInfo?.id) return null; // handles incomplete loading case
 
@@ -559,6 +662,14 @@ const NotificationSettingsPage = () => {
                       onChange={() =>
                         handleSubscriptions(hasSomeInAppSubs, subs)
                       }
+                    />
+                    <CWMultiSelectDropdown
+                      placeholder={'Options'}
+                      options={options}
+                      containerClassName="subscriptions-dropdown"
+                      onSelect={wrappedHandleSubscriptionDelivery}
+                      initialValues={initialValues}
+                      disabled={options.length === 0}
                     />
                   </div>
                 }
