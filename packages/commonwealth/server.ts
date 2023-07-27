@@ -25,9 +25,11 @@ import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers'
 import {
   DATABASE_CLEAN_HOUR,
   RABBITMQ_URI,
+  REDIS_URL,
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
+  VULTR_IP,
 } from './server/config';
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -50,7 +52,8 @@ import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
-import DatabaseCleaner from './server/util/databaseCleaner';
+import { databaseCleaner } from './server/util/databaseCleaner';
+import { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -261,6 +264,9 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
+  const redisCache = new RedisCache();
+  await redisCache.init(REDIS_URL, VULTR_IP);
+
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
@@ -295,12 +301,13 @@ async function main() {
 
   setupErrorHandlers(app, rollbar);
 
-  setupServer(app, rollbar, models, rabbitMQController);
+  setupServer(app, rollbar, models, rabbitMQController, redisCache);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  const databaseCleaner = new DatabaseCleaner(
+  databaseCleaner.initLoop(
     models,
     Number(DATABASE_CLEAN_HOUR),
+    redisCache,
     rollbar
   );
 }
