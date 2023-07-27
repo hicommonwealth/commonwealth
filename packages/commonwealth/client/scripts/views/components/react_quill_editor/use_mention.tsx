@@ -91,7 +91,7 @@ export const useMention = ({
             ];
           } else {
             // try to get results from cache
-            const { data } = await axios.get('/api/profiles', {
+            const { data } = await axios.get(`${app.serverUrl()}/profiles`, {
               headers: {
                 'Content-Type': 'application/json',
               },
