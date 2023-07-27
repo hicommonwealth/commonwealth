@@ -149,7 +149,7 @@ export const CWTextInput = (props: TextInputProps) => {
           containerClassName,
           validationStatus: props.validationStatus,
         },
-        ComponentType.TextInput
+        ComponentType.OldTextInput
       )}
       onClick={onClick}
     >
