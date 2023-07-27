@@ -115,6 +115,7 @@ const seedOptions = [
     value: 'proposal',
   },
 ];
+
 export const ProtocolCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
   const [loading, setLoading] = useState<boolean>(false);
@@ -301,7 +302,6 @@ export const ProtocolCommunityForm = () => {
           setSymbol(v);
         }}
       />
-      {defaultChainRows(chainFormDefaultFields)}
       <CWText type="h2" fontWeight="bold">
         2. Base Membership
       </CWText>
@@ -338,6 +338,11 @@ export const ProtocolCommunityForm = () => {
         }}
       />
       {checked && seedWalletForm()}
+      <CWText type="h2" fontWeight="bold">
+        4. Socials and Additional Info
+      </CWText>
+      <CWDivider />
+      {defaultChainRows(chainFormDefaultFields)}
       <CWButton
         label="Save changes"
         disabled={saving || id.length < 1}
