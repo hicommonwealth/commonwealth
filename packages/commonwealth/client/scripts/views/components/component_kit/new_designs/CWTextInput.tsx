@@ -31,6 +31,7 @@ export type BaseTextInputProps = {
   onClick?: (e) => void;
   placeholder?: string;
   tabIndex?: number;
+  instructionalMessage?: string;
   manualStatusMessage?: string;
   manualValidationStatus?: ValidationStatus;
 };
@@ -62,6 +63,7 @@ type MessageRowProps = {
   label?: string | React.ReactNode;
   statusMessage?: string;
   validationStatus?: ValidationStatus;
+  instructionalMessage?: string;
 };
 
 export const MessageRow: FC<MessageRowProps> = ({
@@ -69,10 +71,12 @@ export const MessageRow: FC<MessageRowProps> = ({
   label,
   statusMessage,
   validationStatus,
+  instructionalMessage,
 }) => {
   return (
-    <div className={getClasses({ hasFeedback }, 'MessageRow')}>
+    <div className={getClasses({}, 'MessageRow')}>
       {label && <CWLabel label={label} />}
+      {instructionalMessage && <CWLabel label={instructionalMessage} />}
       {hasFeedback && (
         <>
           <div className={getClasses({ validationStatus }, 'icon')}>
@@ -149,6 +153,7 @@ export const CWTextInput = (props: TextInputProps) => {
     displayOnly,
     manualStatusMessage = '',
     manualValidationStatus = '',
+    instructionalMessage,
   } = props;
 
   const getWidth = () => {
@@ -261,6 +266,15 @@ export const CWTextInput = (props: TextInputProps) => {
           <div className="text-input-right-icon">{iconRight}</div>
         ) : null}
       </div>
+      {label && (
+        <MessageRow
+          instructionalMessage={instructionalMessage}
+          statusMessage={manualStatusMessage || validationProps.statusMessage}
+          validationStatus={
+            manualValidationStatus || validationProps.validationStatus
+          }
+        />
+      )}
       {label && (
         <MessageRow
           hasFeedback={!!inputValidationFn}

@@ -886,6 +886,13 @@ export const ComponentShowcase = () => {
           isCompact
         />
         <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          isCompact
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
           name="Form field"
           inputValidationFn={(val: string): [ValidationStatus, string] => {
             if (val.match(/[^A-Za-z]/)) {
@@ -898,6 +905,21 @@ export const ComponentShowcase = () => {
           placeholder="Type here"
           isCompact
           width="250"
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          isCompact
+          width="250"
+          instructionalMessage="Instructional message"
         />
         <CWTextInput
           label="Text field with icons"
@@ -966,6 +988,12 @@ export const ComponentShowcase = () => {
           placeholder="Placeholder"
         />
         <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
           name="Form field"
           inputValidationFn={(val: string): [ValidationStatus, string] => {
             if (val.match(/[^A-Za-z]/)) {
@@ -977,6 +1005,20 @@ export const ComponentShowcase = () => {
           label="This input only accepts A-Z"
           placeholder="Type here"
           width="250"
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          width="250"
+          instructionalMessage="Instructional message"
         />
         <CWTextInput
           label="Text field with icons"
