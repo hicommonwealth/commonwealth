@@ -20,20 +20,33 @@ const MembersPage = () => {
   const [totalCount, setTotalCount] = useState<number>(1);
   const [page, setPage] = useState<number>(1);
 
+  const searchErr = useRef<Error>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const handleLoadNextPage = async (searchQuery: string, reset: boolean) => {
+    if (searchErr.current) {
+      console.log('skipping next page');
+      return;
+    }
+
     const newPage = reset ? 1 : page + 1;
     setPage(newPage);
 
-    const response = await app.search.searchMentionableProfiles(
-      searchQuery || '',
-      app.activeChainId(),
-      50,
-      newPage,
-      true
-    );
+    let response: any = null;
+    try {
+      response = await app.search.searchMentionableProfiles(
+        searchQuery || '',
+        app.activeChainId(),
+        50,
+        newPage,
+        true
+      );
+    } catch (err) {
+      searchErr.current = err;
+      console.error(err);
+      return;
+    }
 
     if (response.totalCount) {
       setTotalCount(response.totalCount);
@@ -82,6 +95,7 @@ const MembersPage = () => {
 
   // on debounced search term change, refresh search results
   useEffect(() => {
+    searchErr.current = null;
     if (debouncedSearchTerm === '') {
       handleLoadNextPage('', true);
       return;

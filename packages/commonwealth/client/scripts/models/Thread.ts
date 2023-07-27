@@ -14,7 +14,7 @@ export interface IThreadCollaborator {
 }
 
 export type AssociatedReaction = {
-  id: number;
+  id: number | string;
   type: ReactionType;
   address: string;
 };
@@ -63,13 +63,17 @@ export class Thread implements IUniqueId {
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+
   public markedAsSpamAt: moment.Moment;
+  public archivedAt: moment.Moment;
   public readonly lockedAt: moment.Moment;
+
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
+  public readonly discord_meta: any;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -98,6 +102,7 @@ export class Thread implements IUniqueId {
     chainEntities,
     lastEdited,
     markedAsSpamAt,
+    archivedAt,
     lockedAt,
     hasPoll,
     lastCommentedOn,
@@ -109,6 +114,7 @@ export class Thread implements IUniqueId {
     canvasSession,
     canvasHash,
     links,
+    discord_meta,
   }: {
     author: string;
     title: string;
@@ -132,6 +138,7 @@ export class Thread implements IUniqueId {
     chainEntities?: any[];
     lastEdited?: moment.Moment;
     markedAsSpamAt?: moment.Moment;
+    archivedAt?: moment.Moment;
     lockedAt?: moment.Moment;
     hasPoll: boolean;
     polls?: Poll[];
@@ -143,6 +150,7 @@ export class Thread implements IUniqueId {
     canvasSession?: string;
     canvasHash?: string;
     links?: Link[];
+    discord_meta?: any;
   }) {
     this.author = author;
     this.title = title;
@@ -179,6 +187,7 @@ export class Thread implements IUniqueId {
     this.hasPoll = hasPoll;
     this.lastEdited = lastEdited;
     this.markedAsSpamAt = markedAsSpamAt;
+    this.archivedAt = archivedAt;
     this.lockedAt = lockedAt;
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];
@@ -195,6 +204,7 @@ export class Thread implements IUniqueId {
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
     this.links = links || [];
+    this.discord_meta = discord_meta;
   }
 }
 

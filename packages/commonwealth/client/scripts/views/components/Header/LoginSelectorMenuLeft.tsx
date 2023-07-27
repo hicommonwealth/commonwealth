@@ -5,29 +5,20 @@ import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { setActiveAccount } from 'controllers/app/login';
 import { UserBlock } from 'views/components/user/user_block';
-import { isSameAccount, pluralize } from 'helpers';
+import { isSameAccount } from 'helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { SelectAddressModal } from 'views/modals/select_address_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 
 import 'components/Header/LoginSelectorMenu.scss';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 
-type LoginSelectorMenuLeftAttrs = {
-  nAccountsWithoutRole: number;
-};
-
-export const LoginSelectorMenuLeft = ({
-  nAccountsWithoutRole,
-}: LoginSelectorMenuLeftAttrs) => {
+export const LoginSelectorMenuLeft = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
-    useState(false);
   const [profileId, setProfileId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
@@ -70,9 +61,11 @@ export const LoginSelectorMenuLeft = ({
     <div className="LoginSelectorMenu left">
       {app.activeChainId() && (
         <>
-          <CWText type="caption" className="title">
-            Select address to use
-          </CWText>
+          {activeAccounts?.length > 0 && (
+            <CWText type="caption" className="title">
+              Select address to use
+            </CWText>
+          )}
           {activeAccounts.map((account, i) => {
             return (
               <div
@@ -116,29 +109,10 @@ export const LoginSelectorMenuLeft = ({
       </div>
       <div
         className="login-menu-item"
-        onClick={() => {
-          if (nAccountsWithoutRole > 0) {
-            setIsSelectAddressModalOpen(true);
-          } else {
-            setIsLoginModalOpen(true);
-          }
-        }}
+        onClick={() => setIsLoginModalOpen(true)}
       >
-        <CWText type="caption">
-          {nAccountsWithoutRole > 0
-            ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-            : 'Connect a new address'}
-        </CWText>
+        <CWText type="caption">Connect a new address</CWText>
       </div>
-      <Modal
-        content={
-          <SelectAddressModal
-            onModalClose={() => setIsSelectAddressModalOpen(false)}
-          />
-        }
-        onClose={() => setIsSelectAddressModalOpen(false)}
-        open={isSelectAddressModalOpen}
-      />
       <Modal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}

@@ -10,23 +10,24 @@ import type Topic from '../../../models/Topic';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
 import { TopicSummaryRow } from './topic_summary_row';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const { isWindowExtraSmall } = useBrowserWindow({});
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
-    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
-      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
@@ -68,68 +69,70 @@ const OverviewPage = () => {
     };
   });
 
-  return <div className="OverviewPage">
-    <div className="header-row">
-      <div className="header-row-left">
-        <CWText type="h3" fontWeight="semiBold">
-          Overview
-        </CWText>
-        <CWButton
-          className="latest-button"
-          buttonType="mini-black"
-          label="Latest Threads"
-          iconLeft="home"
-          onClick={() => {
-            navigate('/discussions');
-          }}
-        />
+  return !topicSummaryRows.length && !app.threads.initialized ? (
+    <PageLoading />
+  ) : (
+    <div className="OverviewPage">
+      <div className="header-row">
+        <div className="header-row-left">
+          <CWText type="h3" fontWeight="semiBold">
+            Overview
+          </CWText>
+          <CWButton
+            className="latest-button"
+            buttonType="mini-black"
+            label="Latest Threads"
+            iconLeft="home"
+            onClick={() => {
+              navigate('/discussions');
+            }}
+          />
+        </div>
+        {isWindowExtraSmall ? (
+          <CWIconButton
+            iconName="plusCircle"
+            iconButtonTheme="black"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!hasJoinedCommunity}
+          />
+        ) : (
+          <CWButton
+            buttonType="mini-black"
+            label="Create Thread"
+            iconLeft="plus"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!hasJoinedCommunity}
+          />
+        )}
       </div>
-      {isWindowExtraSmall ? (
-        <CWIconButton
-          iconName="plusCircle"
-          iconButtonTheme="black"
-          onClick={() => {
-            navigate('/new/discussion');
-          }}
-          disabled={!app.user.activeAccount}
-        />
-      ) : (
-        <CWButton
-          buttonType="mini-black"
-          label="Create Thread"
-          iconLeft="plus"
-          onClick={() => {
-            navigate('/new/discussion');
-          }}
-          disabled={!app.user.activeAccount}
-        />
-      )}
-    </div>
-    <div className="column-headers-row">
-      <CWText
-        type="h5"
-        fontWeight="semiBold"
-        className="threads-header-row-text"
-      >
-        Topic
-      </CWText>
-      <div className="threads-header-container">
+      <div className="column-headers-row">
         <CWText
           type="h5"
           fontWeight="semiBold"
           className="threads-header-row-text"
         >
-          Recent threads
+          Topic
         </CWText>
+        <div className="threads-header-container">
+          <CWText
+            type="h5"
+            fontWeight="semiBold"
+            className="threads-header-row-text"
+          >
+            Recent threads
+          </CWText>
+        </div>
       </div>
-    </div>
-    <CWDivider />
-    {(!topicSummaryRows.length && !app.threads.initialized) ?
-      Array(4).fill(undefined).map((row, i) => <TopicSummaryRow {...row} key={i} />) :
-      topicSummaryRows.map((row, i) => (
+      <CWDivider />
+      {topicSummaryRows.map((row, i) => (
         <TopicSummaryRow {...row} key={i} />
       ))}
-  </div>
+    </div>
+  );
 };
 
 export default OverviewPage;

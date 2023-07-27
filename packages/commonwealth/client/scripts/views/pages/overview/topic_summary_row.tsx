@@ -21,6 +21,7 @@ import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import { NewThreadTag } from '../discussions/NewThreadTag';
 import { getLastUpdated, isHot } from '../discussions/helpers';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
@@ -158,12 +159,14 @@ export const TopicSummaryRow = ({
 
                 <div className="row-bottom">
                   <div className="comments-and-users">
-                    <div className="comments-count">
-                      <CWIcon iconName="feedback" iconSize="small" />
-                      <CWText type="caption">
-                        {pluralize(thread.numberOfComments, 'comment')}
-                      </CWText>
-                    </div>
+                    <CWThreadAction
+                      label={`${pluralize(thread.numberOfComments, 'Comment')}`}
+                      action="comment"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                    />
                   </div>
                   <div className="row-bottom-menu">
                     <div

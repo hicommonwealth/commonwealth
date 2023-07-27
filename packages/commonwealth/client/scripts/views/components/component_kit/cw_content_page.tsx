@@ -8,11 +8,9 @@ import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import {
-  AuthorAndPublishInfo as ThreadAuthorAndPublishInfo
-} from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
-import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
 import { Skeleton } from '../Skeleton';
+import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
+import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
@@ -37,6 +35,11 @@ type ContentPageProps = {
   updatedAt?: moment.Moment;
   lastEdited?: moment.Moment | number;
   author?: Account | AddressInfo | MinimumProfile | undefined;
+  discord_meta?: {
+    user: { id: string; username: string };
+    channel_id: string;
+    message_id: string;
+  };
   collaborators?: IThreadCollaborator[];
   body?: (children: ReactNode) => ReactNode;
   comments?: ReactNode;
@@ -140,6 +143,7 @@ const CWContentPageSkeleton = ({ isWindowMedium }) => {
 export const CWContentPage = ({
   thread,
   author,
+  discord_meta,
   body,
   comments,
   contentBodyLabel,
@@ -189,9 +193,10 @@ export const CWContentPage = ({
           title
         )}
         <div className="header-info-row">
-          <ThreadAuthorAndPublishInfo
+          <AuthorAndPublishInfo
             showSplitDotIndicator={true}
             isNew={!!displayNewTag}
+            discord_meta={discord_meta}
             isLocked={thread?.readOnly}
             {...(thread?.lockedAt && {
               lockedAt: thread.lockedAt.toISOString(),
@@ -229,8 +234,8 @@ export const CWContentPage = ({
       {body &&
         body(
           <ThreadOptions
-            canVote={!thread?.readOnly}
-            canComment={!thread?.readOnly}
+            upvoteBtnVisible={!thread?.readOnly}
+            commentBtnVisible={!thread?.readOnly}
             thread={thread}
             totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}

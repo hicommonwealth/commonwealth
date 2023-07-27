@@ -9,7 +9,7 @@ export function isNewThread(threadCreatedAt: moment.Moment){
 
 export const NewThreadTag = ({ threadCreatedAt }: {threadCreatedAt: moment.Moment}) => {
   if (isNewThread(threadCreatedAt)) {
-    return <CWTag label={'NEW'} type={'new'} iconName={'newStar'}/>
+    return <CWTag label={'New'} type={'new'} iconName={'newStar'}/>
   }
 
   return null;

@@ -3,8 +3,7 @@ import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { modelReactionCountFromServer, modelReactionFromServer } from 'controllers/server/comments';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 import moment from 'moment';
@@ -26,6 +25,7 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../models/types';
+import fetchThreadReactionCounts from "../../state/api/threads/fetchReactionCounts";
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -117,6 +117,7 @@ class ThreadsController {
       body,
       last_edited,
       marked_as_spam_at,
+      archived_at,
       locked_at,
       version_history,
       Attachments,
@@ -141,6 +142,7 @@ class ThreadsController {
       canvasSession,
       canvasHash,
       links,
+      discord_meta,
     } = thread;
 
     let { reactionIds, reactionType, addressesReacted } = thread;
@@ -151,11 +153,11 @@ class ThreadsController {
 
     if (reactions) {
       for (const reaction of reactions) {
-        app.reactions.store.add(modelReactionFromServer(reaction));
+        app.comments.reactionsStore.add(modelReactionFromServer(reaction));
       }
       reactionIds = reactions.map((r) => r.id);
-      reactionType = reactions.map((r) => r.type);
-      addressesReacted = reactions.map((r) => r.address);
+      reactionType = reactions.map((r) => r?.type || r?.reaction);
+      addressesReacted = reactions.map((r) => r?.address || r?.Address?.address);
     }
 
     let versionHistoryProcessed;
@@ -169,8 +171,8 @@ class ThreadsController {
             typeof history.author === 'string'
               ? JSON.parse(history.author)
               : typeof history.author === 'object'
-              ? history.author
-              : null;
+                ? history.author
+                : null;
           history.timestamp = moment(history.timestamp);
         } catch (e) {
           console.log(e);
@@ -195,10 +197,12 @@ class ThreadsController {
     const lastEditedProcessed = last_edited
       ? moment(last_edited)
       : versionHistoryProcessed && versionHistoryProcessed?.length > 1
-      ? versionHistoryProcessed[0].timestamp
-      : null;
+        ? versionHistoryProcessed[0].timestamp
+        : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    const archivedAt = archived_at ? moment(archived_at) : null;
+
     let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;
     if (topic?.id) {
@@ -255,6 +259,7 @@ class ThreadsController {
       canvasSession,
       canvasHash,
       links,
+      discord_meta,
     });
 
     return t;
@@ -343,8 +348,8 @@ class ThreadsController {
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
           : err.message
-          ? err.message
-          : 'Failed to create thread'
+            ? err.message
+            : 'Failed to create thread'
       );
     }
   }
@@ -416,7 +421,7 @@ class ThreadsController {
     topicId?: number
   ): Promise<Topic> {
     try {
-      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+      const response = await $.post(`${app.serverUrl()}/updateThreadTopic`, {
         jwt: app.user.jwt,
         thread_id: threadId,
         topic_id: topicId,
@@ -465,11 +470,33 @@ class ThreadsController {
   }
 
   public async toggleSpam(threadId: number, isSpam: boolean) {
+    try {
+      const verb = isSpam ? 'put' : 'delete';
+      const response = await axios[verb](
+        `${app.serverUrl()}/threads/${threadId}/spam`,
+        {
+          data: {
+            jwt: app.user.jwt,
+            chain_id: app.activeChainId(),
+          } as any,
+        }
+      );
+      const foundThread = this.store.getByIdentifier(threadId);
+      foundThread.markedAsSpamAt = response.data.result.marked_as_spam_at;
+      this.updateThreadInStore(new Thread({ ...foundThread }));
+      return foundThread;
+    } catch (err) {
+      console.error(err);
+      notifyError(`Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`);
+      throw err;
+    }
+  }
+
+  public async setArchived(threadId: number, isArchived: boolean) {
     return new Promise((resolve, reject) => {
       $.post(
-        `${app.serverUrl()}/threads/${threadId}/${
-          !isSpam ? 'mark' : 'unmark'
-        }-as-spam`,
+        `${app.serverUrl()}/threads/${threadId}/${!isArchived ? 'archive' : 'unarchive'
+        }`,
         {
           jwt: app.user.jwt,
           chain_id: app.activeChainId(),
@@ -477,14 +504,14 @@ class ThreadsController {
       )
         .then((response) => {
           const foundThread = this.store.getByIdentifier(threadId);
-          foundThread.markedAsSpamAt = response.result.marked_as_spam_at;
+          foundThread.archivedAt = response.result.archived_at;
           this.updateThreadInStore(new Thread({ ...foundThread }));
           resolve(foundThread);
         })
         .catch((e) => {
           console.error(e);
           notifyError(
-            `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+            `Could not ${!isArchived ? 'archive' : 'unarchive'} thread`
           );
           reject(e);
         });
@@ -713,7 +740,6 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.data.result.map((rawThread) => {
-      console.log('rawThread => ', rawThread);
       /**
        * rawThread has a different DS than the threads in store
        * here we will find if thread is in store and if so use most keys
@@ -726,10 +752,13 @@ class ThreadsController {
         ...((foundThread || {}) as any),
         ...((thread || {}) as any),
       });
-      finalThread.associatedReactions =
-        thread.associatedReactions.length > 0
-          ? thread.associatedReactions
-          : foundThread?.associatedReactions || [];
+      finalThread.associatedReactions = [
+        ...(
+          thread.associatedReactions.length > 0
+            ? thread.associatedReactions
+            : foundThread?.associatedReactions || []
+        )
+      ];
       finalThread.numberOfComments =
         rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
       this._store.update(finalThread);
@@ -747,30 +776,28 @@ class ThreadsController {
   // TODO Graham 4/24/22: All "ReactionsCount" names need renaming to "ReactionCount" (singular)
   // TODO Graham 4/24/22: All of JB's AJAX requests should be swapped out for .get and .post reqs
   fetchReactionsCount = async (threads) => {
-    const { result: reactionCounts } = await $.ajax({
-      type: 'POST',
-      url: `${app.serverUrl()}/reactionsCounts`,
-      headers: {
-        'content-type': 'application/json',
-      },
-      data: JSON.stringify({
-        thread_ids: threads.map((thread) => thread.id),
-        active_address: app.user.activeAccount?.address,
-      }),
-    });
+    // TODO: fetchThreadReactionCounts here is the migrated query func of this non-react controller
+    // when this controller is migrated to react query, we should also complete the migrate of react
+    // query for fetchThreadReactionCounts in its file. At the moment, the query function for
+    // fetchThreadReactionCounts is migrated but the cache logic is commented in that file.
+    // The reason why it was not migrated is because "reactive" code from react query wont work in this
+    // non reactive scope
+    const reactionCounts = await fetchThreadReactionCounts({
+      threadIds: threads.map((thread) => thread.id) as number[]
+    })
 
     for (const rc of reactionCounts) {
-      const id = app.reactionCounts.store.getIdentifier({
+      const id = app.comments.reactionCountsStore.getIdentifier({
         threadId: rc.thread_id,
         proposalId: rc.proposal_id,
         commentId: rc.comment_id,
       });
-      const existing = app.reactionCounts.store.getById(id);
+      const existing = app.comments.reactionCountsStore.getById(id);
       if (existing) {
-        app.reactionCounts.store.remove(existing);
+        app.comments.reactionCountsStore.remove(existing);
       }
       try {
-        app.reactionCounts.store.add(
+        app.comments.reactionCountsStore.add(
           modelReactionCountFromServer({ ...rc, id })
         );
       } catch (e) {
@@ -896,8 +923,6 @@ class ThreadsController {
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
     });
-
-    app.threadReactions.refreshReactionsFromThreads(modeledThreads);
 
     modeledThreads.forEach((thread) => {
       try {

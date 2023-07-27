@@ -1,2 +1,2 @@
-import { Card as ThreadCard } from './Card';
+import { ThreadCard } from './ThreadCard';
 export { ThreadCard };
