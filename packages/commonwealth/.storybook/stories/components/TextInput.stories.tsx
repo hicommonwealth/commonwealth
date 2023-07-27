@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import type { Meta } from "@storybook/react";
 
-import { CWTextInput } from '../../../client/scripts/views/components/component_kit/new_designs/cw_text_input';
+import { CWTextInput } from '../../../client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import { phosphorIconLookup } from '../phosphor_icon_lookup';
 
 const iconOptions = [ undefined, ...Object.keys(phosphorIconLookup) ];

@@ -8,21 +8,39 @@
 
 .MessageRow {
   display: flex;
+  background-color: #FFFFE0;
+  border: 1px solid #cccccc;
 
   &.hasFeedback {
-    align-items: flex-end;
+    // align-items: flex-start;
+    align-items: center;
     gap: 8px;
     justify-content: space-between;
-
+    
     > * {
       flex: 1;
     }
   }
 
+  .icon {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+
+    &.success > svg {
+      color: $green-600;
+    }
+
+    &.failure > svg {
+      color: $rorange-500;
+    }
+  }
+
   .feedback-message-text.Text {
-    justify-content: flex-end;
-    margin-bottom: 4px;
-    text-align: right;
+    justify-content: flex-start;
+    // margin-bottom: 4px;
+    text-align: left;
+    align-items: center;
 
     &.success {
       color: $green-600;
@@ -40,7 +58,7 @@
 
   .input-and-icon-container {
     display: flex;
-    align-items: center; /* Center icons vertically */
+    align-items: center;
     position: relative;
     flex: 1;
 

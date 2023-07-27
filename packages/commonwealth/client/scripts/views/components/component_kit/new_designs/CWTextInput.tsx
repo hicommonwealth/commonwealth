@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { FC } from 'react';
+import { CheckCircle, Warning } from '@phosphor-icons/react';
 
-import 'components/component_kit/new_designs/cw_text_input.scss';
+import 'components/component_kit/new_designs/CWTextInput.scss';
 import { CWLabel } from '../cw_label';
 import { CWText } from '../cw_text';
 import type { ValidationStatus } from '../cw_validation_text';
@@ -51,39 +52,43 @@ type InputInternalStyleProps = {
   isTyping?: boolean;
 };
 
-type MessageRowProps = {
-  hasFeedback?: boolean;
-  label: string | React.ReactNode;
-  statusMessage?: string;
-  validationStatus?: ValidationStatus;
-};
-
 type TextInputProps = BaseTextInputProps &
   InputStyleProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement>;
 
-export const MessageRow = (props: MessageRowProps) => {
-  const { hasFeedback, label, statusMessage, validationStatus } = props;
+type MessageRowProps = {
+  hasFeedback?: boolean;
+  label?: string | React.ReactNode;
+  statusMessage?: string;
+  validationStatus?: ValidationStatus;
+};
 
+export const MessageRow: FC<MessageRowProps> = ({
+  hasFeedback,
+  label,
+  statusMessage,
+  validationStatus,
+}) => {
   return (
-    <div
-      className={getClasses<{ hasFeedback: boolean }>(
-        { hasFeedback },
-        'MessageRow'
-      )}
-    >
-      <CWLabel label={label} />
+    <div className={getClasses({ hasFeedback }, 'MessageRow')}>
+      {label && <CWLabel label={label} />}
       {hasFeedback && (
-        <CWText
-          type="caption"
-          className={getClasses<{ status: ValidationStatus }>(
-            { status: validationStatus },
-            'feedback-message-text'
-          )}
-        >
-          {statusMessage}
-        </CWText>
+        <>
+          <div className={getClasses({ validationStatus }, 'icon')}>
+            {validationStatus === 'success' && <CheckCircle weight="fill" />}
+            {validationStatus === 'failure' && <Warning weight="fill" />}
+          </div>
+          <CWText
+            type="caption"
+            className={getClasses<{ status: ValidationStatus }>(
+              { status: validationStatus },
+              'feedback-message-text'
+            )}
+          >
+            {statusMessage}
+          </CWText>
+        </>
       )}
     </div>
   );
@@ -150,7 +155,7 @@ export const CWTextInput = (props: TextInputProps) => {
     if (fullWidth) {
       return { width: '100%' };
     } else if (width) {
-      return { width: `${width}px` };
+      return { width: `${width}px` }; // this one
     } else {
       return { width: '240px' };
     }
@@ -172,7 +177,6 @@ export const CWTextInput = (props: TextInputProps) => {
     >
       {label && (
         <MessageRow
-          hasFeedback={!!inputValidationFn}
           label={label}
           statusMessage={manualStatusMessage || validationProps.statusMessage}
           validationStatus={
@@ -257,6 +261,15 @@ export const CWTextInput = (props: TextInputProps) => {
           <div className="text-input-right-icon">{iconRight}</div>
         ) : null}
       </div>
+      {label && (
+        <MessageRow
+          hasFeedback={!!inputValidationFn}
+          statusMessage={manualStatusMessage || validationProps.statusMessage}
+          validationStatus={
+            manualValidationStatus || validationProps.validationStatus
+          }
+        />
+      )}
     </div>
   );
 };
