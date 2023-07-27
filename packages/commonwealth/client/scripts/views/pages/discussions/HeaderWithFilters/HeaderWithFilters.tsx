@@ -161,6 +161,7 @@ export const HeaderWithFilters = ({
   return (
     <div className="HeaderWithFilters">
       {featureFlags.sessionKeys && (
+        // TODO adjust communityName and onClose to be dynamic once the logic is ready
         <SwitchAddressBanner
           communityName="dydx"
           onCommunityJoin={handleJoinCommunity}

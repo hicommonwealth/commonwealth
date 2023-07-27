@@ -25,7 +25,7 @@ const AccountConnectionIndicator = ({
       <div className="status-row">
         <div className={clsx('status-light', { connected })} />
         <CWIdentificationTag
-          iconLeft="eth"
+          iconLeft="twitterIcon"
           address="0xc4ED43a303E3ADFA0aa9711f12285C910a1D3499"
         />
       </div>
