@@ -101,6 +101,8 @@ const CreateCommunity = (props: CreateCommunityProps) => {
   useEffect(() => {
     if (!type) {
       navigate('/createCommunity/starter');
+    } else {
+      setCurrentForm(getFormType(type));
     }
   }, [type]);
 
