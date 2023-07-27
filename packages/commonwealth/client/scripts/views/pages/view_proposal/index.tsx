@@ -29,6 +29,9 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
+import { useCosmosGovParams } from 'hooks/cosmos/useCosmosGovParams';
+import { useVotesQuery } from 'controllers/chain/cosmos/gov/queries';
+import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -50,6 +53,15 @@ const ViewProposalPage = ({
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
   const { metadata } = useProposalMetadata({ app, proposal });
+  const { isLoadingDepositParams } = useCosmosGovParams({
+    isApiReady: !!app.chain?.apiInitialized,
+  });
+  const { data } = useVotesQuery({
+    isApiReady: !!app.chain?.apiInitialized,
+    proposal: proposal as CosmosProposal,
+  });
+
+  console.log('data', data);
 
   useEffect(() => {
     if (metadata?.title) forceRerender();
@@ -83,7 +95,7 @@ const ViewProposalPage = ({
           try {
             const cosmosProposal = await (
               app.chain as Cosmos
-            ).governance.getProposal(+proposalId);
+            ).governance.getProposal(+proposalId); // TODO: RQ
             setProposal(cosmosProposal);
             setError(null);
           } catch (err) {

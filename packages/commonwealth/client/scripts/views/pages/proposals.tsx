@@ -26,6 +26,7 @@ import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'controllers/chain/cosmos/gov/queries';
+import { useCosmosGovParams } from 'hooks/cosmos/useCosmosGovParams';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -71,6 +72,14 @@ const ProposalsPage = () => {
       });
     };
   }, [setSubstrateLoading]);
+
+  const { isLoadingDepositParams } = useCosmosGovParams({
+    isApiReady: !!app.chain?.apiInitialized,
+  });
+
+  console.log('isLoadingDepositParams', isLoadingDepositParams);
+  // console.log('tallyParams', tallyParams);
+  // console.log('votingParams', votingParams);
 
   const {
     data: activeCosmosProposals,

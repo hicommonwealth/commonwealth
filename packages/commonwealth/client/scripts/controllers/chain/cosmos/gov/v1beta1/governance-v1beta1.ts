@@ -16,6 +16,11 @@ import {
   encodeMsgSubmitProposal,
   msgToIProposal,
 } from './utils-v1beta1';
+import {
+  DepositParamsQueryResponse,
+  TallyParamsQueryResponse,
+  VotingParamsQueryResponse,
+} from '../types';
 
 /* CosmosGovernance v1beta1 */
 
@@ -47,16 +52,10 @@ class CosmosGovernance extends ProposalModule<
   ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-
-    await Promise.all([
-      this.fetchDepositParams(),
-      this.fetchTallyThresholds(),
-      this.fetchVotingPeriod(),
-    ]);
     this._initialized = true;
   }
 
-  private async fetchDepositParams(): Promise<void> {
+  public async fetchDepositParams(): Promise<DepositParamsQueryResponse> {
     try {
       const { depositParams } = await this._Chain.api.gov.params('deposit');
       this._maxDepositPeriodS =
@@ -79,27 +78,36 @@ class CosmosGovernance extends ProposalModule<
         this._minDeposit = new CosmosToken(this._Chain.denom, 0);
       }
       console.log('minDeposit: ', this._minDeposit);
+      return {
+        minDeposit: this._minDeposit,
+        maxDepositPeriodS: this._maxDepositPeriodS,
+      }; // TODO: set these in UI instead of relying on state?
     } catch (e) {
       console.error('Error fetching deposit params', e);
     }
   }
 
-  private async fetchTallyThresholds(): Promise<void> {
+  public async fetchTallyThresholds(): Promise<TallyParamsQueryResponse> {
     try {
       const { tallyParams } = await this._Chain.api.gov.params('tallying');
       this._yesThreshold = await asciiLiteralToDecimal(tallyParams.threshold);
       this._vetoThreshold = await asciiLiteralToDecimal(
         tallyParams.vetoThreshold
       );
+      return {
+        yesThreshold: this._yesThreshold,
+        vetoThreshold: this._vetoThreshold,
+      };
     } catch (e) {
       console.error('Error fetching tally params', e);
     }
   }
 
-  private async fetchVotingPeriod(): Promise<void> {
+  public async fetchVotingPeriod(): Promise<VotingParamsQueryResponse> {
     try {
       const { votingParams } = await this._Chain.api.gov.params('voting');
       this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
+      return { votingPeriodS: this._votingPeriodS };
     } catch (e) {
       console.error('Error fetching voting params', e);
     }

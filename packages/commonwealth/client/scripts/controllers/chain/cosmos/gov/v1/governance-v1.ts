@@ -14,6 +14,11 @@ import { CosmosProposalV1 } from './proposal-v1';
 import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { encodeMsgSubmitProposal } from '../v1beta1/utils-v1beta1';
 import { propToIProposal } from './utils-v1';
+import {
+  DepositParamsQueryResponse,
+  TallyParamsQueryResponse,
+  VotingParamsQueryResponse,
+} from '../types';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for
  * gov module version v1. This is considered a patch to make sure v1-enabled chains
@@ -50,11 +55,6 @@ class CosmosGovernanceV1 extends ProposalModule<
   ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    await Promise.all([
-      this.fetchDepositParams(),
-      this.fetchTallyThresholds(),
-      this.fetchVotingPeriod(),
-    ]);
     this._initialized = true;
   }
 
@@ -94,7 +94,7 @@ class CosmosGovernanceV1 extends ProposalModule<
     }
   }
 
-  private async fetchDepositParams(): Promise<void> {
+  public async fetchDepositParams(): Promise<DepositParamsQueryResponse> {
     try {
       const { deposit_params } = await this._Chain.lcd.cosmos.gov.v1.params({
         paramsType: 'deposit',
@@ -121,29 +121,38 @@ class CosmosGovernanceV1 extends ProposalModule<
         this._minDeposit = new CosmosToken(this._Chain.denom, 0);
       }
       console.log(this._minDeposit);
+      return {
+        minDeposit: this._minDeposit,
+        maxDepositPeriodS: this._maxDepositPeriodS,
+      };
     } catch (e) {
       console.error('Error fetching deposit params', e);
     }
   }
 
-  private async fetchTallyThresholds(): Promise<void> {
+  public async fetchTallyThresholds(): Promise<TallyParamsQueryResponse> {
     try {
       const { tally_params } = await this._Chain.lcd.cosmos.gov.v1.params({
         paramsType: 'tallying',
       });
       this._yesThreshold = +tally_params?.threshold;
       this._vetoThreshold = +tally_params?.veto_threshold;
+      return {
+        yesThreshold: this._yesThreshold,
+        vetoThreshold: this._vetoThreshold,
+      };
     } catch (e) {
       console.error('Error fetching tally params', e);
     }
   }
 
-  private async fetchVotingPeriod(): Promise<void> {
+  public async fetchVotingPeriod(): Promise<VotingParamsQueryResponse> {
     try {
       const { voting_params } = await this._Chain.lcd.cosmos.gov.v1.params({
         paramsType: 'voting',
       });
       this._votingPeriodS = +voting_params.voting_period.replace('s', '');
+      return { votingPeriodS: this._votingPeriodS };
     } catch (e) {
       console.error('Error fetching voting params', e);
     }

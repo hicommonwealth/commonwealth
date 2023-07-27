@@ -29,6 +29,7 @@ import type CosmosChain from '../../chain';
 import type { CosmosApiType } from '../../chain';
 import type CosmosGovernance from './governance-v1beta1';
 import { encodeMsgVote, marshalTally } from './utils-v1beta1';
+import { VoteInfoQueryResponse } from '../types';
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {
@@ -148,8 +149,6 @@ export class CosmosProposal extends Proposal<
   }
 
   public async init() {
-    await this.fetchVoteInfo();
-
     if (!this.initialized) {
       this._initialized = true;
     }
@@ -158,59 +157,76 @@ export class CosmosProposal extends Proposal<
     }
   }
 
-  private async fetchVoteInfo() {
+  public async fetchVoteInfo(): Promise<VoteInfoQueryResponse> {
     const api = this._Chain.api;
     // only fetch voter data if active
-    if (!this.data.state.completed) {
-      try {
-        const [depositResp, voteResp, tallyResp]: [
-          QueryDepositsResponse,
-          QueryVotesResponse,
-          QueryTallyResultResponse
-        ] = await Promise.all([
-          this.status === 'DepositPeriod'
-            ? api.gov.deposits(this.data.identifier)
-            : Promise.resolve(null),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : api.gov.votes(this.data.identifier),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : api.gov.tally(this.data.identifier),
-        ]);
-        if (depositResp?.deposits) {
-          for (const deposit of depositResp.deposits) {
-            if (deposit.amount && deposit.amount[0]) {
-              this.data.state.depositors.push([
-                deposit.depositor,
-                new BN(deposit.amount[0].amount),
-              ]);
-            }
+    if (this.data.state.completed) {
+      //todo
+      return {
+        depositors: [],
+        voters: [],
+        tally: {
+          yes: new BN(0),
+          abstain: new BN(0),
+          no: new BN(0),
+          noWithVeto: new BN(0),
+        },
+      };
+    }
+
+    try {
+      const [depositsResponse, votesResponse, tallyResponse]: [
+        QueryDepositsResponse,
+        QueryVotesResponse,
+        QueryTallyResultResponse
+      ] = await Promise.all([
+        this.status === 'DepositPeriod'
+          ? api.gov.deposits(this.data.identifier)
+          : Promise.resolve(null),
+        this.status === 'DepositPeriod'
+          ? Promise.resolve(null)
+          : api.gov.votes(this.data.identifier),
+        this.status === 'DepositPeriod'
+          ? Promise.resolve(null)
+          : api.gov.tally(this.data.identifier),
+      ]);
+      if (depositsResponse?.deposits) {
+        for (const deposit of depositsResponse.deposits) {
+          if (deposit.amount && deposit.amount[0]) {
+            this.data.state.depositors.push([
+              deposit.depositor,
+              new BN(deposit.amount[0].amount),
+            ]);
           }
         }
-        if (voteResp) {
-          for (const voter of voteResp.votes) {
-            const vote = voteToEnum(voter.option);
-            if (vote) {
-              this.data.state.voters.push([voter.voter, vote]);
-              this.addOrUpdateVote(
-                new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
-              );
-            } else {
-              console.error(
-                `voter: ${voter.voter} has invalid vote option: ${voter.option}`
-              );
-            }
-          }
-        }
-        if (tallyResp?.tally) {
-          this.data.state.tally = marshalTally(tallyResp?.tally);
-        }
-      } catch (err) {
-        console.error(`Votes query failed: ${err.message}`);
-      } finally {
-        this.isFetched.emit('redraw');
       }
+      if (votesResponse) {
+        for (const voter of votesResponse.votes) {
+          const vote = voteToEnum(voter.option);
+          if (vote) {
+            this.data.state.voters.push([voter.voter, vote]);
+            this.addOrUpdateVote(
+              new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
+            );
+          } else {
+            console.error(
+              `voter: ${voter.voter} has invalid vote option: ${voter.option}`
+            );
+          }
+        }
+      }
+      if (tallyResponse?.tally) {
+        this.data.state.tally = marshalTally(tallyResponse?.tally);
+      }
+      return {
+        depositors: this.data.state.depositors,
+        voters: this.data.state.voters,
+        tally: this.data.state.tally,
+      };
+    } catch (err) {
+      console.error(`Votes query failed: ${err.message}`);
+    } finally {
+      this.isFetched.emit('redraw');
     }
   }
 

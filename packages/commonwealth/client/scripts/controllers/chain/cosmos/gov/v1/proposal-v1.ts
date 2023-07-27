@@ -32,6 +32,7 @@ import { marshalTallyV1 } from './utils-v1';
 import type CosmosGovernanceV1 from './governance-v1';
 import { CosmosVote } from '../v1beta1/proposal-v1beta1';
 import { encodeMsgVote } from '../v1beta1/utils-v1beta1';
+import { VoteInfoQueryResponse } from '../types';
 
 const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
   switch (voteOption) {
@@ -134,7 +135,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async init() {
-    await this.fetchVoteInfo();
+    // await this.fetchVoteInfo();
 
     if (!this.initialized) {
       this._initialized = true;
@@ -144,60 +145,76 @@ export class CosmosProposalV1 extends Proposal<
     }
   }
 
-  private async fetchVoteInfo() {
+  public async fetchVoteInfo(): Promise<VoteInfoQueryResponse> {
     const lcd = this._Chain.lcd;
     const proposalId = longify(this.data.identifier);
     // only fetch voter data if active
-    if (!this.data.state.completed) {
-      try {
-        const [depositResp, voteResp, tallyResp]: [
-          QueryDepositsResponseSDKType,
-          QueryVotesResponseSDKType,
-          QueryTallyResultResponseSDKType
-        ] = await Promise.all([
-          this.status === 'DepositPeriod'
-            ? lcd.cosmos.gov.v1.deposits({ proposalId })
-            : Promise.resolve(null),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : lcd.cosmos.gov.v1.votes({ proposalId }),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : lcd.cosmos.gov.v1.tallyResult({ proposalId }),
-        ]);
-        if (depositResp?.deposits) {
-          for (const deposit of depositResp.deposits) {
-            if (deposit.amount && deposit.amount[0]) {
-              this.data.state.depositors.push([
-                deposit.depositor,
-                new BN(deposit.amount[0].amount),
-              ]);
-            }
+    if (this.data.state.completed) {
+      //todo
+      return {
+        depositors: [],
+        voters: [],
+        tally: {
+          yes: new BN(0),
+          abstain: new BN(0),
+          no: new BN(0),
+          noWithVeto: new BN(0),
+        },
+      };
+    }
+    try {
+      const [depositsResponse, votesResponse, tallyResponse]: [
+        QueryDepositsResponseSDKType,
+        QueryVotesResponseSDKType,
+        QueryTallyResultResponseSDKType
+      ] = await Promise.all([
+        this.status === 'DepositPeriod'
+          ? lcd.cosmos.gov.v1.deposits({ proposalId })
+          : Promise.resolve(null),
+        this.status === 'DepositPeriod'
+          ? Promise.resolve(null)
+          : lcd.cosmos.gov.v1.votes({ proposalId }),
+        this.status === 'DepositPeriod'
+          ? Promise.resolve(null)
+          : lcd.cosmos.gov.v1.tallyResult({ proposalId }),
+      ]);
+      if (depositsResponse?.deposits) {
+        for (const deposit of depositsResponse.deposits) {
+          if (deposit.amount && deposit.amount[0]) {
+            this.data.state.depositors.push([
+              deposit.depositor,
+              new BN(deposit.amount[0].amount),
+            ]);
           }
         }
-        if (voteResp) {
-          for (const voter of voteResp.votes) {
-            const vote = voteToEnumV1(voter.options[0].option);
-            if (vote) {
-              this.data.state.voters.push([voter.voter, vote]);
-              this.addOrUpdateVote(
-                new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
-              );
-            } else {
-              console.error(
-                `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`
-              );
-            }
-          }
-        }
-        if (tallyResp?.tally) {
-          this.data.state.tally = marshalTallyV1(tallyResp?.tally);
-        }
-      } catch (err) {
-        console.error(`Cosmos vote query failed: ${err.message}`);
-      } finally {
-        this.isFetched.emit('redraw');
       }
+      if (votesResponse) {
+        for (const voter of votesResponse.votes) {
+          const vote = voteToEnumV1(voter.options[0].option);
+          if (vote) {
+            this.data.state.voters.push([voter.voter, vote]);
+            this.addOrUpdateVote(
+              new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
+            );
+          } else {
+            console.error(
+              `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`
+            );
+          }
+        }
+      }
+      if (tallyResponse?.tally) {
+        this.data.state.tally = marshalTallyV1(tallyResponse?.tally);
+      }
+      return {
+        depositors: this.data.state.depositors,
+        voters: this.data.state.voters,
+        tally: this.data.state.tally,
+      };
+    } catch (err) {
+      console.error(`Cosmos vote query failed: ${err.message}`);
+    } finally {
+      this.isFetched.emit('redraw');
     }
   }
 
