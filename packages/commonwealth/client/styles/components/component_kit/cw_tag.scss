@@ -98,11 +98,16 @@
   &.trending {
     background-color: $green-50;
     border-radius: $border-radius-corners-wider;
+    padding: 4px 8px;
     border: 1px solid $green-600;
 
     .tag-text.Text,
     .tag-icon.Icon {
       color: $green-600;
+    }
+
+    .tag-text.Text {
+      line-height: 17px;
     }
 
     svg {

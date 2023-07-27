@@ -2625,15 +2625,15 @@ export const CWTrendUp = (props: IconProps) => {
         componentType
       )}
       xmlns="http://www.w3.org/2000/svg"
-      width="13.5"
-      height="13.5"
+      width="17"
+      height="16"
       fill="none"
-      viewBox="0 0 18 18"
+      viewBox="0 0 17 16"
       {...otherProps}
     >
-      <path  d="M14.66 3.5L8.66003 9.5L6.16003 7L1.66003 11.5" stroke="#7B9E3F" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M14.6599 3.5L8.65991 9.5L6.15991 7L1.65991 11.5" stroke="#7B9E3F" stroke-linecap="round" stroke-linejoin="round"/>
 
-      <path d="M14.66 7.5V3.5H10.66" stroke="#7B9E3F" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M14.6599 7.5V3.5H10.6599" stroke="#7B9E3F" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   );
 };

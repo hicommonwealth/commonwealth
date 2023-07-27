@@ -66,7 +66,7 @@ export const getThreadsHandler = async (
         throw new AppError(Errors.InvalidThreadId);
       }
     }
-    const threads = await controllers.threads.getThreadsByIds(threadIds);
+    const threads = await controllers.threads.getThreadsByIds({ threadIds });
     return success(res, threads);
   }
 
@@ -83,17 +83,17 @@ export const getThreadsHandler = async (
       to_date,
     } = req.query as BulkThreadsRequestQuery;
 
-    const bulkThreads = await controllers.threads.getBulkThreads(
+    const bulkThreads = await controllers.threads.getBulkThreads({
       chain,
       stage,
-      parseInt(topic_id, 10),
-      includePinnedThreads === 'true',
-      parseInt(page, 10),
-      parseInt(limit, 10),
+      topicId: parseInt(topic_id, 10),
+      includePinnedThreads: includePinnedThreads === 'true',
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
       orderBy,
-      from_date,
-      to_date
-    );
+      fromDate: from_date,
+      toDate: to_date,
+    });
     return success(res, bulkThreads);
   }
 
@@ -101,10 +101,10 @@ export const getThreadsHandler = async (
   if (active) {
     const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
 
-    const activeThreads = await controllers.threads.getActiveThreads(
+    const activeThreads = await controllers.threads.getActiveThreads({
       chain,
-      parseInt(threads_per_topic, 10)
-    );
+      threadsPerTopic: parseInt(threads_per_topic, 10),
+    });
     return success(res, activeThreads);
   }
 
@@ -123,14 +123,14 @@ export const getThreadsHandler = async (
       throw new AppError(Errors.NoChains);
     }
 
-    const searchResults = await controllers.threads.searchThreads(
+    const searchResults = await controllers.threads.searchThreads({
       chain,
-      search,
-      thread_title_only === 'true',
+      searchTerm: search,
+      threadTitleOnly: thread_title_only === 'true',
       sort,
-      parseInt(page, 10),
-      parseInt(page_size, 10)
-    );
+      page: parseInt(page, 10),
+      pageSize: parseInt(page_size, 10),
+    });
     return success(res, searchResults);
   }
 

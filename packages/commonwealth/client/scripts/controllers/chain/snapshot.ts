@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { getProposals, getSpace } from 'helpers/snapshot_utils';
 
@@ -18,6 +19,8 @@ class SnapshotController {
     return this._initialized;
   }
 
+  public snapshotEmitter: EventEmitter = new EventEmitter();
+
   // private _votes = new Store<SnapshotVote>();
 
   public async refreshProposals() {
@@ -36,12 +39,16 @@ class SnapshotController {
     }
     this._initializing = false;
     this._initialized = true;
+
+    this.snapshotEmitter.emit('initialized');
   }
 
   public async deinit() {
     this._initialized = false;
     this._space = null;
     this._proposals = [];
+
+    this.snapshotEmitter.emit('deinitialized');
   }
 }
 
