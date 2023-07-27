@@ -3,6 +3,8 @@ import { expect } from 'chai';
 import { PORT } from '../../../server/config';
 import { addAlchemyKey, login } from '../utils/e2eUtils';
 
+test.describe.configure({ mode: 'parallel' });
+
 test.describe('Commonwealth Create Community', () => {
   test.setTimeout(60000);
 
