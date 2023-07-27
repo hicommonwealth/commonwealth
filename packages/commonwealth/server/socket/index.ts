@@ -3,8 +3,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
-import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
+import { redisRetryStrategy } from 'common-common/src/redisCache';
 import { StatsDController } from 'common-common/src/statsd';
 import type * as http from 'http';
 import * as jwt from 'jsonwebtoken';
@@ -194,12 +193,6 @@ export async function setupWebSocketServer(
 
   // provide the redis connection instances to the socket.io adapters
   await io.adapter(<any>createAdapter(pubClient, subClient));
-
-  const redisCache = new RedisCache();
-  console.log('Initializing Redis Cache for WebSockets...');
-  await redisCache.init(REDIS_URL, VULTR_IP);
-  console.log('Redis Cache initialized!');
-  cacheDecorator.setCache(redisCache);
 
   const chainEventsNamespace = createNamespace(
     io,
