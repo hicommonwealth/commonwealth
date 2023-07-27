@@ -161,7 +161,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate('/createCommunity', {}, null);
+        navigate('/createCommunity/starter', {}, null);
       },
     },
     {

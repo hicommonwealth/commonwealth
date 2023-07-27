@@ -36,6 +36,7 @@ type CommentsTreeAttrs = {
   setIsReplying: (status: boolean) => void;
   parentCommentId: number;
   setParentCommentId: (id: number) => void;
+  fromDiscordBot?: boolean;
   canComment: boolean;
 };
 
@@ -44,6 +45,7 @@ export const CommentTree = ({
   thread,
   setIsGloballyEditing,
   includeSpams,
+  fromDiscordBot,
   isReplying,
   setIsReplying,
   parentCommentId,
@@ -89,7 +91,8 @@ export const CommentTree = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
-  const isLocked = !!(thread instanceof Thread && thread.readOnly);
+  const isLocked =
+    fromDiscordBot || !!(thread instanceof Thread && thread.readOnly);
 
   useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {

@@ -166,6 +166,7 @@ class ThreadsController {
       canvasSession,
       canvasHash,
       links,
+      discord_meta,
     } = thread;
 
     let { reactionIds, reactionType, addressesReacted } = thread;
@@ -282,6 +283,7 @@ class ThreadsController {
       canvasSession,
       canvasHash,
       links,
+      discord_meta,
     });
 
     return t;
@@ -443,7 +445,7 @@ class ThreadsController {
     topicId?: number
   ): Promise<Topic> {
     try {
-      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+      const response = await $.post(`${app.serverUrl()}/updateThreadTopic`, {
         jwt: app.user.jwt,
         thread_id: threadId,
         topic_id: topicId,
