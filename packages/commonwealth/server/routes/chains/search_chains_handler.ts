@@ -5,14 +5,9 @@ import {
   success,
 } from '../../types';
 import { ServerControllers } from '../../routing/router';
-import { AppError } from '../../../../common-common/src/errors';
 import { SearchChainsResult } from 'server/controllers/server_chains_methods/search_chains';
 
 export const MIN_COMMENT_SEARCH_QUERY_LENGTH = 4;
-
-const Errors = {
-  QueryMissing: 'Must enter query to begin searching',
-};
 
 type SearchChainsRequestParams = {
   search: string;
@@ -26,9 +21,6 @@ export const searchChainsHandler = async (
   res: TypedResponse<SearchChainsResponse>
 ) => {
   const options = req.query;
-  if (!options.search) {
-    throw new AppError(Errors.QueryMissing);
-  }
 
   const results = await controllers.chains.searchChains({
     search: options.search,

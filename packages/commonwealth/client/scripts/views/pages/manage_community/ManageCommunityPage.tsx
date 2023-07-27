@@ -10,30 +10,12 @@ import RoleInfo from '../../../models/RoleInfo';
 import Permissions from '../../../utils/Permissions';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
-import { useQuery } from '@tanstack/react-query';
 import ErrorPage from '../error';
-
-type ProfilesSearchResponse = {
-  results: {
-    id: number;
-    user_id: string;
-    profile_name: string;
-    avatar_url: string;
-    addresses: {
-      id: number;
-      chain: string;
-      address: string;
-    }[];
-    roles?: any[];
-  }[];
-  limit: number;
-  page: number;
-  totalPages: number;
-  totalResults: number;
-};
-
-const orderBy = 'last_active';
-const orderDirection = 'DESC';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -70,44 +52,20 @@ const ManageCommunityPage = () => {
     setMods(memberMods);
   };
 
-  const fetchSearchResults = async ({ pageParam = 0 }) => {
-    const {
-      data: { result },
-    } = await axios.get<{ result: ProfilesSearchResponse }>(`/api/profiles`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      params: {
-        chain: app.activeChainId(),
-        search: searchTerm,
-        limit: (50).toString(),
-        page: pageParam.toString(),
-        order_by: orderBy,
-        order_direction: orderDirection,
-        include_roles: 'true',
-      },
-    });
-    return result.results;
-  };
-
-  const { data: searchResults, refetch } = useQuery({
-    queryKey: [
-      'search-members-manage',
-      {
-        debouncedSearchTerm,
-        chain: app.activeChainId(),
-        orderBy,
-        orderDirection,
-      },
-    ],
-    queryFn: fetchSearchResults,
+  const { data: searchResults, refetch } = useSearchProfilesQuery({
+    chainId: app.activeChainId(),
+    searchTerm: debouncedSearchTerm,
+    limit: 20,
+    orderBy: APIOrderBy.LastActive,
+    orderDirection: APIOrderDirection.Desc,
+    includeRoles: true,
   });
 
   const roleData = useMemo(() => {
-    if (!searchResults) {
+    if (!searchResults?.pages?.length) {
       return [];
     }
-    return searchResults.map((profile) => {
+    return searchResults.pages[0].results.map((profile) => {
       return {
         ...(profile.roles[0] || {}),
         Address: profile.addresses[0],
@@ -123,11 +81,6 @@ const ManageCommunityPage = () => {
 
     NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
   }, [forceRerender]);
-
-  // on update debounced search term, fetch
-  useEffect(() => {
-    refetch();
-  }, [debouncedSearchTerm]);
 
   // on init, fetch
   useEffect(() => {

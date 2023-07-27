@@ -16,35 +16,34 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderSearchResults } from './helpers';
-import axios from 'axios';
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import { useCommonNavigate } from '../../../navigation/helpers';
+import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
+import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
-  (scope) => !['All', 'Proposals'].includes(scope)
+  (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope)
 );
 
 // maps client-side sort options to server-side sort options
-const SORT_MAP: Record<string, string[]> = {
-  Best: ['rank', 'DESC'],
-  Newest: ['created_at', 'DESC'],
-  Oldest: ['created_at', 'ASC'],
+const SORT_MAP: Record<string, [APIOrderBy, APIOrderDirection]> = {
+  Best: [APIOrderBy.Rank, APIOrderDirection.Desc],
+  Newest: [APIOrderBy.CreatedAt, APIOrderDirection.Desc],
+  Oldest: [APIOrderBy.CreatedAt, APIOrderDirection.Asc],
 };
-const DEFAULT_SORT_OPTIONS = ['rank', 'DESC'];
+const DEFAULT_SORT_OPTIONS = SORT_MAP.Best;
 
 type SearchQueryParams = {
   q?: string;
   chainScope?: string;
   sort?: string;
   tab?: string;
-};
-type SearchResultsPayload = {
-  results: any[];
-  limit: number;
-  page: number;
-  totalPages: number;
-  totalResults: number;
 };
 
 const SearchPage = () => {
@@ -77,43 +76,6 @@ const SearchPage = () => {
     });
   };
 
-  const fetchSearchResults = async ({ pageParam = 0 }) => {
-    const [orderBy, orderDirection] =
-      SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
-
-    const url = (() => {
-      switch (activeTab) {
-        case SearchScope.Threads:
-          return '/api/threads';
-        case SearchScope.Members:
-          return '/api/profiles';
-        case SearchScope.Communities:
-          return '/api/chains';
-        case SearchScope.Replies:
-          return '/api/comments';
-        default:
-          throw new Error(`invalid tab for search: ${activeTab}`);
-      }
-    })();
-
-    const {
-      data: { result },
-    } = await axios.get<{ result: SearchResultsPayload }>(url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      params: {
-        chain: chain,
-        search: queryParams.q,
-        limit: (10).toString(),
-        page: pageParam.toString(),
-        order_by: orderBy,
-        order_direction: orderDirection,
-      },
-    });
-    return result;
-  };
-
   const handleSearchAllCommunities = () => {
     const newQueryParams = new URLSearchParams(urlQueryParams.toString());
     newQueryParams.set('chainScope', 'all_chains');
@@ -133,38 +95,99 @@ const SearchPage = () => {
     });
   };
 
-  const { isLoading, error, data, fetchNextPage } = useInfiniteQuery(
-    [
-      'search',
-      {
-        tab: activeTab,
-        searchTerm: queryParams.q,
-        sortBy: queryParams.sort,
-        chain: queryParams.chainScope,
-      },
-    ],
-    fetchSearchResults,
-    {
-      getNextPageParam: (lastPage) => {
-        const nextPageNum = lastPage.page + 1;
-        if (nextPageNum <= lastPage.totalPages) {
-          return nextPageNum;
-        }
-        return undefined;
-      },
-    }
-  );
+  const [orderBy, orderDirection] =
+    SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
+
+  const sharedQueryOptions = {
+    chainId: app.activeChainId() || 'all_chains',
+    searchTerm: queryParams.q,
+    limit: 20,
+    orderBy,
+    orderDirection,
+  };
+
+  const {
+    data: threadsData,
+    error: threadsError,
+    fetchNextPage: threadsFetchNextPage,
+    isLoading: threadsIsLoading,
+  } = useSearchThreadsQuery({
+    ...sharedQueryOptions,
+    enabled: activeTab === SearchScope.Threads,
+  });
+
+  const {
+    data: commentsData,
+    error: commentsError,
+    fetchNextPage: commentsFetchNextPage,
+    isLoading: commentsIsLoading,
+  } = useSearchCommentsQuery({
+    ...sharedQueryOptions,
+    enabled: activeTab === SearchScope.Replies,
+  });
+
+  const {
+    data: chainsData,
+    error: chainsError,
+    fetchNextPage: chainsFetchNextPage,
+    isLoading: chainsIsLoading,
+  } = useSearchChainsQuery({
+    ...sharedQueryOptions,
+    enabled: activeTab === SearchScope.Communities,
+  });
+
+  const {
+    data: profilesData,
+    error: profilesError,
+    fetchNextPage: profilesFetchNextPage,
+    isLoading: profilesIsLoading,
+  } = useSearchProfilesQuery({
+    ...sharedQueryOptions,
+    includeRoles: true,
+    enabled: activeTab === SearchScope.Members,
+  });
 
   const results = useMemo(() => {
-    if (!data?.pages) {
-      return [];
+    switch (activeTab) {
+      case SearchScope.Threads:
+        return (
+          threadsData?.pages.reduce((acc, p) => [...acc, ...p.results], []) ||
+          []
+        );
+      case SearchScope.Replies:
+        return (
+          commentsData?.pages.reduce((acc, p) => [...acc, ...p.results], []) ||
+          []
+        );
+      case SearchScope.Communities:
+        return (
+          chainsData?.pages.reduce((acc, p) => [...acc, ...p.results], []) || []
+        );
+      case SearchScope.Members:
+        return (
+          profilesData?.pages.reduce((acc, p) => [...acc, ...p.results], []) ||
+          []
+        );
+      default:
+        return [];
     }
-    return data.pages.reduce((acc, page) => {
-      return [...acc, ...page.results];
-    }, []);
-  }, [data]);
+  }, [activeTab, chainsData, commentsData, profilesData, threadsData]);
 
-  const totalResults = data?.pages[0]?.totalResults || 0;
+  const totalResults = useMemo(() => {
+    switch (activeTab) {
+      case SearchScope.Threads:
+        return threadsData?.pages?.[0]?.totalResults || 0;
+      case SearchScope.Replies:
+        return commentsData?.pages?.[0]?.totalResults || 0;
+      case SearchScope.Communities:
+        return chainsData?.pages?.[0]?.totalResults || 0;
+      case SearchScope.Members:
+        return profilesData?.pages?.[0]?.totalResults || 0;
+      default:
+        return 0;
+    }
+  }, [activeTab, chainsData, commentsData, profilesData, threadsData]);
+
   const totalResultsText = pluralize(totalResults, activeTab.toLowerCase());
   const scopeText = useMemo(() => {
     if (chain) {
@@ -180,18 +203,52 @@ const SearchPage = () => {
 
   // when error, notify
   useEffect(() => {
-    if (error) {
-      notifyError((error as Error).message);
+    const err = threadsError || commentsError || chainsError || profilesError;
+    if (err) {
+      notifyError((err as Error).message);
     }
-  }, [error]);
+  }, [chainsError, commentsError, profilesError, threadsError]);
 
   // when scroll to bottom, fetch next page
   useEffect(() => {
     if (bottomInView) {
-      fetchNextPage();
+      switch (activeTab) {
+        case SearchScope.Threads:
+          threadsFetchNextPage();
+          break;
+        case SearchScope.Replies:
+          commentsFetchNextPage();
+          break;
+        case SearchScope.Communities:
+          chainsFetchNextPage();
+          break;
+        case SearchScope.Members:
+          profilesFetchNextPage();
+          break;
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bottomInView]);
+  }, [activeTab, bottomInView]);
+
+  const isLoading = useMemo(() => {
+    switch (activeTab) {
+      case SearchScope.Threads:
+        return threadsIsLoading;
+      case SearchScope.Replies:
+        return commentsIsLoading;
+      case SearchScope.Communities:
+        return chainsIsLoading;
+      case SearchScope.Members:
+        return profilesIsLoading;
+      default:
+        return false;
+    }
+  }, [
+    activeTab,
+    chainsIsLoading,
+    commentsIsLoading,
+    profilesIsLoading,
+    threadsIsLoading,
+  ]);
 
   return (
     <div className="SearchPage">

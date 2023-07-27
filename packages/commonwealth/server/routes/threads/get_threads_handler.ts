@@ -12,7 +12,6 @@ const Errors = {
   UnexpectedError: 'Unexpected error',
   InvalidRequest: 'Invalid request',
   InvalidThreadId: 'Invalid thread ID',
-  QueryMissing: 'Must enter query to begin searching',
   NoChains: 'No chains resolved to execute search',
 };
 
@@ -111,9 +110,6 @@ export const getThreadsHandler = async (
   if (search) {
     const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
-    if (!search) {
-      throw new AppError(Errors.QueryMissing);
-    }
     if (!req.chain && req.query.chain !== ALL_CHAINS) {
       // if no chain resolved, ensure that client explicitly requested all chains
       throw new AppError(Errors.NoChains);

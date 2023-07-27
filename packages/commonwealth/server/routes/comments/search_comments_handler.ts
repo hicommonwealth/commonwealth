@@ -10,9 +10,6 @@ import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { SearchCommentsResult } from 'server/controllers/server_comments_methods/search_comments';
 
 const Errors = {
-  UnexpectedError: 'Unexpected error',
-  QueryMissing: 'Must enter query to begin searching',
-  NoCommunity: 'Title search must be community scoped',
   NoChains: 'No chains resolved to execute search',
 };
 
@@ -29,9 +26,6 @@ export const searchCommentsHandler = async (
   res: TypedResponse<SearchCommentsResponse>
 ) => {
   const options = req.query;
-  if (!options.search) {
-    throw new AppError(Errors.QueryMissing);
-  }
   if (!options.chain) {
     throw new AppError(Errors.NoChains);
   }
