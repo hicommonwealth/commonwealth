@@ -170,7 +170,7 @@ export const AuthorAndPublishInfo = ({
         <CWTag label={'NEW'} type={'new'} iconName={'newStar'} />
       )}
 
-      {!isHot && (
+      {isHot && (
         <CWTag iconName="trendUp" label="Trending" type="trending"/>
       )}
 
