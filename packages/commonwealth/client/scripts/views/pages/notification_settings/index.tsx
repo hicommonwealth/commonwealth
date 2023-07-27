@@ -626,7 +626,7 @@ const NotificationSettingsPage = () => {
           const wrappedHandleSubscriptionDelivery = (
             selectedItems: DropdownItemType[]
           ) => {
-            handleSubscriptionDelivery(selectedItems, subs);
+            handleSubscriptionDelivery(selectedItems, subs, initialValues);
           };
 
           if (!chainInfo?.id) return null; // handles incomplete loading case
