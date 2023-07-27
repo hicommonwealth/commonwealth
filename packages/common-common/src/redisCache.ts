@@ -164,8 +164,8 @@ export class RedisCache {
       return false;
     }
 
-    // redis returns 'Ok' on successful write but if nothing is updated e.g. NX true then it returns null
-    return res === 'Ok';
+    // redis returns 'OK' on successful write but if nothing is updated e.g. NX true then it returns null
+    return res === 'OK';
   }
 
   public async getKey(
