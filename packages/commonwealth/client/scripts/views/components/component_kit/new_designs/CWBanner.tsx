@@ -32,13 +32,13 @@ const typeIconLookup: {
   error: Warning,
 };
 
-type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
+export type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
 
 interface CWBannerProps {
   type?: BannerType;
   title: string;
   body?: string;
-  buttons: ButtonProps[];
+  buttons?: ButtonProps[];
   className?: string;
   onClose: () => void;
 }
