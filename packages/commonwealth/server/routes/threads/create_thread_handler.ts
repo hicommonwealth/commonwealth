@@ -14,6 +14,7 @@ type CreateThreadRequestBody = {
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
+  discord_meta?: any;
 };
 type CreateThreadResponse = ThreadAttributes;
 
@@ -35,28 +36,33 @@ export const createThreadHandler = async (
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
+    discord_meta,
   } = req.body;
 
   const attachments = req.body['attachments[]'];
 
-  const [thread, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThread(
-      user,
-      address,
-      chain,
-      title,
-      body,
-      kind,
-      readOnly,
-      parseInt(topicId, 10) || undefined,
-      topicName,
-      stage,
-      url,
-      attachments,
-      canvasAction,
-      canvasSession,
-      canvasHash
-    );
+  const [
+    thread,
+    notificationOptions,
+    analyticsOptions,
+  ] = await controllers.threads.createThread({
+    user,
+    address,
+    chain,
+    title,
+    body,
+    kind,
+    readOnly,
+    topicId: parseInt(topicId, 10) || undefined,
+    topicName,
+    stage,
+    url,
+    attachments,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discord_meta,
+  });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

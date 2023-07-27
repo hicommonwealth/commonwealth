@@ -23,7 +23,9 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
-  RABBITMQ_URI, ROLLBAR_ENV,
+  DATABASE_CLEAN_HOUR,
+  RABBITMQ_URI,
+  ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
 } from './server/config';
@@ -48,6 +50,7 @@ import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
+import DatabaseCleaner from './server/util/databaseCleaner';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -293,6 +296,13 @@ async function main() {
   setupErrorHandlers(app, rollbar);
 
   setupServer(app, rollbar, models, rabbitMQController);
+
+  // database clean-up jobs (should be run after the API so, we don't affect start-up time
+  const databaseCleaner = new DatabaseCleaner(
+    models,
+    Number(DATABASE_CLEAN_HOUR),
+    rollbar
+  );
 }
 
 main().catch((e) => console.log(e));

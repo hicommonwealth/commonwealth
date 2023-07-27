@@ -1,12 +1,13 @@
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelReactionCountFromServer } from 'controllers/server/comments';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
@@ -19,6 +20,8 @@ import app from 'state';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
@@ -45,13 +48,14 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { CommentsTree } from '../discussions/CommentTree';
+import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
+import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -83,15 +87,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [thread, setThread] = useState<Thread>(null);
   const [threadFetchFailed, setThreadFetchFailed] = useState(false);
   const [title, setTitle] = useState('');
-  const [viewCount, setViewCount] = useState(null);
+  const [viewCount, setViewCount] = useState<number>(null);
   const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [commentSortType, setCommentSortType] =
-    useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
+  const [commentSortType, setCommentSortType] = useState<
+    CommentsFeaturedFilterTypes
+  >(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
-  const [parentCommentId, setParentCommentId] = useState(null);
+  const [parentCommentId, setParentCommentId] = useState<number>(null);
+  const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -176,24 +182,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .fetchThreadsFromId([+threadId])
       .then((res) => {
         const t = res[0];
-        if (t) {
-          const reactions = app.reactions.getByPost(t);
-          t.associatedReactions = reactions
-            .filter((r) => r.reaction === 'like')
-            .map((r) => {
-              return {
-                id: r.id,
-                type: 'like',
-                address: r.author,
-              };
-            });
-
-          setThread(t);
-        }
+        if (t) setThread(t);
+        setThreadFetchCompleted(true);
       })
       .catch(() => {
         notifyError('Thread not found');
         setThreadFetchFailed(true);
+        setThreadFetchCompleted(true);
       });
   }, [threadId]);
 
@@ -263,19 +258,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             }),
           });
 
-          // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier({
+            const id = app.comments.reactionCountsStore.getIdentifier({
               threadId: rc.thread_id,
               proposalId: rc.proposal_id,
               commentId: rc.comment_id,
             });
 
-            app.reactionCounts.store.add(
+            app.comments.reactionCountsStore.add(
               modelReactionCountFromServer({ ...rc, id })
             );
 
-            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
+            app.comments.isReactionFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {
@@ -441,6 +435,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [comments, thread, threadId]);
 
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
@@ -452,6 +450,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // load app controller
   if (!app.threads.initialized) {
     return <PageLoading />;
+  }
+
+  if (!thread && threadFetchCompleted) {
+    return <PageNotFound />;
   }
 
   if (threadFetchFailed) {
@@ -478,12 +480,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isAuthor ||
     isAdminOrMod;
 
+  // Todo who should actually be able to view this
+  const canCreateSnapshotProposal =
+    app.chain?.meta?.snapshot?.length > 0 && (isAuthor || isAdminOrMod);
+
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
+  const hasSnapshotProposal = thread.links.find(x => x.source === 'snapshot')
+
   const canComment =
-    app.user.activeAccount ||
-    (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
+    !!hasJoinedCommunity ||
+    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
   const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({
@@ -507,6 +515,35 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setThread(newThread);
   };
 
+  const handleNewSnapshotChange = async ({
+    id,
+    snapshot_title,
+  }: {
+    id: string;
+    snapshot_title: string;
+  }) => {
+    const newLink: Link = {
+      source: LinkSource.Snapshot,
+      identifier: id,
+      title: snapshot_title,
+    };
+    const toAdd = [newLink]; // Add this line to create an array with the new link
+
+    if (toAdd.length > 0) {
+      await app.threads.addLinks({
+        threadId: thread.id,
+        links: toAdd,
+      });
+    }
+
+    const newThread = {
+      ...thread,
+      links: [...thread.links, newLink],
+    } as Thread;
+
+    setThread(newThread);
+  };
+
   const editsToSave = localStorage.getItem(
     `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
   );
@@ -521,214 +558,238 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : moment(b.createdAt).diff(moment(a.createdAt))
   );
 
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const fromDiscordBot =
+    thread.discord_meta !== null && thread.discord_meta !== undefined;
+
+  const showLocked =
+    (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
+
   return (
-    <CWContentPage
-      showTabs={isCollapsedSize && tabsShouldBePresent}
-      contentBodyLabel="Thread"
-      showSidebar={
-        showLinkedProposalOptions ||
-        showLinkedThreadOptions ||
-        polls?.length > 0 ||
-        isAuthor
-      }
-      isSpamThread={!!thread.markedAsSpamAt}
-      title={
-        isEditingBody ? (
-          <CWTextInput
-            onInput={(e) => {
-              setTitle(e.target.value);
-            }}
-            defaultValue={thread.title}
-          />
-        ) : (
-          thread.title
-        )
-      }
-      author={app.chain.accounts.get(thread.author)}
-      collaborators={thread.collaborators}
-      createdAt={thread.createdAt}
-      updatedAt={thread.updatedAt}
-      lastEdited={thread.lastEdited}
-      viewCount={viewCount}
-      canUpdateThread={
-        isLoggedIn &&
-        (Permissions.isSiteAdmin() ||
-          Permissions.isThreadAuthor(thread) ||
-          Permissions.isThreadCollaborator(thread))
-      }
-      displayNewTag={true}
-      stageLabel={!isStageDefault && thread.stage}
-      subHeader={
-        !!thread.url && (
-          <ExternalLink url={thread.url}>
-            {extractDomain(thread.url)}
-          </ExternalLink>
-        )
-      }
-      thread={thread}
-      onLockToggle={(isLock) => {
-        setIsGloballyEditing(false);
-        setIsEditingBody(false);
-        setRecentlyEdited(true);
-        setThread((t) => ({
-          ...t,
-          readOnly: isLock,
-          uniqueIdentifier: t.uniqueIdentifier,
-        }));
-      }}
-      onPinToggle={(isPin) => {
-        setThread((t) => ({
-          ...t,
-          pinned: isPin,
-          uniqueIdentifier: t.uniqueIdentifier,
-        }));
-      }}
-      onTopicChange={(topic: Topic) => {
-        const newThread = new Thread({ ...thread, topic });
-        setThread(newThread);
-      }}
-      onCollaboratorsEdit={(collaborators: IThreadCollaborator[]) => {
-        const newThread = new Thread({ ...thread, collaborators });
-        setThread(newThread);
-      }}
-      onDelete={() => navigate('/discussions')}
-      onEditCancel={() => {
-        setIsGloballyEditing(true);
-        setIsEditingBody(true);
-      }}
-      onEditConfirm={() => {
-        setShouldRestoreEdits(true);
-        setIsGloballyEditing(true);
-        setIsEditingBody(true);
-      }}
-      onEditStart={() => {
-        if (editsToSave) {
-          clearEditingLocalStorage(thread.id, ContentType.Thread);
-
-          setSavedEdits(editsToSave || '');
+    <>
+      <CWContentPage
+        showTabs={isCollapsedSize && tabsShouldBePresent}
+        contentBodyLabel="Thread"
+        showSidebar={
+          showLinkedProposalOptions ||
+          showLinkedThreadOptions ||
+          polls?.length > 0 ||
+          isAuthor
         }
-
-        setIsGloballyEditing(true);
-        setIsEditingBody(true);
-      }}
-      onSpamToggle={(updatedThread) => {
-        setIsGloballyEditing(false);
-        setIsEditingBody(false);
-        setRecentlyEdited(true);
-        setThread((t) => ({
-          ...t,
-          markedAsSpamAt: updatedThread.markedAsSpamAt,
-          uniqueIdentifier: t.uniqueIdentifier,
-        }));
-      }}
-      onProposalStageChange={(stage) => {
-        setThread((t) => ({
-          ...t,
-          stage: stage,
-          uniqueIdentifier: t.uniqueIdentifier,
-        }));
-      }}
-      hasPendingEdits={!!editsToSave}
-      body={(threadOptionsComp) => (
-        <div className="thread-content">
-          {isEditingBody ? (
-            <>
-              {threadOptionsComp}
-              <EditBody
-                title={title}
-                thread={thread}
-                savedEdits={savedEdits}
-                shouldRestoreEdits={shouldRestoreEdits}
-                cancelEditing={cancelEditing}
-                threadUpdatedCallback={threadUpdatedCallback}
-              />
-            </>
+        isSpamThread={!!thread.markedAsSpamAt}
+        title={
+          isEditingBody ? (
+            <CWTextInput
+              onInput={(e) => {
+                setTitle(e.target.value);
+              }}
+              defaultValue={thread.title}
+            />
           ) : (
-            <>
-              <QuillRenderer doc={thread.body} cutoffLines={50} />
-              {thread.readOnly ? (
-                <>
-                  {threadOptionsComp}
-                  {!thread.readOnly && thread.markedAsSpamAt && (
-                    <div className="callout-text">
-                      <CWIcon iconName="flag" weight="fill" iconSize="small" />
-                      <CWText type="h5">
-                        This thread was flagged as spam on{' '}
-                        {moment(thread.createdAt).format('DD/MM/YYYY')}, meaning
-                        it can no longer be edited or commented on.
-                      </CWText>
-                    </div>
-                  )}
-                  {thread.readOnly && !thread.markedAsSpamAt && (
-                    <LockMessage
-                      lockedAt={thread.lockedAt}
-                      updatedAt={thread.updatedAt}
+            thread.title
+          )
+        }
+        author={app.chain.accounts.get(thread.author)}
+        discord_meta={thread.discord_meta}
+        collaborators={thread.collaborators}
+        createdAt={thread.createdAt}
+        updatedAt={thread.updatedAt}
+        lastEdited={thread.lastEdited}
+        viewCount={viewCount}
+        canUpdateThread={
+          isLoggedIn &&
+          (Permissions.isSiteAdmin() ||
+            Permissions.isThreadAuthor(thread) ||
+            Permissions.isThreadCollaborator(thread))
+        }
+        displayNewTag={true}
+        stageLabel={!isStageDefault && thread.stage}
+        subHeader={
+          !!thread.url && (
+            <ExternalLink url={thread.url}>
+              {extractDomain(thread.url)}
+            </ExternalLink>
+          )
+        }
+        thread={thread}
+        onLockToggle={(isLock) => {
+          setIsGloballyEditing(false);
+          setIsEditingBody(false);
+          setRecentlyEdited(true);
+          setThread((t) => ({
+            ...t,
+            readOnly: isLock,
+            uniqueIdentifier: t.uniqueIdentifier,
+          }));
+        }}
+        onPinToggle={(isPin) => {
+          setThread((t) => ({
+            ...t,
+            pinned: isPin,
+            uniqueIdentifier: t.uniqueIdentifier,
+          }));
+        }}
+        onTopicChange={(topic: Topic) => {
+          const newThread = new Thread({ ...thread, topic });
+          setThread(newThread);
+        }}
+        onCollaboratorsEdit={(collaborators: IThreadCollaborator[]) => {
+          const newThread = new Thread({ ...thread, collaborators });
+          setThread(newThread);
+        }}
+        onDelete={() => navigate('/discussions')}
+        onEditCancel={() => {
+          setIsGloballyEditing(true);
+          setIsEditingBody(true);
+        }}
+        onEditConfirm={() => {
+          setShouldRestoreEdits(true);
+          setIsGloballyEditing(true);
+          setIsEditingBody(true);
+        }}
+        onEditStart={() => {
+          if (editsToSave) {
+            clearEditingLocalStorage(thread.id, ContentType.Thread);
+
+            setSavedEdits(editsToSave || '');
+          }
+
+          setIsGloballyEditing(true);
+          setIsEditingBody(true);
+        }}
+        onSpamToggle={(updatedThread) => {
+          setIsGloballyEditing(false);
+          setIsEditingBody(false);
+          setRecentlyEdited(true);
+          setThread((t) => ({
+            ...t,
+            markedAsSpamAt: updatedThread.markedAsSpamAt,
+            uniqueIdentifier: t.uniqueIdentifier,
+          }));
+        }}
+        onProposalStageChange={(stage) => {
+          setThread((t) => ({
+            ...t,
+            stage: stage,
+            uniqueIdentifier: t.uniqueIdentifier,
+          }));
+        }}
+        hasPendingEdits={!!editsToSave}
+        body={(threadOptionsComp) => (
+          <div className="thread-content">
+            {isEditingBody ? (
+              <>
+                {/*// TODO editing thread */}
+                {threadOptionsComp}
+                <EditBody
+                  title={title}
+                  thread={thread}
+                  savedEdits={savedEdits}
+                  shouldRestoreEdits={shouldRestoreEdits}
+                  cancelEditing={cancelEditing}
+                  threadUpdatedCallback={threadUpdatedCallback}
+                />
+              </>
+            ) : (
+              <>
+                <QuillRenderer doc={thread.body} cutoffLines={50} />
+                {thread.readOnly || fromDiscordBot ? (
+                  <>
+                    {threadOptionsComp}
+                    {!thread.readOnly && thread.markedAsSpamAt && (
+                      <div className="callout-text">
+                        <CWIcon
+                          iconName="flag"
+                          weight="fill"
+                          iconSize="small"
+                        />
+                        <CWText type="h5">
+                          This thread was flagged as spam on{' '}
+                          {moment(thread.createdAt).format('DD/MM/YYYY')},
+                          meaning it can no longer be edited or commented on.
+                        </CWText>
+                      </div>
+                    )}
+                    {showLocked && (
+                      <LockMessage
+                        lockedAt={thread.lockedAt}
+                        updatedAt={thread.updatedAt}
+                        fromDiscordBot={fromDiscordBot}
+                      />
+                    )}
+                  </>
+                ) : !isGloballyEditing && isLoggedIn ? (
+                  <>
+                    {threadOptionsComp}
+                    <CreateComment
+                      updatedCommentsCallback={updatedCommentsCallback}
+                      rootThread={thread}
+                      canComment={canComment}
                     />
-                  )}
-                </>
-              ) : !isGloballyEditing && canComment && isLoggedIn ? (
-                <>
-                  {threadOptionsComp}
-                  <CreateComment
-                    updatedCommentsCallback={updatedCommentsCallback}
-                    rootThread={thread}
-                  />
-                </>
-              ) : null}
-            </>
-          )}
-        </div>
-      )}
-      comments={
-        <>
-          {comments.length > 0 && (
-            <div className="comments-filter-row">
-              <Select
-                key={commentSortType}
-                size="compact"
-                selected={commentSortType}
-                onSelect={(item: any) => {
-                  setCommentSortType(item.value);
-                }}
-                options={[
-                  {
-                    id: 1,
-                    value: CommentsFeaturedFilterTypes.Newest,
-                    label: 'Newest',
-                    iconLeft: 'sparkle',
-                  },
-                  {
-                    id: 2,
-                    value: CommentsFeaturedFilterTypes.Oldest,
-                    label: 'Oldest',
-                    iconLeft: 'clockCounterClockwise',
-                  },
-                ]}
-              />
-              <CWCheckbox
-                checked={includeSpamThreads}
-                label="Include comments flagged as spam"
-                onChange={(e) => setIncludeSpamThreads(e.target.checked)}
-              />
-            </div>
-          )}
-          <CommentsTree
-            comments={sortedComments}
-            includeSpams={includeSpamThreads}
-            thread={thread}
-            setIsGloballyEditing={setIsGloballyEditing}
-            updatedCommentsCallback={updatedCommentsCallback}
-            isReplying={isReplying}
-            setIsReplying={setIsReplying}
-            parentCommentId={parentCommentId}
-            setParentCommentId={setParentCommentId}
-          />
-        </>
-      }
-      sidebarComponents={
-        [
-          ...(showLinkedProposalOptions || showLinkedThreadOptions
-            ? [
+                    {showBanner && (
+                      <JoinCommunityBanner
+                        onClose={handleCloseBanner}
+                        onJoin={handleJoinCommunity}
+                      />
+                    )}
+                  </>
+                ) : null}
+              </>
+            )}
+          </div>
+        )}
+        comments={
+          <>
+            {comments.length > 0 && (
+              <div className="comments-filter-row">
+                <Select
+                  key={commentSortType}
+                  size="compact"
+                  selected={commentSortType}
+                  onSelect={(item: any) => {
+                    setCommentSortType(item.value);
+                  }}
+                  options={[
+                    {
+                      id: 1,
+                      value: CommentsFeaturedFilterTypes.Newest,
+                      label: 'Newest',
+                      iconLeft: 'sparkle',
+                    },
+                    {
+                      id: 2,
+                      value: CommentsFeaturedFilterTypes.Oldest,
+                      label: 'Oldest',
+                      iconLeft: 'clockCounterClockwise',
+                    },
+                  ]}
+                />
+                <CWCheckbox
+                  checked={includeSpamThreads}
+                  label="Include comments flagged as spam"
+                  onChange={(e) => setIncludeSpamThreads(e.target.checked)}
+                />
+              </div>
+            )}
+            <CommentTree
+              comments={sortedComments}
+              includeSpams={includeSpamThreads}
+              thread={thread}
+              setIsGloballyEditing={setIsGloballyEditing}
+              updatedCommentsCallback={updatedCommentsCallback}
+              isReplying={isReplying}
+              setIsReplying={setIsReplying}
+              parentCommentId={parentCommentId}
+              setParentCommentId={setParentCommentId}
+              canComment={canComment}
+              fromDiscordBot={fromDiscordBot}
+            />
+          </>
+        }
+        sidebarComponents={
+          [
+            ...(showLinkedProposalOptions || showLinkedThreadOptions
+              ? [
                 {
                   label: 'Links',
                   item: (
@@ -751,10 +812,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ),
                 },
               ]
-            : []),
-          ...(polls?.length > 0 ||
-          (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
-            ? [
+              : []),
+            ...(canCreateSnapshotProposal && !hasSnapshotProposal
+              ? [
+                {
+                  label: 'Snapshot',
+                  item: (
+                    <div className="cards-column">
+                      <SnapshotCreationCard
+                        thread={thread}
+                        allowSnapshotCreation={isAuthor || isAdminOrMod}
+                        onChangeHandler={handleNewSnapshotChange}
+                      />
+                    </div>
+                  ),
+                },
+              ]
+              : []),
+            ...(polls?.length > 0 ||
+              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+              ? [
                 {
                   label: 'Polls',
                   item: (
@@ -788,10 +865,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ),
                 },
               ]
-            : []),
-        ] as SidebarComponents
-      }
-    />
+              : []),
+          ] as SidebarComponents
+        }
+      />
+      {JoinCommunityModals}
+    </>
   );
 };
 

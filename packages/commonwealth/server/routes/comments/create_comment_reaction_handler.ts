@@ -45,7 +45,7 @@ export const createCommentReactionHandler = async (
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.comments.createCommentReaction(
+    await controllers.comments.createCommentReaction({
       user,
       address,
       chain,
@@ -53,8 +53,8 @@ export const createCommentReactionHandler = async (
       commentId,
       canvasAction,
       canvasSession,
-      canvasHash
-    );
+      canvasHash,
+    });
 
   // update address last active
   address.last_active = new Date();

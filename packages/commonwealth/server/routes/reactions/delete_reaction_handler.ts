@@ -19,7 +19,10 @@ export const deleteReactionHandler = async (
     throw new AppError(Errors.InvalidReactionId);
   }
 
-  await controllers.reactions.deleteReaction(req.user, reactionId);
+  await controllers.reactions.deleteReaction({
+    user: req.user,
+    reactionId,
+  });
 
   return success(res, undefined);
 };

@@ -193,10 +193,10 @@ export class CosmosProposalV1 extends Proposal<
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTallyV1(tallyResp?.tally);
         }
-
-        this.isFetched.emit('redraw');
       } catch (err) {
-        console.error(`Cosmos query failed: ${err.message}`);
+        console.error(`Cosmos vote query failed: ${err.message}`);
+      } finally {
+        this.isFetched.emit('redraw');
       }
     }
   }
