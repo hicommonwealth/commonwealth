@@ -5,6 +5,10 @@ import { addAlchemyKey, login } from '../utils/e2eUtils';
 
 test.describe.configure({ mode: 'parallel' });
 
+function getRandomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 test.describe('Commonwealth Create Community', () => {
   test.setTimeout(60000);
 
@@ -18,7 +22,7 @@ test.describe('Commonwealth Create Community', () => {
   });
 
   test('Test create starter community', async ({ page }) => {
-    const chainName = Date.now().toString();
+    const chainName = Date.now().toString() + getRandomInteger(1, 100000);
     await page.locator('input#NameInput').fill(chainName);
     const iconField = await page.$('input[id*=Icon]');
     await iconField.type(
@@ -30,7 +34,7 @@ test.describe('Commonwealth Create Community', () => {
   });
 
   test('Test create erc20 community', async ({ page }) => {
-    const chainName = Date.now().toString();
+    const chainName = Date.now().toString() + getRandomInteger(1, 100000);
 
     await fillOutERCForm(
       page,
@@ -43,7 +47,7 @@ test.describe('Commonwealth Create Community', () => {
   });
 
   test('Test create erc721 community', async ({ page }) => {
-    const chainName = Date.now().toString();
+    const chainName = Date.now().toString() + getRandomInteger(1, 100000);
 
     await fillOutERCForm(
       page,
@@ -56,7 +60,7 @@ test.describe('Commonwealth Create Community', () => {
   });
 
   test('Test create Polygon community', async ({ page }) => {
-    const chainName = Date.now().toString();
+    const chainName = Date.now().toString() + getRandomInteger(1, 100000);
     await page.locator('input#NameInput').fill(chainName);
     const iconField = await page.$('input[id*=Icon]');
     await iconField.type(
