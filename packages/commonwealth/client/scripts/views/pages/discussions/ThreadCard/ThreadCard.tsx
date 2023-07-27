@@ -115,6 +115,7 @@ export const ThreadCard = ({
               {...(thread.updatedAt && {
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
+              discord_meta={thread.discord_meta}
             />
             <div className="content-header-icons">
               {isHot(thread) && <div className="flame" />}
