@@ -9,7 +9,7 @@ export async function login(page) {
   await addUserIfNone();
 
   await page.waitForSelector('.LoginSelector button');
-  let button = await page.$('.LoginSelector button');
+  let button = await page.locator('.LoginSelector button');
   await button.click();
 
   await page.waitForSelector('.LoginDesktop');
@@ -17,7 +17,7 @@ export async function login(page) {
   let metaMaskIcon = await page.$$("text='Metamask'");
   do {
     await page.mouse.click(0, 0);
-    button = await page.$('.LoginSelector button');
+    button = await page.locator('.LoginSelector button');
     await button.click();
     metaMaskIcon = await page.$$("text='Metamask'");
   } while (metaMaskIcon.length === 0);
