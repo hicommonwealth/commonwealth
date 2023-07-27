@@ -36,7 +36,8 @@
     "packages/common-common",
     "packages/chain-events",
     "packages/token-balance-cache",
-    "packages/commonwealth"
+    "packages/commonwealth",
+    "packages/discord-bot"
   ],
   "dependencies": {
     "@capacitor/android": "^4.3.0",
