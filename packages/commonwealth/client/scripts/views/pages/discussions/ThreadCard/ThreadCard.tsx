@@ -12,20 +12,21 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import useBrowserWindow from '../../../../../hooks/useBrowserWindow';
-import AddressInfo from '../../../../../models/AddressInfo';
-import { ThreadStage } from '../../../../../models/types';
-import Permissions from '../../../../../utils/Permissions';
-import { CWTag } from '../../../../components/component_kit/cw_tag';
-import { CWText } from '../../../../components/component_kit/cw_text';
-import { getClasses } from '../../../../components/component_kit/helpers';
-import { isNewThread } from '../../NewThreadTag';
-import { isHot } from '../../helpers';
-import { AuthorAndPublishInfo } from '../AuthorAndPublishInfo';
-import { Options } from '../Options';
-import { AdminActionsProps } from '../Options/AdminActions';
-import { ReactionButton } from '../Options/ReactionButton';
-import './index.scss';
+import useBrowserWindow from '../../../../hooks/useBrowserWindow';
+import AddressInfo from '../../../../models/AddressInfo';
+import { ThreadStage } from '../../../../models/types';
+import Permissions from '../../../../utils/Permissions';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from 'views/components/component_kit/helpers';
+import { isNewThread } from '../NewThreadTag';
+import { isHot } from '../helpers';
+import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
+import { ThreadOptions } from './ThreadOptions';
+import { AdminActionsProps } from './ThreadOptions/AdminActions';
+import { ReactionButton } from './ThreadOptions/ReactionButton';
+import './ThreadCard.scss';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
@@ -33,7 +34,7 @@ type CardProps = AdminActionsProps & {
   threadHref: string;
 };
 
-export const Card = ({
+export const ThreadCard = ({
   thread,
   onDelete,
   onSpamToggle,
@@ -53,6 +54,7 @@ export const Card = ({
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -91,17 +93,21 @@ export const Card = ({
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ReactionButton thread={thread} size="big" />
+          <ReactionButton
+            thread={thread}
+            size="big"
+            disabled={!hasJoinedCommunity}
+          />
         )}
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              showSplitDotIndicator={!isWindowSmallInclusive}
               authorInfo={
                 new AddressInfo(null, thread.author, thread.authorChain, null)
               }
               publishDate={moment(thread.createdAt).format('l')}
               isNew={isNewThread(thread.createdAt)}
+              isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
                 lockedAt: thread.lockedAt.toISOString(),
@@ -109,11 +115,37 @@ export const Card = ({
               {...(thread.updatedAt && {
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
+              discord_meta={thread.discord_meta}
             />
             <div className="content-header-icons">
-              {isHot(thread) && <div className="flame" />}
               {thread.pinned && <CWIcon iconName="pin" />}
             </div>
+          </div>
+          <div className="content-body-wrapper">
+            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
+            <div className="content-title">
+              <CWText type="h5" fontWeight="semiBold">
+                {thread.title}
+              </CWText>
+            </div>
+            <div className='content-top-tags'>
+              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+              {linkedSnapshots.length > 0 && (
+                <CWTag
+                  type="active"
+                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
+                    ? linkedSnapshots[0].identifier.split('/')[1]
+                    : linkedSnapshots[0].identifier
+                  )
+                    .toString()
+                    .slice(0, 4)}…`}
+                />
+              )}
+            </div>
+            <CWText type="caption" className="content-body">
+              {thread.plaintext}
+            </CWText>
           </div>
           {isTagsRowVisible && (
             <div className="content-tags">
@@ -138,45 +170,28 @@ export const Card = ({
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
                     )} 
-                        ${Number.isNaN(parseInt(link.identifier, 10))
-                        ? ''
-                        : ` #${link.identifier}`
-                      }`}
+                        ${
+                          Number.isNaN(parseInt(link.identifier, 10))
+                            ? ''
+                            : ` #${link.identifier}`
+                        }`}
                   />
                 ))}
             </div>
           )}
-          <div className="content-body-wrapper">
-            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
-            <div className="content-title">
-              <CWText type="h5" fontWeight="semiBold">
-                {thread.title}
-              </CWText>
-              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
-
-              {linkedSnapshots.length > 0 && (
-                <CWTag
-                  type="active"
-                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
-                    ? linkedSnapshots[0].identifier.split('/')[1]
-                    : linkedSnapshots[0].identifier
-                  )
-                    .toString()
-                    .slice(0, 4)}…`}
-                />
-              )}
-            </div>
-            <CWText type="caption" className="content-body">
-              {thread.plaintext}
-            </CWText>
-          </div>
-          <div className="content-footer">
-            <Options
+          <div
+            className="content-footer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <ThreadOptions
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}
               thread={thread}
-              canVote={isWindowSmallInclusive}
-              canComment={!thread.readOnly}
+              upvoteBtnVisible={isWindowSmallInclusive}
+              commentBtnVisible={!thread.readOnly}
               canUpdateThread={
                 isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)

@@ -1,4 +1,4 @@
-@import '../../../../../../styles/shared';
+@import '../../../../../styles/shared';
 
 .ThreadCard {
   cursor: pointer;
@@ -25,7 +25,7 @@
   }
 
   &:hover {
-    background: $neutral-100;
+    background: $neutral-50;
     text-decoration: none;
     color: unset;
   }
@@ -56,7 +56,6 @@
       }
     }
 
-
     .content-body-wrapper {
       display: flex;
       flex-direction: column;
@@ -75,6 +74,11 @@
       }
     }
 
+    .content-top-tags {
+      display: flex;
+      gap: 8px;
+    }
+
     .content-tags {
       display: flex;
       flex-wrap: wrap;
@@ -85,17 +89,6 @@
     .content-footer {
       display: flex;
       justify-content: space-between;
-
-      .comments-count {
-        align-items: center;
-        display: flex;
-        gap: 8px;
-
-        .Icon,
-        .Text {
-          // color: $neutral-500;
-        }
-      }
 
       .content-footer-btn {
         outline: 0;

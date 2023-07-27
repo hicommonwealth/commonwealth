@@ -277,24 +277,19 @@ class SearchController {
     page?: number,
     includeRoles?: boolean
   ) => {
-    try {
-      const response = await axios.get(`${app.serverUrl()}/searchProfiles`, {
-        params: {
-          chain: chainScope,
-          search: searchTerm,
-          page_size: pageSize,
-          page,
-          include_roles: includeRoles,
-        },
-      });
-      if (response.data.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${response.status}`);
-      }
-      return response.data.result;
-    } catch (e) {
-      console.error(e);
-      return { profiles: [] };
+    const response = await axios.get(`${app.serverUrl()}/searchProfiles`, {
+      params: {
+        chain: chainScope,
+        search: searchTerm,
+        page_size: pageSize,
+        page,
+        include_roles: includeRoles,
+      },
+    });
+    if (response.data.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
     }
+    return response.data.result;
   };
 
   private sortResults = (a, b) => {

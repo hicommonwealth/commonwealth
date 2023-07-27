@@ -48,7 +48,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { CommentsTree } from '../discussions/CommentTree';
+import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
@@ -92,8 +92,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [commentSortType, setCommentSortType] =
-    useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
+  const [commentSortType, setCommentSortType] = useState<
+    CommentsFeaturedFilterTypes
+  >(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
@@ -181,20 +182,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .fetchThreadsFromId([+threadId])
       .then((res) => {
         const t = res[0];
-        if (t) {
-          const reactions = app.comments.getReactionByPost(t);
-          t.associatedReactions = reactions
-            .filter((r) => r.reaction === 'like')
-            .map((r) => {
-              return {
-                id: r.id,
-                type: 'like',
-                address: r.author,
-              };
-            });
-
-          setThread(t);
-        }
+        if (t) setThread(t);
         setThreadFetchCompleted(true);
       })
       .catch(() => {
@@ -571,6 +559,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const fromDiscordBot =
+    thread.discord_meta !== null && thread.discord_meta !== undefined;
+
+  const showLocked =
+    (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
 
   return (
     <>
@@ -597,6 +590,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           )
         }
         author={app.chain.accounts.get(thread.author)}
+        discord_meta={thread.discord_meta}
         collaborators={thread.collaborators}
         createdAt={thread.createdAt}
         updatedAt={thread.updatedAt}
@@ -685,6 +679,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <div className="thread-content">
             {isEditingBody ? (
               <>
+                {/*// TODO editing thread */}
                 {threadOptionsComp}
                 <EditBody
                   title={title}
@@ -698,7 +693,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
-                {thread.readOnly ? (
+                {thread.readOnly || fromDiscordBot ? (
                   <>
                     {threadOptionsComp}
                     {!thread.readOnly && thread.markedAsSpamAt && (
@@ -715,10 +710,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         </CWText>
                       </div>
                     )}
-                    {thread.readOnly && !thread.markedAsSpamAt && (
+                    {showLocked && (
                       <LockMessage
                         lockedAt={thread.lockedAt}
                         updatedAt={thread.updatedAt}
+                        fromDiscordBot={fromDiscordBot}
                       />
                     )}
                   </>
@@ -775,7 +771,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 />
               </div>
             )}
-            <CommentsTree
+            <CommentTree
               comments={sortedComments}
               includeSpams={includeSpamThreads}
               thread={thread}
@@ -786,6 +782,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               parentCommentId={parentCommentId}
               setParentCommentId={setParentCommentId}
               canComment={canComment}
+              fromDiscordBot={fromDiscordBot}
             />
           </>
         }
