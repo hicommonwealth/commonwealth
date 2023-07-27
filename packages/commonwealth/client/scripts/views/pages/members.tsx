@@ -68,15 +68,21 @@ const MembersPage = () => {
       });
   }, [data]);
 
-  // on data change, scroll to top
+  const totalResults = data?.pages?.[0]?.totalResults || 0;
+
+  // fixes bug that prevents scrolling on initial page load
   useEffect(() => {
-    containerRef.current.scrollToIndex(0);
-  }, [data]);
+    const shouldFetchMore = members.length < 50 && totalResults > 50;
+    if (!shouldFetchMore) {
+      return;
+    }
+    fetchNextPage();
+  }, [members, totalResults]);
 
   return (
     <div className="MembersPage">
       <CWText type="h3" fontWeight="medium">
-        Members ({data?.pages?.[0]?.totalResults || 0})
+        Members ({totalResults})
       </CWText>
       <MembersSearchBar
         searchTerm={searchTerm}
