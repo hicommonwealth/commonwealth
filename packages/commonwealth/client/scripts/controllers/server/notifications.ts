@@ -2,7 +2,9 @@
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import NotificationSubscription, { modelFromServer } from 'models/NotificationSubscription';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
 
 import app from 'state';
 
@@ -105,7 +107,7 @@ class NotificationsController {
           const newSubscription = modelFromServer(result);
           if (newSubscription.category === 'chain-event')
             app.socket.chainEventsNs.addChainEventSubscriptions([
-              newSubscription,
+              newSubscription.chainId,
             ]);
           this._subscriptions.push(newSubscription);
         }
@@ -124,7 +126,7 @@ class NotificationsController {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
-          if (s.category === 'chain-event') ceSubs.push(s);
+          if (s.category === 'chain-event') ceSubs.push(s.chainId);
         }
         app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
       }
@@ -340,20 +342,22 @@ class NotificationsController {
   }
 
   private parseNotifications(subscriptions) {
-    const ceSubs = [];
+    const ceSubs: string[] = [];
 
     for (const subscriptionJSON of subscriptions) {
-      const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+      const subscriptionId = subscriptionJSON.subscription_id;
+      const categoryId = subscriptionJSON.category_id;
 
       // save the notification read + notification instances if any
       for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
         const data = {
           is_read: notificationsReadJSON.is_read,
+          subscription_id: subscriptionId,
           ...notificationsReadJSON.Notification,
         };
-        const notification = Notification.fromJSON(data, subscription);
+        const notification = Notification.fromJSON(data);
 
-        if (subscription.category === 'chain-event') {
+        if (categoryId === 'chain-event') {
           if (!this._chainEventStore.getById(notification.id))
             this._chainEventStore.add(notification);
           // the minimum id is the new max id for next page
@@ -372,7 +376,7 @@ class NotificationsController {
           }
         }
       }
-      if (subscription.category === 'chain-event') ceSubs.push(subscription);
+      if (categoryId === 'chain-event') ceSubs.push(subscriptionJSON.chain_id);
     }
     app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }

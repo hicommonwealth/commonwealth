@@ -99,7 +99,7 @@ export async function createSubscription(
   return models.Subscription.create(subData, options);
 }
 
-interface SubscriptionFindOptions {
+export interface SubscriptionFindOptions {
   chainId?: string;
   threadId?: number;
   commentId?: number;

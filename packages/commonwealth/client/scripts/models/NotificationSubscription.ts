@@ -7,17 +7,17 @@ import type ChainInfo from './ChainInfo';
 import type { Comment as CommentT } from './Comment';
 import type { IUniqueId } from './interfaces';
 import { Thread as ThreadT } from './Thread';
+import { SubscriptionFindOptions } from 'subscriptionMapping';
 
-class NotificationSubscription {
+class NotificationSubscription implements SubscriptionFindOptions {
   public readonly category: string;
-  public readonly objectId: string;
+  public readonly snapshotId: string;
   public readonly createdAt: moment.Moment;
   public readonly Chain: ChainInfo;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
 
   public readonly id?: number;
-  public readonly chainEntityId?: any;
 
   private _immediateEmail: boolean;
   public get immediateEmail() {
@@ -33,56 +33,65 @@ class NotificationSubscription {
   }
 
   private _isActive: boolean;
-  public get isActive() {
-    return this._isActive;
-  }
-
-  // TODO: should resolve Chain vs chain
-  public get chainId() {
-    return this.Chain.id || this.Chain;
+  public disable() {
+    this._isActive = false;
   }
 
   public enable() {
     this._isActive = true;
   }
 
-  public disable() {
-    this._isActive = false;
+  public get isActive() {
+    return this._isActive;
+  }
+
+  // TODO: @Timothee these types need to be consolidated - ideally viewSubscriptions route doesn't fetch
+  //  threads and comments so only id's like `viewNotifications` route
+  public get chainId() {
+    return this.Chain.id || <string>(<unknown>this.Chain);
+  }
+
+  public get threadId() {
+    return this.Thread.id || <number>(<unknown>this.Thread);
+  }
+
+  public get commentId() {
+    return this.Comment.id || <number>(<unknown>this.Comment);
   }
 
   constructor(
     id,
     category,
-    objectId,
     isActive,
     createdAt,
     immediateEmail,
     Chain?,
     comment?: CommentT<IUniqueId>,
-    thread?: ThreadT
+    thread?: ThreadT,
+    snapshotId?: string
   ) {
     this.id = id;
     this.category = category;
-    this.objectId = objectId;
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.Chain = Chain;
     this.Comment = comment;
     this.Thread = thread;
+    this.snapshotId = snapshotId;
   }
 
   public static fromJSON(json) {
     return new NotificationSubscription(
       json.id,
       json.category_id,
-      json.object_id,
       json.is_active,
       json.created_at,
       json.immediate_email,
       json.chain_id,
       json.Comment || json.comment_id,
-      json.Thread || json.thread_id
+      json.Thread || json.thread_id,
+      json.snapshot_id
     );
   }
 }
@@ -91,13 +100,13 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
   const {
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,
     Chain,
     Comment,
     Thread,
+    snapshot_id,
   } = subscription;
 
   let modeledThread: ThreadT;
@@ -123,13 +132,13 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
   return new NotificationSubscription(
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,
     Chain,
     modeledComment,
-    modeledThread
+    modeledThread,
+    snapshot_id
   );
 };
 
