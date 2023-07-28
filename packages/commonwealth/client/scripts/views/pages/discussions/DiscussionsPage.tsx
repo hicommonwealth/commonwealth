@@ -91,7 +91,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     includePinnedThreads: true,
     orderBy: featuredFilter,
     // toDate: dateCursor.toDate,
-    toDate: '2023-07-27T11:00:16.924Z' // todo: REPLACE THIS
+    toDate: '2023-09-27T13:04:56.656Z' // todo: REPLACE THIS
     // fromDate: dateCursor.fromDate, // todo: REPLACE THIS
   })
 
@@ -125,26 +125,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
                 localStorage[`${app.activeChainId()}-discussions-scrollY`] =
                   scrollEle.scrollTop;
-              }}
-              onSpamToggle={(updatedThread) => {
-                // setThreads((oldThreads) => {
-                //   const updatedThreads = [...oldThreads];
-                //   const foundThread = updatedThreads.find(
-                //     (x) => x.id === thread.id
-                //   );
-                //   if (foundThread)
-                //     foundThread.markedAsSpamAt = updatedThread.markedAsSpamAt;
-                //   return updatedThreads;
-                // });
-              }}
-              onTopicChange={(topic) => {
-                if (topic.id !== thread.topic.id) {
-                  const tempThreads = [...threads].filter(
-                    (t) => t.id !== thread.id
-                  );
-
-                  // setThreads(tempThreads);
-                }
               }}
             />
           );
