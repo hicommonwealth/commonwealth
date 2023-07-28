@@ -51,11 +51,6 @@ export default (
       foreignKey: 'address_id',
       targetKey: 'id',
     });
-    models.DiscussionDraft.hasMany(models.Attachment, {
-      foreignKey: 'attachment_id',
-      constraints: false,
-      scope: { attachable: 'thread' },
-    });
   };
 
   return DiscussionDraft;

@@ -7,7 +7,6 @@ import moment from 'moment';
 import app from 'state';
 import { CommentsStore, ReactionCountsStore, ReactionStore } from 'stores';
 import AbridgedThread from '../../models/AbridgedThread';
-import Attachment from '../../models/Attachment';
 import Comment from '../../models/Comment';
 import Reaction from '../../models/Reaction';
 import Thread from '../../models/Thread';
@@ -45,10 +44,6 @@ export const modelReactionFromServer = (reaction) => {
 };
 
 export const modelFromServer = (comment) => {
-  const attachments = comment.Attachments
-    ? comment.Attachments.map((a) => new Attachment(a.url, a.description))
-    : [];
-
   const { reactions } = comment;
   if (reactions) {
     for (const reaction of reactions) {
@@ -95,7 +90,6 @@ export const modelFromServer = (comment) => {
           text: '[deleted]',
           plaintext: '[deleted]',
           versionHistory: [],
-          attachments: [],
           threadId: comment.thread_id,
           id: comment.id,
           createdAt: moment(comment.created_at),
@@ -116,7 +110,6 @@ export const modelFromServer = (comment) => {
           text: decodeURIComponent(comment.text),
           plaintext: comment.plaintext,
           versionHistory,
-          attachments,
           threadId: comment.thread_id,
           id: comment.id,
           createdAt: moment(comment.created_at),
@@ -198,8 +191,7 @@ class CommentsController {
     threadId: number,
     chain: string,
     unescapedText: string,
-    parentCommentId: any = null,
-    attachments?: string[]
+    parentCommentId: any = null
   ) {
     let chainEntity;
     try {
@@ -218,7 +210,6 @@ class CommentsController {
           address: app.user.activeAccount.address,
           parent_id: parentCommentId,
           chain_entity_id: chainEntity?.id,
-          'attachments[]': attachments,
           text: encodeURIComponent(unescapedText),
           jwt: app.user.jwt,
           canvas_action: action,
@@ -254,11 +245,7 @@ class CommentsController {
     }
   }
 
-  public async edit(
-    comment: Comment<any>,
-    body: string,
-    attachments?: string[]
-  ) {
+  public async edit(comment: Comment<any>, body: string) {
     const newBody = body || comment.text;
     try {
       const { session, action, hash } = await app.sessions.signComment({
@@ -274,7 +261,6 @@ class CommentsController {
           id: comment.id,
           chain: comment.chain,
           body: encodeURIComponent(newBody),
-          'attachments[]': attachments,
           jwt: app.user.jwt,
           canvas_action: action,
           canvas_session: session,

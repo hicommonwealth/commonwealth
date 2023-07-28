@@ -1,6 +1,5 @@
 import type moment from 'moment';
 import type { VersionHistory } from '../controllers/server/threads';
-import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -11,7 +10,6 @@ export class Comment<T extends IUniqueId> {
   public readonly author: string;
   public readonly text: string;
   public readonly plaintext: string;
-  public readonly attachments: Attachment[];
   public readonly id: number;
   public readonly createdAt: moment.Moment;
   public readonly authorChain?: string;
@@ -33,7 +31,6 @@ export class Comment<T extends IUniqueId> {
     text,
     plaintext,
     versionHistory,
-    attachments,
     id,
     createdAt,
     threadId,
@@ -53,7 +50,6 @@ export class Comment<T extends IUniqueId> {
     this.text = text;
     this.plaintext = plaintext;
     this.versionHistory = versionHistory;
-    this.attachments = attachments;
     this.threadId = threadId;
     this.id = id;
     this.createdAt = createdAt;

@@ -58,7 +58,6 @@ const deleteThreadLinks = async (
         // through: models.Collaboration,
         as: 'collaborators',
       },
-      models.Attachment,
       {
         model: models.Topic,
         as: 'topic',
