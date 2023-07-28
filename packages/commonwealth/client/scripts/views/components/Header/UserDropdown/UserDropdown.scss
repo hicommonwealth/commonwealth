@@ -1,0 +1,75 @@
+@import '../../../../../styles/shared';
+
+.UserDropdown {
+  width: 256px;
+
+  .menu-item-text {
+    width: 100%;
+  }
+}
+
+.UserDropdownTriggerButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  background-color: $white;
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+
+  &.isOpen {
+    background-color: $neutral-100;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  .caret-icon {
+    fill: $neutral-500;
+    margin-left: 8px;
+  }
+}
+
+.UserDropdownItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  .Text {
+    color: $neutral-500;
+  }
+
+  &.isSignedIn {
+    .Text {
+      color: $neutral-700;
+      font-weight: 500;
+    }
+  }
+
+  .identification {
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    white-space: nowrap;
+  }
+
+  .check-icon {
+    display: flex;
+
+    svg {
+      fill: $green-600;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

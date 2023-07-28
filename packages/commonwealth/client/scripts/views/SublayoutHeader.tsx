@@ -13,6 +13,8 @@ import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
+import { featureFlags } from 'helpers/feature-flags';
+import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -77,6 +79,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           <HelpMenuPopover />
           {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>
+        {featureFlags.sessionKeys ? <UserDropdown /> : <LoginSelector />}
         <LoginSelector />
       </div>
     </div>
