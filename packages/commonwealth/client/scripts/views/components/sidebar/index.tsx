@@ -17,6 +17,7 @@ import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import Permissions from '../../../utils/Permissions';
+import AccountConnectionIndicator from './AccountConnectionIndicator';
 
 export type SidebarMenuName =
   | 'default'
@@ -41,6 +42,9 @@ export const Sidebar = ({ isInsideCommunity }) => {
         <SidebarQuickSwitcher />
         {app.activeChainId() && isInsideCommunity && (
           <div className="community-menu">
+            {featureFlags.sessionKeys && (
+              <AccountConnectionIndicator connected={true} />
+            )}
             {showAdmin && <AdminSection />}
             {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
               <div
