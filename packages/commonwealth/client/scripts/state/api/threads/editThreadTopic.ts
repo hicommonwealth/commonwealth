@@ -42,7 +42,6 @@ const useEditThreadTopicMutation = ({ chainId, threadId }: UseEditThreadTopicMut
     mutationFn: editThreadTopic,
     onSuccess: async ({ updatedTopic, oldTopicId }) => {
       updateThreadTopicInAllCaches(chainId, threadId, updatedTopic, oldTopicId)
-
       return updatedTopic; // TODO: improve it and return thread as the proper response.
     }
   });

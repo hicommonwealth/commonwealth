@@ -3,7 +3,6 @@ import axios from 'axios';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentReactionsQuery from './fetchReactions';
-import ReactionCount from 'models/ReactionCount';
 
 interface CreateReactionProps {
   address: string;
@@ -64,34 +63,6 @@ const useCreateCommentReactionMutation = ({ commentId, chainId }: Partial<Create
           return updatedReactions
         }
       );
-
-      // TODO: this state below would be stored in comments react query state when we migrate the
-      // whole comment controller from current state to react query (there is a good chance we can
-      // remove this entirely)
-      const reactionCount = app.threads.reactionCountsStore.getByPost(reaction);
-
-      if (!reactionCount) {
-        const { thread_id, proposal_id, comment_id } = reaction;
-        const id = app.threads.reactionCountsStore.getIdentifier({
-          threadId: thread_id,
-          proposalId: proposal_id,
-          commentId: comment_id,
-        });
-        app.threads.reactionCountsStore.add(new ReactionCount({
-          id,
-          thread_id,
-          proposal_id,
-          comment_id,
-          has_reacted: true,
-          like: 1,
-        }));
-      } else {
-        app.threads.reactionCountsStore.update({
-          ...reactionCount,
-          likes: reactionCount.likes + 1,
-          hasReacted: true,
-        });
-      }
     },
   });
 };

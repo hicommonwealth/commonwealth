@@ -171,9 +171,8 @@ const useFetchThreadsQuery = ({
         topicId
       })
 
-      // todo clean this up
+      // TODO: clean this up
       await Promise.all([
-        app.threads.fetchReactionsCount(res.threads),
         app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
           threads: res.threads,
           chain: chainId,

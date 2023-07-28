@@ -1,12 +1,10 @@
-import type ChainInfo from 'models/ChainInfo';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
 import { useCreateThreadReactionMutation, useDeleteThreadReactionMutation } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import {
-  getDisplayedReactorsForPopup,
-  onReactionClick,
+  getDisplayedReactorsForPopup
 } from 'views/components/ReactionButton/helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { Modal } from 'views/components/component_kit/cw_modal';
@@ -51,43 +49,36 @@ export const ReactionButton = ({
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isUserForbidden = !isAdmin && app.chain.isGatedTopic(thread.topic?.id);
 
-  const dislike = async () => {
-    if (!hasReacted || isLoading) {
-      return;
-    }
-
-    deleteThreadReaction({ chainId: app.activeChainId(), threadId: thread.id, reactionId: reactedId as number })
-      .catch((e) => {
-        console.log(e);
-      })
-  };
-
-  const like = async (
-    chain: ChainInfo,
-    chainId: string,
-    userAddress: string
-  ) => {
-    if (hasReacted || isLoading) {
-      return;
-    }
-
-    createThreadReaction({
-      chainId: app.activeChainId(),
-      address: userAddress,
-      threadId: thread.id,
-      reactionType: 'like'
-    }).catch((e) => {
-      console.log(e);
-    })
-  };
-
-  const handleSmallVoteClick = async (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handleVoteClick = async (event) => {
+    event.stopPropagation();
+    event.preventDefault();
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
     } else {
-      onReactionClick(e, hasReacted, dislike, like);
+
+      if (hasReacted) {
+        if (!hasReacted || isLoading) {
+          return;
+        }
+
+        deleteThreadReaction({ chainId: app.activeChainId(), threadId: thread.id, reactionId: reactedId as number })
+          .catch((e) => {
+            console.log(e);
+          })
+      } else {
+        if (hasReacted || isLoading) {
+          return;
+        }
+
+        createThreadReaction({
+          chainId: app.activeChainId(),
+          address: activeAddress,
+          threadId: thread.id,
+          reactionType: 'like'
+        }).catch((e) => {
+          console.log(e);
+        })
+      }
     }
   };
 
@@ -99,23 +90,14 @@ export const ReactionButton = ({
           disabled={isUserForbidden || disabled}
           selected={hasReacted}
           onMouseEnter={() => undefined}
-          onClick={handleSmallVoteClick}
+          onClick={handleVoteClick}
           tooltipContent={getDisplayedReactorsForPopup({
             reactors: reactors,
           })}
         />
       ) : (
         <button
-          onClick={async (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-
-            if (!app.isLoggedIn() || !app.user.activeAccount) {
-              setIsModalOpen(true);
-            } else {
-              onReactionClick(e, hasReacted, dislike, like);
-            }
-          }}
+          onClick={handleVoteClick}
           className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
             }${hasReacted ? ' has-reacted' : ''}`}
         >

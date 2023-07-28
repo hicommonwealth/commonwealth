@@ -1,18 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import ReactionCount from 'models/ReactionCount';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentReactionsQuery from './fetchReactions';
 
 interface DeleteReactionProps {
-  reactionCount: ReactionCount<any>
   canvasHash: string
   reactionId: number;
 }
 
 const deleteReaction = async ({
-  reactionCount,
   canvasHash,
   reactionId
 }: DeleteReactionProps) => {
@@ -37,7 +34,6 @@ const deleteReaction = async ({
       ...r.data,
       result: {
         ...(r.data.result || {}),
-        reactionCount,
         reactionId
       }
     }
@@ -59,7 +55,7 @@ const useDeleteCommentReactionMutation = ({ commentId, chainId }: UseDeleteComme
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
-      const { reactionCount, reactionId } = response.data.result
+      const { reactionId } = response.data.result
 
       // update fetch reaction query state
       const key = [ApiEndpoints.getCommentReactions(commentId), chainId]
@@ -70,14 +66,6 @@ const useDeleteCommentReactionMutation = ({ commentId, chainId }: UseDeleteComme
           return updatedReactions
         }
       );
-
-      // TODO: this state below would be stored in comments react query state when we migrate the
-      // whole comment controller from current state to react query (there is a good chance we can
-      // remove this entirely)
-      app.threads.reactionCountsStore.update(reactionCount);
-      if (reactionCount.likes === 0 && reactionCount.dislikes === 0) {
-        app.threads.reactionCountsStore.remove(reactionCount);
-      }
     }
   });
 };

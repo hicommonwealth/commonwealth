@@ -8,19 +8,12 @@ import { Link } from 'server/models/thread';
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 /* eslint-disable no-restricted-syntax */
-import { ReactionCountsStore, ReactionStore } from 'stores';
-import AbridgedThread from '../../models/AbridgedThread';
 import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
-import Comment from '../../models/Comment';
 import type MinimumProfile from '../../models/MinimumProfile';
 import Poll from '../../models/Poll';
-import Reaction from '../../models/Reaction';
-import ReactionCount from '../../models/ReactionCount';
 import Thread from '../../models/Thread';
 import Topic from '../../models/Topic';
-import type { AnyProposal } from '../../models/types';
-import { fetchReactionCounts } from "../../state/api/reactionCounts";
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -65,24 +58,6 @@ class ThreadsController {
   public _overviewStore: ProposalStore<Thread>;
   public isFetched = new EventEmitter();
   public isReactionFetched = new EventEmitter();
-  private _reactionCountsStore: ReactionCountsStore = new ReactionCountsStore();
-  private _reactionsStore: ReactionStore = new ReactionStore();
-
-  public get reactionCountsStore() {
-    return this._reactionCountsStore;
-  }
-
-  public get reactionsStore() {
-    return this._reactionsStore;
-  }
-
-  public deinitReactionCountsStore() {
-    this.reactionCountsStore.clear();
-  }
-
-  public getReactionByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
-    return this.reactionsStore.getByPost(post);
-  }
 
   private constructor() {
     this._store = new ProposalStore<Thread>();
@@ -165,9 +140,6 @@ class ThreadsController {
       : [];
 
     if (reactions) {
-      for (const reaction of reactions) {
-        app.threads.reactionsStore.add(new Reaction(reaction));
-      }
       reactionIds = reactions.map((r) => r.id);
       reactionType = reactions.map((r) => r?.type || r?.reaction);
       addressesReacted = reactions.map((r) => r?.address || r?.Address?.address);
@@ -350,7 +322,7 @@ class ThreadsController {
        * here we will find if thread is in store and if so use most keys
        * of that data else if there is a valid key rawThread then it will
        * replace existing key from foundThread
-       */
+      */
       const thread = this.modelFromServer(rawThread);
       const foundThread = this._store.getByIdentifier(thread.identifier);
       const finalThread = new Thread({
@@ -372,45 +344,9 @@ class ThreadsController {
       }
 
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
-      this.fetchReactionsCount([finalThread]);
       return finalThread;
     });
   }
-
-  // TODO Graham 4/24/22: Should this method be in reactionCounts controller?
-  // TODO Graham 4/24/22: All "ReactionsCount" names need renaming to "ReactionCount" (singular)
-  // TODO Graham 4/24/22: All of JB's AJAX requests should be swapped out for .get and .post reqs
-  fetchReactionsCount = async (threads) => {
-    // TODO: fetchReactionCounts here is the migrated query func of this non-react controller
-    // when this controller is migrated to react query, we should also complete the migrate of react
-    // query for fetchReactionCounts in its file. At the moment, the query function for
-    // fetchReactionCounts is migrated but the cache logic is commented in that file.
-    // The reason why it was not migrated is because "reactive" code from react query wont work in this
-    // non reactive scope
-    const reactionCounts = await fetchReactionCounts({
-      address: app.user.activeAccount?.address,
-      threadIds: threads.map((thread) => thread.id) as number[]
-    })
-
-    for (const rc of reactionCounts) {
-      const id = app.threads.reactionCountsStore.getIdentifier({
-        threadId: rc.thread_id,
-        proposalId: rc.proposal_id,
-        commentId: rc.comment_id,
-      });
-      const existing = app.threads.reactionCountsStore.getById(id);
-      if (existing) {
-        app.threads.reactionCountsStore.remove(existing);
-      }
-      try {
-        app.threads.reactionCountsStore.add(
-          new ReactionCount({ ...rc, id })
-        );
-      } catch (e) {
-        console.error(e.message);
-      }
-    }
-  };
 
   public initialize(
     initialThreads = [],

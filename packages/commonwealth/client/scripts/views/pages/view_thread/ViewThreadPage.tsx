@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -9,16 +10,14 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
-import ReactionCount from 'models/ReactionCount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import { fetchReactionCounts } from 'state/api/reactionCounts';
 import { useAddThreadLinksMutation, useGetThreadsByIdQuery } from 'state/api/threads';
-// import { ContentType } from 'types';
+import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
@@ -50,8 +49,7 @@ import {
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
-// import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import axios from 'axios';
+import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -95,7 +93,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false)
   const [areProfilesLoaded, setAreProfilesLoaded] = useState(false)
-  const [areReactionsLoaded, setAreReactionsLoaded] = useState(false)
   const [isViewMarked, setIsViewMarked] = useState(false)
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -170,20 +167,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         `${threadId}-${slugify(thread?.title)}${window.location.search}`,
         true
       );
-      console.log("url => ", { url, threadId, identifier, thread })
       navigate(url, { replace: true });
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
   // ------------
-
-  useNecessaryEffect(() => {
-    if (!thread || (thread && areReactionsLoaded)) {
-      return;
-    }
-
-    app.threads.fetchReactionsCount([thread])
-    setAreReactionsLoaded(true)
-  }, [thread, areReactionsLoaded]);
 
   useNecessaryEffect(() => {
     if (!thread || (thread && arePollsFetched)) {
@@ -250,30 +237,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread,
     areProfilesLoaded
   ]);
-
-  useNecessaryEffect(() => {
-    if (comments.length > 0 && thread && thread.id) {
-      fetchReactionCounts({
-        proposalIds: [`${thread.id}`],
-        commentIds: comments.map(c => `${c.id}`),
-        address: app.user.activeAccount?.address,
-      }).then(reactionCounts => {
-        for (const rc of reactionCounts) {
-          const id = app.threads.reactionCountsStore.getIdentifier({
-            threadId: rc.thread_id,
-            proposalId: rc.proposal_id,
-            commentId: rc.comment_id,
-          });
-
-          app.threads.reactionCountsStore.add(
-            new ReactionCount({ ...rc, id } as any)
-          );
-
-          app.threads.isReactionFetched.emit('redraw', rc.comment_id);
-        }
-      })
-    }
-  }, [thread, threadId, comments]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -422,9 +385,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }}
         onEditStart={() => {
           if (editsToSave) {
-            // clearEditingLocalStorage(thread.id, ContentType.Thread);
+            clearEditingLocalStorage(thread.id, ContentType.Thread);
 
-            // setSavedEdits(editsToSave || '');
+            setSavedEdits(editsToSave || '');
           }
 
           setIsGloballyEditing(true);
