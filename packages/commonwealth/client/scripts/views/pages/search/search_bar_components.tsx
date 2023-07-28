@@ -4,7 +4,6 @@ import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
 
-import app from 'state';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import AddressInfo from '../../../models/AddressInfo';
 import ChainInfo from '../../../models/ChainInfo';
@@ -15,6 +14,12 @@ import { User } from '../../components/user/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
+import {
+  CommunityResult,
+  MemberResult,
+  ReplyResult,
+  ThreadResult,
+} from './helpers';
 
 type SearchChipProps = {
   isActive: boolean;
@@ -42,24 +47,13 @@ export const SearchChip = (props: SearchChipProps) => {
   );
 };
 
-type SearchBarPreviewRowProps = {
-  searchResult: {
-    id?: string;
-    address_id: number;
-    address: string;
-    address_chain: string;
-    proposalid: string;
-    profile_id?: string;
-    title: string;
-    body?: string;
-    text?: string;
-    chain?: string;
-    created_at: string;
-  };
+type SearchBarThreadPreviewRowProps = {
+  searchResult: ThreadResult;
   searchTerm?: string;
 };
-
-export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
+export const SearchBarThreadPreviewRow = (
+  props: SearchBarThreadPreviewRowProps
+) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
 
@@ -67,7 +61,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}`;
+    const path = `/${searchResult.chain}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -105,7 +99,13 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   );
 };
 
-export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
+type SearchBarCommentPreviewRowProps = {
+  searchResult: ReplyResult;
+  searchTerm?: string;
+};
+export const SearchBarCommentPreviewRow = (
+  props: SearchBarCommentPreviewRowProps
+) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
 
@@ -138,12 +138,12 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
   );
 };
 
-type SearchCommunityPreviewProps = {
-  searchResult: ChainInfo;
+type SearchBarChainPreviewRowProps = {
+  searchResult: CommunityResult;
+  searchTerm?: string;
 };
-
 export const SearchBarCommunityPreviewRow = (
-  props: SearchCommunityPreviewProps
+  props: SearchBarChainPreviewRowProps
 ) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
@@ -152,28 +152,36 @@ export const SearchBarCommunityPreviewRow = (
     navigate(`/${searchResult.id}`, {}, null);
   };
 
+  const chainInfo = ChainInfo.fromJSON(searchResult as any);
+
   return (
     <div className="SearchBarCommunityPreviewRow" onClick={handleClick}>
-      <CommunityLabel community={searchResult} />
+      <CommunityLabel community={chainInfo} />
     </div>
   );
 };
 
-export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
+type SearchBarMemberPreviewRowProps = {
+  searchResult: MemberResult;
+  searchTerm?: string;
+};
+export const SearchBarMemberPreviewRow = (
+  props: SearchBarMemberPreviewRowProps
+) => {
   const { searchResult } = props;
+  const chain = searchResult.addresses[0].chain;
+  const address = searchResult.addresses[0].address;
+
   const navigate = useCommonNavigate();
 
   const handleClick = () => {
-    navigate(`/profile/id/${searchResult.profile_id}`, {}, null);
+    navigate(`/profile/id/${searchResult.id}`, {}, null);
   };
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
       <User
-        user={NewProfilesController.Instance.getProfile(
-          searchResult.chain,
-          searchResult.address
-        )}
+        user={NewProfilesController.Instance.getProfile(chain, address)}
         linkify
       />
     </div>
