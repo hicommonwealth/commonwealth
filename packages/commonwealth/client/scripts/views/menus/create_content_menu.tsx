@@ -180,6 +180,13 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       },
     },
     {
+      type: 'divider',
+    },
+    {
+      type: 'header',
+      label: 'Link an Existing DAO',
+    },
+    {
       label: 'New ERC20 Community',
       iconLeft: 'people',
       onClick: (e) => {
@@ -195,6 +202,15 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         e?.preventDefault();
         resetSidebarState();
         navigate(`/createCommunity/${CommunityType.Cosmos}`, {}, null);
+      },
+    },
+    {
+      label: 'New Solana Community',
+      iconLeft: 'people',
+      onClick: (e) => {
+        e?.preventDefault();
+        resetSidebarState();
+        navigate(`/createCommunity/${CommunityType.SplToken}`, {}, null);
       },
     },
   ];
