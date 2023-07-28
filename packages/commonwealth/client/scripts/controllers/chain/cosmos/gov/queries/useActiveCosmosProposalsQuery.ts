@@ -11,9 +11,9 @@ const useActiveCosmosProposalsQuery = ({
   isApiReady,
 }: ActiveProposalsProps) => {
   const cosmosChain = app.chain as Cosmos;
+  const id = cosmosChain.id;
   return useQuery({
-    /* eslint-disable @tanstack/query/exhaustive-deps*/
-    queryKey: ['activeProposals', cosmosChain.id],
+    queryKey: ['activeProposals', { id }],
     queryFn: () => getActiveProposals(cosmosChain),
     enabled: isApiReady,
     retry: 5, // these can be problematic, so we retry

@@ -11,9 +11,9 @@ const useCompletedCosmosProposalsQuery = ({
   isApiReady,
 }: CompletedProposalsProps) => {
   const cosmosChain = app.chain as Cosmos;
+  const id = cosmosChain.id;
   return useQuery({
-    /* eslint-disable @tanstack/query/exhaustive-deps*/
-    queryKey: ['completedProposals', cosmosChain.id],
+    queryKey: ['completedProposals', { id }],
     queryFn: () => getCompletedProposals(cosmosChain),
     enabled: isApiReady,
     retry: 3, // these can be problematic, so we retry
