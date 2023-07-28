@@ -1,18 +1,20 @@
+import type ChainInfo from 'models/ChainInfo';
+import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
-import type Thread from '../../../../../../models/Thread';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { useCreateThreadReactionMutation, useDeleteThreadReactionMutation } from 'state/api/threads';
+import Permissions from 'utils/Permissions';
 import {
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from 'views/components/ReactionButton/helpers';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { LoginModal } from '../../../../../modals/login_modal';
 import './ReactionButton.scss';
-import { useReactionButton } from './useReactionButton';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 
 type ReactionButtonProps = {
   thread: Thread;
@@ -26,10 +28,58 @@ export const ReactionButton = ({
   disabled,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [reactors, setReactors] = useState<Array<any>>([]);
+  const reactors = thread.associatedReactions.map((t) => t.address)
+  const activeAddress = app.user.activeAccount?.address;
+  const thisUserReaction = thread.associatedReactions.filter(
+    (r) => r.address === activeAddress
+  );
+  const hasReacted = thisUserReaction.length !== 0;
+  const reactedId = thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id
 
-  const { dislike, hasReacted, isLoading, isUserForbidden, like } =
-    useReactionButton(thread, setReactors);
+  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } = useCreateThreadReactionMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id
+  });
+  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } = useDeleteThreadReactionMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id
+  });
+
+  const isLoading = isAddingReaction || isDeletingReaction
+
+  // token balance check if needed
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(thread.topic?.id);
+
+  const dislike = async () => {
+    if (!hasReacted || isLoading) {
+      return;
+    }
+
+    deleteThreadReaction({ chainId: app.activeChainId(), threadId: thread.id, reactionId: reactedId as number })
+      .catch((e) => {
+        console.log(e);
+      })
+  };
+
+  const like = async (
+    chain: ChainInfo,
+    chainId: string,
+    userAddress: string
+  ) => {
+    if (hasReacted || isLoading) {
+      return;
+    }
+
+    createThreadReaction({
+      chainId: app.activeChainId(),
+      address: userAddress,
+      threadId: thread.id,
+      reactionType: 'like'
+    }).catch((e) => {
+      console.log(e);
+    })
+  };
 
   const handleSmallVoteClick = async (e) => {
     e.stopPropagation();
@@ -40,11 +90,6 @@ export const ReactionButton = ({
       onReactionClick(e, hasReacted, dislike, like);
     }
   };
-  const handleSmallVoteMouseEnter = async () => {
-    if (reactors.length === 0) {
-      setReactors(thread.associatedReactions.map((addr) => addr));
-    }
-  };
 
   return (
     <>
@@ -53,7 +98,7 @@ export const ReactionButton = ({
           voteCount={reactors.length}
           disabled={isUserForbidden || disabled}
           selected={hasReacted}
-          onMouseEnter={handleSmallVoteMouseEnter}
+          onMouseEnter={() => undefined}
           onClick={handleSmallVoteClick}
           tooltipContent={getDisplayedReactorsForPopup({
             reactors: reactors,
@@ -61,11 +106,6 @@ export const ReactionButton = ({
         />
       ) : (
         <button
-          onMouseEnter={async () => {
-            if (reactors.length === 0) {
-              setReactors(thread.associatedReactions.map((a) => a.address));
-            }
-          }}
           onClick={async (e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -76,9 +116,8 @@ export const ReactionButton = ({
               onReactionClick(e, hasReacted, dislike, like);
             }
           }}
-          className={`ThreadReactionButton ${
-            isLoading || isUserForbidden ? ' disabled' : ''
-          }${hasReacted ? ' has-reacted' : ''}`}
+          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
+            }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (
             <CWTooltip
@@ -97,9 +136,8 @@ export const ReactionButton = ({
                       {...(hasReacted && { weight: 'fill' })}
                     />
                     <div
-                      className={`reactions-count ${
-                        hasReacted ? ' has-reacted' : ''
-                      }`}
+                      className={`reactions-count ${hasReacted ? ' has-reacted' : ''
+                        }`}
                     >
                       {reactors.length}
                     </div>
@@ -111,9 +149,8 @@ export const ReactionButton = ({
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
               <div
-                className={`reactions-count ${
-                  hasReacted ? ' has-reacted' : ''
-                }`}
+                className={`reactions-count ${hasReacted ? ' has-reacted' : ''
+                  }`}
               >
                 {reactors.length}
               </div>
