@@ -130,7 +130,7 @@ export async function __updateComment(
 
   allNotificationOptions.push({
     notificationData: {
-      category: NotificationCategories.CommentEdit,
+      categoryId: NotificationCategories.CommentEdit,
       data: {
         created_at: new Date(),
         thread_id: comment.thread_id,
@@ -198,7 +198,7 @@ export async function __updateComment(
       }
       allNotificationOptions.push({
         notificationData: {
-          category: NotificationCategories.NewMention,
+          categoryId: NotificationCategories.NewMention,
           data: {
             mentioned_user_id: mentionedAddress.User.id,
             created_at: new Date(),

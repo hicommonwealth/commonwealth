@@ -19,6 +19,7 @@ import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { createSubscription } from 'subscriptionMapping';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -235,22 +236,20 @@ export async function __createThreadComment({
   const subsTransaction = await this.models.sequelize.transaction();
   try {
     // auto-subscribe comment author to reactions & child comments
-    await this.createSubscription(
+    await createSubscription(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
-        object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
         comment_id: finalComment.id,
         is_active: true,
       },
       { transaction: subsTransaction }
     );
-    await this.createSubscription(
+    await createSubscription(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,
-        object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
         comment_id: finalComment.id,
         is_active: true,
@@ -300,7 +299,7 @@ export async function __createThreadComment({
   // build notification for root thread
   allNotificationOptions.push({
     notificationData: {
-      category: NotificationCategories.NewComment,
+      categoryId: NotificationCategories.NewComment,
       data: {
         created_at: new Date(),
         thread_id: threadId,
@@ -328,7 +327,7 @@ export async function __createThreadComment({
   if (parentId && parentComment) {
     allNotificationOptions.push({
       notificationData: {
-        category: NotificationCategories.NewComment,
+        categoryId: NotificationCategories.NewComment,
         data: {
           created_at: new Date(),
           thread_id: +threadId,
@@ -357,7 +356,7 @@ export async function __createThreadComment({
         if (shouldNotifyMentionedUser) {
           allNotificationOptions.push({
             notificationData: {
-              category: NotificationCategories.NewMention,
+              categoryId: NotificationCategories.NewMention,
               data: {
                 mentioned_user_id: mentionedAddress.User.id,
                 created_at: new Date(),

@@ -123,7 +123,7 @@ describe('emitNotifications tests', () => {
       const notification_data = {};
 
       await emitNotifications(models, {
-        category: NotificationCategories.NewThread,
+        categoryId: NotificationCategories.NewThread,
         data: {
           created_at: new Date(),
           thread_id: thread.id,
@@ -169,7 +169,7 @@ describe('emitNotifications tests', () => {
       });
 
       const notifData: NotificationDataAndCategory = {
-        category: NotificationCategories.NewComment,
+        categoryId: NotificationCategories.NewComment,
         data: {
           created_at: new Date(),
           thread_id: thread.id,
@@ -216,7 +216,7 @@ describe('emitNotifications tests', () => {
       });
 
       const notification_data: NotificationDataAndCategory = {
-        category: NotificationCategories.NewReaction,
+        categoryId: NotificationCategories.NewReaction,
         data: {
           created_at: new Date(),
           thread_id: thread.id,
@@ -276,7 +276,7 @@ describe('emitNotifications tests', () => {
 
       const eventType: SnapshotEventType = SnapshotEventType.Created;
       const notififcation_data: NotificationDataAndCategory = {
-        category: NotificationCategories.SnapshotProposal,
+        categoryId: NotificationCategories.SnapshotProposal,
         data: {
           ...snapshotNotificationData,
         },

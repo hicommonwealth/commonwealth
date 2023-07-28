@@ -141,7 +141,7 @@ export async function __createCommentReaction(
 
   allNotificationOptions.push({
     notificationData: {
-      category: NotificationCategories.NewReaction,
+      categoryId: NotificationCategories.NewReaction,
       data: {
         created_at: new Date(),
         thread_id: thread.id,

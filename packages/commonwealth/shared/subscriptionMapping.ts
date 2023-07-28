@@ -14,16 +14,16 @@ const log = factory.getLogger(formatFilename(__filename));
 export function mapNotificationsDataToSubscriptions(
   notification: NotificationDataAndCategory
 ) {
-  const uniqueData = { category_id: notification.category };
-  if (notification.category === NotificationCategories.ChainEvent) {
+  const uniqueData = { category_id: notification.categoryId };
+  if (notification.categoryId === NotificationCategories.ChainEvent) {
     uniqueData['chain_id'] = notification.data.chain;
   } else if (
-    notification.category === NotificationCategories.SnapshotProposal
+    notification.categoryId === NotificationCategories.SnapshotProposal
   ) {
     uniqueData['snapshot_id'] = notification.data.space;
-  } else if (notification.category === NotificationCategories.NewThread) {
+  } else if (notification.categoryId === NotificationCategories.NewThread) {
     uniqueData['chain_id'] = notification.data.chain_id;
-  } else if (notification.category === NotificationCategories.NewComment) {
+  } else if (notification.categoryId === NotificationCategories.NewComment) {
     if (
       notification.data.parent_comment_id &&
       notification.data.parent_comment_text
@@ -32,20 +32,20 @@ export function mapNotificationsDataToSubscriptions(
     } else {
       uniqueData['thread_id'] = notification.data.thread_id;
     }
-  } else if (notification.category === NotificationCategories.NewReaction) {
+  } else if (notification.categoryId === NotificationCategories.NewReaction) {
     if (notification.data.comment_id) {
       uniqueData['comment_id'] = notification.data.comment_id;
     } else {
       uniqueData['thread_id'] = notification.data.thread_id;
     }
-  } else if (notification.category === NotificationCategories.NewMention) {
+  } else if (notification.categoryId === NotificationCategories.NewMention) {
     uniqueData['subscriber_id'] = notification.data.mentioned_user_id;
   } else if (
-    notification.category === NotificationCategories.NewCollaboration
+    notification.categoryId === NotificationCategories.NewCollaboration
   ) {
     uniqueData['subscriber_id'] = notification.data.collaborator_user_id;
   } else {
-    log.info(`${notification.category} does not support subscriptions`);
+    log.info(`${notification.categoryId} does not support subscriptions`);
     return;
   }
   return uniqueData;
@@ -103,6 +103,7 @@ export async function createSubscription(
   }
   // no need to check NewMention + NewCollaboration because subscriber_id is always required anyway
 
+  console.log('\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', subData, options);
   return models.Subscription.create(subData, options);
 }
 

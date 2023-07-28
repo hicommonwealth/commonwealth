@@ -134,7 +134,7 @@ export async function __createThreadReaction({
   // build notification options
   const notificationOptions: EmitOptions = {
     notificationData: {
-      category: NotificationCategories.NewReaction,
+      categoryId: NotificationCategories.NewReaction,
       data: {
         created_at: new Date(),
         thread_id: thread.id,

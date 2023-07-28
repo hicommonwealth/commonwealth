@@ -29,7 +29,7 @@ export async function processChainEventNotificationsCUD(
     dbNotification = await emitNotifications(
       this.models,
       {
-        category: NotificationCategories.ChainEvent,
+        categoryId: NotificationCategories.ChainEvent,
         data: {
           ...chainEvent,
         },

@@ -32,7 +32,7 @@ export default async function emitNotifications(
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
   const notification_data = notification_data_and_category.data;
-  const category_id = notification_data_and_category.category;
+  const category_id = notification_data_and_category.categoryId;
   // get subscribers to send notifications to
   StatsDController.get().increment('cw.notifications.created', {
     category_id,

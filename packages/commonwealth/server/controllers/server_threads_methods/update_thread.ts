@@ -205,7 +205,7 @@ export async function __updateThread(
 
   allNotificationOptions.push({
     notificationData: {
-      category: NotificationCategories.ThreadEdit,
+      categoryId: NotificationCategories.ThreadEdit,
       data: {
         created_at: new Date(),
         thread_id: +finalThread.id,
@@ -269,7 +269,7 @@ export async function __updateThread(
       }
       allNotificationOptions.push({
         notificationData: {
-          category: NotificationCategories.NewMention,
+          categoryId: NotificationCategories.NewMention,
           data: {
             mentioned_user_id: mentionedAddress.User.id,
             created_at: new Date(),

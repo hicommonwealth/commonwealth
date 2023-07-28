@@ -126,7 +126,7 @@ const editComment = async (
     emitNotifications(
       models,
       {
-        category: NotificationCategories.CommentEdit,
+        categoryId: NotificationCategories.CommentEdit,
         data: {
           created_at: new Date(),
           thread_id: comment.thread_id,
@@ -201,7 +201,7 @@ const editComment = async (
         emitNotifications(
           models,
           {
-            category: NotificationCategories.NewMention,
+            categoryId: NotificationCategories.NewMention,
             data: {
               mentioned_user_id: mentionedAddress.User.id,
               created_at: new Date(),

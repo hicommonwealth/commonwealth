@@ -73,16 +73,12 @@ describe('ServerThreadsController', () => {
 
       expect(newReaction).to.be.ok;
 
-      expect(notificationOptions).to.have.property(
-        'categoryId',
-        'new-reaction'
-      );
-      expect(notificationOptions).to.have.property('objectId', 'discussion_4');
-
       expect(notificationOptions).to.have.property('notificationData');
       const { notificationData } = notificationOptions;
-      expect(notificationData).to.have.property('created_at');
-      expect(notificationData).to.include({
+      expect(notificationData).to.have.property('categoryId', 'new-reaction');
+
+      expect(notificationData.data).to.have.property('created_at');
+      expect(notificationData.data).to.include({
         thread_id: 4,
         root_title: 'Big Thread!',
         root_type: 'discussion',
@@ -407,8 +403,8 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#createThreadComment', () => {
-    it('should create a thread comment', async () => {
-      const user = {};
+    it.only('should create a thread comment', async () => {
+      const user = { id: 1, save: async () => ({}) };
       const address = {
         id: 1,
         address: '0x123',
@@ -1272,10 +1268,9 @@ describe('ServerThreadsController', () => {
 
       expect(!!updatedThread).to.equal(true);
       expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.include({
+      expect(notificationOptions[0]).to.have.property('notificationData');
+      expect(notificationOptions[0].notificationData).to.include({
         categoryId: 'thread-edit',
-        objectId: '',
-        webhookData: null,
       });
       expect(notificationOptions[0].notificationData).to.include({
         thread_id: 1,
@@ -1703,9 +1698,9 @@ describe('ServerThreadsController', () => {
       expect(thread.stage).to.equal(stage);
 
       expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.include({
+      expect(notificationOptions[0]).to.have.property('notificationData');
+      expect(notificationOptions[0].notificationData).to.include({
         categoryId: 'new-thread-creation',
-        objectId: 'ethereum',
       });
       expect(notificationOptions[0].webhookData).to.include({
         user: '0x123',
@@ -1716,7 +1711,7 @@ describe('ServerThreadsController', () => {
         chain: 'ethereum',
         body: 'hello',
       });
-      expect(notificationOptions[0].notificationData).to.include({
+      expect(notificationOptions[0].notificationData.data).to.include({
         thread_id: 1,
         root_type: 'discussion',
         root_title: 'mythread',

@@ -165,7 +165,7 @@ export type NotifCategoryToNotifDataMapping = {
 // data is provided for a given NotificationCategory.
 export type NotificationDataAndCategory = {
   [K in NotificationCategory]: {
-    category: K;
+    categoryId: K;
     data: NotifCategoryToNotifDataMapping[K];
   };
 }[NotificationCategory];
