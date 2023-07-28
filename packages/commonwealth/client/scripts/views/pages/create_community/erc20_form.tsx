@@ -43,8 +43,10 @@ export const ERC20Form = (props: EthChainFormState) => {
 
   useEffect(() => {
     ethChainFormFields.setChainString('Ethereum Mainnet');
-    ethChainFormFields.setNodeUrl(ethChains[1].url);
-  }, []);
+    if (ethChains[1]) {
+      ethChainFormFields.setNodeUrl(ethChains[1].url);
+    }
+  }, [ethChains]);
 
   const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !chainFormState.loaded;

@@ -30,6 +30,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { CWRadioButton } from '../../components/component_kit/cw_radio_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { setupCommunityContracts } from 'controllers/chain/ethereum/callContractFunction';
 
 const abi = [
   {
@@ -395,44 +396,13 @@ export const ProtocolCommunityForm = () => {
           }
 
           try {
-            // get querying wallet
-            const signingWallet = WebWalletController.Instance.availableWallets(
-              ChainBase.Ethereum
-            )[0];
-            await signingWallet.enable('5');
-            if (!signingWallet.api) {
-              throw new Error('Web3 Api Not Initialized');
-            }
-            const web3: Web3 = signingWallet.api;
-
-            const factory = new web3.eth.Contract(
-              abi as AbiItem[],
-              '0x689Ce208E0f72447D7B23C479756374ACe977913'
-            );
-
-            //check that namespace doesnt exist
-            const namespace = await factory.methods
-              .getNamespace(web3.utils.asciiToHex(name))
-              .call();
-            if (
-              namespace['token'] &&
-              namespace['token'] !==
-                '0x0000000000000000000000000000000000000000'
-            ) {
-              throw new Error('Name already used, try another name');
-            }
-
             setLoading(true);
-            const txReceipt = await factory.methods
-              .createNamespace(
-                web3.utils.asciiToHex(name),
-                '0x0000000000000000000000000000000000000000'
-              )
-              .send({ from: signingWallet.accounts[0] });
-            if (!txReceipt) {
-              setLoading(false);
-              throw new Error('Transaction failed');
-            }
+            await setupCommunityContracts({
+              name,
+              gate,
+              gateMeta,
+              seedWalletMeta,
+            });
 
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               jwt: app.user.jwt,

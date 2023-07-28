@@ -9,6 +9,7 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import { CommunityType } from '../pages/create_community';
 
 const resetSidebarState = () => {
   sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -160,7 +161,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate('/createCommunity', {}, null);
+        navigate(`/createCommunity/${CommunityType.CommonProtocol}`, {}, null);
       },
     },
     {
@@ -176,6 +177,24 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             process.env.DISCORD_UI_URL
           )}/callback&response_type=code&scope=bot`
         );
+      },
+    },
+    {
+      label: 'New ERC20 Community',
+      iconLeft: 'people',
+      onClick: (e) => {
+        e?.preventDefault();
+        resetSidebarState();
+        navigate(`/createCommunity/${CommunityType.Erc20Community}`, {}, null);
+      },
+    },
+    {
+      label: 'New Cosmos Community',
+      iconLeft: 'people',
+      onClick: (e) => {
+        e?.preventDefault();
+        resetSidebarState();
+        navigate(`/createCommunity/${CommunityType.Cosmos}`, {}, null);
       },
     },
   ];

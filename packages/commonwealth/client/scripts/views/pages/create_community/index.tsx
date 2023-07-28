@@ -18,19 +18,20 @@ import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
 import { ProtocolCommunityForm } from './protocol_community';
 import { PolygonForm } from './polygon_form';
+import { useParams } from 'react-router';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
-  Erc20Community = 'ERC20',
-  Erc721Community = 'ERC721',
+  Erc20Community = 'ercToken',
+  Erc721Community = 'ercNFT',
   SubstrateCommunity = 'Substrate',
-  SputnikDao = 'Sputnik (V2)',
+  SputnikDao = 'Sputnik(V2)',
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
-  SplToken = 'Solana Token',
+  SplToken = 'SolanaToken',
   Polygon = 'Polygon',
-  AbiFactory = 'Abi Factory',
-  CommonProtocol = 'Common Protocol',
+  AbiFactory = 'AbiFactory',
+  CommonProtocol = 'CommonProtocol',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -41,9 +42,7 @@ const ADMIN_ONLY_TABS = [
 ];
 
 const CreateCommunity = () => {
-  const [currentForm, setCurrentForm] = useState<CommunityType>(
-    CommunityType.StarterCommunity
-  );
+  const { communityType } = useParams();
   const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
     useEthChainFormState();
 
@@ -88,7 +87,7 @@ const CreateCommunity = () => {
   }, [ethChains]);
 
   const getCurrentForm = () => {
-    switch (currentForm) {
+    switch (communityType) {
       case CommunityType.StarterCommunity:
         return <StarterCommunityForm />;
       case CommunityType.Erc20Community:
@@ -118,7 +117,7 @@ const CreateCommunity = () => {
       case CommunityType.CommonProtocol:
         return <ProtocolCommunityForm />;
       default:
-        throw new Error(`Invalid community type: ${currentForm}`);
+        throw new Error(`Invalid community type: ${communityType}`);
     }
   };
 
@@ -127,27 +126,6 @@ const CreateCommunity = () => {
       <CWText type="h3" fontWeight="semiBold">
         New Commonwealth Community
       </CWText>
-      <CWTabBar>
-        {Object.values(CommunityType)
-          .filter((t) => {
-            return (
-              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-              t !== CommunityType.AbiFactory
-            );
-          })
-          .map((t, i) => {
-            return (
-              <CWTab
-                key={i}
-                label={t.toString()}
-                isSelected={currentForm === t}
-                onClick={() => {
-                  setCurrentForm(t);
-                }}
-              />
-            );
-          })}
-      </CWTabBar>
       {getCurrentForm()}
     </div>
   );
