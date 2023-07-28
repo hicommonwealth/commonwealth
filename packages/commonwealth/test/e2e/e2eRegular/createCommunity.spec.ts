@@ -1,20 +1,21 @@
 import { test } from '@playwright/test';
 import { expect } from 'chai';
 import { PORT } from '../../../server/config';
-import { addAlchemyKey, login } from '../utils/e2eUtils';
+import { addAlchemyKey, addUserIfNone, login } from '../utils/e2eUtils';
 
-test.describe.configure({ mode: 'parallel' });
+test.setTimeout(60000);
 
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 test.describe('Commonwealth Create Community', () => {
-  test.setTimeout(60000);
-
   test.beforeAll(async () => {
     await addAlchemyKey();
+    await addUserIfNone();
   });
+
+  test.describe.configure({ mode: 'parallel' });
 
   test.beforeEach(async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/createCommunity`);
