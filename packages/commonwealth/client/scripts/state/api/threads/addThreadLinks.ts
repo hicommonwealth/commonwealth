@@ -33,7 +33,7 @@ const useAddThreadLinksMutation = ({ chainId, threadId }: UseAddThreadLinksMutat
   return useMutation({
     mutationFn: addThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, updatedThread)
+      updateThreadInAllCaches(chainId, threadId, updatedThread)
       return updatedThread
     }
   });

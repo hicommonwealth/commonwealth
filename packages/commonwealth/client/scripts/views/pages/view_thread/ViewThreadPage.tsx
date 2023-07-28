@@ -9,7 +9,6 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
-import $ from 'jquery';
 import ReactionCount from 'models/ReactionCount';
 import type { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
@@ -19,8 +18,8 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import { fetchReactionCounts } from 'state/api/reactionCounts';
-import { useAddThreadLinksMutation } from 'state/api/threads';
-import { ContentType } from 'types';
+import { useAddThreadLinksMutation, useGetThreadsByIdQuery } from 'state/api/threads';
+// import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
@@ -30,11 +29,13 @@ import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource, Thread } from '../../../models/Thread';
+import {
+  Link,
+  LinkSource,
+} from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import {
   CommentsFeaturedFilterTypes,
-  ThreadStage,
 } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -51,7 +52,8 @@ import {
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
-import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+// import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import axios from 'axios';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -74,21 +76,21 @@ type ViewThreadPageProps = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
+  const threadId = identifier.split('-')[0];
+
   const navigate = useCommonNavigate();
+
   const { isLoggedIn } = useUserLoggedIn();
 
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [polls, setPolls] = useState<Array<Poll>>([]);
   const [prefetch, setPrefetch] = useState<ThreadPrefetch>({});
-  const [recentlyEdited, setRecentlyEdited] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
-  const [thread, setThread] = useState<Thread>(null);
-  const [threadFetchFailed, setThreadFetchFailed] = useState(false);
+  // const [thread, setThread] = useState<Thread>(null);
   const [title, setTitle] = useState('');
   const [viewCount, setViewCount] = useState<number>(null);
-  const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -96,11 +98,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-  const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
+  const [arePollsFetched, setArePollsFetched] = useState(false)
+  const [areProfilesLoaded, setAreProfilesLoaded] = useState(false)
+  const [isViewMarked, setIsViewMarked] = useState(false)
 
-  const threadId = identifier.split('-')[0];
-  const threadDoesNotMatch =
-    +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: comments = [], error: fetchCommentsError } = useFetchCommentsQuery({
     chainId: app.activeChainId(),
@@ -109,17 +113,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: thread?.id
+    threadId: parseInt(threadId)
   })
+
+  const { data, error: fetchThreadError, isLoading } = useGetThreadsByIdQuery({
+    chainId: app.activeChainId(),
+    ids: [+threadId]
+  })
+
+  const thread = data?.[0]
+  const threadDoesNotMatch =
+    +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError])
-
-  const cancelEditing = () => {
-    setIsGloballyEditing(false);
-    setIsEditingBody(false);
-  };
 
   useBrowserWindow({
     onResize: () =>
@@ -147,17 +155,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
   });
 
-  const threadUpdatedCallback = (newTitle: string, body: string) => {
-    setThread(
-      new Thread({
-        ...thread,
-        title: newTitle,
-        body: body,
-      })
-    );
-    cancelEditing();
-  };
-
   // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
   if (!prefetch[threadId]) {
     setPrefetch((prevState) => ({
@@ -172,46 +169,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   useEffect(() => {
-    if (recentlyEdited) {
-      setRecentlyEdited(false);
+    if (!initializedPolls && thread?.id) {
+      setInitializedPolls(true);
+      setPolls(app.polls.getByThreadId(thread?.id));
     }
-  }, [recentlyEdited]);
+  }, [initializedPolls, thread?.id]);
 
-  useNecessaryEffect(() => {
-    app.threads
-      .fetchThreadsFromId([+threadId])
-      .then((res) => {
-        const t = res[0];
-        if (t) setThread(t);
-        setThreadFetchCompleted(true);
-      })
-      .catch(() => {
-        notifyError('Thread not found');
-        setThreadFetchFailed(true);
-        setThreadFetchCompleted(true);
-      });
-  }, [threadId]);
-
-  useNecessaryEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    // load proposal
-    if (!prefetch[threadId]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([thread]).then(() => {
-        setThread(thread);
-      });
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          threadReactionsStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, threadId]);
-
+  // unnecessary code
   useNecessaryEffect(() => {
     if (!thread) {
       return;
@@ -223,10 +187,30 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         `${threadId}-${slugify(thread?.title)}${window.location.search}`,
         true
       );
+      console.log("url => ", { url, threadId, identifier, thread })
       navigate(url, { replace: true });
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
+  // ------------
 
+  // fetches reactions (redundant)
+  useNecessaryEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    // load proposal
+    if (!prefetch[threadId]['threadReactionsStarted']) {
+      app.threads.fetchReactionsCount([thread])
+      setPrefetch((prevState) => ({
+        ...prevState,
+        [threadId]: {
+          ...prevState[threadId],
+          threadReactionsStarted: true,
+        },
+      }));
+    }
+  }, [prefetch, thread, threadId]);
   useNecessaryEffect(() => {
     if (comments.length > 0 && thread && thread.id) {
       fetchReactionCounts({
@@ -251,179 +235,82 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread, threadId, comments]);
 
-  useEffect(() => {
-    if (!initializedComments) {
-      setInitializedComments(true);
-    }
-  }, [initializedComments]);
-
-  useEffect(() => {
-    if (!initializedPolls) {
-      setInitializedPolls(true);
-      setPolls(app.polls.getByThreadId(thread?.id));
-    }
-  }, [initializedPolls, thread?.id]);
-
   useNecessaryEffect(() => {
-    if (!thread) {
+    if (!thread || (thread && arePollsFetched)) {
       return;
     }
 
-    // load polls
-    if (!prefetch[threadId]['pollsStarted']) {
-      app.polls
-        .fetchPolls(app.activeChainId(), thread?.id)
-        .then(() => {
-          setPolls(app.polls.getByThreadId(thread.id));
-        })
-        .catch(() => {
-          notifyError('Failed to load polls');
-          setPolls([]);
-        });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          pollsStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, thread?.id, threadId]);
+    app.polls
+      .fetchPolls(app.activeChainId(), thread?.id)
+      .then(() => {
+        setPolls(app.polls.getByThreadId(thread.id));
+        setArePollsFetched(true)
+      })
+      .catch(() => {
+        notifyError('Failed to load polls');
+        setPolls([]);
+      });
+  }, [thread, arePollsFetched]);
 
   useNecessaryEffect(() => {
-    if (!thread) {
+    if (!thread || (thread && isViewMarked)) {
       return;
     }
 
     // load view count
-    if (!prefetch[threadId]['viewCountStarted']) {
-      $.post(`${app.serverUrl()}/viewCount`, {
-        chain: app.activeChainId(),
-        object_id: thread.id,
+    axios.post(`${app.serverUrl()}/viewCount`, {
+      chain: app.activeChainId(),
+      object_id: thread.id,
+    })
+      .then((response) => {
+        setViewCount(response?.data?.result?.view_count || 0);
       })
-        .then((response) => {
-          if (response.status !== 'Success') {
-            setViewCount(0);
-            throw new Error(`got unsuccessful status: ${response.status}`);
-          } else {
-            setViewCount(response.result.view_count);
-          }
-        })
-        .catch(() => {
-          setViewCount(0);
-          throw new Error('could not load view count');
-        });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          viewCountStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, thread?.id, threadId]);
+      .catch(() => {
+        setViewCount(0);
+      }).finally(() => {
+        setIsViewMarked(true)
+      });
+  }, [thread, isViewMarked]);
 
   useNecessaryEffect(() => {
-    if (!thread) {
+    if (!thread || (thread && areProfilesLoaded)) {
       return;
     }
 
     // load profiles
-    if (!prefetch[threadId]['profilesStarted']) {
+    NewProfilesController.Instance.getProfile(
+      thread.authorChain,
+      thread.author
+    );
+
+    comments.forEach((comment) => {
       NewProfilesController.Instance.getProfile(
-        thread.authorChain,
-        thread.author
+        comment.authorChain,
+        comment.author
       );
+    });
 
-      comments.forEach((comment) => {
-        NewProfilesController.Instance.getProfile(
-          comment.authorChain,
-          comment.author
-        );
-      });
+    NewProfilesController.Instance.isFetched.on('redraw', () => {
+      setAreProfilesLoaded(true)
+    });
 
-      NewProfilesController.Instance.isFetched.on('redraw', () => {
-        if (!prefetch[threadId]?.['profilesFinished']) {
-          setPrefetch((prevState) => ({
-            ...prevState,
-            [threadId]: {
-              ...prevState[threadId],
-              profilesFinished: true,
-            },
-          }));
-        }
-      });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          profilesStarted: true,
-        },
-      }));
-    }
+    setAreProfilesLoaded(true)
   }, [
     comments,
-    prefetch,
     thread,
-    thread?.author,
-    thread?.authorChain,
-    threadId,
+    areProfilesLoaded
   ]);
-
-  useEffect(() => {
-    if (threadDoesNotMatch) {
-      setThread(undefined);
-      setRecentlyEdited(false);
-    }
-  }, [threadDoesNotMatch]);
-
-  useEffect(() => {
-    if (thread?.id && comments?.length > 0) {
-      const mismatchedComments = comments.filter((c) => {
-        return c.threadId !== thread.id;
-      });
-
-      if (mismatchedComments.length) {
-        setPrefetch((prevState) => ({
-          ...prevState,
-          [threadId]: {
-            ...prevState[threadId],
-          },
-        }));
-      }
-    }
-  }, [comments, thread, threadId]);
-
-  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
-  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta) {
+  if (!app.chain?.meta || !app.threads.initialized) {
     return <PageLoading />;
   }
 
-  // load app controller
-  if (!app.threads.initialized) {
-    return <PageLoading />;
-  }
-
-  if (!thread && threadFetchCompleted) {
+  if ((!isLoading && !thread) || (!thread) || (fetchThreadError)) {
     return <PageNotFound />;
-  }
-
-  if (threadFetchFailed) {
-    return <PageNotFound />;
-  }
-
-  if (!thread) {
-    return <PageLoading />;
   }
 
   // Original posters have full editorial control, while added collaborators
@@ -455,27 +342,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     !!hasJoinedCommunity ||
     (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
-  const handleLinkedThreadChange = (links: Thread['links']) => {
-    const updatedThread = new Thread({
-      ...thread,
-      links,
-    });
+  // const handleLinkedProposalChange = (
+  //   stage: ThreadStage,
+  //   links: Link[] = []
+  // ) => {
+  //   const newThread = {
+  //     ...thread,
+  //     stage,
+  //     links,
+  //   } as Thread;
 
-    setThread(updatedThread);
-  };
-
-  const handleLinkedProposalChange = (
-    stage: ThreadStage,
-    links: Link[] = []
-  ) => {
-    const newThread = {
-      ...thread,
-      stage,
-      links,
-    } as Thread;
-
-    setThread(newThread);
-  };
+  //   setThread(newThread);
+  // };
 
   const handleNewSnapshotChange = async ({
     id,
@@ -504,12 +382,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       }
     }
 
-    const newThread = {
-      ...thread,
-      links: [...thread.links, newLink],
-    } as Thread;
+    // const newThread = {
+    //   ...thread,
+    //   links: [...thread.links, newLink],
+    // } as Thread;
 
-    setThread(newThread);
+    // setThread(newThread);
   };
 
   const editsToSave = localStorage.getItem(
@@ -577,27 +455,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onLockToggle={(isLock) => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
-          setRecentlyEdited(true);
-          setThread((t) => ({
-            ...t,
-            readOnly: isLock,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
-        }}
-        onPinToggle={(isPin) => {
-          setThread((t) => ({
-            ...t,
-            pinned: isPin,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
+          // setThread((t) => ({
+          //   ...t,
+          //   readOnly: isLock,
+          //   uniqueIdentifier: t.uniqueIdentifier,
+          // }));
         }}
         onTopicChange={(topic: Topic) => {
-          const newThread = new Thread({ ...thread, topic });
-          setThread(newThread);
+          // const newThread = new Thread({ ...thread, topic });
+          // setThread(newThread);
         }}
         onCollaboratorsEdit={(collaborators: IThreadCollaborator[]) => {
-          const newThread = new Thread({ ...thread, collaborators });
-          setThread(newThread);
+          // const newThread = new Thread({ ...thread, collaborators });
+          // setThread(newThread);
         }}
         onDelete={() => navigate('/discussions')}
         onEditCancel={() => {
@@ -611,9 +481,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }}
         onEditStart={() => {
           if (editsToSave) {
-            clearEditingLocalStorage(thread.id, ContentType.Thread);
+            // clearEditingLocalStorage(thread.id, ContentType.Thread);
 
-            setSavedEdits(editsToSave || '');
+            // setSavedEdits(editsToSave || '');
           }
 
           setIsGloballyEditing(true);
@@ -622,19 +492,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onSpamToggle={(updatedThread) => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
-          setRecentlyEdited(true);
-          setThread((t) => ({
-            ...t,
-            markedAsSpamAt: updatedThread.markedAsSpamAt,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
-        }}
-        onProposalStageChange={(stage) => {
-          setThread((t) => ({
-            ...t,
-            stage: stage,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
+          // setThread((t) => ({
+          //   ...t,
+          //   markedAsSpamAt: updatedThread.markedAsSpamAt,
+          //   uniqueIdentifier: t.uniqueIdentifier,
+          // }));
         }}
         hasPendingEdits={!!editsToSave}
         body={(threadOptionsComp) => (
@@ -648,8 +510,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   thread={thread}
                   savedEdits={savedEdits}
                   shouldRestoreEdits={shouldRestoreEdits}
-                  cancelEditing={cancelEditing}
-                  threadUpdatedCallback={threadUpdatedCallback}
+                  cancelEditing={() => {
+                    setIsGloballyEditing(false);
+                    setIsEditingBody(false);
+                  }}
+                  threadUpdatedCallback={() => {
+                    setIsGloballyEditing(false);
+                    setIsEditingBody(false);
+                  }}
                 />
               </>
             ) : (
@@ -754,7 +622,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <div className="cards-column">
                       {showLinkedProposalOptions && (
                         <LinkedProposalsCard
-                          onChangeHandler={handleLinkedProposalChange}
+                          // onChangeHandler={handleLinkedProposalChange}
+                          onChangeHandler={() => { return null }}
                           thread={thread}
                           showAddProposalButton={isAuthor || isAdminOrMod}
                         />
@@ -763,7 +632,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <LinkedThreadsCard
                           thread={thread}
                           allowLinking={isAuthor || isAdminOrMod}
-                          onChangeHandler={handleLinkedThreadChange}
+                          // onChangeHandler={handleLinkedThreadChange}
+                          onChangeHandler={() => { return null }}
                         />
                       )}
                     </div>

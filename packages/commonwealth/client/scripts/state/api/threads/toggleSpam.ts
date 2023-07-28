@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Thread from 'models/Thread';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface ToggleThreadSpamProps {
   chainId: string;
@@ -32,12 +32,10 @@ const useToggleThreadSpamMutation = ({ chainId, threadId }: ToggleThreadSpamMuta
   return useMutation({
     mutationFn: toggleThreadSpam,
     onSuccess: async (response) => {
-      // TODO: migrate the thread store objects, then clean this up
-      const foundThread = app.threads.store.getByIdentifier(threadId);
-      foundThread.markedAsSpamAt = response.data.result.markedAsSpamAt;
-      app.threads.updateThreadInStore(new Thread({ ...foundThread }));
-
-      return foundThread
+      updateThreadInAllCaches(chainId, threadId, {
+        markedAsSpamAt: response.data.result.markedAsSpamAt
+      })
+      return response.data.result
     }
   });
 };

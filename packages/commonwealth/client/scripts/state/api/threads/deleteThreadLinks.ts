@@ -35,7 +35,7 @@ const useDeleteThreadLinksMutation = ({ chainId, threadId }: deleteThreadLinksMu
   return useMutation({
     mutationFn: deleteThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, updatedThread)
+      updateThreadInAllCaches(chainId, threadId, updatedThread)
       return updatedThread
     }
   });

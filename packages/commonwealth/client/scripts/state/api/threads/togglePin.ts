@@ -29,7 +29,7 @@ const useToggleThreadPinMutation = ({ chainId, threadId }: ToggleThreadPinMutati
   return useMutation({
     mutationFn: toggleThreadPin,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, updatedThread)
+      updateThreadInAllCaches(chainId, threadId, updatedThread)
       return updatedThread;
     }
   });

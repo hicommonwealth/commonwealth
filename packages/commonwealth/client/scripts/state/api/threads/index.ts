@@ -12,6 +12,7 @@ import useEditThreadTopicMutation from './editThreadTopic';
 import useToggleThreadPinMutation from './togglePin';
 import useAddThreadLinksMutation from './addThreadLinks';
 import useDeleteThreadLinksMutation from './deleteThreadLinks';
+import useGetThreadsByIdQuery from "./getThreadsById";
 
 export {
     useCreateThreadReactionMutation,
@@ -26,5 +27,6 @@ export {
     useEditThreadTopicMutation,
     useToggleThreadPinMutation,
     useAddThreadLinksMutation,
-    useDeleteThreadLinksMutation
+    useDeleteThreadLinksMutation,
+    useGetThreadsByIdQuery
 };

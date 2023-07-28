@@ -32,8 +32,7 @@ const useEditThreadPrivacyMutation = ({ chainId, threadId }: UseEditThreadPrivac
   return useMutation({
     mutationFn: editThreadPrivacy,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, updatedThread)
-
+      updateThreadInAllCaches(chainId, threadId, updatedThread)
       return updatedThread;
     }
   });

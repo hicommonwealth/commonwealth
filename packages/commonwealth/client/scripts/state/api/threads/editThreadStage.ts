@@ -34,7 +34,7 @@ const useEditThreadStageMutation = ({ chainId, threadId }: UseEditThreadStageMut
   return useMutation({
     mutationFn: editThreadStage,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, updatedThread)
+      updateThreadInAllCaches(chainId, threadId, updatedThread)
       // TODO: migrate the thread store objects, then clean this up
       // TODO: get this from react query state when fully migrated
       // if (args.stage === ThreadStage.Voting) app.threads.numVotingThreads--;

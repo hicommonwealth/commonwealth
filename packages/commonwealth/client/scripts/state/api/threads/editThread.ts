@@ -71,7 +71,7 @@ const useEditThreadMutation = ({ chainId, threadId }: UseEditThreadMutationProps
   return useMutation({
     mutationFn: editThread,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, updatedThread)
+      updateThreadInAllCaches(chainId, threadId, updatedThread)
       // TODO: migrate the thread store objects, then clean this up
       // Update counters
       // TODO: get this from react query state when fully migrated

@@ -115,12 +115,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread.id + '-' + thread.readOnly}
               thread={thread}
-              onPinToggle={(isPinned) => {
-                const tempThreads = [...threads];
-                const foundThread = tempThreads.find((t) => t.id === thread.id);
-                foundThread.pinned = isPinned;
-                // setThreads(tempThreads);
-              }}
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -143,12 +137,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 //   return updatedThreads;
                 // });
               }}
-              onDelete={() => {
-                const tempThreads = [...threads].filter(
-                  (t) => t.id !== thread.id
-                );
-                // setThreads(tempThreads);
-              }}
               onTopicChange={(topic) => {
                 if (topic.id !== thread.topic.id) {
                   const tempThreads = [...threads].filter(
@@ -157,20 +145,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
                   // setThreads(tempThreads);
                 }
-              }}
-              onProposalStageChange={(stage) => {
-                // setThreads((oldThreads) => {
-                //   const updatedThreads = [...oldThreads];
-                //   const foundThread = updatedThreads.find(
-                //     (x) => x.id === thread.id
-                //   );
-                //   if (foundThread) foundThread.stage = stage;
-                //   return updatedThreads.filter(
-                //     // make sure that if we have an active stage filter (from the dropdown)
-                //     // then we also filter the current list for the current stage only
-                //     (x) => (stageName ? x.stage === stageName : x)
-                //   );
-                // });
               }}
             />
           );
