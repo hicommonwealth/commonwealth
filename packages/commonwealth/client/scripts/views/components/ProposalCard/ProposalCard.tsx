@@ -23,6 +23,8 @@ import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
 import useForceRerender from 'hooks/useForceRerender';
+import { useVotesQuery } from 'controllers/chain/cosmos/gov/queries';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -34,9 +36,13 @@ export const ProposalCard = ({
   injectedContent,
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
   const [title, setTitle] = useState(proposal.title);
   const { metadata } = useProposalMetadata({ app, proposal });
-  const forceRerender = useForceRerender();
+  const { data, isLoading } = useVotesQuery({
+    isApiReady: !!app.chain?.apiInitialized,
+    proposal: proposal as CosmosProposal,
+  });
 
   const secondaryTagText = getSecondaryTagText(proposal);
 

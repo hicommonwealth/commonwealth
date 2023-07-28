@@ -17,7 +17,7 @@ const useVotesQuery = ({ isApiReady, proposal }: Props) => {
       { chainId: cosmosChain?.id, proposalId: proposal?.identifier },
     ],
     queryFn: () => proposal.fetchVoteInfo(),
-    enabled: isApiReady && !!proposal,
+    enabled: isApiReady && !!proposal && !proposal.completed, // TODO: is there a better way to avoid completed proposals cluttering up RQ? Maybe wrap in a hook?
   });
 };
 

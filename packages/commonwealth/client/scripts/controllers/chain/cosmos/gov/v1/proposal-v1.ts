@@ -135,8 +135,6 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async init() {
-    // await this.fetchVoteInfo();
-
     if (!this.initialized) {
       this._initialized = true;
     }
