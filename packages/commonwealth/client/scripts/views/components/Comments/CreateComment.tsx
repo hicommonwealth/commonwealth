@@ -87,7 +87,8 @@ export const CreateComment = ({
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId()
+    chainId: app.activeChainId(),
+    existingNumberOfComments: rootThread.numberOfComments || 0
   })
 
   const handleSubmitComment = async () => {
@@ -103,6 +104,7 @@ export const CreateComment = ({
         address: author.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
+        existingNumberOfComments: rootThread.numberOfComments || 0
       })
 
       setErrorMsg(null);

@@ -9,21 +9,21 @@ import {
   useToggleCommentSpamStatusMutation
 } from 'state/api/comments';
 import { ContentType } from 'types';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { notifyError } from '../../../../controllers/app/notifications';
-import type { Comment as CommentType } from '../../../../models/Comment';
-import Thread from '../../../../models/Thread';
-import Permissions from '../../../../utils/Permissions';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 import {
   deserializeDelta,
   serializeDelta,
 } from 'views/components/react_quill_editor/utils';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import { notifyError } from '../../../../controllers/app/notifications';
+import type { Comment as CommentType } from '../../../../models/Comment';
+import Thread from '../../../../models/Thread';
+import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
-import { jumpHighlightComment } from './helpers';
 import './CommentTree.scss';
+import { jumpHighlightComment } from './helpers';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -60,7 +60,8 @@ export const CommentTree = ({
 
   const { mutateAsync: deleteComment } = useDeleteCommentMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
+    threadId: thread.id,
+    existingNumberOfComments: thread.numberOfComments
   })
 
   const { mutateAsync: editComment } = useEditCommentMutation({
@@ -162,7 +163,8 @@ export const CommentTree = ({
                 commentId: comment.id,
                 canvasHash: comment.canvas_hash,
                 chainId: app.activeChainId(),
-                address: app.user.activeAccount.address
+                address: app.user.activeAccount.address,
+                existingNumberOfComments: thread.numberOfComments
               })
             } catch (e) {
               console.log(e);
@@ -414,8 +416,7 @@ export const CommentTree = ({
                       .map((_, i) => (
                         <div
                           key={i}
-                          className={`thread-connector ${
-                            isReplying &&
+                          className={`thread-connector ${isReplying &&
                             i === threadLevel - 1 &&
                             parentCommentId === comment.id
                             ? 'replying'

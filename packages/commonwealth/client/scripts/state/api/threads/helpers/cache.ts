@@ -128,7 +128,7 @@ const cacheUpdater = ({
                                     }
                                 })
                             } else if (arrayManipulationMode === 'replaceArray') {
-                                updatedThreads[foundThreadIndex].data.threads[foundThreadIndex] = {
+                                updatedThreads[foundThreadIndex] = {
                                     ...updatedThreads[foundThreadIndex],
                                     ...updateBody, // destructure order is important here
                                 }
