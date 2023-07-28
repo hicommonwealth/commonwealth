@@ -37,7 +37,7 @@ interface SearchThreadsProps {
 }
 
 const searchThreads = async ({
-  pageParam = 0,
+  pageParam = 1,
   chainId,
   searchTerm,
   limit,

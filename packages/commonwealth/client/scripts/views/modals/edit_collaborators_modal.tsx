@@ -49,8 +49,6 @@ export const EditCollaboratorsModal = ({
           true
         );
 
-        console.log('res: ', response);
-
         const results: Array<RoleInstanceWithPermissionAttributes> =
           response.results
             .map((profile) => ({

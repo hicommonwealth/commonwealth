@@ -30,12 +30,11 @@ interface SearchChainsProps {
   limit: number;
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
-
   enabled?: boolean;
 }
 
 const searchChains = async ({
-  pageParam = 0,
+  pageParam = 1,
   chainId,
   searchTerm,
   limit,

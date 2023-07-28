@@ -40,7 +40,7 @@ interface SearchProfilesProps {
 }
 
 const searchProfiles = async ({
-  pageParam = 0,
+  pageParam = 1,
   chainId,
   searchTerm,
   limit,

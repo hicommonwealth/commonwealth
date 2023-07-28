@@ -77,7 +77,7 @@ const MembersPage = () => {
       return;
     }
     fetchNextPage();
-  }, [members, totalResults]);
+  }, [members, totalResults, fetchNextPage]);
 
   return (
     <div className="MembersPage">
