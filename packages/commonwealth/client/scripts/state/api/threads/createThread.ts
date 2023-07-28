@@ -9,6 +9,7 @@ import {
   ThreadStage
 } from 'models/types';
 import app from 'state';
+import { addThreadInAllCaches } from './helpers/cache';
 
 interface CreateThreadProps {
   address: string;
@@ -76,21 +77,11 @@ const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
+      addThreadInAllCaches(chainId, newThread)
       // TODO: migrate the thread store objects, then clean this up
       // Update stage counts
       if (newThread.stage === ThreadStage.Voting) app.threads.numVotingThreads++;
-
-      // New posts are added to both the topic and allProposals sub-store
-      const lastPinnedThreadIndex = app.threads.store
-        .getAll()
-        .slice()
-        .reverse()
-        .findIndex((x) => x.pinned === true);
-      app.threads.store.add(newThread, {
-        pushToIndex: lastPinnedThreadIndex || 0,
-      });
       app.threads.numTotalThreads += 1;
-      app.threads._listingStore.add(newThread);
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
 

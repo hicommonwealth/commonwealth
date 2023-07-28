@@ -79,15 +79,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const navigate = useCommonNavigate();
 
   const { isLoggedIn } = useUserLoggedIn();
-
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [polls, setPolls] = useState<Array<Poll>>([]);
-  const [prefetch, setPrefetch] = useState<ThreadPrefetch>({});
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
-  // const [thread, setThread] = useState<Thread>(null);
-  const [title, setTitle] = useState('');
+  const [draftTitle, setDraftTitle] = useState('');
   const [viewCount, setViewCount] = useState<number>(null);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
@@ -154,19 +151,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
   });
 
-  // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
-  if (!prefetch[threadId]) {
-    setPrefetch((prevState) => ({
-      ...prevState,
-      [threadId]: {
-        pollsStarted: false,
-        viewCountStarted: false,
-        profilesStarted: false,
-        profilesFinished: false,
-      },
-    }));
-  }
-
   useEffect(() => {
     if (!initializedPolls && thread?.id) {
       setInitializedPolls(true);
@@ -174,7 +158,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [initializedPolls, thread?.id]);
 
-  // unnecessary code
+  // TODO: unnecessary code - must be in a redirect hook
   useNecessaryEffect(() => {
     if (!thread) {
       return;
@@ -198,13 +182,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     app.threads.fetchReactionsCount([thread])
-    setPrefetch((prevState) => ({
-      ...prevState,
-      [threadId]: {
-        ...prevState[threadId],
-        threadReactionsStarted: true,
-      },
-    }));
+    setAreReactionsLoaded(true)
   }, [thread, areReactionsLoaded]);
 
   useNecessaryEffect(() => {
@@ -398,7 +376,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           isEditingBody ? (
             <CWTextInput
               onInput={(e) => {
-                setTitle(e.target.value);
+                setDraftTitle(e.target.value);
               }}
               defaultValue={thread.title}
             />
@@ -464,7 +442,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 {/*// TODO editing thread */}
                 {threadOptionsComp}
                 <EditBody
-                  title={title}
+                  title={draftTitle}
                   thread={thread}
                   savedEdits={savedEdits}
                   shouldRestoreEdits={shouldRestoreEdits}

@@ -152,5 +152,21 @@ const updateThreadTopicInAllCaches = (chainId: string, threadId: number, newTopi
 
 }
 
-export { removeThreadFromAllCaches, updateThreadInAllCaches, updateThreadTopicInAllCaches };
+const addThreadInAllCaches = (chainId: string, newThread: Thread) => {
+    // refetch all caches for the thread topic and also the general cache
+    const queryCache = queryClient.getQueryCache()
+    const queryKeys = queryCache.getAll().map(cache => cache.queryKey)
+    const keysForThreads = queryKeys.filter(x => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId)
+
+    keysForThreads.map((k) => {
+        if (k[2] === 'bulk' && (k[3] === newThread.topic.id || k[3] === undefined)) {
+            queryClient.cancelQueries(k)
+            queryClient.refetchQueries(k)
+        }
+        // TODO: for now single cache will fetch the thread - not adding its state, ideally we should
+        // add the thread here
+    })
+}
+
+export { removeThreadFromAllCaches, updateThreadInAllCaches, updateThreadTopicInAllCaches, addThreadInAllCaches };
 
