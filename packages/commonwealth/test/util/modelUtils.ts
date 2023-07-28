@@ -299,7 +299,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
   const { chain, address, jwt, author_chain, reaction, comment_id } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/createReaction')
+    .post(`/api/comments/${comment_id}/reactions`)
     .set('Accept', 'application/json')
     .send({
       chain,

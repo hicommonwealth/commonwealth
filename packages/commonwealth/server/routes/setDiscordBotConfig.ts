@@ -14,7 +14,6 @@ enum SetDiscordBotConfigErrors {
 
 type SetDiscordBotConfigReq = {
   chain_id: string;
-  bot_id?: string;
   guild_id?: string;
   verification_token?: string;
   snapshot_channel_id?: string;
@@ -29,15 +28,10 @@ const setDiscordBotConfig = async (
   req: TypedRequestBody<SetDiscordBotConfigReq>,
   res: TypedResponse<SetDiscordBotConfigResp>
 ) => {
-  const {
-    chain_id,
-    bot_id,
-    guild_id,
-    verification_token,
-    snapshot_channel_id,
-  } = req.body;
+  const { chain_id, guild_id, verification_token, snapshot_channel_id } =
+    req.body;
 
-  const [error] = await validateChain(models, { chain_id });
+  const [chain, error] = await validateChain(models, { chain_id });
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {
@@ -101,6 +95,23 @@ const setDiscordBotConfig = async (
     throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
   } else {
     try {
+      const profile = await models.Profile.findOne({
+        where: {
+          profile_name: 'Discord Bot',
+        },
+      });
+      await models.Address.create({
+        user_id: profile.user_id,
+        profile_id: profile.id,
+        address: '0xdiscordbot',
+        chain: chain_id,
+        role: 'admin',
+        verification_token: '123456',
+        verification_token_expires: new Date(2030, 1, 1),
+        verified: new Date(),
+        last_active: new Date(),
+      });
+
       chainInstance.discord_config_id = configEntry.id;
       await chainInstance.save();
     } catch (e) {
@@ -112,7 +123,6 @@ const setDiscordBotConfig = async (
     await configEntry.update(
       {
         chain_id,
-        bot_id,
         guild_id,
         verification_token: null,
         token_expiration: null,

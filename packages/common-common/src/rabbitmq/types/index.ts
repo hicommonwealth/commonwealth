@@ -13,6 +13,7 @@ import type { RmqSnapshotNotification } from './snapshotNotification';
 import { Sequelize } from 'sequelize';
 import { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
 import { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
+import { RmqDiscordMessage } from './discordMessage';
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -34,7 +35,8 @@ export type TRmqMessages =
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
-  | RmqSnapshotNotification.RmqMsgType;
+  | RmqSnapshotNotification.RmqMsgType 
+  | RmqDiscordMessage.RmqMsgType;
 
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError;
@@ -49,6 +51,7 @@ export enum RascalPublications {
   ChainEventNotifications = 'ChainEventNotificationsPublication',
   SnapshotProposalNotifications = 'SnapshotProposalNotificationsPublication',
   SnapshotListener = 'SnapshotListenerPublication',
+  DiscordListener = 'DiscordMessageSubscription'
 }
 
 export enum RascalSubscriptions {
@@ -58,6 +61,7 @@ export enum RascalSubscriptions {
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
   SnapshotProposalNotifications = 'SnapshotProposalNotificationsSubscription',
   SnapshotListener = 'SnapshotListenerSubscription',
+  DiscordListener = 'DiscordMessageSubscription'
 }
 
 export enum RascalExchanges {
@@ -76,6 +80,7 @@ export enum RascalQueues {
   DeadLetter = 'DeadLetterQueue',
   SnapshotProposalNotifications = 'SnapshotProposalNotificationsQueue',
   SnapshotListener = 'SnapshotListenerQueue',
+  DiscordListener = 'DiscordMessageQueue'
 }
 
 export enum RascalBindings {
@@ -86,6 +91,7 @@ export enum RascalBindings {
   SnapshotProposalNotifications = 'SnapshotProposalNotificationsBinding',
   SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding',
+  DiscordListener = 'DiscordMessageBinding'
 }
 
 export enum RascalRoutingKeys {
@@ -96,6 +102,7 @@ export enum RascalRoutingKeys {
   SnapshotProposalNotifications = 'SnapshotProposalNotifications',
   SnapshotListener = 'SnapshotListener',
   DeadLetter = 'DeadLetter',
+  DiscordListener = 'DiscordListener'
 }
 
 export type SafeRmqPublishSupported =
