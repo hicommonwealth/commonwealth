@@ -6,6 +6,11 @@
   flex-wrap: wrap;
   gap: 8px;
 
+  .discord-author {
+    display: flex;
+    gap: 4px;
+  }
+
   .User {
     align-items: center;
     display: flex;
@@ -56,5 +61,4 @@
       color: $rorange-500;
     }
   }
-
 }

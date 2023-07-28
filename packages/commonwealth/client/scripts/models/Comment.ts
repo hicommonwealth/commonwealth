@@ -25,6 +25,7 @@ export class Comment<T extends IUniqueId> {
   public readonly canvasAction: string;
   public readonly canvasSession: string;
   public readonly canvasHash: string;
+  public readonly discord_meta: any;
 
   constructor({
     chain,
@@ -45,6 +46,7 @@ export class Comment<T extends IUniqueId> {
     canvasAction,
     canvasSession,
     canvasHash,
+    discord_meta,
   }) {
     this.chain = chain;
     this.author = author;
@@ -63,6 +65,7 @@ export class Comment<T extends IUniqueId> {
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
+    this.discord_meta = discord_meta;
   }
 }
 

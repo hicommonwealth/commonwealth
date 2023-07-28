@@ -5,7 +5,7 @@ import { featureFlags } from 'helpers/feature-flags';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/chain_metadata_rows.scss';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import type ChainInfo from '../../../models/ChainInfo';
@@ -20,6 +20,10 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
+import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
+import { openConfirmation } from '../../modals/confirmation_modal';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -29,6 +33,126 @@ type ChainMetadataRowsProps = {
   onSave: () => void;
 };
 
+type DiscordChannelConnection = {
+  channelName: string;
+  channelId: string;
+  onConnect: (topicId: string) => void;
+};
+
+const DiscordForumConnections = ({
+  channels,
+  topics,
+  refetchTopics,
+}: {
+  channels: DiscordChannelConnection[];
+  topics: { id: string; name: string; channelId: string | null }[];
+  refetchTopics: () => Promise<void>;
+}) => {
+  const topicOptions = topics.map((topic) => {
+    return { label: topic.name, value: topic.id };
+  });
+
+  const connectedTopics = topics.filter(
+    (topic) => topic.channelId !== null && topic.channelId !== ''
+  );
+
+  const [connectionVerified, setConnectionVerified] = useState(true);
+  const [topicIdToRemoveConnection, setTopicIdToRemoveConnection] = useState<
+    string | null
+  >(null);
+
+  const removeConnection = (topicId: string) => {
+    setTopicIdToRemoveConnection(topicId);
+
+    openConfirmation({
+      title: 'Warning',
+      // eslint-disable-next-line max-len
+      description: `Are you sure you want to remove this connection? New comments on Discord threads will NOT be updated on Commonwealth.`,
+      buttons: [
+        {
+          label: 'Remove',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              await app.discord.setForumChannelConnection(topicId, null);
+              setConnectionVerified(false);
+              await refetchTopics();
+              setConnectionVerified(true);
+            } catch (e) {
+              console.log(e);
+            }
+          },
+        },
+        {
+          label: 'No',
+          buttonType: 'mini-white',
+        },
+      ],
+    });
+  };
+
+  return (
+    <div className="DiscordForumConnections">
+      {channels.length > 0 ? (
+        <div className="TopicRow">
+          <CWText className="HeaderText">Channel</CWText>
+          <CWText>Topic</CWText>
+        </div>
+      ) : (
+        <CWText>Add a forum channel in your Discord server</CWText>
+      )}
+
+      {channels.map((channel) => {
+        const connectedTopic = topics.find(
+          (topic) => topic.channelId === channel.channelId
+        );
+
+        const remainingTopics = topicOptions.filter(
+          (topic) =>
+            !connectedTopics.find(
+              (connected_topic) => connected_topic.id === topic.value
+            )
+        );
+
+        if (connectedTopic) {
+          remainingTopics.push({
+            label: connectedTopic.name,
+            value: connectedTopic.id,
+          });
+        }
+
+        return (
+          <div key={channel.channelId} className="TopicRow">
+            <CWText className="ChannelText">#{channel.channelName}</CWText>
+            {connectionVerified && (
+              <CWDropdown
+                initialValue={
+                  connectedTopic
+                    ? { label: connectedTopic.name, value: connectedTopic.id }
+                    : { label: 'Not connected', value: '' }
+                }
+                options={remainingTopics}
+                onSelect={async (item) => {
+                  // Connect the channel to the topic
+                  channel.onConnect(item.value);
+                }}
+              />
+            )}
+            {connectedTopic && (
+              <CWClose
+                className="CloseButton"
+                onClick={() => {
+                  removeConnection(connectedTopic.id);
+                }}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export const ChainMetadataRows = ({
   chain,
   admins,
@@ -36,6 +160,20 @@ export const ChainMetadataRows = ({
   onRoleUpdate,
   onSave,
 }: ChainMetadataRowsProps) => {
+  const params = new URLSearchParams(window.location.search);
+  const returningFromDiscordCallback = params.get(
+    'returningFromDiscordCallback'
+  );
+
+  const { data: topics, refetch: refetchTopics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+
+  const { data: discordChannels, refetch: refetchDiscordSettings } =
+    useFetchDiscordChannelsQuery({
+      chainId: app.activeChainId(),
+    });
+
   const [name, setName] = useState(chain.name);
   const [description, setDescription] = useState(chain.description);
   const [website, setWebsite] = useState(chain.website);
@@ -57,43 +195,40 @@ export const ChainMetadataRows = ({
   const [hasHomepage, setHasHomepage] = useState(chain.hasHomepage);
   const [selectedTags2, setSelectedTags2] = useState(setSelectedTags(chain.id));
   const [discordBotConnected, setDiscordBotConnected] = useState(
-    chain.discordConfigId !== null
+    returningFromDiscordCallback === 'true'
+      ? true
+      : chain.discordConfigId !== null
   );
   const [discordBotConnecting, setDiscordBotConnecting] = useState(
-    chain.discordConfigId !== null
+    returningFromDiscordCallback === 'true'
+      ? true
+      : chain.discordConfigId !== null
   );
   const [communityBanner, setCommunityBanner] = useState(chain.communityBanner);
-  const [channelsLoaded, setChannelsLoaded] = useState(false);
   const [uploadInProgress, setUploadInProgress] = useState(false);
-  const [snapshotChannels, setSnapshotChannels] = useState([]);
   const [snapshotNotificationsEnabled, setSnapshotNotificationsEnabled] =
     useState(false);
   const [selectedSnapshotChannel, setSelectedSnapshotChannel] = useState<{
     id: string;
     name: string;
   } | null>(null);
+  const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
 
-  const getChannels = useCallback(async () => {
-    try {
-      const res = await app.discord.getChannels(chain.id);
-      setSnapshotChannels(res.channels);
-      setSelectedSnapshotChannel(res.selectedChannel);
+  useEffect(() => {
+    setDiscordBotConnected(chain.discordConfigId !== null);
+  }, [chain]);
 
-      if (res.selectedChannel?.id) {
-        setSnapshotNotificationsEnabled(true);
-      }
-
-      setChannelsLoaded(true);
-    } catch (e) {
-      console.log(e);
+  useEffect(() => {
+    if (
+      discordChannels &&
+      discordChannels.selectedChannel &&
+      discordChannels.selectedChannel.id
+    ) {
+      setSelectedSnapshotChannel(discordChannels.selectedChannel);
+      setSnapshotNotificationsEnabled(true);
+      setSelectedChannelLoaded(true);
     }
-  }, [chain.id]);
-
-  useNecessaryEffect(() => {
-    if (discordBotConnected && !channelsLoaded) {
-      getChannels();
-    }
-  }, [channelsLoaded, discordBotConnected, getChannels]);
+  }, [discordChannels]);
 
   if (!selectedTags2) {
     return;
@@ -168,15 +303,17 @@ export const ChainMetadataRows = ({
       await app.discord.createConfig(verification_token);
 
       window.open(
-        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID
-        }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-          process.env.DISCORD_UI_URL
-        )}/callback&response_type=code&scope=bot&state=${encodeURI(
+        `https://discord.com/oauth2/authorize?client_id=${
+          process.env.DISCORD_CLIENT_ID
+        }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+          `${window.location.origin}`
+        )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
           })
-        )}`
+        )}`,
+        '_parent'
       );
 
       setDiscordBotConnected(false);
@@ -211,17 +348,18 @@ export const ChainMetadataRows = ({
       await app.discord.createConfig(verification_token);
 
       window.open(
-        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID
-        }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-          process.env.DISCORD_UI_URL
-        )}/callback&response_type=code&scope=bot&state=${encodeURI(
+        `https://discord.com/oauth2/authorize?client_id=${
+          process.env.DISCORD_CLIENT_ID
+        }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+          `${window.location.origin}`
+        )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
           })
-        )}`
+        )}`,
+        '_parent'
       );
-
       setDiscordBotConnecting(true);
     } catch (e) {
       console.log(e);
@@ -387,7 +525,7 @@ export const ChainMetadataRows = ({
                 }
               })
               .filter((val) => val.length > 4);
-            const uniqueSnpshots = [...new Set(snapshots)] as string[]
+            const uniqueSnpshots = [...new Set(snapshots)] as string[];
             setSnapshot(uniqueSnpshots);
             setSnapshotString(v);
           }}
@@ -464,7 +602,7 @@ export const ChainMetadataRows = ({
               className="connect-button"
               onClick={handleReconnectBot}
             />
-            <div className="snapshot-settings">
+            {/* <div className="snapshot-settings">
               <CWText type="h4">Snapshot Notifications</CWText>
               <CWToggle
                 onChange={() =>
@@ -474,10 +612,10 @@ export const ChainMetadataRows = ({
               />
             </div>
             <div className="connected-line">
-              {channelsLoaded && (
+              {discordChannels && snapshotNotificationsEnabled && (
                 <CWDropdown
                   label={'Select Channel'}
-                  options={snapshotChannels.map((channel) => {
+                  options={discordChannels.textChannels.map((channel) => {
                     return {
                       label: channel.name,
                       value: channel.id,
@@ -495,14 +633,48 @@ export const ChainMetadataRows = ({
                   }}
                 />
               )}
+            </div> */}
+            <div className="snapshot-settings">
+              <CWText type="h4">Connected Forum Channels</CWText>
             </div>
-
-            <CWButton
+            <CWText type="caption" className="ForumCaption">
+              Adding a connection will sync discord content to your Common
+              forum.
+            </CWText>
+            <div className="connected-line">
+              {discordChannels && (
+                <DiscordForumConnections
+                  channels={discordChannels.forumChannels?.map((channel) => {
+                    return {
+                      channelName: channel.name,
+                      channelId: channel.id,
+                      connectedTopicId: '',
+                      onConnect: async (topicId: string) => {
+                        try {
+                          await app.discord.setForumChannelConnection(
+                            topicId,
+                            channel.id
+                          );
+                          await refetchTopics();
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      },
+                    };
+                  })}
+                  topics={topics}
+                  refetchTopics={async () => {
+                    await refetchTopics();
+                  }}
+                />
+              )}
+            </div>
+            {/* <CWButton
               label="Save Commonbot Settings"
               className="save-snapshot"
               buttonType="primary-black"
               onClick={handleSaveCommonbotSettings}
-            />
+            /> */}
           </>
         ) : discordBotConnecting ? (
           <>

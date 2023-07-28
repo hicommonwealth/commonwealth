@@ -44,6 +44,7 @@ export type CreateThreadCommentOptions = {
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
+  discord_meta?: any;
 };
 
 export type CreateThreadCommentResult = [
@@ -63,6 +64,7 @@ export async function __createThreadComment({
   canvasAction,
   canvasSession,
   canvasHash,
+  discord_meta,
 }: CreateThreadCommentOptions): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
@@ -173,6 +175,7 @@ export async function __createThreadComment({
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
+    discord_meta,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
