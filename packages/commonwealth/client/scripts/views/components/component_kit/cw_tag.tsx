@@ -17,6 +17,7 @@ type TagType =
   | 'referendum'
   | 'stage'
   | 'new'
+  | 'trending'
   | 'disabled'
   | 'discord';
 
