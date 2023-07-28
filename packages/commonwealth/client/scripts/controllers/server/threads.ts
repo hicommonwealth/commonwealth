@@ -3,7 +3,10 @@ import axios from 'axios';
 import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
-import { modelReactionCountFromServer, modelReactionFromServer } from 'controllers/server/comments';
+import {
+  modelReactionCountFromServer,
+  modelReactionFromServer,
+} from 'controllers/server/comments';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 import moment from 'moment';
@@ -25,7 +28,7 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../models/types';
-import fetchThreadReactionCounts from "../../state/api/threads/fetchReactionCounts";
+import fetchThreadReactionCounts from '../../state/api/threads/fetchReactionCounts';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -157,7 +160,9 @@ class ThreadsController {
       }
       reactionIds = reactions.map((r) => r.id);
       reactionType = reactions.map((r) => r?.type || r?.reaction);
-      addressesReacted = reactions.map((r) => r?.address || r?.Address?.address);
+      addressesReacted = reactions.map(
+        (r) => r?.address || r?.Address?.address
+      );
     }
 
     let versionHistoryProcessed;
@@ -171,8 +176,8 @@ class ThreadsController {
             typeof history.author === 'string'
               ? JSON.parse(history.author)
               : typeof history.author === 'object'
-                ? history.author
-                : null;
+              ? history.author
+              : null;
           history.timestamp = moment(history.timestamp);
         } catch (e) {
           console.log(e);
@@ -197,8 +202,8 @@ class ThreadsController {
     const lastEditedProcessed = last_edited
       ? moment(last_edited)
       : versionHistoryProcessed && versionHistoryProcessed?.length > 1
-        ? versionHistoryProcessed[0].timestamp
-        : null;
+      ? versionHistoryProcessed[0].timestamp
+      : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     const archivedAt = archived_at ? moment(archived_at) : null;
@@ -335,8 +340,8 @@ class ThreadsController {
         is_active: true,
         created_at: Date.now(),
         immediate_email: false,
-        chain_id: result.chain,
-        thread_id: result.id,
+        Chain: app.config.chains.getById(result.chain),
+        Thread: result,
       };
       app.user.notifications.subscriptions.push(
         NotificationSubscription.fromJSON(subscriptionJSON)
@@ -348,8 +353,8 @@ class ThreadsController {
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
           : err.message
-            ? err.message
-            : 'Failed to create thread'
+          ? err.message
+          : 'Failed to create thread'
       );
     }
   }
@@ -495,7 +500,8 @@ class ThreadsController {
   public async setArchived(threadId: number, isArchived: boolean) {
     return new Promise((resolve, reject) => {
       $.post(
-        `${app.serverUrl()}/threads/${threadId}/${!isArchived ? 'archive' : 'unarchive'
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isArchived ? 'archive' : 'unarchive'
         }`,
         {
           jwt: app.user.jwt,
@@ -753,11 +759,9 @@ class ThreadsController {
         ...((thread || {}) as any),
       });
       finalThread.associatedReactions = [
-        ...(
-          thread.associatedReactions.length > 0
-            ? thread.associatedReactions
-            : foundThread?.associatedReactions || []
-        )
+        ...(thread.associatedReactions.length > 0
+          ? thread.associatedReactions
+          : foundThread?.associatedReactions || []),
       ];
       finalThread.numberOfComments =
         rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
@@ -783,8 +787,8 @@ class ThreadsController {
     // The reason why it was not migrated is because "reactive" code from react query wont work in this
     // non reactive scope
     const reactionCounts = await fetchThreadReactionCounts({
-      threadIds: threads.map((thread) => thread.id) as number[]
-    })
+      threadIds: threads.map((thread) => thread.id) as number[],
+    });
 
     for (const rc of reactionCounts) {
       const id = app.comments.reactionCountsStore.getIdentifier({

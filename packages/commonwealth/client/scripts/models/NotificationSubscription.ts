@@ -88,9 +88,9 @@ class NotificationSubscription implements SubscriptionFindOptions {
       json.is_active,
       json.created_at,
       json.immediate_email,
-      json.chain_id,
-      json.Comment || json.comment_id,
-      json.Thread || json.thread_id,
+      json.Chain,
+      json.Comment,
+      json.Thread,
       json.snapshot_id
     );
   }
