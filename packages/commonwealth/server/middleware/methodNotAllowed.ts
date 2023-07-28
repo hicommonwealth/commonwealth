@@ -13,7 +13,7 @@ const routesMethods: { [key: string]: string[] } = {};
 
 type ValidateThenHandle = [ValidationChain[], ...RequestHandler[]];
 
-// middleware for to capture route traffic and latency
+// middleware to capture route traffic and latency
 const statsMiddleware = (method: string, path: string) => (req, res, next) => {
   try {
     const routePattern = `${method.toUpperCase()} ${path}`;
