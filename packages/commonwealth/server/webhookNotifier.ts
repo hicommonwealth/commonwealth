@@ -272,7 +272,10 @@ const send = async (models, content: WebhookContent) => {
               },
             ],
           });
-        } else if (url.indexOf('discord.com') !== -1) {
+        } else if (
+          url.indexOf('discord.com') !== -1 &&
+          actor !== 'Discord Bot'
+        ) {
           // discord webhook format (raw json, for application/json)
           webhookData = isChainEvent
             ? {
