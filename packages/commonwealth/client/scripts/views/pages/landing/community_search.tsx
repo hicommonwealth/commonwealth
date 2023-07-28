@@ -125,6 +125,7 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
               onClick={() => {
                 window.open('https://discord.gg/t9XscHdZrG', '_blank');
               }}
+              className="discord-icon"
               iconSize="large"
             />
             <CWIconButton

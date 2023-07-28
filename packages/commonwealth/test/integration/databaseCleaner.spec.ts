@@ -6,12 +6,15 @@ import models from '../../server/database';
 import sinon from 'sinon';
 import { NotificationCategories } from 'common-common/src/types';
 import { QueryTypes } from 'sequelize';
-import { createSubscription } from 'subscriptionMapping';
+import { RedisCache } from 'common-common/src/redisCache';
+import { REDIS_URL } from '../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('DatabaseCleaner Tests', () => {
+describe.only('DatabaseCleaner Tests', () => {
+  let mockRedis: sinon.SinonStubbedInstance<RedisCache>;
+
   before('Reset database', async () => {
     await resetDatabase();
   });
@@ -33,16 +36,28 @@ describe('DatabaseCleaner Tests', () => {
       clock.restore();
     });
 
+    beforeEach(() => {
+      mockRedis = sinon.createStubInstance(RedisCache);
+      mockRedis.setKey.resolves(true);
+    });
+
+    afterEach(() => {
+      sinon.restore();
+    });
+
     it('should not run if started before the correct hour', () => {
       const now = new Date();
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
-      const dbCleaner = new DatabaseCleaner(
+      const dbCleaner = new DatabaseCleaner();
+      dbCleaner.initLoop(
         models,
         now.getUTCHours() + 4,
+        mockRedis,
         undefined,
         true
       );
+
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(
@@ -53,12 +68,10 @@ describe('DatabaseCleaner Tests', () => {
 
     it('should run exactly once (immediately) if started in the correct hour', () => {
       const now = new Date();
-      const dbCleaner = new DatabaseCleaner(
-        models,
-        now.getUTCHours(),
-        undefined,
-        true
-      );
+      now.setUTCMinutes(0);
+      now.setUTCMilliseconds(0);
+      const dbCleaner = new DatabaseCleaner();
+      dbCleaner.initLoop(models, now.getUTCHours(), mockRedis, undefined, true);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getUTCHours()).to.be.equal(now.getUTCHours());
@@ -67,9 +80,11 @@ describe('DatabaseCleaner Tests', () => {
 
     it('should not run if started after the correct hour', () => {
       const now = new Date();
-      const dbCleaner = new DatabaseCleaner(
+      const dbCleaner = new DatabaseCleaner();
+      dbCleaner.initLoop(
         models,
         now.getUTCHours() - 4,
+        mockRedis,
         undefined,
         true
       );
@@ -77,26 +92,32 @@ describe('DatabaseCleaner Tests', () => {
       clearTimeout(dbCleaner.timeoutID);
       now.setUTCDate(now.getUTCDate() + 1);
       now.setUTCHours(now.getUTCHours() - 4);
+      now.setUTCMinutes(0);
+      now.setUTCMilliseconds(0);
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(now.getTime());
       expect(dbCleaner.completed).to.be.false;
     });
 
     it('should not run if an hour to run is not provided', () => {
-      const dbCleaner = new DatabaseCleaner(models, NaN, undefined, true);
+      const dbCleaner = new DatabaseCleaner();
+      dbCleaner.initLoop(models, NaN, mockRedis, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
     it('should not run if the hour provided is invalid', () => {
-      let dbCleaner = new DatabaseCleaner(models, 24, undefined, true);
+      let dbCleaner = new DatabaseCleaner();
+      dbCleaner.initLoop(models, 24, mockRedis, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
-      dbCleaner = new DatabaseCleaner(models, 25, undefined, true);
+      dbCleaner = new DatabaseCleaner();
+      dbCleaner.initLoop(models, 25, mockRedis, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
-      dbCleaner = new DatabaseCleaner(models, -1, undefined, true);
+      dbCleaner = new DatabaseCleaner();
+      dbCleaner.initLoop(models, -1, mockRedis, undefined, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
@@ -150,27 +171,9 @@ describe('DatabaseCleaner Tests', () => {
         category_id: 'new-thread-creation',
       });
 
-      const dbCleaner = new DatabaseCleaner(
-        models,
-        now.getUTCHours() + 2,
-        undefined,
-        true
-      );
-      clock.runAll();
-
-      const waitForStart = new Promise((resolve) => {
-        const intervalId = setInterval(() => {
-          if (dbCleaner.completed === true) {
-            clearInterval(intervalId);
-            resolve(null);
-          } else {
-            console.log(
-              'Waiting on cleaner to finish executing the start method...'
-            );
-          }
-        }, 100);
-      });
-      await waitForStart;
+      const dbCleaner = new DatabaseCleaner();
+      dbCleaner.init(models);
+      await dbCleaner.executeQueries();
 
       const notifs = await models.Notification.findAll();
       expect(notifs.length).to.equal(1);
@@ -225,27 +228,9 @@ describe('DatabaseCleaner Tests', () => {
         immediate_email: false,
       });
 
-      const dbCleaner = new DatabaseCleaner(
-        models,
-        now.getHours() + 2,
-        undefined,
-        true
-      );
-      clock.runAll();
-
-      const waitForStart = new Promise((resolve) => {
-        const intervalId = setInterval(() => {
-          if (dbCleaner.completed === true) {
-            clearInterval(intervalId);
-            resolve(null);
-          } else {
-            console.log(
-              'Waiting on cleaner to finish executing the start method...'
-            );
-          }
-        }, 100);
-      });
-      await waitForStart;
+      const dbCleaner = new DatabaseCleaner();
+      dbCleaner.init(models);
+      await dbCleaner.executeQueries();
 
       const subs = await models.Subscription.findAll();
       let newUserSub;

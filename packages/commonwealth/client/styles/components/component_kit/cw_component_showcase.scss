@@ -171,6 +171,13 @@ $width: 360px;
     }
   }
 
+  .tag-gallery {
+    .tag-row {
+      display: flex;
+      gap: 8px;
+    }
+  }
+  
   .editor-toggle {
     display: flex;
     align-items: center;
