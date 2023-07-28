@@ -6,6 +6,7 @@ import models from '../../server/database';
 import sinon from 'sinon';
 import { NotificationCategories } from 'common-common/src/types';
 import { QueryTypes } from 'sequelize';
+import { createSubscription } from 'subscriptionMapping';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -210,14 +211,14 @@ describe('DatabaseCleaner Tests', () => {
         )
       )[0][0];
 
-      const newSub = await models.Subscription.create({
+      const newSub = await createSubscription({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
         is_active: true,
         immediate_email: false,
       });
 
-      const oldSub = await models.Subscription.create({
+      const oldSub = await createSubscription({
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
         is_active: true,

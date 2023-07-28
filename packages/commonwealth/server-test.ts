@@ -42,6 +42,7 @@ import {
 } from '../common-common/src/cacheKeyUtils';
 
 import { factory, formatFilename } from 'common-common/src/logging';
+import { createSubscription } from 'subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -335,12 +336,12 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       // Admins need to be subscribed to mentions and collaborations
-      await models.Subscription.create({
+      await createSubscription({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
         is_active: true,
       });
-      await models.Subscription.create({
+      await createSubscription({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,

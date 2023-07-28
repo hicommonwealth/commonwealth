@@ -4,6 +4,7 @@ import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import type { DB } from '../models';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { createSubscription } from 'subscriptionMapping';
 
 export const redirectWithLoginSuccess = (
   res,
@@ -136,14 +137,14 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     });
 
     // Automatically create subscription to their own mentions
-    await models.Subscription.create({
+    await createSubscription({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
       is_active: true,
     });
 
     // Automatically create a subscription to collaborations
-    await models.Subscription.create({
+    await createSubscription({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewCollaboration,
       is_active: true,

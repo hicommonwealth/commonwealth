@@ -18,6 +18,7 @@ import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { AppError } from '../../../../common-common/src/errors';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { createSubscription } from 'subscriptionMapping';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -251,18 +252,16 @@ export async function __createThread({
   // -----
 
   // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.create({
+  await createSubscription({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewComment,
-    object_id: `discussion_${finalThread.id}`,
     thread_id: finalThread.id,
     chain_id: finalThread.chain,
     is_active: true,
   });
-  await this.models.Subscription.create({
+  await createSubscription({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewReaction,
-    object_id: `discussion_${finalThread.id}`,
     thread_id: finalThread.id,
     chain_id: finalThread.chain,
     is_active: true,

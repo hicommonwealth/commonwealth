@@ -15,6 +15,7 @@ import {
 import type { DB } from '../models';
 
 import '../types';
+import { createSubscription } from 'subscriptionMapping';
 
 /**
  * The OAuth 2.0 authentication strategy authenticates requests using the OAuth
@@ -170,12 +171,12 @@ async function authenticateSocialAccount(
     const newUser = await models.User.createWithProfile(models, {
       email: null,
     });
-    await models.Subscription.create({
+    await createSubscription({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
       is_active: true,
     });
-    await models.Subscription.create({
+    await createSubscription({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewCollaboration,
       is_active: true,

@@ -15,6 +15,7 @@ import {
   SnapshotEventType,
 } from 'types';
 import { Op, Sequelize } from 'sequelize';
+import { createSubscription } from 'subscriptionMapping';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -113,7 +114,7 @@ describe('emitNotifications tests', () => {
 
   describe('PostNotificationData', () => {
     it('should generate a notification and notification reads for a new thread', async () => {
-      const subscription = await models.Subscription.create({
+      const subscription = await createSubscription({
         subscriber_id: userId,
         category_id: NotificationCategories.NewThread,
         chain_id: chain,
@@ -160,7 +161,7 @@ describe('emitNotifications tests', () => {
     });
 
     it('should generate a notification and notification reads for a thread comment', async () => {
-      const subscription = await models.Subscription.create({
+      const subscription = await createSubscription({
         subscriber_id: userId,
         category_id: NotificationCategories.NewComment,
         chain_id: chain,
@@ -207,7 +208,7 @@ describe('emitNotifications tests', () => {
     });
 
     it('should generate a notification and notification reads for a new thread reaction', async () => {
-      const subscription = await models.Subscription.create({
+      const subscription = await createSubscription({
         subscriber_id: userId,
         category_id: NotificationCategories.NewReaction,
         chain_id: chain,
@@ -256,7 +257,7 @@ describe('emitNotifications tests', () => {
   describe('SnapshotNotificationData', () => {
     it('should generate a notification for a new snapshot proposal', async () => {
       const space = 'plutusclub.eth';
-      const subscription = await models.Subscription.create({
+      const subscription = await createSubscription({
         subscriber_id: userId,
         category_id: NotificationCategories.SnapshotProposal,
         snapshot_id: space,

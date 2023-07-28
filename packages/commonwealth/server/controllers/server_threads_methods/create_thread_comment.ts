@@ -232,7 +232,7 @@ export async function __createThreadComment({
   const subsTransaction = await this.models.sequelize.transaction();
   try {
     // auto-subscribe comment author to reactions & child comments
-    await this.models.Subscription.create(
+    await this.createSubscription(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
@@ -243,7 +243,7 @@ export async function __createThreadComment({
       },
       { transaction: subsTransaction }
     );
-    await this.models.Subscription.create(
+    await this.createSubscription(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,

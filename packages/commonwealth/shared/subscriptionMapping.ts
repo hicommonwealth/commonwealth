@@ -3,6 +3,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SubscriptionAttributes } from '../server/models/subscription';
 import models from '../server/database';
+import { Transaction } from 'sequelize';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -46,7 +47,10 @@ export function mapNotificationsDataToSubscriptions(
   return uniqueData;
 }
 
-export async function createSubscription(subData: SubscriptionAttributes) {
+export async function createSubscription(
+  subData: SubscriptionAttributes,
+  options?: { transaction: Transaction }
+) {
   if (
     subData.category_id === NotificationCategories.ChainEvent &&
     !subData.chain_id
@@ -88,5 +92,5 @@ export async function createSubscription(subData: SubscriptionAttributes) {
   }
   // no need to check NewMention + NewCollaboration because subscriber_id is always required anyway
 
-  return models.Subscription.create(subData);
+  return models.Subscription.create(subData, options);
 }
