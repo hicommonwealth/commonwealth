@@ -82,7 +82,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             ...exchangeConfig,
           },
           [RascalExchanges.SnapshotListener]: {
-            type: 'fanout',
+            type: 'topic',
             ...exchangeConfig,
           },
           [RascalExchanges.DeadLetter]: {
@@ -133,7 +133,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalQueues.DiscordListener]: {
             ...queueConfig,
-          }
+          },
         },
         bindings: {
           [RascalBindings.ChainEvents]: {
@@ -182,8 +182,8 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             source: RascalExchanges.SnapshotListener,
             destination: RascalQueues.DiscordListener,
             destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.DiscordListener
-          }
+            bindingKey: RascalRoutingKeys.DiscordListener,
+          },
         },
         publications: {
           [RascalPublications.ChainEvents]: {
@@ -250,7 +250,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           [RascalSubscriptions.DiscordListener]: {
             queue: RascalQueues.DiscordListener,
             ...subscriptionConfig,
-          }
+          },
         },
       },
     },
