@@ -10,7 +10,6 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import ReactionCount from 'models/ReactionCount';
-import type { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
@@ -33,7 +32,6 @@ import {
   Link,
   LinkSource,
 } from '../../../models/Thread';
-import Topic from '../../../models/Topic';
 import {
   CommentsFeaturedFilterTypes,
 } from '../../../models/types';
@@ -195,7 +193,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // ------------
 
   useNecessaryEffect(() => {
-    if (!thread|| (thread && areReactionsLoaded)) {
+    if (!thread || (thread && areReactionsLoaded)) {
       return;
     }
 
@@ -433,14 +431,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onLockToggle={(isLock) => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
-        }}
-        onTopicChange={(topic: Topic) => {
-          // const newThread = new Thread({ ...thread, topic });
-          // setThread(newThread);
-        }}
-        onCollaboratorsEdit={(collaborators: IThreadCollaborator[]) => {
-          // const newThread = new Thread({ ...thread, collaborators });
-          // setThread(newThread);
         }}
         onDelete={() => navigate('/discussions')}
         onEditCancel={() => {
