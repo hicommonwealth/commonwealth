@@ -1,16 +1,21 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
-interface CreateReactionProps {
-  address: string;
-  reactionType: 'like';
+interface IuseCreateThreadReactionMutation {
   threadId: number;
+  chainId: string;
+}
+interface CreateReactionProps extends IuseCreateThreadReactionMutation {
+  address: string;
+  reactionType?: 'like';
 }
 
 const createReaction = async ({
+  chainId,
   address,
-  reactionType,
+  reactionType = 'like',
   threadId
 }: CreateReactionProps) => {
   const {
@@ -38,12 +43,16 @@ const createReaction = async ({
   )
 };
 
-const useCreateThreadReactionMutation = () => {
+const useCreateThreadReactionMutation = ({ chainId, threadId }: IuseCreateThreadReactionMutation) => {
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
-      // TODO: when we migrate the reactionCounts store proper to react query
-      // then we will have to update the react query state here
+      const reaction: any = {
+        id: response.data.result.id,
+        address: response.data.result.Address.address,
+        type: 'like'
+      }
+      updateThreadInAllCaches(chainId, threadId, { associatedReactions: [reaction] }, 'combineAndRemoveDups')
     },
   });
 };

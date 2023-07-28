@@ -32,6 +32,17 @@ export type Link = {
   title?: string;
 };
 
+// a list of thread fields that are an array (only includes 1st level arrays)
+// IMPORTANT: this should always be updated when thread modal updates array fields or
+// api response changes
+export const THREAD_ARRAY_FIELDS = [
+  'collaborators',
+  'chainEntities',
+  'attachments',
+  'versionHistory',
+  'associatedReactions'
+]
+
 export class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
@@ -171,15 +182,15 @@ export class Thread implements IUniqueId {
     this.lastCommentedOn = lastCommentedOn;
     this.chainEntities = chainEntities
       ? chainEntities.map((ce) => {
-          return {
-            id: +ce.id,
-            chain,
-            type: ce.type,
-            typeId: ce.type_id || ce.typeId,
-            completed: ce.completed,
-            author,
-          };
-        })
+        return {
+          id: +ce.id,
+          chain,
+          type: ce.type,
+          typeId: ce.type_id || ce.typeId,
+          completed: ce.completed,
+          author,
+        };
+      })
       : [];
     this.hasPoll = hasPoll;
     this.lastEdited = lastEdited;

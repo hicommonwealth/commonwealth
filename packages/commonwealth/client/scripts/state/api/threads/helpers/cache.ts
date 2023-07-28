@@ -4,12 +4,14 @@ import Topic from 'models/Topic';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 type IExistingThreadState = null | undefined | { pages: any[], pageParams: any[] }[] | any
+type IArrayManipulationMode = 'combineAndRemoveDups' | 'removeFromExisting' | 'replaceArray'
 
 interface CacheUpdater {
     chainId: string;
     threadId: number;
     updateBody?: Partial<Thread>;
     method: 'update' | 'remove';
+    arrayManipulationMode?: IArrayManipulationMode // nested arrays are not updated
 }
 
 const cacheUpdater = ({
@@ -17,10 +19,16 @@ const cacheUpdater = ({
     threadId,
     updateBody,
     method,
+    arrayManipulationMode = 'replaceArray'
 }: CacheUpdater) => {
     const queryCache = queryClient.getQueryCache()
     const queryKeys = queryCache.getAll().map(cache => cache.queryKey)
     const keysForThreads = queryKeys.filter(x => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId)
+
+    const arrayFieldsFromUpdateBody = updateBody
+        ? Object.keys(updateBody).filter(k => Array.isArray(updateBody[k]))
+        : []
+
     keysForThreads.map((k: any[]) => {
         const existingData: IExistingThreadState = queryClient.getQueryData(k)
         if (existingData) {
@@ -36,9 +44,33 @@ const cacheUpdater = ({
                             return index > -1 ? true : -1
                         })
                         if (foundPageIndex > -1 && foundThreadIndex > -1) {
-                            pages[foundPageIndex].data.threads[foundThreadIndex] = {
-                                ...pages[foundPageIndex].data.threads[foundThreadIndex],
-                                ...updateBody
+                            if (
+                                arrayManipulationMode === 'combineAndRemoveDups' ||
+                                arrayManipulationMode === 'removeFromExisting' ||
+                                arrayFieldsFromUpdateBody.length > 0
+                            ) {
+                                pages[foundPageIndex].data.threads[foundThreadIndex] = {
+                                    ...updateBody, // destructure order is important here
+                                    ...pages[foundPageIndex].data.threads[foundThreadIndex],
+                                }
+                                arrayFieldsFromUpdateBody.map((field) => {
+                                    if (pages[foundPageIndex].data.threads[foundThreadIndex][field]) {
+                                        const updateBodyFieldIds = updateBody[field].map(x => x?.id)
+                                        pages[foundPageIndex].data.threads[foundThreadIndex][field] = [
+                                            ...pages[foundPageIndex].data.threads[foundThreadIndex][field],
+                                            // in filter we are assuming that each array field has a property 'id'
+                                        ].filter(x => !updateBodyFieldIds.includes(x?.id)) // this filter takes care of 'combineAndRemoveDups'
+
+                                        if (arrayManipulationMode === 'combineAndRemoveDups') {
+                                            pages[foundPageIndex].data.threads[foundThreadIndex][field] = [...pages[foundPageIndex].data.threads[foundThreadIndex][field], ...updateBody[field]]
+                                        }
+                                    }
+                                })
+                            } else if (arrayManipulationMode === 'replaceArray') {
+                                pages[foundPageIndex].data.threads[foundThreadIndex] = {
+                                    ...pages[foundPageIndex].data.threads[foundThreadIndex],
+                                    ...updateBody, // destructure order is important here
+                                }
                             }
                         }
 
@@ -73,9 +105,33 @@ const cacheUpdater = ({
                         const updatedThreads = [...existingData] // threads array
                         const foundThreadIndex = updatedThreads.findIndex(x => x.id === threadId)
                         if (foundThreadIndex > -1) {
-                            updatedThreads[foundThreadIndex] = {
-                                ...updatedThreads[foundThreadIndex],
-                                ...updateBody
+                            if (
+                                arrayManipulationMode === 'combineAndRemoveDups' ||
+                                arrayManipulationMode === 'removeFromExisting' ||
+                                arrayFieldsFromUpdateBody.length > 0
+                            ) {
+                                updatedThreads[foundThreadIndex] = {
+                                    ...updateBody, // destructure order is important here
+                                    ...updatedThreads[foundThreadIndex],
+                                }
+                                arrayFieldsFromUpdateBody.map((field) => {
+                                    if (updatedThreads[foundThreadIndex][field]) {
+                                        const updateBodyFieldIds = updateBody[field].map(x => x?.id)
+                                        updatedThreads[foundThreadIndex][field] = [
+                                            ...updatedThreads[foundThreadIndex][field],
+                                            // in filter we are assuming that each array field has a property 'id'
+                                        ].filter(x => !updateBodyFieldIds.includes(x?.id)) // this filter takes care of 'combineAndRemoveDups'
+
+                                        if (arrayManipulationMode === 'combineAndRemoveDups') {
+                                            updatedThreads[foundThreadIndex][field] = [...updatedThreads[foundThreadIndex][field], ...updateBody[field]]
+                                        }
+                                    }
+                                })
+                            } else if (arrayManipulationMode === 'replaceArray') {
+                                updatedThreads[foundThreadIndex].data.threads[foundThreadIndex] = {
+                                    ...updatedThreads[foundThreadIndex],
+                                    ...updateBody, // destructure order is important here
+                                }
                             }
                         }
                         return updatedThreads;
@@ -91,8 +147,13 @@ const cacheUpdater = ({
     })
 }
 
-const updateThreadInAllCaches = (chainId: string, threadId: number, updateBody: Partial<Thread>) => {
-    cacheUpdater({ chainId, threadId, method: 'update', updateBody })
+const updateThreadInAllCaches = (
+    chainId: string,
+    threadId: number,
+    updateBody: Partial<Thread>,
+    arrayManipulationMode?: IArrayManipulationMode
+) => {
+    cacheUpdater({ chainId, threadId, method: 'update', updateBody, arrayManipulationMode: arrayManipulationMode || 'replaceArray' })
 }
 
 const removeThreadFromAllCaches = (chainId: string, threadId: number) => {
@@ -168,5 +229,5 @@ const addThreadInAllCaches = (chainId: string, newThread: Thread) => {
     })
 }
 
-export { removeThreadFromAllCaches, updateThreadInAllCaches, updateThreadTopicInAllCaches, addThreadInAllCaches };
+export { addThreadInAllCaches, removeThreadFromAllCaches, updateThreadInAllCaches, updateThreadTopicInAllCaches };
 
