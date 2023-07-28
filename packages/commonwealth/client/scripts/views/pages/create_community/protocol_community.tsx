@@ -119,11 +119,20 @@ const seedOptions = [
 export const ProtocolCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
   const [loading, setLoading] = useState<boolean>(false);
+  //Pass to tx Function
   const [gate, setGate] = useState<string>('');
+  //Pass to tx function
   const [gateType, setGateType] = useState<string>('all');
+  //Pass to tx function
   const [gateMeta, setGateMeta] = useState<any>({ token: '', amount: 0 });
   const [selectedRadio, setSelectedRadio] = useState<string>('wallet');
   const [checked, setChecked] = useState<boolean>(true);
+  //Pass to tx function
+  const [seedWalletMeta, setSeedWalletMeta] = useState<any>({
+    type: 'wallet',
+    amount: 0,
+    address: '',
+  });
 
   const { id, setId, name, setName, symbol, setSymbol } =
     useChainFormIdFields();
@@ -225,9 +234,9 @@ export const ProtocolCommunityForm = () => {
         {selectedRadio === 'wallet' && (
           <InputRow
             title="Amount of ETH"
-            onChangeHandler={function (e: any): void {
-              throw new Error('Function not implemented.');
-            }}
+            onChangeHandler={(e) =>
+              setSeedWalletMeta({ type: 'wallet', amount: e })
+            }
             value={''}
           />
         )}
@@ -235,16 +244,24 @@ export const ProtocolCommunityForm = () => {
           <>
             <InputRow
               title="Multi-sig Wallet Address"
-              onChangeHandler={function (e: any): void {
-                throw new Error('Function not implemented.');
-              }}
+              onChangeHandler={(e) =>
+                setSeedWalletMeta({
+                  type: 'multi',
+                  amount: seedWalletMeta['amount'],
+                  address: e,
+                })
+              }
               value={''}
             />
             <InputRow
               title="Amount of ETH"
-              onChangeHandler={function (e: any): void {
-                throw new Error('Function not implemented.');
-              }}
+              onChangeHandler={(e) =>
+                setSeedWalletMeta({
+                  type: 'multi',
+                  amount: e,
+                  address: seedWalletMeta['address'],
+                })
+              }
               value={''}
             />
           </>
@@ -253,16 +270,24 @@ export const ProtocolCommunityForm = () => {
           <>
             <InputRow
               title="Governance Contract"
-              onChangeHandler={function (e: any): void {
-                throw new Error('Function not implemented.');
-              }}
+              onChangeHandler={(e) =>
+                setSeedWalletMeta({
+                  type: 'multi',
+                  amount: seedWalletMeta['amount'],
+                  address: e,
+                })
+              }
               value={''}
             />
             <InputRow
               title="Amount of ETH"
-              onChangeHandler={function (e: any): void {
-                throw new Error('Function not implemented.');
-              }}
+              onChangeHandler={(e) =>
+                setSeedWalletMeta({
+                  type: 'multi',
+                  amount: e,
+                  address: seedWalletMeta['address'],
+                })
+              }
               value={''}
             />
           </>

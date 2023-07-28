@@ -9,6 +9,56 @@ import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
 import WebWalletController from '../../app/web_wallets';
 import { sendUserOp } from 'helpers/aa_op_builder';
+const abi = [
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    name: 'getNamespace',
+    outputs: [
+      {
+        internalType: 'contract INamespace',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'contract IGate',
+        name: 'gate',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'name',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'address',
+        name: 'gateImpl',
+        type: 'address',
+      },
+    ],
+    name: 'createNamespace',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+];
 
 async function sendFunctionCall({
   fn,
@@ -57,29 +107,32 @@ async function sendFunctionCall({
   return txReceipt;
 }
 
-export async function get4337Account (web3: Web3, eoaAddress: string){
+export async function get4337Account(web3: Web3, eoaAddress: string) {
   const abi = [
     {
-      "inputs": [
+      inputs: [
         {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        }
+          internalType: 'address',
+          name: 'owner',
+          type: 'address',
+        },
       ],
-      "name": "getAccount",
-      "outputs": [
+      name: 'getAccount',
+      outputs: [
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
+          internalType: 'address',
+          name: '',
+          type: 'address',
+        },
       ],
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ]
-  const factory = new web3.eth.Contract(abi as AbiItem[], '0xb28A7002bC67e61b31dCe32C079D7146Bf43ae60')
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+  const factory = new web3.eth.Contract(
+    abi as AbiItem[],
+    '0xb28A7002bC67e61b31dCe32C079D7146Bf43ae60'
+  );
   const accountAddr = await factory.methods.getAccount(eoaAddress).call();
   return accountAddr;
 }
@@ -99,16 +152,16 @@ export async function callContractFunction({
   fn,
   inputArgs,
   tx_options,
-  senderERC4337
+  senderERC4337,
 }: {
   contract: Contract;
   fn: AbiItem;
   inputArgs: string[];
   tx_options?: any;
-  senderERC4337?: boolean
+  senderERC4337?: boolean;
 }): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
-  console.log(sender)
+  console.log(sender);
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
     sender,
@@ -123,7 +176,7 @@ export async function callContractFunction({
   const processedArgs = processAbiInputsToDataTypes(fn.inputs, inputArgs);
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
-  if(!senderERC4337){
+  if (!senderERC4337) {
     const functionConfig: {
       fn: AbiItem;
       signingWallet: IWebWallet<any>;
@@ -143,20 +196,93 @@ export async function callContractFunction({
       functionConfig
     );
     return txReceipt;
-  }else{
-    const accountAddr = await get4337Account(web3, signingWallet.accounts[0])
+  } else {
+    const accountAddr = await get4337Account(web3, signingWallet.accounts[0]);
     const userOpEvent = await sendUserOp(
       web3,
       accountAddr,
       contract.address,
-      tx_options?.value ?? "0",
-      functionTx 
-      )
-    return await userOpEvent.getTransactionReceipt()
+      tx_options?.value ?? '0',
+      functionTx
+    );
+    return await userOpEvent.getTransactionReceipt();
   }
 }
 
 export function encodeParameters(types, values) {
   const abi = new ethers.utils.AbiCoder();
   return abi.encode(types, values);
+}
+
+export async function setupCommunityContracts({
+  name,
+  gate,
+  gateMeta,
+  seedWalletMeta,
+}: {
+  name: string;
+  gate: string;
+  gateMeta: {
+    token: string;
+    amount: number;
+  };
+  seedWalletMeta: {
+    type: string;
+    amount: number;
+    address: string;
+  };
+}) {
+  const signingWallet = WebWalletController.Instance.availableWallets(
+    ChainBase.Ethereum
+  )[0];
+  await signingWallet.enable('5');
+  if (!signingWallet.api) {
+    throw new Error('Web3 Api Not Initialized');
+  }
+  const web3: Web3 = signingWallet.api;
+  const factory = new web3.eth.Contract(
+    abi as AbiItem[],
+    '0x689Ce208E0f72447D7B23C479756374ACe977913'
+  );
+
+  //check that namespace doesnt exist
+  const namespace = await factory.methods
+    .getNamespace(web3.utils.asciiToHex(name))
+    .call();
+  if (
+    namespace['token'] &&
+    namespace['token'] !== '0x0000000000000000000000000000000000000000'
+  ) {
+    throw new Error('Name already used, try another name');
+  }
+
+  //1. config gate settings on gate contract
+  if (gateMeta.token !== '') {
+    //encode gateMeta into call data for ERC20/NFT gates
+    //send tx with data(name, id=2, calldata) to gate
+  }
+  //2. Deploy namespace
+  const txReceipt = await factory.methods
+    .createNamespace(
+      web3.utils.asciiToHex(name),
+      gate !== '' ? gate : '0x0000000000000000000000000000000000000000'
+    )
+    .send({ from: signingWallet.accounts[0] });
+  if (!txReceipt) {
+    throw new Error('Transaction failed');
+  }
+  //CREAT2 calc
+  const walletAddress = '';
+  //3. Set up wallet seed transactions
+  if (seedWalletMeta.type === 'wallet' && seedWalletMeta.amount > 0) {
+    const txReceipt = web3.eth.sendTransaction({
+      to: walletAddress,
+      from: signingWallet.accounts[0],
+      value: seedWalletMeta.amount,
+    });
+  } else if (seedWalletMeta.type === 'multi') {
+    //Create mulit-sig prop to seedAWalletMeta.address with amount to walletAddress
+  } else if (seedWalletMeta.type === 'proposal') {
+    //Create compound prop to seedAWalletMeta.address with amount to walletAddress
+  }
 }
