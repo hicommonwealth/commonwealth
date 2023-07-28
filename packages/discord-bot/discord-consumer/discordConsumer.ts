@@ -49,7 +49,10 @@ async function consumeMessages() {
           title: encodeURIComponent(parsedMessage.title),
           body: encodeURIComponent(
             `[Go to Discord post](https://discord.com/channels/${parsedMessage.guild_id}/${parsedMessage.channel_id}) \n\n` +
-              parsedMessage.content
+              parsedMessage.content +
+              parsedMessage.imageUrls
+                .map((url) => `\n\n![image](${url})`)
+                .join('')
           ),
           stage: 'discussion',
           kind: 'discussion',
