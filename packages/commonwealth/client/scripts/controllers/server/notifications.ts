@@ -10,6 +10,8 @@ import app from 'state';
 
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
+import { findSubscription, SubUniqueData } from 'subscriptionMapping';
+import { NotificationCategories } from 'common-common/src/types';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -85,22 +87,40 @@ class NotificationsController {
   }
 
   private _subscriptions: NotificationSubscription[] = [];
-  public get subscriptions() {
-    return this._subscriptions;
+
+  public get discussionSubscriptions(): NotificationSubscription[] {
+    return this._subscriptions.filter(
+      (s) => s.categoryId !== NotificationCategories.ChainEvent
+    );
   }
 
-  public subscribe(category: string, objectId: string) {
-    const subscription = this.subscriptions.find(
-      (v) => v.category === category && v.objectId === objectId
+  public get chainEventSubscriptions(): NotificationSubscription[] {
+    return this._subscriptions.filter(
+      (s) => s.categoryId === NotificationCategories.ChainEvent
     );
+  }
+
+  public addSubscription(sub: NotificationSubscription) {
+    return this._subscriptions.push(sub);
+  }
+
+  public subscribe(data: SubUniqueData) {
+    const subscription = this.findNotificationSubscription(data);
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
+      const requestData = Object.fromEntries(
+        Object.entries(data.options).map(([k, v]) => [
+          k.replace(/([A-Z])/g, '_$1').toLowerCase(),
+          v,
+        ])
+      );
+
       return post(
         '/createSubscription',
         {
-          category,
-          object_id: objectId,
+          category: subscription.categoryId,
+          ...requestData,
           is_active: true,
         },
         (result) => {
@@ -405,6 +425,10 @@ class NotificationsController {
     ]);
     this.isLoaded.emit('redraw');
     return Promise.resolve();
+  }
+
+  public findNotificationSubscription(findOptions: SubUniqueData) {
+    return findSubscription(findOptions, this._subscriptions);
   }
 }
 

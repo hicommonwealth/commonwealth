@@ -48,7 +48,7 @@ import disableSubscriptions from '../routes/subscription/disableSubscriptions';
 import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
 import viewNotifications, {
-  NotificationCategories,
+  RouteNotificationCategories,
 } from '../routes/viewNotifications';
 import viewUserActivity from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
@@ -1004,14 +1004,18 @@ function setupRouter(
     'post',
     '/viewDiscussionNotifications',
     passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(this, models, NotificationCategories.Discussion)
+    viewNotifications.bind(this, models, RouteNotificationCategories.Discussion)
   );
   registerRoute(
     router,
     'post',
     '/viewChainEventNotifications',
     passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
+    viewNotifications.bind(
+      this,
+      models,
+      RouteNotificationCategories.ChainEvents
+    )
   );
 
   registerRoute(

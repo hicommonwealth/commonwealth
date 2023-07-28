@@ -336,14 +336,13 @@ class ThreadsController {
       const subscriptionJSON = {
         id: null,
         category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${result.id}`,
         is_active: true,
         created_at: Date.now(),
         immediate_email: false,
         Chain: app.config.chains.getById(result.chain),
         Thread: result,
       };
-      app.user.notifications.subscriptions.push(
+      app.user.notifications.addSubscription(
         NotificationSubscription.fromJSON(subscriptionJSON)
       );
       return result;

@@ -106,6 +106,33 @@ export async function createSubscription(
   return models.Subscription.create(subData, options);
 }
 
+// export type NewCommentSubUniqueData = { commentId: number; threadId?: number } | { commentId?: number; threadId: number }
+// export type NewReactionSubUniqueData = { commentId: number; threadId?: number } | { commentId?: number; threadId: number }
+// export type NewThreadSubUniqueData = { chainId: string }
+// export type ChainEventSubUniqueData = { chainId: string }
+// export type SnapshotSubUniqueData = { snapshotId: string }
+//
+// export type NotifCategoryToSubUniqueData = {
+//   [K in NotificationCategory]: K extends typeof NotificationCategories.NewComment
+//     ? NewCommentSubUniqueData
+//     : K extends typeof NotificationCategories.NewReaction
+//       ? NewReactionSubUniqueData
+//       : K extends  typeof NotificationCategories.NewThread
+//         ? NewThreadSubUniqueData
+//         : K extends typeof NotificationCategories.ChainEvent
+//           ? ChainEventSubUniqueData
+//           : K extends typeof NotificationCategories.SnapshotProposal
+//             ? SnapshotSubUniqueData
+//             : never;
+// }
+//
+// export type SubUniqueData = {
+//   [K in NotificationCategory]: {
+//     categoryId: K;
+//     options: NotifCategoryToSubUniqueData[K]
+//   }
+// }[NotificationCategory];
+
 export type SubUniqueData =
   | {
       categoryId:
@@ -128,13 +155,16 @@ export type SubUniqueData =
   | {
       categoryId:
         | NotificationCategories.NewMention
-        | NotificationCategories.NewCollaboration;
+        | NotificationCategories.NewCollaboration
+        | NotificationCategories.ThreadEdit
+        | NotificationCategories.CommentEdit;
+      options: {};
     };
 
-export async function findSubscription(
+export function findSubscription(
   findOptions: SubUniqueData,
   subs: NotificationSubscription[]
-): Promise<NotificationSubscription> {
+): NotificationSubscription {
   const categoryId = findOptions.categoryId;
   if (
     categoryId === NotificationCategories.ChainEvent ||

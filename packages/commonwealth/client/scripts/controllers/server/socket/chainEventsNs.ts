@@ -67,9 +67,10 @@ export class ChainEventsNamespace {
   }
 
   private onChainEvent(notification: ChainEventNotification) {
-    const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.chainId === notification.ChainEvent.chain
-    );
+    const subscription = app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.ChainEvent,
+      options: { chainId: notification.ChainEvent.chain },
+    });
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
       console.log('Local subscription not found. Re-sync subscriptions!');
@@ -86,9 +87,7 @@ export class ChainEventsNamespace {
   private onConnect() {
     this._isConnected = true;
     this.addChainEventSubscriptions(
-      app.user.notifications.subscriptions
-        .filter((s) => s.category === NotificationCategories.ChainEvent)
-        .map((s) => s.chainId)
+      app.user.notifications.chainEventSubscriptions.map((s) => s.chainId)
     );
     console.log('Chain events namespace connected!');
   }

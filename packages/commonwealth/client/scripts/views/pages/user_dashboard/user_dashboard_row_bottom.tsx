@@ -5,8 +5,8 @@ import { NotificationCategories } from 'common-common/src/types';
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import app from 'state';
-import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
+import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
@@ -44,17 +44,17 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
 
   const adjustedId = `discussion_${threadId}`;
 
-  const commentSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewComment
-  );
+  const commentSubscription =
+    app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.NewComment,
+      options: { threadId: Number(threadId) },
+    });
 
-  const reactionSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewReaction
-  );
+  const reactionSubscription =
+    app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.NewReaction,
+      options: { threadId: Number(threadId) },
+    });
 
   const bothActive =
     commentSubscription?.isActive && reactionSubscription?.isActive;

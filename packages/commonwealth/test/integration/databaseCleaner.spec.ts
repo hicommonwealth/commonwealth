@@ -8,6 +8,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { QueryTypes } from 'sequelize';
 import { RedisCache } from 'common-common/src/redisCache';
 import { REDIS_URL } from '../../server/config';
+import { createSubscription } from 'subscriptionMapping';
 
 chai.use(chaiHttp);
 const { expect } = chai;
