@@ -76,11 +76,18 @@ export async function createSubscription(
     throw new Error(
       `chain_id cannot be undefined for a ${NotificationCategories.NewThread} subscription`
     );
-  } else if (subData.category_id === NotificationCategories.NewComment) {
-    if (!subData.thread_id && !subData.comment_id) {
+  } else if (
+    subData.category_id === NotificationCategories.NewComment ||
+    subData.category_id === NotificationCategories.NewReaction
+  ) {
+    if (!subData.chain_id) {
+      throw new Error(
+        `A ${subData.category_id} subscription must define a chain_id`
+      );
+    } else if (!subData.thread_id && !subData.comment_id) {
       throw new Error(
         `A thread-level (root) ${subData.category_id} subscription must define a thread_id` +
-          ` and a sub-level subscription must define comment_id`
+          ` and a sub-level subscription must define a comment_id`
       );
     } else if (subData.thread_id && subData.comment_id) {
       throw new Error(

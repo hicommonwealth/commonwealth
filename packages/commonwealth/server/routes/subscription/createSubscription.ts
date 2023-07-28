@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../../models';
 import Errors from './errors';
 import { createSubscription } from 'subscriptionMapping';
+import { ChainInstance } from 'server/models/chain';
 
 export default async (
   models: DB,
@@ -13,8 +14,8 @@ export default async (
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
-  if (!req.body.category || req.body.object_id === undefined) {
-    return next(new AppError(Errors.NoCategoryAndObjectId));
+  if (!req.body.category) {
+    return next(new AppError(Errors.NoCategory));
   }
 
   const category = await models.NotificationCategory.findOne({
@@ -24,49 +25,43 @@ export default async (
     return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
-  let obj;
-  const parsed_object_id = req.body.object_id.split(/-|_/);
-  const p_id = parsed_object_id[1];
-  const p_entity = parsed_object_id[0];
-  let chain;
+  let obj, chain: ChainInstance, thread, comment;
 
   switch (category.name) {
     case 'new-thread-creation': {
       chain = await models.Chain.findOne({
         where: {
-          id: p_entity,
+          id: req.body.chain_id,
         },
       });
-      if (chain) {
-        obj = { chain_id: p_entity };
-      }
+      if (!chain) return next(new AppError(Errors.InvalidChain));
+      obj = { chain_id: req.body.chain_id };
       break;
     }
     case 'snapshot-proposal': {
       const space = await models.SnapshotSpace.findOne({
         where: {
-          snapshot_space: p_entity,
+          snapshot_space: req.body.snapshot_id,
         },
       });
-      if (space) {
-        obj = { snapshot_id: space.snapshot_space };
-      }
+      if (!space) return next(new AppError(Errors.InvalidSnapshotSpace));
+      obj = { snapshot_id: req.body.snapshot_id };
       break;
     }
     case 'new-comment-creation':
     case 'new-reaction': {
-      if (p_entity === 'discussion') {
-        const thread = await models.Thread.findOne({
-          where: { id: Number(p_id) },
+      if (req.body.thread_id) {
+        thread = await models.Thread.findOne({
+          where: { id: req.body.thread_id },
         });
         if (!thread) return next(new AppError(Errors.NoThread));
-        obj = { thread_id: Number(p_id), chain_id: thread.chain };
-      } else if (p_entity === 'comment') {
-        const comment = await models.Comment.findOne({
-          where: { id: Number(p_id) },
+        obj = { thread_id: req.body.thread_id };
+      } else if (req.body.comment_id) {
+        comment = await models.Comment.findOne({
+          where: { id: req.body.comment_id },
         });
         if (!comment) return next(new AppError(Errors.NoComment));
-        obj = { comment_id: Number(p_id), chain_id: comment.chain };
+        obj = { comment_id: req.body.comment_id };
       }
       break;
     }
@@ -76,13 +71,11 @@ export default async (
     case 'chain-event': {
       chain = await models.Chain.findOne({
         where: {
-          id: p_entity,
+          id: req.body.chain_id,
         },
       });
       if (!chain) return next(new AppError(Errors.InvalidChain));
-
-      // object_id = req.body.object_id = [chain_id]_chainEvents
-      obj = { chain_id: p_entity };
+      obj = { chain_id: req.body.chain_id };
       break;
     }
     default:
@@ -100,6 +93,12 @@ export default async (
 
   if (chain) {
     subscription.Chain = chain.toJSON();
+  }
+  if (thread) {
+    subscription.Thread = thread.toJSON();
+  }
+  if (comment) {
+    subscription.Comment = thread.toJSON();
   }
 
   return res.json({ status: 'Success', result: subscription });

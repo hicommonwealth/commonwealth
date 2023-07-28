@@ -63,6 +63,7 @@ export interface ISnapshotNotificationData {
   eventType: SnapshotEventType;
 }
 
+// TODO: @Timothee remove this type
 export interface IForumNotificationData {
   created_at: any;
   thread_id: number | string;

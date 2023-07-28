@@ -45,18 +45,16 @@ class NotificationSubscription implements SubscriptionFindOptions {
     return this._isActive;
   }
 
-  // TODO: @Timothee these types need to be consolidated - ideally viewSubscriptions route doesn't fetch
-  //  threads and comments so only id's like `viewNotifications` route
   public get chainId() {
-    return this.Chain.id || <string>(<unknown>this.Chain);
+    return this.Chain.id;
   }
 
   public get threadId() {
-    return this.Thread.id || <number>(<unknown>this.Thread);
+    return this.Thread.id;
   }
 
   public get commentId() {
-    return this.Comment.id || <number>(<unknown>this.Comment);
+    return this.Comment.id;
   }
 
   constructor(
