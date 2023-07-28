@@ -277,7 +277,7 @@ class SearchController {
     page?: number,
     includeRoles?: boolean
   ) => {
-    const response = await axios.get(`${app.serverUrl()}/searchProfiles`, {
+    const response = await axios.get(`${app.serverUrl()}/profiles`, {
       params: {
         chain: chainScope,
         search: searchTerm,

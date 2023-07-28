@@ -162,6 +162,7 @@ export interface IDiscordMessage {
   channel_id: string;
   parent_channel_id: string;
   guild_id: string;
+  imageUrls?: string[];
 }
 export type HttpMethod =
   | 'get'
