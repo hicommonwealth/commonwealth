@@ -21,6 +21,7 @@ const cacheUpdater = ({
     keysForThreads.map((k: any[]) => {
         const existingData: null | undefined | { pages: any[], pageParams: any[] }[] | any = queryClient.getQueryData(k)
         if (existingData) {
+            const remainingCallbacks = []
             queryClient.setQueryData(k, () => {
                 if (k[2] === 'bulk') {
                     if (method === 'update') {
@@ -65,6 +66,7 @@ const cacheUpdater = ({
                 }
 
                 if (k[2] === 'single') {
+                    if (method === 'update') {
                     const updatedThreads = [...existingData] // threads array
                     const foundThreadIndex = updatedThreads.findIndex(x => x.id === threadId)
                     if (foundThreadIndex > -1) {
@@ -75,7 +77,13 @@ const cacheUpdater = ({
                     }
                     return updatedThreads;
                 }
+                    if (method === 'remove') {
+                        remainingCallbacks.push(() => queryClient.refetchQueries(k))
+                        return [{}]
+                    }
+                }
             })
+            remainingCallbacks.map(x => x())
         }
     })
 }
