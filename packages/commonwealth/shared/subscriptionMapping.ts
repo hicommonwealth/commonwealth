@@ -106,68 +106,80 @@ export async function createSubscription(
   return models.Subscription.create(subData, options);
 }
 
-export interface SubscriptionFindOptions {
-  chainId?: string;
-  threadId?: number;
-  commentId?: number;
-  snapshotId?: string;
-}
+export type SubUniqueData =
+  | {
+      categoryId:
+        | NotificationCategories.ChainEvent
+        | NotificationCategories.NewThread;
+      options: { chainId: string };
+    }
+  | {
+      categoryId: NotificationCategories.SnapshotProposal;
+      options: { snapshotId: string };
+    }
+  | {
+      categoryId:
+        | NotificationCategories.NewComment
+        | NotificationCategories.NewReaction;
+      options:
+        | { threadId: number; commentId?: number }
+        | { commentId: number; threadId?: number };
+    }
+  | {
+      categoryId:
+        | NotificationCategories.NewMention
+        | NotificationCategories.NewCollaboration;
+    };
 
 export async function findSubscription(
-  categoryId: NotificationCategory,
-  findOptions: SubscriptionFindOptions,
+  findOptions: SubUniqueData,
   subs: NotificationSubscription[]
 ): Promise<NotificationSubscription> {
+  const categoryId = findOptions.categoryId;
   if (
     categoryId === NotificationCategories.ChainEvent ||
     categoryId === NotificationCategories.NewThread
   ) {
-    if (!findOptions.chainId) {
+    if (!findOptions.options.chainId) {
       console.error(
         `Must provide the chain id to find a ${categoryId} subscription`
       );
       return;
     }
     return subs.find(
-      (s) => s.category === categoryId && s.chainId === findOptions.chainId
+      (s) =>
+        s.categoryId === categoryId && s.chainId === findOptions.options.chainId
     );
   } else if (
     categoryId === NotificationCategories.NewCollaboration ||
     categoryId === NotificationCategories.NewMention
   ) {
-    return subs.find((s) => s.category === categoryId);
+    return subs.find((s) => s.categoryId === categoryId);
   } else if (
     categoryId === NotificationCategories.NewComment ||
     categoryId === NotificationCategories.NewReaction
   ) {
-    if (
-      (!findOptions.threadId && !findOptions.commentId) ||
-      !findOptions.chainId
-    ) {
+    if (!findOptions.options.threadId && !findOptions.options.commentId) {
       console.error(
-        `Must provide a thread id or comment id and a chain id to find a ${categoryId} subscription`
+        `Must provide a thread id or comment id to find a ${categoryId} subscription`
       );
       return;
     }
     return subs.find((s) => {
-      const commonCheck =
-        s.category === categoryId && s.chainId === findOptions.chainId;
-      if (findOptions.threadId) {
+      if (findOptions.options.threadId) {
         return (
-          commonCheck &&
-          (s.Thread.id === findOptions.threadId ||
-            <number>(<unknown>s.Thread) === findOptions.threadId)
+          s.categoryId === categoryId &&
+          s.threadId === findOptions.options.threadId
         );
       } else {
         return (
-          commonCheck &&
-          (s.Comment.id === findOptions.commentId ||
-            <number>(<unknown>s.Comment) === findOptions.commentId)
+          s.categoryId === categoryId &&
+          s.commentId === findOptions.options.commentId
         );
       }
     });
   } else if (categoryId === NotificationCategories.SnapshotProposal) {
-    if (!findOptions.snapshotId) {
+    if (!findOptions.options.snapshotId) {
       console.error(
         'Must provide a snapshot space id to find a snapshot-proposal subscription'
       );
@@ -175,7 +187,8 @@ export async function findSubscription(
     }
     return subs.find(
       (s) =>
-        s.category === categoryId && s.snapshotId === findOptions.snapshotId
+        s.categoryId === categoryId &&
+        s.snapshotId === findOptions.options.snapshotId
     );
   } else {
     console.error('Searching for an unsupported subscription category!');

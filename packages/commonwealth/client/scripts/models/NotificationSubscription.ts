@@ -7,9 +7,8 @@ import type ChainInfo from './ChainInfo';
 import type { Comment as CommentT } from './Comment';
 import type { IUniqueId } from './interfaces';
 import { Thread as ThreadT } from './Thread';
-import { SubscriptionFindOptions } from 'subscriptionMapping';
 
-class NotificationSubscription implements SubscriptionFindOptions {
+class NotificationSubscription {
   public readonly category: string;
   public readonly snapshotId: string;
   public readonly createdAt: moment.Moment;
@@ -55,6 +54,10 @@ class NotificationSubscription implements SubscriptionFindOptions {
 
   public get commentId() {
     return this.Comment.id;
+  }
+
+  public get categoryId() {
+    return this.category;
   }
 
   constructor(
