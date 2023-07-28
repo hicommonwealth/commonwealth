@@ -35,6 +35,7 @@ export type IconComponentProps = IconProps & {
 
 export type CustomIconStyleProps = {
   iconSize?: IconSize;
+  className?: string;
 };
 
 export type CustomIconProps = {
