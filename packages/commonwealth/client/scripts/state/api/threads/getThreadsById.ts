@@ -21,6 +21,9 @@ const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
     }
   );
 
+  // TODO: do we need to do this?
+  // app.chainEntities.getRawEntities(app.activeChainId()),
+
   return response.data.result.map((t) => app.threads.modelFromServer(t));
 };
 

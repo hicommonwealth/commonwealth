@@ -1,10 +1,9 @@
+import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { filterLinks } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/view_thread/linked_threads_card.scss';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import 'pages/view_thread/linked_threads_card.scss';
 import app from 'state';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { slugify } from '../../../../../shared/utils';
@@ -25,9 +24,7 @@ export const LinkedThreadsCard = ({
   thread,
   allowLinking,
 }: LinkedThreadsCardProps) => {
-  const [linkedThreads, setLinkedThreads] = useState<Array<Thread>>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [threadsLoaded, setThreadsLoaded] = useState(false);
 
   const linkedThreadIds = useMemo(
     () =>
@@ -37,26 +34,17 @@ export const LinkedThreadsCard = ({
     [thread.links]
   );
 
-  useNecessaryEffect(() => {
-    if (linkedThreadIds.length > 0) {
-      app.threads
-        .fetchThreadsFromId(linkedThreadIds)
-        .then((data) => {
-          setLinkedThreads(data);
-          setThreadsLoaded(true);
-        })
-        .catch(console.error);
-    } else {
-      setLinkedThreads([]);
-    }
-  }, [linkedThreadIds]);
+  const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
+    chainId: app.activeChainId(),
+    ids: linkedThreadIds.map(Number)
+  });
 
   return (
     <>
       <CWContentPageCard
         header="Linked Discussions"
         content={
-          linkedThreadIds.length > 0 && !threadsLoaded ? (
+          linkedThreadIds.length > 0 && isLoading ? (
             <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>

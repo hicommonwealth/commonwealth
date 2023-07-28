@@ -53,24 +53,18 @@ export interface VersionHistory {
 
 class ThreadsController {
   private static _instance: ThreadsController;
-  public _store: ProposalStore<Thread>;
   public _listingStore: RecentListingStore;
   public _overviewStore: ProposalStore<Thread>;
   public isFetched = new EventEmitter();
   public isReactionFetched = new EventEmitter();
 
   private constructor() {
-    this._store = new ProposalStore<Thread>();
     this._listingStore = new RecentListingStore();
     this._overviewStore = new ProposalStore<Thread>();
   }
 
   public static get Instance() {
     return this._instance || (this._instance = new this());
-  }
-
-  public get store() {
-    return this._store;
   }
 
   public get listingStore() {
@@ -89,15 +83,6 @@ class ThreadsController {
 
   public numVotingThreads: number;
   public numTotalThreads: number;
-  private _resetPagination: boolean;
-
-  public resetPagination() {
-    this._resetPagination = true;
-  }
-
-  public getById(id: number) {
-    return this._store.getByIdentifier(id);
-  }
 
   public modelFromServer(thread) {
     const {
@@ -249,36 +234,6 @@ class ThreadsController {
     return t;
   }
 
-  public async setArchived(threadId: number, isArchived: boolean) {
-    return new Promise((resolve, reject) => {
-      $.post(
-        `${app.serverUrl()}/threads/${threadId}/${!isArchived ? 'archive' : 'unarchive'
-        }`,
-        {
-          jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
-        }
-      )
-        .then((response) => {
-          const foundThread = this.store.getByIdentifier(threadId);
-          foundThread.archivedAt = response.result.archived_at;
-          this.updateThreadInStore(new Thread({ ...foundThread }));
-          resolve(foundThread);
-        })
-        .catch((e) => {
-          console.error(e);
-          notifyError(
-            `Could not ${!isArchived ? 'archive' : 'unarchive'} thread`
-          );
-          reject(e);
-        });
-    });
-  }
-
-  public async updateThreadInStore(thread: Thread) {
-    this._store.update(thread);
-  }
-
   /**
    * Gets all threads associated with a link(ie all threads linked to 1 proposal)
    * @param args
@@ -302,52 +257,6 @@ class ThreadsController {
     }
   }
 
-  public async fetchThreadsFromId(
-    ids: Array<number | string>
-  ): Promise<Thread[]> {
-    const params = {
-      chain: app.activeChainId(),
-      thread_ids: ids,
-    };
-    const [response] = await Promise.all([
-      axios.get(`${app.serverUrl()}/threads`, { params }),
-      app.chainEntities.getRawEntities(app.activeChainId()),
-    ]);
-    if (response.data.status !== 'Success') {
-      throw new Error(`Cannot fetch thread: ${response.status}`);
-    }
-    return response.data.result.map((rawThread) => {
-      /**
-       * rawThread has a different DS than the threads in store
-       * here we will find if thread is in store and if so use most keys
-       * of that data else if there is a valid key rawThread then it will
-       * replace existing key from foundThread
-      */
-      const thread = this.modelFromServer(rawThread);
-      const foundThread = this._store.getByIdentifier(thread.identifier);
-      const finalThread = new Thread({
-        ...((foundThread || {}) as any),
-        ...((thread || {}) as any),
-      });
-      finalThread.associatedReactions = [
-        ...(
-          thread.associatedReactions.length > 0
-            ? thread.associatedReactions
-            : foundThread?.associatedReactions || []
-        )
-      ];
-      finalThread.numberOfComments =
-        rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
-      this._store.update(finalThread);
-      if (foundThread) {
-        this.numTotalThreads += 1;
-      }
-
-      // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
-      return finalThread;
-    });
-  }
-
   public initialize(
     initialThreads = [],
     numVotingThreads,
@@ -355,7 +264,6 @@ class ThreadsController {
     reset
   ) {
     if (reset) {
-      this._store.clear();
       this._listingStore.clear();
     }
 
@@ -373,13 +281,10 @@ class ThreadsController {
     this.numVotingThreads = numVotingThreads;
     this.numTotalThreads = numTotalThreads;
     this._initialized = true;
-    this._resetPagination = true;
   }
 
   public deinit() {
     this._initialized = false;
-    this._resetPagination = true;
-    this._store.clear();
     this._listingStore.clear();
     this.numTotalThreads = 0;
   }

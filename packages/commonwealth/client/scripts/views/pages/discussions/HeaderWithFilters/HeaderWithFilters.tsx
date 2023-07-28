@@ -126,7 +126,6 @@ export const HeaderWithFilters = ({
       // we use that to show the applied featured filter data which would
       // not be accurate - whenever "featured" filter changes we have to
       // refetch fresh threads data from api.
-      app.threads.store.clear();
       app.threads.listingStore.clear();
       app.threads.numTotalThreads = 0;
     }

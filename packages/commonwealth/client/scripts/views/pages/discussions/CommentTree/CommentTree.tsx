@@ -24,6 +24,7 @@ import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -73,6 +74,9 @@ export const CommentTree = ({
     chainId: app.activeChainId(),
     threadId: thread.id
   })
+
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const [edits, setEdits] = useState<{
     [commentId: number]: {
@@ -427,6 +431,8 @@ export const CommentTree = ({
                   </div>
                 )}
                 <CommentCard
+                  canReply={!!hasJoinedCommunity}
+                  canReact={!!hasJoinedCommunity || isAdmin || !app.chain.isGatedTopic(thread.topic.id)}
                   canEdit={!isLocked && (isCommentAuthor || isAdminOrMod)}
                   editDraft={edits?.[comment.id]?.editDraft || ''}
                   onEditStart={async () => await handleEditStart(comment)}

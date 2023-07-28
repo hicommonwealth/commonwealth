@@ -8,7 +8,6 @@ import {
   useDeleteCommentReactionMutation,
   useFetchCommentReactionsQuery,
 } from '../../../state/api/comments';
-import Permissions from '../../../utils/Permissions';
 import { LoginModal } from '../../modals/login_modal';
 import { Modal } from '../component_kit/cw_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
@@ -43,12 +42,6 @@ export const CommentReactionButton = ({
   const activeAddress = app.user.activeAccount?.address;
   const hasReacted = (reactions || []).find(x => x?.Address?.address === activeAddress)
   const likes = (reactions || []).length;
-
-  // token balance check if needed
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const parentThread = app.threads.getById(comment.threadId);
-  const topicId = parentThread?.topic?.id;
-  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(topicId);
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
@@ -90,7 +83,7 @@ export const CommentReactionButton = ({
       />
       <CWUpvoteSmall
         voteCount={likes}
-        disabled={isUserForbidden || disabled}
+        disabled={disabled}
         selected={hasReacted}
         onMouseEnter={() => undefined}
         onClick={handleVoteClick}
