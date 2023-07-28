@@ -100,6 +100,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false)
   const [areProfilesLoaded, setAreProfilesLoaded] = useState(false)
+  const [areReactionsLoaded, setAreReactionsLoaded] = useState(false)
   const [isViewMarked, setIsViewMarked] = useState(false)
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -193,47 +194,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
   // ------------
 
-  // fetches reactions (redundant)
   useNecessaryEffect(() => {
-    if (!thread) {
+    if (!thread|| (thread && areReactionsLoaded)) {
       return;
     }
 
-    // load proposal
-    if (!prefetch[threadId]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([thread])
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          threadReactionsStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, threadId]);
-  useNecessaryEffect(() => {
-    if (comments.length > 0 && thread && thread.id) {
-      fetchReactionCounts({
-        proposalIds: [`${thread.id}`],
-        commentIds: comments.map(c => `${c.id}`),
-        address: app.user.activeAccount?.address,
-      }).then(reactionCounts => {
-        for (const rc of reactionCounts) {
-          const id = app.threads.reactionCountsStore.getIdentifier({
-            threadId: rc.thread_id,
-            proposalId: rc.proposal_id,
-            commentId: rc.comment_id,
-          });
-
-          app.threads.reactionCountsStore.add(
-            new ReactionCount({ ...rc, id } as any)
-          );
-
-          app.threads.isReactionFetched.emit('redraw', rc.comment_id);
-        }
-      })
-    }
-  }, [thread, threadId, comments]);
+    app.threads.fetchReactionsCount([thread])
+    setPrefetch((prevState) => ({
+      ...prevState,
+      [threadId]: {
+        ...prevState[threadId],
+        threadReactionsStarted: true,
+      },
+    }));
+  }, [thread, areReactionsLoaded]);
 
   useNecessaryEffect(() => {
     if (!thread || (thread && arePollsFetched)) {
@@ -301,6 +275,30 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     areProfilesLoaded
   ]);
 
+  useNecessaryEffect(() => {
+    if (comments.length > 0 && thread && thread.id) {
+      fetchReactionCounts({
+        proposalIds: [`${thread.id}`],
+        commentIds: comments.map(c => `${c.id}`),
+        address: app.user.activeAccount?.address,
+      }).then(reactionCounts => {
+        for (const rc of reactionCounts) {
+          const id = app.threads.reactionCountsStore.getIdentifier({
+            threadId: rc.thread_id,
+            proposalId: rc.proposal_id,
+            commentId: rc.comment_id,
+          });
+
+          app.threads.reactionCountsStore.add(
+            new ReactionCount({ ...rc, id } as any)
+          );
+
+          app.threads.isReactionFetched.emit('redraw', rc.comment_id);
+        }
+      })
+    }
+  }, [thread, threadId, comments]);
+
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
@@ -342,19 +340,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     !!hasJoinedCommunity ||
     (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
-  // const handleLinkedProposalChange = (
-  //   stage: ThreadStage,
-  //   links: Link[] = []
-  // ) => {
-  //   const newThread = {
-  //     ...thread,
-  //     stage,
-  //     links,
-  //   } as Thread;
-
-  //   setThread(newThread);
-  // };
-
   const handleNewSnapshotChange = async ({
     id,
     snapshot_title,
@@ -381,13 +366,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         return;
       }
     }
-
-    // const newThread = {
-    //   ...thread,
-    //   links: [...thread.links, newLink],
-    // } as Thread;
-
-    // setThread(newThread);
   };
 
   const editsToSave = localStorage.getItem(
@@ -455,11 +433,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onLockToggle={(isLock) => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
-          // setThread((t) => ({
-          //   ...t,
-          //   readOnly: isLock,
-          //   uniqueIdentifier: t.uniqueIdentifier,
-          // }));
         }}
         onTopicChange={(topic: Topic) => {
           // const newThread = new Thread({ ...thread, topic });
@@ -492,11 +465,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onSpamToggle={(updatedThread) => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
-          // setThread((t) => ({
-          //   ...t,
-          //   markedAsSpamAt: updatedThread.markedAsSpamAt,
-          //   uniqueIdentifier: t.uniqueIdentifier,
-          // }));
         }}
         hasPendingEdits={!!editsToSave}
         body={(threadOptionsComp) => (
@@ -622,8 +590,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <div className="cards-column">
                       {showLinkedProposalOptions && (
                         <LinkedProposalsCard
-                          // onChangeHandler={handleLinkedProposalChange}
-                          onChangeHandler={() => { return null }}
                           thread={thread}
                           showAddProposalButton={isAuthor || isAdminOrMod}
                         />
@@ -632,8 +598,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <LinkedThreadsCard
                           thread={thread}
                           allowLinking={isAuthor || isAdminOrMod}
-                          // onChangeHandler={handleLinkedThreadChange}
-                          onChangeHandler={() => { return null }}
                         />
                       )}
                     </div>

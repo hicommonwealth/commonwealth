@@ -19,13 +19,11 @@ import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 type LinkedThreadsCardProps = {
   thread: Thread;
   allowLinking: boolean;
-  onChangeHandler: (links: Thread['links']) => void;
 };
 
 export const LinkedThreadsCard = ({
   thread,
   allowLinking,
-  onChangeHandler,
 }: LinkedThreadsCardProps) => {
   const [linkedThreads, setLinkedThreads] = useState<Array<Thread>>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -101,7 +99,6 @@ export const LinkedThreadsCard = ({
           <LinkedThreadModal
             thread={thread}
             linkedThreads={linkedThreads}
-            onSave={onChangeHandler}
             onModalClose={() => setIsModalOpen(false)}
           />
         }
