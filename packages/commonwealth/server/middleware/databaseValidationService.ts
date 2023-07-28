@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import { validateChain, validateChainWithTopics } from './validateChain';
+import { CW_BOT_KEY } from '../config';
 
 export const ALL_CHAINS = 'all_chains';
 
@@ -42,6 +43,25 @@ export default class DatabaseValidationService {
 
     return [chain, error];
   }
+
+  public validateBotUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    //1. Check for bot token
+    if (req.body.auth !== CW_BOT_KEY) {
+      return next(new AppError('Approved Bot Only Endpoint'));
+    }
+    //2. Get Bot User and inject
+    const profile = await this.models.Profile.findOne({
+      where: {
+        profile_name: 'Discord Bot',
+      },
+    });
+    req.user = await profile.getUser();
+    next();
+  };
 
   public validateAuthor = async (
     req: Request,

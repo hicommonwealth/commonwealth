@@ -1,6 +1,4 @@
 // Note, this login will not work for the homepage
-import { TestInfo } from '@playwright/test';
-import { Page } from 'playwright-test';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
@@ -199,5 +197,3 @@ export async function addUserIfNone(chain) {
     )
   `);
 }
-
-export async function addEthereumChainNode() {}
