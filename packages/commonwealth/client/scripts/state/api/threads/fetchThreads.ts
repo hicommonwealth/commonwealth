@@ -180,31 +180,6 @@ const useFetchThreadsQuery = ({
         }),
       ]);
 
-
-      //   // Update listing cutoff date (date up to which threads have been fetched)
-      // this._listingStore.add(thread);
-      // const unPinnedThreads = modeledThreads.filter((t) => !t.pinned);
-      // if (modeledThreads?.length) {
-      //   const lastThread = unPinnedThreads.sort(orderDiscussionsbyLastComment)[
-      //     unPinnedThreads.length - 1
-      //   ];
-
-      //   if (lastThread) {
-      //     const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
-      //     this.listingStore.setCutoffDate(options, cutoffDate);
-      //   }
-      // }
-      // if (!this.listingStore.isInitialized(options)) {
-      //   this.listingStore.initializeListing(options);
-      // }
-      // if (
-      //   (includePinnedThreads ? threads.length : unPinnedThreads.length) <
-      //   DEFAULT_PAGE_SIZE
-      // ) {
-      //   this.listingStore.depleteListing(options);
-      // }
-
-
       return { data: res, pageParam: res.threads.length > 0 ? pageParam + 1 : undefined }
     },
     getNextPageParam: (lastPage, pages) => lastPage.pageParam,
