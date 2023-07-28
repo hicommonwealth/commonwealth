@@ -17,7 +17,9 @@ type TagType =
   | 'referendum'
   | 'stage'
   | 'new'
-  | 'disabled';
+  | 'trending'
+  | 'disabled'
+  | 'discord';
 
 export type TagProps = {
   iconName?: IconName;

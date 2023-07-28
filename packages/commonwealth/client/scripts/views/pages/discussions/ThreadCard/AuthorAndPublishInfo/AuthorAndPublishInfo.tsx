@@ -19,7 +19,13 @@ import moment from 'moment';
 
 export type AuthorAndPublishInfoProps = {
   isNew?: boolean;
+  isHot?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
+  discord_meta?: {
+    user: { id: string; username: string };
+    channel_id: string;
+    message_id: string;
+  };
   collaboratorsInfo?: IThreadCollaborator[];
   isLocked?: boolean;
   lockedAt?: string;
@@ -37,12 +43,14 @@ export type AuthorAndPublishInfoProps = {
 
 export const AuthorAndPublishInfo = ({
   isNew,
+  isHot,
   authorInfo,
   isLocked,
   lockedAt,
   lastUpdated,
   viewsCount,
   publishDate,
+  discord_meta,
   showSplitDotIndicator = true,
   showPublishLabelWithDate,
   showEditedLabelWithDate,
@@ -58,6 +66,8 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
+  const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
+
   return (
     <div className="AuthorAndPublishInfo">
       <User
@@ -65,8 +75,25 @@ export const AuthorAndPublishInfo = ({
         user={authorInfo}
         popover
         linkify
-        showAddressWithDisplayName={showUserAddressWithInfo}
+        showAddressWithDisplayName={
+          fromDiscordBot ? false : showUserAddressWithInfo
+        }
       />
+
+      {fromDiscordBot && (
+        <>
+          {dotIndicator}
+          <CWText type="caption" className="discord-author">
+            <b>{discord_meta?.user?.username}</b>
+          </CWText>
+          {dotIndicator}
+          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
+          {dotIndicator}
+          <CWText type="caption" className="discord-author">
+            Bridged from Discord
+          </CWText>
+        </>
+      )}
 
       {collaboratorsInfo?.length > 0 && (
         <>
@@ -140,27 +167,22 @@ export const AuthorAndPublishInfo = ({
       )}
 
       {isNew && (
-        <>
-          {dotIndicator}
-          <CWTag label={'NEW'} type={'new'} iconName={'newStar'} />
-        </>
+        <CWTag label={'New'} type={'new'} iconName={'newStar'} />
+      )}
+
+      {isHot && (
+        <CWTag iconName="trendUp" label="Trending" type="trending"/>
       )}
 
       {isSpamThread && (
-        <>
-          {dotIndicator}
-          <CWTag label={'SPAM'} type={'disabled'} />
-        </>
+        <CWTag label={'SPAM'} type={'disabled'} />
       )}
 
       {isLocked && lockedAt && lastUpdated && (
-        <>
-          {dotIndicator}
-          <LockWithTooltip
-            lockedAt={moment(lockedAt)}
-            updatedAt={moment(lastUpdated)}
-          />
-        </>
+        <LockWithTooltip
+          lockedAt={moment(lockedAt)}
+          updatedAt={moment(lastUpdated)}
+        />
       )}
     </div>
   );

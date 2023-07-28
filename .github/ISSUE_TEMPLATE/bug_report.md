@@ -13,5 +13,8 @@ labels: 🐛 bug, needs estimate
 ## Expected behavior
 <!-- A clear and concise description of what you expected to happen. -->
 
+## "How We Fixed It"
+<!-- Brief description of solution, to be added once issue is resolved. -->
+
 ## Additional context
 <!-- Any other context here, such as communities affected, growth team links, etc -->

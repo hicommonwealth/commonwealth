@@ -132,6 +132,7 @@ export enum RedisNamespaces {
   Function_Response = 'function_response',
   Global_Response = 'global_response',
   Test_Redis = 'test_redis',
+  Database_Cleaner = 'database_cleaner',
 }
 
 export interface ISnapshotNotification {
@@ -150,3 +151,25 @@ export enum DefaultPage {
   Overview = 'default_summary_view',
   Homepage = 'homepage',
 }
+
+export interface IDiscordMessage {
+  user: {
+    id: string;
+    username: string;
+  };
+  title?: string;
+  content: string;
+  message_id: string;
+  channel_id: string;
+  parent_channel_id: string;
+  guild_id: string;
+  imageUrls?: string[];
+}
+export type HttpMethod =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head';
