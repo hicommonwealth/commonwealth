@@ -38,7 +38,7 @@ class NotificationSubscription {
   }
 
   // TODO: should resolve Chain vs chain
-  public get getChain() {
+  public get chainId() {
     return this.Chain.id || this.Chain;
   }
 

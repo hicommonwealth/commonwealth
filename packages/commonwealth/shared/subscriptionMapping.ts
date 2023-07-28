@@ -1,9 +1,13 @@
 import { NotificationDataAndCategory } from 'types';
-import { NotificationCategories } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  NotificationCategory,
+} from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SubscriptionAttributes } from '../server/models/subscription';
 import models from '../server/database';
 import { Transaction } from 'sequelize';
+import NotificationSubscription from 'models/NotificationSubscription';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -93,4 +97,80 @@ export async function createSubscription(
   // no need to check NewMention + NewCollaboration because subscriber_id is always required anyway
 
   return models.Subscription.create(subData, options);
+}
+
+interface SubscriptionFindOptions {
+  chainId?: string;
+  threadId?: number;
+  commentId?: number;
+  snapshotId?: string;
+}
+
+export async function findSubscription(
+  categoryId: NotificationCategory,
+  findOptions: SubscriptionFindOptions,
+  subs: NotificationSubscription[]
+): Promise<NotificationSubscription> {
+  if (
+    categoryId === NotificationCategories.ChainEvent ||
+    categoryId === NotificationCategories.NewThread
+  ) {
+    if (!findOptions.chainId) {
+      console.error(
+        `Must provide the chain id to find a ${categoryId} subscription`
+      );
+      return;
+    }
+    return subs.find(
+      (s) => s.category === categoryId && s.chainId === findOptions.chainId
+    );
+  } else if (
+    categoryId === NotificationCategories.NewCollaboration ||
+    categoryId === NotificationCategories.NewMention
+  ) {
+    return subs.find((s) => s.category === categoryId);
+  } else if (
+    categoryId === NotificationCategories.NewComment ||
+    categoryId === NotificationCategories.NewReaction
+  ) {
+    if (
+      (!findOptions.threadId && !findOptions.commentId) ||
+      !findOptions.chainId
+    ) {
+      console.error(
+        `Must provide a thread id or comment id and a chain id to find a ${categoryId} subscription`
+      );
+      return;
+    }
+    return subs.find((s) => {
+      const commonCheck =
+        s.category === categoryId && s.chainId === findOptions.chainId;
+      if (findOptions.threadId) {
+        return (
+          commonCheck &&
+          (s.Thread.id === findOptions.threadId ||
+            <number>(<unknown>s.Thread) === findOptions.threadId)
+        );
+      } else {
+        return (
+          commonCheck &&
+          (s.Comment.id === findOptions.commentId ||
+            <number>(<unknown>s.Comment) === findOptions.commentId)
+        );
+      }
+    });
+  } else if (categoryId === NotificationCategories.SnapshotProposal) {
+    if (!findOptions.snapshotId) {
+      console.error(
+        'Must provide a snapshot space id to find a snapshot-proposal subscription'
+      );
+      return;
+    }
+    return subs.find(
+      (s) =>
+        s.category === categoryId && s.snapshotId === findOptions.snapshotId
+    );
+  } else {
+    console.error('Searching for an unsupported subscription category!');
+  }
 }
