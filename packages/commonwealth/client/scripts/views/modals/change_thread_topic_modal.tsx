@@ -34,15 +34,16 @@ export const ChangeThreadTopicModal = ({
 
   const handleSaveChanges = async () => {
     try {
-      const topic: Topic = await editThreadTopic({
+      const { updatedTopic }: { updatedTopic: Topic } = await editThreadTopic({
         chainId: app.activeChainId(),
         address: app.user.activeAccount.address,
         threadId: thread.id,
         topicName: activeTopic.name,
-        topicId: activeTopic.id,
+        newTopicId: activeTopic.id,
+        oldTopicId: thread?.topic?.id
       })
 
-      onChangeHandler(topic);
+      onChangeHandler(updatedTopic);
       onModalClose();
     } catch (err) {
       const error = err?.responseJSON?.error || 'Failed to update thread topic'
