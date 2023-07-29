@@ -10,13 +10,12 @@ const useInitApp = () => {
     setLoading(true);
 
     console.log('Checking if on native device');
-    console.log(app.isNative(window));
+    console.log(app.platform());
 
-    if (app.isNative(window)) {
+    if (app.platform() !== 'web') {
       console.log(
-        'On native device, skipping custom domain and initializing app state.'
+        'On native device or desktop, skipping custom domain and initializing app state.',
       );
-      console.log('Init app here');
       initAppState(true).then(() => {
         setLoading(false);
       });

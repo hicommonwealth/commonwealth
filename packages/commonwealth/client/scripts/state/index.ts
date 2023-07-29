@@ -32,6 +32,7 @@ import {
   FirebaseMessaging,
   GetTokenOptions,
 } from '@capacitor-firebase/messaging';
+import { platform } from '@todesktop/client-core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -229,8 +230,13 @@ const app: IApp = {
     return !!(capacitor && capacitor.isNative);
   },
   platform: () => {
-    // Update this to use to Desktop API later to determine platform = desktop
-    return Capacitor.getPlatform();
+    // Using Desktop API to determine if the platform is desktop
+    if (platform.todesktop.isDesktopApp()) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
+    }
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
@@ -262,7 +268,7 @@ const app: IApp = {
 export async function initAppState(
   updateSelectedChain = true,
   customDomain = null,
-  shouldRedraw = true
+  shouldRedraw = true,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     axios
@@ -289,18 +295,18 @@ export async function initAppState(
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(
-                  chainsWithSnapshots.chain.chain_node_id
+                  chainsWithSnapshots.chain.chain_node_id,
                 ),
                 snapshot: chainsWithSnapshots.snapshot,
                 ...chainsWithSnapshots.chain,
-              })
+              }),
             );
           });
 
         app.roles.setRoles(data.result.roles);
         app.config.notificationCategories =
           data.result.notificationCategories.map((json) =>
-            NotificationCategory.fromJSON(json)
+            NotificationCategory.fromJSON(json),
           );
         app.config.chainCategoryMap = data.result.chainCategoryMap;
         // add recentActivity
@@ -331,17 +337,17 @@ export async function initAppState(
             'tokenReceived',
             (token) => {
               const mechanism = app.user.notifications.deliveryMechanisms.find(
-                (m) => m.type === app.platform()
+                (m) => m.type === app.platform(),
               );
               // If matching mechanism found, update it on the server
               if (mechanism) {
                 app.user.notifications.updateDeliveryMechanism(
                   token.token,
                   mechanism.type,
-                  mechanism.enabled
+                  mechanism.enabled,
                 );
               }
-            }
+            },
           );
         } else if (
           app.loginState === LoginState.LoggedOut &&
@@ -360,7 +366,7 @@ export async function initAppState(
         }
 
         app.user.setStarredCommunities(
-          data.result.user ? data.result.user.starredCommunities : []
+          data.result.user ? data.result.user.starredCommunities : [],
         );
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -370,7 +376,7 @@ export async function initAppState(
           data.result.user.selectedChain
         ) {
           app.user.setSelectedChain(
-            ChainInfo.fromJSON(data.result.user.selectedChain)
+            ChainInfo.fromJSON(data.result.user.selectedChain),
           );
         }
 
