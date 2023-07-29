@@ -66,7 +66,8 @@ const cacheUpdater = ({
                                         }
                                     }
                                 })
-                            } else if (arrayManipulationMode === 'replaceArray') {
+                            }
+                            if (arrayManipulationMode === 'replaceArray') {
                                 pages[foundPageIndex].data.threads[foundThreadIndex] = {
                                     ...pages[foundPageIndex].data.threads[foundThreadIndex],
                                     ...updateBody, // destructure order is important here
@@ -127,7 +128,8 @@ const cacheUpdater = ({
                                         }
                                     }
                                 })
-                            } else if (arrayManipulationMode === 'replaceArray') {
+                            }
+                            if (arrayManipulationMode === 'replaceArray') {
                                 updatedThreads[foundThreadIndex] = {
                                     ...updatedThreads[foundThreadIndex],
                                     ...updateBody, // destructure order is important here
