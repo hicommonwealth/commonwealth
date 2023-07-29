@@ -7,7 +7,6 @@ export { default as NotificationStore } from './NotificationStore';
 export { default as NewProfileStore } from './NewProfileStore';
 export { default as ProposalStore } from './ProposalStore';
 export { default as Store } from './Store';
-export { default as RecentListingStore } from './RecentListingStore';
 export { default as PersistentStore } from './PersistentStore';
 
 export { UpdateType } from './interfaces';

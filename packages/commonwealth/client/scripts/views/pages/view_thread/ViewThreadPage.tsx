@@ -242,7 +242,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta || !app.threads.initialized) {
+  if (!app.chain?.meta) {
     return <PageLoading />;
   }
 

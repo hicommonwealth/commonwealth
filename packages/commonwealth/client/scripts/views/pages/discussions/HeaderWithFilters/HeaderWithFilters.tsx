@@ -2,12 +2,18 @@ import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { Select } from 'views/components/Select';
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
 import {
@@ -15,13 +21,7 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { Select } from 'views/components/Select';
 import './HeaderWithFilters.scss';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -97,12 +97,12 @@ export const HeaderWithFilters = ({
 
   const stages = !customStages
     ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
-      ]
+      ThreadStage.Discussion,
+      ThreadStage.ProposalInReview,
+      ThreadStage.Voting,
+      ThreadStage.Passed,
+      ThreadStage.Failed,
+    ]
     : parseCustomStages(customStages);
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
@@ -117,19 +117,6 @@ export const HeaderWithFilters = ({
     filterKey = '',
     filterVal = '',
   }) => {
-    if (
-      filterKey === 'featured' &&
-      filterVal !== (featuredFilter || ThreadFeaturedFilterTypes.Newest)
-    ) {
-      // Remove threads from state whenever the featured filter changes
-      // This prevents the situation when we have less data in state and
-      // we use that to show the applied featured filter data which would
-      // not be accurate - whenever "featured" filter changes we have to
-      // refetch fresh threads data from api.
-      app.threads.listingStore.clear();
-      app.threads.numTotalThreads = 0;
-    }
-
     const urlParams = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
@@ -141,9 +128,9 @@ export const HeaderWithFilters = ({
 
     navigate(
       `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
-        Object.keys(urlParams)
-          .map((x) => `${x}=${urlParams[x]}`)
-          .join('&')
+      Object.keys(urlParams)
+        .map((x) => `${x}=${urlParams[x]}`)
+        .join('&')
     );
   };
 
@@ -288,11 +275,10 @@ export const HeaderWithFilters = ({
                     ...stages.map((s) => ({
                       id: s,
                       value: s,
-                      label: `${threadStageToLabel(s)} ${
-                        s === ThreadStage.Voting
+                      label: `${threadStageToLabel(s)} ${s === ThreadStage.Voting
                           ? app.threads.numVotingThreads
                           : ''
-                      }`,
+                        }`,
                     })),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
