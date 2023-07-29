@@ -64,10 +64,6 @@ class RecentActivityController {
       return { info, count };
     });
   }
-
-  public getMostActiveUsers() {
-    return this._activeUsers;
-  }
 }
 
 export default RecentActivityController;

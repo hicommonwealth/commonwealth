@@ -67,7 +67,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     const {
       admins,
-      activeUsers,
+      // activeUsers,
+      // pinned and active threads must not be returned from api
       numVotingThreads,
       numTotalThreads,
       communityBanner,
@@ -79,7 +80,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numTotalThreads,
     );
     this.meta.setAdmins(admins);
-    this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
     if (gateStrategies.length > 0) {
