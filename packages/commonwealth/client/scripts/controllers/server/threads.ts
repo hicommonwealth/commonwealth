@@ -14,10 +14,6 @@ import type MinimumProfile from '../../models/MinimumProfile';
 import Poll from '../../models/Poll';
 import Thread from '../../models/Thread';
 import Topic from '../../models/Topic';
-
-export const INITIAL_PAGE_SIZE = 10;
-export const DEFAULT_PAGE_SIZE = 20;
-
 /*
 
 Threads are stored in two stores. One store, the listingStore, is responsible for all posts
@@ -56,7 +52,6 @@ class ThreadsController {
   public _listingStore: RecentListingStore;
   public _overviewStore: ProposalStore<Thread>;
   public isFetched = new EventEmitter();
-  public isReactionFetched = new EventEmitter();
 
   private constructor() {
     this._listingStore = new RecentListingStore();
@@ -232,29 +227,6 @@ class ThreadsController {
     });
 
     return t;
-  }
-
-  /**
-   * Gets all threads associated with a link(ie all threads linked to 1 proposal)
-   * @param args
-   * @returns A list of resolved thread objects
-   */
-  public async getThreadsForLink({
-    link,
-  }: {
-    link: Link;
-  }): Promise<{ title: string; id: string }[]> {
-    try {
-      const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
-        link,
-        jwt: app.user.jwt,
-      });
-
-      return response.data.result.threads;
-    } catch (err) {
-      notifyError('Could not get threads');
-      console.log(err);
-    }
   }
 
   public initialize(

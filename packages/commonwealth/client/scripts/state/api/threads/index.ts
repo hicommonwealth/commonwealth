@@ -15,6 +15,7 @@ import useAddThreadLinksMutation from './addThreadLinks';
 import useDeleteThreadLinksMutation from './deleteThreadLinks';
 import useDeleteThreadCollaboratorsMutation from './deleteThreadCollaborators';
 import useGetThreadsByIdQuery from "./getThreadsById";
+import useGetThreadsByLinkQuery from "./getThreadsByLink"
 
 export {
     useCreateThreadReactionMutation,
@@ -32,5 +33,6 @@ export {
     useDeleteThreadLinksMutation,
     useGetThreadsByIdQuery,
     useDeleteThreadCollaboratorsMutation,
-    useAddThreadCollaboratorsMutation
+    useAddThreadCollaboratorsMutation,
+    useGetThreadsByLinkQuery,
 };
