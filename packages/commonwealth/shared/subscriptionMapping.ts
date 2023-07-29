@@ -2,9 +2,18 @@ import { NotificationDataAndCategory } from 'types';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import NotificationSubscription from 'models/NotificationSubscription';
+import { CreationAttributes } from 'sequelize';
+import { SubscriptionInstance } from '../server/models/subscription';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+/**
+ * This function maps fields from the different notification data objects to Subscription model fields. It returns an
+ * object that contains the fields needed to uniquely identify a subscription within a category group. For example, for
+ * chain-event notification data it would return { chain_id }. Note that this subscription would not be unique
+ * between users i.e. multiple users (different subscriber_ids) could be subscribed to the same chain-event.
+ * @param notification
+ */
 export function mapNotificationsDataToSubscriptions(
   notification: NotificationDataAndCategory
 ) {
@@ -45,7 +54,16 @@ export function mapNotificationsDataToSubscriptions(
   return uniqueData;
 }
 
-export function checkSubscriptionValues(values: any) {
+/**
+ * Given the creation attributes of a subscription, this function throws an error if the required values
+ * for the associated subscription category id are not present. This function only checks for values that are not
+ * already required in the database like subscriber_id. For example, new-comment-creation subscriptions must always
+ * define a thread_id or a comment_id but never both.
+ * @param values Creation attributes of the Subscription Model
+ */
+export function checkSubscriptionValues(
+  values: CreationAttributes<SubscriptionInstance>
+) {
   if (
     values.category_id === NotificationCategories.ChainEvent &&
     !values.chain_id
@@ -95,33 +113,6 @@ export function checkSubscriptionValues(values: any) {
   // no need to check NewMention + NewCollaboration because subscriber_id is always required anyway
 }
 
-// export type NewCommentSubUniqueData = { commentId: number; threadId?: number } | { commentId?: number; threadId: number }
-// export type NewReactionSubUniqueData = { commentId: number; threadId?: number } | { commentId?: number; threadId: number }
-// export type NewThreadSubUniqueData = { chainId: string }
-// export type ChainEventSubUniqueData = { chainId: string }
-// export type SnapshotSubUniqueData = { snapshotId: string }
-//
-// export type NotifCategoryToSubUniqueData = {
-//   [K in NotificationCategory]: K extends typeof NotificationCategories.NewComment
-//     ? NewCommentSubUniqueData
-//     : K extends typeof NotificationCategories.NewReaction
-//       ? NewReactionSubUniqueData
-//       : K extends  typeof NotificationCategories.NewThread
-//         ? NewThreadSubUniqueData
-//         : K extends typeof NotificationCategories.ChainEvent
-//           ? ChainEventSubUniqueData
-//           : K extends typeof NotificationCategories.SnapshotProposal
-//             ? SnapshotSubUniqueData
-//             : never;
-// }
-//
-// export type SubUniqueData = {
-//   [K in NotificationCategory]: {
-//     categoryId: K;
-//     options: NotifCategoryToSubUniqueData[K]
-//   }
-// }[NotificationCategory];
-
 export type SubUniqueData =
   | {
       categoryId:
@@ -150,6 +141,14 @@ export type SubUniqueData =
       options: {};
     };
 
+/**
+ * This function searches through a list of NotificationSubscriptions and returns the one that matches the given values.
+ * If the minimum required values to uniquely identify a NotificationSubscription are not present, the function logs
+ * an error and returns void. For example, in order to find a `new-thread-creation` subscription you must provide a
+ * chainId.
+ * @param findOptions The data used to find a matching NotificationSubscription.
+ * @param subs The list of NotificationSubscriptions.
+ */
 export function findSubscription(
   findOptions: SubUniqueData,
   subs: NotificationSubscription[]
