@@ -50,7 +50,7 @@ const NotificationSettingsPage = () => {
   const [token, setToken] = useState('');
 
   const [currentFrequency, setCurrentFrequency] = useState(
-    app.user.emailInterval
+    app.user.emailInterval,
   );
 
   useEffect(() => {
@@ -74,10 +74,6 @@ const NotificationSettingsPage = () => {
         if (currentToken) {
           setToken(currentToken.token);
           _token = currentToken.token;
-        } else {
-          console.log(
-            'No registration token available. Request permission to generate one.'
-          );
         }
       })
       .catch((err) => {
@@ -88,7 +84,7 @@ const NotificationSettingsPage = () => {
 
   const handleToggleDeliveryMechanism = async (mechanismType, isEnabled) => {
     const mechanism = app.user.notifications.deliveryMechanisms.find(
-      (m) => m.type === mechanismType
+      (m) => m.type === mechanismType,
     );
 
     const platform = app.platform();
@@ -98,7 +94,8 @@ const NotificationSettingsPage = () => {
       (mechanismType === DeliveryMechanismType.Android &&
         platform === 'android') ||
       (mechanismType === DeliveryMechanismType.Browser && platform === 'web') ||
-      (mechanismType === DeliveryMechanismType.Desktop && platform === 'web');
+      (mechanismType === DeliveryMechanismType.Desktop &&
+        platform === 'desktop');
 
     if (
       isOnRightPlatform &&
@@ -109,14 +106,14 @@ const NotificationSettingsPage = () => {
         await app.user.notifications.addDeliveryMechanism(
           _token,
           mechanismType,
-          true
+          true,
         );
       } else if (mechanism && isEnabled) {
         const _token = await getToken();
         await app.user.notifications.updateDeliveryMechanism(
           _token,
           mechanismType,
-          true
+          true,
         );
       } else if (mechanism && !isEnabled) {
         // If the user wants to disable the delivery mechanism and it exists, we disable it
@@ -129,7 +126,7 @@ const NotificationSettingsPage = () => {
   const handleSubscriptionDelivery = async (
     selectedItems: DropdownItemType[],
     subs: NotificationSubscription[],
-    initialValues: any
+    initialValues: any,
   ) => {
     const selectedTypes = selectedItems.map((item) => item.value);
 
@@ -139,20 +136,20 @@ const NotificationSettingsPage = () => {
       .map((item) => item.value);
     // Types that were initially deselected but are now selected
     const typesToEnable = selectedTypes.filter(
-      (type) => !initialValues.includes(type)
+      (type) => !initialValues.includes(type),
     );
 
     for (const type of typesToDisable) {
       await app.user.notifications.disableSubscriptionDeliveryMechanism(
         type,
-        subs
+        subs,
       );
     }
 
     for (const type of typesToEnable) {
       await app.user.notifications.enableSubscriptionDeliveryMechanism(
         type,
-        subs
+        subs,
       );
     }
 
@@ -161,7 +158,7 @@ const NotificationSettingsPage = () => {
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
-    subs: NotificationSubscription[]
+    subs: NotificationSubscription[],
   ) => {
     if (hasSomeInAppSubs) {
       await app.user.notifications.disableSubscriptions(subs);
@@ -173,7 +170,7 @@ const NotificationSettingsPage = () => {
 
   const handleEmailSubscriptions = async (
     hasSomeEmailSubs: boolean,
-    subs: NotificationSubscription[]
+    subs: NotificationSubscription[],
   ) => {
     if (hasSomeEmailSubs) {
       await app.user.notifications.disableImmediateEmails(subs);
@@ -198,14 +195,14 @@ const NotificationSettingsPage = () => {
   // bundled discussion subscriptions
   const bundledSubs = bundleSubs(
     app?.user.notifications.subscriptions.filter(
-      (x) => x.category !== 'chain-event'
-    )
+      (x) => x.category !== 'chain-event',
+    ),
   );
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
     app?.user.notifications.subscriptions.filter(
-      (x) => x.category === 'chain-event'
-    )
+      (x) => x.category === 'chain-event',
+    ),
   );
 
   const subscribedChainIds =
@@ -364,7 +361,7 @@ const NotificationSettingsPage = () => {
       </div>
       {deliveryMechanismTypes.map((mechanismType) => {
         const mechanism = app?.user.notifications.deliveryMechanisms.find(
-          (m) => m.type === mechanismType
+          (m) => m.type === mechanismType,
         );
         const platform = app.platform();
         const isOnPlatform =
@@ -374,7 +371,9 @@ const NotificationSettingsPage = () => {
           (mechanismType === DeliveryMechanismType.Browser &&
             platform === 'web') ||
           (mechanismType === DeliveryMechanismType.Desktop &&
-            platform === 'web');
+            platform === 'desktop');
+
+        console.log('isOnPlatform', isOnPlatform, 'for', mechanismType);
 
         return (
           <div
@@ -395,13 +394,14 @@ const NotificationSettingsPage = () => {
                 checked={mechanism?.enabled || false}
                 disabled={!isOnPlatform}
                 onChange={() => {
+                  console.log('toggle');
                   if (isOnPlatform) {
                     const newEnabledState = mechanism
                       ? !mechanism.enabled
                       : true;
                     handleToggleDeliveryMechanism(
                       mechanismType,
-                      newEnabledState
+                      newEnabledState,
                     );
                   }
                 }}
@@ -523,11 +523,10 @@ const NotificationSettingsPage = () => {
               value: delivery.type,
             }));
           const wrappedHandleSubscriptionDelivery = (
-            selectedItems: DropdownItemType[]
+            selectedItems: DropdownItemType[],
           ) => {
             handleSubscriptionDelivery(selectedItems, subs, initialValues);
           };
-          console.log(initialValues, subs);
 
           return (
             <div
@@ -621,7 +620,7 @@ const NotificationSettingsPage = () => {
               value: delivery.type,
             }));
           const wrappedHandleSubscriptionDelivery = (
-            selectedItems: DropdownItemType[]
+            selectedItems: DropdownItemType[],
           ) => {
             handleSubscriptionDelivery(selectedItems, subs, initialValues);
           };
@@ -702,7 +701,7 @@ const NotificationSettingsPage = () => {
                                   null,
                                   sub.Thread.author,
                                   sub.Thread.chain,
-                                  null
+                                  null,
                                 )
                               }
                             />
@@ -715,7 +714,7 @@ const NotificationSettingsPage = () => {
                                   null,
                                   sub.Comment.author,
                                   sub.Comment.chain,
-                                  null
+                                  null,
                                 )
                               }
                             />
