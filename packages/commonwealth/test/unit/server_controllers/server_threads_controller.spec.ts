@@ -403,7 +403,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#createThreadComment', () => {
-    it.only('should create a thread comment', async () => {
+    it('should create a thread comment', async () => {
       const user = { id: 1, save: async () => ({}) };
       const address = {
         id: 1,
@@ -1272,7 +1272,7 @@ describe('ServerThreadsController', () => {
       expect(notificationOptions[0].notificationData).to.include({
         categoryId: 'thread-edit',
       });
-      expect(notificationOptions[0].notificationData).to.include({
+      expect(notificationOptions[0].notificationData.data).to.include({
         thread_id: 1,
         root_type: 'discussion',
         root_title: 'mythread',
