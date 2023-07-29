@@ -23,6 +23,8 @@ import NotificationCategory from 'models/NotificationCategory';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
+import { Capacitor } from '@capacitor/core';
+import { platform } from '@todesktop/client-core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -106,6 +108,8 @@ export interface IApp {
 
   serverUrl(): string;
 
+  platform(): string;
+
   loadingError: string;
 
   _customDomainId: string;
@@ -186,6 +190,15 @@ const app: IApp = {
   isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
+  },
+  platform: () => {
+    // Using Desktop API to determine if the platform is desktop
+    if (platform.todesktop.isDesktopApp()) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
+    }
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
