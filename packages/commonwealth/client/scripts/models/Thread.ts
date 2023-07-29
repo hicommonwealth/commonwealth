@@ -5,11 +5,18 @@ import Poll from 'models/Poll';
 import type momentT from 'moment';
 import moment from 'moment';
 import app from 'state';
-import type { VersionHistory } from '../controllers/server/threads';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
+import type MinimumProfile from 'models/MinimumProfile';
+
+export interface VersionHistory {
+  author?: MinimumProfile;
+  timestamp: momentT.Moment;
+  body: string;
+}
+
 
 export interface IThreadCollaborator {
   address: string;

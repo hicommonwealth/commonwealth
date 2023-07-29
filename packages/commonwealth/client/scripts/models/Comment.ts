@@ -1,6 +1,6 @@
 import type momentType from 'moment';
 import moment from 'moment';
-import type { VersionHistory } from '../controllers/server/threads';
+import { VersionHistory } from 'models/Thread';
 import AddressInfo from './AddressInfo';
 import Reaction from './Reaction';
 import type { IUniqueId } from './interfaces';

@@ -67,7 +67,7 @@ const OverviewPage = () => {
     };
   });
 
-  return !topicSummaryRows.length && !app.threads.initialized ? (
+  return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
     <div className="OverviewPage">
