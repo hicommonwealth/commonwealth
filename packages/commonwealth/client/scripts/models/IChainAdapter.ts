@@ -91,14 +91,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
 
-    if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
-      this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
-        threads: this.app.threads.listingStore.getPinnedThreads(),
-        chain: this.meta.id,
-        pinned: true,
-      });
-    }
-
     this._serverLoaded = true;
     return true;
   }
@@ -109,7 +101,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     if (this.app.chainEntities) {
       this.app.chainEntities.deinit();
     }
-    this.app.threadUniqueAddressesCount.deinit();
     console.log(`${this.meta.name} stopped`);
   }
 

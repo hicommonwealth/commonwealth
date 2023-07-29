@@ -6,7 +6,6 @@ export { default as NodeStore } from './NodeStore';
 export { default as NotificationStore } from './NotificationStore';
 export { default as NewProfileStore } from './NewProfileStore';
 export { default as ProposalStore } from './ProposalStore';
-export { default as ThreadUniqueAddressesCountStore } from './ThreadUniqueAddressesCountStore';
 export { default as Store } from './Store';
 export { default as RecentListingStore } from './RecentListingStore';
 export { default as PersistentStore } from './PersistentStore';

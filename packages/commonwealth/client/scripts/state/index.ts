@@ -11,7 +11,6 @@ import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
 import { WebSocketController } from 'controllers/server/socket';
-import ThreadUniqueAddressesCount from 'controllers/server/threadUniqueAddressesCount';
 import ThreadsController from 'controllers/server/threads';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
@@ -51,7 +50,6 @@ export interface IApp {
 
   // Threads
   threads: ThreadsController;
-  threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   polls: PollsController;
 
   // Proposals
@@ -138,7 +136,6 @@ const app: IApp = {
 
   // Thread
   threads: ThreadsController.Instance,
-  threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   polls: new PollsController(),
 
   // Proposals

@@ -171,14 +171,6 @@ const useFetchThreadsQuery = ({
         topicId
       })
 
-      // TODO: clean this up
-      await Promise.all([
-        app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
-          threads: res.threads,
-          chain: chainId,
-        }),
-      ]);
-
       return { data: res, pageParam: res.threads.length > 0 ? pageParam + 1 : undefined }
     },
     getNextPageParam: (lastPage, pages) => lastPage.pageParam,
