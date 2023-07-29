@@ -45,6 +45,7 @@ export default async (
     return next(new AppError(Errors.NoDeliveryMechanismFound));
   }
 
+  let notModified = false;
   await sequelize.transaction(async (t) => {
     await Promise.all(
       subscriptions.map(async (s) => {
@@ -58,7 +59,7 @@ export default async (
           });
 
         if (existingSubscriptionDelivery) {
-          res.status(304).send(); // Return 304 Not Modified
+          notModified = true;
           return;
         }
 
@@ -74,5 +75,9 @@ export default async (
     );
   });
 
-  return res.json({ status: 'Success', result: 'Enabled Delivery Option' });
+  if (notModified) {
+    return res.status(304).send();
+  } else {
+    return res.json({ status: 'Success', result: 'Enabled Delivery Option' });
+  }
 };

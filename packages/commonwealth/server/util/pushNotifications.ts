@@ -91,8 +91,8 @@ export async function createNotificationMessage(
     );
 
     return {
-      title: emailSubjectLine,
-      body: `${communityCopy}: ${excerpt}.`,
+      title: `${emailSubjectLine} ${communityCopy}`,
+      body: `${excerpt}`,
       data: {
         proposalPath,
         authorPath,
@@ -108,13 +108,7 @@ export async function sendPushNotification(
   category_id: string,
   models: DB
 ) {
-  console.log('Function sendPushNotification called');
-  console.log('deliveryMechanism:', deliveryMechanism);
-  console.log('notificationData:', notificationData);
-
-  // Get the user's FCM token (identifier for FCM)
   const token = deliveryMechanism.identifier;
-  console.log('FCM token:', token);
 
   // Prepare notification payload
   const message = await createNotificationMessage(
@@ -150,8 +144,6 @@ export async function sendPushNotification(
     token: token,
   };
 
-  console.log('Notification payload:', payload);
-
   switch (deliveryMechanism.type) {
     case 'browser':
     case 'ios':
@@ -159,11 +151,8 @@ export async function sendPushNotification(
       // Send push notification to both mobile and web using FCM
       try {
         if (token) {
-          console.log('Attempting to send message');
           const response = await firebase.send(payload);
           console.log('Successfully sent message:', response);
-        } else {
-          console.error('FCM token is not available.');
         }
       } catch (error) {
         console.error('Error sending push notification:', error);

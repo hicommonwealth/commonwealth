@@ -72,7 +72,6 @@ const NotificationSettingsPage = () => {
     await FirebaseMessaging.getToken({ vapidKey: vapidKey })
       .then((currentToken) => {
         if (currentToken) {
-          console.log('Current token:', currentToken);
           setToken(currentToken.token);
           _token = currentToken.token;
         } else {
@@ -144,7 +143,6 @@ const NotificationSettingsPage = () => {
     );
 
     for (const type of typesToDisable) {
-      console.log(type, subs, 'disabling');
       await app.user.notifications.disableSubscriptionDeliveryMechanism(
         type,
         subs
@@ -152,7 +150,6 @@ const NotificationSettingsPage = () => {
     }
 
     for (const type of typesToEnable) {
-      console.log(type, subs, 'enabling');
       await app.user.notifications.enableSubscriptionDeliveryMechanism(
         type,
         subs
