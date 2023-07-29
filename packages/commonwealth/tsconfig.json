@@ -25,5 +25,8 @@
     "./server.ts",
     "./scripts"
   ],
-  "exclude": ["./node_modules"]
+  "exclude": [
+    "./node_modules",
+    "./firebase-messaging-sw.js"
+  ]
 }
