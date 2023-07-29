@@ -18,7 +18,7 @@ const getThreadsByLink = async ({ link }: GetThreadsByLinkProps) => {
     jwt: app.user.jwt,
   });
 
-  return response.data.result.threads//.map((t) => app.threads.modelFromServer(t));
+  return response.data.result.threads
 };
 
 // Gets all threads associated with a link(ie all threads linked to 1 proposal)

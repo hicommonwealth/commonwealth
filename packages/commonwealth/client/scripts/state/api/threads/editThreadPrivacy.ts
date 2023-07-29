@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
+import Thread from 'models/Thread';
 
 interface EditThreadPrivacyProps {
   chainId: string;
@@ -20,7 +21,7 @@ const editThreadPrivacy = async ({
     jwt: app.user.jwt,
   })
 
-  return app.threads.modelFromServer(response.data.result)
+  return new Thread(response.data.result)
 };
 
 interface UseEditThreadPrivacyMutationProps {

@@ -7,6 +7,7 @@ import { ApiEndpoints } from 'state/api/config';
 import {
   ThreadTimelineFilterTypes
 } from '../../../models/types';
+import Thread from 'models/Thread';
 
 const THREADS_STALE_TIME = 100 * 1_000; // 30s todo: UNDO THIS
 
@@ -170,7 +171,7 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
           // transform the response
           const transformedData = {
             ...res.data.result,
-            threads: res.data.result.threads.map((c) => app.threads.modelFromServer(c))
+            threads: res.data.result.threads.map((c) => new Thread(c))
           };
 
           return { data: transformedData, pageParam: transformedData.threads.length > 0 ? pageParam + 1 : undefined }
@@ -190,7 +191,7 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
           );
 
           // transform response
-          return response.data.result.map((c) => app.threads.modelFromServer(c))
+          return response.data.result.map((c) => new Thread(c))
         }
       }
     })(),

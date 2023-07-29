@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
+import Thread from 'models/Thread';
 
 interface ToggleThreadPinProps {
   chainId: string;
@@ -17,7 +18,7 @@ const toggleThreadPin = async ({
     thread_id: threadId,
   })
 
-  return app.threads.modelFromServer(response.data.result)
+  return new Thread(response.data.result)
 };
 
 interface ToggleThreadPinMutationProps {

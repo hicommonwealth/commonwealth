@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import Thread from 'models/Thread';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 
@@ -24,7 +25,7 @@ const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
   // TODO: do we need to do this?
   // app.chainEntities.getRawEntities(app.activeChainId()),
 
-  return response.data.result.map((t) => app.threads.modelFromServer(t));
+  return response.data.result.map((t) => new Thread(t));
 };
 
 const useGetThreadsByIdQuery = ({ chainId, ids }: GetThreadsByIdProps) => {

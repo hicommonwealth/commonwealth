@@ -1,11 +1,10 @@
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
-import app from '../state';
 import type ChainInfo from './ChainInfo';
 import { default as CommentT } from './Comment';
-import type { IUniqueId } from './interfaces';
 import { Thread as ThreadT } from './Thread';
+import type { IUniqueId } from './interfaces';
 
 class NotificationSubscription {
   public readonly category: string;
@@ -103,7 +102,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Thread) {
     try {
-      modeledThread = app.threads.modelFromServer(Thread);
+      modeledThread = new ThreadT(Thread as any);
     } catch (e) {
       console.log('error', e);
     }

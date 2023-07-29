@@ -2,7 +2,7 @@ import moment from 'moment';
 import app from 'state';
 import SearchStore from 'stores/SearchStore';
 import { SearchContentType } from 'types';
-import type Thread from '../../models/Thread';
+import Thread from 'models/Thread';
 import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 import type { SearchParams } from '../../models/SearchQuery';
 import axios from 'axios';
@@ -262,7 +262,7 @@ class SearchController {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
       return response.data.result.map((rawThread) => {
-        return app.threads.modelFromServer(rawThread);
+        return new Thread(rawThread)
       });
     } catch (e) {
       console.error(e);

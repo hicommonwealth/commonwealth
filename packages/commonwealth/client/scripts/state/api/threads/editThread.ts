@@ -4,6 +4,7 @@ import MinimumProfile from 'models/MinimumProfile';
 import { ThreadStage } from 'models/types';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
+import Thread from 'models/Thread';
 
 interface EditThreadProps {
   address: string;
@@ -59,7 +60,7 @@ const editThread = async ({
     canvas_hash: hash,
   })
 
-  return app.threads.modelFromServer(response.data.result)
+  return new Thread(response.data.result)
 };
 
 interface UseEditThreadMutationProps {

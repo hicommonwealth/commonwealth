@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ThreadStage } from 'models/types';
+import Thread from 'models/Thread';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -22,7 +23,7 @@ const editThreadStage = async ({
     jwt: app.user.jwt,
   })
 
-  return app.threads.modelFromServer(response.data.result)
+  return new Thread(response.data.result)
 };
 
 interface UseEditThreadStageMutationProps {

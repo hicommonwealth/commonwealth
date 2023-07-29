@@ -42,7 +42,7 @@ const Profile = ({ profileId }: ProfileProps) => {
       });
 
       setProfile(new NewProfile(result.profile));
-      setThreads(result.threads.map((t) => app.threads.modelFromServer(t)));
+      setThreads(result.threads.map((t) => new Thread(t)));
       const responseComments = result.comments.map((c) =>
         new Comment(c)
       );

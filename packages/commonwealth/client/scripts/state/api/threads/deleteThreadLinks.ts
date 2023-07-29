@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { Link } from 'models/Thread';
+import Thread, { Link } from 'models/Thread';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -23,7 +23,7 @@ const deleteThreadLinks = async ({
     },
   })
 
-  return app.threads.modelFromServer(response.data.result)
+  return new Thread(response.data.result)
 };
 
 interface deleteThreadLinksMutationProps {

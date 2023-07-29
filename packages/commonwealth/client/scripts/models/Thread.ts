@@ -1,11 +1,14 @@
 import { ProposalType } from 'common-common/src/types';
-import type moment from 'moment';
+import Attachment from 'models/Attachment';
+import type ChainEntity from 'models/ChainEntity';
+import Poll from 'models/Poll';
+import type momentT from 'moment';
+import moment from 'moment';
+import app from 'state';
 import type { VersionHistory } from '../controllers/server/threads';
-import type Attachment from './Attachment';
-import type { IUniqueId } from './interfaces';
-import type Poll from './Poll';
 import type { ReactionType } from './Reaction';
-import type Topic from './Topic';
+import Topic from './Topic';
+import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
 export interface IThreadCollaborator {
@@ -65,19 +68,19 @@ export class Thread implements IUniqueId {
   //  we should remove the number to allow the store to work.
   public readonly identifier: string;
   public readonly id: number;
-  public readonly createdAt: moment.Moment;
-  public readonly updatedAt: moment.Moment;
-  public readonly lastCommentedOn: moment.Moment;
+  public readonly createdAt: momentT.Moment;
+  public readonly updatedAt: momentT.Moment;
+  public readonly lastCommentedOn: momentT.Moment;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
-  public readonly lastEdited: moment.Moment;
+  public readonly lastEdited: momentT.Moment;
 
-  public markedAsSpamAt: moment.Moment;
-  public archivedAt: moment.Moment;
-  public readonly lockedAt: moment.Moment;
+  public markedAsSpamAt: momentT.Moment;
+  public archivedAt: momentT.Moment;
+  public readonly lockedAt: momentT.Moment;
 
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
@@ -90,128 +93,185 @@ export class Thread implements IUniqueId {
   }
 
   constructor({
-    author,
+    marked_as_spam_at,
     title,
-    attachments,
+    body,
     id,
-    createdAt,
-    updatedAt,
-    topic,
     kind,
     stage,
-    versionHistory,
     chain,
-    readOnly,
-    // optional args:
-    body,
-    plaintext,
     url,
-    authorChain,
     pinned,
-    collaborators,
-    chainEntities,
-    lastEdited,
-    markedAsSpamAt,
-    archivedAt,
-    lockedAt,
-    hasPoll,
-    lastCommentedOn,
-    numberOfComments,
-    reactionIds,
-    reactionType,
-    addressesReacted,
+    links,
     canvasAction,
     canvasSession,
     canvasHash,
-    links,
+    plaintext,
+    collaborators,
+    last_edited,
+    locked_at,
+    last_commented_on,
+    created_at,
+    updated_at,
+    read_only,
+    has_poll,
+    archived_at,
+    numberOfComments,
+    polls,
+    Attachments,
+    topic,
+    reactions,
+    chain_entity_meta,
+    version_history,
+    Address,
   }: {
-    author: string;
+    marked_as_spam_at: string;
     title: string;
-    attachments: Attachment[];
+    body?: string;
     id: number;
-    createdAt: moment.Moment;
-    updatedAt: moment.Moment;
-    lastCommentedOn: moment.Moment;
-    topic: Topic;
     kind: ThreadKind;
     stage: ThreadStage;
-    versionHistory: VersionHistory[];
     chain: string;
-    readOnly: boolean;
-    body?: string;
-    plaintext?: string;
     url?: string;
-    authorChain?: string;
     pinned?: boolean;
-    collaborators?: any[];
-    chainEntities?: any[];
-    lastEdited?: moment.Moment;
-    markedAsSpamAt?: moment.Moment;
-    archivedAt?: moment.Moment;
-    lockedAt?: moment.Moment;
-    hasPoll: boolean;
-    polls?: Poll[];
-    numberOfComments?: number;
-    reactionIds?: number[];
-    reactionType?: ReactionType[];
-    addressesReacted?: string[];
+    links?: Link[];
     canvasAction?: string;
     canvasSession?: string;
     canvasHash?: string;
-    links?: Link[];
+    plaintext?: string;
+    collaborators?: any[];
+    last_edited: string;
+    locked_at: string;
+    last_commented_on: string;
+    created_at: string;
+    updated_at: string;
+    archived_at?: string;
+    read_only: boolean;
+    has_poll: boolean;
+    numberOfComments?: number;
+    polls?: Poll[];
+    Attachments: Attachment[]; // TODO: fix type
+    topic: any; // TODO: fix type
+    reactions?: any[]; // TODO: fix type
+    chain_entity_meta: any, // TODO: fix type
+    version_history: any[]; // TODO: fix type
+    Address: any; // TODO: fix type
   }) {
-    this.author = author;
-    this.title = title;
-    this.body = body;
-    this.plaintext = plaintext;
-    this.attachments = attachments;
+    this.author = Address.address;
+    this.authorChain = Address.chain;
     this.id = id;
-    this.identifier = `${id}`;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-    this.topic = topic;
     this.kind = kind;
     this.stage = stage;
-    this.authorChain = authorChain;
-    this.pinned = pinned;
-    this.url = url;
-    this.versionHistory = versionHistory;
     this.chain = chain;
-    this.readOnly = readOnly;
-    this.collaborators = collaborators || [];
-    this.lastCommentedOn = lastCommentedOn;
-    this.chainEntities = chainEntities
-      ? chainEntities.map((ce) => {
-        return {
-          id: +ce.id,
-          chain,
-          type: ce.type,
-          typeId: ce.type_id || ce.typeId,
-          completed: ce.completed,
-          author,
-        };
-      })
-      : [];
-    this.hasPoll = hasPoll;
-    this.lastEdited = lastEdited;
-    this.markedAsSpamAt = markedAsSpamAt;
-    this.archivedAt = archivedAt;
-    this.lockedAt = lockedAt;
-    this.numberOfComments = numberOfComments || 0;
-    this.associatedReactions = [];
-    if (reactionIds) {
-      for (let i = 0; i < reactionIds.length; i++) {
-        this.associatedReactions.push({
-          id: reactionIds[i],
-          type: reactionType[i],
-          address: addressesReacted[i],
-        });
-      }
-    }
+    this.url = url;
+    this.pinned = pinned;
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
+    this.plaintext = plaintext;
+    this.readOnly = read_only;
+    this.hasPoll = has_poll;
+    this.topic = topic?.id ? new Topic(topic) : null;
+    this.numberOfComments = numberOfComments || 0;
     this.links = links || [];
+    this.collaborators = collaborators || [];
+    this.attachments = Attachments
+      ? Attachments.map((a) => new Attachment(a.url, a.description))
+      : [];
+    this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    this.title = (() => {
+      try {
+        return decodeURIComponent(title);
+      } catch (err) {
+        console.error(`Could not decode title: "${title}"`);
+        return title;
+      }
+    })();
+    this.body = (() => {
+      try {
+        return decodeURIComponent(body);
+      } catch (err) {
+        console.error(`Could not decode body: "${body}"`);
+        return body;
+      }
+    })();
+    this.associatedReactions = [];
+    if (reactions) {
+      const reactionIds = reactions.map((r) => r.id);
+      const reactionType = reactions.map((r) => r?.type || r?.reaction);
+      const addressesReacted = reactions.map((r) => r?.address || r?.Address?.address);
+      if (reactionIds?.length > 0) {
+        for (let i = 0; i < reactionIds.length; i++) {
+          this.associatedReactions.push({
+            id: reactionIds[i],
+            type: reactionType[i],
+            address: addressesReacted[i],
+          });
+        }
+      }
+    }
+    this.chainEntities = (() => {
+      const chainEntitiesProcessed: ChainEntity[] = [];
+      if (chain_entity_meta) {
+        for (const meta of chain_entity_meta) {
+          const full_entity = Array.from(app.chainEntities.store.values())
+            .flat()
+            .filter((e) => e.id === meta.ce_id)[0];
+          if (full_entity) {
+            if (meta.title) full_entity.title = meta.title;
+            chainEntitiesProcessed.push(full_entity);
+          }
+        }
+      }
+
+      return chainEntitiesProcessed
+        ? chainEntitiesProcessed.map((ce) => {
+          return {
+            id: +ce.id,
+            chain,
+            type: ce.type,
+            typeId: (ce as any).type_id || ce.typeId,
+            completed: ce.completed,
+            author: this.author,
+          };
+        })
+        : [];
+    })()
+    this.versionHistory = (() => {
+      let versionHistoryProcessed;
+      if (version_history) {
+        versionHistoryProcessed = version_history.map((v) => {
+          if (!v) return;
+          let history;
+          try {
+            history = JSON.parse(v);
+            history.author =
+              typeof history.author === 'string'
+                ? JSON.parse(history.author)
+                : typeof history.author === 'object'
+                  ? history.author
+                  : null;
+            history.timestamp = moment(history.timestamp);
+          } catch (e) {
+            console.log(e);
+          }
+          return history;
+        });
+      }
+      return versionHistoryProcessed
+    })();
+    this.lastEdited = last_edited
+      ? moment(last_edited)
+      : this.versionHistory && this.versionHistory?.length > 1
+        ? this.versionHistory[0].timestamp
+        : null;
+    this.lockedAt = locked_at ? moment(locked_at) : null;
+    this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
+    this.createdAt = moment(created_at);
+    this.updatedAt = moment(updated_at);
+    this.archivedAt = archived_at ? moment(archived_at) : null;
+    this.polls = (polls || []).map((p) => new Poll(p))
+    this.identifier = `${id}`;
   }
 }
 

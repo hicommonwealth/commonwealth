@@ -10,6 +10,7 @@ import {
 } from 'models/types';
 import app from 'state';
 import { addThreadInAllCaches } from './helpers/cache';
+import Thread from 'models/Thread';
 
 interface CreateThreadProps {
   address: string;
@@ -70,7 +71,7 @@ const createThread = async ({
     }
   );
 
-  return app.threads.modelFromServer(response.data.result)
+  return new Thread(response.data.result)
 };
 
 const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
