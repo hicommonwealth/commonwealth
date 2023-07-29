@@ -4,7 +4,6 @@ import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import type { DB } from '../models';
 import { redirectWithLoginError } from './finishEmailLogin';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
-import { createSubscription } from 'subscriptionMapping';
 
 const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
   const token = req.query.token;
@@ -73,14 +72,14 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
     });
 
     // Automatically create subscription to their own mentions
-    await createSubscription({
+    await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
       is_active: true,
     });
 
     // Automatically create a subscription to collaborations
-    await createSubscription({
+    await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewCollaboration,
       is_active: true,

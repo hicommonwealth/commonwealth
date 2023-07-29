@@ -19,7 +19,6 @@ import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { createSubscription } from 'subscriptionMapping';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -236,7 +235,7 @@ export async function __createThreadComment({
   const subsTransaction = await this.models.sequelize.transaction();
   try {
     // auto-subscribe comment author to reactions & child comments
-    await createSubscription(
+    await this.models.Subscription.create(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
@@ -246,7 +245,7 @@ export async function __createThreadComment({
       },
       { transaction: subsTransaction }
     );
-    await createSubscription(
+    await this.models.Subscription.create(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,

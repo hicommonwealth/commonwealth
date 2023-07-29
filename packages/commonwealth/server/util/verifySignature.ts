@@ -28,7 +28,6 @@ import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
-import { createSubscription } from 'subscriptionMapping';
 const log = factory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({
@@ -326,12 +325,12 @@ const verifySignature = async (
     if (!addressModel.user_id) {
       const user = await models.User.createWithProfile(models, { email: null });
       addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
-      await createSubscription({
+      await models.Subscription.create({
         subscriber_id: user.id,
         category_id: NotificationCategories.NewMention,
         is_active: true,
       });
-      await createSubscription({
+      await models.Subscription.create({
         subscriber_id: user.id,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,

@@ -18,6 +18,7 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
+import { checkSubscriptionValues } from 'subscriptionMapping';
 
 export type SubscriptionAttributes = {
   subscriber_id: number;
@@ -125,6 +126,17 @@ export default (
       foreignKey: 'comment_id',
       targetKey: 'id',
     });
+  };
+
+  // override the create method for Subscriptions in order to validate input values.
+  const originalCreate = Subscription.create;
+  Subscription.create = async function (
+    this: Omit<typeof Subscription, 'associate'>,
+    values: Parameters<typeof originalCreate>[0],
+    options: Parameters<typeof originalCreate>[1]
+  ) {
+    checkSubscriptionValues(values);
+    return originalCreate.call(Subscription, values, options);
   };
 
   return Subscription;

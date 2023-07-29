@@ -29,7 +29,6 @@ import verifySignature from '../util/verifySignature';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
-import { createSubscription } from 'subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -124,12 +123,12 @@ const processAddress = async (
       addressInstance.profile_id = (
         newUser.Profiles[0] as ProfileAttributes
       ).id;
-      await createSubscription({
+      await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
         is_active: true,
       });
-      await createSubscription({
+      await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,

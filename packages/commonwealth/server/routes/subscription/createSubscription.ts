@@ -2,7 +2,6 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../../models';
 import Errors from './errors';
-import { createSubscription } from 'subscriptionMapping';
 import { ChainInstance } from 'server/models/chain';
 
 export default async (
@@ -83,7 +82,7 @@ export default async (
   }
 
   const subscription = (
-    await createSubscription({
+    await models.Subscription.create({
       subscriber_id: req.user.id,
       category_id: req.body.category,
       is_active: !!req.body.is_active,

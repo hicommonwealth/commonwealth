@@ -1,12 +1,6 @@
 import { NotificationDataAndCategory } from 'types';
-import {
-  NotificationCategories,
-  NotificationCategory,
-} from 'common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SubscriptionAttributes } from '../server/models/subscription';
-import models from '../server/database';
-import { Transaction } from 'sequelize';
 import NotificationSubscription from 'models/NotificationSubscription';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -51,60 +45,54 @@ export function mapNotificationsDataToSubscriptions(
   return uniqueData;
 }
 
-export async function createSubscription(
-  subData: SubscriptionAttributes,
-  options?: { transaction: Transaction }
-) {
+export function checkSubscriptionValues(values: any) {
   if (
-    subData.category_id === NotificationCategories.ChainEvent &&
-    !subData.chain_id
+    values.category_id === NotificationCategories.ChainEvent &&
+    !values.chain_id
   ) {
     throw new Error(
       `chain_id cannot be undefined for a ${NotificationCategories.ChainEvent} subscription`
     );
   } else if (
-    subData.category_id === NotificationCategories.SnapshotProposal &&
-    !subData.snapshot_id
+    values.category_id === NotificationCategories.SnapshotProposal &&
+    !values.snapshot_id
   ) {
     throw new Error(
       `snapshot_id cannot be undefined for a ${NotificationCategories.SnapshotProposal} subscription`
     );
   } else if (
-    subData.category_id === NotificationCategories.NewThread &&
-    !subData.chain_id
+    values.category_id === NotificationCategories.NewThread &&
+    !values.chain_id
   ) {
     throw new Error(
       `chain_id cannot be undefined for a ${NotificationCategories.NewThread} subscription`
     );
   } else if (
-    subData.category_id === NotificationCategories.NewComment ||
-    subData.category_id === NotificationCategories.NewReaction
+    values.category_id === NotificationCategories.NewComment ||
+    values.category_id === NotificationCategories.NewReaction
   ) {
-    if (!subData.chain_id) {
+    if (!values.chain_id) {
       throw new Error(
-        `A ${subData.category_id} subscription must define a chain_id`
+        `A ${values.category_id} subscription must define a chain_id`
       );
-    } else if (!subData.thread_id && !subData.comment_id) {
+    } else if (!values.thread_id && !values.comment_id) {
       throw new Error(
-        `A thread-level (root) ${subData.category_id} subscription must define a thread_id` +
+        `A thread-level (root) ${values.category_id} subscription must define a thread_id` +
           ` and a sub-level subscription must define a comment_id`
       );
-    } else if (subData.thread_id && subData.comment_id) {
+    } else if (values.thread_id && values.comment_id) {
       throw new Error(
-        `A ${subData.category_id} subscription cannot define` +
+        `A ${values.category_id} subscription cannot define` +
           `both a thread_id and a comment_id`
       );
     }
   } else if (
-    subData.category_id === NotificationCategories.ThreadEdit ||
-    subData.category_id === NotificationCategories.CommentEdit
+    values.category_id === NotificationCategories.ThreadEdit ||
+    values.category_id === NotificationCategories.CommentEdit
   ) {
-    throw new Error(`${subData.category_id} subscriptions are not supported`);
+    throw new Error(`${values.category_id} subscriptions are not supported`);
   }
   // no need to check NewMention + NewCollaboration because subscriber_id is always required anyway
-
-  console.log('\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', subData, options);
-  return models.Subscription.create(subData, options);
 }
 
 // export type NewCommentSubUniqueData = { commentId: number; threadId?: number } | { commentId?: number; threadId: number }

@@ -7,8 +7,6 @@ import sinon from 'sinon';
 import { NotificationCategories } from 'common-common/src/types';
 import { QueryTypes } from 'sequelize';
 import { RedisCache } from 'common-common/src/redisCache';
-import { REDIS_URL } from '../../server/config';
-import { createSubscription } from 'subscriptionMapping';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -215,14 +213,14 @@ describe.only('DatabaseCleaner Tests', () => {
         )
       )[0][0];
 
-      const newSub = await createSubscription({
+      const newSub = await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
         is_active: true,
         immediate_email: false,
       });
 
-      const oldSub = await createSubscription({
+      const oldSub = await models.Subscription.create({
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
         is_active: true,

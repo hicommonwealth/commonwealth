@@ -21,7 +21,6 @@ import type { ProfileAttributes, ProfileInstance } from '../models/profile';
 import { SsoTokenInstance } from '../models/sso_token';
 import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
-import { createSubscription } from 'subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -121,7 +120,7 @@ async function createNewMagicUser({
       );
 
     // Automatically create subscription to their own mentions
-    await createSubscription(
+    await models.Subscription.create(
       {
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
@@ -131,7 +130,7 @@ async function createNewMagicUser({
     );
 
     // Automatically create a subscription to collaborations
-    await createSubscription(
+    await models.Subscription.create(
       {
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,

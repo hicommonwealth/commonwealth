@@ -18,7 +18,6 @@ import { createRole } from '../util/roles';
 
 import { redirectWithLoginError } from './finishEmailLogin';
 import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
-import { createSubscription } from 'subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -337,7 +336,7 @@ const finishSsoLogin = async (
       );
 
       // Automatically create subscription to their own mentions
-      await createSubscription(
+      await models.Subscription.create(
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewMention,
@@ -347,7 +346,7 @@ const finishSsoLogin = async (
       );
 
       // Automatically create a subscription to collaborations
-      await createSubscription(
+      await models.Subscription.create(
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewCollaboration,
