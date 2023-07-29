@@ -11,7 +11,7 @@ import { RedisCache } from 'common-common/src/redisCache';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('DatabaseCleaner Tests', () => {
+describe('DatabaseCleaner Tests', () => {
   let mockRedis: sinon.SinonStubbedInstance<RedisCache>;
 
   before('Reset database', async () => {

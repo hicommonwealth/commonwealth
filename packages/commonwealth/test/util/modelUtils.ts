@@ -414,7 +414,6 @@ export const updateRole = async (args: AssignRoleArgs) => {
 };
 
 export interface SubscriptionArgs {
-  object_id: string | number;
   jwt: any;
   is_active: boolean;
   category: string;

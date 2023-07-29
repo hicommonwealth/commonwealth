@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors } from '../../../server/routes/addEditors';
 import { post } from './external/appHook.spec';
@@ -16,6 +16,10 @@ const { expect } = chai;
 
 describe('addEditors Integration Tests', () => {
   let jwtToken;
+
+  before(async () => {
+    await resetDatabase();
+  });
 
   beforeEach(() => {
     jwtToken = jwt.sign(
@@ -77,6 +81,7 @@ describe('addEditors Integration Tests', () => {
     };
     const response = await post('/api/addEditors', validRequest, true, app);
 
+    console.log(response);
     expect(response.status).to.equal('Success');
     expect(response.result.collaborators).to.haveOwnProperty('length');
     expect(response.result.collaborators.length).equal(2);

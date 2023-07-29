@@ -16,6 +16,7 @@ import * as modelUtils from '../../util/modelUtils';
 chai.use(chaiHttp);
 const { expect } = chai;
 
+// TODO: @Timothee Update all of these tests
 describe.skip('Subscriptions Tests', () => {
   let jwtToken;
   let loggedInAddr;
@@ -394,7 +395,6 @@ describe.skip('Subscriptions Tests', () => {
 
     it.skip('should check /viewSubscriptions for all', async () => {
       const subscription = await modelUtils.createSubscription({
-        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -413,7 +413,6 @@ describe.skip('Subscriptions Tests', () => {
     let subscription: NotificationSubscription;
     beforeEach('creating a subscription', async () => {
       subscription = await modelUtils.createSubscription({
-        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -469,7 +468,6 @@ describe.skip('Subscriptions Tests', () => {
       for (let i = 0; i < 3; i++) {
         subscriptions.push(
           modelUtils.createSubscription({
-            object_id: chain,
             jwt: jwtToken,
             is_active: true,
             category: NotificationCategories.NewThread,
@@ -544,7 +542,6 @@ describe.skip('Subscriptions Tests', () => {
     let subscription: NotificationSubscription;
     beforeEach('creating a subscription', async () => {
       subscription = await modelUtils.createSubscription({
-        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -641,7 +638,6 @@ describe.skip('Subscriptions Tests', () => {
 
     beforeEach('make subscription', async () => {
       subscription = await modelUtils.createSubscription({
-        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -688,7 +684,6 @@ describe.skip('Subscriptions Tests', () => {
     it('emitting a notification', async () => {
       // Subscription for Default User in 'Staking'
       subscription = await modelUtils.createSubscription({
-        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -717,7 +712,6 @@ describe.skip('Subscriptions Tests', () => {
 
     it('should emit a Snapshot Proposal notification to a subscribed user', async () => {
       subscription = await modelUtils.createSubscription({
-        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.SnapshotProposal,
