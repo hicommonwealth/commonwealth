@@ -136,11 +136,11 @@ export async function sendPushNotification(
       body: message.body,
       // additional fields specific to your mobile platform (e.g., "badge" for iOS or "icon" for Android)
     },
-    data: {
-      title: message.title,
-      body: message.body,
-      link: message.data.proposalPath ? message.data.proposalPath : null,
-    },
+    // data: {
+    //   title: message.title,
+    //   body: message.body,
+    //   link: message.data.proposalPath ? message.data.proposalPath : null,
+    // }, // add back later for deeplinks
     token: token,
   };
 
@@ -149,6 +149,16 @@ export async function sendPushNotification(
     case 'ios':
     case 'android':
       // Send push notification to both mobile and web using FCM
+      try {
+        if (token) {
+          const response = await firebase.send(payload);
+          console.log('Successfully sent message:', response);
+        }
+      } catch (error) {
+        console.error('Error sending push notification:', error);
+      }
+      break;
+    case 'desktop':
       try {
         if (token) {
           const response = await firebase.send(payload);
