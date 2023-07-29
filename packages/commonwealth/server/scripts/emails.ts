@@ -30,8 +30,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-
-const getForumNotificationCopy = async (
+export const getForumNotificationCopy = async (
   models: DB,
   notification_data: IPostNotificationData,
   category_id
@@ -127,10 +126,7 @@ const getForumNotificationCopy = async (
     title: root_title,
     chain: chain_id,
   };
-  const proposalPath = getThreadUrl(
-    pseudoProposal,
-    comment_id,
-  );
+  const proposalPath = getThreadUrl(pseudoProposal, comment_id);
   return [
     emailSubjectLine,
     authorName,
