@@ -1,6 +1,6 @@
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useEffect } from 'react';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
 import { HelpMenuPopover } from 'views/menus/help_menu';
@@ -29,6 +29,16 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setUserToggledVisibility,
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
+
+  function handleToggle() {
+    const isVisible = !menuVisible;
+    const sidebar = document.getElementsByClassName('Sidebar')[0];
+    if (sidebar) sidebar.classList.toggle('onremove', !isVisible);
+    setMenu({ name: menuName, isVisible });
+    setTimeout(() => {
+      setUserToggledVisibility(isVisible ? 'open' : 'closed');
+    }, 200);
+  }
 
   return (
     <div className="SublayoutHeader">
@@ -59,11 +69,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           <CWIconButton
             iconButtonTheme="black"
             iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-            onClick={() => {
-              const newMenuVisibility = !menuVisible;
-              setMenu({ name: menuName, isVisible: newMenuVisibility });
-              setUserToggledVisibility(newMenuVisibility ? 'open' : 'closed');
-            }}
+            onClick={handleToggle}
           />
         )}
       </div>
