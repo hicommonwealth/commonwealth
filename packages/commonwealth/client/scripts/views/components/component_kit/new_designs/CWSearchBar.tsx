@@ -10,6 +10,7 @@ import { ValidationStatus } from '../cw_validation_text';
 import ChainInfo from '../../../../models/ChainInfo';
 
 import 'components/component_kit/new_designs/CWSearchBar.scss';
+import { CWText } from '../cw_text';
 
 type BaseSearchBarProps = {
   autoComplete?: string;
@@ -154,7 +155,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           />
         </div>
       </div>
-      {groupedOptions.length > 0 && (
+      {groupedOptions.length > 0 ? (
         <ul className="listBox" {...getListboxProps()}>
           {(groupedOptions as typeof communities).map((option, index) => (
             <li
@@ -166,7 +167,11 @@ export const CWSearchBar: FC<SearchBarProps> = ({
             </li>
           ))}
         </ul>
-      )}
+      ) : value.length > 0 ? (
+        <div className="noResults">
+          <CWText type="b2">No results found</CWText>
+        </div>
+      ) : null}
     </div>
   );
 };
