@@ -14,6 +14,12 @@ interface CacheUpdater {
     arrayManipulationMode?: IArrayManipulationMode // nested arrays are not updated
 }
 
+export const cacheTypes = {
+    SINGLE_THREAD: 'single',
+    BULK_THREADS: 'bulk',
+    ACTIVE_THREADS: 'active'
+}
+
 const cacheUpdater = ({
     chainId,
     threadId,
@@ -34,7 +40,7 @@ const cacheUpdater = ({
         if (existingData) {
             const remainingCallbacks = []
             queryClient.setQueryData(k, () => {
-                if (k[2] === 'bulk') {
+                if (k[2] === cacheTypes.BULK_THREADS) {
                     if (method === 'update') {
                         const pages = [...(existingData.pages || [])]
                         let foundThreadIndex = -1
@@ -101,7 +107,7 @@ const cacheUpdater = ({
                     }
                 }
 
-                if (k[2] === 'single') {
+                if (k[2] === cacheTypes.SINGLE_THREAD) {
                     if (method === 'update') {
                         const updatedThreads = [...existingData] // threads array
                         const foundThreadIndex = updatedThreads.findIndex(x => x.id === threadId)
@@ -169,7 +175,7 @@ const updateThreadTopicInAllCaches = (chainId: string, threadId: number, newTopi
 
     keysForThreads.map((k) => {
         // 1- for single queries - just update the topic
-        if (k[2] === 'single' && (k[3] === threadId || (k[3] as number[])?.includes(threadId))) {
+        if (k[2] === cacheTypes.SINGLE_THREAD && (k[3] === threadId || (k[3] as number[])?.includes(threadId))) {
             const existingData: IExistingThreadState = queryClient.getQueryData(k)
             const updatedThreads = [...existingData] // threads array
             const foundThreadIndex = updatedThreads.findIndex(x => x.id === threadId)
@@ -183,7 +189,7 @@ const updateThreadTopicInAllCaches = (chainId: string, threadId: number, newTopi
         }
 
         // 2- for bulk queries
-        if (k[2] === 'bulk') {
+        if (k[2] === cacheTypes.BULK_THREADS) {
             // filter from old topic query
             if (k[3] === oldTopicId || k[3] === undefined) {
                 const existingData: IExistingThreadState = queryClient.getQueryData(k)
@@ -222,7 +228,7 @@ const addThreadInAllCaches = (chainId: string, newThread: Thread) => {
     const keysForThreads = queryKeys.filter(x => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId)
 
     keysForThreads.map((k) => {
-        if (k[2] === 'bulk' && (k[3] === newThread.topic.id || k[3] === undefined)) {
+        if (k[2] === cacheTypes.BULK_THREADS && (k[3] === newThread.topic.id || k[3] === undefined)) {
             queryClient.cancelQueries(k)
             queryClient.refetchQueries(k)
         }

@@ -8,12 +8,13 @@ import {
   ThreadTimelineFilterTypes
 } from '../../../models/types';
 import Thread from 'models/Thread';
+import { cacheTypes } from './helpers/cache';
 
 const THREADS_STALE_TIME = 100 * 1_000; // 30s todo: UNDO THIS
 
 const QueryTypes = {
-  ACTIVE: 'active',
-  BULK: 'bulk'
+  ACTIVE: cacheTypes.ACTIVE_THREADS,
+  BULK: cacheTypes.BULK_THREADS
 }
 
 const queryTypeToRQMap = {
