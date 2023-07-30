@@ -29,6 +29,7 @@ import {
   FirebaseMessaging,
   GetTokenOptions,
 } from '@capacitor-firebase/messaging';
+import { platform } from '@todesktop/client-core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -220,8 +221,13 @@ const app: IApp = {
     return !!(capacitor && capacitor.isNative);
   },
   platform: () => {
-    // Update this to use to Desktop API later to determine platform = desktop
-    return Capacitor.getPlatform();
+    // Using Desktop API to determine if the platform is desktop
+    if (platform.todesktop.isDesktopApp()) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
+    }
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,

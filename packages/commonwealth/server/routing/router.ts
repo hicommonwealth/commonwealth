@@ -421,6 +421,17 @@ function setupRouter(
     databaseValidationService.validateChainWithTopics,
     createThreadHandler.bind(this, serverControllers)
   );
+
+  registerRoute(
+    router,
+    'post',
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    createThreadHandler.bind(this, serverControllers)
+  );
+
   registerRoute(
     router,
     'patch',
@@ -677,6 +688,17 @@ function setupRouter(
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
   );
+
+  registerRoute(
+    router,
+    'post',
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createThreadCommentHandler.bind(this, serverControllers)
+  );
+
   registerRoute(
     router,
     'patch',

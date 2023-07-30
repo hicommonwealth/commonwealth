@@ -86,6 +86,23 @@ export const CreateComment = ({
     }
   }, [tokenPostingThreshold]);
 
+  useEffect(() => {
+    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
+  }, [activeTopic]);
+
+  useEffect(() => {
+    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
+      setBalanceLoading(true);
+      if (!app.user.activeAccount?.tokenBalance) {
+        getTokenBalance().then(() => {
+          setUserBalance(app.user.activeAccount?.tokenBalance);
+        });
+      } else {
+        setUserBalance(app.user.activeAccount?.tokenBalance);
+      }
+    }
+  }, [tokenPostingThreshold]);
+
   const handleSubmitComment = async (e) => {
     e.stopPropagation();
     setErrorMsg(null);
