@@ -48,33 +48,32 @@ type SearchBarProps = BaseSearchBarProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement>;
 
-// TODO remove this
-const communities = [
-  'Altitude',
-  'Terra Classic',
-  'Osmosis',
-  'Qwoyn Network',
-  '1inch',
-  'Stargate Finance',
-  'Timeless',
-  'Terra Agora',
-  'Injective',
-  'Juno',
-  'Common',
-];
-
 export const CWSearchBar: FC<SearchBarProps> = ({
   disabled,
   placeholder,
   options,
 }) => {
-  const [value, setValue] = useState<string>(null);
+  const [value, setValue] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [communityName, setCommunityName] = useState<string>(null);
+  const [communities, setCommunities] = useState([]);
+  const [id, setId] = useState(null);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
+  const {
+    getRootProps,
+    getInputProps,
+    getListboxProps,
+    getOptionProps,
+    groupedOptions,
+  } = useAutocomplete({
+    options: communities,
+    onChange: (event: any, newValue) => {
+      console.log('event:', event.target.innerText);
+      console.log('newValue:', newValue);
+      setValue('');
+      setId(newValue.id);
+    },
+    getOptionLabel: (option) => option.name,
+  });
 
   const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -86,31 +85,36 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   };
 
   const handleOnKeyDown = (e: any) => {
-    if (e.key === 'Backspace') {
-      // TODO remove tag when backspace key pressed
+    if (e.key === 'Backspace' && value.length === 0) {
+      setId(null);
     }
   };
 
-  const {
-    getRootProps,
-    getInputProps,
-    getListboxProps,
-    getOptionProps,
-    groupedOptions,
-  } = useAutocomplete({
-    options: communities,
-    value,
-    onChange: (event: any, newValue) => {
-      setCommunityName(newValue);
-      setValue('');
-    },
-    getOptionLabel: (option) => option,
-  });
+  const sortByName = (a: any, b: any) => {
+    const nameA = a.name.toUpperCase();
+    const nameB = b.name.toUpperCase();
+
+    if (nameA < nameB) {
+      return -1;
+    } else if (nameA > nameB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+
+  const getChain = (id: string): ChainInfo => options.find((c) => c.id === id);
 
   useEffect(() => {
-    // const chainList = app.config.chains.getAll();
-    const chainList = options;
-    console.log('ChainInfo[]:', chainList);
+    let list = [];
+    for (let i = 0; i < options.length; i++) {
+      list.push({
+        id: options[i].id,
+        name: options[i].name,
+      });
+    }
+    list.sort(sortByName);
+    setCommunities([...list]);
   }, []);
 
   return (
@@ -132,13 +136,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           weight="regular"
           size={24}
         />
-        {communityName && (
-          <CWTag
-            // TODO pass right community as props
-            community={options[0]}
-            onClick={() => setCommunityName(null)}
-          />
-        )}
+        {id && <CWTag community={getChain(id)} onClick={() => setId(null)} />}
         <div
           className={getClasses(
             { inputElement: true },
@@ -148,20 +146,23 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         >
           <input
             placeholder={placeholder}
-            value={value}
-            onChange={handleInputChange}
             onInput={handleOnInput}
             onKeyDown={handleOnKeyDown}
             disabled={disabled}
             {...getInputProps()}
+            value={value}
           />
         </div>
       </div>
       {groupedOptions.length > 0 && (
         <ul className="listBox" {...getListboxProps()}>
           {(groupedOptions as typeof communities).map((option, index) => (
-            <li className="option" {...getOptionProps({ option, index })}>
-              {option}
+            <li
+              key={option.id}
+              className="option"
+              {...getOptionProps({ option, index })}
+            >
+              {option.name}
             </li>
           ))}
         </ul>
