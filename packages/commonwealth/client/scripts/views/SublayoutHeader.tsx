@@ -20,8 +20,14 @@ type SublayoutHeaderProps = {
 
 export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
-  const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
-    useSidebarStore();
+  const {
+    menuVisible,
+    setMenu,
+    menuName,
+    setMobileMenuName,
+    mobileMenuName,
+    setUserToggledVisibility,
+  } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
 
   return (
@@ -40,22 +46,22 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
-          app.activeChainId() && (
-            <CWCommunityAvatar
-              size="large"
-              community={app.chain.meta}
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          )}
-        {onMobile && app.activeChainId() && (
+        {app.activeChainId() && (
+          <CWCommunityAvatar
+            size="large"
+            community={app.chain.meta}
+            onClick={() => {
+              navigate('/discussions');
+            }}
+          />
+        )}
+        {app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"
             iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
               setMenu({ name: menuName, isVisible: !menuVisible });
+              setUserToggledVisibility(!menuVisible ? 'closed' : 'open');
             }}
           />
         )}
