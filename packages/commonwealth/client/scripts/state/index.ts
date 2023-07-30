@@ -32,7 +32,7 @@ import {
   FirebaseMessaging,
   GetTokenOptions,
 } from '@capacitor-firebase/messaging';
-import { platform } from '@todesktop/client-core';
+import { platform, pushNotifications } from '@todesktop/client-core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -219,6 +219,9 @@ const app: IApp = {
     if (app.isFirebaseInitialized) {
       initializeApp(firebaseConfig);
       app.isFirebaseInitialized;
+      if (app.platform() === 'desktop') {
+        pushNotifications.start('158803639844');
+      }
     }
   },
   isFirebaseInitialized: () => false,
@@ -333,12 +336,19 @@ export async function initAppState(
             app.loginStateEmitter.emit('redraw');
           }
 
+          if (app.platform() === 'desktop') {
+            pushNotifications.on('start', (e, token) => {
+              console.log(`Your FCM token is: ${token}`);
+            });
+          }
+
           tokenRefreshListener = FirebaseMessaging.addListener(
             'tokenReceived',
             (token) => {
               const mechanism = app.user.notifications.deliveryMechanisms.find(
                 (m) => m.type === app.platform(),
               );
+              console.log('tokenReceived', token, mechanism);
               // If matching mechanism found, update it on the server
               if (mechanism) {
                 app.user.notifications.updateDeliveryMechanism(

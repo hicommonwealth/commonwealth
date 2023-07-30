@@ -11,6 +11,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWMultiSelectDropdown } from '../../components/component_kit/cw_dropdown_multi';
+import { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -31,7 +32,7 @@ import {
   FirebaseMessaging,
   GetTokenOptions,
 } from '@capacitor-firebase/messaging';
-import { DropdownItemType } from '../../components/component_kit/cw_dropdown';
+import { pushNotifications } from '@todesktop/client-core';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -96,7 +97,6 @@ const NotificationSettingsPage = () => {
       (mechanismType === DeliveryMechanismType.Browser && platform === 'web') ||
       (mechanismType === DeliveryMechanismType.Desktop &&
         platform === 'desktop');
-
     if (
       isOnRightPlatform &&
       (await requestPermission()).receive === 'granted'
