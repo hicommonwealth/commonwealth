@@ -1,6 +1,6 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import 'Sublayout.scss';
@@ -21,8 +21,10 @@ const Sublayout = ({
   hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName } = useSidebarStore();
+  const { menuVisible, mobileMenuName, userToggledVisibility } =
+    useSidebarStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const { setMenu } = useSidebarStore();
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -39,12 +41,24 @@ const Sublayout = ({
     ) {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
+
+    const onResize = () => {
+      if (userToggledVisibility === null) {
+        setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
+      }
+    };
+
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = menuVisible || !isWindowSmallInclusive;
+  const showSidebar = menuVisible;
 
   return (
     <div className="Sublayout">
