@@ -60,8 +60,9 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             iconButtonTheme="black"
             iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
-              setMenu({ name: menuName, isVisible: !menuVisible });
-              setUserToggledVisibility(!menuVisible ? 'closed' : 'open');
+              const newMenuVisibility = !menuVisible;
+              setMenu({ name: menuName, isVisible: newMenuVisibility });
+              setUserToggledVisibility(newMenuVisibility ? 'open' : 'closed');
             }}
           />
         )}
