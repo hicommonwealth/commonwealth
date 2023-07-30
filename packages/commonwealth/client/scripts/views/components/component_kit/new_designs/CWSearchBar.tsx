@@ -4,11 +4,12 @@ import useAutocomplete from '@mui/base/useAutocomplete';
 
 import { ComponentType } from '../types';
 import { CWTag } from './CWTag';
-
-import 'components/component_kit/new_designs/CWSearchBar.scss';
 import { IconName } from '../cw_icons/cw_icon_lookup';
 import { getClasses } from '../helpers';
 import { ValidationStatus } from '../cw_validation_text';
+import ChainInfo from '../../../../models/ChainInfo';
+
+import 'components/component_kit/new_designs/CWSearchBar.scss';
 
 type BaseSearchBarProps = {
   autoComplete?: string;
@@ -29,6 +30,7 @@ type BaseSearchBarProps = {
   tabIndex?: number;
   manualStatusMessage?: string;
   manualValidationStatus?: ValidationStatus;
+  options?: ChainInfo[];
 };
 
 type InputStyleProps = {
@@ -46,6 +48,7 @@ type SearchBarProps = BaseSearchBarProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement>;
 
+// TODO remove this
 const communities = [
   'Altitude',
   'Terra Classic',
@@ -60,7 +63,11 @@ const communities = [
   'Common',
 ];
 
-export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
+export const CWSearchBar: FC<SearchBarProps> = ({
+  disabled,
+  placeholder,
+  options,
+}) => {
   const [value, setValue] = useState<string>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [communityName, setCommunityName] = useState<string>(null);
@@ -78,7 +85,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
     }
   };
 
-  const handleOnKeyDown = (e: KeyboardEvent) => {
+  const handleOnKeyDown = (e: any) => {
     if (e.key === 'Backspace') {
       // TODO remove tag when backspace key pressed
     }
@@ -99,6 +106,12 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
     },
     getOptionLabel: (option) => option,
   });
+
+  useEffect(() => {
+    // const chainList = app.config.chains.getAll();
+    const chainList = options;
+    console.log('ChainInfo[]:', chainList);
+  }, []);
 
   return (
     <div className="container" onBlur={() => setIsTyping(false)}>
@@ -121,7 +134,8 @@ export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
         />
         {communityName && (
           <CWTag
-            communityName={communityName}
+            // TODO pass right community as props
+            community={options[0]}
             onClick={() => setCommunityName(null)}
           />
         )}
