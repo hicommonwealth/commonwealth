@@ -1,6 +1,6 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import 'Sublayout.scss';
@@ -23,7 +23,11 @@ const Sublayout = ({
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName, userToggledVisibility } =
     useSidebarStore();
-  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [resizing, setResizing] = useState(false);
+  const { isWindowSmallInclusive } = useBrowserWindow({
+    onResize: () => setResizing(true),
+    resizeListenerUpdateDeps: [resizing],
+  });
   const { setMenu } = useSidebarStore();
 
   useEffect(() => {
@@ -33,6 +37,18 @@ const Sublayout = ({
       app.sidebarRedraw.off('redraw', forceRerender);
     };
   }, [forceRerender]);
+
+  useEffect(() => {
+    let timer;
+    if (resizing) {
+      timer = setTimeout(() => {
+        setResizing(false);
+      }, 200); // adjust delay as needed
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [resizing]);
 
   useEffect(() => {
     if (
@@ -66,7 +82,11 @@ const Sublayout = ({
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
           {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
-          <div className="body-and-sticky-headers-container">
+          <div
+            className={`body-and-sticky-headers-container 
+            ${menuVisible ? 'menu-visible' : ''} 
+            ${resizing ? 'resizing' : ''}`}
+          >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
             {isWindowSmallInclusive && mobileMenuName ? (
