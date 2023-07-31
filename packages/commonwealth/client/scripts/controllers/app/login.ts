@@ -5,7 +5,7 @@ import { initAppState } from 'state';
 import { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
-import $ from 'jquery';
+import axios from 'axios';
 
 import moment from 'moment';
 import app from 'state';
