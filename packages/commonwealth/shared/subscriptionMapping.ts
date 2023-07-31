@@ -5,6 +5,7 @@ import NotificationSubscription from 'models/NotificationSubscription';
 import { CreationAttributes } from 'sequelize';
 import { SubscriptionInstance } from '../server/models/subscription';
 
+// TODO: @Timothee split this file into a directory with types file per function
 const log = factory.getLogger(formatFilename(__filename));
 
 /**
@@ -16,7 +17,7 @@ const log = factory.getLogger(formatFilename(__filename));
  */
 export function mapNotificationsDataToSubscriptions(
   notification: NotificationDataAndCategory
-) {
+): Record<string, unknown> {
   const uniqueData = { category_id: notification.categoryId };
   if (notification.categoryId === NotificationCategories.ChainEvent) {
     uniqueData['chain_id'] = notification.data.chain;
@@ -27,10 +28,7 @@ export function mapNotificationsDataToSubscriptions(
   } else if (notification.categoryId === NotificationCategories.NewThread) {
     uniqueData['chain_id'] = notification.data.chain_id;
   } else if (notification.categoryId === NotificationCategories.NewComment) {
-    if (
-      notification.data.parent_comment_id &&
-      notification.data.parent_comment_text
-    ) {
+    if (notification.data.parent_comment_id) {
       uniqueData['comment_id'] = notification.data.parent_comment_id;
     } else {
       uniqueData['thread_id'] = notification.data.thread_id;
