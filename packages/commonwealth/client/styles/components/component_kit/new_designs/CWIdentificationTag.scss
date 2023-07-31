@@ -1,0 +1,29 @@
+@import '../../../shared';
+
+.CWIdentificationTag {
+  display: flex;
+  align-items: center;
+  background-color: $neutral-200;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: default;
+
+  .icon-left {
+    margin-right: 6px;
+    fill: none;
+  }
+
+  .icon-right {
+    margin-left: 4px;
+  }
+
+  .label {
+    color: $neutral-600;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    max-width: 108px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+}

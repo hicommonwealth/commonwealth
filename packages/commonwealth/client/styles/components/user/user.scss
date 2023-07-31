@@ -99,7 +99,8 @@
 
   .id-short {
     color: $neutral-600;
-    display: inline-block;
+    display: flex;
+    align-items: center;
     font-size: 10px;
     line-height: 16px;
     font-weight: 500;

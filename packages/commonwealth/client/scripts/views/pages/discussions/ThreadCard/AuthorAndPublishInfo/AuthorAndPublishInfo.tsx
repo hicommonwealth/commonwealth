@@ -167,7 +167,7 @@ export const AuthorAndPublishInfo = ({
       )}
 
       {isNew && (
-        <CWTag label={'NEW'} type={'new'} iconName={'newStar'} />
+        <CWTag label={'New'} type={'new'} iconName={'newStar'} />
       )}
 
       {isHot && (

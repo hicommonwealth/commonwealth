@@ -7,10 +7,31 @@ import {
 } from 'express';
 import { HttpMethod } from 'aws-sdk/clients/appmesh';
 import { ValidationChain } from 'express-validator';
+import { StatsDController } from '../../../common-common/src/statsd';
 
 const routesMethods: { [key: string]: string[] } = {};
 
 type ValidateThenHandle = [ValidationChain[], ...RequestHandler[]];
+
+// middleware to capture route traffic and latency
+const statsMiddleware = (method: string, path: string) => (req, res, next) => {
+  try {
+    const routePattern = `${method.toUpperCase()} ${path}`;
+    StatsDController.get().increment('cw.path.called', {
+      path: routePattern,
+    });
+    const start = Date.now();
+    res.on('finish', () => {
+      const latency = Date.now() - start;
+      StatsDController.get().histogram(`cw.path.latency`, latency, {
+        path: routePattern,
+      });
+    });
+  } catch (err) {
+    console.error(err);
+  }
+  next();
+};
 
 /**
  * Use this function to register a route on a given Express Router. This function updates an object that stores the
@@ -28,8 +49,8 @@ export const registerRoute = (
   path: string,
   ...handlers: RequestHandler[] | ValidateThenHandle
 ) => {
-  router[method](path, ...handlers);
   const realPath = `/api${path}`;
+  router[method](path, statsMiddleware(method, realPath), ...handlers);
   if (!routesMethods[realPath]) routesMethods[realPath] = [];
   routesMethods[realPath].push(method.toUpperCase());
 };
