@@ -41,7 +41,8 @@ export const EditBody = (props: EditBodyProps) => {
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
+    threadId: thread.id,
+    currentStage: thread.stage
   })
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

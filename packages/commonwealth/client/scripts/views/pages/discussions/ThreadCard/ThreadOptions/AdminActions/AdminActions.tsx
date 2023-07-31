@@ -65,7 +65,8 @@ export const AdminActions = ({
 
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
+    threadId: thread.id,
+    currentStage: thread.stage
   })
 
   const { mutateAsync: toggleSpam } = useToggleThreadSpamMutation({

@@ -66,9 +66,10 @@ const editThread = async ({
 interface UseEditThreadMutationProps {
   chainId: string
   threadId: number;
+  currentStage: ThreadStage
 }
 
-const useEditThreadMutation = ({ chainId, threadId }: UseEditThreadMutationProps) => {
+const useEditThreadMutation = ({ chainId, threadId, currentStage }: UseEditThreadMutationProps) => {
   return useMutation({
     mutationFn: editThread,
     onSuccess: async (updatedThread) => {

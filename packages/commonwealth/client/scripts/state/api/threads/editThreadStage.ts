@@ -29,9 +29,10 @@ const editThreadStage = async ({
 interface UseEditThreadStageMutationProps {
   chainId: string
   threadId: number;
+  currentStage: ThreadStage;
 }
 
-const useEditThreadStageMutation = ({ chainId, threadId }: UseEditThreadStageMutationProps) => {
+const useEditThreadStageMutation = ({ chainId, threadId, currentStage }: UseEditThreadStageMutationProps) => {
   return useMutation({
     mutationFn: editThreadStage,
     onSuccess: async (updatedThread) => {

@@ -23,9 +23,10 @@ const deleteThread = async ({
 interface UseDeleteThreadMutationProps {
   chainId: string
   threadId: number;
+  currentStage: ThreadStage;
 }
 
-const useDeleteThreadMutation = ({ chainId, threadId }: UseDeleteThreadMutationProps) => {
+const useDeleteThreadMutation = ({ chainId, threadId, currentStage }: UseDeleteThreadMutationProps) => {
   return useMutation({
     mutationFn: deleteThread,
     onSuccess: async (response) => {
