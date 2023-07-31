@@ -13,7 +13,7 @@ import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('emitNotifications tests', () => {
+describe.only('emitNotifications tests', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
@@ -113,20 +113,20 @@ describe('emitNotifications tests', () => {
         chain_id: chain,
       });
 
-      const notification_data = {};
+      const notification_data = {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_type: ProposalType.Thread,
+        root_title: title,
+        comment_text: '',
+        chain_id: chain,
+        author_address: userAddress2,
+        author_chain: chain,
+      };
 
       await emitNotifications(models, {
         categoryId: NotificationCategories.NewThread,
-        data: {
-          created_at: new Date(),
-          thread_id: thread.id,
-          root_type: ProposalType.Thread,
-          root_title: title,
-          comment_text: '',
-          chain_id: chain,
-          author_address: userAddress2,
-          author_chain: chain,
-        },
+        data: notification_data,
       });
 
       const notif = await models.Notification.findOne({
@@ -161,21 +161,21 @@ describe('emitNotifications tests', () => {
         thread_id: thread.id,
       });
 
-      const notifData: NotificationDataAndCategory = {
-        categoryId: NotificationCategories.NewComment,
-        data: {
-          created_at: new Date(),
-          thread_id: thread.id,
-          root_type: ProposalType.Thread,
-          root_title: title,
-          comment_id: comment.id,
-          comment_text: commentBody,
-          chain_id: chain,
-          author_address: userAddress2,
-          author_chain: chain,
-        },
+      const notifData = {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_type: ProposalType.Thread,
+        root_title: title,
+        comment_id: comment.id,
+        comment_text: commentBody,
+        chain_id: chain,
+        author_address: userAddress2,
+        author_chain: chain,
       };
-      await emitNotifications(models, notifData);
+      await emitNotifications(models, {
+        categoryId: NotificationCategories.NewComment,
+        data: notifData,
+      });
 
       const notif = await models.Notification.findOne({
         where: {
@@ -208,19 +208,19 @@ describe('emitNotifications tests', () => {
         thread_id: thread.id,
       });
 
-      const notification_data: NotificationDataAndCategory = {
-        categoryId: NotificationCategories.NewReaction,
-        data: {
-          created_at: new Date(),
-          thread_id: thread.id,
-          root_type: ProposalType.Thread,
-          root_title: title,
-          chain_id: chain,
-          author_address: userAddress,
-          author_chain: chain,
-        },
+      const notification_data = {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_type: ProposalType.Thread,
+        root_title: title,
+        chain_id: chain,
+        author_address: userAddress,
+        author_chain: chain,
       };
-      await emitNotifications(models, notification_data);
+      await emitNotifications(models, {
+        categoryId: NotificationCategories.NewReaction,
+        data: notification_data,
+      });
 
       const notif = await models.Notification.findOne({
         where: {
