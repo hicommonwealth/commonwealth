@@ -1,6 +1,7 @@
 import React from 'react';
 import type { StoryObj } from '@storybook/react';
 
+import app from '../../../client/scripts/state/index';
 import { CWSearchBar } from '../../../client/scripts/views/components/component_kit/new_designs/CWSearchBar';
 
 const searchbar = {
@@ -13,6 +14,7 @@ type Story = StoryObj<typeof searchbar>;
 
 export const SearchBar: Story = {
   args: {
+    options: app.config.chains.getAll(),
     placeholder: 'Search Common',
     disabled: false,
   },
