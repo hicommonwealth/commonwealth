@@ -42,9 +42,26 @@ const abi = [
         type: 'bytes32',
       },
       {
-        internalType: 'address',
-        name: 'gateImpl',
-        type: 'address',
+        components: [
+          {
+            internalType: 'bytes32',
+            name: 'gateType',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'address',
+            name: 'customGate',
+            type: 'address',
+          },
+          {
+            internalType: 'bytes',
+            name: 'gateData',
+            type: 'bytes',
+          },
+        ],
+        internalType: 'struct CommonFactoryV1.GateInitialization',
+        name: 'gateConfig',
+        type: 'tuple',
       },
     ],
     name: 'createNamespace',
@@ -225,6 +242,7 @@ export async function setupCommunityContracts({
   gateMeta: {
     token: string;
     amount: number;
+    type: string;
   };
   seedWalletMeta: {
     type: string;
@@ -242,7 +260,7 @@ export async function setupCommunityContracts({
   const web3: Web3 = signingWallet.api;
   const factory = new web3.eth.Contract(
     abi as AbiItem[],
-    '0x689Ce208E0f72447D7B23C479756374ACe977913'
+    '0xc4E27255c6D49af92DDF86d6A39ECbD9B46cB3e9'
   );
 
   //check that namespace doesnt exist
@@ -257,16 +275,19 @@ export async function setupCommunityContracts({
   }
 
   //1. config gate settings on gate contract
-  if (gateMeta.token !== '') {
-    //encode gateMeta into call data for ERC20/NFT gates
-    //send tx with data(name, id=2, calldata) to gate
-  }
+
+  const gateConfig = {
+    gateType: web3.utils.padLeft(web3.utils.asciiToHex(gateMeta.type), 64),
+    customGate: gate ?? '0x0000000000000000000000000000000000000000',
+    gateData: web3.eth.abi.encodeParameters(
+      ['address[]', 'uint256[]'],
+      [[gateMeta.token], [gateMeta.amount]]
+    ),
+  };
+
   //2. Deploy namespace
   const txReceipt = await factory.methods
-    .createNamespace(
-      web3.utils.asciiToHex(name),
-      gate !== '' ? gate : '0x0000000000000000000000000000000000000000'
-    )
+    .createNamespace(web3.utils.asciiToHex(name), gateConfig)
     .send({ from: signingWallet.accounts[0] });
   if (!txReceipt) {
     throw new Error('Transaction failed');

@@ -121,11 +121,17 @@ export const ProtocolCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
   const [loading, setLoading] = useState<boolean>(false);
   //Pass to tx Function
-  const [gate, setGate] = useState<string>('');
+  const [gate, setGate] = useState<string>(
+    '0x0000000000000000000000000000000000000000'
+  );
   //Pass to tx function
   const [gateType, setGateType] = useState<string>('all');
   //Pass to tx function
-  const [gateMeta, setGateMeta] = useState<any>({ token: '', amount: 0 });
+  const [gateMeta, setGateMeta] = useState<any>({
+    token: '',
+    amount: 0,
+    type: '',
+  });
   const [selectedRadio, setSelectedRadio] = useState<string>('wallet');
   const [checked, setChecked] = useState<boolean>(true);
   //Pass to tx function
@@ -146,12 +152,6 @@ export const ProtocolCommunityForm = () => {
 
   const onGateChange = (v) => {
     setGateType(v.value);
-    switch (v) {
-      case 'nft':
-        setGate('0xNFT');
-      case 'erc20':
-        setGate('0xerc20');
-    }
   };
 
   const getGateForm = (type) => {
@@ -166,16 +166,18 @@ export const ProtocolCommunityForm = () => {
                 setGateMeta({
                   token: v,
                   amount: gateMeta.amount,
+                  type: 'nft',
                 });
               }}
             />
             <InputRow
               title="NFT Id(optional)"
-              value={gateMeta.token}
+              value={gateMeta.amount}
               onChangeHandler={(v) => {
                 setGateMeta({
                   token: gateMeta.token,
                   amount: v,
+                  type: 'nft',
                 });
               }}
             />
@@ -201,16 +203,18 @@ export const ProtocolCommunityForm = () => {
                 setGateMeta({
                   token: v,
                   amount: gateMeta.amount,
+                  type: 'erc',
                 });
               }}
             />
             <InputRow
               title="Amount(optional)"
-              value={gateMeta.token}
+              value={gateMeta.amount}
               onChangeHandler={(v) => {
                 setGateMeta({
                   token: gateMeta.token,
                   amount: v,
+                  type: 'erc',
                 });
               }}
             />
