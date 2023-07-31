@@ -75,13 +75,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               />
             </div>
           )}
-        {app.activeChainId() && (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-            onClick={handleToggle}
-          />
-        )}
+        <CWIconButton
+          iconButtonTheme="black"
+          iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
+          onClick={handleToggle}
+        />
       </div>
       <SearchBar />
       <div className="header-right">
