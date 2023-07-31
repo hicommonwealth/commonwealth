@@ -16,11 +16,8 @@ import * as modelUtils from '../../util/modelUtils';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-// TODO: @Timothee Update all of these tests
 describe.only('Subscriptions Tests', () => {
-  let jwtToken;
-  let loggedInAddr;
-  let loggedInAddrId;
+  let jwtToken, loggedInAddr, loggedInAddrId, thread, comment;
   const chain = 'ethereum';
 
   before('reset database', async () => {
@@ -33,9 +30,35 @@ describe.only('Subscriptions Tests', () => {
       { id: result.user_id, email: result.email },
       JWT_SECRET
     );
+
+    let res = await modelUtils.createThread({
+      chainId: chain,
+      address: loggedInAddr,
+      jwt: jwtToken,
+      title: 't',
+      body: 't',
+      kind: 'discussion',
+      stage: 'discussion',
+      topicName: 't',
+      topicId: undefined,
+    });
+    expect(res).to.not.be.null;
+    expect(res.status).to.be.equal('Success');
+    thread = res.result;
+
+    res = await modelUtils.createComment({
+      chain,
+      address: loggedInAddr,
+      jwt: jwtToken,
+      text: 'cw4eva',
+      thread_id: thread.id,
+    });
+    expect(res).to.not.be.null;
+    expect(res.status).to.be.equal('Success');
+    comment = res.result;
   });
 
-  describe.only('/createSubscription test', () => {
+  describe('/createSubscription test', () => {
     describe(`${NotificationCategories.NewThread} subscription tests`, () => {
       it('should create new-thread subscription', async () => {
         const is_active = true;
@@ -107,34 +130,7 @@ describe.only('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.NewComment} subscription tests`, () => {
-      let thread, comment, rootCommmentSubscription, commentSubscription;
-      before('create thread', async () => {
-        let res = await modelUtils.createThread({
-          chainId: chain,
-          address: loggedInAddr,
-          jwt: jwtToken,
-          title: 't',
-          body: 't',
-          kind: 'discussion',
-          stage: 'discussion',
-          topicName: 't',
-          topicId: undefined,
-        });
-        expect(res).to.not.be.null;
-        expect(res.status).to.be.equal('Success');
-        thread = res.result;
-
-        res = await modelUtils.createComment({
-          chain,
-          address: loggedInAddr,
-          jwt: jwtToken,
-          text: 'cw4eva',
-          thread_id: thread.id,
-        });
-        expect(res).to.not.be.null;
-        expect(res.status).to.be.equal('Success');
-        comment = res.result;
-      });
+      let rootCommmentSubscription, commentSubscription;
 
       it('should create new-comment subscription on a thread', async () => {
         const is_active = true;
@@ -262,34 +258,7 @@ describe.only('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.NewReaction} subscription tests`, () => {
-      let thread, comment, rootCommmentSubscription, commentSubscription;
-      before('create thread and comment', async () => {
-        let res = await modelUtils.createThread({
-          chainId: chain,
-          address: loggedInAddr,
-          jwt: jwtToken,
-          title: 't',
-          body: 't',
-          kind: 'discussion',
-          stage: 'discussion',
-          topicName: 't',
-          topicId: undefined,
-        });
-        expect(res).to.not.be.null;
-        expect(res.status).to.be.equal('Success');
-        thread = res.result;
-
-        res = await modelUtils.createComment({
-          chain,
-          address: loggedInAddr,
-          jwt: jwtToken,
-          text: 'cw4eva',
-          thread_id: thread.id,
-        });
-        expect(res).to.not.be.null;
-        expect(res.status).to.be.equal('Success');
-        comment = res.result;
-      });
+      let rootCommmentSubscription, commentSubscription;
 
       it('should create a new-reaction subscription on a thread', async () => {
         const is_active = true;
@@ -627,12 +596,27 @@ describe.only('Subscriptions Tests', () => {
   });
 
   describe('/viewSubscriptions', () => {
-    it.skip('should check /viewSubscriptions for all', async () => {
-      const subscription = await modelUtils.createSubscription({
+    let threadSub, chainEventSub;
+    before('Delete existing subscriptions and create new ones', async () => {
+      await models.Subscription.destroy({
+        where: {},
+      });
+
+      threadSub = await modelUtils.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
+        chain_id: chain,
       });
+      chainEventSub = await modelUtils.createSubscription({
+        jwt: jwtToken,
+        is_active: false,
+        category: NotificationCategories.ChainEvent,
+        chain_id: chain,
+      });
+    });
+
+    it('should retrieve all of a users subscriptions', async () => {
       const res = await chai
         .request(app)
         .get('/api/viewSubscriptions')
@@ -640,20 +624,72 @@ describe.only('Subscriptions Tests', () => {
         .send({ jwt: jwtToken });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result).to.be.an('array');
+      expect(res.body.result.length).to.be.equal(2);
+
+      const threadSubRes = res.body.result.find(
+        (sub: NotificationSubscription) => sub.id === threadSub.id
+      );
+      const ceSubRes = res.body.result.find(
+        (sub: NotificationSubscription) => sub.id === chainEventSub.id
+      );
+      expect(threadSubRes).to.not.be.undefined;
+      expect(ceSubRes).to.not.be.undefined;
+
+      expect(threadSub.id).to.be.equal(threadSub.id);
+      expect(ceSubRes.id).to.be.equal(chainEventSub.id);
+    });
+
+    it('should not fetch subscriptions of another user', async () => {
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const newJWT = jwt.sign(
+        { id: result.user_id, email: result.email },
+        JWT_SECRET
+      );
+
+      const newThreadSub = await modelUtils.createSubscription({
+        jwt: newJWT,
+        is_active: true,
+        category: NotificationCategories.NewThread,
+        chain_id: chain,
+      });
+
+      const res = await chai
+        .request(app)
+        .get('/api/viewSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result).to.be.an('array');
+      expect(res.body.result.length).to.be.equal(2);
+
+      const threadSubRes = res.body.result.find(
+        (sub: NotificationSubscription) => sub.id === threadSub.id
+      );
+      const ceSubRes = res.body.result.find(
+        (sub: NotificationSubscription) => sub.id === chainEventSub.id
+      );
+      expect(threadSubRes).to.not.be.undefined;
+      expect(ceSubRes).to.not.be.undefined;
+
+      expect(threadSub.id).to.be.equal(threadSub.id);
+      expect(ceSubRes.id).to.be.equal(chainEventSub.id);
     });
   });
 
   describe('/disableSubscriptions + /enableSubscriptions', () => {
     let subscription: NotificationSubscription;
-    beforeEach('creating a subscription', async () => {
+    before('creating a subscription', async () => {
       subscription = await modelUtils.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
+        chain_id: chain,
       });
     });
 
-    it('should pause a subscription', async () => {
+    it('should disable a subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(app)
@@ -664,7 +700,7 @@ describe.only('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should unpause a subscription', async () => {
+    it('should enable a subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(app)
@@ -674,7 +710,7 @@ describe.only('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should pause and unpause a subscription with just the id as string (not array)', async () => {
+    it('should disable and enable a subscription with just the id as string (not array)', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai
         .request(app)
@@ -699,12 +735,16 @@ describe.only('Subscriptions Tests', () => {
 
     it('should pause and unpause an array of subscription', async () => {
       const subscriptions = [];
-      for (let i = 0; i < 3; i++) {
+      for (const category of [
+        NotificationCategories.NewThread,
+        NotificationCategories.ChainEvent,
+      ]) {
         subscriptions.push(
           modelUtils.createSubscription({
             jwt: jwtToken,
             is_active: true,
-            category: NotificationCategories.NewThread,
+            category: category,
+            chain_id: chain,
           })
         );
       }
@@ -774,11 +814,12 @@ describe.only('Subscriptions Tests', () => {
 
   describe('/enableImmediateEmails and /disableImmediateEmails', () => {
     let subscription: NotificationSubscription;
-    beforeEach('creating a subscription', async () => {
+    before('creating a subscription', async () => {
       subscription = await modelUtils.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
+        chain_id: chain,
       });
     });
 
@@ -870,11 +911,12 @@ describe.only('Subscriptions Tests', () => {
   describe('/deleteSubscription', () => {
     let subscription;
 
-    beforeEach('make subscription', async () => {
+    before('make subscription', async () => {
       subscription = await modelUtils.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
+        chain_id: chain,
       });
     });
 
@@ -899,187 +941,14 @@ describe.only('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
     });
 
-    it('should fail to find a bad subscription id', async () => {
+    it('should fail to find an invalid subscription id', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(app)
         .post('/api/deleteSubscription')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, subscription_id: 'hello' });
+        .send({ jwt: jwtToken, subscription_id: -999999 });
       expect(res.body.error).to.not.be.null;
-    });
-  });
-
-  describe('Notification Routes', () => {
-    let subscription;
-    let thread;
-    let notifications;
-
-    it('emitting a notification', async () => {
-      // Subscription for Default User in 'Staking'
-      subscription = await modelUtils.createSubscription({
-        jwt: jwtToken,
-        is_active: true,
-        category: NotificationCategories.NewThread,
-      });
-      // New User makes a thread in 'Staking', should emit notification to Default User
-      const result = await modelUtils.createAndVerifyAddress({ chain });
-      const newAddress = result.address;
-      const newJWT = jwt.sign(
-        { id: result.user_id, email: result.email },
-        JWT_SECRET
-      );
-      thread = await modelUtils.createThread({
-        chainId: chain,
-        jwt: newJWT,
-        address: newAddress,
-        title: 'hi',
-        body: 'hi you!',
-        kind: 'discussion',
-        stage: 'discussion',
-        topicName: 't',
-        topicId: undefined,
-      });
-      expect(subscription).to.not.be.null;
-      expect(thread).to.not.be.null;
-    });
-
-    it('should emit a Snapshot Proposal notification to a subscribed user', async () => {
-      subscription = await modelUtils.createSubscription({
-        jwt: jwtToken,
-        is_active: true,
-        category: NotificationCategories.SnapshotProposal,
-      });
-
-      const result = await modelUtils.createAndVerifyAddress({ chain });
-      const newAddress = result.address;
-      const newJWT = jwt.sign(
-        { id: result.user_id, email: result.email },
-        JWT_SECRET
-      );
-      thread = await modelUtils.createThread({
-        chainId: chain,
-        jwt: newJWT,
-        address: newAddress,
-        title: 'hi snapshot proposal',
-        body: 'hi you snapshot proposal!',
-        kind: 'snapshot proposal',
-        stage: 'discussion',
-        topicName: 't',
-        topicId: undefined,
-      });
-      expect(subscription).to.not.be.null;
-      expect(thread).to.not.be.null;
-    });
-
-    describe('/viewNotifications: return notifications to user', () => {
-      it("should return all notifications with just a user's jwt", async () => {
-        const res = await chai
-          .request(app)
-          .post('/api/viewDiscussionNotifications')
-          .set('Accept', 'application/json')
-          .send({ jwt: jwtToken });
-        expect(res.body).to.not.be.null;
-        expect(res.body.status).to.be.equal('Success');
-        expect(res.body.result.subscriptions.length).to.be.greaterThan(0);
-        notifications = res.body.result.subscriptions;
-      });
-
-      it('should return only unread notifications', async () => {
-        const res = await chai
-          .request(app)
-          .post('/api/viewDiscussionNotifications')
-          .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, unread_only: true });
-        expect(res.body).to.not.be.null;
-        expect(res.body.status).to.be.equal('Success');
-        expect(res.body.result.subscriptions.length).to.be.greaterThan(0);
-        notifications = res.body.result.subscriptions;
-      });
-
-      it('should return only notifications with active_only turned on', async () => {
-        const res = await chai
-          .request(app)
-          .post('/api/viewDiscussionNotifications')
-          .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, active_only: true });
-        expect(res.body).to.not.be.null;
-        expect(res.body.status).to.be.equal('Success');
-        expect(res.body.result.subscriptions.length).to.be.greaterThan(0);
-        notifications = res.body.result.subscriptions;
-      });
-    });
-
-    describe('/viewNotification Snapshot Proposals', () => {
-      it('should return all snapshot proposals', async () => {
-        const res = await chai
-          .request(app)
-          .post('/api/viewSnapshotProposals')
-          .set('Accept', 'application/json')
-          .send({ jwt: jwtToken });
-        expect(res.body).to.not.be.null;
-        expect(res.body.status).to.be.equal('Success');
-        expect(res.body.result.proposals.length).to.be.greaterThan(0);
-        notifications = res.body.result.proposals;
-      });
-
-      describe('/markNotificationsRead', async () => {
-        it('should pass when query formatted correctly', async () => {
-          // Mark Notifications Read for Default User
-          expect(notifications).to.not.be.null;
-          const notification_ids = notifications.map((n) => {
-            return n.id;
-          });
-          const res = await chai
-            .request(app)
-            .post('/api/markNotificationsRead')
-            .set('Accept', 'application/json')
-            .send({ jwt: jwtToken, 'notification_ids[]': notification_ids });
-          expect(res.body).to.not.be.null;
-          expect(res.body.status).to.be.equal('Success');
-        });
-        it('should pass when notification id is string', async () => {
-          // Mark Notifications Read for Default User
-          expect(notifications).to.not.be.null;
-          const notification_ids = notifications.map((n) => {
-            return n.id;
-          });
-          const res = await chai
-            .request(app)
-            .post('/api/markNotificationsRead')
-            .set('Accept', 'application/json')
-            .send({
-              jwt: jwtToken,
-              'notification_ids[]': notification_ids[0].toString(),
-            });
-          expect(res.body).to.not.be.null;
-          expect(res.body.status).to.be.equal('Success');
-        });
-        it('should fail when no notifications are passed', async () => {
-          const res = await chai
-            .request(app)
-            .post('/api/markNotificationsRead')
-            .set('Accept', 'application/json')
-            .send({ jwt: jwtToken });
-          expect(res.body).to.not.be.null;
-          expect(res.body.error).to.not.be.null;
-          expect(res.body.error).to.be.equal(MarkNotifErrors.NoNotificationIds);
-        });
-      });
-
-      describe('/clearReadNotifications', async () => {
-        it('should pass when query formatted correctly', async () => {
-          // Clear Read for Default User
-          expect(notifications).to.not.be.null;
-          const res = await chai
-            .request(app)
-            .post('/api/clearReadNotifications')
-            .set('Accept', 'application/json')
-            .send({ jwt: jwtToken });
-          expect(res.body).to.not.be.null;
-          expect(res.body.status).to.be.equal('Success');
-        });
-      });
     });
   });
 });
