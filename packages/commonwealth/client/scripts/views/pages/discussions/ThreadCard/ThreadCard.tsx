@@ -37,10 +37,10 @@ type CardProps = AdminActionsProps & {
 };
 
 
-const CardSkeleton = ({ isWindowSmallInclusive, thread }) => {
+const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
   return <div className={'ThreadCard showSkeleton'}>
     {!isWindowSmallInclusive && (
-      <ReactionButton thread={thread} size="big" showSkeleton />
+      <ReactionButton thread={thread} size="big" showSkeleton disabled={disabled} />
     )}
     <div className="content-wrapper">
       <div>
@@ -84,7 +84,7 @@ export const ThreadCard = ({
     }
   }, []);
 
-  if (showSkeleton) return <CardSkeleton thread isWindowSmallInclusive={false} />
+  if (showSkeleton) return <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
