@@ -73,7 +73,7 @@ describe('ServerThreadsController', () => {
 
       expect(newReaction).to.be.ok;
 
-      expect(notificationOptions).to.have.property('notificationData');
+      expect(notificationOptions).to.have.property('notification');
       const { notification } = notificationOptions;
       expect(notification).to.have.property('categoryId', 'new-reaction');
 
@@ -1268,7 +1268,7 @@ describe('ServerThreadsController', () => {
 
       expect(!!updatedThread).to.equal(true);
       expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.have.property('notificationData');
+      expect(notificationOptions[0]).to.have.property('notification');
       expect(notificationOptions[0].notification).to.include({
         categoryId: 'thread-edit',
       });
@@ -1698,7 +1698,7 @@ describe('ServerThreadsController', () => {
       expect(thread.stage).to.equal(stage);
 
       expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.have.property('notificationData');
+      expect(notificationOptions[0]).to.have.property('notification');
       expect(notificationOptions[0].notification).to.include({
         categoryId: 'new-thread-creation',
       });

@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../../models';
 import Errors from './errors';
 import { ChainInstance } from 'server/models/chain';
+import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
 
 export default async (
   models: DB,
@@ -24,10 +25,16 @@ export default async (
     return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
+  if (!supportedSubscriptionCategories().includes(category.name)) {
+    return next(new AppError(Errors.InvalidSubscriptionCategory));
+  }
+
   let obj, chain: ChainInstance, thread, comment;
 
   switch (category.name) {
     case 'new-thread-creation': {
+      // this check avoids a 500 error -> 'WHERE parameter "id" has invalid "undefined" value'
+      if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
       chain = await models.Chain.findOne({
         where: {
           id: req.body.chain_id,
@@ -77,8 +84,6 @@ export default async (
       obj = { chain_id: req.body.chain_id };
       break;
     }
-    default:
-      return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
   const subscription = (

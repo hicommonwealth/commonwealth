@@ -3,6 +3,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { CreationAttributes } from 'sequelize';
 import { SubscriptionInstance } from '../models/subscription';
+import NotificationCategory from 'models/NotificationCategory';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -50,6 +51,18 @@ export function mapNotificationsDataToSubscriptions(
   return uniqueData;
 }
 
+export function supportedSubscriptionCategories(): string[] {
+  return [
+    NotificationCategories.NewMention,
+    NotificationCategories.NewCollaboration,
+    NotificationCategories.NewThread,
+    NotificationCategories.NewComment,
+    NotificationCategories.NewReaction,
+    NotificationCategories.ChainEvent,
+    NotificationCategories.SnapshotProposal,
+  ];
+}
+
 /**
  * Given the creation attributes of a subscription, this function throws an error if the required values
  * for the associated subscription category id are not present. This function only checks for values that are not
@@ -60,15 +73,7 @@ export function mapNotificationsDataToSubscriptions(
 export function checkSubscriptionValues(
   values: CreationAttributes<SubscriptionInstance>
 ) {
-  if (
-    values.category_id !== NotificationCategories.NewMention &&
-    values.category_id !== NotificationCategories.NewCollaboration &&
-    values.category_id !== NotificationCategories.NewThread &&
-    values.category_id !== NotificationCategories.NewComment &&
-    values.category_id !== NotificationCategories.NewReaction &&
-    values.category_id !== NotificationCategories.ChainEvent &&
-    values.category_id !== NotificationCategories.SnapshotProposal
-  ) {
+  if (!supportedSubscriptionCategories().includes(values.category_id)) {
     // this means we don't support new notification category subscriptions by default
     throw new Error(`${values.category_id} subscriptions are not supported`);
   }

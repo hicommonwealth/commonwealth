@@ -82,7 +82,7 @@ describe('ServerCommentsController', () => {
 
       expect(newReaction).to.be.ok;
 
-      expect(allNotificationOptions[0]).to.have.property('notificationData');
+      expect(allNotificationOptions[0]).to.have.property('notification');
       const { notification } = allNotificationOptions[0];
       expect(notification).to.have.property(
         'categoryId',
@@ -579,7 +579,7 @@ describe('ServerCommentsController', () => {
         text: 'Hello',
       });
 
-      expect(allNotificationOptions[0]).to.have.property('notificationData');
+      expect(allNotificationOptions[0]).to.have.property('notification');
       const { notification } = allNotificationOptions[0];
       expect(notification).to.have.property('categoryId', 'comment-edit');
 

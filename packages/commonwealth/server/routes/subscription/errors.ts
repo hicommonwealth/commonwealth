@@ -3,6 +3,8 @@ const Errors = {
   NotLoggedIn: 'Not logged in',
   NoCategory: 'Must provide a category',
   InvalidNotificationCategory: 'invalid notification category',
+  InvalidSubscriptionCategory:
+    'Subscriptions of this category are not supported',
   NoSubscriptionId: 'Must provide subscription id(s)',
   NoSubscription: 'Subscription not found',
   NotUsersSubscription: 'Subscription does not belong to user',
