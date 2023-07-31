@@ -49,13 +49,13 @@ export const CommentReactionButton = ({
         return;
       }
 
-      setReactionCounts(app.comments.reactionCountsStore.getByPost(comment));
+      setReactionCounts(app.threads.reactionCountsStore.getByPost(comment));
     };
 
-    app.comments.isReactionFetched.on('redraw', redrawFunction);
+    app.threads.isReactionFetched.on('redraw', redrawFunction);
 
     return () => {
-      app.comments.isReactionFetched.off('redraw', redrawFunction);
+      app.threads.isReactionFetched.off('redraw', redrawFunction);
     };
   });
 
@@ -85,16 +85,14 @@ export const CommentReactionButton = ({
         likes: likes - 1,
         hasReacted: false,
       },
-    })
-      .then(() => {
-        setReactors(
-          reactors.filter(({ Address }) => Address.address !== userAddress)
-        );
-        setReactionCounts(app.comments.reactionCountsStore.getByPost(comment));
-      })
-      .catch(() => {
-        notifyError('Failed to update reaction count');
-      });
+    }).then(() => {
+      setReactors(
+        reactors.filter(({ Address }) => Address.address !== userAddress)
+      );
+      setReactionCounts(app.threads.reactionCountsStore.getByPost(comment));
+    }).catch(() => {
+      notifyError('Failed to update reaction count');
+    });
   };
 
   const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
@@ -102,17 +100,15 @@ export const CommentReactionButton = ({
       address: userAddress,
       commentId: comment.id,
       chainId: chainId,
+    }).then(() => {
+      setReactors([
+        ...reactors,
+        { Address: { address: userAddress, chain } },
+      ]);
+      setReactionCounts(app.threads.reactionCountsStore.getByPost(comment));
+    }).catch(() => {
+      notifyError('Failed to save reaction');
     })
-      .then(() => {
-        setReactors([
-          ...reactors,
-          { Address: { address: userAddress, chain } },
-        ]);
-        setReactionCounts(app.comments.reactionCountsStore.getByPost(comment));
-      })
-      .catch(() => {
-        notifyError('Failed to save reaction');
-      });
   };
 
   const handleVoteClick = async (e) => {
