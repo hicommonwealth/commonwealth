@@ -4,7 +4,6 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { CreationAttributes } from 'sequelize';
 import { SubscriptionInstance } from '../models/subscription';
 
-// TODO: @Timothee split this file into a directory with types file per function
 const log = factory.getLogger(formatFilename(__filename));
 
 /**

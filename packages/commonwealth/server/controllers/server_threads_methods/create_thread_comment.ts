@@ -297,7 +297,7 @@ export async function __createThreadComment({
 
   // build notification for root thread
   allNotificationOptions.push({
-    notificationData: {
+    notification: {
       categoryId: NotificationCategories.NewComment,
       data: {
         created_at: new Date(),
@@ -325,7 +325,7 @@ export async function __createThreadComment({
   // if child comment, build notification for parent author
   if (parentId && parentComment) {
     allNotificationOptions.push({
-      notificationData: {
+      notification: {
         categoryId: NotificationCategories.NewComment,
         data: {
           created_at: new Date(),
@@ -354,7 +354,7 @@ export async function __createThreadComment({
         const shouldNotifyMentionedUser = true;
         if (shouldNotifyMentionedUser) {
           allNotificationOptions.push({
-            notificationData: {
+            notification: {
               categoryId: NotificationCategories.NewMention,
               data: {
                 mentioned_user_id: mentionedAddress.User.id,

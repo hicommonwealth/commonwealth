@@ -83,14 +83,14 @@ describe('ServerCommentsController', () => {
       expect(newReaction).to.be.ok;
 
       expect(allNotificationOptions[0]).to.have.property('notificationData');
-      const { notificationData } = allNotificationOptions[0];
-      expect(notificationData).to.have.property(
+      const { notification } = allNotificationOptions[0];
+      expect(notification).to.have.property(
         'categoryId',
         NotificationCategories.NewReaction
       );
 
-      expect(notificationData.data).to.have.property('created_at');
-      expect(notificationData.data).to.include({
+      expect(notification.data).to.have.property('created_at');
+      expect(notification.data).to.include({
         thread_id: 4,
         comment_id: 3,
         comment_text: 'my comment body',
@@ -580,11 +580,11 @@ describe('ServerCommentsController', () => {
       });
 
       expect(allNotificationOptions[0]).to.have.property('notificationData');
-      const { notificationData } = allNotificationOptions[0];
-      expect(notificationData).to.have.property('categoryId', 'comment-edit');
+      const { notification } = allNotificationOptions[0];
+      expect(notification).to.have.property('categoryId', 'comment-edit');
 
-      expect(notificationData.data).to.have.property('created_at');
-      expect(notificationData.data).to.include({
+      expect(notification.data).to.have.property('created_at');
+      expect(notification.data).to.include({
         thread_id: 2,
         comment_id: 123,
         comment_text: 'Hello',

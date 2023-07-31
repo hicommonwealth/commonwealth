@@ -74,11 +74,11 @@ describe('ServerThreadsController', () => {
       expect(newReaction).to.be.ok;
 
       expect(notificationOptions).to.have.property('notificationData');
-      const { notificationData } = notificationOptions;
-      expect(notificationData).to.have.property('categoryId', 'new-reaction');
+      const { notification } = notificationOptions;
+      expect(notification).to.have.property('categoryId', 'new-reaction');
 
-      expect(notificationData.data).to.have.property('created_at');
-      expect(notificationData.data).to.include({
+      expect(notification.data).to.have.property('created_at');
+      expect(notification.data).to.include({
         thread_id: 4,
         root_title: 'Big Thread!',
         root_type: 'discussion',
@@ -1269,10 +1269,10 @@ describe('ServerThreadsController', () => {
       expect(!!updatedThread).to.equal(true);
       expect(notificationOptions).to.have.length(1);
       expect(notificationOptions[0]).to.have.property('notificationData');
-      expect(notificationOptions[0].notificationData).to.include({
+      expect(notificationOptions[0].notification).to.include({
         categoryId: 'thread-edit',
       });
-      expect(notificationOptions[0].notificationData.data).to.include({
+      expect(notificationOptions[0].notification.data).to.include({
         thread_id: 1,
         root_type: 'discussion',
         root_title: 'mythread',
@@ -1699,7 +1699,7 @@ describe('ServerThreadsController', () => {
 
       expect(notificationOptions).to.have.length(1);
       expect(notificationOptions[0]).to.have.property('notificationData');
-      expect(notificationOptions[0].notificationData).to.include({
+      expect(notificationOptions[0].notification).to.include({
         categoryId: 'new-thread-creation',
       });
       expect(notificationOptions[0].webhookData).to.include({
@@ -1711,7 +1711,7 @@ describe('ServerThreadsController', () => {
         chain: 'ethereum',
         body: 'hello',
       });
-      expect(notificationOptions[0].notificationData.data).to.include({
+      expect(notificationOptions[0].notification.data).to.include({
         thread_id: 1,
         root_type: 'discussion',
         root_title: 'mythread',
