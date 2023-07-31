@@ -28,7 +28,7 @@ export const Errors = {
   UnsupportedKind: 'Only discussion and link posts supported',
   FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
-  NoBody: '',
+  NoBody: 'Thread body cannot be blank',
 };
 
 export type CreateThreadOptions = {
