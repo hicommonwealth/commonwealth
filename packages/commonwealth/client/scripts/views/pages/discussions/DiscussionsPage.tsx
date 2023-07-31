@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { useFetchThreadsQuery } from 'state/api/threads';
+import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -61,7 +62,7 @@ const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const navigate = useCommonNavigate();
-  const totalThreads = app.threads.numTotalThreads;
+  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
@@ -149,7 +150,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 stage={stageName}
                 featuredFilter={featuredFilter}
                 dateRange={dateRange}
-                totalThreadCount={threads ? totalThreads : 0}
+                totalThreadCount={threads ? totalThreadsInCommunity : 0}
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}
               />

@@ -8,6 +8,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
+import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import ProposalModule from './ProposalModule';
@@ -75,10 +76,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       contractsWithTemplatesData,
       gateStrategies,
     } = response.result;
-    this.app.threads.initialize(
-      numVotingThreads,
-      numTotalThreads,
-    );
+    // Update community level thread counters variables (Store in state instead of react query here is an
+    // exception case, view the threadCountersStore code for more details)
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: numTotalThreads,
+      totalThreadsInCommunityForVoting: numVotingThreads,
+    })
     this.meta.setAdmins(admins);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
@@ -92,7 +95,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public deinitServer() {
     this._serverLoaded = false;
-    this.app.threads.deinit();
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: 0,
+      totalThreadsInCommunityForVoting: 0,
+    })
     if (this.app.chainEntities) {
       this.app.chainEntities.deinit();
     }

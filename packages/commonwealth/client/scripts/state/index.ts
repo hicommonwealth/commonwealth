@@ -11,7 +11,6 @@ import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
 import { WebSocketController } from 'controllers/server/socket';
-import ThreadsController from 'controllers/server/threads';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
@@ -49,7 +48,6 @@ export interface IApp {
   isModuleReady: boolean;
 
   // Threads
-  threads: ThreadsController;
   polls: PollsController;
 
   // Proposals
@@ -135,7 +133,6 @@ const app: IApp = {
   isModuleReady: false,
 
   // Thread
-  threads: ThreadsController.Instance,
   polls: new PollsController(),
 
   // Proposals

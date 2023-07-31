@@ -22,6 +22,7 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
+import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -50,6 +51,7 @@ export const HeaderWithFilters = ({
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const { totalThreadsInCommunityForVoting } = useEXCEPTION_CASE_threadCountersStore()
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -276,8 +278,8 @@ export const HeaderWithFilters = ({
                       id: s,
                       value: s,
                       label: `${threadStageToLabel(s)} ${s === ThreadStage.Voting
-                          ? app.threads.numVotingThreads
-                          : ''
+                        ? totalThreadsInCommunityForVoting
+                        : ''
                         }`,
                     })),
                   ]}
