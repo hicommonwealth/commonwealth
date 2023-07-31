@@ -12,21 +12,20 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 /* eslint-disable no-restricted-syntax */
-import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
 import NotificationSubscription from '../../models/NotificationSubscription';
 import Poll from '../../models/Poll';
 import Reaction from '../../models/Reaction';
 import ReactionCount from '../../models/ReactionCount';
-import Thread, { AssociatedReaction } from '../../models/Thread';
+import Thread from '../../models/Thread';
 import Topic from '../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../models/types';
-import { fetchReactionCounts } from "../../state/api/reactionCounts";
+import { fetchReactionCounts } from '../../state/api/reactionCounts';
 import { ReactionCountsStore, ReactionStore } from 'stores';
 import AbridgedThread from '../../models/AbridgedThread';
 import Comment from '../../models/Comment';
@@ -90,7 +89,9 @@ class ThreadsController {
     this.reactionCountsStore.clear();
   }
 
-  public getReactionByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
+  public getReactionByPost(
+    post: Thread | AbridgedThread | AnyProposal | Comment<any>
+  ) {
     return this.reactionsStore.getByPost(post);
   }
 
@@ -144,7 +145,6 @@ class ThreadsController {
       archived_at,
       locked_at,
       version_history,
-      Attachments,
       created_at,
       updated_at,
       topic,
@@ -171,17 +171,15 @@ class ThreadsController {
 
     let { reactionIds, reactionType, addressesReacted } = thread;
 
-    const attachments = Attachments
-      ? Attachments.map((a) => new Attachment(a.url, a.description))
-      : [];
-
     if (reactions) {
       for (const reaction of reactions) {
         app.threads.reactionsStore.add(new Reaction(reaction));
       }
       reactionIds = reactions.map((r) => r.id);
       reactionType = reactions.map((r) => r?.type || r?.reaction);
-      addressesReacted = reactions.map((r) => r?.address || r?.Address?.address);
+      addressesReacted = reactions.map(
+        (r) => r?.address || r?.Address?.address
+      );
     }
 
     let versionHistoryProcessed;
@@ -195,8 +193,8 @@ class ThreadsController {
             typeof history.author === 'string'
               ? JSON.parse(history.author)
               : typeof history.author === 'object'
-                ? history.author
-                : null;
+              ? history.author
+              : null;
           history.timestamp = moment(history.timestamp);
         } catch (e) {
           console.log(e);
@@ -221,8 +219,8 @@ class ThreadsController {
     const lastEditedProcessed = last_edited
       ? moment(last_edited)
       : versionHistoryProcessed && versionHistoryProcessed?.length > 1
-        ? versionHistoryProcessed[0].timestamp
-        : null;
+      ? versionHistoryProcessed[0].timestamp
+      : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     const archivedAt = archived_at ? moment(archived_at) : null;
@@ -257,7 +255,6 @@ class ThreadsController {
       body: decodedBody,
       createdAt: moment(created_at),
       updatedAt: moment(updated_at),
-      attachments,
       topic: topicModel,
       kind,
       stage,
@@ -298,7 +295,6 @@ class ThreadsController {
     topic: Topic,
     body?: string,
     url?: string,
-    attachments?: string[],
     readOnly?: boolean
   ) {
     try {
@@ -322,7 +318,6 @@ class ThreadsController {
         body: encodeURIComponent(body),
         kind,
         stage,
-        'attachments[]': attachments,
         topic_name: topic.name,
         topic_id: topic.id,
         url,
@@ -372,8 +367,8 @@ class ThreadsController {
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
           : err.message
-            ? err.message
-            : 'Failed to create thread'
+          ? err.message
+          : 'Failed to create thread'
       );
     }
   }
@@ -382,8 +377,7 @@ class ThreadsController {
     proposal: Thread,
     body: string,
     title: string,
-    url?: string,
-    attachments?: string[]
+    url?: string
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
@@ -412,7 +406,6 @@ class ThreadsController {
         body: encodeURIComponent(newBody),
         title: encodeURIComponent(newTitle),
         url,
-        'attachments[]': attachments,
         jwt: app.user.jwt,
         canvas_action: action,
         canvas_session: session,
@@ -519,7 +512,8 @@ class ThreadsController {
   public async setArchived(threadId: number, isArchived: boolean) {
     return new Promise((resolve, reject) => {
       $.post(
-        `${app.serverUrl()}/threads/${threadId}/${!isArchived ? 'archive' : 'unarchive'
+        `${app.serverUrl()}/threads/${threadId}/${
+          !isArchived ? 'archive' : 'unarchive'
         }`,
         {
           jwt: app.user.jwt,
@@ -777,11 +771,9 @@ class ThreadsController {
         ...((thread || {}) as any),
       });
       finalThread.associatedReactions = [
-        ...(
-          thread.associatedReactions.length > 0
-            ? thread.associatedReactions
-            : foundThread?.associatedReactions || []
-        )
+        ...(thread.associatedReactions.length > 0
+          ? thread.associatedReactions
+          : foundThread?.associatedReactions || []),
       ];
       finalThread.numberOfComments =
         rawThread?.numberOfComments || foundThread?.numberOfComments || 0;
@@ -808,8 +800,8 @@ class ThreadsController {
     // non reactive scope
     const reactionCounts = await fetchReactionCounts({
       address: app.user.activeAccount?.address,
-      threadIds: threads.map((thread) => thread.id) as number[]
-    })
+      threadIds: threads.map((thread) => thread.id) as number[],
+    });
 
     for (const rc of reactionCounts) {
       const id = app.threads.reactionCountsStore.getIdentifier({
@@ -822,9 +814,7 @@ class ThreadsController {
         app.threads.reactionCountsStore.remove(existing);
       }
       try {
-        app.threads.reactionCountsStore.add(
-          new ReactionCount({ ...rc, id })
-        );
+        app.threads.reactionCountsStore.add(new ReactionCount({ ...rc, id }));
       } catch (e) {
         console.error(e.message);
       }

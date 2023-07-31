@@ -54,26 +54,28 @@ export class Comment<T extends IUniqueId> {
     marked_as_spam_at,
     discord_meta,
   }) {
-    const versionHistory = version_history ? version_history.map((v) => {
-      if (!v) return;
-      let history;
-      try {
-        history = JSON.parse(v || '{}');
-        history.author =
-          typeof history.author === 'string'
-            ? JSON.parse(history.author)
-            : typeof history.author === 'object'
-              ? history.author
-              : null;
-        history.timestamp = moment(history.timestamp);
-      } catch (e) {
-        console.log(e);
-      }
-      return history;
-    }) : []
+    const versionHistory = version_history
+      ? version_history.map((v) => {
+          if (!v) return;
+          let history;
+          try {
+            history = JSON.parse(v || '{}');
+            history.author =
+              typeof history.author === 'string'
+                ? JSON.parse(history.author)
+                : typeof history.author === 'object'
+                ? history.author
+                : null;
+            history.timestamp = moment(history.timestamp);
+          } catch (e) {
+            console.log(e);
+          }
+          return history;
+        })
+      : [];
 
     this.chain = chain;
-    this.author = Address?.address || author
+    this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
     this.versionHistory = versionHistory;
@@ -85,14 +87,14 @@ export class Comment<T extends IUniqueId> {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : versionHistory && versionHistory?.length > 1
-        ? versionHistory[0].timestamp
-        : null;
+      ? versionHistory[0].timestamp
+      : null;
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.lnegth > 0 ? true : false;
     this.canvasAction = canvas_action;
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;
-    this.reactions = (reactions || []).map(r => new Reaction(r));
+    this.reactions = (reactions || []).map((r) => new Reaction(r));
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
   }
