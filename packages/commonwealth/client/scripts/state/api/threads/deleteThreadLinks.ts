@@ -15,7 +15,7 @@ const deleteThreadLinks = async ({
   threadId,
   links
 }: deleteThreadLinksProps) => {
-  const response = await axios.post(`${app.serverUrl()}/linking/deleteLinks`, {
+  const response = await axios.delete(`${app.serverUrl()}/linking/deleteLinks`, {
     data: {
       thread_id: threadId,
       links,
