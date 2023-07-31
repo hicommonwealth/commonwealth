@@ -3,7 +3,6 @@ import passport from 'passport';
 import type { Express } from 'express';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { StatsDController } from 'common-common/src/statsd';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -226,20 +225,6 @@ function setupRouter(
   // ---
 
   const router = express.Router();
-
-  router.use((req, res, next) => {
-    StatsDController.get().increment('cw.path.called', {
-      path: req.path.slice(1),
-    });
-    const start = Date.now();
-    res.on('finish', () => {
-      const latency = Date.now() - start;
-      StatsDController.get().histogram(`cw.path.latency`, latency, {
-        path: req.path.slice(1),
-      });
-    });
-    next();
-  });
 
   // Updating the address
   registerRoute(
