@@ -33,11 +33,8 @@ const toggleThreadArchiveMutation = ({ chainId, threadId }: ToggleThreadArchiveM
     mutationFn: toggleThreadArchive,
     onSuccess: async (response) => {
       console.log("response => ", response)
+      // TODO: complete this
       // TODO: migrate the thread store objects, then clean this up
-      // const foundThread = app.threads.store.getByIdentifier(threadId);
-      // foundThread.archivedAt = response.result.archived_at;
-      // app.threads.updateThreadInStore(new Thread({ ...foundThread }));
-
       // return foundThread
     }
   });
