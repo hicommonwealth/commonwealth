@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { expect } from 'chai';
+import { expect, test } from '@playwright/test';
+import { parseInt } from 'lodash';
 import { PORT } from '../../../server/config';
 import {
   clearTestEntities,
@@ -34,13 +34,12 @@ test.describe('Discussion Page Tests', () => {
     await login(page, testChains[0].id);
   });
 
-  test('Check User can create/update/delete comment', async ({ page }) => {
+  test('Check User can create/update/delete/like/unlike comment', async ({
+    page,
+  }) => {
     let time = Date.now();
 
-    let textBox;
-    do {
-      textBox = await page.$('.ql-editor');
-    } while (!textBox);
+    let textBox = await getQuillTextBox(page);
     let commentText = `test comment made at ${time}`;
     await textBox.fill(commentText);
 
@@ -49,17 +48,18 @@ test.describe('Discussion Page Tests', () => {
     // asserts that comment is created
     await page.getByText(commentText);
 
-    // The 3 dots below the comment doesn't have a clear unique identifier.
-    let commentOptionButton = await page.locator('.comment-option-btn', {
-      has: page.locator('svg.Icon.small'),
-    });
-    await commentOptionButton.nth(2).click();
+    await performUpvote(page, 'comment-content');
 
-    await page.locator('div', { hasText: 'Edit' }).click();
+    // The 3 dots below the comment doesn't have a clear unique identifier.
+    let commentOptionButton = await page.locator(
+      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]'
+    );
+    await commentOptionButton.click();
+    await page.locator('div.PopoverMenuItem').first().click();
 
     time = Date.now();
 
-    textBox = await page.$('.ql-editor');
+    textBox = await getQuillTextBox(page);
     commentText = `test comment updated at ${time}`;
     await textBox.fill(commentText);
 
@@ -68,17 +68,74 @@ test.describe('Discussion Page Tests', () => {
     // asserts that comment is created
     await page.getByText(commentText);
 
-    commentOptionButton = await page.locator('.comment-option-btn');
-    await commentOptionButton.first().click();
+    // The 3 dots below the comment doesn't have a clear unique identifier.
+    commentOptionButton = await page.locator(
+      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]'
+    );
+    await commentOptionButton.click();
+    await page.locator('div.PopoverMenuItem').nth(2).click();
 
-    await page.locator('div', { hasText: 'Delete' }).click();
+    const deleteButton = await page.locator('button.mini-red');
+    await deleteButton.click();
 
-    await expect(page).not.to.have.text('div', commentText);
+    let commentExists = await page.getByText(commentText).count();
+    do {
+      commentExists = await page.getByText(commentText).count();
+    } while (commentExists !== 0);
+
+    expect(await page.getByText(commentText).count()).toEqual(0);
   });
 
-  // test('Check User can like/dislike thread', async ({ page }) => {
-  //   await page.locator('.CommentReactionButton').first().click();
-  // });
-  //
-  // test('Check User can like/dislike comment in thread', async ({ page }) => {});
+  test('Check User can like/dislike thread', async ({ page }) => {
+    await performUpvote(page, 'ThreadOptions');
+  });
 });
+
+async function getQuillTextBox(page) {
+  let textBox;
+  do {
+    textBox = await page.locator('.ql-editor');
+  } while (!textBox);
+
+  return textBox;
+}
+
+// performs upvote for the specified parent class.
+async function performUpvote(page, parentClass: string) {
+  const amountOfThreadLikes = await page
+    .locator(
+      `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`
+    )
+    .textContent();
+
+  let threadLikeButton = await page.locator(
+    `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]`
+  );
+  await threadLikeButton.click();
+
+  // expect likes to increment by 1
+  await expect(async () => {
+    expect(
+      await page
+        .locator(
+          `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`
+        )
+        .textContent()
+    ).toEqual((parseInt(amountOfThreadLikes) + 1).toString());
+  }).toPass();
+
+  threadLikeButton = await page.locator(
+    `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]`
+  );
+  await threadLikeButton.click();
+
+  await expect(async () => {
+    expect(
+      await page
+        .locator(
+          `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`
+        )
+        .textContent()
+    ).toEqual(amountOfThreadLikes);
+  }).toPass();
+}
