@@ -60,7 +60,7 @@ const useDateCursor = ({ dateRange }: { dateRange?: ThreadTimelineFilterTypes })
   useEffect(() => {
     const today = moment();
 
-    const interval = setInterval(() => {
+    const updater = () => {
       const fromDate = (() => {
         if (dateRange) {
           if (
@@ -102,7 +102,9 @@ const useDateCursor = ({ dateRange }: { dateRange?: ThreadTimelineFilterTypes })
         return moment().toISOString();
       })();
       setDateCursor({ toDate, fromDate })
-    }, THREADS_STALE_TIME)
+    }
+    updater();
+    const interval = setInterval(() => updater(), THREADS_STALE_TIME - 10)
 
     return (() => {
       clearInterval(interval)

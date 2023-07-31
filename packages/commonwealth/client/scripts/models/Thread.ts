@@ -170,7 +170,6 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
   }) {
-    console.log("Address => ", Address)
     this.author = Address.address;
     this.authorChain = Address.chain;
     this.id = id;

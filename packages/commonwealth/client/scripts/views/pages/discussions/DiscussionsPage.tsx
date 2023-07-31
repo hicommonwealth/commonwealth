@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { useFetchThreadsQuery } from 'state/api/threads';
+import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
@@ -76,11 +77,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     chainId: app.activeChainId(),
   });
 
-  // const { dateCursor } = useDateCursor({
-  //   dateRange: searchParams.get(
-  //     'dateRange'
-  //   ) as ThreadTimelineFilterTypes
-  // })
+  const { dateCursor } = useDateCursor({
+    dateRange: searchParams.get(
+      'dateRange'
+    ) as ThreadTimelineFilterTypes
+  })
 
   const { fetchNextPage, data, isInitialLoading } = useFetchThreadsQuery({
     chainId: app.activeChainId(),
@@ -91,9 +92,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     stage: stageName,
     includePinnedThreads: true,
     orderBy: featuredFilter,
-    // toDate: dateCursor.toDate,
-    toDate: '2023-09-27T13:04:56.656Z' // todo: REPLACE THIS
-    // fromDate: dateCursor.fromDate, // todo: REPLACE THIS
+    toDate: dateCursor.toDate,
+    fromDate: dateCursor.fromDate,
   })
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter))
