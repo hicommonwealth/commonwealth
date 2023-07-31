@@ -10,7 +10,10 @@ import app from 'state';
 
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
-import { findSubscription, SubUniqueData } from 'subscriptionMapping';
+import {
+  findSubscription,
+  SubUniqueData,
+} from '../../../../server/util/subscriptionMapping';
 import { NotificationCategories } from 'common-common/src/types';
 
 const post = (route, args, callback) => {

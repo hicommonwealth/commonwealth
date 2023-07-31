@@ -18,7 +18,7 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
-import { checkSubscriptionValues } from 'subscriptionMapping';
+import { checkSubscriptionValues } from '../util/subscriptionMapping';
 
 export type SubscriptionAttributes = {
   subscriber_id: number;

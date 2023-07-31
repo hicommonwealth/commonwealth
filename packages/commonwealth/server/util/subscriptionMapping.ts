@@ -3,7 +3,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import NotificationSubscription from 'models/NotificationSubscription';
 import { CreationAttributes } from 'sequelize';
-import { SubscriptionInstance } from '../server/models/subscription';
+import { SubscriptionInstance } from '../models/subscription';
 
 // TODO: @Timothee split this file into a directory with types file per function
 const log = factory.getLogger(formatFilename(__filename));

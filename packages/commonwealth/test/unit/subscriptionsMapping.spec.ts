@@ -1,5 +1,5 @@
 import { NotificationCategories } from 'common-common/src/types';
-import { mapNotificationsDataToSubscriptions } from 'subscriptionMapping';
+import { mapNotificationsDataToSubscriptions } from '../../server/util/subscriptionMapping';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {

@@ -18,7 +18,7 @@ import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SupportedNetwork } from 'chain-events/src';
-import { mapNotificationsDataToSubscriptions } from 'subscriptionMapping';
+import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
 
