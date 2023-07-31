@@ -3,6 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.removeColumn('DiscussionDrafts', 'attachment', { transaction });
       await queryInterface.dropTable('Attachments', { transaction });
     })
   },
@@ -39,7 +40,17 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: false,
         },
-      });
+      }, { transaction });
+
+      await queryInterface.addColumn(
+        'DiscussionDrafts',
+        'attachment',
+        {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+          references: { model: 'Attachments', key: 'id' },
+        }
+      );
     })
   }
 };

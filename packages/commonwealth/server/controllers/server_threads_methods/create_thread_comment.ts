@@ -19,6 +19,7 @@ import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -52,18 +53,21 @@ export type CreateThreadCommentResult = [
   TrackOptions
 ];
 
-export async function __createThreadComment({
-  user,
-  address,
-  chain,
-  parentId,
-  threadId,
-  text,
-  canvasAction,
-  canvasSession,
-  canvasHash,
-  discord_meta,
-}: CreateThreadCommentOptions): Promise<CreateThreadCommentResult> {
+export async function __createThreadComment(
+  this: ServerThreadsController,
+  {
+    user,
+    address,
+    chain,
+    parentId,
+    threadId,
+    text,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discord_meta,
+  }: CreateThreadCommentOptions
+): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,

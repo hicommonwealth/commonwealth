@@ -18,6 +18,7 @@ import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { AppError } from '../../../../common-common/src/errors';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -54,23 +55,26 @@ export type CreateThreadResult = [
   TrackOptions
 ];
 
-export async function __createThread({
-  user,
-  address,
-  chain,
-  title,
-  body,
-  kind,
-  readOnly,
-  topicId,
-  topicName,
-  stage,
-  url,
-  canvasAction,
-  canvasSession,
-  canvasHash,
-  discord_meta,
-}: CreateThreadOptions): Promise<CreateThreadResult> {
+export async function __createThread(
+  this: ServerThreadsController,
+  {
+    user,
+    address,
+    chain,
+    title,
+    body,
+    kind,
+    readOnly,
+    topicId,
+    topicName,
+    stage,
+    url,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discord_meta,
+  }: CreateThreadOptions
+): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
       throw new Error(Errors.DiscussionMissingTitle);
