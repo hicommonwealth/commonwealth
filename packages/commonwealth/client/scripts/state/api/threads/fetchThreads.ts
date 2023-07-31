@@ -206,7 +206,6 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
     staleTime: THREADS_STALE_TIME,
   });
 
-
   if (isFetchBulkThreadsProps(props)) {
     // transform pages into workable object
     const reducedData = (chosenQueryType?.data?.pages || []).reduce(

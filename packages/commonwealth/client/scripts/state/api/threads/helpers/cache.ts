@@ -107,7 +107,7 @@ const cacheUpdater = ({
                     }
                 }
 
-                if (k[2] === cacheTypes.SINGLE_THREAD) {
+                if (k[2] === cacheTypes.SINGLE_THREAD || k[2] === cacheTypes.ACTIVE_THREADS) {
                     if (method === 'update') {
                         const updatedThreads = [...existingData] // threads array
                         const foundThreadIndex = updatedThreads.findIndex(x => x.id === threadId)
@@ -174,8 +174,15 @@ const updateThreadTopicInAllCaches = (chainId: string, threadId: number, newTopi
     const keysForThreads = queryKeys.filter(x => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId)
 
     keysForThreads.map((k) => {
-        // 1- for single queries - just update the topic
-        if (k[2] === cacheTypes.SINGLE_THREAD && (k[3] === threadId || (k[3] as number[])?.includes(threadId))) {
+        // 1- for single and active thread queries - just update the topic
+        if (
+            k[2] === cacheTypes.ACTIVE_THREADS
+            ||
+            (
+                k[2] === cacheTypes.SINGLE_THREAD &&
+                (k[3] === threadId || (k[3] as number[])?.includes(threadId))
+            )
+        ) {
             const existingData: IExistingThreadState = queryClient.getQueryData(k)
             const updatedThreads = [...existingData] // threads array
             const foundThreadIndex = updatedThreads.findIndex(x => x.id === threadId)
@@ -188,7 +195,8 @@ const updateThreadTopicInAllCaches = (chainId: string, threadId: number, newTopi
             queryClient.setQueryData(k, () => updatedThreads);
         }
 
-        // 2- for bulk queries
+        // 2- for bulk queries - filter the existing thread that has old topic and refetch queries for the updates
+        // topic id ideally we should not refetch - TODO: find a way to make this consistent
         if (k[2] === cacheTypes.BULK_THREADS) {
             // filter from old topic query
             if (k[3] === oldTopicId || k[3] === undefined) {
@@ -216,7 +224,6 @@ const updateThreadTopicInAllCaches = (chainId: string, threadId: number, newTopi
                 queryClient.refetchQueries(k)
             }
         }
-
     })
 
 }
@@ -228,7 +235,13 @@ const addThreadInAllCaches = (chainId: string, newThread: Thread) => {
     const keysForThreads = queryKeys.filter(x => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId)
 
     keysForThreads.map((k) => {
-        if (k[2] === cacheTypes.BULK_THREADS && (k[3] === newThread.topic.id || k[3] === undefined)) {
+        // TODO: this is improper, we are essentially clearing cache when a thread is added. This is done to ensure
+        // we have the correct thread ordering when refetching threads, but ideally we should find a way to correctly
+        // position the thread in cache
+        if (
+            (k[2] === cacheTypes.BULK_THREADS && (k[3] === newThread.topic.id || k[3] === undefined)) ||
+            k[2] === cacheTypes.ACTIVE_THREADS
+        ) {
             queryClient.cancelQueries(k)
             queryClient.refetchQueries(k)
         }
