@@ -13,7 +13,8 @@ import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('emitNotifications tests', () => {
+// TODO: add tests for each notification type
+describe('emitNotifications tests', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
