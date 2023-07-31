@@ -67,11 +67,9 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     groupedOptions,
   } = useAutocomplete({
     options: communities,
-    onChange: (event: any, newValue) => {
-      console.log('event:', event.target.innerText);
-      console.log('newValue:', newValue);
+    onChange: (event: any, chain) => {
       setValue('');
-      setId(newValue.id);
+      setId(chain.id);
     },
     getOptionLabel: (option) => option.name,
   });
@@ -91,23 +89,18 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     }
   };
 
+  const getChain = (chainId: string): ChainInfo =>
+    options.find((c) => c.id === chainId);
+
   const sortByName = (a: any, b: any) => {
     const nameA = a.name.toUpperCase();
     const nameB = b.name.toUpperCase();
 
-    if (nameA < nameB) {
-      return -1;
-    } else if (nameA > nameB) {
-      return 1;
-    } else {
-      return 0;
-    }
+    return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
   };
 
-  const getChain = (id: string): ChainInfo => options.find((c) => c.id === id);
-
   useEffect(() => {
-    let list = [];
+    const list = [];
     for (let i = 0; i < options.length; i++) {
       list.push({
         id: options[i].id,
@@ -116,7 +109,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     }
     list.sort(sortByName);
     setCommunities([...list]);
-  }, []);
+  }, [options]);
 
   return (
     <div className="container" onBlur={() => setIsTyping(false)}>
