@@ -80,7 +80,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>
         {featureFlags.sessionKeys ? <UserDropdown /> : <LoginSelector />}
-        <LoginSelector />
       </div>
     </div>
   );
