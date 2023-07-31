@@ -52,34 +52,27 @@ export const ReactionButton = ({
   const handleVoteClick = async (event) => {
     event.stopPropagation();
     event.preventDefault();
+    if (isLoading) return;
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
-    } else {
-
-      if (hasReacted) {
-        if (!hasReacted || isLoading) {
-          return;
-        }
-
-        deleteThreadReaction({ chainId: app.activeChainId(), threadId: thread.id, reactionId: reactedId as number })
-          .catch((e) => {
-            console.log(e);
-          })
-      } else {
-        if (hasReacted || isLoading) {
-          return;
-        }
-
-        createThreadReaction({
-          chainId: app.activeChainId(),
-          address: activeAddress,
-          threadId: thread.id,
-          reactionType: 'like'
-        }).catch((e) => {
+      return;
+    }
+    if (hasReacted) {
+      deleteThreadReaction({ chainId: app.activeChainId(), threadId: thread.id, reactionId: reactedId as number })
+        .catch((e) => {
           console.log(e);
         })
-      }
+    } else {
+      createThreadReaction({
+        chainId: app.activeChainId(),
+        address: activeAddress,
+        threadId: thread.id,
+        reactionType: 'like'
+      }).catch((e) => {
+        console.log(e);
+      })
     }
+
   };
 
   return (
