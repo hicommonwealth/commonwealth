@@ -1,8 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { ThreadStage } from 'models/types';
 import Thread from 'models/Thread';
+import { ThreadStage } from 'models/types';
 import app from 'state';
+import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface EditThreadStageProps {
@@ -36,11 +37,17 @@ const useEditThreadStageMutation = ({ chainId, threadId, currentStage }: UseEdit
   return useMutation({
     mutationFn: editThreadStage,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread)
-      // TODO: migrate the thread store objects, then clean this up
-      // TODO: get this from react query state when fully migrated
-      // if (args.stage === ThreadStage.Voting) app.threads.numVotingThreads--;
-      if (updatedThread.stage === ThreadStage.Voting) app.threads.numVotingThreads++;
+      // Update community level thread counters variables
+      let incBy = 0;
+      if (currentStage === ThreadStage.Voting) incBy--;
+      if (updatedThread.stage === ThreadStage.Voting) incBy++;
+      EXCEPTION_CASE_threadCountersStore.setState(({
+        totalThreadsInCommunityForVoting
+      }) => ({
+        totalThreadsInCommunityForVoting: totalThreadsInCommunityForVoting + incBy
+      }))
+      updateThreadInAllCaches(chainId, threadId, updatedThread);
+
       return updatedThread;
     }
   });

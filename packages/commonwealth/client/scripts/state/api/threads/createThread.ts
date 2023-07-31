@@ -11,6 +11,7 @@ import {
 import app from 'state';
 import { addThreadInAllCaches } from './helpers/cache';
 import Thread from 'models/Thread';
+import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 
 interface CreateThreadProps {
   address: string;
@@ -79,14 +80,20 @@ const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
     mutationFn: createThread,
     onSuccess: async (newThread) => {
       addThreadInAllCaches(chainId, newThread)
-      // TODO: migrate the thread store objects, then clean this up
-      // Update stage counts
-      if (newThread.stage === ThreadStage.Voting) app.threads.numVotingThreads++;
-      app.threads.numTotalThreads += 1;
+      // Update community level thread counters variables
+      EXCEPTION_CASE_threadCountersStore.setState(({
+        totalThreadsInCommunity,
+        totalThreadsInCommunityForVoting
+      }) => ({
+        totalThreadsInCommunity: totalThreadsInCommunity + 1,
+        totalThreadsInCommunityForVoting: newThread.stage === ThreadStage.Voting ?
+          totalThreadsInCommunityForVoting + 1 :
+          totalThreadsInCommunityForVoting,
+      }))
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
 
-      // synthesize new subscription rather than hitting backend
+      // synthesize new subscription rather than hitting backend // TODO: do we really need this
       const subscriptionJSON = {
         id: null,
         category_id: NotificationCategories.NewComment,
