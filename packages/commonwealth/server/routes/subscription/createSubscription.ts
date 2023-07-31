@@ -86,24 +86,26 @@ export default async (
     }
   }
 
-  const subscription = (
-    await models.Subscription.create({
+  const [subscription, created] = await models.Subscription.findOrCreate({
+    where: {
       subscriber_id: req.user.id,
       category_id: req.body.category,
       is_active: !!req.body.is_active,
       ...obj,
-    })
-  ).toJSON();
+    },
+  });
+
+  const subJson = subscription.toJSON();
 
   if (chain) {
-    subscription.Chain = chain.toJSON();
+    subJson.Chain = chain.toJSON();
   }
   if (thread) {
-    subscription.Thread = thread.toJSON();
+    subJson.Thread = thread.toJSON();
   }
   if (comment) {
-    subscription.Comment = thread.toJSON();
+    subJson.Comment = thread.toJSON();
   }
 
-  return res.json({ status: 'Success', result: subscription });
+  return res.json({ status: 'Success', result: subJson });
 };

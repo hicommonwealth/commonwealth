@@ -13,7 +13,7 @@ import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-// TODO: add tests for each notification type
+// TODO: @Timothee add tests for each notification type
 describe('emitNotifications tests', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
