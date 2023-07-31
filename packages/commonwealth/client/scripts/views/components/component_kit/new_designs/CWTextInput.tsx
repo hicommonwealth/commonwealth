@@ -41,7 +41,6 @@ type InputStyleProps = {
   darkMode?: boolean;
   disabled?: boolean;
   size?: TextInputSize;
-  width?: number | string;
   fullWidth?: boolean;
   validationStatus?: ValidationStatus;
   displayOnly?: boolean;
@@ -133,7 +132,6 @@ export const CWTextInput = (props: TextInputProps) => {
     defaultValue,
     value,
     disabled,
-    width,
     fullWidth,
     iconLeft,
     iconLeftonClick,
@@ -155,16 +153,6 @@ export const CWTextInput = (props: TextInputProps) => {
     manualValidationStatus = '',
     instructionalMessage,
   } = props;
-
-  const getWidth = () => {
-    if (fullWidth) {
-      return { width: '100%' };
-    } else if (width) {
-      return { width: `${width}px` }; // this one
-    } else {
-      return { width: '240px' };
-    }
-  };
 
   return (
     <div
@@ -189,7 +177,7 @@ export const CWTextInput = (props: TextInputProps) => {
           }
         />
       )}
-      <div className="input-and-icon-container" style={getWidth()}>
+      <div className={getClasses({ fullWidth }, 'input-and-icon-container')}>
         {iconLeftonClick && iconLeft ? (
           <div className="text-input-left-onClick-icon">{iconLeft}</div>
         ) : iconLeft ? (
@@ -200,6 +188,7 @@ export const CWTextInput = (props: TextInputProps) => {
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({
             size: isCompact ? 'small' : 'large',
+            fullWidth,
             validationStatus: validationProps.validationStatus,
             disabled,
             displayOnly,
@@ -209,7 +198,6 @@ export const CWTextInput = (props: TextInputProps) => {
             darkMode,
             inputClassName,
           })}
-          style={getWidth()}
           disabled={disabled || displayOnly}
           tabIndex={tabIndex}
           maxLength={maxLength}

@@ -477,8 +477,8 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Status Tags</CWText>
-          <CWTag label="New" type="new" iconName='newStar' />
-          <CWTag label="Trending" type="trending" iconName='trendUp' />
+          <CWTag label="New" type="new" iconName="newStar" />
+          <CWTag label="Trending" type="trending" iconName="trendUp" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Elements Tags</CWText>
@@ -487,15 +487,15 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Stage Tags</CWText>
-          <CWTag label="Stage 1" type="new-stage" classNames='rorange-600'/>
-          <CWTag label="Stage 2" type="new-stage" classNames='rorange-400'/>
-          <CWTag label="Stage 3" type="new-stage" classNames='yellow-500'/>
-          <CWTag label="Stage 4" type="new-stage" classNames='green-600'/>
-          <CWTag label="Stage 5" type="new-stage" classNames='green-500'/>
-          <CWTag label="Stage 6" type="new-stage" classNames='primary-600'/>
-          <CWTag label="Stage 7" type="new-stage" classNames='primary-400'/>
-          <CWTag label="Stage 8" type="new-stage" classNames='purple-600'/>
-          <CWTag label="Stage 9" type="new-stage" classNames='purple-400'/>
+          <CWTag label="Stage 1" type="new-stage" classNames="rorange-600" />
+          <CWTag label="Stage 2" type="new-stage" classNames="rorange-400" />
+          <CWTag label="Stage 3" type="new-stage" classNames="yellow-500" />
+          <CWTag label="Stage 4" type="new-stage" classNames="green-600" />
+          <CWTag label="Stage 5" type="new-stage" classNames="green-500" />
+          <CWTag label="Stage 6" type="new-stage" classNames="primary-600" />
+          <CWTag label="Stage 7" type="new-stage" classNames="primary-400" />
+          <CWTag label="Stage 8" type="new-stage" classNames="purple-600" />
+          <CWTag label="Stage 9" type="new-stage" classNames="purple-400" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Proposal Tag</CWText>
@@ -507,27 +507,35 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
-          <CWTag label="mnh7a" type="login" loginIcon='cosmos' />
-          <CWTag label="mnh7a" type="login" loginIcon='discordLogin' />
-          <CWTag label="mnh7a" type="login" loginIcon='envelope' />
-          <CWTag label="mnh7a" type="login" loginIcon='ethereum' />
-          <CWTag label="mnh7a" type="login" loginIcon='octocat' />
-          <CWTag label="mnh7a" type="login" loginIcon='near' />
-          <CWTag label="mnh7a" type="login" loginIcon='polkadot' />
-          <CWTag label="mnh7a" type="login" loginIcon='polygon' />
-          <CWTag label="mnh7a" type="login" loginIcon='twitterNew' />
+          <CWTag label="mnh7a" type="login" loginIcon="cosmos" />
+          <CWTag label="mnh7a" type="login" loginIcon="discordLogin" />
+          <CWTag label="mnh7a" type="login" loginIcon="envelope" />
+          <CWTag label="mnh7a" type="login" loginIcon="ethereum" />
+          <CWTag label="mnh7a" type="login" loginIcon="octocat" />
+          <CWTag label="mnh7a" type="login" loginIcon="near" />
+          <CWTag label="mnh7a" type="login" loginIcon="polkadot" />
+          <CWTag label="mnh7a" type="login" loginIcon="polygon" />
+          <CWTag label="mnh7a" type="login" loginIcon="twitterNew" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Address Tags</CWText>
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='cosmos' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='discordLogin' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='envelope' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='ethereum' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='octocat' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='near' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='polkadot' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='polygon' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='twitterNew' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="cosmos" />
+          <CWTag
+            label="0xd83e1...a39bD"
+            type="address"
+            loginIcon="discordLogin"
+          />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="envelope" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="ethereum" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="octocat" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="near" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polkadot" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polygon" />
+          <CWTag
+            label="0xd83e1...a39bD"
+            type="address"
+            loginIcon="twitterNew"
+          />
         </div>
       </div>
       <div className="button-gallery">
@@ -998,6 +1006,40 @@ export const ComponentShowcase = () => {
           placeholder="Placeholder"
           isCompact
         />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          isCompact
+          fullWidth
+        />
         <CWTextInput
           name="Text field"
           label="Text Input with instructional message"
@@ -1017,7 +1059,6 @@ export const ComponentShowcase = () => {
           label="This input only accepts A-Z"
           placeholder="Type here"
           isCompact
-          width="250"
         />
         <CWTextInput
           name="Form field"
@@ -1031,7 +1072,6 @@ export const ComponentShowcase = () => {
           label="This input only accepts A-Z"
           placeholder="Type here"
           isCompact
-          width="250"
           instructionalMessage="Instructional message"
         />
         <CWTextInput
@@ -1042,7 +1082,6 @@ export const ComponentShowcase = () => {
             <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
           }
           isCompact
-          width={260}
         />
         <CWTextInput
           label="Text field with icons"
@@ -1052,7 +1091,6 @@ export const ComponentShowcase = () => {
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
           isCompact
-          width={280}
         />
         <CWTextInput
           label="Text field with icons"
@@ -1065,7 +1103,6 @@ export const ComponentShowcase = () => {
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
           isCompact
-          width={300}
         />
         <CWTextInput
           label="Text field with icons fullWidth"
@@ -1100,6 +1137,36 @@ export const ComponentShowcase = () => {
           label="Text Input with default width of 240 px"
           placeholder="Placeholder"
         />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          fullWidth
+        />
         <CWTextInput
           name="Text field"
           label="Text Input with instructional message"
@@ -1117,7 +1184,6 @@ export const ComponentShowcase = () => {
           }}
           label="This input only accepts A-Z"
           placeholder="Type here"
-          width="250"
         />
         <CWTextInput
           name="Form field"
@@ -1130,7 +1196,6 @@ export const ComponentShowcase = () => {
           }}
           label="This input only accepts A-Z"
           placeholder="Type here"
-          width="250"
           instructionalMessage="Instructional message"
         />
         <CWTextInput
@@ -1140,7 +1205,6 @@ export const ComponentShowcase = () => {
           iconLeft={
             <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
           }
-          width={260}
         />
         <CWTextInput
           label="Text field with icons"
@@ -1149,7 +1213,6 @@ export const ComponentShowcase = () => {
           iconRight={
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
-          width={280}
         />
         <CWTextInput
           label="Text field with icons"
@@ -1161,7 +1224,6 @@ export const ComponentShowcase = () => {
           iconRight={
             <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
           }
-          width={300}
         />
         <CWTextInput
           label="Text field with icons fullWidth"
