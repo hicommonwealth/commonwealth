@@ -18,6 +18,8 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { NotificationRow } from '../pages/notifications/notification_row';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 import { byDescendingCreationDate } from 'helpers';
+import clsx from 'clsx';
+import { featureFlags } from 'helpers/feature-flags';
 
 export const NotificationsMenu = () => {
   const navigate = useCommonNavigate();
@@ -85,19 +87,36 @@ export const NotificationsMenuPopover = () => {
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
       <div>
-        {app.user.notifications.numUnread > 0 ? (
-          <div className="unreads-icon">
-            <CWCustomIcon
-              iconName="unreads"
+        {featureFlags.sessionKeys ? (
+          <div
+            className={clsx('notifications-container', {
+              'unread-notifications': app.user.notifications.numUnread > 0,
+            })}
+          >
+            <CWIconButton
+              iconButtonTheme="black"
+              iconName="bell"
               onClick={popoverProps.handleInteraction}
             />
           </div>
         ) : (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName="bell"
-            onClick={popoverProps.handleInteraction}
-          />
+          <div>
+            {app.user.notifications.numUnread > 0 ? (
+              <div className="unreads-icon">
+                <CWCustomIcon
+                  iconName="unreads"
+                  onClick={popoverProps.handleInteraction}
+                />
+              </div>
+            ) : (
+              <CWIconButton
+                iconButtonTheme="black"
+                iconName="bell"
+                onClick={popoverProps.handleInteraction}
+              />
+            )}
+            <Popover content={<NotificationsMenu />} {...popoverProps} />
+          </div>
         )}
         <Popover content={<NotificationsMenu />} {...popoverProps} />
       </div>
