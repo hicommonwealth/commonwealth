@@ -9,14 +9,13 @@ import type NotificationSubscription from '../../../client/scripts/models/Notifi
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
-import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 import Errors from '../../../server/routes/subscription/errors';
 import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('Subscriptions Tests', () => {
+describe('Subscriptions Tests', () => {
   let jwtToken, loggedInAddr, loggedInAddrId, thread, comment;
   const chain = 'ethereum';
 

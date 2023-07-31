@@ -127,6 +127,7 @@ export default (
     });
   };
 
+  // TODO: @Timothee override findOrCreate to validate input values.
   // override the create method for Subscriptions in order to validate input values.
   const originalCreate = Subscription.create;
   Subscription.create = async function (
