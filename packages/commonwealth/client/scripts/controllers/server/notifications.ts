@@ -10,11 +10,8 @@ import app from 'state';
 
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
-import {
-  findSubscription,
-  SubUniqueData,
-} from '../../../../server/util/subscriptionMapping';
 import { NotificationCategories } from 'common-common/src/types';
+import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
