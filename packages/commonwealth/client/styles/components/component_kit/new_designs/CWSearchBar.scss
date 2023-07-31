@@ -120,6 +120,10 @@
   border-radius: 8px;
   cursor: default;
 
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+
   font-family: 'NeueHaasUnica';
   font-style: normal;
   font-weight: 400;

@@ -8,9 +8,10 @@ import { IconName } from '../cw_icons/cw_icon_lookup';
 import { getClasses } from '../helpers';
 import { ValidationStatus } from '../cw_validation_text';
 import ChainInfo from '../../../../models/ChainInfo';
+import { CWText } from '../cw_text';
+import { CWCommunityAvatar } from '../cw_community_avatar';
 
 import 'components/component_kit/new_designs/CWSearchBar.scss';
-import { CWText } from '../cw_text';
 
 type BaseSearchBarProps = {
   autoComplete?: string;
@@ -102,10 +103,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   useEffect(() => {
     const list = [];
     for (let i = 0; i < options.length; i++) {
-      list.push({
-        id: options[i].id,
-        name: options[i].name,
-      });
+      list.push(options[i]);
     }
     list.sort(sortByName);
     setCommunities([...list]);
@@ -156,6 +154,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
               className="option"
               {...getOptionProps({ option, index })}
             >
+              <CWCommunityAvatar size="medium" community={option} />
               {option.name}
             </li>
           ))}
