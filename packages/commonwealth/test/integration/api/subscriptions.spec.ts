@@ -35,8 +35,8 @@ describe.only('Subscriptions Tests', () => {
     );
   });
 
-  describe('/createSubscription test', () => {
-    describe.only(`${NotificationCategories.NewThread} subscription tests`, () => {
+  describe.only('/createSubscription test', () => {
+    describe(`${NotificationCategories.NewThread} subscription tests`, () => {
       it('should create new-thread subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.NewThread;
@@ -45,7 +45,6 @@ describe.only('Subscriptions Tests', () => {
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, chain_id: chain, is_active });
-        console.log(res.body);
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
@@ -107,330 +106,527 @@ describe.only('Subscriptions Tests', () => {
       });
     });
 
-    describe('SnapshotProposal /createSubscription test', () => {
-      it('should create new-thread subscription on community for snapshot-proposal category', async () => {
-        const object_id = chain;
+    describe(`${NotificationCategories.NewComment} subscription tests`, () => {
+      let thread, comment, rootCommmentSubscription, commentSubscription;
+      before('create thread', async () => {
+        let res = await modelUtils.createThread({
+          chainId: chain,
+          address: loggedInAddr,
+          jwt: jwtToken,
+          title: 't',
+          body: 't',
+          kind: 'discussion',
+          stage: 'discussion',
+          topicName: 't',
+          topicId: undefined,
+        });
+        expect(res).to.not.be.null;
+        expect(res.status).to.be.equal('Success');
+        thread = res.result;
+
+        res = await modelUtils.createComment({
+          chain,
+          address: loggedInAddr,
+          jwt: jwtToken,
+          text: 'cw4eva',
+          thread_id: thread.id,
+        });
+        expect(res).to.not.be.null;
+        expect(res.status).to.be.equal('Success');
+        comment = res.result;
+      });
+
+      it('should create new-comment subscription on a thread', async () => {
         const is_active = true;
-        const category = NotificationCategories.SnapshotProposal;
+        const category = NotificationCategories.NewComment;
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, object_id });
+          .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.object_id).to.equal(object_id);
         expect(res.body.result.is_active).to.be.equal(true);
+        expect(res.body.result.thread_id).to.be.equal(thread.id);
+        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.comment_id).to.be.null;
+        rootCommmentSubscription = res.body.result;
+      });
+
+      it('should create new-comment subscription on a comment', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewComment;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.category_id).to.be.equal(category);
+        expect(res.body.result.is_active).to.be.equal(true);
+        expect(res.body.result.thread_id).to.be.null;
+        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.comment_id).to.be.equal(comment.id);
+        commentSubscription = res.body.result;
+      });
+
+      it('should not create a duplicate new-comment subscription', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewComment;
+        let res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.id).to.be.equal(rootCommmentSubscription.id);
+
+        res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.id).to.be.equal(commentSubscription.id);
+      });
+
+      it('should fail to create a new-comment subscription on a thread and comment simultaneously', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewComment;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: thread.id,
+            comment_id: comment.id,
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.BothThreadAndComment);
+      });
+
+      it('should fail to create a new-comment subscription without a thread or comment', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewComment;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.NoThreadOrComment);
+      });
+
+      it('should fail to create a new-comment subscription on a non-existent thread', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewComment;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, thread_id: 999999 });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(
+          'Cannot find thread model for new subscription'
+        );
+      });
+
+      it('should fail to create a new-comment subscription on a non-existent comment', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewComment;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, comment_id: 999999 });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(
+          'Cannot find comment model for new subscription'
+        );
       });
     });
 
-    it('should make new-comment subscription on thread in community', async () => {
-      let res = await modelUtils.createThread({
-        chainId: chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        title: 't',
-        body: 't',
-        kind: 'discussion',
-        stage: 'discussion',
-        topicName: 't',
-        topicId: undefined,
-      });
-      const object_id = `discussion_${res.result.id}`;
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.category_id).to.be.equal(category);
-      expect(res.body.result.object_id).to.equal(`${object_id}`);
-      expect(res.body.result.is_active).to.be.equal(true);
-    });
-
-    it('should make new-comment subscription on thread in chain', async () => {
-      let res = await modelUtils.createThread({
-        chainId: chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        title: 't2',
-        body: 't2',
-        kind: 'discussion',
-        stage: 'discussion',
-        topicName: 't',
-        topicId: undefined,
-      });
-      const object_id = `discussion_${res.result.id}`;
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.category_id).to.be.equal(category);
-      expect(res.body.result.object_id).to.equal(`${object_id}`);
-      expect(res.body.result.is_active).to.be.equal(true);
-    });
-
-    it('should make new-comment subscription on comment on thread in chain', async () => {
-      const res1 = await modelUtils.createThread({
-        chainId: chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        title: 't2',
-        body: 't2',
-        kind: 'discussion',
-        stage: 'discussion',
-        topicName: 't',
-        topicId: undefined,
-      });
-      let res = await modelUtils.createComment({
-        chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        text: 'cw4eva',
-        thread_id: res1.result.id,
-      });
-      const object_id = `comment-${res.result.id}`;
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.category_id).to.be.equal(category);
-      expect(res.body.result.object_id).to.equal(`${object_id}`);
-      expect(res.body.result.is_active).to.be.equal(true);
-    });
-
-    it('should make new-comment subscription on comment on thread in community', async () => {
-      let res = await modelUtils.createThread({
-        chainId: chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        title: 't3',
-        body: 't3',
-        kind: 'discussion',
-        stage: 'discussion',
-        topicName: 't',
-        topicId: undefined,
-      });
-      res = await modelUtils.createComment({
-        chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        text: 'hi',
-        thread_id: res.result.id,
-      });
-      const object_id = `comment-${res.result.id}`;
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.category_id).to.be.equal(category);
-      expect(res.body.result.object_id).to.equal(`${object_id}`);
-      expect(res.body.result.is_active).to.be.equal(true);
-    });
-
-    it('should make new-comment subscription on chainEntity', async () => {
-      const entityInstance = await models['ChainEntity'].create({
-        chain: 'edgeware',
-        type: 'treasury-proposal',
-        type_id: '6',
-        completed: false,
-      });
-      const object_id = `treasuryproposal_${entityInstance.type_id}`;
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({
+    describe(`${NotificationCategories.NewReaction} subscription tests`, () => {
+      let thread, comment, rootCommmentSubscription, commentSubscription;
+      before('create thread and comment', async () => {
+        let res = await modelUtils.createThread({
+          chainId: chain,
+          address: loggedInAddr,
           jwt: jwtToken,
-          category,
-          is_active,
-          object_id,
-          chain_id: 'edgeware',
+          title: 't',
+          body: 't',
+          kind: 'discussion',
+          stage: 'discussion',
+          topicName: 't',
+          topicId: undefined,
         });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.category_id).to.be.equal(category);
-      expect(res.body.result.object_id).to.equal(`${object_id}`);
-      expect(res.body.result.is_active).to.be.equal(true);
-    });
+        expect(res).to.not.be.null;
+        expect(res.status).to.be.equal('Success');
+        thread = res.result;
 
-    it('should fail to make new-comment subscription on chainEntity without chain', async () => {
-      const chainEntity = await models['ChainEntity'].create({
-        chain: 'edgeware',
-        type: 'treasury-proposal',
-        type_id: '6',
-        completed: false,
+        res = await modelUtils.createComment({
+          chain,
+          address: loggedInAddr,
+          jwt: jwtToken,
+          text: 'cw4eva',
+          thread_id: thread.id,
+        });
+        expect(res).to.not.be.null;
+        expect(res.status).to.be.equal('Success');
+        comment = res.result;
       });
-      const object_id = `treasuryproposal_${chainEntity.type_id}`;
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.ChainRequiredForEntity);
+
+      it('should create a new-reaction subscription on a thread', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.category_id).to.be.equal(category);
+        expect(res.body.result.is_active).to.be.equal(true);
+        expect(res.body.result.thread_id).to.be.equal(thread.id);
+        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.comment_id).to.be.null;
+        rootCommmentSubscription = res.body.result;
+      });
+
+      it('should create new-reaction subscription on a comment', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.category_id).to.be.equal(category);
+        expect(res.body.result.is_active).to.be.equal(true);
+        expect(res.body.result.thread_id).to.be.null;
+        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.comment_id).to.be.equal(comment.id);
+        commentSubscription = res.body.result;
+      });
+
+      it('should not create a duplicate new-reaction subscription', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        let res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.id).to.be.equal(rootCommmentSubscription.id);
+
+        res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.id).to.be.equal(commentSubscription.id);
+      });
+
+      it('should fail to create a new-reaction subscription on a thread and comment simultaneously', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: thread.id,
+            comment_id: comment.id,
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.BothThreadAndComment);
+      });
+
+      it('should fail to create a new-reaction subscription without a thread or comment', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.NoThreadOrComment);
+      });
+
+      it('should fail to create a new-reaction subscription on a non-existent thread', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, thread_id: 999999 });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(
+          'Cannot find thread model for new subscription'
+        );
+      });
+
+      it('should fail to create a new-reaction subscription on a non-existent comment', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, comment_id: 999999 });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(
+          'Cannot find comment model for new subscription'
+        );
+      });
     });
 
-    it('should fail to make new-comment subscription on nonexistent chainEntity', async () => {
-      const object_id = `treasuryproposal_${10}`;
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          category,
-          is_active,
-          object_id,
-          chain_id: 'edgeware',
+    describe(`${NotificationCategories.NewMention} subscription tests`, () => {
+      it('should fail to create a new-mention subscription using this route', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewMention;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.NoMentions);
+      });
+    });
+
+    describe(`${NotificationCategories.NewCollaboration} subscription tests`, () => {
+      it('should fail to create a new-collaboration subscription using this route', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewCollaboration;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.NoCollaborations);
+      });
+    });
+
+    describe(`${NotificationCategories.ChainEvent} subscription tests`, () => {
+      let chainSubscription;
+
+      it('should create a chain-event subscription', async () => {
+        const is_active = true;
+        const category = NotificationCategories.ChainEvent;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, chain_id: chain });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.category_id).to.be.equal(category);
+        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.is_active).to.be.equal(true);
+        chainSubscription = res.body.result;
+      });
+
+      it('should not create a duplicate chain-event subscription', async () => {
+        const is_active = true;
+        const category = NotificationCategories.ChainEvent;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, chain_id: chain });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.category_id).to.be.equal(category);
+        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.is_active).to.be.equal(true);
+        expect(res.body.result.id).to.equal(chainSubscription.id);
+      });
+
+      it('should fail to create a chain-event subscription with an invalid chain', async () => {
+        const is_active = true;
+        const category = NotificationCategories.ChainEvent;
+        let res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.be.equal(Errors.InvalidChain);
+
+        res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            chain_id: 'very_random_chain_name_yee_haw',
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.be.equal(Errors.InvalidChain);
+      });
+    });
+
+    describe(`${NotificationCategories.SnapshotProposal} subscription tests`, () => {
+      const snapshot_id = 'test_space';
+      let snapshotSubscription;
+
+      before('create a snapshot space', async () => {
+        await models.SnapshotSpace.create({
+          snapshot_space: snapshot_id,
         });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.NoChainEntity);
+      });
+
+      it('should create a snapshot-proposal subscription', async () => {
+        const is_active = true;
+        const category = NotificationCategories.SnapshotProposal;
+        const snapshot_id = 'test_space';
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, snapshot_id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.category_id).to.be.equal(category);
+        expect(res.body.result.is_active).to.be.equal(true);
+        expect(res.body.result.snapshot_id).to.be.equal(snapshot_id);
+        snapshotSubscription = res.body.result;
+      });
+
+      it('should not create a duplicate snapshot-proposal subscription', async () => {
+        const is_active = true;
+        const category = NotificationCategories.SnapshotProposal;
+        const snapshot_id = 'test_space';
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active, snapshot_id });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.category_id).to.be.equal(category);
+        expect(res.body.result.is_active).to.be.equal(true);
+        expect(res.body.result.id).to.equal(snapshotSubscription.id);
+      });
+
+      it('should fail to create a chain-event subscription with an invalid snapshot_id', async () => {
+        const is_active = true;
+        const category = NotificationCategories.SnapshotProposal;
+        let res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.be.equal(Errors.InvalidSnapshotSpace);
+
+        res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            snapshot_id: 'very_random_snapshot_space_yee_haw',
+          });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.be.equal(Errors.InvalidSnapshotSpace);
+      });
     });
 
-    it('should fail to make new-comment subscription on nonexistent comment', async () => {
-      const object_id = 'comment-420';
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          category,
-          is_active,
-          object_id,
-          chain_id: 'edgeware',
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.NoComment);
-    });
+    describe('Misc category subscription tests', () => {
+      it('should fail to create a subscription with an unknown category', async () => {
+        const is_active = true;
+        const category = 'unknown_category';
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.be.equal(Errors.InvalidNotificationCategory);
+      });
 
-    it('should fail to make new-comment subscription on nonexistent thread', async () => {
-      const object_id = 'discussion_420';
-      const is_active = true;
-      const category = NotificationCategories.NewComment;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          category,
-          is_active,
-          object_id,
-          chain_id: 'edgeware',
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.NoThread);
-    });
+      it('should fail to create a subscription with an invalid category', async () => {
+        const is_active = true;
+        let category = NotificationCategories.ThreadEdit;
+        let res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.be.equal(Errors.InvalidSubscriptionCategory);
 
-    it.skip('should make chain-event subscription', async () => {
-      const object_id = 'edgeware-democracy-proposed';
-      const is_active = true;
-      const category = NotificationCategories.ChainEvent;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body).to.not.be.null;
-      expect(res.body.result.category_id).to.be.equal(category);
-      expect(res.body.result.object_id).to.equal(`${object_id}`);
-      expect(res.body.result.is_active).to.be.equal(true);
+        category = NotificationCategories.ThreadEdit;
+        res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, category, is_active });
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.be.equal(Errors.InvalidSubscriptionCategory);
+      });
     });
+  });
 
-    it('should fail to make chain-event subscription with invalid type', async () => {
-      const object_id = 'edgeware-onchain-party';
-      const is_active = true;
-      const category = NotificationCategories.ChainEvent;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.InvalidChainEventId);
-    });
-
-    it('should fail to make chain-event subscription with invalid chain', async () => {
-      const object_id = 'zakchain-treasury-proposal';
-      const is_active = true;
-      const category = NotificationCategories.ChainEvent;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.InvalidChain);
-    });
-
-    it('should fail to make new-mention subscription generally', async () => {
-      const object_id = 'user-2020';
-      const is_active = true;
-      const category = NotificationCategories.NewMention;
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.NoMentions);
-    });
-
-    it('should fail to make subscription with nonexistent category_id', async () => {
-      const object_id = 'treasuryproposal_6';
-      const is_active = true;
-      const category = 'offchain-event';
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.InvalidNotificationCategory);
-    });
-
-    it('should fail to make subscription with nonexistent object_id', async () => {
-      const object_id = undefined;
-      const is_active = true;
-      const category = 'offchain-event';
-      const res = await chai
-        .request(app)
-        .post('/api/createSubscription')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, category, is_active, object_id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(Errors.NoCategory);
-    });
-
+  describe('/viewSubscriptions', () => {
     it.skip('should check /viewSubscriptions for all', async () => {
       const subscription = await modelUtils.createSubscription({
         jwt: jwtToken,

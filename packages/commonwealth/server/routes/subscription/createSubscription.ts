@@ -4,6 +4,7 @@ import type { DB } from '../../models';
 import Errors from './errors';
 import { ChainInstance } from 'server/models/chain';
 import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
+import { NotificationCategories } from 'common-common/src/types';
 
 export default async (
   models: DB,
@@ -32,7 +33,7 @@ export default async (
   let obj, chain: ChainInstance, thread, comment;
 
   switch (category.name) {
-    case 'new-thread-creation': {
+    case NotificationCategories.NewThread: {
       // this check avoids a 500 error -> 'WHERE parameter "id" has invalid "undefined" value'
       if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
       chain = await models.Chain.findOne({
@@ -44,7 +45,10 @@ export default async (
       obj = { chain_id: req.body.chain_id };
       break;
     }
-    case 'snapshot-proposal': {
+    case NotificationCategories.SnapshotProposal: {
+      if (!req.body.snapshot_id) {
+        return next(new AppError(Errors.InvalidSnapshotSpace));
+      }
       const space = await models.SnapshotSpace.findOne({
         where: {
           snapshot_space: req.body.snapshot_id,
@@ -54,8 +58,14 @@ export default async (
       obj = { snapshot_id: req.body.snapshot_id };
       break;
     }
-    case 'new-comment-creation':
-    case 'new-reaction': {
+    case NotificationCategories.NewComment:
+    case NotificationCategories.NewReaction: {
+      if (!req.body.thread_id && !req.body.comment_id) {
+        return next(new AppError(Errors.NoThreadOrComment));
+      } else if (req.body.thread_id && req.body.comment_id) {
+        return next(new AppError(Errors.BothThreadAndComment));
+      }
+
       if (req.body.thread_id) {
         thread = await models.Thread.findOne({
           where: { id: req.body.thread_id },
@@ -72,9 +82,13 @@ export default async (
       break;
     }
 
-    case 'new-mention':
+    case NotificationCategories.NewMention:
       return next(new AppError(Errors.NoMentions));
-    case 'chain-event': {
+    case NotificationCategories.NewCollaboration:
+      return next(new AppError(Errors.NoCollaborations));
+    case NotificationCategories.ChainEvent: {
+      if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
+
       chain = await models.Chain.findOne({
         where: {
           id: req.body.chain_id,
@@ -104,7 +118,7 @@ export default async (
     subJson.Thread = thread.toJSON();
   }
   if (comment) {
-    subJson.Comment = thread.toJSON();
+    subJson.Comment = comment.toJSON();
   }
 
   return res.json({ status: 'Success', result: subJson });
