@@ -4,14 +4,14 @@ import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
 import MinimumProfile from 'models/MinimumProfile';
 import NotificationSubscription from 'models/NotificationSubscription';
+import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import {
   ThreadStage
 } from 'models/types';
 import app from 'state';
-import { addThreadInAllCaches } from './helpers/cache';
-import Thread from 'models/Thread';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
+import { addThreadInAllCaches } from './helpers/cache';
 
 interface CreateThreadProps {
   address: string;

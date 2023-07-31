@@ -160,8 +160,8 @@ export class Thread implements IUniqueId {
     has_poll: boolean;
     numberOfComments?: number;
     polls?: Poll[];
-    Attachments: Attachment[]; // TODO: fix type
-    topic: any; // TODO: fix type
+    Attachments: Attachment[]; // TODO: this is to be removed
+    topic: Topic;
     reactions?: any[]; // TODO: fix type
     reactionIds: any[]; // TODO: fix type
     addressesReacted: any[]; //TODO: fix type,
@@ -170,6 +170,7 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
   }) {
+    console.log("Address => ", Address)
     this.author = Address.address;
     this.authorChain = Address.chain;
     this.id = id;
@@ -184,7 +185,7 @@ export class Thread implements IUniqueId {
     this.plaintext = plaintext;
     this.readOnly = read_only;
     this.hasPoll = has_poll;
-    this.topic = topic?.id ? new Topic(topic) : null;
+    this.topic = topic?.id ? new Topic({...(topic || {})} as any) : null;
     this.numberOfComments = numberOfComments || 0;
     this.links = links || [];
     this.collaborators = collaborators || [];

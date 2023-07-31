@@ -4,7 +4,7 @@ import Thread from 'models/Thread';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 
-const THREAD_STALE_TIME = 30 * 1_000; // 30 s
+const THREAD_STALE_TIME = 180000; // 3 minutes
 
 interface GetThreadsByIdProps {
   chainId: string;

@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import Thread from 'models/Thread';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import app from 'state';
@@ -7,10 +8,9 @@ import { ApiEndpoints } from 'state/api/config';
 import {
   ThreadTimelineFilterTypes
 } from '../../../models/types';
-import Thread from 'models/Thread';
 import { cacheTypes } from './helpers/cache';
 
-const THREADS_STALE_TIME = 100 * 1_000; // 30s todo: UNDO THIS
+const THREADS_STALE_TIME = 180000; // 3 minutes
 
 const QueryTypes = {
   ACTIVE: cacheTypes.ACTIVE_THREADS,
