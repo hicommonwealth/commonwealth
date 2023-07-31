@@ -18,7 +18,7 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 import {
   defaultChainRows,
   ethChainRows,
-  updateAdminRole,
+  updateAdminOnCreateCommunity,
 } from './chain_input_rows';
 import type { EthChainFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -239,7 +239,7 @@ export const ERC20Form = (props: EthChainFormState) => {
             }
 
             await initAppState(false);
-            await updateAdminRole(id);
+            await updateAdminOnCreateCommunity(id);
 
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {

@@ -12,7 +12,10 @@ import { constructSubstrateUrl } from 'substrate';
 import { slugify } from 'utils';
 import { InputRow } from 'views/components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { defaultChainRows, updateAdminRole } from './chain_input_rows';
+import {
+  defaultChainRows,
+  updateAdminOnCreateCommunity,
+} from './chain_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   useChainFormIdFields,
@@ -152,7 +155,7 @@ export const SubstrateForm = () => {
                   res.result.role.chain_id
                 );
               }
-              await updateAdminRole(slugify(name));
+              await updateAdminOnCreateCommunity(slugify(name));
               navigate(`/${res.result.chain.id}`);
             })
             .catch((err: any) => {
