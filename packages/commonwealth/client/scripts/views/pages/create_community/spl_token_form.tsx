@@ -14,7 +14,10 @@ import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { defaultChainRows, updateAdminRole } from './chain_input_rows';
+import {
+  defaultChainRows,
+  updateAdminOnCreateCommunity,
+} from './chain_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   useChainFormIdFields,
@@ -173,7 +176,7 @@ export const SplTokenForm = () => {
             }
 
             await initAppState(false);
-            await updateAdminRole(id);
+            await updateAdminOnCreateCommunity(id);
 
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {

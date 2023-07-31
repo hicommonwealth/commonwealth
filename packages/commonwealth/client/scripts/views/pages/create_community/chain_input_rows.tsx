@@ -15,7 +15,7 @@ import type {
   UseEthChainFormFieldsHookType,
 } from './types';
 
-export async function updateAdminRole(chainId: string) {
+export async function updateAdminOnCreateCommunity(chainId: string) {
   app.user.ephemerallySetActiveAccount(
     app.user.addresses.filter((a) => a.chain.id === chainId)[0]
   );
@@ -28,6 +28,7 @@ export async function updateAdminRole(chainId: string) {
   });
 
   app.roles.addRole(roles.data.result[0]);
+  app.skipDeinitChain = true;
 }
 
 export const initChainForm = (): ChainFormDefaultFields => {
