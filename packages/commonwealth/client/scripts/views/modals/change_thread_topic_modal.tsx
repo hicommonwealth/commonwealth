@@ -43,8 +43,8 @@ export const ChangeThreadTopicModal = ({
         oldTopicId: thread?.topic?.id
       })
 
-      onChangeHandler(updatedTopic);
-      onModalClose();
+      onChangeHandler && onChangeHandler(updatedTopic);
+      onModalClose && onModalClose();
     } catch (err) {
       const error = err?.responseJSON?.error || 'Failed to update thread topic'
       console.log(error);

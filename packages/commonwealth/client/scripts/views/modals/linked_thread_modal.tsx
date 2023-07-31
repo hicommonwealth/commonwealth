@@ -76,7 +76,7 @@ export const LinkedThreadModal = ({
 
       onModalClose();
 
-      if (links) {
+      if (links && onSave) {
         onSave(links);
       }
     } catch (err) {
