@@ -1,5 +1,8 @@
 import { NotificationCategories } from 'common-common/src/types';
-import { mapNotificationsDataToSubscriptions } from '../../server/util/subscriptionMapping';
+import {
+  checkSubscriptionValues,
+  mapNotificationsDataToSubscriptions,
+} from '../../server/util/subscriptionMapping';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {
@@ -12,7 +15,7 @@ import { SupportedNetwork } from 'chain-events/src';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('Subscription Mapping Tests', () => {
+describe('Subscription Mapping Tests', () => {
   describe('Tests mapNotificationsDataToSubscriptions', () => {
     const chain = 'ethereum';
     const threadId = 1;
@@ -194,6 +197,181 @@ describe.only('Subscription Mapping Tests', () => {
         category_id: NotificationCategories.SnapshotProposal,
         snapshot_id: snapshotSpace,
       });
+    });
+  });
+
+  describe('Tests checkSubscriptionValues', () => {
+    it('should throw if chain event subscription values are incorrect', () => {
+      let subData: Record<string, unknown> = {
+        category_id: NotificationCategories.ChainEvent,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `chain_id cannot be undefined for a ${NotificationCategories.ChainEvent} subscription`
+      );
+
+      subData = {
+        category_id: NotificationCategories.ChainEvent,
+        chain_id: 'ethereum',
+      };
+      expect(() => checkSubscriptionValues(subData)).to.not.throw();
+    });
+
+    it('should throw if snapshot proposal subscription values are incorrect', () => {
+      const subData = {
+        category_id: NotificationCategories.SnapshotProposal,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `snapshot_id cannot be undefined for a ${NotificationCategories.SnapshotProposal} subscription`
+      );
+
+      const subData2 = {
+        category_id: NotificationCategories.SnapshotProposal,
+        snapshot_id: 'test',
+      };
+      expect(() => checkSubscriptionValues(subData2)).to.not.throw();
+    });
+
+    it('should throw if new thread subscription values are incorrect', () => {
+      const subData = {
+        category_id: NotificationCategories.NewThread,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `chain_id cannot be undefined for a ${NotificationCategories.NewThread} subscription`
+      );
+
+      const subData2 = {
+        category_id: NotificationCategories.NewThread,
+        chain_id: 'ethereum',
+      };
+      expect(() => checkSubscriptionValues(subData2)).to.not.throw();
+    });
+
+    it('should throw if new comment subscription values are incorrect', () => {
+      let subData: any = {
+        category_id: NotificationCategories.NewComment,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `chain_id cannot be undefined for a ${NotificationCategories.NewComment} subscription`
+      );
+
+      subData = {
+        category_id: NotificationCategories.NewComment,
+        chain_id: 'ethereum',
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `A thread-level (root) ${NotificationCategories.NewComment} subscription must define a thread_id` +
+          ` and a sub-level subscription must define a comment_id`
+      );
+
+      subData = {
+        category_id: NotificationCategories.NewComment,
+        chain_id: 'ethereum',
+        thread_id: 1,
+        comment_id: 2,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `A ${NotificationCategories.NewComment} subscription cannot define` +
+          `both a thread_id and a comment_id`
+      );
+
+      subData = {
+        category_id: NotificationCategories.NewComment,
+        chain_id: 'ethereum',
+        thread_id: 1,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.not.throw();
+
+      subData = {
+        category_id: NotificationCategories.NewComment,
+        chain_id: 'ethereum',
+        comment_id: 1,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.not.throw();
+    });
+
+    it('should throw if new reaction subscription values are incorrect', () => {
+      let subData: any = {
+        category_id: NotificationCategories.NewReaction,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `chain_id cannot be undefined for a ${NotificationCategories.NewReaction} subscription`
+      );
+
+      subData = {
+        category_id: NotificationCategories.NewReaction,
+        chain_id: 'ethereum',
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `A thread-level (root) ${NotificationCategories.NewReaction} subscription must define a thread_id` +
+          ` and a sub-level subscription must define a comment_id`
+      );
+
+      subData = {
+        category_id: NotificationCategories.NewReaction,
+        chain_id: 'ethereum',
+        thread_id: 1,
+        comment_id: 2,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `A ${NotificationCategories.NewReaction} subscription cannot define` +
+          `both a thread_id and a comment_id`
+      );
+
+      subData = {
+        category_id: NotificationCategories.NewReaction,
+        chain_id: 'ethereum',
+        thread_id: 1,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.not.throw();
+
+      subData = {
+        category_id: NotificationCategories.NewReaction,
+        chain_id: 'ethereum',
+        comment_id: 1,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.not.throw();
+    });
+
+    it('should not throw for new collaboration subscription values', () => {
+      const subData = {
+        category_id: NotificationCategories.NewCollaboration,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.not.throw();
+    });
+
+    it('should not throw for new mention subscription values', () => {
+      const subData = {
+        category_id: NotificationCategories.NewMention,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.not.throw();
+    });
+
+    it('should throw for thread edit subscription values', () => {
+      const subData = {
+        category_id: NotificationCategories.ThreadEdit,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `${NotificationCategories.ThreadEdit} subscriptions are not supported`
+      );
+    });
+
+    it('should throw for comment edit subscription values', () => {
+      const subData = {
+        category_id: NotificationCategories.CommentEdit,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `${NotificationCategories.CommentEdit} subscriptions are not supported`
+      );
+    });
+
+    it('should throw for any unrecognized notification category', () => {
+      const notifCategory = 'random';
+      const subData = {
+        category_id: notifCategory,
+      };
+      expect(() => checkSubscriptionValues(subData)).to.throw(
+        `${notifCategory} subscriptions are not supported`
+      );
     });
   });
 });

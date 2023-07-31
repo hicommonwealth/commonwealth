@@ -61,6 +61,19 @@ export function checkSubscriptionValues(
   values: CreationAttributes<SubscriptionInstance>
 ) {
   if (
+    values.category_id !== NotificationCategories.NewMention &&
+    values.category_id !== NotificationCategories.NewCollaboration &&
+    values.category_id !== NotificationCategories.NewThread &&
+    values.category_id !== NotificationCategories.NewComment &&
+    values.category_id !== NotificationCategories.NewReaction &&
+    values.category_id !== NotificationCategories.ChainEvent &&
+    values.category_id !== NotificationCategories.SnapshotProposal
+  ) {
+    // this means we don't support new notification category subscriptions by default
+    throw new Error(`${values.category_id} subscriptions are not supported`);
+  }
+
+  if (
     values.category_id === NotificationCategories.ChainEvent &&
     !values.chain_id
   ) {
@@ -87,7 +100,7 @@ export function checkSubscriptionValues(
   ) {
     if (!values.chain_id) {
       throw new Error(
-        `A ${values.category_id} subscription must define a chain_id`
+        `chain_id cannot be undefined for a ${values.category_id} subscription`
       );
     } else if (!values.thread_id && !values.comment_id) {
       throw new Error(
@@ -100,11 +113,5 @@ export function checkSubscriptionValues(
           `both a thread_id and a comment_id`
       );
     }
-  } else if (
-    values.category_id === NotificationCategories.ThreadEdit ||
-    values.category_id === NotificationCategories.CommentEdit
-  ) {
-    throw new Error(`${values.category_id} subscriptions are not supported`);
   }
-  // no need to check NewMention + NewCollaboration because subscriber_id is always required anyway
 }
