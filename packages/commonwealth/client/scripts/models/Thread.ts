@@ -131,6 +131,9 @@ export class Thread implements IUniqueId {
     chain_entity_meta,
     version_history,
     Address,
+    reactionIds,
+    addressesReacted,
+    reactionType
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -160,6 +163,9 @@ export class Thread implements IUniqueId {
     Attachments: Attachment[]; // TODO: fix type
     topic: any; // TODO: fix type
     reactions?: any[]; // TODO: fix type
+    reactionIds: any[]; // TODO: fix type
+    addressesReacted: any[]; //TODO: fix type,
+    reactionType: any[]; // TODO: fix type
     chain_entity_meta: any, // TODO: fix type
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
@@ -203,18 +209,21 @@ export class Thread implements IUniqueId {
       }
     })();
     this.associatedReactions = [];
-    if (reactions) {
-      const reactionIds = reactions.map((r) => r.id);
-      const reactionType = reactions.map((r) => r?.type || r?.reaction);
-      const addressesReacted = reactions.map((r) => r?.address || r?.Address?.address);
-      if (reactionIds?.length > 0) {
-        for (let i = 0; i < reactionIds.length; i++) {
-          this.associatedReactions.push({
-            id: reactionIds[i],
-            type: reactionType[i],
-            address: addressesReacted[i],
-          });
-        }
+    const tempReactionIds = (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
+    const tempReactionType = (reactions ? reactions.map((r) => r?.type || r?.reaction) : reactionType) || [];
+    const tempAddressesReacted = (reactions ? reactions.map((r) => r?.address || r?.Address?.address) : addressesReacted) || [];
+    if (
+      tempReactionIds.length > 0 && (
+        tempReactionIds.length === tempReactionType.length &&
+        tempReactionType.length === tempAddressesReacted.length
+      )
+    ) {
+      for (let i = 0; i < tempReactionIds.length; i++) {
+        this.associatedReactions.push({
+          id: tempReactionIds[i],
+          type: tempReactionType[i],
+          address: tempAddressesReacted[i],
+        });
       }
     }
     this.chainEntities = (() => {
