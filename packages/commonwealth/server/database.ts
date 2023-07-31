@@ -3,7 +3,6 @@ import { DATABASE_URI } from './config';
 
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
-import AttachmentFactory from './models/attachment';
 import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
 import ChainEntityMetaFactory from './models/chain_entity_meta';
@@ -95,7 +94,6 @@ const models: Models = {
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
-  Attachment: AttachmentFactory(sequelize, DataTypes),
   Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),

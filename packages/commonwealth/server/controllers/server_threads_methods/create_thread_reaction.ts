@@ -15,6 +15,7 @@ import { AppError } from '../../../../common-common/src/errors';
 import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -41,16 +42,19 @@ export type CreateThreadReactionResult = [
   TrackOptions
 ];
 
-export async function __createThreadReaction({
-  user,
-  address,
-  chain,
-  reaction,
-  threadId,
-  canvasAction,
-  canvasSession,
-  canvasHash,
-}: CreateThreadReactionOptions): Promise<CreateThreadReactionResult> {
+export async function __createThreadReaction(
+  this: ServerThreadsController,
+  {
+    user,
+    address,
+    chain,
+    reaction,
+    threadId,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+  }: CreateThreadReactionOptions
+): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
     where: { id: threadId },
   });
