@@ -242,11 +242,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta) {
+  if (!app.chain?.meta || isLoading) {
     return <PageLoading />;
   }
 
-  if ((!isLoading && !thread) || (!thread) || (fetchThreadError)) {
+  if ((!isLoading && !thread) || (fetchThreadError)) {
     return <PageNotFound />;
   }
 
@@ -324,6 +324,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showBanner = !hasJoinedCommunity && isBannerVisible;
 
   return (
+    // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
       <CWContentPage
         showTabs={isCollapsedSize && tabsShouldBePresent}
