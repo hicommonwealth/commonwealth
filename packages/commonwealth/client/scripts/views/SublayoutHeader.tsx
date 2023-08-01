@@ -50,7 +50,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               }}
             />
           )}
-        {onMobile && app.activeChainId() && (
+        {onMobile && (
           <CWIconButton
             iconButtonTheme="black"
             iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}

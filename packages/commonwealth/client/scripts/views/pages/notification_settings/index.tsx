@@ -24,10 +24,10 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
-import {
-  FirebaseMessaging,
-  GetTokenOptions,
-} from '@capacitor-firebase/messaging';
+// import {
+//   FirebaseMessaging,
+//   GetTokenOptions,
+// } from '@capacitor-firebase/messaging';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -133,8 +133,8 @@ const NotificationSettingsPage = () => {
 
   // Handler for the 'Request Permission' button
   const requestPermission = async () => {
-    const permission = await FirebaseMessaging.requestPermissions();
-    console.log(`Permission: ${permission}`);
+    // const permission = await FirebaseMessaging.requestPermissions();
+    // console.log(`Permission: ${permission}`);
   };
 
   // Handler for the 'Get Token' button
@@ -142,20 +142,20 @@ const NotificationSettingsPage = () => {
     const vapidKey =
       'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
 
-    await FirebaseMessaging.getToken({ vapidKey: vapidKey })
-      .then((currentToken) => {
-        if (currentToken) {
-          console.log('Current token:', currentToken);
-          setToken(currentToken.token);
-        } else {
-          console.log(
-            'No registration token available. Request permission to generate one.'
-          );
-        }
-      })
-      .catch((err) => {
-        console.log('An error occurred while retrieving token. ', err);
-      });
+    // await FirebaseMessaging.getToken({ vapidKey: vapidKey })
+    //   .then((currentToken) => {
+    //     if (currentToken) {
+    //       console.log('Current token:', currentToken);
+    //       setToken(currentToken.token);
+    //     } else {
+    //       console.log(
+    //         'No registration token available. Request permission to generate one.'
+    //       );
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log('An error occurred while retrieving token. ', err);
+    //   });
   };
 
   return (
