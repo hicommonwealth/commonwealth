@@ -267,6 +267,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 );
                 setThreads(tempThreads);
               }}
+              onArchive={() => {
+              }}
               onTopicChange={(topic) => {
                 if (topic.id !== thread.topic.id) {
                   const tempThreads = [...threads].filter(

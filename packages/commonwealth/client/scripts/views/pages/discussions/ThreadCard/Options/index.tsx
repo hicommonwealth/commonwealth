@@ -32,6 +32,7 @@ export const Options = ({
   onTopicChange,
   onCollaboratorsEdit,
   onDelete,
+  onArchive,
   onEditStart,
   onEditCancel,
   onEditConfirm,
@@ -40,7 +41,6 @@ export const Options = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
-  archivedAt,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -91,7 +91,7 @@ export const Options = ({
           )}
         />
 
-        { archivedAt === null &&
+        { thread.archivedAt === null &&
           <button
             onClick={async (e) => {
               // prevent clicks from propagating to discussion row
@@ -134,6 +134,7 @@ export const Options = ({
             onProposalStageChange={onProposalStageChange}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             onSpamToggle={onSpamToggle}
+            onArchive={onArchive}
             hasPendingEdits={hasPendingEdits}
             archivedAt={thread.archivedAt}
           />

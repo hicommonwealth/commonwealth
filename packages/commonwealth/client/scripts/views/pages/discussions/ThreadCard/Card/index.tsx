@@ -46,6 +46,7 @@ export const Card = ({
   onEditStart,
   onEditCancel,
   onEditConfirm,
+  onArchive,
   hasPendingEdits,
   onBodyClick,
   onStageTagClick,
@@ -199,8 +200,8 @@ export const Card = ({
               onEditStart={onEditStart}
               onEditCancel={onEditCancel}
               onEditConfirm={onEditConfirm}
+              onArchive={onArchive}
               hasPendingEdits={hasPendingEdits}
-              archivedAt={thread.archivedAt}
             />
           </div>
         </div>

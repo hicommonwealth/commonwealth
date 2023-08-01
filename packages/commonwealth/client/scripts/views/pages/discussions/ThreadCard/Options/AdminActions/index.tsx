@@ -31,6 +31,7 @@ export type AdminActionsProps = {
   onEditStart?: () => any;
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
+  onArchive?: () => any;
   hasPendingEdits?: boolean;
   archivedAt?: moment.Moment | null;
 };
@@ -48,6 +49,7 @@ export const AdminActions = ({
   onEditStart,
   onEditCancel,
   onEditConfirm,
+  onArchive,
   hasPendingEdits,
   archivedAt,
 }: AdminActionsProps) => {
