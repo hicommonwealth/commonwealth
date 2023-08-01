@@ -32,13 +32,13 @@ const typeIconLookup: {
   error: Warning,
 };
 
-type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
+export type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
 
 interface CWBannerProps {
   type?: BannerType;
   title: string;
   body?: string;
-  buttons: ButtonProps[];
+  buttons?: ButtonProps[];
   className?: string;
   onClose: () => void;
 }
@@ -66,7 +66,7 @@ const CWBanner = ({
   const TypeIcon = typeIconLookup[type];
 
   return (
-    <div className={clsx('CWBanner', className)}>
+    <div className={clsx('CWBanner', className, type)}>
       {type !== 'default' && (
         <div className="type-icon-container">
           <TypeIcon size={24} />

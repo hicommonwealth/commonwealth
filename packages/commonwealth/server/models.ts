@@ -1,7 +1,6 @@
 import type { Sequelize } from 'sequelize';
 
 import type { AddressModelStatic } from './models/address';
-import type { AttachmentModelStatic } from './models/attachment';
 import type { BanModelStatic } from './models/ban';
 import type { ChainModelStatic } from './models/chain';
 import type { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
@@ -60,7 +59,6 @@ export type Models = {
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
-  Attachment: AttachmentModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;
   Reaction: ReactionModelStatic;

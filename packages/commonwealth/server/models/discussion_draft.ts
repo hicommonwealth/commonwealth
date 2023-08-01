@@ -9,7 +9,6 @@ export type DiscussionDraftAttributes = {
   topic?: string;
   body?: string;
   chain: string;
-  attachment?: string;
 };
 
 export type DiscussionDraftInstance = ModelInstance<DiscussionDraftAttributes>;
@@ -30,7 +29,6 @@ export default (
       topic: { type: DataTypes.STRING, allowNull: true },
       body: { type: DataTypes.TEXT, allowNull: true },
       chain: { type: DataTypes.STRING, allowNull: false },
-      attachment: { type: DataTypes.INTEGER, allowNull: true },
     },
     {
       tableName: 'DiscussionDrafts',
@@ -50,11 +48,6 @@ export default (
     models.DiscussionDraft.belongsTo(models.Address, {
       foreignKey: 'address_id',
       targetKey: 'id',
-    });
-    models.DiscussionDraft.hasMany(models.Attachment, {
-      foreignKey: 'attachment_id',
-      constraints: false,
-      scope: { attachable: 'thread' },
     });
   };
 

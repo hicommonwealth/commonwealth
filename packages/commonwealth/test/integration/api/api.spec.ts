@@ -23,4 +23,14 @@ describe('API Tests', () => {
     expect(res.body).to.not.be.null;
     expect(res.body.result).to.not.be.null;
   });
+
+  it('Should receive a 405 error when requesting with an invalid method', async () => {
+    const res = await chai
+      .request(app)
+      .post('/api/viewVotes?chain=ethereum')
+      .set('Accept', 'application/json');
+
+    expect(res.status).to.equal(405);
+    res.should.have.header('Allow', 'GET');
+  });
 });

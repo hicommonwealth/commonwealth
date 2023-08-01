@@ -1,9 +1,4 @@
-import {
-  TypedRequest,
-  TypedRequestBody,
-  TypedResponse,
-  success,
-} from '../../types';
+import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { CommentAttributes } from 'server/models/comment';
 import { AppError } from '../../../../common-common/src/errors';
@@ -38,7 +33,6 @@ export const updateCommentHandler = async (
   if (!commentBody) {
     throw new AppError(Errors.NoBody);
   }
-  const attachments = req.body['attachments[]'];
 
   const [updatedComment, notificationOptions] =
     await controllers.comments.updateComment({
@@ -47,7 +41,6 @@ export const updateCommentHandler = async (
       chain,
       commentId,
       commentBody,
-      attachments,
     });
 
   // emit notifications

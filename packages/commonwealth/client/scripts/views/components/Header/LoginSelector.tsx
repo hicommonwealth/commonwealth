@@ -10,6 +10,7 @@ import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { CWButton } from '../component_kit/cw_button';
+import { CWButton as CWButtonNew } from '../component_kit/new_designs/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
@@ -101,8 +102,8 @@ export const LoginSelector = () => {
           profileLoadComplete &&
           !hasJoinedCommunity && (
             <div className="join-button-container">
-              <CWButton
-                buttonType="tertiary-black"
+              <CWButtonNew
+                buttonType="primary"
                 onClick={handleJoinCommunity}
                 label={
                   sameBaseAddressesRemoveDuplicates.length === 0
@@ -111,7 +112,7 @@ export const LoginSelector = () => {
                         CHAINBASE_SHORT[app.chain?.meta?.base] ||
                         ''
                       } address`
-                    : 'Join'
+                    : 'Join community'
                 }
               />
             </div>
@@ -130,10 +131,7 @@ export const LoginSelector = () => {
                 <User user={app.user.addresses[0]} />
               </div>
 
-              <Popover
-                content={<LoginSelectorMenuLeft />}
-                {...leftMenuProps}
-              />
+              <Popover content={<LoginSelectorMenuLeft />} {...leftMenuProps} />
             </div>
           </ClickAwayListener>
         )}

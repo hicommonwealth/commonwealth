@@ -2,14 +2,10 @@
 import $ from 'jquery';
 import moment from 'moment';
 import app from 'state';
-import Attachment from '../../models/Attachment';
 import DiscussionDraft from '../../models/DiscussionDraft';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
-  const attachments = draft.Attachments
-    ? draft.Attachments.map((a) => new Attachment(a.url, a.description))
-    : [];
   return new DiscussionDraft(
     draft.Address.address,
     draft.id,
@@ -17,8 +13,7 @@ const modelFromServer = (draft) => {
     draft.title,
     draft.body,
     draft.topic,
-    moment(draft.created_at),
-    attachments
+    moment(draft.created_at)
   );
 };
 
@@ -27,7 +22,6 @@ export type DraftParams = {
   title: string;
   body: string;
   topicName: string;
-  attachments?: string[];
 };
 
 class DraftsController {
@@ -44,7 +38,7 @@ class DraftsController {
   }
 
   public async create(params: DraftParams) {
-    const { title, body, topicName, attachments } = params;
+    const { title, body, topicName } = params;
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
         address: app.user.activeAccount.address,
@@ -53,7 +47,6 @@ class DraftsController {
         title,
         body,
         topic: topicName,
-        'attachments[]': attachments,
         jwt: app.user.jwt,
       });
       const result = modelFromServer(response.result);
@@ -68,9 +61,8 @@ class DraftsController {
     }
   }
 
-  // TODO: Handle attachments
   public async edit(params: DraftParams) {
-    const { existingDraftId, title, body, topicName, attachments } = params;
+    const { existingDraftId, title, body, topicName } = params;
     if (!existingDraftId) {
       throw new Error('Must include id of draft being edited.');
     }
@@ -85,7 +77,6 @@ class DraftsController {
           title,
           body,
           topic: topicName,
-          'attachments[]': attachments,
           jwt: app.user.jwt,
         },
       });

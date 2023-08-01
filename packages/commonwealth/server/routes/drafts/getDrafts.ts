@@ -15,7 +15,7 @@ const getDiscussionDrafts = async (models, req: Request, res: Response) => {
         [Op.in]: addressIds,
       },
     },
-    include: [models.Address, models.Attachment],
+    include: [models.Address],
   });
 
   return res.json({ status: 'Success', result: drafts.map((d) => d.toJSON()) });
