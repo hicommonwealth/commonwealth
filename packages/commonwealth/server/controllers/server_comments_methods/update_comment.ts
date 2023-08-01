@@ -13,6 +13,7 @@ import { parseUserMentions } from '../../util/parseUserMentions';
 import { CommentAttributes } from '../../models/comment';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   ThreadNotFoundForComment: 'Thread not found for comment',
@@ -40,7 +41,7 @@ export async function __updateComment(
     address: address.address,
   });
   if (!canInteract) {
-    throw new Error(`${Errors.BanError}: ${banError}`);
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   const userOwnedAddressIds = (await user.getAddresses())
@@ -57,7 +58,7 @@ export async function __updateComment(
     where: { id: comment.thread_id },
   });
   if (!thread) {
-    throw new Error(Errors.ThreadNotFoundForComment);
+    throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
   let latestVersion;
@@ -136,7 +137,7 @@ export async function __updateComment(
       return !alreadyExists;
     });
   } catch (e) {
-    throw new Error(Errors.ParseMentionsFailed);
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   // grab mentions to notify tagged users

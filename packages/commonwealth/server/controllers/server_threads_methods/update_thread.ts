@@ -13,6 +13,7 @@ import {
 } from '../../../../common-common/src/types';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ThreadAttributes } from '../../models/thread';
+import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -79,7 +80,7 @@ export async function __updateThread(
       address: address.address,
     });
     if (!canInteract) {
-      throw new Error(`${Errors.BanError}: ${banError}`);
+      throw new AppError(`${Errors.BanError}: ${banError}`);
     }
   }
 
@@ -99,12 +100,12 @@ export async function __updateThread(
     });
   }
   if (!thread) {
-    throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+    throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
   // check body
   if (thread.kind === 'discussion' && (!body || !body.trim())) {
-    throw new Error(Errors.NoBody);
+    throw new AppError(Errors.NoBody);
   }
 
   let latestVersion;
@@ -152,7 +153,7 @@ export async function __updateThread(
     if (validURL(url)) {
       thread.url = url;
     } else {
-      throw new Error(Errors.InvalidLink);
+      throw new AppError(Errors.InvalidLink);
     }
   }
   thread.last_edited = new Date().toISOString();
@@ -206,7 +207,7 @@ export async function __updateThread(
       return !alreadyExists;
     });
   } catch (e) {
-    throw new Error(Errors.ParseMentionsFailed);
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   // grab mentions to notify tagged users
