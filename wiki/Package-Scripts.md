@@ -1,15 +1,16 @@
-Documentation for [packages/commonwealth/package.json](../package.json).
+_Documentation for [the Commonwealth package.json file](../packages/commonwealth/package.json)._
 
-CONTENTS:
-- [Build Scripts](#Build%20Scripts)
+_Entries with an asterisk have been flagged for removal._
+
+**CONTENTS**
+- [Build Scripts](#build-scripts)
   - [build-all](#build-all)
-  - [build-android](#build-android)
   - [build-app](#build-app)
   - [build-consumer](#build-consumer)
-  - [build-ios](#build-ios)
-  - [build:css](#build:css)
-  - [build-storybook](#build-storybook)
-- [Database Scripts](#Database%20Scripts)
+  - [build:css](#buildcss)*
+- [CI Scripts](#ci-scripts)
+  - [wait-server](#wait-server)
+- [Database Scripts](#database-scripts)
   - [db-all](#db-all)
   - [dump-db](#dump-db)
   - [dump-db-limit](#dump-db-limit)
@@ -17,11 +18,25 @@ CONTENTS:
   - [migrate-db](#migrate-db)
   - [migrate-db-down](#migrate-db-down)
   - [migrate-server](#migrate-server)
+- [Mobile](#mobile)
+  - [build-android](#build-android)
+  - [build-ios](#build-ios)
+  - [open-android](#open-android)
+  - [open-ios](#open-ios)
+  - [start-android](#start-android)
+  - [start-ios](#start-ios)
+- [Other Services](#other-services)
+  - [compress-images](#compress-images)*
 - [Storybook](#storybook)
   - [storybook](#storybook-1)
-  - [build-storybook](#build-storybook)
-- [Test Scripts](#Test%20Scripts)
-  - [wait-server](#wait-server)
+  - [build-storybook](#build-storybook)*
+- [Testing](#testing)
+  - [unit-test](#unit-test)
+  - [unit-test:watch](#unit-testwatch)
+- [TSNode]
+  - [listen](#listen)
+  - [start](#start)
+  - [sync-entities](#sync-entities)
 
 # Build Scripts
 
@@ -45,27 +60,11 @@ Definition: `tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsc
 
 Description: Runs a compilation based on tsconfig.consumer.json; does not emit files; replaces alias with relative paths post-compilation.
 
-## build-ios 
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios`
-
-Description: Uses Capacitor library to build app for iOS based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
-## build-android 
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
-
-Description: Uses Capacitor library to build app for iOS based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
 ## build:css
 
-Definition: `NODE_ENV=production build client/styles/shared.scss`
+_Deprecated; recommend for removal._
 
-Description: 
+Definition: `NODE_ENV=production build client/styles/shared.scss` 
 
 Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify.
     
@@ -80,6 +79,16 @@ Description: Builds project on Heroku, using get-max-old-space-size.sh to dynami
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
     
 Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200)
+
+# CI Scripts
+
+## wait-server
+
+Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
+
+Description: Used for CI. Waits for the server to be ready (start serving on port 8080)
+
+Contributor: Kurtis Assad
 
 # Database Scripts
 
@@ -209,16 +218,64 @@ Description: Runs Playwright tests.
 
 Contributor: Kurtis Assad
 
-# Test Scripts
+# Mobile
 
-## wait-server
+_Open question: Are these still in use?_
 
-Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
+## build-android 
 
-Description: Used for CI. Waits for the server to be ready (start serving on port 8080)
+Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
 
-Contributor: Kurtis Assad
-    
+Description: Uses Capacitor library to build app for Android based on webpack.config.mobile.js file.
+
+Contributor: Dillon Chen
+
+## build-ios
+
+Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios`
+
+Description: Uses Capacitor library to build app for iOS based on webpack.config.mobile.js file.
+
+Contributor: Dillon Chen
+
+## open-ios
+
+Definition: `NODE_ENV=mobile npx cap open android`
+
+Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
+
+Contributor: Dillon Chen
+
+## open-ios
+
+Definition: `NODE_ENV=mobile npx cap open ios`
+
+Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
+
+Contributor: Dillon Chen
+
+## start-android
+
+Definition: `npx cap run android`
+
+Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
+
+Contributor: Dillon Chen
+
+## start-ios
+
+Definition: `npx cap run ios`
+
+Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
+
+Contributor: Dillon Chen
+
+# Other services
+
+## compress-images
+
+_Deprecated, recommend removal._
+
 # Storybook
 
 ## storybook
@@ -231,17 +288,13 @@ Contributor: Daniel Martins
 
 ## build-storybook
 
+_Deprecated, recommend removal._
+
 Definition `storybook build`
 
 Description:  Compiles Storybook instance for deployment.
 
 Contributor: Daniel Martins
-
-# Other services
-
-## compress-images
-
-Notes: Deprecated, Kurtis (contributor) recommends removal.
 
 # Testing
 
@@ -261,13 +314,32 @@ Description: Watches for changes to any .spec files within `./test/unit` and aut
 
 Contributor: Ryan Bennett
 
+# TSNode
+
+## listen
+
+Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
+
+Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
+
+## start
+
+Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
+
+Description: Used to start the Commonwealth app in development. Runs both the backend and frontend server.
+
+Considerations: Follow up with Kurtis; see #2247
+
+## sync-entities
+
+Definition: `ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)`
+
+Description: See full documentation in [enforceDataConsistency.ts](../packages/commonwealth/server/scripts/enforceDataConsistency.ts).
+
+
 # Undocumented & in-progress
 
-// JAKE
-"sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)",
 
-
-"listen": "RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts",
 
 // TESTING
 "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
@@ -283,13 +355,7 @@ Contributor: Ryan Bennett
 "test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
 "test-scripts": "ts-mocha --project tsconfig.json test/integration/enforceDataConsistency.spec.ts",
 
-## start
 
-Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
-
-Description: Used to start the Commonwealth app in development. Runs both the backend and frontend server.
-
-Considerations: Follow up with Kurtis; see #2247
 
 
 "start-consumer": "ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script",
@@ -306,18 +372,10 @@ Considerations: Follow up with Kurtis; see #2247
 "datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
 
 
-// TIMOTHEE
+//ADDED BY TIMOTHEE
 "create-migration": "npx sequelize migration:generate --name",
 "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get CW_READ_DB -a commonwealth-beta) -a -f limited_dump.sql",
 "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql",
-
-// ADDED BY DILLON
-"start-ios": "npx cap run ios",
-"open-ios": "NODE_ENV=mobile npx cap open ios",
-"start-android": "npx cap run android",
-"open-android": "NODE_ENV=mobile npx cap open ios",
-
-//ADDED BY TIMOTHEE
 "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
 "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
 "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
