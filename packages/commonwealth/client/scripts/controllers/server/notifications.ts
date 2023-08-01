@@ -100,10 +100,6 @@ class NotificationsController {
     );
   }
 
-  public addSubscription(sub: NotificationSubscription) {
-    return this._subscriptions.push(sub);
-  }
-
   public subscribe(data: SubUniqueData) {
     const subscription = this.findNotificationSubscription(data);
     if (subscription) {

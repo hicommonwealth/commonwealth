@@ -346,19 +346,6 @@ class ThreadsController {
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
 
-      // synthesize new subscription rather than hitting backend
-      const subscriptionJSON = {
-        id: null,
-        category_id: NotificationCategories.NewComment,
-        is_active: true,
-        created_at: Date.now(),
-        immediate_email: false,
-        Chain: app.config.chains.getById(result.chain),
-        Thread: result,
-      };
-      app.user.notifications.addSubscription(
-        NotificationSubscription.fromJSON(subscriptionJSON)
-      );
       return result;
     } catch (err) {
       console.log('Failed to create thread');
