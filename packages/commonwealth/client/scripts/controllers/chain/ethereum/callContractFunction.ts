@@ -77,6 +77,22 @@ const abi = [
   },
 ];
 
+const compGovAbi = {
+  constant: false,
+  inputs: [
+    { internalType: 'address[]', name: 'targets', type: 'address[]' },
+    { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+    { internalType: 'string[]', name: 'signatures', type: 'string[]' },
+    { internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
+    { internalType: 'string', name: 'description', type: 'string' },
+  ],
+  name: 'propose',
+  outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+  payable: false,
+  stateMutability: 'nonpayable',
+  type: 'function',
+};
+
 async function sendFunctionCall({
   fn,
   signingWallet,
@@ -292,8 +308,12 @@ export async function setupCommunityContracts({
   if (!txReceipt) {
     throw new Error('Transaction failed');
   }
-  //CREAT2 calc
-  const walletAddress = '';
+
+  //Can/should be CREATE2 calc but this works for now
+  const walletAddress = (
+    await factory.methods.getNamespace(web3.utils.asciiToHex(name)).call()
+  )['communityWallet'];
+
   //3. Set up wallet seed transactions
   if (seedWalletMeta.type === 'wallet' && seedWalletMeta.amount > 0) {
     const txReceipt = web3.eth.sendTransaction({
@@ -302,8 +322,20 @@ export async function setupCommunityContracts({
       value: seedWalletMeta.amount,
     });
   } else if (seedWalletMeta.type === 'multi') {
-    //Create mulit-sig prop to seedAWalletMeta.address with amount to walletAddress
+    //TODO: Create mulit-sig prop to seedAWalletMeta.address with amount to walletAddress
   } else if (seedWalletMeta.type === 'proposal') {
-    //Create compound prop to seedAWalletMeta.address with amount to walletAddress
+    const gov = new web3.eth.Contract(
+      compGovAbi as AbiItem,
+      seedWalletMeta.address
+    );
+    const txReceipt = await gov.methods
+      .propose(
+        [walletAddress],
+        [seedWalletMeta.amount],
+        [''],
+        [''],
+        'Fund Community Wallet'
+      )
+      .send({ from: signingWallet.accounts[0] });
   }
 }
