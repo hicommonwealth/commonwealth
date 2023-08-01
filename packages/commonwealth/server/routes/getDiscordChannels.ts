@@ -9,7 +9,7 @@ enum SetDiscordBotConfigErrors {
   NoChain = 'Must supply a chain ID',
   NotAdmin = 'Not an admin',
   CommonbotConnected = 'Discord is already connected to another Commonwealth community',
-  Error = 'Could not set discord bot config',
+  Error = 'Could not get discord bot config',
   TokenExpired = 'Token expired',
 }
 
@@ -47,6 +47,14 @@ const getDiscordChannels = async (
       chain_id,
     },
   });
+
+  if (!configEntry) {
+    return success(res, {
+      channels: [],
+      forumChannels: [],
+      selectedChannel: null,
+    });
+  }
 
   const url = `https://discord.com/api/v10/guilds/${configEntry.guild_id}/channels`;
 

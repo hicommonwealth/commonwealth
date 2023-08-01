@@ -19,6 +19,7 @@ import moment from 'moment';
 
 export type AuthorAndPublishInfoProps = {
   isNew?: boolean;
+  isHot?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
   discord_meta?: {
     user: { id: string; username: string };
@@ -42,6 +43,7 @@ export type AuthorAndPublishInfoProps = {
 
 export const AuthorAndPublishInfo = ({
   isNew,
+  isHot,
   authorInfo,
   isLocked,
   lockedAt,
@@ -165,27 +167,22 @@ export const AuthorAndPublishInfo = ({
       )}
 
       {isNew && (
-        <>
-          {dotIndicator}
-          <CWTag label={'NEW'} type={'new'} iconName={'newStar'} />
-        </>
+        <CWTag label={'New'} type={'new'} iconName={'newStar'} />
+      )}
+
+      {isHot && (
+        <CWTag iconName="trendUp" label="Trending" type="trending"/>
       )}
 
       {isSpamThread && (
-        <>
-          {dotIndicator}
-          <CWTag label={'SPAM'} type={'disabled'} />
-        </>
+        <CWTag label={'SPAM'} type={'disabled'} />
       )}
 
       {isLocked && lockedAt && lastUpdated && (
-        <>
-          {dotIndicator}
-          <LockWithTooltip
-            lockedAt={moment(lockedAt)}
-            updatedAt={moment(lastUpdated)}
-          />
-        </>
+        <LockWithTooltip
+          lockedAt={moment(lockedAt)}
+          updatedAt={moment(lastUpdated)}
+        />
       )}
     </div>
   );

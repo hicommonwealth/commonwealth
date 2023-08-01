@@ -17,7 +17,7 @@ const createDraft = async (
 
   const author = req.address;
 
-  if (!title && !body && !req.body['attachments[]']?.length) {
+  if (!title && !body) {
     return next(new AppError(Errors.InsufficientData));
   }
 
@@ -31,35 +31,11 @@ const createDraft = async (
 
   const draft = await models.DiscussionDraft.create(draftContent);
 
-  // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
-  if (
-    req.body['attachments[]'] &&
-    typeof req.body['attachments[]'] === 'string'
-  ) {
-    await models.Attachment.create({
-      attachable: 'draft',
-      attachment_id: draft.id,
-      url: req.body['attachments[]'],
-      description: 'image',
-    });
-  } else if (req.body['attachments[]']) {
-    await Promise.all(
-      req.body['attachments[]'].map((u) =>
-        models.Attachment.create({
-          attachable: 'draft',
-          attachment_id: draft.id,
-          url: u,
-          description: 'image',
-        })
-      )
-    );
-  }
-
   let finalDraft;
   try {
     finalDraft = await models.DiscussionDraft.findOne({
       where: { id: draft.id },
-      include: [models.Address, models.Attachment],
+      include: [models.Address],
     });
   } catch (err) {
     return next(err);

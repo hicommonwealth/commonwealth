@@ -235,48 +235,51 @@ const ReactQuillEditor = ({
               setIsPreviewVisible={setIsPreviewVisible}
               isDisabled={isDisabled}
             />
-            <ReactQuill
-              ref={editorRef}
-              className={clsx('QuillEditor', className, {
-                markdownEnabled: isMarkdownEnabled,
-              })}
-              placeholder={placeholder}
-              tabIndex={tabIndex}
-              theme="snow"
-              value={contentDelta}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              onChange={handleChange}
-              onChangeSelection={(selection: RangeStatic) => {
-                if (!selection) {
-                  return;
-                }
-                lastSelectionRef.current = selection;
-              }}
-              formats={isMarkdownEnabled ? [] : undefined}
-              modules={{
-                toolbar: {
-                  container: `#${toolbarId}`,
-                  handlers: isMarkdownEnabled
-                    ? markdownToolbarHandlers
+            <div data-text-editor="name">
+              <ReactQuill
+                ref={editorRef}
+                className={clsx('QuillEditor', className, {
+                  markdownEnabled: isMarkdownEnabled,
+                })}
+                placeholder={placeholder}
+                tabIndex={tabIndex}
+                theme="snow"
+                bounds={`[data-text-editor="name"]`}
+                value={contentDelta}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                onChange={handleChange}
+                onChangeSelection={(selection: RangeStatic) => {
+                  if (!selection) {
+                    return;
+                  }
+                  lastSelectionRef.current = selection;
+                }}
+                formats={isMarkdownEnabled ? [] : undefined}
+                modules={{
+                  toolbar: {
+                    container: `#${toolbarId}`,
+                    handlers: isMarkdownEnabled
+                      ? markdownToolbarHandlers
+                      : undefined,
+                  },
+                  imageDropAndPaste: {
+                    handler: handleImageDropAndPaste,
+                  },
+                  clipboard: {
+                    matchers: clipboardMatchers,
+                  },
+                  mention,
+                  magicUrl: !isMarkdownEnabled,
+                  keyboard: isMarkdownEnabled
+                    ? markdownKeyboardShortcuts
                     : undefined,
-                },
-                imageDropAndPaste: {
-                  handler: handleImageDropAndPaste,
-                },
-                clipboard: {
-                  matchers: clipboardMatchers,
-                },
-                mention,
-                magicUrl: !isMarkdownEnabled,
-                keyboard: isMarkdownEnabled
-                  ? markdownKeyboardShortcuts
-                  : undefined,
-                imageUploader: {
-                  upload: handleImageUploader,
-                },
-              }}
-            />
+                  imageUploader: {
+                    upload: handleImageUploader,
+                  },
+                }}
+              />
+            </div>
           </>
         )}
       </div>

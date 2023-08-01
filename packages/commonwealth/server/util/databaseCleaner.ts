@@ -2,6 +2,9 @@ import type { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { QueryTypes } from 'sequelize';
 import Rollbar from 'rollbar';
+import { RedisCache } from 'common-common/src/redisCache';
+import { v4 as uuidv4 } from 'uuid';
+import { RedisNamespaces } from 'common-common/src/types';
 
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
@@ -10,26 +13,39 @@ import Rollbar from 'rollbar';
  */
 export default class DatabaseCleaner {
   private readonly log = factory.getLogger(formatFilename(__filename));
-  private readonly _models: DB;
-  private readonly _rollbar?: Rollbar;
-  private readonly _timeToRun: Date;
+  private _models: DB;
+  private _redisCache: RedisCache;
+  private _rollbar?: Rollbar;
+  private _timeToRun: Date;
   private _completed = false;
+  private _oneRunMax = false;
   private _timeoutID;
+  private _lockName = 'cw_database_cleaner_locker';
+  // lock times out in 12 hours
+  private _lockTimeoutSeconds = 43200;
+
+  public init(models: DB, rollbar?: Rollbar) {
+    this._models = models;
+    this._rollbar = rollbar;
+  }
 
   /**
    * @param models An instance of the DB containing the sequelize instance and all the models.
    * @param hourToRun A number in [0, 24) indicating the hour in which to run the cleaner. Uses UTC!
+   * @param redisCache An instance of RedisCache used for locking a key that ensures only 1 dbCleaner is running.
    * @param rollbar A rollbar instance to report errors
    * @param oneRunMax If set to true the database clean will only occur once and will not be re-scheduled
    */
-  constructor(
+  public initLoop(
     models: DB,
     hourToRun: number,
+    redisCache: RedisCache,
     rollbar?: Rollbar,
     oneRunMax = false
   ) {
-    this._models = models;
-    this._rollbar = rollbar;
+    this.init(models, rollbar);
+    this._redisCache = redisCache;
+    this._oneRunMax = oneRunMax;
 
     if (!hourToRun) {
       this.log.warn(`No hourToRun given. The cleaner will not run.`);
@@ -53,39 +69,54 @@ export default class DatabaseCleaner {
     this._timeToRun.setUTCMinutes(0);
     this._timeToRun.setUTCMilliseconds(0);
 
-    this._timeoutID = setTimeout(
-      this.start.bind(this),
-      this.getTimeout(),
-      oneRunMax
-    );
+    this._timeoutID = setTimeout(this.startLoop.bind(this), this.getTimeout());
 
     this.log.info(
       `The current date is ${now.toString()}. The cleaner will run on ${this._timeToRun.toString()}`
     );
   }
 
-  public async start(oneRunMax = false) {
+  public async startLoop() {
+    // the lock will automatically time out so there is no need to unlock it
+    const lockAcquired = await this.acquireLock();
+
+    if (lockAcquired === false) {
+      this.log.info('Unable to acquire lock. Skipping clean-up...');
+    } else {
+      await this.executeQueries();
+    }
+
+    this._completed = true;
+    if (!this._oneRunMax) {
+      this._timeoutID = setTimeout(
+        this.startLoop.bind(this),
+        this.getTimeout()
+      );
+    }
+  }
+
+  public async executeQueries() {
+    if (!this._models) {
+      this.log.error(`Must initialize the cleaner before executing queries`);
+      return;
+    }
     this.log.info('Database clean-up starting...');
 
     try {
-      await this.cleanNotifications(oneRunMax);
+      await this.cleanNotifications(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean notifications', e);
       this._rollbar?.error('Failed to clean notifications', e);
     }
 
     try {
-      await this.cleanSubscriptions(oneRunMax);
+      await this.cleanSubscriptions(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
       this._rollbar?.error('Failed to clean subscriptions', e);
     }
 
-    this._completed = true;
     this.log.info('Database clean-up finished.');
-    if (!oneRunMax) {
-      this._timeoutID = setTimeout(this.start.bind(this), this.getTimeout());
-    }
   }
 
   /**
@@ -266,6 +297,17 @@ export default class DatabaseCleaner {
     }
   }
 
+  private async acquireLock() {
+    // the lock will automatically time out so there is no need to unlock it
+    return await this._redisCache.setKey(
+      RedisNamespaces.Database_Cleaner,
+      this._lockName,
+      uuidv4(),
+      this._lockTimeoutSeconds,
+      true
+    );
+  }
+
   public get timeToRun() {
     return this._timeToRun;
   }
@@ -278,3 +320,5 @@ export default class DatabaseCleaner {
     return this._timeoutID;
   }
 }
+
+export const databaseCleaner = new DatabaseCleaner();

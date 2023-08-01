@@ -7,7 +7,11 @@ import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { debounce } from 'lodash';
-import { TTLCache } from '../../../helpers/ttl_cache';
+import axios from 'axios';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
 
 const Delta = Quill.import('delta');
 Quill.register('modules/mention', QuillMention);
@@ -21,10 +25,6 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
-  const mentionCache = useMemo(() => {
-    return new TTLCache(1_000 * 60, `mentions-${app.activeChainId()}`);
-  }, []);
-
   const selectMention = useCallback(
     (item: QuillMention) => {
       const editor = editorRef.current?.getEditor();
@@ -91,18 +91,20 @@ export const useMention = ({
             ];
           } else {
             // try to get results from cache
-            let { profiles } = mentionCache.get(searchTerm) || {};
-            if (!profiles) {
-              const res = await app.search.searchMentionableProfiles(
-                searchTerm,
-                app.activeChainId()
-              );
-              if (!res.profiles?.length) {
-                return;
-              }
-              profiles = res.profiles;
-              mentionCache.set(searchTerm, res);
-            }
+            const { data } = await axios.get(`${app.serverUrl()}/profiles`, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              params: {
+                chain: app.activeChainId(),
+                search: searchTerm,
+                limit: '50',
+                page: '1',
+                order_by: APIOrderBy.LastActive,
+                order_direction: APIOrderDirection.Desc,
+              },
+            });
+            const profiles = data?.result?.results;
             formattedMatches = profiles.map((p: any) => {
               const profileId = p.id;
               const profileAddress = p.addresses[0]?.address;
