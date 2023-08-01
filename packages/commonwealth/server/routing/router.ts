@@ -952,7 +952,7 @@ function setupRouter(
     viewCount.bind(this, models, viewCountCache)
   );
 
-  // attachments
+  // uploads
   registerRoute(
     router,
     'post',

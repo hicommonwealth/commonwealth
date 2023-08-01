@@ -417,7 +417,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const attachments = null;
       const canvasAction = null;
       const canvasHash = null;
       const canvasSession = null;
@@ -486,7 +485,6 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -564,7 +562,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const attachments = null;
       const canvasAction = null;
       const canvasHash = null;
       const canvasSession = null;
@@ -577,7 +574,6 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -643,7 +639,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const attachments = null;
       const canvasAction = null;
       const canvasHash = null;
       const canvasSession = null;
@@ -656,7 +651,6 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -678,7 +672,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const attachments = null;
       const canvasAction = null;
       const canvasHash = null;
       const canvasSession = null;
@@ -748,7 +741,6 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -817,7 +809,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const attachments = null;
       const canvasAction = null;
       const canvasHash = null;
       const canvasSession = null;
@@ -830,7 +821,6 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -903,7 +893,6 @@ describe('ServerThreadsController', () => {
       };
       const threadId = 1;
       const text = 'hello';
-      const attachments = null;
       const canvasAction = null;
       const canvasHash = null;
       const canvasSession = null;
@@ -916,7 +905,6 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -986,7 +974,6 @@ describe('ServerThreadsController', () => {
       const parentId = 1;
       const threadId = 1;
       const text = 'hello';
-      const attachments = null;
       const canvasAction = null;
       const canvasHash = null;
       const canvasSession = null;
@@ -999,7 +986,6 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -1241,7 +1227,6 @@ describe('ServerThreadsController', () => {
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
-      const attachments = undefined;
       const canvasAction = undefined;
       const canvasSession = undefined;
       const canvasHash = undefined;
@@ -1256,7 +1241,6 @@ describe('ServerThreadsController', () => {
           body,
           stage,
           url,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -1326,7 +1310,6 @@ describe('ServerThreadsController', () => {
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
-      const attachments = undefined;
       const canvasAction = undefined;
       const canvasSession = undefined;
       const canvasHash = undefined;
@@ -1341,7 +1324,6 @@ describe('ServerThreadsController', () => {
           body,
           stage,
           url,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -1349,7 +1331,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    it('should throw error (discussion without body or attachments)', async () => {
+    it('should throw error (discussion without body)', async () => {
       let data;
       data = {
         id: 1,
@@ -1408,7 +1390,6 @@ describe('ServerThreadsController', () => {
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
-      const attachments = undefined;
       const canvasAction = undefined;
       const canvasSession = undefined;
       const canvasHash = undefined;
@@ -1423,12 +1404,11 @@ describe('ServerThreadsController', () => {
           body,
           stage,
           url,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
         })
-      ).to.be.rejectedWith('Must provide body or attachment');
+      ).to.be.rejectedWith('Must provide body');
     });
 
     it('should throw error (thread not found)', async () => {
@@ -1474,7 +1454,6 @@ describe('ServerThreadsController', () => {
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
-      const attachments = undefined;
       const canvasAction = undefined;
       const canvasSession = undefined;
       const canvasHash = undefined;
@@ -1489,7 +1468,6 @@ describe('ServerThreadsController', () => {
           body,
           stage,
           url,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -1556,7 +1534,6 @@ describe('ServerThreadsController', () => {
       const title = 'mythread';
       const stage = 'stage';
       const url = '--';
-      const attachments = undefined;
       const canvasAction = undefined;
       const canvasSession = undefined;
       const canvasHash = undefined;
@@ -1571,7 +1548,6 @@ describe('ServerThreadsController', () => {
           body,
           stage,
           url,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,
@@ -1669,7 +1645,6 @@ describe('ServerThreadsController', () => {
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
-      const attachments = undefined;
       const canvasAction = undefined;
       const canvasSession = undefined;
       const canvasHash = undefined;
@@ -1687,7 +1662,6 @@ describe('ServerThreadsController', () => {
           topicName,
           stage,
           url,
-          attachments,
           canvasAction,
           canvasSession,
           canvasHash,

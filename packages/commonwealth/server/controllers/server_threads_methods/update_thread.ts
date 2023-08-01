@@ -17,7 +17,7 @@ import { ThreadAttributes } from '../../models/thread';
 export const Errors = {
   ThreadNotFound: 'Thread not found',
   BanError: 'Ban error',
-  NoBodyOrAttachment: 'Must provide body or attachment',
+  NoBody: 'Must provide body',
   InvalidLink: 'Invalid thread URL',
   ParseMentionsFailed: 'Failed to parse mentions',
 };
@@ -31,7 +31,6 @@ export type UpdateThreadOptions = {
   body?: string;
   stage?: string;
   url?: string;
-  attachments?: any;
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
@@ -50,7 +49,6 @@ export async function __updateThread(
     body,
     stage,
     url,
-    attachments,
     canvasAction,
     canvasSession,
     canvasHash,
@@ -104,34 +102,10 @@ export async function __updateThread(
     throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
-  // check attachments
-  if (thread.kind === 'discussion') {
-    if ((!body || !body.trim()) && (!attachments || attachments.length === 0)) {
-      throw new Error(Errors.NoBodyOrAttachment);
-    }
+  // check body
+  if (thread.kind === 'discussion' && (!body || !body.trim())) {
+    throw new Error(Errors.NoBody);
   }
-
-  const attachFiles = async () => {
-    if (attachments && typeof attachments === 'string') {
-      await this.models.Attachment.create({
-        attachable: 'thread',
-        attachment_id: threadId,
-        url: attachments,
-        description: 'image',
-      });
-    } else if (attachments) {
-      await Promise.all(
-        attachments.map((url_) =>
-          this.models.Attachment.create({
-            attachable: 'thread',
-            attachment_id: threadId,
-            url: url_,
-            description: 'image',
-          })
-        )
-      );
-    }
-  };
 
   let latestVersion;
   try {
@@ -184,7 +158,6 @@ export async function __updateThread(
   thread.last_edited = new Date().toISOString();
 
   await thread.save();
-  await attachFiles();
 
   const finalThread = await this.models.Thread.findOne({
     where: { id: thread.id },
@@ -195,7 +168,6 @@ export async function __updateThread(
         // through: models.Collaboration,
         as: 'collaborators',
       },
-      this.models.Attachment,
       { model: this.models.Topic, as: 'topic' },
     ],
   });

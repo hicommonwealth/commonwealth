@@ -26,21 +26,13 @@ export type UpdateCommentOptions = {
   chain: ChainInstance;
   commentId: number;
   commentBody: string;
-  attachments?: any;
 };
 
 export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
 
 export async function __updateComment(
   this: ServerCommentsController,
-  {
-    user,
-    address,
-    chain,
-    commentId,
-    commentBody,
-    attachments,
-  }: UpdateCommentOptions
+  { user, address, chain, commentId, commentBody }: UpdateCommentOptions
 ): Promise<UpdateCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
@@ -50,28 +42,6 @@ export async function __updateComment(
   if (!canInteract) {
     throw new Error(`${Errors.BanError}: ${banError}`);
   }
-
-  const attachFiles = async () => {
-    if (attachments && typeof attachments === 'string') {
-      await this.models.Attachment.create({
-        attachable: 'comment',
-        attachment_id: commentId,
-        url: attachments,
-        description: 'image',
-      });
-    } else if (attachments) {
-      await Promise.all(
-        attachments.map((u) =>
-          this.models.Attachment.create({
-            attachable: 'comment',
-            attachment_id: commentId,
-            url: u,
-            description: 'image',
-          })
-        )
-      );
-    }
-  };
 
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -117,10 +87,9 @@ export async function __updateComment(
     }
   })();
   await comment.save();
-  await attachFiles();
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
-    include: [this.models.Address, this.models.Attachment],
+    include: [this.models.Address],
   });
 
   const cwUrl = getThreadUrl(thread, comment?.id);

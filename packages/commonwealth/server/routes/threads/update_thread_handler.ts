@@ -5,7 +5,7 @@ import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
-  MissingTextOrAttachment: 'Must provide text or attachment',
+  MissingText: 'Must provide text',
 };
 
 type UpdateThreadRequestBody = {
@@ -31,11 +31,8 @@ export const updateThreadHandler = async (
     throw new AppError(Errors.InvalidThreadID);
   }
 
-  if (
-    (!body || !body.trim()) &&
-    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-  ) {
-    throw new AppError(Errors.MissingTextOrAttachment);
+  if (!body || !body.trim()) {
+    throw new AppError(Errors.MissingText);
   }
 
   const [updatedThread, notificationOptions] =

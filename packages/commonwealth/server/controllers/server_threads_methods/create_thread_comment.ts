@@ -19,6 +19,7 @@ import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -40,7 +41,6 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  attachments: any;
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
@@ -53,19 +53,21 @@ export type CreateThreadCommentResult = [
   TrackOptions
 ];
 
-export async function __createThreadComment({
-  user,
-  address,
-  chain,
-  parentId,
-  threadId,
-  text,
-  attachments,
-  canvasAction,
-  canvasSession,
-  canvasHash,
-  discord_meta,
-}: CreateThreadCommentOptions): Promise<CreateThreadCommentResult> {
+export async function __createThreadComment(
+  this: ServerThreadsController,
+  {
+    user,
+    address,
+    chain,
+    parentId,
+    threadId,
+    text,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discord_meta,
+  }: CreateThreadCommentOptions
+): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,
@@ -181,58 +183,15 @@ export async function __createThreadComment({
     Object.assign(commentContent, { parent_id: parentId });
   }
 
-  // create comment and attachments in transaction
-
-  const transaction = await this.models.sequelize.transaction();
-
-  let comment: CommentInstance | null = null;
-  try {
-    comment = await this.models.Comment.create(commentContent, {
-      transaction,
-    });
-
-    // TODO: attachments can likely be handled like mentions (see lines 10 & 11)
-    if (attachments) {
-      if (typeof attachments === 'string') {
-        await this.models.Attachment.create(
-          {
-            attachable: 'comment',
-            attachment_id: comment.id,
-            url: attachments,
-            description: 'image',
-          },
-          { transaction }
-        );
-      } else {
-        await Promise.all(
-          attachments.map((url) =>
-            this.models.Attachment.create(
-              {
-                attachable: 'comment',
-                attachment_id: comment.id,
-                url,
-                description: 'image',
-              },
-              { transaction }
-            )
-          )
-        );
-      }
-    }
-
-    await transaction.commit();
-  } catch (err) {
-    await transaction.rollback();
-    throw err;
-  }
+  const comment = await this.models.Comment.create(commentContent);
 
   // fetch attached objects to return to user
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
-    include: [this.models.Address, this.models.Attachment],
+    include: [this.models.Address],
   });
 
-  const subsTransaction = await this.models.sequelize.transaction();
+  const transaction = await this.models.sequelize.transaction();
   try {
     // auto-subscribe comment author to reactions & child comments
     await this.models.Subscription.create(
@@ -243,7 +202,7 @@ export async function __createThreadComment({
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction: subsTransaction }
+      { transaction }
     );
     await this.models.Subscription.create(
       {
@@ -253,12 +212,12 @@ export async function __createThreadComment({
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction: subsTransaction }
+      { transaction }
     );
 
-    await subsTransaction.commit();
+    await transaction.commit();
   } catch (err) {
-    await subsTransaction.rollback();
+    await transaction.rollback();
     await finalComment.destroy();
     throw err;
   }
