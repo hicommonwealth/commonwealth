@@ -7,6 +7,8 @@ import { PORT } from '../config';
 import type { DB } from '../models';
 import { setupWebSocketServer } from '../socket';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { RedisCache } from 'common-common/src/redisCache';
+import { cacheDecorator } from 'common-common/src/cacheDecorator';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,11 +16,13 @@ const setupServer = (
   app: Express,
   rollbar: Rollbar,
   models: DB,
-  rabbitMQController: RabbitMQController
+  rabbitMQController: RabbitMQController,
+  redisCache: RedisCache
 ) => {
   app.set('port', PORT);
   const server = http.createServer(app);
   setupWebSocketServer(server, rollbar, models, rabbitMQController);
+  cacheDecorator.setCache(redisCache);
 
   const onError = (error) => {
     if (error.syscall !== 'listen') {

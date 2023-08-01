@@ -32,7 +32,7 @@
 
     # this if-else section ensures that the money multiplier does not increase memory beyond 95% of what is available
     # or decrease under 400MB
-    if [ $MAX_OLD_SPACE_SIZE -gt $(awk "BEGIN {print int($MEMORY_LIMIT*0.95); exit}") ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
+    if [ $MAX_OLD_SPACE_SIZE -gt $(awk "BEGIN {printf \"%.0f\", $MEMORY_LIMIT*0.95; exit}") ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
       # default to 70%
       echo $(($MEMORY_LIMIT*$DEFAULT_PERCENT/100000000))
     else

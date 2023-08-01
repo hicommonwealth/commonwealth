@@ -104,7 +104,7 @@ const getChainStatus = async (models: DB) => {
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
       `
-      SELECT "Threads".chain, COUNT("Threads".id) 
+      SELECT "Threads".chain, COUNT("Threads".id)
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
       AND "Threads".deleted_at IS NULL
@@ -164,7 +164,7 @@ export const getUserStatus = async (models: DB, user) => {
     where: {
       address_id: { [Op.in]: myAddressIds },
     },
-    include: [models.Address, models.Attachment],
+    include: [models.Address],
   });
 
   // get starred communities for user

@@ -18,7 +18,8 @@ type TagType =
   | 'stage'
   | 'new'
   | 'trending'
-  | 'disabled';
+  | 'disabled'
+  | 'discord';
 
 export type TagProps = {
   iconName?: IconName;
