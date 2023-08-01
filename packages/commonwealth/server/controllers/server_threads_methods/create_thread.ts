@@ -18,16 +18,17 @@ import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { AppError } from '../../../../common-common/src/errors';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
   ParseMentionsFailed: 'Failed to parse mentions',
-  NoBodyOrAttachments: 'Discussion posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only discussion and link posts supported',
   FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
+  NoBody: 'Thread body cannot be blank',
 };
 
 export type CreateThreadOptions = {
@@ -42,7 +43,6 @@ export type CreateThreadOptions = {
   topicName?: string;
   stage?: string;
   url?: string;
-  attachments?: any;
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
@@ -55,43 +55,34 @@ export type CreateThreadResult = [
   TrackOptions
 ];
 
-export async function __createThread({
-  user,
-  address,
-  chain,
-  title,
-  body,
-  kind,
-  readOnly,
-  topicId,
-  topicName,
-  stage,
-  url,
-  attachments,
-  canvasAction,
-  canvasSession,
-  canvasHash,
-  discord_meta,
-}: CreateThreadOptions): Promise<CreateThreadResult> {
+export async function __createThread(
+  this: ServerThreadsController,
+  {
+    user,
+    address,
+    chain,
+    title,
+    body,
+    kind,
+    readOnly,
+    topicId,
+    topicName,
+    stage,
+    url,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discord_meta,
+  }: CreateThreadOptions
+): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
       throw new Error(Errors.DiscussionMissingTitle);
     }
-    if (
-      (!body || !body.trim()) &&
-      (!attachments['attachments[]'] ||
-        attachments['attachments[]'].length === 0)
-    ) {
-      throw new Error(Errors.NoBodyOrAttachments);
-    }
     try {
       const quillDoc = JSON.parse(decodeURIComponent(body));
-      if (
-        quillDoc.ops.length === 1 &&
-        quillDoc.ops[0].insert.trim() === '' &&
-        (!attachments || attachments.length === 0)
-      ) {
-        throw new Error(Errors.NoBodyOrAttachments);
+      if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '') {
+        throw new Error(Errors.NoBody);
       }
     } catch (e) {
       // check always passes if the body isn't a Quill document
@@ -206,28 +197,6 @@ export async function __createThread({
       const thread = await this.models.Thread.create(threadContent, {
         transaction,
       });
-      if (attachments && typeof attachments === 'string') {
-        await this.models.Attachment.create(
-          {
-            attachable: 'thread',
-            attachment_id: thread.id,
-            url: attachments,
-            description: 'image',
-          },
-          { transaction }
-        );
-      } else if (attachments) {
-        const data = [];
-        attachments.map((u) => {
-          data.push({
-            attachable: 'thread',
-            attachment_id: thread.id,
-            url: u,
-            description: 'image',
-          });
-        });
-        await this.models.Attachment.bulkCreate(data, { transaction });
-      }
 
       address.last_active = new Date();
       await address.save({ transaction });
@@ -241,7 +210,6 @@ export async function __createThread({
     where: { id: newThreadId },
     include: [
       { model: this.models.Address, as: 'Address' },
-      this.models.Attachment,
       { model: this.models.Topic, as: 'topic' },
     ],
   });

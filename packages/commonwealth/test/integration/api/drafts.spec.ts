@@ -126,7 +126,6 @@ describe('Draft Tests', () => {
           title: null,
           topic,
           body: null,
-          'attachments[]': null,
           jwt: userJWT,
         });
       expect(res).to.not.have.status(200);
