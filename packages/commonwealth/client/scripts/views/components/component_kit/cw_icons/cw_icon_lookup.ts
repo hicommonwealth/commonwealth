@@ -24,6 +24,7 @@ import {
   Question,
   Compass,
   PaperPlaneTilt,
+  SignOut,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -130,6 +131,7 @@ export const iconLookup = {
   share2: Icons.CWShare2,
   sidebarCollapse: Icons.CWSidebarCollapse,
   sidebarExpand: Icons.CWSidebarExpand,
+  signOut: withPhosphorIcon(SignOut),
   sparkle: withPhosphorIcon(Sparkle),
   star: Icons.CWStar,
   sun: Icons.CWSun,
