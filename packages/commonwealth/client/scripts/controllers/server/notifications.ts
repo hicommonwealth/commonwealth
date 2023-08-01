@@ -119,7 +119,7 @@ class NotificationsController {
       return post(
         '/createSubscription',
         {
-          category: subscription.categoryId,
+          category: data.categoryId,
           ...requestData,
           is_active: true,
         },

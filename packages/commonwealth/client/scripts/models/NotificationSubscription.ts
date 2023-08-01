@@ -45,15 +45,15 @@ class NotificationSubscription {
   }
 
   public get chainId() {
-    return this.Chain.id;
+    return this.Chain?.id;
   }
 
   public get threadId() {
-    return this.Thread.id;
+    return this.Thread?.id;
   }
 
   public get commentId() {
-    return this.Comment.id;
+    return this.Comment?.id;
   }
 
   public get categoryId() {
