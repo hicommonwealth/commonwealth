@@ -15,6 +15,7 @@ import { AppError } from '../../../../common-common/src/errors';
 import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -41,27 +42,30 @@ export type CreateThreadReactionResult = [
   TrackOptions
 ];
 
-export async function __createThreadReaction({
-  user,
-  address,
-  chain,
-  reaction,
-  threadId,
-  canvasAction,
-  canvasSession,
-  canvasHash,
-}: CreateThreadReactionOptions): Promise<CreateThreadReactionResult> {
+export async function __createThreadReaction(
+  this: ServerThreadsController,
+  {
+    user,
+    address,
+    chain,
+    reaction,
+    threadId,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+  }: CreateThreadReactionOptions
+): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
     where: { id: threadId },
   });
 
   if (!thread) {
-    throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+    throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
   // check if thread is archived
   if (thread.archived_at) {
-    throw new Error(Errors.ThreadArchived);
+    throw new AppError(Errors.ThreadArchived);
   }
 
   // check address ban
@@ -71,7 +75,7 @@ export async function __createThreadReaction({
       address: address.address,
     });
     if (!canInteract) {
-      throw new Error(`${Errors.BanError}: ${banError}`);
+      throw new AppError(`${Errors.BanError}: ${banError}`);
     }
   }
 
