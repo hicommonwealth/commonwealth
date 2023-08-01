@@ -13,7 +13,6 @@ import type { CommunitySnapshotSpaceModelStatic } from './models/community_snaps
 import type { ContractModelStatic } from './models/contract';
 import type { ContractAbiModelStatic } from './models/contract_abi';
 import type { DiscordBotConfigModelStatic } from './models/discord_bot_config';
-import type { DiscussionDraftModelStatic } from './models/discussion_draft';
 import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
 import type { NotificationCategoryModelStatic } from './models/notification_category';
@@ -53,7 +52,6 @@ export type Models = {
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
-  DiscussionDraft: DiscussionDraftModelStatic;
   DiscordBotConfig: DiscordBotConfigModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;

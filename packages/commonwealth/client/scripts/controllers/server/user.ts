@@ -11,7 +11,6 @@ import ChainInfo from '../../models/ChainInfo';
 import SocialAccount from '../../models/SocialAccount';
 import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
-import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
@@ -150,15 +149,6 @@ export class UserController {
 
   private _setStarredCommunities(starredCommunities: StarredCommunity[]): void {
     this._starredCommunities = starredCommunities;
-  }
-
-  private _discussionDrafts: DraftsController = new DraftsController();
-  public get discussionDrafts(): DraftsController {
-    return this._discussionDrafts;
-  }
-
-  private _setDiscussionDrafts(drafts: DraftsController): void {
-    this._discussionDrafts = drafts;
   }
 
   private _unseenPosts: object;
@@ -302,10 +292,6 @@ export class UserController {
 
   public setNotifications(notifications: NotificationsController): void {
     this._setNotifications(notifications);
-  }
-
-  public setDiscussionDrafts(drafts: DraftsController): void {
-    this.setDiscussionDrafts(drafts);
   }
 
   public setLastVisited(lastVisited: object): void {
