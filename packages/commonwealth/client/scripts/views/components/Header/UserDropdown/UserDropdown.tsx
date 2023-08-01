@@ -68,7 +68,7 @@ const UserDropdown = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const user = app.user.addresses[0];
-  const profileId = user?.profileId || user?._profile?._id;
+  const profileId = user?.profileId || user?.profile.id;
 
   return (
     <>

@@ -26,7 +26,7 @@ export const getMainMenuItems = (
           },
         ]
       : []) as Array<MenuItem>),
-    ...(featureFlags.sessionKeys
+    ...((featureFlags.sessionKeys
       ? [
           {
             label: 'Explore communities',
@@ -47,7 +47,7 @@ export const getMainMenuItems = (
             iconRight: 'chevronRight',
             onClick: () => setMobileMenuName('HelpMenu'),
           },
-        ]),
+        ]) as Array<MenuItem>),
     ...((app.isLoggedIn()
       ? [
           {
