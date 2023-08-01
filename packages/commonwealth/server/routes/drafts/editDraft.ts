@@ -21,31 +21,6 @@ const editDraft = async (
 
   const { id, title, body, topic } = req.body;
 
-  const attachFiles = async () => {
-    if (
-      req.body['attachments[]'] &&
-      typeof req.body['attachments[]'] === 'string'
-    ) {
-      await models.Attachment.create({
-        attachable: 'draft',
-        attachment_id: id,
-        url: req.body['attachments[]'],
-        description: 'image',
-      });
-    } else if (req.body['attachments[]']) {
-      await Promise.all(
-        req.body['attachments[]'].map((url) =>
-          models.Attachment.create({
-            attachable: 'draft',
-            attachment_id: id,
-            url,
-            description: 'image',
-          })
-        )
-      );
-    }
-  };
-
   try {
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
@@ -55,14 +30,13 @@ const editDraft = async (
         id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [models.Address, models.Attachment],
+      include: [models.Address],
     });
     if (!draft) return next(new AppError(Errors.NotFound));
     if (body) draft.body = body;
     if (title) draft.title = title;
     if (topic) draft.topic = topic;
     await draft.save();
-    await attachFiles();
 
     return res.json({ status: 'Success', result: draft.toJSON() });
   } catch (e) {

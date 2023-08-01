@@ -60,7 +60,7 @@ export class ServerCommentsController {
   }
 
   /**
-   * Returns all reactions for a specified comment.
+   * Returns comment search results.
    *
    */
   async searchComments(
