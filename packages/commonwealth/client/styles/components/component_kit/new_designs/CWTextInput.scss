@@ -50,8 +50,7 @@
     align-items: center;
     position: relative;
     flex: 1;
-    --input-width: 240px;
-    width: var(--input-width);
+    width: 240px;
 
     &.fullWidth {
       width: 100%;
@@ -59,11 +58,7 @@
 
     input {
       @include inputStyles;
-      width: var(--input-width);
-
-      &.fullWidth {
-        width: 100%;
-      }
+      width: 100%;
 
       &.darkMode {
         @include darkModeInputStyles;

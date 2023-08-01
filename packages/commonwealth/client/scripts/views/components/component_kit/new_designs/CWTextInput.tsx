@@ -188,7 +188,6 @@ export const CWTextInput = (props: TextInputProps) => {
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({
             size: isCompact ? 'small' : 'large',
-            fullWidth,
             validationStatus: validationProps.validationStatus,
             disabled,
             displayOnly,
