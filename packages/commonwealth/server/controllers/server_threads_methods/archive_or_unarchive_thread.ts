@@ -2,6 +2,7 @@ import { UserInstance } from '../../models/user';
 import { ServerThreadsController } from '../server_threads_controller';
 import { ThreadAttributes } from '../../models/thread';
 import { validateOwner } from '../../util/validateOwner';
+import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -26,7 +27,7 @@ export async function __archiveOrUnarchiveThread(
     },
   });
   if (!thread) {
-    throw new Error(Errors.ThreadNotFound);
+    throw new AppError(Errors.ThreadNotFound);
   }
 
   const isOwner = await validateOwner({
@@ -40,7 +41,7 @@ export async function __archiveOrUnarchiveThread(
   });
 
   if (!isOwner) {
-    throw new Error(Errors.InvalidPermissions);
+    throw new AppError(Errors.InvalidPermissions);
   }
 
   await thread.update({
