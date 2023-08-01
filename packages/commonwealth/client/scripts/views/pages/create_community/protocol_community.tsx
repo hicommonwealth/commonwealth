@@ -242,7 +242,7 @@ export const ProtocolCommunityForm = () => {
             onChangeHandler={(e) =>
               setSeedWalletMeta({ type: 'wallet', amount: e })
             }
-            value={''}
+            value={seedWalletMeta.amount}
           />
         )}
         {selectedRadio === 'multi' && (
@@ -256,7 +256,7 @@ export const ProtocolCommunityForm = () => {
                   address: e,
                 })
               }
-              value={''}
+              value={seedWalletMeta.address}
             />
             <InputRow
               title="Amount of ETH"
@@ -267,7 +267,7 @@ export const ProtocolCommunityForm = () => {
                   address: seedWalletMeta['address'],
                 })
               }
-              value={''}
+              value={seedWalletMeta.amount}
             />
           </>
         )}
@@ -282,7 +282,7 @@ export const ProtocolCommunityForm = () => {
                   address: e,
                 })
               }
-              value={''}
+              value={seedWalletMeta.address}
             />
             <InputRow
               title="Amount of ETH"
@@ -293,7 +293,7 @@ export const ProtocolCommunityForm = () => {
                   address: seedWalletMeta['address'],
                 })
               }
-              value={''}
+              value={seedWalletMeta.amount}
             />
           </>
         )}
