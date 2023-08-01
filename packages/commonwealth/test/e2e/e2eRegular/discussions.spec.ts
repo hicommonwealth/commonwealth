@@ -6,6 +6,7 @@ import {
   clearTestEntities,
   createTestEntities,
   testChains,
+  testThreads,
 } from '../../integration/api/external/dbEntityHooks.spec';
 import { login } from '../utils/e2eUtils';
 
@@ -91,7 +92,7 @@ test.describe('DiscussionsPage Homepage', () => {
     reactionsCountDivs = await page.$$('.reactions-count');
     chai.assert.equal(
       await reactionsCountDivs[0].innerText(),
-      firstThreadReactionCount,
+      await firstThreadReactionCount,
       'reaction count did not decrease after clicked'
     );
   });

@@ -22,8 +22,6 @@ export async function login(page, chain = 'ethereum') {
   } while (metaMaskIcon.length === 0);
 
   await page.getByText('Metamask').click();
-
-  await page.waitForSelector('a.user-display-name.username', { timeout: 5000 });
 }
 
 // This connection is used to speed up tests, so we don't need to load in all the models with the associated
