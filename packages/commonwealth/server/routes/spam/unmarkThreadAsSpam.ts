@@ -1,7 +1,7 @@
 import { AppError } from 'common-common/src/errors';
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import type { DB } from '../../models';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { success } from '../../types';
 import { findAllRoles } from '../../util/roles';
 
@@ -12,19 +12,14 @@ export const Errors = {
   NotAdmin: 'Not an admin',
 };
 
-export default async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export default async (models: DB, req: Request, res: Response) => {
   const threadId = req.params.id;
   if (!threadId) {
-    return next(new AppError(Errors.InvalidThreadId));
+    throw new AppError(Errors.InvalidThreadId);
   }
 
   if (!req.user) {
-    return next(new AppError(Errors.NotLoggedIn));
+    throw new AppError(Errors.NotLoggedIn);
   }
 
   const thread = await models.Thread.findOne({
@@ -33,7 +28,7 @@ export default async (
     },
   });
   if (!thread) {
-    return next(new AppError(Errors.ThreadNotFound));
+    throw new AppError(Errors.ThreadNotFound);
   }
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -50,7 +45,7 @@ export default async (
       return r.chain_id === thread.chain;
     });
     if (!role) {
-      return next(new AppError(Errors.NotAdmin));
+      throw new AppError(Errors.NotAdmin);
     }
   }
 
