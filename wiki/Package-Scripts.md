@@ -83,11 +83,13 @@ Description:  Runs webpack-bundle-analyzer library to display breakdown of bundl
 
 # Database Scripts
 
-## psql
+## db-all
 
-Definition: `chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh`
+Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
 
-Description: Start a PostgreSQL instance.
+Description: Resets, loads, and migrates db (composite script).
+
+Contributor: Kurtis Assad
 
 ## dump-db-local
 
@@ -95,20 +97,19 @@ Definition: ` pg_dump -U commonwealth --verbose --no-privileges --no-owner -f lo
 
 Description: Exports local database to a dump file, `local_save.dump`.
 
+## load-db 
+
+Definition: `chmod u+x scripts/load-db.sh && ./scripts/load-db.sh`
+
+Description: Loads database following the `load-db.sh` script. Looks for dump file `latest.dump` by default; if script is called with an argument, the value of DUMP_NAME will be updated to that argument's value.
+
+Considerations: Should we reconcile various dump names in different scripts to be consistent?
+
 ## load-db-local
 
 Description: Loads local database from a dump file, `local_save.dump`.
 
 Definition: `psql -d commonwealth -U commonwealth -W -f local_save.dump`
-
-## reset-db
-
-Definition: `chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh`
-
-Description: Resets the local database.
-
-Description: Loads database
-"load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
 
 ## migrate-db
 
@@ -122,13 +123,17 @@ Definition: `npx sequelize db:migrate:undo`
 
 Description: Undoes the last-run Sequelize migration.
 
-## db-all
+## psql
 
-Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
+Definition: `chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh`
 
-Description: Resets, loads, and migrates db (composite script).
+Description: Start a PostgreSQL instance.
 
-Contributor: Kurtis Assad
+## reset-db
+
+Definition: `chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh`
+
+Description: Resets the local database.
 
 ## reset-frack-db 
 
@@ -278,9 +283,15 @@ Contributor: Ryan Bennett
 "test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
 "test-scripts": "ts-mocha --project tsconfig.json test/integration/enforceDataConsistency.spec.ts",
 
-// Ask Kurtis; see #2247
-"start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
-Used to start the commonwealth app in development. Runs both the backend and frontend server.
+## start
+
+Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
+
+Description: Used to start the Commonwealth app in development. Runs both the backend and frontend server.
+
+Considerations: Follow up with Kurtis; see #2247
+
+
 "start-consumer": "ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script",
 "start-prerender": "ts-node --project tsconfig.json server/scripts/runPrerenderService.ts",
 "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
@@ -314,5 +325,4 @@ Used to start the commonwealth app in development. Runs both the backend and fro
 
 // ADDED BY KURTIS
 "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
-"compress-images": "npx ts-node -T ./scripts/compressImages.ts",
 "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
