@@ -90,6 +90,7 @@ export const UpdateProposalStatusModal = ({
   const { mutateAsync: editThreadStage } = useEditThreadStageMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
+    currentStage: thread.stage
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({

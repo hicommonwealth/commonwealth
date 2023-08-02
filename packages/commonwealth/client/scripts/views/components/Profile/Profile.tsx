@@ -5,7 +5,6 @@ import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
 import NewProfile from '../../../models/NewProfile';
-import Comment from '../../../models/Comment';
 import Thread from '../../../models/Thread';
 import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
