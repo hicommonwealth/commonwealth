@@ -206,22 +206,8 @@ export default async function emitNotifications(
     }
   }
 
-  const erc20Tokens = (
-    await models.Chain.findAll({
-      where: {
-        base: ChainBase.Ethereum,
-        type: ChainType.Token,
-      },
-    })
-  ).map((o) => o.id);
-
   // send data to relevant webhooks
-  if (
-    webhook_data &&
-    // TODO: this OR clause seems redundant?
-    (webhook_data.chainEventType?.chain ||
-      !erc20Tokens.includes(webhook_data.chainEventType?.chain))
-  ) {
+  if (webhook_data) {
     await send(models, {
       notificationCategory: category_id,
       ...(webhook_data as Required<WebhookContent>),
