@@ -4,8 +4,6 @@ import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
 
 export async function login(page) {
-  await addUserIfNone();
-
   await page.waitForSelector('.LoginSelector button');
   let button = await page.locator('.LoginSelector button');
   await button.click();
