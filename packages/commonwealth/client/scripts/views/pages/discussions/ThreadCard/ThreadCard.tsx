@@ -11,6 +11,7 @@ import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -31,8 +32,28 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
-  threadHref: string;
+  threadHref?: string;
+  showSkeleton?: boolean;
 };
+
+
+const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
+  return <div className={'ThreadCard showSkeleton'}>
+    {!isWindowSmallInclusive && (
+      <ReactionButton thread={thread} size="big" showSkeleton disabled={disabled} />
+    )}
+    <div className="content-wrapper">
+      <div>
+        <Skeleton count={1} className='content-header-skeleton' />
+        <div> <Skeleton className='content-header-icons-skeleton' /> </div>
+      </div>
+      <div className="content-body-wrapper">
+        <Skeleton count={3} />
+      </div>
+    </div>
+    <div className="content-footer"><Skeleton /></div>
+  </div>
+}
 
 export const ThreadCard = ({
   thread,
@@ -51,6 +72,7 @@ export const ThreadCard = ({
   onBodyClick,
   onStageTagClick,
   threadHref,
+  showSkeleton
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -61,6 +83,8 @@ export const ThreadCard = ({
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
   }, []);
+
+  if (showSkeleton) return <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||

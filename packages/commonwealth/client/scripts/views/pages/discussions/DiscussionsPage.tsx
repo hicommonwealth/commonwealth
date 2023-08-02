@@ -7,7 +7,6 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { slugify } from 'utils';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import {
@@ -69,7 +68,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
     // Default: Assuming featuredFilter === 'newest'
     return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
-  }, []);
+  }, [featuredFilter]);
 
   /**
    * the api will return sorted results and those are stored in state, when user
@@ -298,8 +297,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         components={{
           EmptyPlaceholder: () =>
             initializing ? (
-              <div className="thread-loader">
-                <CWSpinner size="xl" />
+              <div className='threads-wrapper'>
+                {Array(3).fill({}).map((x, i) =>
+                  <ThreadCard
+                    key={i}
+                    showSkeleton
+                    thread={{} as any}
+                  />
+                )}
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">
