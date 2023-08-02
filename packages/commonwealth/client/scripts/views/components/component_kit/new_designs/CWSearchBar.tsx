@@ -108,7 +108,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   }, [options]);
 
   return (
-    <div className="container">
+    <div className={getClasses({ container: true }, ComponentType.Searchbar)}>
       <div
         className={getClasses<InputStyleProps & InputInternalStyleProps>(
           {
@@ -153,11 +153,11 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         </div>
       </div>
       {groupedOptions.length > 0 ? (
-        <ul className="listBox" {...getListboxProps()}>
+        <ul className={getClasses({ ListBox: true })} {...getListboxProps()}>
           {(groupedOptions as typeof communities).map((option, index) => (
             <li
               key={option.id}
-              className="option"
+              className={getClasses({ ListBox: true, option: true })}
               {...getOptionProps({ option, index })}
             >
               <CWCommunityAvatar size="medium" community={option} />
@@ -166,7 +166,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           ))}
         </ul>
       ) : value.length > 0 && isFocused ? (
-        <div className="noResults">
+        <div className={getClasses({ ListBox: true, noResults: true })}>
           <CWText type="b2">No results found</CWText>
         </div>
       ) : null}
