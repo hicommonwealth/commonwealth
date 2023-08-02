@@ -39,5 +39,12 @@ function getRequestBrowserInfo(req: any): Record<string, any> {
       browserInfo[k] = v;
     }
   }
+  // manually check for Brave since middleware shows Brave as Chrome
+  const brand = req.headers['sec-ch-ua'];
+  if (typeof brand === 'string' && brand.includes('Brave')) {
+    delete browserInfo['isChrome'];
+    browserInfo['isBrave'] = true;
+    browserInfo['browser'] = 'Brave';
+  }
   return browserInfo;
 }
