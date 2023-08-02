@@ -25,7 +25,6 @@ import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import Poll from '../../../models/Poll';
@@ -116,7 +115,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsEditingBody(false);
   };
 
-  useBrowserWindow({
+  const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -392,21 +391,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [comments, thread, threadId]);
 
+
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  if (typeof identifier !== 'string') {
+  if (typeof identifier !== 'string' || threadFetchFailed) {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta) {
-    return <PageLoading />;
+  if (!app.chain?.meta || !app.threads.initialized || !thread) {
+    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
   }
 
-  // load app controller
-  if (!app.threads.initialized) {
-    return <PageLoading />;
+  if (typeof identifier !== 'string') {
+    return <PageNotFound />;
   }
 
   if (!thread && threadFetchCompleted) {
@@ -415,10 +414,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   if (threadFetchFailed) {
     return <PageNotFound />;
-  }
-
-  if (!thread) {
-    return <PageLoading />;
   }
 
   // Original posters have full editorial control, while added collaborators

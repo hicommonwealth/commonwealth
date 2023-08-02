@@ -17,6 +17,10 @@
   max-height: 54px;
   outline: none;
 
+  &.showSkeleton {
+    border: 1px solid transparent;
+  }
+
   &.has-reacted {
     color: $primary-500;
   }
