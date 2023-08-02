@@ -7,15 +7,24 @@ class AddressInfo extends Account {
   public readonly id: number;
   public readonly profileId: number;
 
-  constructor({ id, address, chainId, keytype, walletId, walletSsoSource, ghostAddress, profileId }: {
-    id: number | null | undefined,
-    address: string,
-    chainId: string,
-    keytype?: string,
-    walletId?: WalletId,
-    walletSsoSource?: WalletSsoSource,
-    ghostAddress?: boolean,
-    profileId?: number
+  constructor({
+    id,
+    address,
+    chainId,
+    keytype,
+    walletId,
+    walletSsoSource,
+    ghostAddress,
+    profileId,
+  }: {
+    id: number | null | undefined;
+    address: string;
+    chainId: string;
+    keytype?: string;
+    walletId?: WalletId;
+    walletSsoSource?: WalletSsoSource;
+    ghostAddress?: boolean;
+    profileId?: number;
   }) {
     const chain = app.config.chains.getById(chainId);
     if (!chain) throw new Error(`Failed to locate chain: ${chainId}`);

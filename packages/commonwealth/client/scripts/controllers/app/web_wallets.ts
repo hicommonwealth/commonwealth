@@ -19,7 +19,7 @@ export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
   private static _instance: WebWalletController;
 
-  public static get Instance(): WebWalletController{
+  public static get Instance(): WebWalletController {
     return this._instance || (this._instance = new this());
   }
 

@@ -252,7 +252,7 @@ export function updateActiveUser(data) {
             keytype: a.keytype,
             walletId: a.wallet_id,
             walletSsoSource: a.wallet_sso_source,
-            ghostAddress: a.ghost_address
+            ghostAddress: a.ghost_address,
           })
       )
     );
@@ -315,7 +315,7 @@ export async function unlinkLogin(account: AddressInfo) {
   app.roles.deleteRole({
     address: account,
     chain: account.chain.id,
-  })
+  });
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);
@@ -456,7 +456,7 @@ export async function handleSocialLoginCallback({
   const profileMetadata = getProfileMetadata(result.oauth);
   let magicAddress, authedSessionPayload, authedSignature;
   if (isCosmos) {
-    magicAddress = result.magic.userMetadata.publicAddress
+    magicAddress = result.magic.userMetadata.publicAddress;
   } else {
     const { utils } = await import('ethers');
     magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
@@ -502,7 +502,10 @@ export async function handleSocialLoginCallback({
     );
     authedSessionPayload = JSON.stringify(sessionPayload);
     authedSignature = JSON.stringify(signature.signatures[0]);
-    console.log("Reauthenticated Cosmos session from magic address:", magicAddress);
+    console.log(
+      'Reauthenticated Cosmos session from magic address:',
+      magicAddress
+    );
   } else {
     const { Web3Provider } = await import('@ethersproject/providers');
     const { utils } = await import('ethers');
@@ -529,7 +532,10 @@ export async function handleSocialLoginCallback({
     );
     authedSessionPayload = JSON.stringify(sessionPayload);
     authedSignature = signature;
-    console.log("Reauthenticated Ethereum session from magic address:", checksumAddress);
+    console.log(
+      'Reauthenticated Ethereum session from magic address:',
+      checksumAddress
+    );
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login

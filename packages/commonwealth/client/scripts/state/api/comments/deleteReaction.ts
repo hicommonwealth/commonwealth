@@ -6,42 +6,47 @@ import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentReactionsQuery from './fetchReactions';
 
 interface DeleteReactionProps {
-  reactionCount: ReactionCount<any>
-  canvasHash: string
+  reactionCount: ReactionCount<any>;
+  canvasHash: string;
   reactionId: number;
 }
 
 const deleteReaction = async ({
   reactionCount,
   canvasHash,
-  reactionId
+  reactionId,
 }: DeleteReactionProps) => {
   const {
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteCommentReaction(app.user.activeAccount.address, {
-    comment_id: canvasHash,
-  })
-
-  return await axios.delete(`${app.serverUrl()}/reactions/${reactionId}`, {
-    data: {
-      jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
-    },
-  }).then((r) => ({
-    ...r,
-    data: {
-      ...r.data,
-      result: {
-        ...(r.data.result || {}),
-        reactionCount,
-        reactionId
-      }
+  } = await app.sessions.signDeleteCommentReaction(
+    app.user.activeAccount.address,
+    {
+      comment_id: canvasHash,
     }
-  }));
+  );
+
+  return await axios
+    .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
+      data: {
+        jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
+      },
+    })
+    .then((r) => ({
+      ...r,
+      data: {
+        ...r.data,
+        result: {
+          ...(r.data.result || {}),
+          reactionCount,
+          reactionId,
+        },
+      },
+    }));
 };
 
 interface UseDeleteCommentReactionMutationProps {
@@ -49,27 +54,30 @@ interface UseDeleteCommentReactionMutationProps {
   commentId: number;
 }
 
-const useDeleteCommentReactionMutation = ({ commentId, chainId }: UseDeleteCommentReactionMutationProps) => {
+const useDeleteCommentReactionMutation = ({
+  commentId,
+  chainId,
+}: UseDeleteCommentReactionMutationProps) => {
   const queryClient = useQueryClient();
   const { data: reactions } = useFetchCommentReactionsQuery({
     chainId,
     commentId: commentId as number,
-  })
+  });
 
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
-      const { reactionCount, reactionId } = response.data.result
+      const { reactionCount, reactionId } = response.data.result;
 
       // update fetch reaction query state
-      const key = [ApiEndpoints.getCommentReactions(commentId), chainId]
+      const key = [ApiEndpoints.getCommentReactions(commentId), chainId];
       queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key,
-        () => {
-          const updatedReactions = [...(reactions || []).filter(x => x.id !== reactionId)]
-          return updatedReactions
-        }
-      );
+      queryClient.setQueryData(key, () => {
+        const updatedReactions = [
+          ...(reactions || []).filter((x) => x.id !== reactionId),
+        ];
+        return updatedReactions;
+      });
 
       // TODO: this state below would be stored in comments react query state when we migrate the
       // whole comment controller from current state to react query (there is a good chance we can
@@ -78,7 +86,7 @@ const useDeleteCommentReactionMutation = ({ commentId, chainId }: UseDeleteComme
       if (reactionCount.likes === 0 && reactionCount.dislikes === 0) {
         app.threads.reactionCountsStore.remove(reactionCount);
       }
-    }
+    },
   });
 };
 

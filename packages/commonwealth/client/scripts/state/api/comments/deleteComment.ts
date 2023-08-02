@@ -7,8 +7,8 @@ import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteCommentProps {
   address: string;
-  chainId: string
-  canvasHash: string
+  chainId: string;
+  canvasHash: string;
   commentId: number;
 }
 
@@ -24,16 +24,16 @@ const deleteComment = async ({
     hash = null,
   } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
     comment_id: canvasHash,
-  })
+  });
 
   await axios.delete(`${app.serverUrl()}/comments/${commentId}`, {
     data: {
       jwt: app.user.jwt,
       address: address,
       chain: chainId,
-      author_chain: chainId
+      author_chain: chainId,
     },
-  })
+  });
 
   // Important: we render comments in a tree, if this deleted comment was
   // the root comment of a tree, then we want to preserve the comment tree,
@@ -48,41 +48,47 @@ const deleteComment = async ({
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,
-    }
-  }
+    },
+  };
 };
 
 interface UseDeleteCommentMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useDeleteCommentMutation = ({ chainId, threadId }: UseDeleteCommentMutationProps) => {
+const useDeleteCommentMutation = ({
+  chainId,
+  threadId,
+}: UseDeleteCommentMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     chainId,
     threadId,
-  })
+  });
 
   return useMutation({
     mutationFn: deleteComment,
     onSuccess: async (response) => {
       // find the existing comment index
-      const foundCommentIndex = comments.findIndex(x => x.id === response.softDeleted.id)
+      const foundCommentIndex = comments.findIndex(
+        (x) => x.id === response.softDeleted.id
+      );
 
       if (foundCommentIndex > -1) {
-        const softDeletedComment = Object.assign({ ...comments[foundCommentIndex] }, { ...response.softDeleted })
+        const softDeletedComment = Object.assign(
+          { ...comments[foundCommentIndex] },
+          { ...response.softDeleted }
+        );
 
         // update fetch comments query state
-        const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId]
+        const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
         queryClient.cancelQueries({ queryKey: key });
-        queryClient.setQueryData([...key],
-          () => {
-            const updatedComments = [...(comments || [])]
-            updatedComments[foundCommentIndex] = { ...softDeletedComment }
-            return [...updatedComments]
-          }
-        );
+        queryClient.setQueryData([...key], () => {
+          const updatedComments = [...(comments || [])];
+          updatedComments[foundCommentIndex] = { ...softDeletedComment };
+          return [...updatedComments];
+        });
       }
 
       // TODO: this state below would be stored in threads react query state when we migrate the
@@ -99,8 +105,8 @@ const useDeleteCommentMutation = ({ chainId, threadId }: UseDeleteCommentMutatio
         );
       }
 
-      return response
-    }
+      return response;
+    },
   });
 };
 

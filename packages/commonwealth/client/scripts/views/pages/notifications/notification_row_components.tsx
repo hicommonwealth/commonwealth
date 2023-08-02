@@ -19,7 +19,9 @@ import { UserGallery } from '../../components/user/user_gallery';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useNavigate } from 'react-router';
 
-export const ChainEventNotificationRow = (props: Omit<NotificationRowProps, 'allRead'>) => {
+export const ChainEventNotificationRow = (
+  props: Omit<NotificationRowProps, 'allRead'>
+) => {
   const { notification, onListPage } = props;
 
   const navigate = useCommonNavigate();
@@ -152,7 +154,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       ) : (
         <UserGallery
           users={authorInfo.map(
-            (auth) => new AddressInfo({ id: null, address: auth[1], chainId: auth[0] })
+            (auth) =>
+              new AddressInfo({ id: null, address: auth[1], chainId: auth[0] })
           )}
           avatarSize={26}
         />

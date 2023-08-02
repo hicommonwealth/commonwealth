@@ -82,7 +82,7 @@ const EditProfileComponent = () => {
               keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
-              ghostAddress: a.ghost_address
+              ghostAddress: a.ghost_address,
             });
           } catch (err) {
             console.error(`Could not return AddressInfo: "${err}"`);

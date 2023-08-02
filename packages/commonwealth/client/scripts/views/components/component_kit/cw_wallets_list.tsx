@@ -256,20 +256,35 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="discord"
             label="Discord"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin(WalletSsoSource.Discord, useSessionKeyRevalidationFlow)}
+            onClick={async () =>
+              onSocialLogin(
+                WalletSsoSource.Discord,
+                useSessionKeyRevalidationFlow
+              )
+            }
             className="DiscordAuthButton"
           />
           <CWAuthButton
             type="github"
             label="Github"
             darkMode={darkMode}
-            onClick={() => onSocialLogin(WalletSsoSource.Github, useSessionKeyRevalidationFlow)}
+            onClick={() =>
+              onSocialLogin(
+                WalletSsoSource.Github,
+                useSessionKeyRevalidationFlow
+              )
+            }
           />
           <CWAuthButton
             type="twitter"
             label="Twitter"
             darkMode={darkMode}
-            onClick={() => onSocialLogin(WalletSsoSource.Twitter, useSessionKeyRevalidationFlow)}
+            onClick={() =>
+              onSocialLogin(
+                WalletSsoSource.Twitter,
+                useSessionKeyRevalidationFlow
+              )
+            }
           />
 
           {wallets.length === 0 && (

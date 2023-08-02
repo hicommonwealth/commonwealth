@@ -1,5 +1,10 @@
 import crypto from 'crypto';
-import { ChainBase, ChainNetwork, WalletId, WalletSsoSource } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainNetwork,
+  WalletId,
+  WalletSsoSource,
+} from 'common-common/src/types';
 import { bech32 } from 'bech32';
 import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';

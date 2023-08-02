@@ -11,7 +11,7 @@ interface CreateReactionProps {
 const createReaction = async ({
   address,
   reactionType,
-  threadId
+  threadId,
 }: CreateReactionProps) => {
   const {
     session = null,
@@ -22,20 +22,17 @@ const createReaction = async ({
     like: reactionType === 'like',
   });
 
-  return await axios.post(
-    `${app.serverUrl()}/threads/${threadId}/reactions`,
-    {
-      author_chain: app.user.activeAccount.chain.id,
-      thread_id: threadId,
-      chain: app.chain.id,
-      address,
-      reaction: reactionType,
-      jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
-    }
-  )
+  return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
+    author_chain: app.user.activeAccount.chain.id,
+    thread_id: threadId,
+    chain: app.chain.id,
+    address,
+    reaction: reactionType,
+    jwt: app.user.jwt,
+    canvas_action: action,
+    canvas_session: session,
+    canvas_hash: hash,
+  });
 };
 
 const useCreateThreadReactionMutation = () => {

@@ -53,7 +53,11 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
   const actorName = (
     <User
       user={
-        new AddressInfo({ id: null, address: author_address, chainId: author_chain ?? chain_id })
+        new AddressInfo({
+          id: null,
+          address: author_address,
+          chainId: author_chain ?? chain_id,
+        })
       }
       linkify
       avatarSize={16}

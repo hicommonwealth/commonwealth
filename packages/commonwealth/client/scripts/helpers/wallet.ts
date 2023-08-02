@@ -32,9 +32,9 @@ const getWalletName = (walletId: WalletId) => {
     [WalletId.CosmosEvmMetamask]: 'Metamask',
     [WalletId.Phantom]: 'Phantom',
     [WalletId.Ronin]: 'Ronin Wallet',
-  }
+  };
   return lookups[walletId];
-}
+};
 
 const getAddressFromWallet = (wallet: IWebWallet<any>) => {
   const selectedAddress = (() => {

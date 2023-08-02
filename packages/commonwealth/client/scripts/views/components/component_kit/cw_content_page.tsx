@@ -69,76 +69,82 @@ type ContentPageProps = {
   hasPendingEdits?: boolean;
   canUpdateThread?: boolean;
   showTabs?: boolean;
-  showSkeleton?: boolean
-  isWindowMedium?: boolean
+  showSkeleton?: boolean;
+  isWindowMedium?: boolean;
 };
 
 const CWContentPageSkeleton = ({ isWindowMedium }) => {
-  const mainBody = <div className="main-body-container">
-    {/* thread header */}
-    <div className="header">
-      <Skeleton width={'90%'} />
+  const mainBody = (
+    <div className="main-body-container">
+      {/* thread header */}
+      <div className="header">
+        <Skeleton width={'90%'} />
+        <Skeleton />
+      </div>
+
+      {/* thread title */}
       <Skeleton />
-    </div>
 
-    {/* thread title */}
-    <Skeleton />
+      {/* thread description */}
+      <div>
+        <Skeleton width={'80%'} />
+        <Skeleton />
+        <Skeleton width={'90%'} />
+        <Skeleton />
+        <Skeleton width={'95%'} />
+      </div>
 
-    {/* thread description */}
-    <div>
-      <Skeleton width={'80%'} />
+      {/* comment input */}
+      <div>
+        <Skeleton height={200} />
+      </div>
+
+      {/* comment filter row */}
       <Skeleton />
-      <Skeleton width={'90%'} />
-      <Skeleton />
-      <Skeleton width={'95%'} />
-    </div>
 
-    {/* comment input */}
-    <div>
-      <Skeleton height={200} />
+      {/* mimics comments */}
+      <div>
+        <Skeleton width={'80%'} />
+        <Skeleton width={'100%'} />
+        <Skeleton width={'90%'} />
+      </div>
+      <div>
+        <Skeleton width={'90%'} />
+        <Skeleton width={'25%'} />
+      </div>
     </div>
+  );
 
-    {/* comment filter row */}
-    <Skeleton />
-
-    {/* mimics comments */}
-    <div>
-      <Skeleton width={'80%'} />
-      <Skeleton width={'100%'} />
-      <Skeleton width={'90%'} />
+  return (
+    <div className={ComponentType.ContentPage}>
+      <div className="sidebar-view">
+        {mainBody}
+        {isWindowMedium && (
+          <div className="sidebar">
+            <div className="cards-column">
+              <Skeleton width={'80%'} />
+              <Skeleton width={'100%'} />
+              <Skeleton width={'50%'} />
+              <Skeleton width={'75%'} />
+            </div>
+            <div className="cards-column">
+              <Skeleton width={'80%'} />
+              <Skeleton width={'100%'} />
+              <Skeleton width={'50%'} />
+              <Skeleton width={'75%'} />
+            </div>
+            <div className="cards-column">
+              <Skeleton width={'80%'} />
+              <Skeleton width={'100%'} />
+              <Skeleton width={'50%'} />
+              <Skeleton width={'75%'} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-    <div>
-      <Skeleton width={'90%'} />
-      <Skeleton width={'25%'} />
-    </div>
-  </div>
-
-  return <div className={ComponentType.ContentPage}>
-    <div className="sidebar-view">
-      {mainBody}
-      {isWindowMedium && <div className="sidebar">
-        <div className="cards-column">
-          <Skeleton width={'80%'} />
-          <Skeleton width={'100%'} />
-          <Skeleton width={'50%'} />
-          <Skeleton width={'75%'} />
-        </div>
-        <div className="cards-column">
-          <Skeleton width={'80%'} />
-          <Skeleton width={'100%'} />
-          <Skeleton width={'50%'} />
-          <Skeleton width={'75%'} />
-        </div>
-        <div className="cards-column">
-          <Skeleton width={'80%'} />
-          <Skeleton width={'100%'} />
-          <Skeleton width={'50%'} />
-          <Skeleton width={'75%'} />
-        </div>
-      </div>}
-    </div>
-  </div>
-}
+  );
+};
 
 export const CWContentPage = ({
   thread,
@@ -174,11 +180,12 @@ export const CWContentPage = ({
   canUpdateThread,
   showTabs = false,
   showSkeleton,
-  isWindowMedium
+  isWindowMedium,
 }: ContentPageProps) => {
   const [tabSelected, setTabSelected] = useState<number>(0);
 
-  if (showSkeleton) return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />
+  if (showSkeleton)
+    return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />;
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 
@@ -209,9 +216,10 @@ export const CWContentPage = ({
               new AddressInfo({
                 id: null,
                 address: author?.address,
-                chainId: typeof author.chain === 'string'
-                  ? author.chain
-                  : author.chain.id,
+                chainId:
+                  typeof author.chain === 'string'
+                    ? author.chain
+                    : author.chain.id,
               })
             }
             collaboratorsInfo={collaborators}

@@ -9,10 +9,10 @@ import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
   address: string;
-  threadId: number,
+  threadId: number;
   chainId: string;
-  unescapedText: string,
-  parentCommentId: number,
+  unescapedText: string;
+  parentCommentId: number;
 }
 
 const createComment = async ({
@@ -47,31 +47,32 @@ const createComment = async ({
     }
   );
 
-  return new Comment(response.data.result)
+  return new Comment(response.data.result);
 };
 
-const useCreateCommentMutation = ({ chainId, threadId }: Partial<CreateCommentProps>) => {
+const useCreateCommentMutation = ({
+  chainId,
+  threadId,
+}: Partial<CreateCommentProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     chainId,
     threadId,
-  })
+  });
 
   return useMutation({
     mutationFn: createComment,
     onSuccess: async (newComment) => {
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId]
+      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
       queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key,
-        () => {
-          return [...comments, newComment]
-        }
-      );
+      queryClient.setQueryData(key, () => {
+        return [...comments, newComment];
+      });
 
       // TODO: these types of async calls should also have a dedicated react query handler
       // update last visisted
-      updateLastVisited(app.chain.meta, true)
+      updateLastVisited(app.chain.meta, true);
 
       // TODO: this state below would be stored in threads react query state when we migrate the
       // whole threads controller from current state to react query (there is a good chance we can
@@ -87,7 +88,7 @@ const useCreateCommentMutation = ({ chainId, threadId }: Partial<CreateCommentPr
         );
       }
 
-      return newComment
+      return newComment;
     },
   });
 };

@@ -10,7 +10,7 @@ const validate = async (setRoute) => {
   const chain = params.get('chain');
   const walletSsoSource = params.get('sso');
   let redirectTo = params.get('redirectTo');
-  if (redirectTo?.startsWith("/finishsociallogin")) redirectTo = null;
+  if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
   try {
     await handleSocialLoginCallback({ chain, walletSsoSource });
@@ -36,7 +36,7 @@ const FinishSocialLogin = () => {
     validate(navigate).catch((error) => {
       // useEffect will be called twice in development because of React strict mode,
       // causing an error to be displayed until validate() finishes
-      if (document.location.host === "localhost:8080") {
+      if (document.location.host === 'localhost:8080') {
         return;
       }
       if (typeof error === 'string') {

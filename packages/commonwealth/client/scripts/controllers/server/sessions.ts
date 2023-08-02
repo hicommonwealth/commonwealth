@@ -207,7 +207,9 @@ class SessionsController {
 
       // Some login methods may require a single sign-on redirect, and take
       // the user away from this page, so this promise might never resolve
-      const { openSessionRevalidation } = await import('views/modals/session_revalidation_modal');
+      const { openSessionRevalidation } = await import(
+        'views/modals/session_revalidation_modal'
+      );
       const signerAddress: string = await new Promise((resolve, reject) => {
         openSessionRevalidation({
           walletAddress: address,
@@ -230,7 +232,9 @@ class SessionsController {
       );
       if (!sessionReauthed) {
         const err = new Error();
-        const { formatAddress } = await import('views/components/user/user_block');
+        const { formatAddress } = await import(
+          'views/components/user/user_block'
+        );
         (err as any).responseJSON = {
           error: `Expected the address ${formatAddress(
             address

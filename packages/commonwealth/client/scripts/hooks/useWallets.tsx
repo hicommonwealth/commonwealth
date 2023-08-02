@@ -218,7 +218,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         provider,
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
-        chain: app.chain?.id
+        chain: app.chain?.id,
       });
       setIsMagicLoading(false);
 

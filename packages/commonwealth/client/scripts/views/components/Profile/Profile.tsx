@@ -43,9 +43,7 @@ const Profile = ({ profileId }: ProfileProps) => {
 
       setProfile(new NewProfile(result.profile));
       setThreads(result.threads.map((t) => app.threads.modelFromServer(t)));
-      const responseComments = result.comments.map((c) =>
-        new Comment(c)
-      );
+      const responseComments = result.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
           (t) => t.id === parseInt(c.threadId, 10)
@@ -63,7 +61,7 @@ const Profile = ({ profileId }: ProfileProps) => {
               keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
-              ghostAddress: a.ghost_address
+              ghostAddress: a.ghost_address,
             });
           } catch (err) {
             console.error(`Could not return AddressInfo: "${err}"`);

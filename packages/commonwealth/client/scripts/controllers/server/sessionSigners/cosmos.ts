@@ -1,7 +1,5 @@
 import { verify as verifyCanvasSessionSignature } from 'canvas';
-import type {
-  Secp256k1Wallet,
-} from '@cosmjs/amino';
+import type { Secp256k1Wallet } from '@cosmjs/amino';
 
 import type {
   Action,

@@ -127,7 +127,7 @@ function setupCosmosProxy(app: Express, models: DB) {
         let targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
           const fallback = await models.Chain.findOne({
-            where: { id: "osmosis" },
+            where: { id: 'osmosis' },
             include: models.ChainNode,
           });
           targetUrl = fallback.ChainNode.alt_wallet_url;
@@ -176,7 +176,7 @@ function setupCosmosProxy(app: Express, models: DB) {
         let targetUrl = chain.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
           const fallback = await models.Chain.findOne({
-            where: { id: "osmosis" },
+            where: { id: 'osmosis' },
             include: models.ChainNode,
           });
           targetUrl = fallback.ChainNode.alt_wallet_url;
@@ -186,7 +186,9 @@ function setupCosmosProxy(app: Express, models: DB) {
         // either the requested chain or osmo, if we're using the fallback
         const { words } = bech32.decode(req.params.address);
         const rewrittenAddress = bech32.encode(
-          chain.ChainNode?.alt_wallet_url ? chain.bech32_prefix : "osmo", words);
+          chain.ChainNode?.alt_wallet_url ? chain.bech32_prefix : 'osmo',
+          words
+        );
         const rewrite = req.originalUrl
           .replace(req.baseUrl, targetUrl)
           .replace(req.params.address, rewrittenAddress)

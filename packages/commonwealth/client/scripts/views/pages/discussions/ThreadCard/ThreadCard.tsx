@@ -36,24 +36,35 @@ type CardProps = AdminActionsProps & {
   showSkeleton?: boolean;
 };
 
-
 const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
-  return <div className={'ThreadCard showSkeleton'}>
-    {!isWindowSmallInclusive && (
-      <ReactionButton thread={thread} size="big" showSkeleton disabled={disabled} />
-    )}
-    <div className="content-wrapper">
-      <div>
-        <Skeleton count={1} className='content-header-skeleton' />
-        <div> <Skeleton className='content-header-icons-skeleton' /> </div>
+  return (
+    <div className={'ThreadCard showSkeleton'}>
+      {!isWindowSmallInclusive && (
+        <ReactionButton
+          thread={thread}
+          size="big"
+          showSkeleton
+          disabled={disabled}
+        />
+      )}
+      <div className="content-wrapper">
+        <div>
+          <Skeleton count={1} className="content-header-skeleton" />
+          <div>
+            {' '}
+            <Skeleton className="content-header-icons-skeleton" />{' '}
+          </div>
+        </div>
+        <div className="content-body-wrapper">
+          <Skeleton count={3} />
+        </div>
       </div>
-      <div className="content-body-wrapper">
-        <Skeleton count={3} />
+      <div className="content-footer">
+        <Skeleton />
       </div>
     </div>
-    <div className="content-footer"><Skeleton /></div>
-  </div>
-}
+  );
+};
 
 export const ThreadCard = ({
   thread,
@@ -72,7 +83,7 @@ export const ThreadCard = ({
   onBodyClick,
   onStageTagClick,
   threadHref,
-  showSkeleton
+  showSkeleton,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -84,7 +95,10 @@ export const ThreadCard = ({
     }
   }, []);
 
-  if (showSkeleton) return <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
+  if (showSkeleton)
+    return (
+      <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
+    );
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -127,7 +141,11 @@ export const ThreadCard = ({
           <div className="content-header">
             <AuthorAndPublishInfo
               authorInfo={
-                new AddressInfo({ id: null, address: thread.author, chainId: thread.authorChain })
+                new AddressInfo({
+                  id: null,
+                  address: thread.author,
+                  chainId: thread.authorChain,
+                })
               }
               publishDate={moment(thread.createdAt).format('l')}
               isNew={isNewThread(thread.createdAt)}
@@ -152,7 +170,7 @@ export const ThreadCard = ({
                 {thread.title}
               </CWText>
             </div>
-            <div className='content-top-tags'>
+            <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
               {linkedSnapshots.length > 0 && (

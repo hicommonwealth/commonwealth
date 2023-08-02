@@ -202,20 +202,20 @@ export const CommentCard = ({
 
               {isCanvasVerifyModalVisible && (
                 <Modal
-                content={<CanvasVerifyDataModal obj={comment} />}
-                onClose={() => setIsCanvasVerifyDataModalVisible(false)}
-                open={isCanvasVerifyModalVisible}
-                  />
+                  content={<CanvasVerifyDataModal obj={comment} />}
+                  onClose={() => setIsCanvasVerifyDataModalVisible(false)}
+                  open={isCanvasVerifyModalVisible}
+                />
               )}
               {verifiedAction && verifiedSession && (
                 <CWText
-                type="caption"
-                fontWeight="medium"
-                className="verification-icon"
-                onClick={() => setIsCanvasVerifyDataModalVisible(true)}
-                  >
+                  type="caption"
+                  fontWeight="medium"
+                  className="verification-icon"
+                  onClick={() => setIsCanvasVerifyDataModalVisible(true)}
+                >
                   <CWIcon iconName="check" iconSize="xs" />
-                  </CWText>
+                </CWText>
               )}
             </div>
           )}

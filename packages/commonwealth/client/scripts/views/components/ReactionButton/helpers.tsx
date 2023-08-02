@@ -24,7 +24,13 @@ export const getDisplayedReactorsForPopup = ({
         >
           <CWText noWrap>
             <User
-              user={new AddressInfo({ id: null, address: rxn, chainId: app.chain.id })}
+              user={
+                new AddressInfo({
+                  id: null,
+                  address: rxn,
+                  chainId: app.chain.id,
+                })
+              }
               linkify
             />
           </CWText>

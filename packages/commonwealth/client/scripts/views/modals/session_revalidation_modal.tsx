@@ -211,7 +211,8 @@ const SessionRevalidationModal = ({
                 </CWText>
                 <CWText>
                   Oops! It looks like the session for your current address has
-                  expired. Just a fancy way of saying you may need to log in again.
+                  expired. Just a fancy way of saying you may need to log in
+                  again.
                 </CWText>
                 <CWText>
                   To create threads, comment, or upvote, you will need access to

@@ -85,8 +85,8 @@ export const CreateComment = ({
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId()
-  })
+    chainId: app.activeChainId(),
+  });
 
   const handleSubmitComment = async () => {
     setErrorMsg(null);
@@ -101,7 +101,7 @@ export const CreateComment = ({
         address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
-      })
+      });
 
       setErrorMsg(null);
       setContentDelta(createDeltaFromText(''));
@@ -116,8 +116,8 @@ export const CreateComment = ({
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
-      const errMsg = err?.responseJSON?.error || 'Failed to create comment'
-      if (errMsg === "Login canceled") return;
+      const errMsg = err?.responseJSON?.error || 'Failed to create comment';
+      if (errMsg === 'Login canceled') return;
       notifyError(errMsg);
       setErrorMsg(errMsg);
     } finally {
