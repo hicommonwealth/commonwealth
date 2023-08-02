@@ -87,7 +87,7 @@ const useDeleteCommentMutation = ({
         // update fetch comments query state
         const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
         queryClient.cancelQueries({ queryKey: key });
-        queryClient.setQueryData([...key], () => {
+        queryClient.setQueryData(key, () => {
           const updatedComments = [...(comments || [])];
           updatedComments[foundCommentIndex] = { ...softDeletedComment };
           return [...updatedComments];
