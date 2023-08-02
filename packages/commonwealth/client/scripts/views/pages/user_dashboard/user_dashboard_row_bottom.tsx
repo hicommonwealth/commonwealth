@@ -42,8 +42,6 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     forceRerender();
   };
 
-  const adjustedId = `discussion_${threadId}`;
-
   const commentSubscription =
     app.user.notifications.findNotificationSubscription({
       categoryId: NotificationCategories.NewComment,

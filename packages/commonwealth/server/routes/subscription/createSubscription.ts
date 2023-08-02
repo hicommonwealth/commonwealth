@@ -60,15 +60,6 @@ export default async (
     }
     case NotificationCategories.NewComment:
     case NotificationCategories.NewReaction: {
-      if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
-      chain = await models.Chain.findOne({
-        where: {
-          id: req.body.chain_id,
-        },
-      });
-      if (!chain) return next(new AppError(Errors.InvalidChain));
-      obj = { chain_id: req.body.chain_id };
-
       if (!req.body.thread_id && !req.body.comment_id) {
         return next(new AppError(Errors.NoThreadOrComment));
       } else if (req.body.thread_id && req.body.comment_id) {
@@ -80,13 +71,13 @@ export default async (
           where: { id: req.body.thread_id },
         });
         if (!thread) return next(new AppError(Errors.NoThread));
-        obj.thread_id = req.body.thread_id;
+        obj = { thread_id: req.body.thread_id, chain_id: thread.chain };
       } else if (req.body.comment_id) {
         comment = await models.Comment.findOne({
           where: { id: req.body.comment_id },
         });
         if (!comment) return next(new AppError(Errors.NoComment));
-        obj.comment_id = req.body.comment_id;
+        obj = { comment_id: req.body.comment_id, chain_id: comment.chain };
       }
       break;
     }
