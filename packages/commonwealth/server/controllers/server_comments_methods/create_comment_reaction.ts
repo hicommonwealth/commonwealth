@@ -59,14 +59,14 @@ export async function __createCommentReaction(
     where: { id: commentId },
   });
   if (!comment) {
-    throw new Error(`${Errors.CommentNotFound}: ${commentId}`);
+    throw new AppError(`${Errors.CommentNotFound}: ${commentId}`);
   }
 
   const thread = await this.models.Thread.findOne({
     where: { id: comment.thread_id },
   });
   if (!thread) {
-    throw new Error(`${Errors.ThreadNotFoundForComment}: ${commentId}`);
+    throw new AppError(`${Errors.ThreadNotFoundForComment}: ${commentId}`);
   }
 
   // check address ban
@@ -76,7 +76,7 @@ export async function __createCommentReaction(
       address: address.address,
     });
     if (!canInteract) {
-      throw new Error(`${Errors.BanError}: ${banError}`);
+      throw new AppError(`${Errors.BanError}: ${banError}`);
     }
   }
 
@@ -103,9 +103,8 @@ export async function __createCommentReaction(
           address.address
         );
       } catch (e) {
-        throw new ServerError(Errors.BalanceCheckFailed, e);
+        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
       }
-
       if (!canReact) {
         throw new AppError(Errors.InsufficientTokenBalance);
       }

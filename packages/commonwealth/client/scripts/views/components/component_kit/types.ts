@@ -29,6 +29,7 @@ export enum ComponentType {
   MobileMenu = 'MobileMenu',
   Modal = 'Modal',
   OldTextInput = 'OldTextInput',
+  OldTooltip = 'OldTooltip',
   Popover = 'Popover',
   PopoverMenu = 'PopoverMenu',
   ProgressBar = 'ProgressBar',
@@ -61,7 +62,7 @@ export type DividerMenuItem = { type: 'divider'; className?: string };
 
 export type HeaderMenuItem = {
   type: 'header';
-  label?: string;
+  label?: string | JSX.Element;
   className?: string;
 };
 
@@ -72,24 +73,25 @@ export type DefaultMenuItem = {
   iconRight?: IconName;
   iconRightWeight?: 'fill' | 'bold';
   isSecondary?: boolean;
-  label?: string;
+  label?: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'default';
   className?: string;
+  preventClosing?: boolean;
 };
 
 type NotificationMenuItem = {
   hasUnreads?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
-  label?: string;
+  label?: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'notification';
 };
 
 export type CommunityMenuItem = {
   community?: ChainInfo;
-  label?: string;
+  label?: string | JSX.Element;
   type?: 'community';
 };
 

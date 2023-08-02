@@ -2,7 +2,6 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
 import type { AddressAttributes } from './address';
-import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -29,7 +28,6 @@ export type CommentAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
 };
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
@@ -72,7 +70,7 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
-      discord_meta: { type: dataTypes.JSONB, allowNull: true},
+      discord_meta: { type: dataTypes.JSONB, allowNull: true },
     },
     {
       timestamps: true,
@@ -107,13 +105,6 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
       targetKey: 'id',
-    });
-    models.Comment.hasMany(models.Attachment, {
-      foreignKey: 'attachment_id',
-      constraints: false,
-      scope: {
-        attachable: 'comment',
-      },
     });
     models.Comment.hasMany(models.Reaction, {
       foreignKey: 'comment_id',

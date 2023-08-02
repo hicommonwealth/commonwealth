@@ -18,6 +18,18 @@ log.info(
   )} GB`
 );
 
+const getImageUrls = (message: Message) => {
+  const attachments = [...message.attachments.values()];
+
+  return attachments
+    .filter((attachment) => {
+      return attachment.contentType.startsWith('image');
+    })
+    .map((attachment) => {
+      return attachment.url;
+    });
+};
+
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -64,7 +76,8 @@ client.on('messageCreate', async (message: Message) => {
       message_id: message.id,
       channel_id: message.channelId,
       parent_channel_id: parent_id,
-      guild_id: message.guildId
+      guild_id: message.guildId,
+      imageUrls: getImageUrls(message),
     };
 
     if (!message.nonce) new_message.title = channel.name;
