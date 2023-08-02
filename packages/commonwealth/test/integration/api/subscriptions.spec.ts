@@ -15,7 +15,7 @@ import * as modelUtils from '../../util/modelUtils';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('Subscriptions Tests', () => {
+describe('Subscriptions Tests', () => {
   let jwtToken, loggedInAddr, loggedInAddrId, thread, comment;
   const chain = 'ethereum';
 
