@@ -1,9 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
-import type {
-  AccountId,
-  Conviction,
-} from '@polkadot/types/interfaces';
+import type { AccountId, Conviction } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 
@@ -12,12 +9,11 @@ import { AccountsStore } from 'stores';
 import Account from '../../../models/Account';
 import { IAccountsModule } from '../../../models/interfaces';
 import SubstrateChain from './shared';
+import { decodeAddress } from '@polkadot/util-crypto';
 
 type Delegation = [AccountId, Conviction] & Codec;
 
 export class SubstrateAccount extends Account {
-  private polkadot;
-
   // GETTERS AND SETTERS
 
   // The total balance
@@ -137,8 +133,6 @@ class SubstrateAccounts
 
   private _Chain: SubstrateChain;
 
-  private polkadot;
-
   public get(address: string, keytype?: string) {
     if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {
       throw new Error(`invalid keytype: ${keytype}`);
@@ -156,13 +150,13 @@ class SubstrateAccounts
   }
 
   public isZero(address: string) {
-    const decoded = this.polkadot.decodeAddress(address);
+    const decoded = decodeAddress(address);
     return decoded.every((v) => v === 0);
   }
 
   public fromAddress(address: string, isEd25519 = false): SubstrateAccount {
     try {
-      this.polkadot.decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
+      decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
       console.error(`Decoded invalid address: ${address}`);
       return;
@@ -199,7 +193,6 @@ class SubstrateAccounts
   }
 
   public async init(ChainInfo: SubstrateChain): Promise<void> {
-    this.polkadot = await import('@polkadot/keyring');
     this._Chain = ChainInfo;
     this._initialized = true;
   }

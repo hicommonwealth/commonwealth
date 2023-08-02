@@ -94,8 +94,9 @@ export const User = ({
     addrShort = formatAddressShort(
       user.address,
       typeof user.chain === 'string' ? user.chain : user.chain?.id,
-      false,
-      maxCharLength
+      true,
+      maxCharLength,
+      app.chain?.meta?.bech32Prefix
     );
 
     friendlyChainName = app.config.chains.getById(
@@ -233,7 +234,9 @@ export const User = ({
                   profile.name
                 ) : (
                   <>
-                    {profile.name}
+                    <div>
+                      {profile.name}
+                    </div>
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
@@ -319,7 +322,13 @@ export const User = ({
                   <>
                     {profile.name}
                     <div className="id-short">
-                      {formatAddressShort(profile.address, profile.chain)}
+                      {formatAddressShort(
+                        profile.address,
+                        profile.chain,
+                        true,
+                        maxCharLength,
+                        app.chain?.meta?.bech32Prefix
+                      )}
                     </div>
                   </>
                 )}
@@ -331,8 +340,9 @@ export const User = ({
               {formatAddressShort(
                 profile.address,
                 profile.chain,
-                false,
-                maxCharLength
+                true,
+                maxCharLength,
+                app.chain?.meta?.bech32Prefix
               )}
             </div>
           )}

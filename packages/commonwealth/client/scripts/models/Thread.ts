@@ -1,7 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import type moment from 'moment';
 import type { VersionHistory } from '../controllers/server/threads';
-import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
 import type Poll from './Poll';
 import type { ReactionType } from './Reaction';
@@ -14,7 +13,7 @@ export interface IThreadCollaborator {
 }
 
 export type AssociatedReaction = {
-  id: number;
+  id: number | string;
   type: ReactionType;
   address: string;
 };
@@ -43,7 +42,6 @@ export class Thread implements IUniqueId {
   public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
-  public readonly attachments: Attachment[];
   public readOnly: boolean;
 
   public readonly canvasAction: string;
@@ -63,13 +61,17 @@ export class Thread implements IUniqueId {
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+
   public markedAsSpamAt: moment.Moment;
+  public archivedAt: moment.Moment;
   public readonly lockedAt: moment.Moment;
+
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
+  public readonly discord_meta: any;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -78,7 +80,6 @@ export class Thread implements IUniqueId {
   constructor({
     author,
     title,
-    attachments,
     id,
     createdAt,
     updatedAt,
@@ -98,6 +99,7 @@ export class Thread implements IUniqueId {
     chainEntities,
     lastEdited,
     markedAsSpamAt,
+    archivedAt,
     lockedAt,
     hasPoll,
     lastCommentedOn,
@@ -109,10 +111,10 @@ export class Thread implements IUniqueId {
     canvasSession,
     canvasHash,
     links,
+    discord_meta,
   }: {
     author: string;
     title: string;
-    attachments: Attachment[];
     id: number;
     createdAt: moment.Moment;
     updatedAt: moment.Moment;
@@ -132,6 +134,7 @@ export class Thread implements IUniqueId {
     chainEntities?: any[];
     lastEdited?: moment.Moment;
     markedAsSpamAt?: moment.Moment;
+    archivedAt?: moment.Moment;
     lockedAt?: moment.Moment;
     hasPoll: boolean;
     polls?: Poll[];
@@ -143,12 +146,12 @@ export class Thread implements IUniqueId {
     canvasSession?: string;
     canvasHash?: string;
     links?: Link[];
+    discord_meta?: any;
   }) {
     this.author = author;
     this.title = title;
     this.body = body;
     this.plaintext = plaintext;
-    this.attachments = attachments;
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = createdAt;
@@ -179,6 +182,7 @@ export class Thread implements IUniqueId {
     this.hasPoll = hasPoll;
     this.lastEdited = lastEdited;
     this.markedAsSpamAt = markedAsSpamAt;
+    this.archivedAt = archivedAt;
     this.lockedAt = lockedAt;
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];
@@ -195,6 +199,7 @@ export class Thread implements IUniqueId {
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
     this.links = links || [];
+    this.discord_meta = discord_meta;
   }
 }
 

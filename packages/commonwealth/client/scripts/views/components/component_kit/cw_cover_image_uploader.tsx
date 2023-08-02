@@ -1,18 +1,20 @@
-import React from 'react';
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import $ from 'jquery';
+import React from 'react';
 
 import app from 'state';
-
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWSpinner } from './cw_spinner';
-import { getClasses } from './helpers';
-import { CWTextInput, MessageRow } from './cw_text_input';
-import type { ValidationStatus } from './cw_validation_text';
+import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
-import { CWText } from './cw_text';
+
+import { CWIcon } from './cw_icons/cw_icon';
 import { CWRadioGroup } from './cw_radio_group';
+import { CWSpinner } from './cw_spinner';
+import { CWText } from './cw_text';
+import { CWTextInput, MessageRow } from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
+import { compressImage } from 'utils/ImageCompression';
 
 type CoverImageUploaderProps = {
   headerText?: string;
@@ -64,16 +66,18 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
       );
       if (signatureResponse.status !== 'Success') throw new Error();
 
+      const compressedImage = await compressImage(file);
+
       const uploadURL = signatureResponse.result;
       const uploadResponse = await fetch(uploadURL, {
         method: 'put',
-        body: file,
+        body: compressedImage,
       });
 
       const trimmedImageURL = uploadResponse.url?.replace(/\?.*/, '').trim();
       if (!trimmedImageURL) throw new Error();
 
-      return [trimmedImageURL, 'success'];
+      return [replaceBucketWithCDN(trimmedImageURL), 'success'];
     } catch (e) {
       return [null, 'failure'];
     }

@@ -88,6 +88,19 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
     }
   }, [defaultTopic, threadTopic]);
 
+  useEffect(() => {
+    if (threadTopic?.defaultOffchainTemplate) {
+      try {
+        const template = JSON.parse(
+          threadTopic.defaultOffchainTemplate
+        ) as DeltaStatic;
+        setThreadContentDelta(template);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }, [threadTopic]);
+
   return {
     threadKind,
     setThreadKind,

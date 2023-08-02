@@ -1,11 +1,3 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
-
-import { HydraDXSpec } from './specs/hydraDX';
-import { KulupuSpec } from './specs/kulupu';
-import { StafiSpec } from './specs/stafi';
-import { CloverSpec } from './specs/clover';
-import { EdgewareSpec } from './specs/edgeware';
-
 export const networkUrls = {
   clover: 'wss://api.clover.finance',
   hydradx: 'wss://rpc-01.snakenet.hydradx.io',
@@ -34,18 +26,6 @@ export const networkUrls = {
   'eth-local': 'ws://127.0.0.1:8545',
   osmosis: 'https://rpc-osmosis.blockapsis.com',
 } as const;
-
-export const networkSpecs: { [chain: string]: RegisteredTypes } = {
-  clover: CloverSpec,
-  hydradx: HydraDXSpec,
-  kulupu: KulupuSpec,
-  edgeware: EdgewareSpec,
-  'edgeware-local': EdgewareSpec,
-  'edgeware-testnet': EdgewareSpec,
-  stafi: StafiSpec,
-  kusama: {},
-  polkadot: {},
-};
 
 export const contracts = {
   marlin: '0x777992c2E4EDF704e49680468a9299C6679e37F6',

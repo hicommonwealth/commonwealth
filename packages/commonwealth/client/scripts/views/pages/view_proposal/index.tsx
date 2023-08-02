@@ -28,6 +28,7 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
+import { JSONDisplay } from './json_display';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -45,7 +46,6 @@ const ViewProposalPage = ({
 
   const hasFetchedProposalRef = useRef(false);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [type, setType] = useState(typeProp);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
@@ -68,12 +68,13 @@ const ViewProposalPage = ({
       if (hasFetchedProposalRef.current) return;
       hasFetchedProposalRef.current = true;
 
-      if (!type) {
-        setType(chainToProposalSlug(app.chain.meta));
+      let resolvedType = typeProp;
+      if (!typeProp) {
+        resolvedType = chainToProposalSlug(app.chain.meta);
       }
 
       try {
-        const proposalFromStore = idToProposal(type, proposalId);
+        const proposalFromStore = idToProposal(resolvedType, proposalId);
         setProposal(proposalFromStore);
         setError(null);
       } catch (e) {
@@ -102,7 +103,7 @@ const ViewProposalPage = ({
     } else {
       afterAdapterLoaded();
     }
-  }, [type, isAdapterLoaded, proposalId]);
+  }, [isAdapterLoaded, proposalId]);
 
   if (!isAdapterLoaded || !proposal) {
     return <PageLoading message="Loading..." />;
@@ -160,6 +161,10 @@ const ViewProposalPage = ({
           />
           {proposal instanceof AaveProposal && (
             <AaveViewProposalDetail proposal={proposal} />
+          )}
+          {metadata && <JSONDisplay data={metadata} title="Metadata" />}
+          {proposal.data?.messages && (
+            <JSONDisplay data={proposal.data.messages} title="Messages" />
           )}
           <VotingResults proposal={proposal} />
           <VotingActions

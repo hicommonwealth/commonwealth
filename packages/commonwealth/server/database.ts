@@ -3,7 +3,6 @@ import { DATABASE_URI } from './config';
 
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
-import AttachmentFactory from './models/attachment';
 import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
 import ChainNodeFactory from './models/chain_node';
@@ -15,7 +14,6 @@ import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
-import DiscussionDraftFactory from './models/discussion_draft';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
@@ -87,13 +85,11 @@ const models: Models = {
   Template: TemplateFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
-  DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
-  Attachment: AttachmentFactory(sequelize, DataTypes),
   Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),
