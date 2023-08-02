@@ -15,7 +15,7 @@ import * as modelUtils from '../../util/modelUtils';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('Subscriptions Tests', () => {
+describe.only('Subscriptions Tests', () => {
   let jwtToken, loggedInAddr, loggedInAddrId, thread, comment;
   const chain = 'ethereum';
 
@@ -131,7 +131,7 @@ describe('Subscriptions Tests', () => {
     describe(`${NotificationCategories.NewComment} subscription tests`, () => {
       let rootCommmentSubscription, commentSubscription;
 
-      it('should create new-comment subscription on a thread', async () => {
+      it('should fail to create a new-comment subscription without a chain id', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
@@ -139,6 +139,25 @@ describe('Subscriptions Tests', () => {
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.InvalidChain);
+      });
+
+      it('should create new-comment subscription on a thread', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewComment;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: thread.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
@@ -156,7 +175,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            comment_id: comment.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
@@ -174,7 +199,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: thread.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.id).to.be.equal(rootCommmentSubscription.id);
@@ -183,7 +214,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            comment_id: comment.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.id).to.be.equal(commentSubscription.id);
@@ -202,6 +239,7 @@ describe('Subscriptions Tests', () => {
             is_active,
             thread_id: thread.id,
             comment_id: comment.id,
+            chain_id: chain,
           });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
@@ -219,6 +257,7 @@ describe('Subscriptions Tests', () => {
             jwt: jwtToken,
             category,
             is_active,
+            chain_id: chain,
           });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
@@ -232,7 +271,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, thread_id: 999999 });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: 999999,
+            chain_id: chain,
+          });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
@@ -247,7 +292,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, comment_id: 999999 });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            comment_id: 999999,
+            chain_id: chain,
+          });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
@@ -259,7 +310,7 @@ describe('Subscriptions Tests', () => {
     describe(`${NotificationCategories.NewReaction} subscription tests`, () => {
       let rootCommmentSubscription, commentSubscription;
 
-      it('should create a new-reaction subscription on a thread', async () => {
+      it('should fail to create a new-reaction subscription without a chain id', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
@@ -267,6 +318,25 @@ describe('Subscriptions Tests', () => {
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
+        expect(res.status).to.equal(400);
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.equal(Errors.InvalidChain);
+      });
+
+      it('should create a new-reaction subscription on a thread', async () => {
+        const is_active = true;
+        const category = NotificationCategories.NewReaction;
+        const res = await chai
+          .request(app)
+          .post('/api/createSubscription')
+          .set('Accept', 'application/json')
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: thread.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
@@ -284,7 +354,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            comment_id: comment.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
@@ -302,7 +378,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, thread_id: thread.id });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: thread.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.id).to.be.equal(rootCommmentSubscription.id);
@@ -311,7 +393,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, comment_id: comment.id });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            comment_id: comment.id,
+            chain_id: chain,
+          });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.id).to.be.equal(commentSubscription.id);
@@ -330,6 +418,7 @@ describe('Subscriptions Tests', () => {
             is_active,
             thread_id: thread.id,
             comment_id: comment.id,
+            chain_id: chain,
           });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
@@ -347,6 +436,7 @@ describe('Subscriptions Tests', () => {
             jwt: jwtToken,
             category,
             is_active,
+            chain_id: chain,
           });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
@@ -360,7 +450,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, thread_id: 999999 });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            thread_id: 999999,
+            chain_id: chain,
+          });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
@@ -375,7 +471,13 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, comment_id: 999999 });
+          .send({
+            jwt: jwtToken,
+            category,
+            is_active,
+            comment_id: 999999,
+            chain_id: chain,
+          });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
