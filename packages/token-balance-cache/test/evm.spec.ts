@@ -16,6 +16,7 @@ async function mockNodesProvider(): Promise<IChainNode[]> {
     },
   ];
 }
+
 const providers = [new evmBalanceProvider()];
 const tbc = new TokenBalanceCache(0, 0, providers, mockNodesProvider);
 
