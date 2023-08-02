@@ -3,13 +3,14 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import useAutocomplete from '@mui/base/useAutocomplete';
 
 import { ComponentType } from '../types';
-import { CWTag } from './CWTag';
+import { CWTag } from './cw_tag';
+
 import { IconName } from '../cw_icons/cw_icon_lookup';
-import { getClasses } from '../helpers';
 import { ValidationStatus } from '../cw_validation_text';
-import ChainInfo from '../../../../models/ChainInfo';
 import { CWText } from '../cw_text';
 import { CWCommunityAvatar } from '../cw_community_avatar';
+import { getClasses } from '../helpers';
+import ChainInfo from '../../../../models/ChainInfo';
 
 import 'components/component_kit/new_designs/CWSearchBar.scss';
 
@@ -57,6 +58,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const [value, setValue] = useState<string>('');
   const [communities, setCommunities] = useState([]);
   const [id, setId] = useState(null);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
   const {
     getRootProps,
@@ -75,6 +77,10 @@ export const CWSearchBar: FC<SearchBarProps> = ({
 
   const handleOnInput = (e: ChangeEvent<HTMLInputElement>) =>
     setValue(e.target.value);
+
+  const handleOnFocus = () => setIsFocused(true);
+
+  const handleOnBlur = () => setIsFocused(false);
 
   const handleOnKeyDown = (e: any) => {
     if (e.key === 'Backspace' && value.length === 0) {
@@ -110,6 +116,8 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           },
           ComponentType.Searchbar
         )}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
       >
         <MagnifyingGlass
           className={getClasses(
@@ -119,7 +127,14 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           weight="regular"
           size={24}
         />
-        {id && <CWTag community={getChain(id)} onClick={() => setId(null)} />}
+        {id && (
+          <CWTag
+            label={getChain(id).name}
+            type="input"
+            community={getChain(id)}
+            onClick={() => setId(null)}
+          />
+        )}
         <div
           className={getClasses(
             { inputElement: true },
@@ -150,7 +165,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
             </li>
           ))}
         </ul>
-      ) : value.length > 0 ? (
+      ) : value.length > 0 && isFocused ? (
         <div className="noResults">
           <CWText type="b2">No results found</CWText>
         </div>

@@ -260,4 +260,17 @@
     }
   }
 
+  &.action {
+    display: grid;
+    align-items: center;
+    color: $neutral-500;
+    width: fit-content;
+    height: fit-content;
+    padding: 0;
+
+    &:hover {
+      cursor: pointer;
+      color: $neutral-600;
+    }
+  }
 }
