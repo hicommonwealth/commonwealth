@@ -66,7 +66,9 @@ export function supportedSubscriptionCategories(): string[] {
  * Given the creation attributes of a subscription, this function throws an error if the required values
  * for the associated subscription category id are not present. This function only checks for values that are not
  * already required in the database like subscriber_id. For example, new-comment-creation subscriptions must always
- * define a thread_id or a comment_id but never both.
+ * define a thread_id or a comment_id but never both. This function is an application layer value checker that mimics
+ * the database level checks created in the rm-object-id migration. The benefit of this function is that returns
+ * readable errors rather than sequelize errors that only state the constraint name.
  * @param values Creation attributes of the Subscription Model
  */
 export function checkSubscriptionValues(
