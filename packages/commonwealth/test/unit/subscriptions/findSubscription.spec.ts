@@ -205,7 +205,7 @@ const notifSubscriptions: NotificationSubscription[] = [
   ),
 ];
 
-describe.only('findSubscription tests', () => {
+describe('findSubscription tests', () => {
   describe(`${NotificationCategories.ChainEvent} subscriptions`, () => {
     it(`should return null if no chainId is provided`, () => {
       const findOptions = {
