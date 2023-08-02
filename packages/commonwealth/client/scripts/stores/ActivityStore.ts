@@ -31,14 +31,14 @@ export class ActiveThreadsStore {
     const comments = {};
     const reactions = {};
     const allThreads = this.getThreadsByCommunity(parentEntity);
-    allThreads.forEach((thread) => {
-      const allComments = app.comments.getByThread(thread);
-      comments[thread.id] = allComments;
-      reactions[thread.id] = app.reactions.getByPost(thread);
-      allComments.forEach((c) => {
-        reactions[thread.id].concat(app.reactions.getByPost(c));
-      });
-    });
+    // allThreads.forEach((thread) => {
+    //   // const allComments = app.threads.getByThread(thread);
+    //   // comments[thread.id] = allComments;
+    //   // reactions[thread.id] = app.threads.getReactionByPost(thread);
+    //   // allComments.forEach((c) => {
+    //   //   reactions[thread.id].concat(app.threads.getReactionByPost(c));
+    //   // });
+    // });
     allThreads.sort((threadA, threadB) => {
       const totalActivityA =
         comments[threadA.id]?.length + reactions[threadA.id]?.length;

@@ -82,8 +82,8 @@ const ProposalsPage = () => {
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
     setIsLoading: setIsCosmosCompletedProposalsLoading,
-    isLoading: isCosmosCompletedProposalsLoading,
     setIsLoadingMore: setIsCosmosCompletedProposalsLoadingMore,
+    isApiReady: app.chain?.apiInitialized,
   });
 
   if (isLoading) {

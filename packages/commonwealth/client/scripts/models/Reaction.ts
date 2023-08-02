@@ -17,28 +17,27 @@ class Reaction {
 
   constructor({
     id,
-    author,
-    chain,
+    Address,
     reaction,
-    threadId,
-    proposalId,
-    commentId,
+    thread_id,
+    proposal_id,
+    comment_id,
     author_chain,
-    canvasAction,
-    canvasSession,
-    canvasHash,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
   }) {
     this.id = id;
-    this.author = author;
-    this.chain = chain;
+    this.author = Address.address;
+    this.chain = Address.chain;
     this.reaction = reaction;
-    this.threadId = threadId;
-    this.commentId = commentId;
-    this.proposalId = proposalId;
+    this.threadId = thread_id;
+    this.commentId = comment_id;
+    this.proposalId = proposal_id;
     this.author_chain = author_chain;
-    this.canvasAction = canvasAction;
-    this.canvasSession = canvasSession;
-    this.canvasHash = canvasHash;
+    this.canvasAction = canvas_action;
+    this.canvasSession = canvas_session;
+    this.canvasHash = canvas_hash;
   }
 }
 

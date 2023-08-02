@@ -13,6 +13,7 @@ export type TopicAttributes = {
   chain_id: string;
   description?: string;
   telegram?: string;
+  channel_id?: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -62,6 +63,7 @@ export default (
         allowNull: false,
         defaultValue: '',
       },
+      channel_id: { type: dataTypes.STRING, allowNull: true },
     },
     {
       timestamps: true,

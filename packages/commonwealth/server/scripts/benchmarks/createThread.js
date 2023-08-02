@@ -5,14 +5,14 @@ const { syncPerformanceTester, asyncPerformanceTester } = require('./util');
 
 const jwt =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIxMTMsImVtYWlsIjpudWxsLCJpYXQiOjE2NTI2NzA4MDR9.WN5vxIaAcAzpNvTJiCeelm071yErhRtcEgXbA5iS-wA';
-let url = 'http://localhost:8080/api/createThread';
+let url = 'http://localhost:8080/api/threads';
 
 let options = {
   headers: {
     'Content-Type': 'application/json',
     Authorization: `jwt ${jwt}`,
   },
-  body: `{"author_chain":"ethereum","author":{},"chain":"ethereum","address":"0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE","title":"Testing","body":"This is the thread body","kind":"forum","stage":"discussion","attachments[]":["someImage.com","anotherImage.com","thirdImage.com"],"topic_name":"General","topic_id":96,"jwt":"${jwt}"}`,
+  body: `{"author_chain":"ethereum","author":{},"chain":"ethereum","address":"0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE","title":"Testing","body":"This is the thread body","kind":"forum","stage":"discussion","topic_name":"General","topic_id":96,"jwt":"${jwt}"}`,
 };
 
 function sync_requests() {
