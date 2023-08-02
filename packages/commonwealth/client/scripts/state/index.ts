@@ -47,7 +47,7 @@ export interface IApp {
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
 
-  // Threads
+  // Polls
   polls: PollsController;
 
   // Proposals
@@ -132,7 +132,7 @@ const app: IApp = {
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 
-  // Thread
+  // Polls
   polls: new PollsController(),
 
   // Proposals

@@ -7,8 +7,8 @@ import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteCommentProps {
   address: string;
-  chainId: string
-  canvasHash: string
+  chainId: string;
+  canvasHash: string;
   commentId: number;
   existingNumberOfComments: number;
 }

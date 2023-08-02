@@ -60,7 +60,7 @@ export const EditCollaboratorsModal = ({
         );
 
         const results: Array<RoleInstanceWithPermissionAttributes> =
-          response.profiles
+          response.results
             .map((profile) => ({
               ...profile.roles[0],
               Address: profile.addresses[0],

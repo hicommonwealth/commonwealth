@@ -1,5 +1,4 @@
 import { ProposalType } from 'common-common/src/types';
-import Attachment from 'models/Attachment';
 import type ChainEntity from 'models/ChainEntity';
 import Poll from 'models/Poll';
 import type momentT from 'moment';
@@ -48,7 +47,6 @@ export type Link = {
 export const THREAD_ARRAY_FIELDS = [
   'collaborators',
   'chainEntities',
-  'attachments',
   'versionHistory',
   'associatedReactions'
 ]
@@ -64,7 +62,6 @@ export class Thread implements IUniqueId {
   public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
-  public readonly attachments: Attachment[];
   public readOnly: boolean;
 
   public readonly canvasAction: string;
@@ -94,46 +91,47 @@ export class Thread implements IUniqueId {
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
+  public readonly discord_meta: any;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
   }
 
   constructor({
-    marked_as_spam_at,
+    Address,
     title,
-    body,
     id,
+    created_at,
+    updated_at,
+    topic,
     kind,
     stage,
+    version_history,
     chain,
+    read_only,
+    body,
+    plaintext,
     url,
     pinned,
-    links,
+    collaborators,
+    chain_entity_meta,
+    last_edited,
+    marked_as_spam_at,
+    locked_at,
+    archived_at,
+    has_poll,
+    last_commented_on,
+    numberOfComments,
+    polls,
+    reactions,
+    reactionIds,
+    reactionType,
+    addressesReacted,
     canvasAction,
     canvasSession,
     canvasHash,
-    plaintext,
-    collaborators,
-    last_edited,
-    locked_at,
-    last_commented_on,
-    created_at,
-    updated_at,
-    read_only,
-    has_poll,
-    archived_at,
-    numberOfComments,
-    polls,
-    Attachments,
-    topic,
-    reactions,
-    chain_entity_meta,
-    version_history,
-    Address,
-    reactionIds,
-    addressesReacted,
-    reactionType
+    links,
+    discord_meta,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -160,7 +158,6 @@ export class Thread implements IUniqueId {
     has_poll: boolean;
     numberOfComments?: number;
     polls?: Poll[];
-    Attachments: Attachment[]; // TODO: this is to be removed
     topic: Topic;
     reactions?: any[]; // TODO: fix type
     reactionIds: any[]; // TODO: fix type
@@ -169,29 +166,9 @@ export class Thread implements IUniqueId {
     chain_entity_meta: any, // TODO: fix type
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
+    discord_meta?: any;
   }) {
     this.author = Address.address;
-    this.authorChain = Address.chain;
-    this.id = id;
-    this.kind = kind;
-    this.stage = stage;
-    this.chain = chain;
-    this.url = url;
-    this.pinned = pinned;
-    this.canvasAction = canvasAction;
-    this.canvasSession = canvasSession;
-    this.canvasHash = canvasHash;
-    this.plaintext = plaintext;
-    this.readOnly = read_only;
-    this.hasPoll = has_poll;
-    this.topic = topic?.id ? new Topic({...(topic || {})} as any) : null;
-    this.numberOfComments = numberOfComments || 0;
-    this.links = links || [];
-    this.collaborators = collaborators || [];
-    this.attachments = Attachments
-      ? Attachments.map((a) => new Attachment(a.url, a.description))
-      : [];
-    this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.title = (() => {
       try {
         return decodeURIComponent(title);
@@ -208,24 +185,44 @@ export class Thread implements IUniqueId {
         return body;
       }
     })();
-    this.associatedReactions = [];
-    const tempReactionIds = (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
-    const tempReactionType = (reactions ? reactions.map((r) => r?.type || r?.reaction) : reactionType) || [];
-    const tempAddressesReacted = (reactions ? reactions.map((r) => r?.address || r?.Address?.address) : addressesReacted) || [];
-    if (
-      tempReactionIds.length > 0 && (
-        tempReactionIds.length === tempReactionType.length &&
-        tempReactionType.length === tempAddressesReacted.length
-      )
-    ) {
-      for (let i = 0; i < tempReactionIds.length; i++) {
-        this.associatedReactions.push({
-          id: tempReactionIds[i],
-          type: tempReactionType[i],
-          address: tempAddressesReacted[i],
+    this.plaintext = plaintext;
+    this.id = id;
+    this.identifier = `${id}`;
+    this.createdAt = moment(created_at);
+    this.updatedAt = moment(updated_at);
+    this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
+    this.kind = kind;
+    this.stage = stage;
+    this.authorChain = Address.chain;
+    this.pinned = pinned;
+    this.url = url;
+    this.versionHistory = (() => {
+      let versionHistoryProcessed;
+      if (version_history) {
+        versionHistoryProcessed = version_history.map((v) => {
+          if (!v) return;
+          let history;
+          try {
+            history = JSON.parse(v);
+            history.author =
+              typeof history.author === 'string'
+                ? JSON.parse(history.author)
+                : typeof history.author === 'object'
+                  ? history.author
+                  : null;
+            history.timestamp = moment(history.timestamp);
+          } catch (e) {
+            console.log(e);
+          }
+          return history;
         });
       }
-    }
+      return versionHistoryProcessed
+    })();
+    this.chain = chain;
+    this.readOnly = read_only;
+    this.collaborators = collaborators || [];
+    this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
     this.chainEntities = (() => {
       const chainEntitiesProcessed: ChainEntity[] = [];
       if (chain_entity_meta) {
@@ -253,41 +250,40 @@ export class Thread implements IUniqueId {
         })
         : [];
     })()
-    this.versionHistory = (() => {
-      let versionHistoryProcessed;
-      if (version_history) {
-        versionHistoryProcessed = version_history.map((v) => {
-          if (!v) return;
-          let history;
-          try {
-            history = JSON.parse(v);
-            history.author =
-              typeof history.author === 'string'
-                ? JSON.parse(history.author)
-                : typeof history.author === 'object'
-                  ? history.author
-                  : null;
-            history.timestamp = moment(history.timestamp);
-          } catch (e) {
-            console.log(e);
-          }
-          return history;
-        });
-      }
-      return versionHistoryProcessed
-    })();
+    this.hasPoll = has_poll;
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
         ? this.versionHistory[0].timestamp
         : null;
-    this.lockedAt = locked_at ? moment(locked_at) : null;
-    this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
-    this.createdAt = moment(created_at);
-    this.updatedAt = moment(updated_at);
+    this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
+    this.lockedAt = locked_at ? moment(locked_at) : null;
     this.polls = (polls || []).map((p) => new Poll(p))
-    this.identifier = `${id}`;
+    this.numberOfComments = numberOfComments || 0;
+    this.associatedReactions = [];
+    const tempReactionIds = (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
+    const tempReactionType = (reactions ? reactions.map((r) => r?.type || r?.reaction) : reactionType) || [];
+    const tempAddressesReacted = (reactions ? reactions.map((r) => r?.address || r?.Address?.address) : addressesReacted) || [];
+    if (
+      tempReactionIds.length > 0 && (
+        tempReactionIds.length === tempReactionType.length &&
+        tempReactionType.length === tempAddressesReacted.length
+      )
+    ) {
+      for (let i = 0; i < tempReactionIds.length; i++) {
+        this.associatedReactions.push({
+          id: tempReactionIds[i],
+          type: tempReactionType[i],
+          address: tempAddressesReacted[i],
+        });
+      }
+    }
+    this.canvasAction = canvasAction;
+    this.canvasSession = canvasSession;
+    this.canvasHash = canvasHash;
+    this.links = links || [];
+    this.discord_meta = discord_meta;
   }
 }
 

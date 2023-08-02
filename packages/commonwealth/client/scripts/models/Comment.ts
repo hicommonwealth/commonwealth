@@ -31,6 +31,7 @@ export class Comment<T extends IUniqueId> {
   public readonly canvasAction: string;
   public readonly canvasSession: string;
   public readonly canvasHash: string;
+  public readonly discord_meta: any;
 
   constructor({
     id,
@@ -51,27 +52,30 @@ export class Comment<T extends IUniqueId> {
     canvas_session,
     version_history,
     marked_as_spam_at,
+    discord_meta
   }) {
-    const versionHistory = version_history ? version_history.map((v) => {
-      if (!v) return;
-      let history;
-      try {
-        history = JSON.parse(v || '{}');
-        history.author =
-          typeof history.author === 'string'
-            ? JSON.parse(history.author)
-            : typeof history.author === 'object'
-              ? history.author
-              : null;
-        history.timestamp = moment(history.timestamp);
-      } catch (e) {
-        console.log(e);
-      }
-      return history;
-    }) : []
+    const versionHistory = version_history
+      ? version_history.map((v) => {
+          if (!v) return;
+          let history;
+          try {
+            history = JSON.parse(v || '{}');
+            history.author =
+              typeof history.author === 'string'
+                ? JSON.parse(history.author)
+                : typeof history.author === 'object'
+                ? history.author
+                : null;
+            history.timestamp = moment(history.timestamp);
+          } catch (e) {
+            console.log(e);
+          }
+          return history;
+        })
+      : [];
 
     this.chain = chain;
-    this.author = Address?.address || author
+    this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
     this.versionHistory = versionHistory;
@@ -92,6 +96,7 @@ export class Comment<T extends IUniqueId> {
     this.canvasHash = canvas_hash;
     this.reactions = (reactions || []).map(r => new Reaction(r));
     this.rootThread = thread_id;
+    this.discord_meta = discord_meta;
   }
 }
 

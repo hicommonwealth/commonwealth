@@ -13,6 +13,7 @@ import type { MenuItem } from './types';
 import { ComponentType } from './types';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
+import { featureFlags } from 'helpers/feature-flags';
 
 type CWSidebarMenuItemProps = {
   isStarred?: boolean;
@@ -154,7 +155,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
           {
             type: 'default',
             label: 'Explore communities',
-            iconLeft: 'compass',
+            iconLeft: featureFlags.sessionKeys ? 'compassPhosphor' : 'compass',
             onClick: () => {
               setMenu({ name: 'default', isVisible: false });
               navigate('/communities', {}, null);

@@ -8,6 +8,7 @@ import useToggleCommentSpamStatusMutation from "./toggleCommentSpamStatus";
 import useFetchCommentReactionsQuery from './fetchReactions';
 import useCreateCommentReactionMutation from './createReaction';
 import useDeleteCommentReactionMutation from './deleteReaction';
+import useSearchCommentsQuery from './searchComments';
 
 export {
     // comments
@@ -16,6 +17,7 @@ export {
     useCreateCommentMutation,
     useDeleteCommentMutation,
     useToggleCommentSpamStatusMutation,
+    useSearchCommentsQuery,
     // comment reactions
     useFetchCommentReactionsQuery,
     useCreateCommentReactionMutation,

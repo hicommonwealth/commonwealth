@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
@@ -52,11 +51,11 @@ export type ThreadAttributes = {
   marked_as_spam_at?: Date;
   archived_at?: Date;
   locked_at?: Date;
+  discord_meta?: any;
 
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
@@ -111,7 +110,7 @@ export default (
         allowNull: false,
       },
       links: { type: dataTypes.JSONB, allowNull: true },
-
+      discord_meta: { type: dataTypes.JSONB, allowNull: true },
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
       // signed data
@@ -160,11 +159,6 @@ export default (
       as: 'Address',
       foreignKey: 'address_id',
       targetKey: 'id',
-    });
-    models.Thread.hasMany(models.Attachment, {
-      foreignKey: 'attachment_id',
-      constraints: false,
-      scope: { attachable: 'thread' },
     });
     models.Thread.hasMany(models.Comment, {
       foreignKey: 'thread_id',

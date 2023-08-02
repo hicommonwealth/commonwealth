@@ -11,6 +11,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_PORT, RABBITMQ_URI } from './config';
 import { StatsDController } from 'common-common/src/statsd';
 import v8 from 'v8';
+import {methodNotAllowedMiddleware, registerRoute} from "./utils/methodNotAllowed";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,11 +27,11 @@ app.use(express.json());
 
 let controller: RabbitMQController;
 
-app.get('/', (req: Request, res: Response) => {
+registerRoute(app, 'get', '/', (req: Request, res: Response) => {
   res.send('OK!');
 });
 
-app.post('/snapshot', async (req: Request, res: Response) => {
+registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
   try {
     const event: ISnapshotNotification = req.body;
     if (!event) {
@@ -72,6 +73,8 @@ app.post('/snapshot', async (req: Request, res: Response) => {
     res.status(500).send('error: ' + err);
   }
 });
+
+app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
   const log = factory.getLogger(formatFilename(__filename));

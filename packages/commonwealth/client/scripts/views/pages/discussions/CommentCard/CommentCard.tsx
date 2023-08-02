@@ -79,6 +79,7 @@ export const CommentCard = ({
           <AuthorAndPublishInfo
             authorInfo={app.chain.accounts.get(comment.author)}
             publishDate={moment(comment.createdAt).format('l')}
+            discord_meta={comment.discord_meta}
           />
         )}
       </div>

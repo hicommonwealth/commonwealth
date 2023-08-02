@@ -10,6 +10,7 @@ import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { featureFlags } from 'helpers/feature-flags';
 
 const resetSidebarState = () => {
   sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -161,7 +162,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate('/createCommunity', {}, null);
+        navigate('/createCommunity/starter', {}, null);
       },
     },
     {
@@ -271,7 +272,9 @@ export const CreateContentPopover = () => {
       renderTrigger={(onclick) => (
         <CWIconButton
           iconButtonTheme="black"
-          iconName="plusCircle"
+          iconName={
+            featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
+          }
           onClick={onclick}
         />
       )}

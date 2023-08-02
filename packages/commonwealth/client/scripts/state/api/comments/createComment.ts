@@ -9,11 +9,11 @@ import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
   address: string;
-  threadId: number,
+  threadId: number;
   chainId: string;
-  unescapedText: string,
-  parentCommentId: number,
-  existingNumberOfComments: number
+  unescapedText: string;
+  parentCommentId: number;
+  existingNumberOfComments: number;
 }
 
 const createComment = async ({

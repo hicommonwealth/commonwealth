@@ -1,5 +1,6 @@
 import useCreateThreadReactionMutation from './createReaction';
 import useDeleteThreadReactionMutation from './deleteReaction';
+import useSearchThreadsQuery from './searchThreads';
 
 import useFetchThreadsQuery from './fetchThreads';
 import useCreateThreadMutation from './createThread';
@@ -18,21 +19,22 @@ import useGetThreadsByIdQuery from "./getThreadsById";
 import useGetThreadsByLinkQuery from "./getThreadsByLink"
 
 export {
-    useCreateThreadReactionMutation,
-    useDeleteThreadReactionMutation,
-    useFetchThreadsQuery,
-    useCreateThreadMutation,
-    useEditThreadMutation,
-    useDeleteThreadMutation,
-    useToggleThreadSpamMutation,
-    useEditThreadStageMutation,
-    useEditThreadPrivacyMutation,
-    useEditThreadTopicMutation,
-    useToggleThreadPinMutation,
-    useAddThreadLinksMutation,
-    useDeleteThreadLinksMutation,
-    useGetThreadsByIdQuery,
-    useDeleteThreadCollaboratorsMutation,
-    useAddThreadCollaboratorsMutation,
-    useGetThreadsByLinkQuery,
+  useCreateThreadReactionMutation,
+  useDeleteThreadReactionMutation,
+  useFetchThreadsQuery,
+  useCreateThreadMutation,
+  useEditThreadMutation,
+  useDeleteThreadMutation,
+  useToggleThreadSpamMutation,
+  useEditThreadStageMutation,
+  useEditThreadPrivacyMutation,
+  useEditThreadTopicMutation,
+  useToggleThreadPinMutation,
+  useAddThreadLinksMutation,
+  useDeleteThreadLinksMutation,
+  useGetThreadsByIdQuery,
+  useDeleteThreadCollaboratorsMutation,
+  useAddThreadCollaboratorsMutation,
+  useGetThreadsByLinkQuery,
+  useSearchThreadsQuery,
 };
