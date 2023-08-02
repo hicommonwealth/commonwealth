@@ -15,12 +15,12 @@ export const deleteCommentHandler = async (
   const { user, address, chain } = req;
   const { id: commentId } = req.params;
 
-  await controllers.comments.deleteComment(
+  await controllers.comments.deleteComment({
     user,
     address,
     chain,
-    parseInt(commentId, 10)
-  );
+    commentId: parseInt(commentId, 10),
+  });
 
   return success(res, undefined);
 };

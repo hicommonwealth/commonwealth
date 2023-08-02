@@ -5,12 +5,12 @@
 }
 
 @mixin controlStyles {
-  border: 2px solid $neutral-300;
-  height: 12px;
+  border: 2px solid $neutral-400;
+  width: 15px;
+  height: 15px;
   margin: 8px 8px 8px 0px;
   position: relative;
   flex-shrink: 0;
-  width: 12px;
 }
 
 @mixin hoverColors {

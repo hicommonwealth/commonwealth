@@ -8,8 +8,9 @@ import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import { AuthorAndPublishInfo as ThreadAuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
-import { Options as ThreadOptions } from '../../pages/discussions/ThreadCard/Options';
+import { Skeleton } from '../Skeleton';
+import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
+import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
@@ -29,23 +30,24 @@ export type SidebarComponents = [
 
 type ContentPageProps = {
   thread?: Thread;
-  createdAt: moment.Moment | number;
-  title: string | ReactNode;
-  //
+  createdAt?: moment.Moment | number;
+  title?: string | ReactNode;
   updatedAt?: moment.Moment;
-  //
   lastEdited?: moment.Moment | number;
   author?: Account | AddressInfo | MinimumProfile | undefined;
+  discord_meta?: {
+    user: { id: string; username: string };
+    channel_id: string;
+    message_id: string;
+  };
   collaborators?: IThreadCollaborator[];
   body?: (children: ReactNode) => ReactNode;
   comments?: ReactNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   stageLabel?: ThreadStage;
-  //
   headerComponents?: React.ReactNode;
   readOnly?: boolean;
   lockedAt?: moment.Moment;
-  //
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: ReactNode;
@@ -67,11 +69,81 @@ type ContentPageProps = {
   hasPendingEdits?: boolean;
   canUpdateThread?: boolean;
   showTabs?: boolean;
+  showSkeleton?: boolean
+  isWindowMedium?: boolean
 };
+
+const CWContentPageSkeleton = ({ isWindowMedium }) => {
+  const mainBody = <div className="main-body-container">
+    {/* thread header */}
+    <div className="header">
+      <Skeleton width={'90%'} />
+      <Skeleton />
+    </div>
+
+    {/* thread title */}
+    <Skeleton />
+
+    {/* thread description */}
+    <div>
+      <Skeleton width={'80%'} />
+      <Skeleton />
+      <Skeleton width={'90%'} />
+      <Skeleton />
+      <Skeleton width={'95%'} />
+    </div>
+
+    {/* comment input */}
+    <div>
+      <Skeleton height={200} />
+    </div>
+
+    {/* comment filter row */}
+    <Skeleton />
+
+    {/* mimics comments */}
+    <div>
+      <Skeleton width={'80%'} />
+      <Skeleton width={'100%'} />
+      <Skeleton width={'90%'} />
+    </div>
+    <div>
+      <Skeleton width={'90%'} />
+      <Skeleton width={'25%'} />
+    </div>
+  </div>
+
+  return <div className={ComponentType.ContentPage}>
+    <div className="sidebar-view">
+      {mainBody}
+      {isWindowMedium && <div className="sidebar">
+        <div className="cards-column">
+          <Skeleton width={'80%'} />
+          <Skeleton width={'100%'} />
+          <Skeleton width={'50%'} />
+          <Skeleton width={'75%'} />
+        </div>
+        <div className="cards-column">
+          <Skeleton width={'80%'} />
+          <Skeleton width={'100%'} />
+          <Skeleton width={'50%'} />
+          <Skeleton width={'75%'} />
+        </div>
+        <div className="cards-column">
+          <Skeleton width={'80%'} />
+          <Skeleton width={'100%'} />
+          <Skeleton width={'50%'} />
+          <Skeleton width={'75%'} />
+        </div>
+      </div>}
+    </div>
+  </div>
+}
 
 export const CWContentPage = ({
   thread,
   author,
+  discord_meta,
   body,
   comments,
   contentBodyLabel,
@@ -101,8 +173,13 @@ export const CWContentPage = ({
   hasPendingEdits,
   canUpdateThread,
   showTabs = false,
+  showSkeleton,
+  isWindowMedium
 }: ContentPageProps) => {
   const [tabSelected, setTabSelected] = useState<number>(0);
+
+  if (showSkeleton) return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />
+
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 
   const mainBody = (
@@ -116,9 +193,10 @@ export const CWContentPage = ({
           title
         )}
         <div className="header-info-row">
-          <ThreadAuthorAndPublishInfo
+          <AuthorAndPublishInfo
             showSplitDotIndicator={true}
             isNew={!!displayNewTag}
+            discord_meta={discord_meta}
             isLocked={thread?.readOnly}
             {...(thread?.lockedAt && {
               lockedAt: thread.lockedAt.toISOString(),
@@ -156,8 +234,8 @@ export const CWContentPage = ({
       {body &&
         body(
           <ThreadOptions
-            canVote={!thread?.readOnly}
-            canComment={!thread?.readOnly}
+            upvoteBtnVisible={!thread?.readOnly}
+            commentBtnVisible={!thread?.readOnly}
             thread={thread}
             totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}

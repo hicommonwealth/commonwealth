@@ -3,20 +3,7 @@ import type {
   EventRecord,
   Extrinsic,
   Event,
-  IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
-import type { RegisteredTypes } from '@polkadot/types/types';
-
-import type { EnricherConfig } from './filters/enricher';
-
-export interface ISubstrateListenerOptions {
-  startBlock: number;
-  skipCatchup: boolean;
-  archival: boolean;
-  url: string;
-  spec: RegisteredTypes;
-  enricherConfig: EnricherConfig;
-}
 
 /**
  * To implement a new form of event, add it to this enum, and add its
@@ -38,43 +25,6 @@ export enum IdentityJudgement {
   OutOfDate = 'out-of-date',
   LowQuality = 'low-quality',
   Erroneous = 'erroneous',
-}
-
-export interface BountyStatusCuratorProposed {
-  curator: AccountId;
-}
-
-export interface BountyStatusActive {
-  curator: AccountId;
-  updateDue: BlockNumber;
-}
-
-export interface BountyStatusPendingPayout {
-  curator: AccountId;
-  beneficiary: AccountId;
-  unlockAt: BlockNumber;
-}
-
-export interface BountyStatus {
-  isProposed: boolean;
-  isApproved: boolean;
-  isFunded: boolean;
-  isCuratorProposed: boolean;
-  asCuratorProposed: BountyStatusCuratorProposed;
-  isActive: boolean;
-  asActive: BountyStatusActive;
-  isPendingPayout: boolean;
-  asPendingPayout: BountyStatusPendingPayout;
-}
-
-export function parseJudgement(j: SubstrateJudgement): IdentityJudgement {
-  if (j.isFeePaid) return IdentityJudgement.FeePaid;
-  if (j.isReasonable) return IdentityJudgement.Reasonable;
-  if (j.isKnownGood) return IdentityJudgement.KnownGood;
-  if (j.isOutOfDate) return IdentityJudgement.OutOfDate;
-  if (j.isLowQuality) return IdentityJudgement.LowQuality;
-  if (j.isErroneous) return IdentityJudgement.Erroneous;
-  return IdentityJudgement.Unknown;
 }
 
 /**
@@ -527,11 +477,6 @@ export interface IIdentityKilled extends IEvent {
   who: AccountId;
 }
 
-// Interface for era reward points
-export interface AccountPoints {
-  [key: string]: number;
-}
-
 export type IEventData =
   | ISlash
   | IReward
@@ -581,29 +526,3 @@ export type IEventData =
 // eslint-disable-next-line semi-style
 
 export const EventKinds: EventKind[] = Object.values(EventKind);
-
-/**
- * The following auxiliary types and functions are used in migrations and should
- * not be relied upon for general implementations.
- */
-export type IDemocracyProposalEvents =
-  | IDemocracyProposed
-  | IDemocracySeconded
-  | IDemocracyTabled;
-export type IDemocracyReferendumEvents =
-  | IDemocracyStarted
-  | IDemocracyVoted
-  | IDemocracyPassed
-  | IDemocracyNotPassed
-  | IDemocracyCancelled
-  | IDemocracyExecuted;
-export type IDemocracyPreimageEvents =
-  | IPreimageNoted
-  | IPreimageUsed
-  | IPreimageInvalid
-  | IPreimageMissing
-  | IPreimageReaped;
-export type ITreasuryProposalEvents =
-  | ITreasuryProposed
-  | ITreasuryRejected
-  | ITreasuryAwarded;
