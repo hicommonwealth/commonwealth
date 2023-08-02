@@ -63,7 +63,8 @@ export interface ISnapshotNotificationData {
   eventType: SnapshotEventType;
 }
 
-// TODO: @Timothee remove this type
+// TODO: @Timothee remove this type in favor of the one below once webhook and email functions are fixed + tested and
+//  their types are updated
 export interface IForumNotificationData {
   created_at: any;
   thread_id: number | string;
@@ -80,6 +81,15 @@ export interface IForumNotificationData {
   like_count?: number;
   comment_count?: number;
 }
+
+// export type IForumNotificationData =
+//   | INewCommentNotificationData
+//   | INewReactionNotificationData
+//   | INewThreadNotificationData
+//   | INewMentionNotificationData
+//   | INewCollaborationNotificationData
+//   | IThreadEditNotificationData
+//   | ICommentEditNotificationData;
 
 export interface IBaseForumNotificationData {
   created_at: any;
