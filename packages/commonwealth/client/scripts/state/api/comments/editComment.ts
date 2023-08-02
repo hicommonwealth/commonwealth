@@ -26,7 +26,7 @@ const editComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment({
+  } = await app.sessions.signComment(app.user.activeAccount.address, {
     thread_id: threadId,
     body: updatedBody,
     parent_comment_id: parentCommentId,

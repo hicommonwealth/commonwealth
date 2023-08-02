@@ -12,7 +12,7 @@ const deleteReaction = async ({ reactionId, threadId }: DeleteReactionProps) => 
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteThreadReaction({
+  } = await app.sessions.signDeleteThreadReaction(app.user.activeAccount.address, {
     thread_id: threadId,
   });
 
