@@ -75,10 +75,6 @@ import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
-import createDraft from '../routes/drafts/createDraft';
-import deleteDraft from '../routes/drafts/deleteDraft';
-import editDraft from '../routes/drafts/editDraft';
-import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
@@ -637,36 +633,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
 
-  // discussion drafts
-  registerRoute(
-    router,
-    'post',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    createDraft.bind(this, models)
-  );
-  registerRoute(router, 'get', '/drafts', getDrafts.bind(this, models));
-  registerRoute(
-    router,
-    'delete',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteDraft.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'patch',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    editDraft.bind(this, models)
-  );
-
   registerRoute(
     router,
     'get',
@@ -952,7 +918,7 @@ function setupRouter(
     viewCount.bind(this, models, viewCountCache)
   );
 
-  // attachments
+  // uploads
   registerRoute(
     router,
     'post',

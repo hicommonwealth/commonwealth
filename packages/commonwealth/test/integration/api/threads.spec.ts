@@ -432,9 +432,7 @@ describe('Thread Tests', () => {
         });
 
         expect(cRes.error).to.not.be.null;
-        expect(cRes.error).to.be.equal(
-          CreateCommentErrors.MissingTextOrAttachment
-        );
+        expect(cRes.error).to.be.equal(CreateCommentErrors.MissingText);
       });
 
       it('should fail to create a comment on a non-existent thread', async () => {
@@ -487,7 +485,6 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: thread.body,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: userJWT,
           });
@@ -513,7 +510,6 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: thread.body,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });
@@ -543,13 +539,12 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: null,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });
         expect(res.body.error).to.not.be.null;
         expect(res.status).to.be.equal(400);
-        expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
+        expect(res.body.error).to.be.equal(EditThreadErrors.NoBody);
       });
 
       it('should succeed in updating a thread body', async () => {
@@ -570,7 +565,6 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: newBody,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });
@@ -597,7 +591,6 @@ describe('Thread Tests', () => {
             stage: thread_stage,
             body: thread.body,
             title: newTitle,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });

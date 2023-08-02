@@ -6,6 +6,7 @@ import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_m
 import { FeedbackModal } from '../modals/feedback_modal';
 import { Modal } from '../components/component_kit/cw_modal';
 import useSidebarStore from 'state/ui/sidebar';
+import { featureFlags } from 'helpers/feature-flags';
 
 export const HelpMenu = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -44,12 +45,12 @@ export const HelpMenuPopover = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
-    <React.Fragment>
+    <>
       <PopoverMenu
         renderTrigger={(onclick) => (
           <CWIconButton
             iconButtonTheme="black"
-            iconName="help"
+            iconName={featureFlags.sessionKeys ? 'question' : 'help'}
             onClick={onclick}
           />
         )}
@@ -70,6 +71,6 @@ export const HelpMenuPopover = () => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

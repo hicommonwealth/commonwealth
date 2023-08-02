@@ -196,6 +196,11 @@ $width: 360px;
     }
   }
 
+  .tooltip {
+    @include gallery-grid(32px, column);
+    align-items: center;
+  }
+
   .searchbar-gallery {
     @include gallery-grid(8px, column);
   }

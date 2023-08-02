@@ -23,7 +23,6 @@ const viewComments = async (
     where: { chain: chain.id, thread_id: req.query.thread_id },
     include: [
       models.Address,
-      models.Attachment,
       {
         model: models.Reaction,
         as: 'reactions',
