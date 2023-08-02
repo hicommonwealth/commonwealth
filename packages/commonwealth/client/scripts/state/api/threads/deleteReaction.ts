@@ -3,12 +3,12 @@ import axios from 'axios';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
-interface IuseDeleteThreadReactionMutation {
+interface UseDeleteThreadReactionMutationProps {
   chainId: string;
   threadId: number;
 }
 
-interface DeleteReactionProps extends IuseDeleteThreadReactionMutation {
+interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
   reactionId: number;
 }
 
@@ -51,7 +51,7 @@ const deleteReaction = async ({
 const useDeleteThreadReactionMutation = ({
   chainId,
   threadId,
-}: IuseDeleteThreadReactionMutation) => {
+}: UseDeleteThreadReactionMutationProps) => {
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {

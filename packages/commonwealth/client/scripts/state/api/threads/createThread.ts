@@ -1,9 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { NotificationCategories } from 'common-common/src/types';
 import { updateLastVisited } from 'controllers/app/login';
 import MinimumProfile from 'models/MinimumProfile';
-import NotificationSubscription from 'models/NotificationSubscription';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
@@ -87,21 +85,6 @@ const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
       );
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
-
-      // synthesize new subscription rather than hitting backend // TODO: do we really need this
-      const subscriptionJSON = {
-        id: null,
-        category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${newThread.id}`,
-        is_active: true,
-        created_at: Date.now(),
-        immediate_email: false,
-        chain_id: newThread.chain,
-        offchain_thread_id: newThread.id,
-      };
-      app.user.notifications.subscriptions.push(
-        NotificationSubscription.fromJSON(subscriptionJSON)
-      );
 
       return newThread;
     },

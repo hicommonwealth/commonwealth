@@ -3,7 +3,7 @@ import axios from 'axios';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
-interface deleteThreadCollaboratorsProps {
+interface DeleteThreadCollaboratorsProps {
   address: string;
   chainId: string;
   threadId: number;
@@ -15,7 +15,7 @@ const deleteThreadCollaborators = async ({
   chainId,
   threadId,
   updatedCollaborators,
-}: deleteThreadCollaboratorsProps) => {
+}: DeleteThreadCollaboratorsProps) => {
   const response = await axios.post(`${app.serverUrl()}/deleteEditors`, {
     address: address,
     author_chain: chainId,
@@ -28,7 +28,7 @@ const deleteThreadCollaborators = async ({
   return response.data.result.collaborators;
 };
 
-interface deleteThreadCollaboratorsMutationProps {
+interface DeleteThreadCollaboratorsProps {
   chainId: string;
   threadId: number;
 }
@@ -36,7 +36,7 @@ interface deleteThreadCollaboratorsMutationProps {
 const useDeleteThreadCollaboratorsMutation = ({
   chainId,
   threadId,
-}: deleteThreadCollaboratorsMutationProps) => {
+}: DeleteThreadCollaboratorsProps) => {
   return useMutation({
     mutationFn: deleteThreadCollaborators,
     onSuccess: async (collaborators) => {

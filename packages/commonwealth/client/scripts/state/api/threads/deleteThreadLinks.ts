@@ -4,7 +4,7 @@ import Thread, { Link } from 'models/Thread';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
-interface deleteThreadLinksProps {
+interface DeleteThreadLinksProps {
   chainId: string;
   threadId: number;
   links: Link[];
@@ -14,7 +14,7 @@ const deleteThreadLinks = async ({
   chainId,
   threadId,
   links,
-}: deleteThreadLinksProps) => {
+}: DeleteThreadLinksProps) => {
   const response = await axios.delete(
     `${app.serverUrl()}/linking/deleteLinks`,
     {
@@ -29,7 +29,7 @@ const deleteThreadLinks = async ({
   return new Thread(response.data.result);
 };
 
-interface deleteThreadLinksMutationProps {
+interface DeleteThreadLinksMutationProps {
   chainId: string;
   threadId: number;
 }
@@ -37,7 +37,7 @@ interface deleteThreadLinksMutationProps {
 const useDeleteThreadLinksMutation = ({
   chainId,
   threadId,
-}: deleteThreadLinksMutationProps) => {
+}: DeleteThreadLinksMutationProps) => {
   return useMutation({
     mutationFn: deleteThreadLinks,
     onSuccess: async (updatedThread) => {

@@ -102,6 +102,9 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Thread) {
     try {
+      // The `Thread` var here uses /server/models/thread.ts as its type
+      // and we are modeling it to /client/scripts/models/Thread.ts so
+      // using any here to avoid lint error.
       modeledThread = new ThreadT(Thread as any);
     } catch (e) {
       console.log('error', e);
