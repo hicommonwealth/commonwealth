@@ -7,7 +7,7 @@ import type Comment from 'models/Comment';
 import type AddressInfo from 'models/AddressInfo';
 import type { IUniqueId } from 'models/interfaces';
 import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
-import ProfileActivityContent from './ProfileActivityContent';
+import ProfileActivityContent from '../profile/ProfileActivityContent';
 
 enum ProfileActivityType {
   Addresses,

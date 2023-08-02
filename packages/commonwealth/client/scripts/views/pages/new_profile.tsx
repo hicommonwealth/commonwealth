@@ -2,7 +2,7 @@ import React from 'react';
 
 import 'pages/new_profile.scss';
 
-import Profile from '../components/Profile';
+import Profile from '../components/profile';
 
 type NewProfileAttrs = {
   profileId: string;

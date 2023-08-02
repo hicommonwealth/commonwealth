@@ -22,7 +22,7 @@ import { fetchReactionCounts } from 'state/api/reactionCounts';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import useJoinCommunity from 'views/components/header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';

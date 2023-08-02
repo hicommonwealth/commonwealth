@@ -16,9 +16,9 @@ import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Modal } from '../component_kit/cw_modal';
 import useForceRerender from 'hooks/useForceRerender';
-import { LoginSelectorMenuLeft } from 'views/components/Header/LoginSelectorMenuLeft';
-import { LoginSelectorMenuRight } from 'views/components/Header/LoginSelectorMenuRight';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import { LoginSelectorMenuLeft } from 'views/components/header/LoginSelectorMenuLeft';
+import { LoginSelectorMenuRight } from 'views/components/header/LoginSelectorMenuRight';
+import useJoinCommunity from 'views/components/header/useJoinCommunity';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const CHAINBASE_SHORT = {
