@@ -135,14 +135,13 @@ export const CWContentPage = ({
             })}
             authorInfo={
               author &&
-              new AddressInfo(
-                null,
-                author?.address,
-                typeof author.chain === 'string'
+              new AddressInfo({
+                id: null,
+                address: author?.address,
+                chainId: typeof author.chain === 'string'
                   ? author.chain
                   : author.chain.id,
-                null
-              )
+              })
             }
             collaboratorsInfo={collaborators}
             publishDate={

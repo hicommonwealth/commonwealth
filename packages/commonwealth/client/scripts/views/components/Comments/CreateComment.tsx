@@ -98,7 +98,7 @@ export const CreateComment = ({
       const newComment: any = await createComment({
         threadId: rootThread.id,
         chainId: chainId,
-        address: author.address,
+        address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
       })
@@ -165,7 +165,7 @@ export const CreateComment = ({
             fontWeight="medium"
             className={clsx('user-link-text', { disabled: !canComment })}
           >
-            <User user={author} hideAvatar linkify />
+            <User user={app.user.activeAccount} hideAvatar linkify />
           </CWText>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}

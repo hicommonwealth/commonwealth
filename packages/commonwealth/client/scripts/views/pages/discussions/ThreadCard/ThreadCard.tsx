@@ -103,7 +103,7 @@ export const ThreadCard = ({
           <div className="content-header">
             <AuthorAndPublishInfo
               authorInfo={
-                new AddressInfo(null, thread.author, thread.authorChain, null)
+                new AddressInfo({ id: null, address: thread.author, chainId: thread.authorChain })
               }
               publishDate={moment(thread.createdAt).format('l')}
               isNew={isNewThread(thread.createdAt)}
@@ -169,7 +169,7 @@ export const ThreadCard = ({
                     type="proposal"
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
-                    )} 
+                    )}
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''

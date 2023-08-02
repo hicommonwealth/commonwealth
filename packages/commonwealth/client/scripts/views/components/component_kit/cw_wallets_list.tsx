@@ -241,6 +241,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   Sign in with another email address
                 </a>
               </CWText>
+            </>
+          )}
 
           <CWDivider className="wallets-divider" />
           {/* <CWAuthButton
@@ -254,20 +256,20 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="discord"
             label="Discord"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin('discord')}
+            onClick={async () => onSocialLogin(WalletSsoSource.Discord, useSessionKeyRevalidationFlow)}
             className="DiscordAuthButton"
           />
           <CWAuthButton
             type="github"
             label="Github"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('github')}
+            onClick={() => onSocialLogin(WalletSsoSource.Github, useSessionKeyRevalidationFlow)}
           />
           <CWAuthButton
             type="twitter"
             label="Twitter"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('twitter')}
+            onClick={() => onSocialLogin(WalletSsoSource.Twitter, useSessionKeyRevalidationFlow)}
           />
 
           {wallets.length === 0 && (
