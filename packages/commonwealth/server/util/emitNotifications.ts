@@ -1,5 +1,9 @@
 import { StatsDController } from 'common-common/src/statsd';
-import { ChainBase, ChainType } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainType,
+  NotificationCategories,
+} from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
@@ -49,17 +53,7 @@ export default async function emitNotifications(
 
   // typeguard function to differentiate between chain event notifications as needed
   let chainEvent: IChainEventNotificationData;
-  const isChainEventData = !!(
-    typeof (<any>notification_data).id === 'number' &&
-    typeof (<any>notification_data).block_number === 'number' &&
-    (<any>notification_data).event_data &&
-    Object.values(SupportedNetwork).includes(
-      (<any>notification_data).network
-    ) &&
-    (<any>notification_data).chain &&
-    typeof (<any>notification_data).chain === 'string' &&
-    typeof (<any>notification_data).entity_id === 'number'
-  );
+  const isChainEventData = category_id === NotificationCategories.ChainEvent;
 
   if (isChainEventData) {
     chainEvent = <IChainEventNotificationData>notification_data;

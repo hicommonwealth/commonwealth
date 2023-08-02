@@ -145,10 +145,7 @@ export const createImmediateNotificationEmailObject = async (
   category_id,
   models
 ) => {
-  if (
-    (<IChainEventNotificationData>notification_data).block_number &&
-    (<IChainEventNotificationData>notification_data).event_data
-  ) {
+  if (category_id === NotificationCategories.ChainEvent) {
     const ceInstance = <IChainEventNotificationData>notification_data;
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {

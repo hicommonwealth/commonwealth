@@ -9,12 +9,12 @@ import emitNotifications from '../../server/util/emitNotifications';
 import models from '../../server/database';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, SnapshotEventType } from 'types';
+import { SupportedNetwork } from 'chain-events/src';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
-// TODO: @Timothee add tests for each notification type
-describe('emitNotifications tests', () => {
+describe.only('emitNotifications tests', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
@@ -106,7 +106,7 @@ describe('emitNotifications tests', () => {
     });
   });
 
-  describe('PostNotificationData', () => {
+  describe('Forum Notifications', () => {
     it('should generate a notification and notification reads for a new thread', async () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
@@ -248,7 +248,7 @@ describe('emitNotifications tests', () => {
     });
   });
 
-  describe('SnapshotNotificationData', () => {
+  describe('Snapshot Notifications', () => {
     it('should generate a notification for a new snapshot proposal', async () => {
       const space = 'plutusclub.eth';
       const subscription = await models.Subscription.create({
@@ -288,6 +288,60 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.exist;
+
+      const notifRead = await models.NotificationsRead.findOne({
+        where: {
+          subscription_id: subscription.id,
+          notification_id: notif.id,
+          user_id: userId,
+        },
+      });
+      expect(notifRead).to.exist;
+    });
+  });
+
+  describe('Chain Event Notifications', () => {
+    it('should generate a notification and notification reads for a new chain event', async () => {
+      const subscription = await models.Subscription.create({
+        subscriber_id: userId,
+        category_id: NotificationCategories.ChainEvent,
+        chain_id: chain,
+      });
+
+      const chainEventId = -1;
+      const notification_data = {
+        id: chainEventId,
+        block_number: 10,
+        event_data: '',
+        queued: 1,
+        network: SupportedNetwork.Compound,
+        chain: chain,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+
+      await emitNotifications(models, {
+        categoryId: NotificationCategories.ChainEvent,
+        data: notification_data,
+      });
+
+      const notif = await models.Notification.findOne({
+        where: {
+          chain_id: chain,
+          category_id: NotificationCategories.ChainEvent,
+          chain_event_id: chainEventId,
+        },
+      });
+      expect(notif).to.exist;
+
+      const notifRead = await models.NotificationsRead.findOne({
+        where: {
+          subscription_id: subscription.id,
+          notification_id: notif.id,
+          user_id: userId,
+        },
+      });
+      expect(notifRead).to.exist;
     });
   });
 });
