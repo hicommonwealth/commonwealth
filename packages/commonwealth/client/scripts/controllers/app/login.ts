@@ -19,7 +19,6 @@ import SocialAccount from '../../models/SocialAccount';
 import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
 import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
 
-import { CosmosExtension } from '@magic-ext/cosmos';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
