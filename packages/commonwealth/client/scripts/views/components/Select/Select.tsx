@@ -9,6 +9,7 @@ import { Option } from './Option';
 import './Select.scss';
 
 export type SelectProps = {
+  size?: 'default' | 'compact';
   placeholder?: string;
   selected: string;
   onSelect?: (
@@ -29,6 +30,7 @@ export type SelectProps = {
 };
 
 export const Select = ({
+  size = 'default',
   options,
   selected,
   onClose,
@@ -55,10 +57,12 @@ export const Select = ({
       {/* needs to be div instead of fragment so listener can work */}
       <div>
         <CWButton
-          className={`Select ${popoverProps.anchorEl ? 'active' : ''}`}
+          className={`Select ${
+            popoverProps.anchorEl ? 'active' : ''
+          } ${`size-${size}`}`}
           {...(selectedOption &&
             selectedOption.iconLeft && { iconLeft: selectedOption.iconLeft })}
-          iconRight={popoverProps.anchorEl ? 'carotUp' : 'carotDown'}
+          iconRight={popoverProps.anchorEl ? 'caretUp' : 'caretDown'}
           buttonType="mini-white"
           label={
             selectedOption
@@ -80,6 +84,7 @@ export const Select = ({
                 return (
                   <Option
                     key={i}
+                    size={size}
                     label={label}
                     onClick={(e) => {
                       e.preventDefault();

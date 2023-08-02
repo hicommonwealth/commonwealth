@@ -180,7 +180,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClick={async () => {
                   await onWalletSelect(wallet);
                   if (wallet.chain === 'substrate') {
-                    setIsModalOpen(true);
+                    // setIsModalOpen(true);
                   }
                 }}
               />
@@ -203,7 +203,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                       })();
 
                       await onWalletAddressSelect(wallet, selectedAddress);
-                      setIsModalOpen(false);
+                      // setIsModalOpen(false);
                     }}
                     onModalClose={() => setIsModalOpen(false)}
                   />
@@ -242,49 +242,33 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 </a>
               </CWText>
 
-              <CWDivider className="wallets-divider" />
-              {/* <CWAuthButton
-              type="email"
-              label="Email"
-              darkMode={darkMode}
-              onClick={onConnectAnotherWay}
-              className="CustomIcon large email-auth-btn"
-            /> */}
-              <CWAuthButton
-                type="discord"
-                label="Discord"
-                darkMode={darkMode}
-                onClick={async () =>
-                  onSocialLogin(
-                    WalletSsoSource.Discord,
-                    useSessionKeyRevalidationFlow
-                  )
-                }
-              />
-              <CWAuthButton
-                type="github"
-                label="Github"
-                darkMode={darkMode}
-                onClick={() =>
-                  onSocialLogin(
-                    WalletSsoSource.Github,
-                    useSessionKeyRevalidationFlow
-                  )
-                }
-              />
-              <CWAuthButton
-                type="twitter"
-                label="Twitter"
-                darkMode={darkMode}
-                onClick={() =>
-                  onSocialLogin(
-                    WalletSsoSource.Twitter,
-                    useSessionKeyRevalidationFlow
-                  )
-                }
-              />
-            </>
-          )}
+          <CWDivider className="wallets-divider" />
+          {/* <CWAuthButton
+            type="email"
+            label="Email"
+            darkMode={darkMode}
+            onClick={onConnectAnotherWay}
+            className="CustomIcon large email-auth-btn"
+          /> */}
+          <CWAuthButton
+            type="discord"
+            label="Discord"
+            darkMode={darkMode}
+            onClick={async () => onSocialLogin('discord')}
+            className="DiscordAuthButton"
+          />
+          <CWAuthButton
+            type="github"
+            label="Github"
+            darkMode={darkMode}
+            onClick={() => onSocialLogin('github')}
+          />
+          <CWAuthButton
+            type="twitter"
+            label="Twitter"
+            darkMode={darkMode}
+            onClick={() => onSocialLogin('twitter')}
+          />
 
           {wallets.length === 0 && (
             <CWNoAuthMethodsAvailable darkMode={darkMode} />

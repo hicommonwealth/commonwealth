@@ -8,6 +8,34 @@ $size: 48px;
   flex-direction: column;
   width: 100%;
 
+  div[data-test-id=virtuoso-item-list],
+  div[data-viewport-type=element]>div:first-child {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 40px;
+
+    @include medium {
+      padding: 40px;
+    }
+
+    @include mediumSmall {
+      padding: 32px;
+    }
+
+    @include smallInclusive {
+      padding: 24px;
+    }
+  }
+
+  div[data-test-id=virtuoso-item-list] {
+    gap: 2px;
+  }
+
+  div[data-viewport-type=element]>div:first-child {
+    padding-bottom: 16px !important;
+  }
+
   .no-threads-text {
     color: $neutral-500;
     margin-left: 40px;

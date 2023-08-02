@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
@@ -49,12 +48,14 @@ export type ThreadAttributes = {
   last_edited?: Date;
   deleted_at?: Date;
   last_commented_on?: Date;
+  marked_as_spam_at?: Date;
+  archived_at?: Date;
   locked_at?: Date;
+  discord_meta?: any;
 
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
@@ -109,7 +110,7 @@ export default (
         allowNull: false,
       },
       links: { type: dataTypes.JSONB, allowNull: true },
-
+      discord_meta: { type: dataTypes.JSONB, allowNull: true },
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
       // signed data
@@ -122,6 +123,8 @@ export default (
       last_edited: { type: dataTypes.DATE, allowNull: true },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       last_commented_on: { type: dataTypes.DATE, allowNull: true },
+      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
+      archived_at: { type: dataTypes.DATE, allowNull: true },
       locked_at: {
         type: dataTypes.DATE,
         allowNull: true,
@@ -156,11 +159,6 @@ export default (
       as: 'Address',
       foreignKey: 'address_id',
       targetKey: 'id',
-    });
-    models.Thread.hasMany(models.Attachment, {
-      foreignKey: 'attachment_id',
-      constraints: false,
-      scope: { attachable: 'thread' },
     });
     models.Thread.hasMany(models.Comment, {
       foreignKey: 'thread_id',

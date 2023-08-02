@@ -37,6 +37,11 @@ export enum ThreadFeaturedFilterTypes {
   MostComments = 'mostComments',
 }
 
+export enum CommentsFeaturedFilterTypes {
+  Newest = 'newest',
+  Oldest = 'oldest',
+}
+
 export enum ThreadTimelineFilterTypes {
   AllTime = 'allTime',
   ThisWeek = 'thisWeek',

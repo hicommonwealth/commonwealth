@@ -53,6 +53,10 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
 
       return wallet.accounts[0].address;
     }
+
+    if (wallet.chain === 'substrate') {
+      return wallet.accounts[0].address;
+    }
   })();
 
   return selectedAddress;

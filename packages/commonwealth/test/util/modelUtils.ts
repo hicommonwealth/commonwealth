@@ -219,7 +219,6 @@ export interface ThreadArgs {
   topicId?: number;
   body?: string;
   url?: string;
-  attachments?: string[];
   readOnly?: boolean;
   session: Session;
   sign: (actionPayload: ActionPayload) => string;
@@ -268,7 +267,7 @@ export const createThread = async (args: ThreadArgs) => {
 
   const res = await chai.request
     .agent(app)
-    .post('/api/createThread')
+    .post('/api/threads')
     .set('Accept', 'application/json')
     .send({
       author_chain: chainId,
@@ -277,7 +276,6 @@ export const createThread = async (args: ThreadArgs) => {
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       kind,
-      'attachments[]': undefined,
       topic_name: topicName,
       topic_id: topicId,
       url,
@@ -385,7 +383,6 @@ export const createComment = async (args: CommentArgs) => {
       chain,
       address,
       parent_id: parentCommentId,
-      'attachments[]': undefined,
       text,
       jwt,
       canvas_action,
@@ -414,7 +411,6 @@ export const editComment = async (args: EditCommentArgs) => {
       author_chain: chain,
       address,
       body: encodeURIComponent(text),
-      'attachments[]': undefined,
       jwt,
       chain: community ? undefined : chain,
       community,
@@ -467,7 +463,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
 
   const res = await chai.request
     .agent(app)
-    .post('/api/createReaction')
+    .post(`/api/comments/${comment_id}/reactions`)
     .set('Accept', 'application/json')
     .send({
       chain,

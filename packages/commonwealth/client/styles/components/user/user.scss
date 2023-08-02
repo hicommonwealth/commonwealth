@@ -72,7 +72,7 @@
   white-space: nowrap;
   align-items: center;
 
-  > a {
+  >a {
     // reset link styles
 
     &,
@@ -91,20 +91,24 @@
   }
 
   a.user-display-name {
+    color: $neutral-800;
     cursor: inherit;
     text-decoration: initial;
+    display: flex;
   }
 
   .id-short {
-    color: $neutral-500;
-    display: inline-block;
-    font-size: 75%;
+    color: $neutral-600;
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    line-height: 16px;
     font-weight: 500;
     margin-left: 4px;
     background: $neutral-100;
-    border-radius: $border-radius-rounded-corners;
+    border-radius: $border-radius-corners-wider;
     text-decoration: none !important;
-    padding: 0 8px;
+    padding: 1px 8px;
     height: 16px;
   }
 
@@ -122,6 +126,7 @@
 
   .role-tag-container {
     display: inline-block;
+
     .role-tag-text.Text {
       background-color: $neutral-200;
       border-radius: $border-radius-rounded-corners;
@@ -166,7 +171,7 @@
 
     a {
       text-decoration: none !important;
-      color: $neutral-800 !important;
+      color: $neutral-800  !important;
     }
 
     a:hover {
@@ -176,7 +181,7 @@
 
   .user-address,
   .user-chain {
-    color: $neutral-500 !important;
+    color: $neutral-500  !important;
   }
 
   .role-tag {

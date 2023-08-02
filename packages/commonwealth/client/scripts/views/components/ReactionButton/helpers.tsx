@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-
 import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
@@ -47,15 +45,8 @@ export const getDisplayedReactorsForPopup = ({
   );
 };
 
-export const fetchReactionsByComment = async (commentId: number) => {
-  const { result = [] } = await $.get(
-    `${app.serverUrl()}/comments/${commentId}/reactions`
-  );
-  return result;
-};
-
 export const onReactionClick = (
-  e: React.MouseEvent<HTMLDivElement>,
+  e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
   hasReacted: boolean,
   dislike: (userAddress: string) => void,
   like: (chain: ChainInfo, chainId: string, userAddress: string) => void

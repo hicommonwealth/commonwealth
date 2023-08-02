@@ -1,38 +1,47 @@
-import React, { useEffect, useState } from 'react';
-
-import 'components/ReactionButton/CommentReactionButton.scss';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-
+import React, { useState, useEffect } from 'react';
+import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type Comment from '../../../models/Comment';
 import ReactionCount from '../../../models/ReactionCount';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
-import { CWText } from '../component_kit/cw_text';
 import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../component_kit/helpers';
-import {
-  fetchReactionsByComment,
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from './helpers';
+  useCreateCommentReactionMutation,
+  useDeleteCommentReactionMutation,
+  useFetchCommentReactionsQuery,
+} from '../../../state/api/comments';
+import Permissions from '../../../utils/Permissions';
 import { LoginModal } from '../../modals/login_modal';
 import { Modal } from '../component_kit/cw_modal';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
+  disabled: boolean;
 };
 
 export const CommentReactionButton = ({
   comment,
+  disabled,
 }: CommentReactionButtonProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
+  const { mutateAsync: createCommentReaction } =
+    useCreateCommentReactionMutation({
+      commentId: comment.id,
+      chainId: app.activeChainId(),
+    });
+  const { mutateAsync: deleteCommentReaction } =
+    useDeleteCommentReactionMutation({
+      commentId: comment.id,
+      chainId: app.activeChainId(),
+    });
+  const { data: reactions } = useFetchCommentReactionsQuery({
+    chainId: app.activeChainId(),
+    commentId: comment.id,
+  });
 
   useEffect(() => {
     const redrawFunction = (comment_id) => {
@@ -40,70 +49,81 @@ export const CommentReactionButton = ({
         return;
       }
 
-      setReactionCounts(app.reactionCounts.store.getByPost(comment));
+      setReactionCounts(app.threads.reactionCountsStore.getByPost(comment));
     };
 
-    app.reactionCounts.isFetched.on('redraw', redrawFunction);
+    app.threads.isReactionFetched.on('redraw', redrawFunction);
 
     return () => {
-      app.reactionCounts.isFetched.off('redraw', redrawFunction);
+      app.threads.isReactionFetched.off('redraw', redrawFunction);
     };
   });
 
   const { likes = 0, hasReacted } = reactionCounts || {};
 
   // token balance check if needed
-  const isAdmin =
-    app.user.isSiteAdmin ||
-    app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const parentThread = app.threads.getById(comment.threadId);
 
-  const topicName = parentThread?.topic?.name;
+  const topicId = parentThread?.topic?.id;
 
-  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
+  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(topicId);
 
   const activeAddress = app.user.activeAccount?.address;
 
   const dislike = async (userAddress: string) => {
-    const reaction = (await fetchReactionsByComment(comment.id)).find((r) => {
+    const foundReaction = reactions.find((r) => {
       return r.Address.address === activeAddress;
     });
 
-    setIsLoading(true);
-
-    app.reactionCounts
-      .delete(reaction, {
+    deleteCommentReaction({
+      canvasHash: foundReaction.canvas_hash,
+      reactionId: foundReaction.id,
+      reactionCount: {
         ...reactionCounts,
         likes: likes - 1,
         hasReacted: false,
-      })
-      .then(() => {
-        setReactors(
-          reactors.filter(({ Address }) => Address.address !== userAddress)
-        );
-        setReactionCounts(app.reactionCounts.store.getByPost(comment));
-      }).finally(() => {
-        setIsLoading(false);
-      });
+      },
+    }).then(() => {
+      setReactors(
+        reactors.filter(({ Address }) => Address.address !== userAddress)
+      );
+      setReactionCounts(app.threads.reactionCountsStore.getByPost(comment));
+    }).catch(() => {
+      notifyError('Failed to update reaction count');
+    });
   };
 
   const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
-    setIsLoading(true);
+    createCommentReaction({
+      address: userAddress,
+      commentId: comment.id,
+      chainId: chainId,
+    }).then(() => {
+      setReactors([
+        ...reactors,
+        { Address: { address: userAddress, chain } },
+      ]);
+      setReactionCounts(app.threads.reactionCountsStore.getByPost(comment));
+    }).catch(() => {
+      notifyError('Failed to save reaction');
+    })
+  };
 
-    app.reactionCounts
-      .createCommentReaction(userAddress, comment, 'like', chainId)
-      .then(() => {
-        setReactors([
-          ...reactors,
-          {
-            Address: { address: userAddress, chain },
-          },
-        ]);
-        setReactionCounts(app.reactionCounts.store.getByPost(comment));
-      }).finally(() => {
-        setIsLoading(false);
-      });
+  const handleVoteClick = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!app.isLoggedIn() || !app.user.activeAccount) {
+      setIsModalOpen(true);
+    } else {
+      onReactionClick(e, hasReacted, dislike, like);
+    }
+  };
+
+  const handleVoteMouseEnter = async () => {
+    setReactors(reactions);
   };
 
   return (
@@ -114,58 +134,16 @@ export const CommentReactionButton = ({
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-      <div
-        className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading || isUserForbidden },
-          'CommentReactionButton'
-        )}
-        onMouseEnter={async () => {
-          setReactors(await fetchReactionsByComment(comment.id));
-        }}
-      >
-        <CWIconButton
-          iconName="upvote"
-          iconSize="small"
-          selected={hasReacted}
-          onClick={async (e) => {
-            if (!app.isLoggedIn() || !app.user.activeAccount) {
-              setIsModalOpen(true);
-            } else {
-              onReactionClick(e, hasReacted, dislike, like);
-            }
-          }}
-        />
-        {likes > 0 ? (
-          <CWTooltip
-            content={
-              <div className="reaction-button-tooltip-contents">
-                {getDisplayedReactorsForPopup({
-                  reactors: reactors.map((r) => r.Address.address),
-                })}
-              </div>
-            }
-            renderTrigger={(handleInteraction) => (
-              <CWText
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-                className="menu-buttons-text"
-                type="caption"
-                fontWeight="medium"
-              >
-                {likes}
-              </CWText>
-            )}
-          />
-        ) : (
-          <CWText
-            className="menu-buttons-text"
-            type="caption"
-            fontWeight="medium"
-          >
-            {likes}
-          </CWText>
-        )}
-      </div>
+      <CWUpvoteSmall
+        voteCount={likes}
+        disabled={isUserForbidden || disabled}
+        selected={hasReacted}
+        onMouseEnter={handleVoteMouseEnter}
+        onClick={handleVoteClick}
+        tooltipContent={getDisplayedReactorsForPopup({
+          reactors: reactors.map((r) => r.Address.address),
+        })}
+      />
     </>
   );
 };

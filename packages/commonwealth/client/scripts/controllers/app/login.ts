@@ -15,10 +15,12 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
 import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
+
+import { CosmosExtension } from '@magic-ext/cosmos';
+import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -39,10 +41,6 @@ export async function setActiveAccount(
 ): Promise<void> {
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
-
-  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-    await app.chain.activeAddressHasToken(account.address);
-  }
 
   if (!role || role.is_user_default) {
     app.user.ephemerallySetActiveAccount(account);
@@ -191,6 +189,8 @@ export async function updateActiveAddresses({
     shouldRedraw
   );
 
+  getTokenBalance();
+
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
     return app.roles.isMember({ chain: chain.id, account });
@@ -312,6 +312,11 @@ export async function unlinkLogin(account: AddressInfo) {
     auth: true,
     jwt: app.user.jwt,
   });
+  // remove deleted role from app.roles
+  app.roles.deleteRole({
+    address: account,
+    chain: account.chain.id,
+  })
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);
@@ -395,10 +400,7 @@ export async function startLoginWithMagicLink({
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({
-  provider,
-  userInfo,
-}): {
+function getProfileMetadata({ provider, userInfo }): {
   username?: string;
   avatarUrl?: string;
 } {
@@ -406,9 +408,8 @@ function getProfileMetadata({
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } = userInfo.sources[
-      'https://discord.com/api/users/@me'
-    ];
+    const { avatar, id, username } =
+      userInfo.sources['https://discord.com/api/users/@me'];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };

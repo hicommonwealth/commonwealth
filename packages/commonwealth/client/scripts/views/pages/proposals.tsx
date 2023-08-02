@@ -59,25 +59,31 @@ const ProposalsPage = () => {
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
-    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
 
     return () => {
       app.chainAdapterReady.off('ready', () => {
         setLoading(false);
         app.chainAdapterReady.removeAllListeners();
       });
+    };
+  }, [setLoading]);
+
+  useEffect(() => {
+    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
+
+    return () => {
       app.chainModuleReady.off('ready', () => {
         setSubstrateLoading(false);
         app.chainModuleReady.removeAllListeners();
       });
     };
-  }, [setLoading, setSubstrateLoading]);
+  }, [setSubstrateLoading]);
 
   const { completedCosmosProposals } = useGetCompletedCosmosProposals({
     app,
     setIsLoading: setIsCosmosCompletedProposalsLoading,
-    isLoading: isCosmosCompletedProposalsLoading,
     setIsLoadingMore: setIsCosmosCompletedProposalsLoadingMore,
+    isApiReady: app.chain?.apiInitialized,
   });
 
   if (isLoading) {

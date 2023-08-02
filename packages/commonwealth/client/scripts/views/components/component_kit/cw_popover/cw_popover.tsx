@@ -1,6 +1,8 @@
 import React from 'react';
-import { PopperUnstyled } from '@mui/base';
-import type { Placement } from '@popperjs/core/lib';
+import PopperUnstyled, {
+  PopperPlacementType,
+  PopperOwnProps,
+} from '@mui/base/Popper';
 
 import { uuidv4 } from 'lib/util';
 
@@ -16,7 +18,9 @@ type UsePopoverProps = {
 
 type PopoverProps = {
   content: React.ReactNode;
-  placement?: Placement;
+  placement?: PopperPlacementType;
+  disablePortal?: boolean;
+  modifiers?: PopperOwnProps['modifiers'];
 } & UsePopoverProps;
 
 export type PopoverTriggerProps = {
@@ -44,15 +48,22 @@ export const usePopover = (): UsePopoverProps => {
   };
 };
 
-export const Popover = (props: PopoverProps) => {
-  const { anchorEl, content, id, open, placement } = props;
-
+export const Popover = ({
+  anchorEl,
+  content,
+  id,
+  open,
+  placement,
+  disablePortal,
+  modifiers = [],
+}: PopoverProps) => {
   return (
     <PopperUnstyled
       id={id}
       open={open}
       anchorEl={anchorEl}
-      placement={placement}
+      disablePortal={disablePortal}
+      placement={placement || 'bottom-start'}
       modifiers={[
         {
           name: 'preventOverflow',
@@ -60,6 +71,7 @@ export const Popover = (props: PopoverProps) => {
             padding: 16,
           },
         },
+        ...modifiers,
       ]}
     >
       {content}

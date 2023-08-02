@@ -11,7 +11,6 @@ import ChainInfo from '../../models/ChainInfo';
 import SocialAccount from '../../models/SocialAccount';
 import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
-import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
@@ -152,15 +151,6 @@ export class UserController {
     this._starredCommunities = starredCommunities;
   }
 
-  private _discussionDrafts: DraftsController = new DraftsController();
-  public get discussionDrafts(): DraftsController {
-    return this._discussionDrafts;
-  }
-
-  private _setDiscussionDrafts(drafts: DraftsController): void {
-    this._discussionDrafts = drafts;
-  }
-
   private _unseenPosts: object;
   public get unseenPosts(): object {
     return this._unseenPosts;
@@ -175,6 +165,7 @@ export class UserController {
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
   public ephemerallySetActiveAccount(account: Account): void {
     this._setActiveAccount(account);
+    this.isFetched.emit('redraw');
   }
 
   public setEmail(email: string): void {
@@ -301,10 +292,6 @@ export class UserController {
 
   public setNotifications(notifications: NotificationsController): void {
     this._setNotifications(notifications);
-  }
-
-  public setDiscussionDrafts(drafts: DraftsController): void {
-    this.setDiscussionDrafts(drafts);
   }
 
   public setLastVisited(lastVisited: object): void {

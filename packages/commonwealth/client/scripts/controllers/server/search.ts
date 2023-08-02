@@ -200,7 +200,7 @@ class SearchController {
       if (page) {
         queryParams['page'] = page;
       }
-      const response = await axios.get(`${app.serverUrl()}/searchDiscussions`, {
+      const response = await axios.get(`${app.serverUrl()}/threads`, {
         params: queryParams,
       });
       if (response.data.status !== 'Success') {
@@ -249,7 +249,7 @@ class SearchController {
   ): Promise<Thread[]> => {
     const { pageSize, chainScope, communityScope } = params;
     try {
-      const response = await axios.get(`${app.serverUrl()}/searchDiscussions`, {
+      const response = await axios.get(`${app.serverUrl()}/threads`, {
         params: {
           chain: chainScope,
           community: communityScope,
@@ -277,24 +277,19 @@ class SearchController {
     page?: number,
     includeRoles?: boolean
   ) => {
-    try {
-      const response = await axios.get(`${app.serverUrl()}/searchProfiles`, {
-        params: {
-          chain: chainScope,
-          search: searchTerm,
-          page_size: pageSize,
-          page,
-          include_roles: includeRoles,
-        },
-      });
-      if (response.data.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${response.status}`);
-      }
-      return response.data.result;
-    } catch (e) {
-      console.error(e);
-      return { profiles: [] };
+    const response = await axios.get(`${app.serverUrl()}/profiles`, {
+      params: {
+        chain: chainScope,
+        search: searchTerm,
+        page_size: pageSize,
+        page,
+        include_roles: includeRoles,
+      },
+    });
+    if (response.data.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
     }
+    return response.data.result;
   };
 
   private sortResults = (a, b) => {

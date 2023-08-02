@@ -140,7 +140,7 @@ describe('Topic Tests', () => {
     it('Should fail to update thread without a topic name', async () => {
       const res = await chai
         .request(app)
-        .post('/api/updateTopic')
+        .post('/api/updateThreadTopic')
         .set('Accept', 'application/json')
         .send({
           jwt: adminJWT,
@@ -156,7 +156,7 @@ describe('Topic Tests', () => {
     it('Should successfully add topic to thread with admin account', async () => {
       const res = await chai
         .request(app)
-        .post('/api/updateTopic')
+        .post('/api/updateThreadTopic')
         .set('Accept', 'application/json')
         .send({
           jwt: adminJWT,
@@ -173,7 +173,7 @@ describe('Topic Tests', () => {
     it('Should fail to add topic to thread with non-admin account', async () => {
       const res = await chai
         .request(app)
-        .post('/api/updateTopic')
+        .post('/api/updateThreadTopic')
         .set('Accept', 'application/json')
         .send({
           jwt: userJWT,

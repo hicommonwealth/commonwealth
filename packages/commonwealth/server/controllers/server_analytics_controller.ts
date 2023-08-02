@@ -1,26 +1,7 @@
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
-import { AnalyticsPayload } from '../../shared/analytics/types';
+import { TrackOptions, __track } from './server_analytics_methods/track';
 
-export type AnalyticsOptions = Record<string, any> & AnalyticsPayload;
-
-/**
- * An interface that describes the methods related to analytics
- */
-interface IServerAnalyticsController {
-  /**
-   * Emits a notification
-   *
-   * @param payload - Analytics payload
-   * @returns Promise
-   */
-  track(options: AnalyticsOptions);
-}
-
-/**
- * Implements methods related to analytics
- */
-export class ServerAnalyticsController implements IServerAnalyticsController {
-  async track(options: AnalyticsOptions) {
-    await serverAnalyticsTrack(options);
+export class ServerAnalyticsController {
+  async track(options: TrackOptions) {
+    return __track.call(this, options);
   }
 }

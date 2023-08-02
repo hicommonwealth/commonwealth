@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
-
 import 'components/Avatar/AvatarUpload.scss';
 
 import app from 'state';
+import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import Account from '../../../models/Account';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
 import { ComponentType } from '../component_kit/types';
 import { notifyError } from 'controllers/app/notifications';
 import { Avatar } from 'views/components/Avatar/Avatar';
+import { compressImage } from 'utils/ImageCompression';
 
 const uploadToS3 = async (file: File, signedUrl: string) => {
   const options = {
@@ -83,10 +84,13 @@ export const AvatarUpload = ({
         const uploadURL = response.data.result;
         acceptedFiles[0].uploadURL = uploadURL;
 
+        const compressedFile = await compressImage(acceptedFiles[0]);
+
         // Upload the file to S3
-        await uploadToS3(acceptedFiles[0], uploadURL);
+        await uploadToS3(compressedFile, uploadURL);
 
         if (uploadCompleteCallback) {
+          acceptedFiles[0].uploadURL = replaceBucketWithCDN(uploadURL);
           uploadCompleteCallback([acceptedFiles[0]]);
         }
       } catch (e) {

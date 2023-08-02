@@ -5,8 +5,8 @@ import 'pages/view_thread/edit_body.scss';
 import { notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
 import { ContentType } from 'types';
-import { clearEditingLocalStorage } from '../../components/Comments/helpers';
-import { CWButton } from '../../components/component_kit/cw_button';
+import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
@@ -96,10 +96,15 @@ export const EditBody = (props: EditBodyProps) => {
         <CWButton
           label="Cancel"
           disabled={saving}
-          buttonType="secondary-blue"
+          buttonType="tertiary"
           onClick={cancel}
         />
-        <CWButton label="Save" disabled={saving} onClick={save} />
+        <CWButton
+          label="Save"
+          buttonWidth="wide"
+          disabled={saving}
+          onClick={save}
+        />
       </div>
     </div>
   );

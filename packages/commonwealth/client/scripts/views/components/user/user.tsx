@@ -18,6 +18,7 @@ import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import { Avatar } from 'views/components/Avatar';
+import Permissions from '../../../utils/Permissions';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -88,16 +89,14 @@ export const User = ({
 
   if (user) {
     loggedInUserIsAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
-      });
+      Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
     addrShort = formatAddressShort(
       user.address,
       typeof user.chain === 'string' ? user.chain : user.chain?.id,
-      false,
-      maxCharLength
+      true,
+      maxCharLength,
+      app.chain?.meta?.bech32Prefix
     );
 
     friendlyChainName = app.config.chains.getById(
@@ -205,7 +204,8 @@ export const User = ({
       key={profile?.address || '-'}
     >
       {showAvatar && (
-        <div
+        <Link
+          to={profile ? `/profile/id/${profile.id}` : undefined}
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
@@ -214,7 +214,7 @@ export const User = ({
             size={avatarSize}
             address={profile?.id}
           />
-        </div>
+        </Link>
       )}
       {
         <>
@@ -234,7 +234,9 @@ export const User = ({
                   profile.name
                 ) : (
                   <>
-                    {profile.name}
+                    <div>
+                      {profile.name}
+                    </div>
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
@@ -320,7 +322,13 @@ export const User = ({
                   <>
                     {profile.name}
                     <div className="id-short">
-                      {formatAddressShort(profile.address, profile.chain)}
+                      {formatAddressShort(
+                        profile.address,
+                        profile.chain,
+                        true,
+                        maxCharLength,
+                        app.chain?.meta?.bech32Prefix
+                      )}
                     </div>
                   </>
                 )}
@@ -332,8 +340,9 @@ export const User = ({
               {formatAddressShort(
                 profile.address,
                 profile.chain,
-                false,
-                maxCharLength
+                true,
+                maxCharLength,
+                app.chain?.meta?.bech32Prefix
               )}
             </div>
           )}

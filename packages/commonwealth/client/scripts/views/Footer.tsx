@@ -1,9 +1,8 @@
-import React from 'react';
-
 import 'Footer.scss';
-
-import { isNotUndefined } from '../helpers/typeGuards';
 import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { isNotUndefined } from '../helpers/typeGuards';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -38,16 +37,16 @@ export const Footer = () => {
       <div className="footer-links-container">
         {footercontents.map((item) => {
           return isNotUndefined(item.redirectTo) ? (
-            <a
+            <Link
               className="footer-link"
               onClick={(e) => {
-                e.preventDefault();
-                redirectClick(item.redirectTo);
+                e.stopPropagation();
               }}
               key={item.text}
+              to={item.redirectTo}
             >
               {item.text}
-            </a>
+            </Link>
           ) : (
             <a
               className="footer-link"

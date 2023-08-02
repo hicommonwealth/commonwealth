@@ -156,7 +156,7 @@ export const ethChainRows = (
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    onSelectHandler(options[0]);
+    onSelectHandler(options[6]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -165,8 +165,9 @@ export const ethChainRows = (
       <CWDropdown
         label="Chain"
         options={options}
-        initialValue={options[0]}
+        initialValue={options[6]}
         onSelect={(o) => onSelectHandler(o)}
+        disabled={!!props.disabled}
       />
       {state.chainString === 'Custom' && (
         <InputRow
@@ -202,7 +203,7 @@ export const ethChainRows = (
         />
       )}
       <InputRow
-        title="Address"
+        title="Token Contract Address"
         value={state.address}
         placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
         onChangeHandler={(v) => {

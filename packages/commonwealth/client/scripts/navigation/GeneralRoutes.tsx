@@ -15,7 +15,7 @@ const GeneralRoutes = () => [
   />,
   <Route
     path="/tos-1-26-2023"
-    element={withLayout(OldTermsPage, { type: 'common' })}
+    element={withLayout(OldTermsPage, { type: 'blank' })}
   />,
   <Route
     path="/components"

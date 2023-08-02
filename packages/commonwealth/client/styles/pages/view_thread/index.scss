@@ -10,30 +10,27 @@
     align-items: center;
     display: flex;
     gap: 16px;
-
-    .comments-count {
-      align-items: center;
-      display: flex;
-      gap: 4px;
-
-      .Text,
-      .Icon {
-        color: $neutral-500;
-      }
-    }
   }
 
   .callout-text {
+    background: #f7f6f7;
     display: flex;
-    align-items: center;
-    background-color: #F7F6F7;
+    gap: 10px;
     color: #656167;
-    padding: 16px 24px 16px 24px;
+    padding: 16px 24px;
     border-radius: $border-radius-corners;
 
     .Text {
-      margin-left: 10px;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      color: #656167;
     }
+  }
+
+  .JoinCommunityBanner {
+    margin-top: 8px;
   }
 }
 
@@ -41,4 +38,31 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.comments-filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+
+  .CommentsTree {
+    margin-left: auto;
+  }
+
+  .Checkbox {
+    margin-left: auto !important;
+  }
+}
+
+@include extraSmall {
+  .comments-filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    .Checkbox {
+      margin-left: 0 !important;
+    }
+  }
 }

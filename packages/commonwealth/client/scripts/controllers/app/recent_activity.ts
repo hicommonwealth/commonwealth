@@ -5,6 +5,7 @@ import type Topic from '../../models/Topic';
 import moment from 'moment';
 import app from 'state';
 import AbridgedThread from '../../models/AbridgedThread';
+import axios from 'axios';
 
 export interface IAbridgedThreadFromServer {
   id: number;
@@ -74,19 +75,20 @@ class RecentActivityController {
 
   public async getRecentTopicActivity(id?: string): Promise<Thread[]> {
     const params = {
+      active: true,
       chain: id || app.activeChainId(),
       threads_per_topic: 3,
     };
 
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/activeThreads`, params),
+      axios.get(`${app.serverUrl()}/threads`, { params }),
       // app.chainEntities.refresh(params.chain),
     ]);
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }
 
-    const threads = response.result;
+    const threads = response.data.result;
     return threads.map((thread) => {
       const modeledThread = app.threads.modelFromServer(thread);
       if (!thread.Address) {

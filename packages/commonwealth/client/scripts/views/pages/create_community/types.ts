@@ -70,6 +70,7 @@ export type EthChainNamesType = { [id: number]: string };
 export type EthChainFormState = {
   ethChains: EthChainsType;
   ethChainNames: EthChainNamesType;
+  disabled?: boolean;
 };
 
 export type EthChainFormStateSetters = {
