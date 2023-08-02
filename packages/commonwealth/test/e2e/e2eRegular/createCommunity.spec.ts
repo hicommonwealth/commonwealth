@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { expect } from 'chai';
 import { PORT } from '../../../server/config';
-import { addAlchemyKey, addUserIfNone, login } from '../utils/e2eUtils';
+import { addAlchemyKey, login } from '../utils/e2eUtils';
 
 test.setTimeout(60000);
 
