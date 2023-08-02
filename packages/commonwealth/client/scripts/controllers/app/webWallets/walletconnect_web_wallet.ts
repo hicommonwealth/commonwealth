@@ -1,6 +1,4 @@
-import type WalletConnectProvider from '@walletconnect/web3-provider';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
