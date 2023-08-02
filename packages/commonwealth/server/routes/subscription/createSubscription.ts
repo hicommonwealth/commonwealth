@@ -5,6 +5,10 @@ import Errors from './errors';
 import { ChainInstance } from 'server/models/chain';
 import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
 import { NotificationCategories } from 'common-common/src/types';
+import { CommentInstance } from '../../models/comment';
+import { ThreadInstance } from '../../models/thread';
+import { WhereOptions } from 'sequelize';
+import { SubscriptionAttributes } from 'server/models/subscription';
 
 export default async (
   models: DB,
@@ -30,7 +34,10 @@ export default async (
     return next(new AppError(Errors.InvalidSubscriptionCategory));
   }
 
-  let obj, chain: ChainInstance, thread, comment;
+  let obj: WhereOptions<SubscriptionAttributes>,
+    chain: ChainInstance,
+    thread: ThreadInstance,
+    comment: CommentInstance;
 
   switch (category.name) {
     case NotificationCategories.NewThread: {
