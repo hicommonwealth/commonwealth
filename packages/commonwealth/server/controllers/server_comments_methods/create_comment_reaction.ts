@@ -172,5 +172,9 @@ export async function __createCommentReaction(
     isCustomDomain: null,
   });
 
+  // update address last active
+  address.last_active = new Date();
+  address.save().catch(console.error);
+
   return [finalReaction.toJSON(), allNotificationOptions, allAnalyticsOptions];
 }
