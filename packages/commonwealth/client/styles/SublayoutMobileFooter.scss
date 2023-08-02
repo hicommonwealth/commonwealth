@@ -1,0 +1,17 @@
+@import 'shared';
+
+/* New class for sticky footer */
+.SublayoutMobileFooter {
+  //   position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  //   z-index: 9999;
+  padding: 0 8px;
+  border-top: 1px solid #e0dfe1;
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  min-height: 56px;
+}

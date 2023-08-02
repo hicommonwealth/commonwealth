@@ -1930,11 +1930,6 @@
     safe-stable-stringify "^2.4.2"
     sha.js "^2.4.11"
 
-"@capacitor-firebase/messaging@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor-firebase/messaging/-/messaging-5.0.1.tgz#67eefb1e9643988933857e991f65eabc3c51d7c8"
-  integrity sha512-KPmVukeJYOfxuIhpOmb+XGkWYKSL9HBVO9Gxn+JHcrs4lKURo5PtVpiw3Z1ulzSiqHny6PyIWSPxCcL3eFg8NQ==
-
 "@capacitor/android@^5.0.0":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-5.2.2.tgz#9f2cfd5b81f96deecc22d77aee9a3161c14c70b4"
@@ -26565,7 +26560,7 @@ ts-node@7.0.1:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-ts-node@^10.4.0, ts-node@^10.9.1:
+ts-node@^10.2.1, ts-node@^10.4.0, ts-node@^10.9.1:
   version "10.9.1"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.9.1.tgz#e73de9102958af9e1f0b168a6ff320e25adcff4b"
   integrity sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==

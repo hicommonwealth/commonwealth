@@ -1,6 +1,6 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import 'Sublayout.scss';
@@ -9,6 +9,7 @@ import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
+import { SublayoutMobileFooter } from './SublayoutMobileFooter';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -76,6 +77,39 @@ const Sublayout = ({
   const banner = app.chain ? chain.communityBanner : null;
   const showSidebar = menuVisible;
 
+  const [showComponent, setShowComponent] = useState(true);
+  const lastScrollTop = useRef(0);
+  const scrollThreshold = useRef(0.15); // 15% of the div height (will be calculated later)
+  const divRef = useRef(null);
+
+  const onScroll = () => {
+    const st = divRef.current.scrollTop;
+    const divHeight = divRef.current.offsetHeight;
+    scrollThreshold.current = divHeight * 0.15;
+
+    if (Math.abs(st - lastScrollTop.current) >= scrollThreshold.current) {
+      // Only change component visibility if scroll distance >= threshold
+      if (st > lastScrollTop.current) {
+        // downscroll
+        setShowComponent(false);
+      } else {
+        // upscroll
+        setShowComponent(true);
+      }
+      lastScrollTop.current = st <= 0 ? 0 : st;
+    }
+  };
+
+  useEffect(() => {
+    const div = divRef.current;
+    if (div) {
+      div.addEventListener('scroll', onScroll);
+      return () => {
+        div.removeEventListener('scroll', onScroll);
+      };
+    }
+  }, []); // removed lastScrollTop from dependencies
+
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
@@ -92,13 +126,14 @@ const Sublayout = ({
             {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
-              <div className="Body">
+              <div className="Body" ref={divRef}>
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>
             )}
           </div>
         </div>
+        {showComponent && <SublayoutMobileFooter />}
       </div>
     </div>
   );
