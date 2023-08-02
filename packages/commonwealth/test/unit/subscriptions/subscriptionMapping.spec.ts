@@ -2,7 +2,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import {
   checkSubscriptionValues,
   mapNotificationsDataToSubscriptions,
-} from '../../server/util/subscriptionMapping';
+} from '../../../server/util/subscriptionMapping';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {

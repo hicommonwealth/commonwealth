@@ -50,10 +50,9 @@ export class ChainEventsNamespace {
     if (this._isConnected) {
       const roomsToLeave = [];
       for (const sub of subs) {
-        const chain = sub?.Chain?.id || sub.Chain;
-        if (this.subscriptionRoomsJoined.has(chain)) {
-          roomsToLeave.push(chain);
-          this.subscriptionRoomsJoined.delete(chain);
+        if (this.subscriptionRoomsJoined.has(sub.chainId)) {
+          roomsToLeave.push(sub.chainId);
+          this.subscriptionRoomsJoined.delete(sub.chainId);
         }
       }
 

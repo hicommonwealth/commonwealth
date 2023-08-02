@@ -71,6 +71,14 @@ export function findSubscription(
       );
       return;
     }
+
+    if (findOptions.options.threadId && findOptions.options.commentId) {
+      console.error(
+        `Cannot provide both a thread id and comment id to find a ${categoryId} subscription`
+      );
+      return;
+    }
+
     return subs.find((s) => {
       if (findOptions.options.threadId) {
         return (
