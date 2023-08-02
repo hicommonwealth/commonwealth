@@ -20,7 +20,7 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
-import useJoinCommunity from 'views/components/header/useJoinCommunity';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';

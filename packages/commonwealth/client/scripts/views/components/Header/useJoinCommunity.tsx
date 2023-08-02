@@ -11,7 +11,7 @@ import ITokenAdapter from 'models/ITokenAdapter';
 import React, { useState } from 'react';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
-import { TOSModal } from 'views/components/header/TOSModal';
+import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 

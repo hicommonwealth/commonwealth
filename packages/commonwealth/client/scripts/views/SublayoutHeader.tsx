@@ -12,12 +12,12 @@ import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
-import { LoginSelector } from './components/header/LoginSelector';
+import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 import { featureFlags } from 'helpers/feature-flags';
-import UserDropdown from 'views/components/header/UserDropdown/UserDropdown';
+import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';

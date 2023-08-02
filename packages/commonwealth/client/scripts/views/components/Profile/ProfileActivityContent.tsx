@@ -4,8 +4,8 @@ import 'components/Profile/Profile.scss';
 
 import { CWText } from '../component_kit/cw_text';
 import type Thread from 'models/Thread';
-import ProfileActivityRow from '../profile/ProfileActivityRow';
-import type { CommentWithAssociatedThread } from '../profile/ProfileActivity';
+import ProfileActivityRow from './ProfileActivityRow';
+import type { CommentWithAssociatedThread } from './ProfileActivity';
 
 enum ProfileActivityType {
   Addresses,

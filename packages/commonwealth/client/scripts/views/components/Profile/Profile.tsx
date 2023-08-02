@@ -9,9 +9,9 @@ import Thread from '../../../models/Thread';
 import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
 import { CWSpinner } from '../component_kit/cw_spinner';
-import type { CommentWithAssociatedThread } from '../profile/ProfileActivity';
-import ProfileActivity from '../profile/ProfileActivity';
-import ProfileHeader from '../profile/ProfileHeader';
+import type { CommentWithAssociatedThread } from './ProfileActivity';
+import ProfileActivity from './ProfileActivity';
+import ProfileHeader from './ProfileHeader';
 
 enum ProfileError {
   None,
