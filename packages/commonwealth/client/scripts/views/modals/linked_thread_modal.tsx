@@ -6,7 +6,10 @@ import { notifyError } from 'controllers/app/notifications';
 import { getAddedAndDeleted } from 'helpers/threads';
 import { LinkSource } from 'models/Thread';
 import app from 'state';
-import { useAddThreadLinksMutation, useDeleteThreadLinksMutation } from 'state/api/threads';
+import {
+  useAddThreadLinksMutation,
+  useDeleteThreadLinksMutation,
+} from 'state/api/threads';
 import { ThreadSelector } from 'views/components/thread_selector';
 import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -30,13 +33,13 @@ export const LinkedThreadModal = ({
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(

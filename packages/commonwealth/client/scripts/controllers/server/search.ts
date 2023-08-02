@@ -262,7 +262,7 @@ class SearchController {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
       return response.data.result.map((rawThread) => {
-        return new Thread(rawThread)
+        return new Thread(rawThread);
       });
     } catch (e) {
       console.error(e);

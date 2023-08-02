@@ -45,17 +45,17 @@ export const ViewProposalPage = ({
     chainId: app.activeChainId(),
     link: {
       source: LinkSource.Snapshot,
-      identifier: proposal?.id
+      identifier: proposal?.id,
     },
     enabled: !!(app.activeChainId() && proposal?.id),
-  })
-  const threads = data || []
+  });
+  const threads = data || [];
 
   useEffect(() => {
     if (!isLoading && error) {
       notifyError('Could not get threads');
     }
-  }, [error, isLoading])
+  }, [error, isLoading]);
 
   const symbol: string = space?.symbol || '';
   const validatedAgainstStrategies: boolean = !power

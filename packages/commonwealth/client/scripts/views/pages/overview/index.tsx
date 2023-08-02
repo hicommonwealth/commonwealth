@@ -25,9 +25,9 @@ const OverviewPage = () => {
   const { data: recentlyActiveThreads } = useFetchThreadsQuery({
     queryType: 'active',
     chainId: app.activeChainId(),
-    topicsPerThread: 3
+    topicsPerThread: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
-  })
+  });
 
   useEffect(() => {
     app.loginStateEmitter.on('redraw', forceRerender);

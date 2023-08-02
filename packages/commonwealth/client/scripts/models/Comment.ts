@@ -52,7 +52,7 @@ export class Comment<T extends IUniqueId> {
     canvas_session,
     version_history,
     marked_as_spam_at,
-    discord_meta
+    discord_meta,
   }) {
     const versionHistory = version_history
       ? version_history.map((v) => {
@@ -87,14 +87,14 @@ export class Comment<T extends IUniqueId> {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : versionHistory && versionHistory?.length > 1
-        ? versionHistory[0].timestamp
-        : null;
+      ? versionHistory[0].timestamp
+      : null;
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.lnegth > 0 ? true : false;
     this.canvasAction = canvas_action;
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;
-    this.reactions = (reactions || []).map(r => new Reaction(r));
+    this.reactions = (reactions || []).map((r) => new Reaction(r));
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
   }

@@ -14,35 +14,35 @@ const deleteThreadCollaborators = async ({
   address,
   chainId,
   threadId,
-  updatedCollaborators
+  updatedCollaborators,
 }: deleteThreadCollaboratorsProps) => {
-  const response = await axios.post(
-    `${app.serverUrl()}/deleteEditors`,
-    {
-      address: address,
-      author_chain: chainId,
-      chain: chainId,
-      thread_id: threadId,
-      editors: updatedCollaborators,
-      jwt: app.user.jwt,
-    }
-  );
+  const response = await axios.post(`${app.serverUrl()}/deleteEditors`, {
+    address: address,
+    author_chain: chainId,
+    chain: chainId,
+    thread_id: threadId,
+    editors: updatedCollaborators,
+    jwt: app.user.jwt,
+  });
 
-  return response.data.result.collaborators
+  return response.data.result.collaborators;
 };
 
 interface deleteThreadCollaboratorsMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useDeleteThreadCollaboratorsMutation = ({ chainId, threadId }: deleteThreadCollaboratorsMutationProps) => {
+const useDeleteThreadCollaboratorsMutation = ({
+  chainId,
+  threadId,
+}: deleteThreadCollaboratorsMutationProps) => {
   return useMutation({
     mutationFn: deleteThreadCollaborators,
     onSuccess: async (collaborators) => {
-      updateThreadInAllCaches(chainId, threadId, { collaborators }) // mimic the thread partial body
+      updateThreadInAllCaches(chainId, threadId, { collaborators }); // mimic the thread partial body
       return collaborators; // TODO: improve it and return thread as the proper response.
-    }
+    },
   });
 };
 

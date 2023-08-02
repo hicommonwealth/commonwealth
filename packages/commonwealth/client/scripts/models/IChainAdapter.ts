@@ -81,7 +81,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     EXCEPTION_CASE_threadCountersStore.setState({
       totalThreadsInCommunity: numTotalThreads,
       totalThreadsInCommunityForVoting: numVotingThreads,
-    })
+    });
     this.meta.setAdmins(admins);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
@@ -98,7 +98,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     EXCEPTION_CASE_threadCountersStore.setState({
       totalThreadsInCommunity: 0,
       totalThreadsInCommunityForVoting: 0,
-    })
+    });
     if (this.app.chainEntities) {
       this.app.chainEntities.deinit();
     }

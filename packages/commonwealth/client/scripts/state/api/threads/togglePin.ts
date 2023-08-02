@@ -9,30 +9,30 @@ interface ToggleThreadPinProps {
   threadId: number;
 }
 
-const toggleThreadPin = async ({
-  chainId,
-  threadId
-}: ToggleThreadPinProps) => {
+const toggleThreadPin = async ({ chainId, threadId }: ToggleThreadPinProps) => {
   const response = await axios.post(`${app.serverUrl()}/updateThreadPinned`, {
     jwt: app.user.jwt,
     thread_id: threadId,
-  })
+  });
 
-  return new Thread(response.data.result)
+  return new Thread(response.data.result);
 };
 
 interface ToggleThreadPinMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useToggleThreadPinMutation = ({ chainId, threadId }: ToggleThreadPinMutationProps) => {
+const useToggleThreadPinMutation = ({
+  chainId,
+  threadId,
+}: ToggleThreadPinMutationProps) => {
   return useMutation({
     mutationFn: toggleThreadPin,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread)
+      updateThreadInAllCaches(chainId, threadId, updatedThread);
       return updatedThread;
-    }
+    },
   });
 };
 

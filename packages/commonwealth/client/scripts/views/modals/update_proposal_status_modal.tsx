@@ -18,7 +18,11 @@ import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
 import { Link, LinkSource } from 'models/Thread';
 import app from 'state';
-import { useAddThreadLinksMutation, useDeleteThreadLinksMutation, useEditThreadStageMutation } from 'state/api/threads';
+import {
+  useAddThreadLinksMutation,
+  useDeleteThreadLinksMutation,
+  useEditThreadStageMutation,
+} from 'state/api/threads';
 import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -57,12 +61,12 @@ export const UpdateProposalStatusModal = ({
   const { customStages } = app.chain.meta;
   const stages = !customStages
     ? [
-      ThreadStage.Discussion,
-      ThreadStage.ProposalInReview,
-      ThreadStage.Voting,
-      ThreadStage.Passed,
-      ThreadStage.Failed,
-    ]
+        ThreadStage.Discussion,
+        ThreadStage.ProposalInReview,
+        ThreadStage.Voting,
+        ThreadStage.Passed,
+        ThreadStage.Failed,
+      ]
     : parseCustomStages(customStages);
 
   const [tempStage, setTempStage] = useState(
@@ -85,18 +89,18 @@ export const UpdateProposalStatusModal = ({
 
   const { mutateAsync: editThreadStage } = useEditThreadStageMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const handleSaveChanges = async () => {
     // set stage
@@ -104,10 +108,12 @@ export const UpdateProposalStatusModal = ({
       await editThreadStage({
         chainId: app.activeChainId(),
         threadId: thread.id,
-        stage: tempStage
-      })
+        stage: tempStage,
+      });
     } catch (err) {
-      const error = err?.responseJSON?.error || 'Failed to update stage. Make sure one is selected.'
+      const error =
+        err?.responseJSON?.error ||
+        'Failed to update stage. Make sure one is selected.';
       notifyError(error);
       throw new Error(error);
     }
@@ -153,7 +159,7 @@ export const UpdateProposalStatusModal = ({
               title: enrichedSnapshot.title,
             },
           ],
-        })
+        });
 
         links = updatedThread.links;
       }
@@ -293,8 +299,8 @@ export const UpdateProposalStatusModal = ({
     );
     const updatedProposals = isSelected
       ? tempCosmosProposals.filter(
-        ({ identifier }) => proposal.identifier !== String(identifier)
-      )
+          ({ identifier }) => proposal.identifier !== String(identifier)
+        )
       : [...tempCosmosProposals, proposal];
     setTempCosmosProposals(updatedProposals);
     setVotingStage();

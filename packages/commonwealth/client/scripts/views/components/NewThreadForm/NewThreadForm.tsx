@@ -63,8 +63,8 @@ export const NewThreadForm = () => {
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
-    chainId: app.activeChainId()
-  })
+    chainId: app.activeChainId(),
+  });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -108,15 +108,16 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        authorProfile: app.user.activeAccount.profile
-      })
+        authorProfile: app.user.activeAccount.profile,
+      });
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
       navigate(`/discussion/${thread.id}`);
     } catch (err) {
-      const error = err?.responseJSON?.error || err?.message || 'Failed to create thread'
+      const error =
+        err?.responseJSON?.error || err?.message || 'Failed to create thread';
       throw new Error(error);
     } finally {
       setIsSaving(false);

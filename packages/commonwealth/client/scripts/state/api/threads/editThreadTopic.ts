@@ -19,7 +19,7 @@ const editThreadTopic = async ({
   threadId,
   topicName,
   newTopicId,
-  oldTopicId
+  oldTopicId,
 }: EditThreadTopicProps) => {
   const response = await axios.post(`${app.serverUrl()}/updateTopic`, {
     jwt: app.user.jwt,
@@ -27,23 +27,29 @@ const editThreadTopic = async ({
     topic_id: newTopicId,
     topic_name: topicName,
     address: address,
-  })
+  });
 
-  return { updatedTopic: new Topic(response.data.result), oldTopicId: oldTopicId }
+  return {
+    updatedTopic: new Topic(response.data.result),
+    oldTopicId: oldTopicId,
+  };
 };
 
 interface UseEditThreadTopicMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useEditThreadTopicMutation = ({ chainId, threadId }: UseEditThreadTopicMutationProps) => {
+const useEditThreadTopicMutation = ({
+  chainId,
+  threadId,
+}: UseEditThreadTopicMutationProps) => {
   return useMutation({
     mutationFn: editThreadTopic,
     onSuccess: async ({ updatedTopic, oldTopicId }) => {
-      updateThreadTopicInAllCaches(chainId, threadId, updatedTopic, oldTopicId)
+      updateThreadTopicInAllCaches(chainId, threadId, updatedTopic, oldTopicId);
       return updatedTopic; // TODO: improve it and return thread as the proper response. currently it returns just the topic
-    }
+    },
   });
 };
 

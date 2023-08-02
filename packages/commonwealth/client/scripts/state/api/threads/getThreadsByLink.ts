@@ -18,11 +18,15 @@ const getThreadsByLink = async ({ link }: GetThreadsByLinkProps) => {
     jwt: app.user.jwt,
   });
 
-  return response.data.result.threads
+  return response.data.result.threads;
 };
 
 // Gets all threads associated with a link(ie all threads linked to 1 proposal)
-const useGetThreadsByLinkQuery = ({ chainId, link, enabled }: GetThreadsByLinkProps) => {
+const useGetThreadsByLinkQuery = ({
+  chainId,
+  link,
+  enabled,
+}: GetThreadsByLinkProps) => {
   return useQuery({
     // TODO: we are not updating cache here, because the response looks like this
     // {
@@ -38,7 +42,13 @@ const useGetThreadsByLinkQuery = ({ chainId, link, enabled }: GetThreadsByLinkPr
     // }
     // decide if we need to cache this?? -- atm it looks like we dont have to
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [ApiEndpoints.FETCH_THREADS, chainId, 'byLink', link.source, link.identifier],
+    queryKey: [
+      ApiEndpoints.FETCH_THREADS,
+      chainId,
+      'byLink',
+      link.source,
+      link.identifier,
+    ],
     queryFn: () => getThreadsByLink({ chainId, link, enabled }),
     staleTime: THREAD_STALE_TIME,
     enabled: enabled,

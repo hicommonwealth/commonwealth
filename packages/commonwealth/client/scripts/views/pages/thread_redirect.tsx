@@ -11,11 +11,14 @@ export default function ThreadRedirect({ identifier }: { identifier: string }) {
     const getThreadCommunity = async () => {
       const threadId = identifier.split('-')[0];
 
-      const response = await axios.get(`${app.serverUrl()}/getThreads`, {
-        params: {
-          ids: [threadId],
-        },
-      }).then(r => r['data']['result'][0]).catch(() => null);
+      const response = await axios
+        .get(`${app.serverUrl()}/getThreads`, {
+          params: {
+            ids: [threadId],
+          },
+        })
+        .then((r) => r['data']['result'][0])
+        .catch(() => null);
 
       if (response && response.chain) {
         navigate(`/discussion/${identifier}`, {}, response.chain);

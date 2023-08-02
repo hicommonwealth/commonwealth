@@ -16,7 +16,10 @@ import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import { useAddThreadLinksMutation, useGetThreadsByIdQuery } from 'state/api/threads';
+import {
+  useAddThreadLinksMutation,
+  useGetThreadsByIdQuery,
+} from 'state/api/threads';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
@@ -27,13 +30,8 @@ import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import Poll from '../../../models/Poll';
-import {
-  Link,
-  LinkSource,
-} from '../../../models/Thread';
-import {
-  CommentsFeaturedFilterTypes,
-} from '../../../models/types';
+import { Link, LinkSource } from '../../../models/Thread';
+import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
@@ -87,41 +85,45 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [commentSortType, setCommentSortType] = useState<
-    CommentsFeaturedFilterTypes
-  >(CommentsFeaturedFilterTypes.Newest);
+  const [commentSortType, setCommentSortType] =
+    useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-  const [arePollsFetched, setArePollsFetched] = useState(false)
-  const [areProfilesLoaded, setAreProfilesLoaded] = useState(false)
-  const [isViewMarked, setIsViewMarked] = useState(false)
+  const [arePollsFetched, setArePollsFetched] = useState(false);
+  const [areProfilesLoaded, setAreProfilesLoaded] = useState(false);
+  const [isViewMarked, setIsViewMarked] = useState(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const { data: comments = [], error: fetchCommentsError } = useFetchCommentsQuery({
-    chainId: app.activeChainId(),
-    threadId: parseInt(`${threadId}`)
-  })
+  const { data: comments = [], error: fetchCommentsError } =
+    useFetchCommentsQuery({
+      chainId: app.activeChainId(),
+      threadId: parseInt(`${threadId}`),
+    });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: parseInt(threadId)
-  })
+    threadId: parseInt(threadId),
+  });
 
-  const { data, error: fetchThreadError, isLoading } = useGetThreadsByIdQuery({
+  const {
+    data,
+    error: fetchThreadError,
+    isLoading,
+  } = useGetThreadsByIdQuery({
     chainId: app.activeChainId(),
-    ids: [+threadId]
-  })
+    ids: [+threadId],
+  });
 
-  const thread = data?.[0]
+  const thread = data?.[0];
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
-  }, [fetchCommentsError])
+  }, [fetchCommentsError]);
 
   useBrowserWindow({
     onResize: () =>
@@ -182,7 +184,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .fetchPolls(app.activeChainId(), thread?.id)
       .then(() => {
         setPolls(app.polls.getByThreadId(thread.id));
-        setArePollsFetched(true)
+        setArePollsFetched(true);
       })
       .catch(() => {
         notifyError('Failed to load polls');
@@ -196,17 +198,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     // load view count
-    axios.post(`${app.serverUrl()}/viewCount`, {
-      chain: app.activeChainId(),
-      object_id: thread.id,
-    })
+    axios
+      .post(`${app.serverUrl()}/viewCount`, {
+        chain: app.activeChainId(),
+        object_id: thread.id,
+      })
       .then((response) => {
         setViewCount(response?.data?.result?.view_count || 0);
       })
       .catch(() => {
         setViewCount(0);
-      }).finally(() => {
-        setIsViewMarked(true)
+      })
+      .finally(() => {
+        setIsViewMarked(true);
       });
   }, [thread, isViewMarked]);
 
@@ -229,15 +233,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     });
 
     NewProfilesController.Instance.isFetched.on('redraw', () => {
-      setAreProfilesLoaded(true)
+      setAreProfilesLoaded(true);
     });
 
-    setAreProfilesLoaded(true)
-  }, [
-    comments,
-    thread,
-    areProfilesLoaded
-  ]);
+    setAreProfilesLoaded(true);
+  }, [comments, thread, areProfilesLoaded]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -247,7 +247,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageLoading />;
   }
 
-  if ((!isLoading && !thread) || (fetchThreadError)) {
+  if ((!isLoading && !thread) || fetchThreadError) {
     return <PageNotFound />;
   }
 
@@ -274,7 +274,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
-  const hasSnapshotProposal = thread.links.find(x => x.source === 'snapshot')
+  const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
   const canComment =
     !!hasJoinedCommunity ||
@@ -316,11 +316,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
-  const sortedComments = [...comments].filter(c => !c.parentComment).sort((a, b) =>
-    commentSortType === CommentsFeaturedFilterTypes.Oldest
-      ? moment(a.createdAt).diff(moment(b.createdAt))
-      : moment(b.createdAt).diff(moment(a.createdAt))
-  )
+  const sortedComments = [...comments]
+    .filter((c) => !c.parentComment)
+    .sort((a, b) =>
+      commentSortType === CommentsFeaturedFilterTypes.Oldest
+        ? moment(a.createdAt).diff(moment(b.createdAt))
+        : moment(b.createdAt).diff(moment(a.createdAt))
+    );
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
@@ -525,79 +527,79 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                {
-                  label: 'Links',
-                  item: (
-                    <div className="cards-column">
-                      {showLinkedProposalOptions && (
-                        <LinkedProposalsCard
-                          thread={thread}
-                          showAddProposalButton={isAuthor || isAdminOrMod}
-                        />
-                      )}
-                      {showLinkedThreadOptions && (
-                        <LinkedThreadsCard
-                          thread={thread}
-                          allowLinking={isAuthor || isAdminOrMod}
-                        />
-                      )}
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Links',
+                    item: (
+                      <div className="cards-column">
+                        {showLinkedProposalOptions && (
+                          <LinkedProposalsCard
+                            thread={thread}
+                            showAddProposalButton={isAuthor || isAdminOrMod}
+                          />
+                        )}
+                        {showLinkedThreadOptions && (
+                          <LinkedThreadsCard
+                            thread={thread}
+                            allowLinking={isAuthor || isAdminOrMod}
+                          />
+                        )}
+                      </div>
+                    ),
+                  },
+                ]
               : []),
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
-                {
-                  label: 'Snapshot',
-                  item: (
-                    <div className="cards-column">
-                      <SnapshotCreationCard
-                        thread={thread}
-                        allowSnapshotCreation={isAuthor || isAdminOrMod}
-                        onChangeHandler={handleNewSnapshotChange}
-                      />
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Snapshot',
+                    item: (
+                      <div className="cards-column">
+                        <SnapshotCreationCard
+                          thread={thread}
+                          allowSnapshotCreation={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleNewSnapshotChange}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
               : []),
             ...(polls?.length > 0 ||
-              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                {
-                  label: 'Polls',
-                  item: (
-                    <div className="cards-column">
-                      {[
-                        ...new Map(
-                          polls?.map((poll) => [poll.id, poll])
-                        ).values(),
-                      ].map((poll: Poll) => {
-                        return (
-                          <ThreadPollCard
-                            poll={poll}
-                            key={poll.id}
-                            onVote={() => setInitializedPolls(false)}
-                            showDeleteButton={isAuthor || isAdmin}
-                            onDelete={() => {
-                              setInitializedPolls(false);
-                            }}
-                          />
-                        );
-                      })}
-                      {isAuthor &&
-                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                          <ThreadPollEditorCard
-                            thread={thread}
-                            threadAlreadyHasPolling={!polls?.length}
-                            onPollCreate={() => setInitializedPolls(false)}
-                          />
-                        )}
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Polls',
+                    item: (
+                      <div className="cards-column">
+                        {[
+                          ...new Map(
+                            polls?.map((poll) => [poll.id, poll])
+                          ).values(),
+                        ].map((poll: Poll) => {
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                              showDeleteButton={isAuthor || isAdmin}
+                              onDelete={() => {
+                                setInitializedPolls(false);
+                              }}
+                            />
+                          );
+                        })}
+                        {isAuthor &&
+                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                            <ThreadPollEditorCard
+                              thread={thread}
+                              threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
+                            />
+                          )}
+                      </div>
+                    ),
+                  },
+                ]
               : []),
           ] as SidebarComponents
         }

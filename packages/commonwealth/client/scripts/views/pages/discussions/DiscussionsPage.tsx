@@ -31,9 +31,7 @@ type DiscussionsPageProps = {
  * function will sort those correctly.
  */
 const sortPinned = (t: Thread[]) => {
-  return [...t].sort((a, b) =>
-    a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0
-  );
+  return [...t].sort((a, b) => (a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0));
 };
 
 /**
@@ -42,9 +40,7 @@ const sortPinned = (t: Thread[]) => {
  */
 const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
   if (featuredFilter === ThreadFeaturedFilterTypes.Oldest) {
-    return [...t].sort((a, b) =>
-      moment(a.createdAt).diff(moment(b.createdAt))
-    );
+    return [...t].sort((a, b) => moment(a.createdAt).diff(moment(b.createdAt)));
   }
 
   if (featuredFilter === ThreadFeaturedFilterTypes.MostComments) {
@@ -78,10 +74,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const { dateCursor } = useDateCursor({
-    dateRange: searchParams.get(
-      'dateRange'
-    ) as ThreadTimelineFilterTypes
-  })
+    dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
+  });
 
   const { fetchNextPage, data, isInitialLoading } = useFetchThreadsQuery({
     chainId: app.activeChainId(),
@@ -94,9 +88,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     orderBy: featuredFilter,
     toDate: dateCursor.toDate,
     fromDate: dateCursor.fromDate,
-  })
+  });
 
-  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter))
+  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
   return (
     <div className="DiscussionsPage">

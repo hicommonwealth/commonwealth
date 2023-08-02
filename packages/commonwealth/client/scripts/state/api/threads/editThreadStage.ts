@@ -9,31 +9,35 @@ import { updateThreadInAllCaches } from './helpers/cache';
 interface EditThreadStageProps {
   chainId: string;
   threadId: number;
-  stage: ThreadStage
+  stage: ThreadStage;
 }
 
 const editThreadStage = async ({
   chainId,
   threadId,
-  stage
+  stage,
 }: EditThreadStageProps) => {
   const response = await axios.post(`${app.serverUrl()}/updateThreadStage`, {
     chain: chainId,
     thread_id: threadId,
     stage: stage,
     jwt: app.user.jwt,
-  })
+  });
 
-  return new Thread(response.data.result)
+  return new Thread(response.data.result);
 };
 
 interface UseEditThreadStageMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
   currentStage: ThreadStage;
 }
 
-const useEditThreadStageMutation = ({ chainId, threadId, currentStage }: UseEditThreadStageMutationProps) => {
+const useEditThreadStageMutation = ({
+  chainId,
+  threadId,
+  currentStage,
+}: UseEditThreadStageMutationProps) => {
   return useMutation({
     mutationFn: editThreadStage,
     onSuccess: async (updatedThread) => {
@@ -41,15 +45,16 @@ const useEditThreadStageMutation = ({ chainId, threadId, currentStage }: UseEdit
       let incBy = 0;
       if (currentStage === ThreadStage.Voting) incBy--;
       if (updatedThread.stage === ThreadStage.Voting) incBy++;
-      EXCEPTION_CASE_threadCountersStore.setState(({
-        totalThreadsInCommunityForVoting
-      }) => ({
-        totalThreadsInCommunityForVoting: totalThreadsInCommunityForVoting + incBy
-      }))
+      EXCEPTION_CASE_threadCountersStore.setState(
+        ({ totalThreadsInCommunityForVoting }) => ({
+          totalThreadsInCommunityForVoting:
+            totalThreadsInCommunityForVoting + incBy,
+        })
+      );
       updateThreadInAllCaches(chainId, threadId, updatedThread);
 
       return updatedThread;
-    }
+    },
   });
 };
 

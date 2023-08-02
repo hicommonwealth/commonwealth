@@ -6,9 +6,7 @@ import MinimumProfile from 'models/MinimumProfile';
 import NotificationSubscription from 'models/NotificationSubscription';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
-import {
-  ThreadStage
-} from 'models/types';
+import { ThreadStage } from 'models/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
@@ -36,7 +34,7 @@ const createThread = async ({
   body,
   url,
   readOnly,
-  authorProfile
+  authorProfile,
 }: CreateThreadProps) => {
   const {
     action = null,
@@ -50,46 +48,43 @@ const createThread = async ({
     topic: topic.id,
   });
 
-  const response = await axios.post(
-    `${app.serverUrl()}/threads`,
-    {
-      author_chain: chainId,
-      chain: chainId,
-      address,
-      author: JSON.stringify(authorProfile),
-      title: encodeURIComponent(title),
-      body: encodeURIComponent(body),
-      kind,
-      stage,
-      topic_name: topic.name,
-      topic_id: topic.id,
-      url,
-      readOnly,
-      jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
-    }
-  );
+  const response = await axios.post(`${app.serverUrl()}/threads`, {
+    author_chain: chainId,
+    chain: chainId,
+    address,
+    author: JSON.stringify(authorProfile),
+    title: encodeURIComponent(title),
+    body: encodeURIComponent(body),
+    kind,
+    stage,
+    topic_name: topic.name,
+    topic_id: topic.id,
+    url,
+    readOnly,
+    jwt: app.user.jwt,
+    canvas_action: action,
+    canvas_session: session,
+    canvas_hash: hash,
+  });
 
-  return new Thread(response.data.result)
+  return new Thread(response.data.result);
 };
 
 const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
-      addThreadInAllCaches(chainId, newThread)
+      addThreadInAllCaches(chainId, newThread);
       // Update community level thread counters variables
-      EXCEPTION_CASE_threadCountersStore.setState(({
-        totalThreadsInCommunity,
-        totalThreadsInCommunityForVoting
-      }) => ({
-        totalThreadsInCommunity: totalThreadsInCommunity + 1,
-        totalThreadsInCommunityForVoting: newThread.stage === ThreadStage.Voting ?
-          totalThreadsInCommunityForVoting + 1 :
-          totalThreadsInCommunityForVoting,
-      }))
+      EXCEPTION_CASE_threadCountersStore.setState(
+        ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
+          totalThreadsInCommunity: totalThreadsInCommunity + 1,
+          totalThreadsInCommunityForVoting:
+            newThread.stage === ThreadStage.Voting
+              ? totalThreadsInCommunityForVoting + 1
+              : totalThreadsInCommunityForVoting,
+        })
+      );
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
 
@@ -108,7 +103,7 @@ const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
         NotificationSubscription.fromJSON(subscriptionJSON)
       );
 
-      return newThread
+      return newThread;
     },
   });
 };

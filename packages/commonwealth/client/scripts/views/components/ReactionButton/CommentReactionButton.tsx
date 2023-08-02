@@ -40,7 +40,9 @@ export const CommentReactionButton = ({
   });
 
   const activeAddress = app.user.activeAccount?.address;
-  const hasReacted = (reactions || []).find(x => x?.Address?.address === activeAddress)
+  const hasReacted = (reactions || []).find(
+    (x) => x?.Address?.address === activeAddress
+  );
   const likes = (reactions || []).length;
 
   const handleVoteClick = async (e) => {
@@ -49,7 +51,7 @@ export const CommentReactionButton = ({
 
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
-      return
+      return;
     }
 
     if (hasReacted) {
@@ -69,7 +71,7 @@ export const CommentReactionButton = ({
         chainId: app.activeChainId(),
       }).catch(() => {
         notifyError('Failed to save reaction');
-      })
+      });
     }
   };
 

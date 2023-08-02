@@ -42,8 +42,8 @@ export const EditBody = (props: EditBodyProps) => {
   const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
-    currentStage: thread.stage
-  })
+    currentStage: thread.stage,
+  });
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -92,16 +92,17 @@ export const EditBody = (props: EditBodyProps) => {
         authorProfile: app.user.activeAccount.profile,
         address: app.user.activeAccount.address,
         chainId: app.activeChainId(),
-      })
+      });
       clearEditingLocalStorage(thread.id, ContentType.Thread);
       notifySuccess('Thread successfully edited');
       threadUpdatedCallback(title, newBody);
     } catch (err) {
-      const error = err.responseJSON && err.responseJSON.error
-        ? err.responseJSON.error
-        : 'Failed to edit thread'
+      const error =
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to edit thread';
       console.log(error);
-      notifyError(error)
+      notifyError(error);
     } finally {
       setSaving(false);
     }

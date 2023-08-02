@@ -30,7 +30,7 @@ const editThread = async ({
   newBody,
   newTitle,
   url,
-  authorProfile
+  authorProfile,
 }: EditThreadProps) => {
   const {
     action = null,
@@ -43,7 +43,6 @@ const editThread = async ({
     link: url,
     topic: topicId,
   });
-
 
   const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
     author_chain: chainId,
@@ -59,18 +58,22 @@ const editThread = async ({
     canvas_action: action,
     canvas_session: session,
     canvas_hash: hash,
-  })
+  });
 
-  return new Thread(response.data.result)
+  return new Thread(response.data.result);
 };
 
 interface UseEditThreadMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
-  currentStage: ThreadStage
+  currentStage: ThreadStage;
 }
 
-const useEditThreadMutation = ({ chainId, threadId, currentStage }: UseEditThreadMutationProps) => {
+const useEditThreadMutation = ({
+  chainId,
+  threadId,
+  currentStage,
+}: UseEditThreadMutationProps) => {
   return useMutation({
     mutationFn: editThread,
     onSuccess: async (updatedThread) => {
@@ -78,15 +81,16 @@ const useEditThreadMutation = ({ chainId, threadId, currentStage }: UseEditThrea
       let incBy = 0;
       if (currentStage === ThreadStage.Voting) incBy--;
       if (updatedThread.stage === ThreadStage.Voting) incBy++;
-      EXCEPTION_CASE_threadCountersStore.setState(({
-        totalThreadsInCommunityForVoting
-      }) => ({
-        totalThreadsInCommunityForVoting: totalThreadsInCommunityForVoting + incBy
-      }))
-      updateThreadInAllCaches(chainId, threadId, updatedThread)
+      EXCEPTION_CASE_threadCountersStore.setState(
+        ({ totalThreadsInCommunityForVoting }) => ({
+          totalThreadsInCommunityForVoting:
+            totalThreadsInCommunityForVoting + incBy,
+        })
+      );
+      updateThreadInAllCaches(chainId, threadId, updatedThread);
 
-      return updatedThread
-    }
+      return updatedThread;
+    },
   });
 };
 

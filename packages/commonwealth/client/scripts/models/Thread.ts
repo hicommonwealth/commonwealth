@@ -16,7 +16,6 @@ export interface VersionHistory {
   body: string;
 }
 
-
 export interface IThreadCollaborator {
   address: string;
   chain: string;
@@ -48,8 +47,8 @@ export const THREAD_ARRAY_FIELDS = [
   'collaborators',
   'chainEntities',
   'versionHistory',
-  'associatedReactions'
-]
+  'associatedReactions',
+];
 
 export class Thread implements IUniqueId {
   public readonly author: string;
@@ -163,7 +162,7 @@ export class Thread implements IUniqueId {
     reactionIds: any[]; // TODO: fix type
     addressesReacted: any[]; //TODO: fix type,
     reactionType: any[]; // TODO: fix type
-    chain_entity_meta: any, // TODO: fix type
+    chain_entity_meta: any; // TODO: fix type
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -208,8 +207,8 @@ export class Thread implements IUniqueId {
               typeof history.author === 'string'
                 ? JSON.parse(history.author)
                 : typeof history.author === 'object'
-                  ? history.author
-                  : null;
+                ? history.author
+                : null;
             history.timestamp = moment(history.timestamp);
           } catch (e) {
             console.log(e);
@@ -217,7 +216,7 @@ export class Thread implements IUniqueId {
           return history;
         });
       }
-      return versionHistoryProcessed
+      return versionHistoryProcessed;
     })();
     this.chain = chain;
     this.readOnly = read_only;
@@ -239,37 +238,43 @@ export class Thread implements IUniqueId {
 
       return chainEntitiesProcessed
         ? chainEntitiesProcessed.map((ce) => {
-          return {
-            id: +ce.id,
-            chain,
-            type: ce.type,
-            typeId: (ce as any).type_id || ce.typeId,
-            completed: ce.completed,
-            author: this.author,
-          };
-        })
+            return {
+              id: +ce.id,
+              chain,
+              type: ce.type,
+              typeId: (ce as any).type_id || ce.typeId,
+              completed: ce.completed,
+              author: this.author,
+            };
+          })
         : [];
-    })()
+    })();
     this.hasPoll = has_poll;
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-        ? this.versionHistory[0].timestamp
-        : null;
+      ? this.versionHistory[0].timestamp
+      : null;
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
     this.lockedAt = locked_at ? moment(locked_at) : null;
-    this.polls = (polls || []).map((p) => new Poll(p))
+    this.polls = (polls || []).map((p) => new Poll(p));
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];
-    const tempReactionIds = (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
-    const tempReactionType = (reactions ? reactions.map((r) => r?.type || r?.reaction) : reactionType) || [];
-    const tempAddressesReacted = (reactions ? reactions.map((r) => r?.address || r?.Address?.address) : addressesReacted) || [];
+    const tempReactionIds =
+      (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
+    const tempReactionType =
+      (reactions
+        ? reactions.map((r) => r?.type || r?.reaction)
+        : reactionType) || [];
+    const tempAddressesReacted =
+      (reactions
+        ? reactions.map((r) => r?.address || r?.Address?.address)
+        : addressesReacted) || [];
     if (
-      tempReactionIds.length > 0 && (
-        tempReactionIds.length === tempReactionType.length &&
-        tempReactionType.length === tempAddressesReacted.length
-      )
+      tempReactionIds.length > 0 &&
+      tempReactionIds.length === tempReactionType.length &&
+      tempReactionType.length === tempAddressesReacted.length
     ) {
       for (let i = 0; i < tempReactionIds.length; i++) {
         this.associatedReactions.push({

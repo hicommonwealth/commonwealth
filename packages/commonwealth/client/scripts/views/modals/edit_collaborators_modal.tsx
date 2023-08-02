@@ -5,7 +5,10 @@ import 'modals/edit_collaborators_modal.scss';
 import React, { useState } from 'react';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import app from 'state';
-import { useAddThreadCollaboratorsMutation, useDeleteThreadCollaboratorsMutation } from 'state/api/threads';
+import {
+  useAddThreadCollaboratorsMutation,
+  useDeleteThreadCollaboratorsMutation,
+} from 'state/api/threads';
 import { useDebounce } from 'usehooks-ts';
 import NewProfilesController from '../../controllers/server/newProfiles';
 import type Thread from '../../models/Thread';
@@ -31,15 +34,17 @@ export const EditCollaboratorsModal = ({
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const { mutateAsync: addThreadCollaborators } = useAddThreadCollaboratorsMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id,
-  })
+  const { mutateAsync: addThreadCollaborators } =
+    useAddThreadCollaboratorsMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
 
-  const { mutateAsync: deleteThreadCollaborators } = useDeleteThreadCollaboratorsMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id,
-  })
+  const { mutateAsync: deleteThreadCollaborators } =
+    useDeleteThreadCollaboratorsMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
 
   const [searchResults, setSearchResults] = useState<
     Array<RoleInstanceWithPermissionAttributes>
@@ -188,11 +193,13 @@ export const EditCollaboratorsModal = ({
                     newCollaborators: newCollaborators,
                     chainId: app.activeChainId(),
                     address: app.user.activeAccount.address,
-                  })
+                  });
                   notifySuccess('Collaborators added');
-                  onCollaboratorsUpdated && onCollaboratorsUpdated(updatedCollaborators);
+                  onCollaboratorsUpdated &&
+                    onCollaboratorsUpdated(updatedCollaborators);
                 } catch (err) {
-                  const error = err?.responseJSON?.error || 'Failed to add collaborators'
+                  const error =
+                    err?.responseJSON?.error || 'Failed to add collaborators';
                   notifyError(error);
                 }
               }
@@ -208,11 +215,14 @@ export const EditCollaboratorsModal = ({
                     updatedCollaborators: removedCollaborators,
                     chainId: app.activeChainId(),
                     address: app.user.activeAccount.address,
-                  })
+                  });
                   notifySuccess('Collaborators removed');
-                  onCollaboratorsUpdated && onCollaboratorsUpdated(updatedCollaborators);
+                  onCollaboratorsUpdated &&
+                    onCollaboratorsUpdated(updatedCollaborators);
                 } catch (err) {
-                  const errMsg = err?.responseJSON?.error || 'Failed to remove collaborators';
+                  const errMsg =
+                    err?.responseJSON?.error ||
+                    'Failed to remove collaborators';
                   notifyError(errMsg);
                 }
               }

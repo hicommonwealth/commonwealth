@@ -29,8 +29,8 @@ export const ChangeThreadTopicModal = ({
 
   const { mutateAsync: editThreadTopic } = useEditThreadTopicMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const handleSaveChanges = async () => {
     try {
@@ -40,13 +40,13 @@ export const ChangeThreadTopicModal = ({
         threadId: thread.id,
         topicName: activeTopic.name,
         newTopicId: activeTopic.id,
-        oldTopicId: thread?.topic?.id
-      })
+        oldTopicId: thread?.topic?.id,
+      });
 
       onChangeHandler && onChangeHandler(updatedTopic);
       onModalClose && onModalClose();
     } catch (err) {
-      const error = err?.responseJSON?.error || 'Failed to update thread topic'
+      const error = err?.responseJSON?.error || 'Failed to update thread topic';
       console.log(error);
       throw new Error(error);
     }

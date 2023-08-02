@@ -13,31 +13,37 @@ interface deleteThreadLinksProps {
 const deleteThreadLinks = async ({
   chainId,
   threadId,
-  links
+  links,
 }: deleteThreadLinksProps) => {
-  const response = await axios.delete(`${app.serverUrl()}/linking/deleteLinks`, {
-    data: {
-      thread_id: threadId,
-      links,
-      jwt: app.user.jwt,
-    },
-  })
+  const response = await axios.delete(
+    `${app.serverUrl()}/linking/deleteLinks`,
+    {
+      data: {
+        thread_id: threadId,
+        links,
+        jwt: app.user.jwt,
+      },
+    }
+  );
 
-  return new Thread(response.data.result)
+  return new Thread(response.data.result);
 };
 
 interface deleteThreadLinksMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useDeleteThreadLinksMutation = ({ chainId, threadId }: deleteThreadLinksMutationProps) => {
+const useDeleteThreadLinksMutation = ({
+  chainId,
+  threadId,
+}: deleteThreadLinksMutationProps) => {
   return useMutation({
     mutationFn: deleteThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread)
-      return updatedThread
-    }
+      updateThreadInAllCaches(chainId, threadId, updatedThread);
+      return updatedThread;
+    },
   });
 };
 

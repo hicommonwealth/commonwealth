@@ -17,7 +17,7 @@ const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
     {
       params: {
         chain: chainId,
-        thread_ids: ids
+        thread_ids: ids,
       },
     }
   );
@@ -31,7 +31,12 @@ const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
 const useGetThreadsByIdQuery = ({ chainId, ids }: GetThreadsByIdProps) => {
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [ApiEndpoints.FETCH_THREADS, chainId, 'single', ...ids.sort((a, b) => a - b)],
+    queryKey: [
+      ApiEndpoints.FETCH_THREADS,
+      chainId,
+      'single',
+      ...ids.sort((a, b) => a - b),
+    ],
     queryFn: () => getThreadsById({ chainId, ids }),
     staleTime: THREAD_STALE_TIME,
   });

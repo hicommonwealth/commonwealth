@@ -1,11 +1,12 @@
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
-import { useCreateThreadReactionMutation, useDeleteThreadReactionMutation } from 'state/api/threads';
-import Permissions from 'utils/Permissions';
 import {
-  getDisplayedReactorsForPopup
-} from 'views/components/ReactionButton/helpers';
+  useCreateThreadReactionMutation,
+  useDeleteThreadReactionMutation,
+} from 'state/api/threads';
+import Permissions from 'utils/Permissions';
+import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
@@ -26,24 +27,26 @@ export const ReactionButton = ({
   disabled,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const reactors = thread.associatedReactions.map((t) => t.address)
+  const reactors = thread.associatedReactions.map((t) => t.address);
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread.associatedReactions.filter(
     (r) => r.address === activeAddress
   );
   const hasReacted = thisUserReaction.length !== 0;
-  const reactedId = thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id
+  const reactedId = thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id;
 
-  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } = useCreateThreadReactionMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id
-  });
-  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } = useDeleteThreadReactionMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id
-  });
+  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
+    useCreateThreadReactionMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
+  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
+    useDeleteThreadReactionMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
 
-  const isLoading = isAddingReaction || isDeletingReaction
+  const isLoading = isAddingReaction || isDeletingReaction;
 
   // token balance check if needed
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -58,21 +61,23 @@ export const ReactionButton = ({
       return;
     }
     if (hasReacted) {
-      deleteThreadReaction({ chainId: app.activeChainId(), threadId: thread.id, reactionId: reactedId as number })
-        .catch((e) => {
-          console.log(e);
-        })
+      deleteThreadReaction({
+        chainId: app.activeChainId(),
+        threadId: thread.id,
+        reactionId: reactedId as number,
+      }).catch((e) => {
+        console.log(e);
+      });
     } else {
       createThreadReaction({
         chainId: app.activeChainId(),
         address: activeAddress,
         threadId: thread.id,
-        reactionType: 'like'
+        reactionType: 'like',
       }).catch((e) => {
         console.log(e);
-      })
+      });
     }
-
   };
 
   return (
@@ -91,8 +96,9 @@ export const ReactionButton = ({
       ) : (
         <button
           onClick={handleVoteClick}
-          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
-            }${hasReacted ? ' has-reacted' : ''}`}
+          className={`ThreadReactionButton ${
+            isLoading || isUserForbidden ? ' disabled' : ''
+          }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (
             <CWTooltip
@@ -111,8 +117,9 @@ export const ReactionButton = ({
                       {...(hasReacted && { weight: 'fill' })}
                     />
                     <div
-                      className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                        }`}
+                      className={`reactions-count ${
+                        hasReacted ? ' has-reacted' : ''
+                      }`}
                     >
                       {reactors.length}
                     </div>
@@ -124,8 +131,9 @@ export const ReactionButton = ({
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
               <div
-                className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                  }`}
+                className={`reactions-count ${
+                  hasReacted ? ' has-reacted' : ''
+                }`}
               >
                 {reactors.length}
               </div>

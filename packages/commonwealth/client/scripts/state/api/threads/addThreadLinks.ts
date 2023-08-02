@@ -13,30 +13,35 @@ interface AddThreadLinksProps {
 const addThreadLinks = async ({
   chainId,
   threadId,
-  links
+  links,
 }: AddThreadLinksProps) => {
-  const response = await axios.post(`${app.serverUrl()}/linking/addThreadLinks`, {
-    thread_id: threadId,
-    links,
-    jwt: app.user.jwt,
-  })
+  const response = await axios.post(
+    `${app.serverUrl()}/linking/addThreadLinks`,
+    {
+      thread_id: threadId,
+      links,
+      jwt: app.user.jwt,
+    }
+  );
 
-
-  return new Thread(response.data.result)
+  return new Thread(response.data.result);
 };
 
 interface UseAddThreadLinksMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useAddThreadLinksMutation = ({ chainId, threadId }: UseAddThreadLinksMutationProps) => {
+const useAddThreadLinksMutation = ({
+  chainId,
+  threadId,
+}: UseAddThreadLinksMutationProps) => {
   return useMutation({
     mutationFn: addThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread)
-      return updatedThread
-    }
+      updateThreadInAllCaches(chainId, threadId, updatedThread);
+      return updatedThread;
+    },
   });
 };
 

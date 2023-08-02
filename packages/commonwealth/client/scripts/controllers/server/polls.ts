@@ -102,7 +102,9 @@ class PollsController {
         const modeledPoll = modelFromServer(response.result);
         // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
         // This is an exception until polls get migrated to react query
-        updateThreadInAllCaches(app.activeChainId(), threadId, { hasPoll: true })
+        updateThreadInAllCaches(app.activeChainId(), threadId, {
+          hasPoll: true,
+        });
         this._store.add(modeledPoll);
       },
       error: (err) => {
@@ -130,7 +132,9 @@ class PollsController {
       success: (response) => {
         // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
         // This is an exception until polls get migrated to react query
-        updateThreadInAllCaches(app.activeChainId(), threadId, { hasPoll: false })
+        updateThreadInAllCaches(app.activeChainId(), threadId, {
+          hasPoll: false,
+        });
         this._store.remove(this._store.getById(pollId));
       },
       error: (err) => {

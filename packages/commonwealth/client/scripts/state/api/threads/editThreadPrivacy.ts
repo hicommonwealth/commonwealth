@@ -7,35 +7,38 @@ import { updateThreadInAllCaches } from './helpers/cache';
 interface EditThreadPrivacyProps {
   chainId: string;
   threadId: number;
-  readOnly: boolean
+  readOnly: boolean;
 }
 
 const editThreadPrivacy = async ({
   chainId,
   threadId,
-  readOnly
+  readOnly,
 }: EditThreadPrivacyProps) => {
   const response = await axios.post(`${app.serverUrl()}/updateThreadPrivacy`, {
     thread_id: threadId,
     read_only: readOnly,
     jwt: app.user.jwt,
-  })
+  });
 
-  return new Thread(response.data.result)
+  return new Thread(response.data.result);
 };
 
 interface UseEditThreadPrivacyMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useEditThreadPrivacyMutation = ({ chainId, threadId }: UseEditThreadPrivacyMutationProps) => {
+const useEditThreadPrivacyMutation = ({
+  chainId,
+  threadId,
+}: UseEditThreadPrivacyMutationProps) => {
   return useMutation({
     mutationFn: editThreadPrivacy,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread)
+      updateThreadInAllCaches(chainId, threadId, updatedThread);
       return updatedThread;
-    }
+    },
   });
 };
 

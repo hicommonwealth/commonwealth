@@ -15,7 +15,7 @@ const createReaction = async ({
   address,
   reactionType = 'like',
   chainId,
-  commentId
+  commentId,
 }: CreateReactionProps) => {
   const {
     session = null,
@@ -37,17 +37,20 @@ const createReaction = async ({
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,
-      comment_id: commentId
+      comment_id: commentId,
     }
   );
 };
 
-const useCreateCommentReactionMutation = ({ commentId, chainId }: Partial<CreateReactionProps>) => {
+const useCreateCommentReactionMutation = ({
+  commentId,
+  chainId,
+}: Partial<CreateReactionProps>) => {
   const queryClient = useQueryClient();
   const { data: reactions } = useFetchCommentReactionsQuery({
     chainId,
     commentId: commentId,
-  })
+  });
 
   return useMutation({
     mutationFn: createReaction,
@@ -55,14 +58,18 @@ const useCreateCommentReactionMutation = ({ commentId, chainId }: Partial<Create
       const reaction = response.data.result;
 
       // update fetch reaction query state
-      const key = [ApiEndpoints.getCommentReactions(reaction.comment_id), chainId]
+      const key = [
+        ApiEndpoints.getCommentReactions(reaction.comment_id),
+        chainId,
+      ];
       queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData([...key],
-        () => {
-          const updatedReactions = [...(reactions || []).filter(x => x.id !== reaction.id), reaction]
-          return updatedReactions
-        }
-      );
+      queryClient.setQueryData([...key], () => {
+        const updatedReactions = [
+          ...(reactions || []).filter((x) => x.id !== reaction.id),
+          reaction,
+        ];
+        return updatedReactions;
+      });
     },
   });
 };

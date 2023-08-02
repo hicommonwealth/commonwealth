@@ -5,25 +5,23 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import {
-  ThreadTimelineFilterTypes
-} from '../../../models/types';
+import { ThreadTimelineFilterTypes } from '../../../models/types';
 import { cacheTypes } from './helpers/cache';
 
 const THREADS_STALE_TIME = 180000; // 3 minutes
 
 const QueryTypes = {
   ACTIVE: cacheTypes.ACTIVE_THREADS,
-  BULK: cacheTypes.BULK_THREADS
-}
+  BULK: cacheTypes.BULK_THREADS,
+};
 
 const queryTypeToRQMap = {
   bulk: useInfiniteQuery,
   active: useQuery,
-}
+};
 
 interface CommonProps {
-  queryType: typeof QueryTypes[keyof typeof QueryTypes],
+  queryType: typeof QueryTypes[keyof typeof QueryTypes];
   chainId: string;
 }
 
@@ -36,7 +34,7 @@ interface FetchBulkThreadsProps extends CommonProps {
   topicId?: number;
   stage?: string;
   includePinnedThreads?: boolean;
-  orderBy?: 'newest' | 'oldest' | 'mostLikes' | 'mostComments'
+  orderBy?: 'newest' | 'oldest' | 'mostLikes' | 'mostComments';
 }
 
 interface FetchActiveThreadsProps extends CommonProps {
@@ -51,11 +49,15 @@ const featuredFilterQueryMap = {
   mostComments: 'numberOfComments:desc',
 };
 
-const useDateCursor = ({ dateRange }: { dateRange?: ThreadTimelineFilterTypes }) => {
+const useDateCursor = ({
+  dateRange,
+}: {
+  dateRange?: ThreadTimelineFilterTypes;
+}) => {
   const [dateCursor, setDateCursor] = useState<{
-    toDate: string,
-    fromDate: string | null
-  }>({ toDate: moment().toISOString(), fromDate: null })
+    toDate: string;
+    fromDate: string | null;
+  }>({ toDate: moment().toISOString(), fromDate: null });
 
   useEffect(() => {
     const today = moment();
@@ -101,27 +103,31 @@ const useDateCursor = ({ dateRange }: { dateRange?: ThreadTimelineFilterTypes })
 
         return moment().toISOString();
       })();
-      setDateCursor({ toDate, fromDate })
-    }
+      setDateCursor({ toDate, fromDate });
+    };
     updater();
-    const interval = setInterval(() => updater(), THREADS_STALE_TIME - 10)
+    const interval = setInterval(() => updater(), THREADS_STALE_TIME - 10);
 
-    return (() => {
-      clearInterval(interval)
-    })
-  }, [dateRange])
+    return () => {
+      clearInterval(interval);
+    };
+  }, [dateRange]);
 
-  return { dateCursor }
-}
+  return { dateCursor };
+};
 
-const isFetchActiveThreadsProps = (props): props is FetchActiveThreadsProps => props.queryType === QueryTypes.ACTIVE;
-const isFetchBulkThreadsProps = (props): props is FetchBulkThreadsProps => props.queryType === QueryTypes.BULK;
+const isFetchActiveThreadsProps = (props): props is FetchActiveThreadsProps =>
+  props.queryType === QueryTypes.ACTIVE;
+const isFetchBulkThreadsProps = (props): props is FetchBulkThreadsProps =>
+  props.queryType === QueryTypes.BULK;
 
-const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsProps) => {
-  const { chainId } = props
+const useFetchThreadsQuery = (
+  props: FetchBulkThreadsProps | FetchActiveThreadsProps
+) => {
+  const { chainId } = props;
 
   // better to use this in case someone updates this props, we wont reflect those changes
-  const [queryType] = useState(props.queryType)
+  const [queryType] = useState(props.queryType);
 
   const chosenQueryType = queryTypeToRQMap[queryType]({
     queryKey: (() => {
@@ -136,16 +142,16 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
           props.toDate,
           props.fromDate,
           props.limit,
-          props.orderBy
-        ]
+          props.orderBy,
+        ];
       }
       if (isFetchActiveThreadsProps(props)) {
         return [
           ApiEndpoints.FETCH_THREADS,
           chainId,
           queryType,
-          props.topicsPerThread
-        ]
+          props.topicsPerThread,
+        ];
       }
     })(),
     queryFn: (() => {
@@ -161,7 +167,9 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
                 chain: chainId,
                 ...(props.topicId && { topic_id: props.topicId }),
                 ...(props.stage && { stage: props.stage }),
-                ...(props.includePinnedThreads && { includePinnedThreads: props.includePinnedThreads || true }),
+                ...(props.includePinnedThreads && {
+                  includePinnedThreads: props.includePinnedThreads || true,
+                }),
                 ...(props.fromDate && { from_date: props.fromDate }),
                 to_date: props.toDate,
                 orderBy:
@@ -174,11 +182,15 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
           // transform the response
           const transformedData = {
             ...res.data.result,
-            threads: res.data.result.threads.map((c) => new Thread(c))
+            threads: res.data.result.threads.map((c) => new Thread(c)),
           };
 
-          return { data: transformedData, pageParam: transformedData.threads.length > 0 ? pageParam + 1 : undefined }
-        }
+          return {
+            data: transformedData,
+            pageParam:
+              transformedData.threads.length > 0 ? pageParam + 1 : undefined,
+          };
+        };
       }
       if (isFetchActiveThreadsProps(props)) {
         return async () => {
@@ -194,15 +206,15 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
           );
 
           // transform response
-          return response.data.result.map((c) => new Thread(c))
-        }
+          return response.data.result.map((c) => new Thread(c));
+        };
       }
     })(),
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
         return {
           getNextPageParam: (lastPage, pages) => lastPage.pageParam,
-        }
+        };
       }
     })(),
     staleTime: THREADS_STALE_TIME,
@@ -217,11 +229,11 @@ const useFetchThreadsQuery = (props: FetchBulkThreadsProps | FetchActiveThreadsP
 
     return {
       ...chosenQueryType,
-      data: reducedData.threads
-    }
+      data: reducedData.threads,
+    };
   }
 
-  if (isFetchActiveThreadsProps(props)) return chosenQueryType
+  if (isFetchActiveThreadsProps(props)) return chosenQueryType;
 };
 
 export default useFetchThreadsQuery;

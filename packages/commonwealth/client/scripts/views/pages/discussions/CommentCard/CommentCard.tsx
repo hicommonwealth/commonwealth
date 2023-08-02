@@ -121,10 +121,7 @@ export const CommentCard = ({
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton
-                comment={comment}
-                disabled={!canReact}
-              />
+              <CommentReactionButton comment={comment} disabled={!canReact} />
 
               <SharePopover commentId={comment.id} />
 

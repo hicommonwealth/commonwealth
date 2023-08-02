@@ -53,7 +53,8 @@ export const HeaderWithFilters = ({
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
-  const { totalThreadsInCommunityForVoting } = useEXCEPTION_CASE_threadCountersStore()
+  const { totalThreadsInCommunityForVoting } =
+    useEXCEPTION_CASE_threadCountersStore();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -101,12 +102,12 @@ export const HeaderWithFilters = ({
 
   const stages = !customStages
     ? [
-      ThreadStage.Discussion,
-      ThreadStage.ProposalInReview,
-      ThreadStage.Voting,
-      ThreadStage.Passed,
-      ThreadStage.Failed,
-    ]
+        ThreadStage.Discussion,
+        ThreadStage.ProposalInReview,
+        ThreadStage.Voting,
+        ThreadStage.Passed,
+        ThreadStage.Failed,
+      ]
     : parseCustomStages(customStages);
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
@@ -132,9 +133,9 @@ export const HeaderWithFilters = ({
 
     navigate(
       `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
-      Object.keys(urlParams)
-        .map((x) => `${x}=${urlParams[x]}`)
-        .join('&')
+        Object.keys(urlParams)
+          .map((x) => `${x}=${urlParams[x]}`)
+          .join('&')
     );
   };
 
@@ -296,10 +297,11 @@ export const HeaderWithFilters = ({
                     ...stages.map((s) => ({
                       id: s,
                       value: s,
-                      label: `${threadStageToLabel(s)} ${s === ThreadStage.Voting
-                        ? totalThreadsInCommunityForVoting
-                        : ''
-                        }`,
+                      label: `${threadStageToLabel(s)} ${
+                        s === ThreadStage.Voting
+                          ? totalThreadsInCommunityForVoting
+                          : ''
+                      }`,
                     })),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}

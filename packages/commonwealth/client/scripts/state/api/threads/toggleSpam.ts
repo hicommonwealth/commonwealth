@@ -14,29 +14,32 @@ const toggleThreadSpam = async ({
   threadId,
   isSpam,
 }: ToggleThreadSpamProps) => {
-  const method = isSpam ? 'put' : 'delete'
+  const method = isSpam ? 'put' : 'delete';
   return await axios[method](`${app.serverUrl()}/threads/${threadId}/spam`, {
     data: {
       jwt: app.user.jwt,
       chain_id: chainId,
     } as any,
-  })
+  });
 };
 
 interface ToggleThreadSpamMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useToggleThreadSpamMutation = ({ chainId, threadId }: ToggleThreadSpamMutationProps) => {
+const useToggleThreadSpamMutation = ({
+  chainId,
+  threadId,
+}: ToggleThreadSpamMutationProps) => {
   return useMutation({
     mutationFn: toggleThreadSpam,
     onSuccess: async (response) => {
       updateThreadInAllCaches(chainId, threadId, {
-        markedAsSpamAt: response.data.result.markedAsSpamAt
-      })
-      return response.data.result
-    }
+        markedAsSpamAt: response.data.result.markedAsSpamAt,
+      });
+      return response.data.result;
+    },
   });
 };
 

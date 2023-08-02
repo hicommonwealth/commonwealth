@@ -14,7 +14,7 @@ const addThreadCollaborators = async ({
   address,
   chainId,
   threadId,
-  newCollaborators
+  newCollaborators,
 }: AddThreadCollaboratorsProps) => {
   const response = await axios.post(`${app.serverUrl()}/addEditors`, {
     address: address,
@@ -25,21 +25,24 @@ const addThreadCollaborators = async ({
     jwt: app.user.jwt,
   });
 
-  return response.data.result.collaborators
+  return response.data.result.collaborators;
 };
 
 interface UseAddThreadCollaboratorsMutationProps {
-  chainId: string
+  chainId: string;
   threadId: number;
 }
 
-const useAddThreadCollaboratorsMutation = ({ chainId, threadId }: UseAddThreadCollaboratorsMutationProps) => {
+const useAddThreadCollaboratorsMutation = ({
+  chainId,
+  threadId,
+}: UseAddThreadCollaboratorsMutationProps) => {
   return useMutation({
     mutationFn: addThreadCollaborators,
     onSuccess: async (collaborators) => {
-      updateThreadInAllCaches(chainId, threadId, { collaborators }) // mimic the thread partial body
+      updateThreadInAllCaches(chainId, threadId, { collaborators }); // mimic the thread partial body
       return collaborators; // TODO: improve it and return thread as the proper response.
-    }
+    },
   });
 };
 

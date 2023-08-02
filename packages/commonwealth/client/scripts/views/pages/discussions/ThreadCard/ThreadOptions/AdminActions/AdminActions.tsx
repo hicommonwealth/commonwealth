@@ -1,14 +1,22 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
-import { useDeleteThreadMutation, useEditThreadPrivacyMutation, useToggleThreadPinMutation, useToggleThreadSpamMutation } from 'state/api/threads';
+import {
+  useDeleteThreadMutation,
+  useEditThreadPrivacyMutation,
+  useToggleThreadPinMutation,
+  useToggleThreadSpamMutation,
+} from 'state/api/threads';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { notifyError, notifySuccess } from '../../../../../../controllers/app/notifications';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../../../../../controllers/app/notifications';
 import type Thread from '../../../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../../../models/Thread';
 import Topic from '../../../../../../models/Topic';
@@ -66,23 +74,23 @@ export const AdminActions = ({
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
-    currentStage: thread.stage
-  })
+    currentStage: thread.stage,
+  });
 
   const { mutateAsync: toggleSpam } = useToggleThreadSpamMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const { mutateAsync: editThreadPrivacy } = useEditThreadPrivacyMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const { mutateAsync: togglePin } = useToggleThreadPinMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const handleDeleteThread = () => {
     openConfirmation({
@@ -96,13 +104,14 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 threadId: thread.id,
-                chainId: app.activeChainId()
+                chainId: app.activeChainId(),
               })
                 .then(() => {
-                  onDelete && onDelete()
-                }).catch(() => {
-                  notifyError('Could not delete thread');
+                  onDelete && onDelete();
                 })
+                .catch(() => {
+                  notifyError('Could not delete thread');
+                });
             } catch (err) {
               console.log(err);
             }
@@ -157,15 +166,19 @@ export const AdminActions = ({
           label: !thread.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
           buttonType: 'mini-red',
           onClick: async () => {
-            const isSpam = !thread.markedAsSpamAt
+            const isSpam = !thread.markedAsSpamAt;
             try {
               await toggleSpam({
                 chainId: app.activeChainId(),
                 threadId: thread.id,
-                isSpam: isSpam
-              }).then((t: Thread | any) => onSpamToggle && onSpamToggle(t)).catch(() => {
-                notifyError(`Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`);
-              });
+                isSpam: isSpam,
+              })
+                .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
+                .catch(() => {
+                  notifyError(
+                    `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+                  );
+                });
             } catch (err) {
               console.log(err);
             }
@@ -179,13 +192,15 @@ export const AdminActions = ({
     editThreadPrivacy({
       threadId: thread.id,
       readOnly: !thread.readOnly,
-      chainId: app.activeChainId()
-    }).then(() => {
-      notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
-      onLockToggle(!thread?.readOnly);
-    }).catch(() => {
-      notifyError('Could not update thread read_only')
-    });
+      chainId: app.activeChainId(),
+    })
+      .then(() => {
+        notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
+        onLockToggle(!thread?.readOnly);
+      })
+      .catch(() => {
+        notifyError('Could not update thread read_only');
+      });
   };
 
   const handleThreadPinToggle = () => {
@@ -248,101 +263,101 @@ export const AdminActions = ({
           className="AdminActions"
           menuItems={[
             ...(hasAdminPermissions ||
-              isThreadAuthor ||
-              (isThreadCollaborator && !thread.readOnly)
+            isThreadAuthor ||
+            (isThreadCollaborator && !thread.readOnly)
               ? [
-                {
-                  label: 'Edit',
-                  iconLeft: 'write' as const,
-                  iconLeftWeight: 'bold' as const,
-                  onClick: handleEditThread,
-                },
-                {
-                  label: 'Edit collaborators',
-                  iconLeft: 'write' as const,
-                  iconLeftWeight: 'bold' as const,
-                  onClick: () => {
-                    setIsEditCollaboratorsModalOpen(true);
+                  {
+                    label: 'Edit',
+                    iconLeft: 'write' as const,
+                    iconLeftWeight: 'bold' as const,
+                    onClick: handleEditThread,
                   },
-                },
-              ]
+                  {
+                    label: 'Edit collaborators',
+                    iconLeft: 'write' as const,
+                    iconLeftWeight: 'bold' as const,
+                    onClick: () => {
+                      setIsEditCollaboratorsModalOpen(true);
+                    },
+                  },
+                ]
               : []),
             ...(hasAdminPermissions
               ? [
-                {
-                  onClick: handleThreadPinToggle,
-                  label: thread.pinned ? 'Unpin' : 'Pin',
-                  iconLeft: 'pin' as const,
-                  iconLeftWeight: 'bold' as const,
-                },
-                {
-                  onClick: handleThreadLockToggle,
-                  label: thread.readOnly ? 'Unlock' : 'Lock',
-                  iconLeft: thread.readOnly
-                    ? ('keyLockOpened' as const)
-                    : ('keyLockClosed' as const),
-                  iconLeftWeight: 'bold' as const,
-                },
-                {
-                  onClick: () => setIsChangeTopicModalOpen(true),
-                  label: 'Change topic',
-                  iconLeft: 'filter' as const,
-                  iconLeftWeight: 'bold' as const,
-                },
-              ]
+                  {
+                    onClick: handleThreadPinToggle,
+                    label: thread.pinned ? 'Unpin' : 'Pin',
+                    iconLeft: 'pin' as const,
+                    iconLeftWeight: 'bold' as const,
+                  },
+                  {
+                    onClick: handleThreadLockToggle,
+                    label: thread.readOnly ? 'Unlock' : 'Lock',
+                    iconLeft: thread.readOnly
+                      ? ('keyLockOpened' as const)
+                      : ('keyLockClosed' as const),
+                    iconLeftWeight: 'bold' as const,
+                  },
+                  {
+                    onClick: () => setIsChangeTopicModalOpen(true),
+                    label: 'Change topic',
+                    iconLeft: 'filter' as const,
+                    iconLeftWeight: 'bold' as const,
+                  },
+                ]
               : []),
             ...(isThreadAuthor || hasAdminPermissions
               ? [
-                ...(app.chain?.meta.snapshot.length
-                  ? [
-                    {
-                      label: 'Snapshot proposal from thread',
-                      iconLeft: 'democraticProposal' as const,
-                      iconLeftWeight: 'bold' as const,
-                      onClick: handleSnapshotProposalClick,
-                    },
-                  ]
-                  : []),
-                ...(thread.readOnly
-                  ? [
-                    {
-                      label: 'Snapshot proposal from thread',
-                      iconLeft: 'democraticProposal' as const,
-                      iconLeftWeight: 'bold' as const,
-                      onClick: () => {
-                        const snapshotSpaces = app.chain.meta.snapshot;
-                        onSnapshotProposalFromThread();
-                        navigate(
-                          snapshotSpaces.length > 1
-                            ? '/multiple-snapshots'
-                            : `/snapshot/${snapshotSpaces}`
-                        );
-                      },
-                    },
-                  ]
-                  : []),
-                {
-                  onClick: () => setIsUpdateProposalStatusModalOpen(true),
-                  label: 'Update status',
-                  iconLeft: 'democraticProposal' as const,
-                  iconLeftWeight: 'bold' as const,
-                },
-                {
-                  onClick: handleFlagMarkAsSpam,
-                  label: !thread.markedAsSpamAt
-                    ? 'Flag as spam'
-                    : 'Unflag as spam',
-                  iconLeft: 'flag' as const,
-                  iconLeftWeight: 'bold' as const,
-                },
-                {
-                  onClick: handleDeleteThread,
-                  label: 'Delete',
-                  iconLeft: 'trash' as const,
-                  iconLeftWeight: 'bold' as const,
-                  className: 'danger',
-                },
-              ]
+                  ...(app.chain?.meta.snapshot.length
+                    ? [
+                        {
+                          label: 'Snapshot proposal from thread',
+                          iconLeft: 'democraticProposal' as const,
+                          iconLeftWeight: 'bold' as const,
+                          onClick: handleSnapshotProposalClick,
+                        },
+                      ]
+                    : []),
+                  ...(thread.readOnly
+                    ? [
+                        {
+                          label: 'Snapshot proposal from thread',
+                          iconLeft: 'democraticProposal' as const,
+                          iconLeftWeight: 'bold' as const,
+                          onClick: () => {
+                            const snapshotSpaces = app.chain.meta.snapshot;
+                            onSnapshotProposalFromThread();
+                            navigate(
+                              snapshotSpaces.length > 1
+                                ? '/multiple-snapshots'
+                                : `/snapshot/${snapshotSpaces}`
+                            );
+                          },
+                        },
+                      ]
+                    : []),
+                  {
+                    onClick: () => setIsUpdateProposalStatusModalOpen(true),
+                    label: 'Update status',
+                    iconLeft: 'democraticProposal' as const,
+                    iconLeftWeight: 'bold' as const,
+                  },
+                  {
+                    onClick: handleFlagMarkAsSpam,
+                    label: !thread.markedAsSpamAt
+                      ? 'Flag as spam'
+                      : 'Unflag as spam',
+                    iconLeft: 'flag' as const,
+                    iconLeftWeight: 'bold' as const,
+                  },
+                  {
+                    onClick: handleDeleteThread,
+                    label: 'Delete',
+                    iconLeft: 'trash' as const,
+                    iconLeftWeight: 'bold' as const,
+                    className: 'danger',
+                  },
+                ]
               : []),
           ]}
           renderTrigger={(onClick) => (
