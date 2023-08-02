@@ -23,7 +23,7 @@ const tbc = new TokenBalanceCache(0, 0, providers, mockNodesProvider);
 const testSDK = new ChainTesting('http://127.0.0.1:3000');
 
 describe('EVM Token BP unit tests', () => {
-  it('should return correct ERC20 balance', async () => {
+  it('should return the correct ERC20 balance', async () => {
     await tbc.start();
     let amt = 10;
     const accounts = await testSDK.getAccounts();
@@ -42,7 +42,7 @@ describe('EVM Token BP unit tests', () => {
     assert.equal(balance.balances[accounts[0]], amt.toString());
   });
 
-  it('should return correct ERC721 balance', async () => {
+  it('should return the correct ERC721 balance', async () => {
     const accounts = await testSDK.getAccounts();
     const nft = await testSDK.deployNFT();
     await nft.mint('137', 0);
