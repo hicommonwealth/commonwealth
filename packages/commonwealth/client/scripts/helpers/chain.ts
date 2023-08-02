@@ -42,7 +42,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     return;
   }
 
-  // Shut down old chain if applicable
+  // This is a bandaid fix used to stop chain deinit on navigation from createCommunities page. Should be removed.
   if (!app.skipDeinitChain) {
     await deinitChainOrCommunity();
     app.skipDeinitChain = false;

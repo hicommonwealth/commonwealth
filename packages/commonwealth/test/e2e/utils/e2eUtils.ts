@@ -3,10 +3,7 @@ import * as process from 'process';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
 
-// Logs in user for specific chain
-export async function login(page, chain = 'ethereum') {
-  await addUserIfNone(chain);
-
+export async function login(page) {
   await page.waitForSelector('.LoginSelector button');
   let button = await page.locator('.LoginSelector button');
   await button.click();
@@ -107,9 +104,6 @@ export async function removeUser() {
 
 // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
 export async function addUserIfNone(chain) {
-  if (chain != 'ethereum') {
-    await addUserIfNone('ethereum');
-  }
   const userExists = await testDb.query(
     `select 1 from "Addresses" where address = '${testAddress}' AND chain = '${chain}'`
   );

@@ -12,7 +12,6 @@ function getRandomInteger(min, max) {
 test.describe('Commonwealth Create Community', () => {
   test.beforeAll(async () => {
     await addAlchemyKey();
-    await addUserIfNone('ethereum');
   });
 
   test.describe.configure({ mode: 'parallel' });
