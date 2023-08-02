@@ -7,9 +7,10 @@ import app from 'state';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../component_kit/types';
 import useSidebarStore from 'state/ui/sidebar';
+import user from 'server/models/user';
 
 export const ExploreCommunitiesSidebar = () => {
-  const { setMenu } = useSidebarStore();
+  const { setMenu, userToggledVisibility } = useSidebarStore();
 
   const allCommunities = app.config.chains
     .getAll()
@@ -69,7 +70,8 @@ export const ExploreCommunitiesSidebar = () => {
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            setMenu({ name: 'default', isVisible: false });
+            const isSidebarOpen = Boolean(userToggledVisibility);
+            setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
       }}

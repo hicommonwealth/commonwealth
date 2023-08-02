@@ -4,6 +4,13 @@
   display: flex;
   flex-direction: column;
   width: min-content;
+  animation: slidein 0.2s ease-in-out;
+  position: absolute;
+  height: 100%;
+
+  &.onremove {
+    animation: slideout 0.2s ease-in-out;
+  }
 
   .sidebar-default-menu {
     border-right: 1px solid $neutral-200;
@@ -21,7 +28,7 @@
       overflow-y: auto;
       width: $sidebar-width;
 
-      @include smallInclusive {
+      @include small {
         width: calc(100vw - $quick-switcher-width);
       }
 
@@ -86,7 +93,7 @@
   .ExploreCommunitiesSidebar {
     // display: block;
     position: absolute;
-    z-index: 1000;
+    z-index: 70;
 
     animation: slidein 0.2s ease-in-out;
 

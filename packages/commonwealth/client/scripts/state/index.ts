@@ -10,9 +10,6 @@ import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
 import NewProfilesController from 'controllers/server/newProfiles';
 import PollsController from 'controllers/server/polls';
-import ReactionCountsController from 'controllers/server/reactionCounts';
-import ReactionsController from 'controllers/server/reactions';
-import ThreadReactionsController from 'controllers/server/reactions/ThreadReactionsController';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
@@ -27,6 +24,8 @@ import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import { ChainCategoryType } from 'common-common/src/types';
 import { CapacitorCookies } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
+import { platform } from '@todesktop/client-core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -59,9 +58,6 @@ export interface IApp {
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   comments: CommentsController;
-  reactions: ReactionsController;
-  threadReactions: ThreadReactionsController;
-  reactionCounts: ReactionCountsController;
   polls: PollsController;
 
   // Proposals
@@ -113,6 +109,8 @@ export interface IApp {
 
   serverUrl(): string;
 
+  platform(): string;
+
   loadingError: string;
 
   _customDomainId: string;
@@ -150,9 +148,6 @@ const app: IApp = {
   threads: ThreadsController.Instance,
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
-  reactions: new ReactionsController(),
-  threadReactions: new ThreadReactionsController(),
-  reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
 
   // Proposals
@@ -196,6 +191,15 @@ const app: IApp = {
   isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
+  },
+  platform: () => {
+    // Using Desktop API to determine if the platform is desktop
+    if (platform.todesktop.isDesktopApp()) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
+    }
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,

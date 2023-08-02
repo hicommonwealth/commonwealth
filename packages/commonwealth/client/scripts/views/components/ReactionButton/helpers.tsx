@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-
 import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
@@ -45,13 +43,6 @@ export const getDisplayedReactorsForPopup = ({
       {slicedReactors}
     </div>
   );
-};
-
-export const fetchReactionsByComment = async (commentId: number) => {
-  const { result = [] } = await $.get(
-    `${app.serverUrl()}/comments/${commentId}/reactions`
-  );
-  return result;
 };
 
 export const onReactionClick = (
