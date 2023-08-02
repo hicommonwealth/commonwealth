@@ -42,7 +42,6 @@ type InputStyleProps = {
 
 type InputInternalStyleProps = {
   hasLeftIcon?: boolean;
-  isTyping?: boolean;
 };
 
 type SearchBarProps = BaseSearchBarProps &
@@ -56,7 +55,6 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   options,
 }) => {
   const [value, setValue] = useState<string>('');
-  const [isTyping, setIsTyping] = useState<boolean>(false);
   const [communities, setCommunities] = useState([]);
   const [id, setId] = useState(null);
 
@@ -75,14 +73,8 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     getOptionLabel: (option) => option.name,
   });
 
-  const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleOnInput = (e: ChangeEvent<HTMLInputElement>) =>
     setValue(e.target.value);
-    if (e.currentTarget.value?.length === 0) {
-      setIsTyping(false);
-    } else {
-      setIsTyping(true);
-    }
-  };
 
   const handleOnKeyDown = (e: any) => {
     if (e.key === 'Backspace' && value.length === 0) {
@@ -110,11 +102,10 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   }, [options]);
 
   return (
-    <div className="container" onBlur={() => setIsTyping(false)}>
+    <div className="container">
       <div
         className={getClasses<InputStyleProps & InputInternalStyleProps>(
           {
-            isTyping,
             disabled,
           },
           ComponentType.Searchbar
