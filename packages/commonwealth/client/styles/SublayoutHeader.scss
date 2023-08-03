@@ -91,6 +91,10 @@ html.todesktop .SublayoutHeader {
         }
       }
 
+      & div {
+        display: flex;
+      }
+
       @include extraSmall {
         display: none;
       }
