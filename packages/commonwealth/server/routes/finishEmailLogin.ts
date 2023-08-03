@@ -3,7 +3,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import type { DB } from '../models';
-import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 export const redirectWithLoginSuccess = (
   res,

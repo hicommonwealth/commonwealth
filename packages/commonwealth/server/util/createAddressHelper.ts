@@ -11,7 +11,7 @@ import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
 import { Op } from 'sequelize';
-import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 type CreateAddressReq = {
   address: string;

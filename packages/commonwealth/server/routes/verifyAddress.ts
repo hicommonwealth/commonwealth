@@ -20,7 +20,7 @@ import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySignature from '../util/verifySignature';
 
-import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -26,7 +26,7 @@ import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
-import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const MAX_IMAGE_SIZE_KB = 500;
 

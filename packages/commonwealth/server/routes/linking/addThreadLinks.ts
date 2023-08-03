@@ -5,7 +5,7 @@ import { Link, LinkSource, ThreadInstance } from '../../models/thread';
 import type { DB } from '../../models';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
+import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
 
 type AddThreadLinkReq = {
   thread_id: number;

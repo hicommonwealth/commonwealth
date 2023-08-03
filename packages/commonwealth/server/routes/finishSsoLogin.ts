@@ -17,7 +17,7 @@ import { success } from '../types';
 import { createRole } from '../util/roles';
 
 import { redirectWithLoginError } from './finishEmailLogin';
-import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const log = factory.getLogger(formatFilename(__filename));
 
