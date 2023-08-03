@@ -30,16 +30,19 @@ function getRequestBrowserInfo(req: any): Record<string, any> {
   if (Object.keys(req.useragent).length === 0) {
     return {};
   }
+  // take the useragent data and pick certain entries to add to browserInfo
   const browserInfo = {};
   const userAgent = (req as any).useragent || {};
   for (const [k, v] of Object.entries(userAgent)) {
     if (k.startsWith('is') && v) {
+      // for keys like 'isChrome' and 'isFirefox', only include them if the value is true
       browserInfo[k] = v;
     } else if (typeof v === 'string') {
+      // or include any entry where the value is a string
       browserInfo[k] = v;
     }
   }
-  // manually check for Brave since middleware shows Brave as Chrome
+  // manually check for Brave since middleware thinks Brave is Chrome
   const brand = req.headers['sec-ch-ua'];
   if (typeof brand === 'string' && brand.includes('Brave')) {
     delete browserInfo['isChrome'];
