@@ -6,7 +6,7 @@ import {
   createTestEntities,
   testChains,
 } from '../../integration/api/external/dbEntityHooks.spec';
-import { login } from '../utils/e2eUtils';
+import { addAddressIfNone, login } from '../utils/e2eUtils';
 
 test.beforeEach(async () => {
   await createTestEntities();
@@ -21,7 +21,8 @@ test.describe('New Discussion Page Tests', () => {
     await page.goto(
       `http://localhost:${PORT}/${testChains[0].id}/new/discussion`
     );
-    await login(page, testChains[0].id);
+    await addAddressIfNone(testChains[0].id);
+    await login(page);
     await page.goto(
       `http://localhost:${PORT}/${testChains[0].id}/new/discussion`
     );

@@ -3,6 +3,7 @@ import * as process from 'process';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
 
+// Logs in user for specific chain
 export async function login(page) {
   await page.waitForSelector('.LoginSelector button');
   let button = await page.locator('.LoginSelector button');
@@ -103,12 +104,19 @@ export async function removeUser() {
 }
 
 // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
-export async function addUserIfNone(chain) {
+export async function addAddressIfNone(chain) {
   const userExists = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}' AND chain = '${chain}'`
+    `select 1 from "Addresses" where address = '${testAddress}'`
   );
 
-  if (userExists[0].length > 0) return;
+  let profileId = null;
+  if (userExists[0].length > 0) {
+    // address already exists
+    if (userExists[0].filter((u) => u['chain'] === chain).length > 0) return;
+
+    // Assign user to existing profile
+    profileId = userExists[0][0]['profile_id'];
+  }
 
   const userId = await testDb.query(`
   INSERT INTO "Users" (
@@ -133,23 +141,25 @@ export async function addUserIfNone(chain) {
         'never'
       ) RETURNING id`);
 
-  const profileId = await testDb.query(`
-  INSERT INTO "Profiles" (
-      user_id,
-      created_at,
-      updated_at,
-      profile_name,
-      is_default,
-      socials
-    ) VALUES (
-      ${userId[0][0]['id']},
-      '2023-07-14 13:03:56.203-07',
-      '2023-07-14 13:03:56.415-07',
-      'TestAddress',
-      false,
-      '{}'
-    ) RETURNING id
-  `);
+  if (!profileId) {
+    profileId = await testDb.query(`
+    INSERT INTO "Profiles" (
+        user_id,
+        created_at,
+        updated_at,
+        profile_name,
+        is_default,
+        socials
+      ) VALUES (
+        ${userId[0][0]['id']},
+        '2023-07-14 13:03:56.203-07',
+        '2023-07-14 13:03:56.415-07',
+        'TestAddress',
+        false,
+        '{}'
+      ) RETURNING id
+    `);
+  }
 
   testDb.query(`
     INSERT INTO "Addresses" (

@@ -6,7 +6,7 @@ import {
   createTestEntities,
   testChains,
 } from '../../integration/api/external/dbEntityHooks.spec';
-import { login, testDb } from '../utils/e2eUtils';
+import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
 
 test.beforeEach(async () => {
   await createTestEntities();
@@ -31,7 +31,8 @@ test.describe('Discussion Page Tests', () => {
     await page.goto(
       `http://localhost:${PORT}/${testChains[0].id}/discussion/${threadId}`
     );
-    await login(page, testChains[0].id);
+    await addAddressIfNone(testChains[0].id);
+    await login(page);
   });
 
   test('Check User can create/update/delete/like/unlike comment', async ({
