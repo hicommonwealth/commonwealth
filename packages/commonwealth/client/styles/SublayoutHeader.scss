@@ -65,6 +65,10 @@
         }
       }
 
+      & div {
+        display: flex;
+      }
+
       @include extraSmall {
         display: none;
       }
