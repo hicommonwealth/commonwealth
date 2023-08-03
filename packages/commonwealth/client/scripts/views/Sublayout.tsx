@@ -10,6 +10,7 @@ import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { SublayoutMobileFooter } from './SublayoutMobileFooter';
+import useSwipe from '../hooks/useSwipe';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -75,7 +76,12 @@ const Sublayout = ({
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = menuVisible;
+  const [showSidebar, setShowSidebar] = useState(menuVisible);
+
+  useEffect(() => {
+    setShowSidebar(menuVisible);
+  }, [menuVisible]);
+
   // On the mobile APP (not mobile browser)
   const isMobileDevice =
     app.platform() === 'ios' || app.platform() === 'android';
@@ -115,6 +121,18 @@ const Sublayout = ({
   //     };
   //   }
   // }, []);
+
+  useSwipe({
+    onLeftSwipe: () => {
+      console.log('Swiped left!');
+      setShowSidebar(false);
+    },
+    onRightSwipe: () => {
+      console.log('Swiped right!');
+      setShowSidebar(true);
+    },
+    threshold: 100,
+  });
 
   return (
     <div className="Sublayout">
