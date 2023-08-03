@@ -5,7 +5,6 @@ import type { SubscriptionAttributes } from './subscription';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationsReadAttributes = {
-  id: number;
   subscription_id: number;
   notification_id: number;
   is_read: boolean;
