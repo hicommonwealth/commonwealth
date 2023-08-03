@@ -246,6 +246,88 @@ describe.only('emitNotifications tests', () => {
       });
       expect(notifRead).to.not.be.null;
     });
+
+    it('should generate a notification and notification read for a new mention', async () => {
+      const subscription = await models.Subscription.create({
+        subscriber_id: userId,
+        category_id: NotificationCategories.NewMention,
+      });
+
+      const notification_data: NotificationDataAndCategory = {
+        categoryId: NotificationCategories.NewMention,
+        data: {
+          created_at: new Date(),
+          thread_id: thread.id,
+          root_type: ProposalType.Thread,
+          root_title: title,
+          chain_id: chain,
+          author_address: userAddress,
+          author_chain: chain,
+          mentioned_user_id: userId,
+          comment_text: '',
+        },
+      };
+      await emitNotifications(models, notification_data);
+
+      const notif = await models.Notification.findOne({
+        where: {
+          category_id: NotificationCategories.NewMention,
+        },
+      });
+      expect(notif).to.not.be.null;
+      expect(JSON.parse(notif.notification_data).thread_id).to.equal(thread.id);
+
+      const notifRead = await models.NotificationsRead.findOne({
+        where: {
+          subscription_id: subscription.id,
+          notification_id: notif.id,
+          user_id: userId,
+          is_read: false,
+        },
+      });
+      expect(notifRead).to.not.be.null;
+    });
+
+    it('should generate a notification and notification read for a new collaboration', async () => {
+      const subscription = await models.Subscription.create({
+        subscriber_id: userId,
+        category_id: NotificationCategories.NewCollaboration,
+      });
+
+      const notification_data: NotificationDataAndCategory = {
+        categoryId: NotificationCategories.NewCollaboration,
+        data: {
+          created_at: new Date(),
+          thread_id: thread.id,
+          root_type: ProposalType.Thread,
+          root_title: title,
+          chain_id: chain,
+          author_address: userAddress,
+          author_chain: chain,
+          comment_text: '',
+          collaborator_user_id: userId,
+        },
+      };
+      await emitNotifications(models, notification_data);
+
+      const notif = await models.Notification.findOne({
+        where: {
+          category_id: NotificationCategories.NewCollaboration,
+        },
+      });
+      expect(notif).to.not.be.null;
+      expect(JSON.parse(notif.notification_data).thread_id).to.equal(thread.id);
+
+      const notifRead = await models.NotificationsRead.findOne({
+        where: {
+          subscription_id: subscription.id,
+          notification_id: notif.id,
+          user_id: userId,
+          is_read: false,
+        },
+      });
+      expect(notifRead).to.not.be.null;
+    });
   });
 
   describe('Snapshot Notifications', () => {
