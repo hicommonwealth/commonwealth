@@ -83,7 +83,7 @@ export default async (
     where: {
       [Op.and]: whereAndOptions,
     },
-    order: [['id', 'DESC']],
+    order: [['notification_id', 'DESC']],
     limit: MAX_NOTIF,
     raw: true,
     nest: true,

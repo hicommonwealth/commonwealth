@@ -2,11 +2,11 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn('Notifications', 'id');
+    await queryInterface.removeColumn('NotificationsRead', 'id');
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('Notifications', 'id', {
+    await queryInterface.addColumn('NotificationsRead', 'id', {
       type: Sequelize.INTEGER,
     });
   },

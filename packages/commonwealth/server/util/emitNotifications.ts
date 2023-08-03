@@ -181,7 +181,6 @@ export default async function emitNotifications(
         notification.id,
         subscription.id,
         false,
-        subscription.subscriber_id,
         subscription.subscriber_id
       );
     } else {
@@ -198,6 +197,7 @@ export default async function emitNotifications(
     await models.sequelize.query(query, {
       replacements,
       type: QueryTypes.INSERT,
+      logging: console.error,
     });
   }
 
