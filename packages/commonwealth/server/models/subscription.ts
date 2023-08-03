@@ -18,6 +18,15 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
+import { NotificationCategories } from 'common-common/src/types';
+
+export enum SubscriptionValidationErrors {
+  NoChainId = 'Must provide a chain_id',
+  NoSnapshotId = 'Must provide a snapshot_id',
+  NoThreadOrComment = 'Must provide a thread_id or a comment_id',
+  NotBothThreadAndComment = 'Cannot provide both thread_id and comment_id',
+  UnsupportedCategory = 'Subscriptions for this category are not supported',
+}
 
 export type SubscriptionAttributes = {
   subscriber_id: number;
@@ -96,6 +105,37 @@ export default (
         { fields: ['category_id', 'is_active'] },
         { fields: ['thread_id'] },
       ],
+      validate: {
+        validSubscription() {
+          switch (this.category_id) {
+            case NotificationCategories.ChainEvent:
+            case NotificationCategories.NewThread:
+              if (!this.chain_id)
+                throw new Error(SubscriptionValidationErrors.NoChainId);
+              break;
+            case NotificationCategories.SnapshotProposal:
+              if (!this.snapshot_id)
+                throw new Error(SubscriptionValidationErrors.NoSnapshotId);
+              break;
+            case NotificationCategories.NewComment:
+            case NotificationCategories.NewReaction:
+              if (!this.chain_id)
+                throw new Error(SubscriptionValidationErrors.NoChainId);
+              if (!this.thread_id && !this.comment_id)
+                throw new Error(SubscriptionValidationErrors.NoThreadOrComment);
+              if (this.thread_id && this.comment_id)
+                throw new Error(
+                  SubscriptionValidationErrors.NotBothThreadAndComment
+                );
+              break;
+            case NotificationCategories.NewMention:
+            case NotificationCategories.NewCollaboration:
+              break;
+            default:
+              throw new Error(SubscriptionValidationErrors.UnsupportedCategory);
+          }
+        },
+      },
     }
   );
 

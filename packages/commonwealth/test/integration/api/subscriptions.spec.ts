@@ -11,12 +11,13 @@ import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import Errors from '../../../server/routes/subscription/errors';
 import * as modelUtils from '../../util/modelUtils';
+import { SubscriptionValidationErrors } from '../../../server/models/subscription';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken, loggedInAddr, loggedInAddrId, thread, comment;
+  let jwtToken, loggedInAddr, loggedInAddrId, thread, comment, userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
@@ -29,6 +30,7 @@ describe('Subscriptions Tests', () => {
       { id: result.user_id, email: result.email },
       JWT_SECRET
     );
+    userId = result.user_id;
 
     let res = await modelUtils.createThread({
       chainId: chain,
@@ -1008,6 +1010,209 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, subscription_id: -999999 });
       expect(res.body.error).to.not.be.null;
+    });
+  });
+
+  describe.only('Subscription model validation', () => {
+    const sequelizeErrMsg = 'Validation error: ';
+    const subscriptionCreateErrMsg = 'Subscription creation should fail';
+    it('should fail to create a subscription with an invalid category', async () => {
+      let category_id = 'invalid';
+      try {
+        await models.Subscription.create({
+          subscriber_id: userId,
+          category_id,
+        });
+        expect.fail(subscriptionCreateErrMsg);
+      } catch (e) {
+        expect(e.message).to.be.equal(
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+        );
+      }
+
+      category_id = NotificationCategories.ThreadEdit;
+      try {
+        await models.Subscription.create({
+          subscriber_id: userId,
+          category_id,
+        });
+        expect.fail(subscriptionCreateErrMsg);
+      } catch (e) {
+        expect(e.message).to.be.equal(
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+        );
+      }
+
+      category_id = NotificationCategories.CommentEdit;
+      try {
+        await models.Subscription.create({
+          subscriber_id: userId,
+          category_id,
+        });
+        expect.fail(subscriptionCreateErrMsg);
+      } catch (e) {
+        expect(e.message).to.be.equal(
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+        );
+      }
+    });
+
+    it(`should fail to create a ${NotificationCategories.NewThread} subscription without a chain_id`, async () => {
+      let category_id = NotificationCategories.NewThread;
+      try {
+        await models.Subscription.create({
+          subscriber_id: userId,
+          category_id,
+        });
+        expect.fail(subscriptionCreateErrMsg);
+      } catch (e) {
+        expect(e.message).to.be.equal(
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+        );
+      }
+    });
+
+    it(`should fail to create a ${NotificationCategories.ChainEvent} subscription without a chain_id`, async () => {
+      let category_id = NotificationCategories.ChainEvent;
+      try {
+        await models.Subscription.create({
+          subscriber_id: userId,
+          category_id,
+        });
+        expect.fail(subscriptionCreateErrMsg);
+      } catch (e) {
+        expect(e.message).to.be.equal(
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+        );
+      }
+    });
+
+    describe(`${NotificationCategories.NewComment} tests`, () => {
+      it(`should fail to create a subscription without a chain_id`, async () => {
+        let category_id = NotificationCategories.NewComment;
+        try {
+          await models.Subscription.create({
+            subscriber_id: userId,
+            category_id,
+          });
+          expect.fail(subscriptionCreateErrMsg);
+        } catch (e) {
+          expect(e.message).to.be.equal(
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+          );
+        }
+      });
+
+      it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
+        let category_id = NotificationCategories.NewComment;
+        try {
+          await models.Subscription.create({
+            subscriber_id: userId,
+            category_id,
+            chain_id: chain,
+            thread_id: 1,
+            comment_id: 1,
+          });
+          expect.fail(subscriptionCreateErrMsg);
+        } catch (e) {
+          expect(e.message).to.be.equal(
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`
+          );
+        }
+      });
+
+      it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
+        let category_id = NotificationCategories.NewComment;
+        try {
+          await models.Subscription.create({
+            subscriber_id: userId,
+            category_id,
+            chain_id: chain,
+          });
+          expect.fail(subscriptionCreateErrMsg);
+        } catch (e) {
+          expect(e.message).to.be.equal(
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`
+          );
+        }
+      });
+    });
+
+    describe(`${NotificationCategories.NewReaction} tests`, () => {
+      it(`should fail to create a subscription without a chain_id`, async () => {
+        let category_id = NotificationCategories.NewReaction;
+        try {
+          await models.Subscription.create({
+            subscriber_id: userId,
+            category_id,
+          });
+          expect.fail(subscriptionCreateErrMsg);
+        } catch (e) {
+          expect(e.message).to.be.equal(
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+          );
+        }
+      });
+
+      it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
+        let category_id = NotificationCategories.NewReaction;
+        try {
+          await models.Subscription.create({
+            subscriber_id: userId,
+            category_id,
+            chain_id: chain,
+            thread_id: 1,
+            comment_id: 1,
+          });
+          expect.fail(subscriptionCreateErrMsg);
+        } catch (e) {
+          expect(e.message).to.be.equal(
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`
+          );
+        }
+      });
+
+      it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
+        let category_id = NotificationCategories.NewReaction;
+        try {
+          await models.Subscription.create({
+            subscriber_id: userId,
+            category_id,
+            chain_id: chain,
+          });
+          expect.fail(subscriptionCreateErrMsg);
+        } catch (e) {
+          expect(e.message).to.be.equal(
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`
+          );
+        }
+      });
+    });
+
+    it(`should allow ${NotificationCategories.NewMention} to be created`, async () => {
+      let category_id = NotificationCategories.NewMention;
+      try {
+        const result = await models.Subscription.create({
+          subscriber_id: userId,
+          category_id,
+        });
+        expect(result).to.not.be.null;
+      } catch (e) {
+        expect.fail('Subscription creation should not fail');
+      }
+    });
+
+    it(`should allow ${NotificationCategories.NewCollaboration} to be created`, async () => {
+      let category_id = NotificationCategories.NewCollaboration;
+      try {
+        const result = await models.Subscription.create({
+          subscriber_id: userId,
+          category_id,
+        });
+        expect(result).to.not.be.null;
+      } catch (e) {
+        expect.fail('Subscription creation should not fail');
+      }
     });
   });
 });
