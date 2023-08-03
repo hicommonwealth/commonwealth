@@ -3,8 +3,8 @@ import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
@@ -92,9 +92,13 @@ const updateThreadStage = async (
       ],
     });
 
-    serverAnalyticsTrack({
-      event: MixpanelCommunityInteractionEvent.UPDATE_STAGE,
-    });
+    const serverAnalyticsController = new ServerAnalyticsController();
+    serverAnalyticsController.track(
+      {
+        event: MixpanelCommunityInteractionEvent.UPDATE_STAGE,
+      },
+      req
+    );
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {

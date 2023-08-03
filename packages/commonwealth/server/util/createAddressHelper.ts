@@ -10,8 +10,8 @@ import type { UserInstance } from '../models/user';
 import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import { Op } from 'sequelize';
+import { ServerAnalyticsController } from 'server/controllers/server_analytics_controller';
 
 type CreateAddressReq = {
   address: string;
@@ -190,11 +190,15 @@ export async function createAddressHelper(
         await createRole(models, newObj.id, req.chain, 'member');
       }
 
-      serverAnalyticsTrack({
-        event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-        chain: req.chain,
-        isCustomDomain: null,
-      });
+      const serverAnalyticsController = new ServerAnalyticsController();
+      serverAnalyticsController.track(
+        {
+          event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
+          chain: req.chain,
+          isCustomDomain: null,
+        },
+        req
+      );
 
       return {
         ...newObj.toJSON(),
