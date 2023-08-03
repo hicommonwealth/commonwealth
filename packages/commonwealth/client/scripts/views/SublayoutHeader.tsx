@@ -16,9 +16,13 @@ import { SearchBar } from './pages/search/search_bar';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
+  onMobileDevice: boolean;
 };
 
-export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
+export const SublayoutHeader = ({
+  onMobile,
+  onMobileDevice,
+}: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
   const {
     menuVisible,
@@ -87,22 +91,24 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
       </div>
       <SearchBar />
       <div className="header-right">
-        <div className="MobileMenuContainer">
-          <CWIconButton
-            iconName="dotsVertical"
-            iconButtonTheme="black"
-            onClick={() => {
-              setMenu({ name: menuName, isVisible: false });
-              setMobileMenuName(mobileMenuName ? null : 'MainMenu');
-            }}
-          />
-        </div>
+        {!onMobileDevice && (
+          <div className="MobileMenuContainer">
+            <CWIconButton
+              iconName="dotsVertical"
+              iconButtonTheme="black"
+              onClick={() => {
+                setMenu({ name: menuName, isVisible: false });
+                setMobileMenuName(mobileMenuName ? null : 'MainMenu');
+              }}
+            />
+          </div>
+        )}
         <div className="DesktopMenuContainer">
           <CreateContentPopover />
           <HelpMenuPopover />
           {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>
-        <LoginSelector />
+        <LoginSelector onMobileDevice={onMobileDevice} />
       </div>
     </div>
   );

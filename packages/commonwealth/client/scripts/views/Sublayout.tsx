@@ -76,8 +76,11 @@ const Sublayout = ({
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
   const showSidebar = menuVisible;
+  // On the mobile APP (not mobile browser)
+  const isMobileDevice =
+    app.platform() === 'ios' || app.platform() === 'android';
 
-  // Hide Footer on Scroll Code (not sure we want)
+  // ------ Hide Footer on Scroll Code (not sure we want) ------ //
 
   // const [showFooter, setShowFooter] = useState(true);
   // const lastScrollTop = useRef(0);
@@ -116,7 +119,10 @@ const Sublayout = ({
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
-        <SublayoutHeader onMobile={isWindowSmallInclusive} />
+        <SublayoutHeader
+          onMobile={isWindowSmallInclusive}
+          onMobileDevice={isMobileDevice}
+        />
         <div className="sidebar-and-body-container">
           {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
           <div
@@ -136,7 +142,7 @@ const Sublayout = ({
             )}
           </div>
         </div>
-        {<SublayoutMobileFooter />}
+        {isMobileDevice && <SublayoutMobileFooter />}
       </div>
     </div>
   );

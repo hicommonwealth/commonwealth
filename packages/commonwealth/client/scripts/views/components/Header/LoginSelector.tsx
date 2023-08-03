@@ -34,7 +34,11 @@ const CHAINNETWORK_SHORT = {
   [ChainNetwork.Terra]: 'Terra',
 };
 
-export const LoginSelector = () => {
+export const LoginSelector = ({
+  onMobileDevice,
+}: {
+  onMobileDevice: boolean;
+}) => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -117,7 +121,7 @@ export const LoginSelector = () => {
               />
             </div>
           )}
-        {profileLoadComplete && (
+        {profileLoadComplete && !onMobileDevice && (
           <ClickAwayListener
             onClickAway={() => {
               leftMenuProps.setAnchorEl(null);
@@ -135,24 +139,26 @@ export const LoginSelector = () => {
             </div>
           </ClickAwayListener>
         )}
-        <ClickAwayListener
-          onClickAway={() => {
-            rightMenuProps.setAnchorEl(null);
-          }}
-        >
-          <div className="button-container">
-            <div
-              className="right-button"
-              onClick={rightMenuProps.handleInteraction}
-            >
-              <CWIconButton iconName="person" iconButtonTheme="black" />
+        {!onMobileDevice && (
+          <ClickAwayListener
+            onClickAway={() => {
+              rightMenuProps.setAnchorEl(null);
+            }}
+          >
+            <div className="button-container">
+              <div
+                className="right-button"
+                onClick={rightMenuProps.handleInteraction}
+              >
+                <CWIconButton iconName="person" iconButtonTheme="black" />
+              </div>
+              <Popover
+                content={<LoginSelectorMenuRight onLogout={onLogout} />}
+                {...rightMenuProps}
+              />
             </div>
-            <Popover
-              content={<LoginSelectorMenuRight onLogout={onLogout} />}
-              {...rightMenuProps}
-            />
-          </div>
-        </ClickAwayListener>
+          </ClickAwayListener>
+        )}
       </div>
       {JoinCommunityModals}
     </>

@@ -25,7 +25,7 @@ export const SublayoutMobileFooter = () => {
         iconButtonTheme="black"
         onClick={() => {
           setMobileMenuName(null);
-          navigate('/dashboard/for-you');
+          navigate('/dashboard/for-you', {}, null);
         }}
       />
       <CWIconButton
@@ -34,7 +34,7 @@ export const SublayoutMobileFooter = () => {
         iconButtonTheme="black"
         onClick={() => {
           setMobileMenuName(null);
-          navigate('/search');
+          navigate('/search', {}, null);
         }}
       />
       {isLoggedIn && (
@@ -43,7 +43,7 @@ export const SublayoutMobileFooter = () => {
           iconSize="large"
           onClick={() => {
             setMobileMenuName(null);
-            navigate('/notifications');
+            navigate('/notifications', {}, null);
           }}
         />
       )}
