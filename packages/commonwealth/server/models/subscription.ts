@@ -18,7 +18,6 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
-import { checkSubscriptionValues } from '../util/subscriptionMapping';
 
 export type SubscriptionAttributes = {
   subscriber_id: number;
@@ -126,33 +125,6 @@ export default (
       targetKey: 'id',
     });
   };
-
-  // override the create method for Subscriptions in order to validate input values.
-  const originalCreate = Subscription.create;
-  Subscription.create = async function (
-    this: Omit<typeof Subscription, 'associate'>,
-    values: Parameters<typeof originalCreate>[0],
-    options: Parameters<typeof originalCreate>[1]
-  ): Promise<ReturnType<typeof originalCreate>> {
-    checkSubscriptionValues(values);
-    return originalCreate.call(Subscription, values, options);
-  };
-
-  const originalFindOrCreate = Subscription.findOrCreate;
-  // the type coercion is necessary because the type definition for findOrCreate contains a generic
-  // in the return type i.e. Promise<M, boolean> so SubscriptionInstance is not assignable to M.
-  // ReturnType<typeof originalFindOrCreate> is not valid either.
-  Subscription.findOrCreate = async function (
-    this: Omit<typeof Subscription, 'associate'>,
-    options: Parameters<typeof originalFindOrCreate>[0]
-  ): Promise<[SubscriptionInstance, boolean]> {
-    const values = {
-      ...options.where,
-      ...options.defaults,
-    };
-    checkSubscriptionValues(values);
-    return originalFindOrCreate.call(Subscription, options);
-  } as unknown as typeof originalFindOrCreate;
 
   return Subscription;
 };
