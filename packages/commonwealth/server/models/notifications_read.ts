@@ -26,7 +26,6 @@ export default (
   const NotificationsRead = <NotificationsReadModelStatic>sequelize.define(
     'NotificationsRead',
     {
-      id: { type: dataTypes.INTEGER },
       subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
       notification_id: { type: dataTypes.INTEGER, primaryKey: true },
       is_read: {
