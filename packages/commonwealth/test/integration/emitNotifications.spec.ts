@@ -14,7 +14,7 @@ import { SupportedNetwork } from 'chain-events/src';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('emitNotifications tests', () => {
+describe('emitNotifications tests', () => {
   const chain = 'ethereum';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine

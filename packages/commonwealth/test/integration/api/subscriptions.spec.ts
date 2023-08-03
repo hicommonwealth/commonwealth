@@ -1013,7 +1013,7 @@ describe('Subscriptions Tests', () => {
     });
   });
 
-  describe.only('Subscription model validation', () => {
+  describe('Subscription model validation', () => {
     const sequelizeErrMsg = 'Validation error: ';
     const subscriptionCreateErrMsg = 'Subscription creation should fail';
     it('should fail to create a subscription with an invalid category', async () => {
