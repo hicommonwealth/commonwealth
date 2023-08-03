@@ -164,7 +164,7 @@ export default async function emitNotifications(
     console.trace(e);
   }
 
-  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id, id) VALUES `;
+  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id) VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {
@@ -176,7 +176,7 @@ export default async function emitNotifications(
           (notification_data as any).chain_id,
         subscriber: `${subscription.subscriber_id}`,
       });
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `;
+      query += `(?, ?, ?, ?), `;
       replacements.push(
         notification.id,
         subscription.id,
