@@ -46,7 +46,7 @@ export const createThreadReactionHandler = async (
 
   await verifyReaction(canvasAction, canvasSession, canvasHash, {
     thread_id: threadId,
-    address: address,
+    address: address.address,
     chain: chain.id,
     value: reaction,
   });

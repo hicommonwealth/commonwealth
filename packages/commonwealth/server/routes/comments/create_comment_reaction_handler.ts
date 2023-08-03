@@ -46,7 +46,7 @@ export const createCommentReactionHandler = async (
 
   await verifyReaction(canvasAction, canvasSession, canvasHash, {
     comment_id: commentId,
-    address: address,
+    address: address.address,
     chain: chain.id,
     value: reaction,
   });
