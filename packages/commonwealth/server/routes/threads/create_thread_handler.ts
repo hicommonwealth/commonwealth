@@ -43,7 +43,7 @@ export const createThreadHandler = async (
   await verifyThread(canvasAction, canvasSession, canvasHash, {
     title,
     body,
-    address: address,
+    address: address.address,
     community: chain.id,
     topic: topicId ? parseInt(topicId, 10) : null,
   });
