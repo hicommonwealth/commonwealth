@@ -34,6 +34,7 @@ type BaseSearchBarProps = {
   manualStatusMessage?: string;
   manualValidationStatus?: ValidationStatus;
   options?: ChainInfo[];
+  setSelectedChain: (chain: ChainInfo) => void;
 };
 
 type InputStyleProps = {
@@ -54,6 +55,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   disabled,
   placeholder,
   options,
+  setSelectedChain,
 }) => {
   const [value, setValue] = useState<string>('');
   const [communities, setCommunities] = useState([]);
@@ -71,6 +73,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     onChange: (event: any, chain) => {
       setValue('');
       setId(chain.id);
+      setSelectedChain(chain.id);
     },
     getOptionLabel: (option) => option.name,
   });
@@ -85,6 +88,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleOnKeyDown = (e: any) => {
     if (e.key === 'Backspace' && value.length === 0) {
       setId(null);
+      setSelectedChain(null);
     }
   };
 
@@ -132,7 +136,10 @@ export const CWSearchBar: FC<SearchBarProps> = ({
             label={getChain(id).name}
             type="input"
             community={getChain(id)}
-            onClick={() => setId(null)}
+            onClick={() => {
+              setId(null);
+              setSelectedChain(null);
+            }}
           />
         )}
         <div

@@ -187,6 +187,9 @@ export const ComponentShowcase = () => {
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
+  const allChains = app.config.chains.getAll();
+  const [chainId, setChainId] = useState(allChains[1]);
+  const [selectedChain, setSelectedChain] = useState(null);
 
   return (
     <div className="ComponentShowcase">
@@ -523,7 +526,14 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Input Tag</CWText>
-          <CWTag label="Display name" type="input" />
+          {chainId && (
+            <CWTag
+              label={allChains[1].name}
+              type="input"
+              community={allChains[1]}
+              onClick={() => setChainId(null)}
+            />
+          )}
         </div>
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
@@ -1237,9 +1247,14 @@ export const ComponentShowcase = () => {
       </div>
       <div className="searchbar-gallery">
         <CWText type="h3">SearchBar</CWText>
+        <CWText type="caption">
+          {`Selected community id: 
+          ${selectedChain ? selectedChain : 'none selected'}`}
+        </CWText>
         <CWSearchBar
-          options={app.config.chains.getAll()}
+          options={allChains}
           placeholder="Search Common"
+          setSelectedChain={setSelectedChain}
         />
       </div>
       <div className="Quill">
