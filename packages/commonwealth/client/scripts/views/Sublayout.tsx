@@ -77,38 +77,41 @@ const Sublayout = ({
   const banner = app.chain ? chain.communityBanner : null;
   const showSidebar = menuVisible;
 
-  const [showComponent, setShowComponent] = useState(true);
-  const lastScrollTop = useRef(0);
-  const scrollThreshold = useRef(0.15); // 15% of the div height (will be calculated later)
+  // Hide Footer on Scroll Code (not sure we want)
+
+  // const [showFooter, setShowFooter] = useState(true);
+  // const lastScrollTop = useRef(0);
+  // const scrollThreshold = useRef(0.15); // 15% of the div height (will be calculated later)
   const divRef = useRef(null);
 
-  const onScroll = () => {
-    const st = divRef.current.scrollTop;
-    const divHeight = divRef.current.offsetHeight;
-    scrollThreshold.current = divHeight * 0.15;
+  // // Mobile Footer Scroll Behavior
+  // const onScroll = () => {
+  //   const st = divRef.current.scrollTop;
+  //   const divHeight = divRef.current.offsetHeight;
+  //   scrollThreshold.current = divHeight * 0.15;
 
-    if (Math.abs(st - lastScrollTop.current) >= scrollThreshold.current) {
-      // Only change component visibility if scroll distance >= threshold
-      if (st > lastScrollTop.current) {
-        // downscroll
-        setShowComponent(false);
-      } else {
-        // upscroll
-        setShowComponent(true);
-      }
-      lastScrollTop.current = st <= 0 ? 0 : st;
-    }
-  };
+  //   if (Math.abs(st - lastScrollTop.current) >= scrollThreshold.current) {
+  //     // Only change component visibility if scroll distance >= threshold
+  //     if (st > lastScrollTop.current) {
+  //       // downscroll
+  //       setShowFooter(false);
+  //     } else {
+  //       // upscroll
+  //       setShowFooter(true);
+  //     }
+  //     lastScrollTop.current = st <= 0 ? 0 : st;
+  //   }
+  // };
 
-  useEffect(() => {
-    const div = divRef.current;
-    if (div) {
-      div.addEventListener('scroll', onScroll);
-      return () => {
-        div.removeEventListener('scroll', onScroll);
-      };
-    }
-  }, []); // removed lastScrollTop from dependencies
+  // useEffect(() => {
+  //   const div = divRef.current;
+  //   if (div) {
+  //     div.addEventListener('scroll', onScroll);
+  //     return () => {
+  //       div.removeEventListener('scroll', onScroll);
+  //     };
+  //   }
+  // }, []);
 
   return (
     <div className="Sublayout">
@@ -133,7 +136,7 @@ const Sublayout = ({
             )}
           </div>
         </div>
-        {showComponent && <SublayoutMobileFooter />}
+        {<SublayoutMobileFooter />}
       </div>
     </div>
   );
