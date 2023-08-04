@@ -80,97 +80,102 @@ const useDateCursor = ({
 
 const isFetchActiveThreadsProps = (props): props is FetchActiveThreadsProps =>
   props.queryType === QueryTypes.ACTIVE;
+
 const isFetchBulkThreadsProps = (props): props is FetchBulkThreadsProps =>
   props.queryType === QueryTypes.BULK;
+
+const getFetchThreadsQueryKey = (props) => {
+  if (isFetchBulkThreadsProps(props)) {
+    return [
+      ApiEndpoints.FETCH_THREADS,
+      props.chainId,
+      props.queryType,
+      props.topicId,
+      props.stage,
+      props.includePinnedThreads,
+      props.toDate,
+      props.fromDate,
+      props.limit,
+      props.orderBy,
+    ];
+  }
+  if (isFetchActiveThreadsProps(props)) {
+    return [
+      ApiEndpoints.FETCH_THREADS,
+      props.chainId,
+      props.queryType,
+      props.topicsPerThread,
+    ];
+  }
+}
+
+const fetchBulkThreads = (props) => {
+  return async ({ pageParam = 1 }) => {
+    const res = await axios.get(
+      `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
+      {
+        params: {
+          bulk: true,
+          page: pageParam,
+          limit: props.limit,
+          chain: props.chainId,
+          ...(props.topicId && { topic_id: props.topicId }),
+          ...(props.stage && { stage: props.stage }),
+          ...(props.includePinnedThreads && {
+            includePinnedThreads: props.includePinnedThreads || true,
+          }),
+          ...(props.fromDate && { from_date: props.fromDate }),
+          to_date: props.toDate,
+          orderBy:
+            featuredFilterQueryMap[props.orderBy] ||
+            featuredFilterQueryMap.newest,
+        },
+      }
+    );
+
+    // transform the response
+    const transformedData = {
+      ...res.data.result,
+      threads: res.data.result.threads.map((c) => new Thread(c)),
+    };
+
+    return {
+      data: transformedData,
+      pageParam:
+        transformedData.threads.length > 0 ? pageParam + 1 : undefined,
+    };
+  };
+}
+
+const fetchActiveThreads = (props) => {
+  return async () => {
+    const response = await axios.get(
+      `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
+      {
+        params: {
+          active: true,
+          chain: props.chainId,
+          threads_per_topic: props.topicsPerThread || 3,
+        },
+      }
+    );
+
+    // transform response
+    return response.data.result.map((c) => new Thread(c));
+  };
+}
 
 const useFetchThreadsQuery = (
   props: FetchBulkThreadsProps | FetchActiveThreadsProps
 ) => {
-  const { chainId } = props;
-
   // better to use this in case someone updates this props, we wont reflect those changes
   const [queryType] = useState(props.queryType);
 
   const chosenQueryType = queryTypeToRQMap[queryType]({
-    queryKey: (() => {
-      if (isFetchBulkThreadsProps(props)) {
-        return [
-          ApiEndpoints.FETCH_THREADS,
-          chainId,
-          queryType,
-          props.topicId,
-          props.stage,
-          props.includePinnedThreads,
-          props.toDate,
-          props.fromDate,
-          props.limit,
-          props.orderBy,
-        ];
-      }
-      if (isFetchActiveThreadsProps(props)) {
-        return [
-          ApiEndpoints.FETCH_THREADS,
-          chainId,
-          queryType,
-          props.topicsPerThread,
-        ];
-      }
-    })(),
+    queryKey: getFetchThreadsQueryKey(props),
     queryFn: (() => {
-      if (isFetchBulkThreadsProps(props)) {
-        return async ({ pageParam = 1 }) => {
-          const res = await axios.get(
-            `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
-            {
-              params: {
-                bulk: true,
-                page: pageParam,
-                limit: props.limit,
-                chain: chainId,
-                ...(props.topicId && { topic_id: props.topicId }),
-                ...(props.stage && { stage: props.stage }),
-                ...(props.includePinnedThreads && {
-                  includePinnedThreads: props.includePinnedThreads || true,
-                }),
-                ...(props.fromDate && { from_date: props.fromDate }),
-                to_date: props.toDate,
-                orderBy:
-                  featuredFilterQueryMap[props.orderBy] ||
-                  featuredFilterQueryMap.newest,
-              },
-            }
-          );
-
-          // transform the response
-          const transformedData = {
-            ...res.data.result,
-            threads: res.data.result.threads.map((c) => new Thread(c)),
-          };
-
-          return {
-            data: transformedData,
-            pageParam:
-              transformedData.threads.length > 0 ? pageParam + 1 : undefined,
-          };
-        };
-      }
-      if (isFetchActiveThreadsProps(props)) {
-        return async () => {
-          const response = await axios.get(
-            `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
-            {
-              params: {
-                active: true,
-                chain: chainId,
-                threads_per_topic: props.topicsPerThread || 3,
-              },
-            }
-          );
-
-          // transform response
-          return response.data.result.map((c) => new Thread(c));
-        };
-      }
+      if (isFetchBulkThreadsProps(props)) return fetchBulkThreads(props)
+      if (isFetchActiveThreadsProps(props)) return fetchActiveThreads(props)
     })(),
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
