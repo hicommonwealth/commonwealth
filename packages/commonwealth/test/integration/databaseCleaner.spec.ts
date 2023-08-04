@@ -22,7 +22,7 @@ describe.only('DatabaseCleaner Tests', () => {
   describe('Tests when the cleaner runs', () => {
     let clock: sinon.SinonFakeTimers;
 
-    before(function () {
+    beforeEach(function () {
       const now = new Date();
       now.setUTCHours(8);
       now.setUTCMinutes(0);
@@ -32,7 +32,7 @@ describe.only('DatabaseCleaner Tests', () => {
       clock = sinon.useFakeTimers(now);
     });
 
-    after(function () {
+    afterEach(function () {
       clock.restore();
     });
 
@@ -152,13 +152,13 @@ describe.only('DatabaseCleaner Tests', () => {
       const eightyEightDaysAgo = new Date(now);
       eightyEightDaysAgo.setUTCDate(now.getUTCDate() - 88);
 
-      const ninetyTwoDaysAgo = new Date(now);
-      ninetyTwoDaysAgo.setUTCDate(now.getUTCDate() - 92);
+      const hundredDaysAgo = new Date(now);
+      hundredDaysAgo.setUTCDate(now.getUTCDate() - 100);
 
       // create old notification
       await models.Notification.create({
         notification_data: 'testing',
-        created_at: ninetyTwoDaysAgo,
+        created_at: hundredDaysAgo,
         chain_id: 'ethereum',
         category_id: 'new-thread-creation',
       });
