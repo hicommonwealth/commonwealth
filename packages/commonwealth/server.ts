@@ -54,6 +54,21 @@ import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import { RedisCache } from 'common-common/src/redisCache';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServerReady = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.Commonwealth,
+  checkFn: async () => {
+    if (!isServerReady) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -310,6 +325,8 @@ async function main() {
     redisCache,
     rollbar
   );
+
+  isServerReady = true;
 }
 
 main().catch((e) => console.log(e));
