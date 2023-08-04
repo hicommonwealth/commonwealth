@@ -12,13 +12,11 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TopicSelector } from '../components/topic_selector';
 
 type ChangeThreadTopicModalProps = {
-  onChangeHandler: (topic: Topic) => void;
   onModalClose: () => void;
   thread: Thread;
 };
 
 export const ChangeThreadTopicModal = ({
-  onChangeHandler,
   onModalClose,
   thread,
 }: ChangeThreadTopicModalProps) => {
@@ -43,7 +41,6 @@ export const ChangeThreadTopicModal = ({
         oldTopicId: thread?.topic?.id,
       });
 
-      onChangeHandler && onChangeHandler(updatedTopic);
       onModalClose && onModalClose();
     } catch (err) {
       const error = err?.responseJSON?.error || 'Failed to update thread topic';

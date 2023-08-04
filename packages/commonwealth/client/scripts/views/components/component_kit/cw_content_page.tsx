@@ -62,7 +62,6 @@ type ContentPageProps = {
   onDelete?: () => any;
   onSpamToggle?: (thread: Thread) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onTopicChange?: (newTopic: Topic) => any;
   onProposalStageChange?: (newStage: ThreadStage) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
@@ -96,7 +95,6 @@ export const CWContentPage = ({
   onLockToggle,
   onPinToggle,
   onDelete,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -171,7 +169,6 @@ export const CWContentPage = ({
             onSpamToggle={onSpamToggle}
             onDelete={onDelete}
             onPinToggle={onPinToggle}
-            onTopicChange={onTopicChange}
             onCollaboratorsEdit={onCollaboratorsEdit}
             onEditCancel={onEditCancel}
             onEditConfirm={onEditConfirm}

@@ -31,7 +31,6 @@ export type AdminActionsProps = {
   onSpamToggle?: (thread: Thread) => any;
   onLockToggle?: (isLocked: boolean) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onTopicChange?: (newTopic: Topic) => any;
   onProposalStageChange?: (newStage: ThreadStage) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
@@ -47,7 +46,6 @@ export const AdminActions = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -369,7 +367,6 @@ export const AdminActions = ({
       <Modal
         content={
           <ChangeThreadTopicModal
-            onChangeHandler={onTopicChange}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
           />
