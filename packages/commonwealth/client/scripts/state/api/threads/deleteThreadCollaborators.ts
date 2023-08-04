@@ -28,7 +28,7 @@ const deleteThreadCollaborators = async ({
   return response.data.result.collaborators;
 };
 
-interface DeleteThreadCollaboratorsProps {
+interface DeleteThreadCollaboratorsMutationProps {
   chainId: string;
   threadId: number;
 }
@@ -36,7 +36,7 @@ interface DeleteThreadCollaboratorsProps {
 const useDeleteThreadCollaboratorsMutation = ({
   chainId,
   threadId,
-}: DeleteThreadCollaboratorsProps) => {
+}: DeleteThreadCollaboratorsMutationProps) => {
   return useMutation({
     mutationFn: deleteThreadCollaborators,
     onSuccess: async (collaborators) => {
