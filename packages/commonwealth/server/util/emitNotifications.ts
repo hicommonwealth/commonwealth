@@ -197,7 +197,6 @@ export default async function emitNotifications(
     await models.sequelize.query(query, {
       replacements,
       type: QueryTypes.INSERT,
-      logging: console.error,
     });
   }
 
