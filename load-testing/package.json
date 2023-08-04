@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "https://www.artillery.io/docs/reference/engines/http",
   "scripts": {
-    "test:load": "npx dotenv-run-script create:report-dir && npx dotenv-run-script artillery:local",
-    "test:aws": "npx dotenv-run-script create:report-dir && npx dotenv-run-script artillery:aws && npx dotenv-run-script artillery:html",
-    "test:load-dd": "npx dotenv-run-script post:datadog & (npx dotenv-run-script create:report-dir && npx dotenv-run-script artillery:local && npx dotenv-run-script artillery:html)",
-    "create:report-dir": "mkdir -p ${REPORT_DIR}",
-    "post:datadog": "node post-datadog-metrics.js",
-    "artillery:local": "artillery run --dotenv .env -o ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json --environment ${ENV} app/scenarios/${TEST_NAME}.yml",
-    "artillery:html": "artillery report --output ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.html ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json",
-    "artillery:aws": "artillery run:fargate -e ${ENV} --dotenv .env --region ${TEST_LOCATION} app/scenarios/${TEST_NAME}.yml -o ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json"
+    "test-load": "npx dotenv-run-script create-report-dir && npx dotenv-run-script artillery-local",
+    "test-aws": "npx dotenv-run-script create-report-dir && npx dotenv-run-script artillery-aws && npx dotenv-run-script artillery-html",
+    "test-load-dd": "npx dotenv-run-script post-datadog & (npx dotenv-run-script create-report-dir && npx dotenv-run-script artillery-local && npx dotenv-run-script artillery-html)",
+    "create-report-dir": "mkdir -p ${REPORT_DIR}",
+    "post-datadog": "node post-datadog-metrics.js",
+    "artillery-local": "artillery run --dotenv .env -o ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json --environment ${ENV} app/scenarios/${TEST_NAME}.yml",
+    "artillery-html": "artillery report --output ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.html ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json",
+    "artillery-aws": "artillery run:fargate -e ${ENV} --dotenv .env --region ${TEST_LOCATION} app/scenarios/${TEST_NAME}.yml -o ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json"
   },
   "author": "",
   "license": "ISC",

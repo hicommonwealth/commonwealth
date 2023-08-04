@@ -39,7 +39,7 @@ Next, install the necessary packages with `yarn install`.
 To initiate the tests locally, run:
 
 ```bash
-yarn test:load
+yarn test-load
 ```
 
 These tests are executed on your local system but will connect to remote URLs, providing a good performance measure from your actual location.
@@ -47,7 +47,7 @@ These tests are executed on your local system but will connect to remote URLs, p
 For running tests and reporting metrics on the new [Artillery Dashobaord](https://us5.datadoghq.com/dashboard/z7m-wbf-b2z/artillery) on Datadog, use:
 
 ```bash
-yarn test:load-dd
+yarn test-load-dd
 ```
 This will start a local statsd listener along with artillery and report published statsd results to Datadog. Note that it's still a work in progress.
 
@@ -62,7 +62,7 @@ Testing on AWS allows you to measure performance from different regions, like Eu
 To run the tests on AWS, use:
 
 ```bash
-yarn test:aws
+yarn test-aws
 ```
 
 Please note that the `TEST_LOCATION` must be a valid AWS region. The supported regions include us-east-1, us-west-1, eu-west-1, eu-central-1, ap-south-1, and ap-northeast-1.
