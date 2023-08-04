@@ -36,9 +36,9 @@ const deleteComment = async ({
     },
   });
 
-  // Important: we render comments in a tree, if this deleted comment was
-  // the root comment of a tree, then we want to preserve the comment tree,
-  // but in place of this deleted comment we will show the "[deleted]" msg.
+  // Important: we render comments in a tree, if the deleted comment is a
+  // leaf node, remove it, but if it has replies, then preserve it with
+  // [deleted] msg.
   return {
     softDeleted: {
       id: commentId,
