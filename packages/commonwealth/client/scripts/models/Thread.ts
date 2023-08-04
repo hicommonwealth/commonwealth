@@ -10,6 +10,102 @@ import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 import type MinimumProfile from 'models/MinimumProfile';
 
+
+function getDecodedString(str: string) {
+  try {
+    return decodeURIComponent(str);
+  } catch (err) {
+    console.error(`Could not decode str: "${str}"`);
+    return str;
+  }
+}
+
+function processVersionHistory(versionHistory: any[]) {
+  let versionHistoryProcessed;
+  if (versionHistory) {
+    versionHistoryProcessed = versionHistory.map((v) => {
+      if (!v) return;
+      let history;
+      try {
+        history = JSON.parse(v);
+        history.author =
+          typeof history.author === 'string'
+            ? JSON.parse(history.author)
+            : typeof history.author === 'object'
+              ? history.author
+              : null;
+        history.timestamp = moment(history.timestamp);
+      } catch (e) {
+        console.log(e);
+      }
+      return history;
+    });
+  }
+  return versionHistoryProcessed;
+}
+
+function processChainEntities(chain: string, chainEntityMeta: any) {
+  const chainEntitiesProcessed: ChainEntity[] = [];
+  if (chainEntityMeta) {
+    for (const meta of chainEntityMeta) {
+      const full_entity = Array.from(app.chainEntities.store.values())
+        .flat()
+        .filter((e) => e.id === meta.ce_id)[0];
+      if (full_entity) {
+        if (meta.title) full_entity.title = meta.title;
+        chainEntitiesProcessed.push(full_entity);
+      }
+    }
+  }
+
+  return chainEntitiesProcessed
+    ? chainEntitiesProcessed.map((ce) => {
+      return {
+        id: +ce.id,
+        chain,
+        type: ce.type,
+        typeId: (ce as any).type_id || ce.typeId,
+        completed: ce.completed,
+        author: this.author,
+      };
+    })
+    : [];
+}
+
+function processAssociatedReactions(
+  reactions: any[],
+  reactionIds: any[],
+  reactionType: any[],
+  addressesReacted: any[]
+) {
+  const temp = []
+  const tempReactionIds =
+    (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
+  const tempReactionType =
+    (reactions
+      ? reactions.map((r) => r?.type || r?.reaction)
+      : reactionType) || [];
+  const tempAddressesReacted =
+    (reactions
+      ? reactions.map((r) => r?.address || r?.Address?.address)
+      : addressesReacted) || [];
+  if (
+    tempReactionIds.length > 0 &&
+    tempReactionIds.length === tempReactionType.length &&
+    tempReactionType.length === tempAddressesReacted.length
+  ) {
+    for (let i = 0; i < tempReactionIds.length; i++) {
+      temp.push({
+        id: tempReactionIds[i],
+        type: tempReactionType[i],
+        address: tempAddressesReacted[i],
+      });
+    }
+  }
+  return temp
+}
+
+
 export interface VersionHistory {
   author?: MinimumProfile;
   timestamp: momentT.Moment;
@@ -168,22 +264,8 @@ export class Thread implements IUniqueId {
     discord_meta?: any;
   }) {
     this.author = Address.address;
-    this.title = (() => {
-      try {
-        return decodeURIComponent(title);
-      } catch (err) {
-        console.error(`Could not decode title: "${title}"`);
-        return title;
-      }
-    })();
-    this.body = (() => {
-      try {
-        return decodeURIComponent(body);
-      } catch (err) {
-        console.error(`Could not decode body: "${body}"`);
-        return body;
-      }
-    })();
+    this.title = getDecodedString(title);
+    this.body = getDecodedString(body);
     this.plaintext = plaintext;
     this.id = id;
     this.identifier = `${id}`;
@@ -195,100 +277,29 @@ export class Thread implements IUniqueId {
     this.authorChain = Address.chain;
     this.pinned = pinned;
     this.url = url;
-    this.versionHistory = (() => {
-      let versionHistoryProcessed;
-      if (version_history) {
-        versionHistoryProcessed = version_history.map((v) => {
-          if (!v) return;
-          let history;
-          try {
-            history = JSON.parse(v);
-            history.author =
-              typeof history.author === 'string'
-                ? JSON.parse(history.author)
-                : typeof history.author === 'object'
-                ? history.author
-                : null;
-            history.timestamp = moment(history.timestamp);
-          } catch (e) {
-            console.log(e);
-          }
-          return history;
-        });
-      }
-      return versionHistoryProcessed;
-    })();
     this.chain = chain;
     this.readOnly = read_only;
     this.collaborators = collaborators || [];
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
-    this.chainEntities = (() => {
-      const chainEntitiesProcessed: ChainEntity[] = [];
-      if (chain_entity_meta) {
-        for (const meta of chain_entity_meta) {
-          const full_entity = Array.from(app.chainEntities.store.values())
-            .flat()
-            .filter((e) => e.id === meta.ce_id)[0];
-          if (full_entity) {
-            if (meta.title) full_entity.title = meta.title;
-            chainEntitiesProcessed.push(full_entity);
-          }
-        }
-      }
-
-      return chainEntitiesProcessed
-        ? chainEntitiesProcessed.map((ce) => {
-            return {
-              id: +ce.id,
-              chain,
-              type: ce.type,
-              typeId: (ce as any).type_id || ce.typeId,
-              completed: ce.completed,
-              author: this.author,
-            };
-          })
-        : [];
-    })();
     this.hasPoll = has_poll;
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-      ? this.versionHistory[0].timestamp
-      : null;
+        ? this.versionHistory[0].timestamp
+        : null;
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.polls = (polls || []).map((p) => new Poll(p));
     this.numberOfComments = numberOfComments || 0;
-    this.associatedReactions = [];
-    const tempReactionIds =
-      (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
-    const tempReactionType =
-      (reactions
-        ? reactions.map((r) => r?.type || r?.reaction)
-        : reactionType) || [];
-    const tempAddressesReacted =
-      (reactions
-        ? reactions.map((r) => r?.address || r?.Address?.address)
-        : addressesReacted) || [];
-    if (
-      tempReactionIds.length > 0 &&
-      tempReactionIds.length === tempReactionType.length &&
-      tempReactionType.length === tempAddressesReacted.length
-    ) {
-      for (let i = 0; i < tempReactionIds.length; i++) {
-        this.associatedReactions.push({
-          id: tempReactionIds[i],
-          type: tempReactionType[i],
-          address: tempAddressesReacted[i],
-        });
-      }
-    }
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
+    this.versionHistory = processVersionHistory(version_history);
+    this.chainEntities = processChainEntities(chain, chain_entity_meta);
+    this.associatedReactions = processAssociatedReactions(reactions, reactionIds, reactionType, addressesReacted);
   }
 }
 
