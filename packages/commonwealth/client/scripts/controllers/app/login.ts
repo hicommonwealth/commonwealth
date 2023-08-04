@@ -6,6 +6,7 @@ import { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import axios from 'axios';
+import $ from 'jquery';
 
 import moment from 'moment';
 import app from 'state';
