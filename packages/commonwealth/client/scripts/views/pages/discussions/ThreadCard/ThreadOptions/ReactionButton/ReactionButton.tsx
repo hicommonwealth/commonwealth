@@ -42,13 +42,13 @@ export const ReactionButton = ({
   showSkeleton
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const reactors = thread.associatedReactions.map((t) => t.address);
+  const reactors = thread?.associatedReactions?.map((t) => t.address);
   const activeAddress = app.user.activeAccount?.address;
-  const thisUserReaction = thread.associatedReactions.filter(
+  const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress
   );
-  const hasReacted = thisUserReaction.length !== 0;
-  const reactedId = thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id;
+  const hasReacted = thisUserReaction?.length !== 0;
+  const reactedId = thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
 
   const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
     useCreateThreadReactionMutation({
