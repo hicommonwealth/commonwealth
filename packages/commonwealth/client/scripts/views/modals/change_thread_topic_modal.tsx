@@ -32,7 +32,7 @@ export const ChangeThreadTopicModal = ({
 
   const handleSaveChanges = async () => {
     try {
-      const { updatedTopic }: { updatedTopic: Topic } = await editThreadTopic({
+      await editThreadTopic({
         chainId: app.activeChainId(),
         address: app.user.activeAccount.address,
         threadId: thread.id,
