@@ -1,4 +1,4 @@
-import { ThreadTimelineFilterTypes } from "client/scripts/models/types";
+import { ThreadTimelineFilterTypes } from "models/types";
 import moment from 'moment';
 
 export const getToAndFromDatesRangesForThreadsTimelines = (timeline: ThreadTimelineFilterTypes) => {
