@@ -8,7 +8,6 @@ import { useFetchThreadsQuery } from 'state/api/threads';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   ThreadFeaturedFilterTypes,
@@ -96,8 +95,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         components={{
           EmptyPlaceholder: () =>
             isInitialLoading ? (
-              <div className="thread-loader">
-                <CWSpinner size="xl" />
+              <div className='threads-wrapper'>
+                {Array(3).fill({}).map((x, i) =>
+                  <ThreadCard
+                    key={i}
+                    showSkeleton
+                    thread={{} as any}
+                  />
+                )}
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">

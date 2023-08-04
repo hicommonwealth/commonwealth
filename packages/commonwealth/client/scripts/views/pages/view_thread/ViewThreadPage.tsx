@@ -26,7 +26,6 @@ import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import Poll from '../../../models/Poll';
@@ -125,7 +124,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
 
-  useBrowserWindow({
+  const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -244,7 +243,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (!app.chain?.meta || isLoading) {
-    return <PageLoading />;
+    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
   }
 
   if ((!isLoading && !thread) || fetchThreadError) {
@@ -527,79 +526,79 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div className="cards-column">
-                        {showLinkedProposalOptions && (
-                          <LinkedProposalsCard
-                            thread={thread}
-                            showAddProposalButton={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                        {showLinkedThreadOptions && (
-                          <LinkedThreadsCard
-                            thread={thread}
-                            allowLinking={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Links',
+                  item: (
+                    <div className="cards-column">
+                      {showLinkedProposalOptions && (
+                        <LinkedProposalsCard
+                          thread={thread}
+                          showAddProposalButton={isAuthor || isAdminOrMod}
+                        />
+                      )}
+                      {showLinkedThreadOptions && (
+                        <LinkedThreadsCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                        />
+                      )}
+                    </div>
+                  ),
+                },
+              ]
               : []),
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
-                  {
-                    label: 'Snapshot',
-                    item: (
-                      <div className="cards-column">
-                        <SnapshotCreationCard
-                          thread={thread}
-                          allowSnapshotCreation={isAuthor || isAdminOrMod}
-                          onChangeHandler={handleNewSnapshotChange}
-                        />
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Snapshot',
+                  item: (
+                    <div className="cards-column">
+                      <SnapshotCreationCard
+                        thread={thread}
+                        allowSnapshotCreation={isAuthor || isAdminOrMod}
+                        onChangeHandler={handleNewSnapshotChange}
+                      />
+                    </div>
+                  ),
+                },
+              ]
               : []),
             ...(polls?.length > 0 ||
-            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                  {
-                    label: 'Polls',
-                    item: (
-                      <div className="cards-column">
-                        {[
-                          ...new Map(
-                            polls?.map((poll) => [poll.id, poll])
-                          ).values(),
-                        ].map((poll: Poll) => {
-                          return (
-                            <ThreadPollCard
-                              poll={poll}
-                              key={poll.id}
-                              onVote={() => setInitializedPolls(false)}
-                              showDeleteButton={isAuthor || isAdmin}
-                              onDelete={() => {
-                                setInitializedPolls(false);
-                              }}
-                            />
-                          );
-                        })}
-                        {isAuthor &&
-                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                            <ThreadPollEditorCard
-                              thread={thread}
-                              threadAlreadyHasPolling={!polls?.length}
-                              onPollCreate={() => setInitializedPolls(false)}
-                            />
-                          )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Polls',
+                  item: (
+                    <div className="cards-column">
+                      {[
+                        ...new Map(
+                          polls?.map((poll) => [poll.id, poll])
+                        ).values(),
+                      ].map((poll: Poll) => {
+                        return (
+                          <ThreadPollCard
+                            poll={poll}
+                            key={poll.id}
+                            onVote={() => setInitializedPolls(false)}
+                            showDeleteButton={isAuthor || isAdmin}
+                            onDelete={() => {
+                              setInitializedPolls(false);
+                            }}
+                          />
+                        );
+                      })}
+                      {isAuthor &&
+                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                          <ThreadPollEditorCard
+                            thread={thread}
+                            threadAlreadyHasPolling={!polls?.length}
+                            onPollCreate={() => setInitializedPolls(false)}
+                          />
+                        )}
+                    </div>
+                  ),
+                },
+              ]
               : []),
           ] as SidebarComponents
         }
