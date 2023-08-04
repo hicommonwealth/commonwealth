@@ -89,7 +89,7 @@ const useDeleteCommentMutation = ({
         queryClient.cancelQueries({ queryKey: key });
         queryClient.setQueryData(key, () => {
           const updatedComments = [...(comments || [])];
-          updatedComments[foundCommentIndex] = { ...softDeletedComment };
+          updatedComments[foundCommentIndex] = softDeletedComment;
           return [...updatedComments];
         });
       }

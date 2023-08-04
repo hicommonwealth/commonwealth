@@ -7,6 +7,7 @@ import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { ThreadTimelineFilterTypes } from '../../../models/types';
 import { cacheTypes } from './helpers/cache';
+import { getToAndFromDatesRangesForThreadsTimelines } from './helpers/dates';
 
 const THREADS_STALE_TIME = 180000; // 3 minutes
 
@@ -60,51 +61,12 @@ const useDateCursor = ({
   }>({ toDate: moment().toISOString(), fromDate: null });
 
   useEffect(() => {
-    const today = moment();
-
     const updater = () => {
-      const fromDate = (() => {
-        if (dateRange) {
-          if (
-            [
-              ThreadTimelineFilterTypes.ThisMonth,
-              ThreadTimelineFilterTypes.ThisWeek,
-            ].includes(dateRange)
-          ) {
-            return today
-              .startOf(dateRange.toLowerCase().replace('this', '') as any)
-              .toISOString();
-          }
-
-          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
-            return new Date(0).toISOString();
-          }
-        }
-
-        return null;
-      })();
-      const toDate = (() => {
-        if (dateRange) {
-          if (
-            [
-              ThreadTimelineFilterTypes.ThisMonth,
-              ThreadTimelineFilterTypes.ThisWeek,
-            ].includes(dateRange)
-          ) {
-            return today
-              .endOf(dateRange.toLowerCase().replace('this', '') as any)
-              .toISOString();
-          }
-
-          if (dateRange.toLowerCase() === ThreadTimelineFilterTypes.AllTime) {
-            return moment().toISOString();
-          }
-        }
-
-        return moment().toISOString();
-      })();
+      const { toDate, fromDate } = getToAndFromDatesRangesForThreadsTimelines(dateRange)
       setDateCursor({ toDate, fromDate });
     };
+
+    // set date cursor and schedule it to run after some intervals
     updater();
     const interval = setInterval(() => updater(), THREADS_STALE_TIME - 10);
 
