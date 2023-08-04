@@ -3,8 +3,8 @@ import axios from 'axios';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import app from 'state';
-import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { updateThreadInAllCaches } from './helpers/cache';
+import { updateThreadCountsByStageChange } from './helpers/counts';
 
 interface EditThreadStageProps {
   chainId: string;
@@ -42,15 +42,8 @@ const useEditThreadStageMutation = ({
     mutationFn: editThreadStage,
     onSuccess: async (updatedThread) => {
       // Update community level thread counters variables
-      let incBy = 0;
-      if (currentStage === ThreadStage.Voting) incBy--;
-      if (updatedThread.stage === ThreadStage.Voting) incBy++;
-      EXCEPTION_CASE_threadCountersStore.setState(
-        ({ totalThreadsInCommunityForVoting }) => ({
-          totalThreadsInCommunityForVoting:
-            totalThreadsInCommunityForVoting + incBy,
-        })
-      );
+      updateThreadCountsByStageChange(currentStage, updatedThread.stage)
+
       updateThreadInAllCaches(chainId, threadId, updatedThread);
 
       return updatedThread;
