@@ -1,49 +1,108 @@
-# Load Testing with Artillery
-https://github.com/artilleryio/artillery
-https://www.artillery.io/docs/reference/engines/http
+# A Guide to Load Testing
 
+## Understanding the Need for Load Testing
 
-### Pre-req load-test
-create .env based on env.local.sh
-```bash
-yarn install
+[Load testing](https://github.com/hicommonwealth/commonwealth/wiki/benchmark) is an essential aspect of software testing. It is designed to understand how a system behaves under a specific load, primarily used for identifying bottlenecks and performance issues, while also aiding in determining system scalability.
+
+For the purpose of load testing, we use a tool named [Artillery](https://github.com/artilleryio/artillery). It is a potent, up-to-date tool for testing HTTP, WebSocket, and socket.io backends. It's capable of executing load tests at scale on AWS Fargate, an engine for serverless computing meant for containers that's compatible with both Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS). 
+
+This guide will help you set up and perform load tests with Artillery, both on your local machine and AWS.
+
+## Artillery Documentation and Repository Links
+
+- [Artillery GitHub Repository](https://github.com/artilleryio/artillery)  
+- [Artillery HTTP Engines](https://www.artillery.io/docs/reference/engines/http)   
+- [Artillery Metrics Publishing](https://www.artillery.io/docs/reference/extensions/publish-metrics#datadog)   
+- [Artillery on AWS Fargate](https://www.artillery.io/docs/load-testing-at-scale/aws-fargate) 
+
+## Getting Started with Load Testing
+
+First, based on `env.local.sh`, create a `.env` file. It should include:
+
+```makefile
+JWT=eyJWT
+USER_ADDRESS=0xAABCDEF
+POST_THREAD_ID=11875
+ENV=local
+REPORT_DIR=output
+TEST_LOCATION=us-east-1
+TEST_NAME=commonwealth-api-threads
+DD_API_KEY=lldjfs
+DD_APP_KEY=lsdfsjsldk
+DD_SITE=us5.datadoghq.com
 ```
 
-### run local
+Next, install the necessary packages with `yarn install`.
+
+## Performing Tests Locally
+
+To initiate the tests locally, run:
+
 ```bash
-yarn test:local
+yarn test:load
 ```
 
-### run aws
-`TEST_LOCATION` should be valid aws region
-Supported Regions: us-east-1, us-west-1, eu-west-1, eu-central-1, ap-south-1, ap-northeast-1
+These tests are executed on your local system but will connect to remote URLs, providing a good performance measure from your actual location.
+
+For running tests and reporting metrics on the new [Artillery Dashobaord](https://us5.datadoghq.com/dashboard/z7m-wbf-b2z/artillery) on Datadog, use:
+
+```bash
+yarn test:load-dd
+```
+This will start a local statsd listener along with artillery and report published statsd results to Datadog. Note that it's still a work in progress.
+
+## Performing Tests on AWS
+
+Testing on AWS allows you to measure performance from different regions, like Europe or Asia, regardless of your physical location.
+
+## AWS Setup - NoSetup - Just logged in account required
+- Once you have logged in AWS account on your local terminal it should work given your account have enough permissions.
+- No other setup required for running on AWS.
+
+To run the tests on AWS, use:
 
 ```bash
 yarn test:aws
 ```
+
+Please note that the `TEST_LOCATION` must be a valid AWS region. The supported regions include us-east-1, us-west-1, eu-west-1, eu-central-1, ap-south-1, and ap-northeast-1.
 
 Unfortunately `ap-south-1` didnt work for me
 ```
     stoppedReason: 'CannotPullContainerError: pull image manifest has been retried 1 time(s): failed to resolve ref 301676560329.dkr.ecr.ap-south-1.amazonaws.com/artillery-pro/aws-ecs-node:v2-1f676ad7a2ecc923e813cdc7ac1bf4a2328daec0: 301676560329.dkr.ecr.ap-south-1.amazonaws.com/artillery-pro/aws-ecs-node:v2-1f676ad7a2ecc923e813cdc7ac1bf4a2328daec0: not found',
 ```
 
-### Visualize
-Visualize results in browser `load-testing/output/report-${ENV}.html`
+If you encounter permission issues, check the IAM role that was created. The permission syntax must be correct. For debugging permissions, refer to [Artillery IAM permissions](https://www.artillery.io/docs/load-testing-at-scale/aws-fargate#iam-permissions).
+
+## Future Plans - Github Action
+
+To use GitHub actions, ensure that a base image with AWS CLI and Node.js is used. Also, ensure that the account is appropriately set up and logged in before setting up these performance tests.
+
+## Resource Usage on AWS
+
+Results of the test run are stored on S3, and a JSON output file is saved locally. Artillery autonomously generates any required infrastructure and deletes it upon completion.
+
+## Visualizing the Results
+
+The results can be visualized by opening the `load-testing/output/report-${ENV}.html` file in your browser.
 
 ## Artillery Basics
 
-### run
-```bash
-yarn artillery run test.yml
-```
+You're free to experiment with your `test.yml` file. Here are some basic commands to get you started:
 
-### visualize
 ```bash
+# to run a test
+yarn artillery run test.yml
+
+# to generate a report
 yarn artillery report --output report.html report.json
 ```
 
-## Extras
-### Start influx db & grafana
+## Additional Information
+
+Currently, Influx and Grafana aren't in use. However, these tools can be used to set up a local dashboard to read and compare results from different runs, making use of visualizations instead of just output files.
+
 ```bash
+# to start influx db & grafana
 docker-compose up -d
 ```
