@@ -33,10 +33,13 @@ _Entries with an asterisk have been flagged for removal._
 - [Testing](#testing)
   - [unit-test](#unit-test)
   - [unit-test:watch](#unit-testwatch)
-- [TSNode]
+- [TSNode](#tsnode)
   - [listen](#listen)
   - [start](#start)
   - [sync-entities](#sync-entities)
+- [Webpack](#webpack)
+  - [bundle-report](#bundle-report)
+  - [profile](#profile)
 
 # Build Scripts
 
@@ -73,12 +76,6 @@ Considerations: Why do we have a separate CSS build? Who uses it? And does it ev
 Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
 
 Description: Builds project on Heroku, using get-max-old-space-size.sh to dynamically allocate memory; runs webpack and build-consumer script
-
-## bundle-report    
-
-Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
-    
-Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200)
 
 # CI Scripts
 
@@ -336,8 +333,25 @@ Definition: `ts-node server/scripts/enforceDataConsistency.ts run-as-script $(he
 
 Description: See full documentation in [enforceDataConsistency.ts](../packages/commonwealth/server/scripts/enforceDataConsistency.ts).
 
+# Webpack
+
+## bundle-report    
+
+Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
+    
+Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.js](../packages/commonwealth/webpack/webpack.prod.config.js), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
+
+## profile 
+
+Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json`
+
+Description: Runs build webpack analyzer. 
+
+Considerations: Deprecated; recommend removal. Appears to be redundant with `bundle-report`. As of 22-08-03 #all-eng conversation, appears to be unused. See also [stats.sh](../packages/commonwealth/stats.sh) for possible removal.
+
 
 # Undocumented & in-progress
+
 
 
 
@@ -365,7 +379,7 @@ Description: See full documentation in [enforceDataConsistency.ts](../packages/c
 "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
 "migrate-server": "heroku run npx sequelize db:migrate --debug",
 "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
-"profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json",
+
 
 // Export heroku db from dump (ask Nakul or other for rationale on flags)
 "dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
@@ -384,3 +398,4 @@ Description: See full documentation in [enforceDataConsistency.ts](../packages/c
 // ADDED BY KURTIS
 "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
 "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
+
