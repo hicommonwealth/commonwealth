@@ -114,7 +114,6 @@ export default async (
     if (nr.Notification.chain_event_id) {
       chainEvent = JSON.parse(nr.Notification.notification_data);
     }
-
     // creates an object for each subscription for which we have a NotificationsRead instance.
     // this object will store all the NotificationsRead, Notification, and ChainEvent instances associated with
     // a specific subscription
