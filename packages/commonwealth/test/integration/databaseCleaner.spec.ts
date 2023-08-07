@@ -12,7 +12,7 @@ import { REDIS_URL } from '../../server/config';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('DatabaseCleaner Tests', () => {
+describe('DatabaseCleaner Tests', () => {
   let mockRedis: sinon.SinonStubbedInstance<RedisCache>;
 
   before('Reset database', async () => {
