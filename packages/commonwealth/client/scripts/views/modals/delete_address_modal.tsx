@@ -8,10 +8,11 @@ import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
 import NewProfile from '../../models/NewProfile';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
+import { WarningOctagon, X } from '@phosphor-icons/react';
 
 type DeleteAddressModalAttrs = {
   profile: NewProfile;
@@ -46,11 +47,11 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         jwt: app.user.jwt,
       });
       // remove deleted role from app.roles
-      const foundAddressInfo = addresses.find(a => a.address === address)
+      const foundAddressInfo = addresses.find((a) => a.address === address);
       app.roles.deleteRole({
         address: foundAddressInfo,
         chain: chain,
-      })
+      });
 
       if (response?.status === 'Success') {
         notifySuccess('Address has been successfully removed.');
@@ -69,10 +70,11 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
   return (
     <div className="DeleteAddressModal">
       <div className="title">
-        <CWText type="h4" fontWeight="semiBold">
-          Delete Address
-        </CWText>
-        <CWIconButton iconName="close" onClick={closeModal} />
+        <div className="Frame">
+          <WarningOctagon className="warning-icon" weight="fill" />
+          <CWText type="h4">Delete Address</CWText>
+        </div>
+        <X className="close-icon" onClick={closeModal} />
       </div>
       <div className="body">
         <CWText>
@@ -97,13 +99,15 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         <div className="actions">
           <CWButton
             label="Delete"
-            buttonType="secondary-red"
+            buttonType="destructive"
             onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
+            buttonHeight="sm"
           />
           <CWButton
             label="Cancel"
-            buttonType="primary-black"
+            buttonType="primary"
             onClick={closeModal}
+            buttonHeight="sm"
           />
         </div>
       </div>

@@ -9,6 +9,37 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+
+    background: $white;
+    border-radius: 6px 6px 0px 0px;
+
+    font-family: $font-family-silka;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 28px;
+    letter-spacing: -0.01em;
+
+    color: $neutral-800;
+
+    .Frame {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .warning-icon {
+      color: $rorange-600;
+    }
+
+    .close-icon {
+      color: $neutral-500;
+
+      &:hover {
+        cursor: pointer;
+        color: $neutral-800;
+      }
+    }
   }
 
   .profile {
@@ -32,9 +63,8 @@
 
   .actions {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    gap: 16px;
+    flex: 1;
+    justify-content: space-between;
     margin-top: 24px;
   }
 }
