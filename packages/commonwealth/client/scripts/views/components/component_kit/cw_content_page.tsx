@@ -8,9 +8,9 @@ import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import { Skeleton } from '../Skeleton';
 import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
+import { Skeleton } from '../Skeleton';
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
@@ -70,7 +70,8 @@ type ContentPageProps = {
   canUpdateThread?: boolean;
   showTabs?: boolean;
   showSkeleton?: boolean
-  isWindowMedium?: boolean
+  isWindowMedium?: boolean;
+  isEditing?: boolean
 };
 
 const CWContentPageSkeleton = ({ isWindowMedium }) => {
@@ -174,13 +175,53 @@ export const CWContentPage = ({
   canUpdateThread,
   showTabs = false,
   showSkeleton,
-  isWindowMedium
+  isWindowMedium,
+  isEditing = false
 }: ContentPageProps) => {
   const [tabSelected, setTabSelected] = useState<number>(0);
 
   if (showSkeleton) return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
+
+  const authorAndPublishInfoRow = (
+    <div className="header-info-row">
+      <AuthorAndPublishInfo
+        showSplitDotIndicator={true}
+        isNew={!!displayNewTag}
+        discord_meta={discord_meta}
+        isLocked={thread?.readOnly}
+        {...(thread?.lockedAt && {
+          lockedAt: thread.lockedAt.toISOString(),
+        })}
+        {...(thread?.updatedAt && {
+          lastUpdated: thread.updatedAt.toISOString(),
+        })}
+        authorInfo={
+          author &&
+          new AddressInfo(
+            null,
+            author?.address,
+            typeof author.chain === 'string'
+              ? author.chain
+              : author.chain.id,
+            null
+          )
+        }
+        collaboratorsInfo={collaborators}
+        publishDate={
+          createdOrEditedDate
+            ? moment(createdOrEditedDate).format('l')
+            : null
+        }
+        viewsCount={viewCount}
+        showPublishLabelWithDate={!lastEdited}
+        showEditedLabelWithDate={!!lastEdited}
+        isSpamThread={isSpamThread}
+        threadStage={stageLabel}
+      />
+    </div>
+  )
 
   const mainBody = (
     <div className="main-body-container">
@@ -192,66 +233,34 @@ export const CWContentPage = ({
         ) : (
           title
         )}
-        <div className="header-info-row">
-          <AuthorAndPublishInfo
-            showSplitDotIndicator={true}
-            isNew={!!displayNewTag}
-            discord_meta={discord_meta}
-            isLocked={thread?.readOnly}
-            {...(thread?.lockedAt && {
-              lockedAt: thread.lockedAt.toISOString(),
-            })}
-            {...(thread?.updatedAt && {
-              lastUpdated: thread.updatedAt.toISOString(),
-            })}
-            authorInfo={
-              author &&
-              new AddressInfo(
-                null,
-                author?.address,
-                typeof author.chain === 'string'
-                  ? author.chain
-                  : author.chain.id,
-                null
-              )
-            }
-            collaboratorsInfo={collaborators}
-            publishDate={
-              createdOrEditedDate
-                ? moment(createdOrEditedDate).format('l')
-                : null
-            }
-            viewsCount={viewCount}
-            showPublishLabelWithDate={!lastEdited}
-            showEditedLabelWithDate={!!lastEdited}
-            isSpamThread={isSpamThread}
-            threadStage={stageLabel}
-          />
-        </div>
+        {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
 
       {body &&
         body(
-          <ThreadOptions
-            upvoteBtnVisible={!thread?.readOnly}
-            commentBtnVisible={!thread?.readOnly}
-            thread={thread}
-            totalComments={thread?.numberOfComments}
-            onLockToggle={onLockToggle}
-            onSpamToggle={onSpamToggle}
-            onDelete={onDelete}
-            onPinToggle={onPinToggle}
-            onTopicChange={onTopicChange}
-            onCollaboratorsEdit={onCollaboratorsEdit}
-            onEditCancel={onEditCancel}
-            onEditConfirm={onEditConfirm}
-            onEditStart={onEditStart}
-            canUpdateThread={canUpdateThread}
-            hasPendingEdits={hasPendingEdits}
-            onProposalStageChange={onProposalStageChange}
-            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-          />
+          <>
+            {isEditing ? authorAndPublishInfoRow : <></>}
+            <ThreadOptions
+              upvoteBtnVisible={!thread?.readOnly}
+              commentBtnVisible={!thread?.readOnly}
+              thread={thread}
+              totalComments={thread?.numberOfComments}
+              onLockToggle={onLockToggle}
+              onSpamToggle={onSpamToggle}
+              onDelete={onDelete}
+              onPinToggle={onPinToggle}
+              onTopicChange={onTopicChange}
+              onCollaboratorsEdit={onCollaboratorsEdit}
+              onEditCancel={onEditCancel}
+              onEditConfirm={onEditConfirm}
+              onEditStart={onEditStart}
+              canUpdateThread={canUpdateThread}
+              hasPendingEdits={hasPendingEdits}
+              onProposalStageChange={onProposalStageChange}
+              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+            />
+          </>
         )}
 
       {subBody}
