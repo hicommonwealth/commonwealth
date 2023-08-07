@@ -17,7 +17,7 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         `
-        ALTER INDEX "subscriptions_offchain_thread_id" RENAME TO "subscriptions_thread_id";
+        ALTER INDEX IF EXISTS "subscriptions_offchain_thread_id" RENAME TO "subscriptions_thread_id";
       `,
         { transaction: t }
       );
@@ -40,7 +40,7 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         `
-        ALTER INDEX "subscriptions_thread_id" RENAME TO "subscriptions_offchain_thread_id";
+        ALTER INDEX IF EXISTS "subscriptions_thread_id" RENAME TO "subscriptions_offchain_thread_id";
       `,
         { transaction: t }
       );
