@@ -38,14 +38,10 @@ const client = new Client({
   ],
 });
 
-const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
-const initPromise = controller.init();
-
-client.on('ready', () => {
-  log.info('Discord bot is ready.');
-});
-
-client.on('messageCreate', async (message: Message) => {
+const handleMessage = async (
+  message: Message,
+  action: 'create' | 'update' | 'delete'
+) => {
   try {
     // 1. Filter for designated forum channels
     const channel = client.channels.cache.get(message.channelId);
@@ -78,6 +74,7 @@ client.on('messageCreate', async (message: Message) => {
       parent_channel_id: parent_id,
       guild_id: message.guildId,
       imageUrls: getImageUrls(message),
+      action, // Indicates how the consumer should handle the message
     };
 
     if (!message.nonce) new_message.title = channel.name;
@@ -95,6 +92,25 @@ client.on('messageCreate', async (message: Message) => {
   } catch (error) {
     log.info(`Error Processing Discord Message`, error);
   }
+};
+
+const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+const initPromise = controller.init();
+
+client.on('ready', () => {
+  log.info('Discord bot is ready.');
+});
+
+client.on('messageDelete', async (message: Message) => {
+  await handleMessage(message, 'delete');
+});
+
+client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {
+  await handleMessage(newMessage, 'update');
+});
+
+client.on('messageCreate', async (message: Message) => {
+  await handleMessage(message, 'create');
 });
 
 client.login(DISCORD_TOKEN);
