@@ -4,6 +4,7 @@ import { UserInstance } from '../../models/user';
 import { ServerCommentsController } from '../server_comments_controller';
 import { Op } from 'sequelize';
 import { findOneRole } from '../../util/roles';
+import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -30,7 +31,7 @@ export async function __deleteComment(
     address: address.address,
   });
   if (!canInteract) {
-    throw new Error(`${Errors.BanError}; ${error}`);
+    throw new AppError(`${Errors.BanError}; ${error}`);
   }
 
   const userOwnedAddressIds = (await user.getAddresses())
@@ -55,7 +56,7 @@ export async function __deleteComment(
       include: [this.models.Chain],
     });
     if (!comment) {
-      throw new Error(Errors.CommentNotFound);
+      throw new AppError(Errors.CommentNotFound);
     }
     const requesterIsAdminOrMod = await findOneRole(
       this.models,
@@ -65,7 +66,7 @@ export async function __deleteComment(
     );
 
     if (!requesterIsAdminOrMod && !user.isAdmin) {
-      throw new Error(Errors.NotOwned);
+      throw new AppError(Errors.NotOwned);
     }
   }
 

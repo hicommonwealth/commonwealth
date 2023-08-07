@@ -3,6 +3,7 @@ import { findOneRole } from '../../util/roles';
 import { ServerThreadsController } from '../server_threads_controller';
 import { Op } from 'sequelize';
 import deleteThreadFromDb from '../../util/deleteThread';
+import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -28,7 +29,7 @@ export async function __deleteThread(
     include: [{ model: this.models.Address, as: 'Address' }],
   });
   if (!thread) {
-    throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+    throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
   // check ban
@@ -37,7 +38,7 @@ export async function __deleteThread(
     address: thread.Address.address,
   });
   if (!canInteract) {
-    throw new Error(`Ban error: ${banError}`);
+    throw new AppError(`Ban error: ${banError}`);
   }
 
   // check ownership (bypass if admin)
@@ -54,7 +55,7 @@ export async function __deleteThread(
     ['admin', 'moderator']
   );
   if (!isAuthor && !isAdminOrMod) {
-    throw new Error(Errors.NotOwned);
+    throw new AppError(Errors.NotOwned);
   }
 
   await deleteThreadFromDb(this.models, thread.id);

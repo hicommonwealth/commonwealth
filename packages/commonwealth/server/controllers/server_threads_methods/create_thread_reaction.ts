@@ -60,12 +60,12 @@ export async function __createThreadReaction(
   });
 
   if (!thread) {
-    throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+    throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
   // check if thread is archived
   if (thread.archived_at) {
-    throw new Error(Errors.ThreadArchived);
+    throw new AppError(Errors.ThreadArchived);
   }
 
   // check address ban
@@ -75,7 +75,7 @@ export async function __createThreadReaction(
       address: address.address,
     });
     if (!canInteract) {
-      throw new Error(`${Errors.BanError}: ${banError}`);
+      throw new AppError(`${Errors.BanError}: ${banError}`);
     }
   }
 

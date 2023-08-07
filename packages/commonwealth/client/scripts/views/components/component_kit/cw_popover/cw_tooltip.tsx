@@ -36,7 +36,7 @@ export const CWTooltip = ({
             <div
               className={getClasses<{ hasBackground?: boolean }>(
                 { hasBackground },
-                ComponentType.Tooltip
+                ComponentType.OldTooltip
               )}
             >
               <CWText type="caption">{content}</CWText>
@@ -45,7 +45,7 @@ export const CWTooltip = ({
             <div
               className={getClasses<{ hasBackground?: boolean }>(
                 { hasBackground },
-                ComponentType.Tooltip
+                ComponentType.OldTooltip
               )}
             >
               {content}

@@ -1,6 +1,7 @@
 import { UserInstance } from 'server/models/user';
 import { ServerReactionsController } from '../server_reactions_controller';
 import { Op } from 'sequelize';
+import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   ReactionNotFound: 'Reaction not found',
@@ -31,7 +32,7 @@ export async function __deleteReaction(
   });
 
   if (!reaction) {
-    throw new Error(`${Errors.ReactionNotFound}: ${reactionId}`);
+    throw new AppError(`${Errors.ReactionNotFound}: ${reactionId}`);
   }
 
   // check if author is banned
@@ -40,7 +41,7 @@ export async function __deleteReaction(
     address: reaction.Address.address,
   });
   if (!canInteract) {
-    throw new Error(`${Errors.BanError}: ${banError}`);
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   await reaction.destroy();

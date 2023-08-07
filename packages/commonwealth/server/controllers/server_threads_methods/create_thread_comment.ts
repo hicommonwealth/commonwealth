@@ -30,6 +30,7 @@ const Errors = {
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
+  ParseMentionsFailed: 'Failed to parse mentions',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -74,7 +75,7 @@ export async function __createThreadComment(
     address: address.address,
   });
   if (!canInteract) {
-    throw new Error(`${Errors.BanError}: ${banError}`);
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   // check if thread exists
@@ -82,17 +83,17 @@ export async function __createThreadComment(
     where: { id: threadId },
   });
   if (!thread) {
-    throw new Error(Errors.ThreadNotFound);
+    throw new AppError(Errors.ThreadNotFound);
   }
 
   // check if thread is archived
   if (thread.archived_at) {
-    throw new Error(Errors.ThreadArchived);
+    throw new AppError(Errors.ThreadArchived);
   }
 
   // check if thread is read-only
   if (thread.read_only) {
-    throw new Error(Errors.CantCommentOnReadOnly);
+    throw new AppError(Errors.CantCommentOnReadOnly);
   }
 
   // get parent comment
@@ -106,7 +107,7 @@ export async function __createThreadComment(
       },
     });
     if (!parentComment) {
-      throw new Error(Errors.InvalidParent);
+      throw new AppError(Errors.InvalidParent);
     }
     // check to ensure comments are never nested more than max depth:
     const [commentDepthExceeded] = await getCommentDepth(
@@ -115,7 +116,7 @@ export async function __createThreadComment(
       MAX_COMMENT_DEPTH
     );
     if (commentDepthExceeded) {
-      throw new Error(Errors.NestingTooDeep);
+      throw new AppError(Errors.NestingTooDeep);
     }
   }
 
@@ -142,7 +143,7 @@ export async function __createThreadComment(
           address.address
         );
       } catch (e) {
-        throw new ServerError(Errors.BalanceCheckFailed, e);
+        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
       }
 
       if (!canReact) {
@@ -245,7 +246,7 @@ export async function __createThreadComment(
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
   } catch (e) {
-    throw new Error('Failed to parse mentions');
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
