@@ -109,6 +109,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           );
         }
 
+        if (topicName === 'Archived') {
+          finalThreads = finalThreads.filter(
+            (x) =>  x.archivedAt !== null
+          )
+        }
+
         // get threads for current stage
         if (stageName) {
           finalThreads = finalThreads.filter((x) => x.stage === stageName);
