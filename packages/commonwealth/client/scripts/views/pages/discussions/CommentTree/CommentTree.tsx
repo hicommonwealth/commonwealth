@@ -6,7 +6,7 @@ import {
   useDeleteCommentMutation,
   useEditCommentMutation,
   useFetchCommentsQuery,
-  useToggleCommentSpamStatusMutation
+  useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
 import { ContentType } from 'types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -57,23 +57,24 @@ export const CommentTree = ({
 
   const { data: allComments = [] } = useFetchCommentsQuery({
     chainId: app.activeChainId(),
-    threadId: parseInt(`${thread.id}`)
-  })
+    threadId: parseInt(`${thread.id}`),
+  });
 
   const { mutateAsync: deleteComment } = useDeleteCommentMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
   const { mutateAsync: editComment } = useEditCommentMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
-  const { mutateAsync: toggleCommentSpamStatus } = useToggleCommentSpamStatusMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+  const { mutateAsync: toggleCommentSpamStatus } =
+    useToggleCommentSpamStatusMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
 
   const [edits, setEdits] = useState<{
     [commentId: number]: {
@@ -91,8 +92,7 @@ export const CommentTree = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
-  const isLocked =
-    fromDiscordBot || !!(thread instanceof Thread && thread.readOnly);
+  const isLocked = !!(thread instanceof Thread && thread.readOnly);
 
   useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
@@ -133,7 +133,9 @@ export const CommentTree = ({
           break;
         }
 
-        const grandchildren = allComments.filter(c => c.threadId === thread.id && c.parentComment === comment.id)
+        const grandchildren = allComments.filter(
+          (c) => c.threadId === thread.id && c.parentComment === comment.id
+        );
 
         for (let j = 0; j < grandchildren.length; j++) {
           const grandchild = grandchildren[j];
@@ -165,8 +167,8 @@ export const CommentTree = ({
                 commentId: comment.id,
                 canvasHash: comment.canvas_hash,
                 chainId: app.activeChainId(),
-                address: app.user.activeAccount.address
-              })
+                address: app.user.activeAccount.address,
+              });
             } catch (e) {
               console.log(e);
               notifyError('Failed to delete comment.');
@@ -305,8 +307,8 @@ export const CommentTree = ({
           threadId: thread.id,
           parentCommentId: comment.parentComment,
           chainId: app.activeChainId(),
-          address: app.user.activeAccount.address
-        })
+          address: app.user.activeAccount.address,
+        });
         setEdits((p) => ({
           ...p,
           [comment.id]: {
@@ -377,7 +379,7 @@ export const CommentTree = ({
                 commentId: comment.id,
                 isSpam: !!comment.markedAsSpamAt,
                 chainId: app.activeChainId(),
-              })
+              });
             } catch (err) {
               console.log(err);
             }
@@ -397,7 +399,9 @@ export const CommentTree = ({
     return comments_
       .filter((x) => (includeSpams ? true : !x.markedAsSpamAt))
       .map((comment: CommentType<any>) => {
-        const children = allComments.filter(c => c.threadId === thread.id && c.parentComment === comment.id)
+        const children = allComments.filter(
+          (c) => c.threadId === thread.id && c.parentComment === comment.id
+        );
 
         if (isLivingCommentTree(comment, children)) {
           const isCommentAuthor =
@@ -405,7 +409,12 @@ export const CommentTree = ({
 
           const isLast = threadLevel === 8;
 
-          const replyBtnVisible = !!(!isLast && !isLocked && isLoggedIn);
+          const replyBtnVisible = !!(
+            !isLast &&
+            !isLocked &&
+            !fromDiscordBot &&
+            isLoggedIn
+          );
 
           return (
             <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
@@ -421,9 +430,9 @@ export const CommentTree = ({
                             isReplying &&
                             i === threadLevel - 1 &&
                             parentCommentId === comment.id
-                            ? 'replying'
-                            : ''
-                            }`}
+                              ? 'replying'
+                              : ''
+                          }`}
                         />
                       ))}
                   </div>
