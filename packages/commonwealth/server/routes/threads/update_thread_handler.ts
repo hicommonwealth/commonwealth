@@ -14,6 +14,7 @@ type UpdateThreadRequestBody = {
   kind?: string;
   stage?: string;
   url?: string;
+  discord_meta?: any;
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -24,9 +25,22 @@ export const updateThreadHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { id } = req.params;
-  const { body, title, stage, url } = req.body;
+  const { body, title, stage, url, discord_meta } = req.body;
 
-  const threadId = parseInt(id, 10) || 0;
+  let threadId = parseInt(id, 10) || 0;
+
+  // Special handling for discobot threads
+  if (discord_meta !== undefined && discord_meta !== null) {
+    const existingThread = await controllers.threads.models.Thread.findOne({
+      where: { discord_meta: discord_meta },
+    });
+    if (existingThread) {
+      threadId = existingThread.id;
+    } else {
+      throw new AppError(Errors.InvalidThreadID);
+    }
+  }
+
   if (!threadId) {
     throw new AppError(Errors.InvalidThreadID);
   }

@@ -428,6 +428,16 @@ function setupRouter(
   registerRoute(
     router,
     'patch',
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    updateThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,

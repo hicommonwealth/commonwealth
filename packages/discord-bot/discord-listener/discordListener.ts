@@ -106,6 +106,7 @@ client.on('messageDelete', async (message: Message) => {
 });
 
 client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {
+  console.log('updatingggg');
   await handleMessage(newMessage, 'update');
 });
 

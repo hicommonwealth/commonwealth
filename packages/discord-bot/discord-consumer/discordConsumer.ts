@@ -40,7 +40,7 @@ async function consumeMessages() {
       )[0][0];
 
       if (parsedMessage.title) {
-        const create_thread = {
+        const thread = {
           author_chain: topic['chain_id'],
           address: '0xdiscordbot',
           chain: topic['chain_id'],
@@ -69,11 +69,15 @@ async function consumeMessages() {
           auth: CW_BOT_KEY,
         };
 
-        const response = await axios.post(
-          `${SERVER_URL}/api/bot/threads`,
-          create_thread
-        );
-        console.log(response.status, response.statusText);
+        const action = parsedMessage.action;
+
+        if (action === 'create') {
+          await axios.post(`${SERVER_URL}/api/bot/threads`, thread);
+        } else if (action === 'update') {
+          console.log('updating thread');
+          await axios.patch(`${SERVER_URL}/api/bot/threads`, thread);
+        }
+
         StatsDController.get().increment('cw.discord_thread_added', 1, {
           chain: topic['chain_id'],
         });
