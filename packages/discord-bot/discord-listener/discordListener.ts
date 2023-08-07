@@ -1,4 +1,4 @@
-import { Client, Message, IntentsBitField } from 'discord.js';
+import { Client, Message, IntentsBitField, ThreadChannel } from 'discord.js';
 import { sequelize } from '../utils/database';
 import {
   RabbitMQController,
@@ -18,7 +18,8 @@ log.info(
   )} GB`
 );
 
-const getImageUrls = (message: Message) => {
+const getImageUrls = (message: Partial<Message>) => {
+  if (!message.attachments) return [];
   const attachments = [...message.attachments.values()];
 
   return attachments
@@ -39,14 +40,17 @@ const client = new Client({
 });
 
 const handleMessage = async (
-  message: Message,
+  message: Partial<Message>,
   action: 'create' | 'update' | 'delete'
 ) => {
   try {
     // 1. Filter for designated forum channels
     const channel = client.channels.cache.get(message.channelId);
-    if (channel?.type !== 11) return; // must be thread channel(all forum posts are Threads)
-    const parent_id = channel.parentId ?? '0';
+
+    if (channel?.type !== 11 && channel?.type !== 15) return; // must be thread channel(all forum posts are Threads)
+    const parent_id =
+      channel?.type === 11 ? channel.parentId : channel.id ?? '0';
+
     // Only process messages from relevant channels
     const relevantChannels = (
       await sequelize.query(
@@ -64,15 +68,15 @@ const handleMessage = async (
     // 2. Figure out if message is comment or thread
     const new_message: IDiscordMessage = {
       user: {
-        id: message.author.id,
-        username: message.author.username,
+        id: message.author?.id ?? null,
+        username: message.author?.username ?? null,
       },
       // If title is nothing == comment. channel_id will correspond to the thread channel id.
-      content: message.content,
-      message_id: message.id,
-      channel_id: message.channelId,
-      parent_channel_id: parent_id,
-      guild_id: message.guildId,
+      content: message.content ?? null,
+      message_id: message.id ?? null,
+      channel_id: message.channelId ?? null,
+      parent_channel_id: parent_id ?? null,
+      guild_id: message.guildId ?? null,
       imageUrls: getImageUrls(message),
       action, // Indicates how the consumer should handle the message
     };
@@ -101,12 +105,14 @@ client.on('ready', () => {
   log.info('Discord bot is ready.');
 });
 
-client.on('messageDelete', async (message: Message) => {
-  await handleMessage(message, 'delete');
+client.on('threadDelete', async (thread: ThreadChannel) => {
+  await handleMessage(
+    { id: thread.id, channelId: thread.parentId } as Partial<Message>,
+    'delete'
+  );
 });
 
 client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {
-  console.log('updatingggg');
   await handleMessage(newMessage, 'update');
 });
 

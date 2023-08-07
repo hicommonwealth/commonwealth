@@ -39,6 +39,14 @@ async function consumeMessages() {
         )
       )[0][0];
 
+      if (parsedMessage.action === 'delete') {
+        await axios.delete(
+          `${SERVER_URL}/api/bot/threads/${parsedMessage.message_id}`,
+          { data: { auth: CW_BOT_KEY, address: '0xdiscordbot' } }
+        );
+        return;
+      }
+
       if (parsedMessage.title) {
         const thread = {
           author_chain: topic['chain_id'],
@@ -74,7 +82,6 @@ async function consumeMessages() {
         if (action === 'create') {
           await axios.post(`${SERVER_URL}/api/bot/threads`, thread);
         } else if (action === 'update') {
-          console.log('updating thread');
           await axios.patch(`${SERVER_URL}/api/bot/threads`, thread);
         }
 

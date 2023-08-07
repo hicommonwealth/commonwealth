@@ -157,16 +157,16 @@ export enum DefaultPage {
 }
 
 export interface IDiscordMessage {
-  user: {
+  user?: {
     id: string;
     username: string;
   };
   title?: string;
   content: string;
   message_id: string;
-  channel_id: string;
-  parent_channel_id: string;
-  guild_id: string;
+  channel_id?: string;
+  parent_channel_id?: string;
+  guild_id?: string;
   imageUrls?: string[];
   action: 'create' | 'update' | 'delete';
 }

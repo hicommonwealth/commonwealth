@@ -176,7 +176,10 @@ import { deleteCommentHandler } from '../routes/comments/delete_comment_handler'
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
 import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
-import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import {
+  deleteBotThreadHandler,
+  deleteThreadHandler,
+} from '../routes/threads/delete_thread_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
@@ -433,6 +436,14 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
     updateThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/threads/:message_id',
+    databaseValidationService.validateBotUser,
+    deleteBotThreadHandler.bind(this, serverControllers)
   );
 
   registerRoute(
