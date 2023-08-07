@@ -167,30 +167,4 @@ describe('Cosmos Governance v1beta1 util Tests', () => {
       });
     });
   });
-  // Disabled for CI. Fails often in CI because heroku devnet resets periodically
-  describe.skip('getCompletedProposals', () => {
-    it('should fetch completed proposals (csdk-beta)', async () => {
-      const id = 'csdk-beta';
-      const tmClient = await getTMClient(
-        `http://localhost:8080/cosmosAPI/${id}`
-      );
-      const rpc = await getRPCClient(tmClient);
-      const proposals = await getCompletedProposalsV1Beta1(rpc);
-      // if below fails, make a proposal in csdk-beta UI and run again after 10 minutes.
-      // Somstimes the remote node crashes and restarts.
-      expect(
-        proposals.length,
-        'If this fails, make a proposal in csdk-beta UI and run tests again after 10 minutes.'
-      ).to.be.greaterThan(0);
-
-      proposals.forEach((proposal) => {
-        expect(proposal.state.completed).to.eq(true);
-        expect(proposal.state.status).to.be.oneOf([
-          'Passed',
-          'Rejected',
-          'Failed',
-        ]);
-      });
-    });
-  });
 });
