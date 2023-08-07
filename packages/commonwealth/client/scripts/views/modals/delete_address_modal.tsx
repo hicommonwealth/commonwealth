@@ -10,7 +10,6 @@ import AddressInfo from '../../models/AddressInfo';
 import NewProfile from '../../models/NewProfile';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
 import { WarningOctagon, X } from '@phosphor-icons/react';
 

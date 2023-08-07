@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
+import { WarningOctagon, X } from '@phosphor-icons/react';
 
-import 'components/poll_card.scss';
-
-import { CWButton } from './component_kit/cw_button';
+import { CWButton } from './component_kit/new_designs/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
@@ -12,6 +11,8 @@ import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
 import { Modal } from './component_kit/cw_modal';
+
+import 'components/poll_card.scss';
 
 const LIVE_PREVIEW_MAX = 3;
 const ENDED_PREVIEW_MAX = 1;
@@ -32,6 +33,11 @@ export type PollOptionProps = {
   selectedOptions?: Array<string>;
   disableVoteOptions?: boolean;
   setSelectedOptions?: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+type DeletePollModalProps = {
+  onClickDelete: any;
+  onClickClose: () => void;
 };
 
 export const PollOptions = ({
@@ -279,22 +285,36 @@ export const ResultsSection = ({
   );
 };
 
-const DeletePollModal = ({ onClickDelete }) => {
+export const DeletePollModal: FC<DeletePollModalProps> = ({
+  onClickDelete,
+  onClickClose,
+}) => {
   const handleDeleteClick = async (e) => {
     e.preventDefault();
     await onClickDelete();
     // Assuming you are using a library like 'react-modal', you can trigger the modal exit using that library's methods.
   };
 
+  const handleCloseModal = () => onClickClose();
+
   return (
     <div className="DeleteThreadModal">
       <div className="compact-modal-title">
-        <CWText className="modal-text">Delete this poll?</CWText>
+        <div className="Frame">
+          <WarningOctagon className="warning-icon" weight="fill" />
+          <CWText type="h4">Delete this poll?</CWText>
+        </div>
+        <X className="close-icon" onClick={handleCloseModal} />
       </div>
       <div className="compact-modal-body">
         <div className="modal-body">
           <CWText>This action cannot be reversed.</CWText>
-          <CWButton label="confirm" onClick={handleDeleteClick} />
+          <CWButton
+            buttonType="destructive"
+            buttonHeight="sm"
+            label="Confirm"
+            onClick={handleDeleteClick}
+          />
         </div>
       </div>
     </div>
@@ -360,6 +380,7 @@ export const PollCard = ({
                 if (onDeleteClick) onDeleteClick();
                 setDeleteModalOpen(false);
               }}
+              onClickClose={() => setDeleteModalOpen(false)}
             />
           }
           onClose={() => setDeleteModalOpen(false)}
