@@ -15,6 +15,12 @@ module.exports = {
         'comment_id',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `
+        ALTER INDEX "subscriptions_offchain_thread_id" RENAME TO "subscriptions_thread_id";
+      `,
+        { transaction: t }
+      );
     });
   },
 
@@ -30,6 +36,12 @@ module.exports = {
         'Subscriptions',
         'comment_id',
         'offchain_comment_id',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        `
+        ALTER INDEX "subscriptions_thread_id" RENAME TO "subscriptions_offchain_thread_id";
+      `,
         { transaction: t }
       );
     });
