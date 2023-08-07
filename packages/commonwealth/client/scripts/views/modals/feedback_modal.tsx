@@ -5,11 +5,11 @@ import $ from 'jquery';
 import 'modals/feedback_modal.scss';
 
 import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { X } from '@phosphor-icons/react';
 
 type FeedbackModalProps = {
   onModalClose: () => void;
@@ -27,7 +27,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
     <div className="FeedbackModal">
       <div className="compact-modal-title">
         <h3>Send feedback</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+        <X className="close-icon" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
         <CWTextArea
@@ -38,6 +38,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
           }}
         />
         <CWButton
+          buttonType="primary"
           disabled={isSending}
           label="Send feedback"
           onClick={(e) => {
