@@ -7,6 +7,9 @@ Closes: #TODO
 - Adds FIXME widget to TODO page.
 - 
 
+## "How We Fixed It"
+<!-- Brief description of solution, if bug, to be added once issue is resolved. -->
+
 ## Test Plan
 - Unit tested the `FIXME()` call.
 - CA (click around) tested on local and frack:
