@@ -5,7 +5,7 @@ import {
   clearTestEntities,
   createTestEntities,
   testChains,
-} from '../../integration/api/external/dbEntityHooks.spec';
+} from '../hooks/e2eDbEntityHooks.spec';
 import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
 
 test.beforeEach(async () => {
