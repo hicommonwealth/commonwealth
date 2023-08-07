@@ -17,6 +17,10 @@
   max-height: 54px;
   outline: none;
 
+  &.showSkeleton {
+    border: 1px solid transparent;
+  }
+
   .reactions-container {
     display: flex;
     flex-direction: column;

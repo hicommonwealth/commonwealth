@@ -13,11 +13,12 @@ import {
 } from '../../../../common-common/src/types';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ThreadAttributes } from '../../models/thread';
+import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
   BanError: 'Ban error',
-  NoBodyOrAttachment: 'Must provide body or attachment',
+  NoBody: 'Must provide body',
   InvalidLink: 'Invalid thread URL',
   ParseMentionsFailed: 'Failed to parse mentions',
 };
@@ -31,7 +32,6 @@ export type UpdateThreadOptions = {
   body?: string;
   stage?: string;
   url?: string;
-  attachments?: any;
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
@@ -50,7 +50,6 @@ export async function __updateThread(
     body,
     stage,
     url,
-    attachments,
     canvasAction,
     canvasSession,
     canvasHash,
@@ -81,7 +80,7 @@ export async function __updateThread(
       address: address.address,
     });
     if (!canInteract) {
-      throw new Error(`${Errors.BanError}: ${banError}`);
+      throw new AppError(`${Errors.BanError}: ${banError}`);
     }
   }
 
@@ -101,37 +100,13 @@ export async function __updateThread(
     });
   }
   if (!thread) {
-    throw new Error(`${Errors.ThreadNotFound}: ${threadId}`);
+    throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
-  // check attachments
-  if (thread.kind === 'discussion') {
-    if ((!body || !body.trim()) && (!attachments || attachments.length === 0)) {
-      throw new Error(Errors.NoBodyOrAttachment);
-    }
+  // check body
+  if (thread.kind === 'discussion' && (!body || !body.trim())) {
+    throw new AppError(Errors.NoBody);
   }
-
-  const attachFiles = async () => {
-    if (attachments && typeof attachments === 'string') {
-      await this.models.Attachment.create({
-        attachable: 'thread',
-        attachment_id: threadId,
-        url: attachments,
-        description: 'image',
-      });
-    } else if (attachments) {
-      await Promise.all(
-        attachments.map((url_) =>
-          this.models.Attachment.create({
-            attachable: 'thread',
-            attachment_id: threadId,
-            url: url_,
-            description: 'image',
-          })
-        )
-      );
-    }
-  };
 
   let latestVersion;
   try {
@@ -178,13 +153,12 @@ export async function __updateThread(
     if (validURL(url)) {
       thread.url = url;
     } else {
-      throw new Error(Errors.InvalidLink);
+      throw new AppError(Errors.InvalidLink);
     }
   }
   thread.last_edited = new Date().toISOString();
 
   await thread.save();
-  await attachFiles();
 
   const finalThread = await this.models.Thread.findOne({
     where: { id: thread.id },
@@ -195,7 +169,6 @@ export async function __updateThread(
         // through: models.Collaboration,
         as: 'collaborators',
       },
-      this.models.Attachment,
       { model: this.models.Topic, as: 'topic' },
     ],
   });
@@ -234,7 +207,7 @@ export async function __updateThread(
       return !alreadyExists;
     });
   } catch (e) {
-    throw new Error(Errors.ParseMentionsFailed);
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   // grab mentions to notify tagged users

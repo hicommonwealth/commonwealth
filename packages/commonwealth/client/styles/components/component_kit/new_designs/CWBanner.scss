@@ -32,6 +32,7 @@
   border: 1px solid $neutral-600;
   background: $neutral-25;
   justify-content: flex-start;
+  min-width: fit-content;
 
   .type-icon-container {
     margin-right: 8px;
@@ -40,7 +41,7 @@
   .content-container {
     display: flex;
     flex-direction: column;
-    padding-right: 75px;
+    padding-right: 5px;
 
     .header {
       color: $neutral-600;
@@ -62,6 +63,7 @@
   .actions-row {
     display: flex;
     margin-top: 24px;
+    flex-wrap: wrap;
   }
 
   &.info {
