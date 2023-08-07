@@ -183,7 +183,6 @@ export class Thread implements IUniqueId {
     this.hasPoll = hasPoll;
     this.lastEdited = lastEdited;
     this.markedAsSpamAt = markedAsSpamAt;
-    this.archivedAt = archivedAt;
     this.lockedAt = lockedAt;
     this.numberOfComments = numberOfComments || 0;
     this.associatedReactions = [];

@@ -913,6 +913,7 @@ class ThreadsController {
         ...(stageName && { stage: stageName }),
         ...(includePinnedThreads && { includePinnedThreads: true }),
         ...(fromDate && { from_date: fromDate }),
+        ...((topicName === 'Archived') && { archive: true }),
         to_date: toDate,
         orderBy:
           featuredFilterQueryMap[featuredFilter] ||

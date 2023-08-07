@@ -29,6 +29,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const totalThreads = app.threads.numTotalThreads;
   const [initializing, setInitializing] = useState(true);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
+  const [includeArchivedThreads, setIncludeArchivedThreads] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const pageNumber = useRef<number>(0);
   const stageName: string = searchParams.get('stage');
@@ -223,6 +224,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
+          if (topicName !== 'Archived' && !includeArchivedThreads && thread.archivedAt !== null) return null;
+
           return (
             <ThreadCard
               key={thread.id + '-' + thread.readOnly}
@@ -267,8 +270,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 );
                 setThreads(tempThreads);
               }}
-              onArchive={() => {
-              }}
               onTopicChange={(topic) => {
                 if (topic.id !== thread.topic.id) {
                   const tempThreads = [...threads].filter(
@@ -291,6 +292,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     (x) => (stageName ? x.stage === stageName : x)
                   );
                 });
+              }}
+              onArchive={() => {
+                const tempThreads = [...threads].filter(
+                  (t) => t.id !== thread.id
+                );
+                setThreads(tempThreads);
               }}
             />
           );
@@ -318,6 +325,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 totalThreadCount={threads ? totalThreads : 0}
                 isIncludingSpamThreads={includeSpamThreads}
                 onIncludeSpamThreads={setIncludeSpamThreads}
+                isIncludingArchivedThreads={includeArchivedThreads}
+                onIncludeArchivedThreads={setIncludeArchivedThreads}
+                onArchivePage={topicName === 'Archived'}
               />
             );
           },

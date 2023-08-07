@@ -33,6 +33,9 @@ type HeaderWithFiltersProps = {
   totalThreadCount: number;
   isIncludingSpamThreads: boolean;
   onIncludeSpamThreads: (includeSpams: boolean) => any;
+  isIncludingArchivedThreads: boolean;
+  onIncludeArchivedThreads: (includeArchived: boolean) => any;
+  onArchivePage?: boolean;
 };
 
 export const HeaderWithFilters = ({
@@ -43,6 +46,9 @@ export const HeaderWithFilters = ({
   totalThreadCount,
   isIncludingSpamThreads,
   onIncludeSpamThreads,
+  isIncludingArchivedThreads,
+  onIncludeArchivedThreads,
+  onArchivePage,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
@@ -350,14 +356,25 @@ export const HeaderWithFilters = ({
         </div>
       )}
 
-      <CWCheckbox
-        checked={isIncludingSpamThreads}
-        label="Include posts flagged as spam"
-        className="ml-auto"
-        onChange={(e) => {
-          onIncludeSpamThreads(e.target.checked);
-        }}
-      />
+      <div className="checkboxes">
+        <CWCheckbox
+          checked={isIncludingSpamThreads}
+          label="Include posts flagged as spam"
+          onChange={(e) => {
+            onIncludeSpamThreads(e.target.checked);
+          }}
+        />
+
+        { !onArchivePage && 
+            <CWCheckbox
+              checked={isIncludingArchivedThreads}
+              label="Include archived posts"
+              onChange={(e) => {
+                onIncludeArchivedThreads(e.target.checked);
+              }}
+            />
+        }
+      </div>
 
       <Modal
         content={

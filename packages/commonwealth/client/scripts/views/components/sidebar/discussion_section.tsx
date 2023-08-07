@@ -164,7 +164,7 @@ export const DiscussionSection = () => {
         handleRedirectClicks(
           navigate,
           e,
-          `/discussions/archived`,
+          `/discussions/Archived`,
           app.activeChainId(),
           () => {
             setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);

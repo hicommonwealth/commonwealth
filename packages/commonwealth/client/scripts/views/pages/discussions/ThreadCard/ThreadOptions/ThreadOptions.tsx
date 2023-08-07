@@ -40,6 +40,7 @@ export const ThreadOptions = ({
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onSpamToggle,
+  onArchive,
   hasPendingEdits,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
@@ -119,7 +120,9 @@ export const ThreadOptions = ({
             onProposalStageChange={onProposalStageChange}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             onSpamToggle={onSpamToggle}
+            onArchive={onArchive}
             hasPendingEdits={hasPendingEdits}
+            archivedAt={thread.archivedAt}
           />
         )}
       </div>

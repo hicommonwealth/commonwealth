@@ -204,6 +204,14 @@ export const AdminActions = ({
     );
   };
 
+  const handleArchiveThread = () => {
+    if (archivedAt === null) {
+      setIsArchiveThreadModalOpen(true)
+    } else {
+      app.threads.setArchived(thread.id, !!archivedAt).then(() => onArchive && onArchive())
+    }
+  }
+
   return (
     <>
       <span
@@ -261,18 +269,12 @@ export const AdminActions = ({
                         },
                       ]
                     : []),
-                    {
-                      label: archivedAt === null ? 'Archive' : 'Unarchive',
-                      iconLeft: archivedAt === null ? 'archiveTray' as const : 'archiveTrayFilled' as const,
-                      iconLeftWeight: 'bold' as const,
-                      onClick: () => {
-                        if (archivedAt === null) {
-                          setIsArchiveThreadModalOpen(true)
-                        } else {
-                          app.threads.setArchived(thread.id, !!thread.archivedAt)
-                        }
-                      },
-                    },
+                  {
+                    label: archivedAt === null ? 'Archive' : 'Unarchive',
+                    iconLeft: archivedAt === null ? 'archiveTray' as const : 'archiveTrayFilled' as const,
+                    iconLeftWeight: 'bold' as const,
+                    onClick: handleArchiveThread,
+                  },
                 ]
               : []),
             ...(isThreadAuthor || hasAdminPermissions
@@ -381,6 +383,7 @@ export const AdminActions = ({
         content={
           <ArchiveThreadModal
             thread={thread}
+            onArchive={onArchive}
             onModalClose={() => setIsArchiveThreadModalOpen(false)}
           />
         }
