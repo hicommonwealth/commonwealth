@@ -168,6 +168,7 @@ export interface IDiscordMessage {
   parent_channel_id: string;
   guild_id: string;
   imageUrls?: string[];
+  action: 'create' | 'update' | 'delete';
 }
 export type HttpMethod =
   | 'get'
