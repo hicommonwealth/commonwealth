@@ -39,7 +39,7 @@ export default class AaveGovernance extends ProposalModule<
   }
 
   // INIT / DEINIT
-  constructor(app: IApp, private _usingServerChainEntities = false) {
+  constructor(app: IApp) {
     super(app, (e) => new AaveProposal(this._Chain, this._Accounts, this, e));
   }
 
@@ -97,7 +97,10 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // send transaction
-    const contract = await attachSigner(this.app.user.activeAccount, this._api.Governance);
+    const contract = await attachSigner(
+      this.app.user.activeAccount,
+      this._api.Governance
+    );
     const tx = await contract.create(
       executorContract.address,
       targets,
