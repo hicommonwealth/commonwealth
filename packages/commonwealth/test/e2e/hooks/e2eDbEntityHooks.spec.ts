@@ -26,6 +26,12 @@ export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
 
 export async function clearTestEntities() {
+  const threadsToDelete = await models.Thread.findAll({
+    where: {
+      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+    },
+  });
+
   try {
     await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
     await models.Reaction.destroy({
@@ -42,7 +48,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
-          { thread_id: { [Op.lt]: 0 } },
+          { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
           { address_id: { [Op.lt]: 0 } },
         ],
       },

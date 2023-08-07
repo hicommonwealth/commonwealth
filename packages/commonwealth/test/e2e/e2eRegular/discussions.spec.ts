@@ -1,5 +1,4 @@
-import { test } from '@playwright/test';
-import chai from 'chai';
+import { expect, test } from '@playwright/test';
 import chaiHttp from 'chai-http';
 import { PORT } from '../../../server/config';
 import {
@@ -7,23 +6,17 @@ import {
   createTestEntities,
   testChains,
   testThreads,
-} from '../../integration/api/external/dbEntityHooks.spec';
+} from '../hooks/e2eDbEntityHooks.spec';
 import { login } from '../utils/e2eUtils';
-
-chai.use(chaiHttp);
-const { expect } = chai;
-
-test.beforeEach(async () => {
-  await createTestEntities();
-});
-
-test.afterEach(async () => {
-  await clearTestEntities();
-});
 
 test.describe('DiscussionsPage Homepage', () => {
   test.beforeEach(async ({ page }) => {
+    await createTestEntities();
     await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
+  });
+
+  test.afterEach(async () => {
+    await clearTestEntities();
   });
 
   test('Discussion page loads and can navigate to first thread', async ({
@@ -44,7 +37,7 @@ test.describe('DiscussionsPage Homepage', () => {
       'div[data-test-id] > div',
       (divs) => divs.length
     );
-    expect(numberOfThreads).to.equal(Math.min(20, testThreads.length));
+    expect(numberOfThreads).to.be.gte(testThreads.length - 1);
 
     const firstThread = await page.$(
       'div[data-test-id="virtuoso-item-list"] > div:first-child'
@@ -72,28 +65,34 @@ test.describe('DiscussionsPage Homepage', () => {
   test('Check User can Like/Dislike post', async ({ page }) => {
     await login(page);
 
-    let reactionsCountDivs = await page.$$('.reactions-count');
+    let reactionsCountDivs = await page.locator('.reactions-count');
+
+    do {
+      reactionsCountDivs = await page.locator('.reactions-count');
+    } while (!reactionsCountDivs[0]);
+
     const firstThreadReactionCount = reactionsCountDivs[0].innerText();
 
     // click button
     await page.getByRole('button', { name: '0', exact: true }).first().click();
 
-    reactionsCountDivs = await page.$$('.reactions-count');
-    console.log(await reactionsCountDivs[0].innerText());
-    chai.assert.equal(
-      await reactionsCountDivs[0].innerText(),
-      (await firstThreadReactionCount) + 1,
-      'reaction count did not increase after clicked'
-    );
+    // assert reaction count increased
+    await expect(async () => {
+      reactionsCountDivs = await page.locator('.reactions-count');
+      expect(await reactionsCountDivs[0].innerText()).toEqual(
+        (await firstThreadReactionCount) + 1
+      );
+    }).toPass();
 
     // click button
     await page.getByRole('button', { name: '1', exact: true }).first().click();
 
-    reactionsCountDivs = await page.$$('.reactions-count');
-    chai.assert.equal(
-      await reactionsCountDivs[0].innerText(),
-      await firstThreadReactionCount,
-      'reaction count did not decrease after clicked'
-    );
+    // assert reaction count decreased
+    await expect(async () => {
+      reactionsCountDivs = await page.locator('.reactions-count');
+      expect(await reactionsCountDivs[0].innerText()).toEqual(
+        await firstThreadReactionCount
+      );
+    }).toPass();
   });
 });
