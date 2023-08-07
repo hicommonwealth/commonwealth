@@ -167,7 +167,8 @@ describe('Cosmos Governance v1beta1 util Tests', () => {
       });
     });
   });
-  describe('getCompletedProposals', () => {
+  // Disabled for CI. Fails often in CI because heroku devnet resets periodically
+  describe.skip('getCompletedProposals', () => {
     it('should fetch completed proposals (csdk-beta)', async () => {
       const id = 'csdk-beta';
       const tmClient = await getTMClient(
