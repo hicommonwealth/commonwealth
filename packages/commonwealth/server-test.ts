@@ -113,7 +113,7 @@ const resetServer = (debug = false): Promise<void> => {
           'Ropsten Testnet',
           '3',
         ],
-        ['https://rpc-juno.itastakers.com', 'Juno', null, BalanceType.Cosmos],
+        ['https://rpc-juno.ecostake.com', 'Juno', null, BalanceType.Cosmos],
         [
           'https://cosmos-devnet.herokuapp.com/rpc',
           'Cosmos SDK v0.46.11 devnet',
