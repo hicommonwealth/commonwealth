@@ -223,7 +223,6 @@ class ThreadsController {
       : null;
 
     const markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
-    const archivedAt = archived_at ? moment(archived_at) : null;
 
     let topicModel = null;
     const lockedAt = locked_at ? moment(locked_at) : null;

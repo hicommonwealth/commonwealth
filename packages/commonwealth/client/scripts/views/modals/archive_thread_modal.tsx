@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import 'modals/archive_thread_modal.scss';
 import type Thread from '../../models/Thread';
 import app from 'state';

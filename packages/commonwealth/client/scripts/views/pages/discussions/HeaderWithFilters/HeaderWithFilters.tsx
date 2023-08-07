@@ -365,7 +365,7 @@ export const HeaderWithFilters = ({
           }}
         />
 
-        { !onArchivePage && 
+        { !onArchivePage &&
             <CWCheckbox
               checked={isIncludingArchivedThreads}
               label="Include archived posts"
