@@ -1,3 +1,4 @@
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import moment from 'moment';
@@ -40,6 +41,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   /**
    * the api will return sorted results and those are stored in state, when user
@@ -226,6 +228,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread.id + '-' + thread.readOnly}
               thread={thread}
+              canReact={!(!hasJoinedCommunity || !!thread.lockedAt || !!thread.archivedAt)}
               onLockToggle={(isLocked) => {
                 const tempThreads = [...threads];
                 const foundThread = tempThreads.find((t) => t.id === thread.id);

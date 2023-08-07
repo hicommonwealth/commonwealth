@@ -13,27 +13,27 @@ import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
-import { CWTag } from 'views/components/component_kit/cw_tag';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { getClasses } from 'views/components/component_kit/helpers';
 import { isNewThread } from '../NewThreadTag';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
+import './ThreadCard.scss';
 import { ThreadOptions } from './ThreadOptions';
 import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
-import './ThreadCard.scss';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
   threadHref?: string;
   showSkeleton?: boolean;
+  canReact?: boolean;
 };
 
 
@@ -72,11 +72,11 @@ export const ThreadCard = ({
   onBodyClick,
   onStageTagClick,
   threadHref,
-  showSkeleton
+  showSkeleton,
+  canReact = true,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -120,7 +120,7 @@ export const ThreadCard = ({
           <ReactionButton
             thread={thread}
             size="big"
-            disabled={!hasJoinedCommunity}
+            disabled={!canReact}
           />
         )}
         <div className="content-wrapper">
@@ -194,11 +194,10 @@ export const ThreadCard = ({
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
                     )} 
-                        ${
-                          Number.isNaN(parseInt(link.identifier, 10))
-                            ? ''
-                            : ` #${link.identifier}`
-                        }`}
+                        ${Number.isNaN(parseInt(link.identifier, 10))
+                        ? ''
+                        : ` #${link.identifier}`
+                      }`}
                   />
                 ))}
             </div>
