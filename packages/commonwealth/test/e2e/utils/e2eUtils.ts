@@ -106,7 +106,7 @@ export async function removeUser() {
 // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
 export async function addAddressIfNone(chain) {
   const userExists = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}'`
+    `select * from "Addresses" where address = '${testAddress}'`
   );
 
   let profileId = null;
@@ -142,7 +142,8 @@ export async function addAddressIfNone(chain) {
       ) RETURNING id`);
 
   if (!profileId) {
-    profileId = await testDb.query(`
+    profileId = (
+      await testDb.query(`
     INSERT INTO "Profiles" (
         user_id,
         created_at,
@@ -158,10 +159,12 @@ export async function addAddressIfNone(chain) {
         false,
         '{}'
       ) RETURNING id
-    `);
+    `)
+    )[0][0]['id'];
   }
 
-  testDb.query(`
+  try {
+    testDb.query(`
     INSERT INTO "Addresses" (
       address,
       chain,
@@ -191,11 +194,14 @@ export async function addAddressIfNone(chain) {
       false,
       false,
       false,
-      ${profileId[0][0]['id']},
+      ${profileId},
       'metamask',
       '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
       false,
       'member'
     )
   `);
+  } catch (e) {
+    console.log(e);
+  }
 }

@@ -1,4 +1,3 @@
-import moment from 'moment';
 import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
@@ -226,7 +225,6 @@ export async function createTestEntities() {
                 chain: 'cmntest',
                 verification_token: '',
                 profile_id: i < 2 ? -1 : -2,
-                verified: moment.now(),
               },
             })
           )[0]
