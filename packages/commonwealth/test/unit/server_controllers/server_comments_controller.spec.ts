@@ -57,7 +57,9 @@ describe('ServerCommentsController', () => {
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
-      const address = {};
+      const address = {
+        save: async () => {},
+      };
       const chain = {
         id: 'ethereum',
       };

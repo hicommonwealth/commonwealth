@@ -62,7 +62,7 @@ export const createThreadHandler = async (
     controllers.notifications.emit(n).catch(console.error);
   }
 
-  controllers.analytics.track(analyticsOptions);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, thread);
 };
