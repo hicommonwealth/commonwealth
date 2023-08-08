@@ -5,7 +5,7 @@ import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   MissingThreadId: 'Must provide valid thread_id',
-  MissingTextOrAttachment: 'Must provide text or attachment',
+  MissingText: 'Must provide text',
 
   MissingRootId: 'Must provide valid thread_id',
   InvalidParent: 'Invalid parent',
@@ -47,32 +47,23 @@ export const createThreadCommentHandler = async (
   if (!threadId) {
     throw new AppError(Errors.MissingThreadId);
   }
-  if (
-    (!text || !text.trim()) &&
-    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-  ) {
-    throw new AppError(Errors.MissingTextOrAttachment);
+  if (!text || !text.trim()) {
+    throw new AppError(Errors.MissingText);
   }
 
-  const attachments = req.body['attachments[]'];
-
-  const [
-    comment,
-    notificationOptions,
-    analyticsOptions,
-  ] = await controllers.threads.createThreadComment({
-    user,
-    address,
-    chain,
-    parentId,
-    threadId: parseInt(threadId, 10),
-    text,
-    attachments,
-    canvasAction,
-    canvasSession,
-    canvasHash,
-    discord_meta,
-  });
+  const [comment, notificationOptions, analyticsOptions] =
+    await controllers.threads.createThreadComment({
+      user,
+      address,
+      chain,
+      parentId,
+      threadId: parseInt(threadId, 10),
+      text,
+      canvasAction,
+      canvasSession,
+      canvasHash,
+      discord_meta,
+    });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

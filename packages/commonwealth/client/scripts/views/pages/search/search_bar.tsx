@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
 import 'pages/search/search_bar.scss';
@@ -18,8 +18,15 @@ import {
 } from './search_bar_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useDebounce } from 'usehooks-ts';
+import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
 
-const MIN_SEARCH_TERM_LENGTH = 4;
 const NUM_RESULTS_PER_SECTION = 2;
 
 let resetTimer = null;
@@ -33,11 +40,6 @@ const goToSearchPage = (
     return;
   }
 
-  if (query.searchTerm.length < MIN_SEARCH_TERM_LENGTH) {
-    notifyError(`Query must be at least ${MIN_SEARCH_TERM_LENGTH} characters`);
-    return;
-  }
-
   app.search.addToHistory(query);
 
   setRoute(`/search?${query.toUrlParams()}`);
@@ -45,29 +47,23 @@ const goToSearchPage = (
 
 export const SearchBar = () => {
   const navigate = useCommonNavigate();
+  const chainId = app.activeChainId() || 'all_chains';
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<
-    Record<string, Array<any>>
-  >({});
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const showDropdown =
-    Object.keys(searchResults || {}).length > 0 && searchTerm.length > 0;
-
   const resetSearchBar = () => {
     setSearchTerm('');
-    setSearchResults({});
   };
 
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: app.activeChainId(),
+      chainScope: chainId,
     });
-
     goToSearchPage(searchQuery, navigate);
+    resetSearchBar();
   };
 
   const handleInputChange = (e) => {
@@ -75,43 +71,47 @@ export const SearchBar = () => {
     setSearchTerm(value);
   };
 
-  const handleGetSearchPreview = async (value: string) => {
-    const searchQuery = new SearchQuery(value, {
-      isSearchPreview: true,
-      chainScope: app.activeChainId() || 'all_chains',
-    });
-
-    try {
-      await app.search.search(searchQuery);
-      const searchResponse = app.search.getByQuery(searchQuery)?.results;
-
-      const results = searchResponse
-        ? Object.fromEntries(
-            Object.entries(searchResponse).map(([k, v]) => [
-              k,
-              v.slice(0, NUM_RESULTS_PER_SECTION),
-            ])
-          )
-        : {};
-
-      setSearchResults(results);
-      app.search.addToHistory(searchQuery);
-    } catch (err) {
-      console.error(err);
-      setSearchResults({});
-      notifyError(
-        err.responseJSON?.error || err.responseText || err.toString()
-      );
-    }
+  const sharedQueryOptions = {
+    chainId,
+    searchTerm: debouncedSearchTerm,
+    limit: NUM_RESULTS_PER_SECTION,
+    orderBy: APIOrderBy.Rank,
+    orderDirection: APIOrderDirection.Desc,
   };
+  const queryEnabled = debouncedSearchTerm.length > 0;
 
-  // when debounced search term changes, fetch search results
-  useEffect(() => {
-    clearTimeout(resetTimer);
-    if (debouncedSearchTerm?.length >= MIN_SEARCH_TERM_LENGTH) {
-      handleGetSearchPreview(debouncedSearchTerm);
-    }
-  }, [debouncedSearchTerm]);
+  const { data: threadsData } = useSearchThreadsQuery({
+    ...sharedQueryOptions,
+    enabled: queryEnabled,
+  });
+
+  const { data: commentsData } = useSearchCommentsQuery({
+    ...sharedQueryOptions,
+    enabled: queryEnabled,
+  });
+
+  const { data: chainsData } = useSearchChainsQuery({
+    ...sharedQueryOptions,
+    enabled: queryEnabled,
+  });
+
+  const { data: profilesData } = useSearchProfilesQuery({
+    ...sharedQueryOptions,
+    includeRoles: false,
+    enabled: queryEnabled,
+  });
+
+  const searchResults = useMemo(() => {
+    return {
+      [SearchScope.Threads]: threadsData?.pages?.[0]?.results || [],
+      [SearchScope.Replies]: commentsData?.pages?.[0]?.results || [],
+      [SearchScope.Communities]: chainsData?.pages?.[0]?.results || [],
+      [SearchScope.Members]: profilesData?.pages?.[0]?.results || [],
+    };
+  }, [threadsData, chainsData, profilesData, commentsData]);
+
+  const showDropdown =
+    searchTerm.length > 0 && Object.keys(searchResults || {}).length > 0;
 
   return (
     <div

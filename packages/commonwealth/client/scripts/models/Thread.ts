@@ -1,7 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import type moment from 'moment';
 import type { VersionHistory } from '../controllers/server/threads';
-import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
 import type Poll from './Poll';
 import type { ReactionType } from './Reaction';
@@ -43,7 +42,6 @@ export class Thread implements IUniqueId {
   public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
-  public readonly attachments: Attachment[];
   public readOnly: boolean;
 
   public readonly canvasAction: string;
@@ -82,7 +80,6 @@ export class Thread implements IUniqueId {
   constructor({
     author,
     title,
-    attachments,
     id,
     createdAt,
     updatedAt,
@@ -118,7 +115,6 @@ export class Thread implements IUniqueId {
   }: {
     author: string;
     title: string;
-    attachments: Attachment[];
     id: number;
     createdAt: moment.Moment;
     updatedAt: moment.Moment;
@@ -156,7 +152,6 @@ export class Thread implements IUniqueId {
     this.title = title;
     this.body = body;
     this.plaintext = plaintext;
-    this.attachments = attachments;
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = createdAt;

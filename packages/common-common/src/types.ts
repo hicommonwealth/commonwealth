@@ -5,16 +5,12 @@
 export const NotificationCategories = {
   NewComment: 'new-comment-creation',
   NewThread: 'new-thread-creation',
-  NewCommunity: 'new-community-creation',
-  NewRoleCreation: 'new-role-creation',
   NewMention: 'new-mention',
   NewReaction: 'new-reaction',
   NewCollaboration: 'new-collaboration',
   ThreadEdit: 'thread-edit',
   CommentEdit: 'comment-edit',
   ChainEvent: 'chain-event',
-  EntityEvent: 'entity-event',
-  NewSnapshot: 'new-snapshot',
   SnapshotProposal: 'snapshot-proposal',
 };
 
@@ -136,6 +132,7 @@ export enum RedisNamespaces {
   Function_Response = 'function_response',
   Global_Response = 'global_response',
   Test_Redis = 'test_redis',
+  Database_Cleaner = 'database_cleaner',
 }
 
 export interface ISnapshotNotification {
@@ -166,6 +163,7 @@ export interface IDiscordMessage {
   channel_id: string;
   parent_channel_id: string;
   guild_id: string;
+  imageUrls?: string[];
 }
 export type HttpMethod =
   | 'get'

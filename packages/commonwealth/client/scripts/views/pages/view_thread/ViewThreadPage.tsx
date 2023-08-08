@@ -1,6 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { modelReactionCountFromServer } from 'controllers/server/comments';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -11,22 +10,23 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
+import ReactionCount from 'models/ReactionCount';
 import type { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useFetchCommentsQuery } from 'state/api/comments';
+import { fetchReactionCounts } from 'state/api/reactionCounts';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
-import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource, Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
@@ -59,7 +59,6 @@ import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
-    commentsStarted: boolean;
     pollsStarted?: boolean;
     profilesFinished: boolean;
     profilesStarted: boolean;
@@ -76,7 +75,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
 
-  const [comments, setComments] = useState<Array<Comment<Thread>>>([]);
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [polls, setPolls] = useState<Array<Poll>>([]);
@@ -103,12 +101,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
+  const { data: comments = [], error: fetchCommentsError } = useFetchCommentsQuery({
+    chainId: app.activeChainId(),
+    threadId: parseInt(`${threadId}`)
+  })
+
+  useEffect(() => {
+    if (fetchCommentsError) notifyError('Failed to load comments');
+  }, [fetchCommentsError])
+
   const cancelEditing = () => {
     setIsGloballyEditing(false);
     setIsEditingBody(false);
   };
 
-  useBrowserWindow({
+  const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -145,24 +152,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     cancelEditing();
   };
 
-  const updatedCommentsCallback = useCallback(() => {
-    if (!thread) {
-      return;
-    }
-
-    const _comments =
-      app.comments
-        .getByThread(thread)
-        .filter((c) => c.parentComment === null) || [];
-    setComments([..._comments]);
-  }, [thread]);
-
   // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
   if (!prefetch[threadId]) {
     setPrefetch((prevState) => ({
       ...prevState,
       [threadId]: {
-        commentsStarted: false,
         pollsStarted: false,
         viewCountStarted: false,
         profilesStarted: false,
@@ -228,71 +222,34 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
 
   useNecessaryEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    if (!prefetch[threadId]['commentsStarted']) {
-      app.comments
-        .refresh(thread, app.activeChainId())
-        .then(async () => {
-          // fetch comments
-          const _comments = app.comments
-            .getByThread(thread)
-            .filter((c) => c.parentComment === null);
-          setComments(_comments);
-
-          // fetch reactions
-          const { result: reactionCounts } = await $.ajax({
-            type: 'POST',
-            url: `${app.serverUrl()}/reactionsCounts`,
-            headers: {
-              'content-type': 'application/json',
-            },
-            data: JSON.stringify({
-              proposal_ids: [threadId],
-              comment_ids: app.comments
-                .getByThread(thread)
-                .map((comment) => comment.id),
-              active_address: app.user.activeAccount?.address,
-            }),
+    if (comments.length > 0 && thread && thread.id) {
+      fetchReactionCounts({
+        proposalIds: [`${thread.id}`],
+        commentIds: comments.map(c => `${c.id}`),
+        address: app.user.activeAccount?.address,
+      }).then(reactionCounts => {
+        for (const rc of reactionCounts) {
+          const id = app.threads.reactionCountsStore.getIdentifier({
+            threadId: rc.thread_id,
+            proposalId: rc.proposal_id,
+            commentId: rc.comment_id,
           });
 
-          for (const rc of reactionCounts) {
-            const id = app.comments.reactionCountsStore.getIdentifier({
-              threadId: rc.thread_id,
-              proposalId: rc.proposal_id,
-              commentId: rc.comment_id,
-            });
+          app.threads.reactionCountsStore.add(
+            new ReactionCount({ ...rc, id } as any)
+          );
 
-            app.comments.reactionCountsStore.add(
-              modelReactionCountFromServer({ ...rc, id })
-            );
-
-            app.comments.isReactionFetched.emit('redraw', rc.comment_id);
-          }
-        })
-        .catch(() => {
-          notifyError('Failed to load comments');
-          setComments([]);
-        });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          commentsStarted: true,
-        },
-      }));
+          app.threads.isReactionFetched.emit('redraw', rc.comment_id);
+        }
+      })
     }
-  }, [prefetch, thread, threadId]);
+  }, [thread, threadId, comments]);
 
   useEffect(() => {
     if (!initializedComments) {
       setInitializedComments(true);
-      updatedCommentsCallback();
     }
-  }, [initializedComments, updatedCommentsCallback]);
+  }, [initializedComments]);
 
   useEffect(() => {
     if (!initializedPolls) {
@@ -428,28 +385,27 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ...prevState,
           [threadId]: {
             ...prevState[threadId],
-            commentsStarted: false,
           },
         }));
       }
     }
   }, [comments, thread, threadId]);
 
+
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  if (typeof identifier !== 'string') {
+  if (typeof identifier !== 'string' || threadFetchFailed) {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta) {
-    return <PageLoading />;
+  if (!app.chain?.meta || !app.threads.initialized || !thread) {
+    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
   }
 
-  // load app controller
-  if (!app.threads.initialized) {
-    return <PageLoading />;
+  if (typeof identifier !== 'string') {
+    return <PageNotFound />;
   }
 
   if (!thread && threadFetchCompleted) {
@@ -458,10 +414,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   if (threadFetchFailed) {
     return <PageNotFound />;
-  }
-
-  if (!thread) {
-    return <PageLoading />;
   }
 
   // Original posters have full editorial control, while added collaborators
@@ -552,11 +504,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
-  const sortedComments = [...comments].sort((a, b) =>
+  const sortedComments = [...comments].filter(c => !c.parentComment).sort((a, b) =>
     commentSortType === CommentsFeaturedFilterTypes.Oldest
       ? moment(a.createdAt).diff(moment(b.createdAt))
       : moment(b.createdAt).diff(moment(a.createdAt))
-  );
+  )
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
@@ -722,7 +674,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   <>
                     {threadOptionsComp}
                     <CreateComment
-                      updatedCommentsCallback={updatedCommentsCallback}
                       rootThread={thread}
                       canComment={canComment}
                     />
@@ -776,7 +727,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               includeSpams={includeSpamThreads}
               thread={thread}
               setIsGloballyEditing={setIsGloballyEditing}
-              updatedCommentsCallback={updatedCommentsCallback}
               isReplying={isReplying}
               setIsReplying={setIsReplying}
               parentCommentId={parentCommentId}

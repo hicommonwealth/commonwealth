@@ -11,6 +11,7 @@ import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -31,8 +32,28 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
-  threadHref: string;
+  threadHref?: string;
+  showSkeleton?: boolean;
 };
+
+
+const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
+  return <div className={'ThreadCard showSkeleton'}>
+    {!isWindowSmallInclusive && (
+      <ReactionButton thread={thread} size="big" showSkeleton disabled={disabled} />
+    )}
+    <div className="content-wrapper">
+      <div>
+        <Skeleton count={1} className='content-header-skeleton' />
+        <div> <Skeleton className='content-header-icons-skeleton' /> </div>
+      </div>
+      <div className="content-body-wrapper">
+        <Skeleton count={3} />
+      </div>
+    </div>
+    <div className="content-footer"><Skeleton /></div>
+  </div>
+}
 
 export const ThreadCard = ({
   thread,
@@ -51,6 +72,7 @@ export const ThreadCard = ({
   onBodyClick,
   onStageTagClick,
   threadHref,
+  showSkeleton
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -61,6 +83,8 @@ export const ThreadCard = ({
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
   }, []);
+
+  if (showSkeleton) return <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -102,12 +126,12 @@ export const ThreadCard = ({
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              showSplitDotIndicator={!isWindowSmallInclusive}
               authorInfo={
                 new AddressInfo(null, thread.author, thread.authorChain, null)
               }
               publishDate={moment(thread.createdAt).format('l')}
               isNew={isNewThread(thread.createdAt)}
+              isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
                 lockedAt: thread.lockedAt.toISOString(),
@@ -118,9 +142,34 @@ export const ThreadCard = ({
               discord_meta={thread.discord_meta}
             />
             <div className="content-header-icons">
-              {isHot(thread) && <div className="flame" />}
               {thread.pinned && <CWIcon iconName="pin" />}
             </div>
+          </div>
+          <div className="content-body-wrapper">
+            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
+            <div className="content-title">
+              <CWText type="h5" fontWeight="semiBold">
+                {thread.title}
+              </CWText>
+            </div>
+            <div className='content-top-tags'>
+              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+              {linkedSnapshots.length > 0 && (
+                <CWTag
+                  type="active"
+                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
+                    ? linkedSnapshots[0].identifier.split('/')[1]
+                    : linkedSnapshots[0].identifier
+                  )
+                    .toString()
+                    .slice(0, 4)}…`}
+                />
+              )}
+            </div>
+            <CWText type="caption" className="content-body">
+              {thread.plaintext}
+            </CWText>
           </div>
           {isTagsRowVisible && (
             <div className="content-tags">
@@ -154,31 +203,13 @@ export const ThreadCard = ({
                 ))}
             </div>
           )}
-          <div className="content-body-wrapper">
-            {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
-            <div className="content-title">
-              <CWText type="h5" fontWeight="semiBold">
-                {thread.title}
-              </CWText>
-              {thread.hasPoll && <CWTag label="Poll" type="poll" />}
-
-              {linkedSnapshots.length > 0 && (
-                <CWTag
-                  type="active"
-                  label={`Snap ${(linkedSnapshots[0].identifier.includes('/')
-                    ? linkedSnapshots[0].identifier.split('/')[1]
-                    : linkedSnapshots[0].identifier
-                  )
-                    .toString()
-                    .slice(0, 4)}…`}
-                />
-              )}
-            </div>
-            <CWText type="caption" className="content-body">
-              {thread.plaintext}
-            </CWText>
-          </div>
-          <div className="content-footer">
+          <div
+            className="content-footer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
             <ThreadOptions
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}

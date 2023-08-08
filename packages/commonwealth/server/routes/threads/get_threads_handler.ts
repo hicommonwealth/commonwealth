@@ -1,16 +1,17 @@
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import {
+  PaginationQueryParams,
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+} from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { AppError } from '../../../../common-common/src/errors';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
-
-const MIN_SEARCH_QUERY_LENGTH = 4;
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
   InvalidRequest: 'Invalid request',
   InvalidThreadId: 'Invalid thread ID',
-  QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 4 characters',
   NoChains: 'No chains resolved to execute search',
 };
 
@@ -27,10 +28,7 @@ type ActiveThreadsRequestQuery = {
 type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
-  sort?: string;
-  page?: string;
-  page_size?: string;
-};
+} & PaginationQueryParams;
 type BulkThreadsRequestQuery = {
   topic_id: string;
   stage?: string;
@@ -40,6 +38,7 @@ type BulkThreadsRequestQuery = {
   orderBy?: string;
   from_date?: string;
   to_date?: string;
+  archived?: string;
 };
 type GetThreadsResponse = any;
 
@@ -81,7 +80,12 @@ export const getThreadsHandler = async (
       orderBy,
       from_date,
       to_date,
+      archived,
     } = req.query as BulkThreadsRequestQuery;
+
+    if (!chain && req.query.chain !== ALL_CHAINS) {
+      throw new AppError(Errors.NoChains);
+    }
 
     const bulkThreads = await controllers.threads.getBulkThreads({
       chain,
@@ -93,6 +97,7 @@ export const getThreadsHandler = async (
       orderBy,
       fromDate: from_date,
       toDate: to_date,
+      archived: archived === 'true',
     });
     return success(res, bulkThreads);
   }
@@ -110,14 +115,8 @@ export const getThreadsHandler = async (
 
   // search for threads
   if (search) {
-    const { thread_title_only, sort, page, page_size } =
+    const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
-    if (!search) {
-      throw new AppError(Errors.QueryMissing);
-    }
-    if (search.length < MIN_SEARCH_QUERY_LENGTH) {
-      throw new AppError(Errors.QueryTooShort);
-    }
     if (!req.chain && req.query.chain !== ALL_CHAINS) {
       // if no chain resolved, ensure that client explicitly requested all chains
       throw new AppError(Errors.NoChains);
@@ -127,9 +126,10 @@ export const getThreadsHandler = async (
       chain,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
-      sort,
-      page: parseInt(page, 10),
-      pageSize: parseInt(page_size, 10),
+      limit: parseInt(limit, 10) || 0,
+      page: parseInt(page, 10) || 0,
+      orderBy: order_by,
+      orderDirection: order_direction as any,
     });
     return success(res, searchResults);
   }
