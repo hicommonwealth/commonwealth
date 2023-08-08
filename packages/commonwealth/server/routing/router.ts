@@ -686,6 +686,16 @@ function setupRouter(
   registerRoute(
     router,
     'patch',
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
     '/comments/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,

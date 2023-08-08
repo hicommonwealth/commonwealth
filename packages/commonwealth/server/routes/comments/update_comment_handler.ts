@@ -12,6 +12,7 @@ const Errors = {
 
 type UpdateCommentRequestBody = {
   body: string;
+  discord_meta?: any;
 };
 type UpdateCommentRequestParams = {
   id: number;
@@ -25,8 +26,23 @@ export const updateCommentHandler = async (
   res: TypedResponse<UpdateCommentResponse>
 ) => {
   const { user, chain, address } = req;
-  const { id: commentId } = req.params;
-  const { body: commentBody } = req.body;
+  const { id } = req.params;
+  const { body: commentBody, discord_meta } = req.body;
+
+  let commentId = id;
+
+  // Special handling for discobot threads
+  if (discord_meta !== undefined && discord_meta !== null) {
+    const existingComment = await controllers.threads.models.Comment.findOne({
+      where: { discord_meta: discord_meta },
+    });
+    if (existingComment) {
+      commentId = existingComment.id;
+    } else {
+      throw new AppError(Errors.NoId);
+    }
+  }
+
   if (!commentId) {
     throw new AppError(Errors.NoId);
   }
