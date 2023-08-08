@@ -21,7 +21,9 @@ export const PreviewModal = ({
   return (
     <div className="PreviewModal">
       <div className="compact-modal-title">
-        <CWText type="h4">{title ? `Preview: ${title}` : 'Preview'}</CWText>
+        <CWText className="title-text" type="h4">
+          {title ? `Preview: ${title}` : 'Preview'}
+        </CWText>
         <X className="close-icon" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
