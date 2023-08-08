@@ -1,44 +1,46 @@
 import React, { useState } from 'react';
 import app from 'state';
-import { Skeleton } from 'views/components/Skeleton';
-import type Thread from '../../../../../../models/Thread';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import {
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from 'views/components/ReactionButton/helpers';
+import { Skeleton } from 'views/components/Skeleton';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import type Thread from '../../../../../../models/Thread';
 import { LoginModal } from '../../../../../modals/login_modal';
 import './ReactionButton.scss';
 import { useReactionButton } from './useReactionButton';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
-  showSkeleton?: boolean
+  showSkeleton?: boolean;
   disabled: boolean;
 };
 
 const ReactionButtonSkeleton = () => {
-  return <button
-    onClick={async (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-    }}
-    className={`ThreadReactionButton showSkeleton`}
-  >
-    <Skeleton height={52} width={40} />
-  </button>
-}
+  return (
+    <button
+      onClick={async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      className={`ThreadReactionButton showSkeleton`}
+    >
+      <Skeleton height={52} width={40} />
+    </button>
+  );
+};
 
 export const ReactionButton = ({
   thread,
   size,
   disabled,
-  showSkeleton
+  showSkeleton,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
@@ -46,12 +48,12 @@ export const ReactionButton = ({
   const { dislike, hasReacted, isLoading, isUserForbidden, like } =
     useReactionButton(thread, setReactors);
 
-
-  if (showSkeleton) return <ReactionButtonSkeleton />
+  if (showSkeleton) return <ReactionButtonSkeleton />;
 
   const handleSmallVoteClick = async (e) => {
     e.stopPropagation();
     e.preventDefault();
+    if (disabled) return;
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
     } else {
@@ -87,6 +89,7 @@ export const ReactionButton = ({
           onClick={async (e) => {
             e.stopPropagation();
             e.preventDefault();
+            if (disabled) return;
 
             if (!app.isLoggedIn() || !app.user.activeAccount) {
               setIsModalOpen(true);
@@ -94,8 +97,9 @@ export const ReactionButton = ({
               onReactionClick(e, hasReacted, dislike, like);
             }
           }}
-          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
-            }${hasReacted ? ' has-reacted' : ''}`}
+          className={`ThreadReactionButton ${
+            isLoading || isUserForbidden ? ' disabled' : ''
+          }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (
             <CWTooltip
@@ -114,8 +118,9 @@ export const ReactionButton = ({
                       {...(hasReacted && { weight: 'fill' })}
                     />
                     <div
-                      className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                        }`}
+                      className={`reactions-count ${
+                        hasReacted ? ' has-reacted' : ''
+                      }`}
                     >
                       {reactors.length}
                     </div>
@@ -127,8 +132,9 @@ export const ReactionButton = ({
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
               <div
-                className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                  }`}
+                className={`reactions-count ${
+                  hasReacted ? ' has-reacted' : ''
+                }`}
               >
                 {reactors.length}
               </div>
