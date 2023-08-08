@@ -23,7 +23,7 @@ export const getProposalsHandler = async (
   return res.json({
     status: 'Success',
     result: {
-      proposals: JSON.stringify(proposals, null, 2),
+      proposals,
     },
   });
 };
