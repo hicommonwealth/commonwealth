@@ -82,7 +82,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             ...exchangeConfig,
           },
           [RascalExchanges.SnapshotListener]: {
-            type: 'topic',
+            type: 'fanout',
             ...exchangeConfig,
           },
           [RascalExchanges.DeadLetter]: {
