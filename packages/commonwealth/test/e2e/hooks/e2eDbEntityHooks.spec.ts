@@ -26,28 +26,43 @@ export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
 
 export async function clearTestEntities() {
-  const threadsToDelete = await models.Thread.findAll({
-    where: {
-      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
-    },
-  });
-
-  const usersToDelete = await models.User.findAll({
-    where: {
-      [Op.or]: [
-        { id: { [Op.lt]: 0 } },
-        { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
-      ],
-    },
-  });
-
   try {
+    const threadsToDelete = await models.Thread.findAll({
+      where: {
+        [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+      },
+    });
+
+    const usersToDelete = await models.User.findAll({
+      where: {
+        [Op.or]: [
+          { id: { [Op.lt]: 0 } },
+          { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
+        ],
+      },
+    });
+
+    const commentsToDelete = await models.Comment.findAll({
+      where: {
+        [Op.or]: [
+          { id: { [Op.lt]: 0 } },
+          { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
+          { address_id: { [Op.lt]: 0 } },
+        ],
+      },
+    });
+
+    const chainsToDelete = await models.Chain.findAll({
+      where: { chain_node_id: { [Op.lt]: 0 } },
+    });
+
     await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
     await models.Reaction.destroy({
       where: {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
           { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
+          { comment_id: { [Op.in]: commentsToDelete.map((t) => t['id']) } },
           { address_id: { [Op.lt]: 0 } },
         ],
       },
@@ -60,7 +75,7 @@ export async function clearTestEntities() {
     await models.Comment.destroy({
       where: {
         [Op.or]: [
-          { id: { [Op.lt]: 0 } },
+          { id: { [Op.in]: commentsToDelete.map((c) => c['id']) } },
           { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
           { address_id: { [Op.lt]: 0 } },
         ],
@@ -95,11 +110,16 @@ export async function clearTestEntities() {
       force: true,
     });
     await models.Notification.destroy({
-      where: { thread_id: { [Op.lt]: 0 } },
+      where: {
+        [Op.or]: [
+          { thread_id: { [Op.lt]: 0 } },
+          { chain_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
+        ],
+      },
       force: true,
     });
     await models.Chain.destroy({
-      where: { chain_node_id: { [Op.lt]: 0 } },
+      where: { id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
       force: true,
     });
     await models.ChainNode.destroy({
