@@ -1,15 +1,15 @@
 import React from 'react';
-
 import $ from 'jquery';
-
-import 'modals/feedback_modal.scss';
+import { X } from '@phosphor-icons/react';
 
 import app from 'state';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { X } from '@phosphor-icons/react';
+
+import 'modals/feedback_modal.scss';
+import { CWText } from '../components/component_kit/cw_text';
 
 type FeedbackModalProps = {
   onModalClose: () => void;
@@ -26,8 +26,10 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
   return (
     <div className="FeedbackModal">
       <div className="compact-modal-title">
-        <h3>Send feedback</h3>
-        <X className="close-icon" onClick={() => onModalClose()} />
+        <CWText className="title-text" type="h4">
+          Send feedback
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size="24" />
       </div>
       <div className="compact-modal-body">
         <CWTextArea

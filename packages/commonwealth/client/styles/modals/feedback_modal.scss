@@ -6,17 +6,16 @@
   max-width: 100vw;
 
   .compact-modal-title {
+    display: flex;
+    align-items: center;
+
     background: $white;
     border-radius: 6px 6px 0px 0px;
 
-    font-family: $font-family-silka;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 28px;
-    letter-spacing: -0.01em;
-
-    color: $neutral-800;
+    .title-text {
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
   }
 
   .compact-modal-body {
