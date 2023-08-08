@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import '@typechain/hardhat'
+import 'hardhat-typechain';
 import '@nomiclabs/hardhat-ethers';
 import type { HardhatUserConfig } from 'hardhat/types';
 
