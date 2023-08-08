@@ -18,12 +18,13 @@ import {
 import { longify } from '@cosmjs/stargate/build/queries/utils';
 
 import type {
+  CoinObject,
   CosmosProposalState,
   CosmosProposalType,
-  CosmosToken,
   ICosmosProposal,
   ICosmosProposalTally,
 } from 'controllers/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { CosmosApiType } from '../../chain';
 
 /* -- v1beta1-specific methods: -- */
@@ -151,12 +152,17 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
   );
   let type: CosmosProposalType = 'text';
   let spendRecipient: string;
-  let spendAmount: string;
+  let spendAmount: CoinObject[];
   if (isCommunitySpend) {
     const spend = CommunityPoolSpendProposal.decode(content.value);
     type = 'communitySpend';
     spendRecipient = spend.recipient;
-    spendAmount = spend?.amount[0]?.amount;
+    spendAmount = [
+      new CosmosToken(
+        spend.amount[0].denom.toUpperCase(),
+        spend.amount[0].amount
+      ).toCoinObject(),
+    ];
   }
   return {
     identifier: p.proposalId.toString(),

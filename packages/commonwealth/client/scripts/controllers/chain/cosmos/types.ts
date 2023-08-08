@@ -18,13 +18,18 @@ export class CosmosToken extends Coin {
     return +this;
   }
 
-  public toCoinObject() {
+  public toCoinObject(): CoinObject {
     return {
       denom: this.denom,
       amount: this.toString(),
     };
   }
 }
+
+export type CoinObject = {
+  denom: string;
+  amount: string;
+};
 
 export type CosmosProposalType =
   | 'text'
@@ -64,7 +69,7 @@ export interface ICosmosProposal extends IIdentifiable {
   messages?: any[]; // v1 only
   proposer: string;
   spendRecipient?: string;
-  spendAmount?: string;
+  spendAmount?: CoinObject[];
   submitTime: moment.Moment;
   depositEndTime: moment.Moment;
   votingStartTime: moment.Moment;
