@@ -3,7 +3,7 @@ import { factory, formatFilename } from '../../src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const PING_INTERVAL = 1_000 * 3;
+const PING_INTERVAL = 1_000 * 20;
 
 export enum ServiceKey {
   Commonwealth = 'commonwealth',
