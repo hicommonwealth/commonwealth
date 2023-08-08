@@ -17,6 +17,10 @@
 
       .warning-icon {
         color: $rorange-600;
+
+        &:hover {
+          cursor: auto;
+        }
       }
 
       .title-text {
