@@ -39,7 +39,9 @@ async function consumeMessages() {
         )
       )[0][0];
 
-      if (parsedMessage.action === 'delete') {
+      const action = parsedMessage.action;
+
+      if (action === 'delete') {
         await axios.delete(
           `${SERVER_URL}/api/bot/threads/${parsedMessage.message_id}`,
           { data: { auth: CW_BOT_KEY, address: '0xdiscordbot' } }
@@ -77,8 +79,6 @@ async function consumeMessages() {
           auth: CW_BOT_KEY,
         };
 
-        const action = parsedMessage.action;
-
         if (action === 'create') {
           await axios.post(`${SERVER_URL}/api/bot/threads`, thread);
         } else if (action === 'update') {
@@ -112,11 +112,13 @@ async function consumeMessages() {
           },
         };
 
-        const response = await axios.post(
-          `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
-          create_comment
-        );
-        console.log(response.status, response.statusText);
+        if (action === 'create') {
+          await axios.post(
+            `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
+            create_comment
+          );
+        }
+
         StatsDController.get().increment('cw.discord_comment_added', 1, {
           chain: topic['chain_id'],
         });
