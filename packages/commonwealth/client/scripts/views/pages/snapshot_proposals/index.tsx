@@ -18,6 +18,8 @@ type SnapshotProposalsPageProps = {
 
 const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
   const [activeTab, setActiveTab] = useState<number>(1);
+  const [isSnapshotProposalsLoading, setIsSnapshotProposalsLoading] =
+    useState<boolean>(true);
   const [proposals, setProposals] = useState<{
     active: Array<SnapshotProposal>;
     ended: Array<SnapshotProposal>;
@@ -41,6 +43,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   useNecessaryEffect(() => {
     const fetch = async () => {
+      setIsSnapshotProposalsLoading(true);
       await app.snapshot.init(snapshotId);
 
       if (app.snapshot.initialized) {
@@ -57,6 +60,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
         );
 
         setProposals(tempProposals);
+        setIsSnapshotProposalsLoading(false);
       }
     };
 
@@ -102,20 +106,33 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
           />
         </div>
       </div>
-      {proposalsToDisplay.length > 0 ? (
+      {!isSnapshotProposalsLoading ? (
+        proposalsToDisplay.length > 0 ? (
+          <CardsCollection
+            content={proposalsToDisplay.map((proposal, i) => (
+              <SnapshotProposalCard
+                key={i}
+                snapshotId={snapshotId}
+                proposal={proposal}
+              />
+            ))}
+          />
+        ) : (
+          <CWText className="no-proposals-text">
+            No active proposals found.
+          </CWText>
+        )
+      ) : (
         <CardsCollection
-          content={proposalsToDisplay.map((proposal, i) => (
+          content={Array.from({ length: 10 }).map((x, i) => (
             <SnapshotProposalCard
               key={i}
               snapshotId={snapshotId}
-              proposal={proposal}
+              showSkeleton
+              proposal={{} as any}
             />
           ))}
         />
-      ) : (
-        <CWText className="no-proposals-text">
-          No active proposals found.
-        </CWText>
       )}
     </div>
   );
