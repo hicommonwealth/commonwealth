@@ -23,7 +23,7 @@ export type HealthCheckOptions = {
 };
 
 export function startHealthCheckLoop({
-  enabled,
+  enabled = true,
   service,
   checkFn,
 }: HealthCheckOptions) {
@@ -35,7 +35,6 @@ export function startHealthCheckLoop({
   // perform a loop that invokes 'checkFn' and sends status to StatsD
   const loop = async () => {
     const nextCheckAt = Date.now() + PING_INTERVAL;
-    log.info(`[${stat}] ${nextCheckAt}`);
     let status = 0;
     try {
       await checkFn();
@@ -43,6 +42,7 @@ export function startHealthCheckLoop({
     } catch (err) {
       log.error(err);
     }
+    log.info(`[${stat}] –– ${status}`);
     StatsDController.get().gauge(stat, status);
     const durationUntilNextCheck = nextCheckAt - Date.now();
     setTimeout(loop, durationUntilNextCheck);

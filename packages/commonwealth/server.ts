@@ -59,12 +59,12 @@ import {
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
 
-let isServerReady = false;
+let isServiceHealthy = false;
 
 startHealthCheckLoop({
   service: ServiceKey.Commonwealth,
   checkFn: async () => {
-    if (!isServerReady) {
+    if (!isServiceHealthy) {
       throw new Error('service not healthy');
     }
   },
@@ -294,6 +294,18 @@ async function main() {
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(models);
 
+  if (!process.env.NODE_ENV) {
+    app.post('/health/down', (req, res) => {
+      isServiceHealthy = false;
+      res.send('ok');
+    });
+
+    app.post('/health/up', (req, res) => {
+      isServiceHealthy = true;
+      res.send('ok');
+    });
+  }
+
   setupAPI(
     '/api',
     app,
@@ -326,7 +338,7 @@ async function main() {
     rollbar
   );
 
-  isServerReady = true;
+  isServiceHealthy = true;
 }
 
 main().catch((e) => console.log(e));
