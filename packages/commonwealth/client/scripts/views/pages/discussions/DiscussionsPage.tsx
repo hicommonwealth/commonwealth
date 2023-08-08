@@ -51,26 +51,31 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
    * This function is responsible for sorting threads in state that were earlier
    * sorted by another featured flag
    */
-  const sortByFeaturedFilter = useCallback((t: Thread[]) => {
-    if (featuredFilter === ThreadFeaturedFilterTypes.Oldest) {
+  const sortByFeaturedFilter = useCallback(
+    (t: Thread[]) => {
+      if (featuredFilter === ThreadFeaturedFilterTypes.Oldest) {
+        return [...t].sort((a, b) =>
+          moment(a.createdAt).diff(moment(b.createdAt))
+        );
+      }
+
+      if (featuredFilter === ThreadFeaturedFilterTypes.MostComments) {
+        return [...t].sort((a, b) => b.numberOfComments - a.numberOfComments);
+      }
+
+      if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
+        return [...t].sort(
+          (a, b) => b.associatedReactions.length - a.associatedReactions.length
+        );
+      }
+
+      // Default: Assuming featuredFilter === 'newest'
       return [...t].sort((a, b) =>
-        moment(a.createdAt).diff(moment(b.createdAt))
+        moment(b.createdAt).diff(moment(a.createdAt))
       );
-    }
-
-    if (featuredFilter === ThreadFeaturedFilterTypes.MostComments) {
-      return [...t].sort((a, b) => b.numberOfComments - a.numberOfComments);
-    }
-
-    if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
-      return [...t].sort(
-        (a, b) => b.associatedReactions.length - a.associatedReactions.length
-      );
-    }
-
-    // Default: Assuming featuredFilter === 'newest'
-    return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
-  }, [featuredFilter]);
+    },
+    [featuredFilter]
+  );
 
   /**
    * the api will return sorted results and those are stored in state, when user
@@ -224,11 +229,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
+          const canReact =
+            hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
           return (
             <ThreadCard
               key={thread.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={!(!hasJoinedCommunity || !!thread.lockedAt || !!thread.archivedAt)}
+              canReact={canReact}
               onLockToggle={(isLocked) => {
                 const tempThreads = [...threads];
                 const foundThread = tempThreads.find((t) => t.id === thread.id);
@@ -300,14 +307,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         components={{
           EmptyPlaceholder: () =>
             initializing ? (
-              <div className='threads-wrapper'>
-                {Array(3).fill({}).map((x, i) =>
-                  <ThreadCard
-                    key={i}
-                    showSkeleton
-                    thread={{} as any}
-                  />
-                )}
+              <div className="threads-wrapper">
+                {Array(3)
+                  .fill({})
+                  .map((x, i) => (
+                    <ThreadCard key={i} showSkeleton thread={{} as any} />
+                  ))}
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">

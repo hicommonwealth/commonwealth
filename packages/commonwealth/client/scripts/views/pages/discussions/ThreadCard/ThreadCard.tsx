@@ -36,24 +36,35 @@ type CardProps = AdminActionsProps & {
   canReact?: boolean;
 };
 
-
 const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
-  return <div className={'ThreadCard showSkeleton'}>
-    {!isWindowSmallInclusive && (
-      <ReactionButton thread={thread} size="big" showSkeleton disabled={disabled} />
-    )}
-    <div className="content-wrapper">
-      <div>
-        <Skeleton count={1} className='content-header-skeleton' />
-        <div> <Skeleton className='content-header-icons-skeleton' /> </div>
+  return (
+    <div className={'ThreadCard showSkeleton'}>
+      {!isWindowSmallInclusive && (
+        <ReactionButton
+          thread={thread}
+          size="big"
+          showSkeleton
+          disabled={disabled}
+        />
+      )}
+      <div className="content-wrapper">
+        <div>
+          <Skeleton count={1} className="content-header-skeleton" />
+          <div>
+            {' '}
+            <Skeleton className="content-header-icons-skeleton" />{' '}
+          </div>
+        </div>
+        <div className="content-body-wrapper">
+          <Skeleton count={3} />
+        </div>
       </div>
-      <div className="content-body-wrapper">
-        <Skeleton count={3} />
+      <div className="content-footer">
+        <Skeleton />
       </div>
     </div>
-    <div className="content-footer"><Skeleton /></div>
-  </div>
-}
+  );
+};
 
 export const ThreadCard = ({
   thread,
@@ -84,7 +95,10 @@ export const ThreadCard = ({
     }
   }, []);
 
-  if (showSkeleton) return <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
+  if (showSkeleton)
+    return (
+      <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
+    );
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -117,11 +131,7 @@ export const ThreadCard = ({
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ReactionButton
-            thread={thread}
-            size="big"
-            disabled={!canReact}
-          />
+          <ReactionButton thread={thread} size="big" disabled={!canReact} />
         )}
         <div className="content-wrapper">
           <div className="content-header">
@@ -152,7 +162,7 @@ export const ThreadCard = ({
                 {thread.title}
               </CWText>
             </div>
-            <div className='content-top-tags'>
+            <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
               {linkedSnapshots.length > 0 && (
@@ -194,10 +204,11 @@ export const ThreadCard = ({
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
                     )} 
-                        ${Number.isNaN(parseInt(link.identifier, 10))
-                        ? ''
-                        : ` #${link.identifier}`
-                      }`}
+                        ${
+                          Number.isNaN(parseInt(link.identifier, 10))
+                            ? ''
+                            : ` #${link.identifier}`
+                        }`}
                   />
                 ))}
             </div>

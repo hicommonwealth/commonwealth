@@ -18,21 +18,23 @@ import { useReactionButton } from './useReactionButton';
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
-  showSkeleton?: boolean
+  showSkeleton?: boolean;
   disabled: boolean;
 };
 
 const ReactionButtonSkeleton = () => {
-  return <button
-    onClick={async (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-    }}
-    className={`ThreadReactionButton showSkeleton`}
-  >
-    <Skeleton height={52} width={40} />
-  </button>
-}
+  return (
+    <button
+      onClick={async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      className={`ThreadReactionButton showSkeleton`}
+    >
+      <Skeleton height={52} width={40} />
+    </button>
+  );
+};
 
 export const ReactionButton = ({
   thread,
@@ -46,13 +48,12 @@ export const ReactionButton = ({
   const { dislike, hasReacted, isLoading, isUserForbidden, like } =
     useReactionButton(thread, setReactors);
 
-
-  if (showSkeleton) return <ReactionButtonSkeleton />
+  if (showSkeleton) return <ReactionButtonSkeleton />;
 
   const handleSmallVoteClick = async (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if (disabled) return
+    if (disabled) return;
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
     } else {
@@ -88,7 +89,7 @@ export const ReactionButton = ({
           onClick={async (e) => {
             e.stopPropagation();
             e.preventDefault();
-            if (disabled) return
+            if (disabled) return;
 
             if (!app.isLoggedIn() || !app.user.activeAccount) {
               setIsModalOpen(true);
@@ -96,8 +97,9 @@ export const ReactionButton = ({
               onReactionClick(e, hasReacted, dislike, like);
             }
           }}
-          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
-            }${hasReacted ? ' has-reacted' : ''}`}
+          className={`ThreadReactionButton ${
+            isLoading || isUserForbidden ? ' disabled' : ''
+          }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (
             <CWTooltip
@@ -116,8 +118,9 @@ export const ReactionButton = ({
                       {...(hasReacted && { weight: 'fill' })}
                     />
                     <div
-                      className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                        }`}
+                      className={`reactions-count ${
+                        hasReacted ? ' has-reacted' : ''
+                      }`}
                     >
                       {reactors.length}
                     </div>
@@ -129,8 +132,9 @@ export const ReactionButton = ({
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
               <div
-                className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                  }`}
+                className={`reactions-count ${
+                  hasReacted ? ' has-reacted' : ''
+                }`}
               >
                 {reactors.length}
               </div>
