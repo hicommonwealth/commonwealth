@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect } from 'react';
 
 import app from 'state';
@@ -13,6 +14,22 @@ import type {
   UseChainFormStateHookType,
   UseEthChainFormFieldsHookType,
 } from './types';
+
+export async function updateAdminOnCreateCommunity(chainId: string) {
+  app.user.ephemerallySetActiveAccount(
+    app.user.addresses.filter((a) => a.chain.id === chainId)[0]
+  );
+
+  const roles = await axios.get(`${app.serverUrl()}/roles`, {
+    params: {
+      chain_id: chainId,
+      permissions: ['admin'],
+    },
+  });
+
+  app.roles.addRole(roles.data.result[0]);
+  app.skipDeinitChain = true;
+}
 
 export const initChainForm = (): ChainFormDefaultFields => {
   return {
@@ -135,6 +152,8 @@ export const ethChainRows = (
     app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
   ] as Array<DropdownItemType>;
 
+  const ethChainNode = options.filter((o) => o.label === 'Ethereum Mainnet')[0];
+
   function onSelectHandler(o) {
     state.setChainString(o.value);
 
@@ -156,7 +175,7 @@ export const ethChainRows = (
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    onSelectHandler(options[0]);
+    onSelectHandler(ethChainNode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -165,8 +184,9 @@ export const ethChainRows = (
       <CWDropdown
         label="Chain"
         options={options}
-        initialValue={options[0]}
+        initialValue={ethChainNode}
         onSelect={(o) => onSelectHandler(o)}
+        disabled={!!props.disabled}
       />
       {state.chainString === 'Custom' && (
         <InputRow
@@ -202,7 +222,7 @@ export const ethChainRows = (
         />
       )}
       <InputRow
-        title="Address"
+        title="Token Contract Address"
         value={state.address}
         placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
         onChangeHandler={(v) => {

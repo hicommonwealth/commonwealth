@@ -42,8 +42,11 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     return;
   }
 
-  // Shut down old chain if applicable
-  await deinitChainOrCommunity();
+  // This is a bandaid fix used to stop chain deinit on navigation from createCommunities page. Should be removed.
+  if (!app.skipDeinitChain) {
+    await deinitChainOrCommunity();
+    app.skipDeinitChain = false;
+  }
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
 
@@ -221,8 +224,11 @@ export const initChain = async (): Promise<void> => {
     await app.chain.initApi();
   }
 
+  if (!app.chain.loaded) {
+    await app.chain.initData();
+  }
+
   const chain = app.chain.meta;
-  await app.chain.initData();
 
   // Emit chain as updated
   app.chainAdapterReady.emit('ready');

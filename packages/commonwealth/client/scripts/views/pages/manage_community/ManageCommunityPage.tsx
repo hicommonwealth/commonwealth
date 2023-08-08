@@ -6,29 +6,24 @@ import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
 import NewProfilesController from '../../../controllers/server/newProfiles';
-import { TTLCache } from '../../../helpers/ttl_cache';
 import RoleInfo from '../../../models/RoleInfo';
 import Permissions from '../../../utils/Permissions';
-import { PageLoading } from '../loading';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
+import ErrorPage from '../error';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
-  const [initialized, setInitialized] = useState(false);
-  const [roleData, setRoleData] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [mods, setMods] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
-
-  const membersCache = useMemo(() => {
-    return new TTLCache(
-      1_000 * 60,
-      `manage-community-members-${app.activeChainId()}`
-    );
-  }, []);
 
   const fetchAdmins = async () => {
     const memberAdmins = [];
@@ -57,48 +52,27 @@ const ManageCommunityPage = () => {
     setMods(memberMods);
   };
 
-  const searchMembers = async (searchQuery?: string) => {
-    try {
-      let profiles = [];
+  const { data: searchResults, refetch } = useSearchProfilesQuery({
+    chainId: app.activeChainId(),
+    searchTerm: debouncedSearchTerm,
+    limit: 20,
+    orderBy: APIOrderBy.LastActive,
+    orderDirection: APIOrderDirection.Desc,
+    includeRoles: true,
+  });
 
-      const cachedResult = membersCache.get(searchQuery);
-      if (cachedResult) {
-        profiles = cachedResult.profiles;
-      } else {
-        const res = await axios.get(`${app.serverUrl()}/searchProfiles`, {
-          params: {
-            chain: app.activeChainId(),
-            search: searchQuery || '',
-            page_size: 100,
-            page: 1,
-            include_roles: true,
-          },
-        });
-        if (res.data.status !== 'Success') {
-          throw new Error('Could not fetch members');
-        }
-        membersCache.set(searchQuery, res.data.result);
-        profiles = res.data.result.profiles;
-      }
-
-      let roles = [];
-
-      if (profiles.length > 0) {
-        roles = profiles.map((profile) => {
-          return {
-            ...(profile.roles[0] || {}),
-            Address: profile.addresses[0],
-            id: profile.addresses[0].id,
-          };
-        });
-      }
-      setRoleData(roles);
-      setInitialized(true);
-    } catch (err) {
-      setRoleData([]);
-      setInitialized(true);
+  const roleData = useMemo(() => {
+    if (!searchResults?.pages?.length) {
+      return [];
     }
-  };
+    return searchResults.pages[0].results.map((profile) => {
+      return {
+        ...(profile.roles[0] || {}),
+        Address: profile.addresses[0],
+        id: profile.addresses[0].id,
+      };
+    });
+  }, [searchResults]);
 
   useEffect(() => {
     NewProfilesController.Instance.isFetched.on('redraw', () =>
@@ -108,30 +82,19 @@ const ManageCommunityPage = () => {
     NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
   }, [forceRerender]);
 
-  // on update debounced search term, fetch
-  useEffect(() => {
-    searchMembers(debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
-
   // on init, fetch
   useEffect(() => {
     if (!app.activeChainId()) {
       return;
     }
-
     fetchAdmins();
-    searchMembers();
   }, []);
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  if (!initialized) {
-    return <PageLoading />;
+  if (!isAdmin) {
+    return <ErrorPage message={'Must be admin'} />;
   }
-
-  // if (!isAdmin) {
-  //   return <ErrorPage message={'Must be admin'} />;
-  // }
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
@@ -183,7 +146,7 @@ const ManageCommunityPage = () => {
       }
     }
 
-    searchMembers();
+    refetch();
   };
 
   return (

@@ -104,16 +104,16 @@ const resetServer = (debug = false): Promise<void> => {
       const nodes = [
         ['mainnet1.edgewa.re', 'Edgeware Mainnet', null, BalanceType.Substrate],
         [
-          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
           'Ethereum Mainnet',
           '1',
         ],
         [
-          'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+          'https://eth-ropsten.alchemyapi.io/v2/dummy_key',
           'Ropsten Testnet',
           '3',
         ],
-        ['https://rpc-juno.itastakers.com', 'Juno', null, BalanceType.Cosmos],
+        ['https://rpc-juno.ecostake.com', 'Juno', null, BalanceType.Cosmos],
         [
           'https://cosmos-devnet.herokuapp.com/rpc',
           'Cosmos SDK v0.46.11 devnet',
@@ -298,10 +298,6 @@ const resetServer = (debug = false): Promise<void> => {
 
       // Notification Categories
       await models.NotificationCategory.create({
-        name: NotificationCategories.NewCommunity,
-        description: 'someone makes a new community',
-      });
-      await models.NotificationCategory.create({
         name: NotificationCategories.NewThread,
         description: 'someone makes a new thread',
       });
@@ -332,14 +328,6 @@ const resetServer = (debug = false): Promise<void> => {
       await models.NotificationCategory.create({
         name: NotificationCategories.CommentEdit,
         description: 'someoned edited a comment',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.NewRoleCreation,
-        description: 'someone created a role',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.EntityEvent,
-        description: 'an entity-event as occurred',
       });
       await models.NotificationCategory.create({
         name: NotificationCategories.SnapshotProposal,
@@ -428,8 +416,6 @@ export enum CACHE_ENDPOINTS {
 }
 
 export const setupCacheTestEndpoints = (appAttach: Express) => {
-  log.info('setupCacheTestEndpoints');
-
   // /cachedummy endpoint for testing
   appAttach.get(
     CACHE_ENDPOINTS.BROKEN_4XX,
@@ -519,19 +505,6 @@ const rollbar = new Rollbar({
 
 setupErrorHandlers(app, rollbar);
 setupServer();
-
-function availableRoutes() {
-  return app._router.stack
-    .filter((r) => r.route)
-    .map((r) => {
-      return {
-        method: Object.keys(r.route.methods)[0].toUpperCase(),
-        path: r.route.path,
-      };
-    });
-}
-
-console.log(JSON.stringify(availableRoutes(), null, 2));
 
 export const resetDatabase = () => resetServer();
 export const getTokenBalanceCache = () => tokenBalanceCache;

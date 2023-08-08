@@ -45,7 +45,7 @@ export const createCommentReactionHandler = async (
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.comments.createCommentReaction(
+    await controllers.comments.createCommentReaction({
       user,
       address,
       chain,
@@ -53,12 +53,8 @@ export const createCommentReactionHandler = async (
       commentId,
       canvasAction,
       canvasSession,
-      canvasHash
-    );
-
-  // update address last active
-  address.last_active = new Date();
-  address.save().catch(console.error);
+      canvasHash,
+    });
 
   // emit notifications
   for (const n of notificationOptions) {
@@ -67,7 +63,7 @@ export const createCommentReactionHandler = async (
 
   // track analytics events
   for (const a of analyticsOptions) {
-    controllers.analytics.track(a).catch(console.error);
+    controllers.analytics.track(a, req).catch(console.error);
   }
 
   return success(res, newReaction);

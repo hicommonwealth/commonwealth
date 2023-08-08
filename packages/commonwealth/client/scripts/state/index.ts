@@ -1,31 +1,26 @@
-import ChainEntityController from 'controllers/server/chain_entities';
-import DiscordController from 'controllers/server/discord';
-import { WebSocketController } from 'controllers/server/socket';
-import { EventEmitter } from 'events';
-import { ChainStore, NodeStore } from 'stores';
+import { ChainCategoryType } from 'common-common/src/types';
+import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import SnapshotController from 'controllers/chain/snapshot';
-import CommentsController from 'controllers/server/comments';
+import ChainEntityController from 'controllers/server/chain_entities';
 import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
-import NewProfilesController from 'controllers/server/newProfiles';
+import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
-import ReactionCountsController from 'controllers/server/reactionCounts';
-import ReactionsController from 'controllers/server/reactions';
-import ThreadReactionsController from 'controllers/server/reactions/ThreadReactionsController';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
-import ThreadsController from 'controllers/server/threads';
+import { WebSocketController } from 'controllers/server/socket';
 import ThreadUniqueAddressesCount from 'controllers/server/threadUniqueAddressesCount';
+import ThreadsController from 'controllers/server/threads';
 import { UserController } from 'controllers/server/user';
+import { EventEmitter } from 'events';
+import $ from 'jquery';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
-import $ from 'jquery';
-import { updateActiveUser } from 'controllers/app/login';
-import { ChainCategoryType } from 'common-common/src/types';
+import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -57,10 +52,6 @@ export interface IApp {
   // Threads
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
-  comments: CommentsController;
-  reactions: ReactionsController;
-  threadReactions: ThreadReactionsController;
-  reactionCounts: ReactionCountsController;
   polls: PollsController;
 
   // Proposals
@@ -121,6 +112,9 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
+
+  // bandaid fix to skip next deinit chain on layout.tsx transition
+  skipDeinitChain: boolean;
 }
 
 // INJECT DEPENDENCIES
@@ -148,10 +142,6 @@ const app: IApp = {
   // Thread
   threads: ThreadsController.Instance,
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
-  comments: new CommentsController(),
-  reactions: new ReactionsController(),
-  threadReactions: new ThreadReactionsController(),
-  reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
 
   // Proposals
@@ -219,6 +209,7 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
+  skipDeinitChain: false,
 };
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status

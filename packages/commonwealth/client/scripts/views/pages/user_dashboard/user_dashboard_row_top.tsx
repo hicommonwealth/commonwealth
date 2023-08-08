@@ -1,15 +1,13 @@
-import React from 'react';
-
 import { capitalize } from 'lodash';
 import moment from 'moment';
-
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
-
+import React from 'react';
+import { Link } from 'react-router-dom';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWText } from '../../components/component_kit/cw_text';
-import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 type UserDashboardRowTopProps = {
@@ -74,15 +72,14 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       <div className="community-info">
         <img className="icon" src={communityIcon} />
         <CWText type="caption" fontWeight="medium">
-          <a
+          <Link
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              navigate(`/${chain_id}`);
             }}
+            to={`/${chain_id}`}
           >
             {communityName}
-          </a>
+          </Link>
         </CWText>
         <div className="dot">.</div>
         <CWText type="caption" fontWeight="medium" className="gray-text">

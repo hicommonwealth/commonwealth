@@ -11,12 +11,7 @@ import type { DB } from '../../database/database';
 import type { ChainEventInstance } from '../../database/models/chain_event';
 
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
-import {
-  EntityEventKind,
-  eventToEntity,
-  IEventHandler,
-} from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types';
+import { eventToEntity, IEventHandler } from 'chain-events/src';
 
 export interface StorageFilterConfig {
   excludedEvents?: IChainEventKind[];
@@ -43,23 +38,6 @@ export default class extends IEventHandler {
     });
   }
 
-  /**
-   * Truncates a preimage with large args into a smaller form, to decrease
-   * storage size in the db and size of /bulkEntities fetches.
-   */
-  private truncateEvent(event: CWEvent, maxLength = 64): CWEvent {
-    // only truncate preimages, for now
-    if (
-      event.data.kind === SubstrateTypes.EventKind.PreimageNoted &&
-      event.data.preimage
-    ) {
-      event.data.preimage.args = event.data.preimage.args.map((m) =>
-        m.length > maxLength ? `${m.slice(0, maxLength - 1)}…` : m
-      );
-    }
-    return event;
-  }
-
   private async _shouldSkip(event: CWEvent): Promise<boolean> {
     if (!event) return true;
 
@@ -81,7 +59,6 @@ export default class extends IEventHandler {
     );
     const chain = event.chain || this._chain;
 
-    event = this.truncateEvent(event);
     const shouldSkip = await this._shouldSkip(event);
     if (shouldSkip) {
       log.trace(`Skipping event!`);

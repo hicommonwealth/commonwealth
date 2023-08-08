@@ -1,8 +1,10 @@
 import { filterLinks } from 'helpers/threads';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/view_thread/linked_threads_card.scss';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import 'pages/view_thread/linked_threads_card.scss';
 import app from 'state';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { slugify } from '../../../../../shared/utils';
@@ -72,9 +74,9 @@ export const LinkedThreadsCard = ({
                     );
 
                     return (
-                      <a key={t.id} href={discussionLink}>
+                      <Link key={t.id} to={discussionLink}>
                         {t.title}
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>

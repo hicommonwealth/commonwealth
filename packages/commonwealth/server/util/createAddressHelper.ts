@@ -10,7 +10,8 @@ import type { UserInstance } from '../models/user';
 import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { Op } from 'sequelize';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 type CreateAddressReq = {
   address: string;
@@ -93,6 +94,12 @@ export async function createAddressHelper(
       where: { chain: req.chain, address: encodedAddress },
     }
   );
+
+  const existingAddressOnOtherChain = await models.Address.scope(
+    'withPrivateData'
+  ).findOne({
+    where: { chain: { [Op.ne]: req.chain }, address: encodedAddress },
+  });
 
   if (existingAddress) {
     // address already exists on another user, only take ownership if
@@ -183,13 +190,20 @@ export async function createAddressHelper(
         await createRole(models, newObj.id, req.chain, 'member');
       }
 
-      serverAnalyticsTrack({
-        event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-        chain: req.chain,
-        isCustomDomain: null,
-      });
+      const serverAnalyticsController = new ServerAnalyticsController();
+      serverAnalyticsController.track(
+        {
+          event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
+          chain: req.chain,
+          isCustomDomain: null,
+        },
+        req
+      );
 
-      return { ...newObj.toJSON(), newly_created: true };
+      return {
+        ...newObj.toJSON(),
+        newly_created: !existingAddressOnOtherChain,
+      };
     } catch (e) {
       return next(e);
     }

@@ -4,6 +4,7 @@ import { getScore } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
+import Thread from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/new_snapshot_proposal.scss';
@@ -17,10 +18,9 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
-  createDeltaFromText,
   ReactQuillEditor,
+  createDeltaFromText,
 } from '../../components/react_quill_editor';
-import { PageLoading } from '../loading';
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
 
@@ -28,11 +28,20 @@ type NewSnapshotProposalPageProps = {
   snapshotId: string;
 };
 
-export const NewSnapshotProposalPageComponent = ({
+type NewSnapshotProposalFormProps = {
+  snapshotId: string;
+  thread?: Thread;
+  onSave?: (snapshotInfo: { id: string; snapshot_title: string }) => void;
+};
+
+export const NewSnapshotProposalForm = ({
   snapshotId,
-}: NewSnapshotProposalPageProps) => {
+  thread,
+  onSave,
+}: NewSnapshotProposalFormProps) => {
   const navigate = useCommonNavigate();
 
+  const [loading, setLoading] = useState<boolean>(true);
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   const [form, setForm] = useState<ThreadForm | null>(null);
@@ -41,8 +50,7 @@ export const NewSnapshotProposalPageComponent = ({
     createDeltaFromText('')
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [snapshotScoresFetched, setSnapshotScoresFetched] =
-    useState<boolean>(false);
+  const [, setSnapshotScoresFetched] = useState<boolean>(false);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [userScore, setUserScore] = useState<number>(0);
 
@@ -67,7 +75,7 @@ export const NewSnapshotProposalPageComponent = ({
       setIsSaving(true);
 
       const content = JSON.stringify(contentDelta);
-      await createNewProposal(form, content, author, space);
+      const response = await createNewProposal(form, content, author, space);
 
       clearLocalStorage();
       trackAnalytics({
@@ -75,6 +83,10 @@ export const NewSnapshotProposalPageComponent = ({
       });
       notifySuccess('Snapshot Created!');
       navigate(`/snapshot/${space.id}`);
+
+      if (onSave) {
+        onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
+      }
     } catch (err) {
       notifyError(capitalize(err.message));
     } finally {
@@ -85,14 +97,17 @@ export const NewSnapshotProposalPageComponent = ({
   useEffect(() => {
     const init = async () => {
       await app.snapshot.init(snapshotId);
+    };
 
+    // Add event listener for SnapshotController
+    const handleInitialized = async () => {
       if (!app.snapshot.initialized) {
         return;
       }
 
       const initialForm: ThreadForm = {
-        name: '',
-        body: '',
+        name: !thread ? '' : thread.title,
+        body: !thread ? '' : thread.plaintext,
         choices: ['Yes', 'No'],
         range: '5d',
         start: new Date().getTime(),
@@ -123,6 +138,28 @@ export const NewSnapshotProposalPageComponent = ({
           }
         }
       }
+      if (thread && thread.body) {
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/discussion/')) {
+          const domain = window.location.origin;
+          const chainId = app.activeChainId();
+          const threadId = thread.id;
+
+          const linkText = `\n\nThis conversation was started on Commonwealth. Any attached images have been removed. See more discussion: `;
+          const linkUrl = `\n${domain}/${chainId}/discussion/${threadId}`;
+
+          const linkMarkdown = `${linkText}[here](${linkUrl})`;
+
+          const delta = createDeltaFromText(
+            thread.plaintext + linkMarkdown,
+            true
+          );
+          setContentDelta(delta);
+        } else {
+          const delta = createDeltaFromText(thread.plaintext);
+          setContentDelta(delta);
+        }
+      }
 
       setForm(initialForm);
 
@@ -135,12 +172,23 @@ export const NewSnapshotProposalPageComponent = ({
       setSpace(snapshotSpace);
       setMembers(snapshotSpace.members);
       setSnapshotScoresFetched(true);
+      setLoading(false);
     };
+
     init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
+
+    return () => {
+      app.snapshot.snapshotEmitter.off('initialized', handleInitialized);
+    };
   }, []);
 
-  if (!form || !snapshotScoresFetched) return <PageLoading />;
+  if (loading)
+    return (
+      <div className="loading-state">
+        <CWSpinner />
+      </div>
+    );
 
   const author = app.user.activeAccount;
 
@@ -166,11 +214,10 @@ export const NewSnapshotProposalPageComponent = ({
       (minScoreFromSpace > 0 && userScore > minScoreFromSpace) ||
       isMember);
 
+  // Check if the space object is not null before rendering the form
+
   return (
-    <div className="NewSnapshotProposalPage">
-      <CWText type="h3" fontWeight="medium">
-        New Snapshot Proposal
-      </CWText>
+    <div className="NewSnapshotProposalForm">
       {space.filters?.onlyMembers && !isMember && (
         <CWText>
           You need to be a member of the space in order to submit a proposal.
@@ -182,7 +229,10 @@ export const NewSnapshotProposalPageComponent = ({
           in order to submit a proposal.
         </CWText>
       ) : (
-        <CWSpinner />
+        <CWText>
+          You need to meet the minimum quorum of {space.symbol} in order to
+          submit a proposal.
+        </CWText>
       )}
       <CWTextInput
         label="Question/Proposal"
@@ -247,6 +297,19 @@ export const NewSnapshotProposalPageComponent = ({
         disabled={!author || isSaving || !isValid}
         onClick={handlePublish}
       />
+    </div>
+  );
+};
+
+const NewSnapshotProposalPageComponent = ({
+  snapshotId,
+}: NewSnapshotProposalPageProps) => {
+  return (
+    <div className="NewSnapshotProposalPage">
+      <CWText type="h3" fontWeight="medium">
+        New Snapshot Proposal
+      </CWText>
+      <NewSnapshotProposalForm snapshotId={snapshotId} />
     </div>
   );
 };

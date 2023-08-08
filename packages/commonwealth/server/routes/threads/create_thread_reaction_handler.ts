@@ -45,7 +45,7 @@ export const createThreadReactionHandler = async (
 
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadReaction(
+    await controllers.threads.createThreadReaction({
       user,
       address,
       chain,
@@ -53,8 +53,8 @@ export const createThreadReactionHandler = async (
       threadId,
       canvasAction,
       canvasSession,
-      canvasHash
-    );
+      canvasHash,
+    });
 
   // update address last active
   address.last_active = new Date();
@@ -64,7 +64,7 @@ export const createThreadReactionHandler = async (
   controllers.notifications.emit(notificationOptions).catch(console.error);
 
   // track analytics event
-  controllers.analytics.track(analyticsOptions).catch(console.error);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, newReaction);
 };

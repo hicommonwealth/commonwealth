@@ -10,24 +10,24 @@ import type Topic from '../../../models/Topic';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
+import { CWText } from '../../components/component_kit/cw_text';
 import { TopicSummaryRow } from './topic_summary_row';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const { isWindowExtraSmall } = useBrowserWindow({});
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
-    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
       app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
-      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
@@ -95,7 +95,7 @@ const OverviewPage = () => {
             onClick={() => {
               navigate('/new/discussion');
             }}
-            disabled={!app.user.activeAccount}
+            disabled={!hasJoinedCommunity}
           />
         ) : (
           <CWButton
@@ -105,7 +105,7 @@ const OverviewPage = () => {
             onClick={() => {
               navigate('/new/discussion');
             }}
-            disabled={!app.user.activeAccount}
+            disabled={!hasJoinedCommunity}
           />
         )}
       </div>

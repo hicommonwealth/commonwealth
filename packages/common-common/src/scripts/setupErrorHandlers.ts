@@ -7,9 +7,6 @@ import { ServerError, AppError } from '../errors';
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
 const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
-  // Rollbar notifications
-  app.use(rollbar.errorHandler());
-
   // Handle 404 errors
   app.use((req: Request, res: Response) => {
     res.status(404);
@@ -24,21 +21,24 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
   app.use((error, req, res: Response, next) => {
     if (error instanceof ServerError) {
       console.trace(error);
-      rollbar.error(error); // expected server error
+      // if the original error is given when creating the ServerError instance then pass its message to Rollbar
+      if (error.error.message) {
+        rollbar.error(error, req, { OriginalError: error.error.message });
+      } else rollbar.error(error, req);
       res.status(error.status).send({
         status: error.status,
         // Use external facing error message
         error: 'Server error, please try again later.',
       });
     } else if (error instanceof AppError) {
-      rollbar.log(error); // expected application/user error
+      rollbar.log(error, req); // expected application/user error
       res.status(error.status).send({
         status: error.status,
         error: error.message,
       });
     } else {
       console.trace(error);
-      rollbar.critical(error); // unexpected error
+      rollbar.critical(error, req); // unexpected error
       res.status(500);
       res.json({
         status: error.status,

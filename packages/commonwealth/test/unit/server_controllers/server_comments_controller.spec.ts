@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
+import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import { ChainInstance } from 'server/models/chain';
 import Sinon from 'sinon';
 
@@ -56,7 +57,9 @@ describe('ServerCommentsController', () => {
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
-      const address = {};
+      const address = {
+        save: async () => {},
+      };
       const chain = {
         id: 'ethereum',
       };
@@ -70,13 +73,13 @@ describe('ServerCommentsController', () => {
       );
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
-        await serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        );
+        await serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId,
+        });
 
       expect(newReaction).to.be.ok;
 
@@ -185,13 +188,13 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          123
-        )
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId: 123,
+        })
       ).to.be.rejectedWith('Comment not found: 123');
     });
 
@@ -254,13 +257,13 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          123
-        )
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId: 123,
+        })
       ).to.be.rejectedWith('Thread not found for comment: 123');
     });
 
@@ -328,13 +331,13 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        )
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId,
+        })
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
@@ -426,14 +429,14 @@ describe('ServerCommentsController', () => {
       );
 
       expect(
-        serverCommentsController.createCommentReaction(
-          user as any,
-          address as any,
-          chain as any,
-          reaction as any,
-          commentId
-        )
-      ).to.be.rejectedWith('Could not verify user token balance');
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId,
+        })
+      ).to.be.rejectedWith('Insufficient token balance');
     });
   });
 
@@ -459,17 +462,25 @@ describe('ServerCommentsController', () => {
         banCache as any
       );
 
-      const reactions = await serverCommentsController.getCommentReactions(777);
+      const reactions = await serverCommentsController.getCommentReactions({
+        commentId: 777,
+      });
       expect(reactions).to.have.length(2);
     });
   });
 
   describe('#searchComments', () => {
     it('should return comment search results', async () => {
-      const sandbox = Sinon.createSandbox();
       const db = {
         sequelize: {
-          query: sandbox.stub().resolves([{ id: 1 }, { id: 2 }]),
+          query: (sql: string) => {
+            if (sql.includes('COUNT')) {
+              return [{ count: '11' }];
+            }
+            return Array(5)
+              .fill(0)
+              .map((_, idx) => ({ id: idx + 1 }));
+          },
         },
       };
       const tokenBalanceCache = {};
@@ -482,30 +493,24 @@ describe('ServerCommentsController', () => {
       );
 
       const chain = { id: 'ethereum' };
-      const searchOptions = {
+      const searchOptions: SearchCommentsOptions = {
+        chain: chain as ChainInstance,
         search: 'hello',
-        sort: 'blah',
-        page: 7,
-        pageSize: 5,
+        limit: 5,
+        page: 2,
+        orderBy: 'created_at',
+        orderDirection: 'DESC',
       };
       const comments = await serverCommentsController.searchComments(
-        chain as ChainInstance,
-        searchOptions.search,
-        searchOptions.sort,
-        searchOptions.page,
-        searchOptions.pageSize
+        searchOptions
       );
-      const sqlArgs = db.sequelize.query.args[0];
-      expect(sqlArgs).to.have.length(2);
-      expect(sqlArgs[1].bind).to.include({
-        searchTerm: 'hello',
-        limit: 5,
-        offset: 30,
-        chain: 'ethereum',
-      });
-      expect(comments).to.have.length(2);
-      expect(comments[0].id).to.equal(1);
-      expect(comments[1].id).to.equal(2);
+      expect(comments.results).to.have.length(5);
+      expect(comments.results[0].id).to.equal(1);
+      expect(comments.results[1].id).to.equal(2);
+      expect(comments.limit).to.equal(5);
+      expect(comments.page).to.equal(2);
+      expect(comments.totalPages).to.equal(3);
+      expect(comments.totalResults).to.equal(11);
     });
   });
 
@@ -566,13 +571,13 @@ describe('ServerCommentsController', () => {
       const commentId = 123;
       const commentBody = 'Hello';
       const [updatedComment, allNotificationOptions] =
-        await serverCommentsController.updateComment(
-          user as any,
-          address as any,
-          chain as any,
+        await serverCommentsController.updateComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           commentId,
-          commentBody
-        );
+          commentBody,
+        });
 
       expect(updatedComment).to.include({
         id: 123,
@@ -667,13 +672,13 @@ describe('ServerCommentsController', () => {
       const commentId = 123;
       const commentBody = 'Hello';
       expect(
-        serverCommentsController.updateComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverCommentsController.updateComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           commentId,
-          commentBody
-        )
+          commentBody,
+        })
       ).to.be.rejectedWith('Ban error: banned');
     });
 
@@ -728,23 +733,26 @@ describe('ServerCommentsController', () => {
       const commentId = 123;
       const commentBody = 'Hello';
       expect(
-        serverCommentsController.updateComment(
-          user as any,
-          address as any,
-          chain as any,
+        serverCommentsController.updateComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
           commentId,
-          commentBody
-        )
+          commentBody,
+        })
       ).to.be.rejectedWith('Thread not found for comment');
     });
   });
 
   describe('#deleteComment', () => {
     it('should delete a comment', async () => {
+      let didDestroy = false;
       const db = {
         Comment: {
           findOne: async () => ({
-            destroy: async () => ({}),
+            destroy: async () => {
+              didDestroy = true;
+            },
           }),
         },
         Subscription: {
@@ -768,12 +776,13 @@ describe('ServerCommentsController', () => {
       const address = {};
       const chain = {};
       const commentId = 1;
-      await serverCommentsController.deleteComment(
-        user as any,
-        address as any,
-        chain as any,
-        commentId
-      );
+      await serverCommentsController.deleteComment({
+        user: user as any,
+        address: address as any,
+        chain: chain as any,
+        commentId,
+      });
+      expect(didDestroy).to.be.true;
     });
   });
 });

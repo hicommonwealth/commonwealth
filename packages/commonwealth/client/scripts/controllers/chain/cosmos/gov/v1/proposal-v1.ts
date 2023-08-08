@@ -193,10 +193,10 @@ export class CosmosProposalV1 extends Proposal<
         if (tallyResp?.tally) {
           this.data.state.tally = marshalTallyV1(tallyResp?.tally);
         }
-
-        this.isFetched.emit('redraw');
       } catch (err) {
-        console.error(`Cosmos query failed: ${err.message}`);
+        console.error(`Cosmos vote query failed: ${err.message}`);
+      } finally {
+        this.isFetched.emit('redraw');
       }
     }
   }
@@ -273,7 +273,7 @@ export class CosmosProposalV1 extends Proposal<
       case 'Rejected':
         return ProposalStatus.Failed;
       case 'VotingPeriod':
-        return this.support > 0.5 && this.veto <= 1 / 3
+        return +this.support > 0.5 && this.veto <= 1 / 3
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':

@@ -1,0 +1,58 @@
+@import '../../../../../../../styles/shared';
+
+.ThreadReactionButton {
+  align-items: center;
+  border-radius: $border-radius-corners-wider;
+  border: 1px solid $neutral-200;
+  color: $neutral-500;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  padding: 4px 12px;
+  width: fit-content;
+  height: fit-content;
+  justify-content: center;
+  max-width: 42px;
+  max-height: 54px;
+  outline: none;
+
+  &.showSkeleton {
+    border: 1px solid transparent;
+  }
+
+  &.has-reacted {
+    color: $primary-500;
+  }
+
+  &.disabled {
+    border-color: $neutral-50;
+    color: $neutral-500;
+    pointer-events: none;
+  }
+
+  .reactions-container {
+    display: flex;
+    flex-direction: column;
+
+    svg {
+      margin: 4px auto 2px;
+
+      &.Icon {
+        font-size: 16px;
+      }
+    }
+
+    .reactions-count {
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 400;
+      margin: 2px auto 4px;
+      color: $neutral-400;
+
+      &.has-reacted {
+        color: $primary-500;
+      }
+    }
+  }
+}

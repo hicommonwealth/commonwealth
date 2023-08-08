@@ -14,10 +14,6 @@ export type Proposal = UnPromisify<
 // API is imported contracts classes
 interface IAaveContracts {
   governance: IAaveGovernanceV2;
-
-  // optional token types for Delegation events
-  aaveToken?: IGovernancePowerDelegationToken;
-  stkAaveToken?: IGovernancePowerDelegationToken;
 }
 
 export interface ListenerOptions {
