@@ -11,12 +11,12 @@ export async function login(page) {
 
   await page.waitForSelector('.LoginDesktop');
 
-  let metaMaskIcon = await page.$$("text='Metamask'");
+  let metaMaskIcon = await page.locator("text='Metamask'");
   do {
     await page.mouse.click(0, 0);
     button = await page.locator('.LoginSelector button');
     await button.click();
-    metaMaskIcon = await page.$$("text='Metamask'");
+    metaMaskIcon = await page.locator("text='Metamask'");
   } while (metaMaskIcon.length === 0);
 
   await page.getByText('Metamask').click();
