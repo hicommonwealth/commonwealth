@@ -212,6 +212,7 @@ const ReactQuillEditor = ({
         {showTooltip && <QuillTooltip label={tooltipLabel} />}
         {isUploading && <LoadingIndicator />}
         <Modal
+          className="hiddenOverflow"
           content={
             <PreviewModal
               doc={
