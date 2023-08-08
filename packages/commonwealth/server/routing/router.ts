@@ -1,8 +1,14 @@
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
+import useragent from 'express-useragent';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from '../middleware/methodNotAllowed';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -75,10 +81,6 @@ import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
-import createDraft from '../routes/drafts/createDraft';
-import deleteDraft from '../routes/drafts/deleteDraft';
-import editDraft from '../routes/drafts/editDraft';
-import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
@@ -195,10 +197,6 @@ export type ServerControllers = {
   profiles: ServerProfilesController;
   chains: ServerChainsController;
 };
-import {
-  methodNotAllowedMiddleware,
-  registerRoute,
-} from '../middleware/methodNotAllowed';
 
 function setupRouter(
   endpoint: string,
@@ -225,6 +223,8 @@ function setupRouter(
   // ---
 
   const router = express.Router();
+
+  router.use(useragent.express());
 
   // Updating the address
   registerRoute(
@@ -636,36 +636,6 @@ function setupRouter(
     searchProfilesHandler.bind(this, serverControllers)
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
-
-  // discussion drafts
-  registerRoute(
-    router,
-    'post',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    createDraft.bind(this, models)
-  );
-  registerRoute(router, 'get', '/drafts', getDrafts.bind(this, models));
-  registerRoute(
-    router,
-    'delete',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteDraft.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'patch',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    editDraft.bind(this, models)
-  );
 
   registerRoute(
     router,

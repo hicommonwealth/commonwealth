@@ -1,0 +1,93 @@
+@import '../../../shared';
+
+@mixin tip ($top, $right, $bottom, $left) {
+  position: absolute;
+  transform: rotate(45deg);
+  width: 8px;
+  height: 8px;
+
+  background: $neutral-900;
+  
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+  z-index: 1;
+
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+.Tooltip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: $neutral-900;
+  border-radius: 4px;
+  border: none;
+  overflow: hidden;
+  padding: 4px 8px;
+  isolation: isolate;
+  max-width: 232px;
+  height: fit-content;
+  max-height: 40px;
+
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+
+  &.top {
+    margin-bottom: 8px;
+  }
+  
+  &.right {
+    margin-left: 8px;
+  }
+  
+  &.bottom {
+    margin-top: 8px;
+  }
+  
+  &.left {
+    margin-right: 8px;
+  }
+
+  .Arrow {
+    border-radius: 0;
+    border: none;
+    padding: 0;
+
+    &.tipTop {
+      @include tip(auto, auto, -4px, calc(50% - 8px/2));
+    }
+    
+    &.tipRight {
+      @include tip(calc(50% - 8px/2), auto, auto, -4px);
+    }
+    
+    &.tipBottom {
+      @include tip(-4px, auto, auto, calc(50% - 8px/2));
+    }
+    
+    &.tipLeft {
+      @include tip(calc(50% - 8px/2), -4px, auto, auto);
+    }
+  }
+
+  .Text {
+    @include multiline-text-ellipsis(2);
+
+    text-align: center;
+    font-family: 'NeueHaasUnica';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.02em;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+    color: $white;
+    word-break: break-word;
+  }
+}

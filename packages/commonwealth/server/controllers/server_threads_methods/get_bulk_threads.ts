@@ -7,7 +7,7 @@ import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { getLastEdited } from '../../util/getLastEdited';
 
 export type GetBulkThreadsOptions = {
-  chain: ChainInstance;
+  chain?: ChainInstance;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -16,6 +16,7 @@ export type GetBulkThreadsOptions = {
   orderBy: string;
   fromDate: string;
   toDate: string;
+  archived: boolean;
 };
 
 export type GetBulkThreadsResult = {
@@ -37,6 +38,7 @@ export async function __getBulkThreads(
     orderBy,
     fromDate,
     toDate,
+    archived,
   }: GetBulkThreadsOptions
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
@@ -52,7 +54,7 @@ export async function __getBulkThreads(
       page: _page,
       limit: _limit,
       offset: _offset,
-      chain: chain.id,
+      ...(chain && { chain: chain.id }),
       ...(stage && { stage }),
       ...(topicId && { topic_id: topicId }),
     };
@@ -129,9 +131,10 @@ export async function __getBulkThreads(
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          AND t.chain = $chain
+          ${chain ? ` AND t.chain = $chain` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
+          ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
@@ -238,7 +241,9 @@ export async function __getBulkThreads(
 
   const countsQuery = `
      SELECT id, title, stage FROM "Threads"
-     WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
+     WHERE ${
+       chain ? 'chain = $chain AND' : ''
+     } (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: ThreadInstance[] = await this.models.sequelize.query(
     countsQuery,
@@ -247,8 +252,9 @@ export async function __getBulkThreads(
       type: QueryTypes.SELECT,
     }
   );
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
-    .length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   threads = await Promise.all(threads);
 

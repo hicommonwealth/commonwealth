@@ -77,22 +77,22 @@ export async function __createThread(
 ): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
-      throw new Error(Errors.DiscussionMissingTitle);
+      throw new AppError(Errors.DiscussionMissingTitle);
     }
     try {
       const quillDoc = JSON.parse(decodeURIComponent(body));
       if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '') {
-        throw new Error(Errors.NoBody);
+        throw new AppError(Errors.NoBody);
       }
     } catch (e) {
       // check always passes if the body isn't a Quill document
     }
   } else if (kind === 'link') {
     if (!title?.trim() || !url?.trim()) {
-      throw new Error(Errors.LinkMissingTitleOrUrl);
+      throw new AppError(Errors.LinkMissingTitleOrUrl);
     }
   } else {
-    throw new Error(Errors.UnsupportedKind);
+    throw new AppError(Errors.UnsupportedKind);
   }
 
   // check if banned
@@ -101,7 +101,7 @@ export async function __createThread(
     address: address.address,
   });
   if (!canInteract) {
-    throw new Error(`Ban error: ${banError}`);
+    throw new AppError(`Ban error: ${banError}`);
   }
 
   // Render a copy of the thread to plaintext for the search indexer
@@ -157,7 +157,7 @@ export async function __createThread(
         topicId = topic.id;
       } else {
         if (chain.topics?.length) {
-          throw new Error(
+          throw new AppError(
             'Must pass a topic_name string and/or a numeric topic_id'
           );
         }
@@ -216,7 +216,7 @@ export async function __createThread(
 
   // exit early on error, do not emit notifications
   if (!finalThread) {
-    throw new Error(Errors.FailedCreateThread);
+    throw new AppError(Errors.FailedCreateThread);
   }
 
   // -----
@@ -303,7 +303,7 @@ export async function __createThread(
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
   } catch (e) {
-    throw new Error(Errors.ParseMentionsFailed);
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);

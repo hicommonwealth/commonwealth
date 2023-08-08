@@ -1,6 +1,8 @@
 import React from 'react';
-import PopperUnstyled from '@mui/base/Popper';
-import type { Placement } from '@popperjs/core/lib';
+import PopperUnstyled, {
+  PopperPlacementType,
+  PopperOwnProps,
+} from '@mui/base/Popper';
 
 import { uuidv4 } from 'lib/util';
 
@@ -16,8 +18,9 @@ type UsePopoverProps = {
 
 type PopoverProps = {
   content: React.ReactNode;
-  placement?: Placement;
+  placement?: PopperPlacementType;
   disablePortal?: boolean;
+  modifiers?: PopperOwnProps['modifiers'];
 } & UsePopoverProps;
 
 export type PopoverTriggerProps = {
@@ -52,6 +55,7 @@ export const Popover = ({
   open,
   placement,
   disablePortal,
+  modifiers = [],
 }: PopoverProps) => {
   return (
     <PopperUnstyled
@@ -67,6 +71,7 @@ export const Popover = ({
             padding: 16,
           },
         },
+        ...modifiers,
       ]}
     >
       {content}
