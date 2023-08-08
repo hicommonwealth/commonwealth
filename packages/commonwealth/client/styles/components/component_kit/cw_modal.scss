@@ -35,6 +35,10 @@ $modal-padding: 16px;
     height: 100%;
     width: 100%;
   }
+
+  &.hiddenOverflow {
+    overflow: hidden;
+  }
 }
 
 .compact-modal-title {
