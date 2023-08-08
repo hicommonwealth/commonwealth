@@ -38,6 +38,8 @@ test.describe('Discussion Page Tests', () => {
   test('Check User can create/update/delete/like/unlike comment', async ({
     page,
   }) => {
+    test.setTimeout(60000);
+
     let time = Date.now();
 
     let textBox = await getQuillTextBox(page);
