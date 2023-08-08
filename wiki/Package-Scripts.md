@@ -199,6 +199,14 @@ Considerations: Why lint styles separately? Why not just include .scss file exte
 
 # Playwright
 
+## e2e-start-server
+
+Definition: `ETH_RPC=e2e-test yarn start`
+
+Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
+
+Contributor: Kurtis Assad
+
 ## gen-e2e
 
 Definition: `npx playwright codegen`
@@ -209,9 +217,17 @@ Contributor: Kurtis Assad
 
 ## test-e2e
 
-Definition: `TEST_ENV=playwright npx playwright test ./test/e2e/*`
+Definition: `TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 4 ./test/e2e/e2eRegular/*`
 
-Description: Runs Playwright tests.
+Description: Runs Playwright tests using the playwright.config.ts file.
+
+Contributor: Kurtis Assad
+
+## test-e2e-serial
+
+Definition: `TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*`
+
+Description: Runs e2e tests one at a time, to avoid problems of parallel execution.
 
 Contributor: Kurtis Assad
 
