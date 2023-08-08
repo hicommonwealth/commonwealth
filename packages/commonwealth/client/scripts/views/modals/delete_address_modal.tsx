@@ -68,12 +68,14 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
 
   return (
     <div className="DeleteAddressModal">
-      <div className="title">
+      <div className="compact-modal-title">
         <div className="Frame">
-          <WarningOctagon className="warning-icon" weight="fill" />
-          <CWText type="h4">Delete Address</CWText>
+          <WarningOctagon className="warning-icon" weight="fill" size={24} />
+          <CWText className="title-text" type="h4">
+            Delete Address
+          </CWText>
         </div>
-        <X className="close-icon" onClick={closeModal} />
+        <X className="close-icon" onClick={closeModal} size={24} />
       </div>
       <div className="body">
         <CWText>
