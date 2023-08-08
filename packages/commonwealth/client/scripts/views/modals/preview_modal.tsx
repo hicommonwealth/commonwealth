@@ -24,7 +24,7 @@ export const PreviewModal = ({
         <CWText className="title-text" type="h4">
           {title ? `Preview: ${title}` : 'Preview'}
         </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} />
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <QuillRenderer

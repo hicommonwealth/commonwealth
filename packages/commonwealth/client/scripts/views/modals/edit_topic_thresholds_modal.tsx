@@ -1,18 +1,20 @@
+import React from 'react';
+import { X } from '@phosphor-icons/react';
+
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { getDecimals } from 'helpers';
-import 'modals/edit_topic_thresholds_modal.scss';
-import React from 'react';
 import app from 'state';
 import {
   useFetchTopicsQuery,
   useSetTopicThresholdMutation,
 } from 'state/api/topics';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import type Topic from '../../models/Topic';
 import Permissions from '../../utils/Permissions';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWText } from '../components/component_kit/cw_text';
+
+import 'modals/edit_topic_thresholds_modal.scss';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -89,8 +91,10 @@ export const EditTopicThresholdsModal = ({
   return (
     <div className="EditTopicThresholdsModal">
       <div className="compact-modal-title">
-        <h3>Edit topic thresholds</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
+        <CWText className="title-text" type="h4">
+          Edit topic thresholds
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         {topics.length > 0 ? (
