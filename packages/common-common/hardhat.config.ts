@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import 'hardhat-typechain';
+import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers';
 import type { HardhatUserConfig } from 'hardhat/types';
 
@@ -70,8 +70,13 @@ const config: HardhatUserConfig = {
       },
     ],
   },
+  paths: {
+    sources: './src/eth/contracts',
+    artifacts: './src/eth/artifacts',
+    cache: './src/eth/cache',
+  },
   typechain: {
-    outDir: './types',
+    outDir: './src/eth/types',
     target: 'ethers-v5',
   },
 };
