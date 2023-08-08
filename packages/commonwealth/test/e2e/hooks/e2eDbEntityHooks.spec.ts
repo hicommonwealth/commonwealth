@@ -32,11 +32,24 @@ export async function clearTestEntities() {
     },
   });
 
+  const usersToDelete = await models.User.findAll({
+    where: {
+      [Op.or]: [
+        { id: { [Op.lt]: 0 } },
+        { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
+      ],
+    },
+  });
+
   try {
     await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
     await models.Reaction.destroy({
       where: {
-        [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+        [Op.or]: [
+          { id: { [Op.lt]: 0 } },
+          { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
+          { address_id: { [Op.lt]: 0 } },
+        ],
       },
       force: true,
     });
@@ -56,7 +69,7 @@ export async function clearTestEntities() {
     });
     await models.Thread.destroy({
       where: {
-        [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+        id: { [Op.in]: threadsToDelete.map((t) => t['id']) },
       },
       force: true,
     });
@@ -70,10 +83,17 @@ export async function clearTestEntities() {
       force: true,
     });
     await models.Subscription.destroy({
-      where: { subscriber_id: { [Op.lt]: 0 } },
+      where: {
+        subscriber_id: { [Op.in]: usersToDelete.map((u) => u['id']) },
+      },
       force: true,
     });
-    await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+    await models.User.destroy({
+      where: {
+        id: { [Op.in]: usersToDelete.map((u) => u['id']) },
+      },
+      force: true,
+    });
     await models.Notification.destroy({
       where: { thread_id: { [Op.lt]: 0 } },
       force: true,
