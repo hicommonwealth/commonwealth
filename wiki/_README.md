@@ -1,5 +1,9 @@
 _Certified fresh 230808 by Graham Johnson._
 
+# Navigating the docs
+
+For a complete list of entries, see our [Table of Contents](_TOC.md)
+
 # Updating the docs: How & when
 
 Whenever a code change PR breaks (or makes obsolete) existing documentation, the relevant entry should be updated. This docs update should be included within the PR itself, as part of the PR—just as one would update unit tests alongside a breaking code change.
