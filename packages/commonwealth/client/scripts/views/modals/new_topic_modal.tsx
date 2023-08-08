@@ -1,27 +1,27 @@
 import React, { useEffect } from 'react';
+import type { DeltaStatic } from 'quill';
+import { X } from '@phosphor-icons/react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-
-import { pluralizeWithoutNumberPrefix } from 'helpers';
-
-import 'modals/new_topic_modal.scss';
 import app from 'state';
+import { useCommonNavigate } from 'navigation/helpers';
+import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
-import type { DeltaStatic } from 'quill';
 import {
   createDeltaFromText,
   getTextFromDelta,
   ReactQuillEditor,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
-import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
+import { CWText } from '../components/component_kit/cw_text';
+
+import 'modals/new_topic_modal.scss';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -73,8 +73,10 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   return (
     <div className="NewTopicModal">
       <div className="compact-modal-title">
-        <h3>New topic</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+        <CWText className="title-text" type="h4">
+          New topic
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <CWTextInput
