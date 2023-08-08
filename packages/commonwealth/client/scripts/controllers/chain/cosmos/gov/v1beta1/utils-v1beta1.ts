@@ -7,6 +7,7 @@ import {
   ProposalStatus,
   TextProposal,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import moment from 'moment';
 
 import { Any } from 'cosmjs-types/google/protobuf/any';
@@ -18,6 +19,7 @@ import { longify } from '@cosmjs/stargate/build/queries/utils';
 
 import type {
   CosmosProposalState,
+  CosmosProposalType,
   CosmosToken,
   ICosmosProposal,
   ICosmosProposalTally,
@@ -144,9 +146,21 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
   const status = stateEnumToString(p.status);
   // TODO: support more types
   const { title, description } = TextProposal.decode(content.value);
+  const isCommunitySpend = content.typeUrl?.includes(
+    'CommunityPoolSpendProposal'
+  );
+  let type: CosmosProposalType = 'text';
+  let spendRecipient: string;
+  let spendAmount: string;
+  if (isCommunitySpend) {
+    const spend = CommunityPoolSpendProposal.decode(content.value);
+    type = 'communitySpend';
+    spendRecipient = spend.recipient;
+    spendAmount = spend?.amount[0]?.amount;
+  }
   return {
     identifier: p.proposalId.toString(),
-    type: 'text',
+    type,
     title,
     description,
     submitTime: moment.unix(p.submitTime.valueOf() / 1000),
@@ -154,6 +168,8 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
     votingEndTime: moment.unix(p.votingEndTime.valueOf() / 1000),
     votingStartTime: moment.unix(p.votingStartTime.valueOf() / 1000),
     proposer: null,
+    spendRecipient,
+    spendAmount,
     state: {
       identifier: p.proposalId.toString(),
       completed: isCompleted(status),

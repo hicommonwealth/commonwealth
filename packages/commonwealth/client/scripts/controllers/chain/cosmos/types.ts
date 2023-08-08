@@ -26,7 +26,11 @@ export class CosmosToken extends Coin {
   }
 }
 
-export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
+export type CosmosProposalType =
+  | 'text'
+  | 'upgrade'
+  | 'parameter'
+  | 'communitySpend';
 export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
 export type CosmosProposalState =
   | 'Unspecified'
@@ -59,6 +63,8 @@ export interface ICosmosProposal extends IIdentifiable {
   description: string;
   messages?: any[]; // v1 only
   proposer: string;
+  spendRecipient?: string;
+  spendAmount?: string;
   submitTime: moment.Moment;
   depositEndTime: moment.Moment;
   votingStartTime: moment.Moment;
