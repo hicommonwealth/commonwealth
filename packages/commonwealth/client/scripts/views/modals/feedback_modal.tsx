@@ -29,7 +29,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
         <CWText className="title-text" type="h4">
           Send feedback
         </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size="24" />
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <CWTextArea
