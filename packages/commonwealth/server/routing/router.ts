@@ -190,11 +190,15 @@ export type ServerControllers = {
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
   chains: ServerChainsController;
+  proposals: ServerProposalsController;
 };
 import {
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
+import { ServerProposalsController } from '../controllers/server_proposals_controller';
+import { RedisCache } from 'common-common/src/redisCache';
+import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 
 function setupRouter(
   endpoint: string,
@@ -204,7 +208,8 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
-  databaseValidationService: DatabaseValidationService
+  databaseValidationService: DatabaseValidationService,
+  redisCache: RedisCache
 ) {
   // controllers
 
@@ -216,6 +221,7 @@ function setupRouter(
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     chains: new ServerChainsController(models, tokenBalanceCache, banCache),
+    proposals: new ServerProposalsController(models, redisCache),
   };
 
   // ---
@@ -1348,6 +1354,14 @@ function setupRouter(
     'post',
     '/getSubscribedChains',
     getSubscribedChains.bind(this, models)
+  );
+
+  // Proposal routes
+  registerRoute(
+    router,
+    'get',
+    '/proposals',
+    getProposalsHandler.bind(this, serverControllers)
   );
 
   app.use(endpoint, router);

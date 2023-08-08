@@ -287,7 +287,8 @@ async function main() {
     tokenBalanceCache,
     banCache,
     globalActivityCache,
-    dbValidationService
+    dbValidationService,
+    redisCache
   );
 
   // new API
