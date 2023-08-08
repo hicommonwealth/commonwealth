@@ -294,17 +294,16 @@ async function main() {
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(models);
 
-  if (!process.env.NODE_ENV) {
-    app.post('/health/down', (req, res) => {
-      isServiceHealthy = false;
-      res.send('ok');
-    });
-
-    app.post('/health/up', (req, res) => {
-      isServiceHealthy = true;
-      res.send('ok');
-    });
-  }
+  // --- TODO: REMOVE THESE ROUTES
+  app.post('/health/down', (req, res) => {
+    isServiceHealthy = false;
+    res.send('ok');
+  });
+  app.post('/health/up', (req, res) => {
+    isServiceHealthy = true;
+    res.send('ok');
+  });
+  // ---
 
   setupAPI(
     '/api',
