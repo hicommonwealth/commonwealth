@@ -42,7 +42,6 @@ export function startHealthCheckLoop({
     } catch (err) {
       log.error(err);
     }
-    log.info(`[${stat}] –– ${status}`);
     StatsDController.get().gauge(stat, status);
     const durationUntilNextCheck = nextCheckAt - Date.now();
     setTimeout(loop, durationUntilNextCheck);
