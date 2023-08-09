@@ -183,6 +183,8 @@ import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
 import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
+import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
@@ -432,6 +434,24 @@ function setupRouter(
   registerRoute(
     router,
     'patch',
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    updateThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/threads/:message_id',
+    databaseValidationService.validateBotUser,
+    deleteBotThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -664,6 +684,26 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/comments/:message_id',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteBotCommentHandler.bind(this, serverControllers)
   );
 
   registerRoute(
