@@ -77,7 +77,7 @@ const useCreateCommentMutation = ({
       updateLastVisited(app.chain.meta, true);
 
       updateThreadInAllCaches(chainId, threadId, {
-        numberOfComments: existingNumberOfComments + 1 || 0,
+        numberOfComments: existingNumberOfComments + 1,
       });
       return newComment;
     },
