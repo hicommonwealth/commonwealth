@@ -78,3 +78,6 @@ a shared address for this purpose.
     - Give the wallet a name you can recognize, like "CW devnet"
 
 - Go to http://localhost:8080/csdk-beta or http://localhost:8080/csdk and join community. You should be able to create proposals and vote.
+
+- Note: Select 0 gas to run a transaction.
+    - The account should have unstaked tokens too, but Keplr is not registering them for some reason.
