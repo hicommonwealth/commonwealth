@@ -33,31 +33,31 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
         <div>
           Banning an address prevents it from interacting with the forum.
         </div>
-        <div className="ban-modal-content">
-          <CWButton
-            label="Ban address"
-            buttonType="destructive"
-            buttonHeight="sm"
-            onClick={async () => {
-              try {
-                // ZAK TODO: Update Banned User Table with userProfile
-                if (!profile.address) {
-                  notifyError('CW Data error');
-                  return;
-                }
-                await $.post('/api/banAddress', {
-                  jwt: app.user.jwt,
-                  address: profile.address,
-                  chain_id: app.activeChainId(),
-                });
-                onModalClose();
-                notifySuccess('Banned Address');
-              } catch (e) {
-                notifyError('Ban Address Failed');
+      </div>
+      <div className="compact-modal-footer">
+        <CWButton
+          label="Ban address"
+          buttonType="destructive"
+          buttonHeight="sm"
+          onClick={async () => {
+            try {
+              // ZAK TODO: Update Banned User Table with userProfile
+              if (!profile.address) {
+                notifyError('CW Data error');
+                return;
               }
-            }}
-          />
-        </div>
+              await $.post('/api/banAddress', {
+                jwt: app.user.jwt,
+                address: profile.address,
+                chain_id: app.activeChainId(),
+              });
+              onModalClose();
+              notifySuccess('Banned Address');
+            } catch (e) {
+              notifyError('Ban Address Failed');
+            }
+          }}
+        />
       </div>
     </div>
   );
