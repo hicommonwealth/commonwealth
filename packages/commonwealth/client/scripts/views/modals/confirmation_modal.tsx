@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
+import type { Root } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
+import { Warning, X } from '@phosphor-icons/react';
 
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { uuidv4 } from 'lib/util';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
-import type { ButtonProps } from 'views/components/component_kit/cw_button';
-import { CWButton } from 'views/components/component_kit/cw_button';
+import type { ButtonProps } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import 'modals/confirmation_modal.scss';
 
@@ -46,20 +46,23 @@ const ConfirmationModal = ({
     <Modal
       content={
         <div className="ConfirmationModal">
-          <div className="header">
-            {title && <CWText type="h4">{title}</CWText>}
-            <CWIconButton
-              className="ModalExitButton"
-              iconName="close"
-              onClick={onClose}
-            />
+          <div className="compact-modal-title">
+            <div className="Frame">
+              <Warning className="warning-icon" weight="fill" size={24} />
+              {title && (
+                <CWText className="title-text" type="h4">
+                  {title}
+                </CWText>
+              )}
+            </div>
+            <X className="close-icon" onClick={() => onClose()} size={24} />
           </div>
           {description && (
             <CWText type="b1" className="description">
               {description}
             </CWText>
           )}
-          <div className="footer">{actions}</div>
+          <div className="compact-modal-footer">{actions}</div>
         </div>
       }
       onClose={onClose}
