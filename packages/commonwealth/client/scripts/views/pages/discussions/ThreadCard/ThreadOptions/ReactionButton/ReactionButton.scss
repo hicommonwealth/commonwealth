@@ -10,11 +10,9 @@
   flex-direction: column;
   font-weight: 500;
   padding: 8px 4px;
-  width: fit-content;
-  height: fit-content;
   justify-content: center;
-  max-width: 42px;
-  max-height: 54px;
+  width: 40px;
+  height: fit-content;
   outline: none;
 
   &.showSkeleton {
@@ -24,10 +22,9 @@
   .reactions-container {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 
     svg {
-      margin: 4px auto 2px;
-
       &.Icon {
         font-size: 16px;
       }
@@ -37,7 +34,6 @@
       font-size: 12px;
       line-height: 16px;
       font-weight: 400;
-      margin: 2px auto 4px;
       color: $neutral-400;
 
       &.has-reacted {
