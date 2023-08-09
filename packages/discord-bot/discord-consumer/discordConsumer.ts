@@ -1,6 +1,6 @@
 import {
-  RabbitMQController,
   getRabbitMQConfig,
+  RabbitMQController,
 } from 'common-common/src/rabbitmq';
 import { sequelize } from '../utils/database';
 import {
@@ -8,11 +8,12 @@ import {
   TRmqMessages,
 } from 'common-common/src/rabbitmq/types';
 import { IDiscordMessage } from 'common-common/src/types';
-import { RABBITMQ_URI, SERVER_URL, CW_BOT_KEY } from '../utils/config';
+import { CW_BOT_KEY, RABBITMQ_URI, SERVER_URL } from '../utils/config';
 import axios from 'axios';
 import v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -25,7 +26,9 @@ log.info(
 /*
 NOTE: THIS IS ONLY WIP CURRENTLY AND WILL BE COMPLETED AS PART OF #4267
 */
-const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+const controller = new RabbitMQController(
+  getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService)
+);
 
 async function consumeMessages() {
   await controller.init();

@@ -209,12 +209,6 @@ export async function setupWebSocketServer(
       RascalSubscriptions.ChainEventNotifications,
       { server: chainEventsNamespace }
     );
-
-    await rabbitMQController.startSubscription(
-      publishToSnapshotRoom,
-      RascalSubscriptions.SnapshotProposalNotifications,
-      { server: snapshotProposalNamespace }
-    );
   } catch (e) {
     log.error(
       `Failure connecting to ${process.env.NODE_ENV || 'local'}` +

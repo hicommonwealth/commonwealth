@@ -54,6 +54,7 @@ import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import { RedisCache } from 'common-common/src/redisCache';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -241,7 +242,12 @@ async function main() {
   let rabbitMQController: RabbitMQController;
   try {
     rabbitMQController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+      <BrokerConfig>(
+        getRabbitMQConfig(
+          RABBITMQ_URI,
+          RascalConfigServices.CommonwealthService
+        )
+      )
     );
     await rabbitMQController.init();
   } catch (e) {
