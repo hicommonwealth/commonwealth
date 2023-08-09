@@ -1,8 +1,14 @@
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
+import useragent from 'express-useragent';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from '../middleware/methodNotAllowed';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -193,10 +199,6 @@ export type ServerControllers = {
   profiles: ServerProfilesController;
   chains: ServerChainsController;
 };
-import {
-  methodNotAllowedMiddleware,
-  registerRoute,
-} from '../middleware/methodNotAllowed';
 
 function setupRouter(
   endpoint: string,
@@ -223,6 +225,8 @@ function setupRouter(
   // ---
 
   const router = express.Router();
+
+  router.use(useragent.express());
 
   // Updating the address
   registerRoute(
