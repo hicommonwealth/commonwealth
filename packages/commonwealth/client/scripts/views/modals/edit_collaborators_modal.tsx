@@ -1,21 +1,24 @@
+import React, { useState } from 'react';
+import { useDebounce } from 'usehooks-ts';
 import axios from 'axios';
+import { isEqual } from 'lodash';
+import { X } from '@phosphor-icons/react';
+
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { isEqual } from 'lodash';
-import 'modals/edit_collaborators_modal.scss';
-import React, { useState } from 'react';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import app from 'state';
-import { useDebounce } from 'usehooks-ts';
 import NewProfilesController from '../../controllers/server/newProfiles';
 import type Thread from '../../models/Thread';
 import type { IThreadCollaborator } from '../../models/Thread';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { User } from '../components/user/user';
+
+import 'modals/edit_collaborators_modal.scss';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -83,10 +86,13 @@ export const EditCollaboratorsModal = ({
   return (
     <div className="EditCollaboratorsModal">
       <div className="compact-modal-title">
-        <h3>Edit collaborators</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
+        <CWText className="title-text" type="h4">
+          Edit collaborators
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
+        <>body section</>
         <div className="section">
           <CWTextInput
             label="Search Members"
@@ -159,12 +165,15 @@ export const EditCollaboratorsModal = ({
         <div className="buttons-row">
           <CWButton
             label="Cancel"
-            buttonType="secondary-blue"
+            buttonType="secondary"
+            buttonHeight="sm"
             onClick={onModalClose}
           />
           <CWButton
             disabled={isEqual(thread.collaborators, collaborators)}
             label="Save changes"
+            buttonType="primary"
+            buttonHeight="sm"
             onClick={async () => {
               const added = collaborators.filter(
                 (c1) =>
