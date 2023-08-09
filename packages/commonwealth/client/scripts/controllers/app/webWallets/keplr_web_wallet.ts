@@ -1,4 +1,8 @@
-import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
+import type {
+  AccountData,
+  OfflineDirectSigner,
+  OfflineSigner,
+} from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
@@ -6,11 +10,50 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
+import { StdSignDoc } from '@cosmjs/amino';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
+
+// const getOfflineSignerAmino = (chainId: string) => {
+//   return {
+//     getAccounts: async () => {
+//       // if (this.redirect) this.openApp();
+//       return [await this.getAccount(chainId)];
+//     },
+//     signAmino: (signerAddress: string, signDoc: StdSignDoc) =>
+//       this.signAmino(chainId, signerAddress, signDoc),
+//   } as OfflineAminoSigner;
+// };
+
+// const getOfflineSignerDirect = (chainId: string) => {
+//   return {
+//     getAccounts: async () => {
+//       // if (this.redirect) this.openApp();
+//       return [await this.getAccount(chainId)];
+//     },
+//     signDirect: (signerAddress: string, signDoc: DirectSignDoc) =>
+//       this.signDirect(chainId, signerAddress, signDoc),
+//   } as OfflineDirectSigner;
+// };
+
+// // from osmosis:
+// const getOfflineSigner = async (
+//   chainId: string,
+//   preferredSignType?: SignType
+// ) => {
+//   if (preferredSignType === 'amino' && this.getOfflineSignerAmino) {
+//     return getOfflineSignerAmino(chainId);
+//   }
+//   if (preferredSignType === 'direct' && this.getOfflineSignerDirect) {
+//     return getOfflineSignerDirect(chainId);
+//   }
+//   return getOfflineSignerAmino
+//     ? getOfflineSignerAmino?.(chainId)
+//     : getOfflineSignerDirect(chainId);
+// };
 
 class KeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
@@ -19,7 +62,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabling = false;
   private _chainId: string;
   private _chain: string;
-  private _offlineSigner: OfflineDirectSigner;
+  private _offlineSigner: OfflineSigner;
 
   public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
@@ -159,7 +202,10 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 
-      this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
+      this._offlineSigner = window.keplr.getOfflineSignerOnlyAmino(
+        this._chainId
+      );
+      // this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
       this._enabling = false;

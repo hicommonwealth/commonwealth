@@ -17,6 +17,7 @@ nginx
 
 ### intialize the chain
 simd init csdk-beta --chain-id $CSDK_CHAIN_ID
+
 simd config keyring-backend test
 simd config chain-id $CSDK_CHAIN_ID
 simd config broadcast-mode block
@@ -24,11 +25,32 @@ simd config output json
 echo $COW_MNEMONIC | simd keys add cow --recover --keyring-backend=test --home $CSDK_HOME
 # make cow a validator:
 simd add-genesis-account cow 1000000000000stake
-simd gentx cow 7000000000stake --chain-id testnet
+simd gentx cow 7000000000stake --chain-id $CSDK_CHAIN_ID
 simd collect-gentxs
-# Update gov module
 
-dasel put string -f $GENESIS '.app_state.gov.voting_params.voting_period' '600s'
+# modify genesis file and config files (platform dependent usage of sed)
+if [[ $(uname -s) == 'Darwin' ]]; then
+  # change stake denom to ustake
+#   sed -i "" "s/stake/ustake/g" $CSDK_HOME/config/genesis.json
+  # set min gas price
+  sed -i "" "s/minimum-gas-prices = \"\"/minimum-gas-prices = \"0.025ustake\"/g" $CSDK_HOME/config/app.toml
+  # decrease block-time so tests run faster
+  sed -i "" "s/timeout_commit = \"5s\"/timeout_commit = \"500ms\"/g" $CSDK_HOME/config/config.toml
+  # bind on all interfaces, enabling ports to be exposed outside docker
+  sed -i "" "s/127\.0\.0\.1/0.0.0.0/g" $CSDK_HOME/config/config.toml
+else
+  # change stake denom to ustake
+#   sed -i "s/stake/ustake/g" $CSDK_HOME/config/genesis.json
+  # set min gas price
+  sed -i "s/minimum-gas-prices = \"\"/minimum-gas-prices = \"0.025ustake\"/g" $CSDK_HOME/config/app.toml
+  # decrease block-time so tests run faster
+  sed -i "s/timeout_commit = \"5s\"/timeout_commit = \"500ms\"/g" $CSDK_HOME/config/config.toml
+  # bind on all interfaces, enabling ports to be exposed outside docker
+  sed -i "s/127\.0\.0\.1/0.0.0.0/g" $CSDK_HOME/config/config.toml
+fi
+
+# Update gov module
+dasel put string -f $GENESIS '.app_state.gov.voting_params.voting_period' '60s'
 dasel put string -f $GENESIS '.app_state.gov.deposit_params.min_deposit.[0].amount' '100000'
 
 # expose the LCD

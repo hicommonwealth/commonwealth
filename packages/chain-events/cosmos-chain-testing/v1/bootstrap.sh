@@ -29,7 +29,7 @@ simd collect-gentxs
 # Update gov module
 
 ### Configure chain generated config files - genesis.json, app.toml, config.toml
-dasel put string -r json  -f $GENESIS -v '600s' '.app_state.gov.voting_params.voting_period'
+dasel put string -r json  -f $GENESIS -v '30s' '.app_state.gov.voting_params.voting_period'
 dasel put string -r json  -f $GENESIS -v '100000' '.app_state.gov.deposit_params.min_deposit.[0].amount'
 # expose the LCD
 dasel put bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.enable'
