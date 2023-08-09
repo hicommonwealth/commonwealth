@@ -93,7 +93,14 @@ const fetchProposalsByStatus = async (
     }
     return proposalsByStatus;
   } catch (e) {
-    console.error(`Error fetching proposals by status ${status}`, e);
+    // Since these are combined requests, we opt to fail silently and
+    // return an empty array instead of throwing an error. This way, we can
+    // still display the proposals that were successfully fetched.
+    // If an error message is preferred, throw here instead of returning [].
+    console.error(
+      `Error fetching proposals by status ${ProposalStatus[status]}`,
+      e
+    );
     return [];
   }
 };
