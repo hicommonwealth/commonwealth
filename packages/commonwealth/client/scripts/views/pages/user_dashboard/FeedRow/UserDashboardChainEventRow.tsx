@@ -11,7 +11,7 @@ import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import type { IconName } from '../../../components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { getClasses } from '../../../components/component_kit/helpers';
-import { navigateToPathInNewTab, useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardChainEventRowProps = {
   blockNumber: number;
@@ -37,13 +37,8 @@ export const UserDashboardChainEventRow = (
 
       // Extract chain_id from the link URL
       const linkUrlParts = label.linkUrl.split('/');
-      const linkChainId = linkUrlParts.length > 1 ? linkUrlParts[1] : null;
 
-      navigateToPathInNewTab({
-        navigate,
-        path: updatedLinkUrl,
-        chain: linkChainId,
-      });
+      navigate(updatedLinkUrl);
     }
   };
 

@@ -5,12 +5,16 @@ import { NotificationCategories } from 'common-common/src/types';
 import './UserDashboardRowBottom.scss';
 
 import app from 'state';
+import useUserLoggedIn from '../../../../hooks/useUserLoggedIn';
 import { CWAvatarGroup } from '../../../components/component_kit/cw_avatar_group';
 import type { ProfileWithAddress } from '../../../components/component_kit/cw_avatar_group';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../../../components/component_kit/cw_icon_button';
+import { Modal } from '../../../components/component_kit/cw_modal';
 import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../../components/component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../../../components/component_kit/helpers';
+import { LoginModal } from '../../../modals/login_modal';
 import { subscribeToThread } from '../helpers';
 import type NotificationSubscription from '../../../../models/NotificationSubscription';
 import useForceRerender from 'hooks/useForceRerender';
@@ -41,7 +45,9 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     comment,
   } = props;
   const forceRerender = useForceRerender();
+  const { isLoggedIn } = useUserLoggedIn();
   const [isReplying, setIsReplying] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // console log props with object destructuring
   // console.log({
@@ -91,7 +97,6 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     commentSubscription?.isActive && reactionSubscription?.isActive;
 
   const domain = document.location.origin;
-
   return (
     <div className="UserDashboardRowBottom">
       <div className="top-row">
@@ -106,6 +111,9 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
+              if (!isLoggedIn) {
+                return setIsLoginModalOpen(true);
+              }
               if (thread) handleIsReplying();
             }}
           >
@@ -209,6 +217,20 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           parentCommentId={commentId ? toNumber(commentId) : null}
           rootThread={thread}
           updatedCommentsCallback={forceRerender}
+          canComment={!thread.readOnly}
+        />
+      )}
+      {isLoginModalOpen && (
+        <Modal
+          content={
+            <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={(e) => {
+            e.stopPropagation();
+            setIsLoginModalOpen(false);
+          }}
+          open={isLoginModalOpen}
         />
       )}
     </div>

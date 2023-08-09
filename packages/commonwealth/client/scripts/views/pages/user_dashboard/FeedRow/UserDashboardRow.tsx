@@ -12,7 +12,7 @@ import { getClasses } from '../../../components/component_kit/helpers';
 import { UserDashboardChainEventRow } from './UserDashboardChainEventRow';
 import { UserDashboardRowBottom } from './UserDashboardRowBottom';
 import { UserDashboardRowTop } from './UserDashboardRowTop';
-import { navigateToPathInNewTab, useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowProps = {
   notification: DashboardActivityNotification;
@@ -76,12 +76,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
   );
   const handleClick = () => {
     if (path) {
-      navigateToPathInNewTab({
-        navigate,
-        path,
-        chain: chain_id,
-      });
-      // navigate(path);
+      navigate(path);
     }
   };
 
