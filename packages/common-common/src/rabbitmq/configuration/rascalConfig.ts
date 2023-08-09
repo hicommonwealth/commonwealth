@@ -149,6 +149,9 @@ export function getAllRascalConfigs(
     },
     [RascalQueues.DiscordListener]: {
       ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
     },
   };
 
