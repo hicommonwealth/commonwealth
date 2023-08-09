@@ -1,15 +1,13 @@
 import { ProposalType } from 'common-common/src/types';
 import type ChainEntity from 'models/ChainEntity';
 import Poll from 'models/Poll';
-import type momentT from 'moment';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import app from 'state';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 import type MinimumProfile from 'models/MinimumProfile';
-
 
 function getDecodedString(str: string) {
   try {
@@ -32,8 +30,8 @@ function processVersionHistory(versionHistory: any[]) {
           typeof history.author === 'string'
             ? JSON.parse(history.author)
             : typeof history.author === 'object'
-              ? history.author
-              : null;
+            ? history.author
+            : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
         console.log(e);
@@ -60,15 +58,15 @@ function processChainEntities(chain: string, chainEntityMeta: any) {
 
   return chainEntitiesProcessed
     ? chainEntitiesProcessed.map((ce) => {
-      return {
-        id: +ce.id,
-        chain,
-        type: ce.type,
-        typeId: (ce as any).type_id || ce.typeId,
-        completed: ce.completed,
-        author: this.author,
-      };
-    })
+        return {
+          id: +ce.id,
+          chain,
+          type: ce.type,
+          typeId: (ce as any).type_id || ce.typeId,
+          completed: ce.completed,
+          author: this.author,
+        };
+      })
     : [];
 }
 
@@ -78,13 +76,12 @@ function processAssociatedReactions(
   reactionType: any[],
   addressesReacted: any[]
 ) {
-  const temp = []
+  const temp = [];
   const tempReactionIds =
     (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
   const tempReactionType =
-    (reactions
-      ? reactions.map((r) => r?.type || r?.reaction)
-      : reactionType) || [];
+    (reactions ? reactions.map((r) => r?.type || r?.reaction) : reactionType) ||
+    [];
   const tempAddressesReacted =
     (reactions
       ? reactions.map((r) => r?.address || r?.Address?.address)
@@ -102,13 +99,12 @@ function processAssociatedReactions(
       });
     }
   }
-  return temp
+  return temp;
 }
-
 
 export interface VersionHistory {
   author?: MinimumProfile;
-  timestamp: momentT.Moment;
+  timestamp: Moment;
   body: string;
 }
 
@@ -167,19 +163,19 @@ export class Thread implements IUniqueId {
   //  we should remove the number to allow the store to work.
   public readonly identifier: string;
   public readonly id: number;
-  public readonly createdAt: momentT.Moment;
-  public readonly updatedAt: momentT.Moment;
-  public readonly lastCommentedOn: momentT.Moment;
+  public readonly createdAt: Moment;
+  public readonly updatedAt: Moment;
+  public readonly lastCommentedOn: Moment;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
-  public readonly lastEdited: momentT.Moment;
+  public readonly lastEdited: Moment;
 
-  public markedAsSpamAt: momentT.Moment;
-  public archivedAt: momentT.Moment;
-  public readonly lockedAt: momentT.Moment;
+  public markedAsSpamAt: Moment;
+  public archivedAt: Moment;
+  public readonly lockedAt: Moment;
 
   public readonly hasPoll: boolean;
   public readonly polls: Poll[];
@@ -285,8 +281,8 @@ export class Thread implements IUniqueId {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-        ? this.versionHistory[0].timestamp
-        : null;
+      ? this.versionHistory[0].timestamp
+      : null;
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
     this.lockedAt = locked_at ? moment(locked_at) : null;
@@ -299,7 +295,12 @@ export class Thread implements IUniqueId {
     this.discord_meta = discord_meta;
     this.versionHistory = processVersionHistory(version_history);
     this.chainEntities = processChainEntities(chain, chain_entity_meta);
-    this.associatedReactions = processAssociatedReactions(reactions, reactionIds, reactionType, addressesReacted);
+    this.associatedReactions = processAssociatedReactions(
+      reactions,
+      reactionIds,
+      reactionType,
+      addressesReacted
+    );
   }
 }
 
