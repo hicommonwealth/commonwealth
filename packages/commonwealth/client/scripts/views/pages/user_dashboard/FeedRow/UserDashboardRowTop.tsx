@@ -12,6 +12,7 @@ import AddressInfo from '../../../../models/AddressInfo';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
+import { AuthorAndPublishInfo } from '../../discussions/ThreadCard/AuthorAndPublishInfo/index';
 import EmbeddedThreadCard from './EmbeddedThreadCard/index';
 
 type UserDashboardRowTopProps = {
@@ -62,21 +63,6 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       ? `${decodedTitle.slice(0, 47)}...`
       : decodedTitle;
 
-  const actorName = (
-    <User
-      user={
-        new AddressInfo(null, author_address, author_chain ?? chain_id, null)
-      }
-      linkify
-      avatarSize={16}
-      onClick={(e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
-        navigate(`/${author_chain}/account/${author_address}`);
-      }}
-    />
-  );
-
   const isComment = category === 'new-comment-creation';
 
   return (
@@ -100,7 +86,12 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       </div>
       <div className="comment-thread-info">
         <CWText noWrap fontWeight="semiBold">
-          {actorName}&nbsp;
+          <AuthorAndPublishInfo
+            authorInfo={app.chain.accounts.get(author_address)}
+            publishDate={null}
+            discord_meta={null}
+          />
+          &nbsp;
           <span className="info-type">
             {isComment ? 'commented on the thread' : 'created a thread'}&nbsp;
           </span>
