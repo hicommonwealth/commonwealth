@@ -75,5 +75,6 @@ a shared address for this purpose.
     - Use recover phrase or private key
     - copy/paste this mnemonic:
 `ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought`
+    - Give the wallet a name you can recognize, like "CW devnet"
 
 - Go to http://localhost:8080/csdk-beta or http://localhost:8080/csdk and join community. You should be able to create proposals and vote.
