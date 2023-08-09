@@ -1,12 +1,14 @@
 import React from 'react';
+import $ from 'jquery';
+import { WarningOctagon, X } from '@phosphor-icons/react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import $ from 'jquery';
-
 import type MinimumProfile from '../../models/MinimumProfile';
 import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
+
+import 'modals/ban_user_modal.scss';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
@@ -17,10 +19,15 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
   const { profile, onModalClose } = props;
 
   return (
-    <React.Fragment>
-      <div className="compact-modal-title ban-user">
-        <h3>Are You Sure?</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+    <div className="BanUserModal">
+      <div className="compact-modal-title">
+        <div className="Frame">
+          <WarningOctagon className="warning-icon" weight="fill" size={24} />
+          <CWText className="title-text" type="h4">
+            Are You Sure?
+          </CWText>
+        </div>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <div>
@@ -28,8 +35,9 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
         </div>
         <div className="ban-modal-content">
           <CWButton
-            label="Ban Address (just click once and wait)"
-            buttonType="primary-red"
+            label="Ban address"
+            buttonType="destructive"
+            buttonHeight="sm"
             onClick={async () => {
               try {
                 // ZAK TODO: Update Banned User Table with userProfile
@@ -51,6 +59,6 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
           />
         </div>
       </div>
-    </React.Fragment>
+    </div>
   );
 };
