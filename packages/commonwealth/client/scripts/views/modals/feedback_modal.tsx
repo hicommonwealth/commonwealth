@@ -39,8 +39,11 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
             setFeedbackText(e.target.value);
           }}
         />
+      </div>
+      <div className="compact-modal-footer">
         <CWButton
           buttonType="primary"
+          buttonHeight="sm"
           disabled={isSending}
           label="Send feedback"
           onClick={(e) => {

@@ -15,6 +15,14 @@
       font-weight: 500;
       letter-spacing: -0.01em;
     }
+
+    .close-icon {
+      color: $neutral-500;
+
+      &:hover {
+        color: $neutral-800;
+      }
+    }
   }
 
   .compact-modal-body {
@@ -23,11 +31,10 @@
     gap: 16px;
   }
 
-  .close-icon {
-    color: $neutral-500;
-
-    &:hover {
-      color: $neutral-800;
-    }
+  .compact-modal-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 16px;
   }
 }
