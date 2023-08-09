@@ -101,6 +101,128 @@ export const cacheTypes = {
   ACTIVE_THREADS: 'active',
 };
 
+const updateCacheForBulkThreads = ({
+  existingData,
+  threadId,
+  arrayManipulationMode,
+  arrayFieldsFromUpdateBody,
+  updateBody,
+}) => {
+  const pages = [...(existingData.pages || [])];
+  let foundThreadIndex = -1;
+  const foundPageIndex = pages.findIndex((p) => {
+    const index = p.data.threads.findIndex((t) => t.id === threadId);
+    if (index > -1) foundThreadIndex = index;
+    return index > -1 ? true : -1;
+  });
+  if (foundPageIndex > -1 && foundThreadIndex > -1) {
+    if (
+      arrayManipulationMode === 'combineAndRemoveDups' ||
+      arrayManipulationMode === 'removeFromExisting' ||
+      arrayFieldsFromUpdateBody.length > 0
+    ) {
+      pages[foundPageIndex].data.threads[foundThreadIndex] = {
+        ...updateBody, // destructure order is important here
+        ...pages[foundPageIndex].data.threads[foundThreadIndex],
+      };
+      arrayFieldsFromUpdateBody.map((field) => {
+        if (pages[foundPageIndex].data.threads[foundThreadIndex][field]) {
+          const updateBodyFieldIds = updateBody[field].map((x) => x?.id);
+          pages[foundPageIndex].data.threads[foundThreadIndex][field] = [
+            ...pages[foundPageIndex].data.threads[foundThreadIndex][field],
+            // in filter we are assuming that each array field has a property 'id'
+          ].filter((x) => !updateBodyFieldIds.includes(x?.id)); // this filter takes care of 'combineAndRemoveDups'
+
+          if (arrayManipulationMode === 'combineAndRemoveDups') {
+            pages[foundPageIndex].data.threads[foundThreadIndex][field] = [
+              ...pages[foundPageIndex].data.threads[foundThreadIndex][field],
+              ...updateBody[field],
+            ];
+          }
+        }
+      });
+    }
+    if (arrayManipulationMode === 'replaceArray') {
+      pages[foundPageIndex].data.threads[foundThreadIndex] = {
+        ...pages[foundPageIndex].data.threads[foundThreadIndex],
+        ...updateBody, // destructure order is important here
+      };
+    }
+  }
+
+  return {
+    ...existingData,
+    pages,
+  };
+};
+
+const removeCacheForBulkThreads = ({ existingData, threadId }) => {
+  const pages = [...(existingData.pages || [])];
+  let foundThreadIndex = -1;
+  const foundPageIndex = pages.findIndex((p) => {
+    const index = p.data.threads.findIndex((t) => t.id === threadId);
+    if (index > -1) foundThreadIndex = index;
+    return index > -1 ? true : -1;
+  });
+
+  if (foundPageIndex > -1 && foundThreadIndex > -1) {
+    pages[foundPageIndex].data.threads = pages[
+      foundPageIndex
+    ].data.threads.filter((x) => x.id !== threadId);
+  }
+
+  return {
+    ...existingData,
+    pages,
+  };
+};
+
+const updateCacheForSingleAndActiveThreads = ({
+  threadId,
+  updateBody,
+  existingData,
+  arrayManipulationMode,
+  arrayFieldsFromUpdateBody,
+}) => {
+  const updatedThreads = [...existingData]; // threads array
+  const foundThreadIndex = updatedThreads.findIndex((x) => x.id === threadId);
+  if (foundThreadIndex > -1) {
+    if (
+      arrayManipulationMode === 'combineAndRemoveDups' ||
+      arrayManipulationMode === 'removeFromExisting' ||
+      arrayFieldsFromUpdateBody.length > 0
+    ) {
+      updatedThreads[foundThreadIndex] = {
+        ...updateBody, // destructure order is important here
+        ...updatedThreads[foundThreadIndex],
+      };
+      arrayFieldsFromUpdateBody.map((field) => {
+        if (updatedThreads[foundThreadIndex][field]) {
+          const updateBodyFieldIds = updateBody[field].map((x) => x?.id);
+          updatedThreads[foundThreadIndex][field] = [
+            ...updatedThreads[foundThreadIndex][field],
+            // in filter we are assuming that each array field has a property 'id'
+          ].filter((x) => !updateBodyFieldIds.includes(x?.id)); // this filter takes care of 'combineAndRemoveDups'
+
+          if (arrayManipulationMode === 'combineAndRemoveDups') {
+            updatedThreads[foundThreadIndex][field] = [
+              ...updatedThreads[foundThreadIndex][field],
+              ...updateBody[field],
+            ];
+          }
+        }
+      });
+    }
+    if (arrayManipulationMode === 'replaceArray') {
+      updatedThreads[foundThreadIndex] = {
+        ...updatedThreads[foundThreadIndex],
+        ...updateBody, // destructure order is important here
+      };
+    }
+  }
+  return updatedThreads;
+};
+
 const cacheUpdater = ({
   chainId,
   threadId,
@@ -135,85 +257,20 @@ const cacheUpdater = ({
       queryClient.setQueryData(cacheKey, () => {
         if (queryType === cacheTypes.BULK_THREADS) {
           if (method === 'update') {
-            const pages = [...(existingData.pages || [])];
-            let foundThreadIndex = -1;
-            const foundPageIndex = pages.findIndex((p) => {
-              const index = p.data.threads.findIndex((t) => t.id === threadId);
-              if (index > -1) foundThreadIndex = index;
-              return index > -1 ? true : -1;
+            return updateCacheForBulkThreads({
+              existingData,
+              threadId,
+              arrayFieldsFromUpdateBody,
+              arrayManipulationMode,
+              updateBody,
             });
-            if (foundPageIndex > -1 && foundThreadIndex > -1) {
-              if (
-                arrayManipulationMode === 'combineAndRemoveDups' ||
-                arrayManipulationMode === 'removeFromExisting' ||
-                arrayFieldsFromUpdateBody.length > 0
-              ) {
-                pages[foundPageIndex].data.threads[foundThreadIndex] = {
-                  ...updateBody, // destructure order is important here
-                  ...pages[foundPageIndex].data.threads[foundThreadIndex],
-                };
-                arrayFieldsFromUpdateBody.map((field) => {
-                  if (
-                    pages[foundPageIndex].data.threads[foundThreadIndex][field]
-                  ) {
-                    const updateBodyFieldIds = updateBody[field].map(
-                      (x) => x?.id
-                    );
-                    pages[foundPageIndex].data.threads[foundThreadIndex][
-                      field
-                    ] = [
-                      ...pages[foundPageIndex].data.threads[foundThreadIndex][
-                        field
-                      ],
-                      // in filter we are assuming that each array field has a property 'id'
-                    ].filter((x) => !updateBodyFieldIds.includes(x?.id)); // this filter takes care of 'combineAndRemoveDups'
-
-                    if (arrayManipulationMode === 'combineAndRemoveDups') {
-                      pages[foundPageIndex].data.threads[foundThreadIndex][
-                        field
-                      ] = [
-                        ...pages[foundPageIndex].data.threads[foundThreadIndex][
-                          field
-                        ],
-                        ...updateBody[field],
-                      ];
-                    }
-                  }
-                });
-              }
-              if (arrayManipulationMode === 'replaceArray') {
-                pages[foundPageIndex].data.threads[foundThreadIndex] = {
-                  ...pages[foundPageIndex].data.threads[foundThreadIndex],
-                  ...updateBody, // destructure order is important here
-                };
-              }
-            }
-
-            return {
-              ...existingData,
-              pages,
-            };
           }
 
           if (method === 'remove') {
-            const pages = [...(existingData.pages || [])];
-            let foundThreadIndex = -1;
-            const foundPageIndex = pages.findIndex((p) => {
-              const index = p.data.threads.findIndex((t) => t.id === threadId);
-              if (index > -1) foundThreadIndex = index;
-              return index > -1 ? true : -1;
+            return removeCacheForBulkThreads({
+              existingData,
+              threadId,
             });
-
-            if (foundPageIndex > -1 && foundThreadIndex > -1) {
-              pages[foundPageIndex].data.threads = pages[
-                foundPageIndex
-              ].data.threads.filter((x) => x.id !== threadId);
-            }
-
-            return {
-              ...existingData,
-              pages,
-            };
           }
         }
 
@@ -222,47 +279,13 @@ const cacheUpdater = ({
           queryType === cacheTypes.ACTIVE_THREADS
         ) {
           if (method === 'update') {
-            const updatedThreads = [...existingData]; // threads array
-            const foundThreadIndex = updatedThreads.findIndex(
-              (x) => x.id === threadId
-            );
-            if (foundThreadIndex > -1) {
-              if (
-                arrayManipulationMode === 'combineAndRemoveDups' ||
-                arrayManipulationMode === 'removeFromExisting' ||
-                arrayFieldsFromUpdateBody.length > 0
-              ) {
-                updatedThreads[foundThreadIndex] = {
-                  ...updateBody, // destructure order is important here
-                  ...updatedThreads[foundThreadIndex],
-                };
-                arrayFieldsFromUpdateBody.map((field) => {
-                  if (updatedThreads[foundThreadIndex][field]) {
-                    const updateBodyFieldIds = updateBody[field].map(
-                      (x) => x?.id
-                    );
-                    updatedThreads[foundThreadIndex][field] = [
-                      ...updatedThreads[foundThreadIndex][field],
-                      // in filter we are assuming that each array field has a property 'id'
-                    ].filter((x) => !updateBodyFieldIds.includes(x?.id)); // this filter takes care of 'combineAndRemoveDups'
-
-                    if (arrayManipulationMode === 'combineAndRemoveDups') {
-                      updatedThreads[foundThreadIndex][field] = [
-                        ...updatedThreads[foundThreadIndex][field],
-                        ...updateBody[field],
-                      ];
-                    }
-                  }
-                });
-              }
-              if (arrayManipulationMode === 'replaceArray') {
-                updatedThreads[foundThreadIndex] = {
-                  ...updatedThreads[foundThreadIndex],
-                  ...updateBody, // destructure order is important here
-                };
-              }
-            }
-            return updatedThreads;
+            return updateCacheForSingleAndActiveThreads({
+              existingData,
+              arrayManipulationMode,
+              updateBody,
+              arrayFieldsFromUpdateBody,
+              threadId,
+            });
           }
           if (method === 'remove') {
             remainingCallbacks.push(() => queryClient.refetchQueries(cacheKey));
