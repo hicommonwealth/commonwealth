@@ -14,6 +14,10 @@ type UpdateThreadRequestBody = {
   kind?: string;
   stage?: string;
   url?: string;
+  locked?: string;
+  canvas_session?: string;
+  canvas_action?: string;
+  canvas_hash?: string;
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -24,17 +28,24 @@ export const updateThreadHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { id } = req.params;
-  const { body, title, stage, url } = req.body;
+  const {
+    body,
+    title,
+    stage,
+    url,
+    locked,
+    canvas_session,
+    canvas_action,
+    canvas_hash,
+  } = req.body;
 
   const threadId = parseInt(id, 10) || 0;
   if (!threadId) {
     throw new AppError(Errors.InvalidThreadID);
   }
 
-  if (!body || !body.trim()) {
-    throw new AppError(Errors.MissingText);
-  }
-
+  // this is a patch update, so properties should be
+  // `undefined` if they are not intended to be updated
   const [updatedThread, notificationOptions] =
     await controllers.threads.updateThread({
       user,
@@ -45,6 +56,10 @@ export const updateThreadHandler = async (
       body,
       stage,
       url,
+      locked: locked === 'true' ? true : locked === 'false' ? false : undefined,
+      canvas_session,
+      canvas_action,
+      canvas_hash,
     });
 
   for (const n of notificationOptions) {
