@@ -11,7 +11,25 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_PORT, RABBITMQ_URI } from './config';
 import { StatsDController } from 'common-common/src/statsd';
 import v8 from 'v8';
-import {methodNotAllowedMiddleware, registerRoute} from "./utils/methodNotAllowed";
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from './utils/methodNotAllowed';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.SnapshotListener,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -88,4 +106,6 @@ app.listen(port, async () => {
     log.error(`Error starting server: ${err}`);
   }
   app.bind;
+
+  isServiceHealthy = true;
 });

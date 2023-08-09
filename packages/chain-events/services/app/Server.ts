@@ -11,7 +11,23 @@ import { DEFAULT_PORT } from '../config';
 import setupPassport from './passport';
 import setupRouter from './router';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {methodNotAllowedMiddleware} from "chain-events/services/app/middleware";
+import { methodNotAllowedMiddleware } from 'chain-events/services/app/middleware';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  enabled: require.main === module,
+  service: ServiceKey.ChainEventsApp,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 log.info(
@@ -72,5 +88,6 @@ if (require.main === module) {
     app.listen(port, () => {
       log.info(`Chain events server listening on port ${port}`);
     });
+    isServiceHealthy = true;
   });
 }
