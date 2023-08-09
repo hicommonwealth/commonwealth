@@ -4,7 +4,7 @@ import { Link } from 'server/models/thread';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 
-const THREAD_STALE_TIME = 180000; // 3 minutes
+const THREAD_STALE_TIME = 5000; // 5 seconds
 
 interface GetThreadsByLinkProps {
   chainId: string;
