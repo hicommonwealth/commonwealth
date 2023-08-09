@@ -77,7 +77,7 @@ export enum RascalQueues {
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueue',
   ChainEventNotifications = 'ChainEventNotificationsQueue',
   DeadLetter = 'DeadLetterQueue',
-  SnapshotListener = 'SnapshotListenerQueue',
+  SnapshotListener = 'SnapshotListenerQueueV2',
   DiscordListener = 'DiscordMessageQueue',
 }
 
