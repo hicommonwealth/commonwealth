@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { X } from '@phosphor-icons/react';
 
 import Template from 'models/Template';
-import 'modals/view_template_modal.scss';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import app from 'state';
 import { CWCommunityAvatar } from '../components/component_kit/cw_community_avatar';
 import { User } from '../components/user/user';
@@ -14,6 +14,8 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { renderDisabledTemplate } from 'helpers/action_template_helpers';
+
+import 'modals/view_template_modal.scss';
 
 const ViewTemplateModal = ({
   template,
@@ -26,18 +28,13 @@ const ViewTemplateModal = ({
 
   return (
     <div className="ViewTemplateModal">
-      <div className="TopSection">
-        <CWText type="h4" fontWeight="bold">
+      <div className="compact-modal-title">
+        <CWText className="title-text" type="h4">
           View template
         </CWText>
-        <CWIcon
-          iconName="close"
-          iconSize="small"
-          className="closeIcon"
-          onClick={onClose}
-        />
+        <X className="close-icon" onClick={onClose} size={24} />
       </div>
-      <div className="Body">
+      <div className="compact-modal-body">
         <div className="CreationRow">
           <CWText type="b2">By</CWText>
           <User user={creator} showAddressWithDisplayName />
@@ -80,11 +77,11 @@ const ViewTemplateModal = ({
           </div>
         </div>
       </div>
-
-      <div className="BottomSection">
+      <div className="compact-modal-footer">
         <CWButton
           label="Close"
-          buttonType="secondary-black"
+          buttonType="secondary"
+          buttonHeight="sm"
           onClick={onClose}
         />
       </div>
