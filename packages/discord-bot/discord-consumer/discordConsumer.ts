@@ -7,7 +7,7 @@ import {
   RascalSubscriptions,
   TRmqMessages,
 } from 'common-common/src/rabbitmq/types';
-import { IDiscordMessage } from 'common-common/src/types';
+import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
 import { CW_BOT_KEY, RABBITMQ_URI, SERVER_URL } from '../utils/config';
 import axios from 'axios';
 import v8 from 'v8';
@@ -57,8 +57,18 @@ async function consumeMessages() {
         )
       )[0][0];
 
+      const action = parsedMessage.action as DiscordAction;
+
+      if (action === 'thread-delete') {
+        await axios.delete(
+          `${SERVER_URL}/api/bot/threads/${parsedMessage.message_id}`,
+          { data: { auth: CW_BOT_KEY, address: '0xdiscordbot' } }
+        );
+        return;
+      }
+
       if (parsedMessage.title) {
-        const create_thread = {
+        const thread = {
           author_chain: topic['chain_id'],
           address: '0xdiscordbot',
           chain: topic['chain_id'],
@@ -87,11 +97,12 @@ async function consumeMessages() {
           auth: CW_BOT_KEY,
         };
 
-        const response = await axios.post(
-          `${SERVER_URL}/api/bot/threads`,
-          create_thread
-        );
-        console.log(response.status, response.statusText);
+        if (action === 'create') {
+          await axios.post(`${SERVER_URL}/api/bot/threads`, thread);
+        } else if (action === 'update') {
+          await axios.patch(`${SERVER_URL}/api/bot/threads`, thread);
+        }
+
         StatsDController.get().increment('cw.discord_thread_added', 1, {
           chain: topic['chain_id'],
         });
@@ -102,7 +113,7 @@ async function consumeMessages() {
           )
         )[0][0]['id'];
 
-        const create_comment = {
+        const comment = {
           author_chain: topic['chain_id'],
           address: '0xdiscordbot',
           chain: topic['chain_id'],
@@ -119,11 +130,37 @@ async function consumeMessages() {
           },
         };
 
-        const response = await axios.post(
-          `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
-          create_comment
-        );
-        console.log(response.status, response.statusText);
+        if (action === 'create') {
+          await axios.post(
+            `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
+            comment
+          );
+        } else if (action === 'update') {
+          await axios.patch(
+            `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
+            {
+              body: comment.text,
+              discord_meta: comment.discord_meta,
+              auth: CW_BOT_KEY,
+              address: '0xdiscordbot',
+              chain: comment.chain,
+              author_chain: comment.author_chain,
+            }
+          );
+        } else if (action === 'comment-delete') {
+          await axios.delete(
+            `${SERVER_URL}/api/bot/comments/${parsedMessage.message_id}`,
+            {
+              data: {
+                auth: CW_BOT_KEY,
+                address: '0xdiscordbot',
+                chain: comment.chain,
+                author_chain: comment.author_chain,
+              },
+            }
+          );
+        }
+
         StatsDController.get().increment('cw.discord_comment_added', 1, {
           chain: topic['chain_id'],
         });
