@@ -8,9 +8,9 @@ import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
 import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
-import { Skeleton } from '../Skeleton';
 import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
+import { Skeleton } from '../Skeleton';
 import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
@@ -68,76 +68,83 @@ type ContentPageProps = {
   hasPendingEdits?: boolean;
   canUpdateThread?: boolean;
   showTabs?: boolean;
-  showSkeleton?: boolean
-  isWindowMedium?: boolean
+  showSkeleton?: boolean;
+  isWindowMedium?: boolean;
+  isEditing?: boolean;
 };
 
 const CWContentPageSkeleton = ({ isWindowMedium }) => {
-  const mainBody = <div className="main-body-container">
-    {/* thread header */}
-    <div className="header">
-      <Skeleton width={'90%'} />
+  const mainBody = (
+    <div className="main-body-container">
+      {/* thread header */}
+      <div className="header">
+        <Skeleton width={'90%'} />
+        <Skeleton />
+      </div>
+
+      {/* thread title */}
       <Skeleton />
-    </div>
 
-    {/* thread title */}
-    <Skeleton />
+      {/* thread description */}
+      <div>
+        <Skeleton width={'80%'} />
+        <Skeleton />
+        <Skeleton width={'90%'} />
+        <Skeleton />
+        <Skeleton width={'95%'} />
+      </div>
 
-    {/* thread description */}
-    <div>
-      <Skeleton width={'80%'} />
+      {/* comment input */}
+      <div>
+        <Skeleton height={200} />
+      </div>
+
+      {/* comment filter row */}
       <Skeleton />
-      <Skeleton width={'90%'} />
-      <Skeleton />
-      <Skeleton width={'95%'} />
-    </div>
 
-    {/* comment input */}
-    <div>
-      <Skeleton height={200} />
+      {/* mimics comments */}
+      <div>
+        <Skeleton width={'80%'} />
+        <Skeleton width={'100%'} />
+        <Skeleton width={'90%'} />
+      </div>
+      <div>
+        <Skeleton width={'90%'} />
+        <Skeleton width={'25%'} />
+      </div>
     </div>
+  );
 
-    {/* comment filter row */}
-    <Skeleton />
-
-    {/* mimics comments */}
-    <div>
-      <Skeleton width={'80%'} />
-      <Skeleton width={'100%'} />
-      <Skeleton width={'90%'} />
+  return (
+    <div className={ComponentType.ContentPage}>
+      <div className="sidebar-view">
+        {mainBody}
+        {isWindowMedium && (
+          <div className="sidebar">
+            <div className="cards-column">
+              <Skeleton width={'80%'} />
+              <Skeleton width={'100%'} />
+              <Skeleton width={'50%'} />
+              <Skeleton width={'75%'} />
+            </div>
+            <div className="cards-column">
+              <Skeleton width={'80%'} />
+              <Skeleton width={'100%'} />
+              <Skeleton width={'50%'} />
+              <Skeleton width={'75%'} />
+            </div>
+            <div className="cards-column">
+              <Skeleton width={'80%'} />
+              <Skeleton width={'100%'} />
+              <Skeleton width={'50%'} />
+              <Skeleton width={'75%'} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-    <div>
-      <Skeleton width={'90%'} />
-      <Skeleton width={'25%'} />
-    </div>
-  </div>
-
-  return <div className={ComponentType.ContentPage}>
-    <div className="sidebar-view">
-      {mainBody}
-      {isWindowMedium && <div className="sidebar">
-        <div className="cards-column">
-          <Skeleton width={'80%'} />
-          <Skeleton width={'100%'} />
-          <Skeleton width={'50%'} />
-          <Skeleton width={'75%'} />
-        </div>
-        <div className="cards-column">
-          <Skeleton width={'80%'} />
-          <Skeleton width={'100%'} />
-          <Skeleton width={'50%'} />
-          <Skeleton width={'75%'} />
-        </div>
-        <div className="cards-column">
-          <Skeleton width={'80%'} />
-          <Skeleton width={'100%'} />
-          <Skeleton width={'50%'} />
-          <Skeleton width={'75%'} />
-        </div>
-      </div>}
-    </div>
-  </div>
-}
+  );
+};
 
 export const CWContentPage = ({
   thread,
@@ -172,13 +179,50 @@ export const CWContentPage = ({
   canUpdateThread,
   showTabs = false,
   showSkeleton,
-  isWindowMedium
+  isWindowMedium,
+  isEditing = false,
 }: ContentPageProps) => {
   const [tabSelected, setTabSelected] = useState<number>(0);
 
-  if (showSkeleton) return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />
+  if (showSkeleton)
+    return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />;
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
+
+  const authorAndPublishInfoRow = (
+    <div className="header-info-row">
+      <AuthorAndPublishInfo
+        showSplitDotIndicator={true}
+        isNew={!!displayNewTag}
+        discord_meta={discord_meta}
+        isLocked={thread?.readOnly}
+        {...(thread?.lockedAt && {
+          lockedAt: thread.lockedAt.toISOString(),
+        })}
+        {...(thread?.updatedAt && {
+          lastUpdated: thread.updatedAt.toISOString(),
+        })}
+        authorInfo={
+          author &&
+          new AddressInfo(
+            null,
+            author?.address,
+            typeof author.chain === 'string' ? author.chain : author.chain.id,
+            null
+          )
+        }
+        collaboratorsInfo={collaborators}
+        publishDate={
+          createdOrEditedDate ? moment(createdOrEditedDate).format('l') : null
+        }
+        viewsCount={viewCount}
+        showPublishLabelWithDate={!lastEdited}
+        showEditedLabelWithDate={!!lastEdited}
+        isSpamThread={isSpamThread}
+        threadStage={stageLabel}
+      />
+    </div>
+  );
 
   const mainBody = (
     <div className="main-body-container">
@@ -190,44 +234,11 @@ export const CWContentPage = ({
         ) : (
           title
         )}
-        <div className="header-info-row">
-          <AuthorAndPublishInfo
-            showSplitDotIndicator={true}
-            isNew={!!displayNewTag}
-            discord_meta={discord_meta}
-            isLocked={thread?.readOnly}
-            {...(thread?.lockedAt && {
-              lockedAt: thread.lockedAt.toISOString(),
-            })}
-            {...(thread?.updatedAt && {
-              lastUpdated: thread.updatedAt.toISOString(),
-            })}
-            authorInfo={
-              author &&
-              new AddressInfo(
-                null,
-                author?.address,
-                typeof author.chain === 'string'
-                  ? author.chain
-                  : author.chain.id,
-                null
-              )
-            }
-            collaboratorsInfo={collaborators}
-            publishDate={
-              createdOrEditedDate
-                ? moment(createdOrEditedDate).format('l')
-                : null
-            }
-            viewsCount={viewCount}
-            showPublishLabelWithDate={!lastEdited}
-            showEditedLabelWithDate={!!lastEdited}
-            isSpamThread={isSpamThread}
-            threadStage={stageLabel}
-          />
-        </div>
+        {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
+
+      {isEditing ? authorAndPublishInfoRow : <></>}
 
       {body &&
         body(

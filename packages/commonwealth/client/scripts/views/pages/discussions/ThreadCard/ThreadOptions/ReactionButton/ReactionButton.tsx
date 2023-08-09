@@ -19,27 +19,29 @@ import './ReactionButton.scss';
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
-  showSkeleton?: boolean
+  showSkeleton?: boolean;
   disabled: boolean;
 };
 
 const ReactionButtonSkeleton = () => {
-  return <button
-    onClick={async (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-    }}
-    className={`ThreadReactionButton showSkeleton`}
-  >
-    <Skeleton height={52} width={40} />
-  </button>
-}
+  return (
+    <button
+      onClick={async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      className={`ThreadReactionButton showSkeleton`}
+    >
+      <Skeleton height={52} width={40} />
+    </button>
+  );
+};
 
 export const ReactionButton = ({
   thread,
   size,
   disabled,
-  showSkeleton
+  showSkeleton,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
@@ -71,7 +73,8 @@ export const ReactionButton = ({
   const handleVoteClick = async (event) => {
     event.stopPropagation();
     event.preventDefault();
-    if (isLoading) return;
+    if (isLoading || disabled) return;
+
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
       return;
@@ -132,8 +135,9 @@ export const ReactionButton = ({
                       {...(hasReacted && { weight: 'fill' })}
                     />
                     <div
-                      className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                        }`}
+                      className={`reactions-count ${
+                        hasReacted ? ' has-reacted' : ''
+                      }`}
                     >
                       {reactors.length}
                     </div>
@@ -145,8 +149,9 @@ export const ReactionButton = ({
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
               <div
-                className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                  }`}
+                className={`reactions-count ${
+                  hasReacted ? ' has-reacted' : ''
+                }`}
               >
                 {reactors.length}
               </div>

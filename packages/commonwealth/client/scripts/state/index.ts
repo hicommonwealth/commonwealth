@@ -108,6 +108,9 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
+
+  // bandaid fix to skip next deinit chain on layout.tsx transition
+  skipDeinitChain: boolean;
 }
 
 // INJECT DEPENDENCIES
@@ -200,6 +203,7 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
+  skipDeinitChain: false,
 };
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status

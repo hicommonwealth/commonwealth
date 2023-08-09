@@ -355,6 +355,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             thread.title
           )
         }
+        isEditing={isEditingBody}
         author={app.chain.accounts.get(thread.author)}
         discord_meta={thread.discord_meta}
         collaborators={thread.collaborators}
@@ -412,7 +413,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {isEditingBody ? (
               <>
                 {/*// TODO editing thread */}
-                {threadOptionsComp}
                 <EditBody
                   title={draftTitle}
                   thread={thread}
@@ -427,6 +427,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     setIsEditingBody(false);
                   }}
                 />
+                {threadOptionsComp}
               </>
             ) : (
               <>

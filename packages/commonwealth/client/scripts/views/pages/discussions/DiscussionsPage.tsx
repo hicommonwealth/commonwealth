@@ -1,3 +1,4 @@
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
@@ -38,6 +39,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -72,10 +74,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
+          const canReact =
+            hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
           return (
             <ThreadCard
               key={thread.id + '-' + thread.readOnly}
               thread={thread}
+              canReact={canReact}
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);

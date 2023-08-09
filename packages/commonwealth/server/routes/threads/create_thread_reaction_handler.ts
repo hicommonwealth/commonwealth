@@ -64,7 +64,7 @@ export const createThreadReactionHandler = async (
   controllers.notifications.emit(notificationOptions).catch(console.error);
 
   // track analytics event
-  controllers.analytics.track(analyticsOptions).catch(console.error);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, newReaction);
 };
