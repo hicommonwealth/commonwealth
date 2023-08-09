@@ -62,12 +62,18 @@ Browse to these
 * http://localhost:5051/rpc
 * http://localhost:5051/lcd/
 
+
 # How to manually test transactions on the csdk or csdk-beta sandbox community
 
 To create a proposal or vote, you will need an account with staked tokens. We have
 a shared address for this purpose.
 
-- In Keplr, import this mnemonic:
+- In Keplr add a wallet:
+    - click avatar in upper right corner
+    - Add wallet
+    - Import an existing wallet
+    - Use recover phrase or private key
+    - copy/paste this mnemonic:
 `ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought`
 
 - Go to http://localhost:8080/csdk-beta or http://localhost:8080/csdk and join community. You should be able to create proposals and vote.
