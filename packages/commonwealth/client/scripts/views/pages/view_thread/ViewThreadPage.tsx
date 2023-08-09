@@ -521,6 +521,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const canUpdateThread =
     isLoggedIn &&
     (Permissions.isSiteAdmin() ||
+      Permissions.isCommunityAdmin() ||
+      Permissions.isCommunityModerator() ||
       Permissions.isThreadAuthor(thread) ||
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
