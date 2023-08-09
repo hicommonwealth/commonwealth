@@ -22,8 +22,8 @@ const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
     }
   );
 
-  // TODO: this can be removed in future https://commonxyz.slack.com/archives/C050AE0URFH/p1690583494743469
-  app.chainEntities.getRawEntities(app.activeChainId())
+  // TODO: this can be removed in future
+  app.chainEntities.getRawEntities(app.activeChainId());
 
   return response.data.result.map((t) => new Thread(t));
 };
