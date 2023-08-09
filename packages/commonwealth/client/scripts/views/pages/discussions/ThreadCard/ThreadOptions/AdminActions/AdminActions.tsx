@@ -69,7 +69,8 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               app.threads.delete(thread).then(() => onDelete && onDelete());
@@ -80,7 +81,8 @@ export const AdminActions = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -121,11 +123,13 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
         {
           label: !thread.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               app.threads
@@ -171,12 +175,14 @@ export const AdminActions = ({
         buttons: [
           {
             label: 'Restore',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: onEditConfirm,
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
             onClick: onEditCancel,
           },
         ],
