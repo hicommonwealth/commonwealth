@@ -1,13 +1,13 @@
 import { test } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { PORT } from '../../server/config';
+import { PORT } from '../../../server/config';
 import {
   clearTestEntities,
   createTestEntities,
   testChains,
   testThreads,
-} from '../integration/api/external/dbEntityHooks.spec';
+} from '../../integration/api/external/dbEntityHooks.spec';
 chai.use(chaiHttp);
 const { expect } = chai;
 

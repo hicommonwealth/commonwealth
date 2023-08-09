@@ -1198,26 +1198,6 @@ export const ComponentShowcase = () => {
           />
         </div>
       </div>
-      <div className="Quill">
-        <CWText type="h3">Quill Editor</CWText>
-        <div className="editor-toggle">
-          <CWToggle
-            size={'small'}
-            checked={isEditorDisabled}
-            onChange={() => {
-              setIsEditorDisabled((prev) => !prev);
-            }}
-          />
-          <CWText type="caption">
-            Editor {isEditorDisabled ? 'Disabled' : 'Enabled'}
-          </CWText>
-        </div>
-        <ReactQuillEditor
-          contentDelta={threadContentDelta}
-          setContentDelta={setThreadContentDelta}
-          isDisabled={isEditorDisabled}
-        />
-      </div>
       <div className="upvote-gallery">
         <CWText type="h3">Upvote</CWText>
         <div className="upvote-row">
