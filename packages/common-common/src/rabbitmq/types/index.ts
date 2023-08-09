@@ -72,13 +72,13 @@ export enum RascalExchanges {
 }
 
 export enum RascalQueues {
-  ChainEvents = 'ChainEventsQueue',
-  ChainEntityCUDMain = 'ChainEntityCUDMainQueue',
-  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueue',
-  ChainEventNotifications = 'ChainEventNotificationsQueue',
+  ChainEvents = 'ChainEventsQueueV2',
+  ChainEntityCUDMain = 'ChainEntityCUDMainQueueV2',
+  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueueV2',
+  ChainEventNotifications = 'ChainEventNotificationsQueueV2',
   DeadLetter = 'DeadLetterQueue',
   SnapshotListener = 'SnapshotListenerQueueV2',
-  DiscordListener = 'DiscordMessageQueue',
+  DiscordListener = 'DiscordMessageQueueV2',
 }
 
 export enum RascalBindings {
