@@ -10,6 +10,7 @@ export type QuillRendererProps = {
   openLinksInNewTab?: boolean;
   searchTerm?: string;
   cutoffLines?: number;
+  cuttoffCharacters?: number;
   containerClass?: string;
 };
 
@@ -24,6 +25,7 @@ export const QuillRenderer = ({
   searchTerm,
   hideFormatting,
   cutoffLines,
+  cutoffCharacters,
   containerClass,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
@@ -73,6 +75,7 @@ export const QuillRenderer = ({
             doc={docInfo.content}
             searchTerm={searchTerm}
             cutoffLines={cutoffLines}
+            cutoffCharacters={cutoffCharacters}
           />
         );
       case 'markdown':
@@ -88,11 +91,12 @@ export const QuillRenderer = ({
         return <>N/A</>;
     }
   }, [
-    cutoffLines,
+    docInfo.format,
+    docInfo.content,
     hideFormatting,
     searchTerm,
-    docInfo.content,
-    docInfo.format,
+    cutoffLines,
+    cutoffCharacters,
   ]);
 
   if (containerClass) {

@@ -9,17 +9,28 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
-import { countLinesQuill, getTextFromDelta } from './utils';
+import {
+  countCharactersQuill,
+  countLinesQuill,
+  getTextFromDelta,
+} from './utils';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
 };
+
+enum CutoffType {
+  None,
+  Lines,
+  Characters,
+}
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
 export const QuillFormattedText = ({
   doc,
   hideFormatting,
   cutoffLines,
+  cutoffCharacters,
   openLinksInNewTab,
   searchTerm,
 }: QuillFormattedTextProps) => {
@@ -27,21 +38,53 @@ export const QuillFormattedText = ({
 
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
-  const isTruncated: boolean = useMemo(() => {
+  const truncateType: CutoffType = useMemo(() => {
     if (userExpand) {
-      return false;
+      return CutoffType.None;
     }
-    return cutoffLines && cutoffLines < countLinesQuill(doc);
-  }, [cutoffLines, doc, userExpand]);
+    if (cutoffLines && cutoffLines < countLinesQuill(doc)) {
+      return CutoffType.Lines;
+    }
+    if (cutoffCharacters && cutoffCharacters < countCharactersQuill(doc)) {
+      return CutoffType.Characters;
+    }
+
+    return CutoffType.None;
+  }, [cutoffCharacters, cutoffLines, doc, userExpand]);
 
   const truncatedDoc: DeltaStatic = useMemo(() => {
-    if (isTruncated) {
+    // make deep copy to leave original untouched.
+    let ops = JSON.parse(JSON.stringify(doc.ops));
+    if (truncateType === CutoffType.Lines) {
       return {
         ops: [...doc.ops.slice(0, cutoffLines)],
       } as DeltaStatic;
     }
+    if (truncateType === CutoffType.Characters) {
+      let totalChars = 0;
+      let i = 0;
+
+      // find which insert goes past cutoff, cut remaining from this insert
+      while (totalChars < cutoffCharacters) {
+        totalChars += ops[i++].insert.length;
+      }
+
+      // remove strings that go over cutoff
+      ops = [...ops.slice(0, i)];
+
+      // If the last insert went over the cutoff, adjust the length of the last insert
+      if (i > 0 && totalChars > cutoffCharacters) {
+        const cutTo =
+          ops.slice()[i - 1].insert.length - (totalChars - cutoffCharacters);
+        ops[i - 1].insert = ops[i - 1].insert.slice(0, cutTo) + '...';
+      }
+
+      return {
+        ops: ops,
+      } as DeltaStatic;
+    }
     return doc;
-  }, [cutoffLines, doc, isTruncated]);
+  }, [cutoffCharacters, cutoffLines, doc, truncateType]);
 
   // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {
@@ -67,21 +110,24 @@ export const QuillFormattedText = ({
     return <span>{textWithHighlights}</span>;
   }, [hideFormatting, navigate, openLinksInNewTab, searchTerm, truncatedDoc]);
 
-  const toggleDisplay = () => setUserExpand(!userExpand);
+  const onClick = (e) => {
+    e.stopPropagation();
+    setUserExpand(!userExpand);
+  };
 
   return (
     <>
       <div
         className={getClasses<{ collapsed?: boolean }>(
-          { collapsed: isTruncated },
+          { collapsed: truncateType !== CutoffType.None },
           'MarkdownFormattedText'
         )}
       >
         {finalDoc}
       </div>
-      {isTruncated && (
+      {truncateType !== CutoffType.None && (
         <div className="show-more-button-wrapper">
-          <div className="show-more-button" onClick={toggleDisplay}>
+          <div className="show-more-button" onClick={onClick}>
             <CWIcon iconName="plus" iconSize="small" />
             <div className="show-more-text">Show More</div>
           </div>

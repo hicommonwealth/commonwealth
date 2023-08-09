@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { DeltaStatic } from 'quill';
+import type { DeltaOperation, DeltaStatic } from 'quill';
 import { Icon, IconProps } from '@phosphor-icons/react';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
@@ -142,8 +142,10 @@ export const deserializeDelta = (str: string): DeltaStatic => {
   }
 };
 
-// countLinesQuill returns the number of text lines for a quill ops array
-export const countLinesQuill = (delta: DeltaStatic): number => {
+const countQuill = (
+  delta: DeltaStatic,
+  counter: (op: DeltaOperation) => number
+): number => {
   if (!delta || !delta.ops) {
     return 0;
   }
@@ -153,7 +155,7 @@ export const countLinesQuill = (delta: DeltaStatic): number => {
   for (const op of delta.ops) {
     if (typeof op.insert === 'string') {
       try {
-        count += op.insert.split('\n').length - 1;
+        count += counter(op);
       } catch (e) {
         console.log(e);
       }
@@ -161,6 +163,15 @@ export const countLinesQuill = (delta: DeltaStatic): number => {
   }
 
   return count;
+};
+
+// countLinesQuill returns the number of text lines for a quill ops array
+export const countLinesQuill = (delta: DeltaStatic): number => {
+  return countQuill(delta, (op) => op.insert.split('\n').length - 1);
+};
+
+export const countCharactersQuill = (delta: DeltaStatic): number => {
+  return countQuill(delta, (op) => op.insert.length);
 };
 
 // countLinesMarkdown returns the number of lines for the text

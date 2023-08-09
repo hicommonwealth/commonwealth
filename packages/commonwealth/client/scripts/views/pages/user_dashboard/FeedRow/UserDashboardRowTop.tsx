@@ -22,7 +22,13 @@ type UserDashboardRowTopProps = {
 };
 
 export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
-  const { activityData, category, threadText, threadAuthor } = props;
+  const { activityData, category, threadAuthor } = props;
+
+  let threadText = props.threadText;
+  if (threadText?.length > 50) {
+    threadText = threadText.substring(0, 50) + '...';
+  }
+
   const navigate = useCommonNavigate();
 
   const {
@@ -102,7 +108,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
         </CWText>
       </div>
       <div className="comment-preview">
-        {<QuillRenderer doc={comment_text} />}
+        {<QuillRenderer doc={comment_text} cutoffCharacters={280} />}
         {isComment && (
           <EmbeddedThreadCard
             threadId={thread_id}
