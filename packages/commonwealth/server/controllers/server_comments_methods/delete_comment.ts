@@ -17,20 +17,20 @@ export type DeleteCommentOptions = {
   address: AddressInstance;
   chain: ChainInstance;
   commentId?: number;
-  message_id?: string;
+  messageId?: string;
 };
 
 export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, address, chain, commentId, message_id }: DeleteCommentOptions
+  { user, address, chain, commentId, messageId }: DeleteCommentOptions
 ): Promise<DeleteCommentResult> {
   if (!commentId) {
     // Discord Bot Handling
     const existingComment = await this.models.Comment.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: message_id } },
+        discord_meta: { [Op.contains]: { message_id: messageId } },
       },
     });
 

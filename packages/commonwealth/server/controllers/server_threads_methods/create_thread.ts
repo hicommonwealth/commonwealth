@@ -46,7 +46,7 @@ export type CreateThreadOptions = {
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
-  discord_meta?: any;
+  discordMeta?: any;
 };
 
 export type CreateThreadResult = [
@@ -72,7 +72,7 @@ export async function __createThread(
     canvasAction,
     canvasSession,
     canvasHash,
-    discord_meta,
+    discordMeta,
   }: CreateThreadOptions
 ): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
@@ -136,7 +136,7 @@ export async function __createThread(
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta,
+    discord_meta: discordMeta,
   };
 
   // begin essential database changes within transaction

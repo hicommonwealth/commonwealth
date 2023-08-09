@@ -62,7 +62,7 @@ export const createThreadCommentHandler = async (
       canvasAction,
       canvasSession,
       canvasHash,
-      discord_meta,
+      discordMeta: discord_meta,
     });
 
   for (const n of notificationOptions) {

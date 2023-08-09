@@ -19,7 +19,7 @@ export const updateCommentHandler = async (
 ) => {
   const { user, chain, address } = req;
   const { id: commentId } = req.params;
-  const { body: commentBody, discord_meta } = req.body;
+  const { body: commentBody, discord_meta: discordMeta } = req.body;
 
   const [updatedComment, notificationOptions] =
     await controllers.comments.updateComment({
@@ -28,7 +28,7 @@ export const updateCommentHandler = async (
       chain,
       commentId,
       commentBody,
-      discord_meta,
+      discordMeta,
     });
 
   // emit notifications

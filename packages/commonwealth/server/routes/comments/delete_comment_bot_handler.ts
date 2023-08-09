@@ -20,7 +20,7 @@ export const deleteBotCommentHandler = async (
     user,
     address,
     chain,
-    message_id, // Discord bot only
+    messageId: message_id, // Discord bot only
   });
 
   return success(res, undefined);

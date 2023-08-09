@@ -13,20 +13,20 @@ export const Errors = {
 export type DeleteThreadOptions = {
   user: UserInstance;
   threadId?: number;
-  message_id?: string;
+  messageId?: string;
 };
 
 export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, threadId, message_id }: DeleteThreadOptions
+  { user, threadId, messageId }: DeleteThreadOptions
 ): Promise<DeleteThreadResult> {
   if (!threadId) {
     // Special handling for discobot threads
     const existingThread = await this.models.Thread.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: message_id } },
+        discord_meta: { [Op.contains]: { message_id: messageId } },
       },
     });
     if (existingThread) {

@@ -43,7 +43,7 @@ export const updateThreadHandler = async (
       body,
       stage,
       url,
-      discord_meta,
+      discordMeta: discord_meta,
     });
 
   for (const n of notificationOptions) {
