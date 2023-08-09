@@ -16,6 +16,21 @@ import {
   registerRoute,
 } from './utils/methodNotAllowed';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.SnapshotListener,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -94,4 +109,6 @@ app.listen(port, async () => {
     log.error(`Error starting server: ${err}`);
   }
   app.bind;
+
+  isServiceHealthy = true;
 });

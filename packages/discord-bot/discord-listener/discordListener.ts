@@ -4,12 +4,27 @@ import {
   getRabbitMQConfig,
   RabbitMQController,
 } from 'common-common/src/rabbitmq';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { IDiscordMessage } from 'common-common/src/types';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import v8 from 'v8';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.DiscordBotListener,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -46,6 +61,7 @@ const initPromise = controller.init();
 
 client.on('ready', () => {
   log.info('Discord bot is ready.');
+  isServiceHealthy = true;
 });
 
 client.on('messageCreate', async (message: Message) => {

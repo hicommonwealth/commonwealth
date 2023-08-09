@@ -22,7 +22,22 @@ import type { Ithis as ChainEventsProcessorContextType } from './MessageProcesso
 import { processChainEvents } from './MessageProcessors/ChainEventsQueue';
 import v8 from 'v8';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
 
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  enabled: require.main === module,
+  service: ServiceKey.ChainEventsConsumer,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 const log = factory.getLogger(formatFilename(__filename));
 
 log.info(
@@ -124,6 +139,8 @@ async function main() {
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
+
+  isServiceHealthy = true;
 }
 
 if (require.main === module) main();

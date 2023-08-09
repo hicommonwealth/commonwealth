@@ -14,6 +14,21 @@ import v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.DiscordBotConsumer,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -121,6 +136,8 @@ async function consumeMessages() {
     processMessage,
     RascalSubscriptions.DiscordListener
   );
+
+  isServiceHealthy = true;
 }
 
 consumeMessages();
