@@ -7,13 +7,11 @@ import {
 enum AvatarSizes {
   Sm = 16,
   Med = 24,
-  Lg = 36,
+  Lg = 32,
 
-  // TODO: this is to account for sizing in user popover and avatar upload
-  Tmp1 = 18,
-  Tmp2 = 32,
-  Tmp3 = 60,
-  Tmp4 = 108
+  // TODO: this is to account for sizing in the avatar upload
+  Tmp1 = 60,
+  Tmp2 = 108
 };
 
 interface AvatarProps {
