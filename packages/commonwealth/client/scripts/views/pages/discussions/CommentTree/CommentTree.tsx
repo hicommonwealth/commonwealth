@@ -97,8 +97,7 @@ export const CommentTree = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
-  const isLocked =
-    fromDiscordBot || !!(thread instanceof Thread && thread.readOnly);
+  const isLocked = !!(thread instanceof Thread && thread.readOnly);
 
   useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
@@ -416,7 +415,12 @@ export const CommentTree = ({
 
           const isLast = threadLevel === 8;
 
-          const replyBtnVisible = !!(!isLast && !isLocked && isLoggedIn);
+          const replyBtnVisible = !!(
+            !isLast &&
+            !isLocked &&
+            !fromDiscordBot &&
+            isLoggedIn
+          );
 
           return (
             <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>

@@ -10,10 +10,12 @@ import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ProposalTag } from '../../components/ProposalCard/ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
+import { Skeleton } from '../../components/Skeleton';
 
 type SnapshotProposalCardProps = {
   snapshotId: string;
   proposal: SnapshotProposal;
+  showSkeleton?: boolean;
 };
 
 export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
@@ -24,6 +26,22 @@ export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
 
   const time = moment(+proposal.end * 1000);
   const now = moment();
+
+  if (props.showSkeleton) {
+    return (
+      <CWCard
+        elevation="elevation-2"
+        interactive={true}
+        className="ProposalCard"
+      >
+        <div className="proposal-card-metadata">
+          <Skeleton width={'90%'} />
+          <Skeleton width={'100%'} />
+          <Skeleton width={'90%'} />
+        </div>
+      </CWCard>
+    );
+  }
 
   // TODO: display proposal.scores and proposal.scores_total on card
   return (

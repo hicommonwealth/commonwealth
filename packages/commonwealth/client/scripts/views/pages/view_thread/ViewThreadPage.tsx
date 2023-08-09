@@ -330,6 +330,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLocked =
     (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
 
+  const canUpdateThread =
+    isLoggedIn &&
+    (Permissions.isSiteAdmin() ||
+      Permissions.isCommunityAdmin() ||
+      Permissions.isCommunityModerator() ||
+      Permissions.isThreadAuthor(thread) ||
+      Permissions.isThreadCollaborator(thread) ||
+      (fromDiscordBot && isAdmin));
+
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
@@ -363,12 +372,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         updatedAt={thread.updatedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
-        canUpdateThread={
-          isLoggedIn &&
-          (Permissions.isSiteAdmin() ||
-            Permissions.isThreadAuthor(thread) ||
-            Permissions.isThreadCollaborator(thread))
-        }
+        canUpdateThread={canUpdateThread}
         displayNewTag={true}
         stageLabel={!isStageDefault && thread.stage}
         subHeader={
