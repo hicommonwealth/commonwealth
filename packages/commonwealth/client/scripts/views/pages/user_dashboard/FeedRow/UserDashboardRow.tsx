@@ -21,17 +21,15 @@ type UserDashboardRowProps = {
 export const UserDashboardRow = (props: UserDashboardRowProps) => {
   const { notification } = props;
   const [thread, setThread] = useState<Thread>(null);
+  const [commentCount, setCommentCount] = useState('0');
   const navigate = useCommonNavigate();
 
-  const {
-    commentCount,
-    categoryId,
-    threadId,
-    blockNumber,
-    eventNetwork,
-    chain,
-    commenters,
-  } = notification;
+  const { categoryId, threadId, blockNumber, eventNetwork, chain, commenters } =
+    notification;
+
+  useEffect(() => {
+    setCommentCount(notification.commentCount);
+  }, [notification.commentCount]);
 
   if (categoryId === 'chain-event') {
     const chainEvent: CWEvent = {
@@ -99,6 +97,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
         commentId={comment_id}
         chainId={chain_id}
         commentCount={commentCount}
+        setCommentCount={setCommentCount}
         commenters={commenters}
         thread={thread}
       />

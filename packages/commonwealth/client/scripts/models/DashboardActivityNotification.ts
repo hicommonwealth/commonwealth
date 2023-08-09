@@ -7,7 +7,7 @@ class DashboardActivityNotification {
   public readonly categoryId?: string;
   public readonly viewCount?: number;
   public readonly likeCount?: number;
-  public readonly commentCount?: number;
+  public readonly commentCount?: string;
   public readonly createdAt: moment.Moment;
   public readonly notificationData?: string;
   public readonly threadId?: string;

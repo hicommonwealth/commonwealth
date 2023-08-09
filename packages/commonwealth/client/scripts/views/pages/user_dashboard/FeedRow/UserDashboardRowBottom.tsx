@@ -1,31 +1,30 @@
+import { NotificationCategories } from 'common-common/src/types';
+import useForceRerender from 'hooks/useForceRerender';
+import { toNumber } from 'lodash';
+import Thread from 'models/Thread';
 import React, { useState } from 'react';
 
-import { NotificationCategories } from 'common-common/src/types';
-
-import './UserDashboardRowBottom.scss';
-
 import app from 'state';
+import useUserActiveAccount from '../../../../hooks/useUserActiveAccount';
 import useUserLoggedIn from '../../../../hooks/useUserLoggedIn';
-import { CWAvatarGroup } from '../../../components/component_kit/cw_avatar_group';
+import type NotificationSubscription from '../../../../models/NotificationSubscription';
+import { CreateComment } from '../../../components/Comments/CreateComment';
 import type { ProfileWithAddress } from '../../../components/component_kit/cw_avatar_group';
+import { CWAvatarGroup } from '../../../components/component_kit/cw_avatar_group';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../../components/component_kit/cw_icon_button';
 import { Modal } from '../../../components/component_kit/cw_modal';
 import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../../../components/component_kit/helpers';
 import { LoginModal } from '../../../modals/login_modal';
+import { ReactionButton } from '../../discussions/ThreadCard/ThreadOptions/ReactionButton/index';
 import { subscribeToThread } from '../helpers';
-import type NotificationSubscription from '../../../../models/NotificationSubscription';
-import useForceRerender from 'hooks/useForceRerender';
-import { CommentReactionButton } from '../../../components/ReactionButton/CommentReactionButton';
-import { ReactionButton } from '../../discussions/ThreadCard/Options/ReactionButton';
-import Thread from 'models/Thread';
-import { CreateComment } from '../../../components/Comments/CreateComment';
-import { toNumber } from 'lodash';
+
+import './UserDashboardRowBottom.scss';
 
 type UserDashboardRowBottomProps = {
-  commentCount: number;
+  commentCount: string;
+  setCommentCount;
   threadId: string;
   chainId: string;
   commentId?: string;
@@ -38,6 +37,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const {
     threadId,
     commentCount,
+    setCommentCount,
     commentId,
     chainId,
     commenters,
@@ -46,6 +46,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   } = props;
   const forceRerender = useForceRerender();
   const { isLoggedIn } = useUserLoggedIn();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [isReplying, setIsReplying] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -62,6 +63,11 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
 
   const handleIsReplying = () => {
     setIsReplying(!isReplying);
+  };
+
+  const updatedCommentsCallback = () => {
+    setCommentCount(parseInt(commentCount) + 1);
+    forceRerender();
   };
 
   const setSubscription = async (
@@ -101,11 +107,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     <div className="UserDashboardRowBottom">
       <div className="top-row">
         <div className="activity">
-          {/* {
-            thread && (
-              <ReactionButton thread={thread} size="small" />
-            ) /* Show on more than threads? */}
-          {/* {comment && <CommentReactionButton comment={comment} />} */}
+          {thread && (
+            <ReactionButton
+              thread={thread}
+              size="small"
+              disabled={!hasJoinedCommunity}
+            />
+          )}
           <button
             className="thread-option-btn"
             onClick={(e) => {
@@ -216,7 +224,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           handleIsReplying={handleIsReplying}
           parentCommentId={commentId ? toNumber(commentId) : null}
           rootThread={thread}
-          updatedCommentsCallback={forceRerender}
+          updatedCommentsCallback={updatedCommentsCallback}
           canComment={!thread.readOnly}
         />
       )}
