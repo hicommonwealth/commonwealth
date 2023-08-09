@@ -61,8 +61,8 @@ export function getRabbitMQConfig(
     allQueues,
     allBindings,
   } = getAllRascalConfigs(rabbitmq_uri, vhost, purge);
-  let config = baseConfig;
-  let vhostConfig = config.vhosts[vhost];
+  const config = baseConfig;
+  const vhostConfig = config.vhosts[vhost];
   if (service === RascalConfigServices.CommonwealthService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
       RascalExchanges.CUD,
