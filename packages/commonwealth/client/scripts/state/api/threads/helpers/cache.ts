@@ -1,7 +1,80 @@
-// import { useQueryClient } from '@tanstack/react-query';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+
+/**
+ * What is this file?
+ * --
+ * This is a utility file to abstract away complex thread cache updates for react query into a unified and
+ * simplified api (atleast simpler than if it was used in independent files).
+ * --
+ * --
+ * How many thread cache's are we dealing with?
+ * --
+ * We have 3 thread caches.
+ *
+ * 1- for /threads?bulk=true -> we have this array key
+ * [
+ *   ApiEndpoints.FETCH_THREADS,
+ *   props.chainId,
+ *   props.queryType,
+ *   props.topicId,
+ *   props.stage,
+ *   props.includePinnedThreads,
+ *   props.toDate,
+ *   props.fromDate,
+ *   props.limit,
+ *   props.orderBy,
+ * ]
+ * and in this key, other than the first and third parameters, all other parameters can change, each of these changing
+ * parameter will create a new cache
+ *
+ * 2- for /threads?active=true -> we have this array key
+ *  [
+ *    ApiEndpoints.FETCH_THREADS,
+ *    props.chainId,
+ *    props.queryType,
+ *    props.topicsPerThread,
+ *  ]
+ * and only the second and 4th parameter will ever change.
+ *
+ * 3- for /threads?thread_ids=[] -> we have this array key
+ * [
+ *   ApiEndpoints.FETCH_THREADS,
+ *   chainId,
+ *   'single',
+ *   ...ids,
+ * ]
+ * the second parameter can change, and after the 3th param, there can be either 1 or many thread ids, each combination
+ * will create a new cache
+ * --
+ * --
+ * How do cache updates work here?
+ * --
+ * Firstly we have to understand the response formats we are dealing with here.
+ * 1- for 'single' and 'active' thread queries we have a simple array of thread objects ex: [{...thread1}, {...thread2}]
+ * cache update in this case is simple
+ *
+ * 2- for 'bulk' thread queries we have a paginated response of thread which then gets formated by react query ex:
+ * {  pages: [{data: [...threads], ...pagination-params} ... n], pageParams: [...pagination numbers] }
+ * to update cache this we first have to find the page in which we have the specific thread, and then update that
+ * since we can have many different caches, we would have to do it for each cache.
+ * --
+ * --
+ * How are arrays updated?
+ * ---
+ * We use 'arrayManipulationMode' to update arrays in cache, we may want to
+ * - add to an array -> arrayManipulationMode = combineAndRemoveDups
+ * - remove from an array -> arrayManipulationMode = removeFromExisting
+ * - replace an array -> arrayManipulationMode = replaceArray
+ * --
+ * --
+ * What are update methods?
+ * --
+ * We are using 2 cache update methods
+ * - 'update' -> will update the object in every cache
+ * - 'update' -> will remove the object from every cache
+ */
 
 type IExistingThreadState =
   | null
@@ -36,20 +109,30 @@ const cacheUpdater = ({
 }: CacheUpdater) => {
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-  const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId
-  );
 
+  // get all array fields from the update body
   const arrayFieldsFromUpdateBody = updateBody
     ? Object.keys(updateBody).filter((k) => Array.isArray(updateBody[k]))
     : [];
 
-  keysForThreads.map((k: any[]) => {
-    const existingData: IExistingThreadState = queryClient.getQueryData(k);
+  // get all query keys for threads
+  const keysForThreads = queryKeys.filter(
+    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId
+  );
+
+  keysForThreads.map((cacheKey: any[]) => {
+    const [, , queryType] = cacheKey;
+
+    // get existing data of this cache
+    const existingData: IExistingThreadState =
+      queryClient.getQueryData(cacheKey);
+
     if (existingData) {
+      // we might want to run some callbacks after the cache update, store them here
       const remainingCallbacks = [];
-      queryClient.setQueryData(k, () => {
-        if (k[2] === cacheTypes.BULK_THREADS) {
+
+      queryClient.setQueryData(cacheKey, () => {
+        if (queryType === cacheTypes.BULK_THREADS) {
           if (method === 'update') {
             const pages = [...(existingData.pages || [])];
             let foundThreadIndex = -1;
@@ -134,8 +217,8 @@ const cacheUpdater = ({
         }
 
         if (
-          k[2] === cacheTypes.SINGLE_THREAD ||
-          k[2] === cacheTypes.ACTIVE_THREADS
+          queryType === cacheTypes.SINGLE_THREAD ||
+          queryType === cacheTypes.ACTIVE_THREADS
         ) {
           if (method === 'update') {
             const updatedThreads = [...existingData]; // threads array
@@ -181,11 +264,13 @@ const cacheUpdater = ({
             return updatedThreads;
           }
           if (method === 'remove') {
-            remainingCallbacks.push(() => queryClient.refetchQueries(k));
+            remainingCallbacks.push(() => queryClient.refetchQueries(cacheKey));
             return [{}];
           }
         }
       });
+
+      // run the remanining callbacks
       remainingCallbacks.map((x) => x());
     }
   });
