@@ -11,6 +11,27 @@
     width: auto;
   }
 
+  .compact-modal-title {
+    display: flex;
+    align-items: center;
+    background: $white;
+    border-radius: 6px 6px 0px 0px;
+    padding: 0 0 16px 0;
+
+    .title-text {
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .close-icon {
+      color: $neutral-500;
+
+      &:hover {
+        color: $neutral-800;
+      }
+    }
+  }
+
   .disabled-dropdown {
     pointer-events: none;
   }
@@ -55,7 +76,7 @@
     }
   }
 
-  .footer {
+  .compact-modal-footer {
     display: flex;
     gap: 16px;
     justify-content: end;

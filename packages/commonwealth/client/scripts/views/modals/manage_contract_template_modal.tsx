@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
+import { X } from '@phosphor-icons/react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWDropdown,
   DropdownItemType,
 } from 'views/components/component_kit/cw_dropdown';
-import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import app from 'state';
-
-import 'modals/manage_contract_template_modal.scss';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+
+import 'modals/manage_contract_template_modal.scss';
 
 export const displayOptions = [
   { value: '2', label: 'In Create Dropdown' },
@@ -172,9 +173,12 @@ const ManageContractTemplateModal = ({
 
   return (
     <div className="ManageContractTemplateModal">
-      <CWText type="h4" fontWeight="bold">
-        {modalTitle}
-      </CWText>
+      <div className="compact-modal-title">
+        <CWText className="title-text" type="h4">
+          {modalTitle}
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
+      </div>
       {!isEditMode && (
         <CWText type="h5" className="subtitle" fontWeight="medium">
           {modalSubtitle}
@@ -207,7 +211,7 @@ const ManageContractTemplateModal = ({
         )}
         {!isEditMode && (
           <CWText className="create-template-info" type="caption">
-            Don’t see a template that fits your needs?
+            Don't see a template that fits your needs?
             <CWText
               type="caption"
               fontWeight="medium"
@@ -280,14 +284,16 @@ const ManageContractTemplateModal = ({
         />
       </div>
 
-      <div className="footer">
+      <div className="compact-modal-footer">
         <CWButton
-          buttonType="mini-white"
+          buttonType="secondary"
+          buttonHeight="sm"
           label="Cancel"
           onClick={handleCancel}
         />
         <CWButton
-          buttonType="mini-black"
+          buttonType="primary"
+          buttonHeight="sm"
           label={confirmButtonLabel}
           disabled={confirmButtonDisabled}
           onClick={(e) =>
