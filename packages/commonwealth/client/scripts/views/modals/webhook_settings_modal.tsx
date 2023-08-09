@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-
-import 'modals/webhook_settings_modal.scss';
+import { X } from '@phosphor-icons/react';
 
 import type Webhook from '../../models/Webhook';
-
 import { NotificationCategories } from 'common-common/src/types';
 import {
   DydxChainNotificationTypes,
@@ -12,10 +10,11 @@ import {
   KusamaChainNotificationTypes,
   PolkadotChainNotificationTypes,
 } from 'helpers/chain_notification_types';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+
+import 'modals/webhook_settings_modal.scss';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
@@ -83,8 +82,10 @@ export const WebhookSettingsModal = ({
   return (
     <div className="WebhookSettingsModal">
       <div className="compact-modal-title">
-        <h3>Webhook Settings</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+        <CWText className="title-text" type="h4">
+          Webhook Settings
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <CWText>Which events should trigger this webhook?</CWText>
@@ -107,8 +108,12 @@ export const WebhookSettingsModal = ({
             )}
           </div>
         )}
+      </div>
+      <div className="compact-modal-footer">
         <CWButton
-          label="Save webhook settings"
+          label="Save settings"
+          buttonType="primary"
+          buttonHeight="sm"
           onClick={() => updateWebhook(webhook, selectedCategories)}
         />
       </div>
