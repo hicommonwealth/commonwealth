@@ -1,4 +1,4 @@
-import { Client, Message, IntentsBitField } from 'discord.js';
+import { Client, Message, IntentsBitField, ThreadChannel } from 'discord.js';
 import { sequelize } from '../utils/database';
 import {
   RabbitMQController,
@@ -9,7 +9,7 @@ import {
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import { IDiscordMessage } from 'common-common/src/types';
+import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
 import { RABBITMQ_URI, DISCORD_TOKEN } from '../utils/config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import v8 from 'v8';
@@ -33,7 +33,8 @@ log.info(
   )} GB`
 );
 
-const getImageUrls = (message: Message) => {
+const getImageUrls = (message: Partial<Message>) => {
+  if (!message.attachments) return [];
   const attachments = [...message.attachments.values()];
 
   return attachments
@@ -53,20 +54,18 @@ const client = new Client({
   ],
 });
 
-const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
-const initPromise = controller.init();
-
-client.on('ready', () => {
-  log.info('Discord bot is ready.');
-  isServiceHealthy = true;
-});
-
-client.on('messageCreate', async (message: Message) => {
+const handleMessage = async (
+  message: Partial<Message>,
+  action: DiscordAction
+) => {
   try {
     // 1. Filter for designated forum channels
     const channel = client.channels.cache.get(message.channelId);
-    if (channel?.type !== 11) return; // must be thread channel(all forum posts are Threads)
-    const parent_id = channel.parentId ?? '0';
+
+    if (channel?.type !== 11 && channel?.type !== 15) return; // must be thread channel(all forum posts are Threads)
+    const parent_id =
+      channel?.type === 11 ? channel.parentId : channel.id ?? '0';
+
     // Only process messages from relevant channels
     const relevantChannels = (
       await sequelize.query(
@@ -84,16 +83,17 @@ client.on('messageCreate', async (message: Message) => {
     // 2. Figure out if message is comment or thread
     const new_message: IDiscordMessage = {
       user: {
-        id: message.author.id,
-        username: message.author.username,
+        id: message.author?.id ?? null,
+        username: message.author?.username ?? null,
       },
       // If title is nothing == comment. channel_id will correspond to the thread channel id.
-      content: message.content,
-      message_id: message.id,
-      channel_id: message.channelId,
-      parent_channel_id: parent_id,
-      guild_id: message.guildId,
+      content: message.content ?? null,
+      message_id: message.id ?? null,
+      channel_id: message.channelId ?? null,
+      parent_channel_id: parent_id ?? null,
+      guild_id: message.guildId ?? null,
       imageUrls: getImageUrls(message),
+      action, // Indicates how the consumer should handle the message
     };
 
     if (!message.nonce) new_message.title = channel.name;
@@ -111,6 +111,33 @@ client.on('messageCreate', async (message: Message) => {
   } catch (error) {
     log.info(`Error Processing Discord Message`, error);
   }
+};
+
+const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+const initPromise = controller.init();
+
+client.on('ready', () => {
+  log.info('Discord bot is ready.');
+  isServiceHealthy = true;
+});
+
+client.on('threadDelete', async (thread: ThreadChannel) => {
+  await handleMessage(
+    { id: thread.id, channelId: thread.parentId } as Partial<Message>,
+    'thread-delete'
+  );
+});
+
+client.on('messageDelete', async (message: Message) => {
+  await handleMessage(message, 'comment-delete');
+});
+
+client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {
+  await handleMessage(newMessage, 'update');
+});
+
+client.on('messageCreate', async (message: Message) => {
+  await handleMessage(message, 'create');
 });
 
 client.login(DISCORD_TOKEN);
