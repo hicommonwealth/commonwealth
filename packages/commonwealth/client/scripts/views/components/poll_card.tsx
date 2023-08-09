@@ -302,7 +302,9 @@ export const DeletePollModal: FC<DeletePollModalProps> = ({
       <div className="compact-modal-title">
         <div className="Frame">
           <WarningOctagon className="warning-icon" weight="fill" />
-          <CWText type="h4">Delete this poll?</CWText>
+          <CWText className="title-text" type="h4">
+            Delete this poll?
+          </CWText>
         </div>
         <X className="close-icon" onClick={handleCloseModal} />
       </div>

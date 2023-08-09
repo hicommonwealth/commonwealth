@@ -155,18 +155,18 @@
       display: flex;
       align-items: center;
       gap: 8px;
-    }
 
-    .warning-icon {
-      color: $rorange-600;
-    }
+      .warning-icon {
+        color: $rorange-600;
+      }
 
-    .close-icon {
-      color: $neutral-500;
+      .close-icon {
+        color: $neutral-500;
 
-      &:hover {
-        cursor: pointer;
-        color: $neutral-800;
+        &:hover {
+          cursor: pointer;
+          color: $neutral-800;
+        }
       }
     }
   }
