@@ -27,7 +27,7 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
  *   props.orderBy,
  * ]
  * and in this key, other than the first and third parameters, all other parameters can change, each of these changing
- * parameter will create a new cache
+ * parameter will create a new cache -> this cache and api response is used in the thread listing page i.e /discussions
  *
  * 2- for /threads?active=true -> we have this array key
  *  [
@@ -36,7 +36,8 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
  *    props.queryType,
  *    props.topicsPerThread,
  *  ]
- * and only the second and 4th parameter will ever change.
+ * and only the second and 4th parameter will ever change.  -> this cache and api response is used in the community
+ * overview page i.e /overview
  *
  * 3- for /threads?thread_ids=[] -> we have this array key
  * [
@@ -46,7 +47,7 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
  *   ...ids,
  * ]
  * the second parameter can change, and after the 3th param, there can be either 1 or many thread ids, each combination
- * will create a new cache
+ * will create a new cache  -> this cache and api response is used in the thread details page i.e /discussion/:threadId
  * --
  * --
  * How do cache updates work here?
@@ -73,7 +74,7 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
  * --
  * We are using 2 cache update methods
  * - 'update' -> will update the object in every cache
- * - 'update' -> will remove the object from every cache
+ * - 'remove' -> will remove the object from every cache
  */
 
 type IExistingThreadState =
