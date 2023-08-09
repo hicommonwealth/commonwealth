@@ -15,7 +15,11 @@ import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { defaultChainRows, ethChainRows } from './chain_input_rows';
+import {
+  defaultChainRows,
+  ethChainRows,
+  updateAdminOnCreateCommunity,
+} from './chain_input_rows';
 import type { EthChainFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
@@ -228,6 +232,7 @@ export const ERC721Form = (props: EthChainFormState) => {
             }
 
             await initAppState(false);
+            await updateAdminOnCreateCommunity(id);
 
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {

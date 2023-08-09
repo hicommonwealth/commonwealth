@@ -14,7 +14,6 @@ import { CosmosProposal } from './proposal-v1beta1';
 import {
   asciiLiteralToDecimal,
   encodeMsgSubmitProposal,
-  getActiveProposalsV1Beta1,
   msgToIProposal,
 } from './utils-v1beta1';
 
@@ -53,7 +52,6 @@ class CosmosGovernance extends ProposalModule<
       this.fetchDepositParams(),
       this.fetchTallyThresholds(),
       this.fetchVotingPeriod(),
-      this._initProposals(),
     ]);
     this._initialized = true;
   }
@@ -126,32 +124,19 @@ class CosmosGovernance extends ProposalModule<
     }
   }
 
-  private async _initProposals(proposalId?: number): Promise<void> {
-    let cosmosProposals: CosmosProposal[];
+  private async _initProposal(proposalId: number): Promise<void> {
     try {
-      if (!proposalId) {
-        const activeProposals = await getActiveProposalsV1Beta1(
-          this._Chain.api
-        );
-
-        cosmosProposals = activeProposals.map(
-          (p) => new CosmosProposal(this._Chain, this._Accounts, this, p)
-        );
-      } else {
-        const { proposal } = await this._Chain.api.gov.proposal(proposalId);
-        cosmosProposals = [
-          new CosmosProposal(
-            this._Chain,
-            this._Accounts,
-            this,
-            msgToIProposal(proposal)
-          ),
-        ];
-      }
+      if (!proposalId) return;
+      const { proposal } = await this._Chain.api.gov.proposal(proposalId);
+      const cosmosProposal = new CosmosProposal(
+        this._Chain,
+        this._Accounts,
+        this,
+        msgToIProposal(proposal)
+      );
+      await cosmosProposal.init();
     } catch (e) {
-      console.error('Error fetching proposals: ', e);
-    } finally {
-      Promise.all(cosmosProposals.map((p) => p.init()));
+      console.error('Error fetching proposal: ', e);
     }
   }
 
@@ -209,7 +194,7 @@ class CosmosGovernance extends ProposalModule<
       ({ key }) => cosm.fromAscii(key) === 'proposal_id'
     );
     const id = +cosm.fromAscii(idAttribute.value);
-    await this._initProposals(id);
+    await this._initProposal(id);
     return id;
   }
 }

@@ -90,9 +90,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [commentSortType, setCommentSortType] = useState<
-    CommentsFeaturedFilterTypes
-  >(CommentsFeaturedFilterTypes.Newest);
+  const [commentSortType, setCommentSortType] =
+    useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
@@ -101,14 +100,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
-  const { data: comments = [], error: fetchCommentsError } = useFetchCommentsQuery({
-    chainId: app.activeChainId(),
-    threadId: parseInt(`${threadId}`)
-  })
+  const { data: comments = [], error: fetchCommentsError } =
+    useFetchCommentsQuery({
+      chainId: app.activeChainId(),
+      threadId: parseInt(`${threadId}`),
+    });
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
-  }, [fetchCommentsError])
+  }, [fetchCommentsError]);
 
   const cancelEditing = () => {
     setIsGloballyEditing(false);
@@ -225,9 +225,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (comments.length > 0 && thread && thread.id) {
       fetchReactionCounts({
         proposalIds: [`${thread.id}`],
-        commentIds: comments.map(c => `${c.id}`),
+        commentIds: comments.map((c) => `${c.id}`),
         address: app.user.activeAccount?.address,
-      }).then(reactionCounts => {
+      }).then((reactionCounts) => {
         for (const rc of reactionCounts) {
           const id = app.threads.reactionCountsStore.getIdentifier({
             threadId: rc.thread_id,
@@ -241,7 +241,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
           app.threads.isReactionFetched.emit('redraw', rc.comment_id);
         }
-      })
+      });
     }
   }, [thread, threadId, comments]);
 
@@ -391,7 +391,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [comments, thread, threadId]);
 
-
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -439,7 +438,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
-  const hasSnapshotProposal = thread.links.find(x => x.source === 'snapshot')
+  const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
   const canComment =
     !!hasJoinedCommunity ||
@@ -504,11 +503,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const tabsShouldBePresent =
     showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0;
 
-  const sortedComments = [...comments].filter(c => !c.parentComment).sort((a, b) =>
-    commentSortType === CommentsFeaturedFilterTypes.Oldest
-      ? moment(a.createdAt).diff(moment(b.createdAt))
-      : moment(b.createdAt).diff(moment(a.createdAt))
-  )
+  const sortedComments = [...comments]
+    .filter((c) => !c.parentComment)
+    .sort((a, b) =>
+      commentSortType === CommentsFeaturedFilterTypes.Oldest
+        ? moment(a.createdAt).diff(moment(b.createdAt))
+        : moment(b.createdAt).diff(moment(a.createdAt))
+    );
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
@@ -516,6 +517,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showLocked =
     (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
+
+  const canUpdateThread =
+    isLoggedIn &&
+    (Permissions.isSiteAdmin() ||
+      Permissions.isCommunityAdmin() ||
+      Permissions.isCommunityModerator() ||
+      Permissions.isThreadAuthor(thread) ||
+      Permissions.isThreadCollaborator(thread) ||
+      (fromDiscordBot && isAdmin));
 
   return (
     <>
@@ -541,6 +551,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             thread.title
           )
         }
+        isEditing={isEditingBody}
         author={app.chain.accounts.get(thread.author)}
         discord_meta={thread.discord_meta}
         collaborators={thread.collaborators}
@@ -548,12 +559,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         updatedAt={thread.updatedAt}
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
-        canUpdateThread={
-          isLoggedIn &&
-          (Permissions.isSiteAdmin() ||
-            Permissions.isThreadAuthor(thread) ||
-            Permissions.isThreadCollaborator(thread))
-        }
+        canUpdateThread={canUpdateThread}
         displayNewTag={true}
         stageLabel={!isStageDefault && thread.stage}
         subHeader={
@@ -632,7 +638,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {isEditingBody ? (
               <>
                 {/*// TODO editing thread */}
-                {threadOptionsComp}
                 <EditBody
                   title={title}
                   thread={thread}
@@ -641,6 +646,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   cancelEditing={cancelEditing}
                   threadUpdatedCallback={threadUpdatedCallback}
                 />
+                {threadOptionsComp}
               </>
             ) : (
               <>
@@ -740,81 +746,81 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                {
-                  label: 'Links',
-                  item: (
-                    <div className="cards-column">
-                      {showLinkedProposalOptions && (
-                        <LinkedProposalsCard
-                          onChangeHandler={handleLinkedProposalChange}
-                          thread={thread}
-                          showAddProposalButton={isAuthor || isAdminOrMod}
-                        />
-                      )}
-                      {showLinkedThreadOptions && (
-                        <LinkedThreadsCard
-                          thread={thread}
-                          allowLinking={isAuthor || isAdminOrMod}
-                          onChangeHandler={handleLinkedThreadChange}
-                        />
-                      )}
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Links',
+                    item: (
+                      <div className="cards-column">
+                        {showLinkedProposalOptions && (
+                          <LinkedProposalsCard
+                            onChangeHandler={handleLinkedProposalChange}
+                            thread={thread}
+                            showAddProposalButton={isAuthor || isAdminOrMod}
+                          />
+                        )}
+                        {showLinkedThreadOptions && (
+                          <LinkedThreadsCard
+                            thread={thread}
+                            allowLinking={isAuthor || isAdminOrMod}
+                            onChangeHandler={handleLinkedThreadChange}
+                          />
+                        )}
+                      </div>
+                    ),
+                  },
+                ]
               : []),
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
-                {
-                  label: 'Snapshot',
-                  item: (
-                    <div className="cards-column">
-                      <SnapshotCreationCard
-                        thread={thread}
-                        allowSnapshotCreation={isAuthor || isAdminOrMod}
-                        onChangeHandler={handleNewSnapshotChange}
-                      />
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Snapshot',
+                    item: (
+                      <div className="cards-column">
+                        <SnapshotCreationCard
+                          thread={thread}
+                          allowSnapshotCreation={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleNewSnapshotChange}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
               : []),
             ...(polls?.length > 0 ||
-              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                {
-                  label: 'Polls',
-                  item: (
-                    <div className="cards-column">
-                      {[
-                        ...new Map(
-                          polls?.map((poll) => [poll.id, poll])
-                        ).values(),
-                      ].map((poll: Poll) => {
-                        return (
-                          <ThreadPollCard
-                            poll={poll}
-                            key={poll.id}
-                            onVote={() => setInitializedPolls(false)}
-                            showDeleteButton={isAuthor || isAdmin}
-                            onDelete={() => {
-                              setInitializedPolls(false);
-                            }}
-                          />
-                        );
-                      })}
-                      {isAuthor &&
-                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                          <ThreadPollEditorCard
-                            thread={thread}
-                            threadAlreadyHasPolling={!polls?.length}
-                            onPollCreate={() => setInitializedPolls(false)}
-                          />
-                        )}
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Polls',
+                    item: (
+                      <div className="cards-column">
+                        {[
+                          ...new Map(
+                            polls?.map((poll) => [poll.id, poll])
+                          ).values(),
+                        ].map((poll: Poll) => {
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                              showDeleteButton={isAuthor || isAdmin}
+                              onDelete={() => {
+                                setInitializedPolls(false);
+                              }}
+                            />
+                          );
+                        })}
+                        {isAuthor &&
+                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                            <ThreadPollEditorCard
+                              thread={thread}
+                              threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
+                            />
+                          )}
+                      </div>
+                    ),
+                  },
+                ]
               : []),
           ] as SidebarComponents
         }

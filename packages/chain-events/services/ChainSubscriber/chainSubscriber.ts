@@ -32,7 +32,22 @@ import {
 } from './util';
 import type { ChainAttributes, IListenerInstances } from './types';
 import v8 from 'v8';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
 
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  enabled: require.main === module,
+  service: ServiceKey.ChainEventsSubscriber,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 const log = factory.getLogger(formatFilename(__filename));
 
 log.info(
@@ -292,6 +307,7 @@ export async function runSubscriberAsServer() {
       return await processChains(producer, chains, rollbar);
     };
     setInterval(main, REPEAT_TIME * 60000);
+    isServiceHealthy = true;
   } catch (e) {
     log.error('Fatal error occurred', e);
     rollbar.critical('Fatal error occurred', e);
