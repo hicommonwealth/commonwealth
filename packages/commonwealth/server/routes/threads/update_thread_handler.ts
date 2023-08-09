@@ -27,23 +27,7 @@ export const updateThreadHandler = async (
   const { id } = req.params;
   const { body, title, stage, url, discord_meta } = req.body;
 
-  let threadId = parseInt(id, 10) || 0;
-
-  // Special handling for discobot threads
-  if (discord_meta !== undefined && discord_meta !== null) {
-    const existingThread = await controllers.threads.models.Thread.findOne({
-      where: { discord_meta: discord_meta },
-    });
-    if (existingThread) {
-      threadId = existingThread.id;
-    } else {
-      throw new AppError(Errors.InvalidThreadID);
-    }
-  }
-
-  if (!threadId) {
-    throw new AppError(Errors.InvalidThreadID);
-  }
+  const threadId = parseInt(id, 10) || 0;
 
   if (!body || !body.trim()) {
     throw new AppError(Errors.MissingText);
@@ -59,6 +43,7 @@ export const updateThreadHandler = async (
       body,
       stage,
       url,
+      discord_meta,
     });
 
   for (const n of notificationOptions) {

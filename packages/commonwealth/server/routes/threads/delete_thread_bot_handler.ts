@@ -6,23 +6,22 @@ const Errors = {
   InvalidThreadID: 'Invalid thread ID',
 };
 
-type DeleteThreadRequestParams = { id: string };
+type DeleteBotThreadRequestParams = { message_id: string };
 type DeleteThreadResponse = void;
 
-export const deleteThreadHandler = async (
+export const deleteBotThreadHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestParams<DeleteThreadRequestParams>,
+  req: TypedRequestParams<DeleteBotThreadRequestParams>,
   res: TypedResponse<DeleteThreadResponse>
 ) => {
   const { user } = req;
-  const { id } = req.params;
+  const { message_id } = req.params;
 
-  const threadId = parseInt(id, 10) || 0;
-  if (!threadId) {
+  if (!message_id) {
     throw new AppError(Errors.InvalidThreadID);
   }
 
-  await controllers.threads.deleteThread({ user, threadId });
+  await controllers.threads.deleteThread({ user, message_id });
 
   return success(res, undefined);
 };

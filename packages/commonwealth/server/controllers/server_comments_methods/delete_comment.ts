@@ -16,15 +16,31 @@ export type DeleteCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
   chain: ChainInstance;
-  commentId: number;
+  commentId?: number;
+  message_id?: string;
 };
 
 export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, address, chain, commentId }: DeleteCommentOptions
+  { user, address, chain, commentId, message_id }: DeleteCommentOptions
 ): Promise<DeleteCommentResult> {
+  if (!commentId) {
+    // Discord Bot Handling
+    const existingComment = await this.models.Comment.findOne({
+      where: {
+        discord_meta: { [Op.contains]: { message_id: message_id } },
+      },
+    });
+
+    if (existingComment) {
+      commentId = existingComment.id;
+    } else {
+      throw new AppError(Errors.CommentNotFound);
+    }
+  }
+
   // check if author can delete post
   const [canInteract, error] = await this.banCache.checkBan({
     chain: chain.id,

@@ -172,17 +172,13 @@ import { getCommentReactionsHandler } from '../routes/comments/get_comment_react
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
-import {
-  deleteBotCommentHandler,
-  deleteCommentHandler,
-} from '../routes/comments/delete_comment_handler';
+import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
 import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
-import {
-  deleteBotThreadHandler,
-  deleteThreadHandler,
-} from '../routes/threads/delete_thread_handler';
+import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
+import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';

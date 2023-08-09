@@ -27,7 +27,7 @@ export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
   chain: ChainInstance;
-  threadId: number;
+  threadId?: number;
   title?: string;
   body?: string;
   stage?: string;
@@ -35,6 +35,7 @@ export type UpdateThreadOptions = {
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
+  discord_meta?: any;
 };
 
 export type UpdateThreadResult = [ThreadAttributes, EmitOptions[]];
@@ -53,8 +54,21 @@ export async function __updateThread(
     canvasAction,
     canvasSession,
     canvasHash,
+    discord_meta,
   }: UpdateThreadOptions
 ): Promise<UpdateThreadResult> {
+  if (!threadId) {
+    // Discobot handling
+    const existingThread = await this.models.Thread.findOne({
+      where: { discord_meta: discord_meta },
+    });
+    if (existingThread) {
+      threadId = existingThread.id;
+    } else {
+      throw new AppError(Errors.ThreadNotFound);
+    }
+  }
+
   const userOwnedAddresses = await user.getAddresses();
   const userOwnedAddressIds = userOwnedAddresses
     .filter((addr) => !!addr.verified)
