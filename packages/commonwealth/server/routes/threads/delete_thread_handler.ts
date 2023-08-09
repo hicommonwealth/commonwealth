@@ -39,18 +39,20 @@ export const deleteBotThreadHandler = async (
   const { message_id } = req.params;
   let threadId;
 
+  if (!message_id) {
+    throw new AppError(Errors.InvalidThreadID);
+  }
+
   // Special handling for discobot threads
-  if (message_id) {
-    const existingThread = await controllers.threads.models.Thread.findOne({
-      where: {
-        discord_meta: { [Op.contains]: { message_id: message_id } },
-      },
-    });
-    if (existingThread) {
-      threadId = existingThread.id;
-    } else {
-      throw new AppError(Errors.InvalidThreadID);
-    }
+  const existingThread = await controllers.threads.models.Thread.findOne({
+    where: {
+      discord_meta: { [Op.contains]: { message_id: message_id } },
+    },
+  });
+  if (existingThread) {
+    threadId = existingThread.id;
+  } else {
+    throw new AppError(Errors.InvalidThreadID);
   }
 
   await controllers.threads.deleteThread({ user, threadId });

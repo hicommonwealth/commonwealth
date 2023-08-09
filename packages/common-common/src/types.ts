@@ -156,6 +156,12 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
+export type DiscordAction =
+  | 'create'
+  | 'update'
+  | 'thread-delete'
+  | 'comment-delete';
+
 export interface IDiscordMessage {
   user?: {
     id: string;
@@ -168,8 +174,9 @@ export interface IDiscordMessage {
   parent_channel_id?: string;
   guild_id?: string;
   imageUrls?: string[];
-  action: 'create' | 'update' | 'delete';
+  action: DiscordAction;
 }
+
 export type HttpMethod =
   | 'get'
   | 'post'

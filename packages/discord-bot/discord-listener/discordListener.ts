@@ -5,7 +5,7 @@ import {
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import { IDiscordMessage } from 'common-common/src/types';
+import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
 import { RABBITMQ_URI, DISCORD_TOKEN } from '../utils/config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import v8 from 'v8';
@@ -41,7 +41,7 @@ const client = new Client({
 
 const handleMessage = async (
   message: Partial<Message>,
-  action: 'create' | 'update' | 'delete'
+  action: DiscordAction
 ) => {
   try {
     // 1. Filter for designated forum channels
@@ -108,8 +108,12 @@ client.on('ready', () => {
 client.on('threadDelete', async (thread: ThreadChannel) => {
   await handleMessage(
     { id: thread.id, channelId: thread.parentId } as Partial<Message>,
-    'delete'
+    'thread-delete'
   );
+});
+
+client.on('messageDelete', async (message: Message) => {
+  await handleMessage(message, 'comment-delete');
 });
 
 client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {

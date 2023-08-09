@@ -7,7 +7,7 @@ import {
   RascalSubscriptions,
   TRmqMessages,
 } from 'common-common/src/rabbitmq/types';
-import { IDiscordMessage } from 'common-common/src/types';
+import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
 import { RABBITMQ_URI, SERVER_URL, CW_BOT_KEY } from '../utils/config';
 import axios from 'axios';
 import v8 from 'v8';
@@ -39,9 +39,9 @@ async function consumeMessages() {
         )
       )[0][0];
 
-      const action = parsedMessage.action;
+      const action = parsedMessage.action as DiscordAction;
 
-      if (action === 'delete') {
+      if (action === 'thread-delete') {
         await axios.delete(
           `${SERVER_URL}/api/bot/threads/${parsedMessage.message_id}`,
           { data: { auth: CW_BOT_KEY, address: '0xdiscordbot' } }
@@ -127,6 +127,18 @@ async function consumeMessages() {
               address: '0xdiscordbot',
               chain: comment.chain,
               author_chain: comment.author_chain,
+            }
+          );
+        } else if (action === 'comment-delete') {
+          await axios.delete(
+            `${SERVER_URL}/api/bot/comments/${parsedMessage.message_id}`,
+            {
+              data: {
+                auth: CW_BOT_KEY,
+                address: '0xdiscordbot',
+                chain: comment.chain,
+                author_chain: comment.author_chain,
+              },
             }
           );
         }

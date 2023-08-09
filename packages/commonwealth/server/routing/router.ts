@@ -172,7 +172,10 @@ import { getCommentReactionsHandler } from '../routes/comments/get_comment_react
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
-import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
+import {
+  deleteBotCommentHandler,
+  deleteCommentHandler,
+} from '../routes/comments/delete_comment_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
 import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
@@ -691,6 +694,16 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     updateCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/comments/:message_id',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteBotCommentHandler.bind(this, serverControllers)
   );
 
   registerRoute(
