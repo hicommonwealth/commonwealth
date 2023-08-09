@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
+import { X } from '@phosphor-icons/react';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
-import 'modals/edit_topic_modal.scss';
 import Topic from '../../models/Topic';
 
 import app from 'state';
 
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
@@ -24,6 +24,9 @@ import {
 } from '../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { useDeleteTopicMutation, useEditTopicMutation } from 'state/api/topics';
+import { CWText } from '../components/component_kit/cw_text';
+
+import 'modals/edit_topic_modal.scss';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -102,8 +105,14 @@ export const EditTopicModal = ({
       description: <>Delete this topic?</>,
       buttons: [
         {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await deleteTopic({
               topicId: id,
@@ -113,10 +122,6 @@ export const EditTopicModal = ({
             navigate('/');
           },
         },
-        {
-          label: 'Cancel',
-          buttonType: 'mini-white',
-        },
       ],
     });
   };
@@ -124,8 +129,10 @@ export const EditTopicModal = ({
   return (
     <div className="EditTopicModal">
       <div className="compact-modal-title">
-        <h3>Edit topic</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+        <CWText className="title-text" type="h4">
+          Edit topic
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <CWTextInput
@@ -188,9 +195,15 @@ export const EditTopicModal = ({
           />
         )}
         <div className="buttons-row">
-          <CWButton onClick={handleSaveChanges} label="Save changes" />
           <CWButton
-            buttonType="primary-red"
+            buttonType="primary"
+            buttonHeight="sm"
+            onClick={handleSaveChanges}
+            label="Save changes"
+          />
+          <CWButton
+            buttonType="destructive"
+            buttonHeight="sm"
             disabled={isSaving}
             onClick={handleDeleteTopic}
             label="Delete topic"
