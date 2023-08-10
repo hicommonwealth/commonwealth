@@ -208,7 +208,7 @@ export async function addAddressIfNone(chain) {
   );
 
   // address already exists
-  if (addresses[0].some((u) => u.chain === chain)) return;
+  if (addresses[0].some((u) => u['chain'] === chain)) return;
 
   await createAddress(
     chain,

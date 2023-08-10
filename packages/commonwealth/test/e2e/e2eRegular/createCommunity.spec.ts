@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect as pwexpect, test } from '@playwright/test';
 import { expect } from 'chai';
 import { PORT } from '../../../server/config';
 import {
@@ -29,8 +29,8 @@ test.describe('Commonwealth Create Community', () => {
   test('Test create starter community', async ({ page }) => {
     const chainName = Date.now().toString() + getRandomInteger(1, 100000);
     await page.locator('input#NameInput').fill(chainName);
-    const iconField = await page.$('input[id*=Icon]');
-    await iconField.type(
+    const iconField = await page.locator('input[id*=Icon]');
+    await iconField.fill(
       'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
     );
     await page.click('button.Button.primary-blue');
@@ -67,8 +67,8 @@ test.describe('Commonwealth Create Community', () => {
   test('Test create Polygon community', async ({ page }) => {
     const chainName = Date.now().toString() + getRandomInteger(1, 100000);
     await page.locator('input#NameInput').fill(chainName);
-    const iconField = await page.$('input[id*=Icon]');
-    await iconField.type(
+    const iconField = await page.locator('input[id*=Icon]');
+    await iconField.fill(
       'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
     );
     await page.click('button.Button.primary-blue');
@@ -78,18 +78,21 @@ test.describe('Commonwealth Create Community', () => {
 });
 
 async function fillOutERCForm(page, formName, tokenContractAddress, chainName) {
-  do {
+  await pwexpect(async () => {
+    await pwexpect(page.locator('input[id*=Contract]')).toHaveCount(0);
     await page.getByText(formName).click();
-  } while (!(await page.$('input[id*=Contract]')));
+  }).toPass();
 
   // populate token contract address
-  const tokenContractAddressForm = await page.$('input[id*=Contract]');
-  await tokenContractAddressForm.type(tokenContractAddress);
-  await (await page.$('button.Button.primary-blue >> text=/Populate/')).click();
+  const tokenContractAddressForm = await page.locator('input[id*=Contract]');
+  await tokenContractAddressForm.fill(tokenContractAddress);
+  await (
+    await page.locator('button.Button.primary-blue >> text=/Populate/')
+  ).click();
 
   await page.locator('input#NameInput').fill(chainName);
-  const iconField = await page.$('input[id*=Icon]');
-  await iconField.type(
+  const iconField = await page.locator('input[id*=Icon]');
+  await iconField.fill(
     'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
   );
   do {
@@ -103,7 +106,9 @@ async function assertAdminCapablities(page, chainName) {
   });
 
   // Assert create thread button is not disabled
-  const button = await page.$('button.Button.mini-black >> text=Create Thread');
+  const button = await page.locator(
+    'button.Button.mini-black >> text=Create Thread'
+  );
   const isDisabled = await button?.getAttribute('disabled');
   expect(isDisabled).to.be.not.true;
 
