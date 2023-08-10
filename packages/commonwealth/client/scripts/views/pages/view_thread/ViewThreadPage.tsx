@@ -399,20 +399,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta || !app.threads.initialized || !thread) {
-    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
+  if (!thread && threadFetchCompleted) {
+    return <PageNotFound />;
   }
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
 
-  if (!thread && threadFetchCompleted) {
+  if (threadFetchFailed) {
     return <PageNotFound />;
   }
 
-  if (threadFetchFailed) {
-    return <PageNotFound />;
+  if (!app.chain?.meta || !app.threads.initialized || !thread) {
+    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
   }
 
   // Original posters have full editorial control, while added collaborators
