@@ -21,7 +21,7 @@ const editThreadTopic = async ({
   newTopicId,
   oldTopicId,
 }: EditThreadTopicProps) => {
-  const response = await axios.post(`${app.serverUrl()}/updateTopic`, {
+  const response = await axios.post(`${app.serverUrl()}/updateThreadTopic`, {
     jwt: app.user.jwt,
     thread_id: threadId,
     topic_id: newTopicId,
