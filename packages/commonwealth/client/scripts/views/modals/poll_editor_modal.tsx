@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import _ from 'underscore';
 import moment from 'moment';
-
-import 'modals/poll_editor_modal.scss';
+import { X } from '@phosphor-icons/react';
 
 import type Thread from '../../models/Thread';
-
 import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
+
+import 'modals/poll_editor_modal.scss';
 
 const getPollDurationCopy = (
   customDuration: string,
@@ -115,8 +114,10 @@ export const PollEditorModal = ({
   return (
     <div className="PollEditorModal">
       <div className="compact-modal-title">
-        <h3>Create Poll</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+        <CWText className="title-text" type="h4">
+          Create Poll
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <CWTextInput
@@ -142,12 +143,15 @@ export const PollEditorModal = ({
           <div className="buttons-row">
             <CWButton
               label="Remove choice"
-              buttonType="secondary-red"
+              buttonType="destructive"
+              buttonHeight="sm"
               disabled={options.length <= 2}
               onClick={handleRemoveLastChoice}
             />
             <CWButton
               label="Add choice"
+              buttonType="primary"
+              buttonHeight="sm"
               disabled={options.length >= 6}
               onClick={handleAddChoice}
             />
@@ -177,10 +181,16 @@ export const PollEditorModal = ({
         <div className="buttons-row">
           <CWButton
             label="Cancel"
-            buttonType="secondary-blue"
+            buttonType="secondary"
+            buttonHeight="sm"
             onClick={onModalClose}
           />
-          <CWButton label="Save changes" onClick={handleSavePoll} />
+          <CWButton
+            label="Save changes"
+            buttonType="primary"
+            buttonHeight="sm"
+            onClick={handleSavePoll}
+          />
         </div>
       </div>
     </div>
