@@ -43,6 +43,7 @@ export function formatAaveProposal(
     votingSupplyAtStart: proposal.totalVotingSupply,
     forVotes: proposal.forVotes,
     againstVotes: proposal.againstVotes,
+    executionTimeWithGracePeriod: proposal.executionTimeWithGracePeriod,
   };
 
   return aaveResponse;

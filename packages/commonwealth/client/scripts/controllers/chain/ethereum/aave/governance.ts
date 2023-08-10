@@ -162,12 +162,7 @@ export default class AaveGovernance extends ProposalModule<
       }
     );
     result.proposals.forEach((p) => {
-      new AaveProposal(
-        this._Chain,
-        this._Accounts,
-        this,
-        deserializeBigNumbers(p)
-      );
+      new AaveProposal(this._Accounts, this, deserializeBigNumbers(p));
     });
 
     await Promise.all(this.store.getAll().map((p) => p.init()));

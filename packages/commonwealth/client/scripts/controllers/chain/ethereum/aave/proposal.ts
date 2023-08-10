@@ -27,7 +27,6 @@ import type AaveAPI from './api';
 import type { AaveExecutor } from './api';
 import type AaveChain from './chain';
 import type AaveGovernance from './governance';
-import { BigNumber } from 'ethers';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -75,13 +74,8 @@ export default class AaveProposal extends Proposal<
   IAaveProposalResponse,
   AaveProposalVote
 > {
-  private _Chain: AaveChain;
   private _Accounts: EthereumAccounts;
   private _Gov: AaveGovernance;
-  private _Executor: AaveExecutor;
-  public get Executor() {
-    return this._Executor;
-  }
 
   public ipfsDataReady = new EventEmitter();
 
@@ -141,7 +135,7 @@ export default class AaveProposal extends Proposal<
     if (!this.data.executionTime && !this.data.queued)
       return AaveTypes.ProposalState.SUCCEEDED;
     if (this.data.executed) return AaveTypes.ProposalState.EXECUTED;
-    if (currentTime > this.data.executionTime + this._Executor.gracePeriod)
+    if (currentTime > +this.data.executionTimeWithGracePeriod)
       return AaveTypes.ProposalState.EXPIRED;
     if (this.data.queued) return AaveTypes.ProposalState.QUEUED;
     return null;
@@ -271,21 +265,15 @@ export default class AaveProposal extends Proposal<
   }
 
   constructor(
-    Chain: AaveChain,
     Accounts: EthereumAccounts,
     Gov: AaveGovernance,
     data: IAaveProposalResponse
   ) {
-    // data enables creation of proposal objects from proposal data fetched from CW API i.e. GET /api/proposals
-    // backportEntityToAdapter enables creation of proposal objects from entities received directly on the client
     super(ProposalType.AaveProposal, data);
-    console.log('AaveProposal constructor', data);
 
-    this._Chain = Chain;
     this._Accounts = Accounts;
     this._Gov = Gov;
 
-    this._Executor = this._Gov.api.getExecutor(this.data.executor);
     this._Gov.store.add(this);
     // insert Qm prefix via hex
     this._ipfsAddress = bs58.encode(
