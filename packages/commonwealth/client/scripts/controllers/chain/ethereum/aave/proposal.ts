@@ -8,13 +8,15 @@ import { ProposalType } from 'common-common/src/types';
 import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
 import { EventEmitter } from 'events';
-
-import type ChainEntity from '../../../../models/ChainEntity';
 import type ChainEvent from '../../../../models/ChainEvent';
 import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import Proposal from '../../../../models/Proposal';
 import type { ProposalEndTime } from '../../../../models/types';
-import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
+import {
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../models/types';
 import moment from 'moment';
 import Web3 from 'web3-utils';
 import type EthereumAccount from '../account';
@@ -25,6 +27,7 @@ import type AaveAPI from './api';
 import type { AaveExecutor } from './api';
 import type AaveChain from './chain';
 import type AaveGovernance from './governance';
+import { BigNumber } from 'ethers';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -45,23 +48,6 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 }
 
 const ONE_HUNDRED_WITH_PRECISION = 10000;
-
-const backportEntityToAdapter = (
-  entity: ChainEntity
-): IAaveProposalResponse => {
-  const startEvent = entity.chainEvents.find(
-    (e) => e.data.kind === AaveTypes.EventKind.ProposalCreated
-  );
-  const startData = startEvent.data as AaveTypes.IProposalCreated;
-  return {
-    identifier: `${startData.id}`,
-    queued: false,
-    executed: false,
-    cancelled: false,
-    completed: false,
-    ...startData,
-  };
-};
 
 function sumVotes(vs: AaveProposalVote[]): BN {
   return vs.reduce((prev, curr) => {
@@ -144,14 +130,6 @@ export default class AaveProposal extends Proposal<
     return VotingUnit.PowerVote;
   }
 
-  public async queryStateFromChain(): Promise<AaveTypes.ProposalState> {
-    const state = await this._Gov.api.Governance.getProposalState(this.data.id);
-    if (state === null) {
-      throw new Error(`Failed to get state for proposal #${this.data.id}`);
-    }
-    return state;
-  }
-
   public get state(): AaveTypes.ProposalState {
     const currentTime = Date.now() / 1000;
     if (this.data.cancelled) return AaveTypes.ProposalState.CANCELED;
@@ -198,54 +176,45 @@ export default class AaveProposal extends Proposal<
   }
 
   public get support() {
-    const votes = this.getVotes();
-    const yesPower = sumVotes(votes.filter((v) => v.choice));
-    const noPower = sumVotes(votes.filter((v) => !v.choice));
-    if (yesPower.isZero() && noPower.isZero()) return 0;
-    const supportBn = yesPower
-      .muln(ONE_HUNDRED_WITH_PRECISION)
-      .div(yesPower.add(noPower));
-    return +supportBn / ONE_HUNDRED_WITH_PRECISION;
+    if (this.data.forVotes.isZero() && this.data.againstVotes.isZero())
+      return 0;
+    const result = this.data.forVotes
+      .mul(ONE_HUNDRED_WITH_PRECISION)
+      .div(this.data.forVotes.add(this.data.againstVotes));
+    return +result / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get turnout() {
-    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
-      return null;
-    }
-    const totalPowerVoted = sumVotes(this.getVotes());
-    const turnoutBn = totalPowerVoted
-      .muln(ONE_HUNDRED_WITH_PRECISION)
-      .div(this._votingSupplyAtStart);
-    return +turnoutBn / ONE_HUNDRED_WITH_PRECISION;
+    const totalPowerVoted = this.data.forVotes.add(this.data.againstVotes);
+    const result = totalPowerVoted
+      .mul(ONE_HUNDRED_WITH_PRECISION)
+      .div(this.votingSupplyAtStart);
+    return +result / ONE_HUNDRED_WITH_PRECISION;
   }
 
   // (FOR VOTES - AGAINST VOTES) / voting supply
   public get voteDifferential() {
-    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
-      return null;
-    }
-    const votes = this.getVotes();
-    const yesPower = sumVotes(votes.filter((v) => v.choice));
-    const noPower = sumVotes(votes.filter((v) => !v.choice));
-    const forProportion = yesPower
-      .muln(ONE_HUNDRED_WITH_PRECISION)
-      .div(this._votingSupplyAtStart);
-    const againstProportion = noPower
-      .muln(ONE_HUNDRED_WITH_PRECISION)
-      .div(this._votingSupplyAtStart);
-    return (+forProportion - +againstProportion) / ONE_HUNDRED_WITH_PRECISION;
+    const forProp = this.data.forVotes
+      .mul(ONE_HUNDRED_WITH_PRECISION)
+      .div(this.votingSupplyAtStart);
+    const againstProp = this.data.againstVotes
+      .mul(ONE_HUNDRED_WITH_PRECISION)
+      .div(this.votingSupplyAtStart);
+    return (+forProp - +againstProp) / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get minimumQuorum() {
-    return +this._Executor.minimumQuorum / ONE_HUNDRED_WITH_PRECISION;
+    return +this.data.minimumQuorum / ONE_HUNDRED_WITH_PRECISION;
   }
 
   public get minimumVoteDifferential() {
-    return +this._Executor.voteDifferential / ONE_HUNDRED_WITH_PRECISION;
+    return +this.data.minimumDiff / ONE_HUNDRED_WITH_PRECISION;
   }
 
-  private _votingSupplyAtStart: BN;
-  private _minVotingPowerNeeded: BN;
+  public get votingSupplyAtStart() {
+    return this.data.votingSupplyAtStart;
+  }
+
   private _ipfsAddress: string;
   private _ipfsData: AipIpfsObject;
   public get ipfsData() {
@@ -255,25 +224,14 @@ export default class AaveProposal extends Proposal<
   // Check whether a proposal has enough extra FOR-votes than AGAINST-votes
   // FOR VOTES - AGAINST VOTES > VOTE_DIFFERENTIAL * voting supply
   private _isVoteDifferentialPassing() {
-    if (!this._votingSupplyAtStart || this._votingSupplyAtStart.isZero()) {
-      return null;
-    }
-    const votes = this.getVotes();
-    const yesVotes = votes.filter((v) => v.choice);
-    const noVotes = votes.filter((v) => !v.choice);
-    const forProportion = sumVotes(yesVotes)
-      .muln(ONE_HUNDRED_WITH_PRECISION)
-      .div(this._votingSupplyAtStart);
-    const againstProportion = sumVotes(noVotes)
-      .muln(ONE_HUNDRED_WITH_PRECISION)
-      .div(this._votingSupplyAtStart)
-      .add(this._Executor.voteDifferential);
-    return forProportion.gt(againstProportion);
+    const diff = this.data.forVotes.sub(this.data.againstVotes);
+    const result = diff.gt(this.data.minimumDiff.mul(this.votingSupplyAtStart));
+    console.log('Is Vote diff passing:', result);
+    return result;
   }
 
   private _isQuorumValid() {
-    const yesVotes = sumVotes(this.getVotes().filter((v) => v.choice));
-    return yesVotes.gte(this._minVotingPowerNeeded);
+    return this.data.minimumQuorum.gt(this.data.forVotes);
   }
 
   private _isPassed() {
@@ -300,23 +258,6 @@ export default class AaveProposal extends Proposal<
         console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)
       );
 
-    try {
-      const totalVotingSupplyAtStart =
-        await this._Gov.api.Strategy.getTotalVotingSupplyAt(
-          this.data.startBlock
-        );
-      this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
-    } catch (e2) {
-      console.error(
-        'Failed to fetch total voting supply at proposal start block, using hardcoded value.'
-      );
-      this._votingSupplyAtStart = new BN(Web3.toWei(Number(1_000_000_000).toString(), 'ether'));
-    }
-
-    this._minVotingPowerNeeded = this._votingSupplyAtStart
-      .mul(this._Executor.minimumQuorum)
-      .divn(ONE_HUNDRED_WITH_PRECISION);
-
     this._initialized = true;
 
     // special case for expiration because no event is emitted
@@ -333,18 +274,16 @@ export default class AaveProposal extends Proposal<
     Chain: AaveChain,
     Accounts: EthereumAccounts,
     Gov: AaveGovernance,
-    entity: ChainEntity
+    data: IAaveProposalResponse
   ) {
-    // must set identifier before super() because of how response object is named
-    super(ProposalType.AaveProposal, backportEntityToAdapter(entity));
+    // data enables creation of proposal objects from proposal data fetched from CW API i.e. GET /api/proposals
+    // backportEntityToAdapter enables creation of proposal objects from entities received directly on the client
+    super(ProposalType.AaveProposal, data);
+    console.log('AaveProposal constructor', data);
 
     this._Chain = Chain;
     this._Accounts = Accounts;
     this._Gov = Gov;
-
-    entity.chainEvents
-      .sort((e1, e2) => e1.blockNumber - e2.blockNumber)
-      .forEach((e) => this.update(e));
 
     this._Executor = this._Gov.api.getExecutor(this.data.executor);
     this._Gov.store.add(this);
@@ -442,7 +381,10 @@ export default class AaveProposal extends Proposal<
       }
     }
 
-    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
+    const contract = await attachSigner(
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
     const tx = await contract.cancel(this.data.identifier, {
       gasLimit: this._Gov.api.gasLimit,
     });
@@ -460,7 +402,10 @@ export default class AaveProposal extends Proposal<
     }
 
     // no user validation needed
-    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
+    const contract = await attachSigner(
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
     const tx = await contract.queue(this.data.id);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -483,7 +428,10 @@ export default class AaveProposal extends Proposal<
     }
 
     // no user validation needed
-    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
+    const contract = await attachSigner(
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
     const tx = await contract.execute(this.data.id);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -509,7 +457,10 @@ export default class AaveProposal extends Proposal<
       throw new Error('user has already voted on this proposal');
     }
 
-    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Governance);
+    const contract = await attachSigner(
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
     const tx = await contract.submitVote(this.data.id, vote.choice);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {

@@ -38,6 +38,11 @@ export function formatAaveProposal(
       proposal.proposalState === ProposalState.EXECUTED ||
       proposal.proposalState === ProposalState.CANCELED,
     executionTime: proposal.executionTime ? +proposal.executionTime : undefined,
+    minimumQuorum: proposal.minimumQuorum,
+    minimumDiff: proposal.minimumDiff,
+    votingSupplyAtStart: proposal.totalVotingSupply,
+    forVotes: proposal.forVotes,
+    againstVotes: proposal.againstVotes,
   };
 
   return aaveResponse;

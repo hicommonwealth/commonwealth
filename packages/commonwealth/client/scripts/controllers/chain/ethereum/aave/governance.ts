@@ -12,6 +12,8 @@ import type AaveApi from './api';
 import type AaveChain from './chain';
 
 import AaveProposal from './proposal';
+import getFetch from 'helpers/getFetch';
+import { BigNumber } from 'ethers';
 
 export interface AaveProposalArgs {
   executor: Executor | string;
@@ -21,6 +23,30 @@ export interface AaveProposalArgs {
   calldatas: string[];
   withDelegateCalls: boolean[];
   ipfsHash: string;
+}
+
+function deserializeBigNumbers(obj: Record<string, any>) {
+  // Base case: if the object is not an object or is null, return it as-is
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
+  // If the object matches the serialized BigNumber pattern, return a deserialized BigNumber
+  if (obj.type === 'BigNumber' && obj.hex) {
+    return BigNumber.from(obj.hex);
+  }
+
+  // If it's an array, iterate over each element and deserialize if needed
+  if (Array.isArray(obj)) {
+    return obj.map(deserializeBigNumbers);
+  }
+
+  // For plain objects, iterate over each property
+  const result = {};
+  for (let key in obj) {
+    result[key] = deserializeBigNumbers(obj[key]);
+  }
+  return result;
 }
 
 export default class AaveGovernance extends ProposalModule<
@@ -40,7 +66,7 @@ export default class AaveGovernance extends ProposalModule<
 
   // INIT / DEINIT
   constructor(app: IApp) {
-    super(app, (e) => new AaveProposal(this._Chain, this._Accounts, this, e));
+    super(app);
   }
 
   // METHODS
@@ -128,34 +154,23 @@ export default class AaveGovernance extends ProposalModule<
     const entities = this.app.chainEntities.getByType(
       AaveTypes.EntityKind.Proposal
     );
-    entities.forEach((e) => this._entityConstructor(e));
-    console.log(`Found ${entities.length} proposals!`);
 
-    await Promise.all(this.store.getAll().map((p) => p.init()));
-
-    // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
-      AaveTypes.EntityKind.Proposal,
-      (entity, event) => {
-        this.updateProposal(entity, event);
+    const result: { proposals: IAaveProposalResponse[] } = await getFetch(
+      '/api/proposals',
+      {
+        chainId: this.app.chain.id,
       }
     );
+    result.proposals.forEach((p) => {
+      new AaveProposal(
+        this._Chain,
+        this._Accounts,
+        this,
+        deserializeBigNumbers(p)
+      );
+    });
 
-    // kick off listener
-    const chainEventsContracts: AaveTypes.Api = {
-      governance: this._api.Governance as any,
-    };
-    const subscriber = new AaveEvents.Subscriber(
-      chainEventsContracts,
-      this.app.chain.id
-    );
-    const processor = new AaveEvents.Processor(chainEventsContracts);
-    await this.app.chainEntities.subscribeEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      subscriber,
-      processor
-    );
+    await Promise.all(this.store.getAll().map((p) => p.init()));
 
     this._initialized = true;
   }
