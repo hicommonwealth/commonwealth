@@ -44,8 +44,32 @@ async function consumeMessages() {
   const processMessage = async (data: TRmqMessages) => {
     try {
       const parsedMessage = data as IFarcasterMessage;
-      console.log({ parsedMessage });
-      // TODO: Logic for handling messages
+      const threadCasts = new Set();
+
+      const promises = parsedMessage.casts.map(async (cast) => {
+        const parentMerkleRoot = cast.body.data.replyParentMerkleRoot;
+
+        if (parentMerkleRoot) {
+          const response = await axios.get(
+            `https://searchcaster.xyz/api/search?merkleRoot=${parentMerkleRoot}`
+          );
+
+          // Get the cast which has no replyParentMerkeRoot- this is the thread root
+          const threadRootCast = response.data.casts.find(
+            (cast) => !cast.body.data.replyParentMerkleRoot
+          );
+
+          if (threadRootCast) threadCasts.add(JSON.stringify(threadRootCast));
+        } else {
+          threadCasts.add(JSON.stringify(cast));
+        }
+      });
+
+      await Promise.all(promises);
+
+      const uniqueCasts = [...threadCasts].map((item) =>
+        JSON.parse(item as string)
+      );
     } catch (error) {
       log.error(`Failed to process Message:`, error);
     }

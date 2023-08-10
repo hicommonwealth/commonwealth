@@ -14,7 +14,7 @@ const s3 = new AWS.S3();
 
 const S3_BUCKET_NAME = 'assets.commonwealth.im';
 const S3_OBJECT_KEY = `${process.env.NODE_ENV}-last-processed-farcaster-cast-uri.txt`;
-const BOT_KEYWORD = 'giterate';
+const BOT_KEYWORD = 'cw123xyz';
 
 const app = express();
 const PORT = 3000;
@@ -140,7 +140,7 @@ const fetchData = async () => {
         RascalPublications.FarcasterListener
       );
 
-      await saveIDToS3(castsToProcess[0]?.uri);
+      // await saveIDToS3(castsToProcess[0]?.uri); TODO: Comment back in when we're done testing
       log.info(`Message published to RabbitMQ`);
     } catch (error) {
       log.info(`Error publishing to rabbitMQ`, error);
