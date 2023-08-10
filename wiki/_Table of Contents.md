@@ -23,7 +23,7 @@
   - [Database Monitoring](Database-Monitoring.md)
   - [Wallet Support](Wallet-Support.md)
   - [Devnet](Devnet.md)
-  - [Initialization Flow](Initialization-Flow.md)
+  - [App Initialization Flow](App-Initialization-Flow.md)
   - [Notifications](Notifications.md)
 
 **Current Roadmap**
