@@ -13,7 +13,8 @@ import {
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from '../../util/validateOwner';
+import { DB } from 'server/models';
+import { findAllRoles } from 'server/util/roles';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -38,6 +39,9 @@ export type UpdateThreadOptions = {
   url?: string;
   locked?: boolean;
   pinned?: boolean;
+  spam?: boolean;
+  topicId?: number;
+  topicName?: string;
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
@@ -58,6 +62,9 @@ export async function __updateThread(
     url,
     locked,
     pinned,
+    spam,
+    topicId,
+    topicName,
     canvas_action,
     canvas_session,
     canvas_hash,
@@ -75,31 +82,6 @@ export async function __updateThread(
   const thread = await this.models.Thread.findByPk(threadId);
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
-  }
-
-  // check if owner or admin
-  const isOwnerOrAdmin = await validateOwner({
-    models: this.models,
-    user: user,
-    entity: thread,
-    chainId: chain.id,
-    allowAdmin: true,
-  });
-  if (!isOwnerOrAdmin) {
-    // check if collaborator
-    const userOwnedAddresses = await user.getAddresses();
-    const userOwnedAddressIds = userOwnedAddresses
-      .filter((addr) => !!addr.verified)
-      .map((addr) => addr.id);
-    const collaboration = await this.models.Collaboration.findOne({
-      where: {
-        thread_id: threadId,
-        address_id: { [Op.in]: userOwnedAddressIds },
-      },
-    });
-    if (!collaboration) {
-      throw new AppError(Errors.Unauthorized);
-    }
   }
 
   const now = new Date();
@@ -123,25 +105,58 @@ export async function __updateThread(
     thread.version_history = arr;
   }
 
-  // --- patch thread properties
+  // get various permissions
+
+  const userOwnedAddressIds = (await user.getAddresses())
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  const roles = await findAllRoles(
+    this.models,
+    { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+    chain.id,
+    ['moderator', 'admin']
+  );
+
+  const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
+  const isMod = !!roles.find(
+    (r) => r.chain_id === chain.id && r.permission === 'moderator'
+  );
+  const isAdmin = !!roles.find(
+    (r) => r.chain_id === chain.id && r.permission === 'admin'
+  );
+
+  const permissions = { isThreadOwner, isMod, isAdmin };
+
+  //  patch thread properties
 
   const transaction = await this.models.sequelize.transaction();
 
   try {
     await setThreadAttributes(
+      permissions,
       thread,
       {
         title,
         body,
         url,
-        pinned,
       },
       transaction
     );
 
-    await setThreadStage(thread, chain, stage, transaction);
+    await setThreadSpam(permissions, thread, spam, transaction);
 
-    await setThreadLocked(thread, locked, transaction);
+    await setThreadLocked(permissions, thread, locked, transaction);
+
+    await setThreadStage(permissions, thread, stage, chain, transaction);
+
+    await setThreadTopic(
+      permissions,
+      thread,
+      topicId,
+      topicName,
+      this.models,
+      transaction
+    );
 
     await setCanvasSession(
       thread,
@@ -269,19 +284,50 @@ export async function __updateThread(
   return [finalThread.toJSON(), allNotificationOptions];
 }
 
+// -----
+
+type UpdateThreadPermissions = {
+  isThreadOwner: boolean;
+  isMod: boolean;
+  isAdmin: boolean;
+};
+
+/**
+ * Throws error if permissions not satisfied
+ */
+function validatePermissions(
+  permissions: UpdateThreadPermissions,
+  checkFn: (p: UpdateThreadPermissions) => boolean
+) {
+  if (!checkFn(permissions)) {
+    throw new AppError(Errors.Unauthorized);
+  }
+}
+
 /**
  * Updates basic properties of the thread
  */
 async function setThreadAttributes(
+  permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
   {
     title,
     body,
     url,
-    pinned,
-  }: Partial<Pick<ThreadAttributes, 'title' | 'body' | 'url' | 'pinned'>>,
+  }: Partial<Pick<ThreadAttributes, 'title' | 'body' | 'url'>>,
   transaction: Transaction
 ) {
+  if (
+    typeof title !== 'undefined' ||
+    typeof body !== 'undefined' ||
+    typeof url !== 'undefined'
+  ) {
+    validatePermissions(
+      permissions,
+      (p) => p.isThreadOwner || p.isMod || p.isAdmin
+    );
+  }
+
   const toUpdate: Partial<ThreadAttributes> = {};
 
   // title
@@ -309,18 +355,30 @@ async function setThreadAttributes(
 
   // url
   if (typeof url !== 'undefined' && thread.kind === 'link') {
-    if (validURL(url)) {
-      toUpdate.url = url;
-    } else {
+    if (!validURL(url)) {
       throw new AppError(Errors.InvalidLink);
     }
-  }
-
-  if (typeof pinned !== 'undefined') {
-    toUpdate.pinned = pinned;
+    toUpdate.url = url;
   }
 
   if (Object.keys(toUpdate).length > 0) {
+    await thread.update(toUpdate, { transaction });
+  }
+}
+/**
+ * Pins and unpins the thread
+ */
+async function setThreadPinned(
+  permissions: UpdateThreadPermissions,
+  thread: ThreadInstance,
+  pinned: boolean | undefined,
+  transaction: Transaction
+) {
+  if (typeof pinned !== 'undefined') {
+    validatePermissions(permissions, (p) => p.isMod || p.isAdmin);
+
+    const toUpdate: Partial<ThreadAttributes> = {};
+    toUpdate.pinned = pinned;
     await thread.update(toUpdate, { transaction });
   }
 }
@@ -329,11 +387,17 @@ async function setThreadAttributes(
  * Locks and unlocks the thread
  */
 async function setThreadLocked(
+  permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
   locked: boolean | undefined,
   transaction: Transaction
 ) {
   if (typeof locked !== 'undefined') {
+    validatePermissions(
+      permissions,
+      (p) => p.isThreadOwner || p.isMod || p.isAdmin
+    );
+
     const toUpdate: Partial<ThreadAttributes> = {};
 
     toUpdate.read_only = locked;
@@ -349,11 +413,14 @@ async function setThreadLocked(
  * Marks and umarks the thread as spam
  */
 async function setThreadSpam(
+  permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
   spam: boolean | undefined,
   transaction: Transaction
 ) {
   if (typeof spam !== 'undefined') {
+    validatePermissions(permissions, (p) => p.isMod || p.isAdmin);
+
     const toUpdate: Partial<ThreadAttributes> = {};
 
     toUpdate.marked_as_spam_at = spam
@@ -368,12 +435,18 @@ async function setThreadSpam(
  * Updates the stage of the thread
  */
 async function setThreadStage(
+  permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
-  chain: ChainInstance,
   stage: string | undefined,
+  chain: ChainInstance,
   transaction: Transaction
 ) {
   if (typeof stage !== 'undefined') {
+    validatePermissions(
+      permissions,
+      (p) => p.isThreadOwner || p.isMod || p.isAdmin
+    );
+
     const toUpdate: Partial<ThreadAttributes> = {};
 
     // fetch available stages
@@ -410,43 +483,38 @@ async function setThreadStage(
  * Updates the topic for the thread
  */
 async function setThreadTopic(
+  permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
-  topicId: string | undefined,
-  topicName: string | undefined
+  topicId: number | undefined,
+  topicName: string | undefined,
+  models: DB,
+  transaction: Transaction
 ) {
+  if (typeof topicId === 'undefined' || typeof topicName === 'undefined') {
+    validatePermissions(
+      permissions,
+      (p) => p.isThreadOwner || p.isMod || p.isAdmin
+    );
+  }
+
   const toUpdate: Partial<ThreadAttributes> = {};
 
-  if (topicId) {
-    thread.topic_id = topicId;
-    await thread.save();
-    newTopic = await models.Topic.findOne({
-      where: { id: topicId },
-    });
-  } else {
-    [newTopic] = await models.Topic.findOrCreate({
+  if (typeof topicId !== 'undefined') {
+    toUpdate.topic_id = topicId;
+  } else if (typeof topicName !== 'undefined') {
+    const [topic] = await models.Topic.findOrCreate({
       where: {
-        name: req.body.topic_name,
+        name: topicName,
         chain_id: thread.chain,
       },
     });
-    thread.topic_id = newTopic.id;
-    await thread.save();
+    toUpdate.topic_id = topic.id;
   }
 
   if (Object.keys(toUpdate).length > 0) {
     await thread.update(toUpdate, { transaction });
   }
 }
-
-/**
- * Adds collaborators for the thread
- */
-async function addThreadEditors(thread: ThreadInstance, editors: string[]) {}
-
-/**
- * Removes collaborators for the thread
- */
-async function removeThreadEditors(thread: ThreadInstance, editors: string[]) {}
 
 /**
  * Updates the canvas session for the thread
@@ -460,9 +528,11 @@ async function setCanvasSession(
 ) {
   if (typeof canvas_session !== 'undefined') {
     const toUpdate: Partial<ThreadAttributes> = {};
+
     toUpdate.canvas_session = canvas_session;
     toUpdate.canvas_action = canvas_action;
     toUpdate.canvas_hash = canvas_hash;
+
     await thread.update(toUpdate, { transaction });
   }
 }
