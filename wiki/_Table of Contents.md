@@ -24,6 +24,7 @@
   - [Wallet Support](Wallet-Support.md)
   - [Devnet](Devnet.md)
   - [App Initialization Flow](App-Initialization-Flow.md)
+  - [Route Loading Audit](Route-Loading-Audit.md)
   - [Notifications](Notifications.md)
 
 **Current Roadmap**
