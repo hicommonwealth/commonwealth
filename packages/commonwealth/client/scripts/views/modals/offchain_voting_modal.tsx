@@ -1,11 +1,12 @@
 import React from 'react';
+import { X } from '@phosphor-icons/react';
 
-import 'modals/offchain_voting_modal.scss';
 import AddressInfo from '../../models/AddressInfo';
 import Vote from '../../models/Vote';
-
 import { User } from '../components/user/user';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from '../components/component_kit/cw_text';
+
+import 'modals/offchain_voting_modal.scss';
 
 type OffchainVotingModalProps = {
   onModalClose: () => void;
@@ -24,8 +25,10 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
   return (
     <div className="OffchainVotingModal">
       <div className="compact-modal-title">
-        <h3>Votes</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+        <CWText className="title-text" type="h4">
+          Votes
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <div className="download-link">
