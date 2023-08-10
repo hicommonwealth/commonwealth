@@ -143,6 +143,8 @@ export async function __updateThread(
       transaction
     );
 
+    await setThreadPinned(permissions, thread, pinned, transaction);
+
     await setThreadSpam(permissions, thread, spam, transaction);
 
     await setThreadLocked(permissions, thread, locked, transaction);
