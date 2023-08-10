@@ -321,19 +321,112 @@ Contributor: Daniel Martins
 
 # Testing
 
+_Open considerations: When and why do we invoke `nyc` and `NODE_ENV=test` in our scripts? No clear rhyme or reason in our use._
+
+_`nyc` runs IstanbulJS, which tracks and reports how much of our source code is covered by tests._
+
+## integration-test
+
+Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/**/*.spec.ts`
+
+Description: Runs all tests in our integration folder and its subdirectories.
+
+Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested. We should also keep an eye on similar integration-scoped test scripts; there may be redundancies.
+
+## test
+
+Definition: `nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+
+Description: Runs all tests in our /test directory.
+
+## test-api
+
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/api/**/*.spec.ts`
+
+Description: Runs all tests in the /api subfolder of the /integration directory.
+
+
+## test-client
+
+Definition: `webpack-dev-server --config webpack/webpack.config.test.js`
+
+Description: Ostensibly used to test only client-side code.
+
+Considerations: The `webpack.config.test.js` file referenced does not exist. Deprecated; recommend removal.
+
+## test-consumer
+
+Definition: `ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000`
+
+Description: 
+
+## test-devnet
+
+Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
+
+Description: Runs all tests in our /devnet folder.
+
+## test-emit-notif 
+
+Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts`
+
+Description: Runs only the emitNotifications.spec.ts test, of the three /integration folder "utils."
+
+## test-events
+
+Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts`
+
+Description: Ostensibly used to test all events in our integration folder.
+
+Considerations: Misleading name (should be integration-scoped). More importantly, we do not have an /events folder inside our /integration directory. Deprecated; recommend removal.
+
 ## test-integration-util
 
 Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts`
 
-Description: Runs tests in our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing). 
+Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing). 
+
+Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
 
 Author: Timothee Legros
+
+## test-query
+
+Definition: `ts-node server/scripts/testQuery.ts`
+
+Description: Executes testQuery.ts, which runs a select query on chains, for unclear-to-this-documentarian reasons.
+
+Considerations: Why do we have this? Is a "test-" prefix name misleading, given that it is not, strictly speaking, a test (in the same sense as our ts-mocha scripts).
+
+Author: Timothee Legros
+
+## test-scripts
+
+Definition: `ts-mocha --project tsconfig.json test/integration/enforceDataConsistency.spec.ts`
+
+Description: Runs only the enforceDataConsistency.spec.ts test, of the three /integration folder "utils."
+
+## test-select
+
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json`
+
+Description: Append a path to run specific test files or folders.
+
+## test-suite
+
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+
+Description: Runs all tests in our /test directory.
+
+Considerations: This is equivalent to our `test` script but with `NODE_ENV=test` added. Why? Do we actually need both versions?
 
 ## unit-test
 
 Definition: `NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'`
 
 Description: Tests all .spec files within the `./test/unit` sub-directory of test folder.
+
+Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
 
 Contributor: Ryan Bennett
 
@@ -342,6 +435,8 @@ Contributor: Ryan Bennett
 Definition: `NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'`
 
 Description: Watches for changes to any .spec files within `./test/unit` and automatically runs test when they are updated.
+
+Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
 
 Contributor: Ryan Bennett
 
@@ -385,26 +480,6 @@ Considerations: Deprecated; recommend removal. Appears to be redundant with `bun
 
 
 # Undocumented & in-progress
-
-
-
-
-// TESTING
-"test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
-"test-events": "nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts",
-"integration-test": "nyc ts-mocha --project tsconfig.json ./test/integration/**/*.spec.ts",
-"test-devnet": "nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts",
-"test-query": "ts-node server/scripts/testQuery.ts",
-"test": "nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts",
-"test-emit-notif": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts",
-"test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
-"test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/api/**/*.spec.ts",
-"test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts",
-"test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
-"test-scripts": "ts-mocha --project tsconfig.json test/integration/enforceDataConsistency.spec.ts",
-
-
-
 
 "start-consumer": "ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script",
 "start-prerender": "ts-node --project tsconfig.json server/scripts/runPrerenderService.ts",
