@@ -59,7 +59,7 @@ export async function getEthereumAaveProposals(
     provider
   );
 
-  // TODO: skip all proposals cached in redis
+  // TODO: @Timothee - add Redis caching
   return await govHelper.getProposals(
     0,
     ethers.constants.MaxUint256,

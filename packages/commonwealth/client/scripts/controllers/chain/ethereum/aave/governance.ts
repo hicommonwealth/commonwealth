@@ -16,7 +16,7 @@ import getFetch from 'helpers/getFetch';
 import { BigNumber } from 'ethers';
 
 export interface AaveProposalArgs {
-  executor: Executor | string;
+  executor: string;
   targets: string[];
   values: string[];
   signatures: string[];
@@ -97,13 +97,10 @@ export default class AaveGovernance extends ProposalModule<
       throw new Error('all argument arrays must have the same length');
     }
 
-    // validate executor
-    const ex =
-      typeof executor === 'string' ? this._api.getExecutor(executor) : executor;
-    if (!ex) {
+    const executorContract = await this._api.getDeployedExecutor(executor);
+    if (!executorContract) {
       throw new Error('Executor not found.');
     }
-    const executorContract = ex.contract;
     const isExecutorAuthorized =
       await this._api.Governance.isExecutorAuthorized(executorContract.address);
     if (!isExecutorAuthorized) {
@@ -147,13 +144,6 @@ export default class AaveGovernance extends ProposalModule<
     this._Chain = chain;
     this._Accounts = accounts;
     this._api = chain.aaveApi;
-
-    // load server proposals
-    console.log('Fetching aave proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.getByType(
-      AaveTypes.EntityKind.Proposal
-    );
 
     const result: { proposals: IAaveProposalResponse[] } = await getFetch(
       '/api/proposals',

@@ -348,12 +348,14 @@ export default class AaveProposal extends Proposal<
 
     // the guardian can always cancel, but any user can cancel if creator has lost
     // sufficient proposition power
-    const executor = this._Gov.api.getExecutor(this.data.executor);
+    const executor = await this._Gov.api.getDeployedExecutor(
+      this.data.executor
+    );
     if (!executor) {
       throw new Error('executor not found');
     }
     const blockNumber = await this._Gov.api.Provider.getBlockNumber();
-    const isCancellable = await executor.contract.validateProposalCancellation(
+    const isCancellable = await executor.validateProposalCancellation(
       this._Gov.api.Governance.address,
       this.data.proposer,
       blockNumber - 1
