@@ -1,8 +1,8 @@
 import { Client, Message, IntentsBitField, ThreadChannel } from 'discord.js';
 import { sequelize } from '../utils/database';
 import {
-  RabbitMQController,
   getRabbitMQConfig,
+  RabbitMQController,
 } from 'common-common/src/rabbitmq';
 import {
   ServiceKey,
@@ -10,9 +10,10 @@ import {
 } from 'common-common/src/scripts/startHealthCheckLoop';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
-import { RABBITMQ_URI, DISCORD_TOKEN } from '../utils/config';
+import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import v8 from 'v8';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 let isServiceHealthy = false;
 
@@ -113,7 +114,7 @@ const handleMessage = async (
   }
 };
 
-const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService));
 const initPromise = controller.init();
 
 client.on('ready', () => {
