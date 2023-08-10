@@ -14,6 +14,7 @@ const s3 = new AWS.S3();
 
 const S3_BUCKET_NAME = 'assets.commonwealth.im';
 const S3_OBJECT_KEY = `${process.env.NODE_ENV}-last-processed-farcaster-cast-uri.txt`;
+const BOT_KEYWORD = 'giterate';
 
 const app = express();
 const PORT = 3000;
@@ -51,12 +52,12 @@ const getURIFromS3 = async (): Promise<{
     };
   } catch (error) {
     if (error.code === 'NoSuchKey') {
-      console.log(
+      log.info(
         'URI and timestamp not found in S3. This might be a cold start.'
       );
       return { uri: null, timestamp: null };
     } else {
-      console.error('Failed to fetch the URI and timestamp from S3:', error);
+      log.error('Failed to fetch the URI and timestamp from S3:', error);
       return { uri: null, timestamp: null };
     }
   }
@@ -65,8 +66,8 @@ const getURIFromS3 = async (): Promise<{
 // Helper function to save the URI and timestamp to S3
 const saveIDToS3 = async (uri: string): Promise<void> => {
   try {
-    const oneMinuteAgo = Math.floor((Date.now() - 60 * 1000) / 1000); // Convert to Unix timestamp
-    const dataToSave = `${uri},${oneMinuteAgo}`;
+    const twoMinutesAgo = Math.floor((Date.now() - 120 * 1000) / 1000); // Convert to Unix timestamp
+    const dataToSave = `${uri},${twoMinutesAgo}`;
 
     await s3
       .putObject({
@@ -76,9 +77,9 @@ const saveIDToS3 = async (uri: string): Promise<void> => {
       })
       .promise();
 
-    console.log('URI and timestamp saved to S3 successfully');
+    log.info('URI and timestamp saved to S3 successfully');
   } catch (error) {
-    console.error('Failed to save the URI and timestamp to S3:', error);
+    log.error('Failed to save the URI and timestamp to S3:', error);
   }
 };
 
@@ -94,7 +95,7 @@ const fetchData = async () => {
     // Pagination loop
     while (hasNextPage) {
       const response = await axios.get(
-        `https://searchcaster.xyz/api/search?text=${'giterate'}&count=200&page=${pageNo}&after=${lastFetchedTime}`
+        `https://searchcaster.xyz/api/search?text=${BOT_KEYWORD}&count=200&page=${pageNo}&after=${lastFetchedTime}`
       );
 
       const casts = response.data.casts;
@@ -123,25 +124,34 @@ const fetchData = async () => {
         ? allCasts
         : allCasts.slice(0, lastIndexProcessed);
 
-    console.log(castsToProcess.map((cast) => cast.body));
+    if (castsToProcess.length === 0) {
+      // No casts to process, change nothing except timestamp
+      log.info(
+        `No casts to process, nothing published to RabbitMQ, ${new Date()}`
+      );
+      await saveIDToS3(lastProcessedURI);
+      return;
+    }
 
     try {
       await initPromise;
       await controller.publish(
-        { casts: castsToProcess, lastURIProcessed: allCasts[0]?.uri },
+        { casts: castsToProcess, lastURIProcessed: castsToProcess[0]?.uri },
         RascalPublications.FarcasterListener
       );
+
+      await saveIDToS3(castsToProcess[0]?.uri);
       log.info(`Message published to RabbitMQ`);
     } catch (error) {
       log.info(`Error publishing to rabbitMQ`, error);
     }
   } catch (error) {
-    console.error('Error fetching data:', error);
+    log.error('Error fetching data:', error);
   }
 };
 
-// Set up interval to fetch data every minute (60000 milliseconds)
-setInterval(fetchData, 60000);
+// Set up interval to fetch data every 2 minutes (120000 milliseconds)
+setInterval(fetchData, 120000);
 
 app.get('/', (req, res) => {
   res.send('Server running...');

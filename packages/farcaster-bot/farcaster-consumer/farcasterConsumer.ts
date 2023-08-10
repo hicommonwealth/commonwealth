@@ -45,6 +45,7 @@ async function consumeMessages() {
     try {
       const parsedMessage = data as IFarcasterMessage;
       console.log({ parsedMessage });
+      // TODO: Logic for handling messages
     } catch (error) {
       log.error(`Failed to process Message:`, error);
     }
