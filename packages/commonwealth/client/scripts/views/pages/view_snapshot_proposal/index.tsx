@@ -19,10 +19,10 @@ import {
   ClosedProposalPill,
 } from '../../components/proposal_pills';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -65,6 +65,8 @@ export const ViewProposalPage = ({
     }
     return new AddressInfo(null, proposal.author, activeChainId, null);
   }, [proposal, activeChainId]);
+
+  const { isWindowLarge } = useBrowserWindow({});
 
   const loadVotes = useCallback(
     async (snapId: string, proposalId: string) => {
@@ -113,7 +115,12 @@ export const ViewProposalPage = ({
   }, [identifier, loadVotes, snapshotId]);
 
   if (!proposal) {
-    return <PageLoading />;
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
   return (

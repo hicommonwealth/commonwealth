@@ -70,11 +70,11 @@ type ContentPageProps = {
   canUpdateThread?: boolean;
   showTabs?: boolean;
   showSkeleton?: boolean;
-  isWindowMedium?: boolean;
   isEditing?: boolean;
+  sidebarComponentsSkeletonCount?: number;
 };
 
-const CWContentPageSkeleton = ({ isWindowMedium }) => {
+const CWContentPageSkeleton = ({ sidebarComponentsSkeletonCount }) => {
   const mainBody = (
     <div className="main-body-container">
       {/* thread header */}
@@ -120,26 +120,16 @@ const CWContentPageSkeleton = ({ isWindowMedium }) => {
     <div className={ComponentType.ContentPage}>
       <div className="sidebar-view">
         {mainBody}
-        {isWindowMedium && (
+        {sidebarComponentsSkeletonCount > 0 && (
           <div className="sidebar">
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
+            {Array.from({ length: sidebarComponentsSkeletonCount }).map(() => (
+              <div className="cards-column">
+                <Skeleton width={'80%'} />
+                <Skeleton width={'100%'} />
+                <Skeleton width={'50%'} />
+                <Skeleton width={'75%'} />
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -181,13 +171,18 @@ export const CWContentPage = ({
   canUpdateThread,
   showTabs = false,
   showSkeleton,
-  isWindowMedium,
   isEditing = false,
+  sidebarComponentsSkeletonCount = 2,
 }: ContentPageProps) => {
   const [tabSelected, setTabSelected] = useState<number>(0);
 
-  if (showSkeleton)
-    return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />;
+  if (showSkeleton) {
+    return (
+      <CWContentPageSkeleton
+        sidebarComponentsSkeletonCount={sidebarComponentsSkeletonCount}
+      />
+    );
+  }
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 

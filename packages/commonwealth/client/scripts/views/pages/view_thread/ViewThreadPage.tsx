@@ -115,7 +115,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsEditingBody(false);
   };
 
-  const { isWindowMedium } = useBrowserWindow({
+  const { isWindowLarge } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -400,7 +400,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (!app.chain?.meta || !app.threads.initialized || !thread) {
-    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
   if (typeof identifier !== 'string') {
