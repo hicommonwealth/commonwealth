@@ -131,16 +131,6 @@ export type Link = {
   title?: string;
 };
 
-// a list of thread fields that are an array (only includes 1st level arrays)
-// IMPORTANT: this should always be updated when thread modal updates array fields or
-// api response changes
-export const THREAD_ARRAY_FIELDS = [
-  'collaborators',
-  'chainEntities',
-  'versionHistory',
-  'associatedReactions',
-];
-
 export class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
