@@ -198,7 +198,7 @@ import {
 } from '../middleware/methodNotAllowed';
 import { ServerProposalsController } from '../controllers/server_proposals_controller';
 import { RedisCache } from 'common-common/src/redisCache';
-import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
+import { get_proposals_handler } from '../routes/proposals/get_proposals_handler';
 
 function setupRouter(
   endpoint: string,
@@ -1361,7 +1361,7 @@ function setupRouter(
     router,
     'get',
     '/proposals',
-    getProposalsHandler.bind(this, serverControllers)
+    get_proposals_handler.bind(this, serverControllers)
   );
 
   app.use(endpoint, router);

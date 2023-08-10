@@ -1,7 +1,7 @@
 import { ServerControllers } from '../../routing/router';
-import { TypedRequestBody, TypedResponse } from '../../types';
+import { TypedRequestQuery, TypedResponse } from '../../types';
 
-type GetProposalsRequestBody = {
+type GetProposalsRequestParams = {
   chainId: string;
 };
 
@@ -9,12 +9,12 @@ type GetProposalsResponse = {
   proposals: any;
 };
 
-export const getProposalsHandler = async (
+export const get_proposals_handler = async (
   controllers: ServerControllers,
-  req: TypedRequestBody<GetProposalsRequestBody>,
+  req: TypedRequestQuery<GetProposalsRequestParams>,
   res: TypedResponse<GetProposalsResponse>
 ) => {
-  const { chainId } = req.body;
+  const { chainId } = req.query;
 
   const proposals = await controllers.proposals.getCompletedProposals({
     chainId,
