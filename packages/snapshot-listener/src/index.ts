@@ -4,8 +4,8 @@ import type { ISnapshotNotification } from 'common-common/src/types';
 import {
   getRabbitMQConfig,
   RabbitMQController,
-  RascalPublications,
 } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_PORT, RABBITMQ_URI } from './config';
