@@ -10,7 +10,6 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { StdSignDoc } from '@cosmjs/amino';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -62,7 +61,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabling = false;
   private _chainId: string;
   private _chain: string;
-  private _offlineSigner: OfflineSigner;
+  private _offlineSigner: OfflineSigner | OfflineDirectSigner;
 
   public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
@@ -202,10 +201,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 
-      this._offlineSigner = window.keplr.getOfflineSignerOnlyAmino(
+      this._offlineSigner = await window.keplr.getOfflineSignerAuto(
         this._chainId
       );
-      // this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
       this._enabling = false;
