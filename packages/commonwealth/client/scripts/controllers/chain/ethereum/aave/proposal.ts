@@ -24,8 +24,6 @@ import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 
 import type AaveAPI from './api';
-import type { AaveExecutor } from './api';
-import type AaveChain from './chain';
 import type AaveGovernance from './governance';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
@@ -219,9 +217,7 @@ export default class AaveProposal extends Proposal<
   // FOR VOTES - AGAINST VOTES > VOTE_DIFFERENTIAL * voting supply
   private _isVoteDifferentialPassing() {
     const diff = this.data.forVotes.sub(this.data.againstVotes);
-    const result = diff.gt(this.data.minimumDiff.mul(this.votingSupplyAtStart));
-    console.log('Is Vote diff passing:', result);
-    return result;
+    return diff.gt(this.data.minimumDiff.mul(this.votingSupplyAtStart));
   }
 
   private _isQuorumValid() {

@@ -1,6 +1,6 @@
 import { ProposalState } from 'chain-events/src/chains/aave/types';
 import { IGovernanceV2Helper } from 'common-common/src/eth/types/IGovernanceV2Helper';
-import { providers } from 'ethers';
+import { ethers, providers } from 'ethers';
 import { IGovernanceV2Helper__factory } from 'common-common/src/eth/types/factories/IGovernanceV2Helper__factory';
 import { IAaveProposalResponse } from 'shared/adapters/chain/aave/types';
 
@@ -60,5 +60,9 @@ export async function getEthereumAaveProposals(
   );
 
   // TODO: skip all proposals cached in redis
-  return await govHelper.getProposals(0, 1, aaveGovAddress);
+  return await govHelper.getProposals(
+    0,
+    ethers.constants.MaxUint256,
+    aaveGovAddress
+  );
 }
