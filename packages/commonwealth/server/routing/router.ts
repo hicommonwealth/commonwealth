@@ -1,8 +1,14 @@
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
+import useragent from 'express-useragent';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from '../middleware/methodNotAllowed';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -75,10 +81,6 @@ import fetchEntityTitle from '../routes/fetchEntityTitle';
 import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
-import createDraft from '../routes/drafts/createDraft';
-import deleteDraft from '../routes/drafts/deleteDraft';
-import editDraft from '../routes/drafts/editDraft';
-import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
@@ -181,6 +183,8 @@ import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
 import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
+import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
@@ -195,10 +199,6 @@ export type ServerControllers = {
   profiles: ServerProfilesController;
   chains: ServerChainsController;
 };
-import {
-  methodNotAllowedMiddleware,
-  registerRoute,
-} from '../middleware/methodNotAllowed';
 
 function setupRouter(
   endpoint: string,
@@ -225,6 +225,8 @@ function setupRouter(
   // ---
 
   const router = express.Router();
+
+  router.use(useragent.express());
 
   // Updating the address
   registerRoute(
@@ -427,6 +429,24 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
     createThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    updateThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/threads/:message_id',
+    databaseValidationService.validateBotUser,
+    deleteBotThreadHandler.bind(this, serverControllers)
   );
 
   registerRoute(
@@ -637,36 +657,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
 
-  // discussion drafts
-  registerRoute(
-    router,
-    'post',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    createDraft.bind(this, models)
-  );
-  registerRoute(router, 'get', '/drafts', getDrafts.bind(this, models));
-  registerRoute(
-    router,
-    'delete',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteDraft.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'patch',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    editDraft.bind(this, models)
-  );
-
   registerRoute(
     router,
     'get',
@@ -694,6 +684,26 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/comments/:message_id',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteBotCommentHandler.bind(this, serverControllers)
   );
 
   registerRoute(

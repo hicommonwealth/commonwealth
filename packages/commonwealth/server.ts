@@ -18,9 +18,6 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
@@ -48,12 +45,25 @@ import setupCEProxy from './server/util/entitiesProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
-import devWebpackConfig from './webpack/webpack.dev.config.js';
-import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import { RedisCache } from 'common-common/src/redisCache';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.Commonwealth,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -98,16 +108,7 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV
-    ? webpack(devWebpackConfig as any)
-    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const devMiddleware =
-    DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler as any, {
-          publicPath: '/build',
-        })
-      : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
@@ -176,16 +177,6 @@ async function main() {
     //   res.set('Content-Type', 'text/css');
     //   next();
     // });
-
-    // serve the compiled app
-    if (!NO_CLIENT_SERVER) {
-      if (DEV) {
-        app.use(devMiddleware);
-        app.use(webpackHotMiddleware(compiler));
-      } else {
-        app.use('/build', express.static('build'));
-      }
-    }
 
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
@@ -297,7 +288,20 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupCEProxy(app);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+
+  if (!NO_CLIENT_SERVER) {
+    if (DEV) {
+      // lazy import because we want to keep all of webpacks dependencies in devDependencies
+      const setupWebpackDevServer = (
+        await import('./server/scripts/setupWebpackDevServer')
+      ).default;
+      await setupWebpackDevServer(app);
+    } else {
+      app.use('/build', express.static('build'));
+    }
+  }
+
+  setupAppRoutes(app, models, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);
 
@@ -310,6 +314,8 @@ async function main() {
     redisCache,
     rollbar
   );
+
+  isServiceHealthy = true;
 }
 
 main().catch((e) => console.log(e));

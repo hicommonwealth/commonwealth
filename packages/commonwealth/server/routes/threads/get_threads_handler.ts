@@ -38,6 +38,7 @@ type BulkThreadsRequestQuery = {
   orderBy?: string;
   from_date?: string;
   to_date?: string;
+  archived?: string;
 };
 type GetThreadsResponse = any;
 
@@ -79,7 +80,12 @@ export const getThreadsHandler = async (
       orderBy,
       from_date,
       to_date,
+      archived,
     } = req.query as BulkThreadsRequestQuery;
+
+    if (!chain && req.query.chain !== ALL_CHAINS) {
+      throw new AppError(Errors.NoChains);
+    }
 
     const bulkThreads = await controllers.threads.getBulkThreads({
       chain,
@@ -91,6 +97,7 @@ export const getThreadsHandler = async (
       orderBy,
       fromDate: from_date,
       toDate: to_date,
+      archived: archived === 'true',
     });
     return success(res, bulkThreads);
   }

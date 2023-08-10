@@ -15,7 +15,6 @@ import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
-import DiscussionDraftFactory from './models/discussion_draft';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
@@ -53,7 +52,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production'
+    process.env.NODE_ENV !== 'production' || process.env.NO_SSL
       ? { requestTimeout: 40000 }
       : DATABASE_URI ===
         'postgresql://commonwealth:edgeware@localhost/commonwealth'
@@ -88,7 +87,6 @@ const models: Models = {
   Template: TemplateFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
-  DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
