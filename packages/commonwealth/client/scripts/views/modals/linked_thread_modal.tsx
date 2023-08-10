@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-
-import 'modals/linked_thread_modal.scss';
+import { X } from '@phosphor-icons/react';
 
 import type Thread from '../../models/Thread';
 import { ThreadSelector } from 'views/components/thread_selector';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { LinkSource } from 'models/Thread';
 import { getAddedAndDeleted } from 'helpers/threads';
+import { CWText } from '../components/component_kit/cw_text';
+
+import 'modals/linked_thread_modal.scss';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
@@ -88,8 +89,10 @@ export const LinkedThreadModal = ({
   return (
     <div className="LinkedThreadModal">
       <div className="compact-modal-title">
-        <h3>Link to Existing Threads</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
+        <CWText className="title-text" type="h4">
+          Link to Existing Threads
+        </CWText>
+        <X className="close-icon" onClick={() => onModalClose()} size={24} />
       </div>
       <div className="compact-modal-body">
         <ThreadSelector
@@ -100,10 +103,16 @@ export const LinkedThreadModal = ({
         <div className="buttons-row">
           <CWButton
             label="Cancel"
-            buttonType="secondary-blue"
+            buttonType="secondary"
+            buttonHeight="sm"
             onClick={onModalClose}
           />
-          <CWButton label="Save changes" onClick={handleSaveChanges} />
+          <CWButton
+            label="Save changes"
+            buttonType="primary"
+            buttonHeight="sm"
+            onClick={handleSaveChanges}
+          />
         </div>
       </div>
     </div>
