@@ -1,7 +1,12 @@
 import { test } from '@playwright/test';
 import { expect } from 'chai';
 import { PORT } from '../../../server/config';
-import { addAlchemyKey, login } from '../utils/e2eUtils';
+import {
+  addAddressIfNone,
+  addAlchemyKey,
+  createInitialUser,
+  login,
+} from '../utils/e2eUtils';
 
 test.setTimeout(60000);
 

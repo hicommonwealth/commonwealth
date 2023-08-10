@@ -17,9 +17,7 @@ test.afterEach(async () => {
 
 test.describe('New Discussion Page Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(
-      `http://localhost:${PORT}/${testChains[0].id}/new/discussion`
-    );
+    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
     await addAddressIfNone(testChains[0].id);
     await login(page);
     await page.goto(
