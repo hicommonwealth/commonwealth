@@ -24,16 +24,16 @@ import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 
-type ViewProposalPageProps = {
+type ViewSnapshotProposalPageProps = {
   identifier: string;
   scope: string;
   snapshotId: string;
 };
 
-export const ViewProposalPage = ({
+export const ViewSnapshotProposalPage = ({
   identifier,
   snapshotId,
-}: ViewProposalPageProps) => {
+}: ViewSnapshotProposalPageProps) => {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
@@ -179,4 +179,4 @@ export const ViewProposalPage = ({
   );
 };
 
-export default ViewProposalPage;
+export default ViewSnapshotProposalPage;

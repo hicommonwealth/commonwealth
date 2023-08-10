@@ -8,6 +8,7 @@ import app from 'state';
 import { REDIRECT_ACTIONS } from '.';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { useCommonNavigate } from 'navigation/helpers';
+import { Skeleton } from '../../components/Skeleton';
 
 function countActiveProposals(proposals: SnapshotProposal[]): number {
   return proposals.filter((proposal) => proposal.state === 'active').length;
@@ -18,11 +19,39 @@ type SnapshotSpaceCardProps = {
   proposals: SnapshotProposal[];
   redirectAction: string;
   space: SnapshotSpace;
+  showSkeleton?: boolean;
 };
 
 export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
-  const { space, proposals, redirectAction, proposal } = props;
+  const { space, proposals, redirectAction, proposal, showSkeleton } = props;
   const navigate = useCommonNavigate();
+
+  if (showSkeleton) {
+    return (
+      <CWCard
+        elevation="elevation-2"
+        className="SnapshotSpaceCard"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
+        <div className="space-card-container">
+          <div className="space-card-metadata">
+            <div className="space-card-title">
+              <Skeleton />
+            </div>
+            <div className="space-card-subheader">
+              <Skeleton />
+            </div>
+          </div>
+          <div className="space-card-status">
+            <Skeleton />
+          </div>
+        </div>
+      </CWCard>
+    );
+  }
 
   if (!space || !proposals) return;
 
