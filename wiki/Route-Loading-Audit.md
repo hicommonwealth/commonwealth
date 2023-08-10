@@ -1,9 +1,5 @@
-## Route Loading Audit
-
-
-#### Logged Out on /discussions (osmosis, ETH starter community)
-
-
+# Route Loading Audit
+## Logged Out on /discussions (osmosis, ETH starter community)
 
 1. /domain (check custom domain)
 2. /status (load main site data)
@@ -22,10 +18,7 @@
 15. /threadsUsersCountAndAvatars (looks like duplicate call?)
 16. /getAddressProfile (happens sometime after step 7, may be several)
 
-
-#### /overview logged out
-
-
+## /overview logged out
 
 1. /domain
 2. /status
@@ -36,12 +29,9 @@
 7. /threadsUsersCountAndAvatars
 8. /getAddressProfile
 
-
-#### Logged In on /discussions or /overview
+## Logged In on /discussions or /overview
 
 After step (2) above, makes the following additional calls:
-
-
 
 1. /viewDiscussionNotifications
 2. /viewChainEventNotifications
@@ -50,12 +40,8 @@ After step (2) above, makes the following additional calls:
 
 After step (7) above, makes the following additional calls:
 
-
-
 1. /tokenBalance
 2. /selectChain
-
-
-#### /discussions On dYdX
+## /discussions On dYdX
 
 Makes several IPFS calls at end of query (aave proposal naming).
