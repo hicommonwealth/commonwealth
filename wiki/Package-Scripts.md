@@ -89,6 +89,16 @@ Contributor: Kurtis Assad
 
 # Database Scripts
 
+## clean-db
+
+Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
+
+Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily. 
+
+Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script.
+
+Author: Timothee Legros
+
 ## db-all
 
 Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
@@ -311,6 +321,14 @@ Contributor: Daniel Martins
 
 # Testing
 
+## test-integration-util
+
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts`
+
+Description: Runs tests in our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing). 
+
+Author: Timothee Legros
+
 ## unit-test
 
 Definition: `NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'`
@@ -403,12 +421,13 @@ Considerations: Deprecated; recommend removal. Appears to be redundant with `bun
 
 
 //ADDED BY TIMOTHEE
+
+
 "create-migration": "npx sequelize migration:generate --name",
 "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get CW_READ_DB -a commonwealth-beta) -a -f limited_dump.sql",
 "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql",
 "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
 "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
-"stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
 
 
 // ADDED BY KURTIS
