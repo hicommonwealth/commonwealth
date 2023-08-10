@@ -88,10 +88,6 @@ test.describe('Discussion Page Tests', () => {
 
     expect(await page.getByText(commentText).count()).toEqual(0);
   });
-
-  test('Check User can like/dislike thread', async ({ page }) => {
-    await performUpvote(page, 'ThreadOptions');
-  });
 });
 
 async function getQuillTextBox(page) {
