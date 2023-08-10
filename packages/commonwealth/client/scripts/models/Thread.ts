@@ -1,6 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
 import type ChainEntity from 'models/ChainEntity';
-import Poll from 'models/Poll';
 import moment, { Moment } from 'moment';
 import app from 'state';
 import type { ReactionType } from './Reaction';
@@ -178,7 +177,6 @@ export class Thread implements IUniqueId {
   public readonly lockedAt: Moment;
 
   public readonly hasPoll: boolean;
-  public readonly polls: Poll[];
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
@@ -213,7 +211,6 @@ export class Thread implements IUniqueId {
     has_poll,
     last_commented_on,
     numberOfComments,
-    polls,
     reactions,
     reactionIds,
     reactionType,
@@ -248,7 +245,6 @@ export class Thread implements IUniqueId {
     read_only: boolean;
     has_poll: boolean;
     numberOfComments?: number;
-    polls?: Poll[];
     topic: Topic;
     reactions?: any[]; // TODO: fix type
     reactionIds: any[]; // TODO: fix type
@@ -286,7 +282,6 @@ export class Thread implements IUniqueId {
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
     this.lockedAt = locked_at ? moment(locked_at) : null;
-    this.polls = (polls || []).map((p) => new Poll(p));
     this.numberOfComments = numberOfComments || 0;
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;
