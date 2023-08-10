@@ -173,6 +173,32 @@ export interface IDiscordMessage {
   action: DiscordAction;
 }
 
+export interface IFarcasterMessage {
+  casts: Array<{
+    body: {
+      publishedAt: number;
+      username: string;
+      data: {
+        text: string;
+        image: string;
+        replyParentMerkleRoot: string;
+        threadMerkleRoot: string;
+      };
+    };
+    meta: {
+      displayName: string;
+      avatar: string;
+      isVerifiedAvatar: boolean;
+      numReplyChildren: number;
+      reactions: any;
+      recasts: any;
+    };
+    merkleRoot: string;
+    uri: string;
+  }>;
+  lastURIProcessed: string;
+}
+
 export type HttpMethod =
   | 'get'
   | 'post'

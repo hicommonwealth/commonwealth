@@ -9,6 +9,8 @@ export enum ServiceKey {
   Commonwealth = 'commonwealth',
   DiscordBotListener = 'discord-bot-listener',
   DiscordBotConsumer = 'discord-bot-consumer',
+  FarcasterBotListener = 'farcaster-bot-listener',
+  FarcasterBotConsumer = 'farcaster-bot-consumer',
   ChainEventsApp = 'chain-events-app',
   ChainEventsConsumer = 'chain-events-consumer',
   ChainEventsSubscriber = 'chain-events-subscriber',

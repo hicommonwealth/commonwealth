@@ -134,6 +134,9 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           [RascalQueues.DiscordListener]: {
             ...queueConfig,
           },
+          [RascalQueues.FarcasterListener]: {
+            ...queueConfig,
+          },
         },
         bindings: {
           [RascalBindings.ChainEvents]: {
@@ -184,6 +187,12 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             destinationType: 'queue',
             bindingKey: RascalRoutingKeys.DiscordListener,
           },
+          [RascalBindings.FarcasterListener]: {
+            source: RascalExchanges.SnapshotListener,
+            destination: RascalQueues.FarcasterListener,
+            destinationType: 'queue',
+            bindingKey: RascalRoutingKeys.FarcasterListener,
+          },
         },
         publications: {
           [RascalPublications.ChainEvents]: {
@@ -221,6 +230,11 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             routingKey: RascalRoutingKeys.DiscordListener,
             ...publicationConfig,
           },
+          [RascalPublications.FarcasterListener]: {
+            exchange: RascalExchanges.SnapshotListener,
+            routingKey: RascalRoutingKeys.FarcasterListener,
+            ...publicationConfig,
+          },
         },
         subscriptions: {
           [RascalSubscriptions.ChainEvents]: {
@@ -249,6 +263,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalSubscriptions.DiscordListener]: {
             queue: RascalQueues.DiscordListener,
+            ...subscriptionConfig,
+          },
+          [RascalSubscriptions.FarcasterListener]: {
+            queue: RascalQueues.FarcasterListener,
             ...subscriptionConfig,
           },
         },

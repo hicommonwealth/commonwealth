@@ -1,6 +1,14 @@
 import express from 'express';
 import axios from 'axios';
 import AWS from 'aws-sdk';
+import {
+  RabbitMQController,
+  getRabbitMQConfig,
+} from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import { RABBITMQ_URI } from '../utils/config';
+import { factory, formatFilename } from 'common-common/src/logging';
+import v8 from 'v8';
 
 const s3 = new AWS.S3();
 
@@ -9,6 +17,17 @@ const S3_OBJECT_KEY = `${process.env.NODE_ENV}-last-processed-farcaster-cast-uri
 
 const app = express();
 const PORT = 3000;
+
+const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+const initPromise = controller.init();
+
+const log = factory.getLogger(formatFilename(__filename));
+
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 // Helper function to get the URI and timestamp from S3
 const getURIFromS3 = async (): Promise<{
@@ -72,6 +91,7 @@ const fetchData = async () => {
     let pageNo = 0;
     let hasNextPage = true;
 
+    // Pagination loop
     while (hasNextPage) {
       const response = await axios.get(
         `https://searchcaster.xyz/api/search?text=${'giterate'}&count=200&page=${pageNo}&after=${lastFetchedTime}`
@@ -103,7 +123,18 @@ const fetchData = async () => {
         ? allCasts
         : allCasts.slice(0, lastIndexProcessed);
 
-    console.log(castsToProcess);
+    console.log(castsToProcess.map((cast) => cast.body));
+
+    try {
+      await initPromise;
+      await controller.publish(
+        { casts: castsToProcess, lastURIProcessed: allCasts[0]?.uri },
+        RascalPublications.FarcasterListener
+      );
+      log.info(`Message published to RabbitMQ`);
+    } catch (error) {
+      log.info(`Error publishing to rabbitMQ`, error);
+    }
   } catch (error) {
     console.error('Error fetching data:', error);
   }
