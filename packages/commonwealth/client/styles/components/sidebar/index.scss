@@ -55,6 +55,17 @@
       }
     }
 
+    .community-menu-skeleton {
+      padding: 16px;
+
+      .community-menu-skeleton-section-items {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 8px;
+      }
+    }
+
     .powered-by {
       background-image: url(/static/img/powered-by.svg);
       background-position: center;
