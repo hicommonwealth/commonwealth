@@ -103,7 +103,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   } = useGetThreadsByIdQuery({
     chainId: app.activeChainId(),
     ids: [+threadId].filter(Boolean),
-    enabled: !!threadId,
+    apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
 
   const thread = data?.[0];
