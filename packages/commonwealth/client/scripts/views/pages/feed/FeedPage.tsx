@@ -110,13 +110,15 @@ const FeedPage = () => {
     <div ref={setScrollElement} className="FeedPage">
       <div className="dashboard-column">
         <div className="dashboard-header">
-          <CWText type="h3" fontWeight="semiBold">
-            Home
-          </CWText>
           {app.chain.meta.snapshot.length > 0 && (
-            <CardCarousel fetchActiveProposals={fetchActiveProposals} />
+            <>
+              <CWText type="h3" fontWeight="semiBold">
+                Home
+              </CWText>
+              <CardCarousel fetchActiveProposals={fetchActiveProposals} />
+              <CWDivider />
+            </>
           )}
-          <CWDivider />
           <div className="feed-tabs">
             <CWTabBar>
               <CWTab
