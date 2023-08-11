@@ -12,6 +12,8 @@ import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorA
 import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
 import { Skeleton } from '../Skeleton';
 import { CWCard } from './cw_card';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
@@ -326,15 +328,26 @@ type ContentPageCardProps = {
 
 export const CWContentPageCard = (props: ContentPageCardProps) => {
   const { content, header } = props;
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <CWCard className="ContentPageCard">
       <div className="header-container">
         <CWText type="h5" fontWeight="semiBold">
+          <div className={'collapsableButton'}>
+            <CWIconButton
+              iconButtonTheme="black"
+              iconName={isCollapsed ? 'chevronRight' : 'chevronDown'}
+              iconSize={'small'}
+              onClick={() => {
+                setIsCollapsed(!isCollapsed);
+              }}
+            />
+          </div>
           {header}
         </CWText>
       </div>
-      {content}
+      {!isCollapsed ? content : null}
     </CWCard>
   );
 };
