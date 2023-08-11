@@ -50,12 +50,6 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 
 const ONE_HUNDRED_WITH_PRECISION = 10000;
 
-function sumVotes(vs: AaveProposalVote[]): BN {
-  return vs.reduce((prev, curr) => {
-    return prev.add(curr.power);
-  }, new BN(0));
-}
-
 interface AipIpfsObject {
   aip: number;
   title: string;
