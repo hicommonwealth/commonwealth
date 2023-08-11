@@ -4,10 +4,10 @@ import useEditCommentMutation from './editComment';
 import useCreateCommentMutation from './createComment';
 import useDeleteCommentMutation from './deleteComment';
 import useToggleCommentSpamStatusMutation from './toggleCommentSpamStatus';
+import useSearchCommentsQuery from './searchComments';
 // comment reactions
 import useCreateCommentReactionMutation from './createReaction';
 import useDeleteCommentReactionMutation from './deleteReaction';
-import useSearchCommentsQuery from './searchComments';
 
 export {
   // comments
