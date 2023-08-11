@@ -6,7 +6,6 @@ import type Comment from '../../../models/Comment';
 import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
-  useFetchCommentReactionsQuery,
 } from '../../../state/api/comments';
 import { LoginModal } from '../../modals/login_modal';
 import { Modal } from '../component_kit/cw_modal';
@@ -26,6 +25,7 @@ export const CommentReactionButton = ({
 
   const { mutateAsync: createCommentReaction } =
     useCreateCommentReactionMutation({
+      threadId: comment.threadId,
       commentId: comment.id,
       chainId: app.activeChainId(),
     });
@@ -33,17 +33,14 @@ export const CommentReactionButton = ({
     useDeleteCommentReactionMutation({
       commentId: comment.id,
       chainId: app.activeChainId(),
+      threadId: comment.threadId,
     });
-  const { data: reactions } = useFetchCommentReactionsQuery({
-    chainId: app.activeChainId(),
-    commentId: comment.id,
-  });
 
   const activeAddress = app.user.activeAccount?.address;
-  const hasReacted = (reactions || []).find(
-    (x) => x?.Address?.address === activeAddress
+  const hasReacted = !!(comment.reactions || []).find(
+    (x) => x?.author === activeAddress
   );
-  const likes = (reactions || []).length;
+  const likes = (comment.reactions || []).length;
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
@@ -55,11 +52,11 @@ export const CommentReactionButton = ({
     }
 
     if (hasReacted) {
-      const foundReaction = reactions.find((r) => {
-        return r.Address.address === activeAddress;
+      const foundReaction = comment.reactions.find((r) => {
+        return r.author === activeAddress;
       });
       deleteCommentReaction({
-        canvasHash: foundReaction.canvas_hash,
+        canvasHash: foundReaction.canvasHash,
         reactionId: foundReaction.id,
       }).catch(() => {
         notifyError('Failed to update reaction count');
@@ -69,6 +66,7 @@ export const CommentReactionButton = ({
         address: activeAddress,
         commentId: comment.id,
         chainId: app.activeChainId(),
+        threadId: comment.threadId,
       }).catch(() => {
         notifyError('Failed to save reaction');
       });
@@ -90,7 +88,7 @@ export const CommentReactionButton = ({
         onMouseEnter={() => undefined}
         onClick={handleVoteClick}
         tooltipContent={getDisplayedReactorsForPopup({
-          reactors: (reactions || []).map((r) => r.Address.address),
+          reactors: (comment.reactions || []).map((r) => r.author),
         })}
       />
     </>
