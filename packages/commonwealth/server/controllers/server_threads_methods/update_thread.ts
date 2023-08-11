@@ -17,6 +17,7 @@ import { DB } from '../../models';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { uniq } from 'lodash';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -29,6 +30,9 @@ export const Errors = {
   InvalidStage: 'Please Select a Stage',
   FailedToParse: 'Failed to parse custom stages',
   InvalidTopic: 'Invalid topic',
+  MissingCollaborators: 'Failed to find all provided collaborators',
+  CollaboratorsOverlap:
+    'Cannot overlap addresses when adding/removing collaborators',
 };
 
 export type UpdateThreadOptions = {
@@ -46,6 +50,10 @@ export type UpdateThreadOptions = {
   spam?: boolean;
   topicId?: number;
   topicName?: string;
+  collaborators?: {
+    toAdd?: number[];
+    toRemove?: number[];
+  };
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
@@ -74,6 +82,7 @@ export async function __updateThread(
     spam,
     topicId,
     topicName,
+    collaborators,
     canvasSession,
     canvasAction,
     canvasHash,
@@ -94,7 +103,6 @@ export async function __updateThread(
   }
 
   // get various permissions
-
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
@@ -142,10 +150,11 @@ export async function __updateThread(
   const allAnalyticsOptions: TrackOptions[] = [];
 
   //  patch thread properties
-
   const transaction = await this.models.sequelize.transaction();
 
   try {
+    const toUpdate: Partial<ThreadAttributes> = {};
+
     await setThreadAttributes(
       permissions,
       thread,
@@ -157,24 +166,23 @@ export async function __updateThread(
         canvasAction,
         canvasHash,
       },
-      transaction
+      toUpdate
     );
 
-    await setThreadPinned(permissions, thread, pinned, transaction);
+    await setThreadPinned(permissions, pinned, toUpdate);
 
-    await setThreadSpam(permissions, thread, spam, transaction);
+    await setThreadSpam(permissions, spam, toUpdate);
 
-    await setThreadLocked(permissions, thread, locked, transaction);
+    await setThreadLocked(permissions, locked, toUpdate);
 
-    await setThreadArchived(permissions, thread, archived, transaction);
+    await setThreadArchived(permissions, archived, toUpdate);
 
     await setThreadStage(
       permissions,
-      thread,
       stage,
       chain,
       allAnalyticsOptions,
-      transaction
+      toUpdate
     );
 
     await setThreadTopic(
@@ -183,12 +191,23 @@ export async function __updateThread(
       topicId,
       topicName,
       this.models,
-      transaction
+      toUpdate
     );
 
     await thread.update(
-      { last_edited: Sequelize.literal('CURRENT_TIMESTAMP') },
+      {
+        ...toUpdate,
+        last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
       { transaction }
+    );
+
+    await updateThreadCollaborators(
+      permissions,
+      thread,
+      collaborators,
+      this.models,
+      transaction
     );
 
     await address.update(
@@ -216,7 +235,6 @@ export async function __updateThread(
       { model: this.models.Address, as: 'Address' },
       {
         model: this.models.Address,
-        // through: models.Collaboration,
         as: 'collaborators',
       },
       { model: this.models.Topic, as: 'topic' },
@@ -354,7 +372,7 @@ async function setThreadAttributes(
     canvasAction,
     canvasHash,
   }: UpdatableThreadAttributes,
-  transaction: Transaction
+  toUpdate: Partial<ThreadAttributes>
 ) {
   if (
     typeof title !== 'undefined' ||
@@ -365,8 +383,6 @@ async function setThreadAttributes(
       permissions,
       (p) => p.isThreadOwner || p.isMod || p.isAdmin
     );
-
-    const toUpdate: Partial<ThreadAttributes> = {};
 
     // title
     if (typeof title !== 'undefined') {
@@ -404,10 +420,6 @@ async function setThreadAttributes(
       toUpdate.canvas_action = canvasAction;
       toUpdate.canvas_hash = canvasHash;
     }
-
-    if (Object.keys(toUpdate).length > 0) {
-      await thread.update(toUpdate, { transaction });
-    }
   }
 }
 
@@ -416,17 +428,13 @@ async function setThreadAttributes(
  */
 async function setThreadPinned(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
   pinned: boolean | undefined,
-  transaction: Transaction
+  toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof pinned !== 'undefined') {
     validatePermissions(permissions, (p) => p.isMod || p.isAdmin);
 
-    const toUpdate: Partial<ThreadAttributes> = {};
     toUpdate.pinned = pinned;
-
-    await thread.update(toUpdate, { transaction });
   }
 }
 
@@ -435,9 +443,8 @@ async function setThreadPinned(
  */
 async function setThreadLocked(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
   locked: boolean | undefined,
-  transaction: Transaction
+  toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof locked !== 'undefined') {
     validatePermissions(
@@ -445,14 +452,10 @@ async function setThreadLocked(
       (p) => p.isThreadOwner || p.isMod || p.isAdmin
     );
 
-    const toUpdate: Partial<ThreadAttributes> = {};
-
     toUpdate.read_only = locked;
     toUpdate.locked_at = locked
       ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
       : null;
-
-    await thread.update(toUpdate, { transaction });
   }
 }
 
@@ -461,9 +464,8 @@ async function setThreadLocked(
  */
 async function setThreadArchived(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
   archive: boolean | undefined,
-  transaction: Transaction
+  toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof archive !== 'undefined') {
     validatePermissions(
@@ -471,13 +473,9 @@ async function setThreadArchived(
       (p) => p.isThreadOwner || p.isMod || p.isAdmin
     );
 
-    const toUpdate: Partial<ThreadAttributes> = {};
-
     toUpdate.archived_at = archive
       ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
       : null;
-
-    await thread.update(toUpdate, { transaction });
   }
 }
 
@@ -486,20 +484,15 @@ async function setThreadArchived(
  */
 async function setThreadSpam(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
   spam: boolean | undefined,
-  transaction: Transaction
+  toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof spam !== 'undefined') {
     validatePermissions(permissions, (p) => p.isMod || p.isAdmin);
 
-    const toUpdate: Partial<ThreadAttributes> = {};
-
     toUpdate.marked_as_spam_at = spam
       ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
       : null;
-
-    await thread.update(toUpdate, { transaction });
   }
 }
 
@@ -508,19 +501,16 @@ async function setThreadSpam(
  */
 async function setThreadStage(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
   stage: string | undefined,
   chain: ChainInstance,
   allAnalyticsOptions: TrackOptions[],
-  transaction: Transaction
+  toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof stage !== 'undefined') {
     validatePermissions(
       permissions,
       (p) => p.isThreadOwner || p.isMod || p.isAdmin
     );
-
-    const toUpdate: Partial<ThreadAttributes> = {};
 
     // fetch available stages
     let customStages = [];
@@ -548,8 +538,6 @@ async function setThreadStage(
 
     toUpdate.stage = stage;
 
-    await thread.update(toUpdate, { transaction });
-
     allAnalyticsOptions.push({
       event: MixpanelCommunityInteractionEvent.UPDATE_STAGE,
     });
@@ -565,7 +553,7 @@ async function setThreadTopic(
   topicId: number | undefined,
   topicName: string | undefined,
   models: DB,
-  transaction: Transaction
+  toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
     validatePermissions(
@@ -573,13 +561,12 @@ async function setThreadTopic(
       (p) => p.isThreadOwner || p.isMod || p.isAdmin
     );
 
-    const toUpdate: Partial<ThreadAttributes> = {};
-
     if (typeof topicId !== 'undefined') {
-      if (!topicId) {
+      const topic = await models.Topic.findByPk(topicId);
+      if (!topic) {
         throw new AppError(Errors.InvalidTopic);
       }
-      toUpdate.topic_id = topicId;
+      toUpdate.topic_id = topic.id;
     } else if (typeof topicName !== 'undefined') {
       const [topic] = await models.Topic.findOrCreate({
         where: {
@@ -588,6 +575,78 @@ async function setThreadTopic(
         },
       });
       toUpdate.topic_id = topic.id;
+    }
+  }
+}
+
+/**
+ * Updates the collaborators of a thread
+ */
+async function updateThreadCollaborators(
+  permissions: UpdateThreadPermissions,
+  thread: ThreadInstance,
+  collaborators:
+    | {
+        toAdd?: number[];
+        toRemove?: number[];
+      }
+    | undefined,
+  models: DB,
+  transaction: Transaction
+) {
+  const { toAdd, toRemove } = collaborators || {};
+  if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
+    validatePermissions(permissions, (p) => p.isThreadOwner);
+
+    const toAddUnique = uniq(toAdd || []);
+    const toRemoveUnique = uniq(toRemove || []);
+
+    // check for overlap between toAdd and toRemove
+    for (const r of toRemoveUnique) {
+      if (toAddUnique.includes(r)) {
+        throw new AppError(Errors.CollaboratorsOverlap);
+      }
+    }
+
+    const toUpdate: Partial<ThreadAttributes> = {};
+
+    // add collaborators
+    if (toAddUnique.length > 0) {
+      const collaboratorAddresses = await models.Address.findAll({
+        where: {
+          chain: thread.chain,
+          id: {
+            [Op.in]: toAddUnique,
+          },
+        },
+      });
+      if (collaboratorAddresses.length !== toAddUnique.length) {
+        throw new AppError(Errors.MissingCollaborators);
+      }
+      await Promise.all(
+        collaboratorAddresses.map(async (address) => {
+          return models.Collaboration.findOrCreate({
+            where: {
+              thread_id: thread.id,
+              address_id: address.id,
+            },
+            transaction,
+          });
+        })
+      );
+    }
+
+    // remove collaborators
+    if (toRemoveUnique.length > 0) {
+      await models.Collaboration.destroy({
+        where: {
+          thread_id: thread.id,
+          address_id: {
+            [Op.in]: toRemoveUnique,
+          },
+        },
+        transaction,
+      });
     }
 
     if (Object.keys(toUpdate).length > 0) {

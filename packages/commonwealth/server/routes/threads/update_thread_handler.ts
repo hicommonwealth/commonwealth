@@ -19,6 +19,10 @@ type UpdateThreadRequestBody = {
   spam?: boolean;
   topicId?: number;
   topicName?: string;
+  collaborators?: {
+    toAdd?: number[];
+    toRemove?: number[];
+  };
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
@@ -43,6 +47,7 @@ export const updateThreadHandler = async (
     spam,
     topicId,
     topicName,
+    collaborators,
     canvasSession,
     canvasAction,
     canvasHash,
@@ -71,6 +76,7 @@ export const updateThreadHandler = async (
       spam,
       topicId,
       topicName,
+      collaborators,
       canvasSession,
       canvasAction,
       canvasHash,
