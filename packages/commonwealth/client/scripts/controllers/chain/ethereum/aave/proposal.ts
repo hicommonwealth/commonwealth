@@ -216,12 +216,18 @@ export default class AaveProposal extends Proposal<
   // Check whether a proposal has enough extra FOR-votes than AGAINST-votes
   // FOR VOTES - AGAINST VOTES > VOTE_DIFFERENTIAL * voting supply
   private _isVoteDifferentialPassing() {
-    const diff = this.data.forVotes.sub(this.data.againstVotes);
-    return diff.gt(this.data.minimumDiff.mul(this.votingSupplyAtStart));
+    const forProp = this.data.forVotes
+      .mul(ONE_HUNDRED_WITH_PRECISION)
+      .div(this.votingSupplyAtStart);
+    const againstProp = this.data.againstVotes
+      .mul(ONE_HUNDRED_WITH_PRECISION)
+      .div(this.votingSupplyAtStart)
+      .add(this.data.minimumDiff);
+    return forProp.gt(againstProp);
   }
 
   private _isQuorumValid() {
-    return this.data.minimumQuorum.gt(this.data.forVotes);
+    return this.data.forVotes.gte(this.data.minimumQuorum);
   }
 
   private _isPassed() {
@@ -249,15 +255,6 @@ export default class AaveProposal extends Proposal<
       );
 
     this._initialized = true;
-
-    // special case for expiration because no event is emitted
-    // TODO: hook onto specific block and set expired automatically
-    if (
-      this.state === AaveTypes.ProposalState.EXPIRED ||
-      this.state === AaveTypes.ProposalState.FAILED
-    ) {
-      this.complete(this._Gov.store);
-    }
   }
 
   constructor(
@@ -266,6 +263,7 @@ export default class AaveProposal extends Proposal<
     data: IAaveProposalResponse
   ) {
     super(ProposalType.AaveProposal, data);
+    this._completed = data.completed;
 
     this._Accounts = Accounts;
     this._Gov = Gov;

@@ -36,7 +36,9 @@ export function formatAaveProposal(
     cancelled: proposal.canceled,
     completed:
       proposal.proposalState === ProposalState.EXECUTED ||
-      proposal.proposalState === ProposalState.CANCELED,
+      proposal.proposalState === ProposalState.CANCELED ||
+      proposal.proposalState === ProposalState.FAILED ||
+      proposal.proposalState === ProposalState.EXPIRED,
     executionTime: proposal.executionTime ? +proposal.executionTime : undefined,
     minimumQuorum: proposal.minimumQuorum,
     minimumDiff: proposal.minimumDiff,
