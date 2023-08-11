@@ -87,8 +87,8 @@ export const CreateComment = ({
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId()
-  })
+    chainId: app.activeChainId(),
+  });
 
   const handleSubmitComment = async () => {
     setErrorMsg(null);
@@ -103,7 +103,7 @@ export const CreateComment = ({
         address: author.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
-      })
+      });
 
       setErrorMsg(null);
       setContentDelta(createDeltaFromText(''));
@@ -118,7 +118,7 @@ export const CreateComment = ({
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
-      const errMsg = err?.responseJSON?.error || 'Failed to create comment'
+      const errMsg = err?.responseJSON?.error || 'Failed to create comment';
       notifyError(errMsg);
       setErrorMsg(errMsg);
     } finally {
@@ -130,7 +130,8 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
+  const userFailsThreshold =
+    activeTopic && app.chain.isGatedTopic(activeTopic.id);
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||
