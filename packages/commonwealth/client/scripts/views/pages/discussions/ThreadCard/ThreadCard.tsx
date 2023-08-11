@@ -140,7 +140,6 @@ export const ThreadCard = ({
                 new AddressInfo(null, thread.author, thread.authorChain, null)
               }
               publishDate={moment(thread.createdAt).format('l')}
-              isNew={isNewThread(thread.createdAt)}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {

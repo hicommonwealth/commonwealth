@@ -53,7 +53,6 @@ type ContentPageProps = {
   subBody?: ReactNode;
   subHeader?: ReactNode;
   viewCount?: number;
-  displayNewTag?: boolean;
   isSpamThread?: boolean;
   onLockToggle?: (isLocked: boolean) => any;
   onDelete?: () => any;
@@ -163,7 +162,6 @@ export const CWContentPage = ({
   subHeader,
   title,
   viewCount,
-  displayNewTag,
   isSpamThread,
   collaborators,
   onLockToggle,
@@ -195,7 +193,6 @@ export const CWContentPage = ({
     <div className="header-info-row">
       <AuthorAndPublishInfo
         showSplitDotIndicator={true}
-        isNew={!!displayNewTag}
         discord_meta={discord_meta}
         isLocked={thread?.readOnly}
         {...(thread?.lockedAt && {

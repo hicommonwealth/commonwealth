@@ -50,6 +50,7 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { isNewThread } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -560,7 +561,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         canUpdateThread={canUpdateThread}
-        displayNewTag={true}
+        displayNewTag={isNewThread(thread.createdAt)}
         stageLabel={!isStageDefault && thread.stage}
         subHeader={
           !!thread.url && (
