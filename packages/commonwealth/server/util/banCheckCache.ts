@@ -2,9 +2,6 @@
 import JobRunner from 'common-common/src/cacheJobRunner';
 // If a community is found, also check that the user is allowed to see it.
 import type { DB } from '../models';
-import { ChainInstance } from 'server/models/chain';
-import { AddressAttributes } from 'server/models/address';
-import { AppError } from '../../../common-common/src/errors';
 
 export const BanErrors = {
   NoAddress: 'Address not found',

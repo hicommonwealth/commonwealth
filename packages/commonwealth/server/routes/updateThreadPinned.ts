@@ -49,11 +49,11 @@ const updateThreadPinned = async (
           model: models.Address,
           as: 'Address',
         },
-        // {
-        //   model: models.Address,
-        //   through: models.Collaboration,
-        //   as: 'collaborators',
-        // },
+        {
+          model: models.Address,
+          // through: models.Collaboration,
+          as: 'collaborators',
+        },
         {
           model: models.Topic,
           as: 'topic',

@@ -349,7 +349,7 @@ function validatePermissions(
   }
 }
 
-type UpdatableThreadAttributes = {
+export type UpdatableThreadAttributes = {
   title?: string;
   body?: string;
   url?: string;
