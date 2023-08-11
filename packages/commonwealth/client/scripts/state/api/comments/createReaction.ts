@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import Reaction from 'models/Reaction';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import useFetchCommentReactionsQuery from './fetchReactions';
+import useFetchCommentsQuery from './fetchComments';
 
 interface CreateReactionProps {
   address: string;
   reactionType?: 'like';
   chainId: string;
+  threadId: number;
   commentId: number;
 }
 
@@ -43,13 +45,14 @@ const createReaction = async ({
 };
 
 const useCreateCommentReactionMutation = ({
+  threadId,
   commentId,
   chainId,
 }: Partial<CreateReactionProps>) => {
   const queryClient = useQueryClient();
-  const { data: reactions } = useFetchCommentReactionsQuery({
+  const { data: comments } = useFetchCommentsQuery({
     chainId,
-    commentId: commentId,
+    threadId,
   });
 
   return useMutation({
@@ -57,19 +60,17 @@ const useCreateCommentReactionMutation = ({
     onSuccess: async (response) => {
       const reaction = response.data.result;
 
-      // update fetch reaction query state
-      const key = [
-        ApiEndpoints.getCommentReactions(reaction.comment_id),
-        chainId,
-      ];
+      // update fetch comments query state
+      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
       queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData([...key], () => {
-        const updatedReactions = [
-          ...(reactions || []).filter((x) => x.id !== reaction.id),
-          reaction,
-        ];
-        return updatedReactions;
+      queryClient.setQueryData(key, () => {
+        const tempComments = [...comments];
+        const commentToUpdate = tempComments.find((x) => x.id === commentId);
+        commentToUpdate.reactions.push(new Reaction(reaction));
+        return tempComments;
       });
+
+      return reaction;
     },
   });
 };
