@@ -115,8 +115,6 @@ export abstract class ProposalModule<
     this.store.getAll().map((p) => p.deinit());
     this.store.clear();
   }
-
-  public abstract createTx(...args): ITXModalData | Promise<ITXModalData>;
 }
 
 export default ProposalModule;

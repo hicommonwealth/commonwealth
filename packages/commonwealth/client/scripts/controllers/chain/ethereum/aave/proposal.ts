@@ -29,7 +29,6 @@ import { attachSigner } from '../contractApi';
 import type AaveAPI from './api';
 import type AaveGovernance from './governance';
 import getFetch from 'helpers/getFetch';
-import app from 'state';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -266,7 +265,7 @@ export default class AaveProposal extends Proposal<
     const result: { votes: IAaveVoteResponse[] } = await getFetch(
       '/api/proposalVotes',
       {
-        chainId: app.activeChainId(),
+        chainId: this._Gov.app.activeChainId(),
         proposalId: this.data.id,
       }
     );
@@ -301,41 +300,7 @@ export default class AaveProposal extends Proposal<
   }
 
   public update(e: ChainEvent) {
-    switch (e.data.kind) {
-      case AaveTypes.EventKind.ProposalCreated: {
-        break;
-      }
-      case AaveTypes.EventKind.VoteEmitted: {
-        const power = new BN(e.data.votingPower);
-        const vote = new AaveProposalVote(
-          this._Accounts.get(e.data.voter),
-          e.data.support,
-          power
-        );
-        this.addOrUpdateVote(vote);
-        break;
-      }
-      case AaveTypes.EventKind.ProposalCanceled: {
-        this._data.cancelled = true;
-        this._data.completed = true;
-        this.complete(this._Gov.store);
-        break;
-      }
-      case AaveTypes.EventKind.ProposalQueued: {
-        this._data.queued = true;
-        this._data.executionTime = e.data.executionTime;
-        break;
-      }
-      case AaveTypes.EventKind.ProposalExecuted: {
-        this._data.queued = false;
-        this._data.executed = true;
-        this.complete(this._Gov.store);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    console.error("AaveProposal doesn't support update");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

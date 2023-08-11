@@ -56,7 +56,6 @@ export default class AaveGovernance extends ProposalModule<
 > {
   // CONSTANTS
   private _Accounts: EthereumAccounts;
-  private _Chain: AaveChain;
   private _api: AaveApi;
 
   // GETTERS
@@ -141,7 +140,6 @@ export default class AaveGovernance extends ProposalModule<
   }
 
   public async init(chain: AaveChain, accounts: EthereumAccounts) {
-    this._Chain = chain;
     this._Accounts = accounts;
     this._api = chain.aaveApi;
 
@@ -161,12 +159,6 @@ export default class AaveGovernance extends ProposalModule<
   }
 
   public deinit() {
-    this.app.chainEntities.deinit();
     this.store.clear();
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createTx(...args: any[]): ITXModalData {
-    throw new Error('Method not implemented.');
   }
 }
