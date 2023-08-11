@@ -39,7 +39,7 @@ export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
   chain: ChainInstance;
-  threadId: number;
+  threadId?: number;
   title?: string;
   body?: string;
   stage?: string;
@@ -57,6 +57,7 @@ export type UpdateThreadOptions = {
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
+  discordMeta?: any;
 };
 
 export type UpdateThreadResult = [
@@ -86,8 +87,23 @@ export async function __updateThread(
     canvasSession,
     canvasAction,
     canvasHash,
+    discordMeta,
   }: UpdateThreadOptions
 ): Promise<UpdateThreadResult> {
+  // Discobot handling
+  if (!threadId) {
+    if (!discordMeta) {
+      throw new AppError(Errors.ThreadNotFound);
+    }
+    const existingThread = await this.models.Thread.findOne({
+      where: { discord_meta: discordMeta },
+    });
+    if (!existingThread) {
+      throw new AppError(Errors.ThreadNotFound);
+    }
+    threadId = existingThread.id;
+  }
+
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,

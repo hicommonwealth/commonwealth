@@ -57,13 +57,11 @@ const LinkedProposal = ({
 };
 
 type LinkedProposalsCardProps = {
-  onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
   showAddProposalButton: boolean;
   thread: Thread;
 };
 
 export const LinkedProposalsCard = ({
-  onChangeHandler,
   thread,
   showAddProposalButton,
 }: LinkedProposalsCardProps) => {
@@ -173,7 +171,6 @@ export const LinkedProposalsCard = ({
         className="LinkedProposalsCardModal"
         content={
           <UpdateProposalStatusModal
-            onChangeHandler={onChangeHandler}
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
           />

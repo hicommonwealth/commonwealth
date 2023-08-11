@@ -1,9 +1,11 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
@@ -13,7 +15,6 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
 import { TopicSummaryRow } from './topic_summary_row';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
@@ -21,20 +22,20 @@ const OverviewPage = () => {
   const { isWindowExtraSmall } = useBrowserWindow({});
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
+  const { data: recentlyActiveThreads } = useFetchThreadsQuery({
+    queryType: 'active',
+    chainId: app.activeChainId(),
+    topicsPerThread: 3,
+    // TODO: ask for a pinned thread prop here to show pinned threads
+  });
+
   useEffect(() => {
-    app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
 
     return () => {
-      app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
     };
   }, [forceRerender]);
-
-  const allMonthlyThreads = app.threads.overviewStore.getAll();
-  const allPinnedThreads = app.threads.listingStore.getThreads({
-    pinned: true,
-  });
 
   const { data: topics = [] } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
@@ -55,21 +56,18 @@ const OverviewPage = () => {
     pinnedThreads: Array<Thread>;
     topic: Topic;
   }> = topicsSorted.map((topic) => {
-    const monthlyThreads = allMonthlyThreads.filter(
-      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
-    );
-    const pinnedThreads = allPinnedThreads.filter(
+    const monthlyThreads = (recentlyActiveThreads || []).filter(
       (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
 
     return {
       monthlyThreads,
-      pinnedThreads,
+      pinnedThreads: [], // TODO: ask for a pinned thread prop in /threads?active=true api to show pinned threads
       topic,
     };
   });
 
-  return !topicSummaryRows.length && !app.threads.initialized ? (
+  return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
     <div className="OverviewPage">

@@ -26,6 +26,7 @@ type UpdateThreadRequestBody = {
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
+  discordMeta?: any;
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -51,12 +52,10 @@ export const updateThreadHandler = async (
     canvasSession,
     canvasAction,
     canvasHash,
+    discordMeta,
   } = req.body;
 
   const threadId = parseInt(id, 10) || 0;
-  if (!threadId) {
-    throw new AppError(Errors.InvalidThreadID);
-  }
 
   // this is a patch update, so properties should be
   // `undefined` if they are not intended to be updated
@@ -80,6 +79,7 @@ export const updateThreadHandler = async (
       canvasSession,
       canvasAction,
       canvasHash,
+      discordMeta,
     });
 
   for (const n of notificationOptions) {

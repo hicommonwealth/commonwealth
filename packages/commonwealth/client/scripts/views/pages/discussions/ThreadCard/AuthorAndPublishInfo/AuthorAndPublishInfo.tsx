@@ -166,17 +166,11 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {isNew && (
-        <CWTag label={'New'} type={'new'} iconName={'newStar'} />
-      )}
+      {isNew && <CWTag label={'New'} type={'new'} iconName={'newStar'} />}
 
-      {isHot && (
-        <CWTag iconName="trendUp" label="Trending" type="trending"/>
-      )}
+      {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
 
-      {isSpamThread && (
-        <CWTag label={'SPAM'} type={'disabled'} />
-      )}
+      {isSpamThread && <CWTag label={'SPAM'} type={'disabled'} />}
 
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip

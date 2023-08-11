@@ -152,19 +152,27 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
+export type DiscordAction =
+  | 'create'
+  | 'update'
+  | 'thread-delete'
+  | 'comment-delete';
+
 export interface IDiscordMessage {
-  user: {
+  user?: {
     id: string;
     username: string;
   };
   title?: string;
   content: string;
   message_id: string;
-  channel_id: string;
-  parent_channel_id: string;
-  guild_id: string;
+  channel_id?: string;
+  parent_channel_id?: string;
+  guild_id?: string;
   imageUrls?: string[];
+  action: DiscordAction;
 }
+
 export type HttpMethod =
   | 'get'
   | 'post'

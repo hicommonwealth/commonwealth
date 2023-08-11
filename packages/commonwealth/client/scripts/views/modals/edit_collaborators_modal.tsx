@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { isEqual } from 'lodash';
@@ -6,6 +5,10 @@ import 'modals/edit_collaborators_modal.scss';
 import React, { useState } from 'react';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import app from 'state';
+import {
+  useAddThreadCollaboratorsMutation,
+  useDeleteThreadCollaboratorsMutation,
+} from 'state/api/threads';
 import { useDebounce } from 'usehooks-ts';
 import NewProfilesController from '../../controllers/server/newProfiles';
 import type Thread from '../../models/Thread';
@@ -30,6 +33,18 @@ export const EditCollaboratorsModal = ({
 }: EditCollaboratorsModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+
+  const { mutateAsync: addThreadCollaborators } =
+    useAddThreadCollaboratorsMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
+
+  const { mutateAsync: deleteThreadCollaborators } =
+    useDeleteThreadCollaboratorsMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
 
   const [searchResults, setSearchResults] = useState<
     Array<RoleInstanceWithPermissionAttributes>
@@ -166,67 +181,48 @@ export const EditCollaboratorsModal = ({
             disabled={isEqual(thread.collaborators, collaborators)}
             label="Save changes"
             onClick={async () => {
-              const added = collaborators.filter(
+              const newCollaborators = collaborators.filter(
                 (c1) =>
                   !thread.collaborators.some((c2) => c1.address === c2.address)
               );
 
-              if (added.length > 0) {
+              if (newCollaborators.length > 0) {
                 try {
-                  const response = await axios.post(
-                    `${app.serverUrl()}/addEditors`,
-                    {
-                      address: app.user.activeAccount.address,
-                      author_chain: app.user.activeAccount.chain.id,
-                      chain: app.activeChainId(),
-                      thread_id: thread.id,
-                      editors: added,
-                      jwt: app.user.jwt,
-                    }
-                  );
-
-                  if (response.data.status === 'Success') {
-                    notifySuccess('Collaborators added');
-                    onCollaboratorsUpdated(response.data.result.collaborators);
-                  } else {
-                    notifyError('Failed to add collaborators');
-                  }
+                  const updatedCollaborators = await addThreadCollaborators({
+                    threadId: thread.id,
+                    newCollaborators: newCollaborators,
+                    chainId: app.activeChainId(),
+                    address: app.user.activeAccount.address,
+                  });
+                  notifySuccess('Collaborators added');
+                  onCollaboratorsUpdated &&
+                    onCollaboratorsUpdated(updatedCollaborators);
                 } catch (err) {
-                  throw new Error(
-                    err.responseJSON && err.responseJSON.error
-                      ? err.responseJSON.error
-                      : 'Failed to add collaborators'
-                  );
+                  const error =
+                    err?.responseJSON?.error || 'Failed to add collaborators';
+                  notifyError(error);
                 }
               }
 
-              const deleted = thread.collaborators.filter(
+              const removedCollaborators = thread.collaborators.filter(
                 (c1) => !collaborators.some((c2) => c1.address === c2.address)
               );
 
-              if (deleted.length > 0) {
+              if (removedCollaborators.length > 0) {
                 try {
-                  const response = await axios.post(
-                    `${app.serverUrl()}/deleteEditors`,
-                    {
-                      address: app.user.activeAccount.address,
-                      author_chain: app.user.activeAccount.chain.id,
-                      chain: app.activeChainId(),
-                      thread_id: thread.id,
-                      editors: deleted,
-                      jwt: app.user.jwt,
-                    }
-                  );
-
-                  if (response.data.status === 'Success') {
-                    notifySuccess('Collaborators removed');
-                    onCollaboratorsUpdated(response.data.result.collaborators);
-                  } else {
-                    throw new Error('Failed to remove collaborators');
-                  }
+                  const updatedCollaborators = await deleteThreadCollaborators({
+                    threadId: thread.id,
+                    updatedCollaborators: removedCollaborators,
+                    chainId: app.activeChainId(),
+                    address: app.user.activeAccount.address,
+                  });
+                  notifySuccess('Collaborators removed');
+                  onCollaboratorsUpdated &&
+                    onCollaboratorsUpdated(updatedCollaborators);
                 } catch (err) {
                   const errMsg =
-                    err.responseJSON?.error || 'Failed to remove collaborators';
+                    err?.responseJSON?.error ||
+                    'Failed to remove collaborators';
                   notifyError(errMsg);
                 }
               }
