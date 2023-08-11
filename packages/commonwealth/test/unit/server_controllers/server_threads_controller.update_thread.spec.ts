@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import { UpdateThreadOptions } from 'server/controllers/server_threads_methods/update_thread';
-import { AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 
 describe('ServerThreadsController', () => {
