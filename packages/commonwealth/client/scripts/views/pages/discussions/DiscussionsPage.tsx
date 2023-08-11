@@ -238,6 +238,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           if (topicName !== 'Archived' && !includeArchivedThreads && thread.archivedAt !== null) return null;
 
+          if (topicName === 'Archived' && thread.archivedAt === null) return null;
+
           const canReact =
             hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
           return (
