@@ -10,13 +10,18 @@ interface FetchCommentReactionsProps {
   commentId: number;
 }
 
-const fetchCommentReactions = async ({ commentId }: FetchCommentReactionsProps) => {
-  return await axios.get(
-    `${app.serverUrl()}/comments/${commentId}/reactions`
-  ).then((response) => ([...(response.data.result || [])]));
+const fetchCommentReactions = async ({
+  commentId,
+}: FetchCommentReactionsProps) => {
+  return await axios
+    .get(`${app.serverUrl()}/comments/${commentId}/reactions`)
+    .then((response) => [...(response.data.result || [])]);
 };
 
-const useFetchCommentReactionsQuery = ({ chainId, commentId }: FetchCommentReactionsProps) => {
+const useFetchCommentReactionsQuery = ({
+  chainId,
+  commentId,
+}: FetchCommentReactionsProps) => {
   return useQuery({
     queryKey: [ApiEndpoints.getCommentReactions(commentId), chainId],
     queryFn: () => fetchCommentReactions({ commentId, chainId }),
