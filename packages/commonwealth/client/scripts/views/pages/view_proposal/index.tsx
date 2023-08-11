@@ -75,6 +75,12 @@ const ViewProposalPage = ({
 
       try {
         const proposalFromStore = idToProposal(resolvedType, proposalId);
+
+        if (proposalFromStore instanceof AaveProposal) {
+          proposalFromStore.ipfsDataReady.on('ready', () => {
+            setProposal(proposalFromStore);
+          });
+        }
         setProposal(proposalFromStore);
         setError(null);
       } catch (e) {

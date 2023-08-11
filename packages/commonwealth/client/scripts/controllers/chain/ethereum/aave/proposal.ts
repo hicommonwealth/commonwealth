@@ -1,4 +1,7 @@
-import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import type {
+  IAaveProposalResponse,
+  IAaveVoteResponse,
+} from 'adapters/chain/aave/types';
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
@@ -25,6 +28,8 @@ import { attachSigner } from '../contractApi';
 
 import type AaveAPI from './api';
 import type AaveGovernance from './governance';
+import getFetch from 'helpers/getFetch';
+import app from 'state';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -255,6 +260,26 @@ export default class AaveProposal extends Proposal<
       );
 
     this._initialized = true;
+  }
+
+  public async fetchVotes() {
+    const result: { votes: IAaveVoteResponse[] } = await getFetch(
+      '/api/proposalVotes',
+      {
+        chainId: app.activeChainId(),
+        proposalId: this.data.id,
+      }
+    );
+
+    for (const vote of result.votes) {
+      const power = new BN(vote.votingPower);
+      const aaveVote = new AaveProposalVote(
+        this._Accounts.get(vote.voter),
+        vote.support,
+        power
+      );
+      this.addOrUpdateVote(aaveVote);
+    }
   }
 
   constructor(

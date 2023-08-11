@@ -15,3 +15,5 @@ export type IAaveProposalResponse = Omit<AaveTypes.IProposalCreated, 'kind'> &
     againstVotes: BigNumber;
     executionTimeWithGracePeriod: BigNumber;
   };
+
+export type IAaveVoteResponse = Omit<AaveTypes.IVoteEmitted, 'kind'>;
