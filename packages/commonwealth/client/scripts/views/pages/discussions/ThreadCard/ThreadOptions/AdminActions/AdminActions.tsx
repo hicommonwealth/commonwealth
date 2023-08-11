@@ -16,7 +16,6 @@ import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popove
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import moment from 'moment';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -31,9 +30,8 @@ export type AdminActionsProps = {
   onEditStart?: () => any;
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
-  onArchive?: () => any;
+  onArchiveToggle?: (thread: Thread) => any;
   hasPendingEdits?: boolean;
-  archivedAt?: moment.Moment | null;
 };
 
 export const AdminActions = ({
@@ -49,9 +47,8 @@ export const AdminActions = ({
   onEditStart,
   onEditCancel,
   onEditConfirm,
-  onArchive,
+  onArchiveToggle,
   hasPendingEdits,
-  archivedAt,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
@@ -68,6 +65,7 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
+  let archivedAt = thread.archivedAt;
 
   const handleDeleteThread = () => {
     openConfirmation({
@@ -208,7 +206,10 @@ export const AdminActions = ({
     if (archivedAt === null) {
       setIsArchiveThreadModalOpen(true)
     } else {
-      app.threads.setArchived(thread.id, !!archivedAt).then(() => onArchive && onArchive())
+      app.threads.setArchived(thread.id, !!archivedAt).then(
+        (updatedThread: Thread) => {
+          onArchiveToggle && onArchiveToggle(updatedThread);
+        })
     }
   }
 
@@ -383,7 +384,7 @@ export const AdminActions = ({
         content={
           <ArchiveThreadModal
             thread={thread}
-            onArchive={onArchive}
+            onArchiveToggle={onArchiveToggle}
             onModalClose={() => setIsArchiveThreadModalOpen(false)}
           />
         }

@@ -7,26 +7,28 @@ import { CWText } from '../components/component_kit/cw_text';
 
 type ArchiveThreadModalProps = {
   onModalClose: () => void;
-  onArchive: () => void;
+  onArchiveToggle: (thread: Thread) => void;
   thread: Thread;
 };
 
 export const ArchiveThreadModal = ({
   onModalClose,
-  onArchive,
+  onArchiveToggle,
   thread,
 }: ArchiveThreadModalProps) => {
   const handleArchiveThread = async () => {
     try {
-      await app.threads.setArchived(thread.id, !!thread.archivedAt).then(() => onArchive && onArchive());
+      await app.threads.setArchived(thread.id, !!thread.archivedAt).then((updatedThread: Thread) => {
+        onArchiveToggle && onArchiveToggle(updatedThread);
+      });
       onModalClose();
     } catch (err) {
-      console.log('Failed to archive thread.');
+      console.log('Failed to un/archive thread.');
 
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
-          : 'Failed to archive thread.'
+          : `Failed to ${thread.archivedAt ? 'unarchive' : 'archive'} thread.`
       );
     }
   };

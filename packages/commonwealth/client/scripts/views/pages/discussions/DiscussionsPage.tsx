@@ -308,11 +308,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   );
                 });
               }}
-              onArchive={() => {
-                const tempThreads = [...threads].filter(
-                  (t) => t.id !== thread.id
-                );
-                setThreads(tempThreads);
+              onArchiveToggle={(updatedThread) => {
+                setThreads((oldThreads) => {
+                  const updatedThreads = [...oldThreads];
+                  const foundThread = updatedThreads.find(
+                    (x) => x.id === thread.id
+                  );
+                  if (foundThread)
+                    foundThread.archivedAt = updatedThread.archivedAt;
+                  return updatedThreads;
+                });
               }}
             />
           );
