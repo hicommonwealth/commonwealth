@@ -38,6 +38,96 @@ log.info(
 
 const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
 
+type BotThread = {
+  title: string;
+  address: string;
+  author_chain: string;
+  chain: string;
+  body: string;
+  stage: string;
+  kind: string;
+  auth: string;
+};
+
+type BotComment = {
+  parentCommentId?: string;
+  text: string;
+  chain: string;
+  author_chain: string;
+  auth: string;
+  address: string;
+};
+
+type ThreadCommentTree = {
+  thread: BotThread;
+  comments: Array<BotComment>;
+};
+
+async function buildThreadCommentTree(rootCasts: Array<any>) {
+  const trees = [];
+
+  for (const rootCast of rootCasts) {
+    const threadCommentTree: ThreadCommentTree = {
+      thread: {
+        title: rootCast.body.data.title,
+        address: '0xFarcasterBot',
+        author_chain: '',
+        chain: 'logline',
+        body: rootCast.body.data.text, // Add link here
+        stage: 'discussion',
+        kind: 'thread',
+        auth: CW_BOT_KEY,
+      },
+      comments: [],
+    };
+
+    const queue = [
+      {
+        cast: rootCast,
+        parentThreadId: null,
+        parentCommentId: null,
+        isThread: true,
+      },
+    ];
+
+    // Using this BFS boilerplate so we can easily convert to a nested tree when we want to
+    // Right now this could be accomplished with just a for loop
+    while (queue.length > 0) {
+      const { cast, parentThreadId, parentCommentId, isThread } = queue.shift();
+      console.log('queue', queue.length);
+      console.log('cast', cast.body.data.text);
+
+      if (isThread) {
+        // Make request to create thread
+        const threadId = 'testId'; // TODO: Replace with real request
+
+        const response = await axios.get(
+          `https://searchcaster.xyz/api/search?merkleRoot=${cast.merkleRoot}`
+        );
+
+        for (const commentCast of response.data.casts) {
+          if (!commentCast.body.data.replyParentMerkleRoot) {
+            continue; // This is the thread root itself- no need to create a comment
+          }
+
+          queue.push({
+            cast: commentCast,
+            parentThreadId: threadId,
+            parentCommentId: null,
+            isThread: false,
+          });
+        }
+      } else {
+        // Make request to create comment
+
+        const commentId = 'testId'; // TODO: Replace with real request
+
+        // FOR NESTED COMMENTS, MAKE ANOTHER REQUEST AND PASS CHILDREN AS QUEUE ITEMS
+      }
+    }
+  }
+}
+
 async function consumeMessages() {
   await controller.init();
 
@@ -53,7 +143,6 @@ async function consumeMessages() {
           const response = await axios.get(
             `https://searchcaster.xyz/api/search?merkleRoot=${parentMerkleRoot}`
           );
-
           // Get the cast which has no replyParentMerkeRoot- this is the thread root
           const threadRootCast = response.data.casts.find(
             (cast) => !cast.body.data.replyParentMerkleRoot
@@ -67,9 +156,12 @@ async function consumeMessages() {
 
       await Promise.all(promises);
 
-      const uniqueCasts = [...threadCasts].map((item) =>
+      const uniqueRoots = [...threadCasts].map((item) =>
         JSON.parse(item as string)
       );
+
+      console.log('uniqueRoots', uniqueRoots.length);
+      await buildThreadCommentTree(uniqueRoots);
     } catch (error) {
       log.error(`Failed to process Message:`, error);
     }
