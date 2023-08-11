@@ -35,12 +35,9 @@ The goal of this document is to describe the current state of the app initializa
         3. If, _at render time_, `app.config.chains.getById(scope)` does not return successfully, render a `PageNotFound` view.
         4. If, _at render time_, there is no `selectedScope`, and no custom domain, then whatever chain is currently being loaded is deinitialized by `deinitChainOrCommunity`, and the `ScopeToLoad` state variable set to `null`. A loading spinner is shown, triggered by `shouldShowLoadingState`.
         5. If, _at render time_, the `selectedScope` differs from `app.activeChainId()`, the `isLoading` and `scopeToLoad` global state variables are updated (to `true` and `selectedScope`, respectively). `selectChain()` is fired, receiving new scope's chain as argument; on completion, the `isLoading` state variable is set to `false`.
-            - _Note: The `deferChain` param, passed from Route components to the `withLayout()` function, are presently absent from `LayoutAttrs`, where they ought to be passed. If this logic is obsolete, it should be removed from our router files and `layout.tsx` documentation._
         6. If none of these conditions apply, the routed-to page is rendered.
-        - _Note: A previous iteration of these docs, and of the inline documentation in Layout.tsx, describe conditional logic in which scopes set to Ethereum addresses should trigger a call to `initNewTokenChain`, generating a new community for the provided address while rendering a `LoadingLayout`. The relevant code is no longer present in the file, and this behavior should be considered deprecated unless explicitly reintroduced._
 9. If `selectChain()` (`/helpers/chain.ts`) is fired, per step #8:
     1. If no `chain` argument is passed, the function defaults to a `chain` value set my `app.user.selectedChain`, or else `app.config.defaultChain`.
-        - _Note: This is likely dead code that can be  removed._
     2. If we do not need to initialize a new chain (i.e. the chain we are switching to has already been initialized and selected), exit the function immediately.
     3. Globally deinit other active communities via `deinitChainOrCommunity`.
         - This method triggers a cascade of “deinit” calls, which set various statuses to false, destroy connections to blockchain endpoints, and eentually sets `app.chain` to `null`.
@@ -59,7 +56,6 @@ The goal of this document is to describe the current state of the app initializa
         - If ChainBase is Ethereum and ChainType is Offchain, import the “generic” Ethereum adapter.
         - Otherwise, throw an “invalid chain” error.
     5. `initServer()` is called the returned `IChainAdapter` instance, which clears local storage and makes a call to `/bulkOffchain`, whose data is used to initialize community content.
-        - _Note: Previous documentation referenced the chainEntities adapter refresh. This line is currently commented out, but lingers in the `initServer()` definition._
     6. Dark mode preferences are set, and forum data (e.g. threads, admins, banners, recent activity) is populated. The `app.chain` state variable is set globally to the now-server-initialized `IChainAdapter` instance.
     7. If the `initChain` argument is `true` (e.g. in the case of NEAR communities), we then proceed to `initChain()`.
         1. If `selectChain` has not been called, or if chain is already loaded, immediately exit the function.
