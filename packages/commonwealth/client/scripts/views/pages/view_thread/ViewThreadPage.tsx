@@ -46,6 +46,7 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { isNewThread } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -95,9 +96,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [commentSortType, setCommentSortType] = useState<
-    CommentsFeaturedFilterTypes
-  >(CommentsFeaturedFilterTypes.Newest);
+  const [commentSortType, setCommentSortType] =
+    useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
@@ -501,7 +501,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showLinkedTemplateOptions = linkedTemplates.length > 0;
 
-  const hasSnapshotProposal = thread.links.find(x => x.source === 'snapshot')
+  const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
   const canComment =
     !!hasJoinedCommunity ||
@@ -625,7 +625,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             Permissions.isThreadAuthor(thread) ||
             Permissions.isThreadCollaborator(thread))
         }
-        displayNewTag={true}
+        displayNewTag={isNewThread(thread.createdAt)}
         stageLabel={!isStageDefault && thread.stage}
         subHeader={
           !!thread.url && (
@@ -813,114 +813,114 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                {
-                  label: 'Links',
-                  item: (
-                    <div className="cards-column">
-                      {showLinkedProposalOptions && (
-                        <LinkedProposalsCard
-                          onChangeHandler={handleLinkedProposalChange}
-                          thread={thread}
-                          showAddProposalButton={isAuthor || isAdminOrMod}
-                        />
-                      )}
-                      {showLinkedThreadOptions && (
-                        <LinkedThreadsCard
-                          thread={thread}
-                          allowLinking={isAuthor || isAdminOrMod}
-                          onChangeHandler={handleLinkedThreadChange}
-                        />
-                      )}
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Links',
+                    item: (
+                      <div className="cards-column">
+                        {showLinkedProposalOptions && (
+                          <LinkedProposalsCard
+                            onChangeHandler={handleLinkedProposalChange}
+                            thread={thread}
+                            showAddProposalButton={isAuthor || isAdminOrMod}
+                          />
+                        )}
+                        {showLinkedThreadOptions && (
+                          <LinkedThreadsCard
+                            thread={thread}
+                            allowLinking={isAuthor || isAdminOrMod}
+                            onChangeHandler={handleLinkedThreadChange}
+                          />
+                        )}
+                      </div>
+                    ),
+                  },
+                ]
               : []),
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
-                {
-                  label: 'Snapshot',
-                  item: (
-                    <div className="cards-column">
-                      <SnapshotCreationCard
-                        thread={thread}
-                        allowSnapshotCreation={isAuthor || isAdminOrMod}
-                        onChangeHandler={handleNewSnapshotChange}
-                      />
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Snapshot',
+                    item: (
+                      <div className="cards-column">
+                        <SnapshotCreationCard
+                          thread={thread}
+                          allowSnapshotCreation={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleNewSnapshotChange}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
               : []),
             ...(polls?.length > 0 ||
-              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                {
-                  label: 'Polls',
-                  item: (
-                    <div className="cards-column">
-                      {[
-                        ...new Map(
-                          polls?.map((poll) => [poll.id, poll])
-                        ).values(),
-                      ].map((poll: Poll) => {
-                        return (
-                          <ThreadPollCard
-                            poll={poll}
-                            key={poll.id}
-                            onVote={() => setInitializedPolls(false)}
-                            showDeleteButton={isAuthor || isAdmin}
-                            onDelete={() => {
-                              setInitializedPolls(false);
-                            }}
-                          />
-                        );
-                      })}
-                      {isAuthor &&
-                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                          <ThreadPollEditorCard
-                            thread={thread}
-                            threadAlreadyHasPolling={!polls?.length}
-                            onPollCreate={() => setInitializedPolls(false)}
-                          />
-                        )}
-                    </div>
-                  ),
-                },
-              ]
+                  {
+                    label: 'Polls',
+                    item: (
+                      <div className="cards-column">
+                        {[
+                          ...new Map(
+                            polls?.map((poll) => [poll.id, poll])
+                          ).values(),
+                        ].map((poll: Poll) => {
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                              showDeleteButton={isAuthor || isAdmin}
+                              onDelete={() => {
+                                setInitializedPolls(false);
+                              }}
+                            />
+                          );
+                        })}
+                        {isAuthor &&
+                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                            <ThreadPollEditorCard
+                              thread={thread}
+                              threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
+                            />
+                          )}
+                      </div>
+                    ),
+                  },
+                ]
               : []),
             ...(showLinkedTemplateOptions &&
-          linkedTemplates[0]?.display !== LinkDisplay.inline
-            ? [
-                {
-                  label: 'View Template',
-                  item: (
-                    <div className="cards-column">
-                      <ViewTemplateFormCard
-                        address={linkedTemplates[0]?.identifier.split('/')[1]}
-                        slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                      />
-                    </div>
-                  ),
-                },
-              ]
-            : []),
-          ...(showTemplateOptions
-            ? [
-                {
-                  label: 'Template',
-                  item: (
-                    <div className="cards-column">
-                      <TemplateActionCard
-                        thread={thread}
-                        onChangeHandler={handleLinkedTemplateChange}
-                      />
-                    </div>
-                  ),
-                },
-              ]
-            : []),
-        ] as SidebarComponents
+            linkedTemplates[0]?.display !== LinkDisplay.inline
+              ? [
+                  {
+                    label: 'View Template',
+                    item: (
+                      <div className="cards-column">
+                        <ViewTemplateFormCard
+                          address={linkedTemplates[0]?.identifier.split('/')[1]}
+                          slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showTemplateOptions
+              ? [
+                  {
+                    label: 'Template',
+                    item: (
+                      <div className="cards-column">
+                        <TemplateActionCard
+                          thread={thread}
+                          onChangeHandler={handleLinkedTemplateChange}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+          ] as SidebarComponents
         }
       />
       {JoinCommunityModals}
