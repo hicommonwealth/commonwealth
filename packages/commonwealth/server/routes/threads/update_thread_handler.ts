@@ -9,15 +9,19 @@ export const Errors = {
 };
 
 type UpdateThreadRequestBody = {
-  body?: string;
   title?: string;
-  kind?: string;
+  body?: string;
   stage?: string;
   url?: string;
-  locked?: string;
-  canvas_session?: string;
-  canvas_action?: string;
-  canvas_hash?: string;
+  locked?: boolean;
+  pinned?: boolean;
+  archived?: boolean;
+  spam?: boolean;
+  topicId?: number;
+  topicName?: string;
+  canvasSession?: any;
+  canvasAction?: any;
+  canvasHash?: any;
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -29,14 +33,19 @@ export const updateThreadHandler = async (
   const { user, address, chain } = req;
   const { id } = req.params;
   const {
-    body,
     title,
+    body,
     stage,
     url,
     locked,
-    canvas_session,
-    canvas_action,
-    canvas_hash,
+    pinned,
+    archived,
+    spam,
+    topicId,
+    topicName,
+    canvasSession,
+    canvasAction,
+    canvasHash,
   } = req.body;
 
   const threadId = parseInt(id, 10) || 0;
@@ -46,7 +55,7 @@ export const updateThreadHandler = async (
 
   // this is a patch update, so properties should be
   // `undefined` if they are not intended to be updated
-  const [updatedThread, notificationOptions] =
+  const [updatedThread, notificationOptions, analyticsOptions] =
     await controllers.threads.updateThread({
       user,
       address,
@@ -56,14 +65,23 @@ export const updateThreadHandler = async (
       body,
       stage,
       url,
-      locked: locked === 'true' ? true : locked === 'false' ? false : undefined,
-      canvas_session,
-      canvas_action,
-      canvas_hash,
+      locked,
+      pinned,
+      archived,
+      spam,
+      topicId,
+      topicName,
+      canvasSession,
+      canvasAction,
+      canvasHash,
     });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
+  }
+
+  for (const a of analyticsOptions) {
+    controllers.analytics.track(a).catch(console.error);
   }
 
   return success(res, updatedThread);

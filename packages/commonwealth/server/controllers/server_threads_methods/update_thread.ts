@@ -13,8 +13,10 @@ import {
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { AppError } from '../../../../common-common/src/errors';
-import { DB } from 'server/models';
-import { findAllRoles } from 'server/util/roles';
+import { DB } from '../../models';
+import { findAllRoles } from '../../util/roles';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -26,6 +28,7 @@ export const Errors = {
   Unauthorized: 'Unauthorized',
   InvalidStage: 'Please Select a Stage',
   FailedToParse: 'Failed to parse custom stages',
+  InvalidTopic: 'Invalid topic',
 };
 
 export type UpdateThreadOptions = {
@@ -39,15 +42,20 @@ export type UpdateThreadOptions = {
   url?: string;
   locked?: boolean;
   pinned?: boolean;
+  archived?: boolean;
   spam?: boolean;
   topicId?: number;
   topicName?: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
+  canvasSession?: any;
+  canvasAction?: any;
+  canvasHash?: any;
 };
 
-export type UpdateThreadResult = [ThreadAttributes, EmitOptions[]];
+export type UpdateThreadResult = [
+  ThreadAttributes,
+  EmitOptions[],
+  TrackOptions[]
+];
 
 export async function __updateThread(
   this: ServerThreadsController,
@@ -62,12 +70,13 @@ export async function __updateThread(
     url,
     locked,
     pinned,
+    archived,
     spam,
     topicId,
     topicName,
-    canvas_action,
-    canvas_session,
-    canvas_hash,
+    canvasSession,
+    canvasAction,
+    canvasHash,
   }: UpdateThreadOptions
 ): Promise<UpdateThreadResult> {
   // check if banned
@@ -82,27 +91,6 @@ export async function __updateThread(
   const thread = await this.models.Thread.findByPk(threadId);
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
-  }
-
-  const now = new Date();
-
-  // update version history
-  let latestVersion;
-  try {
-    latestVersion = JSON.parse(thread.version_history[0]).body;
-  } catch (e) {
-    console.log(e);
-  }
-  if (decodeURIComponent(body) !== latestVersion) {
-    const recentEdit: any = {
-      timestamp: moment(now),
-      author: address.address,
-      body: decodeURIComponent(body),
-    };
-    const versionHistory: string = JSON.stringify(recentEdit);
-    const arr = thread.version_history;
-    arr.unshift(versionHistory);
-    thread.version_history = arr;
   }
 
   // get various permissions
@@ -124,8 +112,34 @@ export async function __updateThread(
   const isAdmin = !!roles.find(
     (r) => r.chain_id === chain.id && r.permission === 'admin'
   );
-
+  if (!isThreadOwner && !isMod && !isAdmin) {
+    throw new AppError(Errors.Unauthorized);
+  }
   const permissions = { isThreadOwner, isMod, isAdmin };
+
+  const now = new Date();
+
+  // update version history
+  let latestVersion;
+  try {
+    latestVersion = JSON.parse(thread.version_history[0]).body;
+  } catch (err) {
+    console.log(err);
+  }
+  if (decodeURIComponent(body) !== latestVersion) {
+    const recentEdit: any = {
+      timestamp: moment(now),
+      author: address.address,
+      body: decodeURIComponent(body),
+    };
+    const versionHistory: string = JSON.stringify(recentEdit);
+    const arr = thread.version_history;
+    arr.unshift(versionHistory);
+    thread.version_history = arr;
+  }
+
+  // build analytics
+  const allAnalyticsOptions: TrackOptions[] = [];
 
   //  patch thread properties
 
@@ -139,6 +153,9 @@ export async function __updateThread(
         title,
         body,
         url,
+        canvasSession,
+        canvasAction,
+        canvasHash,
       },
       transaction
     );
@@ -149,7 +166,16 @@ export async function __updateThread(
 
     await setThreadLocked(permissions, thread, locked, transaction);
 
-    await setThreadStage(permissions, thread, stage, chain, transaction);
+    await setThreadArchived(permissions, thread, archived, transaction);
+
+    await setThreadStage(
+      permissions,
+      thread,
+      stage,
+      chain,
+      allAnalyticsOptions,
+      transaction
+    );
 
     await setThreadTopic(
       permissions,
@@ -160,26 +186,29 @@ export async function __updateThread(
       transaction
     );
 
-    await setCanvasSession(
-      thread,
-      canvas_session,
-      canvas_action,
-      canvas_hash,
-      transaction
+    await thread.update(
+      { last_edited: Sequelize.literal('CURRENT_TIMESTAMP') },
+      { transaction }
+    );
+
+    await address.update(
+      {
+        last_active: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      { transaction }
     );
 
     await transaction.commit();
   } catch (err) {
     console.error(err);
     await transaction.rollback();
-    throw new AppError('transaction failed');
+    if (err instanceof AppError) {
+      throw err;
+    }
+    throw new AppError(`transaction failed`);
   }
 
   // ---
-
-  thread.last_edited = now;
-
-  await thread.save();
 
   const finalThread = await this.models.Thread.findOne({
     where: { id: thread.id },
@@ -279,11 +308,7 @@ export async function __updateThread(
     });
   }
 
-  // update address last active
-  address.last_active = now;
-  address.save();
-
-  return [finalThread.toJSON(), allNotificationOptions];
+  return [finalThread.toJSON(), allNotificationOptions, allAnalyticsOptions];
 }
 
 // -----
@@ -295,7 +320,7 @@ type UpdateThreadPermissions = {
 };
 
 /**
- * Throws error if permissions not satisfied
+ * Throws error if permissions check not satisfied
  */
 function validatePermissions(
   permissions: UpdateThreadPermissions,
@@ -305,6 +330,15 @@ function validatePermissions(
     throw new AppError(Errors.Unauthorized);
   }
 }
+
+type UpdatableThreadAttributes = {
+  title?: string;
+  body?: string;
+  url?: string;
+  canvasSession?: string;
+  canvasAction?: string;
+  canvasHash?: string;
+};
 
 /**
  * Updates basic properties of the thread
@@ -316,7 +350,10 @@ async function setThreadAttributes(
     title,
     body,
     url,
-  }: Partial<Pick<ThreadAttributes, 'title' | 'body' | 'url'>>,
+    canvasSession,
+    canvasAction,
+    canvasHash,
+  }: UpdatableThreadAttributes,
   transaction: Transaction
 ) {
   if (
@@ -328,45 +365,52 @@ async function setThreadAttributes(
       permissions,
       (p) => p.isThreadOwner || p.isMod || p.isAdmin
     );
-  }
 
-  const toUpdate: Partial<ThreadAttributes> = {};
+    const toUpdate: Partial<ThreadAttributes> = {};
 
-  // title
-  if (typeof title !== 'undefined') {
-    if (!title) {
-      throw new AppError(Errors.NoTitle);
-    }
-    toUpdate.title = title;
-  }
-
-  // body
-  if (typeof body !== 'undefined') {
-    if (thread.kind === 'discussion' && (!body || !body.trim())) {
-      throw new AppError(Errors.NoBody);
-    }
-    toUpdate.body = body;
-    toUpdate.plaintext = (() => {
-      try {
-        return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
-      } catch (e) {
-        return decodeURIComponent(body);
+    // title
+    if (typeof title !== 'undefined') {
+      if (!title) {
+        throw new AppError(Errors.NoTitle);
       }
-    })();
-  }
-
-  // url
-  if (typeof url !== 'undefined' && thread.kind === 'link') {
-    if (!validURL(url)) {
-      throw new AppError(Errors.InvalidLink);
+      toUpdate.title = title;
     }
-    toUpdate.url = url;
-  }
 
-  if (Object.keys(toUpdate).length > 0) {
-    await thread.update(toUpdate, { transaction });
+    // body
+    if (typeof body !== 'undefined') {
+      if (thread.kind === 'discussion' && (!body || !body.trim())) {
+        throw new AppError(Errors.NoBody);
+      }
+      toUpdate.body = body;
+      toUpdate.plaintext = (() => {
+        try {
+          return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
+        } catch (e) {
+          return decodeURIComponent(body);
+        }
+      })();
+    }
+
+    // url
+    if (typeof url !== 'undefined' && thread.kind === 'link') {
+      if (!validURL(url)) {
+        throw new AppError(Errors.InvalidLink);
+      }
+      toUpdate.url = url;
+    }
+
+    if (typeof canvasSession !== 'undefined') {
+      toUpdate.canvas_session = canvasSession;
+      toUpdate.canvas_action = canvasAction;
+      toUpdate.canvas_hash = canvasHash;
+    }
+
+    if (Object.keys(toUpdate).length > 0) {
+      await thread.update(toUpdate, { transaction });
+    }
   }
 }
+
 /**
  * Pins and unpins the thread
  */
@@ -381,6 +425,7 @@ async function setThreadPinned(
 
     const toUpdate: Partial<ThreadAttributes> = {};
     toUpdate.pinned = pinned;
+
     await thread.update(toUpdate, { transaction });
   }
 }
@@ -404,6 +449,31 @@ async function setThreadLocked(
 
     toUpdate.read_only = locked;
     toUpdate.locked_at = locked
+      ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
+      : null;
+
+    await thread.update(toUpdate, { transaction });
+  }
+}
+
+/**
+ * Archives and unarchives a thread
+ */
+async function setThreadArchived(
+  permissions: UpdateThreadPermissions,
+  thread: ThreadInstance,
+  archive: boolean | undefined,
+  transaction: Transaction
+) {
+  if (typeof archive !== 'undefined') {
+    validatePermissions(
+      permissions,
+      (p) => p.isThreadOwner || p.isMod || p.isAdmin
+    );
+
+    const toUpdate: Partial<ThreadAttributes> = {};
+
+    toUpdate.archived_at = archive
       ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
       : null;
 
@@ -441,6 +511,7 @@ async function setThreadStage(
   thread: ThreadInstance,
   stage: string | undefined,
   chain: ChainInstance,
+  allAnalyticsOptions: TrackOptions[],
   transaction: Transaction
 ) {
   if (typeof stage !== 'undefined') {
@@ -478,6 +549,10 @@ async function setThreadStage(
     toUpdate.stage = stage;
 
     await thread.update(toUpdate, { transaction });
+
+    allAnalyticsOptions.push({
+      event: MixpanelCommunityInteractionEvent.UPDATE_STAGE,
+    });
   }
 }
 
@@ -492,49 +567,31 @@ async function setThreadTopic(
   models: DB,
   transaction: Transaction
 ) {
-  if (typeof topicId === 'undefined' || typeof topicName === 'undefined') {
+  if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
     validatePermissions(
       permissions,
       (p) => p.isThreadOwner || p.isMod || p.isAdmin
     );
-  }
 
-  const toUpdate: Partial<ThreadAttributes> = {};
-
-  if (typeof topicId !== 'undefined') {
-    toUpdate.topic_id = topicId;
-  } else if (typeof topicName !== 'undefined') {
-    const [topic] = await models.Topic.findOrCreate({
-      where: {
-        name: topicName,
-        chain_id: thread.chain,
-      },
-    });
-    toUpdate.topic_id = topic.id;
-  }
-
-  if (Object.keys(toUpdate).length > 0) {
-    await thread.update(toUpdate, { transaction });
-  }
-}
-
-/**
- * Updates the canvas session for the thread
- */
-async function setCanvasSession(
-  thread: ThreadInstance,
-  canvas_session: string | undefined,
-  canvas_action: string | undefined,
-  canvas_hash: string | undefined,
-  transaction: Transaction
-) {
-  if (typeof canvas_session !== 'undefined') {
     const toUpdate: Partial<ThreadAttributes> = {};
 
-    toUpdate.canvas_session = canvas_session;
-    toUpdate.canvas_action = canvas_action;
-    toUpdate.canvas_hash = canvas_hash;
+    if (typeof topicId !== 'undefined') {
+      if (!topicId) {
+        throw new AppError(Errors.InvalidTopic);
+      }
+      toUpdate.topic_id = topicId;
+    } else if (typeof topicName !== 'undefined') {
+      const [topic] = await models.Topic.findOrCreate({
+        where: {
+          name: topicName,
+          chain_id: thread.chain,
+        },
+      });
+      toUpdate.topic_id = topic.id;
+    }
 
-    await thread.update(toUpdate, { transaction });
+    if (Object.keys(toUpdate).length > 0) {
+      await thread.update(toUpdate, { transaction });
+    }
   }
 }
