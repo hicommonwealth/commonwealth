@@ -14,6 +14,7 @@ type UpdateThreadRequestBody = {
   kind?: string;
   stage?: string;
   url?: string;
+  discord_meta?: any;
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -24,12 +25,9 @@ export const updateThreadHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { id } = req.params;
-  const { body, title, stage, url } = req.body;
+  const { body, title, stage, url, discord_meta } = req.body;
 
   const threadId = parseInt(id, 10) || 0;
-  if (!threadId) {
-    throw new AppError(Errors.InvalidThreadID);
-  }
 
   if (!body || !body.trim()) {
     throw new AppError(Errors.MissingText);
@@ -45,6 +43,7 @@ export const updateThreadHandler = async (
       body,
       stage,
       url,
+      discordMeta: discord_meta,
     });
 
   for (const n of notificationOptions) {

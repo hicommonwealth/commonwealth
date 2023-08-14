@@ -13,27 +13,27 @@ import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
-import { CWTag } from 'views/components/component_kit/cw_tag';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { getClasses } from 'views/components/component_kit/helpers';
 import { isNewThread } from '../NewThreadTag';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
+import './ThreadCard.scss';
 import { ThreadOptions } from './ThreadOptions';
 import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
-import './ThreadCard.scss';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
   threadHref?: string;
   showSkeleton?: boolean;
+  canReact?: boolean;
 };
 
 const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
@@ -72,7 +72,6 @@ export const ThreadCard = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -84,10 +83,10 @@ export const ThreadCard = ({
   onStageTagClick,
   threadHref,
   showSkeleton,
+  canReact = true,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -131,11 +130,7 @@ export const ThreadCard = ({
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ReactionButton
-            thread={thread}
-            size="big"
-            disabled={!hasJoinedCommunity}
-          />
+          <ReactionButton thread={thread} size="big" disabled={!canReact} />
         )}
         <div className="content-wrapper">
           <div className="content-header">
@@ -211,7 +206,7 @@ export const ThreadCard = ({
                     type="proposal"
                     label={`${chainEntityTypeToProposalShortName(
                       'proposal' as IChainEntityKind
-                    )}
+                    )} 
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
@@ -242,7 +237,6 @@ export const ThreadCard = ({
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
               onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onCollaboratorsEdit={onCollaboratorsEdit}

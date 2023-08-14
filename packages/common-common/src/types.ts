@@ -5,16 +5,12 @@
 export const NotificationCategories = {
   NewComment: 'new-comment-creation',
   NewThread: 'new-thread-creation',
-  NewCommunity: 'new-community-creation',
-  NewRoleCreation: 'new-role-creation',
   NewMention: 'new-mention',
   NewReaction: 'new-reaction',
   NewCollaboration: 'new-collaboration',
   ThreadEdit: 'thread-edit',
   CommentEdit: 'comment-edit',
   ChainEvent: 'chain-event',
-  EntityEvent: 'entity-event',
-  NewSnapshot: 'new-snapshot',
   SnapshotProposal: 'snapshot-proposal',
 };
 
@@ -166,19 +162,27 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
+export type DiscordAction =
+  | 'create'
+  | 'update'
+  | 'thread-delete'
+  | 'comment-delete';
+
 export interface IDiscordMessage {
-  user: {
+  user?: {
     id: string;
     username: string;
   };
   title?: string;
   content: string;
   message_id: string;
-  channel_id: string;
-  parent_channel_id: string;
-  guild_id: string;
+  channel_id?: string;
+  parent_channel_id?: string;
+  guild_id?: string;
   imageUrls?: string[];
+  action: DiscordAction;
 }
+
 export type HttpMethod =
   | 'get'
   | 'post'

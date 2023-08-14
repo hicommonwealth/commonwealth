@@ -50,21 +50,3 @@ export const getDisplayedReactorsForPopup = ({
     </div>
   );
 };
-
-export const onReactionClick = (
-  e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
-  hasReacted: boolean,
-  dislike: (userAddress: string) => void,
-  like: (chain: ChainInfo, chainId: string, userAddress: string) => void
-) => {
-  const { address: userAddress, chain } = app.user.activeAccount;
-
-  // if it's a community use the app.user.activeAccount.chain.id instead of author chain
-  const chainId = app.activeChainId();
-
-  if (hasReacted) {
-    dislike(userAddress);
-  } else {
-    like(chain, chainId, userAddress);
-  }
-};

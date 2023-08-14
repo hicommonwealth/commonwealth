@@ -16,9 +16,10 @@ import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
+
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -246,17 +247,24 @@ const verifyAddress = async (
       where: { id: newAddress.user_id },
     });
     req.login(user, (err) => {
+      const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
-        serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN_FAILED,
-          isCustomDomain: null,
-        });
+        serverAnalyticsController.track(
+          {
+            event: MixpanelLoginEvent.LOGIN_FAILED,
+            isCustomDomain: null,
+          },
+          req
+        );
         return next(err);
       }
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          isCustomDomain: null,
+        },
+        req
+      );
 
       return res.json({
         status: 'Success',

@@ -67,7 +67,8 @@ export const CreateComment = ({
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 
   useEffect(() => {
-    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
+    activeTopic?.id &&
+      setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic?.id));
   }, [activeTopic]);
 
   useEffect(() => {
@@ -86,6 +87,7 @@ export const CreateComment = ({
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
     chainId: app.activeChainId(),
+    existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
   const handleSubmitComment = async () => {
@@ -101,6 +103,7 @@ export const CreateComment = ({
         address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
+        existingNumberOfComments: rootThread.numberOfComments || 0,
       });
 
       setErrorMsg(null);
@@ -129,7 +132,7 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
+  const userFailsThreshold = app.chain.isGatedTopic(activeTopic?.id);
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||

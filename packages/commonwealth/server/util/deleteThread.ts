@@ -6,7 +6,7 @@ export default async function deleteThread(
 ): Promise<void> {
   models.Subscription.destroy({
     where: {
-      offchain_thread_id: thread_id,
+      thread_id: thread_id,
     },
   });
 
