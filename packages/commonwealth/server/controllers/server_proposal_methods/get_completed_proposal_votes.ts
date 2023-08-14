@@ -30,6 +30,7 @@ export async function __getProposalVotes(
     );
     votes = votesArgs.map((vote) => formatAaveProposalVote(vote));
   } else if (contractInfo.type === ChainNetwork.Compound) {
+    // compound vote fetching
   } else {
     throw new ServerError(
       `Proposal fetching not supported for chain ${chainId} on network ${contractInfo.type}`

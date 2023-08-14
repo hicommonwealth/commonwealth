@@ -38,7 +38,7 @@ function deserializeBigNumbers(obj: Record<string, any>) {
 
   // For plain objects, iterate over each property
   const result = {};
-  for (let key in obj) {
+  for (const key in obj) {
     result[key] = deserializeBigNumbers(obj[key]);
   }
   return result;

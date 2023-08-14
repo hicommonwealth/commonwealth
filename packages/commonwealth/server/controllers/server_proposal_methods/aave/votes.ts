@@ -44,7 +44,7 @@ export async function getAaveProposalVotes(
     proposal.endBlock.toNumber()
   );
 
-  let voteArgs: VoteEventArgsObject[] = [];
+  const voteArgs: VoteEventArgsObject[] = [];
   for (const event of voteEvents) {
     if (event.args.id.toNumber() === proposalId) voteArgs.push(event.args);
   }
