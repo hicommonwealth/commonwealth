@@ -41,19 +41,8 @@ function processVersionHistory(versionHistory: any[]) {
   return versionHistoryProcessed;
 }
 
-function processChainEntities(chain: string, chainEntityMeta: any) {
+function processChainEntities(chain: string) {
   const chainEntitiesProcessed: ChainEntity[] = [];
-  if (chainEntityMeta) {
-    for (const meta of chainEntityMeta) {
-      const full_entity = Array.from(app.chainEntities.store.values())
-        .flat()
-        .filter((e) => e.id === meta.ce_id)[0];
-      if (full_entity) {
-        if (meta.title) full_entity.title = meta.title;
-        chainEntitiesProcessed.push(full_entity);
-      }
-    }
-  }
 
   return chainEntitiesProcessed
     ? chainEntitiesProcessed.map((ce) => {
@@ -193,7 +182,6 @@ export class Thread implements IUniqueId {
     url,
     pinned,
     collaborators,
-    chain_entity_meta,
     last_edited,
     marked_as_spam_at,
     locked_at,
@@ -240,7 +228,6 @@ export class Thread implements IUniqueId {
     reactionIds: any[]; // TODO: fix type
     addressesReacted: any[]; //TODO: fix type,
     reactionType: any[]; // TODO: fix type
-    chain_entity_meta: any; // TODO: fix type
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -279,7 +266,7 @@ export class Thread implements IUniqueId {
     this.links = links || [];
     this.discord_meta = discord_meta;
     this.versionHistory = processVersionHistory(version_history);
-    this.chainEntities = processChainEntities(chain, chain_entity_meta);
+    this.chainEntities = processChainEntities(chain);
     this.associatedReactions = processAssociatedReactions(
       reactions,
       reactionIds,
