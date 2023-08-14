@@ -1,3 +1,5 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { notifyError } from 'controllers/app/notifications';
 import {
   getPower,
@@ -11,7 +13,6 @@ import {
 } from 'helpers/snapshot_utils';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
 import AddressInfo from '../../../models/AddressInfo';
@@ -115,6 +116,10 @@ export const ViewProposalPage = ({
   if (!proposal) {
     return <PageLoading />;
   }
+
+  useEffect(() => {
+    document.title = `${app.chain.meta.name} – ${proposal.title}`;
+  }, []);
 
   return (
     <CWContentPage
