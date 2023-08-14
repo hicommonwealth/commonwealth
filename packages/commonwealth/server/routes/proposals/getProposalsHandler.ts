@@ -9,7 +9,7 @@ type GetProposalsResponse = {
   proposals: any;
 };
 
-export const get_proposals_handler = async (
+export const getProposalsHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetProposalsRequestParams>,
   res: TypedResponse<GetProposalsResponse>

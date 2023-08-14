@@ -191,9 +191,8 @@ import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { searchChainsHandler } from '../routes/chains/search_chains_handler';
-import { get_proposals_handler } from '../routes/proposals/get_proposals_handler';
-import { get_proposal_votes_handler } from '../routes/proposals/get_proposal_votes_handler';
-
+import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
+import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -1407,14 +1406,14 @@ function setupRouter(
     router,
     'get',
     '/proposals',
-    get_proposals_handler.bind(this, serverControllers)
+    getProposalsHandler.bind(this, serverControllers)
   );
 
   registerRoute(
     router,
     'get',
     '/proposalVotes',
-    get_proposal_votes_handler.bind(this, serverControllers)
+    getProposalVotesHandler.bind(this, serverControllers)
   );
 
   app.use(endpoint, router);

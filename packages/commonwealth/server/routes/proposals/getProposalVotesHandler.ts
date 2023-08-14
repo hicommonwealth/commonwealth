@@ -10,7 +10,7 @@ type GetProposalVotesResponse = {
   votes: any[];
 };
 
-export const get_proposal_votes_handler = async (
+export const getProposalVotesHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetProposalVotesRequestParams>,
   res: TypedResponse<GetProposalVotesResponse>
