@@ -72,6 +72,10 @@ const ProposalsPage = () => {
     };
   }, [setSubstrateLoading]);
 
+  useEffect(() => {
+    document.title = `${app.chain.meta.name} – Proposals`;
+  }, []);
+
   const {
     data: activeCosmosProposals,
     isLoading: isCosmosActiveProposalsLoading,
