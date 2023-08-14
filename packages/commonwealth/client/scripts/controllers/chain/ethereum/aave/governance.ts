@@ -1,9 +1,4 @@
 import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { AaveEvents } from 'chain-events/src';
-import { AaveTypes } from 'chain-events/src/types';
-import type { Executor } from 'common-common/src/eth/types';
-import { chainToEventNetwork } from 'controllers/server/chain_entities';
-import type { ITXModalData } from '../../../../models/interfaces';
 import ProposalModule from '../../../../models/ProposalModule';
 import type { IApp } from 'state';
 import type EthereumAccounts from '../accounts';
