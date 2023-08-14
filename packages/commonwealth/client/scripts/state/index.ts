@@ -11,8 +11,6 @@ import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
 import { WebSocketController } from 'controllers/server/socket';
-import ThreadUniqueAddressesCount from 'controllers/server/threadUniqueAddressesCount';
-import ThreadsController from 'controllers/server/threads';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import $ from 'jquery';
@@ -49,9 +47,7 @@ export interface IApp {
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
 
-  // Threads
-  threads: ThreadsController;
-  threadUniqueAddressesCount: ThreadUniqueAddressesCount;
+  // Polls
   polls: PollsController;
 
   // Proposals
@@ -139,9 +135,7 @@ const app: IApp = {
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 
-  // Thread
-  threads: ThreadsController.Instance,
-  threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
+  // Polls
   polls: new PollsController(),
 
   // Proposals

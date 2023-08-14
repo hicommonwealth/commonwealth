@@ -6,11 +6,15 @@ import { DATABASE_URI } from '../../../server/config';
 
 // Logs in user for specific chain
 export async function login(page) {
-  await page.waitForSelector('.LoginSelector button');
-  let button = await page.locator('.LoginSelector button');
-  await button.click();
+  let button;
 
-  await page.waitForSelector('.LoginDesktop');
+  // wait for login button and login modal to appear
+  await expect(async () => {
+    await expect(page.locator('.LoginSelector button')).toBeVisible();
+    button = await page.locator('.LoginSelector button');
+    await button.click();
+    await expect(page.locator('.LoginDesktop')).toBeVisible();
+  }).toPass();
 
   // Basic idea is that we lazily load the metamask mock (otherwise it will include ethereum to our initial bundle)
   // As a result, the metamask button will not appear right away, because the lazy loading is initialized on login screen

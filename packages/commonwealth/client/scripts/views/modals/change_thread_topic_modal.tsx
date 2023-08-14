@@ -5,19 +5,18 @@ import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 
 import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
-import { TopicSelector } from '../components/topic_selector';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useEditThreadTopicMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { TopicSelector } from '../components/topic_selector';
 
 type ChangeThreadTopicModalProps = {
-  onChangeHandler: (topic: Topic) => void;
   onModalClose: () => void;
   thread: Thread;
 };
 
 export const ChangeThreadTopicModal = ({
-  onChangeHandler,
   onModalClose,
   thread,
 }: ChangeThreadTopicModalProps) => {
@@ -26,24 +25,27 @@ export const ChangeThreadTopicModal = ({
     chainId: app.activeChainId(),
   });
 
+  const { mutateAsync: editThreadTopic } = useEditThreadTopicMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
   const handleSaveChanges = async () => {
     try {
-      const topic: Topic = await app.threads.updateTopic(
-        thread.id,
-        activeTopic.name,
-        activeTopic.id
-      );
+      await editThreadTopic({
+        chainId: app.activeChainId(),
+        address: app.user.activeAccount.address,
+        threadId: thread.id,
+        topicName: activeTopic.name,
+        newTopicId: activeTopic.id,
+        oldTopicId: thread?.topic?.id,
+      });
 
-      onChangeHandler(topic);
-      onModalClose();
+      onModalClose && onModalClose();
     } catch (err) {
-      console.log('Failed to update topic');
-
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to update topic'
-      );
+      const error = err?.responseJSON?.error || 'Failed to update thread topic';
+      console.log(error);
+      throw new Error(error);
     }
   };
 
