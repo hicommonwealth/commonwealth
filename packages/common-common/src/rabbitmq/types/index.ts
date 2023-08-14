@@ -1,7 +1,5 @@
-import type { RmqEntityCUD } from './chainEntityCUD';
 import type { RmqCENotificationCUD } from './chainEventNotificationsCUD';
 
-export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD';
 
 export * from './chainEvents';
@@ -30,7 +28,6 @@ export class RmqMsgFormatError extends Error {
  * anywhere, it MUST be one of these types
  */
 export type TRmqMessages =
-  | RmqEntityCUD.RmqMsgType
   | RmqCENotificationCUD.RmqMsgType
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
@@ -46,7 +43,6 @@ export interface RmqMsgNamespace<MsgType> {
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
-  ChainEntityCUDMain = 'ChainEntityCUDMainPublication',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
   SnapshotListener = 'SnapshotListenerPublication',
@@ -55,7 +51,6 @@ export enum RascalPublications {
 
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
-  ChainEntityCUDMain = 'ChainEntityCUDMainSubscription',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
   SnapshotListener = 'SnapshotListenerSubscription',
@@ -73,7 +68,6 @@ export enum RascalExchanges {
 
 export enum RascalQueues {
   ChainEvents = 'ChainEventsQueueV2',
-  ChainEntityCUDMain = 'ChainEntityCUDMainQueueV2',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueueV2',
   ChainEventNotifications = 'ChainEventNotificationsQueueV2',
   DeadLetter = 'DeadLetterQueue',
@@ -83,7 +77,6 @@ export enum RascalQueues {
 
 export enum RascalBindings {
   ChainEvents = 'ChainEventsBinding',
-  ChainEntityCUDMain = 'ChainEntityCUDMainBinding',
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUDBinding',
   ChainEventNotifications = 'ChainEventNotificationsBinding',
   SnapshotListener = 'SnapshotListenerBinding',
@@ -93,7 +86,6 @@ export enum RascalBindings {
 
 export enum RascalRoutingKeys {
   ChainEvents = 'ChainEvents',
-  ChainEntityCUD = 'ChainEntityCUD',
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUD',
   ChainEventNotifications = 'ChainEventNotifications',
   SnapshotListener = 'SnapshotListener',
@@ -101,9 +93,7 @@ export enum RascalRoutingKeys {
   DiscordListener = 'DiscordListener',
 }
 
-export type SafeRmqPublishSupported =
-  | ChainEntityModelStatic
-  | ChainEventModelStatic;
+export type SafeRmqPublishSupported = ChainEventModelStatic;
 
 export abstract class AbstractRabbitMQController {
   protected _initialized = false;

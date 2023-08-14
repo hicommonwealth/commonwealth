@@ -71,28 +71,24 @@ export function getRabbitMQConfig(
       RascalExchanges.Discobot,
     ]);
     copyConfigs(allQueues, vhostConfig.queues, [
-      RascalQueues.ChainEntityCUDMain,
       RascalQueues.ChainEventNotificationsCUDMain,
       RascalQueues.ChainEventNotifications,
       RascalQueues.SnapshotListener,
       RascalQueues.DiscordListener,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
-      RascalBindings.ChainEntityCUDMain,
       RascalBindings.ChainEventNotificationsCUD,
       RascalBindings.ChainEventNotifications,
       RascalBindings.SnapshotListener,
       RascalBindings.DiscordListener,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
-      RascalPublications.ChainEntityCUDMain,
       RascalPublications.ChainEventNotificationsCUDMain,
       RascalPublications.ChainEventNotifications,
       RascalPublications.SnapshotListener,
       RascalPublications.DiscordListener,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
-      RascalSubscriptions.ChainEntityCUDMain,
       RascalSubscriptions.ChainEventNotificationsCUDMain,
       RascalSubscriptions.ChainEventNotifications,
       RascalSubscriptions.SnapshotListener,
@@ -105,22 +101,18 @@ export function getRabbitMQConfig(
     ]);
     copyConfigs(allQueues, vhostConfig.queues, [
       RascalQueues.ChainEvents,
-      RascalQueues.ChainEntityCUDMain,
       RascalQueues.ChainEventNotificationsCUDMain,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvents,
-      RascalBindings.ChainEntityCUDMain,
       RascalBindings.ChainEventNotificationsCUD,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.ChainEvents,
-      RascalPublications.ChainEntityCUDMain,
       RascalPublications.ChainEventNotificationsCUDMain,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.ChainEvents,
-      RascalSubscriptions.ChainEntityCUDMain,
       RascalSubscriptions.ChainEventNotificationsCUDMain,
     ]);
   } else if (service === RascalConfigServices.SnapshotService) {

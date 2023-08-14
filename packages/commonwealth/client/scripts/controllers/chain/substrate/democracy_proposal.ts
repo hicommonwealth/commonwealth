@@ -168,7 +168,6 @@ class SubstrateDemocracyProposal extends Proposal<
     );
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
-    this.threadTitle = entity.threadTitle;
 
     // see if preimage exists and populate data if it does
     const preimage = this._Proposals.app.chainEntities.getPreimage(
@@ -178,11 +177,11 @@ class SubstrateDemocracyProposal extends Proposal<
       this._method = preimage.method;
       this._section = preimage.section;
       this._preimage = preimage;
-      this.title = entity.title || formatCall(preimage);
+      this.title = formatCall(preimage);
     } else {
-      this.title =
-        entity.title ||
-        `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
+      this.title = `Proposal ${formatProposalHashShort(
+        eventData.proposalHash
+      )}`;
     }
 
     entity.chainEvents.forEach((e) => this.update(e));
