@@ -228,6 +228,7 @@ export async function __createThreadComment(
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
   let mentionedAddresses;
+
   try {
     const mentions = parseUserMentions(bodyText);
     if (mentions && mentions.length > 0) {

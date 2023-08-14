@@ -92,6 +92,7 @@ async function consumeMessages() {
             user: parsedMessage.user,
           },
           auth: CW_BOT_KEY,
+          bot_name: 'discord',
         };
 
         if (action === 'create') {
@@ -120,6 +121,7 @@ async function consumeMessages() {
           canvas_hash: null,
           canvas_session: null,
           auth: CW_BOT_KEY,
+          bot_name: 'discord',
           discord_meta: {
             message_id: parsedMessage.message_id,
             channel_id: parsedMessage.parent_channel_id,

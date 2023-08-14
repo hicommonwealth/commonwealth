@@ -71,7 +71,7 @@ async function buildThreadCommentTree(rootCasts: Array<any>) {
       thread: {
         title: rootCast.body.data.title,
         address: '0xFarcasterBot',
-        author_chain: '',
+        author_chain: 'logline',
         chain: 'logline',
         body: rootCast.body.data.text, // Add link here
         stage: 'discussion',
@@ -94,11 +94,34 @@ async function buildThreadCommentTree(rootCasts: Array<any>) {
     // Right now this could be accomplished with just a for loop
     while (queue.length > 0) {
       const { cast, parentThreadId, parentCommentId, isThread } = queue.shift();
-      console.log('queue', queue.length);
-      console.log('cast', cast.body.data.text);
 
       if (isThread) {
+        const payload = {
+          title: cast.body.data.title,
+          address: '0xFarcasterBot',
+          author_chain: '',
+          chain: 'logline',
+          body: cast.body.data.text, // Add link here
+          stage: 'discussion',
+          kind: 'thread',
+          auth: CW_BOT_KEY,
+          bot_name: 'farcaster',
+          topic_id: '',
+          topic_name: '',
+          readOnly: false,
+        };
+
         // Make request to create thread
+        try {
+          const res = await axios.post(
+            `${SERVER_URL}/api/bot/threads`,
+            payload
+          );
+          console.log(res);
+        } catch (e) {
+          console.log(e);
+        }
+
         const threadId = 'testId'; // TODO: Replace with real request
 
         const response = await axios.get(
