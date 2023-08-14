@@ -32,7 +32,7 @@ export type TRmqMessages =
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
-  | RmqSnapshotNotification.RmqMsgType 
+  | RmqSnapshotNotification.RmqMsgType
   | RmqDiscordMessage.RmqMsgType;
 
 export interface RmqMsgNamespace<MsgType> {
@@ -45,18 +45,16 @@ export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsPublication',
   SnapshotListener = 'SnapshotListenerPublication',
-  DiscordListener = 'DiscordMessageSubscription'
+  DiscordListener = 'DiscordMessageSubscription',
 }
 
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsSubscription',
   SnapshotListener = 'SnapshotListenerSubscription',
-  DiscordListener = 'DiscordMessageSubscription'
+  DiscordListener = 'DiscordMessageSubscription',
 }
 
 export enum RascalExchanges {
@@ -65,36 +63,34 @@ export enum RascalExchanges {
   Notifications = 'NotificationsExchange',
   SnapshotListener = 'SnapshotListenerExchange',
   DeadLetter = 'DeadLetterExchange',
+  Discobot = 'DiscobotExchange',
 }
 
 export enum RascalQueues {
-  ChainEvents = 'ChainEventsQueue',
-  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueue',
-  ChainEventNotifications = 'ChainEventNotificationsQueue',
+  ChainEvents = 'ChainEventsQueueV2',
+  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueueV2',
+  ChainEventNotifications = 'ChainEventNotificationsQueueV2',
   DeadLetter = 'DeadLetterQueue',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsQueue',
-  SnapshotListener = 'SnapshotListenerQueue',
-  DiscordListener = 'DiscordMessageQueue'
+  SnapshotListener = 'SnapshotListenerQueueV2',
+  DiscordListener = 'DiscordMessageQueueV2',
 }
 
 export enum RascalBindings {
   ChainEvents = 'ChainEventsBinding',
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUDBinding',
   ChainEventNotifications = 'ChainEventNotificationsBinding',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsBinding',
   SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding',
-  DiscordListener = 'DiscordMessageBinding'
+  DiscordListener = 'DiscordMessageBinding',
 }
 
 export enum RascalRoutingKeys {
   ChainEvents = 'ChainEvents',
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUD',
   ChainEventNotifications = 'ChainEventNotifications',
-  SnapshotProposalNotifications = 'SnapshotProposalNotifications',
   SnapshotListener = 'SnapshotListener',
   DeadLetter = 'DeadLetter',
-  DiscordListener = 'DiscordListener'
+  DiscordListener = 'DiscordListener',
 }
 
 export type SafeRmqPublishSupported = ChainEventModelStatic;

@@ -10,13 +10,16 @@ import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
 import type { BrokerConfig } from 'rascal';
 import { EventKind, IEventData } from '../../../src/chains/aave/types';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 chai.use(chaiHttp);
 const { assert } = chai;
 const chain = 'aave';
 
 const rmqController = new MockRabbitMQController(
-  <BrokerConfig>getRabbitMQConfig('localhost')
+  <BrokerConfig>(
+    getRabbitMQConfig('localhost', RascalConfigServices.ChainEventsService)
+  )
 );
 
 describe('Event Storage Handler Tests', () => {

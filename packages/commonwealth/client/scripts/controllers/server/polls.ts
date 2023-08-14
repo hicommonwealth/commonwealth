@@ -1,12 +1,11 @@
 /* eslint-disable no-restricted-globals */
 import $ from 'jquery';
-import Poll from '../../models/Poll';
-import Vote from '../../models/Vote';
-import Thread from '../../models/Thread';
 import moment from 'moment';
 import app from 'state';
-
+import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import PollStore from 'stores/PollStore';
+import Poll from '../../models/Poll';
+import Vote from '../../models/Vote';
 
 export const modelFromServer = (poll) => {
   const {
@@ -101,9 +100,11 @@ class PollsController {
       },
       success: (response) => {
         const modeledPoll = modelFromServer(response.result);
-        const thread = app.threads.getById(threadId);
-        const updatedThread = new Thread({ ...thread, hasPoll: true });
-        app.threads.updateThreadInStore(updatedThread);
+        // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
+        // This is an exception until polls get migrated to react query
+        updateThreadInAllCaches(app.activeChainId(), threadId, {
+          hasPoll: true,
+        });
         this._store.add(modeledPoll);
       },
       error: (err) => {
@@ -129,9 +130,11 @@ class PollsController {
         jwt: app.user.jwt,
       },
       success: (response) => {
-        const thread = app.threads.getById(threadId);
-        const updatedThread = new Thread({ ...thread, hasPoll: false });
-        app.threads.updateThreadInStore(updatedThread);
+        // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
+        // This is an exception until polls get migrated to react query
+        updateThreadInAllCaches(app.activeChainId(), threadId, {
+          hasPoll: false,
+        });
         this._store.remove(this._store.getById(pollId));
       },
       error: (err) => {

@@ -4,9 +4,19 @@ import {
   CWJdenticon,
 } from 'views/components/component_kit/cw_avatar';
 
+enum AvatarSizes {
+  Sm = 16,
+  Med = 24,
+  Lg = 32,
+
+  // TODO: this is to account for sizing in the avatar upload
+  Tmp1 = 60,
+  Tmp2 = 108
+};
+
 interface AvatarProps {
   url: string;
-  size?: number;
+  size?: AvatarSizes;
   address?: number;
 }
 

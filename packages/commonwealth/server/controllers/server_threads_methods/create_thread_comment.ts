@@ -45,7 +45,7 @@ export type CreateThreadCommentOptions = {
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
-  discord_meta?: any;
+  discordMeta?: any;
 };
 
 export type CreateThreadCommentResult = [
@@ -66,7 +66,7 @@ export async function __createThreadComment(
     canvasAction,
     canvasSession,
     canvasHash,
-    discord_meta,
+    discordMeta,
   }: CreateThreadCommentOptions
 ): Promise<CreateThreadCommentResult> {
   // check if banned
@@ -178,7 +178,7 @@ export async function __createThreadComment(
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta,
+    discord_meta: discordMeta,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
@@ -201,7 +201,7 @@ export async function __createThreadComment(
         category_id: NotificationCategories.NewReaction,
         object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
       { transaction }
@@ -212,7 +212,7 @@ export async function __createThreadComment(
         category_id: NotificationCategories.NewComment,
         object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
       { transaction }

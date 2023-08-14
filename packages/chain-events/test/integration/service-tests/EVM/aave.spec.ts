@@ -29,13 +29,14 @@ import {
   StorageFetcher,
   Subscriber,
 } from '../../../../src/chains/aave';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
 describe('Integration tests for Aave', () => {
   const rmq = new MockRabbitMqHandler(
-    getRabbitMQConfig(RABBITMQ_URI),
+    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.ChainEventsService),
     RascalPublications.ChainEvents
   );
 

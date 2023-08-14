@@ -9,31 +9,22 @@
   display: flex;
   flex-direction: column;
   font-weight: 500;
-  padding: 4px 12px;
-  width: fit-content;
-  height: fit-content;
+  padding: 8px 4px;
   justify-content: center;
-  max-width: 42px;
-  max-height: 54px;
+  width: 40px;
+  height: fit-content;
   outline: none;
 
-  &.has-reacted {
-    color: $primary-500;
-  }
-
-  &.disabled {
-    border-color: $neutral-50;
-    color: $neutral-500;
-    pointer-events: none;
+  &.showSkeleton {
+    border: 1px solid transparent;
   }
 
   .reactions-container {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 
     svg {
-      margin: 4px auto 2px;
-
       &.Icon {
         font-size: 16px;
       }
@@ -43,12 +34,46 @@
       font-size: 12px;
       line-height: 16px;
       font-weight: 400;
-      margin: 2px auto 4px;
       color: $neutral-400;
 
       &.has-reacted {
         color: $primary-500;
       }
     }
+  }
+
+  &.has-reacted {
+    color: $primary-500;
+    border-color: $primary-500;
+  }
+
+  &.disabled {
+    border-color: $neutral-400;
+    background-color: $neutral-200;
+    pointer-events: none;
+
+    .reactions-container {
+      color: $neutral-400;
+
+      .reactions-count {
+        color: $neutral-400;
+      }
+    }
+  }
+
+  &:hover {
+    color: $primary-600;
+    border: 1px solid $primary-600;
+
+    .reactions-container {
+      .reactions-count {
+        color: $primary-600;
+      }
+    }
+
+  }
+
+  &:focus {
+    outline: none;
   }
 }

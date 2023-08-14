@@ -12,6 +12,7 @@ import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
 import models from '../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,7 +27,12 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
+      <BrokerConfig>(
+        getRabbitMQConfig(
+          RABBITMQ_URI,
+          RascalConfigServices.CommonwealthService
+        )
+      ),
       rollbar
     );
     await rmqController.init();

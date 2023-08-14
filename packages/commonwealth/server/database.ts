@@ -51,7 +51,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production'
+    process.env.NODE_ENV !== 'production' || process.env.NO_SSL
       ? { requestTimeout: 40000 }
       : DATABASE_URI ===
         'postgresql://commonwealth:edgeware@localhost/commonwealth'

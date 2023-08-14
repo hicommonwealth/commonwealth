@@ -2,16 +2,35 @@ import type { Request, Response } from 'express';
 import express from 'express';
 import type { ISnapshotNotification } from 'common-common/src/types';
 import {
-  RascalPublications,
-  RabbitMQController,
   getRabbitMQConfig,
+  RabbitMQController,
 } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_PORT, RABBITMQ_URI } from './config';
 import { StatsDController } from 'common-common/src/statsd';
 import v8 from 'v8';
-import {methodNotAllowedMiddleware, registerRoute} from "./utils/methodNotAllowed";
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from './utils/methodNotAllowed';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.SnapshotListener,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -81,11 +100,15 @@ app.listen(port, async () => {
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
   try {
-    controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+    controller = new RabbitMQController(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService)
+    );
     await controller.init();
     log.info('Connected to RabbitMQ');
   } catch (err) {
     log.error(`Error starting server: ${err}`);
   }
   app.bind;
+
+  isServiceHealthy = true;
 });

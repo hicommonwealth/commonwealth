@@ -28,13 +28,14 @@ import {
 } from '../../../../src/chains/compound';
 import { Listener } from '../../../../src';
 import { IListenerInstances } from '../../../../services/ChainSubscriber/types';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
 describe('Integration tests for Compound Bravo', () => {
   const rmq = new MockRabbitMqHandler(
-    getRabbitMQConfig(RABBITMQ_URI),
+    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.ChainEventsService),
     RascalPublications.ChainEvents
   );
 
