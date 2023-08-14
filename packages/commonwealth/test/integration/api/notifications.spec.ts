@@ -68,7 +68,6 @@ describe('Notification Routes Tests', () => {
       notification_id: notification.id,
       subscription_id: newThreadSub.id,
       is_read: false,
-      id: 1,
     });
 
     await models.NotificationsRead.create({
@@ -76,7 +75,6 @@ describe('Notification Routes Tests', () => {
       notification_id: notificationTwo.id,
       subscription_id: newThreadSub.id,
       is_read: true,
-      id: 2,
     });
 
     await models.NotificationsRead.create({
@@ -84,7 +82,6 @@ describe('Notification Routes Tests', () => {
       notification_id: notificationThree.id,
       subscription_id: chainEventSub.id,
       is_read: false,
-      id: 3,
     });
   });
 
@@ -198,7 +195,6 @@ describe('Notification Routes Tests', () => {
         notification_id: notif.id,
         subscription_id: newThreadSub.id,
         is_read: false,
-        id: 1,
       });
 
       const res = await chai
