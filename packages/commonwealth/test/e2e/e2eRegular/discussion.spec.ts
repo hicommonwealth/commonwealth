@@ -1,19 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { parseInt } from 'lodash';
 import { PORT } from '../../../server/config';
-import {
-  clearTestEntities,
-  createTestEntities,
-  testChains,
-} from '../hooks/e2eDbEntityHooks.spec';
+import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks.spec';
 import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
 
 test.beforeEach(async () => {
   await createTestEntities();
-});
-
-test.afterEach(async () => {
-  await clearTestEntities();
 });
 
 test.describe('Discussion Page Tests', () => {
@@ -87,6 +79,10 @@ test.describe('Discussion Page Tests', () => {
     } while (commentExists !== 0);
 
     expect(await page.getByText(commentText).count()).toEqual(0);
+  });
+
+  test('Check User can like/dislike thread', async ({ page }) => {
+    await performUpvote(page, 'ThreadOptions');
   });
 });
 
