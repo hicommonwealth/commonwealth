@@ -22,7 +22,7 @@ const OverviewPage = () => {
   const { isWindowExtraSmall } = useBrowserWindow({});
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const { data: recentlyActiveThreads } = useFetchThreadsQuery({
+  const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
     chainId: app.activeChainId(),
     topicsPerThread: 3,
@@ -127,7 +127,7 @@ const OverviewPage = () => {
       </div>
       <CWDivider />
       {topicSummaryRows.map((row, i) => (
-        <TopicSummaryRow {...row} key={i} />
+        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
       ))}
     </div>
   );
