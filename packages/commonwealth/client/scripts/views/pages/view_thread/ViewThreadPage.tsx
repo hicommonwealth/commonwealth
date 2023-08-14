@@ -143,6 +143,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       },
       isWindowMediumSmallInclusive
     );
+
+    if (thread && thread.title) {
+      document.title = document.title = `Commonwealth – ${thread.title}`;
+    }
   }, []);
 
   useBrowserAnalyticsTrack({
