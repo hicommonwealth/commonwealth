@@ -5,7 +5,6 @@ import type { SubscriptionAttributes } from './subscription';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationsReadAttributes = {
-  id: number;
   subscription_id: number;
   notification_id: number;
   is_read: boolean;
@@ -27,7 +26,6 @@ export default (
   const NotificationsRead = <NotificationsReadModelStatic>sequelize.define(
     'NotificationsRead',
     {
-      id: { type: dataTypes.INTEGER },
       subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
       notification_id: { type: dataTypes.INTEGER, primaryKey: true },
       is_read: {

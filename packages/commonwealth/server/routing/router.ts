@@ -77,8 +77,6 @@ import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
-import fetchEntityTitle from '../routes/fetchEntityTitle';
-import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import deleteChain from '../routes/deleteChain';
@@ -108,7 +106,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
-import getEntityMeta from '../routes/getEntityMeta';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
 import bulkBalances from '../routes/bulkBalances';
@@ -525,12 +522,7 @@ function setupRouter(
     databaseValidationService.validateChain,
     viewVotes.bind(this, models)
   );
-  registerRoute(
-    router,
-    'get',
-    '/fetchEntityTitle',
-    fetchEntityTitle.bind(this, models)
-  );
+
   registerRoute(
     router,
     'post',
@@ -613,14 +605,6 @@ function setupRouter(
     deleteCommunityContractTemplateMetadata.bind(this, models)
   );
 
-  registerRoute(
-    router,
-    'post',
-    '/updateChainEntityTitle',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateChainEntityTitle.bind(this, models)
-  );
   registerRoute(
     router,
     'post',
@@ -1341,13 +1325,6 @@ function setupRouter(
 
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
-
-  registerRoute(
-    router,
-    'get',
-    '/getEntityMeta',
-    getEntityMeta.bind(this, models)
-  );
 
   // snapshotAPI
   registerRoute(
