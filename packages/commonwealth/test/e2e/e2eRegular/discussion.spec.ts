@@ -1,19 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { parseInt } from 'lodash';
 import { PORT } from '../../../server/config';
-import {
-  clearTestEntities,
-  createTestEntities,
-  testChains,
-} from '../hooks/e2eDbEntityHooks.spec';
+import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks.spec';
 import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
 
 test.beforeEach(async () => {
   await createTestEntities();
-});
-
-test.afterEach(async () => {
-  await clearTestEntities();
 });
 
 test.describe('Discussion Page Tests', () => {
