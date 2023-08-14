@@ -5,6 +5,7 @@ const config: PlaywrightTestConfig = {
     video: 'retain-on-failure',
   },
   globalSetup: './globalSetup.ts',
+  globalTeardown: './globalTeardown.ts',
   timeout: 45_000,
 };
 
