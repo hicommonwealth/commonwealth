@@ -47,7 +47,7 @@ export default class DatabaseCleaner {
     this._redisCache = redisCache;
     this._oneRunMax = oneRunMax;
 
-    if (!hourToRun) {
+    if (!hourToRun && hourToRun !== 0) {
       this.log.warn(`No hourToRun given. The cleaner will not run.`);
       this._rollbar?.warn(`No hourToRun given. The cleaner will not run.`);
       return;
