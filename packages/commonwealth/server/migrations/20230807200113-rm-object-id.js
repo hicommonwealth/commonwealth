@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       // some new-thread-creation subscriptions are missing a chain_id
-      // creation of such subscriptions is no longer possible given the override create method in Subscriptions model
+      // creation of such subscriptions is no longer possible with the checks added below and the Sequelize model validation
       await queryInterface.sequelize.query(
         `
         UPDATE "Subscriptions"
