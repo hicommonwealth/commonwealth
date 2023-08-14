@@ -27,7 +27,7 @@ The goal of this document is to describe the current state of the app initializa
     2. `CommonDomainRoutes.tsx` and `CustomDomainRoutes.tsx` declare the routes to front-end pages, switched in `navigation/Router.tsx` based on results of the `/domain` call.
     3. "General routes," referring to pages like `/privacy` and `/terms`, are also loaded via `GeneralRoutes.tsx`.
 8. Most of these routes are set to return their relevant views wrapped inside our `LayoutWrapper` component, via the function `withLayout()`, imported from `client/scripts/views/Layout.tsx`. 
-    1. The `LayoutWrapper` injects the page’s specific params into the page as child, and injects the `scope` and `deferChain` arguments into the `Layout` component.
+    1. The `LayoutWrapper` injects the page’s specific params into the page as child, and injects the `scope` argument into the `Layout` component.
     2. This `Layout` component includes a nested `Suspense` component (via the `react` library) and `ErrorBoundary` component (via the `react-error-boundary` library).
     3. The `LayoutComponent` operates as follows:
         1. If, _at render time_, `app.loadingError` is set, display an application error.
