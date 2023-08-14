@@ -2,7 +2,7 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { useFetchThreadsQuery } from 'state/api/threads';
@@ -60,6 +60,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
+  useEffect(() => {
+    document.title = `${app.chain.meta.name} – Discussions`;
+  }, []);
+
   return (
     <div className="DiscussionsPage">
       <Virtuoso
@@ -100,14 +104,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         components={{
           EmptyPlaceholder: () =>
             isInitialLoading ? (
-              <div className='threads-wrapper'>
-                {Array(3).fill({}).map((x, i) =>
-                  <ThreadCard
-                    key={i}
-                    showSkeleton
-                    thread={{} as any}
-                  />
-                )}
+              <div className="threads-wrapper">
+                {Array(3)
+                  .fill({})
+                  .map((x, i) => (
+                    <ThreadCard key={i} showSkeleton thread={{} as any} />
+                  ))}
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">
