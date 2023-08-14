@@ -16,6 +16,8 @@ import {
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
 
+const v1beta1ChainId = 'juno';
+
 function verifyNoCacheResponse(res) {
   expect(res.body).to.not.be.null;
   expect(res).to.have.status(200);
@@ -49,7 +51,7 @@ describe('Cosmos Cache', () => {
   describe('cosmosAPI', () => {
     async function makeRPCRequest(
       body,
-      path = '/cosmosAPI/juno',
+      path = `/cosmosAPI/${v1beta1ChainId}`,
       headers = {
         'content-type': 'text/plain;charset=UTF-8',
         'accept-language': 'en-US,en;q=0.9',
@@ -67,7 +69,7 @@ describe('Cosmos Cache', () => {
 
     function rpcTestKeyAndDuration(body, expectedKey, expectedDuration) {
       const request = {
-        originalUrl: '/cosmosAPI/juno',
+        originalUrl: `/cosmosAPI/${v1beta1ChainId}`,
       };
       const key = cosmosRPCKey(request, body);
       const duration = cosmosRPCDuration(body);
@@ -81,7 +83,7 @@ describe('Cosmos Cache', () => {
       expectedDuration: number
     ) => {
       const request = {
-        originalUrl: '/cosmosAPI/juno',
+        originalUrl: `/cosmosAPI/${v1beta1ChainId}`,
       };
       const params = {
         path: '/cosmos.gov.v1beta1.Query/Proposals',
@@ -95,7 +97,7 @@ describe('Cosmos Cache', () => {
         params: params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/juno_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
 
       const key = cosmosRPCKey(request, body);
       expect(key).to.be.equal(expectedKey);
@@ -150,8 +152,7 @@ describe('Cosmos Cache', () => {
         },
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey =
-        '/cosmosAPI/juno_{"path":"/cosmos.gov.v1beta1.Query/Proposal","data":"08b502","prove":false}';
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_{"path":"/cosmos.gov.v1beta1.Query/Proposal","data":"08b502","prove":false}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 7);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -169,7 +170,7 @@ describe('Cosmos Cache', () => {
         params: params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/juno_{"path":"/cosmos.gov.v1beta1.Query/Votes","data":"08b502","prove":false}`;
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_{"path":"/cosmos.gov.v1beta1.Query/Votes","data":"08b502","prove":false}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -187,7 +188,7 @@ describe('Cosmos Cache', () => {
         params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/juno_${params.path}`;
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${params.path}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -205,7 +206,9 @@ describe('Cosmos Cache', () => {
         params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/juno_${JSON.stringify(params)}`;
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${JSON.stringify(
+        params
+      )}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -223,7 +226,7 @@ describe('Cosmos Cache', () => {
         params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/juno_${params.path}`;
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${params.path}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -236,7 +239,7 @@ describe('Cosmos Cache', () => {
         params: {},
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/juno_${bodyString}`;
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${bodyString}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -250,7 +253,7 @@ describe('Cosmos Cache', () => {
       };
       const bodyString = JSON.stringify(body);
 
-      const expectedKey = `/cosmosAPI/juno_${bodyString}`;
+      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${bodyString}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);

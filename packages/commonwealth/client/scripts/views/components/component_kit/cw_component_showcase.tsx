@@ -11,6 +11,7 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
+import { CWTooltip } from './new_designs/CWTooltip';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -18,7 +19,7 @@ import { CWIconButton } from './cw_icon_button';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWTab, CWTabBar } from './cw_tabs';
@@ -275,7 +276,7 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Tooltips</CWText>
         <div className="tooltip-row">
           <CWText>Default</CWText>
-          <CWTooltip
+          <CWTooltipOld
             content={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
@@ -291,7 +292,7 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tooltip-row">
           <CWText>Solid background</CWText>
-          <CWTooltip
+          <CWTooltipOld
             content={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
@@ -494,8 +495,8 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Status Tags</CWText>
-          <CWTag label="New" type="new" iconName='newStar' />
-          <CWTag label="Trending" type="trending" iconName='trendUp' />
+          <CWTag label="New" type="new" iconName="newStar" />
+          <CWTag label="Trending" type="trending" iconName="trendUp" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Elements Tags</CWText>
@@ -504,15 +505,15 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Stage Tags</CWText>
-          <CWTag label="Stage 1" type="new-stage" classNames='rorange-600'/>
-          <CWTag label="Stage 2" type="new-stage" classNames='rorange-400'/>
-          <CWTag label="Stage 3" type="new-stage" classNames='yellow-500'/>
-          <CWTag label="Stage 4" type="new-stage" classNames='green-600'/>
-          <CWTag label="Stage 5" type="new-stage" classNames='green-500'/>
-          <CWTag label="Stage 6" type="new-stage" classNames='primary-600'/>
-          <CWTag label="Stage 7" type="new-stage" classNames='primary-400'/>
-          <CWTag label="Stage 8" type="new-stage" classNames='purple-600'/>
-          <CWTag label="Stage 9" type="new-stage" classNames='purple-400'/>
+          <CWTag label="Stage 1" type="new-stage" classNames="rorange-600" />
+          <CWTag label="Stage 2" type="new-stage" classNames="rorange-400" />
+          <CWTag label="Stage 3" type="new-stage" classNames="yellow-500" />
+          <CWTag label="Stage 4" type="new-stage" classNames="green-600" />
+          <CWTag label="Stage 5" type="new-stage" classNames="green-500" />
+          <CWTag label="Stage 6" type="new-stage" classNames="primary-600" />
+          <CWTag label="Stage 7" type="new-stage" classNames="primary-400" />
+          <CWTag label="Stage 8" type="new-stage" classNames="purple-600" />
+          <CWTag label="Stage 9" type="new-stage" classNames="purple-400" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Proposal Tag</CWText>
@@ -524,27 +525,35 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
-          <CWTag label="mnh7a" type="login" loginIcon='cosmos' />
-          <CWTag label="mnh7a" type="login" loginIcon='discordLogin' />
-          <CWTag label="mnh7a" type="login" loginIcon='envelope' />
-          <CWTag label="mnh7a" type="login" loginIcon='ethereum' />
-          <CWTag label="mnh7a" type="login" loginIcon='octocat' />
-          <CWTag label="mnh7a" type="login" loginIcon='near' />
-          <CWTag label="mnh7a" type="login" loginIcon='polkadot' />
-          <CWTag label="mnh7a" type="login" loginIcon='polygon' />
-          <CWTag label="mnh7a" type="login" loginIcon='twitterNew' />
+          <CWTag label="mnh7a" type="login" loginIcon="cosmos" />
+          <CWTag label="mnh7a" type="login" loginIcon="discordLogin" />
+          <CWTag label="mnh7a" type="login" loginIcon="envelope" />
+          <CWTag label="mnh7a" type="login" loginIcon="ethereum" />
+          <CWTag label="mnh7a" type="login" loginIcon="octocat" />
+          <CWTag label="mnh7a" type="login" loginIcon="near" />
+          <CWTag label="mnh7a" type="login" loginIcon="polkadot" />
+          <CWTag label="mnh7a" type="login" loginIcon="polygon" />
+          <CWTag label="mnh7a" type="login" loginIcon="twitterNew" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Address Tags</CWText>
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='cosmos' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='discordLogin' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='envelope' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='ethereum' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='octocat' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='near' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='polkadot' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='polygon' />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon='twitterNew' />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="cosmos" />
+          <CWTag
+            label="0xd83e1...a39bD"
+            type="address"
+            loginIcon="discordLogin"
+          />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="envelope" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="ethereum" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="octocat" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="near" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polkadot" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polygon" />
+          <CWTag
+            label="0xd83e1...a39bD"
+            type="address"
+            loginIcon="twitterNew"
+          />
         </div>
       </div>
       <div className="button-gallery">
@@ -1189,26 +1198,6 @@ export const ComponentShowcase = () => {
           />
         </div>
       </div>
-      <div className="Quill">
-        <CWText type="h3">Quill Editor</CWText>
-        <div className="editor-toggle">
-          <CWToggle
-            size={'small'}
-            checked={isEditorDisabled}
-            onChange={() => {
-              setIsEditorDisabled((prev) => !prev);
-            }}
-          />
-          <CWText type="caption">
-            Editor {isEditorDisabled ? 'Disabled' : 'Enabled'}
-          </CWText>
-        </div>
-        <ReactQuillEditor
-          contentDelta={threadContentDelta}
-          setContentDelta={setThreadContentDelta}
-          isDisabled={isEditorDisabled}
-        />
-      </div>
       <div className="upvote-gallery">
         <CWText type="h3">Upvote</CWText>
         <div className="upvote-row">
@@ -1304,6 +1293,76 @@ export const ComponentShowcase = () => {
             );
           })}
         </div>
+      </div>
+      <CWText type="h3">Tooltip</CWText>
+      <div className="tooltip">
+        <CWTooltip
+          content="Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects together. Never miss an on-chain event, proposal, or important discussion again."
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWText
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              Commonwealth
+            </CWText>
+          )}
+        />
+        <CWTooltip
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWIcon
+              iconName="infoEmpty"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="Commonwealth labs"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="top"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam semper justo eget facilisis auctor. Mauris consequat arcu non est semper vestibulum. Nulla nec porta nisi. Nullam eu erat vel arcu finibus imperdiet nec eget mi. Pellentesque enim nibh, consequat eu urna id, rhoncus porta metus. Vestibulum hendrerit felis urna, in tempor purus lobortis sit amet. Etiam pulvinar nisl eu enim laoreet tristique. Nam semper venenatis massa vel finibus."
+          placement="right"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="right"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="bottom"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="bottom"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="left"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="left"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
       </div>
     </div>
   );

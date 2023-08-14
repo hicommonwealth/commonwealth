@@ -25,8 +25,8 @@ import { success } from '../types';
 import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -456,7 +456,7 @@ const createChain = async (
   if (addressToBeAdmin) {
     const newAddress = await models.Address.create({
       user_id: req.user.id,
-      profile_id: addressToBeAdmin.id,
+      profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       chain: chain.id,
       verification_token: addressToBeAdmin.verification_token,
@@ -487,12 +487,16 @@ const createChain = async (
     });
   }
 
-  serverAnalyticsTrack({
-    chainBase: req.body.base,
-    isCustomDomain: null,
-    communityType: null,
-    event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-  });
+  const serverAnalyticsController = new ServerAnalyticsController();
+  serverAnalyticsController.track(
+    {
+      chainBase: req.body.base,
+      isCustomDomain: null,
+      communityType: null,
+      event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+    },
+    req
+  );
 
   return success(res, {
     chain: chain.toJSON(),

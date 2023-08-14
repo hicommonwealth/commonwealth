@@ -3,7 +3,6 @@ import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import type { ProposalStore } from 'stores';
 import { requiresTypeSlug, slugify } from 'utils';
-import type ThreadsController from './controllers/server/threads';
 import type ChainInfo from './models/ChainInfo';
 import type NotificationSubscription from './models/NotificationSubscription';
 import type ProposalModule from './models/ProposalModule';
@@ -56,8 +55,8 @@ export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
 export const proposalSlugToClass = () => {
   const mmap = new Map<
     string,
-    ProposalModule<any, any, any> | ThreadsController
-  >([[ProposalType.Thread, app.threads]]);
+    ProposalModule<any, any, any>
+  >([[ProposalType.Thread, null]]);
   if (!app.chain) {
     return mmap;
   }

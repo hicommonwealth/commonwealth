@@ -10,12 +10,15 @@ import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
 import type { BrokerConfig } from 'rascal';
 import { EventKind, IEventData } from '../../../src/chains/aave/types';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 chai.use(chaiHttp);
 const { assert } = chai;
 
 const rmqController = new MockRabbitMQController(
-  <BrokerConfig>getRabbitMQConfig('localhost')
+  <BrokerConfig>(
+    getRabbitMQConfig('localhost', RascalConfigServices.ChainEventsService)
+  )
 );
 
 const setupDbEvent = async (event: CWEvent) => {

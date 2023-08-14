@@ -5,7 +5,6 @@ import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
 import type { ChainNodeInstance } from 'server/models/chain_node';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import type { DiscussionDraftAttributes } from 'server/models/discussion_draft';
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
@@ -47,7 +46,6 @@ type StatusResp = {
     disableRichText: boolean;
     lastVisited: string;
     starredCommunities: StarredCommunityAttributes[];
-    discussionDrafts: DiscussionDraftAttributes[];
     unseenPosts: { [chain: string]: number };
   };
   evmTestEnv?: string;
@@ -160,13 +158,6 @@ export const getUserStatus = async (models: DB, user) => {
     include: [models.Address],
   });
 
-  const discussionDraftsPromise = models.DiscussionDraft.findAll({
-    where: {
-      address_id: { [Op.in]: myAddressIds },
-    },
-    include: [models.Address],
-  });
-
   // get starred communities for user
   const starredCommunitiesPromise = models.StarredCommunity.findAll({
     where: { user_id: user.id },
@@ -216,13 +207,11 @@ export const getUserStatus = async (models: DB, user) => {
   );
 
   // wait for all the promises to resolve
-  const [roles, discussionDrafts, starredCommunities, threadNum] =
-    await Promise.all([
-      rolesPromise,
-      discussionDraftsPromise,
-      starredCommunitiesPromise,
-      threadNumPromise,
-    ]);
+  const [roles, starredCommunities, threadNum] = await Promise.all([
+    rolesPromise,
+    starredCommunitiesPromise,
+    threadNumPromise,
+  ]);
 
   // this section iterates through the retrieved threads
   // counting the number of threads and keeping a set of activePosts
@@ -333,7 +322,6 @@ export const getUserStatus = async (models: DB, user) => {
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
       starredCommunities,
-      discussionDrafts,
       unseenPosts,
     },
     id: user.id,
