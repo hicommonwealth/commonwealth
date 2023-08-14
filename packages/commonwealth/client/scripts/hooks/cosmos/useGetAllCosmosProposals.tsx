@@ -3,8 +3,10 @@ import { IApp } from 'state';
 
 import { ChainBase } from 'common-common/src/types';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { useGetCompletedCosmosProposals } from './useGetCompletedCosmosProposals';
-import { useGetActiveCosmosProposals } from './useGetActiveCosmosProposals';
+import {
+  useActiveCosmosProposalsQuery,
+  useCompletedCosmosProposalsQuery,
+} from 'state/api/proposals';
 
 type UseStateSetter<T> = Dispatch<SetStateAction<T>>;
 
@@ -17,8 +19,6 @@ interface Props {
   app: IApp;
   setIsLoadingActiveProposals?: UseStateSetter<boolean>;
   setIsLoadingCompletedProposals?: UseStateSetter<boolean>;
-  isLoadingActiveProposals?: boolean;
-  isLoadingCompletedProposals?: boolean;
   needToInitAPI?: boolean;
 }
 
@@ -26,24 +26,20 @@ export const useGetAllCosmosProposals = ({
   app,
   setIsLoadingActiveProposals,
   setIsLoadingCompletedProposals,
-  isLoadingActiveProposals,
-  isLoadingCompletedProposals,
   needToInitAPI,
 }: Props): Response => {
   const startedApiRef = useRef(false);
-  const [isApiReady, setIsApiReady] = useState(false);
+  const [isApiReady, setIsApiReady] = useState(!needToInitAPI);
 
-  const { activeCosmosProposals } = useGetActiveCosmosProposals({
-    app,
-    setIsLoading: setIsLoadingActiveProposals,
-    isApiReady,
-  });
+  const { data: activeCosmosProposals, isLoading: isLoadingActiveProps } =
+    useActiveCosmosProposalsQuery({
+      isApiReady,
+    });
 
-  const { completedCosmosProposals } = useGetCompletedCosmosProposals({
-    app,
-    setIsLoading: setIsLoadingCompletedProposals,
-    isApiReady,
-  });
+  const { data: completedCosmosProposals, isLoading: isLoadingCompletedProps } =
+    useCompletedCosmosProposalsQuery({
+      isApiReady,
+    });
 
   useEffect(() => {
     const initApi = async () => {
@@ -60,6 +56,30 @@ export const useGetAllCosmosProposals = ({
       initApi();
     }
   }, [needToInitAPI, app.chain]);
+
+  useEffect(() => {
+    setIsLoadingActiveProposals(isLoadingActiveProps);
+    if (!isApiReady && activeCosmosProposals?.length === 0) {
+      setIsLoadingActiveProposals(true);
+    }
+  }, [
+    isLoadingActiveProps,
+    isApiReady,
+    activeCosmosProposals?.length,
+    setIsLoadingActiveProposals,
+  ]);
+
+  useEffect(() => {
+    setIsLoadingCompletedProposals(isLoadingCompletedProps);
+    if (!isApiReady && completedCosmosProposals?.length === 0) {
+      setIsLoadingCompletedProposals(true);
+    }
+  }, [
+    isLoadingCompletedProps,
+    isApiReady,
+    completedCosmosProposals?.length,
+    setIsLoadingCompletedProposals,
+  ]);
 
   return {
     activeCosmosProposals,

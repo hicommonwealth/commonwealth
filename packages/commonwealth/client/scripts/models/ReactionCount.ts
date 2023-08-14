@@ -10,16 +10,15 @@ class ReactionCount<T extends IUniqueId> {
   public readonly likes: number;
   public readonly dislikes?: number;
 
-  constructor(
-    { id,
-      thread_id,
-      comment_id,
-      proposal_id,
-      has_reacted,
-      like,
-      dislikes = 0
-    }
-  ) {
+  constructor({
+    id,
+    thread_id,
+    comment_id,
+    proposal_id,
+    has_reacted,
+    like,
+    dislikes = 0,
+  }) {
     this.id = id;
     this.threadId = thread_id;
     this.commentId = comment_id;

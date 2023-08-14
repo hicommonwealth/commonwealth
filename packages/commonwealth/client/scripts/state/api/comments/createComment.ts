@@ -2,17 +2,18 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { updateLastVisited } from 'controllers/app/login';
 import Comment from 'models/Comment';
-import Thread from 'models/Thread';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
   address: string;
-  threadId: number,
+  threadId: number;
   chainId: string;
-  unescapedText: string,
-  parentCommentId: number,
+  unescapedText: string;
+  parentCommentId: number;
+  existingNumberOfComments: number;
 }
 
 const createComment = async ({
@@ -47,47 +48,38 @@ const createComment = async ({
     }
   );
 
-  return new Comment(response.data.result)
+  return new Comment(response.data.result);
 };
 
-const useCreateCommentMutation = ({ chainId, threadId }: Partial<CreateCommentProps>) => {
+const useCreateCommentMutation = ({
+  chainId,
+  threadId,
+  existingNumberOfComments = 0,
+}: Partial<CreateCommentProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     chainId,
     threadId,
-  })
+  });
 
   return useMutation({
     mutationFn: createComment,
     onSuccess: async (newComment) => {
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId]
+      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
       queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key,
-        () => {
-          return [...comments, newComment]
-        }
-      );
+      queryClient.setQueryData(key, () => {
+        return [...comments, newComment];
+      });
 
       // TODO: these types of async calls should also have a dedicated react query handler
       // update last visisted
-      updateLastVisited(app.chain.meta, true)
+      updateLastVisited(app.chain.meta, true);
 
-      // TODO: this state below would be stored in threads react query state when we migrate the
-      // whole threads controller from current state to react query (there is a good chance we can
-      // remove this entirely)
-      // increment thread count in thread store
-      const thread = app.threads.getById(threadId);
-      if (thread) {
-        app.threads.updateThreadInStore(
-          new Thread({
-            ...thread,
-            numberOfComments: thread.numberOfComments + 1,
-          })
-        );
-      }
-
-      return newComment
+      updateThreadInAllCaches(chainId, threadId, {
+        numberOfComments: existingNumberOfComments + 1,
+      });
+      return newComment;
     },
   });
 };

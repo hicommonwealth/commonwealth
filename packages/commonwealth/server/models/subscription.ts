@@ -30,8 +30,8 @@ export type SubscriptionAttributes = {
   created_at?: Date;
   updated_at?: Date;
   chain_id?: string;
-  offchain_thread_id?: number;
-  offchain_comment_id?: number;
+  thread_id?: number;
+  comment_id?: number;
   snapshot_id?: string;
 
   User?: UserAttributes;
@@ -85,8 +85,8 @@ export default (
       },
       // TODO: change allowNull to false once subscription refactor is implemented
       chain_id: { type: dataTypes.STRING, allowNull: true },
-      offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
-      offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      comment_id: { type: dataTypes.INTEGER, allowNull: true },
       snapshot_id: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -100,7 +100,7 @@ export default (
       indexes: [
         { fields: ['subscriber_id'] },
         { fields: ['category_id', 'object_id', 'is_active'] },
-        { fields: ['offchain_thread_id'] },
+        { fields: ['thread_id'] },
       ],
     }
   );
@@ -123,11 +123,11 @@ export default (
       targetKey: 'id',
     });
     models.Subscription.belongsTo(models.Thread, {
-      foreignKey: 'offchain_thread_id',
+      foreignKey: 'thread_id',
       targetKey: 'id',
     });
     models.Subscription.belongsTo(models.Comment, {
-      foreignKey: 'offchain_comment_id',
+      foreignKey: 'comment_id',
       targetKey: 'id',
     });
   };

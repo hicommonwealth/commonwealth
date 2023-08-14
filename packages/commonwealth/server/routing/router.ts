@@ -1,8 +1,14 @@
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
+import useragent from 'express-useragent';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from '../middleware/methodNotAllowed';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -132,6 +138,7 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import createChainNode from '../routes/createChainNode';
+import { RedisCache } from 'common-common/src/redisCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -164,6 +171,7 @@ import { ServerNotificationsController } from '../controllers/server_notificatio
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
 import { ServerChainsController } from '../controllers/server_chains_controller';
+import { ServerProposalsController } from '../controllers/server_proposals_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -177,10 +185,15 @@ import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
 import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
+import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { searchChainsHandler } from '../routes/chains/search_chains_handler';
+import { get_proposals_handler } from '../routes/proposals/get_proposals_handler';
+import { get_proposal_votes_handler } from '../routes/proposals/get_proposal_votes_handler';
+
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -192,14 +205,6 @@ export type ServerControllers = {
   chains: ServerChainsController;
   proposals: ServerProposalsController;
 };
-import {
-  methodNotAllowedMiddleware,
-  registerRoute,
-} from '../middleware/methodNotAllowed';
-import { ServerProposalsController } from '../controllers/server_proposals_controller';
-import { RedisCache } from 'common-common/src/redisCache';
-import { get_proposals_handler } from '../routes/proposals/get_proposals_handler';
-import { get_proposal_votes_handler } from '../routes/proposals/get_proposal_votes_handler';
 
 function setupRouter(
   endpoint: string,
@@ -228,6 +233,8 @@ function setupRouter(
   // ---
 
   const router = express.Router();
+
+  router.use(useragent.express());
 
   // Updating the address
   registerRoute(
@@ -430,6 +437,24 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChainWithTopics,
     createThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    updateThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/threads/:message_id',
+    databaseValidationService.validateBotUser,
+    deleteBotThreadHandler.bind(this, serverControllers)
   );
 
   registerRoute(
@@ -667,6 +692,26 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/comments/:message_id',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteBotCommentHandler.bind(this, serverControllers)
   );
 
   registerRoute(
