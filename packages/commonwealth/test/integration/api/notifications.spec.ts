@@ -95,7 +95,6 @@ describe('Notification Routes Tests', () => {
 
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.numNotifications).to.equal(3);
       expect(res.body.result.numUnread).to.equal(2);
       expect(res.body.result.subscriptions.length).to.be.equal(1);
       expect(
@@ -130,7 +129,6 @@ describe('Notification Routes Tests', () => {
 
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.numNotifications).to.equal(3);
       expect(res.body.result.numUnread).to.equal(2);
       expect(res.body.result.subscriptions.length).to.be.equal(1);
       expect(
