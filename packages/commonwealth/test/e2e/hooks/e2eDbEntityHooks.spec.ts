@@ -11,6 +11,7 @@ import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
 import { ProfileAttributes } from '../../../server/models/profile';
+import { testAddress } from '../utils/e2eUtils';
 
 const Op = Sequelize.Op;
 
@@ -27,9 +28,19 @@ export let testProfiles: ProfileAttributes[];
 
 export async function clearTestEntities() {
   try {
+    const testAddressInfo = await models.Address.findAll({
+      where: { address: testAddress },
+    });
+
+    const testAddressId: number = testAddressInfo[0]['id'];
+
     const threadsToDelete = await models.Thread.findAll({
       where: {
-        [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+        [Op.or]: [
+          { id: { [Op.lt]: 0 } },
+          { address_id: { [Op.lt]: 0 } },
+          { address_id: testAddressId },
+        ],
       },
     });
 
@@ -48,6 +59,7 @@ export async function clearTestEntities() {
           { id: { [Op.lt]: 0 } },
           { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
           { address_id: { [Op.lt]: 0 } },
+          { address_id: testAddressId },
         ],
       },
     });
@@ -64,6 +76,7 @@ export async function clearTestEntities() {
           { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
           { comment_id: { [Op.in]: commentsToDelete.map((t) => t['id']) } },
           { address_id: { [Op.lt]: 0 } },
+          { address_id: testAddressId },
         ],
       },
       force: true,
@@ -78,6 +91,7 @@ export async function clearTestEntities() {
           { id: { [Op.in]: commentsToDelete.map((c) => c['id']) } },
           { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
           { address_id: { [Op.lt]: 0 } },
+          { address_id: testAddressId },
         ],
       },
       force: true,
