@@ -92,6 +92,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
+          { user_id: { [Op.in]: usersToDelete.map((u) => u['id']) } },
           { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },

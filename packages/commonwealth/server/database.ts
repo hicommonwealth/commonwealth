@@ -5,7 +5,6 @@ import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
-import ChainEntityMetaFactory from './models/chain_entity_meta';
 import ChainNodeFactory from './models/chain_node';
 import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
@@ -71,7 +70,6 @@ const models: Models = {
   Ban: BanFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
-  ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
