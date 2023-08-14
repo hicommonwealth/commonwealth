@@ -72,7 +72,6 @@ export const ThreadCard = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -233,7 +232,6 @@ export const ThreadCard = ({
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
               onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onCollaboratorsEdit={onCollaboratorsEdit}

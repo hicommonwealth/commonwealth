@@ -58,7 +58,6 @@ type ContentPageProps = {
   onDelete?: () => any;
   onSpamToggle?: (thread: Thread) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onTopicChange?: (newTopic: Topic) => any;
   onProposalStageChange?: (newStage: ThreadStage) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
@@ -167,7 +166,6 @@ export const CWContentPage = ({
   onLockToggle,
   onPinToggle,
   onDelete,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -241,27 +239,24 @@ export const CWContentPage = ({
 
       {body &&
         body(
-          <>
-            <ThreadOptions
-              upvoteBtnVisible={!thread?.readOnly}
-              commentBtnVisible={!thread?.readOnly}
-              thread={thread}
-              totalComments={thread?.numberOfComments}
-              onLockToggle={onLockToggle}
-              onSpamToggle={onSpamToggle}
-              onDelete={onDelete}
-              onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
-              onCollaboratorsEdit={onCollaboratorsEdit}
-              onEditCancel={onEditCancel}
-              onEditConfirm={onEditConfirm}
-              onEditStart={onEditStart}
-              canUpdateThread={canUpdateThread}
-              hasPendingEdits={hasPendingEdits}
-              onProposalStageChange={onProposalStageChange}
-              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-            />
-          </>
+          <ThreadOptions
+            upvoteBtnVisible={!thread?.readOnly}
+            commentBtnVisible={!thread?.readOnly}
+            thread={thread}
+            totalComments={thread?.numberOfComments}
+            onLockToggle={onLockToggle}
+            onSpamToggle={onSpamToggle}
+            onDelete={onDelete}
+            onPinToggle={onPinToggle}
+            onCollaboratorsEdit={onCollaboratorsEdit}
+            onEditCancel={onEditCancel}
+            onEditConfirm={onEditConfirm}
+            onEditStart={onEditStart}
+            canUpdateThread={canUpdateThread}
+            hasPendingEdits={hasPendingEdits}
+            onProposalStageChange={onProposalStageChange}
+            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+          />
         )}
 
       {subBody}

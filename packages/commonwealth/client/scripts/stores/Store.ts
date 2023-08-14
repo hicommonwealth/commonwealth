@@ -17,7 +17,7 @@ abstract class Store<T> {
         ? this._store.splice(options.pushToIndex, 0, item)
         : this._store.push(item);
     } else {
-      this._store[index] = {...item};
+      this._store[index] = { ...item };
     }
 
     return this;

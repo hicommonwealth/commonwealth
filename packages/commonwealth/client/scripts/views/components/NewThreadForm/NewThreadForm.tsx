@@ -2,14 +2,19 @@ import 'components/NewThreadForm.scss';
 import { notifyError } from 'controllers/app/notifications';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
 import app from 'state';
+import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
@@ -20,10 +25,6 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -61,6 +62,10 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
+  const { mutateAsync: createThread } = useCreateThreadMutation({
+    chainId: app.activeChainId(),
+  });
+
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
   const isPopulated = useMemo(() => {
@@ -92,25 +97,28 @@ export const NewThreadForm = () => {
     });
 
     try {
-      const result = await app.threads.create(
-        app.user.activeAccount.address,
-        threadKind,
-        app.chain.meta.customStages
+      const thread = await createThread({
+        address: app.user.activeAccount.address,
+        kind: threadKind,
+        stage: app.chain.meta.customStages
           ? parseCustomStages(app.chain.meta.customStages)[0]
           : ThreadStage.Discussion,
-        app.activeChainId(),
-        threadTitle,
-        threadTopic,
-        serializeDelta(threadContentDelta),
-        threadUrl
-      );
+        chainId: app.activeChainId(),
+        title: threadTitle,
+        topic: threadTopic,
+        body: serializeDelta(threadContentDelta),
+        url: threadUrl,
+        authorProfile: app.user.activeAccount.profile,
+      });
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
-      navigate(`/discussion/${result.id}`);
+      navigate(`/discussion/${thread.id}`);
     } catch (err) {
-      console.error(err);
+      const error =
+        err?.responseJSON?.error || err?.message || 'Failed to create thread';
+      throw new Error(error);
     } finally {
       setIsSaving(false);
     }
