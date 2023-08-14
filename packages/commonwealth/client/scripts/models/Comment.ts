@@ -1,6 +1,6 @@
 import type momentType from 'moment';
 import moment from 'moment';
-import type { VersionHistory } from '../controllers/server/threads';
+import { VersionHistory } from 'models/Thread';
 import AddressInfo from './AddressInfo';
 import Reaction from './Reaction';
 import type { IUniqueId } from './interfaces';
@@ -46,11 +46,11 @@ export class Comment<T extends IUniqueId> {
     created_at,
     deleted_at,
     authorChain,
-    version_history,
     last_edited,
     canvas_hash,
     canvas_action,
     canvas_session,
+    version_history,
     marked_as_spam_at,
     discord_meta,
   }) {

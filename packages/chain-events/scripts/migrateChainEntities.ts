@@ -23,6 +23,7 @@ import { RABBITMQ_URI } from '../../commonwealth/server/config';
 import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';
 import NotificationsHandler from '../services/ChainEventsConsumer/ChainEventHandlers/notification';
 import models from '../services/database/database';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -166,7 +167,9 @@ export async function runEntityMigrations(chainId?: string): Promise<void> {
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+      <BrokerConfig>(
+        getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.ChainEventsService)
+      )
     );
     await rmqController.init();
   } catch (e) {

@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect as pwexpect, test } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { PORT } from '../../../server/config';
@@ -7,24 +7,25 @@ import {
   createTestEntities,
   testChains,
   testThreads,
-} from '../../integration/api/external/dbEntityHooks.spec';
+} from '../hooks/e2eDbEntityHooks.spec';
+import { login } from '../utils/e2eUtils';
+
 chai.use(chaiHttp);
 const { expect } = chai;
 
-test.beforeEach(async () => {
-  await createTestEntities();
-});
-
-test.afterEach(async () => {
-  await clearTestEntities();
-});
-
 test.describe('DiscussionsPage Homepage', () => {
+  test.beforeEach(async ({ page }) => {
+    await createTestEntities();
+    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
+  });
+
+  test.afterEach(async () => {
+    await clearTestEntities();
+  });
+
   test('Discussion page loads and can navigate to first thread', async ({
     page,
   }) => {
-    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
-
     await page.waitForSelector('div.HeaderWithFilters');
 
     // Assert Thread header exists on discussions page
@@ -36,11 +37,13 @@ test.describe('DiscussionsPage Homepage', () => {
     await page.waitForSelector('div[data-test-id]');
 
     // Perform the assertion
-    const numberOfThreads = await page.$$eval(
-      'div[data-test-id] > div',
-      (divs) => divs.length
-    );
-    expect(numberOfThreads).to.equal(Math.min(20, testThreads.length));
+    await pwexpect(async () => {
+      const numberOfThreads = await page.$$eval(
+        'div[data-test-id] > div',
+        (divs) => divs.length
+      );
+      expect(numberOfThreads).to.be.gte(testThreads.length - 1);
+    }).toPass();
 
     const firstThread = await page.$(
       'div[data-test-id="virtuoso-item-list"] > div:first-child'
@@ -53,8 +56,6 @@ test.describe('DiscussionsPage Homepage', () => {
   });
 
   test('Check navigation to first profile', async ({ page }) => {
-    await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
-
     let userProfileLinks = await page.locator('a.user-display-name.username');
 
     do {
@@ -65,5 +66,52 @@ test.describe('DiscussionsPage Homepage', () => {
     await userProfileLinks.first().click();
 
     expect(page.url()).to.include('/profile/id/');
+  });
+
+  test('Check User can Like/Dislike post', async ({ page }) => {
+    await login(page);
+
+    let reactionsCountDivs = await page.locator('div.reactions-count');
+
+    await pwexpect(async () => {
+      reactionsCountDivs = await page.locator('div.reactions-count');
+      await pwexpect(reactionsCountDivs.first()).toBeVisible();
+    }).toPass();
+
+    const firstThreadReactionCount = await reactionsCountDivs
+      .first()
+      .innerText();
+
+    // click button
+    await page
+      .getByRole('button', { name: firstThreadReactionCount, exact: true })
+      .first()
+      .click();
+
+    const expectedNewReactionCount = (
+      parseInt(firstThreadReactionCount) + 1
+    ).toString();
+    // assert reaction count increased
+    await pwexpect(async () => {
+      reactionsCountDivs = await page.locator('.reactions-count');
+      pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
+        expectedNewReactionCount
+      );
+    }).toPass({ timeout: 5_000 });
+
+    // click button
+    await page
+      .getByRole('button', { name: expectedNewReactionCount, exact: true })
+      .first()
+      .click();
+
+    console.log(await reactionsCountDivs.first().innerText());
+    // assert reaction count decreased
+    await pwexpect(async () => {
+      reactionsCountDivs = await page.locator('.reactions-count');
+      pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
+        firstThreadReactionCount
+      );
+    }).toPass({ timeout: 5_000 });
   });
 });

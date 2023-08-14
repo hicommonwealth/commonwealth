@@ -20,11 +20,7 @@ import type { ExtendedError } from 'socket.io/dist/namespace';
 import { WebsocketNamespaces } from '../../shared/types';
 import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import type { DB } from '../models';
-import {
-  createNamespace,
-  publishToChainEventsRoom,
-  publishToSnapshotRoom,
-} from './createNamespace';
+import { createNamespace, publishToChainEventsRoom } from './createNamespace';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -198,22 +194,12 @@ export async function setupWebSocketServer(
     io,
     WebsocketNamespaces.ChainEvents
   );
-  const snapshotProposalNamespace = createNamespace(
-    io,
-    WebsocketNamespaces.SnapshotProposals
-  );
 
   try {
     await rabbitMQController.startSubscription(
       publishToChainEventsRoom,
       RascalSubscriptions.ChainEventNotifications,
       { server: chainEventsNamespace }
-    );
-
-    await rabbitMQController.startSubscription(
-      publishToSnapshotRoom,
-      RascalSubscriptions.SnapshotProposalNotifications,
-      { server: snapshotProposalNamespace }
     );
   } catch (e) {
     log.error(
