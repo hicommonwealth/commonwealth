@@ -12,13 +12,12 @@ import {
 } from '../../../../common-common/src/types';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { DB } from '../../models';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { uniq } from 'lodash';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
