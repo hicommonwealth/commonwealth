@@ -38,7 +38,7 @@ const createThread = async ({
     action = null,
     session = null,
     hash = null,
-  } = await app.sessions.signThread({
+  } = await app.sessions.signThread(address, {
     community: chainId,
     title,
     body,

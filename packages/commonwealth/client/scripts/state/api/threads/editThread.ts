@@ -36,7 +36,7 @@ const editThread = async ({
     action = null,
     session = null,
     hash = null,
-  } = await app.sessions.signThread({
+  } = await app.sessions.signThread(address, {
     community: app.activeChainId(),
     title: newTitle,
     body: newBody,
@@ -78,7 +78,7 @@ const useEditThreadMutation = ({
     mutationFn: editThread,
     onSuccess: async (updatedThread) => {
       // Update community level thread counters variables
-      updateThreadCountsByStageChange(currentStage, updatedThread.stage)
+      updateThreadCountsByStageChange(currentStage, updatedThread.stage);
 
       updateThreadInAllCaches(chainId, threadId, updatedThread);
 
