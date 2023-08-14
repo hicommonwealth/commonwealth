@@ -62,13 +62,13 @@ export const ChangeThreadTopicModal = ({
         />
         <div className="buttons-row">
           <CWButton
-            buttonType="primary"
+            buttonType="secondary"
             buttonHeight="sm"
             label="Cancel"
             onClick={onModalClose}
           />
           <CWButton
-            buttonType="secondary"
+            buttonType="primary"
             buttonHeight="sm"
             label="Save changes"
             onClick={handleSaveChanges}
