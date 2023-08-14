@@ -84,7 +84,6 @@ const CustomDomainRoutes = () => {
       path="/"
       element={withLayout(DiscussionsRedirectPage, {
         scoped: true,
-        deferChain: true,
         type: 'blank',
       })}
     />,
@@ -105,28 +104,25 @@ const CustomDomainRoutes = () => {
     <Route path="/home" element={<Navigate to="/overview" />} />,
     <Route
       path="/search"
-      element={withLayout(SearchPage, { deferChain: true, type: 'common' })}
+      element={withLayout(SearchPage, { type: 'common' })}
     />,
     <Route path="/web3login" element={<Navigate to="/" />} />,
     <Route
       path="/overview"
       element={withLayout(OverviewPage, {
         scoped: true,
-        deferChain: true,
       })}
     />,
     <Route
       path="/members"
       element={withLayout(MembersPage, {
         scoped: true,
-        deferChain: true,
       })}
     />,
     <Route
       path="/sputnik-daos"
       element={withLayout(SputnikDaosPage, {
         scoped: true,
-        deferChain: true,
       })}
     />,
     <Route
@@ -150,7 +146,6 @@ const CustomDomainRoutes = () => {
       path="/notifications"
       element={withLayout(NotificationsPage, {
         scoped: true,
-        deferChain: true,
         type: 'common',
       })}
     />,
@@ -158,7 +153,6 @@ const CustomDomainRoutes = () => {
     <Route
       path="/notification-settings"
       element={withLayout(NotificationSettingsPage, {
-        deferChain: true,
         scoped: true,
         type: 'common',
       })}
@@ -200,8 +194,6 @@ const CustomDomainRoutes = () => {
       path="/new/proposal"
       element={withLayout(NewProposalPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     // GOVERNANCE END
@@ -211,32 +203,24 @@ const CustomDomainRoutes = () => {
       path="/discussions"
       element={withLayout(DiscussionsPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/discussions/:topicName"
       element={withLayout(DiscussionsPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/new/discussion"
       element={withLayout(NewThreadPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
@@ -254,24 +238,18 @@ const CustomDomainRoutes = () => {
             path="/contracts"
             element={withLayout(ContractsPage, {
               scoped: true,
-
-              deferChain: true,
             })}
           />,
           <Route
             path="/new/contract"
             element={withLayout(NewContractPage, {
               scoped: true,
-
-              deferChain: true,
             })}
           />,
           <Route
             path="/new/contract_template/:contract_id"
             element={withLayout(NewContractTemplatePage, {
               scoped: true,
-
-              deferChain: true,
             })}
           />,
           <Route
@@ -310,54 +288,42 @@ const CustomDomainRoutes = () => {
       path="/manage"
       element={withLayout(ManageCommunityPage, {
         scoped: true,
-        deferChain: true,
       })}
     />,
     <Route
       path="/discord-callback"
       element={withLayout(DiscordCallbackPage, {
         scoped: true,
-        deferChain: true,
       })}
     />,
     <Route
       path="/analytics"
       element={withLayout(AnalyticsPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/snapshot/:snapshotId"
       element={withLayout(SnapshotProposalPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/multiple-snapshots"
       element={withLayout(ViewMultipleSnapshotsPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/snapshot/:snapshotId/:identifier"
       element={withLayout(ViewSnapshotsProposalPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/new/snapshot/:snapshotId"
       element={withLayout(NewSnapshotProposalPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     // ADMIN END
@@ -368,7 +334,6 @@ const CustomDomainRoutes = () => {
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
         type: 'common',
-        deferChain: true,
       })}
     />,
     <Route
@@ -376,7 +341,6 @@ const CustomDomainRoutes = () => {
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
         type: 'common',
-        deferChain: true,
       })}
     />,
     <Route
@@ -384,7 +348,6 @@ const CustomDomainRoutes = () => {
       element={withLayout(NewProfilePage, {
         scoped: true,
         type: 'common',
-        deferChain: true,
       })}
     />,
     <Route
@@ -392,7 +355,6 @@ const CustomDomainRoutes = () => {
       element={withLayout(EditNewProfilePage, {
         scoped: true,
         type: 'common',
-        deferChain: true,
       })}
     />,
     // PROFILES END
@@ -574,16 +536,12 @@ const CustomDomainRoutes = () => {
       path="/link/chain-entity/:identifier"
       element={withLayout(ChainEntityLinkRedirectPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
     <Route
       path="/link/snapshot-proposal/:identifier"
       element={withLayout(SnapshotProposalLinkRedirectPage, {
         scoped: true,
-
-        deferChain: true,
       })}
     />,
   ];
