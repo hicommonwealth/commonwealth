@@ -143,10 +143,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       },
       isWindowMediumSmallInclusive
     );
-
-    if (thread && thread.title) {
-      document.title = document.title = `Commonwealth – ${thread.title}`;
-    }
   }, []);
 
   useBrowserAnalyticsTrack({
@@ -159,6 +155,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setPolls(app.polls.getByThreadId(thread?.id));
     }
   }, [initializedPolls, thread?.id]);
+
+  useEffect(() => {
+    if (thread && thread.title) {
+      document.title = `${app.chain.meta.name} – ${thread.title}`;
+    }
+  }, [thread]);
 
   // TODO: unnecessary code - must be in a redirect hook
   useNecessaryEffect(() => {
