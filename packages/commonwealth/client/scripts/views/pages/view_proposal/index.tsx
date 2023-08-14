@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
@@ -166,6 +167,16 @@ const ViewProposalPage = ({
           {proposal.data?.messages && (
             <JSONDisplay data={proposal.data.messages} title="Messages" />
           )}
+          {proposal instanceof CosmosProposal &&
+            proposal.data.type === 'communitySpend' && (
+              <JSONDisplay
+                data={{
+                  recipient: proposal.data?.spendRecipient,
+                  amount: proposal.data?.spendAmount,
+                }}
+                title="Community Spend Proposal"
+              />
+            )}
           <VotingResults proposal={proposal} />
           <VotingActions
             onModalClose={onModalClose}

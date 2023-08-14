@@ -64,10 +64,6 @@ export const createCommentReactionHandler = async (
       canvasHash,
     });
 
-  // update address last active
-  address.last_active = new Date();
-  address.save().catch(console.error);
-
   // emit notifications
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
@@ -75,7 +71,7 @@ export const createCommentReactionHandler = async (
 
   // track analytics events
   for (const a of analyticsOptions) {
-    controllers.analytics.track(a).catch(console.error);
+    controllers.analytics.track(a, req).catch(console.error);
   }
 
   return success(res, newReaction);

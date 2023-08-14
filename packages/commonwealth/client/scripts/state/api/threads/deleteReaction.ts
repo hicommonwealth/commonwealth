@@ -1,9 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
-interface DeleteReactionProps {
+interface UseDeleteThreadReactionMutationProps {
+  chainId: string;
   threadId: number;
+}
+
+interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
   reactionId: number;
 }
 
@@ -46,12 +51,23 @@ const deleteReaction = async ({
   };
 };
 
-const useDeleteThreadReactionMutation = () => {
+const useDeleteThreadReactionMutation = ({
+  chainId,
+  threadId,
+}: UseDeleteThreadReactionMutationProps) => {
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
-      // TODO: when we migrate the reactionCounts store proper to react query
-      // then we will have to update the react query state here
+      updateThreadInAllCaches(
+        chainId,
+        threadId,
+        {
+          associatedReactions: [
+            { id: response.data.result.reaction_id },
+          ] as any,
+        },
+        'removeFromExisting'
+      );
     },
   });
 };

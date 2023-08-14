@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import Thread from 'models/Thread';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteCommentProps {
@@ -10,6 +10,7 @@ interface DeleteCommentProps {
   chainId: string;
   canvasHash: string;
   commentId: number;
+  existingNumberOfComments: number;
 }
 
 const deleteComment = async ({
@@ -35,9 +36,9 @@ const deleteComment = async ({
     },
   });
 
-  // Important: we render comments in a tree, if this deleted comment was
-  // the root comment of a tree, then we want to preserve the comment tree,
-  // but in place of this deleted comment we will show the "[deleted]" msg.
+  // Important: we render comments in a tree, if the deleted comment is a
+  // leaf node, remove it, but if it has replies, then preserve it with
+  // [deleted] msg.
   return {
     softDeleted: {
       id: commentId,
@@ -55,11 +56,13 @@ const deleteComment = async ({
 interface UseDeleteCommentMutationProps {
   chainId: string;
   threadId: number;
+  existingNumberOfComments: number;
 }
 
 const useDeleteCommentMutation = ({
   chainId,
   threadId,
+  existingNumberOfComments,
 }: UseDeleteCommentMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
@@ -84,27 +87,15 @@ const useDeleteCommentMutation = ({
         // update fetch comments query state
         const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
         queryClient.cancelQueries({ queryKey: key });
-        queryClient.setQueryData([...key], () => {
+        queryClient.setQueryData(key, () => {
           const updatedComments = [...(comments || [])];
-          updatedComments[foundCommentIndex] = { ...softDeletedComment };
+          updatedComments[foundCommentIndex] = softDeletedComment;
           return [...updatedComments];
         });
       }
-
-      // TODO: this state below would be stored in threads react query state when we migrate the
-      // whole threads controller from current state to react query (there is a good chance we can
-      // remove this entirely)
-      // increment thread count in thread store
-      const thread = app.threads.getById(threadId);
-      if (thread) {
-        app.threads.updateThreadInStore(
-          new Thread({
-            ...thread,
-            numberOfComments: thread.numberOfComments - 1,
-          })
-        );
-      }
-
+      updateThreadInAllCaches(chainId, threadId, {
+        numberOfComments: existingNumberOfComments - 1 || 0,
+      });
       return response;
     },
   });
