@@ -19,6 +19,9 @@ describe('ServerThreadsController', () => {
       expect(() =>
         validatePermissions(permissions, {
           isThreadOwner: true,
+          isMod: true,
+          isAdmin: true,
+          isSuperAdmin: true,
         })
       ).to.throw('Unauthorized');
     });
