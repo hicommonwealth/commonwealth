@@ -18,6 +18,7 @@ import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { uniq } from 'lodash';
+import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -136,10 +137,16 @@ export async function __updateThread(
   const isAdmin = !!roles.find(
     (r) => r.chain_id === chain.id && r.permission === 'admin'
   );
-  if (!isThreadOwner && !isMod && !isAdmin) {
+  const isSuperAdmin = user.isAdmin;
+  if (!isThreadOwner && !isMod && !isAdmin && !isSuperAdmin) {
     throw new AppError(Errors.Unauthorized);
   }
-  const permissions = { isThreadOwner, isMod, isAdmin };
+  const permissions = {
+    isThreadOwner,
+    isMod,
+    isAdmin,
+    isSuperAdmin,
+  };
 
   const now = new Date();
 
@@ -226,24 +233,23 @@ export async function __updateThread(
       transaction
     );
 
-    await address.update(
-      {
-        last_active: Sequelize.literal('CURRENT_TIMESTAMP'),
-      },
-      { transaction }
-    );
-
     await transaction.commit();
   } catch (err) {
     console.error(err);
     await transaction.rollback();
-    if (err instanceof AppError) {
+    if (err instanceof AppError || err instanceof ServerError) {
       throw err;
     }
-    throw new AppError(`transaction failed`);
+    throw new ServerError(`transaction failed: ${err.message}`);
   }
 
   // ---
+
+  address
+    .update({
+      last_active: Sequelize.literal('CURRENT_TIMESTAMP'),
+    })
+    .catch(console.error);
 
   const finalThread = await this.models.Thread.findOne({
     where: { id: thread.id },
@@ -347,22 +353,30 @@ export async function __updateThread(
 
 // -----
 
-type UpdateThreadPermissions = {
+export type UpdateThreadPermissions = {
   isThreadOwner: boolean;
   isMod: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
 };
 
 /**
- * Throws error if permissions check not satisfied
+ * Throws error if none of the permission flags are satisfied
+ * (no error is thrown if at least one flag is satisfied)
  */
-function validatePermissions(
+export function validatePermissions(
   permissions: UpdateThreadPermissions,
-  checkFn: (p: UpdateThreadPermissions) => boolean
+  flags: Partial<UpdateThreadPermissions>
 ) {
-  if (!checkFn(permissions)) {
-    throw new AppError(Errors.Unauthorized);
+  const keys = ['isThreadOwner', 'isMod', 'isAdmin', 'isSuperAdmin'];
+  for (const k of keys) {
+    if (flags[k] && permissions[k]) {
+      // at least one flag is satisfied
+      return;
+    }
   }
+  // no flags were satisfied
+  throw new AppError(Errors.Unauthorized);
 }
 
 export type UpdatableThreadAttributes = {
@@ -395,10 +409,12 @@ async function setThreadAttributes(
     typeof body !== 'undefined' ||
     typeof url !== 'undefined'
   ) {
-    validatePermissions(
-      permissions,
-      (p) => p.isThreadOwner || p.isMod || p.isAdmin
-    );
+    validatePermissions(permissions, {
+      isThreadOwner: true,
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
 
     // title
     if (typeof title !== 'undefined') {
@@ -448,7 +464,11 @@ async function setThreadPinned(
   toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof pinned !== 'undefined') {
-    validatePermissions(permissions, (p) => p.isMod || p.isAdmin);
+    validatePermissions(permissions, {
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
 
     toUpdate.pinned = pinned;
   }
@@ -463,10 +483,12 @@ async function setThreadLocked(
   toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof locked !== 'undefined') {
-    validatePermissions(
-      permissions,
-      (p) => p.isThreadOwner || p.isMod || p.isAdmin
-    );
+    validatePermissions(permissions, {
+      isThreadOwner: true,
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
 
     toUpdate.read_only = locked;
     toUpdate.locked_at = locked
@@ -484,10 +506,12 @@ async function setThreadArchived(
   toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof archive !== 'undefined') {
-    validatePermissions(
-      permissions,
-      (p) => p.isThreadOwner || p.isMod || p.isAdmin
-    );
+    validatePermissions(permissions, {
+      isThreadOwner: true,
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
 
     toUpdate.archived_at = archive
       ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
@@ -504,7 +528,11 @@ async function setThreadSpam(
   toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof spam !== 'undefined') {
-    validatePermissions(permissions, (p) => p.isMod || p.isAdmin);
+    validatePermissions(permissions, {
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
 
     toUpdate.marked_as_spam_at = spam
       ? (Sequelize.literal('CURRENT_TIMESTAMP') as any)
@@ -523,10 +551,12 @@ async function setThreadStage(
   toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof stage !== 'undefined') {
-    validatePermissions(
-      permissions,
-      (p) => p.isThreadOwner || p.isMod || p.isAdmin
-    );
+    validatePermissions(permissions, {
+      isThreadOwner: true,
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
 
     // fetch available stages
     let customStages = [];
@@ -572,10 +602,12 @@ async function setThreadTopic(
   toUpdate: Partial<ThreadAttributes>
 ) {
   if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
-    validatePermissions(
-      permissions,
-      (p) => p.isThreadOwner || p.isMod || p.isAdmin
-    );
+    validatePermissions(permissions, {
+      isThreadOwner: true,
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
 
     if (typeof topicId !== 'undefined') {
       const topic = await models.Topic.findByPk(topicId);
@@ -612,7 +644,10 @@ async function updateThreadCollaborators(
 ) {
   const { toAdd, toRemove } = collaborators || {};
   if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
-    validatePermissions(permissions, (p) => p.isThreadOwner);
+    validatePermissions(permissions, {
+      isThreadOwner: true,
+      isSuperAdmin: true,
+    });
 
     const toAddUnique = uniq(toAdd || []);
     const toRemoveUnique = uniq(toRemove || []);
