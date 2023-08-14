@@ -97,7 +97,6 @@ export const NewThreadForm = () => {
         topic: threadTopic,
       });
 
-    try {
       const thread = await createThread({
         address: app.user.activeAccount.address,
         kind: threadKind,
@@ -121,7 +120,7 @@ export const NewThreadForm = () => {
       console.error(err);
 
       const error =
-          err?.responseJSON?.error || err?.message || 'Failed to create thread';
+        err?.responseJSON?.error || err?.message || 'Failed to create thread';
       throw new Error(error);
     } finally {
       setIsSaving(false);
