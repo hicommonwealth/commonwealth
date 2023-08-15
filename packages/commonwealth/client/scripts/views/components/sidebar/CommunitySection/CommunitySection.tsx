@@ -6,40 +6,15 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
-import Permissions from '../../../utils/Permissions';
-import { Skeleton } from '../Skeleton';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWText } from '../component_kit/cw_text';
-import AccountConnectionIndicator from './AccountConnectionIndicator';
-import { AdminSection } from './admin_section';
-import { DiscussionSection } from './discussion_section';
-import { ExternalLinksModule } from './external_links_module';
-import { GovernanceSection } from './governance_section';
-
-const CommunitySectionSkeleton = ({ sections = 3, itemsPerSection = 5 }) => {
-  return (
-    <div className="community-menu">
-      <div className="community-menu-skeleton">
-        {Array.from({ length: sections }).map((x, index) => (
-          <div
-            className={`community-menu-skeleton-section ${
-              index > 0 ? 'mt-16' : ''
-            }`}
-          >
-            <Skeleton width={'100%'} height={25} />
-            <div className="community-menu-skeleton-section-items">
-              {Array.from({ length: itemsPerSection }).map(() => (
-                <>
-                  <Skeleton width={'90%'} height={20} />
-                </>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+import Permissions from '../../../../utils/Permissions';
+import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
+import { CWText } from '../../component_kit/cw_text';
+import AccountConnectionIndicator from '../AccountConnectionIndicator';
+import { AdminSection } from '../admin_section';
+import { DiscussionSection } from '../discussion_section';
+import { ExternalLinksModule } from '../external_links_module';
+import { GovernanceSection } from '../governance_section';
+import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
 
 export const CommunitySection = ({ showSkeleton }) => {
   const navigate = useCommonNavigate();
