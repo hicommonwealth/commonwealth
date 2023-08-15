@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
+import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
   describe('#createThreadReaction', () => {
@@ -42,10 +43,6 @@ describe('ServerThreadsController', () => {
         },
       };
       const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
-
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
@@ -53,6 +50,7 @@ describe('ServerThreadsController', () => {
       const chain = {
         id: 'ethereum',
       };
+      const banCache = BAN_CACHE_MOCK_FN(chain.id);
       const reaction = {};
       const threadId = 123;
 
@@ -70,6 +68,19 @@ describe('ServerThreadsController', () => {
           reaction: reaction as any,
           threadId: threadId,
         });
+
+      expect(
+        serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId: threadId,
+        })
+      ).to.be.rejectedWith('B');
 
       expect(newReaction).to.be.ok;
 
@@ -471,9 +482,7 @@ describe('ServerThreadsController', () => {
         },
       };
       const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
+      const banCache = BAN_CACHE_MOCK_FN(chain.id);
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
@@ -493,6 +502,24 @@ describe('ServerThreadsController', () => {
           canvasSession,
           canvasHash,
         });
+
+      expect(
+        serverThreadsController.createThreadComment({
+          user: user as any,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+          chain: chain as any,
+          parentId,
+          threadId,
+          text,
+          canvasAction,
+          canvasSession,
+          canvasHash,
+        })
+      ).to.be.rejectedWith('Ban error: banned');
+
       expect(newComment).to.include({
         thread_id: threadId,
         text,
@@ -1004,6 +1031,7 @@ describe('ServerThreadsController', () => {
         Thread: {
           findOne: async () => ({
             id: 1,
+            chain: 'ethereum',
             Address: {
               id: 1,
               address: '0x123',
@@ -1026,8 +1054,9 @@ describe('ServerThreadsController', () => {
         },
       };
       const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: async () => [true, null],
+      const banCache = BAN_CACHE_MOCK_FN('ethereum');
+      const address = {
+        address: '0x123',
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
@@ -1041,7 +1070,19 @@ describe('ServerThreadsController', () => {
       await serverThreadsController.deleteThread({
         user: user as any,
         threadId,
+        address: address as any,
       });
+
+      expect(
+        serverThreadsController.deleteThread({
+          user: user as any,
+          threadId,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+        })
+      ).to.be.rejectedWith('B');
     });
 
     it('should should throw error (thread not found)', async () => {
@@ -1074,10 +1115,14 @@ describe('ServerThreadsController', () => {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
       const threadId = 1;
+      const address = {
+        address: '0x123',
+      };
       expect(
         serverThreadsController.deleteThread({
           user: user as any,
           threadId,
+          address: address as any,
         })
       ).to.be.rejectedWith('Thread not found: 1');
     });
@@ -1118,10 +1163,14 @@ describe('ServerThreadsController', () => {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
       };
       const threadId = 1;
+      const address = {
+        address: '0x123',
+      };
       expect(
         serverThreadsController.deleteThread({
           user: user as any,
           threadId,
+          address: address as any,
         })
       ).to.be.rejectedWith('Ban error: bad');
     });
@@ -1162,10 +1211,14 @@ describe('ServerThreadsController', () => {
         getAddresses: async () => [{ id: 2, address: '0x124', verified: true }],
       };
       const threadId = 1;
+      const address = {
+        address: '0x123',
+      };
       expect(
         serverThreadsController.deleteThread({
           user: user as any,
           threadId,
+          address: address as any,
         })
       ).to.be.rejectedWith('Not owned by this user');
     });
@@ -1232,9 +1285,7 @@ describe('ServerThreadsController', () => {
         },
       };
       const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
+      const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
@@ -1281,6 +1332,28 @@ describe('ServerThreadsController', () => {
           canvasSession,
           canvasHash,
         });
+
+      expect(
+        serverThreadsController.createThread({
+          user: user as any,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+          chain: chain as any,
+          title,
+          body,
+          kind,
+          readOnly,
+          topicId,
+          topicName,
+          stage,
+          url,
+          canvasAction,
+          canvasSession,
+          canvasHash,
+        })
+      ).to.be.rejectedWith('Ban error: banned');
 
       expect(thread.title).to.equal(title);
       expect(thread.body).to.equal(body);

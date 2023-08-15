@@ -622,6 +622,7 @@ function setupRouter(
     'delete',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     deleteThreadHandler.bind(this, serverControllers)
   );
@@ -810,6 +811,7 @@ function setupRouter(
     'delete',
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteReactionHandler.bind(this, serverControllers)
   );
   registerRoute(

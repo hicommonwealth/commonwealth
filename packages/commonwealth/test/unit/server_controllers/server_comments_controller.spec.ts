@@ -4,6 +4,7 @@ import { ServerCommentsController } from 'server/controllers/server_comments_con
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import { ChainInstance } from 'server/models/chain';
 import Sinon from 'sinon';
+import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerCommentsController', () => {
   describe('#createCommentReaction', () => {
@@ -50,9 +51,7 @@ describe('ServerCommentsController', () => {
         },
       };
       const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
+      const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
@@ -80,6 +79,19 @@ describe('ServerCommentsController', () => {
           reaction: reaction as any,
           commentId,
         });
+
+      expect(
+        serverCommentsController.createCommentReaction({
+          user: user as any,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+          chain: chain as any,
+          reaction: reaction as any,
+          commentId,
+        })
+      ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
 
@@ -546,9 +558,7 @@ describe('ServerCommentsController', () => {
         },
       };
       const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
+      const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
@@ -578,6 +588,19 @@ describe('ServerCommentsController', () => {
           commentId,
           commentBody,
         });
+
+      expect(
+        serverCommentsController.updateComment({
+          user: user as any,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+          chain: chain as any,
+          commentId,
+          commentBody,
+        })
+      ).to.be.rejectedWith('Ban error: banned');
 
       expect(updatedComment).to.include({
         id: 123,
@@ -760,9 +783,7 @@ describe('ServerCommentsController', () => {
         },
       };
       const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: async () => [true, null],
-      };
+      const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
@@ -774,7 +795,9 @@ describe('ServerCommentsController', () => {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
       const address = {};
-      const chain = {};
+      const chain = {
+        id: 'ethereum',
+      };
       const commentId = 1;
       await serverCommentsController.deleteComment({
         user: user as any,
@@ -783,6 +806,18 @@ describe('ServerCommentsController', () => {
         commentId,
       });
       expect(didDestroy).to.be.true;
+
+      expect(
+        serverCommentsController.deleteComment({
+          user: user as any,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+          chain: chain as any,
+          commentId,
+        })
+      ).to.be.rejectedWith('Ban error: banned');
     });
   });
 });

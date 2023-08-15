@@ -103,6 +103,7 @@ export const AdminActions = ({
               await deleteThread({
                 threadId: thread.id,
                 chainId: app.activeChainId(),
+                address: app.user.activeAccount.address,
               })
                 .then(() => {
                   onDelete && onDelete();
