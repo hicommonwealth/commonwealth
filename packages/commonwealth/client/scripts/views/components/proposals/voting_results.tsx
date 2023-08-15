@@ -23,6 +23,8 @@ import {
 import useForceRerender from 'hooks/useForceRerender';
 import { IVote } from 'models/interfaces';
 import Proposal from 'models/Proposal';
+import useAaveProposalVotesQuery from 'state/api/proposals/aave/fetchAaveProposalVotes';
+import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
@@ -30,7 +32,7 @@ export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
   const forceRerender = useForceRerender();
   // TODO: @Timothee @Malik any type + is this correct?
-  const [votes, setVotes] = React.useState<any[]>([]);
+  // const [votes, setVotes] = React.useState<any[]>([]);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);
@@ -40,17 +42,13 @@ export const VotingResults = (props: VotingResultsProps) => {
     };
   }, [forceRerender]);
 
-  useEffect(() => {
-    if (proposal instanceof AaveProposal) {
-      const getAaveVotes = async () => {
-        await proposal.fetchVotes();
-        setVotes(proposal.getVotes());
-      };
-      getAaveVotes();
-    } else {
-      setVotes(proposal.getVotes());
-    }
-  }, []);
+  useAaveProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave || app.isModuleReady,
+    chainId: app.chain?.id,
+    proposalId: proposal.identifier,
+  });
+
+  const votes = proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (

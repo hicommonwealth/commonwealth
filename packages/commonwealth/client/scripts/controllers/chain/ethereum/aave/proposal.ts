@@ -29,6 +29,7 @@ import { attachSigner } from '../contractApi';
 import type AaveAPI from './api';
 import type AaveGovernance from './governance';
 import getFetch from 'helpers/getFetch';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -255,24 +256,32 @@ export default class AaveProposal extends Proposal<
     this._initialized = true;
   }
 
-  public async fetchVotes() {
+  static async fetchVotes(proposalId: number, aaveChain: Aave) {
+    const { accounts, governance, meta } = aaveChain;
     const result: { votes: IAaveVoteResponse[] } = await getFetch(
       '/api/proposalVotes',
       {
-        chainId: this._Gov.app.activeChainId(),
-        proposalId: this.data.id,
+        chainId: meta.id,
+        proposalId: proposalId,
       }
     );
+
+    const proposalInstance = governance.store.getByIdentifier(proposalId);
+    if (!proposalInstance) {
+      console.error(`Proposal ${proposalId} not found`);
+    }
 
     for (const vote of result.votes) {
       const power = new BN(vote.votingPower);
       const aaveVote = new AaveProposalVote(
-        this._Accounts.get(vote.voter),
+        accounts.get(vote.voter),
         vote.support,
         power
       );
-      this.addOrUpdateVote(aaveVote);
+      proposalInstance.addOrUpdateVote(aaveVote);
     }
+
+    return proposalInstance.getVotes();
   }
 
   constructor(
