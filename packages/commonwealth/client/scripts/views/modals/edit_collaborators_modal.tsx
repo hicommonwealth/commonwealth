@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+import { isEqual } from 'lodash';
+
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
@@ -18,7 +21,7 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { User } from '../components/user/user';
 
 import 'modals/edit_collaborators_modal.scss';
-import { useState } from 'react';
+import { CWModalHeader } from './CWModalHeader';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -91,18 +94,12 @@ export const EditCollaboratorsModal = ({
     const updated = collaborators.find((_c) => _c.address === c.address)
       ? collaborators.filter((_c) => _c.address !== c.address)
       : collaborators.concat([c]);
-
     setCollaborators(updated);
   };
 
   return (
     <div className="EditCollaboratorsModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Edit collaborators
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Edit collaborators" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <>body section</>
         <div className="section">
