@@ -61,7 +61,7 @@ export const ReactionButton = ({
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       chainId: app.activeChainId(),
-      address: app.user.activeAccount.address,
+      address: app.user.activeAccount?.address,
       threadId: thread.id,
     });
 
@@ -84,7 +84,7 @@ export const ReactionButton = ({
     if (hasReacted) {
       deleteThreadReaction({
         chainId: app.activeChainId(),
-        address: app.user.activeAccount.address,
+        address: app.user.activeAccount?.address,
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {

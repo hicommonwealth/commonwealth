@@ -1,31 +1,12 @@
-import chai from 'chai';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { StdFee } from '@cosmjs/amino';
+import { Secp256k1HdWallet, StdFee } from '@cosmjs/amino';
+import { DeliverTxResponse } from '@cosmjs/stargate';
 
-import { ProposalStatus as ProposalStatusV1 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import {
-  ProposalStatus,
-  VoteOption,
-} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { VoteOption as VoteOptionV1 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import {
-  encodeMsgVote,
-  encodeMsgSubmitProposal,
-  encodeTextProposal,
-} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
-import {
-  getLCDClient,
-  getRPCClient,
   getSigningClient,
   getTMClient,
 } from 'controllers/chain/cosmos/chain.utils';
-import {
-  getActiveProposalsV1,
-  getCompletedProposalsV1,
-} from 'controllers/chain/cosmos/gov/v1/utils-v1';
-import { CosmosApiType } from 'controllers/chain/cosmos/chain';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
 
 const mnemonic =
   'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';
@@ -36,18 +17,29 @@ const DEFAULT_FEE: StdFee = {
 const DEFAULT_MEMO = '';
 export const deposit = new CosmosToken('stake', 100000, false);
 
-export const setupTestSigner = async (rpcUrl: string) => {
-  const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-    prefix: 'cosmos',
-  });
+export const setupTestSigner = async (rpcUrl: string, isAmino?: boolean) => {
+  let signer;
+  if (isAmino) {
+    signer = await Secp256k1HdWallet.fromMnemonic(mnemonic, {
+      prefix: 'cosmos',
+    });
+  } else {
+    signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      prefix: 'cosmos',
+    });
+  }
   const client = await getSigningClient(rpcUrl, signer);
   const accounts = await signer.getAccounts();
   const signerAddress = accounts[0].address;
   return { client, signerAddress };
 };
 
-export const sendTx = async (rpcUrl, tx) => {
-  const { client, signerAddress } = await setupTestSigner(rpcUrl);
+export const sendTx = async (
+  rpcUrl: string,
+  tx: any,
+  isAmino?: boolean
+): Promise<DeliverTxResponse> => {
+  const { client, signerAddress } = await setupTestSigner(rpcUrl, isAmino);
   const result = await client.signAndBroadcast(
     signerAddress,
     [tx],

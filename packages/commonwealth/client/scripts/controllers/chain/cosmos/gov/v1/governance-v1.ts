@@ -1,7 +1,6 @@
 import BN from 'bn.js';
 import type { ICosmosProposal } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';
 
 import type { ITXModalData } from 'models/interfaces';
@@ -158,28 +157,6 @@ class CosmosGovernanceV1 extends ProposalModule<
     memo = ''
   ): ITXModalData {
     throw new Error('unsupported');
-  }
-
-  // TODO: support multiple amount types
-  public encodeCommunitySpend(
-    title: string,
-    description: string,
-    recipient: string,
-    amount: string
-  ): Any {
-    const denom = this._minDeposit.denom;
-    const coinAmount = [{ amount, denom }];
-    const spend = CommunityPoolSpendProposal.fromPartial({
-      title,
-      description,
-      recipient,
-      amount: coinAmount,
-    });
-    const prop = CommunityPoolSpendProposal.encode(spend).finish();
-    return Any.fromPartial({
-      typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-      value: prop,
-    });
   }
 
   // TODO: support multiple deposit types

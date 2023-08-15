@@ -15,7 +15,7 @@ import {
   MsgSubmitProposalEncodeObject,
   MsgVoteEncodeObject,
 } from '@cosmjs/stargate';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
+import { longify } from '@cosmjs/stargate/build/queryclient';
 
 import type {
   CoinObject,
@@ -176,10 +176,10 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
     type,
     title,
     description,
-    submitTime: moment.unix(p.submitTime.valueOf() / 1000),
-    depositEndTime: moment.unix(p.depositEndTime.valueOf() / 1000),
-    votingEndTime: moment.unix(p.votingEndTime.valueOf() / 1000),
-    votingStartTime: moment.unix(p.votingStartTime.valueOf() / 1000),
+    submitTime: moment.unix(p.submitTime.seconds.toNumber()),
+    depositEndTime: moment.unix(p.depositEndTime.seconds.toNumber()),
+    votingEndTime: moment.unix(p.votingEndTime.seconds.toNumber()),
+    votingStartTime: moment.unix(p.votingStartTime.seconds.toNumber()),
     proposer: null,
     spendRecipient,
     spendAmount,
@@ -240,5 +240,27 @@ export const encodeTextProposal = (title: string, description: string): Any => {
   return Any.fromPartial({
     typeUrl: '/cosmos.gov.v1beta1.TextProposal',
     value: Uint8Array.from(TextProposal.encode(tProp).finish()),
+  });
+};
+
+// TODO: support multiple amount types
+export const encodeCommunitySpend = (
+  title: string,
+  description: string,
+  recipient: string,
+  amount: string,
+  denom: string
+): Any => {
+  const coinAmount = [{ amount, denom }];
+  const spend = CommunityPoolSpendProposal.fromPartial({
+    title,
+    description,
+    recipient,
+    amount: coinAmount,
+  });
+  const prop = CommunityPoolSpendProposal.encode(spend).finish();
+  return Any.fromPartial({
+    typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
+    value: prop,
   });
 };
