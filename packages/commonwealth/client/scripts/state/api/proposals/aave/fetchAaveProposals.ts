@@ -7,8 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 const PROPOSAL_STALE_TIME = 30000; // 30 seconds
 
 const fetchAaveProposals = async () => {
-  AaveGovernance.getProposals(app.chain as Aave);
-  return [];
+  return AaveGovernance.getProposals(app.chain as Aave);
 };
 
 const useAaveProposalsQuery = ({
@@ -22,7 +21,7 @@ const useAaveProposalsQuery = ({
     queryKey: [ApiEndpoints.FETCH_PROPOSALS, chainId],
     queryFn: fetchAaveProposals,
     enabled: moduleReady,
-    cacheTime: PROPOSAL_STALE_TIME,
+    staleTime: PROPOSAL_STALE_TIME,
   });
 };
 
