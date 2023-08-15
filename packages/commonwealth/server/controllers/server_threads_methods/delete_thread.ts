@@ -37,6 +37,7 @@ export async function __deleteThread(
       throw new AppError(Errors.ThreadNotFound);
     }
   }
+
   // find thread
   const thread = await this.models.Thread.findOne({
     where: {
