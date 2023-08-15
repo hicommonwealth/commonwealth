@@ -1,4 +1,5 @@
 import chai from 'chai';
+import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import {
   ProposalStatus,
   VoteOption,
@@ -7,8 +8,8 @@ import {
   encodeMsgVote,
   encodeMsgSubmitProposal,
   encodeTextProposal,
-  getCompletedProposalsV1Beta1,
   getActiveProposalsV1Beta1,
+  encodeCommunitySpend,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import {
   getRPCClient,
@@ -49,99 +50,112 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     return vote;
   };
 
-  it('creates a proposal', async () => {
-    const content = encodeTextProposal(
-      `beta test title`,
-      `beta test description`
-    );
+  const proposalTest = async (
+    content: any,
+    expectedProposalType: string,
+    isAmino?: boolean
+  ) => {
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
 
-    const resp = await sendTx(rpcUrlBeta, msg);
+    const resp = await sendTx(rpcUrlBeta, msg, isAmino);
 
+    expect(isDeliverTxSuccess(resp)).to.be.true;
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
 
     await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
-    expect(activeProposals.length).to.be.greaterThan(0);
-  });
-  it('votes NO on an active proposal', async () => {
+    const onchainProposal = activeProposals[activeProposals.length - 1];
+    expect(onchainProposal?.content?.typeUrl).to.be.eql(expectedProposalType);
+  };
+
+  const voteTest = async (
+    voteOption: number,
+    isAmino?: boolean
+  ): Promise<void> => {
     await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
-
     assert.isAtLeast(activeProposals.length, 1);
     const proposal = activeProposals[0];
+    const msg = encodeMsgVote(signer, proposal.proposalId, voteOption);
 
-    const msg = encodeMsgVote(
-      signer,
-      proposal.proposalId,
-      VoteOption.VOTE_OPTION_NO
-    );
-    const resp = await sendTx(rpcUrlBeta, msg);
+    const resp = await sendTx(rpcUrlBeta, msg, isAmino);
 
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
     const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue.option).to.eql(VoteOption.VOTE_OPTION_NO);
+    expect(voteValue.option).to.eql(voteOption);
+  };
+
+  describe('Direct signer', () => {
+    it('creates a text proposal', async () => {
+      const content = encodeTextProposal(
+        `beta text title`,
+        `beta text description`
+      );
+      await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal');
+    });
+    it('creates a community spend proposal', async () => {
+      const content = encodeCommunitySpend(
+        `beta spend title`,
+        `beta spend description`,
+        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
+        '100',
+        'stake'
+      );
+      await proposalTest(
+        content,
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
+      );
+    });
+    it('votes NO on an active proposal', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_NO);
+    });
+    it('votes NO WITH VETO on an active proposal', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_NO_WITH_VETO);
+    });
+    it('votes ABSTAIN on an active proposal', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_ABSTAIN);
+    });
+    it('votes YES on an active proposal', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_YES);
+    });
   });
-  it('votes NO WITH VETO on an active proposal', async () => {
-    await waitOneBlock(rpcUrlBeta);
-    const activeProposals = await getActiveVotingProposals();
 
-    assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
-
-    const msg = encodeMsgVote(
-      signer,
-      proposal.proposalId,
-      VoteOption.VOTE_OPTION_NO_WITH_VETO
-    );
-    const resp = await sendTx(rpcUrlBeta, msg);
-
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue.option).to.eql(VoteOption.VOTE_OPTION_NO_WITH_VETO);
-  });
-  it('votes ABSTAIN on an active proposal', async () => {
-    await waitOneBlock(rpcUrlBeta);
-    const activeProposals = await getActiveVotingProposals();
-
-    assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
-
-    const msg = encodeMsgVote(
-      signer,
-      proposal.proposalId,
-      VoteOption.VOTE_OPTION_ABSTAIN
-    );
-    const resp = await sendTx(rpcUrlBeta, msg);
-
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue.option).to.eql(VoteOption.VOTE_OPTION_ABSTAIN);
-  });
-  it('votes YES on an active proposal', async () => {
-    await waitOneBlock(rpcUrlBeta);
-    const activeProposals = await getActiveVotingProposals();
-
-    expect(activeProposals).to.not.be.undefined;
-    expect(activeProposals.length).to.be.greaterThan(0);
-
-    const proposal = activeProposals[0];
-
-    const msg = encodeMsgVote(
-      signer,
-      proposal.proposalId,
-      VoteOption.VOTE_OPTION_YES
-    );
-    const resp = await sendTx(rpcUrlBeta, msg);
-
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue.option).to.eql(VoteOption.VOTE_OPTION_YES);
+  describe('Amino signing', () => {
+    it('creates a text proposal with legacy amino', async () => {
+      const content = encodeTextProposal(
+        `beta text title`,
+        `beta text description`
+      );
+      await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal', true);
+    });
+    it('creates a community spend proposal with legacy amino', async () => {
+      const content = encodeCommunitySpend(
+        `beta spend title amino`,
+        `beta spend description amino`,
+        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
+        '100',
+        'stake'
+      );
+      await proposalTest(
+        content,
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
+        true
+      );
+    });
+    it('votes NO on an active proposal with legacy amino', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_NO, true);
+    });
+    it('votes NO WITH VETO on an active proposal with legacy amino', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_NO_WITH_VETO, true);
+    });
+    it('votes ABSTAIN on an active proposal with legacy amino', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_ABSTAIN, true);
+    });
+    it('votes YES on an active proposal with legacy amino', async () => {
+      await voteTest(VoteOption.VOTE_OPTION_YES, true);
+    });
   });
 });
 

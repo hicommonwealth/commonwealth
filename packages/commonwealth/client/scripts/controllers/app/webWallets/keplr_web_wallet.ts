@@ -1,4 +1,8 @@
-import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
+import type {
+  AccountData,
+  OfflineDirectSigner,
+  OfflineSigner,
+} from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
@@ -19,7 +23,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabling = false;
   private _chainId: string;
   private _chain: string;
-  private _offlineSigner: OfflineDirectSigner;
+  private _offlineSigner: OfflineDirectSigner | OfflineSigner;
 
   public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
@@ -159,7 +163,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 
-      this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
+      this._offlineSigner = await window.keplr.getOfflineSignerAuto(
+        this._chainId
+      );
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
       this._enabling = false;
