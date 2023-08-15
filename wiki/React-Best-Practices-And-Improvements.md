@@ -2,7 +2,7 @@ _Certified fresh 230815 by Graham Johnson. All React recommendations originally 
 
 - ⚠️ This entry intentionally stays silent on state management. See [State Management](./State-Management.md) entry instead.
 - ⚠️ This entry is not oriented toward performance improvements. It is concerned with improving developer experience, increasing readability, and aligning our codebase with current React standards.
-- ⚠️ This entry discusses aspirational ideals for our codebase, and is not a descriptive documentation of how our codebase is actually organized. Strong divergences between ideal and actual have been explicitly flagged, but few or none of the practices here delineated are consistently or fully implemented.
+- ⚠️ This entry discusses aspirational ideals for our codebase, and is not a descriptive documentation of how our codebase is actually organized. Strong divergences between ideal and actual have been explicitly flagged, but few or none of the practices  delineated are consistently or fully implemented in our present codebase (230815).
 
 # Contents
 
@@ -27,7 +27,7 @@ Currently, our frontend's directory structure is derived from the MVC model, wit
 
 Suggested changes:
 - The `commonwealth/client` folder should serve as root for the front-end application. This means that the `scripts` folder should be removed and its content moved to `client`.
-- The `styles` folder should contain only global styles, such as `index.scss`, `normalize.css`, or shared styles. Any other style files should neighbor the `.tsx` files where page or component files are defined.
+- The `styles` folder should contain only global styles, such as `index.scss`, `normalize.css`, or shared styles. Any other style files should neighbor the `.tsx` files where page or component files are defined. (See discussion in [Components](#components) section.)
 - The `views` folder suggests an MVC architecture. This should be removed, with the main `client` folder housing only two immediate children: `components` and `pages`.
 
 ## Components
@@ -39,15 +39,15 @@ All reusable components (i.e. components that may be invoked multiple times acro
 Each component is housed in a separate, component-scoped folder named in PascalCase convention. (Currently, this naming convention is unevenly implemented, and many instances of snake_case remain.)
 - e.g. `/Button`, `/ProposalCard` etc.
 
-In each folder there should be an `index.ts` file that exports components from that folder. All file imports should go through this index file, rather than importing directly from the component file.
+In each folder there should be an `index.ts` (not `.tsx`) file that exports `.tsx` components from within the folder. All file imports should go through this index file, rather than importing directly from the component file.
 - e.g. `import { AvatarUpload, Avatar} from 'components/Avatar`
 
-Aspirationally, components' respective `.scss` files should be placed next to the components and should be named the same way as the component it belongs to
+Aspirationally, components' respective `.scss` files should be placed next to the components and should share a name with the component it belongs to
 - e.g. `client/components/Sidebar/Sidebar.scss`
 
 ### Skeleton components
 
-Skeleton components should be defined in separate files, in the same directory as their non-skeleton equivalents (e.g. ComponentSkeleton.tsx organized alongside Component.tsx). 
+Skeleton components should be defined in separate files, in the same directory as their non-skeleton equivalents, referencing the name of their non-skeleton equivalents (e.g. `ComponentSkeleton` should be defined in `ComponentSkeleton.tsx`, which should be housed alongside `Component.tsx`). 
 
 Skeleton components should be returned via a conditional `if` statement, e.g. `if (loading) return <ComponentSkeleton />`.
 
@@ -75,23 +75,24 @@ Skeleton components should be returned via a conditional `if` statement, e.g. `i
 
 _Currently housed in `client/script/views/pages`; aspirationally housed in `client/pages`._
 
-Aspirationally, components serving as entry points for routes are housed in this directory.
+Aspirationally, only those components serving as entry points for routes are housed in this directory.
 
 Each folder should demarcate a separate route.
-- `snake_case` is not an appropriate naming convention for folders. We should change it to  either `PascalCase` or `kebab-case`.
+- `snake_case` is not an appropriate naming convention for folders. We should use either `PascalCase` or `kebab-case`.
 
 The central component of a given route-scoped folder should not be defined in `index.ts`, but rather in a separate file (e.g. `Component.tsx`). The `index.ts` file should instead be reserved for exporting any components in its parent folder
 
-As in the `/components` folder, all stylesheets (`.scss` files) should housed be in the same folder as `.tsx` page files.
+As in the `/components` folder, all stylesheets (i.e. `.scss` files) should housed be in the same folder as `.ts` and `.tsx` page files.
 
 # Component file composition
 
-This section looks at best practices for how to organize the code within a component file.
+This section looks at best practices for how to organize code within a component file.
 
 ### General organization
 
-- The component name should be identical to the file name.
-- Files should not house more than a single component.
+A component's name should be identical to the file name.
+
+Files should not house more than a single component.
 
 ### Imports
 
@@ -109,9 +110,9 @@ Props should be immediately destructured within the Component's definition.
 
 In general, hooks and utils should be kept close to the component. If a hook or util function begins to be used by multiple pages or components, it should be moved to our `/utils` and `/helpers` directories.
 
-Ideally, we should extract business logic to custom hooks that are responsible for fetching, storing and manipulating data. This way, we follow single responsibility rule.
+Ideally, we should extract business logic to custom hooks that are responsible for fetching, storing and manipulating data. This way, we follow the [single responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle).
 
-React hooks should be housed either top of the component and should follow [React hooks rules](https://legacy.reactjs.org/docs/hooks-rules.html).
+React hooks should be housed either top of the component and should follow the [React hooks rules](https://legacy.reactjs.org/docs/hooks-rules.html).
 
 We currently overuse `// eslint-disable-next-line react-hooks/exhaustive-deps`. Passing exact dependencies as eslint suggests makes sense in the vast majority of situations; if your dependency array causes an infinite loop, it means that either the logic is poorly designed, or the dependency needs to be wrapped in `useMemo`/`useCallback`.
 
@@ -134,7 +135,7 @@ Down the line we [may want to invole the Husky library in this process](https://
 
 ### Example component composition
 
-An example of a simple component, child component, and custom hook.**
+An example of a simple component, child component, and custom hook.
 
 ```tsx
 // file Component.tsx
