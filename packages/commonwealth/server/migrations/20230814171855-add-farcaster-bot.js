@@ -17,12 +17,35 @@ module.exports = {
 
       const userId = user[0].id;
 
-      await queryInterface.bulkInsert(
+      const profile = await queryInterface.bulkInsert(
         'Profiles',
         [
           {
             profile_name: 'Farcaster Bot',
             user_id: userId,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+        ],
+        { returning: true, transaction }
+      );
+
+      const profileId = profile[0].id;
+
+      // Assumes a starter community "logline" already exists
+      await queryInterface.bulkInsert(
+        'Addresses',
+        [
+          {
+            address: '0xfarcasterbot',
+            user_id: userId,
+            profile_id: profileId,
+            chain: 'logline',
+            role: 'admin',
+            verification_token: '123456',
+            verification_token_expires: new Date(2030, 1, 1),
+            verified: new Date(),
+            last_active: new Date(),
             created_at: new Date(),
             updated_at: new Date(),
           },
