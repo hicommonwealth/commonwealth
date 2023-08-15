@@ -11,7 +11,7 @@ interface CWUpvoteSmallProps {
   onMouseEnter: () => void;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   tooltipContent: JSX.Element;
-  threadArchived: boolean;
+  threadArchived?: boolean;
 }
 
 const CWUpvoteSmall = ({
