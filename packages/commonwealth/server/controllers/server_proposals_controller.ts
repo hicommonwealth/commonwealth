@@ -105,12 +105,12 @@ export class ServerProposalsController {
         {
           model: this.models.ChainNode,
           required: true,
-          attributes: ['url'],
+          attributes: ['private_url'],
         },
       ],
     });
 
-    if (!chain.ChainNode.url) {
+    if (!chain.ChainNode.private_url) {
       throw new ServerError(`No RPC URL found for chain ${chainId}`);
     }
 
@@ -124,6 +124,6 @@ export class ServerProposalsController {
       );
     }
 
-    return chain.ChainNode.url;
+    return chain.ChainNode.private_url;
   }
 }
