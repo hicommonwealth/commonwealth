@@ -52,7 +52,7 @@ const ProposalsPage = () => {
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
-  const { data: cachedAaveProposals } = useAaveProposalsQuery({
+  const { data: cachedAaveProposals, isError } = useAaveProposalsQuery({
     moduleReady: app.chain?.network === ChainNetwork.Aave || !isLoading,
     chainId: app.chain?.id,
   });
@@ -111,6 +111,10 @@ const ProposalsPage = () => {
     }
 
     return <PageLoading message="Connecting to chain" />;
+  }
+
+  if (isError) {
+    return <ErrorPage message="Could not connect to chain" />;
   }
 
   const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;

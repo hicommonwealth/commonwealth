@@ -30,6 +30,8 @@ import type AaveAPI from './api';
 import type AaveGovernance from './governance';
 import getFetch from 'helpers/getFetch';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
+import axios from 'axios';
+import { ApiEndpoints } from 'state/api/config';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -257,21 +259,25 @@ export default class AaveProposal extends Proposal<
   }
 
   static async fetchVotes(proposalId: number, aaveChain: Aave) {
-    const { accounts, governance, meta } = aaveChain;
-    const result: { votes: IAaveVoteResponse[] } = await getFetch(
-      '/api/proposalVotes',
+    const { chain, accounts, governance, meta } = aaveChain;
+    const res = await axios.get(
+      `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSAL_VOTES}`,
       {
-        chainId: meta.id,
-        proposalId: proposalId,
+        params: {
+          chainId: meta.id,
+          proposalId: proposalId,
+        },
       }
     );
+
+    const votes: IAaveVoteResponse[] = res.data.result.votes;
 
     const proposalInstance = governance.store.getByIdentifier(proposalId);
     if (!proposalInstance) {
       console.error(`Proposal ${proposalId} not found`);
     }
 
-    for (const vote of result.votes) {
+    for (const vote of votes) {
       const power = new BN(vote.votingPower);
       const aaveVote = new AaveProposalVote(
         accounts.get(vote.voter),

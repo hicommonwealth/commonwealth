@@ -10,6 +10,8 @@ import AaveProposal from './proposal';
 import getFetch from 'helpers/getFetch';
 import { BigNumber } from 'ethers';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
+import axios from 'axios';
+import { ApiEndpoints } from 'state/api/config';
 
 export interface AaveProposalArgs {
   executor: string;
@@ -145,14 +147,18 @@ export default class AaveGovernance extends ProposalModule<
   }
 
   static async getProposals(aaveChain: Aave) {
-    const { accounts, governance, meta } = aaveChain;
-    const result: { proposals: IAaveProposalResponse[] } = await getFetch(
-      '/api/proposals',
+    const { chain, accounts, governance, meta } = aaveChain;
+    const res = await axios.get(
+      `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
       {
-        chainId: meta.id,
+        params: {
+          chainId: meta.id,
+        },
       }
     );
-    result.proposals.forEach((p) => {
+
+    const proposals: IAaveProposalResponse[] = res.data.result.proposals;
+    proposals.forEach((p) => {
       new AaveProposal(accounts, governance, deserializeBigNumbers(p));
     });
 
