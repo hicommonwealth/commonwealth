@@ -2,6 +2,8 @@ _Documentation for [the Commonwealth package.json file](../packages/commonwealth
 
 _Entries with an asterisk have been flagged for removal._
 
+// TODO: Ensure TOC is sync'd
+
 **CONTENTS**
 - [Build Scripts](#build-scripts)
   - [build-all](#build-all)
@@ -11,10 +13,15 @@ _Entries with an asterisk have been flagged for removal._
 - [CI Scripts](#ci-scripts)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
+  - [clean-db](#clean-db)
+  - [create-migration](#create-migration)
   - [db-all](#db-all)
   - [dump-db](#dump-db)
   - [dump-db-limit](#dump-db-limit)
   - [dump-db-local](#dump-db-local)
+  - [load-db](#load-db)
+  - [load-db-limit](#load-db-limit)
+  - [load-db-local](#load-db-local)
   - [migrate-db](#migrate-db)
   - [migrate-db-down](#migrate-db-down)
   - [migrate-server](#migrate-server)
@@ -40,6 +47,7 @@ _Entries with an asterisk have been flagged for removal._
 - [Webpack](#webpack)
   - [bundle-report](#bundle-report)
   - [profile](#profile)
+
 
 # Build Scripts
 
@@ -99,6 +107,12 @@ Considerations: Engineers will almost never need to use this locally (unless the
 
 Author: Timothee Legros
 
+## create-migration
+
+Definition: `npx sequelize migration:generate --name`
+
+Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `yarn create-migration remove-user-last-visited-col`).
+
 ## db-all
 
 Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
@@ -107,11 +121,23 @@ Description: Resets, loads, and migrates db (composite script).
 
 Contributor: Kurtis Assad
 
+## dump-db
+
+Definition: `pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
+
+Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, Notifications, and SocialAccounts.
+
+## dump-db-limit
+
+Definition: `yarn run dump-db && psql $(heroku config:get CW_READ_DB -a commonwealth-beta) -a -f limited_dump.sql`
+
+Description: In addition to running the [dump-db](#dump-db) script, this copies a limited set of Notification and Subscription data from the commonwealth-beta Heroku database. Used in conjunction with the [load-db-limit](#load-db-limit) script.
+
 ## dump-db-local
 
-Definition: ` pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump`
+Definition: `pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump`
 
-Description: Exports local database to a dump file, `local_save.dump`.
+Description: Exports the local Postgres database to a dump file, `local_save.dump`.
 
 ## load-db 
 
@@ -121,11 +147,17 @@ Description: Loads database following the `load-db.sh` script. Looks for dump fi
 
 Considerations: Should we reconcile various dump names in different scripts to be consistent?
 
+## load-db-limit 
+
+Definition: `yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql`
+
+Description: Used in conjunction with [dump-db-limit](#dump-db-limit), this loads a dumped copy of the commonwealth-beta Heroku database alongside a limited, copied set of Notification and Subscription rows.
+
 ## load-db-local
 
-Description: Loads local database from a dump file, `local_save.dump`.
-
 Definition: `psql -d commonwealth -U commonwealth -W -f local_save.dump`
+
+Description: Loads local database from a dump file, `local_save.dump`.
 
 ## migrate-db
 
@@ -490,17 +522,14 @@ Considerations: Deprecated; recommend removal. Appears to be redundant with `bun
 "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
 
 
-// Export heroku db from dump (ask Nakul or other for rationale on flags)
-"dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
 "datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
 
 
 //ADDED BY TIMOTHEE
 
 
-"create-migration": "npx sequelize migration:generate --name",
-"dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get CW_READ_DB -a commonwealth-beta) -a -f limited_dump.sql",
-"load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql",
+
+
 "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
 "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
 
