@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread from 'models/Thread';
 import app from 'state';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface ToggleThreadArchiveProps {
   chainId: string;
@@ -14,10 +15,9 @@ const toggleThreadArchive = async ({
   threadId,
   isArchived,
 }: ToggleThreadArchiveProps) => {
-  return await axios.post(
-    `${app.serverUrl()}/threads/${threadId}/${
-      !isArchived ? 'archive' : 'unarchive'
-    }`,
+  const method = isArchived ? 'delete' : 'put';
+  return await axios[method](
+    `${app.serverUrl()}/threads/${threadId}/archive`,
     {
       data: {
         jwt: app.user.jwt,
@@ -32,7 +32,7 @@ interface ToggleThreadArchiveMutationProps {
   threadId: number;
 }
 
-const toggleThreadArchiveMutation = ({
+const useToggleThreadArchiveMutation = ({
   chainId,
   threadId,
 }: ToggleThreadArchiveMutationProps) => {
@@ -41,11 +41,12 @@ const toggleThreadArchiveMutation = ({
     mutationFn: toggleThreadArchive,
     onSuccess: async (response) => {
       console.log('response => ', response);
-      // TODO: complete this
-      // TODO: migrate the thread store objects, then clean this up
-      // return foundThread
+      updateThreadInAllCaches(chainId, threadId, {
+        archivedAt: response.data.result.archived_at,
+      });
+      return response.data.result;
     },
   });
 };
 
-export default toggleThreadArchiveMutation;
+export default useToggleThreadArchiveMutation;

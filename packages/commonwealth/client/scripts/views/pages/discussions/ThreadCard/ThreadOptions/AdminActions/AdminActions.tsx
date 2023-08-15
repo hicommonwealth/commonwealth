@@ -6,6 +6,7 @@ import {
   useEditThreadPrivacyMutation,
   useToggleThreadPinMutation,
   useToggleThreadSpamMutation,
+  useToggleThreadArchiveMutation,
 } from 'state/api/threads';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
@@ -38,7 +39,6 @@ export type AdminActionsProps = {
   onEditStart?: () => any;
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
-  onArchiveToggle?: (thread: Thread) => any;
   hasPendingEdits?: boolean;
 };
 
@@ -54,7 +54,6 @@ export const AdminActions = ({
   onEditStart,
   onEditCancel,
   onEditConfirm,
-  onArchiveToggle,
   hasPendingEdits,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
@@ -72,7 +71,6 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
-  let archivedAt = thread.archivedAt;
 
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     chainId: app.activeChainId(),
@@ -91,6 +89,11 @@ export const AdminActions = ({
   });
 
   const { mutateAsync: togglePin } = useToggleThreadPinMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
+  const { mutateAsync: toggleArchive } = useToggleThreadArchiveMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
   });
@@ -255,13 +258,20 @@ export const AdminActions = ({
   };
 
   const handleArchiveThread = () => {
-    if (archivedAt === null) {
+    if (thread.archivedAt === null) {
       setIsArchiveThreadModalOpen(true)
     } else {
-      app.threads.setArchived(thread.id, !!archivedAt).then(
-        (updatedThread: Thread) => {
-          onArchiveToggle && onArchiveToggle(updatedThread);
-        })
+      toggleArchive({
+        threadId: thread.id,
+        chainId: app.activeChainId(),
+        isArchived: !!thread.archivedAt
+      })
+      .then(() => {
+        notifySuccess(`Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`)
+      })
+      .catch(() => {
+        notifyError(`Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`)
+      })
     }
   }
 
@@ -276,7 +286,7 @@ export const AdminActions = ({
         <PopoverMenu
           className="AdminActions"
           menuItems={[
-            ...(archivedAt === null && (hasAdminPermissions ||
+            ...(thread.archivedAt === null && (hasAdminPermissions ||
             isThreadAuthor ||
             (isThreadCollaborator && !thread.readOnly))
               ? [
@@ -304,7 +314,7 @@ export const AdminActions = ({
                     iconLeft: 'pin' as const,
                     iconLeftWeight: 'bold' as const,
                   },
-                  ...(archivedAt === null
+                  ...(thread.archivedAt === null
                     ? [
                         {
                           onClick: handleThreadLockToggle,
@@ -323,8 +333,8 @@ export const AdminActions = ({
                       ]
                     : []),
                   {
-                    label: archivedAt === null ? 'Archive' : 'Unarchive',
-                    iconLeft: archivedAt === null ? 'archiveTray' as const : 'archiveTrayFilled' as const,
+                    label: thread.archivedAt === null ? 'Archive' : 'Unarchive',
+                    iconLeft: thread.archivedAt === null ? 'archiveTray' as const : 'archiveTrayFilled' as const,
                     iconLeftWeight: 'bold' as const,
                     onClick: handleArchiveThread,
                   },
@@ -360,7 +370,7 @@ export const AdminActions = ({
                         },
                       ]
                     : []),
-                  ...(archivedAt === null
+                  ...(thread.archivedAt === null
                     ? [
                         {
                           onClick: () => setIsUpdateProposalStatusModalOpen(true),
@@ -435,7 +445,6 @@ export const AdminActions = ({
         content={
           <ArchiveThreadModal
             thread={thread}
-            onArchiveToggle={onArchiveToggle}
             onModalClose={() => setIsArchiveThreadModalOpen(false)}
           />
         }

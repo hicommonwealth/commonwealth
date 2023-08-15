@@ -4,33 +4,42 @@ import type Thread from '../../models/Thread';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import {
+  useToggleThreadArchiveMutation,
+} from 'state/api/threads';
+
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
 
 type ArchiveThreadModalProps = {
   onModalClose: () => void;
-  onArchiveToggle: (thread: Thread) => void;
   thread: Thread;
 };
 
 export const ArchiveThreadModal = ({
   onModalClose,
-  onArchiveToggle,
   thread,
 }: ArchiveThreadModalProps) => {
-  const handleArchiveThread = async () => {
-    try {
-      await app.threads.setArchived(thread.id, !!thread.archivedAt).then((updatedThread: Thread) => {
-        onArchiveToggle && onArchiveToggle(updatedThread);
-      });
-      onModalClose();
-    } catch (err) {
-      console.log('Failed to un/archive thread.');
+  const { mutateAsync: toggleArchive } = useToggleThreadArchiveMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
 
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : `Failed to ${thread.archivedAt ? 'unarchive' : 'archive'} thread.`
-      );
-    }
+  const handleArchiveThread = async () => {
+    toggleArchive({
+      threadId: thread.id,
+      chainId: app.activeChainId(),
+      isArchived: !!thread.archivedAt,
+    })
+    .then(() => {
+      notifySuccess(`Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`);
+      onModalClose();
+    })
+    .catch(() => {
+      notifyError(`Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`);
+    });
   };
 
   return (

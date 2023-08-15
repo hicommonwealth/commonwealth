@@ -105,6 +105,7 @@ export const ReactionButton = ({
         <CWUpvoteSmall
           voteCount={reactors.length}
           disabled={isUserForbidden || disabled}
+          threadArchived={!!thread.archivedAt}
           selected={hasReacted}
           onMouseEnter={() => undefined}
           onClick={handleVoteClick}
@@ -115,7 +116,7 @@ export const ReactionButton = ({
       ) : (
         <button
           onClick={handleVoteClick}
-          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
+          className={`ThreadReactionButton ${isLoading || isUserForbidden || !!thread.archivedAt ? ' disabled' : ''
             }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (

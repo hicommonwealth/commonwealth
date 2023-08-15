@@ -129,6 +129,7 @@ const fetchBulkThreads = (props) => {
           orderBy:
             featuredFilterQueryMap[props.orderBy] ||
             featuredFilterQueryMap.newest,
+            ...((props.archivePage) && { archived: true }),
         },
       }
     );

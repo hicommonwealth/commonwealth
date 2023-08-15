@@ -78,7 +78,6 @@ export const ThreadCard = ({
   onEditStart,
   onEditCancel,
   onEditConfirm,
-  onArchiveToggle,
   hasPendingEdits,
   onBodyClick,
   onStageTagClick,
@@ -240,7 +239,6 @@ export const ThreadCard = ({
               onEditStart={onEditStart}
               onEditCancel={onEditCancel}
               onEditConfirm={onEditConfirm}
-              onArchiveToggle={onArchiveToggle}
               hasPendingEdits={hasPendingEdits}
             />
           </div>

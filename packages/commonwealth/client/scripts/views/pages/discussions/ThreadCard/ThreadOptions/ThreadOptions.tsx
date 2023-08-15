@@ -39,7 +39,6 @@ export const ThreadOptions = ({
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onSpamToggle,
-  onArchiveToggle,
   hasPendingEdits,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
@@ -80,7 +79,7 @@ export const ThreadOptions = ({
           <ReactionButton
             thread={thread}
             size="small"
-            disabled={!hasJoinedCommunity}
+            disabled={!hasJoinedCommunity || !!thread.archivedAt}
           />
         )}
 
@@ -118,7 +117,6 @@ export const ThreadOptions = ({
             onProposalStageChange={onProposalStageChange}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             onSpamToggle={onSpamToggle}
-            onArchiveToggle={onArchiveToggle}
             hasPendingEdits={hasPendingEdits}
           />
         )}

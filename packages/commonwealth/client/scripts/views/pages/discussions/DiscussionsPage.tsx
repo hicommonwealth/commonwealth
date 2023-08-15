@@ -57,6 +57,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     orderBy: featuredFilter,
     toDate: dateCursor.toDate,
     fromDate: dateCursor.fromDate,
+    ...((topicName === 'Archived') && { archivePage: true }),
   });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -96,17 +97,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
                 localStorage[`${app.activeChainId()}-discussions-scrollY`] =
                   scrollEle.scrollTop;
-              }}
-              onArchiveToggle={(updatedThread) => {
-                setThreads((oldThreads) => {
-                  const updatedThreads = [...oldThreads];
-                  const foundThread = updatedThreads.find(
-                    (x) => x.id === thread.id
-                  );
-                  if (foundThread)
-                    foundThread.archivedAt = updatedThread.archivedAt;
-                  return updatedThreads;
-                });
               }}
             />
           );
