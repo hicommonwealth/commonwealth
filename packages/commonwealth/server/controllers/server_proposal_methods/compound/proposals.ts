@@ -1,4 +1,4 @@
-import { BigNumber, providers } from 'ethers';
+import { BigNumber, ethers, providers } from 'ethers';
 import {
   GovernorCompatibilityBravo__factory,
   IGovernorCompatibilityBravo,
@@ -49,6 +49,25 @@ export function formatCompoundBravoProposal(
 ): ICompoundProposalResponse {
   return {
     identifier: proposalData.rawProposal.id.toString(),
+    id: proposalData.rawProposal.id.toString(),
+    proposer: proposalData.rawProposal.proposer,
+    targets: proposalData.proposalCreatedEvent.args.targets,
+    values: proposalData.proposalCreatedEvent.args.values.map((v) =>
+      v.toString()
+    ),
+    signatures: proposalData.proposalCreatedEvent.args.signatures,
+    calldatas: proposalData.proposalCreatedEvent.args.calldatas.map((c) =>
+      ethers.utils.hexlify(c)
+    ),
+    startBlock: +proposalData.rawProposal.startBlock,
+    endBlock: +proposalData.rawProposal.endBlock,
+    description: proposalData.proposalCreatedEvent.args.description,
+    completed: true,
+    eta: +proposalData.rawProposal.eta,
+    queued: true,
+    executed: proposalData.rawProposal.executed,
+    cancelled: proposalData.rawProposal.canceled,
+    expired: true,
   };
 }
 
