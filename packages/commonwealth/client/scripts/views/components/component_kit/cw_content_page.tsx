@@ -6,7 +6,6 @@ import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
-import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
 import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';

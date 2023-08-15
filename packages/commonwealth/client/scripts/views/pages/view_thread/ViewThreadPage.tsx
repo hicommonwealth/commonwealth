@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -47,7 +46,6 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import { isNewThread } from '../discussions/NewThreadTag';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -373,7 +371,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         canUpdateThread={canUpdateThread}
-        displayNewTag={isNewThread(thread.createdAt)}
         stageLabel={!isStageDefault && thread.stage}
         subHeader={
           !!thread.url && (
