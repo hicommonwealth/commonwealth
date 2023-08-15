@@ -33,6 +33,7 @@ export const ThreadSelector = ({
     limit: 5,
     orderBy: APIOrderBy.Rank,
     orderDirection: APIOrderDirection.Desc,
+    threadTitleOnly: true,
   };
   const isValidSearchTerm = debouncedSearchTerm?.trim().length > 0;
 
