@@ -17,7 +17,6 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -135,6 +134,9 @@ const DiscordForumConnections = ({
                 onSelect={async (item) => {
                   // Connect the channel to the topic
                   channel.onConnect(item.value);
+                  notifySuccess(
+                    `#${channel.channelName} connected to ${item.label}!`
+                  );
                 }}
               />
             )}
