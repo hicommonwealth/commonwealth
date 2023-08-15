@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
@@ -30,6 +30,7 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
+import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -64,8 +65,25 @@ const ViewProposalPage = ({
     };
   }, [proposal, forceRerender]);
 
+  const onAave = app.chain?.network === ChainNetwork.Aave;
+  const fetchAaveData = onAave && isAdapterLoaded;
+  const { data: cachedAaveProposals, isLoading: aaveProposalsLoading } =
+    useAaveProposalsQuery({
+      moduleReady: fetchAaveData,
+      chainId: app.chain?.id,
+    });
+
+  if (aaveProposalsLoading === false && fetchAaveData && !proposal) {
+    const foundProposal = cachedAaveProposals?.find(
+      (p) => p.identifier === proposalId
+    );
+    setProposal(foundProposal);
+  }
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
+      if (onAave) return;
+
       if (hasFetchedProposalRef.current) return;
       hasFetchedProposalRef.current = true;
 
@@ -76,12 +94,6 @@ const ViewProposalPage = ({
 
       try {
         const proposalFromStore = idToProposal(resolvedType, proposalId);
-
-        if (proposalFromStore instanceof AaveProposal) {
-          proposalFromStore.ipfsDataReady.on('ready', () => {
-            setProposal(proposalFromStore);
-          });
-        }
         setProposal(proposalFromStore);
         setError(null);
       } catch (e) {

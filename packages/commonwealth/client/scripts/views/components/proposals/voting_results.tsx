@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
@@ -25,14 +25,27 @@ import { IVote } from 'models/interfaces';
 import Proposal from 'models/Proposal';
 import useAaveProposalVotesQuery from 'state/api/proposals/aave/fetchAaveProposalVotes';
 import { ChainNetwork } from 'common-common/src/types';
+import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
   const forceRerender = useForceRerender();
-  // TODO: @Timothee @Malik any type + is this correct?
-  // const [votes, setVotes] = React.useState<any[]>([]);
+  const [isLoading, setLoading] = useState(
+    !app.chain || !app.chain.loaded || !app.chain.apiInitialized
+  );
+
+  useEffect(() => {
+    app.chainAdapterReady.on('ready', () => setLoading(false));
+
+    return () => {
+      app.chainAdapterReady.off('ready', () => {
+        setLoading(false);
+        app.chainAdapterReady.removeAllListeners();
+      });
+    };
+  }, [setLoading]);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);
@@ -42,13 +55,13 @@ export const VotingResults = (props: VotingResultsProps) => {
     };
   }, [forceRerender]);
 
-  useAaveProposalVotesQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Aave || app.isModuleReady,
+  const { data } = useAaveProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave || !isLoading,
     chainId: app.chain?.id,
     proposalId: proposal.identifier,
   });
 
-  const votes = proposal.getVotes();
+  const votes = data || proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (

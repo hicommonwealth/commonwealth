@@ -27,6 +27,7 @@ import {
   useCompletedCosmosProposalsQuery,
 } from 'state/api/proposals';
 import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -51,8 +52,8 @@ const ProposalsPage = () => {
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
-  useAaveProposalsQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Aave || app.isModuleReady,
+  const { data: cachedAaveProposals } = useAaveProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave || !isLoading,
     chainId: app.chain?.id,
   });
 
@@ -122,6 +123,11 @@ const ProposalsPage = () => {
 
   if (isSubstrateLoading) return modLoading;
 
+  let aaveProposals: AaveProposal[];
+  if (onAave)
+    aaveProposals =
+      cachedAaveProposals || (app.chain as Aave).governance.store.getAll();
+
   // active proposals
   const activeDemocracyProposals =
     onSubstrate &&
@@ -138,8 +144,7 @@ const ProposalsPage = () => {
 
   const activeAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
@@ -215,8 +220,7 @@ const ProposalsPage = () => {
 
   const inactiveAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
