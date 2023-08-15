@@ -440,35 +440,6 @@ describe('ServerCommentsController', () => {
     });
   });
 
-  describe('#getCommentReactions', () => {
-    it('should return comment reactions', async () => {
-      const sandbox = Sinon.createSandbox();
-      const db = {
-        Reaction: {
-          findAll: sandbox
-            .stub()
-            .resolves([
-              { toJSON: () => ({ id: 1 }) },
-              { toJSON: () => ({ id: 2 }) },
-            ]),
-        },
-      };
-      const tokenBalanceCache = {};
-      const banCache = {};
-
-      const serverCommentsController = new ServerCommentsController(
-        db as any,
-        tokenBalanceCache as any,
-        banCache as any
-      );
-
-      const reactions = await serverCommentsController.getCommentReactions({
-        commentId: 777,
-      });
-      expect(reactions).to.have.length(2);
-    });
-  });
-
   describe('#searchComments', () => {
     it('should return comment search results', async () => {
       const db = {
