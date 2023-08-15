@@ -4,21 +4,20 @@ import { X } from '@phosphor-icons/react';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from 'state';
+import { useEditThreadTopicMutation } from 'state/api/threads';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { TopicSelector } from '../components/topic_selector';
-import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from '../components/component_kit/cw_text';
 
 import 'modals/change_thread_topic_modal.scss';
 
 type ChangeThreadTopicModalProps = {
-  onChangeHandler: (topic: Topic) => void;
   onModalClose: () => void;
   thread: Thread;
 };
 
 export const ChangeThreadTopicModal = ({
-  onChangeHandler,
   onModalClose,
   thread,
 }: ChangeThreadTopicModalProps) => {
@@ -27,22 +26,27 @@ export const ChangeThreadTopicModal = ({
     chainId: app.activeChainId(),
   });
 
+  const { mutateAsync: editThreadTopic } = useEditThreadTopicMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
   const handleSaveChanges = async () => {
     try {
-      const topic: Topic = await app.threads.updateTopic(
-        thread.id,
-        activeTopic.name,
-        activeTopic.id
-      );
-      onChangeHandler(topic);
-      onModalClose();
+      await editThreadTopic({
+        chainId: app.activeChainId(),
+        address: app.user.activeAccount.address,
+        threadId: thread.id,
+        topicName: activeTopic.name,
+        newTopicId: activeTopic.id,
+        oldTopicId: thread?.topic?.id,
+      });
+
+      onModalClose && onModalClose();
     } catch (err) {
-      console.log('Failed to update topic');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to update topic'
-      );
+      const error = err?.responseJSON?.error || 'Failed to update thread topic';
+      console.log(error);
+      throw new Error(error);
     }
   };
 

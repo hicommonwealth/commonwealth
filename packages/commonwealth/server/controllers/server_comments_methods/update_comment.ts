@@ -19,22 +19,46 @@ const Errors = {
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
   ParseMentionsFailed: 'Failed to parse mentions',
+  NoId: 'Must provide id',
 };
 
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
   chain: ChainInstance;
-  commentId: number;
+  commentId?: number;
   commentBody: string;
+  discordMeta?: any;
 };
 
 export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
 
 export async function __updateComment(
   this: ServerCommentsController,
-  { user, address, chain, commentId, commentBody }: UpdateCommentOptions
+  {
+    user,
+    address,
+    chain,
+    commentId,
+    commentBody,
+    discordMeta,
+  }: UpdateCommentOptions
 ): Promise<UpdateCommentResult> {
+  if (!commentId && !discordMeta) {
+    throw new AppError(Errors.NoId);
+  }
+
+  if (discordMeta !== undefined && discordMeta !== null) {
+    const existingComment = await this.models.Comment.findOne({
+      where: { discord_meta: discordMeta },
+    });
+    if (existingComment) {
+      commentId = existingComment.id;
+    } else {
+      throw new AppError(Errors.NoId);
+    }
+  }
+
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,

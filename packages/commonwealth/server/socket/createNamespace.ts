@@ -2,7 +2,6 @@ import { addPrefix, factory } from 'common-common/src/logging';
 import type { Server } from 'socket.io';
 import type {
   ChainEventNotification,
-  SnapshotProposalNotification,
   WebsocketNamespaces,
 } from '../../shared/types';
 import {
@@ -87,13 +86,4 @@ export async function publishToChainEventsRoom(
   this.server
     .to(notification.ChainEvent.chain)
     .emit(WebsocketMessageNames.ChainEventNotification, notification);
-}
-
-export async function publishToSnapshotRoom(
-  this: { server: Server },
-  notification: SnapshotProposalNotification
-) {
-  this.server
-    .to(notification.SnapshotProposal.id)
-    .emit(WebsocketMessageNames.SnapshotProposalNotification, notification);
 }
