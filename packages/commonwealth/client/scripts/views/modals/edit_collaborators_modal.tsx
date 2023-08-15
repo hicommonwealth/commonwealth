@@ -1,24 +1,12 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-import { useDebounce } from 'usehooks-ts';
-import axios from 'axios';
-import { isEqual } from 'lodash';
-import { X } from '@phosphor-icons/react';
-
-=======
->>>>>>> master
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import app from 'state';
-<<<<<<< HEAD
-=======
 import {
   useAddThreadCollaboratorsMutation,
   useDeleteThreadCollaboratorsMutation,
 } from 'state/api/threads';
 import { useDebounce } from 'usehooks-ts';
->>>>>>> master
 import NewProfilesController from '../../controllers/server/newProfiles';
 import type Thread from '../../models/Thread';
 import type { IThreadCollaborator } from '../../models/Thread';
@@ -30,6 +18,7 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { User } from '../components/user/user';
 
 import 'modals/edit_collaborators_modal.scss';
+import { useState } from 'react';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;

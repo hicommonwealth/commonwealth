@@ -10,20 +10,11 @@ import {
   useDeleteThreadLinksMutation,
 } from 'state/api/threads';
 import { ThreadSelector } from 'views/components/thread_selector';
-<<<<<<< HEAD
+import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import { LinkSource } from 'models/Thread';
-import { getAddedAndDeleted } from 'helpers/threads';
 import { CWText } from '../components/component_kit/cw_text';
 
 import 'modals/linked_thread_modal.scss';
-=======
-import type Thread from '../../models/Thread';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
->>>>>>> master
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
