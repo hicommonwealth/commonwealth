@@ -23,6 +23,11 @@ const toggleThreadArchive = async ({
         jwt: app.user.jwt,
         chain_id: chainId,
       } as any,
+    },
+    {
+      headers: {
+        "Authorization" : `Bearer ${app.user.jwt}`
+      }
     }
   );
 };
