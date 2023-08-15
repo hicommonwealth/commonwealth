@@ -170,6 +170,7 @@ export const AdminActions = ({
                 chainId: app.activeChainId(),
                 threadId: thread.id,
                 isSpam: isSpam,
+                address: app.user?.activeAccount?.address,
               })
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
                 .catch(() => {
