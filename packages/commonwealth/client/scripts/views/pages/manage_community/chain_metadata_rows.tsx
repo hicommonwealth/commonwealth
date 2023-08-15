@@ -133,14 +133,7 @@ const DiscordForumConnections = ({
                 options={remainingTopics}
                 onSelect={async (item) => {
                   // Connect the channel to the topic
-                  try {
-                    channel.onConnect(item.value);
-                    notifySuccess(
-                      `#${channel.channelName} connected to ${item.label}!`
-                    );
-                  } catch (e) {
-                    notifyError('Error connecting channel to topic.');
-                  }
+                  channel.onConnect(item.value);
                 }}
               />
             )}
@@ -662,8 +655,14 @@ export const ChainMetadataRows = ({
                             channel.id
                           );
                           await refetchTopics();
+                          notifySuccess(
+                            `#${channel.name} connected to ${
+                              topics.find((topic) => topic.id === topicId)?.name
+                            }!`
+                          );
                         } catch (e) {
                           console.log(e);
+                          notifyError('Error connecting channel to topic.');
                         }
                       },
                     };
