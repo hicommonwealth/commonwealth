@@ -29,7 +29,7 @@ export const ThreadPollEditorCard = ({
 }: ThreadPollEditorCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  return (
+  const pollCardElement = (
     <>
       <CWContentPageCard
         header={`Add ${
@@ -62,6 +62,13 @@ export const ThreadPollEditorCard = ({
         open={isModalOpen}
       />
     </>
+  );
+
+  return (
+    <CWContentPageCard
+      header="Thread Poll"
+      content={pollCardElement}
+    ></CWContentPageCard>
   );
 };
 
