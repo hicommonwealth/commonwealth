@@ -1,0 +1,17 @@
+.SessionRevalidationModal {
+  width: 600px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .close-icon {
+      cursor: pointer;
+    }
+  }
+
+  .info {
+    display: block;
+  }
+}

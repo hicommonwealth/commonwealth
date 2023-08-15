@@ -18,9 +18,10 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { UserDropdownItem } from './UserDropdownItem';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, WalletSsoSource } from 'common-common/src/types';
 import { chainBaseToCanvasChainId } from 'canvas';
 import { setActiveAccount } from 'controllers/app/login';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
 
 const UserDropdown = () => {
   const navigate = useCommonNavigate();
@@ -33,6 +34,10 @@ const UserDropdown = () => {
     localStorage.getItem('dark-mode-state') === 'on'
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [revalidationModalData, setRevalidationModalData] = useState<{
+    walletSsoSource: WalletSsoSource;
+    walletAddress: string;
+  }>(null);
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
@@ -86,8 +91,10 @@ const UserDropdown = () => {
             return await setActiveAccount(account);
           }
 
-          // todo login modal does not work for revalidation
-          setIsLoginModalOpen(true);
+          setRevalidationModalData({
+            walletSsoSource: account.walletSsoSource,
+            walletAddress: account.address,
+          });
         },
       };
     }
@@ -163,6 +170,18 @@ const UserDropdown = () => {
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
+      />
+      <Modal
+        isFullScreen={false}
+        content={
+          <SessionRevalidationModal
+            onModalClose={() => setRevalidationModalData(null)}
+            walletSsoSource={revalidationModalData?.walletSsoSource}
+            walletAddress={revalidationModalData?.walletAddress}
+          />
+        }
+        onClose={() => setRevalidationModalData(null)}
+        open={!!revalidationModalData}
       />
     </>
   );
