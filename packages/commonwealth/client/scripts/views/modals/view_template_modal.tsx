@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { X } from '@phosphor-icons/react';
 
 import Template from 'models/Template';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import app from 'state';
 import { CWCommunityAvatar } from '../components/component_kit/cw_community_avatar';
 import { User } from '../components/user/user';
-import { TemplateComponents } from '../pages/view_template/view_template';
-import validateType from 'client/scripts/helpers/validateTypes';
 import { CWDivider } from '../components/component_kit/cw_divider';
-import { CWDropdown } from '../components/component_kit/cw_dropdown';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { renderDisabledTemplate } from 'helpers/action_template_helpers';
 
 import 'modals/view_template_modal.scss';
