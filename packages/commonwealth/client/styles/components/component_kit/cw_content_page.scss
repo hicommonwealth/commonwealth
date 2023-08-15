@@ -82,6 +82,15 @@
   padding: 0;
   width: 248px;
 
+  .collapsableButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding-top: 4px;
+    padding-right: 7px;
+  }
+
   .header-container {
     background-color: $neutral-50;
     border-bottom: 1px solid $neutral-200;

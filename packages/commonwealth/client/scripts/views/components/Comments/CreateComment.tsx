@@ -145,7 +145,8 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
+  const userFailsThreshold =
+    activeTopic && app.chain.isGatedTopic(activeTopic.id);
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||
