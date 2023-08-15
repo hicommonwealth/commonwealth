@@ -3,7 +3,6 @@ import type { Sequelize } from 'sequelize';
 import type { AddressModelStatic } from './models/address';
 import type { BanModelStatic } from './models/ban';
 import type { ChainModelStatic } from './models/chain';
-import type { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
 import type { ChainNodeModelStatic } from './models/chain_node';
 import type { CollaborationModelStatic } from './models/collaboration';
 import type { CommentModelStatic } from './models/comment';
@@ -41,7 +40,6 @@ export type Models = {
   Address: AddressModelStatic;
   Ban: BanModelStatic;
   Chain: ChainModelStatic;
-  ChainEntityMeta: ChainEntityMetaModelStatic;
   ChainNode: ChainNodeModelStatic;
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;

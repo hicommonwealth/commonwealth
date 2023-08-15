@@ -3,7 +3,6 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { PORT } from '../../../server/config';
 import {
-  clearTestEntities,
   createTestEntities,
   testChains,
   testThreads,
@@ -17,10 +16,6 @@ test.describe('DiscussionsPage Homepage', () => {
   test.beforeEach(async ({ page }) => {
     await createTestEntities();
     await page.goto(`http://localhost:${PORT}/${testChains[0].id}/discussions`);
-  });
-
-  test.afterEach(async () => {
-    await clearTestEntities();
   });
 
   test('Discussion page loads and can navigate to first thread', async ({
