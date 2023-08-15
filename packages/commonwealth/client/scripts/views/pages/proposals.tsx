@@ -26,6 +26,7 @@ import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'state/api/proposals';
+import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -49,6 +50,11 @@ const ProposalsPage = () => {
   );
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
+
+  useAaveProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave || app.isModuleReady,
+    chainId: app.chain?.id,
+  });
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));

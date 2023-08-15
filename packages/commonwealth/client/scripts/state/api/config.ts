@@ -17,6 +17,7 @@ export const ApiEndpoints = {
   getCommentReactions: (commentId: number) =>
     `/comments/${commentId}/reactions`,
   DISCORD_CHANNELS: '/getDiscordChannels',
+  FETCH_PROPOSALS: '/proposals',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,

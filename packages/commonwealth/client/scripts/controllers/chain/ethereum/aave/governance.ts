@@ -9,6 +9,7 @@ import type AaveChain from './chain';
 import AaveProposal from './proposal';
 import getFetch from 'helpers/getFetch';
 import { BigNumber } from 'ethers';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 export interface AaveProposalArgs {
   executor: string;
@@ -138,19 +139,26 @@ export default class AaveGovernance extends ProposalModule<
     this._Accounts = accounts;
     this._api = chain.aaveApi;
 
+    // await AaveGovernance.getProposals(chain.app.chain as Aave)
+    // set init to true without fetching proposals so chainAdapterReady emits true
+    this._initialized = true;
+  }
+
+  static async getProposals(aaveChain: Aave) {
+    const { accounts, governance, meta } = aaveChain;
     const result: { proposals: IAaveProposalResponse[] } = await getFetch(
       '/api/proposals',
       {
-        chainId: this.app.chain.id,
+        chainId: meta.id,
       }
     );
     result.proposals.forEach((p) => {
-      new AaveProposal(this._Accounts, this, deserializeBigNumbers(p));
+      new AaveProposal(accounts, governance, deserializeBigNumbers(p));
     });
 
-    await Promise.all(this.store.getAll().map((p) => p.init()));
+    await Promise.all(governance.store.getAll().map((p) => p.init()));
 
-    this._initialized = true;
+    return governance.store.getAll();
   }
 
   public deinit() {
