@@ -77,7 +77,9 @@ const ViewProposalPage = ({
     const foundProposal = cachedAaveProposals?.find(
       (p) => p.identifier === proposalId
     );
-    setProposal(foundProposal);
+    foundProposal.ipfsDataReady.on('ready', () => {
+      setProposal(foundProposal);
+    });
   }
 
   useNecessaryEffect(() => {
