@@ -23,6 +23,11 @@ export const isHot = (thread: Thread) => {
   );
 };
 
+export function isNewThread(threadCreatedAt: moment.Moment) {
+  const diffInMs = moment().diff(threadCreatedAt);
+  return moment.duration(diffInMs).asHours() < 48;
+}
+
 export const getLastUpdate = (thread: Thread): number => {
   const lastComment = thread.lastCommentedOn?.unix() || 0;
   const createdAt = thread.createdAt?.unix() || 0;
