@@ -80,7 +80,7 @@ describe('ServerThreadsController', () => {
           reaction: reaction as any,
           threadId: threadId,
         })
-      ).to.be.rejectedWith('B');
+      ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
 
@@ -1082,7 +1082,7 @@ describe('ServerThreadsController', () => {
             address: '0xbanned',
           },
         })
-      ).to.be.rejectedWith('B');
+      ).to.be.rejectedWith('Ban error: banned');
     });
 
     it('should should throw error (thread not found)', async () => {
