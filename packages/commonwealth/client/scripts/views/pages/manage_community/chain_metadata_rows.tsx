@@ -133,10 +133,14 @@ const DiscordForumConnections = ({
                 options={remainingTopics}
                 onSelect={async (item) => {
                   // Connect the channel to the topic
-                  channel.onConnect(item.value);
-                  notifySuccess(
-                    `#${channel.channelName} connected to ${item.label}!`
-                  );
+                  try {
+                    channel.onConnect(item.value);
+                    notifySuccess(
+                      `#${channel.channelName} connected to ${item.label}!`
+                    );
+                  } catch (e) {
+                    notifyError('Error connecting channel to topic.');
+                  }
                 }}
               />
             )}
